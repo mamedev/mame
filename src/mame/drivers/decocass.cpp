@@ -925,6 +925,11 @@ static MACHINE_CONFIG_DERIVED( ctisland, decocass )
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,ctisland)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ctisland3, decocass )
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,ctisland3)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cexplore, decocass )
 
@@ -1079,7 +1084,7 @@ MACHINE_CONFIG_END
 
 /************ Version A bios roms *************/
 
-/* v0a.7e, New boardset bios, revision A */
+/* v0a.7e, New boardset bios, country code A */
 #define DECOCASS_BIOS_A_MAINCPU \
 	ROM_SYSTEM_BIOS( 0, "a",   "Bios A (Japan)" ) \
 	ROM_LOAD_BIOS( 0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */
@@ -1090,7 +1095,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 0, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
 	ROM_LOAD_BIOS( 0, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
 
-/* Old boardset bios, version A for Japan, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
+/* Old boardset bios, country code A (for Japan), 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
 #define DECOCASS_BIOS_A0_MAINCPU \
 	ROM_SYSTEM_BIOS( 1, "a0",   "Bios A (Japan, older)" ) \
 	ROM_LOAD_BIOS( 1, "dsp-3_p0-a.m9",      0xf000, 0x0800, CRC(2541e34b) SHA1(4f983513dbae1350c83a433dea77a4465748b9c6) ) \
@@ -1104,7 +1109,7 @@ MACHINE_CONFIG_END
 
 /************ Version B bios roms *************/
 
-/* rms8.7e, New boardset bios, revision B */ \
+/* rms8.7e, New boardset bios, country code B */ \
 #define DECOCASS_BIOS_B_MAINCPU \
 	ROM_SYSTEM_BIOS( 2, "b",   "Bios B (USA)" ) \
 	ROM_LOAD_BIOS( 2, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */
@@ -1116,7 +1121,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 2, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
 
 /* Old boardset bios, version B for USA, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
-/* dsp3.p0b/p1b, Old boardset bios, revision B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
+/* dsp3.p0b/p1b, Old boardset bios, country code B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
 #define DECOCASS_BIOS_B0_MAINCPU \
 	ROM_SYSTEM_BIOS( 3, "b0",   "Bios B (USA, older)" ) \
 	ROM_LOAD_BIOS( 3, "dsp-3_p0-b.m9",      0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
@@ -1127,6 +1132,19 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 3, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
 	ROM_LOAD_BIOS( 3, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
 	ROM_LOAD_BIOS( 3, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
+
+/* rms8.7e, New boardset bios, country code D */ \
+#define DECOCASS_BIOS_D_MAINCPU \
+	ROM_SYSTEM_BIOS( 4, "d",   "Bios D (unknown region)" ) \
+	ROM_LOAD_BIOS( 4, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */
+#define DECOCASS_BIOS_D_AUDIOCPU \
+	ROM_LOAD_BIOS( 4, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_D_PROMS \
+	ROM_LOAD_BIOS( 4, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 4, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 4, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+
 
 /************ Common MCU bios rom *************/
 
@@ -1141,16 +1159,19 @@ MACHINE_CONFIG_END
 	DECOCASS_BIOS_A0_MAINCPU \
 	DECOCASS_BIOS_B_MAINCPU \
 	DECOCASS_BIOS_B0_MAINCPU \
+	DECOCASS_BIOS_D_MAINCPU \
 	ROM_REGION( 0x10000, "audiocpu", 0 ) \
 	DECOCASS_BIOS_A_AUDIOCPU \
 	DECOCASS_BIOS_A0_AUDIOCPU \
 	DECOCASS_BIOS_B_AUDIOCPU \
 	DECOCASS_BIOS_B0_AUDIOCPU \
+	DECOCASS_BIOS_D_AUDIOCPU \
 	ROM_REGION( 0x00060, "proms", 0 ) \
 	DECOCASS_BIOS_A_PROMS \
 	DECOCASS_BIOS_A0_PROMS \
 	DECOCASS_BIOS_B_PROMS \
 	DECOCASS_BIOS_B0_PROMS \
+	DECOCASS_BIOS_D_PROMS \
 	ROM_REGION( 0x10000, "mcu", 0 )   /* 4k for the 8041 MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
 	DECOCASS_BIOS_MCU
 
@@ -1170,6 +1191,10 @@ MACHINE_CONFIG_END
 #define DECOCASS_BIOS_AO_ROMS   \
 	DECOCASS_BIOS_MAIN \
 	ROM_DEFAULT_BIOS( "a0" )
+
+#define DECOCASS_BIOS_D_ROMS \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "d" )
 
 ROM_START( decocass )
 	DECOCASS_BIOS_MAIN
@@ -1387,10 +1412,10 @@ ROM_START( ctisland2 )
 ROM_END
 
 ROM_START( ctisland3 )
-	DECOCASS_BIOS_B_ROMS
+	DECOCASS_BIOS_D_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
-	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
+	ROM_LOAD( "ctisland3.pro", 0x0000, 0x0020, CRC(b87b56a7) SHA1(ca84cd61e53985cf24230d297967374ae3822b3b) ) // handcrafted
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "ctislnd3.cas", 0x0000, 0x8000, CRC(45464e1e) SHA1(03275694d963c7ab0e0f5525e248e69da5f9b591) )
@@ -1887,7 +1912,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette) (US)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 1)", 0 )
 /*    */ GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 )
-/*    */ GAME( 1981, ctisland3, ctisland, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (unk)", MACHINE_NOT_WORKING ) /* Different Bitswap, region not verified */
+/*    */ GAME( 1981, ctisland3, ctisland, ctisland3,decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Region D)", 0 ) /* region code 'D' unknown region */
 /* 17 */ // 1981.10 Bobbitto
 /* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_state, decocass, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", MACHINE_NOT_WORKING )
 /* 19 */ GAME( 1982, cdiscon1,  decocass, cdiscon1, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
