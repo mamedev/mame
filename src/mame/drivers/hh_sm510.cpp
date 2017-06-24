@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Sean Riddle
+// thanks-to:Igor
 /***************************************************************************
 
-  Sharp SM510/SM511 handhelds.
+  Sharp SM5xx family handhelds.
 
   TODO:
   - gnw_mc25 emulation is preliminary
@@ -29,6 +30,7 @@
 #include "gnw_dualv.lh"
 #include "gnw_dualh.lh"
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
+#include "hh_sm500_test.lh" // "
 
 
 class hh_sm510_state : public driver_device
@@ -58,6 +60,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
 	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
+	virtual DECLARE_WRITE8_MEMBER(sm500_lcd_segment_w);
 	virtual DECLARE_READ8_MEMBER(input_r);
 	virtual DECLARE_WRITE8_MEMBER(input_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
@@ -114,6 +117,28 @@ WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
 			// H = H1-H4 (0-3)
 			char buf[0x10];
 			sprintf(buf, "%d.%d.%d", offset >> 2, seg, offset & 3);
+			output().set_value(buf, state);
+
+			m_lcd_output_cache[index] = state;
+		}
+	}
+}
+
+WRITE8_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
+{
+	for (int seg = 0; seg < 4; seg++)
+	{
+		int index = offset << 2 | seg;
+		u8 state = data >> seg & 1;
+
+		if (state != m_lcd_output_cache[index])
+		{
+			// output to row.seg.H, where:
+			// row = O group (0-*)
+			// seg = O data (0-3)
+			// H = H1/H2 (0/1)
+			char buf[0x10];
+			sprintf(buf, "%d.%d.%d", offset & 0xf, seg, offset >> 4);
 			output().set_value(buf, state);
 
 			m_lcd_output_cache[index] = state;
@@ -530,8 +555,15 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Mickey Mouse (model MC-25)
+  Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
   * Sharp SM5A label ?
+  
+  MC-25 and EG-26 are the same game, it's assumed that the latter was for
+  regions where Nintendo wasn't able to license from Disney.
+  
+  In 1984, Elektronika(USSR) released a clone, Nu, Pogodi! This was followed
+  by several other games that were the same under the hood, only differing
+  in graphics.
   
 ***************************************************************************/
 
@@ -574,11 +606,12 @@ static MACHINE_CONFIG_START( mc25 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM5A, XTAL_32_768kHz)
+	MCFG_SM500_WRITE_O_CB(WRITE8(hh_sm510_state, sm500_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_input_w))
 
 	/* video hardware */
-	// ..
+	MCFG_DEFAULT_LAYOUT(layout_hh_sm500_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -7,6 +7,7 @@
   TODO:
   - EXKSA, EXKFA opcodes
   - SM500 data book suggests that R1 divider output is selectable, but how?
+  - unknown which H/O pin is which W output, guessed for now
   - ACL doesn't work right?
 
 */
@@ -41,6 +42,7 @@ sm500_device::sm500_device(const machine_config &mconfig, const char *tag, devic
 
 sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
+	m_write_o(*this),
 	m_o_mask(o_mask)
 {
 }
@@ -54,7 +56,10 @@ void sm500_device::device_start()
 {
 	// common init (not everything is used though)
 	sm510_base_device::device_start();
-	
+
+	// resolve callbacks
+	m_write_o.resolve_safe();
+
 	// init/zerofill
 	memset(m_ox, 0, sizeof(m_ox));
 	memset(m_o, 0, sizeof(m_o));
@@ -101,6 +106,27 @@ offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 	extern CPU_DISASSEMBLE(sm500);
 	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
 }
+
+
+
+//-------------------------------------------------
+//  lcd driver
+//-------------------------------------------------
+
+void sm500_device::lcd_update()
+{
+	// 2 columns
+	for (int h = 0; h < 2; h++)
+	{
+		for (int o = 0; o <= m_o_mask; o++)
+		{
+			// 4 segments per group
+			u8 seg = h ? m_o[o] : m_ox[o];
+			m_write_o(h << 4 | o, m_bp ? seg : 0, 0xff);
+		}
+	}
+}
+
 
 
 //-------------------------------------------------
