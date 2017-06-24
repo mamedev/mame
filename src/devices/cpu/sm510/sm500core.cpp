@@ -6,6 +6,8 @@
   
   TODO:
   - EXKSA, EXKFA opcodes
+  - SM500 data book suggests that R1 divider output is selectable, but how?
+  - ACL doesn't work right?
 
 */
 
@@ -85,8 +87,10 @@ void sm500_device::device_reset()
 	
 	// SM500 specific
 	op_idiv();
+	m_1s = true;
 	m_cb = 0;
 	m_rsub = false;
+	m_r = 0xf;
 }
 
 
@@ -96,6 +100,25 @@ offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 {
 	extern CPU_DISASSEMBLE(sm500);
 	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
+}
+
+
+//-------------------------------------------------
+//  buzzer controller
+//-------------------------------------------------
+
+void sm500_device::clock_melody()
+{
+	// R1 buzzer from divider, R2-R4 generic outputs
+	u8 out = m_div >> 2 & 1;
+	out = (out & ~m_r) | (~m_r & 0xe);
+
+	// output to R pins
+	if (out != m_r_out)
+	{
+		m_write_r(0, out, 0xff);
+		m_r_out = out;
+	}
 }
 
 

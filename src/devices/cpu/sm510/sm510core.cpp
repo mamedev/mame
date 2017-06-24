@@ -60,7 +60,7 @@ void sm510_device::clock_melody()
 	out |= (out << 1 ^ 2);
 	out &= m_r;
 
-	// output to R pin
+	// output to R pins
 	if (out != m_r_out)
 	{
 		m_write_r(0, out, 0xff);

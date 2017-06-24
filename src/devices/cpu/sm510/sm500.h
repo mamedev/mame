@@ -83,6 +83,7 @@ protected:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
+	virtual void clock_melody() override;
 
 	virtual void reset_vector() override { do_branch(0, 0xf, 0); }
 	virtual void wakeup_vector() override { do_branch(0, 0, 0); }
