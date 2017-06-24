@@ -119,7 +119,7 @@ public:
 		ERROR_BUSHOG   = 0x0080
 	};
 	DECLARE_READ16_MEMBER(sreg_error_r);
-	DECLARE_WRITE16_MEMBER(sreg_led_w) { m_sreg_led = data; }
+	DECLARE_WRITE16_MEMBER(sreg_led_w);
 
 	enum sreg_status_mask
 	{
@@ -187,7 +187,6 @@ protected:
 
 private:
 	u16 m_sreg_error;
-	u16 m_sreg_led;
 	u16 m_sreg_status;
 	u16 m_sreg_ctrl1;
 	u16 m_sreg_ctrl2;

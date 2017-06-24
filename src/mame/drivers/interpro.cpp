@@ -6,7 +6,10 @@
 #define NEW_SCSI 1
 
 #include "includes/interpro.h"
+
 #include "debugger.h"
+
+#include "interpro.lh"
 
 #define VERBOSE 0
 #if VERBOSE
@@ -31,12 +34,21 @@ void interpro_state::machine_reset()
 	m_sreg_ctrl1 = CTRL1_FLOPRDY;
 }
 
+WRITE16_MEMBER(interpro_state::sreg_led_w)
+{
+	// 7-segment decode patterns (hex digits) borrowed from wico.cpp (mc14495)
+	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
+
+	output().set_digit_value(0, patterns[data & 0xf]);
+}
+
 WRITE16_MEMBER(interpro_state::sreg_ctrl1_w)
 {
 	LOG_SYSTEM("system control register 1 write data 0x%x (%s)\n", data, machine().describe_context());
 
+	// check if led decimal point changes state
 	if ((data ^ m_sreg_ctrl1) & CTRL1_LEDDP)
-		LOG_SYSTEM("LED decimal point %s\n", data & CTRL1_LEDDP ? "on" : "off");
+		output().set_digit_value(0, (output().get_digit_value(0) + 0x80) & 0xff);
 
 	m_sreg_ctrl1 = data;
 }
@@ -73,13 +85,13 @@ READ8_MEMBER(interpro_state::idprom_r)
 
 	static u8 idprom[] = {
 		// module type id
-		0x00, 0x00, 0x00, 0x00, // board type MSMT/MPCB - detected by feature[3]
-		'1', '2', '3',          // board number
-		'A',                    // board revision
+		'M', 'S', 'M', 'T',     // board type MSMT/MPCB - detected by feature[3]
+		'1', '4', '5',          // board number
+		'0',                    // board revision
 
 		// ECO bytes
-		0x87, 0x65, 0x43, 0x21,
-		0xbb, 0xcc, 0xdd, 0xee,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
 
 		// the following 8 bytes are "feature bytes"
 
@@ -91,7 +103,7 @@ READ8_MEMBER(interpro_state::idprom_r)
 		// 0x00, // 2500 series
 
 		0x00, 0x00, 
-		0x80, // board type, 0x80 = MPCB, 0x00 = MSMT
+		0x00, // board type, 0x80 = MPCB, 0x00 = MSMT
 
 		// for the system boards, these bytes contain cpu clock speed (as femtoseconds per cycle, big-endian)
 		(u8)(speed >> 24), (u8)(speed >> 16), (u8)(speed >> 8), (u8)(speed >> 0),
@@ -149,8 +161,10 @@ READ8_MEMBER(interpro_state::slot0_r)
 	};
 #else
 	static u8 slot0[] = {
-		0x00, 0x00, 0x00, 0x00, '1',  '1',  '1',  'A',  // board
-		0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // eco
+		'M', 'S', 'M', 'T',                             // board type
+		'0',  '7',  '0',                                // board
+		'B',                                            // board revision
+		0x02, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // eco
 		0xff, 0xff, 0xff, 0x7f, 0xff, 0xff, 0xff, 0xff, // features
 		0xff, 0xff,                                     // reserved
 		0x05, 0x00,                                     // family
@@ -534,6 +548,8 @@ static MACHINE_CONFIG_START(ip2800)
 
 	// srx arbiter gate array
 	MCFG_DEVICE_ADD(INTERPRO_SRARB_TAG, INTERPRO_SRARB, 0)
+
+	MCFG_DEFAULT_LAYOUT(layout_interpro)
 
 MACHINE_CONFIG_END
 
