@@ -78,6 +78,8 @@ public:
 protected:
 	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
@@ -123,6 +125,8 @@ protected:
 	virtual void op_ats();
 	virtual void op_exksa();
 	virtual void op_exkfa();
+
+	virtual void op_idiv() override;
 
 	virtual void op_rmf();
 	virtual void op_smf();

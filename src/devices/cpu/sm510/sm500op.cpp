@@ -183,6 +183,12 @@ void sm500_device::op_exkfa()
 
 // Divider manipulation instructions
 
+void sm500_device::op_idiv()
+{
+	// IDIV: reset divider low 9 bits
+	m_div &= 0x3f;
+}
+
 
 // Bit manipulation instructions
 

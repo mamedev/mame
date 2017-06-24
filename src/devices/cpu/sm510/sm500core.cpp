@@ -44,6 +44,53 @@ sm500_device::sm500_device(const machine_config &mconfig, device_type type, cons
 }
 
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sm500_device::device_start()
+{
+	// common init (not everything is used though)
+	sm510_base_device::device_start();
+	
+	// init/zerofill
+	memset(m_ox, 0, sizeof(m_ox));
+	memset(m_o, 0, sizeof(m_o));
+	m_cn = 0;
+	m_mx = 0;
+	m_cb = 0;
+	m_s = 0;
+	m_rsub = false;
+
+	// register for savestates
+	save_item(NAME(m_ox));
+	save_item(NAME(m_o));
+	save_item(NAME(m_cn));
+	save_item(NAME(m_mx));
+	save_item(NAME(m_cb));
+	save_item(NAME(m_s));
+	save_item(NAME(m_rsub));
+}
+
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sm500_device::device_reset()
+{
+	// common reset
+	sm510_base_device::device_reset();
+	
+	// SM500 specific
+	op_idiv();
+	m_cb = 0;
+	m_rsub = false;
+}
+
+
+
 // disasm
 offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
