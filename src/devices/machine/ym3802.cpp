@@ -8,8 +8,8 @@
  *   - Transmit Idle detection
  *   - IRx/ITx (used for MIDI system messages)
  *   - FSK modulation
- *   - Timers
- *   - Interrupts (except for Tx Buffer Empty)
+ *   - Timers (MIDI clock timer and Click counter are working but not guaranteed to be perfectly accurate)
+ *   - Interrupts (except for Tx Buffer Empty, MIDI clock detect, Click Counter)
  */
 
 #include "emu.h"
@@ -39,7 +39,8 @@ void ym3802_device::device_start()
 	m_txd_handler.resolve_safe();
 	m_rxd_handler.resolve_safe(0xff);
 	m_clock_timer = timer_alloc(TIMER_SYSTEM_CLOCK);
-	m_midi_timer = timer_alloc(TIMER_MIDI_CLOCK);
+	m_midi_timer = timer_alloc(TIMER_TX_CLOCK);
+	m_midi_counter_timer = timer_alloc(TIMER_MIDI_CLOCK);
 	save_item(NAME(m_reg));
 }
 
@@ -58,8 +59,11 @@ void ym3802_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	// TODO: support clock and timers
 	switch(id)
 	{
-		case TIMER_MIDI_CLOCK:
+		case TIMER_TX_CLOCK:
 			transmit_clk();
+			break;
+		case TIMER_MIDI_CLOCK:
+			midi_clk();
 			break;
 	}
 }
@@ -112,10 +116,35 @@ void ym3802_device::transmit_clk()
 	}
 }
 
+void ym3802_device::midi_clk()
+{
+	if(m_midi_counter_base > 1)  // counter is not guaranteed to work if set to 0 or 1.
+	{
+		if(m_midi_counter == 0)
+		{
+			m_midi_counter = m_midi_counter_base;  // reload timer
+			if(m_reg[REG_IMR] & 0x08)  // if IRQ1 is set to MIDI clock detect
+				set_irq(IRQ_MIDI_CLK);
+			if(m_click_counter_base != 0)
+			{
+				m_click_counter--;
+				if(m_click_counter == 0)
+				{
+					m_click_counter = m_click_counter_base;
+					if(!(m_reg[REG_IMR] & 0x08))  // if IRQ1 is set to click counter
+						set_irq(IRQ_CLICK);
+				}
+			}
+		}
+		else
+			m_midi_counter--;
+	}
+}
+
 void ym3802_device::reset_midi_timer()
 {
 	uint64_t rate;
-	uint8_t divisor = m_reg[REG_RRR] & 0x1f;
+	uint8_t divisor = m_reg[REG_TRR] & 0x1f;
 	
 	if(!(divisor & 0x10))
 	{
@@ -221,10 +250,27 @@ WRITE8_MEMBER(ym3802_device::write)
 		switch(offset + (bank * 10))
 		{
 			case REG_IOR:
-				popmessage("IOR vector write %02\n",data);
+				logerror("IOR vector write %02\n",data);
 				break;
 			case REG_IER:
 				logerror("IER set to %02x\n",data);
+				break;
+			case REG_DCR:
+				if(data & 0x20)
+				{
+					if((data & 0x07) == 2)
+					{
+						uint64_t rate = (m_reg[REG_CCR] & 0x02) ? m_clkm_rate / 4 : m_clkm_rate / 8;
+						
+						// start message to click counter
+						m_midi_counter_timer->adjust(attotime::from_hz(rate),0,attotime::from_hz(rate));
+					}
+					if((data & 0x07) == 3)
+					{
+						// stop message to click counter
+						m_midi_counter_timer->adjust(attotime::zero,0,attotime::never);
+					}
+				}
 				break;
 			case REG_TMR:
 				set_comms_mode();
@@ -246,12 +292,18 @@ WRITE8_MEMBER(ym3802_device::write)
 				//popmessage("General counter set to %i\n",m_general_counter);
 				break;
 			case REG_MTR_LOW:
-				m_midi_counter = (m_midi_counter & 0xff00) | data;
+				m_midi_counter_base = (m_midi_counter & 0xff00) | data;
+				m_midi_counter = m_midi_counter_base;
 				//popmessage("MIDI counter set to %i\n",m_midi_counter);
 				break;
 			case REG_MTR_HIGH:
-				m_midi_counter = (m_midi_counter & 0x00ff) | ((data & 0x3f) << 8);
+				m_midi_counter_base = (m_midi_counter & 0x00ff) | ((data & 0x3f) << 8);
+				m_midi_counter = m_midi_counter_base;
 				//popmessage("MIDI counter set to %i\n",m_midi_counter);
+				break;
+			case REG_CDR:
+				m_click_counter_base = data & 0x7f;
+				m_click_counter = m_click_counter_base;
 				break;
 		}
 	}
