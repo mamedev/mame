@@ -60,6 +60,24 @@ int win_message_box_utf8(HWND window, const char *text, const char *caption, UIN
 
 
 //============================================================
+//  internal_set_window_text
+//============================================================
+
+static BOOL internal_set_window_text(HWND window, LPCTSTR t_text)
+{
+	BOOL result;
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+	result = SetWindowText(window, t_text);
+#else
+	Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->Title = ref new Platform::String(t_text);
+	result = TRUE;
+#endif
+	return result;
+}
+
+
+
+//============================================================
 //  win_set_window_text_utf8
 //============================================================
 
@@ -67,7 +85,7 @@ BOOL win_set_window_text_utf8(HWND window, const char *text)
 {
 	BOOL result = FALSE;
 	LPCTSTR t_text = nullptr;
-	std::basic_string<TCHAR> ts_text;
+	osd::text::tstring ts_text;
 
 	if (text)
 	{
@@ -75,14 +93,19 @@ BOOL win_set_window_text_utf8(HWND window, const char *text)
 		t_text = ts_text.c_str();
 	}
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-	result = SetWindowText(window, t_text);
-#else
-	Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->Title = ref new Platform::String(t_text);
-	result = TRUE;
-#endif
+	return internal_set_window_text(window, t_text);
+}
 
-	return result;
+
+
+//============================================================
+//  win_set_window_text_utf8
+//============================================================
+
+BOOL win_set_window_text_utf8(HWND window, const std::string &text)
+{
+	osd::text::tstring ts_text = osd::text::to_tstring(text);
+	return internal_set_window_text(window, ts_text.c_str());
 }
 
 

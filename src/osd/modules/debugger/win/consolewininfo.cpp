@@ -22,8 +22,6 @@
 
 #include <string>
 
-using namespace std::literals;
-
 
 //**************************************************************************
 //  ANONYMOUS NAMESPACE
@@ -36,7 +34,7 @@ namespace
 //  copy_extension_list
 //-------------------------------------------------
 
-void copy_extension_list(std::ostringstream &dest, const char *extensions)
+void copy_extension_list(std::ostream &dest, const char *extensions)
 {
 	// our extension lists are comma delimited; Win32 expects to see lists
 	// delimited by semicolons
@@ -65,8 +63,10 @@ void copy_extension_list(std::ostringstream &dest, const char *extensions)
 //  add_filter_entry
 //-------------------------------------------------
 
-void add_filter_entry(std::ostringstream &dest, const char *description, const char *extensions)
+void add_filter_entry(std::ostream &dest, const char *description, const char *extensions)
 {
+	using namespace std::literals;
+
 	// add the description
 	dest << description;
 	dest << " (";
@@ -91,6 +91,8 @@ void add_filter_entry(std::ostringstream &dest, const char *description, const c
 
 std::string build_generic_filter(device_image_interface *img, bool is_save)
 {
+	using namespace std::literals;
+
 	std::ostringstream filter;
 	std::string file_extension;
 
@@ -266,16 +268,7 @@ cleanup:
 
 
 //-------------------------------------------------
-//  dtor
-//-------------------------------------------------
-
-consolewin_info::~consolewin_info()
-{
-}
-
-
-//-------------------------------------------------
-//  set_cpu
+//  set_cpu - sets the CPU device for the console
 //-------------------------------------------------
 
 void consolewin_info::set_cpu(device_t &device)
@@ -288,7 +281,7 @@ void consolewin_info::set_cpu(device_t &device)
 	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
 	std::string curtitle = win_get_window_text_utf8(window());
 	if (title != curtitle)
-		win_set_window_text_utf8(window(), title.c_str());
+		win_set_window_text_utf8(window(), title);
 
 	// and recompute the children
 	recompute_children();
@@ -296,7 +289,8 @@ void consolewin_info::set_cpu(device_t &device)
 
 
 //-------------------------------------------------
-//  recompute_children
+//  recompute_children - recompute the size of
+//	the child views
 //-------------------------------------------------
 
 void consolewin_info::recompute_children()
@@ -341,7 +335,8 @@ void consolewin_info::recompute_children()
 
 
 //-------------------------------------------------
-//  update_menu
+//  update_menu - updates the contents of each menu
+//	based on device info
 //-------------------------------------------------
 
 void consolewin_info::update_menu()
@@ -428,7 +423,7 @@ void consolewin_info::update_menu()
 
 
 //-------------------------------------------------
-//  handle_command
+//  handle_command - handles a Win32 message
 //-------------------------------------------------
 
 bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
@@ -564,15 +559,15 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 
 //-------------------------------------------------
-//  process_string
+//  process_string - inputs a string from the user
 //-------------------------------------------------
 
-void consolewin_info::process_string(char const *string)
+void consolewin_info::process_string(std::string &&string)
 {
-	if (string[0] == 0) // an empty string is a single step
+	if (string.empty()) // an empty string is a single step
 		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
 	else                // otherwise, just process the command
-		machine().debugger().console().execute_command(string, true);
+		machine().debugger().console().execute_command(string.c_str(), true);
 
 	// clear the edit text box
 	set_editwnd_text("");
@@ -580,7 +575,8 @@ void consolewin_info::process_string(char const *string)
 
 
 //-------------------------------------------------
-//  get_softlist_info
+//  get_softlist_info - gets info about a softlist
+//	for a particular device
 //-------------------------------------------------
 
 bool consolewin_info::get_softlist_info(device_image_interface *img)

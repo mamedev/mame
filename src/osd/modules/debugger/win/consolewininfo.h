@@ -18,7 +18,6 @@ class consolewin_info : public disasmbasewin_info
 {
 public:
 	consolewin_info(debugger_windows_interface &debugger);
-	virtual ~consolewin_info();
 
 	void set_cpu(device_t &device);
 
@@ -42,7 +41,7 @@ private:
 		DEVOPTION_MAX
 	};
 
-	virtual void process_string(char const *string) override;
+	virtual void process_string(std::string &&string) override;
 
 	bool get_softlist_info(device_image_interface *img);
 
