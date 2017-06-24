@@ -464,6 +464,34 @@ bool gb_cart_slot_device_base::get_mmm01_candidate(const uint8_t *ROM, uint32_t 
 		return false;
 }
 
+bool gb_cart_slot_device_base::is_mbc1col_game(const uint8_t *ROM, uint32_t len)
+{
+	const uint8_t name_length = 0x10u;
+	static const uint8_t internal_names[][name_length + 1] = {
+		/* Bomberman Collection */
+		"BOMCOL\0\0\0\0\0\0\0\0\0\0",
+		/* Bomberman Selection */
+		"BOMSEL\0\0\0\0\0B2CK\xC0",
+		/* Genjin Collection */
+		"GENCOL\0\0\0\0\0\0\0\0\0\0",
+		/* Momotarou Collection */
+		"MOMOCOL\0\0\0\0\0\0\0\0\0",
+		/* Mortal Kombat I & II Japan */
+		"MORTALKOMBAT DUO",
+		/* Mortal Kombat I & II US */
+		"MORTALKOMBATI&II",
+	};
+	
+	const uint8_t rows = sizeof(internal_names) / sizeof(internal_names[0]);
+	
+	for (uint8_t i = 0x00; i < rows; ++i) {
+		if (0 == memcmp(&ROM[0x134], &internal_names[i][0], name_length))
+			return true;
+	}
+	
+	return false;
+}
+
 int gb_cart_slot_device_base::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = GB_MBC_NONE;
@@ -524,6 +552,7 @@ int gb_cart_slot_device_base::get_cart_type(const uint8_t *ROM, uint32_t len)
 
 	// Check for some unlicensed games
 	//if (type == GB_MBC_MBC5)
+	if (len >= 0x184 + 0x30)
 	{
 		int count = 0;
 		for (int i = 0x0184; i < 0x0184 + 0x30; i++)
@@ -547,31 +576,8 @@ int gb_cart_slot_device_base::get_cart_type(const uint8_t *ROM, uint32_t len)
 	}
 
 	/* Check if we're dealing with the multigame variant of the MBC1 mapper */
-	if (type == GB_MBC_MBC1)
-	{   // bomberman collection korea
-		if (ROM[0x134] == 0x42 && ROM[0x135] == 0x4f && ROM[0x136] == 0x4d && ROM[0x137] == 0x53)
-			type = GB_MBC_MBC1_COL;
-//      if (ROM[0x13f] == 0x42 && ROM[0x140] == 0x32 && ROM[0x141] == 0x43 && ROM[0x142] == 0x4B)
-//          type = GB_MBC_MBC1_COL;
-		// genjin collection
-		if (ROM[0x134] == 0x47 && ROM[0x135] == 0x45 && ROM[0x136] == 0x4e && ROM[0x137] == 0x43)
-			type = GB_MBC_MBC1_COL;
-		// bomberman collection japan
-		if (ROM[0x134] == 0x42 && ROM[0x135] == 0x4f && ROM[0x136] == 0x4d && ROM[0x137] == 0x43)
-			type = GB_MBC_MBC1_COL;
-		// mortal kombat I & II US
-		if (ROM[0x140] == 0x49 && ROM[0x141] == 0x26 && ROM[0x142] == 0x49 && ROM[0x143] == 0x49)
-			type = GB_MBC_MBC1_COL;
-		// mortal kombat I & II japan
-		if (ROM[0x140] == 0x20 && ROM[0x141] == 0x44 && ROM[0x142] == 0x55 && ROM[0x143] == 0x4f)
-			type = GB_MBC_MBC1_COL;
-		// momotarou collection 1 japan
-		if (ROM[0x137] == 0x4f && ROM[0x138] == 0x43 && ROM[0x139] == 0x4f && ROM[0x13a] == 0x4c)
-			type = GB_MBC_MBC1_COL;
-		// super chinese 123 dash japan
-		if (ROM[0x142] == 0x32 && ROM[0x143] == 0x33 && ROM[0x144] == 0x42 && ROM[0x145] == 0x41)
-			type = GB_MBC_MBC1_COL;
-	}
+	if (type == GB_MBC_MBC1 && is_mbc1col_game(ROM, len))
+		type = GB_MBC_MBC1_COL;
 
 	return type;
 }
