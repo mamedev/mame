@@ -19,7 +19,7 @@
 #include "interpro_ioga.h"
 
 #define LOG_GENERAL      (1 << 31)
-#define LOG_HWINT_ENABLE ((1<<3) | LOG_GENERAL)
+#define LOG_HWINT_ENABLE 0 //((1<<3) | LOG_GENERAL)
 #define LOG_DMA_ENABLE   ((1<<IOGA_DMA_FLOPPY) | LOG_GENERAL)
 #define LOG_TIMER_ENABLE   0
 
