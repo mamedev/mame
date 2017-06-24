@@ -1002,6 +1002,11 @@ ROM_START( gprnrs1 )
 	ROM_LOAD( "gprnrs1.bin", 0x00000, 0x800000, CRC(c3ffcec8) SHA1(313a790fb51d0b155257f9de84726ed67da43a8f) )
 ROM_END
 
+ROM_START( gprnrs16 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "gprnrs16.bin", 0x00000, 0x2000000, CRC(bdffa40a) SHA1(3d01907211f18e8415171dfc6c1d23cf5952e7bb) )
+ROM_END
+
 
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
@@ -1034,7 +1039,7 @@ CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "In
 CONS( 200?, mc_sp69,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Sports Game 69 in 1", MACHINE_NOT_WORKING )
 
 // doesn't boot
-CONS( 200?, mc_sam60,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "Hummer Team", "Samuri (60 in 1)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_sam60,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_NOT_WORKING )
 
 // titles below don't seem to use the enhanced modes, so probably VT01 / VT02 or plain standalone famiclones?
 
@@ -1050,6 +1055,7 @@ CONS( 200?, mc_110cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "Cool
 CONS( 200?, mc_138cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_NOT_WORKING )
 
 CONS( 200?, gprnrs1,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-1", MACHINE_NOT_WORKING )
+CONS( 200?, gprnrs16,  0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-16", MACHINE_NOT_WORKING )
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_NOT_WORKING ) // dreamGear, but no enhanced games?
 CONS( 200?, mc_aa2,     0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_NOT_WORKING )
