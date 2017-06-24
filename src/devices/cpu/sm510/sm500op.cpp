@@ -166,14 +166,18 @@ void sm500_device::op_ws()
 
 void sm500_device::op_ats()
 {
+	// ATS: transfer ACC to S
+	m_s = m_acc;
 }
 
 void sm500_device::op_exksa()
 {
+	// EXKSA: x
 }
 
 void sm500_device::op_exkfa()
 {
+	// EXKFA: x
 }
 
 

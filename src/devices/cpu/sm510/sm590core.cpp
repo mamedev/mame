@@ -3,6 +3,9 @@
 /*
 
   Sharp SM590 MCU core implementation
+  
+  TODO:
+  - finish SM590/SM595 emulation (NES/SNES CIC)
 
 */
 
@@ -12,9 +15,9 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "SM590")
-//DEFINE_DEVICE_TYPE(SM591, sm591_device, "sm591", "SM591")
-//DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "SM595")
+DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "SM590") // 512x8 ROM, 32x4 RAM
+//DEFINE_DEVICE_TYPE(SM591, sm591_device, "sm591", "SM591") // 1kx8 ROM, 56x4 RAM
+//DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "SM595") // 768x8 ROM, 32x4 RAM
 
 // internal memory maps
 static ADDRESS_MAP_START(program_1x128x4, AS_PROGRAM, 8, sm510_base_device)
@@ -83,19 +86,12 @@ void sm590_device::device_reset()
 	m_halt = false;
 	m_sbm = false; // needed?
 	m_op = m_prev_op = 0;
-	do_branch(0, 0, 0);
+	reset_vector();
 	m_prev_pc = m_pc;
 
 	m_rports[0] = m_rports[1] = m_rports[2] = m_rports[3] = 0;
 	//m_write_r(0, 0, 0xff); // TODO: are the four ports zeroed on reset?
 }
-
-//-------------------------------------------------
-//  init overrides
-//-------------------------------------------------
-void sm590_device::init_divider() {} // doesn't have it
-void sm590_device::init_lcd_driver() {} // doesn't have it
-void sm590_device::init_melody() {} // doesn't have it
 
 //-------------------------------------------------
 //  execute

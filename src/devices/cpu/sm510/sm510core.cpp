@@ -4,6 +4,9 @@
 
   Sharp SM510 MCU core implementation
 
+  TODO:
+  - buzzer control divider bit is mask-programmable?
+
 */
 
 #include "emu.h"
@@ -12,7 +15,7 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "SM510")
+DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "SM510") // 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
 
 
 // internal memory maps

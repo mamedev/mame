@@ -3,6 +3,13 @@
 /*
 
   Sharp SM511 MCU core implementation
+  
+  TODO:
+  - undocumented/guessed opcodes:
+    * $01 is guessed as DIV to ACC transfer, unknown which bits
+    * $5d is certainly CEND
+    * $65 is certainly divider reset, but not sure if it behaves same as on SM510
+    * $6036 and $6037 may be instruction timing? (16kHz and 8kHz), mnemonics unknown
 
 */
 
@@ -12,8 +19,8 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM511, sm511_device, "sm511", "SM511")
-DEFINE_DEVICE_TYPE(SM512, sm512_device, "sm512", "SM512")
+DEFINE_DEVICE_TYPE(SM511, sm511_device, "sm511", "SM511") // 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
+DEFINE_DEVICE_TYPE(SM512, sm512_device, "sm512", "SM512") // 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
 
 
 // internal memory maps

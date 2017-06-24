@@ -3,6 +3,9 @@
 /*
 
   Sharp SM500 MCU core implementation
+  
+  TODO:
+  - EXKSA, EXKFA opcodes
 
 */
 
@@ -12,7 +15,7 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "SM500")
+DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "SM500") // 1.2K ROM, 4x10x4 RAM, shift registers for LCD
 
 
 // internal memory maps
@@ -91,7 +94,7 @@ void sm500_device::execute_one()
 		case 0x14: op_exci(); break;
 		case 0x18: op_lda(); break;
 		case 0x1c: op_excd(); break;
-		case 0x54: op_tmi(); break; // aka tm
+		case 0x54: op_tmi(); break; // TM
 
 		default:
 			switch (m_op)
@@ -101,15 +104,15 @@ void sm500_device::execute_one()
 		case 0x02: op_exksa(); break;
 		case 0x03: op_atbp(); break;
 		case 0x08: op_add(); break;
-		case 0x09: op_add11(); break; // aka addc
+		case 0x09: op_add11(); break; // ADDC
 		case 0x0a: op_coma(); break;
 		case 0x0b: op_exbla(); break;
 
-		case 0x50: op_tal(); break; // aka ta: test alpha
+		case 0x50: op_tal(); break; // TA
 		case 0x51: op_tb(); break;
 		case 0x52: op_tc(); break;
 		case 0x53: op_tam(); break;
-		case 0x58: op_tis(); break; // aka tg: test gamma
+		case 0x58: op_tis(); break; // TG
 		case 0x59: op_ptw(); break;
 		case 0x5a: op_ta0(); break;
 		case 0x5b: op_tabl(); break;
@@ -131,8 +134,8 @@ void sm500_device::execute_one()
 		case 0x6b: op_exkfa(); break;
 		case 0x6c: op_decb(); break;
 		case 0x6d: op_comcb(); break;
-		case 0x6e: op_rtn0(); break; // aka rtn
-		case 0x6f: op_rtn1(); break; // aka rtns
+		case 0x6e: op_rtn0(); break; // RTN
+		case 0x6f: op_rtn1(); break; // RTNS
 
 		// extended opcodes
 		case 0x5e:

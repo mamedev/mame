@@ -32,7 +32,7 @@
 #define MCFG_SM510_WRITE_S_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
 
-// 2-bit R melody output port
+// 2/4-bit R (melody) output port
 #define MCFG_SM510_WRITE_R_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
 
@@ -155,6 +155,9 @@ protected:
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
+	
+	virtual void reset_vector() { do_branch(3, 7, 0); }
+	virtual void wakeup_vector() { do_branch(1, 0, 0); } // after halt
 
 	int m_prgwidth;
 	int m_datawidth;
@@ -190,6 +193,7 @@ protected:
 	bool m_bc;
 
 	u16 get_lcd_row(int column, u8* ram);
+	virtual void lcd_update();
 	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
 	virtual void init_lcd_driver();
 

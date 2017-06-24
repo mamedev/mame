@@ -2,42 +2,21 @@
 // copyright-holders:hap
 /*
 
-  Supported chips: (* means not finished emulated yet)
-
-  Sharp SM510 MCU family:
-  - SM510: 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
-  - SM511: 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
-  - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
-
-  Sharp SM500 MCU family:
-  - *SM500: x
-  - *SM5A: x
-  - *SM5L: low-power version of SM5A
-  - *KB1013VK1-2: Soviet-era clone of SM5A
-
-  Sharp SM590 MCU family:
-  - *SM590: 512x8 ROM, 32x4 RAM
-  - *SM591: 1kx8 ROM, 56x4 RAM
-  - *SM595: 768x8 ROM, 32x4 RAM
+  Sharp SM5xx family, using SM510 as parent device
 
   References:
+  - 1986 Sharp Semiconductor Data Book
   - 1990 Sharp Microcomputers Data Book
   - 1996 Sharp Microcomputer Databook
   - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
-  - finish SM500 emulation (gen.1 Game & Watch)
-  - finish SM590/SM595 emulation (NES/SNES CIC)
+  - source organiziation between files is a mess
   - proper support for LFSR program counter in debugger
-  - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - wake up after CEND doesn't work right
-  - SM510 buzzer control divider bit is mask-programmable?
-  - SM511 undocumented/guessed opcodes:
-    * $01 is guessed as DIV to ACC transfer, unknown which bits
-    * $5d is certainly CEND
-    * $65 is certainly divider reset, but not sure if it behaves same as on SM510
-    * $6036 and $6037 may be instruction timing? (16kHz and 8kHz), mnemonics unknown
+  
+  for more, see the *core.cpp file notes
 
 */
 
@@ -173,7 +152,7 @@ void sm510_base_device::device_reset()
 	m_halt = false;
 	m_sbm = false;
 	m_op = m_prev_op = 0;
-	do_branch(3, 7, 0);
+	reset_vector();
 	m_prev_pc = m_pc;
 
 	// lcd is on (Bp on, BC off, bs(y) off)
@@ -204,7 +183,7 @@ inline u16 sm510_base_device::get_lcd_row(int column, u8* ram)
 	return rowdata;
 }
 
-TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
+void sm510_base_device::lcd_update()
 {
 	// 4 columns
 	for (int h = 0; h < 4; h++)
@@ -218,16 +197,19 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 		u8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
 		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
+}
 
-	// schedule next timeout
-	m_lcd_timer->adjust(attotime::from_ticks(0x200, unscaled_clock()));
+TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
+{
+	lcd_update();
 }
 
 void sm510_base_device::init_lcd_driver()
 {
 	// note: in reality, this timer runs at high frequency off the main divider, strobing one segment at a time
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::lcd_timer_cb), this));
-	m_lcd_timer->adjust(attotime::from_ticks(0x200, unscaled_clock())); // 64hz default
+	attotime period = attotime::from_ticks(0x200, unscaled_clock()); // 64hz default
+	m_lcd_timer->adjust(period, 0, period);
 }
 
 
@@ -244,7 +226,7 @@ bool sm510_base_device::wake_me_up()
 		// note: official doc warns that Bl/Bm and the stack are undefined
 		// after waking up, but we leave it unchanged
 		m_halt = false;
-		do_branch(1, 0, 0);
+		wakeup_vector();
 
 		standard_irq_callback(0);
 		return true;

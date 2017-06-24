@@ -16,7 +16,7 @@
 
 // I/O ports setup
 
-// ..
+// see sm510.h for ACL, K, R, alpha, beta
 
 
 // pinout reference
@@ -81,14 +81,18 @@ protected:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
+
+	virtual void reset_vector() override { do_branch(0, 0xf, 0); }
+	virtual void wakeup_vector() override { do_branch(0, 0, 0); }
 	
 	int m_o_mask; // number of 4-bit O pins minus 1
 	u8 m_ox[9];   // W' latch, max 9
-	u8 m_o[9];    // W latch(O outputs)
-	u8 m_cn;      // CN(digit select)
-	u8 m_mx;      // m'(digit DP select)
-	u8 m_cb;      // CB(PC high bit buffer)
-	bool m_rsub;  // R(in subroutine)
+	u8 m_o[9];    // W latch
+	u8 m_cn;
+	u8 m_mx;
+	u8 m_cb;
+	u8 m_s;
+	bool m_rsub;
 
 	void shift_w();
 	u8 get_digit();
