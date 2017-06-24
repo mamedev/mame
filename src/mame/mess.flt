@@ -239,7 +239,6 @@ hh_cop400.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
-hh_sm500.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp

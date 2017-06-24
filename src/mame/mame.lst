@@ -14523,9 +14523,6 @@ ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
 
-@source:hh_sm500.cpp
-nupogodi                        //
-
 @source:hh_sm510.cpp
 gnw_bx301                       // Nintendo
 gnw_dj101                       // Nintendo
