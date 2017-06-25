@@ -42,22 +42,22 @@ ADDRESS_MAP_END
 
 // device definitions
 sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 8 /* o mask */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 9 /* o group pins */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4))
 {
 }
 
-sm5a_device::sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: sm500_device(mconfig, type, tag, owner, clock, stack_levels, o_mask, prgwidth, program, datawidth, data)
+sm5a_device::sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: sm500_device(mconfig, type, tag, owner, clock, stack_levels, o_pins, prgwidth, program, datawidth, data)
 {
 }
 
 sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 8, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 9, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
 {
 }
 
 kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 8, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 9, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
 {
 }
 

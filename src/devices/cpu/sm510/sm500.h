@@ -83,7 +83,7 @@ public:
 	template <class Object> static devcb_base &set_write_o_callback(device_t &device, Object &&cb) { return downcast<sm500_device &>(device).m_write_o.set_callback(std::forward<Object>(cb)); }
 
 protected:
-	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -99,7 +99,7 @@ protected:
 	devcb_write8 m_write_o;
 	virtual void lcd_update() override;
 
-	int m_o_mask; // number of 4-bit O pins minus 1
+	int m_o_pins; // number of 4-bit O pins
 	u8 m_ox[9];   // W' latch, max 9
 	u8 m_o[9];    // W latch
 	u8 m_cn;
@@ -153,7 +153,7 @@ public:
 	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;

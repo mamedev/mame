@@ -12,7 +12,7 @@
 void sm500_device::shift_w()
 {
 	// shifts internal W' latches
-	for (int i = 0; i < m_o_mask; i++)
+	for (int i = 0; i < (m_o_pins-1); i++)
 		m_ox[i] = m_ox[i + 1];
 }
 
@@ -37,9 +37,8 @@ u8 sm500_device::get_digit()
 void sm500_device::op_lb()
 {
 	// LB x: load BM/BL with 4-bit immediate value (partial)
-	// BL bit 2 is clearned, bit 3 is param bit 2|3
-	m_bm = (m_op & 3);
-	m_bl = ((m_op << 1 | m_op) & 8) | (m_op >> 2 & 3);
+	m_bm = m_op & 3;
+	m_bl = (m_op >> 2 & 3) | ((m_op & 0xc) ? 8 : 0);
 }
 
 void sm500_device::op_incb()
@@ -122,43 +121,43 @@ void sm500_device::op_atbp()
 void sm500_device::op_ptw()
 {
 	// PTW: partial transfer W' to W
-	m_o[m_o_mask] = m_ox[m_o_mask];
-	m_o[m_o_mask-1] = m_ox[m_o_mask-1];
+	m_o[m_o_pins-1] = m_ox[m_o_pins-1];
+	m_o[m_o_pins-2] = m_ox[m_o_pins-2];
 }
 
 void sm500_device::op_tw()
 {
 	// TW: transfer W' to W
-	for (int i = 0; i <= m_o_mask; i++)
+	for (int i = 0; i < m_o_pins; i++)
 		m_o[i] = m_ox[i];
 }
 
 void sm500_device::op_pdtw()
 {
 	// PDTW: partial shift digit into W'
-	m_ox[m_o_mask-1] = m_ox[m_o_mask];
-	m_ox[m_o_mask] = get_digit();
+	m_ox[m_o_pins-2] = m_ox[m_o_pins-1];
+	m_ox[m_o_pins-1] = get_digit();
 }
 
 void sm500_device::op_dtw()
 {
 	// DTW: shift digit into W'
 	shift_w();
-	m_ox[m_o_mask] = get_digit();
+	m_ox[m_o_pins-1] = get_digit();
 }
 
 void sm500_device::op_wr()
 {
 	// WR: shift ACC into W', reset last bit
 	shift_w();
-	m_ox[m_o_mask] = m_acc & 7;
+	m_ox[m_o_pins-1] = m_acc & 7;
 }
 
 void sm500_device::op_ws()
 {
 	// WR: shift ACC into W', set last bit
 	shift_w();
-	m_ox[m_o_mask] = m_acc | 8;
+	m_ox[m_o_pins-1] = m_acc | 8;
 }
 
 
