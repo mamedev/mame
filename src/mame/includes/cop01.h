@@ -35,9 +35,9 @@ public:
 	/* sound-related */
 	int            m_pulse;
 	int            m_timer; // kludge for ym3526 in mightguy
-	uint8_t		   m_prot_command;
-	uint8_t		   m_prot_reg[6];
-	
+	uint8_t        m_prot_command;
+	uint8_t        m_prot_reg[6];
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

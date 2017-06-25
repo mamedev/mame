@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pet_quik" description="Commodore PET quickload">
-	
+
 	<!-- https://www.youtube.com/watch?v=OBEfKMFq8lo -->
 	<software name="npa">
 		<description>No Pets Allowed</description>
@@ -15,7 +15,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- https://www.youtube.com/watch?v=gYHYplCyrM0 -->
 	<software name="hardcore">
 		<description>Hardcore Petting</description>

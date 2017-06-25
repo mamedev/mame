@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
  * ym3802.c - Yamaha MCS MIDI Communication and Service Controller
- * 
+ *
  * TODO:
  *   - Receive serial data
  *   - Transmit Idle detection
@@ -32,7 +32,7 @@ ym3802_device::ym3802_device(const machine_config &mconfig, const char *tag, dev
 	, m_clkf_rate(614400)
 	{
 	}
-	
+
 void ym3802_device::device_start()
 {
 	m_irq_handler.resolve_safe();
@@ -145,7 +145,7 @@ void ym3802_device::reset_midi_timer()
 {
 	uint64_t rate;
 	uint8_t divisor = m_reg[REG_TRR] & 0x1f;
-	
+
 	if(!(divisor & 0x10))
 	{
 		if(divisor & 0x08)
@@ -160,7 +160,7 @@ void ym3802_device::reset_midi_timer()
 		else
 			rate = m_clkf_rate / (64 << (divisor & 0x07));
 	}
-	
+
 	if(rate != m_prev_rate)
 		m_midi_timer->adjust(attotime::from_hz(rate),0,attotime::from_hz(rate));
 	m_prev_rate = rate;
@@ -172,7 +172,7 @@ void ym3802_device::set_comms_mode()
 	uint8_t data_bits = (m_reg[REG_TMR] & 0x20) ? 7 : 8;
 	parity_t parity;
 	stop_bits_t stop_bits = (m_reg[REG_TMR] & 0x02) ? STOP_BITS_2 : STOP_BITS_1;
-	
+
 	if(!(m_reg[REG_TMR] & 0x10))  // parity enable
 		parity = PARITY_NONE;
 	else
@@ -183,7 +183,7 @@ void ym3802_device::set_comms_mode()
 			parity = PARITY_EVEN;
 		// TODO: 4-bit parity
 	}
-	
+
 	set_data_frame(1, data_bits, parity, stop_bits);
 	logerror("MIDI comms set to 1 start bit, %i data bits, %s, parity = %i\n",data_bits, (stop_bits == STOP_BITS_2) ? "2 stop bits" : "1 stop bit", parity);
 }
@@ -261,7 +261,7 @@ WRITE8_MEMBER(ym3802_device::write)
 					if((data & 0x07) == 2)
 					{
 						uint64_t rate = (m_reg[REG_CCR] & 0x02) ? m_clkm_rate / 4 : m_clkm_rate / 8;
-						
+
 						// start message to click counter
 						m_midi_counter_timer->adjust(attotime::from_hz(rate),0,attotime::from_hz(rate));
 					}

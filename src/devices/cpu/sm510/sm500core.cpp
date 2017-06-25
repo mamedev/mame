@@ -3,7 +3,7 @@
 /*
 
   Sharp SM500 MCU core implementation
-  
+
   TODO:
   - EXKSA, EXKFA opcodes
   - SM500 data book suggests that R1 divider output is selectable, but how?
@@ -89,7 +89,7 @@ void sm500_device::device_reset()
 {
 	// common reset
 	sm510_base_device::device_reset();
-	
+
 	// SM500 specific
 	op_idiv();
 	m_1s = true;

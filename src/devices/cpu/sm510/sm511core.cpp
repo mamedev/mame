@@ -3,7 +3,7 @@
 /*
 
   Sharp SM511 MCU core implementation
-  
+
   TODO:
   - undocumented/guessed opcodes:
     * $01 is guessed as DIV to ACC transfer, unknown which bits

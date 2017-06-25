@@ -180,7 +180,7 @@ void consolewin_info::update_menu()
 
 			// not working properly, removed for now until investigation can be done
 			//if (get_softlist_info(&img))
-			//	AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_ITEM, TEXT("Mount Item..."));
+			//  AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_ITEM, TEXT("Mount Item..."));
 
 			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount File..."));
 

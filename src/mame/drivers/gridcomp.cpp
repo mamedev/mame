@@ -2,63 +2,63 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	drivers/gridcomp.cpp
+    drivers/gridcomp.cpp
 
-	Driver file for GRiD Compass series
+    Driver file for GRiD Compass series
 
-	US patent 4,571,456 describes model 1101:
+    US patent 4,571,456 describes model 1101:
 
-	- 15 MHz XTAL, produces
-		- 5 MHz system clock for CPU, FPU, OSP
-		- 7.5 MHz pixel clock
-	- Intel 8086 - CPU
-	- Intel 8087 - FPU
-	- Intel 80130 - Operating System Processor, equivalent of:
-		- 8259 PIC
-		- 8254 PIT
-	- Texas Instruments TMS9914 GPIB controller
-	- Intel 7220 Bubble Memory Controller
-		- 7110 Magnetic Bubble Memory modules and support chips
-	- (unknown) - EAROM for machine ID
-	- (unknown) - Real-Time Clock
-	- (custom DMA logic)
-	- Intel 8741 - keyboard MCU
-	- Intel 8274 - UART
-	- Intel 8255 - modem interface
-		- 2x DAC0832LCN - DAC
-		- MK5089N - DTMF generator
-		- ...
+    - 15 MHz XTAL, produces
+        - 5 MHz system clock for CPU, FPU, OSP
+        - 7.5 MHz pixel clock
+    - Intel 8086 - CPU
+    - Intel 8087 - FPU
+    - Intel 80130 - Operating System Processor, equivalent of:
+        - 8259 PIC
+        - 8254 PIT
+    - Texas Instruments TMS9914 GPIB controller
+    - Intel 7220 Bubble Memory Controller
+        - 7110 Magnetic Bubble Memory modules and support chips
+    - (unknown) - EAROM for machine ID
+    - (unknown) - Real-Time Clock
+    - (custom DMA logic)
+    - Intel 8741 - keyboard MCU
+    - Intel 8274 - UART
+    - Intel 8255 - modem interface
+        - 2x DAC0832LCN - DAC
+        - MK5089N - DTMF generator
+        - ...
 
-	to do:
+    to do:
 
-	- confirm differences between models except screen size
-		- Compass 110x do not have GRiDROM slots.
-		- Compass II (112x, 113x) have 4 of them.
-	- keyboard: decode and add the rest of keycodes
-	- EAROM, RTC
-	- serial port, modem (incl. DTMF generator)
-	- TMS9914 chip driver (incl. DMA)
-	- GPIB storage devices (floppy, hard disk)
+    - confirm differences between models except screen size
+        - Compass 110x do not have GRiDROM slots.
+        - Compass II (112x, 113x) have 4 of them.
+    - keyboard: decode and add the rest of keycodes
+    - EAROM, RTC
+    - serial port, modem (incl. DTMF generator)
+    - TMS9914 chip driver (incl. DMA)
+    - GPIB storage devices (floppy, hard disk)
 
-	missing dumps:
+    missing dumps:
 
-	- BIOS from models other than 1139 (CCOS and MS-DOS variants)
-	- GRiDROM's
-	- keyboard MCU
-	- external floppy and hard disk (2101, 2102)
+    - BIOS from models other than 1139 (CCOS and MS-DOS variants)
+    - GRiDROM's
+    - keyboard MCU
+    - external floppy and hard disk (2101, 2102)
 
-	to boot CCOS 3.0.1:
-	- pad binary image (not .imd) to 384K
-	- attach it as -memcard
-	- use grid1129 with 'patched' ROM
-	- start with -debug and add breakpoints:
+    to boot CCOS 3.0.1:
+    - pad binary image (not .imd) to 384K
+    - attach it as -memcard
+    - use grid1129 with 'patched' ROM
+    - start with -debug and add breakpoints:
 
-	# bubble memory driver
-	bp ff27a,1,{ax=ax*2;go}
-	# boot loader
-	bp 20618,1,{temp0=214A8;do w@(temp0+7)=120;do w@(temp0+9)=121;go}
-	# CCOS kernel
-	bp 0661a,1,{temp0=0f964;do w@(temp0+7)=120;do w@(temp0+9)=121;go}
+    # bubble memory driver
+    bp ff27a,1,{ax=ax*2;go}
+    # boot loader
+    bp 20618,1,{temp0=214A8;do w@(temp0+7)=120;do w@(temp0+9)=121;go}
+    # CCOS kernel
+    bp 0661a,1,{temp0=0f964;do w@(temp0+7)=120;do w@(temp0+9)=121;go}
 
 ***************************************************************************/
 
@@ -309,9 +309,9 @@ IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
 static ADDRESS_MAP_START( grid1101_map, AS_PROGRAM, 16, gridcomp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xdfe80, 0xdfe83) AM_DEVREADWRITE8("i7220", i7220_device, read, write, 0x00ff)
-	AM_RANGE(0xdfea0, 0xdfeaf) AM_UNMAP	// ??
-	AM_RANGE(0xdfec0, 0xdfecf) AM_DEVREADWRITE8("modem", i8255_device, read, write, 0x00ff)	// incl. DTMF generator
-	AM_RANGE(0xdff40, 0xdff5f) AM_NOP	// ?? machine ID EAROM, RTC
+	AM_RANGE(0xdfea0, 0xdfeaf) AM_UNMAP // ??
+	AM_RANGE(0xdfec0, 0xdfecf) AM_DEVREADWRITE8("modem", i8255_device, read, write, 0x00ff) // incl. DTMF generator
+	AM_RANGE(0xdff40, 0xdff5f) AM_NOP   // ?? machine ID EAROM, RTC
 	AM_RANGE(0xdff80, 0xdff8f) AM_READWRITE(grid_gpib_r, grid_gpib_w) // TMS9914
 	AM_RANGE(0xdffc0, 0xdffcf) AM_READWRITE(grid_keyb_r, grid_keyb_w) // Intel 8741 MCU
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
@@ -319,15 +319,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grid1121_map, AS_PROGRAM, 16, gridcomp_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x90000, 0x97fff) AM_UNMAP	// ?? ROM slot
+	AM_RANGE(0x90000, 0x97fff) AM_UNMAP // ?? ROM slot
 	AM_RANGE(0x9ff00, 0x9ff0f) AM_UNMAP // AM_READ(grid_9ff0_r) // ?? ROM?
 	AM_RANGE(0xc0000, 0xcffff) AM_UNMAP // ?? ROM slot -- signature expected: 0x4554, 0x5048
 	AM_RANGE(0xdfe00, 0xdfe1f) AM_UNMAP // AM_DEVREADWRITE8("uart8274", i8274_new_device, ba_cd_r, ba_cd_w, 0x00ff)
-	AM_RANGE(0xdfe40, 0xdfe4f) AM_UNMAP	// ?? diagnostic 8274
+	AM_RANGE(0xdfe40, 0xdfe4f) AM_UNMAP // ?? diagnostic 8274
 	AM_RANGE(0xdfe80, 0xdfe83) AM_DEVREADWRITE8("i7220", i7220_device, read, write, 0x00ff)
-	AM_RANGE(0xdfea0, 0xdfeaf) AM_UNMAP	// ??
-	AM_RANGE(0xdfec0, 0xdfecf) AM_DEVREADWRITE8("modem", i8255_device, read, write, 0x00ff)	// incl. DTMF generator
-	AM_RANGE(0xdff40, 0xdff5f) AM_NOP	// ?? machine ID EAROM, RTC
+	AM_RANGE(0xdfea0, 0xdfeaf) AM_UNMAP // ??
+	AM_RANGE(0xdfec0, 0xdfecf) AM_DEVREADWRITE8("modem", i8255_device, read, write, 0x00ff) // incl. DTMF generator
+	AM_RANGE(0xdff40, 0xdff5f) AM_NOP   // ?? machine ID EAROM, RTC
 	AM_RANGE(0xdff80, 0xdff8f) AM_READWRITE(grid_gpib_r, grid_gpib_w) // TMS9914
 	AM_RANGE(0xdffc0, 0xdffcf) AM_READWRITE(grid_keyb_r, grid_keyb_w) // Intel 8741 MCU
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
@@ -341,14 +341,14 @@ static INPUT_PORTS_START( gridcomp )
 INPUT_PORTS_END
 
 /*
- * IRQ0	serial
- * IRQ1	bubble
- * IRQ2	modem
- * IRQ3	system tick || vert sync
- * IRQ4	keyboard
- * IRQ5	gpib
- * IRQ6	8087
- * IRQ7	ring
+ * IRQ0 serial
+ * IRQ1 bubble
+ * IRQ2 modem
+ * IRQ3 system tick || vert sync
+ * IRQ4 keyboard
+ * IRQ5 gpib
+ * IRQ6 8087
+ * IRQ7 ring
  */
 static MACHINE_CONFIG_START( grid1101 )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_15MHz / 3)
@@ -467,12 +467,12 @@ ROM_START( grid1129 )
 	ROM_FILL(0x24,1,0x2)
 	ROM_FILL(0xbc,1,0x98)
 	ROM_FILL(0xbd,1,0x2)
-	ROM_FILL(0x14e,1,0xc1)	//
-	ROM_FILL(0x14f,1,0x2)	//
-	ROM_FILL(0x15a,1,0xc2)	//
-	ROM_FILL(0x15b,1,0x2)	//
-	ROM_FILL(0x17b,1,0x45)	//
-	ROM_FILL(0x17c,1,0x3)	//
+	ROM_FILL(0x14e,1,0xc1)  //
+	ROM_FILL(0x14f,1,0x2)   //
+	ROM_FILL(0x15a,1,0xc2)  //
+	ROM_FILL(0x15b,1,0x2)   //
+	ROM_FILL(0x17b,1,0x45)  //
+	ROM_FILL(0x17c,1,0x3)   //
 	ROM_FILL(0x28c,1,0x98)
 	ROM_FILL(0x28d,1,0x2)
 	ROM_FILL(0x28f,1,0x98)
@@ -509,18 +509,18 @@ ROM_START( grid1129 )
 	ROM_FILL(0xe51,1,0x2)
 	ROM_FILL(0xfa6,1,0x98)
 	ROM_FILL(0xfa7,1,0x2)
-	ROM_FILL(0x15fe,1,0xce)	//
-	ROM_FILL(0x15ff,1,0x2)	//
-	ROM_FILL(0x1628,1,0xd0)	//
-	ROM_FILL(0x1629,1,0x2)	//
+	ROM_FILL(0x15fe,1,0xce) //
+	ROM_FILL(0x15ff,1,0x2)  //
+	ROM_FILL(0x1628,1,0xd0) //
+	ROM_FILL(0x1629,1,0x2)  //
 	ROM_FILL(0x1700,1,0x98)
 	ROM_FILL(0x1701,1,0x2)
-	ROM_FILL(0x1833,1,0xd6)	//
-	ROM_FILL(0x1834,1,0x2)	//
-	ROM_FILL(0x184a,1,0xd6)	//
-	ROM_FILL(0x184b,1,0x2)	//
-	ROM_FILL(0x1a2e,1,0xd6)	//
-	ROM_FILL(0x1a2f,1,0x2)	//
+	ROM_FILL(0x1833,1,0xd6) //
+	ROM_FILL(0x1834,1,0x2)  //
+	ROM_FILL(0x184a,1,0xd6) //
+	ROM_FILL(0x184b,1,0x2)  //
+	ROM_FILL(0x1a2e,1,0xd6) //
+	ROM_FILL(0x1a2f,1,0x2)  //
 	ROM_FILL(0x19c2,1,0x98)
 	ROM_FILL(0x19c3,1,0x2)
 	ROM_FILL(0x1ee0,1,0x98)
@@ -545,12 +545,12 @@ ROM_START( grid1129 )
 	ROM_FILL(0x295d,1,0x2)
 	ROM_FILL(0x2a5e,1,0x98)
 	ROM_FILL(0x2a5f,1,0x2)
-	ROM_FILL(0x315c,1,0xc9)	//
-	ROM_FILL(0x315d,1,0x2)	//
-	ROM_FILL(0x3160,1,0xce)	//
-	ROM_FILL(0x3161,1,0x2)	//
-	ROM_FILL(0x3164,1,0xcf)	//
-	ROM_FILL(0x3165,1,0x2)	//
+	ROM_FILL(0x315c,1,0xc9) //
+	ROM_FILL(0x315d,1,0x2)  //
+	ROM_FILL(0x3160,1,0xce) //
+	ROM_FILL(0x3161,1,0x2)  //
+	ROM_FILL(0x3164,1,0xcf) //
+	ROM_FILL(0x3165,1,0x2)  //
 ROM_END
 
 ROM_START( grid1131 )

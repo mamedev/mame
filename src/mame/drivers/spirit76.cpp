@@ -47,7 +47,7 @@ private:
 
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, spirit76_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
+//  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // 2x 2112
 	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia", pia6821_device, read, write) // 6820
 	AM_RANGE(0x2400, 0x2400) AM_READ(unk_r)
@@ -130,10 +130,10 @@ static MACHINE_CONFIG_START( spirit76 )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spirit76_state, portb_w))
 	MCFG_PIA_READPA_HANDLER(READ8(spirit76_state, porta_r))
 	MCFG_PIA_READPB_HANDLER(READ8(spirit76_state, portb_r))
-//	MCFG_PIA_CA2_HANDLER(WRITELINE(spirit76_state, pia22_ca2_w))
-//	MCFG_PIA_CB2_HANDLER(WRITELINE(spirit76_state, pia22_cb2_w))
-//	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-//	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+//  MCFG_PIA_CA2_HANDLER(WRITELINE(spirit76_state, pia22_ca2_w))
+//  MCFG_PIA_CB2_HANDLER(WRITELINE(spirit76_state, pia22_cb2_w))
+//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( genpin_audio )

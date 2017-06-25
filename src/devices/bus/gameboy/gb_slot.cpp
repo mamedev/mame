@@ -481,14 +481,14 @@ bool gb_cart_slot_device_base::is_mbc1col_game(const uint8_t *ROM, uint32_t len)
 		/* Mortal Kombat I & II US */
 		"MORTALKOMBATI&II",
 	};
-	
+
 	const uint8_t rows = sizeof(internal_names) / sizeof(internal_names[0]);
-	
+
 	for (uint8_t i = 0x00; i < rows; ++i) {
 		if (0 == memcmp(&ROM[0x134], &internal_names[i][0], name_length))
 			return true;
 	}
-	
+
 	return false;
 }
 

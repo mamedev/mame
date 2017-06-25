@@ -100,7 +100,7 @@ AT-2
 0000 3000 414e 4b41 4b45 5544 4f4e
 0000 2000 0e0e 4b49 5455 4e45 0e0e
 0000 1000 0e4b 414b 4553 4f42 410e
-2079 0001 0004 4ed0 2079 0001 0008 
+2079 0001 0004 4ed0 2079 0001 0008
 4ed0 7c
 */
 
@@ -120,7 +120,7 @@ static const uint16_t mAmazonProtData[] =
 };
 
 /*
-0000 5000 5341 4b45 5349 4755 5245 
+0000 5000 5341 4b45 5349 4755 5245
 0000 4000 0e4b 4154 5544 4f4e 0e0e
 0000 3000 414e 4b41 4b45 5544 4f4e
 0000 2000 0e0e 4b49 5455 4e45 0e0e
@@ -176,7 +176,7 @@ READ8_MEMBER(terracre_state::soundlatch_clear_r)
 	return 0;
 }
 
-// 1412M2 
+// 1412M2
 READ16_MEMBER(terracre_state::amazon_protection_r)
 {
 	if(m_mAmazonProtCmd == 0x37)
@@ -185,14 +185,14 @@ READ16_MEMBER(terracre_state::amazon_protection_r)
 		//its usage is more variable in mightguy for whatever reason.
 		uint16_t prot_offset = (m_mAmazonProtReg[1]<<8)|(m_mAmazonProtReg[2]);
 		uint8_t *prot_rom = memregion("prot_data")->base();
-		
+
 		//printf("Mode %02x:%04x %04x R -> %02x (fixed %02x)\n",m_mAmazonProtReg[0],prot_offset,(m_mAmazonProtReg[3]<<8)|(m_mAmazonProtReg[4]),prot_rom[prot_offset],(prot_rom[prot_offset] - 0x44) & 0xff);
-		
+
 		return prot_rom[prot_offset & 0x1fff] - 0x44;
 	}
 
 	popmessage("unknown prot cmd R %02x",m_mAmazonProtCmd);
-	
+
 	return 0;
 }
 
@@ -209,13 +209,13 @@ WRITE16_MEMBER(terracre_state::amazon_protection_w)
 			if( m_mAmazonProtCmd>=0x32 && m_mAmazonProtCmd<=0x37 )
 			{
 				m_mAmazonProtReg[m_mAmazonProtCmd-0x32] = data;
-				
+
 				#if 0
 				if(m_mAmazonProtCmd == 0x32)
 				{
 					for(int i=0;i<6;i++)
 						printf("%02x ",m_mAmazonProtReg[i]);
-					
+
 					printf("\n");
 				}
 				#endif
@@ -636,7 +636,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( amazon_1412m2, amazon_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_1412m2_map)
-	
+
 	// TODO: install 1412m2 here
 MACHINE_CONFIG_END
 

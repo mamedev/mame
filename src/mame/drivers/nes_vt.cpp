@@ -1030,7 +1030,7 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR",
 CONS( 2012, dgun2561,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
-// these seem to have custom CPU opcodes? looks similar to the above, has many of the same games, but isn't 100% valid 6502 
+// these seem to have custom CPU opcodes? looks similar to the above, has many of the same games, but isn't 100% valid 6502
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 CONS( 200?, ii8in1,    0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
 CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )

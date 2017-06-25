@@ -123,7 +123,7 @@ public:
 
 	enum sreg_status_mask
 	{
-        STATUS_YELLOW_ZONE = 0x0001,
+		STATUS_YELLOW_ZONE = 0x0001,
 		STATUS_SRNMI       = 0x0002,
 		STATUS_PWRLOSS     = 0x0004,
 		STATUS_RED_ZONE    = 0x0008,
@@ -141,11 +141,11 @@ public:
 		CTRL1_ETHDTR     = 0x0020,
 		CTRL1_ETHRMOD    = 0x0040,
 		CTRL1_CLIPRESET  = 0x0040,
-        CTRL1_FIFOACTIVE = 0x0080
+		CTRL1_FIFOACTIVE = 0x0080
 	};
 	DECLARE_READ16_MEMBER(sreg_ctrl1_r) { return m_sreg_ctrl1; }
 	DECLARE_WRITE16_MEMBER(sreg_ctrl1_w);
-	
+
 	enum sreg_ctrl2_mask
 	{
 		CTRL2_PWRUP     = 0x0001,

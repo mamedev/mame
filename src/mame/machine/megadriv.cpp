@@ -953,8 +953,8 @@ MACHINE_CONFIG_START( dcat16_megadriv )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
 
 //  has SD card slot instead?
-//	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
-//	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
+//  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
+//  MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/

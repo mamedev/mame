@@ -106,7 +106,7 @@ protected:
 		SSW_P   = 0x80000000, // previous mode
 	};
 
-	enum clipper_ssw_id 
+	enum clipper_ssw_id
 	{
 		SSW_ID_C400R0 = 0x00000,
 		SSW_ID_C400R1 = 0x04000,

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Jean-François DEL NERO
+// copyright-holders:Jean-FranÃ§ois DEL NERO
 /***************************************************************************
 
     SMT Goupil G1 & G2 driver
@@ -17,7 +17,7 @@
     -> The internal G1 Basic is working (-> 6800 0xC3 illegal opcode emulation needed).
 
     02/04/2016
-    Jean-François DEL NERO
+    Jean-FranÃ§ois DEL NERO
 
 ****************************************************************************/
 
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( goupil_g2 )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")    // visu24x80 2K ram
-	
+
 	MCFG_SCREEN_ADD("screen" ,RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_NO_PALETTE

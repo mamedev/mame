@@ -102,7 +102,7 @@ READ8_MEMBER(interpro_state::idprom_r)
 		0x02, // 2800 series
 		// 0x00, // 2500 series
 
-		0x00, 0x00, 
+		0x00, 0x00,
 		0x00, // board type, 0x80 = MPCB, 0x00 = MSMT
 
 		// for the system boards, these bytes contain cpu clock speed (as femtoseconds per cycle, big-endian)

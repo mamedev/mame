@@ -97,7 +97,7 @@ private:
 	DECLARE_READ8_MEMBER(an6_r);
 	DECLARE_READ8_MEMBER(an7_r);
 
-	
+
 	/* GATE ARRAY */
 	DECLARE_WRITE16_MEMBER(printhead);
 	DECLARE_WRITE8_MEMBER(pf_stepper);

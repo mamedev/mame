@@ -3,7 +3,7 @@
 /*
 
   Sharp SM5A MCU core implementation
-  
+
   TODO:
   - confirm SM5A mnemonics
 
