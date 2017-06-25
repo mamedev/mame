@@ -16,7 +16,7 @@
 
 // I/O ports setup
 
-// LCD segment outputs: H1/2 as a4, O group as a0-a3, O data as d0-d3
+// LCD segment outputs: H1/2 as a0, O group as a1-a4, O data as d0-d3
 #define MCFG_SM500_WRITE_O_CB(_devcb) \
 	devcb = &sm500_device::set_write_o_callback(*device, DEVCB_##_devcb);
 

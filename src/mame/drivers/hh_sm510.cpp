@@ -6,15 +6,11 @@
   Sharp SM5xx family handhelds.
 
   TODO:
-  - gnw_mc25 emulation is preliminary
-  - confirm gnw_mc25 romdump
+  - add svg layout for gnw_mc25
   - improve svg layout for gnw_jr55, gnw_mw56
+  - confirm gnw_mc25 romdump
   - svg lcd screen background/foreground (not supported in core),
     or should it be for external artwork only?
-  - flickering segments, lcd physics? or screen update timing?
-    * ktmnt: "LIMIT" segment when going underwater on level 1
-    * gnw_dj101: cage and clock before you start the game
-    * gnw_mw56: truck boxes while playing
 
 ***************************************************************************/
 
@@ -41,7 +37,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
-		m_inp_lines(0)
+		m_inp_lines(0),
+		m_display_wait(17)
 	{ }
 
 	// devices
@@ -50,10 +47,9 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	u16 m_inp_mux;                 // multiplexed inputs mask
-	int m_inp_lines;               // number of input mux columns
-	u8 m_lcd_output_cache[0x100];
-
+	u16 m_inp_mux;                  // multiplexed inputs mask
+	int m_inp_lines;                // number of input mux columns
+	
 	u8 read_inputs(int columns);
 
 	virtual void update_k_line();
@@ -66,6 +62,18 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
+
+	// display common
+	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 17ms)
+	u8 m_display_x_len;             // lcd number of groups
+	u8 m_display_y_len;             // lcd number of segments
+	u8 m_display_z_len;             // lcd number of commons
+	u32 m_display_state[0x20];      // lcd segment data
+	u8 m_display_decay[0x20][0x20]; // (internal use)
+	u8 m_display_cache[0x20][0x20]; // (internal use)
+
+	void set_display_size(u8 x, u8 y, u8 z);
+	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 
 protected:
 	virtual void machine_start() override;
@@ -80,12 +88,22 @@ void hh_sm510_state::machine_start()
 	// zerofill
 	m_inp_mux = 0;
 	/* m_inp_lines = 0; */ // not here
-	memset(m_lcd_output_cache, ~0, sizeof(m_lcd_output_cache));
+	m_display_x_len = 0;
+	m_display_y_len = 0;
+	m_display_z_len = 0;
+	memset(m_display_state, 0, sizeof(m_display_state));
+	memset(m_display_decay, 0, sizeof(m_display_decay));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_lines));
-	/* save_item(NAME(m_lcd_output_cache)); */ // don't save!
+	save_item(NAME(m_display_x_len));
+	save_item(NAME(m_display_y_len));
+	save_item(NAME(m_display_z_len));
+	save_item(NAME(m_display_state));
+	save_item(NAME(m_display_decay));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 }
 
 void hh_sm510_state::machine_reset()
@@ -101,49 +119,68 @@ void hh_sm510_state::machine_reset()
 ***************************************************************************/
 
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
+// deflicker here, especially needed for SM500/SM5A with the active shift register
 
-WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
+TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 {
-	for (int seg = 0; seg < 0x10; seg++)
+	u8 z_mask = (1 << m_display_z_len) - 1;
+	u8 zx_len = 1 << (m_display_x_len + m_display_z_len);
+	
+	for (int zx = 0; zx < zx_len; zx++)
 	{
-		int index = offset << 4 | seg;
-		u8 state = data >> seg & 1;
-
-		if (state != m_lcd_output_cache[index])
+		for (int y = 0; y < m_display_y_len; y++)
 		{
-			// output to row.seg.H, where:
-			// row = row a/b/bs/c (0/1/2/3)
-			// seg = seg 1-16 (0-15)
-			// H = H1-H4 (0-3)
-			char buf[0x10];
-			sprintf(buf, "%d.%d.%d", offset >> 2, seg, offset & 3);
-			output().set_value(buf, state);
+			// delay lcd segment on/off state
+			if (m_display_state[zx] >> y & 1)
+			{
+				if (m_display_decay[y][zx] < (2 * m_display_wait - 1))
+					m_display_decay[y][zx]++;
+			}
+			else if (m_display_decay[y][zx] > 0)
+				m_display_decay[y][zx]--;
+			u8 active_state = (m_display_decay[y][zx] < m_display_wait) ? 0 : 1;
 
-			m_lcd_output_cache[index] = state;
+			if (active_state != m_display_cache[y][zx])
+			{
+				// SM510 series: output to x.y.z, where:
+				// x = group a/b/bs/c (0/1/2/3)
+				// y = segment 1-16 (0-15)
+				// z = common H1-H4 (0-3)
+
+				// SM500 series: output to x.y.z, where:
+				// x = O group (0-*)
+				// y = O segment (0-3)
+				// z = common H1/H2 (0/1)
+				char buf[0x10];
+				sprintf(buf, "%d.%d.%d", zx >> m_display_z_len, y, zx & z_mask);
+				output().set_value(buf, active_state);
+				
+				m_display_cache[y][zx] = active_state;
+			}
 		}
 	}
 }
 
+void hh_sm510_state::set_display_size(u8 x, u8 y, u8 z)
+{
+	// x = groups(in bits)
+	// y = number of segments per group
+	// z = commons(in bits)
+	m_display_x_len = x;
+	m_display_y_len = y;
+	m_display_z_len = z;
+}
+
+WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
+{
+	set_display_size(2, 16, 2);
+	m_display_state[offset] = data;
+}
+
 WRITE8_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
 {
-	for (int seg = 0; seg < 4; seg++)
-	{
-		int index = offset << 2 | seg;
-		u8 state = data >> seg & 1;
-
-		if (state != m_lcd_output_cache[index])
-		{
-			// output to row.seg.H, where:
-			// row = O group (0-*)
-			// seg = O data (0-3)
-			// H = H1/H2 (0/1)
-			char buf[0x10];
-			sprintf(buf, "%d.%d.%d", offset & 0xf, seg, offset >> 4);
-			output().set_value(buf, state);
-
-			m_lcd_output_cache[index] = state;
-		}
-	}
+	set_display_size(4, 4, 1);
+	m_display_state[offset] = data;
 }
 
 
@@ -276,6 +313,8 @@ static MACHINE_CONFIG_START( ktopgun )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1611, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1611-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -345,6 +384,8 @@ static MACHINE_CONFIG_START( kcontra )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1501, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1501-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -413,6 +454,8 @@ static MACHINE_CONFIG_START( ktmnt )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1380, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1380-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -478,6 +521,8 @@ static MACHINE_CONFIG_START( kgradius )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1435, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1435-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -541,6 +586,8 @@ static MACHINE_CONFIG_START( kloneran )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1495, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1495-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -611,6 +658,7 @@ static MACHINE_CONFIG_START( mc25 )
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_input_w))
 
 	/* video hardware */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm500_test)
 
 	/* sound hardware */
@@ -680,6 +728,7 @@ static MACHINE_CONFIG_START( dm53 )
 	MCFG_SCREEN_SIZE(1920/2, 1219/2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1219/2-1)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
 	/* sound hardware */
@@ -753,6 +802,7 @@ static MACHINE_CONFIG_START( jr55 )
 	MCFG_SCREEN_SIZE(1920/2, 1261/2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1261/2-1)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
 	/* sound hardware */
@@ -822,6 +872,7 @@ static MACHINE_CONFIG_START( mw56 )
 	MCFG_SCREEN_SIZE(2079/2, 1440/2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 2079/2-1, 0, 1440/2-1)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualh)
 
 	/* sound hardware */
@@ -891,6 +942,8 @@ static MACHINE_CONFIG_START( dj101 )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1665, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1665-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -955,6 +1008,8 @@ static MACHINE_CONFIG_START( ml102 )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1759, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1759-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -1041,6 +1096,8 @@ static MACHINE_CONFIG_START( bx301 )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 529)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 529-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */

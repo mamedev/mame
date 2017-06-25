@@ -122,7 +122,7 @@ void sm500_device::lcd_update()
 		{
 			// 4 segments per group
 			u8 seg = h ? m_o[o] : m_ox[o];
-			m_write_o(h << 4 | o, m_bp ? seg : 0, 0xff);
+			m_write_o(o << 1 | h, m_bp ? seg : 0, 0xff);
 		}
 	}
 }
