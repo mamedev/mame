@@ -2792,7 +2792,6 @@ createMAMEProjects(_target, _subtarget, "neogeo")
 files {
 	MAME_DIR .. "src/mame/drivers/neogeo.cpp",
 	MAME_DIR .. "src/mame/includes/neogeo.h",
-	MAME_DIR .. "src/mame/drivers/neodriv.hxx",
 	MAME_DIR .. "src/mame/video/neogeo.cpp",
 	MAME_DIR .. "src/mame/drivers/neopcb.cpp",
 	MAME_DIR .. "src/mame/video/neogeo_spr.cpp",
