@@ -20,7 +20,7 @@ public:
 
 	DECLARE_READ32_MEMBER(gcsr_r) { return m_gcsr; }
 	DECLARE_WRITE32_MEMBER(gcsr_w) { m_gcsr = data; }
-	enum ipoll_mask 
+	enum ipoll_mask
 	{
 		IPOLL_ATTN       = 0x000000ff,
 		IPOLL_DMAEND     = 0x00000700,
@@ -34,7 +34,7 @@ public:
 	DECLARE_READ32_MEMBER(ipoll_r) { return m_ipoll; }
 	DECLARE_WRITE32_MEMBER(ipoll_w) { m_ipoll = data; }
 
-	enum imask_mask 
+	enum imask_mask
 	{
 		IMASK_DMAENDCH1  = 0x00000200,
 		IMASK_NOGRANT    = 0x00001000,
@@ -51,7 +51,7 @@ public:
 	DECLARE_READ32_MEMBER(range_end_r) { return m_range_end; }
 	DECLARE_WRITE32_MEMBER(range_end_w) { m_range_end = data; }
 
-	enum cttag_mask 
+	enum cttag_mask
 	{
 		CTTAG_TAG      = 0x00000007,
 		CTTAG_CYCLE    = 0x000001f8,
@@ -63,14 +63,14 @@ public:
 	DECLARE_READ32_MEMBER(address_r) { return m_address; }
 	DECLARE_WRITE32_MEMBER(address_w) { m_address = data; }
 
-	enum dmacsr_mask 
+	enum dmacsr_mask
 	{
 		DMACSR_CH1ENABLE = 0x00000080
 	};
 	DECLARE_READ32_MEMBER(dmacsr_r) { return m_dmacsr; }
 	DECLARE_WRITE32_MEMBER(dmacsr_w) { m_dmacsr = data; }
 
-	enum edmacsr_mask 
+	enum edmacsr_mask
 	{
 		EDMACSR_CH1RDONLY = 0x00000010
 	};

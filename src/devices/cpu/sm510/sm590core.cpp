@@ -3,7 +3,7 @@
 /*
 
   Sharp SM590 MCU core implementation
-  
+
   TODO:
   - finish SM590/SM595 emulation (NES/SNES CIC)
 

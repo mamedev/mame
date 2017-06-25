@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(eva24_read_g);
 	DECLARE_WRITE8_MEMBER(eva24_write_g);
 	DECLARE_WRITE8_MEMBER(eva24_write_d);
-	
+
 	u8 m_g;
 
 	// EVA-11
@@ -124,9 +124,9 @@ READ8_MEMBER(eva_state::eva11_read_k)
 {
 	// K84: TMS5100 CTL81(O30)
 	u8 ctl = BITSWAP8(m_tms5100->ctl_r(space, 0),7,6,5,4,3,0,1,2) & 0xc;
-	
+
 	// TODO: sensors
-	
+
 	return ctl;
 }
 

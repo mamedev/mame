@@ -80,9 +80,9 @@ void dio16_98544_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(HP98544_ROM_REGION).c_str())->base();
 
 	m_vram.resize(VRAM_SIZE);
-	m_dio->install_memory(0x200000, 0x2fffff, read16_delegate(FUNC(dio16_98544_device::vram_r), this), 
+	m_dio->install_memory(0x200000, 0x2fffff, read16_delegate(FUNC(dio16_98544_device::vram_r), this),
 							write16_delegate(FUNC(dio16_98544_device::vram_w), this));
-	m_dio->install_memory(0x560000, 0x563fff, read16_delegate(FUNC(dio16_98544_device::rom_r), this), 
+	m_dio->install_memory(0x560000, 0x563fff, read16_delegate(FUNC(dio16_98544_device::rom_r), this),
 							write16_delegate(FUNC(dio16_98544_device::rom_w), this));
 }
 
@@ -124,7 +124,7 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	uint32_t *scanline;
 	int x, y;
 	uint32_t pixels;
-	
+
 	for (y = 0; y < 768; y++)
 	{
 		scanline = &bitmap.pix32(y);

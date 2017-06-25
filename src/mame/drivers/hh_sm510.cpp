@@ -430,7 +430,7 @@ MACHINE_CONFIG_END
   Konami Gradius
   * PCB label BH004
   * Sharp SM511 under epoxy (die label KMS73B, KMS774)
-  
+
   Known in Japan as Nemesis.
 
 ***************************************************************************/
@@ -557,14 +557,14 @@ MACHINE_CONFIG_END
 
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
   * Sharp SM5A label ?
-  
+
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
-  
+
   In 1984, Elektronika(USSR) released a clone, Nu, Pogodi! This was followed
   by several other games that were the same under the hood, only differing
   in graphics.
-  
+
 ***************************************************************************/
 
 class mc25_state : public hh_sm510_state
@@ -838,7 +838,7 @@ MACHINE_CONFIG_END
 
   Nintendo Game & Watch: Donkey Kong Jr. (model DJ-101)
   * Sharp SM510 label DJ-101 52ZA (no decap)
-  
+
   This is the new wide screen version, there's also a tabletop version that
   plays more like the arcade game.
 
@@ -907,7 +907,7 @@ MACHINE_CONFIG_END
 
   Nintendo Game & Watch: Mario's Cement Factory (model ML-102)
   * Sharp SM510 label ML-102 298D (die label CMS54C, KMS577)
-  
+
   This is the new wide screen version, there's also a tabletop version.
 
 ***************************************************************************/

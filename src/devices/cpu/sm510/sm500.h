@@ -94,7 +94,7 @@ protected:
 
 	virtual void reset_vector() override { do_branch(0, 0xf, 0); }
 	virtual void wakeup_vector() override { do_branch(0, 0, 0); }
-	
+
 	// lcd driver
 	devcb_write8 m_write_o;
 	virtual void lcd_update() override;
@@ -154,7 +154,7 @@ public:
 
 protected:
 	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
-	
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual int get_trs_field() override { return 1; }

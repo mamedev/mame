@@ -192,7 +192,7 @@ void debugger_cpu::source_script(const char *file)
 	// close any existing source file
 	m_source_file.reset();
 
-	// open a new one if requested 
+	// open a new one if requested
 	if (file != nullptr)
 	{
 		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
@@ -875,7 +875,7 @@ void debugger_cpu::process_source_file()
 
 	// loop until the file is exhausted or until we are executing again
 	while (m_execution_state == EXECUTION_STATE_STOPPED
-			&& m_source_file 
+			&& m_source_file
 			&& std::getline(*m_source_file, buf))
 	{
 		// strip out comments (text after '//')

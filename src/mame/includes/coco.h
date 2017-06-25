@@ -54,7 +54,7 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define DWSOCK_TAG                  "dwsock"
 #define VHD0_TAG                    "vhd0"
 #define VHD1_TAG                    "vhd1"
-#define FLOATING_TAG				"floating"
+#define FLOATING_TAG                "floating"
 
 // inputs
 #define CTRL_SEL_TAG                "ctrl_sel"

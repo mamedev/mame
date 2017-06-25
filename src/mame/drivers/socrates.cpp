@@ -578,10 +578,10 @@ logerror("write to i/o 0x60 of %x\n",data);
 
 /* stuff below belongs in video/socrates.c */
 /* graphics section:
-	0x20 - W - lsb offset of screen display
-	0x21 - W - msb offset of screen display
-	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
-	*/
+    0x20 - W - lsb offset of screen display
+    0x21 - W - msb offset of screen display
+    resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
+    */
 WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 {
 	if (offset == 0)
@@ -966,7 +966,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	0xC0 produces a DMC wave read from an unknown address at around 342hz
 	<todo: test the others, maybe take samples?>
 	*/
-	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) 
+	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, kbmcu_strobe) AM_MIRROR (0xf) /* resets the keyboard IR decoder MCU */
 	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate 
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_SIZE(264, 238) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)

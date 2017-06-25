@@ -18,13 +18,13 @@
       http://www.pioneerelectronics.com/ephox/StaticFiles/Manuals/Business/Pio%20V5000-RS232%20-%20CPM.pdf
       After returning a correct status code, tmp68301 sends "FSDVD04.MPG00001<CR>" to serial, probably tries
       to playback the file ...
-	- h8 board components:
-	  H8/3002
-	  MN7100 8-bit channel data acquisition system
-	  Fujitsu MD0208 
-	  Heatsinked chip (TBD)
-	  IDE and RS232c ports
-	  xtal 27 MHz
+    - h8 board components:
+      H8/3002
+      MN7100 8-bit channel data acquisition system
+      Fujitsu MD0208
+      Heatsinked chip (TBD)
+      IDE and RS232c ports
+      xtal 27 MHz
 
 ***********************************************************************************************************/
 
@@ -85,7 +85,7 @@ public:
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	#endif
-	
+
 	DECLARE_DRIVER_INIT(mjmania);
 	DECLARE_DRIVER_INIT(csplayh5);
 	DECLARE_DRIVER_INIT(fuudol);
@@ -158,8 +158,8 @@ static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x02000a, 0x02000b) AM_READ(test_r)
-//	AM_RANGE(0x020008, 0x02000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
-	
+//  AM_RANGE(0x020008, 0x02000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
+
 	AM_RANGE(0x040018, 0x040019) AM_READ(test_r)
 	AM_RANGE(0x040028, 0x04002f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0) // correct?
 	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
@@ -426,7 +426,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_CPU_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sub_map)
 	MCFG_CPU_IO_MAP(csplayh5_sub_io_map)
-	
+
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(csplayh5_state, ide_irq))
 #endif
@@ -477,7 +477,7 @@ void csplayh5_state::general_init(int patchaddress, int patchvalue)
 	/* patch DVD comms check */
 	MAINROM[patchaddress] = patchvalue;
 	#endif
-	
+
 	uint8_t *SNDROM = m_region_audiocpu->base();
 
 	/* initialize sound rom bank */

@@ -30,7 +30,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-	
+
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 
 protected:

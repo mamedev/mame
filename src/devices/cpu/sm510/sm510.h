@@ -155,7 +155,7 @@ protected:
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
-	
+
 	virtual void reset_vector() { do_branch(3, 7, 0); }
 	virtual void wakeup_vector() { do_branch(1, 0, 0); } // after halt
 

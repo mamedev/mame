@@ -32,7 +32,7 @@ MACHINE_CONFIG_EXTERN( megadriv_timers );
 MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
-MACHINE_CONFIG_EXTERN( dcat16_megadriv ); 
+MACHINE_CONFIG_EXTERN( dcat16_megadriv );
 
 struct genesis_z80_vars
 {

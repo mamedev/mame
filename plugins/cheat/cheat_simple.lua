@@ -71,13 +71,13 @@ function codefuncs.nes_gg(desc, code)
 	if #code == 6 then
 		addr = ((value >> 4) & 7) | ((value >> 8) & 0x78) | ((value >> 12) & 0x80) | ((value << 8) & 0x700) | ((value << 4) & 0x7800)
 		newval = ((value >> 20) & 7) | (value & 8) | ((value >> 12) & 0x70) | ((value >> 16) & 0x80)
-		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8) 
+		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8)
 	elseif #code == 8 then
 		addr = ((value >> 12) & 7) | ((value >> 16) & 0x78) | ((value >> 20) & 0x80) | (value & 0x700) | ((value >> 4) & 0x7800)
 		newval = ((value >> 28) & 7) | (value & 8) | ((value >> 20) & 0x70) | ((value >> 24) & 0x80)
 		comp = ((value >> 4) & 7) | ((value >> 8) & 8) | ((value << 4) & 0x70) | ((value << 1) & 0x80)
 		-- assume 8K banks, 32K also common but is an easy multiple of 8K
-		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp) 
+		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp)
 	else
 		error("error game genie cheat incorrect length " .. desc)
 	end
@@ -100,7 +100,7 @@ local function snes_prepare_cheat(desc, addr, val)
 	local bank = addr >> 16
 	local offset = addr & 0xffff
 	if ((bank <= 0x3f) and (offset < 0x2000)) or ((bank & 0xfe) == 0x7e) then
-		return prepare_ram_cheat(desc, ":maincpu", addr, val, 8) 
+		return prepare_ram_cheat(desc, ":maincpu", addr, val, 8)
 	end
 	if (manager:machine().devices[":maincpu"].spaces["program"]:read_u8(0xffd5) & 1) == 1 then --hirom
 		if (bank & 0x7f) <= 0x3f and offset >= 0x8000 then
@@ -125,7 +125,7 @@ local function snes_prepare_cheat(desc, addr, val)
 			error("error cheat not rom or ram addr " .. desc)
 		end
 	end
-	return prepare_rom_cheat(desc, ":snsslot:cart:rom", addr, val, 8) 
+	return prepare_rom_cheat(desc, ":snsslot:cart:rom", addr, val, 8)
 end
 
 function codefuncs.snes_gg(desc, code)
@@ -184,7 +184,7 @@ function codefuncs.megadriv_gg(desc, code)
 	end
 	local newval = ((value >> 32) & 0xff) | ((value >> 3) & 0x1f00) | ((value << 5) & 0xe000)
 	local addr = (value & 0xff00ff) | ((value >> 16) & 0xff00)
-	return prepare_rom_cheat(desc, ":mdslot:cart:rom", addr, newval, 16) 
+	return prepare_rom_cheat(desc, ":mdslot:cart:rom", addr, newval, 16)
 end
 
 function codefuncs.megadriv_ar(desc, code)
@@ -221,10 +221,10 @@ local function gbgg_ggcodes(desc, code, region)
 		error("error game genie cheat bad addr " .. desc)
 	end
 	if comp == -1 then
-		return prepare_rom_cheat(desc, region, addr, newval, 8) 
+		return prepare_rom_cheat(desc, region, addr, newval, 8)
 	else
 		-- assume 8K banks
-		return prepare_rom_cheat(desc, region, addr, newval, 8, 8192, comp) 
+		return prepare_rom_cheat(desc, region, addr, newval, 8, 8192, comp)
 	end
 	return cheat
 end

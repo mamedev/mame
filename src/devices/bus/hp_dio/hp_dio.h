@@ -4,11 +4,11 @@
 
         HP DIO and DIO-II bus devices
 
-		DIO is 16-bit, essentially the MC68000 bus
-		DIO-II extends to 32-bit for 68020/030/040 machines
-		
-		16-bit DIO cards fit and work in either 16 or 32 bit systems, much like 8-bit ISA.
-		32-bit DIO-II cards only work in 32 bit DIO-II systems.
+        DIO is 16-bit, essentially the MC68000 bus
+        DIO-II extends to 32-bit for 68020/030/040 machines
+
+        16-bit DIO cards fit and work in either 16 or 32 bit systems, much like 8-bit ISA.
+        32-bit DIO-II cards only work in 32 bit DIO-II systems.
 
 ***************************************************************************/
 
@@ -91,7 +91,7 @@ public:
 	template <class Object> static devcb_base &set_out_irq6_callback(device_t &device, Object &&cb) { return downcast<dio16_device &>(device).m_out_irq6_cb.set_callback(std::forward<Object>(cb)); }
 
 	void install_memory(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
-	
+
 	// DANGER: these will currently produce different results for a DIO-I card on DIO-I and DIO-II systems
 	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.
 	//         either know what you're doing (m_prgwidth is available to cards for this purpose) or

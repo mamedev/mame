@@ -2,14 +2,14 @@
 // copyright-holders:R. Belmont, O. Galibert
 /***************************************************************************
 
-	sis85c496.cpp - SiS 85C496/497 PCI chipset
-	by R. Belmont (based on i82439hx.cpp/i82439tx.cpp by O. Galibert)
-	
-	Unlike Intel chipsets, the southbridge is not a PCI device;
-	it connects via a proprietary bus to the northbridge, and the two
-	chips appear to software/the BIOS as a single chip.  Thus we emulate 
-	them in a single file.
-	
+    sis85c496.cpp - SiS 85C496/497 PCI chipset
+    by R. Belmont (based on i82439hx.cpp/i82439tx.cpp by O. Galibert)
+
+    Unlike Intel chipsets, the southbridge is not a PCI device;
+    it connects via a proprietary bus to the northbridge, and the two
+    chips appear to software/the BIOS as a single chip.  Thus we emulate
+    them in a single file.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, sis85c496_host_device)	
+DEVICE_ADDRESS_MAP_START(config_map, 32, sis85c496_host_device)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(dram_config_r, dram_config_w, 0x000000ff)
 	AM_RANGE(0x44, 0x47) AM_READWRITE16(shadow_config_r, shadow_config_w, 0x0000ffff)
 	AM_RANGE(0x58, 0x5b) AM_READWRITE8(smram_ctrl_r, smram_ctrl_w, 0x00ff0000)
@@ -41,7 +41,7 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, sis85c496_host_device)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP
-	
+
 	AM_INHERIT_FROM(pci_host_device::io_configuration_access_map)
 ADDRESS_MAP_END
 
@@ -124,7 +124,7 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 	m_speaker(*this, "speaker"),
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc"),
-    m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }
 
@@ -141,7 +141,7 @@ void sis85c496_host_device::set_ram_size(int _ram_size)
 void sis85c496_host_device::device_start()
 {
 	pci_host_device::device_start();
-		
+
 	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
@@ -159,7 +159,7 @@ void sis85c496_host_device::device_start()
 	m_isa_decoder = 0xff;
 	m_shadctrl = 0;
 	m_smramctrl = 0;
-	
+
 	ram.resize(ram_size/4);
 }
 
@@ -171,14 +171,14 @@ void sis85c496_host_device::reset_all_mappings()
 void sis85c496_host_device::device_reset()
 {
 	pci_host_device::device_reset();
-	
+
 	m_at_spkrdata = 0;
 	m_pit_out2 = 1;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	m_nmi_enabled = 0;
 	m_refresh = false;
-	
+
 	m_bios_config = 0x78;
 	m_dram_config = 0;
 	m_isa_decoder = 0xff;
@@ -194,7 +194,7 @@ void sis85c496_host_device::map_bios(address_space *memory_space, uint32_t start
 
 void sis85c496_host_device::map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr)
 {
-	if (m_shadctrl & 0x100)	// write protected?
+	if (m_shadctrl & 0x100) // write protected?
 	{
 		memory_space->install_rom(addrstart, addrend, baseptr);
 	}
@@ -212,7 +212,7 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 
 	// is SMRAM at e0000?  overrides shadow if so
 	if ((m_smramctrl & 0x16) == 0x16)
-	{		
+	{
 		if (m_smramctrl & 0x08)
 		{
 			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000b0000/4]);
@@ -223,7 +223,7 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000a0000/4]);
 			logerror("Sis496: SMRAM at Exxxx, phys Axxxx\n");
 		}
-		
+
 		// map the high BIOS at FFFExxxx if enabled
 		if (m_bios_config & 0x40)
 		{
@@ -231,7 +231,7 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 		}
 	}
 	else
-	{	
+	{
 		// does shadow RAM actually require this to be set?  can't tell w/Megatouch BIOS.
 		if (m_bios_config & 0x40)
 		{
@@ -242,16 +242,16 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 			{
 				map_bios(memory_space, 0x000e0000, 0x000effff);
 			}
-			else	// at least one 32K block has shadow memory
+			else    // at least one 32K block has shadow memory
 			{
 				if (m_shadctrl & 0x20)
 				{
 					logerror("SiS496: shadow RAM at e8000\n");
 					map_shadowram(memory_space, 0x000e8000, 0x000effff, &ram[0x000e8000/4]);
 				}
-				
+
 				if (m_shadctrl & 0x10)
-				{				
+				{
 					logerror("SiS496: shadow RAM at e0000\n");
 					map_shadowram(memory_space, 0x000e0000, 0x000e7fff, &ram[0x000e0000/4]);
 				}
@@ -261,20 +261,20 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	if (m_bios_config & 0x20)
 	{
 		map_bios(memory_space, 0xffff0000, 0xffffffff);
-		
+
 		if ((m_shadctrl & 0xc0) == 0)
 		{
 			map_bios(memory_space, 0x000f0000, 0x000fffff);
 			logerror("SiS496: BIOS at Fxxxx\n");
 		}
-		else	// at least one 32K block has shadow memory
+		else    // at least one 32K block has shadow memory
 		{
 			if (m_shadctrl & 0x80)
 			{
 				logerror("SiS496: shadow RAM at f8000\n");
 				map_shadowram(memory_space, 0x000f8000, 0x000fffff, &ram[0x000f8000/4]);
 			}
-			
+
 			if (m_shadctrl & 0x40)
 			{
 				logerror("SiS496: shadow RAM at f0000\n");
@@ -282,12 +282,12 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 			}
 		}
 	}
-	
+
 	if (m_shadctrl & 0x08)
 	{
 		logerror("SiS496: shadow RAM at d8000\n");
 		memory_space->install_ram(0x000d8000, 0x000dffff, &ram[0x000d8000/4]);
-	}		
+	}
 	if (m_shadctrl & 0x04)
 	{
 		logerror("SiS496: shadow RAM at d0000\n");
@@ -297,13 +297,13 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	{
 		logerror("SiS496: shadow RAM at c8000\n");
 		memory_space->install_ram(0x000c8000, 0x000cffff, &ram[0x000c8000/4]);
-	}		
+	}
 	if (m_shadctrl & 0x01)
 	{
 		logerror("SiS496: shadow RAM at d8000\n");
 		memory_space->install_ram(0x000c0000, 0x000c7fff, &ram[0x000c0000/4]);
 	}
-				
+
 	// is SMRAM enabled at 6xxxx?
 	if ((m_smramctrl & 0x12) == 0x02)
 	{
@@ -315,7 +315,7 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 		logerror("SiS496: ISA base 640K enabled\n");
 		memory_space->install_ram(0x00000000, 0x0009ffff, &ram[0x00000000/4]);
 	}
-	
+
 	// 32 megs of RAM (todo: don't hardcode)
 	memory_space->install_ram(0x00100000, 0x01ffffff, &ram[0x00100000/4]);
 }
