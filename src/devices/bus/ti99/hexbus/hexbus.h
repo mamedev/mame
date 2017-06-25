@@ -21,119 +21,104 @@ namespace bus { namespace ti99 { namespace hexbus {
 
 enum
 {
-	MAX_DEVICES = 4
+	INBOUND = 0,
+	OUTBOUND = 1
 };
 
 class hexbus_device;
+class hexbus_chained_device;
+
+/********************************************************************
+    Interface for a device that connects to the Hexbus
+********************************************************************/
+
+class device_ti_hexbus_interface : public device_slot_card_interface
+{
+public:
+	virtual uint8_t bus_read(int dir) =0;
+	virtual void bus_write(int dir, uint8_t data) =0;
+
+protected:
+	device_ti_hexbus_interface(const machine_config &mconfig, device_t &device) :
+		device_slot_card_interface(mconfig, device) { }
+};
 
 /********************************************************************
     Common parent class of all devices attached to the hexbus port
+    This class implements the signal propagation in both directions
 ********************************************************************/
-class device_ti_hexbus_interface : public device_slot_card_interface
+class hexbus_chained_device : public device_t, public device_ti_hexbus_interface
 {
 	friend class hexbus_device;
-	friend class hexbus_slot_device;
+
+public:
+	hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void device_start() override;
 
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
-	void hexbus_send(uint8_t value);
-	uint8_t hexbus_receive() { return m_busvalue; }
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void receive(uint8_t value) { m_busvalue = value; }
-	virtual uint8_t get_value() { return m_value; }
+	// Link to the inbound Hexbus (if not null, see Oso chip)
+	hexbus_device *m_hexbus_inbound;
 
-	virtual void interface_config_complete() override;
-	hexbus_device *m_hexbus;        // Link to the Hexbus
+	// Link to the outbound Hexbus (if not null)
+	hexbus_device *m_hexbus_outbound;
+
+	// Common AND of all private values
+	uint8_t m_current_bus_value;
+
+	// From device_ti_hexbus_interface
+	virtual uint8_t bus_read(int dir) override;
+	virtual void bus_write(int dir, uint8_t data) override;
+
+	// Methods to be used from subclasses
+	void hexbus_write(uint8_t data);
+	uint8_t hexbus_read();
+
+	// For interrupts
+	virtual void hexbus_value_changed(uint8_t data) { };
 
 private:
-	void set_hexbus(hexbus_device* hexbus) { m_hexbus = hexbus; }
-	uint8_t m_value;
-	uint8_t m_busvalue;
+	uint8_t m_myvalue;
 };
 
 // ------------------------------------------------------------------------
+
+/********************************************************************
+    Connector to the Hexbus, offers a slot for Hexbus-chained devices
+********************************************************************/
 
 class hexbus_device : public device_t, public device_slot_interface
 {
-	friend class device_ti_hexbus_interface;
-
 public:
 	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void connect_master(device_ti_hexbus_interface *masterdev) { m_master = masterdev; }
+
+	// Used to establish the reverse link (inbound)
+	void set_chain_element(hexbus_chained_device* chain) { m_chain_element = chain; }
+
+	// Read and write operations on the bus
+	uint8_t read(int dir);
+	void write(int dir, uint8_t data);
 
 protected:
 	void device_start() override;
-	void device_config_complete() override;
+	device_ti_hexbus_interface *m_next_dev;
 
 private:
-	device_ti_hexbus_interface *m_master;
-	device_ti_hexbus_interface *m_slave;
-
-	// Called from a slot, samples all values from the devices, and propagates
-	// the logical product to all connected devices
-	void send();
+	// owner of this Hexbus socket; may be the owning component or another
+	// component in the device hierarchy (see TI-99/8 where it belongs to Oso,
+	// but the Hexbus is a subdevice of the driver itself)
+	hexbus_chained_device*  m_chain_element;
 };
-
-
-// ------------------------------------------------------------------------
-
-class hexbus_chain_device : public device_t, public device_ti_hexbus_interface
-{
-public:
-	hexbus_chain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void device_add_mconfig(machine_config &config) override;
-
-private:
-	void device_start() override;
-	void receive(uint8_t value) override;
-	uint8_t get_value() override;
-};
-
-// ------------------------------------------------------------------------
-
-class hexbus_slot_device : public device_t, public device_slot_interface
-{
-	friend class hexbus_attached_device;
-	friend class hexbus_chain_device;
-
-public:
-	hexbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// Called from the hexbus (direction to attached device)
-	void receive(uint8_t value);
-
-	// Called from the hexbus
-	uint8_t get_value();
-
-protected:
-	void device_start() override;
-	void device_config_complete() override;
-
-	// Called from the Hexbus instance
-	int get_index();
-
-private:
-	int get_index_from_tagname();
-
-	device_ti_hexbus_interface* m_hexbdev;
-	hexbus_device* m_hexbus;
-};
-
 
 #define MCFG_HEXBUS_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, TI_HEXBUS, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE( ti_hexbus_conn, nullptr, false)
 
-#define MCFG_HEXBUS_SLOT_ADD(_tag, _slot_intf) \
-	MCFG_DEVICE_ADD(_tag, TI_HEXBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
-
 }   }   }  // end namespace bus::ti99::hexbus
 
 SLOT_INTERFACE_EXTERN( ti_hexbus_conn );
 
-DECLARE_DEVICE_TYPE_NS(TI_HEXBUS,       bus::ti99::hexbus, hexbus_device)
-DECLARE_DEVICE_TYPE_NS(TI_HEXBUS_CHAIN, bus::ti99::hexbus, hexbus_chain_device)
-DECLARE_DEVICE_TYPE_NS(TI_HEXBUS_SLOT,  bus::ti99::hexbus, hexbus_slot_device)
+DECLARE_DEVICE_TYPE_NS(TI_HEXBUS, bus::ti99::hexbus, hexbus_device)
 
 #endif // MAME_BUS_TI99_HEXBUS_HEXBUS_H

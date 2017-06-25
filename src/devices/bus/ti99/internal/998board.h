@@ -422,7 +422,7 @@ private:
 /*
     Custom chip: OSO
 */
-class oso_device : public device_t, public bus::ti99::hexbus::device_ti_hexbus_interface
+class oso_device : public bus::ti99::hexbus::hexbus_chained_device
 {
 public:
 	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -430,13 +430,13 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start() override;
 
+	void hexbus_value_changed(uint8_t data) override;
+
 private:
 	uint8_t m_data;
 	uint8_t m_status;
 	uint8_t m_control;
 	uint8_t m_xmit;
-
-	bus::ti99::hexbus::hexbus_device* m_hexbus;
 };
 
 class mainboard8_device : public device_t
