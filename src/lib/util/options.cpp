@@ -356,7 +356,7 @@ void core_options::simple_entry::internal_set_value(std::string &&newvalue)
 
 void core_options::simple_entry::set_default_value(std::string &&newvalue)
 {
-	m_defdata = std::move(newvalue);
+	m_data = m_defdata = std::move(newvalue);
 }
 
 
