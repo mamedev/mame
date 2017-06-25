@@ -208,7 +208,7 @@ void menu_slot_devices::set_slot_device(device_slot_interface &slot, const char 
 
 
 //-------------------------------------------------
-//	record_current_options
+//  record_current_options
 //-------------------------------------------------
 
 void menu_slot_devices::record_current_options()
@@ -230,7 +230,7 @@ void menu_slot_devices::record_current_options()
 
 
 //-------------------------------------------------
-//	try_refresh_current_options
+//  try_refresh_current_options
 //-------------------------------------------------
 
 bool menu_slot_devices::try_refresh_current_options()

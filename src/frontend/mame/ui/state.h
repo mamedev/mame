@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	ui/state.h
+    ui/state.h
 
-	Menus for saving and loading state
+    Menus for saving and loading state
 
 ***************************************************************************/
 
@@ -45,19 +45,19 @@ private:
 		const std::chrono::system_clock::time_point &last_modified() const { return m_last_modified; }
 
 	private:
-		std::string								m_file_name;			// filename for the state itself
-		std::string								m_visible_name;			// how it appears in the dialog
+		std::string                             m_file_name;            // filename for the state itself
+		std::string                             m_visible_name;         // how it appears in the dialog
 		std::chrono::system_clock::time_point   m_last_modified;
 	};
 
-	static std::string								s_last_file_selected;
+	static std::string                              s_last_file_selected;
 
-	std::unordered_map<std::string, file_entry>		m_file_entries;
-	std::unordered_map<std::string, std::string>	m_filename_to_code_map;
-	const char *									m_header;
-	const char *									m_footer;
-	bool											m_must_exist;
-	bool											m_was_paused;
+	std::unordered_map<std::string, file_entry>     m_file_entries;
+	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
+	const char *                                    m_header;
+	const char *                                    m_footer;
+	bool                                            m_must_exist;
+	bool                                            m_was_paused;
 
 	static void *itemref_from_file_entry(const file_entry &entry);
 	static const file_entry &file_entry_from_itemref(void *itemref);

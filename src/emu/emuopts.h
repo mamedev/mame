@@ -276,9 +276,9 @@ public:
 
 	enum class option_support
 	{
-		FULL,					// full option support
-		GENERAL_AND_SYSTEM,		// support for general options and system (no softlist)
-		GENERAL_ONLY			// only support for general options
+		FULL,                   // full option support
+		GENERAL_AND_SYSTEM,     // support for general options and system (no softlist)
+		GENERAL_ONLY            // only support for general options
 	};
 
 	// construction/destruction
@@ -501,7 +501,7 @@ private:
 	static const options_entry                          s_option_entries[];
 
 	// the basics
-	option_support										m_support;
+	option_support                                      m_support;
 	const game_driver *                                 m_system;
 
 	// slots and devices
@@ -517,7 +517,7 @@ private:
 	ui_option                                           m_ui;
 
 	// special option; the system name we tried to specify
-	std::string											m_attempted_system_name;
+	std::string                                         m_attempted_system_name;
 
 	// special option; the software set name that we did specify
 	std::string                                         m_software_name;

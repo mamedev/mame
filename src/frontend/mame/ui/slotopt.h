@@ -37,8 +37,8 @@ private:
 	bool try_refresh_current_options();
 
 	// variables
-	std::unique_ptr<machine_config>					m_config;
-	std::unordered_map<std::string, std::string>	m_slot_options;
+	std::unique_ptr<machine_config>                 m_config;
+	std::unordered_map<std::string, std::string>    m_slot_options;
 };
 
 } // namespace ui

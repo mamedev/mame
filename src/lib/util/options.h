@@ -248,7 +248,7 @@ private:
 	std::vector<entry::shared_ptr>                      m_entries;              // cannonical list of entries
 	std::unordered_map<std::string, entry::weak_ptr>    m_entrymap;             // map for fast lookup
 	std::string                                         m_command;              // command found
-	std::vector<std::string>                            m_command_arguments;	// command arguments
+	std::vector<std::string>                            m_command_arguments;    // command arguments
 	static const char *const                            s_option_unadorned[];   // array of unadorned option "names"
 };
 

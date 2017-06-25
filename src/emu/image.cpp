@@ -185,11 +185,11 @@ void image_manager::options_extract()
 	{
 		// There are two scenarios where we want to extract the option:
 		//
-		//	1.  When for the device, is_reset_on_load() is false (mounting devices for which is reset_and_load()
-		//		is true forces a reset, hence the name)
+		//  1.  When for the device, is_reset_on_load() is false (mounting devices for which is reset_and_load()
+		//      is true forces a reset, hence the name)
 		//
-		//	2.  When is_reset_on_load(), and this results in a device being unmounted (unmounting is_reset_and_load()
-		//		doesn't force an unmount)
+		//  2.  When is_reset_on_load(), and this results in a device being unmounted (unmounting is_reset_and_load()
+		//      doesn't force an unmount)
 		if (!image.is_reset_on_load()
 			|| (!image.exists() && !machine().options().image_option(image.instance_name()).value().empty()))
 		{
