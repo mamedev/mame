@@ -50,6 +50,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void port80_debug_write(uint8_t value) {}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259_master;

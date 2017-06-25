@@ -297,6 +297,8 @@ WRITE8_MEMBER( southbridge_device::at_page8_w )
 {
 	m_at_pages[offset % 0x10] = data;
 
+	if (offset == 0)
+		port80_debug_write(data);
 	switch(offset % 8)
 	{
 	case 1:
