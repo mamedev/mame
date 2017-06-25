@@ -6,8 +6,7 @@
   Sharp SM5xx family handhelds.
 
   TODO:
-  - add svg layout for gnw_mc25
-  - improve svg layout for gnw_jr55, gnw_mw56
+  - improve svg layout for gnw_mc25, gnw_jr55, gnw_mw56
   - svg lcd screen background/foreground (not supported in core),
     or should it be for external artwork only?
   - confirm gnw_mc25 rom (dumped from Soviet clone, but pretty confident that it's same)
@@ -26,7 +25,7 @@
 #include "gnw_dualv.lh"
 #include "gnw_dualh.lh"
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
-#include "hh_sm500_test.lh" // "
+//#include "hh_sm500_test.lh" // "
 
 
 class hh_sm510_state : public driver_device
@@ -38,7 +37,7 @@ public:
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
 		m_inp_lines(0),
-		m_display_wait(17)
+		m_display_wait(33)
 	{ }
 
 	// devices
@@ -64,7 +63,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
 
 	// display common
-	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 17ms)
+	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 33ms)
 	u8 m_display_x_len;             // lcd number of groups
 	u8 m_display_y_len;             // lcd number of segments
 	u8 m_display_z_len;             // lcd number of commons
@@ -149,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 
 				// SM500 series: output to x.y.z, where:
 				// x = O group (0-*)
-				// y = O segment (0-3)
+				// y = O segment 1-4 (0-3)
 				// z = common H1/H2 (0/1)
 				char buf[0x10];
 				sprintf(buf, "%d.%d.%d", zx >> m_display_z_len, y, zx & z_mask);
@@ -655,8 +654,13 @@ static MACHINE_CONFIG_START( mc25 )
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_input_w))
 
 	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1711, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1711-1, 0, 1080-1)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm500_test)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1174,8 +1178,8 @@ ROM_START( gnw_mc25 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
-	ROM_REGION( 100000, "svg", 0)
-	ROM_LOAD( "gnw_mc25.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 100018, "svg", 0)
+	ROM_LOAD( "gnw_mc25.svg", 0, 100018, CRC(bcd01de3) SHA1(2c7a9da248f96ac11e794a46942a3e420d1e854b) )
 ROM_END
 
 
@@ -1253,7 +1257,7 @@ CONS( 1989, ktmnt,     0,      0, ktmnt,     ktmnt,     ktmnt_state,    0, "Kona
 CONS( 1989, kgradius,  0,      0, kgradius,  kgradius,  kgradius_state, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, kloneran,  0,      0, kloneran,  kloneran,  kloneran_state, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, gnw_mc25,  0,      0, mc25,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, gnw_mc25,  0,      0, mc25,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_dm53,  0,      0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_jr55,  0,      0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mw56,  0,      0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )

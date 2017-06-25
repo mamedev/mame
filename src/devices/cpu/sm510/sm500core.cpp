@@ -7,7 +7,7 @@
   TODO:
   - EXKSA, EXKFA opcodes
   - SM500 data book suggests that R1 divider output is selectable, but how?
-  - unknown which H/O pin is which W output, guessed for now
+  - unknown which O group is which W output, guessed for now (segments and H should be ok)
 
 */
 
@@ -120,7 +120,7 @@ void sm500_device::lcd_update()
 		for (int o = 0; o < m_o_pins; o++)
 		{
 			// 4 segments per group
-			u8 seg = h ? m_o[o] : m_ox[o];
+			u8 seg = h ? m_ox[o] : m_o[o];
 			m_write_o(o << 1 | h, m_bp ? seg : 0, 0xff);
 		}
 	}
