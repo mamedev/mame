@@ -2,6 +2,9 @@
 // copyright-holders:David Haywood
 /* This is MPU4 MOD4 with a Y2413 instead of an OKI */
 
+#include "emu.h"
+#include "includes/mpu4.h"
+
 MACHINE_CONFIG_EXTERN( mod4yam );
 INPUT_PORTS_EXTERN( mpu4 );
 
@@ -227,7 +230,7 @@ ROM_START( m4voodoo )
 	ROM_LOAD( "ddo32", 0x0000, 0x010000, CRC(260dfef1) SHA1(2b4918e40808963a86d289cd251740a9b0bed70a) )
 ROM_END
 
-
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \

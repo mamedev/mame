@@ -19,6 +19,9 @@
 
   */
 
+#include "emu.h"
+#include "includes/mpu4.h"
+
 MACHINE_CONFIG_EXTERN( mod4yam );
 MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( mod2 );
@@ -201,6 +204,8 @@ ROM_START( m4andycp10c )
 	ROM_LOAD( "aci10___.1_1",     0x0000, 0x010000, CRC(afa29daa) SHA1(33d161977b1e3512b550980aed48954ba7f0c5a2) )
 	M4ANDYCP_EXTRA_ROMS
 ROM_END
+
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 GAME( 1994, m4andycp10c,  m4andycp,  mod4oki, mpu4, mpu4_state, m4_andycp10c , ROT0, "Bwb", "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C)",GAME_FLAGS )
 

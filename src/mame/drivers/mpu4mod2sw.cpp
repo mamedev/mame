@@ -13,6 +13,10 @@
  sounds for me to know they use the AY.
 
 */
+
+#include "emu.h"
+#include "includes/mpu4.h"
+
 #include "m4actclb.lh"
 #include "m4actpak.lh"
 #include "m4alladv.lh"
@@ -1754,7 +1758,7 @@ ROM_START( m4brktak )
 	ROM_LOAD( "b-t v1-0 p2", 0x8000, 0x004000, CRC(7465cc6f) SHA1(f984e41c310bc58d7a668ec9f31c238fbf5de9c6) )
 ROM_END
 
-
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 GAME(199?, m4rsg        ,0          ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.2)",GAME_FLAGS )
 GAME(199?, m4rsga       ,m4rsg      ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.0)",GAME_FLAGS )

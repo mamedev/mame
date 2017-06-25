@@ -2,6 +2,9 @@
 // copyright-holders:David Haywood
 /* MPU4 sets from various other manufactuers which appear to be based off unique code / behaviors (no barcrest headers etc.) */
 
+#include "emu.h"
+#include "includes/mpu4.h"
+
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
 
@@ -138,6 +141,7 @@ ROM_START( m4jiggina )
 	M4JIGGIN_SOUND
 ROM_END
 
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 #define M4DCRLS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \

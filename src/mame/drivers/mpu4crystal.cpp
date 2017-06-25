@@ -4,6 +4,9 @@
 
 /* Crystal games tend to have scrambled ROM + a different sound chip */
 
+#include "emu.h"
+#include "includes/mpu4.h"
+
 MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( mpu4crys );
 INPUT_PORTS_EXTERN( mpu4 );
@@ -752,7 +755,7 @@ ROM_START( m4ndupc )
 	M4NDUP_SOUND
 ROM_END
 
-
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 GAME(199?, m4frkstn ,0          ,mpu4crys   ,mpu4       , mpu4_state,m_frkstn,  ROT0,   "Crystal","Frank 'n' Stein (Crystal) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4frkstna,m4frkstn   ,mpu4crys   ,mpu4       , mpu4_state,m_frkstn,  ROT0,   "Crystal","Frank 'n' Stein (Crystal) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )

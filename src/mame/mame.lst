@@ -21388,7 +21388,7 @@ m4wnud                          // Unknown MPU4 'W Nudge'
 m4zill                          // Zillionare's Challenge (Pure Leisure)
 m4zilla                         //
 
-//@source:mpu4avan.inc
+@source:mpu4avan.cpp
 m4abeaut                        //
 m4abeaut_1                      //
 m4abeaut_2                      //
@@ -21890,7 +21890,7 @@ m4trg__x                        //
 m4trg__y                        //
 m4trg__z                        //
 
-//@source:mpu4bwb.inc
+@source:mpu4bwb.cpp
 m4abra                          // Abracadabra (Bwb)
 m4abra__a                       //
 m4abra__b                       //
@@ -22352,7 +22352,7 @@ m4xtrm                          // X-treme (Bwb)
 m4xtrm__a                       //
 m4xtrm__b                       //
 
-//@source:mpu4concept.inc
+@source:mpu4concept.cpp
 m4nudgwc                        // Nudge a Win (Concept)
 m4nudgwc__a                     //
 m4nudgwc__b                     //
@@ -22424,7 +22424,7 @@ m4spnwnc                        // Spin-A-Win (Concept)
 m4spnwnc__a                     //
 m4spnwnc__b                     //
 
-//@source:mpu4crystal.inc
+@source:mpu4crystal.cpp
 m4aladn                         // Aladdin's Cave (Crystal)
 m4aladna                        //
 m4aladnb                        //
@@ -22527,7 +22527,7 @@ m4twstrd                        //
 m4tylb                          // Thank Your Lucky Bars (Crystal)
 m4tylba                         //
 
-//@source:mpu4empire.inc
+@source:mpu4empire.cpp
 m4apachg                        // Apache Gold (Empire)
 m4apachga                       //
 m4apachgb                       //
@@ -22610,7 +22610,7 @@ m4ttrail                        // Treasure Trail (Empire)
 m4ttraila                       //
 m4ttrailb                       //
 
-//@source:mpu4mdm.inc
+@source:mpu4mdm.cpp
 m42punlm                        // 2p Unlimited (Mdm)
 m4bigapl                        // The Big Apple (Mdm)
 m4bigapla                       //
@@ -22656,7 +22656,7 @@ m4themob                        // The Mob (Mdm)
 m4themoba                       //
 m4themobb                       //
 
-//@source:mpu4misc.inc
+@source:mpu4misc.cpp
 m4bangin                        // Bangin' Away (Global)
 m4bangina                       //
 m4banginb                       //
@@ -22795,7 +22795,7 @@ m4wwc                           // Wacky Weekend Club (Global)
 m4wwca                          //
 m4wwcb                          //
 
-//@source:mpu4mod2sw.inc
+@source:mpu4mod2sw.cpp
 m421                            // Twenty One (Barcrest)
 m421club                        // 21 Club (Barcrest)
 m4actbnka                       //
@@ -23040,7 +23040,7 @@ m4wayin                         // Way In (Barcrest)
 m4wayina                        //
 m4wildms                        // Wild Mystery (Barcrest)
 
-//@source:mpu4mod4yam.inc
+@source:mpu4mod4yam.cpp
 m4acechs                        // Ace Chase (Bwb)
 m4acechs__a                     //
 m4acechs__b                     //
@@ -23324,7 +23324,7 @@ m4vivalv__y                     //
 m4vivalv__z                     //
 m4voodoo                        // Voodoo 1000 (Barcrest)
 
-//@source:mpu4sw.inc
+@source:mpu4sw.cpp
 m4actbnk                        // Action Bank (Barcrest)
 m4actbnk__a                     //
 m4actbnk__b                     //
@@ -26703,7 +26703,7 @@ m4wta__x                        //
 m4wta__y                        //
 m4wta__z                        //
 
-//@source:mpu4union.inc
+@source:mpu4union.cpp
 m4crzbn                         // Crazy Bingo
 m4cwalk                         // Cake Walk (Union)
 m4eezee                         // Eezee Fruits (Union)
