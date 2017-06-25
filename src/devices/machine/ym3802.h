@@ -151,7 +151,7 @@ private:
 	uint16_t m_general_counter;
 	uint16_t m_midi_counter;
 	uint16_t m_midi_counter_base;
-	uint8_t m_midi_counter_divider;
+	//uint8_t m_midi_counter_divider;
 	uint8_t m_click_counter;
 	uint8_t m_click_counter_base;
 	uint8_t m_vector;
