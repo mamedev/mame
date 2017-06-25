@@ -17,8 +17,8 @@
 #define VRAM_SIZE   (0x100000)
 
 ROM_START( hp98544 )
-	ROM_REGION( 0x4000, HP98544_ROM_REGION, ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
-	ROM_LOAD16_BYTE( "98544_1818-1999.bin", 0x000001, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )
+	ROM_REGION( 0x2000, HP98544_ROM_REGION, 0 )
+	ROM_LOAD( "98544_1818-1999.bin", 0x000000, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )
 ROM_END
 
 //**************************************************************************
@@ -77,11 +77,13 @@ void dio16_98544_device::device_start()
 	// set_nubus_device makes m_slot valid
 	set_dio_device();
 
-	uint8_t *rom = device().machine().root_device().memregion(this->subtag(HP98544_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(HP98544_ROM_REGION).c_str())->base();
 
 	m_vram.resize(VRAM_SIZE);
-	m_dio->install_bank(0x200000, 0x2fffff, "bank_98544", reinterpret_cast<uint8_t *>(&m_vram[0]));
-	m_dio->install_bank(0x580000, 0x583fff, "rom_98544", rom);
+	m_dio->install_memory(0x200000, 0x2fffff, read16_delegate(FUNC(dio16_98544_device::vram_r), this), 
+							write16_delegate(FUNC(dio16_98544_device::vram_w), this));
+	m_dio->install_memory(0x560000, 0x563fff, read16_delegate(FUNC(dio16_98544_device::rom_r), this), 
+							write16_delegate(FUNC(dio16_98544_device::rom_w), this));
 }
 
 //-------------------------------------------------
@@ -96,21 +98,40 @@ void dio16_98544_device::device_reset()
 	m_palette[0] = rgb_t(0, 0, 0);
 }
 
+READ16_MEMBER(dio16_98544_device::vram_r)
+{
+	return m_vram[offset];
+}
+
+WRITE16_MEMBER(dio16_98544_device::vram_w)
+{
+	COMBINE_DATA(&m_vram[offset]);
+}
+
+READ16_MEMBER(dio16_98544_device::rom_r)
+{
+	return 0xff00 | m_rom[offset];
+}
+
+// the video chip registers live here, so these writes are valid
+WRITE16_MEMBER(dio16_98544_device::rom_w)
+{
+	printf("rom_w: %02x at %x (mask %04x)\n", data, offset, mem_mask);
+}
+
 uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint32_t *scanline;
 	int x, y;
 	uint32_t pixels;
-
+	
 	for (y = 0; y < 768; y++)
 	{
 		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1024/4; x++)
+		for (x = 0; x < 1024/2; x++)
 		{
-			pixels = m_vram[((y * 256) + x)];
+			pixels = m_vram[(y * 512) + x];
 
-			*scanline++ = m_palette[(pixels>>24) & 1];
-			*scanline++ = m_palette[(pixels>>16) & 1];
 			*scanline++ = m_palette[(pixels>>8) & 1];
 			*scanline++ = m_palette[(pixels & 1)];
 		}

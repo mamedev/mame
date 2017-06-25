@@ -78,8 +78,7 @@ DECLARE_DEVICE_TYPE(DIO16_SLOT, dio16_slot_device)
 
 class device_dio16_card_interface;
 // ======================> dio16_device
-class dio16_device : public device_t,
-					public device_memory_interface
+class dio16_device : public device_t
 {
 public:
 	// construction/destruction
@@ -91,22 +90,14 @@ public:
 	template <class Object> static devcb_base &set_out_irq5_callback(device_t &device, Object &&cb) { return downcast<dio16_device &>(device).m_out_irq5_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_irq6_callback(device_t &device, Object &&cb) { return downcast<dio16_device &>(device).m_out_irq6_cb.set_callback(std::forward<Object>(cb)); }
 
-	// for DIO16, put the 16-bit configs in the primary slots and the 32-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_DATA:    return &m_program32_config;
-			default:         return nullptr;
-		}
-	}
-
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-
+	void install_memory(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
+	
+	// DANGER: these will currently produce different results for a DIO-I card on DIO-I and DIO-II systems
+	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.
+	//         either know what you're doing (m_prgwidth is available to cards for this purpose) or
+	//         only use these for 32-bit DIO-II cards.
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
-	void install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	void install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data);
 
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
@@ -117,7 +108,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq5_w );
 	DECLARE_WRITE_LINE_MEMBER( irq6_w );
 
-	const address_space_config m_program_config, m_program32_config;
+	int m_prgwidth;
 
 protected:
 	dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -133,7 +124,6 @@ protected:
 
 	// address spaces
 	address_space *m_prgspace;
-	int m_prgwidth;
 
 	devcb_write_line    m_out_irq3_cb;
 	devcb_write_line    m_out_irq4_cb;
@@ -203,17 +193,6 @@ public:
 	dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
-
-	// for DIO32, put the 32-bit configs in the primary slots and the 16-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program32_config;
-			case AS_DATA:    return &m_program_config;
-			default:         return nullptr;
-		}
-	}
 
 
 protected:

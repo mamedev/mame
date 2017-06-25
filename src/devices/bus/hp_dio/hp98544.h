@@ -22,6 +22,11 @@ public:
 	// construction/destruction
 	dio16_98544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_READ16_MEMBER(vram_r);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_READ16_MEMBER(rom_r);
+	DECLARE_WRITE16_MEMBER(rom_w);
+
 protected:
 	dio16_98544_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -36,8 +41,9 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	std::vector<uint32_t> m_vram;
+	std::vector<uint16_t> m_vram;
 	uint32_t m_palette[2];
+	uint8_t *m_rom;
 };
 
 // device type definition
