@@ -81,6 +81,7 @@ TODO:
 ******************************************************************************/
 
 /* Core includes */
+#include "emu.h"
 #include "audio/socrates.h"
 #include "cpu/z80/z80.h"
 
