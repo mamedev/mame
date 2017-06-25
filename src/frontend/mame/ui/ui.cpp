@@ -2117,14 +2117,18 @@ void mame_ui_manager::popup_time_string(int seconds, std::string message)
 void mame_ui_manager::load_ui_options()
 {
 	// parse the file
-	std::string error;
 	// attempt to open the output file
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 	if (file.open("ui.ini") == osd_file::error::NONE)
 	{
-		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
-		if (!result)
+		try
+		{
+			options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
+		}
+		catch (options_exception &)
+		{
 			osd_printf_error("**Error loading ui.ini**\n");
+		}
 	}
 }
 
@@ -2155,28 +2159,37 @@ void mame_ui_manager::save_main_option()
 {
 	// parse the file
 	std::string error;
-	emu_options options(machine().options()); // This way we make sure that all OSD parts are in
-	std::string error_string;
+	emu_options options(emu_options::option_support::GENERAL_ONLY); // This way we make sure that all OSD parts are in
+
+	options.copy_from(machine().options());
 
 	// attempt to open the main ini file
 	{
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
-			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
-			if (!result)
+			try
+			{
+				options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
+			}
+			catch(options_error_exception &)
 			{
 				osd_printf_error("**Error loading %s.ini**\n", emulator_info::get_configname());
 				return;
 			}
+			catch (options_exception &)
+			{
+				// ignore other exceptions related to options
+			}
 		}
 	}
 
-	for (emu_options::entry &f_entry : machine().options())
+	for (const auto &f_entry : machine().options().entries())
 	{
-		if (f_entry.is_changed())
+		const char *value = f_entry->value();
+		if (value && strcmp(value, options.value(f_entry->name().c_str())))
 		{
-			options.set_value(f_entry.name(), f_entry.value(), OPTION_PRIORITY_CMDLINE, error_string);
+			options.set_value(f_entry->name(), *f_entry->value(), OPTION_PRIORITY_CMDLINE);
 		}
 	}
 

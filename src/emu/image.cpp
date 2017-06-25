@@ -38,37 +38,12 @@ image_manager::image_manager(running_machine &machine)
 			continue;
 
 		// find the image option in image_options()
-		auto iter = machine.options().image_options().find(image.instance_name());
-
-		// GROSS HACK - if we began our journey with a single device configuration (e.g. - a single
-		// cartridge system) but later added a device of that type, image.instance_name() will become
-		// something different.  We're going to try to accomodate that specific scenario here
-		//
-		// Specific example: 'mame snes -cart1 sufami -cart2 poipoi' - the instance_name() starts out
-		// as "cartridge" but at the end becomes "cartridge1"
-		if (iter == machine.options().image_options().end()
-			&& (image.instance_name().rbegin() != image.instance_name().rend())
-			&& (*image.instance_name().rbegin() == '1'))
-		{
-			std::string alternate_instance_name = image.instance_name().substr(0, image.instance_name().size() - 1);
-			iter = machine.options().image_options().find(alternate_instance_name);
-
-			// If we found something, we need to write it back (so later checks work).  We also need to redo
-			// the find; the act of erasing the old value breaks the iterator
-			if (iter != machine.options().image_options().end())
-			{
-				std::string temp = std::move(iter->second);
-				machine.options().image_options()[image.instance_name()] = std::move(temp);
-				machine.options().image_options().erase(alternate_instance_name);
-				iter = machine.options().image_options().find(image.instance_name());
-			}
-		}
+		const std::string &startup_image(machine.options().image_option(image.instance_name()).value());
 
 		// is an image specified for this image?
-		if (iter != machine.options().image_options().end() && !iter->second.empty())
+		if (!startup_image.empty())
 		{
 			// we do have a startup image specified - load it
-			const std::string &startup_image(iter->second);
 			image_init_result result = image_init_result::FAIL;
 
 			// try as a softlist
@@ -93,7 +68,7 @@ image_manager::image_manager(running_machine &machine)
 				image.unload();
 
 				// make sure it is removed from the ini file too
-				machine.options().image_options()[image.instance_name()] = "";
+				machine.options().image_option(image.instance_name()).specify("");
 				if (machine.options().write_config())
 					write_config(machine.options(), nullptr, &machine.system());
 
@@ -208,9 +183,15 @@ void image_manager::options_extract()
 {
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		// only perform this activity for devices where is_reset_on_load() is false; for devices
-		// where this is true, manipulation of this value is done in reset_and_load()
-		if (!image.is_reset_on_load())
+		// There are two scenarios where we want to extract the option:
+		//
+		//	1.  When for the device, is_reset_on_load() is false (mounting devices for which is reset_and_load()
+		//		is true forces a reset, hence the name)
+		//
+		//	2.  When is_reset_on_load(), and this results in a device being unmounted (unmounting is_reset_and_load()
+		//		doesn't force an unmount)
+		if (!image.is_reset_on_load()
+			|| (!image.exists() && !machine().options().image_option(image.instance_name()).value().empty()))
 		{
 			// we have to assemble the image option differently for software lists and for normal images
 			std::string image_opt;
@@ -223,7 +204,7 @@ void image_manager::options_extract()
 			}
 
 			// and set the option
-			machine().options().image_options()[image.instance_name()] = std::move(image_opt);
+			machine().options().image_option(image.instance_name()).specify(std::move(image_opt));
 		}
 	}
 
