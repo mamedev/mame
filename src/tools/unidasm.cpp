@@ -273,7 +273,7 @@ static const dasm_table_entry dasm_table[] =
 //  { "h8",          _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
 //  { "h8_24",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
 //  { "h8_32",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
-	{ "hc11",        _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
+	{ "hc11",        _8bit,  0, CPU_DISASSEMBLE_NAME(hc11) },
 	{ "hcd62121",    _8bit,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
 	{ "hd61700",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
 	{ "hd6301",      _8bit,  0, CPU_DISASSEMBLE_NAME(hd6301) },
