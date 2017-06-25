@@ -8,7 +8,6 @@
   - EXKSA, EXKFA opcodes
   - SM500 data book suggests that R1 divider output is selectable, but how?
   - unknown which H/O pin is which W output, guessed for now
-  - ACL doesn't work right?
 
 */
 
@@ -91,6 +90,7 @@ void sm500_device::device_reset()
 	sm510_base_device::device_reset();
 
 	// SM500 specific
+	push_stack();
 	op_idiv();
 	m_1s = true;
 	m_cb = 0;
