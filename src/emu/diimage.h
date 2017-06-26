@@ -239,6 +239,7 @@ public:
 	}
 
 	bool user_loadable() const { return m_user_loadable; }
+	bool is_reset_and_loading() const { return m_is_reset_and_loading; }
 	const std::string &full_software_name() const { return m_full_software_name; }
 
 protected:
@@ -339,6 +340,8 @@ private:
 	bool m_user_loadable;
 
 	bool m_is_loading;
+
+	bool m_is_reset_and_loading;
 };
 
 // iterator
