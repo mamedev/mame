@@ -1137,12 +1137,12 @@ static INPUT_PORTS_START( bx301 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 
 	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B") // MCU B(beta) pin pulled to GND
-	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
