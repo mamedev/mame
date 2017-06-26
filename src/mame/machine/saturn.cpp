@@ -358,6 +358,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::dma_lv0_ended )
 		m_scu.ist |= (IRQ_DMALV0);
 
 	DnMV_0(0);
+	machine().scheduler().synchronize(); // force resync
 }
 
 /*Lv 1 DMA end irq*/
@@ -369,6 +370,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::dma_lv1_ended)
 		m_scu.ist |= (IRQ_DMALV1);
 
 	DnMV_0(1);
+	machine().scheduler().synchronize(); // force resync
 }
 
 /*Lv 2 DMA end irq*/
@@ -380,6 +382,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::dma_lv2_ended)
 		m_scu.ist |= (IRQ_DMALV2);
 
 	DnMV_0(2);
+	machine().scheduler().synchronize(); // force resync
 }
 
 void saturn_state::scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift)
@@ -423,7 +426,7 @@ void saturn_state::scu_dma_direct(address_space &space, uint8_t dma_ch)
 			m_scu.ist |= (IRQ_DMAILL);
 		return;
 	}
-
+	   
 	DnMV_1(dma_ch);
 
 	/* max size */
