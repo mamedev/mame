@@ -480,9 +480,11 @@ bool gb_cart_slot_device_base::is_mbc1col_game(const uint8_t *ROM, uint32_t len)
 		"MORTALKOMBAT DUO",
 		/* Mortal Kombat I & II US */
 		"MORTALKOMBATI&II",
+		/* Super Chinese Land 1,2,3' */
+		"SUPERCHINESE 123"
 	};
 
-	const uint8_t rows = sizeof(internal_names) / sizeof(internal_names[0]);
+	const uint8_t rows = ARRAY_LENGTH(internal_names);
 
 	for (uint8_t i = 0x00; i < rows; ++i) {
 		if (0 == memcmp(&ROM[0x134], &internal_names[i][0], name_length))
