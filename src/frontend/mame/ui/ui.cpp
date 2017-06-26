@@ -1402,6 +1402,16 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
 			sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
 		}
+		for (device_sound_interface &snd : sound_interface_iterator(machine.root_device()))
+		{
+			device_execute_interface *exec;
+			if (!snd.device().interface(exec) && snd.device().unscaled_clock() != 0)
+			{
+				void *param = (void *)&snd.device();
+				std::string str = string_format(_("Overclock %1$s sound"), snd.device().tag());
+				sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
+			}
+		}
 	}
 
 	// add screen parameters
