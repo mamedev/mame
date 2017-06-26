@@ -986,6 +986,7 @@ void mame_ui_manager::draw_profiler(render_container &container)
 
 void mame_ui_manager::start_save_state()
 {
+	ui::menu::stack_reset(machine());
 	show_menu();
 	ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container());
 }
@@ -997,6 +998,7 @@ void mame_ui_manager::start_save_state()
 
 void mame_ui_manager::start_load_state()
 {
+	ui::menu::stack_reset(machine());
 	show_menu();
 	ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container());
 }
