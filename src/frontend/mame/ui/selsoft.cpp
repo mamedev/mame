@@ -1424,10 +1424,13 @@ void bios_selection::handle()
 						menu::stack_push<software_parts>(ui(), container(), parts, ui_swinfo);
 						return;
 					}
-					std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
-					moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
-					std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
-					moptions.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
+					moptions.set_value(OPTION_SYSTEMNAME, drivlist.driver().name, OPTION_PRIORITY_CMDLINE);
+					moptions.set_value(OPTION_SOFTWARENAME,
+						ui_swinfo->listname + ":" + ui_swinfo->shortname,
+						OPTION_PRIORITY_CMDLINE);
+					moptions.set_value(OPTION_SNAPNAME, 
+						ui_swinfo->listname + std::string(PATH_SEPARATOR) + ui_swinfo->shortname,
+						OPTION_PRIORITY_CMDLINE);
 					reselect_last::driver = drivlist.driver().name;
 					reselect_last::software = ui_swinfo->shortname;
 					reselect_last::swlist = ui_swinfo->listname;
