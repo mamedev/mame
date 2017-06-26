@@ -6,8 +6,8 @@ Template for skeleton device
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_PC9801_26_H
-#define MAME_MACHINE_PC9801_26_H
+#ifndef MAME_BUS_CBUS_PC9801_26_H
+#define MAME_BUS_CBUS_PC9801_26_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ DECLARE_DEVICE_TYPE(PC9801_26, pc9801_26_device)
 
 
 
-#endif // MAME_MACHINE_PC9801_26_H
+#endif // MAME_BUS_CBUS_PC9801_26_H

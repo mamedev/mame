@@ -410,10 +410,11 @@ Keyboard TX commands:
 
 #include "video/upd7220.h"
 
-#include "machine/pc9801_26.h"
-#include "machine/pc9801_86.h"
-#include "machine/pc9801_118.h"
-#include "machine/pc9801_cbus.h"
+#include "bus/cbus/pc9801_26.h"
+#include "bus/cbus/pc9801_86.h"
+#include "bus/cbus/pc9801_118.h"
+#include "bus/cbus/mpu_pc98.h"
+#include "bus/cbus/pc9801_cbus.h"
 #include "machine/pc9801_kbd.h"
 #include "machine/pc9801_cd.h"
 
@@ -693,7 +694,7 @@ public:
 private:
 	uint8_t m_sdip_read(uint16_t port, uint8_t sdip_offset);
 	void m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data);
-	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst);
+	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const;
 	uint16_t egc_shift(int plane, uint16_t val);
 public:
 	DECLARE_MACHINE_START(pc9801_common);
@@ -1326,7 +1327,7 @@ uint16_t pc9801_state::egc_shift(int plane, uint16_t val)
 	return out;
 }
 
-uint16_t pc9801_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst)
+uint16_t pc9801_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const
 {
 	uint16_t out = 0;
 
@@ -1453,7 +1454,8 @@ uint16_t pc9801_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
 	if(m_egc.first && !m_egc.init)
 	{
 		m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
-		m_egc.init = true;
+		if(((m_egc.regs[6] >> 4) & 0xf) >= (m_egc.regs[6] & 0xf)) // check if we have enough bits
+			m_egc.init = true;
 	}
 	for(int i = 0; i < 4; i++)
 		m_egc.src[i] = egc_shift(i, m_video_ram_2[plane_off + (((i + 1) & 3) * 0x4000)]);
@@ -3002,6 +3004,7 @@ static SLOT_INTERFACE_START( pc9801_cbus )
 //  Speak Board
 //  Spark Board
 //  AMD-98 (AmuseMent boarD)
+	SLOT_INTERFACE( "mpu_pc98", MPU_PC98 )
 SLOT_INTERFACE_END
 
 //  Jast Sound, could be put independently
