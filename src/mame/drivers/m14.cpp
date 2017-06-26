@@ -52,6 +52,8 @@ Dumped by Chackn
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "screen.h"
+#include "sound/samples.h"
+#include "speaker.h"
 
 
 class m14_state : public driver_device
@@ -59,29 +61,23 @@ class m14_state : public driver_device
 public:
 	m14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram"),
+		m_color_ram(*this, "color_ram"),
+		m_samples(*this,"samples")
 		{ }
-
-	/* video-related */
-	tilemap_t  *m_m14_tilemap;
-	required_shared_ptr<uint8_t> m_video_ram;
-	required_shared_ptr<uint8_t> m_color_ram;
-
-	/* input-related */
-	uint8_t m_hop_mux;
-	uint8_t m_ballx,m_bally;
-	uint8_t m_paddlex;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
+	required_device<samples_device> m_samples;
 
 	DECLARE_WRITE8_MEMBER(m14_vram_w);
 	DECLARE_WRITE8_MEMBER(m14_cram_w);
@@ -91,6 +87,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ball_x_w);
 	DECLARE_WRITE8_MEMBER(ball_y_w);
 	DECLARE_WRITE8_MEMBER(paddle_x_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
@@ -103,6 +100,15 @@ public:
 	DECLARE_PALETTE_INIT(m14);
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
+	
+private:
+	/* video-related */
+	tilemap_t  *m_m14_tilemap;
+	
+	/* input-related */
+	uint8_t m_hop_mux;
+	uint8_t m_ballx,m_bally;
+	uint8_t m_paddlex;
 };
 
 
@@ -258,6 +264,49 @@ WRITE8_MEMBER(m14_state::paddle_x_w)
 
 /*************************************
  *
+ *  Sound section
+ *
+ *************************************/
+
+static const char *const m14_sample_names[] =
+{
+	"*ptrmj",
+	"wall_hit", // 1
+	"tile_hit", // 2
+	"tick",		// 0x40
+	"ball_drop", // 8
+	"paddle_hit",
+	nullptr
+};
+ 
+WRITE8_MEMBER(m14_state::sound_w)
+{	
+	switch(data)
+	{
+		case 1: // wall hit
+			m_samples->start(0,0);
+			break;
+		case 2: // tile hit
+			m_samples->start(1,1);
+			break;
+		case 8: // ball drop
+			m_samples->start(3,3);
+			break;
+		case 0x40: // tick
+			m_samples->start(2,2);
+			break;
+		case 0x80:
+		case 0: // flips with previous, unknown purpose
+			break;
+		default:
+			logerror("%s: Sound start with %02x param\n",m_samples->tag(),data);
+			break;
+	}
+}
+
+ 
+/*************************************
+ *
  *  Memory Map
  *
  *************************************/
@@ -275,7 +324,7 @@ static ADDRESS_MAP_START( m14_io_map, AS_IO, 8, m14_state )
 	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) AM_WRITE(ball_y_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) AM_WRITE(paddle_x_w)
 	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(hopper_w)
-	AM_RANGE(0xfc, 0xfc) AM_WRITENOP // sound
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(sound_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -414,7 +463,12 @@ static MACHINE_CONFIG_START( m14 )
 
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(m14_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 //  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 //  MCFG_DISCRETE_INTF(m14)
@@ -444,4 +498,4 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptrmj,  0,       m14,  m14, m14_state,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
+GAME( 1979, ptrmj,  0,       m14,  m14, m14_state,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
