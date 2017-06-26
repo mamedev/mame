@@ -96,7 +96,6 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 	, m_cm_rom(0U), m_cm_ram(0U), m_cy(0U)
 	, m_pc(0U), m_pcbase(0U), m_genflags(0U)
 {
-	assert(!((1 & sp_mask) | sp_mask));
 	assert((16U == index_reg_cnt) || (24U == index_reg_cnt));
 }
 

@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 void mpu_pc98_device::device_start()
 {
 	address_space &iospace = machine().firstcpu->space(AS_IO);
-	iospace.install_device(0xe0d0, 0xe0d3, *this, map, 16, 0xffffffffffffffffU >> (64 - iospace.data_width()));
+	iospace.install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map, 16, 0xffffffffffffffffU >> (64 - iospace.data_width()));
 }
 
 //-------------------------------------------------
