@@ -12,17 +12,19 @@
 #pragma once
 
 
-enum
-{
-	Z8_PC, Z8_SP, Z8_RP, Z8_T0, Z8_T1,
-
-	Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
-};
-
-
 class z8_device : public cpu_device
 {
 protected:
+	enum
+	{
+		Z8_PC, Z8_SP, Z8_RP,
+		Z8_IMR, Z8_IRQ, Z8_IPR,
+		Z8_P01M, Z8_P3M, Z8_P2M,
+		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR,
+
+		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
+	};
+
 	// construction/destruction
 	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size);
 

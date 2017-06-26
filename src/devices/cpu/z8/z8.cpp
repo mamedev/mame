@@ -674,9 +674,18 @@ void z8_device::device_start()
 		state_add(Z8_SP,         "SP",        m_fake_sp).callimport().callexport();
 		state_add(STATE_GENSP,   "GENSP",     m_fake_sp).callimport().callexport().noshow();
 		state_add(Z8_RP,         "RP",        m_r[Z8_REGISTER_RP]);
-		state_add(Z8_T0,         "T0",        m_t0);
-		state_add(Z8_T1,         "T1",        m_t1);
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_r[Z8_REGISTER_FLAGS]).noshow().formatstr("%6s");
+		state_add(Z8_IMR,        "IMR",       m_r[Z8_REGISTER_IMR]);
+		state_add(Z8_IRQ,        "IRQ",       m_r[Z8_REGISTER_IRQ]);
+		state_add(Z8_IPR,        "IPR",       m_r[Z8_REGISTER_IPR]);
+		state_add(Z8_P01M,       "P01M",      m_r[Z8_REGISTER_P01M]);
+		state_add(Z8_P3M,        "P3M",       m_r[Z8_REGISTER_P3M]);
+		state_add(Z8_P2M,        "P2M",       m_r[Z8_REGISTER_P2M]);
+		state_add(Z8_PRE0,       "PRE0",      m_r[Z8_REGISTER_PRE0]);
+		state_add(Z8_T0,         "T0",        m_t0);
+		state_add(Z8_PRE1,       "PRE1",      m_r[Z8_REGISTER_PRE1]);
+		state_add(Z8_T1,         "T1",        m_t1);
+		state_add(Z8_TMR,        "TMR",       m_r[Z8_REGISTER_TMR]);
 
 		for (int regnum = 0; regnum < 16; regnum++)
 			state_add(Z8_R0 + regnum, string_format("R%d", regnum).c_str(), m_fake_r[regnum]).callimport().callexport();
@@ -755,8 +764,8 @@ void z8_device::device_reset()
 	m_pc = 0x000c;
 
 	register_write(Z8_REGISTER_TMR, 0x00);
-	register_write(Z8_REGISTER_PRE1, register_read(Z8_REGISTER_PRE1) & 0xfc);
-	register_write(Z8_REGISTER_PRE0, register_read(Z8_REGISTER_PRE0) & 0xfe);
+	register_write(Z8_REGISTER_PRE1, PRE1 & 0xfc);
+	register_write(Z8_REGISTER_PRE0, PRE0 & 0xfe);
 	register_write(Z8_REGISTER_P2M, 0xff);
 	register_write(Z8_REGISTER_P3M, 0x00);
 	register_write(Z8_REGISTER_P01M, 0x4d);
