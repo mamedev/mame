@@ -133,14 +133,14 @@ public:
 
 	enum sreg_ctrl1_mask
 	{
-		CTRL1_FLOPLOW    = 0x0001,
-		CTRL1_FLOPRDY    = 0x0002,
-		CTRL1_LEDENA     = 0x0004,
-		CTRL1_LEDDP      = 0x0008,
-		CTRL1_ETHLOOP    = 0x0010,
-		CTRL1_ETHDTR     = 0x0020,
-		CTRL1_ETHRMOD    = 0x0040,
-		CTRL1_CLIPRESET  = 0x0040,
+        CTRL1_FLOPLOW    = 0x0001,
+        CTRL1_FLOPRDY    = 0x0002,
+        CTRL1_LEDENA     = 0x0004,
+        CTRL1_LEDDP      = 0x0008,
+        CTRL1_ETHLOOP    = 0x0010, // remote modem loopback
+        CTRL1_ETHDTR     = 0x0020,
+        CTRL1_ETHRMOD    = 0x0040, // remote modem configured active low
+        CTRL1_CLIPRESET  = 0x0040,
         CTRL1_FIFOACTIVE = 0x0080
 	};
 	DECLARE_READ16_MEMBER(sreg_ctrl1_r) { return m_sreg_ctrl1; }
