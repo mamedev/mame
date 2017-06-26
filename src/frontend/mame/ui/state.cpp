@@ -104,6 +104,7 @@ menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, rende
 	, m_header(header)
 	, m_footer(footer)
 	, m_must_exist(must_exist)
+	, m_pause_checked(false)
 	, m_was_paused(false)
 {
 }
@@ -206,9 +207,13 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
 	// pause if appropriate
-	m_was_paused = machine().paused();
-	if (!m_was_paused)
-		machine().pause();
+	if (!m_pause_checked)
+	{
+		m_was_paused = machine().paused();
+		if (!m_was_paused)
+			machine().pause();
+		m_pause_checked = true;
+	}
 }
 
 
