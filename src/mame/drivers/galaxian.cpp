@@ -754,8 +754,8 @@ READ8_MEMBER(galaxian_state::konami_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x20) result &= m_ay8910_1->data_r(space, 0);
-	if (offset & 0x80) result &= m_ay8910_0->data_r(space, 0);
+	if (offset & 0x20) result &= m_ay8910[1]->data_r(space, 0);
+	if (offset & 0x80) result &= m_ay8910[0]->data_r(space, 0);
 	return result;
 }
 
@@ -765,14 +765,14 @@ WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		m_ay8910_1->address_w(space, 0, data);
+		m_ay8910[1]->address_w(space, 0, data);
 	else if (offset & 0x20)
-		m_ay8910_1->data_w(space, 0, data);
+		m_ay8910[1]->data_w(space, 0, data);
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		m_ay8910_0->address_w(space, 0, data);
+		m_ay8910[0]->address_w(space, 0, data);
 	else if (offset & 0x80)
-		m_ay8910_0->data_w(space, 0, data);
+		m_ay8910[0]->data_w(space, 0, data);
 }
 
 
@@ -870,8 +870,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x0100) result &= m_ppi8255_0->read(space, offset & 3);
-	if (offset & 0x0200) result &= m_ppi8255_1->read(space, offset & 3);
+	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
+	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
 	return result;
 }
 
@@ -879,8 +879,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) m_ppi8255_0->write(space, offset & 3, data);
-	if (offset & 0x0200) m_ppi8255_1->write(space, offset & 3, data);
+	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
+	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
 
 
@@ -966,7 +966,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x04) result &= m_ppi8255_2->read(space, offset & 3);
+	if (offset & 0x04) result &= m_ppi8255[2]->read(space, offset & 3);
 	return result;
 }
 
@@ -974,7 +974,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) m_ppi8255_2->write(space, offset & 3, data);
+	if (offset & 0x04) m_ppi8255[2]->write(space, offset & 3, data);
 	if (offset & 0x10) m_dac->write(data);
 }
 
@@ -1058,8 +1058,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x1000) result &= m_ppi8255_1->read(space, (offset >> 1) & 3);
-	if (offset & 0x2000) result &= m_ppi8255_0->read(space, (offset >> 1) & 3);
+	if (offset & 0x1000) result &= m_ppi8255[1]->read(space, (offset >> 1) & 3);
+	if (offset & 0x2000) result &= m_ppi8255[0]->read(space, (offset >> 1) & 3);
 	return result;
 }
 
@@ -1067,8 +1067,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) m_ppi8255_1->write(space, (offset >> 1) & 3, data);
-	if (offset & 0x2000) m_ppi8255_0->write(space, (offset >> 1) & 3, data);
+	if (offset & 0x1000) m_ppi8255[1]->write(space, (offset >> 1) & 3, data);
+	if (offset & 0x2000) m_ppi8255[0]->write(space, (offset >> 1) & 3, data);
 }
 
 
@@ -1076,7 +1076,7 @@ READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 {
 	/* the decoding here is very simplistic */
 	uint8_t result = 0xff;
-	if (offset & 0x40) result &= m_ay8910_0->data_r(space, 0);
+	if (offset & 0x40) result &= m_ay8910[0]->data_r(space, 0);
 	return result;
 }
 
@@ -1086,9 +1086,9 @@ WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 	/* the decoding here is very simplistic */
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		m_ay8910_0->data_w(space, 0, data);
+		m_ay8910[0]->data_w(space, 0, data);
 	else if (offset & 0x80)
-		m_ay8910_0->address_w(space, 0, data);
+		m_ay8910[0]->address_w(space, 0, data);
 }
 
 
@@ -1123,8 +1123,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x1000) result &= m_ppi8255_0->read(space, (offset >> 3) & 3);
-	if (offset & 0x2000) result &= m_ppi8255_1->read(space, (offset >> 3) & 3);
+	if (offset & 0x1000) result &= m_ppi8255[0]->read(space, (offset >> 3) & 3);
+	if (offset & 0x2000) result &= m_ppi8255[1]->read(space, (offset >> 3) & 3);
 	return result;
 }
 
@@ -1132,8 +1132,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) m_ppi8255_0->write(space, (offset >> 3) & 3, data);
-	if (offset & 0x2000) m_ppi8255_1->write(space, (offset >> 3) & 3, data);
+	if (offset & 0x1000) m_ppi8255[0]->write(space, (offset >> 3) & 3, data);
+	if (offset & 0x2000) m_ppi8255[1]->write(space, (offset >> 3) & 3, data);
 }
 
 
@@ -1144,10 +1144,10 @@ WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255_0->read(space, (offset >> 4) & 3); }
-READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255_1->read(space, (offset >> 4) & 3); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255_0->write(space, (offset >> 4) & 3, data); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255_1->write(space, (offset >> 4) & 3, data); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255[0]->read(space, (offset >> 4) & 3); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255[1]->read(space, (offset >> 4) & 3); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255[0]->write(space, (offset >> 4) & 3, data); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write(space, (offset >> 4) & 3, data); }
 
 
 
@@ -1161,9 +1161,9 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x08) result &= m_ay8910_2->data_r(space, 0);
-	if (offset & 0x20) result &= m_ay8910_1->data_r(space, 0);
-	if (offset & 0x80) result &= m_ay8910_0->data_r(space, 0);
+	if (offset & 0x08) result &= m_ay8910[2]->data_r(space, 0);
+	if (offset & 0x20) result &= m_ay8910[1]->data_r(space, 0);
+	if (offset & 0x80) result &= m_ay8910[0]->data_r(space, 0);
 	return result;
 }
 
@@ -1171,12 +1171,12 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) m_ay8910_2->address_w(space, 0, data);
-	if (offset & 0x08) m_ay8910_2->data_w(space, 0, data);
-	if (offset & 0x10) m_ay8910_1->address_w(space, 0, data);
-	if (offset & 0x20) m_ay8910_1->data_w(space, 0, data);
-	if (offset & 0x40) m_ay8910_0->address_w(space, 0, data);
-	if (offset & 0x80) m_ay8910_0->data_w(space, 0, data);
+	if (offset & 0x04) m_ay8910[2]->address_w(space, 0, data);
+	if (offset & 0x08) m_ay8910[2]->data_w(space, 0, data);
+	if (offset & 0x10) m_ay8910[1]->address_w(space, 0, data);
+	if (offset & 0x20) m_ay8910[1]->data_w(space, 0, data);
+	if (offset & 0x40) m_ay8910[0]->address_w(space, 0, data);
+	if (offset & 0x80) m_ay8910[0]->data_w(space, 0, data);
 }
 
 
@@ -1279,7 +1279,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				m_ay8910_0->data_address_w(space, offset >> 1, m_zigzag_ay8910_latch);
+				m_ay8910[0]->data_address_w(space, offset >> 1, m_zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
@@ -2071,8 +2071,8 @@ READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
 {
 	// same as theend, but accesses are scrambled
 	uint8_t result = 0xff;
-	if (offset & 0x0100) result &= m_ppi8255_0->read(space, offset & 3);
-	if (offset & 0x0200) result &= m_ppi8255_1->read(space, offset & 3);
+	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
+	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
 	return BITSWAP8(result, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
@@ -2080,8 +2080,8 @@ WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
 {
 	// same as theend, but accesses are scrambled
 	data = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
-	if (offset & 0x0100) m_ppi8255_0->write(space, offset & 3, data);
-	if (offset & 0x0200) m_ppi8255_1->write(space, offset & 3, data);
+	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
+	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
 
 static ADDRESS_MAP_START( froggeram_map, AS_PROGRAM, 8, galaxian_state )
