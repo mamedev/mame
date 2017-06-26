@@ -619,7 +619,7 @@ WRITE8_MEMBER( atari_jsa_i_device::wrio_w )
 	if (m_tms5220 != nullptr)
 	{
 		int count = 5 | ((data >> 2) & 2);
-		m_tms5220->set_frequency(JSA_MASTER_CLOCK*2 / (16 - count));
+		m_tms5220->set_unscaled_clock(JSA_MASTER_CLOCK*2 / (16 - count));
 		m_tms5220->wsq_w((data >> 1) & 1);
 		m_tms5220->rsq_w((data >> 2) & 1);
 	}

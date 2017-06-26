@@ -1674,7 +1674,6 @@ void tms5220_device::device_start()
 	default:
 		fatalerror("Unknown variant in tms5220_set_variant\n");
 	}
-	m_clock = clock();
 
 	/* resolve callbacks */
 	m_irq_handler.resolve();
@@ -1858,7 +1857,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 			m_io_ready = 0;
 			update_ready_state();
 			/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
-			m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
+			m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
 }
@@ -1920,7 +1919,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 			SET RATE (5220C and CD2501ECD only): ? cycles (probably ~16)
 			*/
 			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
-			m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+			m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
 }
@@ -1979,7 +1978,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 				SET RATE (5220C and CD2501ECD only): ? cycles (probably ~16)
 				*/
 				// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
-				m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+				m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 				return;
 			case 1: // /RS active, /WS not
 				/* check for falling or rising edge */
@@ -1992,7 +1991,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 				m_io_ready = 0;
 				update_ready_state();
 				/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
-				m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
+				m_timer_io_ready->adjust(clocks_to_attotime(16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
 				return;
 		}
 	}
@@ -2081,18 +2080,15 @@ READ_LINE_MEMBER( tms5220_device::readyq_r )
 
 /**********************************************************************************************
 
-     tms5220_time_to_ready -- return the time in seconds until the ready line is asserted
+     tms5220_time_to_ready -- return the time until the ready line is asserted
 
 ***********************************************************************************************/
 
-double tms5220_device::time_to_ready()
+attotime tms5220_device::time_to_ready()
 {
-	double cycles;
-
 	/* bring up to date first */
 	m_stream->update();
-	cycles = cycles_to_ready();
-	return cycles * 80.0 / m_clock;
+	return clocks_to_attotime(cycles_to_ready() * 80);
 }
 
 
@@ -2151,10 +2147,9 @@ void tms5220_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 ***********************************************************************************************/
 
-void tms5220_device::set_frequency(int frequency)
+void tms5220_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(frequency / 80);
-	m_clock = frequency;
+	m_stream->set_sample_rate(clock() / 80);
 }
 
 
