@@ -111,7 +111,7 @@ protected:
 
 	void shift_w();
 	u8 get_digit();
-	void set_su(u8 su) { m_stack[0] = (m_stack[0] & ~0x3c0) | (su << 6); }
+	void set_su(u8 su) { m_stack[0] = (m_stack[0] & ~0x3c0) | (su << 6 & 0x3c0); }
 	u8 get_su() { return m_stack[0] >> 6 & 0xf; }
 	virtual int get_trs_field() { return 0; }
 
