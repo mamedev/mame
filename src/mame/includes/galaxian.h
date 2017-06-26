@@ -197,6 +197,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tenspot_unk_6000_w);
 	DECLARE_WRITE8_MEMBER(tenspot_unk_8000_w);
 	DECLARE_WRITE8_MEMBER(tenspot_unk_e000_w);
+	DECLARE_READ8_MEMBER(froggeram_ppi8255_r);
+	DECLARE_WRITE8_MEMBER(froggeram_ppi8255_w);
 	DECLARE_WRITE8_MEMBER(artic_gfxbank_w);
 	DECLARE_READ8_MEMBER(tenspot_dsw_read);
 	DECLARE_INPUT_CHANGED_MEMBER(gmgalax_game_changed);
