@@ -2199,7 +2199,7 @@ void mame_ui_manager::save_main_option()
 	for (const auto &f_entry : machine().options().entries())
 	{
 		const char *value = f_entry->value();
-		if (value && strcmp(value, options.value(f_entry->name().c_str())))
+		if (value && options.exists(f_entry->name()) && strcmp(value, options.value(f_entry->name().c_str())))
 		{
 			options.set_value(f_entry->name(), *f_entry->value(), OPTION_PRIORITY_CMDLINE);
 		}
