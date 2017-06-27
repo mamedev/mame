@@ -50,28 +50,19 @@ sprites.
 
   Convert the color PROMs into a more useable format.
 
-  Real Ghostbusters has two 1024x8 palette PROM.
-  I don't know the exact values of the resistors between the RAM and the
-  RGB output. I assumed these values (the same as Commando)
-
-  bit 7 -- 220 ohm resistor  -- GREEN
-        -- 470 ohm resistor  -- GREEN
-        -- 1  kohm resistor  -- GREEN
-        -- 2.2kohm resistor  -- GREEN
-        -- 220 ohm resistor  -- RED
-        -- 470 ohm resistor  -- RED
-        -- 1  kohm resistor  -- RED
-  bit 0 -- 2.2kohm resistor  -- RED
-
-  bit 7 -- unused
-        -- unused
-        -- unused
-        -- unused
-        -- 220 ohm resistor  -- BLUE
-        -- 470 ohm resistor  -- BLUE
-        -- 1  kohm resistor  -- BLUE
-  bit 0 -- 2.2kohm resistor  -- BLUE
-
+  Real Ghostbusters has two 1024x8 palette PROM,  other games in this driver
+  use palette RAM.  
+  
+  Real Ghostbusters, Cobra Command, Gondomania, Oscar at least are confirmed 
+  to use two custom resistor packs marked DECO RM-C3 to convert the digital 
+  palette for analog output.
+  
+  Each pack contains two channels with resistor values of 220 ohms, 
+  470 ohms, 1 kohm, 2.2 kohm and 4.8 kohm, however the highest resistance is 
+  not used as these games are only 4 bits per channel.
+  
+  This leads to weightings per bit of 0xe, 0x1f, 0x43, 0x8f. 
+  
 ***************************************************************************/
 
 PALETTE_INIT_MEMBER(dec8_state,ghostb)
