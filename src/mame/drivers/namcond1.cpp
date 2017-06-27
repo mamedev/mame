@@ -200,7 +200,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("ygv608", ygv608_device, read, write)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("ygv608", ygv608_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD("ygv608", ygv608_device, debug_trigger_r)
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( abcheck_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("zpr1")
 	AM_RANGE(0x608000, 0x60ffff) AM_RAM AM_SHARE("zpr2")
 	AM_RANGE(0x780000, 0x780001) AM_READ(printer_r)
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("ygv608", ygv608_device, read, write)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("ygv608", ygv608_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD("ygv608", ygv608_device, debug_trigger_r)
