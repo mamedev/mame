@@ -16,20 +16,56 @@
 
 
 /***************************************************************************
-    PORT ENUMERATION
+    PORT CONFIGURATION
 ***************************************************************************/
 
-enum
-{
-	MB88_PORTK = 0, /* input only, 4 bits */
-	MB88_PORTO,     /* output only, PLA function output */
-	MB88_PORTP,     /* 4 bits */
-	MB88_PORTR0,    /* R0-R3, 4 bits */
-	MB88_PORTR1,    /* R4-R7, 4 bits */
-	MB88_PORTR2,    /* R8-R11, 4 bits */
-	MB88_PORTR3,    /* R12-R15, 4 bits */
-	MB88_PORTSI     /* SI, 1 bit */
-};
+// K (K3-K0): input-only port
+#define MCFG_MB88XX_READ_K_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_read_k_callback(*device, DEVCB_##_devcb);
+
+// O (O7-O4 = OH, O3-O0 = OL): output through PLA
+#define MCFG_MB88XX_WRITE_O_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_write_o_callback(*device, DEVCB_##_devcb);
+
+// P (P3-P0): output-only port
+#define MCFG_MB88XX_WRITE_P_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_write_p_callback(*device, DEVCB_##_devcb);
+
+// R0 (R3-R0): input/output port
+#define MCFG_MB88XX_READ_R0_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_read_r_callback(*device, 0, DEVCB_##_devcb);
+#define MCFG_MB88XX_WRITE_R0_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_write_r_callback(*device, 0, DEVCB_##_devcb);
+
+// R1 (R7-R4): input/output port
+#define MCFG_MB88XX_READ_R1_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_read_r_callback(*device, 1, DEVCB_##_devcb);
+#define MCFG_MB88XX_WRITE_R1_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_write_r_callback(*device, 1, DEVCB_##_devcb);
+
+// R2 (R11-R8): input/output port
+#define MCFG_MB88XX_READ_R2_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_read_r_callback(*device, 2, DEVCB_##_devcb);
+#define MCFG_MB88XX_WRITE_R2_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_write_r_callback(*device, 2, DEVCB_##_devcb);
+
+// R3 (R15-R12): input/output port
+#define MCFG_MB88XX_READ_R3_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_read_r_callback(*device, 3, DEVCB_##_devcb);
+#define MCFG_MB88XX_WRITE_R3_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_write_r_callback(*device, 3, DEVCB_##_devcb);
+
+// SI: serial input
+#define MCFG_MB88XX_READ_SI_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_read_si_callback(*device, DEVCB_##_devcb);
+
+// SO: serial output
+#define MCFG_MB88XX_WRITE_SO_CB(_devcb) \
+	devcb = &mb88_cpu_device::set_write_so_callback(*device, DEVCB_##_devcb);
+
+// Configure 32 byte PLA; if nullptr (default) assume direct output
+#define MCFG_MB88XX_OUTPUT_PLA(_pla) \
+	mb88_cpu_device::set_pla(*device, _pla);
 
 /***************************************************************************
     REGISTER ENUMERATION
@@ -56,17 +92,17 @@ enum
 CPU_DISASSEMBLE( mb88 );
 
 
-// Configure 32 byte PLA, if nullptr (default) assume direct output */
-#define MCFG_MB88_PLA(_pla) mb88_cpu_device::set_pla(*device, _pla);
-
-
 class mb88_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	mb88_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// static configuration helpers
+	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<mb88_cpu_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_o_callback(device_t &device, Object &&cb) { return downcast<mb88_cpu_device &>(device).m_write_o.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_p_callback(device_t &device, Object &&cb) { return downcast<mb88_cpu_device &>(device).m_write_p.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r_callback(device_t &device, int n, Object &&cb) { assert(n >= 0 && n < 4); return downcast<mb88_cpu_device &>(device).m_read_r[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r_callback(device_t &device, int n, Object &&cb) { assert(n >= 0 && n < 4); return downcast<mb88_cpu_device &>(device).m_write_r[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_si_callback(device_t &device, Object &&cb) { return downcast<mb88_cpu_device &>(device).m_read_si.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_so_callback(device_t &device, Object &&cb) { return downcast<mb88_cpu_device &>(device).m_write_so.set_callback(std::forward<Object>(cb)); }
 	static void set_pla(device_t &device, uint8_t *pla) { downcast<mb88_cpu_device &>(device).m_PLA = pla; }
 
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
@@ -88,7 +124,7 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 6); }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : (spacenum == AS_DATA) ? &m_data_config : (spacenum == AS_IO) ? &m_io_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : (spacenum == AS_DATA) ? &m_data_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -103,7 +139,6 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
 
 	uint8_t   m_PC;     /* Program Counter: 6 bits */
 	uint8_t   m_PA;     /* Page Address: 4 bits */
@@ -133,8 +168,15 @@ private:
 	uint16_t  m_SBcount;    /* number of bits received */
 	emu_timer *m_serial;
 
-	/* PLA configuration */
+	/* PLA configuration and port callbacks */
 	uint8_t * m_PLA;
+	devcb_read8 m_read_k;
+	devcb_write8 m_write_o;
+	devcb_write8 m_write_p;
+	devcb_read8 m_read_r[4];
+	devcb_write8 m_write_r[4];
+	devcb_read_line m_read_si;
+	devcb_write_line m_write_so;
 
 	/* IRQ handling */
 	uint8_t m_pending_interrupt;
@@ -142,7 +184,6 @@ private:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
-	address_space *m_io;
 	int m_icount;
 
 	// For the debugger
@@ -206,7 +247,6 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(MB88,    mb88_cpu_device)
 DECLARE_DEVICE_TYPE(MB88201, mb88201_cpu_device)
 DECLARE_DEVICE_TYPE(MB88202, mb88202_cpu_device)
 DECLARE_DEVICE_TYPE(MB8841,  mb8841_cpu_device)

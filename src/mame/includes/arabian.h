@@ -34,8 +34,14 @@ public:
 	uint8_t    m_mcu_port_o;
 	uint8_t    m_mcu_port_p;
 	uint8_t    m_mcu_port_r[4];
-	DECLARE_READ8_MEMBER(mcu_port_r_r);
-	DECLARE_WRITE8_MEMBER(mcu_port_r_w);
+	DECLARE_READ8_MEMBER(mcu_port_r0_r);
+	DECLARE_READ8_MEMBER(mcu_port_r1_r);
+	DECLARE_READ8_MEMBER(mcu_port_r2_r);
+	DECLARE_READ8_MEMBER(mcu_port_r3_r);
+	DECLARE_WRITE8_MEMBER(mcu_port_r0_w);
+	DECLARE_WRITE8_MEMBER(mcu_port_r1_w);
+	DECLARE_WRITE8_MEMBER(mcu_port_r2_w);
+	DECLARE_WRITE8_MEMBER(mcu_port_r3_w);
 	DECLARE_READ8_MEMBER(mcu_portk_r);
 	DECLARE_WRITE8_MEMBER(mcu_port_o_w);
 	DECLARE_WRITE8_MEMBER(mcu_port_p_w);
