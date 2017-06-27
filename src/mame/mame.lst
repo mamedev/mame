@@ -15058,6 +15058,9 @@ instantm                        //
 @source:instruct.cpp
 instruct                        //
 
+@source:intellec4.cpp
+intlc440                        //
+
 @source:interact.cpp
 hector1                         //
 interact                        //
