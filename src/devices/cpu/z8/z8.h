@@ -12,8 +12,49 @@
 #pragma once
 
 
+#define MCFG_Z8_PORT_P0_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P1_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P2_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P3_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 3, DEVCB_##_devcb);
+
+
+#define MCFG_Z8_PORT_P0_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P1_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P2_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P3_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 3, DEVCB_##_devcb);
+
+
 class z8_device : public cpu_device
 {
+public:
+	// static configuration
+	template<class Object>
+	static devcb_base &set_input_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < 4);
+		return downcast<z8_device &>(device).m_input_cb[port].set_callback(std::forward<Object>(object));
+	}
+	template<class Object>
+	static devcb_base &set_output_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < 4);
+		return downcast<z8_device &>(device).m_output_cb[port].set_callback(std::forward<Object>(object));
+	}
+
 protected:
 	enum
 	{
@@ -48,7 +89,6 @@ protected:
 		{
 			case AS_PROGRAM:   return &m_program_config;
 			case AS_DATA:      return &m_data_config;
-			case AS_IO:        return &m_io_config;
 			default:           return nullptr;
 		}
 		return nullptr;
@@ -68,12 +108,14 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
-	address_space *m_io;
+
+	// callbacks
+	devcb_read8 m_input_cb[4];
+	devcb_write8 m_output_cb[4];
 
 	/* registers */
 	uint16_t m_pc;              /* program counter */
