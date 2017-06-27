@@ -1448,7 +1448,7 @@ WRITE8_MEMBER(mpu4_state::ic3ss_w)
 
 	if (freq)
 	{
-		m_msm6376->set_frequency(freq);
+		m_msm6376->set_unscaled_clock(freq);
 	}
 }
 
