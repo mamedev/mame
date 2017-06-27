@@ -1756,7 +1756,7 @@ void ymf271_device::device_clock_changed()
 	calculate_clock_correction();
 }
 
-DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271")
+DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271 OPX")
 
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF271, tag, owner, clock)
