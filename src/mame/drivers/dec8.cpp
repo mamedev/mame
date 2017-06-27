@@ -2020,7 +2020,7 @@ static MACHINE_CONFIG_START( lastmisn )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
@@ -2074,7 +2074,7 @@ static MACHINE_CONFIG_START( shackled )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
 
@@ -2128,7 +2128,7 @@ static MACHINE_CONFIG_START( gondo )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
 
@@ -2182,7 +2182,7 @@ static MACHINE_CONFIG_START( garyoret )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
 
@@ -2240,7 +2240,7 @@ static MACHINE_CONFIG_START( ghostb )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_PALETTE_INIT_OWNER(dec8_state,ghostb)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
@@ -2300,7 +2300,7 @@ static MACHINE_CONFIG_START( csilver )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
@@ -2363,7 +2363,7 @@ static MACHINE_CONFIG_START( oscar )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oscar)
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
 
@@ -2409,7 +2409,7 @@ static MACHINE_CONFIG_START( srdarwin )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srdarwin)
 	MCFG_PALETTE_ADD("palette", 144)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
 
@@ -2467,7 +2467,7 @@ static MACHINE_CONFIG_START( cobracom )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cobracom)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR_DECO)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
 
@@ -3587,6 +3587,37 @@ ROM_START( cobracom )
 	ROM_CONTINUE(            0x60000, 0x08000 )
 ROM_END
 
+ROM_START( cobracoma )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "el11-4.bin",  0x08000, 0x08000, CRC(6dca6734) SHA1(1d165845680df2f1febd2b7d2f3163d68523496e) )
+	ROM_LOAD( "el12-4.bin",  0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
+	ROM_LOAD( "el13.bin",    0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "el10-4.bin",  0x8000,  0x8000,  CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "el00-4.bin",  0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
+	ROM_LOAD( "el01-4.bin",  0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
+	ROM_LOAD( "el02-4.bin",  0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
+	ROM_LOAD( "el03-4.bin",  0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
+	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "el07.bin",    0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
+	ROM_LOAD( "el08.bin",    0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(            0x40000, 0x08000 )
+	ROM_LOAD( "el09.bin",    0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(            0x60000, 0x08000 )
+ROM_END
+
 ROM_START( cobracomj )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "eh-11.rom",    0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
@@ -3727,5 +3758,9 @@ GAME( 1987, oscarj1,   oscar,    oscar,    oscarj,    dec8_state, oscar,       R
 GAME( 1987, oscarj2,   oscar,    oscar,    oscarj,    dec8_state, oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, srdarwin,  0,        srdarwin, srdarwin,  dec8_state, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, srdarwinj, srdarwin, srdarwin, srdarwinj, dec8_state, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracom,  0,        cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (World revision 5)", MACHINE_SUPPORTS_SAVE )
+
+// Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release 
+// was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
+GAME( 1988, cobracom,  0,        cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma, cobracom, cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cobracomj, cobracom, cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
