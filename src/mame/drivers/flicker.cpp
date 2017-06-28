@@ -48,8 +48,8 @@ private:
 };
 
 
-static ADDRESS_MAP_START( flicker_rom, AS_PROGRAM, 8, flicker_state )
-	AM_RANGE(0x0000, 0x03FF) AM_ROM
+static ADDRESS_MAP_START( flicker_rom, AS_DECRYPTED_OPCODES, 8, flicker_state )
+	AM_RANGE(0x0000, 0x03FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(flicker_map, AS_DATA, 8, flicker_state )
@@ -199,7 +199,7 @@ sound to produce. We need to change this to just one pulse per actual sound. */
 static MACHINE_CONFIG_START( flicker )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
-	MCFG_CPU_PROGRAM_MAP(flicker_rom)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(flicker_rom)
 	MCFG_CPU_DATA_MAP(flicker_map)
 	MCFG_CPU_IO_MAP(flicker_io)
 	MCFG_NVRAM_ADD_0FILL("nvram")

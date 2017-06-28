@@ -23,7 +23,8 @@ enum class format
 	PAIRIMM,
 	ABS,
 	PAGE,
-	COND
+	COND,
+	EXT
 };
 
 enum class level
@@ -37,90 +38,51 @@ struct op
 	format m_format;
 	level m_level;
 	char const *m_name;
+	op const *m_ext;
 };
 
-#define OP(fmt, lvl, name) { format::fmt, level::lvl, #name }
+#define OP(fmt, lvl, name) { format::fmt, level::lvl, #name, nullptr }
+#define OPX(tbl) { format::EXT, level::I4004, nullptr, f_opx_##tbl }
+
+op const f_opx_0[16] = {
+		OP(SIMPLE, I4004, nop), OP(SIMPLE, I4040, hlt), OP(SIMPLE, I4040, bbs), OP(SIMPLE, I4040, lcr),
+		OP(SIMPLE, I4040, or4), OP(SIMPLE, I4040, or5), OP(SIMPLE, I4040, an6), OP(SIMPLE, I4040, an7),
+		OP(SIMPLE, I4040, db0), OP(SIMPLE, I4040, db1), OP(SIMPLE, I4040, sb0), OP(SIMPLE, I4040, sb1),
+		OP(SIMPLE, I4040, ein), OP(SIMPLE, I4040, din), OP(SIMPLE, I4040, rpm), OP(ILL,    I4004, ill) };
+
+op const f_opx_2[16] = {
+		OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src),
+		OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src),
+		OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src),
+		OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR, I4004, src) };
+
+op const f_opx_3[16] = {
+		OP(PAIR, I4004, fin), OP(PAIR, I4004, jin), OP(PAIR, I4004, fin), OP(PAIR, I4004, jin),
+		OP(PAIR, I4004, fin), OP(PAIR, I4004, jin), OP(PAIR, I4004, fin), OP(PAIR, I4004, jin),
+		OP(PAIR, I4004, fin), OP(PAIR, I4004, jin), OP(PAIR, I4004, fin), OP(PAIR, I4004, jin),
+		OP(PAIR, I4004, fin), OP(PAIR, I4004, jin), OP(PAIR, I4004, fin), OP(PAIR, I4004, jin) };
+
+op const f_opx_io[16] = {
+		OP(SIMPLE, I4004, wrm), OP(SIMPLE, I4004, wmp), OP(SIMPLE, I4004, wrr), OP(SIMPLE, I4004, wpm),
+		OP(SIMPLE, I4004, wr0), OP(SIMPLE, I4004, wr1), OP(SIMPLE, I4004, wr2), OP(SIMPLE, I4004, wr3),
+		OP(SIMPLE, I4004, sbm), OP(SIMPLE, I4004, rdm), OP(SIMPLE, I4004, rdr), OP(SIMPLE, I4004, adm),
+		OP(SIMPLE, I4004, rd0), OP(SIMPLE, I4004, rd1), OP(SIMPLE, I4004, rd2), OP(SIMPLE, I4004, rd3) };
+
+op const f_opx_f[16] = {
+		OP(SIMPLE, I4004, clb), OP(SIMPLE, I4004, clc), OP(SIMPLE, I4004, iac), OP(SIMPLE, I4004, cmc),
+		OP(SIMPLE, I4004, cma), OP(SIMPLE, I4004, ral), OP(SIMPLE, I4004, rar), OP(SIMPLE, I4004, tcc),
+		OP(SIMPLE, I4004, dac), OP(SIMPLE, I4004, tcs), OP(SIMPLE, I4004, stc), OP(SIMPLE, I4004, daa),
+		OP(SIMPLE, I4004, kbp), OP(SIMPLE, I4004, dcl), OP(ILL,    I4004, ill), OP(ILL,    I4004, ill) };
 
 op const f_ops[256] = {
-		OP(SIMPLE,  I4004, nop), OP(SIMPLE,  I4040, hlt), OP(SIMPLE,  I4040, bbs), OP(SIMPLE,  I4040, lcr),
-		OP(SIMPLE,  I4040, or4), OP(SIMPLE,  I4040, or5), OP(SIMPLE,  I4040, an6), OP(SIMPLE,  I4040, an7),
-		OP(SIMPLE,  I4040, db0), OP(SIMPLE,  I4040, db1), OP(SIMPLE,  I4040, sb0), OP(SIMPLE,  I4040, sb1),
-		OP(SIMPLE,  I4040, ein), OP(SIMPLE,  I4040, din), OP(SIMPLE,  I4040, rpm), OP(ILL,     I4004, ill),
+		OPX(0),                  OP(COND,    I4004, jcn), OPX(2),                  OPX(3),
+		OP(ABS,     I4004, jun), OP(ABS,     I4004, jms), OP(REG,     I4004, inc), OP(REGPAGE, I4004, isz),
+		OP(REG,     I4004, add), OP(REG,     I4004, sub), OP(REG,     I4004, ld ), OP(REG,     I4004, xch),
+		OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, ldm), OPX(io),                 OPX(f)                  };
 
-		OP(COND,    I4004, jcn), OP(PAGE,    I4004, jnt), OP(PAGE,    I4004, jc ), OP(COND,    I4004, jcn),
-		OP(PAGE,    I4004, jz ), OP(COND,    I4004, jcn), OP(COND,    I4004, jcn), OP(COND,    I4004, jcn),
-		OP(COND,    I4004, jcn), OP(PAGE,    I4004, jt),  OP(PAGE,    I4004, jnc), OP(COND,    I4004, jcn),
-		OP(PAGE,    I4004, jnz), OP(COND,    I4004, jcn), OP(COND,    I4004, jcn), OP(COND,    I4004, jcn),
-
-		OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src),
-		OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src),
-		OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src),
-		OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src), OP(PAIRIMM, I4004, fim), OP(PAIR,    I4004, src),
-
-		OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin), OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin),
-		OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin), OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin),
-		OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin), OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin),
-		OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin), OP(PAIR,    I4004, fin), OP(PAIR,    I4004, jin),
-
-		OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun),
-		OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun),
-		OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun),
-		OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun), OP(ABS,     I4004, jun),
-
-		OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms),
-		OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms),
-		OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms),
-		OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms), OP(ABS,     I4004, jms),
-
-		OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc),
-		OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc),
-		OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc),
-		OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc), OP(REG,     I4004, inc),
-
-		OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz),
-		OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz),
-		OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz),
-		OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz), OP(REGPAGE, I4004, isz),
-
-		OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add),
-		OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add),
-		OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add),
-		OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add), OP(REG,     I4004, add),
-
-		OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub),
-		OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub),
-		OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub),
-		OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub), OP(REG,     I4004, sub),
-
-		OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ),
-		OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ),
-		OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ),
-		OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ), OP(REG,     I4004, ld ),
-
-		OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch),
-		OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch),
-		OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch),
-		OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch), OP(REG,     I4004, xch),
-
-		OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl),
-		OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl),
-		OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl),
-		OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl), OP(IMM4,    I4004, bbl),
-
-		OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm),
-		OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm),
-		OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm),
-		OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm), OP(IMM4,    I4004, ldm),
-
-		OP(SIMPLE,  I4004, wrm), OP(SIMPLE,  I4004, wmp), OP(SIMPLE,  I4004, wrr), OP(SIMPLE,  I4004, wpm),
-		OP(SIMPLE,  I4004, wr0), OP(SIMPLE,  I4004, wr1), OP(SIMPLE,  I4004, wr2), OP(SIMPLE,  I4004, wr3),
-		OP(SIMPLE,  I4004, sbm), OP(SIMPLE,  I4004, rdm), OP(SIMPLE,  I4004, rdr), OP(SIMPLE,  I4004, adm),
-		OP(SIMPLE,  I4004, rd0), OP(SIMPLE,  I4004, rd1), OP(SIMPLE,  I4004, rd2), OP(SIMPLE,  I4004, rd3),
-
-		OP(SIMPLE,  I4004, clb), OP(SIMPLE,  I4004, clc), OP(SIMPLE,  I4004, iac), OP(SIMPLE,  I4004, cmc),
-		OP(SIMPLE,  I4004, cma), OP(SIMPLE,  I4004, ral), OP(SIMPLE,  I4004, rar), OP(SIMPLE,  I4004, tcc),
-		OP(SIMPLE,  I4004, dac), OP(SIMPLE,  I4004, tcs), OP(SIMPLE,  I4004, stc), OP(SIMPLE,  I4004, daa),
-		OP(SIMPLE,  I4004, kbp), OP(SIMPLE,  I4004, dcl), OP(ILL,     I4004, ill), OP(ILL,     I4004, ill) };
+char const *const f_cond[16] = {
+		"$0", "nt", "c",  "$3", "z",  "$5", "$6", "$7",
+		"$8", "t",  "nc", "$b", "nz", "$d", "$e", "$f" };
 
 offs_t disassemble(
 		cpu_device *device,
@@ -134,8 +96,12 @@ offs_t disassemble(
 {
 	offs_t npc(pc + 1);
 	u8 const opcode(oprom[0]);
-	op const &desc(f_ops[(f_ops[opcode].m_level > lvl) ? 0xffU : opcode]);
+	op const &base_op(f_ops[(opcode >> 4) & 0x0f]);
+	op const &ext_op((base_op.m_format == format::EXT) ? base_op.m_ext[opcode & 0x0f] : base_op);
+	op const desc((ext_op.m_level > lvl) ? f_opx_f[0x0f] : ext_op);
 
+	u8 const imm4(opcode & 0x0f);
+	u8 const pair(opcode & 0x0e);
 	switch (desc.m_format)
 	{
 	case format::ILL:
@@ -145,20 +111,21 @@ offs_t disassemble(
 		util::stream_format(stream, "%s", desc.m_name);
 		break;
 	case format::IMM4:
+		util::stream_format(stream, "%-3s $%01x", desc.m_name, imm4);
+		break;
 	case format::REG:
-		util::stream_format(stream, "%-3s $%01x", desc.m_name, opcode & 0x0fU);
+		util::stream_format(stream, "%-3s r%01x", desc.m_name, imm4);
 		break;
 	case format::REGPAGE:
-	case format::COND:
 		npc++;
-		util::stream_format(stream, "%-3s $%01x,$%03x", desc.m_name, opcode & 0x0fU, opram[1] | (npc & 0x0f00U));
+		util::stream_format(stream, "%-3s r%01x,$%03x", desc.m_name, imm4, opram[1] | (npc & 0x0f00U));
 		break;
 	case format::PAIR:
-		util::stream_format(stream, "%-3s $%01x", desc.m_name, opcode & 0x0eU);
+		util::stream_format(stream, "%-3s r%01xr%01x", desc.m_name, pair, pair + 1U);
 		break;
 	case format::PAIRIMM:
 		npc++;
-		util::stream_format(stream, "%-3s $%01x,$%02x", desc.m_name, opcode & 0x0eU, opram[1]);
+		util::stream_format(stream, "%-3s r%01xr%01x,$%02x", desc.m_name, pair, pair + 1, opram[1]);
 		break;
 	case format::ABS:
 		npc++;
@@ -168,6 +135,12 @@ offs_t disassemble(
 		npc++;
 		util::stream_format(stream, "%-3s $%03x", desc.m_name, opram[1] | (npc & 0x0f00U));
 		break;
+	case format::COND:
+		npc++;
+		util::stream_format(stream, "%-3s %s,$%03x", desc.m_name, f_cond[imm4], opram[1] | (npc & 0x0f00U));
+		break;
+	default:
+		throw false;
 	}
 
 	offs_t flags(0U);

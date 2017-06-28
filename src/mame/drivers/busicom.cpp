@@ -99,9 +99,9 @@ WRITE8_MEMBER(busicom_state::printer_ctrl_w)
 {
 }
 
-static ADDRESS_MAP_START(busicom_rom, AS_PROGRAM, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_rom, AS_DECRYPTED_OPCODES, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x04FF) AM_ROM
+	AM_RANGE(0x0000, 0x04FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(busicom_mem, AS_DATA, 8, busicom_state )
@@ -214,7 +214,7 @@ void busicom_state::machine_reset()
 static MACHINE_CONFIG_START( busicom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, 750000)
-	MCFG_CPU_PROGRAM_MAP(busicom_rom)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(busicom_rom)
 	MCFG_CPU_DATA_MAP(busicom_mem)
 	MCFG_CPU_IO_MAP(busicom_io)
 

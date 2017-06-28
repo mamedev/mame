@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_CPU_I4004_I4004_H
-#define MAME_CPU_I4004_I4004_H
+#ifndef MAME_CPU_MCS40_MCS40_H
+#define MAME_CPU_MCS40_MCS40_H
 
 #pragma once
 
@@ -9,17 +9,6 @@
 /***********************************************************************
     CONSTANTS
 ***********************************************************************/
-
-enum
-{
-	I4004_A = 1,
-	I4004_R01, I4004_R23, I4004_R45, I4004_R67, I4004_R89, I4004_RAB, I4004_RCD, I4004_REF,
-	I4040_RGH, I4040_RIJ, I4040_RKL, I4040_RMN,
-	I4004_ADDR0, I4004_ADDR1, I4004_ADDR2, I4004_ADDR3,
-	I4040_ADDR4, I4040_ADDR5, I4040_ADDR6, I4040_ADDR7,
-	I4004_CR, I4004_RC, I4004_RCN,
-	I4040_SRC
-};
 
 enum
 {
@@ -54,6 +43,12 @@ enum
 #define MCFG_I4004_CM_RAM3_CB(obj) \
 		devcb = &i4004_cpu_device::set_cm_ram_cb<3>(*device, DEVCB_##obj);
 
+#define MCFG_I4004_4289_PM_CB(obj) \
+		devcb = &i4004_cpu_device::set_4289_pm_cb(*device, DEVCB_##obj);
+
+#define MCFG_I4004_4289_F_L_CB(obj) \
+		devcb = &i4004_cpu_device::set_4289_f_l_cb(*device, DEVCB_##obj);
+
 
 #define MCFG_I4040_SYNC_CB(obj) \
 		devcb = &i4040_cpu_device::set_sync_cb(*device, DEVCB_##obj);
@@ -79,6 +74,12 @@ enum
 #define MCFG_I4040_CY_CB(obj) \
 		devcb = &i4040_cpu_device::set_cy_cb(*device, DEVCB_##obj);
 
+#define MCFG_I4040_4289_PM_CB(obj) \
+		devcb = &i4040_cpu_device::set_4289_pm_cb(*device, DEVCB_##obj);
+
+#define MCFG_I4040_4289_F_L_CB(obj) \
+		devcb = &i4040_cpu_device::set_4289_f_l_cb(*device, DEVCB_##obj);
+
 
 
 /***********************************************************************
@@ -87,8 +88,22 @@ enum
 
 class mcs40_cpu_device_base : public cpu_device
 {
+public:
+	// configuration helpers
+	template <typename Obj> static devcb_base &set_4289_pm_cb(device_t &device, Obj &&cb)
+	{ return downcast<mcs40_cpu_device_base &>(device).set_4289_pm_cb(std::forward<Obj>(cb)); }
+	template <typename Obj> static devcb_base &set_4289_f_l_cb(device_t &device, Obj &&cb)
+	{ return downcast<mcs40_cpu_device_base &>(device).set_4289_f_l_cb(std::forward<Obj>(cb)); }
+
+	// 4008/4009 or 4289 outputs
+	u8 get_4289_a() const { return m_4289_a; } // 8-bit address
+	u8 get_4289_c() const { return m_4289_c; } // 4-bit chip select
+	DECLARE_READ_LINE_MEMBER(get_4289_pm) const { return BIT(m_4289_pm, 0); } // 0 = active
+	DECLARE_READ_LINE_MEMBER(get_4289_f_l) const { return BIT(m_4289_f_l, 0); } // 1 = odd, 0 = even
+
 protected:
 	enum class cycle { OP, IM, IN };
+	enum class pmem { NONE, READ, WRITE };
 
 	mcs40_cpu_device_base(
 			machine_config const &mconfig,
@@ -123,7 +138,7 @@ protected:
 
 	// instruction execution
 	virtual bool is_io_op(u8 opr) = 0;
-	virtual cycle do_cycle1(u8 opr, u8 opa) = 0;
+	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) = 0;
 	virtual void do_cycle2(u8 opr, u8 opa, u8 arg) = 0;
 	virtual void do_io(u8 opr, u8 opa) = 0;
 
@@ -170,6 +185,21 @@ protected:
 	{ return m_cy_cb.set_callback(std::forward<Obj>(cb)); }
 
 private:
+	enum
+	{
+		I4004_A = 1,
+		I4004_R01, I4004_R23, I4004_R45, I4004_R67, I4004_R89, I4004_RAB, I4004_RCD, I4004_REF,
+		I4040_RGH, I4040_RIJ, I4040_RKL, I4040_RMN,
+		I4004_R0, I4004_R1, I4004_R2, I4004_R3, I4004_R4, I4004_R5, I4004_R6, I4004_R7,
+		I4004_R8, I4004_R9, I4004_R10, I4004_R11, I4004_R12, I4004_R13, I4004_R14, I4004_R15,
+		I4040_R16, I4040_R17, I4040_R18, I4040_R19, I4040_R20, I4040_R21, I4040_R22, I4040_R23,
+		I4004_SP,
+		I4004_ADDR0, I4004_ADDR1, I4004_ADDR2, I4004_ADDR3,
+		I4040_ADDR4, I4040_ADDR5, I4040_ADDR6, I4040_ADDR7,
+		I4004_CR, I4004_RC, I4004_RCN,
+		I4040_SRC
+	};
+
 	enum class phase { A1, A2, A3, M1, M2, X1, X2, X3 };
 
 	// internal helpers
@@ -178,16 +208,21 @@ private:
 	void update_cm_rom(u8 val);
 	void update_cm_ram(u8 val);
 	void update_cy(u8 val);
+	void update_4289_pm(u8 val);
+	void update_4289_f_l(u8 val);
 
 	// address spaces
-	address_space_config    m_program_config, m_data_config, m_io_config;
-	address_space           *m_program, *m_data, *m_io;
+	address_space_config    m_program_config, m_data_config, m_io_config, m_opcodes_config;
+	address_space           *m_program, *m_data, *m_io, *m_opcodes;
 	direct_read_data        *m_direct;
 
 	// output callbacks
 	devcb_write_line        m_sync_cb;
 	devcb_write_line        m_cm_rom_cb[2], m_cm_ram_cb[4];
 	devcb_write_line        m_cy_cb;
+
+	// 4008/4009 or 4289 output callbacks
+	devcb_write_line        m_4289_pm_cb, m_4289_f_l_cb;
 
 	// configuration
 	bool const  m_extended_cm;
@@ -201,10 +236,12 @@ private:
 	phase   m_phase;
 	cycle   m_cycle;
 	bool    m_io_pending;
+	pmem    m_program_op;
 
 	// instruction ROM fetch/decode
 	u16     m_rom_bank, m_rom_addr;
 	u8      m_opr, m_opa, m_arg;
+	bool    m_4289_first;
 
 	// ALU registers
 	u8      m_a, m_c;
@@ -224,10 +261,12 @@ private:
 	// input/output lines
 	int m_test;
 	u8  m_cm_rom, m_cm_ram, m_cy;
+	u8  m_4289_a, m_4289_c, m_4289_pm, m_4289_f_l;
 
 	// state export/import
-	u16         m_pc, m_pcbase;
-	u8          m_genflags;
+	std::unique_ptr<u8 []>  m_index_reg_halves;
+	u16                     m_pc, m_pcbase;
+	u8                      m_genflags;
 };
 
 
@@ -261,7 +300,7 @@ protected:
 
 	// mcs40_cpu_device_base implementation
 	virtual bool is_io_op(u8 opr) override;
-	virtual cycle do_cycle1(u8 opr, u8 opa) override;
+	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
 	virtual void do_cycle2(u8 opr, u8 opa, u8 arg) override;
 	virtual void do_io(u8 opr, u8 opa) override;
 };
@@ -292,7 +331,7 @@ protected:
 			uint32_t options) override;
 
 	// mcs40_cpu_device_base implementation
-	virtual cycle do_cycle1(u8 opr, u8 opa) override;
+	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
 };
 
 
@@ -304,4 +343,4 @@ protected:
 DECLARE_DEVICE_TYPE(I4004, i4004_cpu_device)
 DECLARE_DEVICE_TYPE(I4040, i4040_cpu_device)
 
-#endif // MAME_CPU_I4004_I4004_H
+#endif // MAME_CPU_MCS40_MCS40_H

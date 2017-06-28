@@ -20,31 +20,121 @@ public:
 	intellec4_40_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_tty(*this, "tty")
+		, m_mon_rom(*this, "monitor", 0x0400)
+		, m_ram(*this, "ram")
+		, m_banks(*this, "bank%u", 0)
+		, m_ram_page(0U), m_ram_data(0U), m_ram_write(false)
 	{
 	}
 
-	DECLARE_READ8_MEMBER(tty_r);
-	DECLARE_WRITE8_MEMBER(tty_w);
+	DECLARE_READ8_MEMBER(pm_read);
+	DECLARE_WRITE8_MEMBER(pm_write);
+
+	DECLARE_READ8_MEMBER(rom0_in);
+	DECLARE_READ8_MEMBER(rome_in);
+	DECLARE_READ8_MEMBER(romf_in);
+
+	DECLARE_WRITE8_MEMBER(rome_out);
+	DECLARE_WRITE8_MEMBER(romf_out);
+
+	DECLARE_WRITE8_MEMBER(ram0_out);
+	DECLARE_WRITE8_MEMBER(ram1_out);
+
+protected:
+	virtual void driver_start() override;
 
 private:
-	required_device<rs232_port_device> m_tty;
+	required_device<rs232_port_device>  m_tty;
+	required_region_ptr<u8>             m_mon_rom;
+	required_shared_ptr<u8>             m_ram;
+	required_memory_bank_array<4>       m_banks;
+
+	u8      m_ram_page, m_ram_data;
+	bool    m_ram_write;
 };
 
 
-READ8_MEMBER(intellec4_40_state::tty_r)
+READ8_MEMBER(intellec4_40_state::pm_read)
 {
-	return m_tty->rxd_r() ? 0x0 : 0x1;
+	// always causes data to be latched
+	u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));
+	m_ram_data = m_ram[addr];
+	return space.unmap();
 }
 
-WRITE8_MEMBER(intellec4_40_state::tty_w)
+WRITE8_MEMBER(intellec4_40_state::pm_write)
 {
+	// always causes data to be latched
+	u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));
+	m_ram_data = m_ram[addr];
+	if (m_ram_write)
+	{
+		bool const first(BIT(offset, 0));
+		m_ram[addr] = (m_ram_data & (first ? 0x0fU : 0xf0U)) | ((data & 0x0fU) << (first ? 4 : 0));
+	}
+}
+
+READ8_MEMBER(intellec4_40_state::rom0_in)
+{
+	// bit 0 of this port is ANDed with the TTY input
+	return m_tty->rxd_r() ? 0x00U : 0x01U;
+}
+
+READ8_MEMBER(intellec4_40_state::rome_in)
+{
+	// upper nybble of RAM data latch
+	return (m_ram_data >> 4) & 0x0fU;
+}
+
+READ8_MEMBER(intellec4_40_state::romf_in)
+{
+	// lower nybble of RAM data latch
+	return m_ram_data & 0x0fU;
+}
+
+WRITE8_MEMBER(intellec4_40_state::rome_out)
+{
+	// bit 0 of this port enables program memory write
+	m_ram_write = BIT(data, 0);
+}
+
+WRITE8_MEMBER(intellec4_40_state::romf_out)
+{
+	// sets the program memory page for read/write operations
+	m_ram_page = data & 0x0fU;
+}
+
+WRITE8_MEMBER(intellec4_40_state::ram0_out)
+{
+	// bit 0 of this port controls the TTY current loop
 	m_tty->write_txd(BIT(data, 0));
+}
+
+WRITE8_MEMBER(intellec4_40_state::ram1_out)
+{
+	// bit 0 of this port controls the paper tape motor (0 = stop, 1 = run)
+	m_tty->write_rts(BIT(~data, 0));
+}
+
+
+void intellec4_40_state::driver_start()
+{
+	for (unsigned i = 0; m_banks.size() > i; ++i)
+	{
+		m_banks[i]->configure_entry(0, &m_mon_rom[i << 8]);
+		m_banks[i]->configure_entry(1, &m_ram[i << 8]);
+		m_banks[i]->set_entry(0);
+	}
+
+	save_item(NAME(m_ram_page));
+	save_item(NAME(m_ram_data));
+	save_item(NAME(m_ram_write));
 }
 
 
 ADDRESS_MAP_START(mod40_program, AS_PROGRAM, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("monitor", 0x0000) // 4289 + 4 * 1702A
+	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(pm_read, pm_write)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mod40_data, AS_DATA, 8, intellec4_40_state)
@@ -54,8 +144,20 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mod40_io, AS_IO, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_READ(tty_r) // RDR when RC=00
-	AM_RANGE(0x1000, 0x103f) AM_MIRROR(0x0800) AM_WRITE(tty_w) // WMP when RC=00
+	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_READ(rom0_in)
+	AM_RANGE(0x00e0, 0x00ef) AM_MIRROR(0x0700) AM_READWRITE(rome_in, rome_out)
+	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x0700) AM_READWRITE(romf_in, romf_out)
+	AM_RANGE(0x1000, 0x103f) AM_MIRROR(0x0800) AM_WRITE(ram0_out)
+	AM_RANGE(0x1040, 0x107f) AM_MIRROR(0x0800) AM_WRITE(ram1_out)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(mod40_opcodes, AS_DECRYPTED_OPCODES, 8, intellec4_40_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_READ_BANK("bank0")
+	AM_RANGE(0x0100, 0x01ff) AM_READ_BANK("bank1")
+	AM_RANGE(0x0200, 0x02ff) AM_READ_BANK("bank2")
+	AM_RANGE(0x0300, 0x03ff) AM_READ_BANK("bank3")
+	AM_RANGE(0x0000, 0x0fff) AM_READONLY AM_SHARE("ram")
 ADDRESS_MAP_END
 
 
@@ -64,6 +166,7 @@ MACHINE_CONFIG_START(intlc440)
 	MCFG_CPU_PROGRAM_MAP(mod40_program)
 	MCFG_CPU_DATA_MAP(mod40_data)
 	MCFG_CPU_IO_MAP(mod40_io)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(mod40_opcodes)
 
 	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, "terminal")
 MACHINE_CONFIG_END
@@ -74,7 +177,7 @@ INPUT_PORTS_END
 
 
 ROM_START(intlc440)
-	ROM_REGION(0x0400, "monitor", 0)
+	ROM_REGION(0x0400, "monitor", 0) // 4 * 1702A
 	ROM_DEFAULT_BIOS("v2.1")
 	ROM_SYSTEM_BIOS(0, "v2.1", "MON 4 V2.1")
 	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(1))
