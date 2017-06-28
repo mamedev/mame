@@ -99,7 +99,7 @@ WRITE8_MEMBER(busicom_state::printer_ctrl_w)
 {
 }
 
-static ADDRESS_MAP_START(busicom_rom, AS_DECRYPTED_OPCODES, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_rom, AS_OPCODES, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x04FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END

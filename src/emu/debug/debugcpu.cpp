@@ -928,7 +928,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				memory = &device->memory();
 			}
 			auto dis = m_machine.disable_side_effect(disable_se);
-			return expression_read_program_direct(memory->space(AS_DECRYPTED_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
+			return expression_read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
 
@@ -1119,7 +1119,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				memory = &device->memory();
 			}
 			auto dis = m_machine.disable_side_effect(disable_se);
-			expression_write_program_direct(memory->space(AS_DECRYPTED_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			expression_write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
 
@@ -1317,7 +1317,7 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 		}
 		if (!device)
 			device = get_visible_cpu();
-		if (!device->interface(memory) || !memory->has_space(AS_DECRYPTED_OPCODES))
+		if (!device->interface(memory) || !memory->has_space(AS_OPCODES))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
 
@@ -1556,8 +1556,8 @@ device_debug::device_debug(device_t &device)
 				m_symtable.add("logunmapd", (void *)&m_memory->space(AS_DATA), get_logunmap, set_logunmap);
 			if (m_memory->has_space(AS_IO))
 				m_symtable.add("logunmapi", (void *)&m_memory->space(AS_IO), get_logunmap, set_logunmap);
-			if (m_memory->has_space(AS_DECRYPTED_OPCODES))
-				m_symtable.add("logunmapo", (void *)&m_memory->space(AS_DECRYPTED_OPCODES), get_logunmap, set_logunmap);
+			if (m_memory->has_space(AS_OPCODES))
+				m_symtable.add("logunmapo", (void *)&m_memory->space(AS_OPCODES), get_logunmap, set_logunmap);
 		}
 
 		// add all registers into it
@@ -2491,7 +2491,7 @@ u32 device_debug::compute_opcode_crc32(offs_t pc) const
 	assert(m_memory != nullptr);
 
 	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
+	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
 	address_space &space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 
@@ -2893,7 +2893,7 @@ u32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 	assert(m_memory != nullptr && m_disasm != nullptr);
 
 	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
+	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
 	address_space &space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 

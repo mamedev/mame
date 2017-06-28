@@ -42,7 +42,7 @@ void m6502_device::device_start()
 void m6502_device::init()
 {
 	mintf->program  = &space(AS_PROGRAM);
-	mintf->sprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : mintf->program;
+	mintf->sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : mintf->program;
 
 	mintf->direct  = &mintf->program->direct();
 	mintf->sdirect = &mintf->sprogram->direct();
@@ -407,7 +407,7 @@ const address_space_config *m6502_device::memory_space_config(address_spacenum s
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
+	case AS_OPCODES: return has_configured_map(AS_OPCODES) ? &sprogram_config : nullptr;
 	default:                   return nullptr;
 	}
 }

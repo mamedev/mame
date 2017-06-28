@@ -12,17 +12,17 @@ other devices can be connected to.  It's mainly, but not only, cpus.
 The interface allows for up to four address spaces, numbered 0-3, with
 symbolic names associated to them in emumem.h for historical reasons.
 
-+------------+-------------+----------------------+
-| Numeric ID | Symbolic ID | Symbolic name        |
-+============+=============+======================+
-| 0          | AS_0        | AS_PROGRAM           |
-+------------+-------------+----------------------+
-| 1          | AS_1        | AS_DATA              |
-+------------+-------------+----------------------+
-| 2          | AS_2        | AS_IO                |
-+------------+-------------+----------------------+
-| 3          | AS_3        | AS_DECRYPTED_OPCODES |
-+------------+-------------+----------------------+
++------------+-------------+---------------+
+| Numeric ID | Symbolic ID | Symbolic name |
++============+=============+===============+
+| 0          | AS_0        | AS_PROGRAM    |
++------------+-------------+---------------+
+| 1          | AS_1        | AS_DATA       |
++------------+-------------+---------------+
+| 2          | AS_2        | AS_IO         |
++------------+-------------+---------------+
+| 3          | AS_3        | AS_OPCODES    |
++------------+-------------+---------------+
 
 2. Setup
 --------
@@ -41,7 +41,7 @@ created.
 The **has_configured_map** method allows to test in the
 **memory_space_config** method whether an **address_map** has been
 associated with a given space.  That allows to implement optional
-memory spaces, such as AS_DECRYPTED_OPCODES in certain cpu cores.  The
+memory spaces, such as AS_OPCODES in certain cpu cores.  The
 parameterless version tests for AS_PROGRAM/AS_0.
 
 3. Associating maps to spaces

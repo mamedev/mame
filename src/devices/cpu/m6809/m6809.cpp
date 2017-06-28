@@ -131,7 +131,7 @@ void m6809_base_device::device_start()
 		m_mintf = new mi_default;
 
 	m_mintf->m_program  = &space(AS_PROGRAM);
-	m_mintf->m_sprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_mintf->m_program;
+	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
 
 	m_mintf->m_direct  = &m_mintf->m_program->direct();
 	m_mintf->m_sdirect = &m_mintf->m_sprogram->direct();
@@ -297,7 +297,7 @@ const address_space_config *m6809_base_device::memory_space_config(address_space
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_sprogram_config : nullptr;
+	case AS_OPCODES: return has_configured_map(AS_OPCODES) ? &m_sprogram_config : nullptr;
 	default:                   return nullptr;
 	}
 }

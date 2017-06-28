@@ -224,7 +224,7 @@ const address_space_config *sh2_device::memory_space_config(address_spacenum spa
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_program_config : nullptr;
+	case AS_OPCODES: return has_configured_map(AS_OPCODES) ? &m_decrypted_program_config : nullptr;
 	default:                   return nullptr;
 	}
 }
@@ -2347,7 +2347,7 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_program = &space(AS_PROGRAM);
-	m_decrypted_program = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : &space(AS_PROGRAM);
+	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
 	m_direct = &m_decrypted_program->direct();
 	m_internal = &space(AS_PROGRAM);
 

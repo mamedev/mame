@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, pengo_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
@@ -404,7 +404,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pengou, pengo )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pengoe, pengo )
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_DERIVED( jrpacmbl, pengo )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jrpacmbl_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 MACHINE_CONFIG_END

@@ -920,7 +920,7 @@ void m68000_base_device::init_cpu_common(void)
 
 	//this = device;//deviceparam;
 	program = &space(AS_PROGRAM);
-	oprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : program;
+	oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : program;
 	int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68000_base_device::standard_irq_callback_member), this);
 
 	/* disable all MMUs */
@@ -2488,7 +2488,7 @@ const address_space_config *m68000_base_device::memory_space_config(address_spac
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_oprogram_config : nullptr;
+	case AS_OPCODES: return has_configured_map(AS_OPCODES) ? &m_oprogram_config : nullptr;
 	default:                   return nullptr;
 	}
 }

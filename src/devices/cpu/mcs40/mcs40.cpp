@@ -133,7 +133,7 @@ void mcs40_cpu_device_base::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
-	m_opcodes = &space(AS_DECRYPTED_OPCODES);
+	m_opcodes = &space(AS_OPCODES);
 	m_direct = &m_opcodes->direct();
 
 	m_sync_cb.resolve_safe();
@@ -330,7 +330,7 @@ address_space_config const *mcs40_cpu_device_base::memory_space_config(address_s
 	case AS_PROGRAM:            return &m_program_config;
 	case AS_DATA:               return &m_data_config;
 	case AS_IO:                 return &m_io_config;
-	case AS_DECRYPTED_OPCODES:  return &m_opcodes_config;
+	case AS_OPCODES:  return &m_opcodes_config;
 	default:                    return nullptr;
 	}
 }

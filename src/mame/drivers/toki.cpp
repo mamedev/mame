@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( toki_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toki_audio_opcodes_map, AS_DECRYPTED_OPCODES, 8, toki_state )
+static ADDRESS_MAP_START( toki_audio_opcodes_map, AS_OPCODES, 8, toki_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( jujuba_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jujuba_audio_opcodes_map, AS_DECRYPTED_OPCODES, 8, toki_state )
+static ADDRESS_MAP_START( jujuba_audio_opcodes_map, AS_OPCODES, 8, toki_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END

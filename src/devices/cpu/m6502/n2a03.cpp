@@ -124,7 +124,7 @@ const address_space_config *n2a03_device::memory_space_config(address_spacenum s
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
+	case AS_OPCODES: return has_configured_map(AS_OPCODES) ? &sprogram_config : nullptr;
 	default:                   return nullptr;
 	}
 }

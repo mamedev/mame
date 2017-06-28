@@ -652,7 +652,7 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x902006, 0x902007) AM_WRITE(sound_command_irq_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas1x_bootleg_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -2303,7 +2303,7 @@ static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb2_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
 	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
 MACHINE_CONFIG_END
@@ -2321,7 +2321,7 @@ static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb2_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
 	MCFG_FRAGMENT_ADD(datsu_ym2151_msm5205)
 

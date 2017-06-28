@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( osborne1_op, AS_DECRYPTED_OPCODES, 8, osborne1_state )
+static ADDRESS_MAP_START( osborne1_op, AS_OPCODES, 8, osborne1_state )
 	AM_RANGE( 0x0000, 0xFFFF ) AM_READ(opcode_r)
 ADDRESS_MAP_END
 

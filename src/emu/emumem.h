@@ -38,7 +38,7 @@ enum address_spacenum
 	AS_PROGRAM = AS_0,              // program address space
 	AS_DATA = AS_1,                 // data address space
 	AS_IO = AS_2,                   // I/O address space
-	AS_DECRYPTED_OPCODES = AS_3     // decrypted opcodes, when separate from data accesses
+	AS_OPCODES = AS_3     // decrypted opcodes, when separate from data accesses
 };
 DECLARE_ENUM_OPERATORS(address_spacenum)
 

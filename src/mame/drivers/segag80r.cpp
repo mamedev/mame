@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, segag80r_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, segag80r_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")

@@ -48,7 +48,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( flicker_rom, AS_DECRYPTED_OPCODES, 8, flicker_state )
+static ADDRESS_MAP_START( flicker_rom, AS_OPCODES, 8, flicker_state )
 	AM_RANGE(0x0000, 0x03FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 

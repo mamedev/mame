@@ -46,7 +46,7 @@ const address_space_config *deco16_device::memory_space_config(address_spacenum 
 	{
 	case AS_PROGRAM:           return &program_config;
 	case AS_IO:                return &io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
+	case AS_OPCODES: return has_configured_map(AS_OPCODES) ? &sprogram_config : nullptr;
 	default:                   return nullptr;
 	}
 }

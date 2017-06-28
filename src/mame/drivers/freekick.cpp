@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, freekick_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, freekick_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
