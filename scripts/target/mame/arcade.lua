@@ -2068,7 +2068,6 @@ files {
 	MAME_DIR .. "src/mame/includes/ginganin.h",
 	MAME_DIR .. "src/mame/video/ginganin.cpp",
 	MAME_DIR .. "src/mame/drivers/homerun.cpp",
-	MAME_DIR .. "src/mame/drivers/homerun.cpp",
 	MAME_DIR .. "src/mame/includes/homerun.h",
 	MAME_DIR .. "src/mame/video/homerun.cpp",
 	MAME_DIR .. "src/mame/drivers/megasys1.cpp",
