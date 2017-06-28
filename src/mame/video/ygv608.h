@@ -17,10 +17,26 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	DECLARE_ADDRESS_MAP(port_map, 8);
 
+	DECLARE_READ8_MEMBER(pattern_name_table_r);
+	DECLARE_READ8_MEMBER(sprite_data_r);
+	DECLARE_READ8_MEMBER(scroll_data_r);
+	DECLARE_READ8_MEMBER(palette_data_r);
+	DECLARE_READ8_MEMBER(register_data_r);
+//	DECLARE_READ8_MEMBER(register_select_r);
+	DECLARE_READ8_MEMBER(status_port_r);
+	DECLARE_READ8_MEMBER(system_control_r);
+	DECLARE_WRITE8_MEMBER(pattern_name_table_w);
+	DECLARE_WRITE8_MEMBER(sprite_data_w);
+	DECLARE_WRITE8_MEMBER(scroll_data_w);
+	DECLARE_WRITE8_MEMBER(palette_data_w);
+	DECLARE_WRITE8_MEMBER(register_data_w);
+	DECLARE_WRITE8_MEMBER(register_select_w);
+	DECLARE_WRITE8_MEMBER(status_port_w);
+	DECLARE_WRITE8_MEMBER(system_control_w);
 
+	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -147,7 +163,7 @@ private:
 	bitmap_ind16 m_work_bitmap;
 
 	void HandleYGV608Reset();
-	void HandleRomTransfers();
+	void HandleRomTransfers(uint8_t type);
 	void SetPreShortcuts(int reg, int data );
 	void SetPostShortcuts(int reg);
 	void ShowYGV608Registers();
