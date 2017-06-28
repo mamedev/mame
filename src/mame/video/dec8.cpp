@@ -46,54 +46,6 @@ sprites.
 #include "emu.h"
 #include "includes/dec8.h"
 
-/***************************************************************************
-
-  Convert the color PROMs into a more useable format.
-
-  Real Ghostbusters has two 1024x8 palette PROM,  other games in this driver
-  use palette RAM.  
-  
-  Real Ghostbusters, Cobra Command, Gondomania, Oscar at least are confirmed 
-  to use two custom resistor packs marked DECO RM-C3 to convert the digital 
-  palette for analog output.
-  
-  Each pack contains two channels with resistor values of 220 ohms, 
-  470 ohms, 1 kohm, 2.2 kohm and 4.8 kohm, however the highest resistance is 
-  not used as these games are only 4 bits per channel.
-  
-  This leads to weightings per bit of 0xe, 0x1f, 0x43, 0x8f. 
-  
-***************************************************************************/
-
-PALETTE_INIT_MEMBER(dec8_state,ghostb)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
-	{
-		int bit0, bit1, bit2, bit3, r, g, b;
-
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i] >> 4) & 0x01;
-		bit1 = (color_prom[i] >> 5) & 0x01;
-		bit2 = (color_prom[i] >> 6) & 0x01;
-		bit3 = (color_prom[i] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[i + palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[i + palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[i + palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-}
-
 WRITE8_MEMBER(dec8_state::dec8_bg_data_w)
 {
 	m_bg_data[offset] = data;
