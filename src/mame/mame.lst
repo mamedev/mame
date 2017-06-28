@@ -14527,9 +14527,11 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_sm510.cpp
+exospace                        // Elektronika
 gnw_bx301                       // Nintendo
 gnw_dj101                       // Nintendo
 gnw_dm53                        // Nintendo
+gnw_eg26                        // Nintendo
 gnw_jr55                        // Nintendo
 gnw_mc25                        // Nintendo
 gnw_ml102                       // Nintendo
@@ -14539,6 +14541,7 @@ kgradius                        // Konami
 kloneran                        // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
+nupogodi                        // Elektronika
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
