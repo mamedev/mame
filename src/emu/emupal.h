@@ -169,9 +169,6 @@
 #define PALETTE_FORMAT_GRBX raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,24,8>)
 #define PALETTE_FORMAT_BGRX raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,16,24>)
 
-// 4 bpp format weighted as per Data East custom DECO RM-C3 resistor network
-#define PALETTE_FORMAT_xxxxBBBBGGGGRRRR_DECO raw_to_rgb_converter(2, &raw_to_rgb_converter::deco_rgb_decoder)
-
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
@@ -345,7 +342,6 @@ public:
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(u32 raw);  // bits 3/2/1 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
-	static rgb_t deco_rgb_decoder(u32 raw); // xxxxBBBBGGGGRRRR custom weighting
 
 	
 private:
