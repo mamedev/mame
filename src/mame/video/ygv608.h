@@ -279,6 +279,7 @@ private:
 	}m_crtc;
 	
 	void screen_configure();
+	attotime raster_sync_offset();	/**< adjust based off raster & CRTC parameters */
 };
 
 // device type definition

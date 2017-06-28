@@ -34,12 +34,13 @@
  *    - move ports into device_address_map (done);
  *    - add registers into own space, improve naming and variable usage;
  *    - remove code repetition in tilemap drawing functions;
- *    - add crtc section;
+ *    - add crtc section (done partially);
  *    - fix garbage tiles in Mappy Arrange/Abnormal Check;
  *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers);
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
  *    - color palette accessors presumably accesses an internal RAMDAC with controllable auto-increment, convert to that;
+ *    - fix char getting cut off from GAME SELECT msg in NCV2;
  *    - clean-ups & documentation;
  *
  *
@@ -490,6 +491,10 @@ void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_screen_status |= 0x10; // FP
 			if(m_raster_irq_mask == true)
 				m_raster_handler(ASSERT_LINE);
+			
+			// adjust for next one shot
+			m_raster_timer->reset();
+			m_raster_timer->adjust(raster_sync_offset(), 0);
 		}
 	}
 }
@@ -1747,6 +1752,13 @@ WRITE8_MEMBER( ygv608_device::irq_mask_w )
 {
 	m_vblank_irq_mask = BIT(data, 0);
 	m_raster_irq_mask = BIT(data, 1);
+	
+	// reset timers in case masking cuts off irqs
+	if(m_vblank_irq_mask == false)
+		m_vblank_timer->reset();
+
+	if(m_raster_irq_mask == false)
+		m_raster_timer->reset();
 }
 
 // R#15R / R#16R raster interrupt control
@@ -1785,7 +1797,31 @@ WRITE8_MEMBER( ygv608_device::irq_ctrl_w )
 		
 		m_raster_irq_hpos = (data & 0x1f) * 32;
 	}
+	
+	// reset raster timer
+	m_raster_timer->reset();
+	m_raster_timer->adjust(raster_sync_offset(), 0);
+
+	//printf("%d %d %d %d %d\n",m_raster_irq_hpos,m_raster_irq_vpos,m_raster_irq_mode,m_crtc.htotal,m_crtc.vtotal);
 }
+
+attotime ygv608_device::raster_sync_offset()
+{
+	
+	// don't care if h/v pos is higher than CRTC params (NCV2 POST)
+	if(m_raster_irq_hpos >  m_crtc.htotal || m_raster_irq_vpos > m_crtc.vtotal )
+		return attotime::never;
+
+	// bail out and throw an error if this happens to be used someday
+	if(m_raster_irq_mode == true)
+	{
+		popmessage("Raster IRQ used with mode = true");
+		return attotime::never;
+	}
+	
+	return m_screen->time_until_pos(m_raster_irq_vpos,m_raster_irq_hpos);
+}
+
 
 // R#39W - R#46W display scan control write
 WRITE8_MEMBER( ygv608_device::crtc_w )
@@ -1822,7 +1858,7 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 			m_crtc.htotal &= ~0x1fe;
 			m_crtc.htotal |= (data & 0xff) << 1;
 			
-			printf("H %d %d %d %d %d\n",m_crtc.htotal,m_crtc.display_hstart,m_crtc.display_width,m_crtc.display_hsync,m_crtc.border_width);
+			//printf("H %d %d %d %d %d\n",m_crtc.htotal,m_crtc.display_hstart,m_crtc.display_width,m_crtc.display_hsync,m_crtc.border_width);
 			break;
 		}
 		
