@@ -43,5 +43,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	INTERRUPT_GEN_MEMBER(mcu_interrupt);
+	DECLARE_WRITE_LINE_MEMBER( vblank_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( raster_irq_w );
+	INTERRUPT_GEN_MEMBER(mcu_interrupt);	
 };

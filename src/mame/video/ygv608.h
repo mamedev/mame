@@ -1,15 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Mark McDougall
+/*
+ *    Yamaha YGV608 - PVDC2 Pattern mode Video Display Controller 2
+ *    - Mark McDougall
+ */
+
 #ifndef MAME_VIDEO_YGV608_H
 #define MAME_VIDEO_YGV608_H
 
 #pragma once
 
 #include "tilemap.h"
-/*
- *    Yamaha YGV608 - PVDC2 Pattern mode Video Display Controller 2
- *    - Mark McDougall
- */
+#include "screen.h"
 
 class ygv608_device : public device_t, 
                       public device_gfx_interface,
@@ -21,6 +23,7 @@ public:
 
 	DECLARE_ADDRESS_MAP(port_map, 8);
 
+	// ports section
 	DECLARE_READ8_MEMBER(pattern_name_table_r);
 	DECLARE_READ8_MEMBER(sprite_data_r);
 	DECLARE_READ8_MEMBER(scroll_data_r);
@@ -38,21 +41,35 @@ public:
 	DECLARE_WRITE8_MEMBER(status_port_w);
 	DECLARE_WRITE8_MEMBER(system_control_w);
 
+	// register section
+	DECLARE_READ8_MEMBER(irq_mask_r);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_READ8_MEMBER(irq_ctrl_r);
+	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
+	DECLARE_WRITE8_MEMBER(crtc_w);
+	
 	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER( timed_interrupt );
 
-	// to be removed
-	DECLARE_READ16_MEMBER( debug_trigger_r );
+	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb)
+	{
+		return downcast<ygv608_device &>(device).m_vblank_handler.set_callback(std::forward<Object>(cb));
+	}
+	template <class Object> static devcb_base &static_set_raster_callback(device_t &device, Object &&cb)
+	{
+		return downcast<ygv608_device &>(device).m_raster_handler.set_callback(std::forward<Object>(cb));
+	}
+	
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_IO) const override;
 	
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	address_space *m_iospace;
 private:
 	const address_space_config m_io_space_config;
@@ -226,7 +243,42 @@ private:
 	// new variable handling starts here
 	uint8_t m_register_address; /**< RN: Register address select */
 	bool m_register_autoinc_r;  /**< RRAI: Register address auto-increment on read */
-	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */	
+	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */
+	uint8_t m_screen_status; 	/**< CD: status port r/w */
+	
+	bool m_raster_irq_mask;		/**< IEP: raster irq mask (INT1 occurs if 1) */
+	bool m_vblank_irq_mask;		/**< IEV: vblank irq mask (INT0 occurs if 1) */
+	int m_raster_irq_hpos;		/**< IH: horizontal position where raster irq occurs x 32 */
+	int m_raster_irq_vpos;		/**< IV: vertical position where raster irq occurs */
+	bool m_raster_irq_mode; 	/**< FPM: if 1 vertical position becomes invalid for raster irqs (irqs occur for every line) */
+
+	// screen section
+	devcb_write_line            m_vblank_handler;
+	devcb_write_line            m_raster_handler;
+	screen_device				*m_screen;
+	emu_timer					*m_vblank_timer;
+	emu_timer					*m_raster_timer;
+	
+	enum
+	{
+		VBLANK_TIMER,
+		RASTER_TIMER
+	};
+	
+	struct {
+		int htotal;				/**< HTL: horizontal total number of dots x 2 */
+		int vtotal;				/**< VTL: vertical total number of lines x 1 */
+		int display_hstart;		/**< HDS: horizontal display starting position x 2*/
+		int display_vstart;		/**< VDS: vertical display starting position x 1 */
+		int display_width;		/**< HDW: horizontal display size x 16 */
+		int display_height;		/**< VDW: vertical display size x 8 */
+		int display_hsync;		/**< HSW: horizontal sync signal x 16 */
+		int display_vsync;		/**< VSW: vertical sync signal x 1 */
+		int border_width;		/**< HBW: horizontal border size x 16 */
+		int border_height;		/**< VBW: vertical border size x 8 */
+	}m_crtc;
+	
+	void screen_configure();
 };
 
 // device type definition
@@ -243,4 +295,11 @@ DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 #define MCFG_YGV608_PALETTE(_palette_tag) \
 	MCFG_GFX_PALETTE(_palette_tag)
 
+#define MCFG_YGV608_VBLANK_HANDLER( _intcallb ) \
+	devcb = &ygv608_device::static_set_vblank_callback( *device, DEVCB_##_intcallb );
+
+#define MCFG_YGV608_RASTER_HANDLER( _intcallb ) \
+	devcb = &ygv608_device::static_set_raster_callback( *device, DEVCB_##_intcallb );
+
+	
 #endif

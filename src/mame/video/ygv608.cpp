@@ -361,7 +361,12 @@ GFXDECODE_END
  *
  ***************************************/
 
+ // we use decimals here to match documentation
 static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
+	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w) 
+	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
+	
+	AM_RANGE(39, 46) AM_WRITE(crtc_w)
 ADDRESS_MAP_END
 
 /***************************************
@@ -390,7 +395,9 @@ ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, de
 	: device_t(mconfig, YGV608, tag, owner, clock), 
 	  device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608)),
 	  device_memory_interface(mconfig, *this),
-	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(regs_map))
+	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(regs_map)),
+ 	  m_vblank_handler(*this),
+	  m_raster_handler(*this)
 {
 }
 
@@ -446,7 +453,14 @@ void ygv608_device::device_start()
 	m_tilemap_B = nullptr;
 
 	m_iospace = &space(AS_IO);
-
+	
+	// TODO: tagging configuration
+	m_screen = downcast<screen_device *>(machine().device("screen"));
+	m_vblank_handler.resolve();
+	m_raster_handler.resolve();
+	m_vblank_timer = timer_alloc(VBLANK_TIMER);
+	m_raster_timer = timer_alloc(RASTER_TIMER);
+	
 	register_state_save();
 }
 
@@ -460,42 +474,32 @@ const address_space_config *ygv608_device::memory_space_config(address_spacenum 
 	return (spacenum == AS_IO) ? &m_io_space_config : nullptr;
 }
 
+void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case VBLANK_TIMER:
+		{
+			m_screen_status |= 8; // FV
+			if(m_vblank_irq_mask == true)
+				m_vblank_handler(ASSERT_LINE);
+			break;
+		}
+		case RASTER_TIMER:
+		{
+			m_screen_status |= 0x10; // FP
+			if(m_raster_irq_mask == true)
+				m_raster_handler(ASSERT_LINE);
+		}
+	}
+}
+
 
 void ygv608_device::set_gfxbank(uint8_t gfxbank)
 {
 	m_namcond1_gfxbank = gfxbank;
 }
 
-/* interrupt generated every 1ms second */
-INTERRUPT_GEN_MEMBER(ygv608_device::timed_interrupt )
-{
-/*
-    this is not quite generic, because we trigger a 68k interrupt
-    - if this chip is ever used by another driver, we should make
-      this more generic - or move it into the machine driver
-*/
-
-	static int timer = 0;
-
-	if( ++timer == 1000 )
-		timer = 0;
-
-	/* once every 60Hz, set the vertical border interval start flag */
-	if( ( timer % (1000/60) ) == 0 )
-	{
-		m_ports.s.p6 |= p6_fv;
-		if (m_regs.s.r14 & r14_iev)
-			device.execute().set_input_line(2, HOLD_LINE);
-	}
-
-	/* once every 60Hz, set the position detection flag (somewhere) */
-	else if( ( timer % (1000/60) ) == 7 )
-	{
-		m_ports.s.p6 |= p6_fp;
-		if (m_regs.s.r14 & r14_iep)
-			device.execute().set_input_line(2, HOLD_LINE);
-	}
-}
 
 
 TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
@@ -1138,13 +1142,6 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 	if( m_screen_resize )
 	{
-#ifdef _ENABLE_SCREEN_RESIZE
-		// hdw should be scaled by 16, not 8
-		// - is it something to do with double dot-clocks???
-		screen.set_visible_area(0, ((int)(m_regs.s.hdw)<<3/*4*/)-1,
-							0, ((int)(m_regs.s.vdw)<<3)-1 );
-#endif
-
 		m_work_bitmap.resize(screen.width(), screen.height());
 
 		// reset resize flag
@@ -1455,7 +1452,7 @@ READ8_MEMBER(ygv608_device::register_data_r)
  ***/
 READ8_MEMBER( ygv608_device::status_port_r )
 {
-	return (uint8_t)(m_ports.b[6]);
+	return m_screen_status;
 }
 
 // P#7R - system control port
@@ -1628,7 +1625,11 @@ WRITE8_MEMBER( ygv608_device::register_select_w )
 WRITE8_MEMBER( ygv608_device::status_port_w )
 {
 	/* writing a '1' resets that bit */
-	m_ports.b[6] &= ~data;
+	m_screen_status &= ~data;
+	if(data & 8)
+		m_vblank_handler(0);
+	if(data & 0x10)
+		m_raster_handler(0);
 }
 
 // P#7W - system control port
@@ -1729,30 +1730,166 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
 #endif
 }
 
-#if 0
-void nvsram( offs_t offset, uint16_t data )
+/***************************************
+ *
+ * Register Interface routines
+ *
+ ****************************************/
+
+// R#14R interrupt mask control
+READ8_MEMBER( ygv608_device::irq_mask_r )
 {
-	static int i = 0;
-
-	data = ( data >> 8 ) & 0xff;
-
-	if( 1 ) {
-	static char ascii[16];
-	if( i%16 == 0 )
-		logerror( "%04X: ", offset );
-	logerror( "%02X ", data );
-	ascii[i%16] = (data > 0x20) ? data : '.';
-	if( i%16 == 15 )
-		logerror( "| %-16.16s\n", ascii );
-	}
-
-	i++;
+	return (m_raster_irq_mask << 1) | (m_vblank_irq_mask << 0);
 }
-#endif
+
+// R#14W interrupt mask control
+WRITE8_MEMBER( ygv608_device::irq_mask_w )
+{
+	m_vblank_irq_mask = BIT(data, 0);
+	m_raster_irq_mask = BIT(data, 1);
+}
+
+// R#15R / R#16R raster interrupt control
+READ8_MEMBER( ygv608_device::irq_ctrl_r )
+{
+	uint8_t res;
+	
+	if(offset == 0) // R#15
+		res = m_raster_irq_vpos & 0xff;
+	else // R#16
+	{
+		res = (m_raster_irq_mode << 7);
+		
+		res|= (BIT(m_raster_irq_vpos, 8) << 6);
+		
+		res|= (m_raster_irq_hpos / 32) & 0x1f;
+	}
+	
+	return res;
+}
+
+// R#15W / R#16W raster interrupt control
+WRITE8_MEMBER( ygv608_device::irq_ctrl_w )
+{
+	if(offset == 0) // R#15
+	{
+		m_raster_irq_vpos &= ~0xff;
+		m_raster_irq_vpos |= data & 0xff;
+	}
+	else // R#16
+	{
+		m_raster_irq_mode = BIT(data,7);
+		
+		m_raster_irq_vpos &= ~0x100;
+		m_raster_irq_vpos |= BIT(data,6) << 8;
+		
+		m_raster_irq_hpos = (data & 0x1f) * 32;
+	}
+}
+
+// R#39W - R#46W display scan control write
+WRITE8_MEMBER( ygv608_device::crtc_w )
+{
+	//printf("[%d] <- %02x\n",offset+39,data);
+
+	switch(offset+39)
+	{
+		case 39:
+		{
+			m_crtc.display_hsync = ((data >> 5) & 7) * 16;
+			m_crtc.border_width = (data & 0x1f) * 16;
+			break;
+		}
+		
+		case 40:
+		{
+			m_crtc.htotal &= ~0x600;
+			m_crtc.htotal |= (data & 0xc0) << 3;
+
+			m_crtc.display_width = (data & 0x3f) * 16;
+			break;
+		}
+		
+		case 41:
+		{
+			m_crtc.display_hstart &= ~0x1fe;
+			m_crtc.display_hstart |= (data & 0xff) << 1;
+			break;
+		}
+		
+		case 42:
+		{
+			m_crtc.htotal &= ~0x1fe;
+			m_crtc.htotal |= (data & 0xff) << 1;
+			
+			printf("H %d %d %d %d %d\n",m_crtc.htotal,m_crtc.display_hstart,m_crtc.display_width,m_crtc.display_hsync,m_crtc.border_width);
+			break;
+		}
+		
+		case 43:
+		{
+			m_crtc.display_vsync = (data >> 5) & 7;
+			m_crtc.border_height = (data & 0x1f) * 8;
+			break;
+		}
+		
+		case 44:
+		{
+			// TODO: VSLS, bit 6
+
+			m_crtc.display_height = (data & 0x3f) * 8;
+			break;
+		}
+		
+		case 45:
+		{
+			m_crtc.vtotal &= ~0x100;
+			m_crtc.vtotal |= BIT(data,7) << 8;
+			
+			// TODO: TRES, bit 6
+			
+			m_crtc.display_vstart = data & 0x3f;			
+			break;
+		}
+		
+		case 46:
+		{
+			m_crtc.vtotal &= ~0xff;
+			m_crtc.vtotal |= data & 0xff;
+			
+			// TODO: call it for all mods in the CRTC
+			screen_configure();
+
+			//printf("V %d %d %d %d %d\n",m_crtc.vtotal,m_crtc.display_vstart,m_crtc.display_height,m_crtc.display_vsync,m_crtc.border_height);
+			break;
+		}
+	}
+}
+
+// TODO: all horizontal values needs to be divided by 2, presumably some other register?
+// TODO: h/vstart not taken into account (needs video mods)
+void ygv608_device::screen_configure()
+{
+//	int display_hend = (m_crtc.display_hstart + (m_crtc.display_width / 2)) - 1;
+	int display_hend = (m_crtc.display_width / 2) - 1;
+//	int display_vend = (m_crtc.display_vstart + m_crtc.display_height) - 1;
+	int display_vend = (m_crtc.display_height) - 1;
+
+	//rectangle visarea(m_crtc.display_hstart, display_hend, m_crtc.display_vstart, display_vend);
+	rectangle visarea(0, display_hend, 0, display_vend);
+
+	attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * m_crtc.vtotal * (m_crtc.htotal / 2);
+
+	m_screen->configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
+	
+	// reset vblank timer
+	m_vblank_timer->reset();
+	//m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_vstart+m_crtc.display_height,0), 0, m_screen->frame_period());
+	m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_height,0), 0, m_screen->frame_period());
+}
 
 // Set any "short-cut" variables before we update the YGV608 registers
 // - these are used only in optimisation of the emulation
-
 void ygv608_device::SetPreShortcuts( int reg, int data )
 {
 	switch( reg ) {
@@ -1937,106 +2074,10 @@ void ygv608_device::SetPostShortcuts(int reg )
 
 }
 
-/*
- *      The rest of this stuff is for debugging only!
- */
 
 
-//#define SHOW_SOURCE_MODE
 
-#if 0
-void dump_block( char *name, uint8_t *block, int len )
-{
-	int i;
 
-	logerror( "uint8_t %s[] = {\n", name );
-	for( i=0; i<len; i++ ) {
-	if( i%8 == 0 )
-		logerror( " " );
-	logerror( "0x%02X, ", block[i] );
-	if( i%8 == 7 )
-		logerror( "\n" );
-	}
-	logerror( "};\n" );
-}
-#endif
-READ16_MEMBER( ygv608_device::debug_trigger_r )
-{
-	static int oneshot = 0;
-
-#ifndef SHOW_SOURCE_MODE
-	int i;
-#endif
-	char ascii[16];
-
-	if( oneshot )
-	return( 0 );
-	oneshot = 1;
-
-	ShowYGV608Registers();
-
-#ifdef SHOW_SOURCE_MODE
-#if 0
-	dump_block( "ygv608_regs",
-			(uint8_t *)m_regs.b,
-			64 );
-	dump_block( "ygv608_pnt",
-			(uint8_t *)m_pattern_name_table,
-			4096 );
-	dump_block( "ygv608_sat",
-			(uint8_t *)m_sprite_attribute_table.b,
-			256 );
-	dump_block( "ygv608_sdt",
-			(uint8_t *)m_scroll_data_table,
-			512 );
-	dump_block( "ygv608_cp",
-			(uint8_t *)m_colour_palette,
-			768 );
-#endif
-
-#else
-
-	/*
-	*  Dump pattern name table ram
-	*/
-#if 1
-	logerror( "Pattern Name Table\n" );
-	for( i=0; i<4096; i++ ) {
-	if( i % 16 == 0 )
-		logerror( "$%04X : ", i );
-	logerror( "%02X ", m_pattern_name_table[i] );
-	if( m_pattern_name_table[i] >= 0x20)
-		ascii[i%16] = m_pattern_name_table[i];
-	else
-		ascii[i%16] = '.';
-	if( i % 16 == 15 )
-		logerror( " | %-16.16s\n", ascii );
-	}
-	logerror( "\n" );
-#endif
-
-	/*
-	*  Dump scroll table ram
-	*/
-
-	logerror( "Scroll Table\n" );
-	for( i=0; i<256; i++ ) {
-	if( i % 16 == 0 )
-		logerror( "$%04X : ", i );
-	logerror( "%02X ", m_scroll_data_table[0][i] );
-	if( m_scroll_data_table[0][i] >= 0x20 )
-		ascii[i%16] = m_scroll_data_table[0][i];
-	else
-		ascii[i%16] = '.';
-	if( i % 16 == 15 )
-		logerror( " | %-16.16s\n", ascii );
-	}
-	logerror( "\n" );
-
-#endif
-
-	return( 0 );
-}
 
 void ygv608_device::ShowYGV608Registers()
 {
