@@ -118,26 +118,26 @@ offs_t disassemble(
 		break;
 	case format::REGPAGE:
 		npc++;
-		util::stream_format(stream, "%-3s r%01x,$%03x", desc.m_name, imm4, opram[1] | (npc & 0x0f00U));
+		util::stream_format(stream, "%-3s r%01x,$%03x", desc.m_name, imm4, oprom[1] | (npc & 0x0f00U));
 		break;
 	case format::PAIR:
 		util::stream_format(stream, "%-3s r%01xr%01x", desc.m_name, pair, pair + 1U);
 		break;
 	case format::PAIRIMM:
 		npc++;
-		util::stream_format(stream, "%-3s r%01xr%01x,$%02x", desc.m_name, pair, pair + 1, opram[1]);
+		util::stream_format(stream, "%-3s r%01xr%01x,$%02x", desc.m_name, pair, pair + 1, oprom[1]);
 		break;
 	case format::ABS:
 		npc++;
-		util::stream_format(stream, "%-3s $%03x", desc.m_name, ((u16(opcode) & 0x0fU) << 8) | opram[1]);
+		util::stream_format(stream, "%-3s $%03x", desc.m_name, ((u16(opcode) & 0x0fU) << 8) | oprom[1]);
 		break;
 	case format::PAGE:
 		npc++;
-		util::stream_format(stream, "%-3s $%03x", desc.m_name, opram[1] | (npc & 0x0f00U));
+		util::stream_format(stream, "%-3s $%03x", desc.m_name, oprom[1] | (npc & 0x0f00U));
 		break;
 	case format::COND:
 		npc++;
-		util::stream_format(stream, "%-3s %s,$%03x", desc.m_name, f_cond[imm4], opram[1] | (npc & 0x0f00U));
+		util::stream_format(stream, "%-3s %s,$%03x", desc.m_name, f_cond[imm4], oprom[1] | (npc & 0x0f00U));
 		break;
 	default:
 		throw false;

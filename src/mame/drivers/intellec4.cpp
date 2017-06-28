@@ -56,9 +56,12 @@ private:
 
 READ8_MEMBER(intellec4_40_state::pm_read)
 {
-	// always causes data to be latched
-	u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));
-	m_ram_data = m_ram[addr];
+	if (!machine().side_effect_disabled())
+	{
+		// always causes data to be latched
+		u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));
+		m_ram_data = m_ram[addr];
+	}
 	return space.unmap();
 }
 

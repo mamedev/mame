@@ -205,6 +205,7 @@ private:
 	// internal helpers
 	u16 &pc() { return m_addr_stack[m_stack_ptr]; }
 	u16 rom_bank() const { return BIT(m_cr, 3) ? 0x1000U : 0x0000U; }
+	u16 program_addr() const { return (u16(BIT(m_cr, 3)) << 9) | (u16(m_4289_a) << 1) | BIT(m_4289_f_l, 0); }
 	void update_cm_rom(u8 val);
 	void update_cm_ram(u8 val);
 	void update_cy(u8 val);

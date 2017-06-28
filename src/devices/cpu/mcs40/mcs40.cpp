@@ -65,7 +65,6 @@ as nybble lane select.
 
 TODO: HLT, BBS, EIN, DIN instructions
 TODO: 4040 halt/interrupt support
-TODO: expose 4289 lines
 TODO: expose data bus
 */
 
@@ -352,10 +351,15 @@ void mcs40_cpu_device_base::execute_run()
 			}
 			else
 			{
+				assert(cycle::OP == m_cycle);
 				m_4289_c = 0x0fU;
 				update_4289_pm(0x00U);
 				update_4289_f_l(m_4289_first ? 0x01 : 0x00);
 				m_4289_first = !m_4289_first;
+				if (pmem::READ == m_program_op)
+					m_arg = m_program->read_byte(program_addr()) & 0x0fU;
+				else
+					assert(pmem::WRITE == m_program_op);
 			}
 			m_phase = phase::X2;
 			break;
@@ -378,20 +382,8 @@ void mcs40_cpu_device_base::execute_run()
 			{
 				assert(m_latched_rc == m_new_rc);
 			}
-			if (pmem::NONE != m_program_op)
-			{
-				assert(cycle::OP == m_cycle);
-				u16 const addr(u16(BIT(m_cr, 3) << 9) | (u16(m_4289_a) << 1) | BIT(m_4289_f_l, 0));
-				if (pmem::READ == m_program_op)
-				{
-					m_arg = m_program->read_byte(addr) & 0x0fU;
-				}
-				else
-				{
-					assert(pmem::WRITE == m_program_op);
-					m_program->write_byte(addr, get_a());
-				}
-			}
+			if (pmem::READ == m_program_op)
+				set_a(m_arg);
 			m_phase = phase::X3;
 			break;
 		case phase::X3:
@@ -407,8 +399,8 @@ void mcs40_cpu_device_base::execute_run()
 			{
 				assert(m_latched_rc == m_new_rc);
 			}
-			if (pmem::READ == m_program_op)
-				set_a(m_arg);
+			if (pmem::WRITE == m_program_op)
+				m_program->write_byte(program_addr(), get_a());
 			m_phase = phase::A1;
 			break;
 		}
