@@ -507,22 +507,3 @@ rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw)
 	u8 const b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
 	return rgb_t(r, g, b);
 }
-
-// This conversion mimics the specific weighting used by the Data East 
-// custom resistor pack marked DECO RM-C3 to convert the digital 
-// palette for analog output.  It is used on games such as The Real
-// Ghostbusters, Gondomania, Cobra Command, Psychonics Oscar.
-//
-// Resistor values are 220 ohms (MSB), 470 ohms, 1 kohm, 2.2 kohm (LSB)
-rgb_t raw_to_rgb_converter::deco_rgb_decoder(u32 raw)
-{
-	u8 r = raw&0xf;
-	u8 g = (raw>>4)&0xf;
-	u8 b = (raw>>8)&0xf;
-	
-	r = 0x0e * (r&1) + 0x1f * ((r&2)>>1) + 0x43 * ((r&4)>>2) + 0x8f * ((r&8)>>3);
-	g = 0x0e * (g&1) + 0x1f * ((g&2)>>1) + 0x43 * ((g&4)>>2) + 0x8f * ((g&8)>>3);
-	b = 0x0e * (b&1) + 0x1f * ((b&2)>>1) + 0x43 * ((b&4)>>2) + 0x8f * ((b&8)>>3);
-
-	return rgb_t(r, g, b);
-}
