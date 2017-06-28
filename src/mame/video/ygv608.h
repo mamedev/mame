@@ -17,8 +17,8 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
 
 
 	void set_gfxbank(uint8_t gfxbank);
@@ -195,6 +195,11 @@ private:
 
 	uint8_t m_screen_resize;  // screen requires resize
 	uint8_t m_tilemap_resize; // tilemap requires resize
+	
+	/* These were statically allocated in the r/w routines, looks hackish? */
+	int p0_state_r,p3_state_r;
+	int p0_state_w,p3_state_w;
+	int pattern_name_base_r,pattern_name_base_w; 	 /* pattern name table base address */
 };
 
 // device type definition
