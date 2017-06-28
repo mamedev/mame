@@ -15326,6 +15326,7 @@ joinem                          // (c) 1983 Global
 loverboy                        // (c) 1983 G.T
 trikitri                        // (c) 1993 DDT
 striv                           // (c) 1985 Nova du Canada
+strivf                          // (c) 1985 Nova du Canada
 sucasino                        // (c) 1982 Data Amusement
 treahunt                        // (c) 1982 Hara Industries
 tripool                         // (c) 1981 Noma (Casino Tech license)
@@ -34778,14 +34779,19 @@ tomcatsw                        // (proto)          (c) 1983
 
 @source:statriv2.cpp
 bigcsino                        // (c) 1984 Status Games
-cstripxi                        // (c) 1981 Status Games
+cstrip                          // (c) 1984 Status Games
+cstripix                        // (c) 1985 Status Games
+cstripviii                      // (c) 1985 Status Games
+cstripxi                        // (c) 1988 Status Games
 funcsino                        // (c) 1981 Status Games
 hangman                         // (c) 1984 Status Games
+nsupertr3                       // (c) 1988 Status Games
 quaquiz2                        // (c) 1985 Status Games
 sextriv                         // (c) 1985 Status Games
 statriv2                        // (c) 1984 Status Games
 statriv2v                       // (c) 1984 Status Games
 statriv4                        // (c) 1985 Status Games
+statriv5se                      // (c) 1985 Status Games
 statusbj                        // (c) 1981 Status Games
 supertr                         // (c) 1986 Status Games
 supertr2                        // (c) 1986 Status Games
