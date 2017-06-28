@@ -586,7 +586,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	uint8_t   attr = 0;
 	int             pattern_name_base = 0;
 	int             set = ((m_regs.s.r7 & r7_md) == MD_1PLANE_256COLOUR
-						? GFX_16X16_8BIT : GFX_16X16_4BIT );
+						? GFX_16X16_8BIT : GFX_16X16_4BIT );	
 	int             base = row >> m_base_y_shift;
 
 	if( col >= m_page_x ) {
@@ -1210,9 +1210,6 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 READ8_MEMBER( ygv608_device::read )
 {
-	static int p0_state = 0;
-	static int p3_state = 0;
-	static int pattern_name_base = 0;  /* pattern name table base address */
 	int pn=0;
 	uint8_t  data = 0;
 
@@ -1223,20 +1220,20 @@ READ8_MEMBER( ygv608_device::read )
 			uint8_t xTile = m_regs.s.r1 & r1_pnx;
 			uint8_t yTile = m_regs.s.r0 & r0_pny;
 
-			switch (p0_state)
+			switch (p0_state_r)
 			{
 				case 0:
 					/* Are we reading from plane B? */
 					if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_regs.s.r0 & r0_b_a))
-						pattern_name_base = ((m_page_y << m_pny_shift) << m_bits16);
+						pattern_name_base_r = ((m_page_y << m_pny_shift) << m_bits16);
 
 					/* read character from ram */
-					pn = pattern_name_base + (((yTile << m_pny_shift) + xTile) << m_bits16);
+					pn = pattern_name_base_r + (((yTile << m_pny_shift) + xTile) << m_bits16);
 					break;
 
 				case 1:
 					/* read character from ram */
-					pn = pattern_name_base + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
+					pn = pattern_name_base_r + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
 					break;
 			}
 
@@ -1244,23 +1241,23 @@ READ8_MEMBER( ygv608_device::read )
 			{
 				logerror( "attempt (%d) to read pattern name %d\n"
 					"mode = %d, pgs = %d (%dx%d)\n"
-					"pattern_name_base = %d\n"
+					"pattern_name_base_r = %d\n"
 					"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-					p0_state,
+					p0_state_r,
 					pn, m_regs.s.r7 & r7_md, m_regs.s.r8 & r8_pgs,
 					m_page_x, m_page_y,
-					pattern_name_base,
+					pattern_name_base_r,
 					xTile, yTile, m_pny_shift,
 					m_bits16 );
 				pn = 0;
 			}
 			data = m_pattern_name_table[pn];
 
-			p0_state++;
+			p0_state_r++;
 			if ((m_regs.s.r7 & r7_md) == MD_2PLANE_8BIT )
-				p0_state++;
+				p0_state_r++;
 
-			if (p0_state == 2)
+			if (p0_state_r == 2)
 			{
 				if (m_regs.s.r0 & r0_pnya)
 				{
@@ -1296,8 +1293,8 @@ READ8_MEMBER( ygv608_device::read )
 					m_regs.s.r1 &= ~r1_pnx;
 					m_regs.s.r1 |= xTile;
 				}
-				p0_state = 0;
-				pattern_name_base = 0;
+				p0_state_r = 0;
+				pattern_name_base_r = 0;
 			}
 			return (data);
 		}
@@ -1320,10 +1317,10 @@ READ8_MEMBER( ygv608_device::read )
 			return( data );
 
 		case 0x03: /* P#3 - color palette data port */
-			data = m_colour_palette[m_regs.s.cc][p3_state];
-			if( ++p3_state == 3 )
+			data = m_colour_palette[m_regs.s.cc][p3_state_r];
+			if( ++p3_state_r == 3 )
 			{
-				p3_state = 0;
+				p3_state_r = 0;
 				if( m_regs.s.r2 & r2_cpar)
 					m_regs.s.cc++;
 			}
@@ -1364,9 +1361,6 @@ READ8_MEMBER( ygv608_device::read )
 
 WRITE8_MEMBER( ygv608_device::write )
 {
-	static int p0_state = 0;
-	static int p3_state = 0;
-	static int pattern_name_base = 0;  /* pattern name table base address */
 	int pn=0;
 
 	//data = ( data >> 8 ) & 0xff;
@@ -1378,20 +1372,20 @@ WRITE8_MEMBER( ygv608_device::write )
 			uint8_t xTile = m_regs.s.r1 & r1_pnx;
 			uint8_t yTile = m_regs.s.r0 & r0_pny;
 
-			switch (p0_state)
+			switch (p0_state_w)
 			{
 				case 0:
 					/* Are we reading from plane B? */
 					if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_regs.s.r0 & r0_b_a))
-						pattern_name_base = ((m_page_y << m_pny_shift) << m_bits16);
+						pattern_name_base_w = ((m_page_y << m_pny_shift) << m_bits16);
 
 					/* read character from ram */
-					pn = pattern_name_base + (((yTile << m_pny_shift) + xTile) << m_bits16);
+					pn = pattern_name_base_w + (((yTile << m_pny_shift) + xTile) << m_bits16);
 					break;
 
 				case 1:
 					/* read character from ram */
-					pn = pattern_name_base + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
+					pn = pattern_name_base_w + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
 					break;
 			}
 
@@ -1399,23 +1393,23 @@ WRITE8_MEMBER( ygv608_device::write )
 			{
 				logerror( "attempt (%d) to read pattern name %d\n"
 					"mode = %d, pgs = %d (%dx%d)\n"
-					"pattern_name_base = %d\n"
+					"pattern_name_base_w = %d\n"
 					"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-					p0_state,
+					p0_state_w,
 					pn, m_regs.s.r7 & r7_md, m_regs.s.r8 & r8_pgs,
 					m_page_x, m_page_y,
-					pattern_name_base,
+					pattern_name_base_w,
 					xTile, yTile, m_pny_shift,
 					m_bits16 );
 				pn = 0;
 			}
 			m_pattern_name_table[pn] = data;
 
-			p0_state++;
+			p0_state_w++;
 			if ((m_regs.s.r7 & r7_md) == MD_2PLANE_8BIT )
-				p0_state++;
+				p0_state_w++;
 
-			if (p0_state == 2)
+			if (p0_state_w == 2)
 			{
 				if (m_regs.s.r0 & r0_pnya)
 				{
@@ -1449,8 +1443,8 @@ WRITE8_MEMBER( ygv608_device::write )
 					m_regs.s.r1 &= ~r1_pnx;
 					m_regs.s.r1 |= xTile;
 				}
-				p0_state = 0;
-				pattern_name_base = 0;
+				p0_state_w = 0;
+				pattern_name_base_w = 0;
 			}
 		}
 		break;
@@ -1473,10 +1467,10 @@ WRITE8_MEMBER( ygv608_device::write )
 			break;
 
 		case 0x03: /* P#3 - colour palette data port */
-			m_colour_palette[m_regs.s.cc][p3_state] = data;
-			if (++p3_state == 3)
+			m_colour_palette[m_regs.s.cc][p3_state_w] = data;
+			if (++p3_state_w == 3)
 			{
-				p3_state = 0;
+				p3_state_w = 0;
 				palette().set_pen_color(m_regs.s.cc,
 					pal6bit(m_colour_palette[m_regs.s.cc][0]),
 					pal6bit(m_colour_palette[m_regs.s.cc][1]),
