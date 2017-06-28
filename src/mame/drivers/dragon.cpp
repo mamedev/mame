@@ -38,14 +38,14 @@ ADDRESS_MAP_END
 
 /* Dragon keyboard
 
-			 PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
-	PA6: Ent Clr Brk N/c N/c N/c N/c Shift
-	PA5: X   Y   Z   Up  Dwn Lft Rgt Space
-	PA4: P   Q   R   S   T   U   V   W
-	PA3: H   I   J   K   L   M   N   O
-	PA2: @   A   B   C   D   E   F   G
-	PA1: 8   9   :   ;   ,   -   .   /
-	PA0: 0   1   2   3   4   5   6   7
+             PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+    PA6: Ent Clr Brk N/c N/c N/c N/c Shift
+    PA5: X   Y   Z   Up  Dwn Lft Rgt Space
+    PA4: P   Q   R   S   T   U   V   W
+    PA3: H   I   J   K   L   M   N   O
+    PA2: @   A   B   C   D   E   F   G
+    PA1: 8   9   :   ;   ,   -   .   /
+    PA0: 0   1   2   3   4   5   6   7
  */
 static INPUT_PORTS_START( dragon_keyboard )
 	PORT_START("row0")

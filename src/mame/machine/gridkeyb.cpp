@@ -4,9 +4,9 @@
 
     GRiD Compass keyboard HLE, derived from generic_keyboard
 
-	Keycodes from "6 - Interceptor, CCProm, Utils, OS - Sysgen/UTILS/DVLEXEC.PLM"
+    Keycodes from "6 - Interceptor, CCProm, Utils, OS - Sysgen/UTILS/DVLEXEC.PLM"
 
-	Multiple shift key combos not simulated yet.
+    Multiple shift key combos not simulated yet.
 
 ***************************************************************************/
 

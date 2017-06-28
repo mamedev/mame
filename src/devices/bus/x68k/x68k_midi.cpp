@@ -2,9 +2,9 @@
 // copyright-holders:Barry Rodewald
 /*
  * x68k_midi.c
- * 
+ *
  * X68000 MIDI interface - YM3802
- * 
+ *
  */
 
 #include "emu.h"
@@ -23,7 +23,7 @@ MACHINE_CONFIG_MEMBER( x68k_midi_device::device_add_mconfig )
 	MCFG_YM3802_IRQ_HANDLER(WRITELINE(x68k_midi_device,irq_w))
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-//	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
+//  MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
 	// TODO: Add serial data handlers
 
 MACHINE_CONFIG_END
@@ -45,7 +45,7 @@ void x68k_midi_device::device_start()
 	space.install_readwrite_handler(0xeafa00,0xeafa0f,read8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_r),this),write8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_w),this),0x00ff00ff);
 }
 
-void x68k_midi_device::device_reset() 
+void x68k_midi_device::device_reset()
 {
 }
 

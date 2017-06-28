@@ -272,6 +272,15 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 };
 
+/*********** Paged7 cartridge (late carts) ********************/
+
+class ti99_paged7_cartridge : public ti99_cartridge_pcb
+{
+public:
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+};
+
 /********************** Mini Memory ***********************************/
 
 class ti99_minimem_cartridge : public ti99_cartridge_pcb

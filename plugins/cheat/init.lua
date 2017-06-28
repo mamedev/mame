@@ -107,7 +107,7 @@ function cheat.startplugin()
 					end
 				end
 			end
-		end			
+		end
 		return newcheats
 	end
 
@@ -416,7 +416,7 @@ function cheat.startplugin()
 				return false
 			end
 
-									
+
 			menu[1] = {"Select cheat to set hotkey", "", "off"}
 			menu[2] = {"---", "", "off"}
 			hotkeylist = {}

@@ -250,6 +250,7 @@ void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
 	m_r = m_acc;
+	clock_melody();
 }
 
 

@@ -145,8 +145,8 @@ void coco_state::device_start()
 
 	// cart slot
 	m_cococart->set_cart_base_update(cococart_base_update_delegate(&coco_state::update_cart_base, this));
-	m_cococart->set_line_delay(cococart_slot_device::line::NMI, 12);	// 12 allowed one more instruction to finished after the line is pulled
-	m_cococart->set_line_delay(cococart_slot_device::line::HALT, 6);	// 6 allowed one more instruction to finished after the line is pulled
+	m_cococart->set_line_delay(cococart_slot_device::line::NMI, 12);    // 12 allowed one more instruction to finished after the line is pulled
+	m_cococart->set_line_delay(cococart_slot_device::line::HALT, 6);    // 6 allowed one more instruction to finished after the line is pulled
 
 	// save state support
 	save_item(NAME(m_dac_output));

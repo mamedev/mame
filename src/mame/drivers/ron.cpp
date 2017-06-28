@@ -2,16 +2,16 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Ron II Mah-Jongg (c) 1981 Sanritsu
+    Ron II Mah-Jongg (c) 1981 Sanritsu
 
-	TODO:
-	- colors;
-	- dip switches;
-	
+    TODO:
+    - colors;
+    - dip switches;
+
 ============================================================================
 Debug cheats:
-0x8580-d player-1 tiles	
-0x8680-d player-2 tiles	
+0x8580-d player-1 tiles
+0x8680-d player-2 tiles
 
 ***************************************************************************/
 
@@ -33,12 +33,12 @@ class ron_state : public driver_device
 {
 public:
 	ron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag), 
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_audiocpu(*this, "audiocpu"),
-  		  m_ay(*this, "aysnd"),
+		  m_ay(*this, "aysnd"),
 		  m_gfxdecode(*this, "gfxdecode"),
-  		  m_vram(*this, "vram"),
+		  m_vram(*this, "vram"),
 		  m_cram(*this, "cram"),
 		  m_mj_ports1(*this, { "PL1_1", "PL1_2", "PL1_3", "PL1_4","PL1_5", "PL1_6", "PL1_7", "PL1_8" }),
 		  m_mj_ports2(*this, { "PL2_1", "PL2_2", "PL2_3", "PL2_4","PL2_5", "PL2_6", "PL2_7", "PL2_8" }),
@@ -46,14 +46,14 @@ public:
 		  m_in1(*this, "IN1"),
 		  m_in2(*this, "IN2"),
 		  m_in3(*this, "IN3")
-    {
+	{
 	}
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(ron);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	
+
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(p1_mux_r);
 	DECLARE_READ8_MEMBER(p2_mux_r);
@@ -109,7 +109,7 @@ uint32_t ron_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 		for (x=0;x<32;x++)
 		{
 			uint16_t tile = m_cram[count];
-			
+
 			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
@@ -118,26 +118,26 @@ uint32_t ron_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 
 	gfx = m_gfxdecode->gfx(1);
 	count = 0;
-	
+
 	for (y=0;y<32;y++)
 	{
 		for (x=0;x<32;x++)
 		{
 			uint16_t tile = m_vram[count];
-			
+
 			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
 
 			count++;
 		}
 	}
-	
+
 	return 0;
 }
 
 WRITE8_MEMBER(ron_state::output_w)
 {
 	m_nmi_enable = (data & 0x10) == 0x10;
-	
+
 	if(data & 0xef)
 		printf("%02x\n",data);
 }
@@ -145,7 +145,7 @@ WRITE8_MEMBER(ron_state::output_w)
 uint8_t ron_state::read_mux(bool which,bool side)
 {
 	uint8_t base_port = which == true ? 4 : 0;
-	
+
 	//uint8_t i,res;
 
 	//  printf("%02x\n", m_mux_data);
@@ -154,7 +154,7 @@ uint8_t ron_state::read_mux(bool which,bool side)
 	for(uint8_t i=0;i<4;i++)
 	{
 		if((~m_mux_data) & (1 << i))
-			return (side == true ? m_mj_ports2[i+base_port] : m_mj_ports1[i+base_port])->read(); 
+			return (side == true ? m_mj_ports2[i+base_port] : m_mj_ports1[i+base_port])->read();
 	}
 
 	// TODO: check me
@@ -171,9 +171,9 @@ READ8_MEMBER(ron_state::p1_mux_r)
 READ8_MEMBER(ron_state::p2_mux_r)
 {
 	uint8_t res = (offset == 0 ? m_in2 : m_in3)->read();
-	
+
 	res &= 0xec;
-	
+
 	return (read_mux(offset,true) & 0x13) | res;
 }
 
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( ron_audio_map, AS_PROGRAM, 8, ron_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ron_audio_io, AS_IO, 8, ron_state)
-	
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ron )
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( ron )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x04, 0x04, "IN1" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( ron )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x04, 0x04, "2P Coinage" ) // how many credits per 2p mode
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( ron )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
@@ -319,10 +319,10 @@ static INPUT_PORTS_START( ron )
 	PORT_START("PL1_7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("PL1_8")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("PL2_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
@@ -337,22 +337,22 @@ static INPUT_PORTS_START( ron )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	
+
 	PORT_START("PL2_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	
+
 	PORT_START("PL2_5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	
+
 	PORT_START("PL2_6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	
+
 	PORT_START("PL2_7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -434,7 +434,7 @@ WRITE8_MEMBER(ron_state::audio_p1_w)
 
 	//printf("p1 %02x %d\n",data,m_ay_address_sel);
 	//machine().debug_break();
-	
+
 	if(m_ay_address_sel == true)
 		m_ay->address_w(space, 0, data);
 	else
@@ -448,7 +448,7 @@ WRITE8_MEMBER(ron_state::audio_p2_w)
 	// p2 3f
 	if(data == 0xff)
 		m_ay_address_sel = false;
-	
+
 	// p2 5f
 	// p2 3f
 	// p2 3f
@@ -456,9 +456,9 @@ WRITE8_MEMBER(ron_state::audio_p2_w)
 		m_ay_address_sel = true;
 
 	m_prev_p2 = data;
-	
+
 	//printf("p2 %02x\n",data);
-//	machine().debug_break();
+//  machine().debug_break();
 }
 
 READ_LINE_MEMBER(ron_state::audio_T1_r )
@@ -522,11 +522,11 @@ ROM_START( ron2 )
 	ROM_LOAD( "r0__3.9l",     0x002000, 0x001000, CRC(6a8c1ef0) SHA1(9300a54102ca096fbf3d5056ede782fba0f5f970) )
 	ROM_LOAD( "r0__4.9n",     0x003000, 0x001000, CRC(86340522) SHA1(0175dda90e9e4798e9f2ab7a0ab97aa397ca18b8) )
 	ROM_LOAD( "r0__5.8h",     0x004000, 0x001000, CRC(3a28ad40) SHA1(872ced2d7515850cd86b84c81b14f200093746ad) )
-	
+
 	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "r0_mu.4a",     0x0000, 0x000800, CRC(3491d8d5) SHA1(0aa0581350f4b3b81f3fa1f7c55a9bfb1f2c5f3b) )
 	ROM_LOAD( "r0_v0.4c",     0x0800, 0x000800, CRC(4160eb7f) SHA1(1756937378cbabb2229129b794d8c5d955252ed4) )
-	
+
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "r0__b.4k",     0x0000, 0x0800, CRC(8a61cdde) SHA1(0a38573ed644f1ed897443187f5cb61a6eb499b2) )
 
@@ -534,16 +534,16 @@ ROM_START( ron2 )
 	ROM_LOAD( "r0_a1.4n",     0x0000, 0x0800, CRC(2d6276f4) SHA1(432b7fe0a1f1e9fdc9e276bcf27f74a5aec6c940) )
 	ROM_LOAD( "r0_a2.4l",     0x0800, 0x0800, CRC(2fe4a54f) SHA1(bb1d109851677ede58f875eff2588f60f979864e) )
 
-	ROM_REGION( 0x040, "unk_proms", ROMREGION_ERASE00 ) // unknown, near sound roms 
-    ROM_LOAD( "82s123_1.6b",  0x000, 0x020, CRC(bd9bb647) SHA1(aad83eb295107cdc7ee96d78e81b0621ac351398) )
-    ROM_LOAD( "82s123_2.6c",  0x020, 0x020, CRC(439109d6) SHA1(f0d79048bb27a63c641296b3b1b81f513df9b33d) )
-	
+	ROM_REGION( 0x040, "unk_proms", ROMREGION_ERASE00 ) // unknown, near sound roms
+	ROM_LOAD( "82s123_1.6b",  0x000, 0x020, CRC(bd9bb647) SHA1(aad83eb295107cdc7ee96d78e81b0621ac351398) )
+	ROM_LOAD( "82s123_2.6c",  0x020, 0x020, CRC(439109d6) SHA1(f0d79048bb27a63c641296b3b1b81f513df9b33d) )
+
 	ROM_REGION( 0x020, "color_prom", ROMREGION_ERASE00 )
-    ROM_LOAD( "82s123_5.1n",  0x000, 0x020, CRC(869784fa) SHA1(4bd0f26961d0bb54edb5eab5708d34468721d4c4) )
+	ROM_LOAD( "82s123_5.1n",  0x000, 0x020, CRC(869784fa) SHA1(4bd0f26961d0bb54edb5eab5708d34468721d4c4) )
 
 	ROM_REGION( 0x200, "clut_proms", ROMREGION_ERASE00 )
-    ROM_LOAD( "82s129_3.2n",  0x000, 0x100, CRC(018ab2a0) SHA1(039c574d8fd3c1a8e9eca6a7c79fe92e8496b157) )
-    ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
+	ROM_LOAD( "82s129_3.2n",  0x000, 0x100, CRC(018ab2a0) SHA1(039c574d8fd3c1a8e9eca6a7c79fe92e8496b157) )
+	ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
 ROM_END
 
 GAME( 1981, ron2,  0,   ron,  ron, ron_state,  0,       ROT270, "Sanritsu",      "Ron II Mah-Jongg", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )

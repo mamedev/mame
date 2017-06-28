@@ -177,7 +177,7 @@ ADDRESS_MAP_END
  * 0x33: - address 1 (source?)
  * 0x34: /
  * 0x35: - address 2 (adjust value in rom?)
- * 0x36: / 
+ * 0x36: /
  * 0x37: R reused for ym3526 register set, read protection rom (same as amatelas)
  *
  * 0x40: counter set, always 1?
@@ -194,25 +194,25 @@ READ8_MEMBER(cop01_state::prot_data_r)
 {
 	if(m_prot_command == 0x41)
 		return (m_audiocpu->total_cycles() / 0x34) & 1; // wrong
-	
+
 	if(m_prot_command == 0x37)
-	{		
+	{
 		uint16_t prot_offset = (m_prot_reg[1]<<8)|(m_prot_reg[2]);
 		uint8_t *prot_rom = memregion("prot_data")->base();
-		// 0x37c are BGMs while 0x34e are SFXs? 
+		// 0x37c are BGMs while 0x34e are SFXs?
 		uint8_t prot_adj = 0x82; //0xbd
-		
+
 		//printf("%02x",(prot_rom[prot_offset] - 0x44) & 0xff);
-				
+
 		return prot_rom[prot_offset & 0x1fff] - prot_adj; // minus value correct?
 	}
-	
+
 	if(m_prot_command == 0x92) // affects coin SFX playback
 		return 1;
-	
+
 	if(m_prot_command == 0x94)
 		return 0;
-	
+
 	return 0;
 }
 
@@ -224,9 +224,9 @@ WRITE8_MEMBER(cop01_state::prot_address_w)
 WRITE8_MEMBER(cop01_state::prot_data_w)
 {
 	if( m_prot_command>=0x32 && m_prot_command<=0x37 )
-	{	
+	{
 		m_prot_reg[m_prot_command-0x32] = data;
-		
+
 		#if 0
 		if(m_prot_command == 0x32)
 		{

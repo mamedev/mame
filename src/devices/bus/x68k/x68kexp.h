@@ -105,10 +105,10 @@ public:
 
 	// reset
 	virtual void x68k_reset_w() { }
-	
+
 	void set_vector(uint8_t vector) { m_vector = vector; }
 	uint8_t vector() { return m_vector; }
-	
+
 protected:
 	device_x68k_expansion_card_interface(const machine_config &mconfig, device_t &device);
 

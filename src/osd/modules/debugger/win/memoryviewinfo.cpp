@@ -47,7 +47,7 @@ bool memoryview_info::physical() const
 }
 
 
-void memoryview_info::set_expression(char const *string)
+void memoryview_info::set_expression(const std::string &string)
 {
 	view<debug_view_memory>()->set_expression(string);
 }

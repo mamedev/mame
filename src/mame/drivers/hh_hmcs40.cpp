@@ -365,7 +365,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   Bambino Dribble Away Basketball (manufactured in Japan)
   * PCB label Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
-  * green VFD display Emix-106, with bezel overlay
+  * cyan VFD display Emix-106, with bezel overlay
 
 ***************************************************************************/
 
@@ -4111,8 +4111,8 @@ ROM_START( bambball )
 	ROM_LOAD( "hd38750a08", 0x0000, 0x0800, CRC(907fef18) SHA1(73fe7ca7c6332268a3a9abc5ac88ada2991012fb) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 
-	ROM_REGION( 280708, "svg", 0)
-	ROM_LOAD( "bambball.svg", 0, 280708, CRC(cf096b37) SHA1(8a2ea1762612c3a3edb68596ff2a9f91eedf0e68) )
+	ROM_REGION( 281988, "svg", 0)
+	ROM_LOAD( "bambball.svg", 0, 281988, CRC(63019194) SHA1(cbfb5b051d8f57f6b4d698796030850b3631ed56) )
 ROM_END
 
 

@@ -748,7 +748,7 @@ Seems to act like an older version of hotsmash mcu code, the quadrature code is 
   0x10 - protection scramble; immediately latch the current command (0x10) (or another byte if you write one VERY fast) and do some rotates and scrambling of the value an XORing it against the prior value, and return it. This is affected by the carry flag if something else set it.
 
 **************************************************************************/
- 
+
 /*
  * This wrapper routine is necessary because the dial is not connected to an
  * hardware counter as usual, but the DIR and CLOCK inputs are directly
@@ -799,17 +799,17 @@ WRITE8_MEMBER(hotsmash_state::hotsmash_68705_portC_w)
 	// maybe on the RISING edge of the latch bit, the semaphores are updated, like TaitoSJ?
 	/*if (BIT(changed_m_portC_out, 3) && BIT(m_portC_out, 3))
 	{
-		switch (m_portC_out & 0x07)
-		{
-		case 0x03:
-			m_Z80HasWritten = 0;
-			break;
-		case 0x05:
-			m_MCUHasWritten = 1;
-			break;
-		default:
-			break;
-		}
+	    switch (m_portC_out & 0x07)
+	    {
+	    case 0x03:
+	        m_Z80HasWritten = 0;
+	        break;
+	    case 0x05:
+	        m_MCUHasWritten = 1;
+	        break;
+	    default:
+	        break;
+	    }
 	}*/
 	// on the falling edge of the latch bit, update port A and (if applicable) m_portB_out latches
 	if (BIT(changed_m_portC_out, 3) && !BIT(m_portC_out, 3))
@@ -852,7 +852,7 @@ WRITE8_MEMBER(hotsmash_state::hotsmash_Z80_mcu_w)
 {
 	m_fromZ80 = data;
 	//if ((m_fromZ80 != 0x04) && (m_fromZ80 != 0x08))
-	//	logerror("%04x: z80 write to MCU %02x; Z80HasWritten: %d (and will be 1 after this); MCUHasWritten: %d\n",space.device().safe_pc(),m_fromZ80, m_Z80HasWritten, m_MCUHasWritten);
+	//  logerror("%04x: z80 write to MCU %02x; Z80HasWritten: %d (and will be 1 after this); MCUHasWritten: %d\n",space.device().safe_pc(),m_fromZ80, m_Z80HasWritten, m_MCUHasWritten);
 	m_Z80HasWritten = 1; // set the semaphore, and assert interrupt on the mcu
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250)); //boost the interleave temporarily, or the game will crash.
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
@@ -863,7 +863,7 @@ READ8_MEMBER(hotsmash_state::hotsmash_Z80_mcu_r)
 	if(!machine().side_effect_disabled())
 	{
 		//if ((m_fromZ80 != 0x04) && (m_fromZ80 != 0x08))
-		//	logerror("%04x: z80 read from MCU %02x; Z80HasWritten: %d; MCUHasWritten: %d (and will be 0 after this)\n",space.device().safe_pc(),m_fromMCU, m_Z80HasWritten, m_MCUHasWritten);
+		//  logerror("%04x: z80 read from MCU %02x; Z80HasWritten: %d; MCUHasWritten: %d (and will be 0 after this)\n",space.device().safe_pc(),m_fromMCU, m_Z80HasWritten, m_MCUHasWritten);
 		m_MCUHasWritten = 0;
 	}
 	// return the last value the 68705 wrote, but do not mark that we've read it

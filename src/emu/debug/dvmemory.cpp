@@ -873,7 +873,7 @@ void debug_view_memory::write(u8 size, offs_t offs, u64 data)
 //  describing the home address
 //-------------------------------------------------
 
-void debug_view_memory::set_expression(const char *expression)
+void debug_view_memory::set_expression(const std::string &expression)
 {
 	begin_update();
 	m_expression.set_string(expression);

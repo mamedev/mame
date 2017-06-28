@@ -16,7 +16,11 @@
 
 // I/O ports setup
 
-// ..
+// LCD segment outputs: H1/2 as a4, O group as a0-a3, O data as d0-d3
+#define MCFG_SM500_WRITE_O_CB(_devcb) \
+	devcb = &sm500_device::set_write_o_callback(*device, DEVCB_##_devcb);
+
+// see sm510.h for ACL, K, R, alpha, beta
 
 
 // pinout reference
@@ -75,12 +79,41 @@ class sm500_device : public sm510_base_device
 public:
 	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-protected:
-	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	// static configuration helpers
+	template <class Object> static devcb_base &set_write_o_callback(device_t &device, Object &&cb) { return downcast<sm500_device &>(device).m_write_o.set_callback(std::forward<Object>(cb)); }
 
+protected:
+	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
+	virtual void clock_melody() override;
+
+	virtual void reset_vector() override { do_branch(0, 0xf, 0); }
+	virtual void wakeup_vector() override { do_branch(0, 0, 0); }
+
+	// lcd driver
+	devcb_write8 m_write_o;
+	virtual void lcd_update() override;
+
+	int m_o_mask; // number of 4-bit O pins minus 1
+	u8 m_ox[9];   // W' latch, max 9
+	u8 m_o[9];    // W latch
+	u8 m_cn;
+	u8 m_mx;
+
+	u8 m_cb;
+	u8 m_s;
+	bool m_rsub;
+
+	void shift_w();
+	u8 get_digit();
+	void set_su(u8 su) { m_stack[0] = (m_stack[0] & ~0x3c0) | (su << 6); }
+	u8 get_su() { return m_stack[0] >> 6 & 0xf; }
+	virtual int get_trs_field() { return 0; }
 
 	// opcode handlers
 	virtual void op_lb() override;
@@ -89,16 +122,24 @@ protected:
 	virtual void op_rbm();
 
 	virtual void op_comcb();
+	virtual void op_rtn0() override;
 	virtual void op_ssr();
+	virtual void op_tr();
 	virtual void op_trs();
 
-	virtual void op_pdtw();
+	virtual void op_atbp() override;
+	virtual void op_ptw() override;
 	virtual void op_tw();
+	virtual void op_pdtw();
 	virtual void op_dtw();
+	virtual void op_wr() override;
+	virtual void op_ws() override;
 
 	virtual void op_ats();
 	virtual void op_exksa();
 	virtual void op_exkfa();
+
+	virtual void op_idiv() override;
 
 	virtual void op_rmf();
 	virtual void op_smf();
@@ -112,10 +153,11 @@ public:
 	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
-	
+	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
+	virtual int get_trs_field() override { return 1; }
 };
 
 class sm5l_device : public sm5a_device

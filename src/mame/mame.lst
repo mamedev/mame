@@ -81,7 +81,7 @@ casanova                        //
 
 @source:40love.cpp
 40love                          // A30 (c) 1984 Taito
-40lovej							// A30 (c) 1984 Taito
+40lovej                         // A30 (c) 1984 Taito
 fieldday                        // A23 (c) 1984 Taito
 undoukai                        // A17 (c) 1984 Taito
 
@@ -10695,7 +10695,7 @@ dblcrown                        // (c) 1994 Excellent System
 dblewing                        // MBE (c) 1993 Mitchell
 
 @source:dbox.cpp
-dbox							// (c) 1996 Nokia Multimedia
+dbox                            // (c) 1996 Nokia Multimedia
 
 @source:dbz.cpp
 dbz                             // (c) 1993 Banpresto
@@ -11084,6 +11084,7 @@ cbnj                            // 27         Bump 'n' Jump
 cbtime                          // 26 1982.08 Hamburger/Burger Time
 cburnrub                        // 27 1982.11 Burnin' Rubber
 cburnrub2                       // 27
+cburnrubj                       //
 cdiscon1                        // 19 1982.04 Disco No.1
 cdsteljn                        // 14 1981.06 DS Telejan
 cexplore                        // 18 1982.02 Explorer
@@ -11092,12 +11093,14 @@ cfghtice                        // 40 1984.04 Fighting Ice Hockey
 cfishing                        // 25 1982.10 Fishing
 cflyball                        // 35 1983.?? Flying Ball/Bampoline
 cgraplop                        // 28 1982.11 Cluster Buster / Graplop
+cgraplopj                       //
 cgraplop2                       // 28
 chamburger                      // 26 1982.08 Hamburger (Japan)
 chwy                            // 01 1980.12 Highway Chase
 clapapa                         // 29 1982.11 La-Pa-Pa
 clapapa2                        // 29         Rootin' Tootin'  // this one doesn't display lapapa anywhere
 clocknch                        // 11 1981.04 Lock'n'Chase
+clocknchj                       //
 cluckypo                        // 15 1981.?? Lucky Poker
 cmanhat                         // 03 1981.01 Manhattan
 cmissnx                         // 21 1982.04 Mission-X/Zoar
@@ -11115,6 +11118,7 @@ cprogolfj                       // 13 1981.08 Tournament Pro Golf (Japan)
 cpsoccer                        // 33 1982.08 Pro Soccer
 cpsoccerj                       // 33 1982.08 Pro Soccer (Japan)
 cptennis                        // 22 1982.06 Pro Tennis
+cptennisj
 cscrtry                         // 38 1984.03 Scrum Try
 cscrtry2                        // 38
 csdtenis                        // 34 1983.09 Super Doubles Tennis
@@ -13093,8 +13097,8 @@ turpins                         // (c) 1981 bootleg
 turtles                         // (c) 1981 Stern
 uniwars                         // (c) Irem
 uniwarsa                        // (c) Karateco
-victoryc						// (c) Comsoft
-victorycb						// (c) Comsoft (bootleg)
+victoryc                        // (c) Comsoft
+victorycb                       // (c) Comsoft (bootleg)
 warofbug                        // (c) 1981 Armenia
 warofbugg                       // German Version
 warofbugu                       // (c) 1981 Armenia
@@ -14519,14 +14523,12 @@ ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
 
-@source:hh_sm500.cpp
-nupogodi                        //
-
 @source:hh_sm510.cpp
 gnw_bx301                       // Nintendo
 gnw_dj101                       // Nintendo
 gnw_dm53                        // Nintendo
 gnw_jr55                        // Nintendo
+gnw_mc25                        // Nintendo
 gnw_ml102                       // Nintendo
 gnw_mw56                        // Nintendo
 kcontra                         // Konami
@@ -14606,6 +14608,7 @@ zodiac                          // Coleco
 alnchase                        // Tomy
 astrocmd                        // Epoch
 bcclimbr                        // Bandai
+bmcfball                        // Bambino
 bmsafari                        // Bambino
 bmsoccer                        // Bambino
 edracula                        // Epoch
@@ -14803,6 +14806,7 @@ hp9816                          //
 hp9k310                         //
 hp9k320                         //
 hp9k330                         //
+hp9k332                         //
 hp9k340                         //
 hp9k370                         //
 hp9k380                         //
@@ -20151,6 +20155,7 @@ segacd2                         // 1993 Sega Sega CD 2 (USA)
 wmega                           // 1992 Sega Wondermega (Japan)
 wmegam2                         // 1993 Victor Wondermega M2 (Japan)
 xeye                            // 1993 JVC X'eye (USA)
+dcat16                          //
 
 @source:megadrvb.cpp
 aladmdb                         // MegaDrive-based hack
@@ -29371,6 +29376,7 @@ mc_8x6ss
 mc_sam60
 vgtablet
 gprnrs1
+gprnrs16
 
 @source:newbrain.cpp
 newbrain                        //
@@ -31100,7 +31106,7 @@ pitagjr                         // Pitagorin Junior
 @source:pitnrun.cpp
 pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
-jumpkun							// prototype
+jumpkun                         // prototype
 
 @source:pk8000.cpp
 hobby                           //
@@ -31492,7 +31498,7 @@ powerins                        // (c) 1993 Atlus (USA)
 powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsj                       // (c) 1993 Atlus (Japan)
-powerinsp						// prototype
+powerinsp                       // prototype
 
 @source:pp01.cpp
 pp01                            //
@@ -32212,7 +32218,7 @@ rollace2                        // (c) 1983 Williams
 rotaryf                         //
 
 @source:ron.cpp
-ron2							// (c) 1981 Sanritsu
+ron2                            // (c) 1981 Sanritsu
 
 @source:roul.cpp
 roul                            // (c) 1990

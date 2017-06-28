@@ -195,8 +195,8 @@ protected:
 	void cart_base_changed(void);
 
 	// accessors for containers
-	cococart_slot_device &owning_slot()		{ assert(m_owning_slot); return *m_owning_slot; }
-	device_cococart_host_interface &host()	{ assert(m_host); return *m_host; }
+	cococart_slot_device &owning_slot()     { assert(m_owning_slot); return *m_owning_slot; }
+	device_cococart_host_interface &host()  { assert(m_host); return *m_host; }
 
 	// CoCo cartridges can read directly from the address bus.  This is used by a number of
 	// cartridges (e.g. - Orch-90, Multi-Pak interface) for their control registers, independently
@@ -233,7 +233,7 @@ private:
 
 
 /***************************************************************************
-	COCO CARTRIDGE DEVICES
+    COCO CARTRIDGE DEVICES
 ***************************************************************************/
 
 // device type definitions - CoCo FDC

@@ -637,7 +637,7 @@ offs_t debug_view_disasm::selected_address()
 //  describing the home address
 //-------------------------------------------------
 
-void debug_view_disasm::set_expression(const char *expression)
+void debug_view_disasm::set_expression(const std::string &expression)
 {
 	begin_update();
 	m_expression.set_string(expression);

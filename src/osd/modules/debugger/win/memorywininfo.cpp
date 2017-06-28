@@ -283,7 +283,7 @@ void memorywin_info::draw_contents(HDC dc)
 }
 
 
-void memorywin_info::process_string(char const *string)
+void memorywin_info::process_string(const std::string &string)
 {
 	// set the string to the memory view
 	downcast<memoryview_info *>(m_views[0].get())->set_expression(string);

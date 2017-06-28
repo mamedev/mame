@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:tim lindner
 /***************************************************************************
 
@@ -222,9 +222,9 @@ void coco_ssc_device::device_start()
 	save_item(NAME(m_tms7000_portb));
 	save_item(NAME(m_tms7000_portc));
 	save_item(NAME(m_tms7000_portd));
-	
+
 	m_tms7000_busy_timer = timer_alloc(BUSY_TIMER_ID);
-	
+
 }
 
 
@@ -249,7 +249,7 @@ void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		case BUSY_TIMER_ID:
 			m_tms7000_busy = false;
- 			m_tms7000_busy_timer->adjust(attotime::never);
+			m_tms7000_busy_timer->adjust(attotime::never);
 			break;
 
 		default:
@@ -453,7 +453,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 		m_spo->ald_w(space, 0, m_tms7000_portd);
 	}
 
-    if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
+	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
 	{
 		m_tms7000_busy_timer->adjust(attotime::from_usec(1800));
 	}
