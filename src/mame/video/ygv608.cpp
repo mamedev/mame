@@ -39,6 +39,7 @@
  *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers);
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
+ *    - color palette accessors presumably accesses an internal RAMDAC with controllable auto-increment, convert to that;
  *    - clean-ups & documentation;
  *
  *
@@ -244,24 +245,14 @@ enum {
 #define GFX_16X16_8BIT  5
 
 
-/***************************************
- *
- * Port Interface map
- *
- ***************************************/
 
-DEVICE_ADDRESS_MAP_START( port_map, 8, ygv608_device )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(pattern_name_table_r,pattern_name_table_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(sprite_data_r,sprite_data_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(scroll_data_r,scroll_data_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_data_r,palette_data_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(register_data_r,register_data_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(register_select_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(status_port_r,status_port_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(system_control_r,system_control_w)
-ADDRESS_MAP_END
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
- 
+// device type definition
+DEFINE_DEVICE_TYPE(YGV608, ygv608_device, "ygv608", "YGV608 VDP")
+
 /* text-layer characters */
 
 static const uint32_t pts_4bits_layout_xoffset[64] =
@@ -360,14 +351,115 @@ static GFXDECODE_START( ygv608 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_16x16_8bits_layout,  0,   1 )
 GFXDECODE_END
 
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
-DEFINE_DEVICE_TYPE(YGV608, ygv608_device, "ygv608", "YGV608 VDP")
+/***************************************
+ *
+ * Internal I/O register structure
+ *
+ ***************************************/
+
+static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
+ADDRESS_MAP_END
+
+/***************************************
+ *
+ * Port Interface map
+ *
+ ***************************************/
+
+DEVICE_ADDRESS_MAP_START( port_map, 8, ygv608_device )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(pattern_name_table_r,pattern_name_table_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(sprite_data_r,sprite_data_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(scroll_data_r,scroll_data_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_data_r,palette_data_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(register_data_r,register_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(register_select_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(status_port_r,status_port_w)
+	AM_RANGE(0x07, 0x07) AM_READWRITE(system_control_r,system_control_w)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ygv608_device - constructor
+//-------------------------------------------------
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, YGV608, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608))
+	: device_t(mconfig, YGV608, tag, owner, clock), 
+	  device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608)),
+	  device_memory_interface(mconfig, *this),
+	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(regs_map))
 {
 }
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void ygv608_device::device_start()
+{
+	memset(&m_ports, 0, sizeof(m_ports));
+	memset(&m_regs, 0, sizeof(m_regs));
+	memset(&m_pattern_name_table, 0, sizeof(m_pattern_name_table));
+	memset(&m_sprite_attribute_table, 0, sizeof(m_sprite_attribute_table));
+
+	memset(&m_scroll_data_table, 0, sizeof(m_scroll_data_table));
+	memset(&m_colour_palette, 0, sizeof(m_colour_palette));
+
+	m_bits16 = 0;
+	m_page_x = 0;
+	m_page_y = 0;
+	m_pny_shift = 0;
+	m_na8_mask = 0;
+	m_col_shift = 0;
+
+	m_ax = 0; m_dx = 0; m_dxy = 0; m_ay = 0; m_dy = 0; m_dyx = 0;
+
+	memset(&m_base_addr, 0, sizeof(m_base_addr));
+	m_base_y_shift = 0;
+
+	// flag rebuild of the tilemaps
+	m_screen_resize = 1;
+	m_tilemap_resize = 1;
+	m_namcond1_gfxbank = 0;
+	save_item(NAME(m_namcond1_gfxbank));
+
+	/* create tilemaps of all sizes and combinations */
+	m_tilemap_A_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
+	m_tilemap_A_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
+	m_tilemap_A_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+
+	m_tilemap_A_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
+	m_tilemap_A_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
+	m_tilemap_A_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+
+	m_tilemap_B_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
+	m_tilemap_B_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
+	m_tilemap_B_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+
+	m_tilemap_B_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
+	m_tilemap_B_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
+	m_tilemap_B_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+
+	m_tilemap_A = nullptr;
+	m_tilemap_B = nullptr;
+
+	m_iospace = &space(AS_IO);
+
+	register_state_save();
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *ygv608_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_IO) ? &m_io_space_config : nullptr;
+}
+
 
 void ygv608_device::set_gfxbank(uint8_t gfxbank)
 {
@@ -806,60 +898,13 @@ void ygv608_device::register_state_save()
 	save_item(NAME(m_sprite_attribute_table.b));
 	save_item(NAME(m_scroll_data_table));
 	save_item(NAME(m_colour_palette));
+//	save_item(NAME(register_state_save));
+	save_item(NAME(m_color_state_r));
+	save_item(NAME(m_color_state_w));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(ygv608_device::postload), this));
 }
 
-void ygv608_device::device_start()
-{
-	memset(&m_ports, 0, sizeof(m_ports));
-	memset(&m_regs, 0, sizeof(m_regs));
-	memset(&m_pattern_name_table, 0, sizeof(m_pattern_name_table));
-	memset(&m_sprite_attribute_table, 0, sizeof(m_sprite_attribute_table));
-
-	memset(&m_scroll_data_table, 0, sizeof(m_scroll_data_table));
-	memset(&m_colour_palette, 0, sizeof(m_colour_palette));
-
-	m_bits16 = 0;
-	m_page_x = 0;
-	m_page_y = 0;
-	m_pny_shift = 0;
-	m_na8_mask = 0;
-	m_col_shift = 0;
-
-	m_ax = 0; m_dx = 0; m_dxy = 0; m_ay = 0; m_dy = 0; m_dyx = 0;
-
-	memset(&m_base_addr, 0, sizeof(m_base_addr));
-	m_base_y_shift = 0;
-
-	// flag rebuild of the tilemaps
-	m_screen_resize = 1;
-	m_tilemap_resize = 1;
-	m_namcond1_gfxbank = 0;
-	save_item(NAME(m_namcond1_gfxbank));
-
-	/* create tilemaps of all sizes and combinations */
-	m_tilemap_A_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_A_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_A_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
-
-	m_tilemap_A_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_A_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_A_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
-
-	m_tilemap_B_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_B_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_B_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
-
-	m_tilemap_B_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_B_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_B_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
-
-	m_tilemap_A = nullptr;
-	m_tilemap_B = nullptr;
-
-	register_state_save();
-}
 
 void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1361,11 +1406,12 @@ READ8_MEMBER( ygv608_device::scroll_data_r )
 // P#3 - color palette data port
 READ8_MEMBER( ygv608_device::palette_data_r )
 {
-	uint8_t res = m_colour_palette[m_regs.s.cc][p3_state_r];
+	uint8_t res = m_colour_palette[m_regs.s.cc][m_color_state_r];
 
-	if( ++p3_state_r == 3 )
+	if( ++m_color_state_r == 3 )
 	{
-		p3_state_r = 0;
+		m_color_state_r = 0;
+
 		if( m_regs.s.r2 & r2_cpar)
 			m_regs.s.cc++;
 	}
@@ -1376,26 +1422,37 @@ READ8_MEMBER( ygv608_device::palette_data_r )
 // P#4R - register data port
 READ8_MEMBER(ygv608_device::register_data_r)
 {
-	uint8_t regNum = (m_ports.s.p5) & p5_rn;
+	int regNum = m_register_address & 0x3f;
 	uint8_t res = m_regs.b[regNum];
 
-	if (m_ports.s.p5 & p5_rrai)
+	//m_iospace->read_byte(regNum);
+
+	
+	if (m_register_autoinc_r == true)
 	{
-		regNum ++;
+		m_register_address ++;
+		m_register_address &= 0x3f;
+		#if 0
+		// we'll catch this in the logerror anyway
 		if (regNum == 50)
 		{
 			regNum = 0;
 			logerror( "warning: rn=50 after read increment\n" );
 		}
-		
-		m_ports.s.p5 &= ~p5_rn;
-		m_ports.s.p5 |= regNum;
+		#endif
 	}
 	
 	return res;
 }
 
 // P#6R - status port
+/***
+ * ---x ---- FP Specified display position flag (R#15 & 16), reset by writing '1'
+ * ---- x--- FV Vertical border interval start, reset by writing '1'
+ * ---- -x-- FC Sprite collision flag, reset by writing '1'
+ * ---- --x- HB 1 when horizontal border or retrace is in progress (read only)
+ * ---- ---x VB 1 when vertical border or retrace is in progress (read only)
+ ***/
 READ8_MEMBER( ygv608_device::status_port_r )
 {
 	return (uint8_t)(m_ports.b[6]);
@@ -1518,10 +1575,10 @@ WRITE8_MEMBER( ygv608_device::scroll_data_w )
 // P#3W - colour palette data port
 WRITE8_MEMBER( ygv608_device::palette_data_w )
 {
-	m_colour_palette[m_regs.s.cc][p3_state_w] = data;
-	if (++p3_state_w == 3)
+	m_colour_palette[m_regs.s.cc][m_color_state_w] = data;
+	if (++m_color_state_w == 3)
 	{
-		p3_state_w = 0;
+		m_color_state_w = 0;
 		palette().set_pen_color(m_regs.s.cc,
 			pal6bit( m_colour_palette[m_regs.s.cc][0] ),
 			pal6bit( m_colour_palette[m_regs.s.cc][1] ),
@@ -1535,32 +1592,36 @@ WRITE8_MEMBER( ygv608_device::palette_data_w )
 // P#4W - register data port
 WRITE8_MEMBER( ygv608_device::register_data_w )
 {
-	uint8_t regNum = (m_ports.s.p5) & p5_rn;
+	uint8_t regNum = m_register_address & 0x3f;
 	//logerror( "R#%d = $%02X\n", regNum, data );
 	
 	SetPreShortcuts (regNum, data);
 	m_regs.b[regNum] = data;
 	SetPostShortcuts (regNum);
+	m_iospace->write_byte(regNum, data);
 	
-	if (m_ports.s.p5 & p5_rwai)
+	if (m_register_autoinc_w == true)
 	{
-		regNum ++;
+		m_register_address ++;
+		m_register_address &= 0x3f;
 		
+		#if 0
+		// we'll catch this in the logerror anyway
 		if (regNum == 50)
 		{
 			regNum = 0;
 			logerror( "warning: rn=50 after write increment\n" );
 		}
-		
-		m_ports.s.p5 &= ~p5_rn;
-		m_ports.s.p5 |= regNum;
+		#endif
 	}
 }
 
 // P#5W - register select port
 WRITE8_MEMBER( ygv608_device::register_select_w )
 {
-	m_ports.b[5] = data;
+	m_register_address = data & 0x3f;
+	m_register_autoinc_r = BIT(data,6);
+	m_register_autoinc_w = BIT(data,7);
 }
 
 // P#6W - status port
@@ -1581,7 +1642,7 @@ WRITE8_MEMBER( ygv608_device::system_control_w )
 }
 
 
-
+// TODO: actual timing of this
 void ygv608_device::HandleYGV608Reset()
 {
 	int i;

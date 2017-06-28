@@ -11,7 +11,9 @@
  *    - Mark McDougall
  */
 
-class ygv608_device : public device_t, public device_gfx_interface
+class ygv608_device : public device_t, 
+                      public device_gfx_interface,
+					  public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -49,7 +51,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_IO) const override;
+	
+	address_space *m_iospace;
 private:
+	const address_space_config m_io_space_config;
 	static constexpr unsigned SPRITE_ATTR_TABLE_SIZE = 256;
 
 	struct YGV_PORTS {
@@ -213,9 +219,14 @@ private:
 	uint8_t m_tilemap_resize; // tilemap requires resize
 	
 	/* These were statically allocated in the r/w routines, looks hackish? */
-	int p0_state_r,p3_state_r;
-	int p0_state_w,p3_state_w;
+	int p0_state_r,m_color_state_r;
+	int p0_state_w,m_color_state_w;
 	int pattern_name_base_r,pattern_name_base_w; 	 /* pattern name table base address */
+	
+	// new variable handling starts here
+	uint8_t m_register_address; /**< RN: Register address select */
+	bool m_register_autoinc_r;  /**< RRAI: Register address auto-increment on read */
+	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */	
 };
 
 // device type definition
