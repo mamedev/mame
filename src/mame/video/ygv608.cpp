@@ -487,6 +487,19 @@ const address_space_config *ygv608_device::memory_space_config(address_spacenum 
 	return (spacenum == AS_IO) ? &m_io_space_config : nullptr;
 }
 
+inline void ygv608_device::vblank_irq_check()
+{
+	if(m_vblank_irq_mask == true && m_screen_status & 8)
+		m_vblank_handler(ASSERT_LINE);
+}
+
+inline void ygv608_device::raster_irq_check()
+{
+	if(m_raster_irq_mask == true && m_screen_status & 0x10)
+		m_raster_handler(ASSERT_LINE);
+}
+
+
 void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
@@ -494,19 +507,18 @@ void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		case VBLANK_TIMER:
 		{
 			m_screen_status |= 8; // FV
-			if(m_vblank_irq_mask == true)
-				m_vblank_handler(ASSERT_LINE);
+			vblank_irq_check();
 			break;
 		}
 		case RASTER_TIMER:
 		{
 			m_screen_status |= 0x10; // FP
-			if(m_raster_irq_mask == true)
-				m_raster_handler(ASSERT_LINE);
+			raster_irq_check();
 			
 			// adjust for next one shot
 			m_raster_timer->reset();
 			m_raster_timer->adjust(raster_sync_offset(), 0);
+			break;
 		}
 	}
 }
@@ -1647,9 +1659,9 @@ WRITE8_MEMBER( ygv608_device::status_port_w )
 	
 	// send an irq ack to the delegates accordingly
 	if(data & 8)
-		m_vblank_handler(0);
+		m_vblank_handler(CLEAR_LINE);
 	if(data & 0x10)
-		m_raster_handler(0);
+		m_raster_handler(CLEAR_LINE);
 }
 
 // P#7W - system control port
@@ -1768,12 +1780,9 @@ WRITE8_MEMBER( ygv608_device::irq_mask_w )
 	m_vblank_irq_mask = BIT(data, 0);
 	m_raster_irq_mask = BIT(data, 1);
 	
-	// reset timers in case masking cuts off irqs
-	if(m_vblank_irq_mask == false)
-		m_vblank_timer->reset();
-
-	if(m_raster_irq_mask == false)
-		m_raster_timer->reset();
+	// check if we have an irq in the queue
+	vblank_irq_check();
+	raster_irq_check();
 }
 
 // R#15R / R#16R raster interrupt control

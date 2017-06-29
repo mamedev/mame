@@ -298,12 +298,15 @@ private:
 	uint16_t m_raw_dy;
 	uint16_t m_raw_dyx;
 
-	// inline helpers for raw to ROZ conversion
+	// inline helpers
+	// for raw to ROZ conversion
 	uint32_t roz_convert_raw24(uint32_t *raw_reg, uint8_t offset, uint8_t data);
 	uint32_t roz_convert_raw16(uint16_t *raw_reg, uint8_t offset, uint8_t data);
 	
-	void screen_configure();
+	void screen_configure();		/**< Adjust screen parameters based off CRTC ones */
 	attotime raster_sync_offset();	/**< adjust based off raster & CRTC parameters */
+	void vblank_irq_check();
+	void raster_irq_check();
 };
 
 // device type definition
