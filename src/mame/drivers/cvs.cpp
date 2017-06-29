@@ -1422,8 +1422,8 @@ ROM_START( loggerr2 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_LOAD( "logger_r2_cp1_d9cf.11", 0x0000, 0x0800, CRC(a1c1eb8c) SHA1(9fa2495b1b245f5889006cfc8857f51e57379cef) ) // hand written LOGGER R2 CP1 D9CF
-	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP3 CD1E
-	ROM_LOAD( "logger_r2_cp3_5535.0",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
+	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP2 CD1E
+	ROM_LOAD( "logger_r2_cp3_5535.9",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
 
 	CVS_COMMON_ROMS
 ROM_END
