@@ -1469,7 +1469,8 @@ READ8_MEMBER(ygv608_device::register_data_r)
  ***/
 READ8_MEMBER( ygv608_device::status_port_r )
 {
-	return m_screen_status;
+	// TODO: we need to use h/vpos in case of border support instead due of how MAME framework works here.
+	return (m_screen_status & 0x1c) | (m_screen->hblank()<<1) | m_screen->vblank();
 }
 
 // P#7R - system control port
@@ -1643,6 +1644,8 @@ WRITE8_MEMBER( ygv608_device::status_port_w )
 {
 	/* writing a '1' resets that bit */
 	m_screen_status &= ~data;
+	
+	// send an irq ack to the delegates accordingly
 	if(data & 8)
 		m_vblank_handler(0);
 	if(data & 0x10)
@@ -1977,7 +1980,7 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 			m_crtc.vtotal &= ~0xff;
 			m_crtc.vtotal |= data & 0xff;
 			
-			// TODO: call it for all mods in the CRTC
+			// TODO: call it for all mods in the CRTC, add sanity checks
 			screen_configure();
 
 			//printf("V %d %d %d %d %d\n",m_crtc.vtotal,m_crtc.display_vstart,m_crtc.display_height,m_crtc.display_vsync,m_crtc.border_height);
