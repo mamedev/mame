@@ -19,10 +19,14 @@ class intellec4_40_state : public driver_device
 public:
 	intellec4_40_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cpu(*this, "maincpu")
 		, m_tty(*this, "tty")
 		, m_mon_rom(*this, "monitor", 0x0400)
 		, m_ram(*this, "ram")
 		, m_banks(*this, "bank%u", 0)
+		, m_mode_sw(*this, "MODE")
+		, m_single_step_timer(nullptr)
+		, m_stp_ack(false), m_single_step(false)
 		, m_ram_page(0U), m_ram_data(0U), m_ram_write(false)
 	{
 	}
@@ -40,15 +44,30 @@ public:
 	DECLARE_WRITE8_MEMBER(ram0_out);
 	DECLARE_WRITE8_MEMBER(ram1_out);
 
+	DECLARE_WRITE_LINE_MEMBER(stp_ack);
+
+	DECLARE_INPUT_CHANGED_MEMBER(stop_sw);
+	DECLARE_INPUT_CHANGED_MEMBER(single_step_sw);
+
 protected:
 	virtual void driver_start() override;
 
 private:
+	TIMER_CALLBACK_MEMBER(single_step_expired);
+
+	bool get_stop_sw() { return BIT(~m_mode_sw->read(), 0); }
+
+	required_device<cpu_device>         m_cpu;
 	required_device<rs232_port_device>  m_tty;
 	required_region_ptr<u8>             m_mon_rom;
 	required_shared_ptr<u8>             m_ram;
 	required_memory_bank_array<4>       m_banks;
 
+	required_ioport                     m_mode_sw;
+
+	emu_timer                           *m_single_step_timer;
+
+	bool    m_stp_ack, m_single_step;
 	u8      m_ram_page, m_ram_data;
 	bool    m_ram_write;
 };
@@ -62,7 +81,9 @@ READ8_MEMBER(intellec4_40_state::pm_read)
 		u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));
 		m_ram_data = m_ram[addr];
 	}
-	return space.unmap();
+
+	// the C outputs of the 4289 are always high for RPM/WPM so it's equivalent to romf_in
+	return m_ram_data & 0x0fU;
 }
 
 WRITE8_MEMBER(intellec4_40_state::pm_write)
@@ -119,6 +140,37 @@ WRITE8_MEMBER(intellec4_40_state::ram1_out)
 	m_tty->write_rts(BIT(~data, 0));
 }
 
+WRITE_LINE_MEMBER(intellec4_40_state::stp_ack)
+{
+	// resets the single-step monostable
+	if (m_stp_ack && state)
+	{
+		m_single_step_timer->reset();
+		m_single_step = false;
+		m_cpu->set_input_line(I4040_STP_LINE, get_stop_sw() ? ASSERT_LINE : CLEAR_LINE);
+	}
+	m_stp_ack = !state;
+}
+
+
+INPUT_CHANGED_MEMBER(intellec4_40_state::stop_sw)
+{
+	m_cpu->set_input_line(I4040_STP_LINE, (newval || m_single_step) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER(intellec4_40_state::single_step_sw)
+{
+	// (re-)triggers the single-step monostable
+	if (newval && !oldval)
+	{
+		// 9602 with Rx = 20kΩ, Cx = 0.005µF
+		// K * Rx(kΩ) * (1 + (1 / Rx(kΩ))) = 0.34 * 20 * 5000 * (1 + (1 / 20)) = 35700ns
+		m_single_step_timer->adjust(attotime::from_nsec(35700));
+		m_single_step = true;
+		m_cpu->set_input_line(I4040_STP_LINE, CLEAR_LINE);
+	}
+}
+
 
 void intellec4_40_state::driver_start()
 {
@@ -129,9 +181,20 @@ void intellec4_40_state::driver_start()
 		m_banks[i]->set_entry(0);
 	}
 
+	m_single_step_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intellec4_40_state::single_step_expired), this));
+
+	save_item(NAME(m_stp_ack));
+	save_item(NAME(m_single_step));
 	save_item(NAME(m_ram_page));
 	save_item(NAME(m_ram_data));
 	save_item(NAME(m_ram_write));
+}
+
+
+TIMER_CALLBACK_MEMBER(intellec4_40_state::single_step_expired)
+{
+	m_single_step = false;
+	m_cpu->set_input_line(I4040_STP_LINE, get_stop_sw() ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -170,12 +233,16 @@ MACHINE_CONFIG_START(intlc440)
 	MCFG_CPU_DATA_MAP(mod40_data)
 	MCFG_CPU_IO_MAP(mod40_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(mod40_opcodes)
+	MCFG_I4040_STP_ACK_CB(WRITELINE(intellec4_40_state, stp_ack))
 
 	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, "terminal")
 MACHINE_CONFIG_END
 
 
 INPUT_PORTS_START(intlc440)
+	PORT_START("MODE")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("STOP")        PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, stop_sw,        0)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 )             PORT_NAME("SINGLE STEP") PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, single_step_sw, 0)
 INPUT_PORTS_END
 
 

@@ -74,6 +74,9 @@ enum
 #define MCFG_I4040_CY_CB(obj) \
 		devcb = &i4040_cpu_device::set_cy_cb(*device, DEVCB_##obj);
 
+#define MCFG_I4040_STP_ACK_CB(obj) \
+		devcb = &i4040_cpu_device::set_stp_ack_cb(*device, DEVCB_##obj);
+
 #define MCFG_I4040_4289_PM_CB(obj) \
 		devcb = &i4040_cpu_device::set_4289_pm_cb(*device, DEVCB_##obj);
 
@@ -157,6 +160,7 @@ protected:
 	void set_index_reg_bank(u8 val);
 
 	// I/O control
+	void halt_decoded();
 	void set_rom_addr(u16 addr, u16 mask);
 	u8 get_cr();
 	void set_cr(u8 val, u8 mask);
@@ -173,6 +177,7 @@ protected:
 	// input lines
 	bool get_test();
 	void set_test(int state);
+	void set_stp(int state);
 
 	// configuration helpers
 	template <typename Obj> devcb_base &set_sync_cb(Obj &&cb)
@@ -183,6 +188,8 @@ protected:
 	{ return m_cm_ram_cb[N].set_callback(std::forward<Obj>(cb)); }
 	template <typename Obj> devcb_base &set_cy_cb(Obj &&cb)
 	{ return m_cy_cb.set_callback(std::forward<Obj>(cb)); }
+	template <typename Obj> devcb_base &set_stp_ack_cb(Obj &&cb)
+	{ return m_stp_ack_cb.set_callback(std::forward<Obj>(cb)); }
 
 private:
 	enum
@@ -202,6 +209,16 @@ private:
 
 	enum class phase { A1, A2, A3, M1, M2, X1, X2, X3 };
 
+	// instruction phases
+	void do_a1();
+	void do_a2();
+	void do_a3();
+	void do_m1();
+	void do_m2();
+	void do_x1();
+	void do_x2();
+	void do_x3();
+
 	// internal helpers
 	u16 &pc() { return m_addr_stack[m_stack_ptr]; }
 	u16 rom_bank() const { return BIT(m_cr, 3) ? 0x1000U : 0x0000U; }
@@ -220,7 +237,7 @@ private:
 	// output callbacks
 	devcb_write_line        m_sync_cb;
 	devcb_write_line        m_cm_rom_cb[2], m_cm_ram_cb[4];
-	devcb_write_line        m_cy_cb;
+	devcb_write_line        m_cy_cb, m_stp_ack_cb;
 
 	// 4008/4009 or 4289 output callbacks
 	devcb_write_line        m_4289_pm_cb, m_4289_f_l_cb;
@@ -238,6 +255,9 @@ private:
 	cycle   m_cycle;
 	bool    m_io_pending;
 	pmem    m_program_op;
+
+	// stop/halt control
+	bool    m_stop_latch, m_stop_ff, m_decoded_halt, m_resume;
 
 	// instruction ROM fetch/decode
 	u16     m_rom_bank, m_rom_addr;
@@ -260,7 +280,7 @@ private:
 	bool        m_rc_pending;
 
 	// input/output lines
-	int m_test;
+	int m_test, m_stp;
 	u8  m_cm_rom, m_cm_ram, m_cy;
 	u8  m_4289_a, m_4289_c, m_4289_pm, m_4289_f_l;
 
@@ -288,7 +308,7 @@ protected:
 	using mcs40_cpu_device_base::mcs40_cpu_device_base;
 
 	// device_execute_interface implementation
-	u32 execute_input_lines() const override;
+	virtual u32 execute_input_lines() const override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface implementation
@@ -304,6 +324,11 @@ protected:
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
 	virtual void do_cycle2(u8 opr, u8 opa, u8 arg) override;
 	virtual void do_io(u8 opr, u8 opa) override;
+
+	// configuration helpers
+	using mcs40_cpu_device_base::set_sync_cb;
+	using mcs40_cpu_device_base::set_cm_rom_cb;
+	using mcs40_cpu_device_base::set_cm_ram_cb;
 };
 
 
@@ -319,6 +344,8 @@ public:
 	{ return downcast<i4040_cpu_device &>(device).set_cm_ram_cb<N>(std::forward<Obj>(cb)); }
 	template <typename Obj> static devcb_base &set_cy_cb(device_t &device, Obj &&cb)
 	{ return downcast<i4040_cpu_device &>(device).set_cy_cb(std::forward<Obj>(cb)); }
+	template <typename Obj> static devcb_base &set_stp_ack_cb(device_t &device, Obj &&cb)
+	{ return downcast<i4040_cpu_device &>(device).set_stp_ack_cb(std::forward<Obj>(cb)); }
 
 	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
@@ -331,8 +358,19 @@ protected:
 			uint8_t const *opram,
 			uint32_t options) override;
 
+	// device_execute_interface implementation
+	virtual u32 execute_input_lines() const override;
+	virtual void execute_set_input(int inputnum, int state) override;
+
 	// mcs40_cpu_device_base implementation
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
+
+	// configuration helpers
+	using mcs40_cpu_device_base::set_sync_cb;
+	using mcs40_cpu_device_base::set_cm_rom_cb;
+	using mcs40_cpu_device_base::set_cm_ram_cb;
+	using mcs40_cpu_device_base::set_cy_cb;
+	using mcs40_cpu_device_base::set_stp_ack_cb;
 };
 
 

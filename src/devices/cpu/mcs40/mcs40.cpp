@@ -63,10 +63,13 @@ current state.  The only way to set it to a fixed value is to reset the
 write-back, using the RC value as the address and the first/last signal
 as nybble lane select.
 
-TODO: HLT, BBS, EIN, DIN instructions
-TODO: 4040 halt/interrupt support
+TODO: 4040 interrupt support (including BBS, EIN, DIN instructions)
 TODO: expose data bus
 */
+
+
+DEFINE_DEVICE_TYPE(I4004, i4004_cpu_device, "i4004", "Intel 4004")
+DEFINE_DEVICE_TYPE(I4040, i4040_cpu_device, "i4040", "Intel 4040")
 
 
 ALLOW_SAVE_TYPE(mcs40_cpu_device_base::cycle);
@@ -74,8 +77,7 @@ ALLOW_SAVE_TYPE(mcs40_cpu_device_base::pmem);
 ALLOW_SAVE_TYPE(mcs40_cpu_device_base::phase);
 
 
-DEFINE_DEVICE_TYPE(I4004, i4004_cpu_device, "i4004", "Intel 4004")
-DEFINE_DEVICE_TYPE(I4040, i4040_cpu_device, "i4040", "Intel 4040")
+static constexpr u8 f_cm_ram_table[8] = { 0x0eU, 0x0dU, 0x0bU, 0x07U, 0x09U, 0x05U, 0x03U, 0x01U };
 
 
 mcs40_cpu_device_base::mcs40_cpu_device_base(
@@ -98,19 +100,19 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 	, m_sync_cb(*this)
 	, m_cm_rom_cb{ { *this }, { *this } }
 	, m_cm_ram_cb{ { *this }, { *this }, { *this }, { *this }, }
-	, m_cy_cb(*this)
-	, m_4289_pm_cb(*this)
-	, m_4289_f_l_cb(*this)
+	, m_cy_cb(*this), m_stp_ack_cb(*this)
+	, m_4289_pm_cb(*this), m_4289_f_l_cb(*this)
 	, m_extended_cm(extended_cm)
 	, m_stack_ptr_mask(stack_ptr_mask), m_index_reg_cnt(index_reg_cnt), m_cr_mask(cr_mask)
 	, m_pc_mask((1U << rom_width) - 1)
 	, m_phase(phase::A1), m_cycle(cycle::OP), m_io_pending(false), m_program_op(pmem::NONE)
+	, m_stop_latch(false), m_stop_ff(false), m_decoded_halt(false), m_resume(false)
 	, m_rom_addr(0U), m_opr(0U), m_opa(0U), m_arg(0U), m_4289_first(false)
 	, m_a(0U), m_c(0U)
 	, m_addr_stack(), m_stack_ptr(0U)
 	, m_index_regs(), m_index_reg_bank(0U)
 	, m_cr(0U), m_pending_cr3(0U), m_latched_rc(0U), m_new_rc(0U), m_src(0U), m_rc_pending(false)
-	, m_test(CLEAR_LINE)
+	, m_test(CLEAR_LINE), m_stp(CLEAR_LINE)
 	, m_cm_rom(0U), m_cm_ram(0U), m_cy(0U), m_4289_a(0U), m_4289_c(0U), m_4289_pm(0U), m_4289_f_l(0U)
 	, m_index_reg_halves(), m_pc(0U), m_pcbase(0U), m_genflags(0U)
 {
@@ -141,8 +143,11 @@ void mcs40_cpu_device_base::device_start()
 	m_cm_ram_cb[2].resolve_safe();
 	m_cm_ram_cb[3].resolve_safe();
 	m_cy_cb.resolve_safe();
+	m_stp_ack_cb.resolve_safe();
 	m_4289_pm_cb.resolve_safe();
 	m_4289_f_l_cb.resolve_safe();
+
+	m_stop_latch = m_decoded_halt = m_resume = false;
 
 	m_rom_addr = 0U;
 	m_opr = m_opa = m_arg = 0U;
@@ -159,6 +164,7 @@ void mcs40_cpu_device_base::device_start()
 	m_latched_rc = m_new_rc = m_src = 0U;
 
 	m_test = CLEAR_LINE;
+	m_stp = CLEAR_LINE;
 	m_cm_rom = 0x03U;
 	m_cm_ram = 0x0fU;
 	m_cy = 0x00U;
@@ -202,6 +208,10 @@ void mcs40_cpu_device_base::device_start()
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_io_pending));
 	save_item(NAME(m_program_op));
+	save_item(NAME(m_stop_latch));
+	save_item(NAME(m_stop_ff));
+	save_item(NAME(m_decoded_halt));
+	save_item(NAME(m_resume));
 	save_item(NAME(m_rom_addr));
 	save_item(NAME(m_opr));
 	save_item(NAME(m_opa));
@@ -220,6 +230,7 @@ void mcs40_cpu_device_base::device_start()
 	save_item(NAME(m_src));
 	save_item(NAME(m_rc_pending));
 	save_item(NAME(m_test));
+	save_item(NAME(m_stp));
 	save_item(NAME(m_cm_ram));
 	save_item(NAME(m_cm_rom));
 	save_item(NAME(m_cy));
@@ -234,6 +245,7 @@ void mcs40_cpu_device_base::device_reset()
 {
 	m_phase = phase::A1;
 	m_cycle = cycle::OP;
+	m_stop_ff = false;
 
 	m_rom_addr = 0U;
 	m_4289_first = true;
@@ -249,6 +261,7 @@ void mcs40_cpu_device_base::device_reset()
 
 	update_cm_rom(0x03U);
 	update_cm_ram(0x0fU);
+	m_stp_ack_cb(1U);
 
 	// TODO: it actually takes multiple cycles with reset asserted for everything to get cleared
 	m_a = m_c = 0U;
@@ -263,144 +276,40 @@ void mcs40_cpu_device_base::device_reset()
 
 void mcs40_cpu_device_base::execute_run()
 {
-	static constexpr u8 cm_ram_table[8] = { 0x0eU, 0x0dU, 0x0bU, 0x07U, 0x09U, 0x05U, 0x03U, 0x01U };
 	while (m_icount > 0)
 	{
 		switch (m_phase)
 		{
 		case phase::A1:
-			m_pending_cr3 = (m_pending_cr3 << 1) | BIT(m_cr, 3);
-			m_cr = (m_cr & 0x07U) | (m_pending_cr3 & 0x08U);
-			if (cycle::OP == m_cycle)
-			{
-				m_pcbase = rom_bank() | m_rom_addr;
-				if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(this, pc());
-			}
-			m_4289_a = (m_4289_a & 0xf0U) | (m_rom_addr & 0x0fU);
-			m_sync_cb(1);
-			update_4289_pm(1U);
-			update_4289_f_l(1U);
-			// low nybble of ROM address is output here
-			// STOPACK is asserted here
+			do_a1();
 			m_phase = phase::A2;
 			break;
 		case phase::A2:
-			// mid nybble of ROM address is output here
-			m_4289_a = (m_4289_a & 0x0fU) | (m_rom_addr & 0xf0U);
+			do_a2();
 			m_phase = phase::A3;
 			break;
 		case phase::A3:
-			// high nybble of ROM address is output here
-			m_4289_c = (m_rom_addr >> 8) & 0x0fU;
-			update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
+			do_a3();
 			m_phase = phase::M1;
 			break;
 		case phase::M1:
-			// OPR is read here
-			{
-				if (!m_extended_cm || (cycle::OP != m_cycle))
-					update_cm_rom(0x03);
-				else
-					update_cm_ram(cm_ram_table[m_cr & 0x07U]);
-				// TODO: split this up into two nybble reads - MAME doesn't support this
-				u8 const read = m_direct->read_byte(rom_bank() | m_rom_addr);
-				if (cycle::OP == m_cycle)
-				{
-					m_opr = read >> 4;
-					m_opa = read & 0x0f;
-					m_io_pending = is_io_op(m_opr);
-				}
-				else
-				{
-					m_arg = read;
-				}
-			}
+			do_m1();
 			m_phase = phase::M2;
 			break;
 		case phase::M2:
-			// OPA is read here
-			if (m_io_pending)
-			{
-				update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
-				update_cm_ram(cm_ram_table[m_cr & 0x07U]);
-			}
-			if (cycle::IN != m_cycle)
-				m_rom_addr = pc() = (pc() + 1) & 0x0fff;
+			do_m2();
 			m_phase = phase::X1;
 			break;
 		case phase::X1:
-			// A or OPA is output here
-			update_cy(m_c);
-			update_cm_rom(0x03U);
-			update_cm_ram(0x0fU);
-			if (cycle::OP == m_cycle)
-			{
-				m_program_op = pmem::NONE;
-				m_cycle = do_cycle1(m_opr, m_opa, m_program_op);
-			}
-			else
-			{
-				do_cycle2(m_opr, m_opa, m_arg);
-				m_cycle = cycle::OP;
-			}
-			m_4289_a = m_latched_rc;
-			if (pmem::NONE == m_program_op)
-			{
-				m_4289_c = (m_latched_rc >> 4) & 0x0fU;
-			}
-			else
-			{
-				assert(cycle::OP == m_cycle);
-				m_4289_c = 0x0fU;
-				update_4289_pm(0x00U);
-				update_4289_f_l(m_4289_first ? 0x01 : 0x00);
-				m_4289_first = !m_4289_first;
-				if (pmem::READ == m_program_op)
-					m_arg = m_program->read_byte(program_addr()) & 0x0fU;
-				else
-					assert(pmem::WRITE == m_program_op);
-			}
+			do_x1();
 			m_phase = phase::X2;
 			break;
 		case phase::X2:
-			if (m_io_pending)
-			{
-				assert(phase::X2 == m_phase);
-				assert(m_latched_rc == m_new_rc);
-				assert(!m_rc_pending);
-				do_io(m_opr, m_opa);
-				m_io_pending = false;
-			}
-			if (m_rc_pending)
-			{
-				update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
-				update_cm_ram(cm_ram_table[m_cr & 0x07U]);
-				m_latched_rc = (m_latched_rc & 0x0fU) | (m_new_rc & 0xf0U);
-			}
-			else
-			{
-				assert(m_latched_rc == m_new_rc);
-			}
-			if (pmem::READ == m_program_op)
-				set_a(m_arg);
+			do_x2();
 			m_phase = phase::X3;
 			break;
 		case phase::X3:
-			m_sync_cb(0);
-			update_cm_rom(0x03U);
-			update_cm_ram(0x0fU);
-			if (m_rc_pending)
-			{
-				m_latched_rc = (m_latched_rc & 0xf0U) | (m_new_rc & 0x0fU);
-				m_rc_pending = false;
-			}
-			else
-			{
-				assert(m_latched_rc == m_new_rc);
-			}
-			if (pmem::WRITE == m_program_op)
-				m_program->write_byte(program_addr(), get_a());
+			do_x3();
 			m_phase = phase::A1;
 			break;
 		}
@@ -573,8 +482,13 @@ inline void mcs40_cpu_device_base::set_index_reg_bank(u8 val)
 
 
 /***********************************************************************
-    register access
+    I/O control
 ***********************************************************************/
+
+inline void mcs40_cpu_device_base::halt_decoded()
+{
+	m_decoded_halt = true;
+}
 
 inline void mcs40_cpu_device_base::set_rom_addr(u16 addr, u16 mask)
 {
@@ -657,6 +571,187 @@ inline bool mcs40_cpu_device_base::get_test()
 inline void mcs40_cpu_device_base::set_test(int state)
 {
 	m_test = ((ASSERT_LINE == state) || (HOLD_LINE == state)) ? state : CLEAR_LINE;
+}
+
+inline void mcs40_cpu_device_base::set_stp(int state)
+{
+	m_stp = ((ASSERT_LINE == state) || (HOLD_LINE == state)) ? state : CLEAR_LINE;
+}
+
+
+/***********************************************************************
+    instruction phases
+***********************************************************************/
+
+inline void mcs40_cpu_device_base::do_a1()
+{
+	m_pending_cr3 = (m_pending_cr3 << 1) | BIT(m_cr, 3);
+	m_cr = (m_cr & 0x07U) | (m_pending_cr3 & 0x08U);
+	if (cycle::OP == m_cycle)
+	{
+		m_pcbase = rom_bank() | m_rom_addr;
+		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+			debugger_instruction_hook(this, pc());
+		if (m_stop_latch)
+		{
+			m_stp = (ASSERT_LINE == m_stp) ? ASSERT_LINE : CLEAR_LINE;
+			if (!m_stop_ff)
+			{
+				m_stop_ff = true;
+				m_stp_ack_cb(0U);
+			}
+		}
+	}
+	m_4289_a = (m_4289_a & 0xf0U) | (m_rom_addr & 0x0fU);
+	m_sync_cb(1);
+	update_4289_pm(1U);
+	update_4289_f_l(1U);
+	// low nybble of ROM address is output here
+}
+
+inline void mcs40_cpu_device_base::do_a2()
+{
+	// mid nybble of ROM address is output here
+	m_4289_a = (m_4289_a & 0x0fU) | (m_rom_addr & 0xf0U);
+}
+
+inline void mcs40_cpu_device_base::do_a3()
+{
+	// high nybble of ROM address is output here
+	m_4289_c = (m_rom_addr >> 8) & 0x0fU;
+	update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
+}
+
+inline void mcs40_cpu_device_base::do_m1()
+{
+	// OPR is read here
+	if (!m_extended_cm || (cycle::OP != m_cycle))
+		update_cm_rom(0x03);
+	else
+		update_cm_ram(f_cm_ram_table[m_cr & 0x07U]);
+	// TODO: split this up into two nybble reads - MAME doesn't support this
+	u8 const read = m_direct->read_byte(rom_bank() | m_rom_addr);
+	if (cycle::OP == m_cycle)
+	{
+		if (m_stop_ff)
+		{
+			m_opr = 0x0U;
+			m_opa = 0x0U;
+		}
+		else
+		{
+			m_opr = read >> 4;
+			m_opa = read & 0x0fU;
+		}
+		m_io_pending = is_io_op(m_opr);
+	}
+	else
+	{
+		m_arg = read;
+	}
+	m_decoded_halt = false;
+}
+
+inline void mcs40_cpu_device_base::do_m2()
+{
+	// OPA is read here
+	if (m_io_pending)
+	{
+		update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
+		update_cm_ram(f_cm_ram_table[m_cr & 0x07U]);
+	}
+	m_resume = m_stop_latch && (CLEAR_LINE == m_stp);
+	m_stop_latch = CLEAR_LINE != m_stp;
+	if (!m_stop_ff && (cycle::IN != m_cycle))
+		m_rom_addr = pc() = (pc() + 1) & 0x0fff;
+}
+
+inline void mcs40_cpu_device_base::do_x1()
+{
+	// A or OPA is output here
+	update_cy(m_c);
+	update_cm_rom(0x03U);
+	update_cm_ram(0x0fU);
+	if (cycle::OP == m_cycle)
+	{
+		m_program_op = pmem::NONE;
+		m_cycle = do_cycle1(m_opr, m_opa, m_program_op);
+	}
+	else
+	{
+		do_cycle2(m_opr, m_opa, m_arg);
+		m_cycle = cycle::OP;
+	}
+	m_4289_a = m_latched_rc;
+	if (pmem::NONE == m_program_op)
+	{
+		m_4289_c = (m_latched_rc >> 4) & 0x0fU;
+	}
+	else
+	{
+		assert(cycle::OP == m_cycle);
+		m_4289_c = 0x0fU;
+		update_4289_pm(0x00U);
+		update_4289_f_l(m_4289_first ? 0x01 : 0x00);
+		m_4289_first = !m_4289_first;
+		if (pmem::READ == m_program_op)
+			m_arg = m_program->read_byte(program_addr()) & 0x0fU;
+		else
+			assert(pmem::WRITE == m_program_op);
+	}
+}
+
+void mcs40_cpu_device_base::do_x2()
+{
+	if (m_io_pending)
+	{
+		assert(phase::X2 == m_phase);
+		assert(m_latched_rc == m_new_rc);
+		assert(!m_rc_pending);
+		do_io(m_opr, m_opa);
+		m_io_pending = false;
+	}
+	if (m_rc_pending)
+	{
+		update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
+		update_cm_ram(f_cm_ram_table[m_cr & 0x07U]);
+		m_latched_rc = (m_latched_rc & 0x0fU) | (m_new_rc & 0xf0U);
+	}
+	else
+	{
+		assert(m_latched_rc == m_new_rc);
+	}
+	if (pmem::READ == m_program_op)
+		set_a(m_arg);
+}
+
+void mcs40_cpu_device_base::do_x3()
+{
+	m_sync_cb(0);
+	update_cm_rom(0x03U);
+	update_cm_ram(0x0fU);
+	if (m_rc_pending)
+	{
+		m_latched_rc = (m_latched_rc & 0xf0U) | (m_new_rc & 0x0fU);
+		m_rc_pending = false;
+	}
+	else
+	{
+		assert(m_latched_rc == m_new_rc);
+	}
+	if (pmem::WRITE == m_program_op)
+		m_program->write_byte(program_addr(), get_a());
+	if (!m_stop_ff && m_decoded_halt)
+	{
+		m_stop_ff = true;
+		m_stp_ack_cb(0U);
+	}
+	else if (m_stop_ff && m_resume)
+	{
+		m_stop_ff = false;
+		m_stp_ack_cb(1U);
+	}
+	m_resume = false;
 }
 
 
@@ -1026,6 +1121,28 @@ i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *ta
 
 
 /***********************************************************************
+    device_execute_interface implementation
+***********************************************************************/
+
+u32 i4040_cpu_device::execute_input_lines() const
+{
+	return 3U;
+}
+
+void i4040_cpu_device::execute_set_input(int inputnum, int state)
+{
+	switch (inputnum)
+	{
+	case I4040_STP_LINE:
+		set_stp(state);
+		break;
+	default:
+		i4004_cpu_device::execute_set_input(inputnum, state);
+	}
+}
+
+
+/***********************************************************************
     device_disasm_interface implementation
 ***********************************************************************/
 
@@ -1052,9 +1169,12 @@ i4040_cpu_device::cycle i4040_cpu_device::do_cycle1(u8 opr, u8 opa, pmem &progra
 	case 0x0:
 		switch (opa)
 		{
+		case 0x1: // HLT
+			halt_decoded();
+			return cycle::OP;
 		case 0x3: // LCR
 			set_a(get_cr());
-			break;
+			return cycle::OP;
 		case 0x4: // OR4
 		case 0x5: // OR5
 			set_a(get_a() | get_index_reg(4U | BIT(opa, 0)));
@@ -1090,7 +1210,6 @@ void i4040_cpu_device::execute_one(unsigned opcode)
 {
 	switch (opcode)
 	{
-	case 0x01: // HLT
 	case 0x02: // BBS
 	case 0x0c: // EIN
 	case 0x0d: // DIN
