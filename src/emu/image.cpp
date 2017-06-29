@@ -206,8 +206,9 @@ void image_manager::options_extract()
 					image_opt = image.filename();
 			}
 
-			// and set the option
-			machine().options().image_option(image.instance_name()).specify(std::move(image_opt));
+			// and set the option (provided that it hasn't been removed out from under us)
+			if (machine().options().exists(image.instance_name()))
+				machine().options().image_option(image.instance_name()).specify(std::move(image_opt));
 		}
 	}
 
