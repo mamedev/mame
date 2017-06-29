@@ -811,7 +811,7 @@ static INPUT_PORTS_START( cdiscon1 )
 	PORT_DIPSETTING(    0x06, "10000" )
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x02, "30000" )
-	PORT_DIPNAME( 0x08, 0x08, "Dance Bombs" )                           PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Music Weapons" )                         PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	/* other dips not verified */
@@ -821,9 +821,10 @@ static INPUT_PORTS_START( csweetht )
 	PORT_INCLUDE( cdiscon1 )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x08, 0x08, "Dance Bombs" )                           PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Music Weapons" )                         PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+	/* other dips not verified */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chwy )
