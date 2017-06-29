@@ -47,6 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
 	DECLARE_WRITE8_MEMBER(crtc_w);
+	DECLARE_WRITE8_MEMBER(base_address_w);
 	
 	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);

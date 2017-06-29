@@ -366,6 +366,7 @@ GFXDECODE_END
 static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w) 
 	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
+	AM_RANGE(17, 24) AM_WRITE(base_address_w)
 	
 	AM_RANGE(39, 46) AM_WRITE(crtc_w)
 ADDRESS_MAP_END
@@ -1805,6 +1806,7 @@ WRITE8_MEMBER( ygv608_device::irq_ctrl_w )
 	//printf("%d %d %d %d %d\n",m_raster_irq_hpos,m_raster_irq_vpos,m_raster_irq_mode,m_crtc.htotal,m_crtc.vtotal);
 }
 
+// helper for validating and convert to screen position
 attotime ygv608_device::raster_sync_offset()
 {
 	
@@ -1819,7 +1821,24 @@ attotime ygv608_device::raster_sync_offset()
 		return attotime::never;
 	}
 	
+	// TODO: actual sync not taken into account, needs a better test than NCV2 limited case
 	return m_screen->time_until_pos(m_raster_irq_vpos,m_raster_irq_hpos);
+}
+
+// R#17 / R#24 - base address
+/* 
+ * offset & 4 selects plane B
+ * -xxx ---- write to base address + 1
+ * ---- -xxx write to base address 
+ */
+WRITE8_MEMBER( ygv608_device::base_address_w )
+{
+	int plane = offset >> 2;
+	int addr = ( offset << 1 ) & 0x07;
+	m_base_addr[plane][addr] = data & 0x07;
+	m_base_addr[plane][addr+1] = (data >> 4) & 0x7;
+	
+	m_tilemap_resize = 1;
 }
 
 
@@ -1961,7 +1980,6 @@ void ygv608_device::SetPreShortcuts( int reg, int data )
 
 void ygv608_device::SetPostShortcuts(int reg )
 {
-	int plane, addr;
 
 	switch (reg)
 	{
@@ -2052,6 +2070,7 @@ void ygv608_device::SetPostShortcuts(int reg )
 	//ShowYGV608Registers();
 	break;
 
+	#if 0
 	case 17 : case 18 : case 19 : case 20 :
 	case 21 : case 22 : case 23 : case 24 :
 	plane = (reg-17) >> 2;
@@ -2059,7 +2078,8 @@ void ygv608_device::SetPostShortcuts(int reg )
 	m_base_addr[plane][addr] = m_regs.b[reg] & 0x0f;
 	m_base_addr[plane][addr+1] = m_regs.b[reg] >> 4;
 	break;
-
+	#endif
+	
 	case 25 : case 26 : case 27 :
 	m_ax = (int)(m_regs.s.ax16 & 0x1f) << 16 |
 				(int)m_regs.s.ax8 << 8 |
