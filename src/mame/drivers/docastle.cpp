@@ -550,6 +550,14 @@ void docastle_state::machine_reset()
 	m_adpcm_pos = m_adpcm_idle = 0;
 	m_adpcm_data = -1;
 	m_adpcm_status = 0;
+
+	for (i = 0; i < 2; i++)
+	{
+		m_inp[i]->write_ms(0); // pin 5 tied low
+		//m_inp[i]->write_ce(1); // pin 4 tied high
+		m_inp[i]->write_s(machine().dummy_space(), 0, 0); // cleared with LS273
+	}
+	flip_screen_set(0); // cleared with LS273
 }
 
 void docastle_state::machine_start()

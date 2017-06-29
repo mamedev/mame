@@ -20,8 +20,7 @@ public:
 		m_cpu3(*this, "cpu3"),
 		m_crtc(*this, "crtc"),
 		m_msm(*this, "msm"),
-		m_inp1(*this, "inp1"),
-		m_inp2(*this, "inp2"),
+		m_inp(*this, "inp%u", 1),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -35,8 +34,7 @@ public:
 	required_device<cpu_device> m_cpu3;
 	required_device<h46505_device> m_crtc;
 	optional_device<msm5205_device> m_msm;
-	required_device<tms1025_device> m_inp1;
-	required_device<tms1025_device> m_inp2;
+	required_device_array<tms1025_device, 2> m_inp;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
