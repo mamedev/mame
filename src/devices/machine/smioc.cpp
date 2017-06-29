@@ -87,45 +87,11 @@ static ADDRESS_MAP_START( smioc_mem, AS_PROGRAM, 8, smioc_device )
 	AM_RANGE(0xF8000, 0xFFFFF) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
-//-------------------------------------------------
-//  ADDRESS_MAP( smioc_io )
-//-------------------------------------------------
-
-//static ADDRESS_MAP_START( smioc_io, AS_IO, 8, smioc_device )
-
-//ADDRESS_MAP_END
-
-//-------------------------------------------------
-//  INPUT_PORTS_START( smioc )
-//-------------------------------------------------
-
-//static INPUT_PORTS_START( smioc_ports )
-
-//INPUT_PORTS_END
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( smioc_rs232ports )
-//-------------------------------------------------
-
-//static SLOT_INTERFACE_START( smioc_rs232ports )
-
-//SLOT_INTERFACE_END
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
 MACHINE_CONFIG_MEMBER( smioc_device::device_add_mconfig )
 	/* CPU - Intel 80C188 */
 	MCFG_CPU_ADD(I188_TAG, I80188, XTAL_20MHz / 2) // Clock division unknown
 	MCFG_CPU_PROGRAM_MAP(smioc_mem)
-	//MCFG_CPU_IO_MAP(smioc_io)
 MACHINE_CONFIG_END
-
-//ioport_constructor smioc_device::device_input_ports() const
-//{
-//	return INPUT_PORTS_NAME( smioc_ports );
-//}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -148,7 +114,6 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 
 void smioc_device::device_start()
 {
-	/* Save States */
 }
 
 //-------------------------------------------------
