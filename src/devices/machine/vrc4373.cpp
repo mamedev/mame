@@ -145,9 +145,9 @@ void vrc4373_device::device_start()
 
 	// Save states
 	// m_ram
-	save_pointer(NAME(m_ram.data()), m_ram_size / 4);
+	save_item(NAME(m_ram));
 	// m_simm
-	save_pointer(NAME(m_simm[0].data()), m_simm0_size / 4);
+	save_item(NAME(m_simm[0]));
 	save_item(NAME(m_cpu_regs));
 	save_item(NAME(m_pci1_laddr));
 	save_item(NAME(m_pci2_laddr));
