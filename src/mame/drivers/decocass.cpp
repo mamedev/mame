@@ -866,6 +866,9 @@ static INPUT_PORTS_START( cprobowl )
 	PORT_INCLUDE( decocass )
 
 	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Show Bonus Instructions" )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	/* other dips not verified */
 INPUT_PORTS_END
 
