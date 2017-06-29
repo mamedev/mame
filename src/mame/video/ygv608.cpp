@@ -364,6 +364,13 @@ GFXDECODE_END
 
  // we use decimals here to match documentation
 static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
+
+	// address pointers
+	AM_RANGE( 3,  3) AM_READWRITE(sprite_address_r,sprite_address_w)
+	AM_RANGE( 4,  4) AM_READWRITE(scroll_address_r,scroll_address_w)
+	AM_RANGE( 5,  5) AM_READWRITE(palette_address_r,palette_address_w)
+	AM_RANGE( 6,  6) AM_READWRITE(sprite_bank_r,sprite_bank_w)
+	
 	// interrupt section
 	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w) 
 	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
@@ -527,6 +534,7 @@ void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void ygv608_device::set_gfxbank(uint8_t gfxbank)
 {
 	m_namcond1_gfxbank = gfxbank;
+	m_tilemap_resize = 1;
 }
 
 
@@ -984,7 +992,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	switch( size ) {
 	case SZ_8X8 :
-		code = ( (int)m_regs.s.sba << 8 ) | (int)sa->sn;
+		code = ( (int)m_sprite_bank << 8 ) | (int)sa->sn;
 		if (spf != 0)
 		color = ( code >> ( (spf - 1) * 2 ) ) & 0x0f;
 		if( code >= layout_total(GFX_8X8_4BIT) ) {
@@ -1014,7 +1022,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		break;
 
 	case SZ_16X16 :
-		code = ( ( (int)m_regs.s.sba & 0xfc ) << 6 ) | (int)sa->sn;
+		code = ( ( (int)m_sprite_bank & 0xfc ) << 6 ) | (int)sa->sn;
 		if (spf != 0)
 		color = ( code >> (spf * 2) ) & 0x0f;
 		if( code >= layout_total(GFX_16X16_4BIT) ) {
@@ -1044,7 +1052,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		break;
 
 	case SZ_32X32 :
-		code = ( ( (int)m_regs.s.sba & 0xf0 ) << 4 ) | (int)sa->sn;
+		code = ( ( (int)m_sprite_bank & 0xf0 ) << 4 ) | (int)sa->sn;
 		if (spf != 0)
 	color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
 		if( code >= layout_total(GFX_32X32_4BIT) ) {
@@ -1074,7 +1082,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		break;
 
 	case SZ_64X64 :
-		code = ( ( (int)m_regs.s.sba & 0xc0 ) << 2 ) | (int)sa->sn;
+		code = ( ( (int)m_sprite_bank & 0xc0 ) << 2 ) | (int)sa->sn;
 		if (spf != 0)
 		color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
 		if( code >= layout_total(GFX_64X64_4BIT) ) {
@@ -1405,10 +1413,10 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 // P#1R - sprite data port
 READ8_MEMBER( ygv608_device::sprite_data_r )
 {
-	uint8_t res = m_sprite_attribute_table.b[m_regs.s.saa];
+	uint8_t res = m_sprite_attribute_table.b[m_sprite_address];
 	
 	if (m_regs.s.r2 & r2_saar)
-		m_regs.s.saa++;
+		m_sprite_address++;
 	
 	return res;
 }
@@ -1416,13 +1424,13 @@ READ8_MEMBER( ygv608_device::sprite_data_r )
 // P#2R - scroll data port 
 READ8_MEMBER( ygv608_device::scroll_data_r )
 {
-	uint8_t res = m_scroll_data_table[(m_regs.s.r2 & r2_b_a) >> 4][m_regs.s.sca];
+	uint8_t res = m_scroll_data_table[(m_regs.s.r2 & r2_b_a) >> 4][m_scroll_address];
 
 	if (m_regs.s.r2 & r2_scar)
 	{
-		m_regs.s.sca++;
+		m_scroll_address++;
 		/* handle wrap to next plane */
-		if (m_regs.s.sca == 0)
+		if (m_scroll_address == 0)
 			m_regs.s.r2 ^= r2_b_a;
 	}
 
@@ -1432,14 +1440,14 @@ READ8_MEMBER( ygv608_device::scroll_data_r )
 // P#3 - color palette data port
 READ8_MEMBER( ygv608_device::palette_data_r )
 {
-	uint8_t res = m_colour_palette[m_regs.s.cc][m_color_state_r];
+	uint8_t res = m_colour_palette[m_palette_address][m_color_state_r];
 
 	if( ++m_color_state_r == 3 )
 	{
 		m_color_state_r = 0;
 
 		if( m_regs.s.r2 & r2_cpar)
-			m_regs.s.cc++;
+			m_palette_address++;
 	}
 
 	return res;
@@ -1579,22 +1587,22 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 // P#1W - sprite data port
 WRITE8_MEMBER( ygv608_device::sprite_data_w )
 {
-	m_sprite_attribute_table.b[m_regs.s.saa] = data;
+	m_sprite_attribute_table.b[m_sprite_address] = data;
 
 	if( m_regs.s.r2 & r2_saaw)
-		m_regs.s.saa++;
+		m_sprite_address++;
 }
 
 // P#2W - scroll data port
 WRITE8_MEMBER( ygv608_device::scroll_data_w )
 {
-	m_scroll_data_table[(m_regs.s.r2 & r2_b_a) >> 4][m_regs.s.sca] = data;
+	m_scroll_data_table[(m_regs.s.r2 & r2_b_a) >> 4][m_scroll_address] = data;
 
 	if (m_regs.s.r2 & r2_scaw)
 	{
-		m_regs.s.sca++;
+		m_scroll_address++;
 		/* handle wrap to next plane */
-		if (m_regs.s.sca == 0)
+		if (m_scroll_address == 0)
 			m_regs.s.r2 ^= r2_b_a;
 	}
 }
@@ -1602,17 +1610,17 @@ WRITE8_MEMBER( ygv608_device::scroll_data_w )
 // P#3W - colour palette data port
 WRITE8_MEMBER( ygv608_device::palette_data_w )
 {
-	m_colour_palette[m_regs.s.cc][m_color_state_w] = data;
+	m_colour_palette[m_palette_address][m_color_state_w] = data;
 	if (++m_color_state_w == 3)
 	{
 		m_color_state_w = 0;
-		palette().set_pen_color(m_regs.s.cc,
-			pal6bit( m_colour_palette[m_regs.s.cc][0] ),
-			pal6bit( m_colour_palette[m_regs.s.cc][1] ),
-			pal6bit( m_colour_palette[m_regs.s.cc][2] ));
+		palette().set_pen_color(m_palette_address,
+			pal6bit( m_colour_palette[m_palette_address][0] ),
+			pal6bit( m_colour_palette[m_palette_address][1] ),
+			pal6bit( m_colour_palette[m_palette_address][2] ));
 
 		if (m_regs.s.r2 & r2_cpaw)
-			m_regs.s.cc++;
+			m_palette_address++;
 	}
 }
 
@@ -1748,7 +1756,7 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
 
 	/* sprite attribute table */
 	if( m_ports.s.ts ) {
-	int dest = (int)m_regs.s.saa;
+	int dest = (int)m_sprite_address;
 
 	/* fudge a transfer for now... */
 	for( i=0; i<bytes; i++ ) {
@@ -1768,6 +1776,55 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
  *
  ****************************************/
 
+// R#3R - sprite attribute table access pointer
+READ8_MEMBER( ygv608_device::sprite_address_r )
+{
+	return m_sprite_address;
+}
+
+// R#3W - sprite attribute table access pointer
+WRITE8_MEMBER( ygv608_device::sprite_address_w )
+{
+	m_sprite_address = data;
+}
+
+ 
+ // R#4R - scroll table access pointer
+READ8_MEMBER( ygv608_device::scroll_address_r )
+{
+	return m_scroll_address;
+}
+
+ // R#4W - scroll table access pointer
+WRITE8_MEMBER( ygv608_device::scroll_address_w )
+{
+	m_scroll_address = data;
+}
+
+ // R#5R - color palette access pointer
+READ8_MEMBER( ygv608_device::palette_address_r )
+{
+	return m_palette_address;
+}
+
+ // R#5W - color palette access pointer
+WRITE8_MEMBER( ygv608_device::palette_address_w )
+{
+	m_palette_address = data;
+}
+
+// R#6R - sprite generator base address
+READ8_MEMBER( ygv608_device::sprite_bank_r )
+{
+	return m_sprite_bank;
+}
+
+// R#6W - sprite generator base address
+WRITE8_MEMBER( ygv608_device::sprite_bank_w )
+{
+	m_sprite_bank = data;
+}
+ 
 // R#14R interrupt mask control
 READ8_MEMBER( ygv608_device::irq_mask_r )
 {
@@ -2086,11 +2143,7 @@ void ygv608_device::SetPostShortcuts(int reg )
 	}
 	break;
 
-	case 6:
-#if 0
-		logerror( "SBA = $%08X\n", (int)m_regs.s.sba << 13 );
-#endif
-		break;
+
 
 	case 7:
 		m_na8_mask = ((m_regs.s.r7 & r7_flip) ? 0x03 : 0x0f );
@@ -2188,7 +2241,7 @@ void ygv608_device::ShowYGV608Registers()
 	logerror(
 		"\tR#03: $%02X : SAA($%02X)\n",
 		m_regs.b[3],
-		m_regs.s.saa );
+		m_sprite_address );
 
 	logerror(
 		"\tR#04: $%02X : SCA($%02X)\n",
@@ -2203,7 +2256,7 @@ void ygv608_device::ShowYGV608Registers()
 	logerror(
 		"\tR#06: $%02X : SBA($%02X)\n",
 		m_regs.b[6],
-		m_regs.s.sba );
+		m_sprite_bank );
 
 	logerror(
 		"\tR#07: $%02X : DSPE(%d),MD(%d),ZRON(%d),FLIP(%d),DCKM(%d)\n",

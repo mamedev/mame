@@ -482,7 +482,7 @@ ROM_START( abcheck )
 	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
 	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) ) 
 	ROM_LOAD( "an1cg1.10f",   0x200000, 0x200000, CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) ) 
-	
+
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) ) 
 

@@ -42,6 +42,14 @@ public:
 	DECLARE_WRITE8_MEMBER(system_control_w);
 
 	// register section
+	DECLARE_READ8_MEMBER(sprite_address_r);
+	DECLARE_WRITE8_MEMBER(sprite_address_w);
+	DECLARE_READ8_MEMBER(scroll_address_r);
+	DECLARE_WRITE8_MEMBER(scroll_address_w);
+	DECLARE_READ8_MEMBER(palette_address_r);
+	DECLARE_WRITE8_MEMBER(palette_address_w);
+	DECLARE_READ8_MEMBER(sprite_bank_r);
+	DECLARE_WRITE8_MEMBER(sprite_bank_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -255,6 +263,11 @@ private:
 	int m_raster_irq_hpos;		/**< IH: horizontal position where raster irq occurs x 32 */
 	int m_raster_irq_vpos;		/**< IV: vertical position where raster irq occurs */
 	bool m_raster_irq_mode; 	/**< FPM: if 1 vertical position becomes invalid for raster irqs (irqs occur for every line) */
+	
+	uint8_t m_scroll_address;	/**< SCA: scroll table access pointer */
+	uint8_t m_palette_address;	/**< CC: color palette access pointer */
+	uint8_t m_sprite_address;	/**< SAA: sprite attribute table access pointer */
+	uint8_t m_sprite_bank;		/**< SBA: sprite generator base address (MA20 to MA13) */
 
 	// screen section
 	devcb_write_line            m_vblank_handler;
@@ -262,6 +275,11 @@ private:
 	screen_device				*m_screen;
 	emu_timer					*m_vblank_timer;
 	emu_timer					*m_raster_timer;
+	
+	void screen_configure();		/**< Adjust screen parameters based off CRTC ones */
+	attotime raster_sync_offset();	/**< adjust based off raster & CRTC parameters */
+	void vblank_irq_check();
+	void raster_irq_check();
 	
 	enum
 	{
@@ -302,11 +320,7 @@ private:
 	// for raw to ROZ conversion
 	uint32_t roz_convert_raw24(uint32_t *raw_reg, uint8_t offset, uint8_t data);
 	uint32_t roz_convert_raw16(uint16_t *raw_reg, uint8_t offset, uint8_t data);
-	
-	void screen_configure();		/**< Adjust screen parameters based off CRTC ones */
-	attotime raster_sync_offset();	/**< adjust based off raster & CRTC parameters */
-	void vblank_irq_check();
-	void raster_irq_check();
+
 };
 
 // device type definition
