@@ -364,10 +364,21 @@ GFXDECODE_END
 
  // we use decimals here to match documentation
 static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
+	// interrupt section
 	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w) 
 	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
+	// base address
 	AM_RANGE(17, 24) AM_WRITE(base_address_w)
 	
+	// ROZ parameters
+	AM_RANGE(25, 27) AM_WRITE(roz_ax_w)
+	AM_RANGE(28, 29) AM_WRITE(roz_dx_w)
+	AM_RANGE(30, 31) AM_WRITE(roz_dxy_w)
+	AM_RANGE(32, 34) AM_WRITE(roz_ay_w)
+	AM_RANGE(35, 36) AM_WRITE(roz_dy_w)
+	AM_RANGE(37, 38) AM_WRITE(roz_dyx_w)
+
+	// CRTC
 	AM_RANGE(39, 46) AM_WRITE(crtc_w)
 ADDRESS_MAP_END
 
@@ -1841,6 +1852,60 @@ WRITE8_MEMBER( ygv608_device::base_address_w )
 	m_tilemap_resize = 1;
 }
 
+// R#25W - R#27W - X coordinate of initial value
+WRITE8_MEMBER( ygv608_device::roz_ax_w )  { m_ax = roz_convert_raw24(&m_raw_ax,offset,data); }
+
+// R#28W - R#29W - increment of coordinate in X direction
+WRITE8_MEMBER( ygv608_device::roz_dx_w )  { m_dx = roz_convert_raw16(&m_raw_dx,offset,data); }
+
+// R#30W - R#31W - increment of coordinate in X direction in movement toward Y direction
+WRITE8_MEMBER( ygv608_device::roz_dxy_w ) { m_dxy = roz_convert_raw16(&m_raw_dxy,offset,data); }
+
+// R#32W - R#34W - Y coordinate of initial value
+WRITE8_MEMBER( ygv608_device::roz_ay_w )  { m_ay = roz_convert_raw24(&m_raw_ay,offset,data); }
+
+// R#35W - R#36W - increment of coordinate in Y direction
+WRITE8_MEMBER( ygv608_device::roz_dy_w )  { m_dy = roz_convert_raw16(&m_raw_dy,offset,data); }
+
+// R#37W - R#38W - increment of coordinate in Y direction in movement toward X direction
+WRITE8_MEMBER( ygv608_device::roz_dyx_w ) { m_dyx = roz_convert_raw16(&m_raw_dyx,offset,data); }
+
+// ROZ assign helpers 
+inline uint32_t ygv608_device::roz_convert_raw24(uint32_t *raw_reg, uint8_t offset, uint8_t data)
+{
+	const uint32_t roz_data_mask24 = 0x1fffff;
+	const uint32_t mem_mask = (0xff << offset*8) ^ ~0;
+	uint32_t res;
+
+	// substitute the new byte value into the raw register
+	*raw_reg &= mem_mask;
+	*raw_reg |= data << offset*8;
+
+	// convert raw to the given register
+	res = *raw_reg & roz_data_mask24;
+	res <<= 7;
+	if( res & 0x08000000 ) res |= 0xf8000000;   // 2s complement
+
+	return res;
+}
+
+inline uint32_t ygv608_device::roz_convert_raw16(uint16_t *raw_reg, uint8_t offset, uint8_t data)
+{
+	const uint16_t roz_data_mask16 = 0x1fff;
+	const uint16_t mem_mask = (0xff << offset*8) ^ ~0;
+	uint32_t res;
+	
+	// substitute the new byte value into the raw register
+	*raw_reg &= mem_mask;
+	*raw_reg |= data << offset*8;
+	
+	// convert raw to the given register
+	res = *raw_reg & roz_data_mask16;
+	res <<= 7;
+	if( res & 0x00080000 ) res |= 0xfff80000;   // 2s complement
+
+	return res;
+}
 
 // R#39W - R#46W display scan control write
 WRITE8_MEMBER( ygv608_device::crtc_w )
@@ -2067,62 +2132,6 @@ void ygv608_device::SetPostShortcuts(int reg )
 	break;
 
 	case 11 :
-	//ShowYGV608Registers();
-	break;
-
-	#if 0
-	case 17 : case 18 : case 19 : case 20 :
-	case 21 : case 22 : case 23 : case 24 :
-	plane = (reg-17) >> 2;
-	addr = ( (reg-17) << 1 ) & 0x07;
-	m_base_addr[plane][addr] = m_regs.b[reg] & 0x0f;
-	m_base_addr[plane][addr+1] = m_regs.b[reg] >> 4;
-	break;
-	#endif
-	
-	case 25 : case 26 : case 27 :
-	m_ax = (int)(m_regs.s.ax16 & 0x1f) << 16 |
-				(int)m_regs.s.ax8 << 8 |
-				(int)m_regs.s.ax0;
-	m_ax <<= 7;
-	if( m_ax & 0x08000000 ) m_ax |= 0xf8000000;   // 2s complement
-	//logerror( "m_ax = $%X\n", m_ax );
-	break;
-
-	case 28 : case 29 :
-	m_dx = (int)(m_regs.s.dx8 & 0x1f) << 8 | (int)m_regs.s.dx0;
-	m_dx <<= 7;
-	if( m_dx & 0x00080000 ) m_dx |= 0xfff80000;   // 2s complement
-	break;
-
-	case 30 : case 31 :
-	m_dxy = (int)(m_regs.s.dxy8 & 0x1f) << 8 | (int)m_regs.s.dxy0;
-	m_dxy <<= 7;
-	if( m_dxy & 0x00080000 ) m_dxy |= 0xfff80000; // 2s complement
-	break;
-
-	case 32 : case 33 : case 34 :
-	m_ay = (int)(m_regs.s.ay16 & 0x1f) << 16 |
-				(int)m_regs.s.ay8 << 8 |
-				(int)m_regs.s.ay0;
-	m_ay <<= 7;
-	if( m_ay & 0x08000000 ) m_ay |= 0xf8000000;   // 2s complement
-	//logerror( "m_ay = $%X\n", m_ay );
-	break;
-
-	case 35 : case 36 :
-	m_dy = (int)(m_regs.s.dy8 & 0x1f) << 8 | (int)m_regs.s.dy0;
-	m_dy <<= 7;
-	if( m_dy & 0x00080000 ) m_dy |= 0xfff80000;   // 2s complement
-	break;
-
-	case 37 : case 38 :
-	m_dyx = (int)(m_regs.s.dyx8 & 0x1f) << 8 | (int)m_regs.s.dyx0;
-	m_dyx <<= 7;
-	if( m_dyx & 0x00080000 ) m_dyx |= 0xfff80000; // 2s complement
-	break;
-
-	case 40 : case 41 : case 42 :
 	//ShowYGV608Registers();
 	break;
 

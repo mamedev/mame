@@ -48,6 +48,12 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_WRITE8_MEMBER(base_address_w);
+	DECLARE_WRITE8_MEMBER(roz_ax_w);
+	DECLARE_WRITE8_MEMBER(roz_dx_w);
+	DECLARE_WRITE8_MEMBER(roz_dxy_w);
+	DECLARE_WRITE8_MEMBER(roz_ay_w);
+	DECLARE_WRITE8_MEMBER(roz_dy_w);
+	DECLARE_WRITE8_MEMBER(roz_dyx_w);
 	
 	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);
@@ -226,9 +232,6 @@ private:
 	uint8_t m_na8_mask;       // mask on/off na11/9:8
 	int m_col_shift;                // shift in scroll table column index
 
-	// rotation, zoom shortcuts
-	uint32_t m_ax, m_dx, m_dxy, m_ay, m_dy, m_dyx;
-
 	// base address shortcuts
 	uint32_t m_base_addr[2][8];
 	uint32_t m_base_y_shift;    // for extracting pattern y coord 'base'
@@ -278,6 +281,26 @@ private:
 		int border_width;		/**< HBW: horizontal border size x 16 */
 		int border_height;		/**< VBW: vertical border size x 8 */
 	}m_crtc;
+	
+	// rotation, zoom shortcuts
+	uint32_t m_ax;				/**< AX */
+	uint32_t m_dx;				/**< DX */
+	uint32_t m_dxy;				/**< DXY */
+	uint32_t m_ay;				/**< AY */
+	uint32_t m_dy;				/**< DY */
+	uint32_t m_dyx;				/**< DYX */
+
+	// raw register versions of above
+	uint32_t m_raw_ax; 
+	uint16_t m_raw_dx; 
+	uint16_t m_raw_dxy;
+	uint32_t m_raw_ay;
+	uint16_t m_raw_dy;
+	uint16_t m_raw_dyx;
+
+	// inline helpers for raw to ROZ conversion
+	uint32_t roz_convert_raw24(uint32_t *raw_reg, uint8_t offset, uint8_t data);
+	uint32_t roz_convert_raw16(uint16_t *raw_reg, uint8_t offset, uint8_t data);
 	
 	void screen_configure();
 	attotime raster_sync_offset();	/**< adjust based off raster & CRTC parameters */
