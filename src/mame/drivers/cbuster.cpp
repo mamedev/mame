@@ -360,7 +360,8 @@ static MACHINE_CONFIG_START( twocrude )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/24) /* 1.3425MHz Verified */
+	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/24 * 3) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9) /* 3.58MHz Verified */
