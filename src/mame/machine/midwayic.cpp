@@ -645,6 +645,7 @@ DEFINE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device, "midway_ioasic", "Midway
 midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, tag, owner, clock),
 	m_serial_tx_cb(*this),
+	m_aux_output_cb(*this),
 	m_has_dcs(0),
 	m_has_cage(0),
 	m_dcs_cpu(nullptr),
@@ -710,6 +711,7 @@ void midway_ioasic_device::device_start()
 	// resolve callbacks
 	m_irq_callback.resolve_safe();
 	m_serial_tx_cb.resolve_safe();
+	m_aux_output_cb.resolve();
 
 	/* initialize the PIC */
 	midway_serial_pic2_device::device_start();
@@ -933,13 +935,18 @@ void midway_ioasic_device::fifo_full_w(uint16_t data)
 /* need to check if device callback is required instead of hardcode here */
 void midway_ioasic_device::output_w(uint32_t data)
 {
-	/* two writes in pairs. flag off first, on second. arg remains the same. */
-	uint8_t flag = (data >> 8) & 0x8;
-	uint8_t op = (data >> 8) & 0x7;
-	uint8_t arg = data & 0xFF;
+	if (!m_aux_output_cb.isnull()) {
+		// This is P15 on vegas boards
+		m_aux_output_cb(data);
+	}
+	else {
+		/* two writes in pairs. flag off first, on second. arg remains the same. */
+		uint8_t flag = (data >> 8) & 0x8;
+		uint8_t op = (data >> 8) & 0x7;
+		uint8_t arg = data & 0xFF;
 
-	switch (op)
-	{
+		switch (op)
+		{
 		default:
 			logerror("Unknown output (%02X) = %02X\n", flag | op, arg);
 			break;
@@ -966,6 +973,7 @@ void midway_ioasic_device::output_w(uint32_t data)
 					machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
 			}
 			break;
+		}
 	}
 }
 
@@ -1165,6 +1173,8 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			break;
 
 		case IOASIC_SOUNDCTL:
+			if (LOG_IOASIC)
+				logerror("%08X write IOASIC_SOUNDCTL=%04x\n", machine().device("maincpu")->safe_pc(), data);
 			/* sound reset? */
 			if (m_has_dcs)
 			{

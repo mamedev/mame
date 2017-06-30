@@ -59,24 +59,25 @@ public:
 	int m_category_enable;
 	int m_tape_head_pos;
 
-	DECLARE_WRITE8_MEMBER(quizshow_lamps1_w);
-	DECLARE_WRITE8_MEMBER(quizshow_lamps2_w);
-	DECLARE_WRITE8_MEMBER(quizshow_lamps3_w);
-	DECLARE_WRITE8_MEMBER(quizshow_tape_control_w);
-	DECLARE_WRITE8_MEMBER(quizshow_audio_w);
-	DECLARE_WRITE8_MEMBER(quizshow_video_disable_w);
-	DECLARE_READ8_MEMBER(quizshow_timing_r);
-	DECLARE_READ_LINE_MEMBER(quizshow_tape_signal_r);
-	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
-	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_WRITE8_MEMBER(lamps3_w);
+	DECLARE_WRITE8_MEMBER(tape_control_w);
+	DECLARE_WRITE8_MEMBER(audio_w);
+	DECLARE_WRITE8_MEMBER(video_disable_w);
+	DECLARE_READ8_MEMBER(timing_r);
+	DECLARE_READ_LINE_MEMBER(tape_signal_r);
+	DECLARE_WRITE_LINE_MEMBER(flag_output_w);
+	DECLARE_WRITE8_MEMBER(main_ram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
+	DECLARE_INPUT_CHANGED_MEMBER(category_select);
 	DECLARE_DRIVER_INIT(quizshow);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(quizshow);
-	uint32_t screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 };
 
 
@@ -118,7 +119,7 @@ void quizshow_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizshow_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 }
 
-uint32_t quizshow_state::screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizshow_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	return 0;
@@ -131,7 +132,7 @@ uint32_t quizshow_state::screen_update_quizshow(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-WRITE8_MEMBER(quizshow_state::quizshow_lamps1_w)
+WRITE8_MEMBER(quizshow_state::lamps1_w)
 {
 	// d0-d3: P1 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -140,7 +141,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps1_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_lamps2_w)
+WRITE8_MEMBER(quizshow_state::lamps2_w)
 {
 	// d0-d3: P2 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -149,17 +150,17 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps2_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_lamps3_w)
+WRITE8_MEMBER(quizshow_state::lamps3_w)
 {
 	// d0-d1: start button lamps
 	output().set_lamp_value(8, data >> 0 & 1);
 	output().set_lamp_value(9, data >> 1 & 1);
 
-	// d2-d3: unused? (chip is shared with quizshow_tape_control_w)
+	// d2-d3: unused? (chip is shared with tape_control_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
+WRITE8_MEMBER(quizshow_state::tape_control_w)
 {
 	// d2: enable user category select (changes tape head position)
 	output().set_lamp_value(10, data >> 2 & 1);
@@ -168,11 +169,11 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 	// d3: tape motor
 	// TODO
 
-	// d0-d1: unused? (chip is shared with quizshow_lamps3_w)
+	// d0-d1: unused? (chip is shared with lamps3_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
+WRITE8_MEMBER(quizshow_state::audio_w)
 {
 	// d1: audio out
 	m_dac->write(BIT(data, 1));
@@ -180,13 +181,13 @@ WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 	// d0, d2-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_video_disable_w)
+WRITE8_MEMBER(quizshow_state::video_disable_w)
 {
 	// d0: video disable (looked glitchy when I implemented it, maybe there's more to it)
 	// d1-d7: N/C
 }
 
-READ8_MEMBER(quizshow_state::quizshow_timing_r)
+READ8_MEMBER(quizshow_state::timing_r)
 {
 	uint8_t ret = 0x80;
 
@@ -206,38 +207,39 @@ READ8_MEMBER(quizshow_state::quizshow_timing_r)
 	return ret;
 }
 
-READ_LINE_MEMBER(quizshow_state::quizshow_tape_signal_r)
+READ_LINE_MEMBER(quizshow_state::tape_signal_r)
 {
 	// TODO (for now, hold INS to fastforward and it'll show garbage questions where D is always(?) the right answer)
-	return machine().rand() & 1;
+	return BIT(machine().rand(), 7); // better than machine().rand() & 1 for some reason
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_main_ram_w)
+WRITE_LINE_MEMBER(quizshow_state::flag_output_w)
+{
+	logerror("Flag output: %d\n", state);
+}
+
+WRITE8_MEMBER(quizshow_state::main_ram_w)
 {
 	m_main_ram[offset]=data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 
-static ADDRESS_MAP_START( quizshow_mem_map, AS_PROGRAM, 8, quizshow_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, quizshow_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(quizshow_audio_w)
-	AM_RANGE(0x1804, 0x1804) AM_WRITE(quizshow_lamps1_w)
-	AM_RANGE(0x1808, 0x1808) AM_WRITE(quizshow_lamps2_w)
-	AM_RANGE(0x1810, 0x1810) AM_WRITE(quizshow_lamps3_w)
-	AM_RANGE(0x1820, 0x1820) AM_WRITE(quizshow_tape_control_w)
-	AM_RANGE(0x1840, 0x1840) AM_WRITE(quizshow_video_disable_w)
+	AM_RANGE(0x1802, 0x1802) AM_WRITE(audio_w)
+	AM_RANGE(0x1804, 0x1804) AM_WRITE(lamps1_w)
+	AM_RANGE(0x1808, 0x1808) AM_WRITE(lamps2_w)
+	AM_RANGE(0x1810, 0x1810) AM_WRITE(lamps3_w)
+	AM_RANGE(0x1820, 0x1820) AM_WRITE(tape_control_w)
+	AM_RANGE(0x1840, 0x1840) AM_WRITE(video_disable_w)
 	AM_RANGE(0x1881, 0x1881) AM_READ_PORT("IN0")
 	AM_RANGE(0x1882, 0x1882) AM_READ_PORT("IN1")
 	AM_RANGE(0x1884, 0x1884) AM_READ_PORT("IN2")
 	AM_RANGE(0x1888, 0x1888) AM_READ_PORT("IN3")
-	AM_RANGE(0x1900, 0x1900) AM_READ(quizshow_timing_r)
-	AM_RANGE(0x1e00, 0x1fff) AM_RAM_WRITE(quizshow_main_ram_w) AM_SHARE("main_ram")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x1900, 0x1900) AM_READ(timing_r)
+	AM_RANGE(0x1e00, 0x1fff) AM_RAM_WRITE(main_ram_w) AM_SHARE("main_ram")
 ADDRESS_MAP_END
 
 
@@ -247,12 +249,12 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(quizshow_state::quizshow_tape_headpos_r)
+CUSTOM_INPUT_MEMBER(quizshow_state::tape_headpos_r)
 {
 	return 1 << m_tape_head_pos;
 }
 
-INPUT_CHANGED_MEMBER(quizshow_state::quizshow_category_select)
+INPUT_CHANGED_MEMBER(quizshow_state::category_select)
 {
 	if (newval)
 	{
@@ -263,7 +265,7 @@ INPUT_CHANGED_MEMBER(quizshow_state::quizshow_category_select)
 
 static INPUT_PORTS_START( quizshow )
 	PORT_START("IN0") // ADR strobe 0
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, quizshow_state,quizshow_tape_headpos_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, quizshow_state, tape_headpos_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -328,7 +330,7 @@ static INPUT_PORTS_START( quizshow )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("CAT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED_MEMBER(DEVICE_SELF, quizshow_state,quizshow_category_select, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED_MEMBER(DEVICE_SELF, quizshow_state, category_select, nullptr)
 
 INPUT_PORTS_END
 
@@ -358,7 +360,7 @@ static GFXDECODE_START( quizshow )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(quizshow_state::quizshow_clock_timer_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(quizshow_state::clock_timer_cb)
 {
 	m_clocks++;
 
@@ -379,16 +381,16 @@ static MACHINE_CONFIG_START( quizshow )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(quizshow_mem_map)
-	MCFG_CPU_IO_MAP(quizshow_io_map)
-	MCFG_S2650_SENSE_INPUT(READLINE(quizshow_state, quizshow_tape_signal_r))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("clock_timer", quizshow_state, quizshow_clock_timer_cb, attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))) // 8V
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_S2650_SENSE_INPUT(READLINE(quizshow_state, tape_signal_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(quizshow_state, flag_output_w))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("clock_timer", quizshow_state, clock_timer_cb, attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))) // 8V
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update_quizshow)
+	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizshow)

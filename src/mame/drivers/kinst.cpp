@@ -18,48 +18,54 @@
 
 ****************************************************************************
 
-Killer Instinct 1 / Killer Instinct 2
+****************************************************************************
+
+Guru-Readme for Killer Instinct 1 / Killer Instinct 2
 Rare/Nintendo, 1994/1995
+
+This is a fighting game using a hard drive to hold the graphics + code, 
+running on hardware made by Midway Manufacturing.
+The hardware is using similar PCB technology to other Midway games 
+of the era such as San Francisco Rush, Mortal Kombat 3, Cruis'n Exotica,
+War Gods etc. The majority of the IC's on the PCB are surface mounted.
 
 PCB Layout
 ----------
 
-This is a fighting game using a hard drive to hold the graphics + code, running on
-what appears to be Williams Electronics manufactured hardware.
-
 KILLER INSTINCT V4.0
 5770-14397-03
 (C)1994 Nintendo/Rare
-(sticker - MIDWAY GAMES 44464 I457034  A-20333)
+(sticker - MIDWAY GAMES 44464 I457034 A-20333)
+(sticker from another PCB - MIDWAY GAMES 44447 635095)
 |---------------------------------------------------------------|
-|       LED1  LED2       GAL          U10    U11    U12    U13  |
-|  TDA7240   TL084  AD1851  10MHz                               |
+|J1 J2       LED1 LED2     GAL               U10  U11  U12  U13 |
+|TDA7240 TL084  AD1851  10MHz                                   |
+|                      |--------|  6116                         |
+|                      |ANALOG  |  6116                         |
+|                      |DEVICES |  6116                         |
+|                      |ADSP2105|            U33  U34  U35  U36 |
 |                      |--------|                               |
-|                      |ANALOG  |                               |
-|                      |DEVICES |                               |
-|                      |ADSP2105|                               |
-|                      |--------|                               |
-|J3                                   U33    U34    U35    U36  |
-|               71256 71256 71256 71256                         |
-|               71256 71256 71256 71256      MT4C4001  MT4C4001 |
-|J              71256 71256 71256 71256      MT4C4001  MT4C4001 |
-|A              71256 71256 71256 71256      MT4C4001  MT4C4001 |
-|M                                           MT4C4001  MT4C4001 |
-|M    ULN2064B                               MT4C4001  MT4C4001 |
-|A                                           MT4C4001  MT4C4001 |
-|          *1                                MT4C4001  MT4C4001 |
-|                        *5                  MT4C4001  MT4C4001 |
-|                                                               |
-|                               50MHz                       JP30|
-|              *4                MAX705                         |
-|                                 JP32  *2        *3        U98 |
-|  DSW1  DSW2                                                   |
-|       J7       J8           J6        S3                      |
+|J3                                                             |
+|-|             71256 71256 71256 71256                         |
+  |             71256 71256 71256 71256      MT4C4001  MT4C4001 |
+|-|             71256 71256 71256 71256      MT4C4001  MT4C4001 |
+| ULN2064B      71256 71256 71256 71256      MT4C4001  MT4C4001 |
+|                                            MT4C4001  MT4C4001 |
+|J      |----|                               MT4C4001  MT4C4001 |
+|A      |EPM |                               MT4C4001  MT4C4001 |
+|M      |7096|        |------|               MT4C4001  MT4C4001 |
+|M      |----|        |R4600 | 49FCT805      MT4C4001  MT4C4001 |
+|A           |----|   |      |                                  |
+|            |EPM |   |------|  50MHz   |----|   |----|     JP30|
+|-|          |7032|             MAX705  |EPM |   |EPM |         |
+  |          |x---|             JP32    |7128|   |7128|   U98   |
+|-|DSW1  DSW2                 J6        |x---|   |y---|         |
+|       J7       J8           J9    S3                          |
 |---------------------|---------------|-------------------------|
                       |     IDE44     |
-                      |               |
-                      |       *6      |
-                      |               |
+                      |               | <---- Conversion board to convert KI1 into KI2
+                      |    EPM7032y   |       PCB Number: 5772-14668-01
+                      |               |       Used only with KI 2 software on KI 1 PCB
                       |     IDE44     |
                       |-|-----------|-|
                         |||||||||||||
@@ -70,54 +76,73 @@ KILLER INSTINCT V4.0
                         |||||||||||||
                         |||||||||||||
                         |||||||||||||
-                  |-----|||||||||||||-----|
-                  |     |-----------|     |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |        Seagate        |
-                  |                       |
-                  |        ST9420AG       |
-                  |                       |
-                  |      2.5" H/Drive     |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |-----------------------|
-
+                      |-|||||||||||||-|
+                      | |-----------| |
+                      |               |
+                      |   Seagate     |
+                      |   ST9150AG    |
+                      |      or       | <---- Can be replaced with a IDE44>CF adapter or IDE44>SD adapter
+                      |   ST9420AG    |       if the factory boot ROM is replaced with the "ANY-IDE" boot ROM.
+                      |               |       Note there are different "ANY-IDE" boot ROMs for KI and KI 2.
+                      | 2.5" H/Drive  |
+                      |               |
+                      |               |
+                      |---------------|
 Notes:
-      GAL - GAL20V8 labelled 'KI-U1 A-19802' (DIP24)
-      MT4C4001 - 1M x4 DRAM (SOJ28)
-      71256 - IDT 71256 32k x8 SRAM (SOJ28)
-      JP30 - 3 pin jumper to configure boot ROM. Set to 1-2. Settings are 1-2 = 4MBit. 2-3 = 8MBit.
-      JP32 - 2 pin jumper to disable Watch Dog (Hard-wired on the PCB shorted 1-2)
-      ADSP2105 - Analog Devices ADSP-2105 (PLCC68)
-      J7 - 15 pin connector for player 3 controls
-      J3 - 10 pin connector for extra controls
-      J6 - 44 pin connector for 2.5" IDE hard drive
-      H/drive - Seagate Marathon 2.5" IDE hard drive, model ST9420AG
-        -for KI2, labelled 'L2.1 KILLER INSTINCT 2 DISK (C)1985 NINTENDO/RARE) CHS - 988/16/52 - 420.8MB
-      For KI1 - H/drive - Seagate Marathon 2.5" IDE hard drive, model ST9150AG
-
-      J8 - 8 pin connector for coin 3-4
-      S3 - Reset push-button switch
-      LED1 - H/Drive activity LED
-      LED2 - Sound Active LED
-      *1 Altera EPM7096LC68-10 labelled 'KI-U92 A-19488 (C)1994 NINTENDO/RARE' (PLCC68)
-      *2 Altera MAX EPM7128ELC84-10 labelled 'KI-U103 A-19486 (C)1994 NINTENDO/RARE' (PLCC68)
-      *3 Altera MAX EPM7128ELC84-10 labelled 'KI-U103 A-19486 (C)1994 NINTENDO/RARE' (PLCC68)
-      *4 Altera EPM7032LC44 -15T labelled 'K12-U96 A-20351 (C)1996 NINTENDO/RARE' (PLCC44)
-      *5 MIPS 4600-based CPU, heatsinked (QFP208)
-      *6 Altera EPM7032LC44 -15T labelled 'K12-U1 A-20383 (C)1996 NINTENDO/RARE' (PLCC44)
-         - This is an updated hard drive controller sub board used only with KI2
+      R4600    - Integrated Device Technology IDT79R4600-100MS R4600 CPU running at 100MHz, with heatsink (QFP208)
+      GAL      - Lattice GAL20V8 labelled 'KI-U1 A-19802 (C)1994 Nintendo/Rare' (DIP24)
+      MT4C4001 - Micron Technology 1M x4-bit Fast Page Mode DRAM (SOJ28)
+      71256    - Integrated Device Technology IDT71256SA20Y 32k x8-bit SRAM (SOJ28). Alternative: Mosel MS62256A-20RC 32k x8-bit SRAM (SOJ28)
+      6116     - Integrated Device Technology IDT6116SA25SO 2k x8-bit SRAM (SOP24)
+      ADSP2105 - Analog Devices ADSP-2105KP-40. Clock input 10.000MHz (PLCC68)
+      49FCT805 - Integrated Device Technology IDT49FCT805 Non-Inverting Buffer/Clock Driver with Two Independent Output Banks and Tri-State Control (SOIC20)
+      TDA7240  - ST Microelectronics TDA7240A 20W Mono Bridge Audio Amplifier IC (DIL4+3). Note the cabinet has two speakers but the generated sound is mono.
+      TL084    - Texas Instruments TL084 General Purpose J-FET Quad Operational Amplifier (DIP14)
+      AD1851   - Analog Devices AD1851 Monolithic PCM Audio DAC (DIP16)
+      ULN2064B - ST Microelectronics ULN2064B 50V 1.5A Quad Darlington Switch (DIP16)
+      MAX705   - Maxim MAX705 Microprocessor Supervisory Circuit / Reset Chip (DIP8)
+      J1       - 2 pin position for connector labelled 'LINE OUT' but not populated
+      J2       - 2 pin position for connector labelled 'AUX IN' but not populated
+      J3       - 10 pin connector for extra controls; coin interlock (pin 6), bill in (pin 5), volume minus (pin 2), volume plus (pin 3)
+      J6       - 44 pin connector for 2.5" IDE hard drive
+      J7       - 15 pin connector marked 'PLAYER 3' but used for player 1 'low' buttons (pins 7, 8, 9) and player 2 'low' buttons (pins 11, 12, 13)
+                 Note the 3 'high' buttons for player 1 and player 2 are on the JAMMA connector. JAMMA pins 25 & 26 top and bottom have no connection.
+      J8       - 8 pin connector for coin 3 (pin 2) and coin 4 (pin 6). Probably used for Bill Acceptors etc.
+      J9       - Position for 40 pin IDE connector for 3.5" IDE hard drive, but not populated. Note the connector can be added and used with a
+                 3.5" IDE HDD but the power for the HDD must be provided separately.
+      JP30     - 3 pin jumper to configure Boot ROM. Set to 1-2. Settings are 1-2 = 4MBit (27C4001/27C040) or 2-3 = 8MBit (27C080)
+      JP32     - 2 pin jumper to disable Watch Dog (Hard-wired on the PCB shorted 1-2)
+      S3       - Reset push-button switch
+      LED1     - H/Drive Activity LED
+      LED2     - Sound Activity LED
+      H/Drive  - 2.5" IDE Hard Drive with 44-pin connector. Note the model is checked by the program and the game will not run unless it finds
+                 the correct model. There is a modified Boot ROM available that allows it to work with any model HDD or a cheap Chinese $2 CF>IDE44 
+                 adapter. A cheap Chinese $5 SD>IDE44 adapter can also be used.
+                   - For KI1, Seagate Marathon 2.5" IDE hard drive, model ST9150AG (131MB formatted capacity)
+                     C/H/S = 419/13/47 = 131076608 bytes, labelled 'L1 KILLER INSTINCT DISK (C)1984 NINTENDO/RARE'
+                   - For KI2, Seagate Marathon 2.5" IDE hard drive, model ST9420AG (420.8MB formatted capacity)
+                     C/H/S = 988/16/52 = 420872192 bytes, labelled 'L2.1 KILLER INSTINCT 2 DISK (C)1985 NINTENDO/RARE'
+      EPM7096  - Altera EPM7096LC68-10 labelled 'KI-U92 A-19488 (C)1994 NINTENDO/RARE' (PLCC68)
+      EPM7128x - Altera MAX EPM7128ELC84-10 CPLD labelled 'KI-U103 A-19486 (C)1994 NINTENDO/RARE' (PLCC84)
+      EPM7128y - Altera MAX EPM7128ELC84-10 CPLD labelled 'KI-U104 A-19487 (C)1994 NINTENDO/RARE' (PLCC84)
+      EPM7032x - Altera EPM7032LC44-15T CPLD
+                   - For KI labelled 'KI-U96 A-19489 (C)1994 NINTENDO/RARE' (PLCC44)
+                   - For KI2 labelled 'K12-U96 A-20351 (C)1996 NINTENDO/RARE' (PLCC44). Note if the PCB has this chip it is a dedicated KI2 PCB.
+                     If the software is replaced with KI 1 (boot ROM and HDD) the board will boot but immediately jumps to test mode and then freezes.
+                     Also, the top title "Killer Instinct" flashes rapidly. If the sticker on U96 is missing (so can't be identified as a KI 2) and 
+                     someone has tried to make it run KI 1 and it has the above symptoms, it is likely a dedicated KI 2 PCB.
+      EPM7032y - Altera EPM7032LC44-15T CPLD labelled 'K12-U1 A-20383 (C)1996 NINTENDO/RARE' (PLCC44)
+                 This IC is mounted on a small PCB (5772-14668-01) and connected between the IDE44 interface on the main board and the IDE44 Hard Drive.
+                 It is used only with the KI2 conversion kit. This is mainly a protection device to stop game swaps on a KI 1 PCB. However if the 
+                 sub board is removed and all the EPROMs and HDD are changed, the main board will run Killer Instinct, providing U96 is the correct 
+                 chip for KI. If U96 is the type for KI2, then the main board will only run KI2 and can't be converted to KI.
+      HSync    - 15.3846kHz
+      VSync    - 58.9634Hz
 
       ROMs
       ----
+
+      Killer Instinct:
       U10 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U10 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U11 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U11 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U12 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U12 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
@@ -126,7 +151,31 @@ Notes:
       U34 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U34 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U35 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U35 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U36 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U36 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
-      U98 - ST 27C4001 EPROM labelled 'L1.4 KILLER INSTINCT U98 ROM 1 (C) 1994 Nintendo/Rare' (DIP32)
+      U98 - ST 27C4001 EPROM labelled 'L1.5D KILLER INSTINCT U98 ROM 1 (C) 1994 Nintendo/Rare' (DIP32)
+            Note earlier revisions exist, this is the last revision.
+
+      Killer Instinct 2:
+      U10 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U10 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U11 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U11 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U12 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U12 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U13 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U13 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U33 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U33 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U34 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U34 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U35 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U35 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U36 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U36 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U98 - ST 27C4001 EPROM labelled 'L1.4 KILLER INSTINCT 2 U98 (C) 1995 Nintendo/Rare' (DIP32)
+            Note earlier revisions exist, this is the last revision.
+
+      BOOT ROMs for IDE HDD to Compact Flash conversion
+      -------------------------------------------------
+      Killer Instinct: 
+      U98 - ST 27C4001 or 27C040 EPROM. File name = KI_L15DI.U98, CRC32 = 230F55FB
+
+      Killer Instinct 2 Dedicated PCB (U96 labelled 'K12-U96 A-20351') 
+      U98 - ST 27C4001 or 27C040 EPROM. File name = KI2_L14P.U98.BIN, CRC32 = D80C937A
+
+      Killer Instinct 2 on Killer Instinct 1 PCB (U96 labelled 'KI-U96 A-19489') with KI 2 protection PCB 5772-14668-01
+      U98 - ST 27C4001 or 27C040 EPROM. File name = KI2_D14P.U98, CRC32 = D716D428
 
 ***************************************************************************/
 

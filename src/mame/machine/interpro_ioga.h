@@ -171,7 +171,7 @@ public:
 	DECLARE_WRITE32_MEMBER(timer2_w) { write_timer(2, data, IOGA_TIMER_2); }
 	DECLARE_WRITE32_MEMBER(timer3_w) { write_timer(3, data, IOGA_TIMER_3); }
 
-	enum hwicr_mask 
+	enum hwicr_mask
 	{
 		IRQ_PENDING         = 0x0100,
 		IRQ_ENABLE_EXTERNAL = 0x0200,
@@ -187,7 +187,7 @@ public:
 	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
 	DECLARE_WRITE8_MEMBER(softint_w);
 
-	enum nmictrl_mask 
+	enum nmictrl_mask
 	{
 		NMI_ALL     = 0x01,
 		NMI_ENABLE1 = 0x02,
@@ -203,7 +203,7 @@ public:
 	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
 	DECLARE_WRITE16_MEMBER(softint_vector_w);
 
-	enum dma_ctrl_mask 
+	enum dma_ctrl_mask
 	{
         DMA_CTRL_TCZERO  = 0x00000001, // transfer count zero
         DMA_CTRL_TAG     = 0x00000e00, // bus tag
@@ -234,7 +234,7 @@ public:
 
 	DECLARE_READ32_MEMBER(error_address_r) { return m_error_address; }
 
-	enum error_businfo_mask 
+	enum error_businfo_mask
 	{
 		BINFO_CT     = 0x003f,
 		BINFO_TAG    = 0x01c0,
@@ -244,7 +244,7 @@ public:
 		BINFO_SNAPOK = 0x4000,
 		BINFO_MSBE   = 0x8000
 	};
-	enum error_businfo_bg 
+	enum error_businfo_bg
 	{
 		BINFO_BG_IOD      = 0x0200,
 		BINFO_BG_ICAMMU   = 0x0400,

@@ -687,6 +687,13 @@ void ymz280b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
+void ymz280b_device::device_clock_changed()
+{
+	m_master_clock = (double)clock() / 384.0;
+	m_stream->set_sample_rate(INTERNAL_SAMPLE_RATE);
+}
+
+
 /**********************************************************************************************
 
      write_to_register -- handle a write to the current register

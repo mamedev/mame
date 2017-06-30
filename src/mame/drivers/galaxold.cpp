@@ -2494,6 +2494,7 @@ static MACHINE_CONFIG_START( hexpoola )
 	MCFG_CPU_PROGRAM_MAP(racknrol)
 	MCFG_CPU_IO_MAP(hexpoola_io)
 	MCFG_CPU_DATA_MAP(hexpoola_data)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
@@ -2542,7 +2543,6 @@ static MACHINE_CONFIG_DERIVED( bullsdrtg, hexpoola )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(bullsdrtg_data_map)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) // ???
 MACHINE_CONFIG_END
 
 

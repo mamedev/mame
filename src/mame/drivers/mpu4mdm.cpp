@@ -2,6 +2,9 @@
 // copyright-holders:David Haywood
 /* MPU4 games by MDM */
 
+#include "emu.h"
+#include "includes/mpu4.h"
+
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
 
@@ -404,6 +407,7 @@ ROM_START( m4ewshft )
 	ROM_LOAD( "each_way_shifter-snd2.bin", 0x080000, 0x080000, CRC(e3ce5ec5) SHA1(9c7eefa4042b1b1aca3d0fbefcad10db34992c43) )
 ROM_END
 
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 /* MDM
    most of these boot and act similar to the Empire games (ie bad text, but run OK) */

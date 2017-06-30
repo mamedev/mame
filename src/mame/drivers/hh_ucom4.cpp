@@ -64,6 +64,7 @@
 
 
 TODO:
+  - confirm that bmcfball is the same rom/serial as ssfball (game seems identical)
   - games that rely on the fact that faster/longer strobed elements appear brighter:
     tactix(player 2)
 
@@ -388,7 +389,8 @@ MACHINE_CONFIG_END
   * NEC uCOM-43 MCU, label D553C 031
   * cyan VFD display Emix-102, with bezel
 
-  The game was rereleased in 1982 as Classic Football, with an improved VFD.
+  The game was rereleased in 1982 as Classic Football (ET-0351), with an
+  improved cyan/green/red VFD.
 
   Press the Kick button to start the game, an automatic sequence follows.
   Then choose a formation(A,B,C) and either pass the ball, and/or start
@@ -1694,9 +1696,9 @@ WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 
 WRITE8_MEMBER(mcompgin_state::lcd_w)
 {
-	// E0: HLCD0569 _CS
-	// E1: HLCD0569 clock
-	// E2: HLCD0569 data in
+	// E0: HLCD0530 _CS
+	// E1: HLCD0530 clock
+	// E2: HLCD0530 data in
 	m_lcd->write_cs(data & 1);
 	m_lcd->write_data(data >> 2 & 1);
 	m_lcd->write_clock(data >> 1 & 1);
@@ -2060,7 +2062,7 @@ MACHINE_CONFIG_END
   Tomy(tronic) Tennis (manufactured in Japan)
   * PCB label TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, label D552C 048
-  * VFD display NEC FIP11AM15T tube no. 0F, with overlay
+  * cyan VFD display NEC FIP11AM15T tube no. 0F, with overlay
 
   The initial release of this game was in 1979, known as Pro-Tennis,
   it has a D553 instead of D552, with just a little over 50% ROM used.
@@ -2676,8 +2678,16 @@ ROM_START( ssfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
 
-	ROM_REGION( 330197, "svg", 0)
-	ROM_LOAD( "ssfball.svg", 0, 330197, CRC(cde0d483) SHA1(99d218aab4bb42e97194fdc38e9a0efbcde082de) )
+	ROM_REGION( 331352, "svg", 0)
+	ROM_LOAD( "ssfball.svg", 0, 331352, CRC(10cffb85) SHA1(c875f73a323d976088ffa1bc19f7bc865d4aac62) )
+ROM_END
+
+ROM_START( bmcfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, BAD_DUMP CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 331352, "svg", 0)
+	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
 ROM_END
 
 
@@ -2685,8 +2695,8 @@ ROM_START( bmsoccer )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
 
-	ROM_REGION( 273804, "svg", 0)
-	ROM_LOAD( "bmsoccer.svg", 0, 273804, CRC(29525b4a) SHA1(2f59d3ed59923a834b7ddcdfb9d61a9818196f2e) )
+	ROM_REGION( 273796, "svg", 0)
+	ROM_LOAD( "bmsoccer.svg", 0, 273796, CRC(4c88d9f8) SHA1(b4b82f26a09f54cd0b6a9d1c1a46796fbfcb578a) )
 ROM_END
 
 
@@ -2694,8 +2704,8 @@ ROM_START( bmsafari )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
 
-	ROM_REGION( 273889, "svg", 0)
-	ROM_LOAD( "bmsafari.svg", 0, 273889, CRC(c61e26b3) SHA1(467db0396d350fddb46ecf2b1ad60501013c5dff) )
+	ROM_REGION( 275386, "svg", 0)
+	ROM_LOAD( "bmsafari.svg", 0, 275386, CRC(c24badbc) SHA1(b191f34155d6d4e834e7c6fe715d4bb76198ad72) )
 ROM_END
 
 
@@ -2804,8 +2814,8 @@ ROM_START( tmtennis )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
 
-	ROM_REGION( 203979, "svg", 0)
-	ROM_LOAD( "tmtennis.svg", 0, 203979, CRC(4679487c) SHA1(845e961e309fa9e52c4a856b3e7f5cecd1173a1b) )
+	ROM_REGION( 204490, "svg", 0)
+	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(ed0086e9) SHA1(26a5b2f0a9cd70401187146e1495aee80020658b) )
 ROM_END
 
 
@@ -2848,7 +2858,8 @@ ROM_END
 
 //    YEAR  NAME      PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
 CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )

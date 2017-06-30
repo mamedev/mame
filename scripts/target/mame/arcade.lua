@@ -103,7 +103,7 @@ CPUS["MINX"] = true
 CPUS["SSEM"] = true
 CPUS["AVR8"] = true
 --CPUS["TMS1000"] = true
-CPUS["I4004"] = true
+CPUS["MCS40"] = true
 CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
 CPUS["I8008"] = true
@@ -1263,23 +1263,23 @@ createMAMEProjects(_target, _subtarget, "barcrest")
 files {
 	MAME_DIR .. "src/mame/drivers/mpu2.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu3.cpp",
-	MAME_DIR .. "src/mame/drivers/mpu4.cpp",
-	MAME_DIR .. "src/mame/drivers/mpu4sw.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4.hxx",
+	MAME_DIR .. "src/mame/machine/mpu4.cpp",
 	MAME_DIR .. "src/mame/includes/mpu4.h",
-	MAME_DIR .. "src/mame/drivers/mpu4mod2sw.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4mod4yam.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4plasma.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4avan.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4bwb.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4concept.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4crystal.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4dealem.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4empire.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4mdm.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4misc.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4mod2sw.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4mod4yam.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4plasma.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4sw.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4union.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4vid.cpp",
-	MAME_DIR .. "src/mame/drivers/mpu4avan.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4union.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4concept.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4empire.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4mdm.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4crystal.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4bwb.hxx",
-	MAME_DIR .. "src/mame/drivers/mpu4misc.hxx",
 	MAME_DIR .. "src/mame/drivers/mpu5.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu5.hxx",
 }
@@ -1629,6 +1629,8 @@ files {
 	MAME_DIR .. "src/mame/machine/deco146.h",
 	MAME_DIR .. "src/mame/video/decbac06.cpp",
 	MAME_DIR .. "src/mame/video/decbac06.h",
+	MAME_DIR .. "src/mame/video/decrmc3.cpp",
+	MAME_DIR .. "src/mame/video/decrmc3.h",
 	MAME_DIR .. "src/mame/video/deco16ic.cpp",
 	MAME_DIR .. "src/mame/video/deco16ic.h",
 	MAME_DIR .. "src/mame/video/decocomn.cpp",
@@ -2792,7 +2794,6 @@ createMAMEProjects(_target, _subtarget, "neogeo")
 files {
 	MAME_DIR .. "src/mame/drivers/neogeo.cpp",
 	MAME_DIR .. "src/mame/includes/neogeo.h",
-	MAME_DIR .. "src/mame/drivers/neodriv.hxx",
 	MAME_DIR .. "src/mame/video/neogeo.cpp",
 	MAME_DIR .. "src/mame/drivers/neopcb.cpp",
 	MAME_DIR .. "src/mame/video/neogeo_spr.cpp",

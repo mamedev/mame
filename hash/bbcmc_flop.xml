@@ -95,6 +95,30 @@
 		</part>
 	</software>
 
+	<software name="bikes">
+		<description>Bikes</description>
+		<year>1990</year>
+		<publisher>Department of Education and The Arts Tasmania</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Bikes I"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Bikes 1 Version 2.0-06-90.adl" size="655360" crc="3ca4ba99" sha1="397501a286ed9b1ebd5421a980e3ce3d5ca9008d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Bikes II"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Bikes 2 Version 2.0-06-90.adl" size="655360" crc="06fcff2e" sha1="30888334f787a5762ed3d31e9ddf387888997674" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Bikes Toolkit"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Bikes Toolkit Version 2.0-06-90.adl" size="655360" crc="37eab1ee" sha1="033c50aea500c95ff334d60ec31625d95ae2fe3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="connectn">
 		<description>Connections</description>
 		<year>1990</year>

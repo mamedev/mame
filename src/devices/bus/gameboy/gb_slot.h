@@ -126,6 +126,7 @@ public:
 	int get_type() { return m_type; }
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 	static bool get_mmm01_candidate(const uint8_t *ROM, uint32_t len);
+	static bool is_mbc1col_game(const uint8_t *ROM, uint32_t len);
 	// remove me when SGB is properly emulated
 	int get_sgb_hack() { return m_sgb_hack; }
 

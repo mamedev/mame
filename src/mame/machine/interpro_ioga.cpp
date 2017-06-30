@@ -19,11 +19,11 @@
 #include "interpro_ioga.h"
 
 #define LOG_GENERAL      (1 << 31)
-#define LOG_HWINT_ENABLE ((1<<2) | LOG_GENERAL)
-#define LOG_DMA_ENABLE   ((1<<IOGA_DMA_SCSI) | LOG_GENERAL)
-#define LOG_TIMER_ENABLE   0
+#define LOG_HWINT_ENABLE 0
+#define LOG_DMA_ENABLE   0
+#define LOG_TIMER_ENABLE 0
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #if VERBOSE
 #define LOG_INTERRUPT(...)        logerror(__VA_ARGS__)

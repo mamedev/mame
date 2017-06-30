@@ -3191,3 +3191,15 @@ if (MACHINES["K054321"]~=null) then
 		MAME_DIR .. "src/devices/machine/k054321.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/smioc.h,MACHINES["SMIOC"] = true
+---------------------------------------------------
+
+if (MACHINES["SMIOC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/smioc.cpp",
+		MAME_DIR .. "src/devices/machine/smioc.h",
+	}
+end

@@ -5050,7 +5050,7 @@ has been replaced with an all-zero block. -->
 	<software name="4dboxing">
 		<description>4D Boxing (US)</description>
 		<year>1991</year>
-		<publisher>Electronic Arts, Inc.</publisher>
+		<publisher>Electronic Arts</publisher>
 		<info name="version" value="1.0" />
 		<info name="developer" value="Distinctive Software, Inc." />
 		<part name="flop1" interface="floppy_3_5">
@@ -5101,6 +5101,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="688 Attack Sub [1989] [Electronic Arts] [3.5] [1 of 1].img" size="737280" crc="a6ab2fdd" sha1="b36511db1302202ee1056bbabafe78cfdbfb7c29" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="688atsub35a" cloneof="688atsub">
+		<description>688 Attack Sub (3.5", older)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="688 Attack Sub [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d03caea2" sha1="ed1ce1160bddbad1118c3651f49011ec6e346675" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5937,7 +5949,7 @@ has been replaced with an all-zero block. -->
 	<software name="jordbird">
 		<description>Jordan vs. Bird: One on One</description>
 		<year>1988</year>
-		<publisher>Electronic Arts, Inc.</publisher>
+		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Jordan vs. Bird - One on One [Electronic Arts] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="069dc971" sha1="0c733967470620774f6c5f9bc080f9eb643c23d1" offset="0"/>
@@ -6044,8 +6056,8 @@ has been replaced with an all-zero block. -->
 	<software name="kotb">
 		<description>Kings of the Beach</description>
 		<year>1988</year>
-		<publisher>Electronic Arts, Inc.</publisher>
-		<info name="developer" value="Electronic Arts, Inc." />
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Kings of the Beach [Electronic Arts] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="6ec6dae7" sha1="03116faf66e9d7d88307fe763f6fe40b52680ec9" offset="0"/>
@@ -6570,6 +6582,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Skweek D2.2 [5.25].img" size="368640" crc="29fb059e" sha1="c93d3411ec866b6c489bfad5b7825c89d79b6f90" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stargoos">
+		<description>Star Goose!</description>
+		<year>1989</year>
+		<publisher>Logotron</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CGA disk"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Goose (CGA disk) [Logotron] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="8b8a1a64" sha1="16f5b9bc34e15f49763f232c29350f8b25947285" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="EGA disk"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Goose (EGA disk) [Logotron] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="97a0ef81" sha1="003161f2ff764acdfeb82983a878e0ef5a2a3f49" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

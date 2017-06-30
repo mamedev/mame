@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( seljan_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x0011, 0x0011 ) AM_MIRROR(0x7f00) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
 	AM_RANGE( 0x0012, 0x0012 ) AM_MIRROR(0x7f00) AM_READ_PORT("DSW2") AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE( 0x0013, 0x0013 ) AM_MIRROR(0x7f00) AM_READ_PORT("DSW3") AM_DEVWRITE("crtc", mc6845_device, register_w)
-	
+
 	// TODO: following actually starts at 0x8000, needs custom 6845 routine because it uses start address register.
 	AM_RANGE( 0x7e00, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -3494,7 +3494,7 @@ static MACHINE_CONFIG_DERIVED( janyoup2, ippatsu )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_18_432MHz/4) // unknown divider
 	MCFG_CPU_IO_MAP(janyoup2_iomap)
-	
+
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_18_432MHz/12) // unknown divider
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
@@ -3799,7 +3799,7 @@ ROM_START( seljan ) // Z80A + HD46505SP + AY891X (a sticker covers the chip type
 	ROM_LOAD( "3",       0x4000, 0x2000, CRC(6c0dfd50) SHA1(1f91ff0ef2f24414888ae8e5ebac72a5bb48780b) )
 	ROM_LOAD( "5",       0x6000, 0x2000, CRC(22eb98ee) SHA1(aae0ba5098852e6fef3dd7cc97dfad97ca444bb7) )
 	ROM_LOAD( "4",       0x8000, 0x1000, CRC(d41e2a10) SHA1(9c24f89ba877ab599ea89961b5e705fa770867be) )
-	
+
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123_1",  0x0000, 0x0020, CRC(f1df0310) SHA1(cc7dd39a0aa10b57039143e587eee02cf5dd2e5c) )
 ROM_END

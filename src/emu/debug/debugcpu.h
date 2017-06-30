@@ -110,7 +110,7 @@ public:
 		offs_t address() const { return m_address; }
 		offs_t length() const { return m_length; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action.c_str(); }
+		const std::string &action() const { return m_action; }
 
 		// setters
 		void setEnabled(bool value) { m_enabled = value; }
@@ -599,7 +599,7 @@ private:
 	device_t *  m_visiblecpu;
 	device_t *  m_breakcpu;
 
-	FILE *      m_source_file;          // script source file
+	std::unique_ptr<std::istream> m_source_file;        // script source file
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 

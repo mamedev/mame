@@ -50,8 +50,7 @@ okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, OKIM6258, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_status(0),
-		m_master_clock(0),
-		m_divider(0),
+		m_divider(512),
 		m_adpcm_type(0),
 		m_data_in(0),
 		m_nibble_shift(0),
@@ -111,8 +110,6 @@ static void compute_tables()
 void okim6258_device::device_start()
 {
 	compute_tables();
-
-	m_master_clock = clock();
 
 	m_divider = dividers[m_start_divider];
 
@@ -189,7 +186,6 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 void okim6258_device::state_save_register()
 {
 	save_item(NAME(m_status));
-	save_item(NAME(m_master_clock));
 	save_item(NAME(m_divider));
 	save_item(NAME(m_data_in));
 	save_item(NAME(m_nibble_shift));
@@ -231,10 +227,8 @@ int16_t okim6258_device::clock_adpcm(uint8_t nibble)
 
 void okim6258_device::set_divider(int val)
 {
-	int divider = dividers[val];
-
 	m_divider = dividers[val];
-	m_stream->set_sample_rate(m_master_clock / divider);
+	notify_clock_changed();
 }
 
 
@@ -244,10 +238,9 @@ void okim6258_device::set_divider(int val)
 
 ***********************************************************************************************/
 
-void okim6258_device::set_clock(int val)
+void okim6258_device::device_clock_changed()
 {
-	m_master_clock = val;
-	m_stream->set_sample_rate(m_master_clock / m_divider);
+	m_stream->set_sample_rate(clock() / m_divider);
 }
 
 
@@ -259,7 +252,7 @@ void okim6258_device::set_clock(int val)
 
 int okim6258_device::get_vclk()
 {
-	return (m_master_clock / m_divider);
+	return (clock() / m_divider);
 }
 
 

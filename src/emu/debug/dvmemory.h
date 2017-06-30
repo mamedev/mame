@@ -65,7 +65,7 @@ public:
 	offs_t addressAtCursorPosition(const debug_view_xy& pos) { return get_cursor_pos(pos).m_address; }
 
 	// setters
-	void set_expression(const char *expression);
+	void set_expression(const std::string &expression);
 	void set_chunks_per_row(u32 rowchunks);
 	void set_data_format(int format); // 1-8 current values 9 32bit floating point
 	void set_reverse(bool reverse);

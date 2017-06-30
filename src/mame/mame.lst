@@ -81,7 +81,7 @@ casanova                        //
 
 @source:40love.cpp
 40love                          // A30 (c) 1984 Taito
-40lovej							// A30 (c) 1984 Taito
+40lovej                         // A30 (c) 1984 Taito
 fieldday                        // A23 (c) 1984 Taito
 undoukai                        // A17 (c) 1984 Taito
 
@@ -9007,6 +9007,7 @@ xsandos                         //
 @source:by6803.cpp
 atlantip                        //
 beatclck                        //
+beatclck2                       //
 black100                        //
 black100s                       //
 blackblt                        //
@@ -10030,7 +10031,8 @@ sf2em                           // 29/01/1991 (c) 1991 (World)
 sf2hf                           // 09/12/1992 (c) 1992 (World)
 sf2hfj                          // 09/12/1992 (c) 1992 (Japan)
 sf2hfu                          // 09/12/1992 (c) 1992 (USA)
-sf2j                            // 10/12/1991 (c) 1991 (Japan)
+sf2j                            // 10/12/1991 (c) 1991 (Japan, CPS-B-13)
+sf2j17                          // 10/12/1991 (c) 1991 (Japan, CPS-B-17)
 sf2ja                           // 14/02/1991 (c) 1991 (Japan)
 sf2jc                           // 06/03/1991 (c) 1991 (Japan)
 sf2jf                           // 11/04/1991 (c) 1991 (Japan)
@@ -10589,7 +10591,8 @@ hero                            // (c) 1983 Seatongrove (c) 1984 CVS
 hunchbak                        // (c) 1983 Century
 hunchbaka                       // (c) 1983 Century
 huncholy                        // (c) 1984 Seatongrove (c) CVS
-logger                          // (c) 1982 Century
+logger                          // (c) 1982 Century (rev 3)
+loggerr2                        // (c) 1982 E T Marketing (rev 2)
 outline                         // (c) 1982 Century
 radarzon                        // (c) 1982 Century
 radarzon1                       // (c) 1982 Century
@@ -10695,7 +10698,7 @@ dblcrown                        // (c) 1994 Excellent System
 dblewing                        // MBE (c) 1993 Mitchell
 
 @source:dbox.cpp
-dbox							// (c) 1996 Nokia Multimedia
+dbox                            // (c) 1996 Nokia Multimedia
 
 @source:dbz.cpp
 dbz                             // (c) 1993 Banpresto
@@ -10994,7 +10997,8 @@ slyspy3                         // (c) 1989 Data East USA (US)
 
 @source:dec8.cpp
 breywood                        // (c) 1986 Data East Corporation (Japan)
-cobracom                        // (c) 1988 Data East Corporation (World)
+cobracom                        // (c) 1988 Data East Corporation (World/US)
+cobracoma                       // (c) 1988 Data East Corporation (World/US)
 cobracomj                       // (c) 1988 Data East Corporation (Japan)
 csilver                         // (c) 1987 Data East Corporation (Japan)
 csilverj                        // (c) 1987 Data East Corporation (Japan)
@@ -11084,6 +11088,7 @@ cbnj                            // 27         Bump 'n' Jump
 cbtime                          // 26 1982.08 Hamburger/Burger Time
 cburnrub                        // 27 1982.11 Burnin' Rubber
 cburnrub2                       // 27
+cburnrubj                       //
 cdiscon1                        // 19 1982.04 Disco No.1
 cdsteljn                        // 14 1981.06 DS Telejan
 cexplore                        // 18 1982.02 Explorer
@@ -11092,12 +11097,14 @@ cfghtice                        // 40 1984.04 Fighting Ice Hockey
 cfishing                        // 25 1982.10 Fishing
 cflyball                        // 35 1983.?? Flying Ball/Bampoline
 cgraplop                        // 28 1982.11 Cluster Buster / Graplop
+cgraplopj                       //
 cgraplop2                       // 28
 chamburger                      // 26 1982.08 Hamburger (Japan)
 chwy                            // 01 1980.12 Highway Chase
 clapapa                         // 29 1982.11 La-Pa-Pa
 clapapa2                        // 29         Rootin' Tootin'  // this one doesn't display lapapa anywhere
 clocknch                        // 11 1981.04 Lock'n'Chase
+clocknchj                       //
 cluckypo                        // 15 1981.?? Lucky Poker
 cmanhat                         // 03 1981.01 Manhattan
 cmissnx                         // 21 1982.04 Mission-X/Zoar
@@ -11115,6 +11122,7 @@ cprogolfj                       // 13 1981.08 Tournament Pro Golf (Japan)
 cpsoccer                        // 33 1982.08 Pro Soccer
 cpsoccerj                       // 33 1982.08 Pro Soccer (Japan)
 cptennis                        // 22 1982.06 Pro Tennis
+cptennisj
 cscrtry                         // 38 1984.03 Scrum Try
 cscrtry2                        // 38
 csdtenis                        // 34 1983.09 Super Doubles Tennis
@@ -13093,8 +13101,8 @@ turpins                         // (c) 1981 bootleg
 turtles                         // (c) 1981 Stern
 uniwars                         // (c) Irem
 uniwarsa                        // (c) Karateco
-victoryc						// (c) Comsoft
-victorycb						// (c) Comsoft (bootleg)
+victoryc                        // (c) Comsoft
+victorycb                       // (c) Comsoft (bootleg)
 warofbug                        // (c) 1981 Armenia
 warofbugg                       // German Version
 warofbugu                       // (c) 1981 Armenia
@@ -14519,14 +14527,14 @@ ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
 
-@source:hh_sm500.cpp
-nupogodi                        //
-
 @source:hh_sm510.cpp
+exospace                        // Elektronika
 gnw_bx301                       // Nintendo
 gnw_dj101                       // Nintendo
 gnw_dm53                        // Nintendo
+gnw_eg26                        // Nintendo
 gnw_jr55                        // Nintendo
+gnw_mc25                        // Nintendo
 gnw_ml102                       // Nintendo
 gnw_mw56                        // Nintendo
 kcontra                         // Konami
@@ -14534,6 +14542,7 @@ kgradius                        // Konami
 kloneran                        // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
+nupogodi                        // Elektronika
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
@@ -14606,6 +14615,7 @@ zodiac                          // Coleco
 alnchase                        // Tomy
 astrocmd                        // Epoch
 bcclimbr                        // Bandai
+bmcfball                        // Bambino
 bmsafari                        // Bambino
 bmsoccer                        // Bambino
 edracula                        // Epoch
@@ -14803,6 +14813,7 @@ hp9816                          //
 hp9k310                         //
 hp9k320                         //
 hp9k330                         //
+hp9k332                         //
 hp9k340                         //
 hp9k370                         //
 hp9k380                         //
@@ -15051,6 +15062,9 @@ instantm                        //
 
 @source:instruct.cpp
 instruct                        //
+
+@source:intellec4.cpp
+intlc440                        //
 
 @source:interact.cpp
 hector1                         //
@@ -15313,6 +15327,7 @@ joinem                          // (c) 1983 Global
 loverboy                        // (c) 1983 G.T
 trikitri                        // (c) 1993 DDT
 striv                           // (c) 1985 Nova du Canada
+strivf                          // (c) 1985 Nova du Canada
 sucasino                        // (c) 1982 Data Amusement
 treahunt                        // (c) 1982 Hara Industries
 tripool                         // (c) 1981 Noma (Casino Tech license)
@@ -20151,6 +20166,7 @@ segacd2                         // 1993 Sega Sega CD 2 (USA)
 wmega                           // 1992 Sega Wondermega (Japan)
 wmegam2                         // 1993 Victor Wondermega M2 (Japan)
 xeye                            // 1993 JVC X'eye (USA)
+dcat16                          //
 
 @source:megadrvb.cpp
 aladmdb                         // MegaDrive-based hack
@@ -21383,7 +21399,7 @@ m4wnud                          // Unknown MPU4 'W Nudge'
 m4zill                          // Zillionare's Challenge (Pure Leisure)
 m4zilla                         //
 
-//@source:mpu4avan.inc
+@source:mpu4avan.cpp
 m4abeaut                        //
 m4abeaut_1                      //
 m4abeaut_2                      //
@@ -21885,7 +21901,7 @@ m4trg__x                        //
 m4trg__y                        //
 m4trg__z                        //
 
-//@source:mpu4bwb.inc
+@source:mpu4bwb.cpp
 m4abra                          // Abracadabra (Bwb)
 m4abra__a                       //
 m4abra__b                       //
@@ -22347,7 +22363,7 @@ m4xtrm                          // X-treme (Bwb)
 m4xtrm__a                       //
 m4xtrm__b                       //
 
-//@source:mpu4concept.inc
+@source:mpu4concept.cpp
 m4nudgwc                        // Nudge a Win (Concept)
 m4nudgwc__a                     //
 m4nudgwc__b                     //
@@ -22419,7 +22435,7 @@ m4spnwnc                        // Spin-A-Win (Concept)
 m4spnwnc__a                     //
 m4spnwnc__b                     //
 
-//@source:mpu4crystal.inc
+@source:mpu4crystal.cpp
 m4aladn                         // Aladdin's Cave (Crystal)
 m4aladna                        //
 m4aladnb                        //
@@ -22522,7 +22538,7 @@ m4twstrd                        //
 m4tylb                          // Thank Your Lucky Bars (Crystal)
 m4tylba                         //
 
-//@source:mpu4empire.inc
+@source:mpu4empire.cpp
 m4apachg                        // Apache Gold (Empire)
 m4apachga                       //
 m4apachgb                       //
@@ -22605,7 +22621,7 @@ m4ttrail                        // Treasure Trail (Empire)
 m4ttraila                       //
 m4ttrailb                       //
 
-//@source:mpu4mdm.inc
+@source:mpu4mdm.cpp
 m42punlm                        // 2p Unlimited (Mdm)
 m4bigapl                        // The Big Apple (Mdm)
 m4bigapla                       //
@@ -22651,7 +22667,7 @@ m4themob                        // The Mob (Mdm)
 m4themoba                       //
 m4themobb                       //
 
-//@source:mpu4misc.inc
+@source:mpu4misc.cpp
 m4bangin                        // Bangin' Away (Global)
 m4bangina                       //
 m4banginb                       //
@@ -22790,7 +22806,7 @@ m4wwc                           // Wacky Weekend Club (Global)
 m4wwca                          //
 m4wwcb                          //
 
-//@source:mpu4mod2sw.inc
+@source:mpu4mod2sw.cpp
 m421                            // Twenty One (Barcrest)
 m421club                        // 21 Club (Barcrest)
 m4actbnka                       //
@@ -23035,7 +23051,7 @@ m4wayin                         // Way In (Barcrest)
 m4wayina                        //
 m4wildms                        // Wild Mystery (Barcrest)
 
-//@source:mpu4mod4yam.inc
+@source:mpu4mod4yam.cpp
 m4acechs                        // Ace Chase (Bwb)
 m4acechs__a                     //
 m4acechs__b                     //
@@ -23319,7 +23335,7 @@ m4vivalv__y                     //
 m4vivalv__z                     //
 m4voodoo                        // Voodoo 1000 (Barcrest)
 
-//@source:mpu4sw.inc
+@source:mpu4sw.cpp
 m4actbnk                        // Action Bank (Barcrest)
 m4actbnk__a                     //
 m4actbnk__b                     //
@@ -26698,7 +26714,7 @@ m4wta__x                        //
 m4wta__y                        //
 m4wta__z                        //
 
-//@source:mpu4union.inc
+@source:mpu4union.cpp
 m4crzbn                         // Crazy Bingo
 m4cwalk                         // Cake Walk (Union)
 m4eezee                         // Eezee Fruits (Union)
@@ -28230,6 +28246,7 @@ ncv1j                           // (c) 1995 (Japan)
 ncv1j2                          // (c) 1995 (Japan)
 ncv2                            // (c) 1996
 ncv2j                           // (c) 1996 (Japan)
+abcheck							// (c) 1996 (Japan)
 
 @source:namcops2.cpp
 bldyr3b                         //
@@ -29371,6 +29388,7 @@ mc_8x6ss
 mc_sam60
 vgtablet
 gprnrs1
+gprnrs16
 
 @source:newbrain.cpp
 newbrain                        //
@@ -29729,6 +29747,7 @@ opwolf                          // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfa                         // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfb                         // bootleg
 opwolfj                         // B20 (c) 1987 Taito Corporation (Japan)
+opwolfjsc                       // B20 (c) 1987 Taito Corporation (Japan)
 opwolfu                         // B20 (c) 1987 Taito America Corporation (US)
 opwolfp                         // prototype?
 
@@ -31100,7 +31119,7 @@ pitagjr                         // Pitagorin Junior
 @source:pitnrun.cpp
 pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
-jumpkun							// prototype
+jumpkun                         // prototype
 
 @source:pk8000.cpp
 hobby                           //
@@ -31492,7 +31511,7 @@ powerins                        // (c) 1993 Atlus (USA)
 powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsj                       // (c) 1993 Atlus (Japan)
-powerinsp						// prototype
+powerinsp                       // prototype
 
 @source:pp01.cpp
 pp01                            //
@@ -32212,7 +32231,7 @@ rollace2                        // (c) 1983 Williams
 rotaryf                         //
 
 @source:ron.cpp
-ron2							// (c) 1981 Sanritsu
+ron2                            // (c) 1981 Sanritsu
 
 @source:roul.cpp
 roul                            // (c) 1990
@@ -34761,14 +34780,19 @@ tomcatsw                        // (proto)          (c) 1983
 
 @source:statriv2.cpp
 bigcsino                        // (c) 1984 Status Games
-cstripxi                        // (c) 1981 Status Games
+cstrip                          // (c) 1984 Status Games
+cstripix                        // (c) 1985 Status Games
+cstripviii                      // (c) 1985 Status Games
+cstripxi                        // (c) 1988 Status Games
 funcsino                        // (c) 1981 Status Games
 hangman                         // (c) 1984 Status Games
+nsupertr3                       // (c) 1988 Status Games
 quaquiz2                        // (c) 1985 Status Games
 sextriv                         // (c) 1985 Status Games
 statriv2                        // (c) 1984 Status Games
 statriv2v                       // (c) 1984 Status Games
 statriv4                        // (c) 1985 Status Games
+statriv5se                      // (c) 1985 Status Games
 statusbj                        // (c) 1981 Status Games
 supertr                         // (c) 1986 Status Games
 supertr2                        // (c) 1986 Status Games
@@ -35876,6 +35900,7 @@ rygar3                          // 6002 - (c) 1986 Tecmo
 rygarj                          // 6002 - (c) 1986 Tecmo
 silkworm                        // 6217 - (c) 1988 Tecmo
 silkwormj                       // 6217 - (c) 1988 Tecmo
+silkwormp                       // 6217 - (c) 1988 Tecmo
 
 @source:tecmo16.cpp
 fstarfrc                        // (c) 1992 Tecmo

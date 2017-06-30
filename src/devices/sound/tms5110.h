@@ -65,14 +65,13 @@ public:
 	// it is not related at all to the speech generation and conflicts with the new ROM controller interface.
 	DECLARE_READ_LINE_MEMBER( romclk_hack_r );
 
-	void set_frequency(int frequency);
-
 protected:
 	tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

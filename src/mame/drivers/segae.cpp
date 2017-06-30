@@ -418,9 +418,6 @@ WRITE8_MEMBER(systeme_state::bank_write)
 
 WRITE8_MEMBER(systeme_state::coin_counters_write)
 {
-	if (data == 0xff)
-		return;
-
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
 	machine().output().set_lamp_value(0, BIT(data, 2)); // used only by hangonjr?
@@ -963,6 +960,7 @@ static MACHINE_CONFIG_START( systeme )
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(systeme_state, coin_counters_write))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \

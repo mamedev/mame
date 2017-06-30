@@ -195,7 +195,7 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 			{
 				m_ym2151->reset();
 				m_tms5220->reset();
-				m_tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / 11);
+				m_tms5220->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / 11);
 				m_ym2151->set_output_gain(ALL_OUTPUTS, 0.0f);
 				m_pokey->set_output_gain(ALL_OUTPUTS, 0.0f);
 				m_tms5220->set_output_gain(ALL_OUTPUTS, 0.0f);
@@ -249,7 +249,7 @@ WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
 
 		case 3: /* speech squeak, bit D7 */
 			data = 5 | ((data >> 6) & 2);
-			m_tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
+			m_tms5220->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / (16 - data));
 			break;
 	}
 }

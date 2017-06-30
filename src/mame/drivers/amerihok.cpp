@@ -11,11 +11,12 @@ U10- 27C020
 
 12 MHz crystal
 
-Processor is unknown
+Processor is a ROMless MCU from the Z8 family.
 
 */
 
 #include "emu.h"
+#include "cpu/z8/z8.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
 
@@ -25,14 +26,18 @@ class amerihok_state : public driver_device
 public:
 	amerihok_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//  ,m_maincpu(*this, "maincpu")
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//  required_device<mcs51_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 };
+
+static ADDRESS_MAP_START(amerihok_map, AS_PROGRAM, 8, amerihok_state)
+	AM_RANGE(0x0000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( amerihok )
 INPUT_PORTS_END
@@ -51,10 +56,9 @@ void amerihok_state::machine_reset()
 static MACHINE_CONFIG_START( amerihok )
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_CPU_PROGRAM_MAP(amerihok_map)
-//  MCFG_CPU_IO_MAP(amerihok_io)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", amerihok_state,  irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z8601, 8000000) // unknown clock; type definitely wrong
+	MCFG_CPU_PROGRAM_MAP(amerihok_map)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", amerihok_state,  irq4_line_hold)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

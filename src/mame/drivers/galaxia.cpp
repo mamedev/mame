@@ -334,6 +334,7 @@ static MACHINE_CONFIG_START( astrowar )
 	MCFG_CPU_IO_MAP(galaxia_io_map)
 	MCFG_CPU_DATA_MAP(galaxia_data_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state, galaxia_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
 
 	/* video hardware */

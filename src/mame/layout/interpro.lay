@@ -4,7 +4,7 @@ license:CC0
 copyright-holders:Patrick Mackinlay
 Intergraph InterPro 2x00 layout.
 
-For now, this is only used to display the (internal) diagnostic 7-segment LED. In the future, it 
+For now, this is only used to display the (internal) diagnostic 7-segment LED. In the future, it
 should be expanded to handle the monitor(s), system unit power/disk lights, and keyboard.
 -->
 <mamelayout version="2">
@@ -18,8 +18,8 @@ should be expanded to handle the monitor(s), system unit power/disk lights, and 
 		<bezel name="digit0" element="digit">
 			<bounds x="850" y="0" width="40" height="50" />
 		</bezel>
-    <screen index="0">
-      <bounds x="0" y="0" width="800" height="600" />
-    </screen>
+	<screen index="0">
+	  <bounds x="0" y="0" width="800" height="600" />
+	</screen>
   </view>
 </mamelayout>

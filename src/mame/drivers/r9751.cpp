@@ -56,6 +56,7 @@
 #include "machine/wd33c93.h"
 
 #include "machine/pdc.h"
+#include "machine/smioc.h"
 #include "softlist.h"
 
 #define TERMINAL_TAG "terminal"
@@ -77,6 +78,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pdc(*this, "pdc"),
+		m_smioc(*this, "smioc"),
 		m_wd33c93(*this, "wd33c93"),
 		m_terminal(*this, TERMINAL_TAG),
 		m_main_ram(*this, "main_ram")
@@ -102,6 +104,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
+	required_device<smioc_device> m_smioc;
 	required_device<wd33c93_device> m_wd33c93;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint32_t> m_main_ram;
@@ -557,6 +560,9 @@ static MACHINE_CONFIG_START( r9751 )
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(r9751_state, kbd_put))
+
+	/* i/o hardware */
+	MCFG_DEVICE_ADD("smioc", SMIOC, 0)
 
 	/* disk hardware */
 	MCFG_DEVICE_ADD("pdc", PDC, 0)

@@ -68,7 +68,7 @@ WRITE8_MEMBER(pitnrun_state::scroll_w)
 	m_scroll = (m_scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
 	m_bg->set_scrollx(0, m_scroll);
 }
- 
+
 WRITE8_MEMBER(pitnrun_state::scroll_y_w)
 {
 	m_bg->set_scrolly(0, data);

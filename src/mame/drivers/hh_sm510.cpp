@@ -1,25 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Sean Riddle
+// thanks-to:Igor
 /***************************************************************************
 
-  Sharp SM510/SM511 handhelds.
+  Sharp SM5xx family handhelds.
 
   TODO:
-  - improve svg layout for gnw_jr55, gnw_mw56
+  - improve svg screen for gnw_mc25, gnw_eg26, gnw_jr55, gnw_mw56, exospace
   - svg lcd screen background/foreground (not supported in core),
     or should it be for external artwork only?
-  - flickering segments, lcd physics? or screen update timing?
-    * ktmnt: "LIMIT" segment when going underwater on level 1
-    * gnw_dj101: cage and clock before you start the game
-    * gnw_mw56: truck boxes while playing
+  - confirm gnw_mc25/gnw_eg26 rom (dumped from Soviet clone, but pretty confident that it's same)
 
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "cpu/sm510/sm510.h"
+#include "cpu/sm510/sm500.h"
 #include "sound/spkrdev.h"
-
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -28,6 +25,7 @@
 #include "gnw_dualv.lh"
 #include "gnw_dualh.lh"
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
+//#include "hh_sm500_test.lh" // "
 
 
 class hh_sm510_state : public driver_device
@@ -38,7 +36,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
-		m_inp_lines(0)
+		m_inp_lines(0),
+		m_display_wait(33)
 	{ }
 
 	// devices
@@ -47,20 +46,33 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	u16 m_inp_mux;                 // multiplexed inputs mask
-	int m_inp_lines;               // number of input mux columns
-	u8 m_lcd_output_cache[0x100];
-
+	u16 m_inp_mux;                  // multiplexed inputs mask
+	int m_inp_lines;                // number of input mux columns
+	
 	u8 read_inputs(int columns);
 
 	virtual void update_k_line();
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
+	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
+	virtual DECLARE_WRITE8_MEMBER(sm500_lcd_segment_w);
 	virtual DECLARE_READ8_MEMBER(input_r);
 	virtual DECLARE_WRITE8_MEMBER(input_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);
-	virtual DECLARE_WRITE16_MEMBER(lcd_segment_w);
+	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
+
+	// display common
+	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 33ms)
+	u8 m_display_x_len;             // lcd number of groups
+	u8 m_display_y_len;             // lcd number of segments
+	u8 m_display_z_len;             // lcd number of commons
+	u32 m_display_state[0x20];      // lcd segment data (max. 5-bit offset)
+	u8 m_display_decay[0x20][0x20]; // (internal use)
+	u8 m_display_cache[0x20][0x20]; // (internal use)
+
+	void set_display_size(u8 x, u8 y, u8 z);
+	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 
 protected:
 	virtual void machine_start() override;
@@ -75,12 +87,22 @@ void hh_sm510_state::machine_start()
 	// zerofill
 	m_inp_mux = 0;
 	/* m_inp_lines = 0; */ // not here
-	memset(m_lcd_output_cache, ~0, sizeof(m_lcd_output_cache));
+	m_display_x_len = 0;
+	m_display_y_len = 0;
+	m_display_z_len = 0;
+	memset(m_display_state, 0, sizeof(m_display_state));
+	memset(m_display_decay, 0, sizeof(m_display_decay));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_lines));
-	/* save_item(NAME(m_lcd_output_cache)); */ // don't save!
+	save_item(NAME(m_display_x_len));
+	save_item(NAME(m_display_y_len));
+	save_item(NAME(m_display_z_len));
+	save_item(NAME(m_display_state));
+	save_item(NAME(m_display_decay));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 }
 
 void hh_sm510_state::machine_reset()
@@ -96,27 +118,68 @@ void hh_sm510_state::machine_reset()
 ***************************************************************************/
 
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
+// deflicker here, especially needed for SM500/SM5A with the active shift register
 
-WRITE16_MEMBER(hh_sm510_state::lcd_segment_w)
+TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 {
-	for (int seg = 0; seg < 0x10; seg++)
+	u8 z_mask = (1 << m_display_z_len) - 1;
+	u8 zx_len = 1 << (m_display_x_len + m_display_z_len);
+	
+	for (int zx = 0; zx < zx_len; zx++)
 	{
-		int index = offset << 4 | seg;
-		u8 state = data >> seg & 1;
-
-		if (state != m_lcd_output_cache[index])
+		for (int y = 0; y < m_display_y_len; y++)
 		{
-			// output to row.seg.H, where:
-			// row = row a/b/bs/c (0/1/2/3)
-			// seg = seg 1-16 (0-15)
-			// H = H1-H4 (0-3)
-			char buf[0x10];
-			sprintf(buf, "%d.%d.%d", offset >> 2, seg, offset & 3);
-			output().set_value(buf, state);
+			// delay lcd segment on/off state
+			if (m_display_state[zx] >> y & 1)
+			{
+				if (m_display_decay[y][zx] < (2 * m_display_wait - 1))
+					m_display_decay[y][zx]++;
+			}
+			else if (m_display_decay[y][zx] > 0)
+				m_display_decay[y][zx]--;
+			u8 active_state = (m_display_decay[y][zx] < m_display_wait) ? 0 : 1;
 
-			m_lcd_output_cache[index] = state;
+			if (active_state != m_display_cache[y][zx])
+			{
+				// SM510 series: output to x.y.z, where:
+				// x = group a/b/bs/c (0/1/2/3)
+				// y = segment 1-16 (0-15)
+				// z = common H1-H4 (0-3)
+
+				// SM500 series: output to x.y.z, where:
+				// x = O group (0-*)
+				// y = O segment 1-4 (0-3)
+				// z = common H1/H2 (0/1)
+				char buf[0x10];
+				sprintf(buf, "%d.%d.%d", zx >> m_display_z_len, y, zx & z_mask);
+				output().set_value(buf, active_state);
+				
+				m_display_cache[y][zx] = active_state;
+			}
 		}
 	}
+}
+
+void hh_sm510_state::set_display_size(u8 x, u8 y, u8 z)
+{
+	// x = groups(in bits)
+	// y = number of segments per group
+	// z = commons(in bits)
+	m_display_x_len = x;
+	m_display_y_len = y;
+	m_display_z_len = z;
+}
+
+WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
+{
+	set_display_size(2, 16, 2);
+	m_display_state[offset] = data;
+}
+
+WRITE8_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
+{
+	set_display_size(4, 4, 1);
+	m_display_state[offset] = data;
 }
 
 
@@ -177,6 +240,13 @@ WRITE8_MEMBER(hh_sm510_state::piezo_r2_w)
 	m_speaker->level_w(data >> 1 & 1);
 }
 
+WRITE8_MEMBER(hh_sm510_state::piezo_input_w)
+{
+	// R1 to piezo, other to input mux
+	piezo_r1_w(space, 0, data & 1);
+	input_w(space, 0, data >> 1);
+}
+
 
 
 
@@ -232,7 +302,7 @@ static MACHINE_CONFIG_START( ktopgun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -242,6 +312,8 @@ static MACHINE_CONFIG_START( ktopgun )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1611, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1611-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -301,7 +373,7 @@ static MACHINE_CONFIG_START( kcontra )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -311,6 +383,8 @@ static MACHINE_CONFIG_START( kcontra )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1501, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1501-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -369,7 +443,7 @@ static MACHINE_CONFIG_START( ktmnt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -379,6 +453,8 @@ static MACHINE_CONFIG_START( ktmnt )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1380, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1380-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -396,7 +472,7 @@ MACHINE_CONFIG_END
   Konami Gradius
   * PCB label BH004
   * Sharp SM511 under epoxy (die label KMS73B, KMS774)
-  
+
   Known in Japan as Nemesis.
 
 ***************************************************************************/
@@ -434,7 +510,7 @@ static MACHINE_CONFIG_START( kgradius )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -444,6 +520,8 @@ static MACHINE_CONFIG_START( kgradius )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1435, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1435-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -497,7 +575,7 @@ static MACHINE_CONFIG_START( kloneran )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -507,12 +585,133 @@ static MACHINE_CONFIG_START( kloneran )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1495, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1495-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
+  * Sharp SM5A label ?
+
+  MC-25 and EG-26 are the same game, it's assumed that the latter was for
+  regions where Nintendo wasn't able to license from Disney.
+
+  In 1984, Elektronika(USSR) released a clone: Nu, pogodi! This was followed
+  by several other titles that were the same under the hood, only differing
+  in graphics. They also made a slightly modified version, adding a new game
+  mode (by pressing A+B) where the player/CPU roles are reversed. This version
+  is known as Razvedciki kosmosa (export version: Explorers of Space).
+
+***************************************************************************/
+
+class mc25_state : public hh_sm510_state
+{
+public:
+	mc25_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+};
+
+// config
+
+static INPUT_PORTS_START( mc25 )
+	PORT_START("IN.0")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND, only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( exospace )
+	PORT_INCLUDE( mc25 )
+
+	PORT_MODIFY("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mc25 )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM5A, XTAL_32_768kHz)
+	MCFG_SM500_WRITE_O_CB(WRITE8(hh_sm510_state, sm500_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_input_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1711, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1711-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( eg26, mc25 )
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(1694, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1694-1, 0, 1080-1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nupogodi, mc25 )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", KB1013VK12, XTAL_32_768kHz)
+	MCFG_SM500_WRITE_O_CB(WRITE8(hh_sm510_state, sm500_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_input_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(1724, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1724-1, 0, 1080-1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( exospace, nupogodi )
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(1756, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1756-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
 
@@ -554,16 +753,22 @@ static INPUT_PORTS_START( dm53 )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( dm53 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r2_w))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
@@ -576,6 +781,7 @@ static MACHINE_CONFIG_START( dm53 )
 	MCFG_SCREEN_SIZE(1920/2, 1219/2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1219/2-1)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
 	/* sound hardware */
@@ -627,16 +833,22 @@ static INPUT_PORTS_START( jr55 )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( jr55 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
@@ -649,6 +861,7 @@ static MACHINE_CONFIG_START( jr55 )
 	MCFG_SCREEN_SIZE(1920/2, 1261/2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1261/2-1)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
 	/* sound hardware */
@@ -696,16 +909,28 @@ static INPUT_PORTS_START( mw56 )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mw56 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen_left", "svg_left")
@@ -718,6 +943,7 @@ static MACHINE_CONFIG_START( mw56 )
 	MCFG_SCREEN_SIZE(2079/2, 1440/2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 2079/2-1, 0, 1440/2-1)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualh)
 
 	/* sound hardware */
@@ -734,7 +960,7 @@ MACHINE_CONFIG_END
 
   Nintendo Game & Watch: Donkey Kong Jr. (model DJ-101)
   * Sharp SM510 label DJ-101 52ZA (no decap)
-  
+
   This is the new wide screen version, there's also a tabletop version that
   plays more like the arcade game.
 
@@ -771,22 +997,36 @@ static INPUT_PORTS_START( dj101 )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( dj101 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1665, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1665-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -803,7 +1043,7 @@ MACHINE_CONFIG_END
 
   Nintendo Game & Watch: Mario's Cement Factory (model ML-102)
   * Sharp SM510 label ML-102 298D (die label CMS54C, KMS577)
-  
+
   This is the new wide screen version, there's also a tabletop version.
 
 ***************************************************************************/
@@ -835,22 +1075,36 @@ static INPUT_PORTS_START( ml102 )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ml102 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1759, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1759-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -921,22 +1175,36 @@ static INPUT_PORTS_START( bx301 )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( bx301 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 529)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 529-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -1012,6 +1280,39 @@ ROM_START( kloneran )
 ROM_END
 
 
+ROM_START( gnw_mc25 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
+
+	ROM_REGION( 100018, "svg", 0)
+	ROM_LOAD( "gnw_mc25.svg", 0, 100018, CRC(bcd01de3) SHA1(2c7a9da248f96ac11e794a46942a3e420d1e854b) )
+ROM_END
+
+ROM_START( gnw_eg26 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
+
+	ROM_REGION( 100529, "svg", 0)
+	ROM_LOAD( "gnw_eg26.svg", 0, 100529, CRC(055c6b47) SHA1(66f78cd705bc982e92c950a7bd685c681c52a5e7) )
+ROM_END
+
+ROM_START( nupogodi )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 123824, "svg", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 123824, CRC(fc1ccab0) SHA1(ef81b5119a62dc68486db85a19ac9db5ef01778e) )
+ROM_END
+
+ROM_START( exospace )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "exospace.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
+
+	ROM_REGION( 63114, "svg", 0)
+	ROM_LOAD( "exospace.svg", 0, 63114, CRC(64a24c67) SHA1(54c77615a748e44c8c6217583c7567a152dcf21f) )
+ROM_END
+
+
 ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm-53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
@@ -1079,16 +1380,23 @@ ROM_END
 
 
 
-//    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1989, ktopgun,   0,      0, ktopgun,   ktopgun,   ktopgun_state,  0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kcontra,   0,      0, kcontra,   kcontra,   kcontra_state,  0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktmnt,     0,      0, ktmnt,     ktmnt,     ktmnt_state,    0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kgradius,  0,      0, kgradius,  kgradius,  kgradius_state, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kloneran,  0,      0, kloneran,  kloneran,  kloneran_state, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   ktopgun_state,  0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kcontra,   0,        0, kcontra,   kcontra,   kcontra_state,  0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     ktmnt_state,    0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kgradius,  0,        0, kgradius,  kgradius,  kgradius_state, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kloneran,  0,        0, kloneran,  kloneran,  kloneran_state, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gnw_dm53,  0,      0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_jr55,  0,      0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_mw56,  0,      0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gnw_dj101, 0,      0, dj101,     dj101,     dj101_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_ml102, 0,      0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, gnw_bx301, 0,      0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_mc25,  0,        0, mc25,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_eg26,  gnw_mc25, 0, eg26,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, nupogodi,  gnw_mc25, 0, nupogodi,  mc25,      mc25_state,     0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, exospace,  gnw_mc25, 0, exospace,  exospace,  mc25_state,     0, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1982, gnw_dm53,  0,        0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_jr55,  0,        0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_mw56,  0,        0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1982, gnw_dj101, 0,        0, dj101,     dj101,     dj101_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_ml102, 0,        0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )

@@ -78,10 +78,15 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 
 READ8_MEMBER(docastle_state::inputs_flipscreen_r)
 {
+	// inputs pass through LS244 non-inverting buffer
+	uint8_t buf = (m_inp[1]->read_h(space, 0) << 4) | m_inp[0]->read_h(space, 0);
+
+	// LS273 latches address bits on rising edge of address decode
 	flip_screen_set(BIT(offset, 7));
-	m_inp1->write_s(space, 0, offset & 7);
-	m_inp2->write_s(space, 0, offset & 7);
-	return (m_inp2->read_h(space, 0) << 4) | m_inp1->read_h(space, 0);
+	m_inp[0]->write_s(space, 0, offset & 7);
+	m_inp[1]->write_s(space, 0, offset & 7);
+
+	return buf;
 }
 
 WRITE8_MEMBER(docastle_state::flipscreen_w)

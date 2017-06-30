@@ -728,7 +728,7 @@ WRITE8_MEMBER(x68k_state::x68k_ct_w)
 
 	m_adpcm.clock = data & 0x02;
 	x68k_set_adpcm();
-	m_okim6258->set_clock(data & 0x02 ? 4000000 : 8000000);
+	m_okim6258->set_unscaled_clock(data & 0x02 ? 4000000 : 8000000);
 }
 
 /*
