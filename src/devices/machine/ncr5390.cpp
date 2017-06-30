@@ -7,11 +7,12 @@
 #define DELAY_HACK
 
 DEFINE_DEVICE_TYPE(NCR5390, ncr5390_device, "ncr5390", "NCR 5390 SCSI")
+DEFINE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device, "ncr53c90a", "NCR 53C90A SCSI")
 DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 SCSI")
 
 DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(tcount_lo_r, tcount_lo_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(tcount_hi_r, tcount_hi_w)
+	AM_RANGE(0x0, 0x0) AM_READWRITE(tcounter_lo_r, tcount_lo_w)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(tcounter_hi_r, tcount_hi_w)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(fifo_r, fifo_w)
 	AM_RANGE(0x3, 0x3) AM_READWRITE(command_r, command_w)
 	AM_RANGE(0x4, 0x4) AM_READWRITE(status_r, bus_id_w)
@@ -19,22 +20,19 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 	AM_RANGE(0x6, 0x6) AM_READWRITE(seq_step_r, sync_period_w)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(fifo_flags_r, sync_offset_w)
 	AM_RANGE(0x8, 0x8) AM_READWRITE(conf_r, conf_w)
+	AM_RANGE(0xa, 0xa) AM_WRITE(test_w)
 	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, ncr53c94_device)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(tcount_lo_r, tcount_lo_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(tcount_hi_r, tcount_hi_w)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(fifo_r, fifo_w)
-	AM_RANGE(0x3, 0x3) AM_READWRITE(command_r, command_w)
-	AM_RANGE(0x4, 0x4) AM_READWRITE(status_r, bus_id_w)
-	AM_RANGE(0x5, 0x5) AM_READWRITE(istatus_r, timeout_w)
-	AM_RANGE(0x6, 0x6) AM_READWRITE(seq_step_r, sync_period_w)
-	AM_RANGE(0x7, 0x7) AM_READWRITE(fifo_flags_r, sync_offset_w)
-	AM_RANGE(0x8, 0x8) AM_READWRITE(conf_r, conf_w)
-	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
-	AM_RANGE(0xa, 0xa) AM_WRITE(test_w)
+DEVICE_ADDRESS_MAP_START(map, 8, ncr53c90a_device)
+	AM_INHERIT_FROM(ncr5390_device::map)
+
 	AM_RANGE(0xb, 0xb) AM_READWRITE(conf2_r, conf2_w)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START(map, 8, ncr53c94_device)
+	AM_INHERIT_FROM(ncr53c90a_device::map)
+
 	AM_RANGE(0xc, 0xc) AM_READWRITE(conf3_r, conf3_w)
 	AM_RANGE(0xf, 0xf) AM_WRITE(fifo_align_w)
 ADDRESS_MAP_END
@@ -42,9 +40,15 @@ ADDRESS_MAP_END
 ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
-	, select_timeout(0), seq(0), tcount(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false)
+	, select_timeout(0), seq(0), tcount(0), tcounter(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false), test_mode(false)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
+{
+}
+
+ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ncr5390_device(mconfig, type, tag, owner, clock)
+	, config2(0)
 {
 }
 
@@ -53,10 +57,13 @@ ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ncr53c90a_device(mconfig, NCR53C90A, tag, owner, clock)
+{
+}
+
 ncr53c94_device::ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ncr5390_device(mconfig, NCR53C94, tag, owner, clock)
-	, test_mode(false)
-	, config2(0)
+	: ncr53c90a_device(mconfig, NCR53C94, tag, owner, clock)
 	, config3(0)
 {
 }
@@ -77,6 +84,7 @@ void ncr5390_device::device_start()
 	save_item(NAME(seq));
 	save_item(NAME(fifo));
 	save_item(NAME(tcount));
+	save_item(NAME(tcounter));
 	save_item(NAME(mode));
 	save_item(NAME(fifo_pos));
 	save_item(NAME(command_pos));
@@ -86,11 +94,13 @@ void ncr5390_device::device_start()
 	save_item(NAME(dma_dir));
 	save_item(NAME(irq));
 	save_item(NAME(drq));
+	save_item(NAME(test_mode));
 
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 
 	tcount = 0;
+	tcounter = 0;
 	config = 0;
 	status = 0;
 	bus_id = 0;
@@ -121,6 +131,7 @@ void ncr5390_device::reset_soft()
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	status &= 0xef;
 	drq = false;
+	test_mode = false;
 	m_drq_handler(drq);
 	reset_disconnect();
 }
@@ -410,17 +421,26 @@ void ncr5390_device::step(bool timeout)
 	case INIT_XFR:
 		switch(xfr_phase) {
 		case S_PHASE_DATA_OUT:
-			dma_set(DMA_OUT);
-			if(tcount == 0 && fifo_pos == 1)
-				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+		case S_PHASE_COMMAND:
+		case S_PHASE_MSG_OUT:
+			dma_set(dma_command ? DMA_OUT : DMA_NONE);
 			state = INIT_XFR_SEND_BYTE;
+
+			// if it's the last message byte, deassert ATN before sending
+			if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command && fifo_pos == 1) || (dma_command && tcounter == 1)))
+				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+
 			send_byte();
 			break;
 
 		case S_PHASE_DATA_IN:
-			dma_set(DMA_IN);
-			state = tcount == fifo_pos+1 ?
-				INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
+		case S_PHASE_STATUS:
+		case S_PHASE_MSG_IN:
+			dma_set(dma_command ? DMA_IN : DMA_NONE);
+
+			// if it's the last message byte, ACK remains asserted, terminate with function_complete()
+			state =	(xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)) ? INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
+
 			recv_byte();
 			break;
 
@@ -435,20 +455,24 @@ void ncr5390_device::step(bool timeout)
 		if(!(ctrl & S_REQ))
 			break;
 
-		if((ctrl & S_PHASE_MASK) != xfr_phase) {
-			command_pos = 0;
+		// check for command complete
+		if ((dma_command && tcounter == 0 && fifo_pos == 0)                 // dma in/out: transfer counter == 0 and fifo empty
+		|| (!dma_command && (xfr_phase & S_INP) == 0 && fifo_pos == 0)      // non-dma out: fifo empty
+		|| (!dma_command && (xfr_phase & S_INP) == S_INP && fifo_pos == 1)) // non-dma in: every byte
 			bus_complete();
-		} else {
-			state = INIT_XFR;
-			step(false);
-		}
+		else
+			// check for phase change
+			if((ctrl & S_PHASE_MASK) != xfr_phase) {
+				command_pos = 0;
+				bus_complete();
+			} else {
+				state = INIT_XFR;
+				step(false);
+			}
 		break;
 
 	case INIT_XFR_SEND_BYTE:
-		if(tcount == 0 && fifo_pos == 0)
-			bus_complete();
-		else
-			state = INIT_XFR_WAIT_REQ;
+		state = INIT_XFR_WAIT_REQ;
 		break;
 
 	case INIT_XFR_RECV_BYTE_ACK:
@@ -474,8 +498,8 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case INIT_XFR_SEND_PAD:
-		tcount--;
-		if(tcount) {
+		tcounter--;
+		if(tcounter) {
 			state = INIT_XFR_SEND_PAD_WAIT_REQ;
 			step(false);
 		} else
@@ -496,8 +520,8 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case INIT_XFR_RECV_PAD:
-		tcount--;
-		if(tcount) {
+		tcounter--;
+		if(tcounter) {
 			state = INIT_XFR_RECV_PAD_WAIT_REQ;
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 			step(false);
@@ -575,10 +599,10 @@ void ncr5390_device::delay_cycles(int cycles)
 	tm->adjust(clocks_to_attotime(cycles));
 }
 
-READ8_MEMBER(ncr5390_device::tcount_lo_r)
+READ8_MEMBER(ncr5390_device::tcounter_lo_r)
 {
-	logerror("%s: tcount_lo_r %02x (%s)\n", tag(), tcount & 0xff, machine().describe_context());
-	return tcount;
+	logerror("%s: tcounter_lo_r %02x (%s)\n", tag(), tcounter & 0xff, machine().describe_context());
+	return tcounter;
 }
 
 WRITE8_MEMBER(ncr5390_device::tcount_lo_w)
@@ -588,10 +612,10 @@ WRITE8_MEMBER(ncr5390_device::tcount_lo_w)
 	logerror("%s: tcount_lo_w %02x (%s)\n", tag(), data, machine().describe_context());
 }
 
-READ8_MEMBER(ncr5390_device::tcount_hi_r)
+READ8_MEMBER(ncr5390_device::tcounter_hi_r)
 {
-	logerror("%s: tcount_hi_r %02x (%s)\n", tag(), tcount >> 8, machine().describe_context());
-	return tcount >> 8;
+	logerror("%s: tcounter_hi_r %02x (%s)\n", tag(), tcounter >> 8, machine().describe_context());
+	return tcounter >> 8;
 }
 
 WRITE8_MEMBER(ncr5390_device::tcount_hi_w)
@@ -606,7 +630,7 @@ uint8_t ncr5390_device::fifo_pop()
 	uint8_t r = fifo[0];
 	fifo_pos--;
 	memmove(fifo, fifo+1, fifo_pos);
-	if((!fifo_pos) && tcount && dma_dir == DMA_OUT)
+	if((!fifo_pos) && tcounter && dma_dir == DMA_OUT)
 		drq_set();
 	return r;
 }
@@ -676,6 +700,11 @@ void ncr5390_device::start_command()
 		return;
 	}
 
+	// for dma commands, reload transfer counter
+	dma_command = command[0] & 0x80;
+	if (dma_command)
+		tcounter = tcount;
+
 	switch(c) {
 	case CM_NOP:
 		command_pop_and_chain();
@@ -728,6 +757,12 @@ void ncr5390_device::start_command()
 
 	case CI_MSG_ACCEPT:
 		state = INIT_MSG_WAIT_REQ;
+		// It's undocumented what the sequence register should contain after a message accept
+		// command, but the InterPro boot code expects it to be non-zero; setting it to an
+		// arbirary 1 here makes InterPro happy. Also in the InterPro case (perhaps typical),
+		// after ACK is asserted the device disconnects and the INIT_MSG_WAIT_REQ state is never
+		// entered, meaning we end up with I_DISCONNECT instead of I_BUS interrupt status.
+		seq = 1;
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		step(false);
 		break;
@@ -847,6 +882,16 @@ WRITE8_MEMBER(ncr5390_device::conf_w)
 {
 	config = data;
 	scsi_id = data & 7;
+
+	// test mode can only be cleared by hard/soft reset
+	if (data & 0x8)
+		test_mode = true;
+}
+
+WRITE8_MEMBER(ncr5390_device::test_w)
+{
+	if (test_mode)
+		logerror("%s: test_w %d (%s) - test mode not implemented\n", tag(), data, machine().describe_context());
 }
 
 WRITE8_MEMBER(ncr5390_device::clock_w)
@@ -857,15 +902,15 @@ WRITE8_MEMBER(ncr5390_device::clock_w)
 void ncr5390_device::dma_set(int dir)
 {
 	dma_dir = dir;
-	if(dma_dir == DMA_OUT && fifo_pos != 16 && tcount != 0)
+	if(dma_dir == DMA_OUT && fifo_pos != 16 && tcounter != 0)
 		drq_set();
 }
 
 void ncr5390_device::dma_w(uint8_t val)
 {
 	fifo_push(val);
-	tcount--;
-	if(fifo_pos == 16 || tcount == 0)
+	tcounter--;
+	if(fifo_pos == 16 || tcounter == 0)
 		drq_clear();
 }
 
@@ -874,8 +919,8 @@ uint8_t ncr5390_device::dma_r()
 	uint8_t r = fifo_pop();
 	if(!fifo_pos)
 		drq_clear();
-	tcount--;
-	if(tcount == 0) {
+	tcounter--;
+	if(tcounter == 0) {
 		status |= S_TC0;
 		step(false);
 	}
@@ -898,39 +943,64 @@ void ncr5390_device::drq_clear()
 	}
 }
 
-void ncr53c94_device::device_start()
-{
-	save_item(NAME(test_mode));
-	save_item(NAME(config2));
-	save_item(NAME(config3));
+/*
+ * According to the NCR 53C90A, 53C90B data book (http://bitsavers.informatik.uni-stuttgart.de/pdf/ncr/scsi/NCR53C90ab.pdf),
+ * the following are the differences from the 53C90:
+ *
+ *   - Supports three-byte message exchange SCSI-2 tagged queueing
+ *   - Added select with ATN3 command
+ *   - Added target DMA abort command
+ *   - Added interrupt polling bit
+ *   - Added second configuration register
+ *   - Improved immunity to cable impedance mismatches and improper termination
+ *   - Tri-state DMA request output
+ *   - Cut leakage current on SCSI input pins when powered off
+ *   - Relaxed register timings
+ *   - Relaxed DMA timings
+ *   - Relaxed CLK duty cycle
+ *   - Lengthened read data access time
+ *   - NOP required less often
+ */
 
-	test_mode = false;
+void ncr53c90a_device::device_start()
+{
+	save_item(NAME(config2));
+
 	config2 = 0;
-	config3 = 0;
 
 	ncr5390_device::device_start();
 }
 
-void ncr53c94_device::reset_soft()
+void ncr53c90a_device::reset_soft()
 {
-	test_mode = false;
 	config2 = 0;
-	config3 = 0;
 
 	ncr5390_device::reset_soft();
 }
 
-WRITE8_MEMBER(ncr53c94_device::conf_w)
+READ8_MEMBER(ncr53c90a_device::status_r)
 {
-	ncr5390_device::conf_w(space, offset, data, mem_mask);
-
-	// test mode can only be cleared by hard/soft reset
-	if (data & 0x8)
-		test_mode = true;
+	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint8_t res = (irq ? S_INTERRUPT : 0) | status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
+	logerror("%s: status_r %02x (%s)\n", tag(), res, machine().describe_context());
+	if (irq)
+		status &= ~(S_GROSS_ERROR | S_PARITY | S_TCC);
+	return res;
 }
 
-WRITE8_MEMBER(ncr53c94_device::test_w)
+
+void ncr53c94_device::device_start()
 {
-	if (test_mode)
-		logerror("%s: test_w %d (%s) - test mode not implemented\n", tag(), data, machine().describe_context());
+	save_item(NAME(config3));
+
+	config3 = 0;
+
+	ncr53c90a_device::device_start();
+}
+
+void ncr53c94_device::reset_soft()
+{
+	config3 = 0;
+
+	ncr53c90a_device::reset_soft();
 }
