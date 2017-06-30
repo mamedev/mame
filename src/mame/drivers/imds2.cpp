@@ -903,7 +903,7 @@ ROM_START(imds2)
 		// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
 		// available.
 		ROM_REGION(0x400 , "iocpio" , 0)
-		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b))
+		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b) SHA1(9b9333a9dc9585aa8f630721d13e551a5c87defc))
 
 		// ROM definition of keyboard controller (8741)
 		ROM_REGION(0x400 , "kbcpu" , 0)
