@@ -13,6 +13,10 @@ public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram"),
+			m_layer_disable(0),
+			m_back_gfx_bank(0),
+			m_fore_gfx_bank(0),
+			m_mid_gfx_bank(0),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_seibu_sound(*this, "seibu_sound"),
