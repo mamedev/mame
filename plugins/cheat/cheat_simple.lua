@@ -9,6 +9,7 @@
 -- gg for game genie -- nes, snes, megadriv, gamegear, gameboy
 -- ar for action replay -- nes, snes, megadriv, gamegear, sms
 --
+-- use "^" as description to link to previous cheat
 -- set name is <softlist>/<entry> like "nes/smb" for softlist items
 -- Don't use commas in the description
 
