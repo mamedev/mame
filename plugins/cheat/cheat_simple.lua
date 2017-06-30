@@ -1,5 +1,5 @@
 -- converter for simple cheats
--- simple cheats are single address every frame ram, rom or gg,ar cheats in one file called cheat.simple
+-- simple cheats are single/linked address every frame ram, rom or gg,ar cheats in one file called cheat.simple
 --
 -- ram/rom cheat format:  <set name>,<cputag|regiontag>,<hex offset>,<b|w|d|q - size>,<hex value>,<desc>
 -- only program address space is supported, comments are prepended with ;
@@ -22,10 +22,30 @@ function simple.filename(name)
 end
 
 local codefuncs = {}
+local currcheat
 
 local function prepare_rom_cheat(desc, region, addr, val, size, banksize, comp)
-	local cheat = { desc = desc, region = { rom = region } }
-	cheat.script = { off = "if on then rom:write_u" .. size .. "(addr, save) end" }
+	local cheat
+	if desc:sub(1,1) ~= "^" then
+		currcheat = { desc = desc, region = { rom = region } }
+		currcheat.script = { off = string.format([[
+			if on then
+				for k, v in pairs(addrs) do
+					rom:write_u%d(v.addr, v.save)
+				end
+			end]], size),
+			on = string.format([[
+			addrs = {
+			--flag
+			}
+			on = true
+			for k, v in pairs(addrs) do
+				v.save = rom:read_u%d(v.addr)
+				rom:write_u%d(v.addr, v.val)
+			end]], size, size) }
+		cheat = currcheat
+
+	end
 	if banksize and comp then
 		local rom = manager:machine():memory().regions[region]
 		local bankaddr = addr & (banksize - 1)
@@ -43,17 +63,17 @@ local function prepare_rom_cheat(desc, region, addr, val, size, banksize, comp)
 			error("rom cheat compare value not found " .. desc)
 		end
 	end
-	cheat.script.on = string.format([[
-				on = true
-				addr = %d
-				save = rom:read_u%d(addr)
-				rom:write_u%d(addr, %d)]], addr, size, size, val)
+	currcheat.script.on = currcheat.script.on:gsub("%-%-flag", string.format("{addr = %d, val = %d},\n--flag", addr, val), 1)
 	return cheat
 end
 
 local function prepare_ram_cheat(desc, tag, addr, val, size)
-	local cheat = { desc = desc, space = { cpup = { tag = tag, type = "program" } } }
-	cheat.script = { run = "cpup:write_u" .. size .. "(" .. addr .. "," .. val .. ", true)" }
+	local cheat
+	if desc:sub(1,1) ~= "^" then
+		currcheat = { desc = desc, space = { cpup = { tag = tag, type = "program" } }, script = { run = "" } }
+		cheat = currcheat
+	end
+	currcheat.script.run = currcheat.script.run .. " cpup:write_u" .. size .. "(" .. addr .. "," .. val .. ", true)"
 	return cheat
 end
 
@@ -292,6 +312,7 @@ function simple.conv_cheat(data)
 			end
 		end
 	end
+	currcheat = nil
 	return cheats
 end
 
