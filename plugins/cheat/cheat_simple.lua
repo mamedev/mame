@@ -75,7 +75,7 @@ function codefuncs.nes_gg(desc, code)
 	elseif #code == 8 then
 		addr = ((value >> 12) & 7) | ((value >> 16) & 0x78) | ((value >> 20) & 0x80) | (value & 0x700) | ((value >> 4) & 0x7800)
 		newval = ((value >> 28) & 7) | (value & 8) | ((value >> 20) & 0x70) | ((value >> 24) & 0x80)
-		comp = ((value >> 4) & 7) | ((value >> 8) & 8) | ((value << 4) & 0x70) | ((value << 1) & 0x80)
+		comp = ((value >> 4) & 7) | ((value >> 8) & 8) | ((value << 4) & 0x70) | (value & 0x80)
 		-- assume 8K banks, 32K also common but is an easy multiple of 8K
 		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp)
 	else
