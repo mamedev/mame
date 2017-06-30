@@ -332,8 +332,8 @@ public:
 	DECLARE_READ16_MEMBER(spc_infifo_data_r);
 	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
 	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
-	DECLARE_DRIVER_INIT(dectalk);
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	void dectalk_outfifo_check ();
 	void dectalk_clear_all_fifos(  );
@@ -468,6 +468,13 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 	m_tlc_dtmf = 0; // TODO
 	m_duart_inport = 0xF;
 	m_duart_outport = 0;
+}
+
+void dectalk_state::machine_start()
+{
+	dectalk_clear_all_fifos();
+	m_simulate_outfifo_error = 0;
+	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }
 
 void dectalk_state::machine_reset()
@@ -856,14 +863,6 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	    duart68681_rx_break(duart, 1, 0);*/
 }
 
-/* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT_MEMBER(dectalk_state,dectalk)
-{
-	dectalk_clear_all_fifos();
-	m_simulate_outfifo_error = 0;
-	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
-}
-
 static MACHINE_CONFIG_START( dectalk )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
@@ -1011,4 +1010,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING )
+COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING )
