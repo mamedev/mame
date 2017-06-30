@@ -366,6 +366,9 @@ GFXDECODE_END
 static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 
 	// address pointers
+	AM_RANGE( 0,  0) AM_READWRITE(pattern_name_table_y_r,pattern_name_table_y_w)
+	AM_RANGE( 1,  1) AM_READWRITE(pattern_name_table_x_r,pattern_name_table_x_w)
+	
 	AM_RANGE( 3,  3) AM_READWRITE(sprite_address_r,sprite_address_w)
 	AM_RANGE( 4,  4) AM_READWRITE(scroll_address_r,scroll_address_w)
 	AM_RANGE( 5,  5) AM_READWRITE(palette_address_r,palette_address_w)
@@ -1328,23 +1331,21 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 READ8_MEMBER( ygv608_device::pattern_name_table_r )
 {
 	int pn = 0;
-	uint8_t xTile = m_regs.s.r1 & r1_pnx;
-	uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 	switch (p0_state_r)
 	{
 		case 0:
 			/* Are we reading from plane B? */
-			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_regs.s.r0 & r0_b_a))
+			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_plane_select_access == true))
 				pattern_name_base_r = ((m_page_y << m_pny_shift) << m_bits16);
 
 			/* read character from ram */
-			pn = pattern_name_base_r + (((yTile << m_pny_shift) + xTile) << m_bits16);
+			pn = pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
 			break;
 
 		case 1:
 			/* read character from ram */
-			pn = pattern_name_base_r + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
+			pn = pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
 			break;
 	}
 
@@ -1358,7 +1359,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 			pn, m_regs.s.r7 & r7_md, m_regs.s.r8 & r8_pgs,
 			m_page_x, m_page_y,
 			pattern_name_base_r,
-			xTile, yTile, m_pny_shift,
+			m_xtile_ptr, m_ytile_ptr, m_pny_shift,
 			m_bits16 );
 		pn = 0;
 	}
@@ -1369,40 +1370,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 
 	if (p0_state_r == 2)
 	{
-		if (m_regs.s.r0 & r0_pnya)
-		{
-			if (yTile++ == (m_page_y - 1))
-			{
-				yTile = 0;
-				if (xTile++ == (m_page_x - 1))
-				{
-					xTile = 0;
-					// we're now off this tile plane, toggle planes
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
-		else if (m_regs.s.r1 & r1_pnxa)
-		{
-			if (xTile++ == (m_page_x - 1))
-			{
-				xTile = 0;
-				if (yTile++ == (m_page_y - 1))
-				{
-					yTile = 0;
-					// we're now off this tile plane, toggle planes
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
+		pattern_name_autoinc_check();
 		p0_state_r = 0;
 		pattern_name_base_r = 0;
 	}
@@ -1503,23 +1471,21 @@ READ8_MEMBER( ygv608_device::system_control_r )
 WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 {
 	int pn = 0;
-	uint8_t xTile = m_regs.s.r1 & r1_pnx;
-	uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 	switch (p0_state_w)
 	{
 		case 0:
 			/* Are we reading from plane B? */
-			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_regs.s.r0 & r0_b_a))
+			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_plane_select_access == true))
 				pattern_name_base_w = ((m_page_y << m_pny_shift) << m_bits16);
 
 			/* read character from ram */
-			pn = pattern_name_base_w + (((yTile << m_pny_shift) + xTile) << m_bits16);
+			pn = pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
 			break;
 
 		case 1:
 			/* read character from ram */
-			pn = pattern_name_base_w + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
+			pn = pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
 			break;
 	}
 
@@ -1533,7 +1499,7 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 			pn, m_regs.s.r7 & r7_md, m_regs.s.r8 & r8_pgs,
 			m_page_x, m_page_y,
 			pattern_name_base_w,
-			xTile, yTile, m_pny_shift,
+			m_xtile_ptr, m_ytile_ptr, m_pny_shift,
 			m_bits16 );
 		pn = 0;
 	}
@@ -1546,42 +1512,47 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 
 	if (p0_state_w == 2)
 	{
-		if (m_regs.s.r0 & r0_pnya)
-		{
-			if (yTile++ == (m_page_y - 1))
-			{
-				yTile = 0;
-				if (xTile++ == (m_page_x - 1))
-				{
-					xTile = 0;
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
-		else if (m_regs.s.r1 & r1_pnxa)
-		{
-			if (xTile++ == (m_page_x - 1))
-			{
-				xTile = 0;
-				if (yTile++ == (m_page_y - 1))
-				{
-					yTile = 0;
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
+		pattern_name_autoinc_check();
 		p0_state_w = 0;
 		pattern_name_base_w = 0;
 	}
+}
 
+inline void ygv608_device::pattern_name_autoinc_check()
+{
+	uint8_t xTile = m_xtile_ptr;
+	uint8_t yTile = m_ytile_ptr;
+
+	if (m_ytile_autoinc == true)
+	{
+		// we are incrementing in Y direction
+		if (yTile++ == (m_page_y - 1))
+		{
+			yTile = 0;
+			if (xTile++ == (m_page_x - 1))
+			{
+				xTile = 0;
+				m_plane_select_access ^= 1; // flip A/B plane
+			}
+		}
+		m_ytile_ptr = yTile;
+		m_xtile_ptr = xTile;
+	}
+	else if (m_xtile_autoinc == true)
+	{
+		// we are incrementing in X direction
+		if (xTile++ == (m_page_x - 1))
+		{
+			xTile = 0;
+			if (yTile++ == (m_page_y - 1))
+			{
+				yTile = 0;
+				m_plane_select_access ^= 1; // flip A/B plane
+			}
+		}
+		m_ytile_ptr = yTile;
+		m_xtile_ptr = xTile;
+	}
 }
 
 // P#1W - sprite data port
@@ -1776,6 +1747,42 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
  *
  ****************************************/
 
+ // R#0R - Pattern Name Table Access pointer Y
+READ8_MEMBER( ygv608_device::pattern_name_table_y_r )
+{
+	return ((m_xtile_autoinc == true) << 7) | ((m_plane_select_access == true) << 6) | m_xtile_ptr;
+}
+
+ // R#0W - Pattern Name Table Access pointer Y
+WRITE8_MEMBER( ygv608_device::pattern_name_table_y_w )
+{
+	m_ytile_ptr = data & 0x3f;
+	//if (yTile >= m_page_y)
+	//	logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine().describe_context(),
+	//		yTile, m_page_y );
+	m_ytile_ptr &= m_page_y -1;
+	m_ytile_autoinc = BIT(data,7); 
+	m_plane_select_access = BIT(data,6);
+}
+
+ // R#1R - Pattern Name Table Access pointer X
+READ8_MEMBER( ygv608_device::pattern_name_table_x_r )
+{
+	return ((m_xtile_autoinc == true) << 7) | m_xtile_ptr;
+}
+
+ // R#1W - Pattern Name Table Access pointer X
+WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
+{
+	m_xtile_ptr = data & 0x3f;
+	//if (xTile >= m_page_x)
+	//	logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine().describe_context(),
+	//		xTile, m_page_x );
+	m_xtile_ptr &= m_page_x -1;
+	m_xtile_autoinc = BIT(data,7); 
+}
+
+ 
 // R#3R - sprite attribute table access pointer
 READ8_MEMBER( ygv608_device::sprite_address_r )
 {
@@ -2111,39 +2118,12 @@ void ygv608_device::SetPreShortcuts( int reg, int data )
 
 // Set any "short-cut" variables after we have updated the YGV608 registers
 // - these are used only in optimisation of the emulation
-
+// TODO: actually this is legacy code that needs to go away
 void ygv608_device::SetPostShortcuts(int reg )
 {
 
 	switch (reg)
 	{
-	case 0:
-	{
-		uint8_t yTile = m_regs.s.r0 & r0_pny;
-
-		if (yTile >= m_page_y)
-		logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine().describe_context(),
-			yTile, m_page_y );
-		yTile &= (m_page_y - 1);
-		m_regs.s.r0 &= ~r0_pny;
-		m_regs.s.r0 |= yTile;
-	}
-	break;
-
-	case 1:
-	{
-		uint8_t xTile = m_regs.s.r1 & r1_pnx;
-
-		if (xTile >= m_page_x)
-		logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine().describe_context(),
-			xTile, m_page_x );
-		xTile &= (m_page_x - 1);
-		m_regs.s.r1 &= ~r1_pnx;
-		m_regs.s.r1 |= xTile;
-	}
-	break;
-
-
 
 	case 7:
 		m_na8_mask = ((m_regs.s.r7 & r7_flip) ? 0x03 : 0x0f );
@@ -2218,7 +2198,7 @@ void ygv608_device::ShowYGV608Registers()
 		"\tR#00: $%02X : PNYA(%d),B/A(%c),PNY(%d)\n",
 		m_regs.b[0],
 		m_regs.s.r0 & r0_pnya,
-		((m_regs.s.r0 & r0_b_a) ? 'B' : 'A' ),
+		((m_plane_select_access == true) ? 'B' : 'A' ),
 		m_regs.s.r0 & r0_pny);
 
 	logerror(
