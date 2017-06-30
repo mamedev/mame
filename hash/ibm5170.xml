@@ -1188,6 +1188,18 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="pcdos405v">
+		<description>IBM Personal Computer DOS (Version J4.05/V) (Japanese)</description>
+		<year>1990</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<!-- converted from name="DOS405V.DDI" size="1128960" crc="2a5e4089" sha1="9845e15010889f2f2dbee8a3faf37f13766743cc" -->
+				<rom name="dos405v.img" size="1228800" crc="1127683f" sha1="a6988935b93b7c2403140aad4f51e42f2733a8d5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos61">
 		<description>IBM DOS (Version 6.1)</description>
 		<year>1993</year>
@@ -1572,6 +1584,67 @@ Missing files come here
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1884160">
 				<rom name="Disk05en-GB.xdf" size="1884160" crc="f16ee7c7" sha1="0324ce2ff00f08ff582a1f81dafb7d0b859a46f0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos70jaau" supported="no">
+		<description>PC DOS 7.00A/V Update (Japanese)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="J7.00A/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01.img" size="1474560" crc="d13e5b29" sha1="0ccb7a4ddb0a2405eb3012b6564ea27394422e36" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk02.img" size="1474560" crc="cfc0372f" sha1="65997b0bf6b88cea92d8a8ed4d212543889f7f18" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos70jabu" supported="no">
+		<description>PC DOS 7.00B/V Update (Japanese)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="J7.00B/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01.img" size="1474560" crc="2b80c78a" sha1="91a8f4c9b8c79d9fddc96309a41dbcc867271bb9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk02.img" size="1474560" crc="6882daea" sha1="dcf3b3e98717c112e69cae5738169068c6eaeb85" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk03.img" size="1474560" crc="1e8af204" sha1="a0d1f88a4f4a07df11004b3783e62d3be3fccaa2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos70jacu" supported="no">
+		<description>PC DOS 7.00C/V Update (Japanese)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="J7.00C/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01.img" size="1474560" crc="6325f1dd" sha1="8ce2ff548841ec655493b90353de7868c68e7355" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk02.img" size="1474560" crc="9f44b8a7" sha1="b30646ce4b96d95db3a64c5168de23986c759f1f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk03.img" size="1474560" crc="15a43440" sha1="70b387dd45a58a5b70d2979f7f425ba67b7508e6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1966,6 +2039,43 @@ Missing files come here
 			<feature name="part_id" value="Supplemental" />
 			<dataarea name="flop" size="1474560">
 				<rom name="supplemental.img" size="1474560" crc="23e03482" sha1="3fac12de77cafdea28a68793b597410a594506f8" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos62v" cloneof="msdos62" supported="no">
+		<description>MS-DOS (Version 6.2/V) (Japanese)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="6.2/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1v.img" size="1474560" crc="5827f2b3" sha1="d625f629b3302cff83ec34bab3a3d02d2f133a04" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk2v.img" size="1474560" crc="dd60e0ef" sha1="c9612d65d9b15e8b432ce50797d8f502845cb77a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk3v.img" size="1474560" crc="275f622f" sha1="3dff00f6e08f2cdafc99c0b9ba5769a675bc5731" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk4v.img" size="1474560" crc="e0be2d2f" sha1="866b288ab0f844c0fa6260aa05204541449c39ea" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk5v.img" size="1474560" crc="3ff5cdba" sha1="15c5e5d9165bcd33ea9238b2dd4cb2a5a51d100e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk6v.img" size="1474560" crc="8c4c0ac7" sha1="a56ec288e014bc2d2d9c06a10e9a69eaced811fb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5443,6 +5553,32 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="b17">
+		<description>B-17 Flying Fortress</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B-17 Flying Fortress (1992)(MicroProse)(Disk 1 of 4).dsk" size="1474560" crc="5520ba43" sha1="f9667ee9e1bb355eea027fe1b7bce0c3b8d70e85" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B-17 Flying Fortress (1992)(MicroProse)(Disk 2 of 4).dsk" size="1474560" crc="d6133a8f" sha1="52ca52b88bf4f37bc1c2fc6d29fbc726fbe98013" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B-17 Flying Fortress (1992)(MicroProse)(Disk 3 of 4).dsk" size="1474560" crc="ccedd1f0" sha1="fb7ad5f0c3a02dc96e17b888143dde8c0fb6b5e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B-17 Flying Fortress (1992)(MicroProse)(Disk 4 of 4).dsk" size="1474560" crc="cc028485" sha1="68ade93d34ae98167d1fe25f237f17328e847a76" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bibadv">
 		<description>Bible Adventures</description>
 		<year>1992</year>
@@ -5478,6 +5614,17 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Bio Menace (USA) (v.1.1) (Disk 2).img" size="1474560" crc="33d83897" sha1="7ef3a391ce171c344ec50a5968d50b5754e512cb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bodyblow">
+		<description>Body Blows</description>
+		<year>1993</year>
+		<publisher>Team 17</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Body Blows (1993)(Team 17)[cp manual].dsk" size="1474560" crc="c0b04cc0" sha1="08219a0cb4ce9d6a0766bb1d1820bc1e25876178" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6185,7 +6332,7 @@ Missing files come here
 	<software name="eschell">
 		<description>Escape From Hell</description>
 		<year>1990</year>
-		<publisher>Electronic Arts, Inc.</publisher>
+		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="disk1.img" size="368640" crc="74856caa" sha1="fab7f8e551bcf735952b95237d2531e6d1bbb645" offset="0" />

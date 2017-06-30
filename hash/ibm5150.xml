@@ -5344,6 +5344,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="batlches">
+		<description>Battle Chess</description>
+		<year>1988</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (1988)(Interplay)(Disk 1 of 2)[cp codebook].dsk" size="737280" crc="21763440" sha1="680ebdcd55b52910df9bd92792f12df5e80d9412" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (1988)(Interplay)(Disk 2 of 2)[cp codebook].dsk" size="737280" crc="8c0a720f" sha1="9a0b9b8adda97a65da4b2a1490c31f605dfef4a8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bivouac">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>Bivouac</description>
@@ -5352,6 +5368,28 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "377856">
 				<rom name="[PC] Bivouac [5.25].img" size="377856" crc="d2ec2072" sha1="997e1a26d0f8207f91a839ce0e63a88a7976a73e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bladestl">
+		<description>Blades of Steel</description>
+		<year>1990</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Blades of Steel (1990)(Konami).dsk" size="737280" crc="9e2ecf8b" sha1="9339e576516b1f36a93a9fb7c0e9c8b3e1f7dabb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdashkit" supported="no">
+		<description>Boulder Dash Construction Kit</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Boulder Dash Construction Kit (1987)(Epyx).dsk" size="368640" crc="7edab8e9" sha1="d2654da37cedc62e723bc516f6b8aa04698faaee" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5410,6 +5448,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Cartooners In Space.bin" size="368640" crc="e7246370" sha1="3e9a1c70ab677b8d0c48853f7d10ccf09b6dc7e4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvania">
+		<description>Castlevania</description>
+		<year>1990</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="CastleVania (1990)(Konami).dsk" size="737280" crc="85d15847" sha1="31d2fae8cd7036c73500c31812b6c7abf2733b08" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5682,6 +5731,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="earlweav">
+		<description>Earl Weaver Baseball</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Mirage Graphics" />
+		<info name="version" value="1.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="338802" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Earl Weaver Baseball [Electronic Arts] [1989] [3.5].img" size="737280" crc="8fa1a0bf" sha1="70f584be42d2b7687b0c24f4d7f11e8e27ed1def" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ferrarf1">
 		<description>Ferrari Formula One</description>
 		<year>1989</year>
@@ -5802,6 +5865,30 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunboat [Accolade] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5c82a583" sha1="1f627bce038f342ae5554d18718f8e9e4428c4c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardbal2">
+		<description>Hardball 2</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Hardball 2 [Accolade] [1989] [5.25] [1].img" size="368640" crc="9fa0cbd1" sha1="049fa2adfd77f47f0c64e75874bdd769c2653a9e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Hardball 2 [Accolade] [1989] [5.25] [2].img" size="368640" crc="566ac0a8" sha1="206f75810db32bc33c570f4bd199ed180ee467b0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Hardball 2 [Accolade] [1989] [5.25] [Data].img" size="368640" crc="4add75f6" sha1="bc58b7c0dfda0fe94d0f84f75b0a8fa8c1ec46b9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5946,6 +6033,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="madden">
+		<description>John Madden Football</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="347102" />
+			<dataarea name="flop" size = "737280">
+				<rom name="John Madden Football [Electronic Arts] [1989] [3.5].img" size="737280" crc="6d70c5cd" sha1="9acae820477eda9606487eacfb2c1aa2a3e20a68" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jordbird">
 		<description>Jordan vs. Bird: One on One</description>
 		<year>1988</year>
@@ -6082,6 +6181,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="lakecelt">
+		<description>Lakers vs Celtics and the NBA Playoffs</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="361302" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Lakers Versus Celtics [Electronic Arts] [1989] [3.5].img" size="737280" crc="250b9754" sha1="ddabfc228055d876ba249407235ac7fe3b2b5d1c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lasrsurg">
 		<description>Laser Surgeon - The Microscopic Mission</description>
 		<year>1987</year>
@@ -6180,6 +6291,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="The Lurking Horror [1987] [5.25] [1 of 1].img" size="368640" crc="4dbd2ab2" sha1="175a7890f776f93c1b7ef6f0a3bc8afc4b634cc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mortviel">
+		<description>Le Manoir de Mortevielle</description>
+		<year>1988</year>
+		<publisher>Lankhor</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Le Manoir de Mortevielle [5.25].img" size="368640" crc="4eebc049" sha1="1f9a8fe4978b76bf14c674a8f681c58e18fa4443" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6697,7 +6819,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="tetris35">
+	<software name="tetris35" cloneof="tetris">
 		<description>Tetris (3.5")</description>
 		<year>1987</year>
 		<publisher>Spectrum Holobyte</publisher>
