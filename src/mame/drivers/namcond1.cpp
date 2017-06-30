@@ -306,12 +306,15 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xc00010, 0xc00011) AM_NOP
 	AM_RANGE(0xc00030, 0xc00031) AM_NOP
 	AM_RANGE(0xc00040, 0xc00041) AM_NOP
+	AM_RANGE(0xffff1a, 0xffff1b) AM_NOP 	// abcheck
+	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP		// ^
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 16, namcond1_state )
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
 	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
+	AM_RANGE(0x14, 0x17) AM_READNOP 		// abcheck
 ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)

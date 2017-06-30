@@ -169,6 +169,7 @@ enum {
 };
 
 
+// TODO: move these into enums
 // R#7(md)
 #define MD_2PLANE_8BIT      0x00
 #define MD_2PLANE_16BIT     0x02
@@ -203,8 +204,8 @@ enum {
 #define PTS_MASK          0xc0
 
 // R#10
-#define SPAS_SPRITESIZE    0
-#define SPAS_SPRITEREVERSE 1
+#define SPAS_SPRITESIZE    false
+#define SPAS_SPRITEREVERSE true
 
 // R#10(spas)=1
 #define SZ_8X8            0x00
@@ -366,11 +367,18 @@ GFXDECODE_END
 static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 
 	// address pointers
+	AM_RANGE( 0,  0) AM_READWRITE(pattern_name_table_y_r,pattern_name_table_y_w)
+	AM_RANGE( 1,  1) AM_READWRITE(pattern_name_table_x_r,pattern_name_table_x_w)
+	
 	AM_RANGE( 3,  3) AM_READWRITE(sprite_address_r,sprite_address_w)
 	AM_RANGE( 4,  4) AM_READWRITE(scroll_address_r,scroll_address_w)
 	AM_RANGE( 5,  5) AM_READWRITE(palette_address_r,palette_address_w)
 	AM_RANGE( 6,  6) AM_READWRITE(sprite_bank_r,sprite_bank_w)
 	
+	// screen control	
+	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_mosaic_sprite_r, screen_ctrl_mosaic_sprite_w)
+	
+	AM_RANGE(13, 13) AM_WRITE(border_color_w)
 	// interrupt section
 	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w) 
 	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
@@ -960,8 +968,8 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int i;
 
 	/* ensure that sprites are enabled */
-	if( ((m_regs.s.r7 & r7_dspe) == 0 ) || (m_regs.s.r10 & r10_sprd))
-	return;
+	if( ((m_regs.s.r7 & r7_dspe) == 0 ) || (m_sprite_disable == true))
+		return;
 
 	/* draw sprites */
 	spriteClip &= cliprect;
@@ -974,10 +982,10 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	sx = ( (int)(sa->attr & 0x02) << 7 ) | (int)sa->sx;
 	sy = ( ( ( (int)(sa->attr & 0x01) << 8 ) | (int)sa->sy ) + 1 ) & 0x1ff;
 	attr = (sa->attr & 0x0c) >> 2;
-	g_attr = (m_regs.s.r10 & r10_spa) >> 6;
+	g_attr = m_sprite_aux_reg & 3;
 	spf = (m_regs.s.r12 & r12_spf) >> 6;
 
-	if ((m_regs.s.r10 & r10_spas) == SPAS_SPRITESIZE )
+	if (m_sprite_aux_mode == SPAS_SPRITESIZE )
 	{
 		size = g_attr;
 		flipx = (attr & SZ_HORIZREVERSE) != 0;
@@ -990,7 +998,8 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		flipy = (g_attr & SZ_VERTREVERSE) != 0;
 	}
 
-	switch( size ) {
+	switch( size ) 
+	{
 	case SZ_8X8 :
 		code = ( (int)m_sprite_bank << 8 ) | (int)sa->sn;
 		if (spf != 0)
@@ -1169,7 +1178,8 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	// clip to the current bitmap
 	finalclip.set(0, screen.width() - 1, 0, screen.height() - 1);
 	finalclip &= cliprect;
-	bitmap.fill(0, visarea );
+	// TODO: black/transparent pen if CBDR is 1 and border color is 0
+	bitmap.fill(m_border_color, visarea );
 
 	// punt if not initialized
 	if (m_page_x == 0 || m_page_y == 0)
@@ -1328,23 +1338,21 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 READ8_MEMBER( ygv608_device::pattern_name_table_r )
 {
 	int pn = 0;
-	uint8_t xTile = m_regs.s.r1 & r1_pnx;
-	uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 	switch (p0_state_r)
 	{
 		case 0:
 			/* Are we reading from plane B? */
-			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_regs.s.r0 & r0_b_a))
+			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_plane_select_access == true))
 				pattern_name_base_r = ((m_page_y << m_pny_shift) << m_bits16);
 
 			/* read character from ram */
-			pn = pattern_name_base_r + (((yTile << m_pny_shift) + xTile) << m_bits16);
+			pn = pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
 			break;
 
 		case 1:
 			/* read character from ram */
-			pn = pattern_name_base_r + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
+			pn = pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
 			break;
 	}
 
@@ -1358,7 +1366,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 			pn, m_regs.s.r7 & r7_md, m_regs.s.r8 & r8_pgs,
 			m_page_x, m_page_y,
 			pattern_name_base_r,
-			xTile, yTile, m_pny_shift,
+			m_xtile_ptr, m_ytile_ptr, m_pny_shift,
 			m_bits16 );
 		pn = 0;
 	}
@@ -1369,40 +1377,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 
 	if (p0_state_r == 2)
 	{
-		if (m_regs.s.r0 & r0_pnya)
-		{
-			if (yTile++ == (m_page_y - 1))
-			{
-				yTile = 0;
-				if (xTile++ == (m_page_x - 1))
-				{
-					xTile = 0;
-					// we're now off this tile plane, toggle planes
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
-		else if (m_regs.s.r1 & r1_pnxa)
-		{
-			if (xTile++ == (m_page_x - 1))
-			{
-				xTile = 0;
-				if (yTile++ == (m_page_y - 1))
-				{
-					yTile = 0;
-					// we're now off this tile plane, toggle planes
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
+		pattern_name_autoinc_check();
 		p0_state_r = 0;
 		pattern_name_base_r = 0;
 	}
@@ -1503,23 +1478,21 @@ READ8_MEMBER( ygv608_device::system_control_r )
 WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 {
 	int pn = 0;
-	uint8_t xTile = m_regs.s.r1 & r1_pnx;
-	uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 	switch (p0_state_w)
 	{
 		case 0:
 			/* Are we reading from plane B? */
-			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_regs.s.r0 & r0_b_a))
+			if (!((m_regs.s.r7 & r7_md) & MD_1PLANE) && (m_plane_select_access == true))
 				pattern_name_base_w = ((m_page_y << m_pny_shift) << m_bits16);
 
 			/* read character from ram */
-			pn = pattern_name_base_w + (((yTile << m_pny_shift) + xTile) << m_bits16);
+			pn = pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
 			break;
 
 		case 1:
 			/* read character from ram */
-			pn = pattern_name_base_w + (((yTile << m_pny_shift) + xTile) << m_bits16) + 1;
+			pn = pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
 			break;
 	}
 
@@ -1533,7 +1506,7 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 			pn, m_regs.s.r7 & r7_md, m_regs.s.r8 & r8_pgs,
 			m_page_x, m_page_y,
 			pattern_name_base_w,
-			xTile, yTile, m_pny_shift,
+			m_xtile_ptr, m_ytile_ptr, m_pny_shift,
 			m_bits16 );
 		pn = 0;
 	}
@@ -1546,42 +1519,47 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 
 	if (p0_state_w == 2)
 	{
-		if (m_regs.s.r0 & r0_pnya)
-		{
-			if (yTile++ == (m_page_y - 1))
-			{
-				yTile = 0;
-				if (xTile++ == (m_page_x - 1))
-				{
-					xTile = 0;
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
-		else if (m_regs.s.r1 & r1_pnxa)
-		{
-			if (xTile++ == (m_page_x - 1))
-			{
-				xTile = 0;
-				if (yTile++ == (m_page_y - 1))
-				{
-					yTile = 0;
-					m_regs.s.r0 ^= r0_b_a;
-				}
-			}
-			m_regs.s.r0 &= ~r0_pny;
-			m_regs.s.r0 |= yTile;
-			m_regs.s.r1 &= ~r1_pnx;
-			m_regs.s.r1 |= xTile;
-		}
+		pattern_name_autoinc_check();
 		p0_state_w = 0;
 		pattern_name_base_w = 0;
 	}
+}
 
+inline void ygv608_device::pattern_name_autoinc_check()
+{
+	uint8_t xTile = m_xtile_ptr;
+	uint8_t yTile = m_ytile_ptr;
+
+	if (m_ytile_autoinc == true)
+	{
+		// we are incrementing in Y direction
+		if (yTile++ == (m_page_y - 1))
+		{
+			yTile = 0;
+			if (xTile++ == (m_page_x - 1))
+			{
+				xTile = 0;
+				m_plane_select_access ^= 1; // flip A/B plane
+			}
+		}
+		m_ytile_ptr = yTile;
+		m_xtile_ptr = xTile;
+	}
+	else if (m_xtile_autoinc == true)
+	{
+		// we are incrementing in X direction
+		if (xTile++ == (m_page_x - 1))
+		{
+			xTile = 0;
+			if (yTile++ == (m_page_y - 1))
+			{
+				yTile = 0;
+				m_plane_select_access ^= 1; // flip A/B plane
+			}
+		}
+		m_ytile_ptr = yTile;
+		m_xtile_ptr = xTile;
+	}
 }
 
 // P#1W - sprite data port
@@ -1614,6 +1592,8 @@ WRITE8_MEMBER( ygv608_device::palette_data_w )
 	if (++m_color_state_w == 3)
 	{
 		m_color_state_w = 0;
+//		if(m_colour_palette[m_palette_address][0] & 0x80) // Transparency designation, none of the Namco games enables it?
+		
 		palette().set_pen_color(m_palette_address,
 			pal6bit( m_colour_palette[m_palette_address][0] ),
 			pal6bit( m_colour_palette[m_palette_address][1] ),
@@ -1776,6 +1756,46 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
  *
  ****************************************/
 
+ // R#0R - Pattern Name Table Access pointer Y
+READ8_MEMBER( ygv608_device::pattern_name_table_y_r )
+{
+	return ((m_xtile_autoinc == true) << 7) | ((m_plane_select_access == true) << 6) | m_xtile_ptr;
+}
+
+ // R#0W - Pattern Name Table Access pointer Y
+WRITE8_MEMBER( ygv608_device::pattern_name_table_y_w )
+{
+	m_ytile_ptr = data & 0x3f;
+	//if (yTile >= m_page_y)
+	//	logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine().describe_context(),
+	//		yTile, m_page_y );
+	m_ytile_ptr &= m_page_y -1;
+	m_ytile_autoinc = BIT(data,7);
+	m_plane_select_access = BIT(data,6);	
+	if(m_ytile_autoinc == true && m_xtile_autoinc == true)
+		logerror("%s: Warning both X/Y Tiles autoinc enabled!\n",this->tag());
+}
+
+ // R#1R - Pattern Name Table Access pointer X
+READ8_MEMBER( ygv608_device::pattern_name_table_x_r )
+{
+	return ((m_xtile_autoinc == true) << 7) | m_xtile_ptr;
+}
+
+ // R#1W - Pattern Name Table Access pointer X
+WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
+{
+	m_xtile_ptr = data & 0x3f;
+	//if (xTile >= m_page_x)
+	//	logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine().describe_context(),
+	//		xTile, m_page_x );
+	m_xtile_ptr &= m_page_x -1;
+	m_xtile_autoinc = BIT(data,7); 
+	if(m_ytile_autoinc == true && m_xtile_autoinc == true)
+		logerror("%s: Warning both X/Y Tiles autoinc enabled!\n",this->tag());
+}
+
+ 
 // R#3R - sprite attribute table access pointer
 READ8_MEMBER( ygv608_device::sprite_address_r )
 {
@@ -1825,6 +1845,33 @@ WRITE8_MEMBER( ygv608_device::sprite_bank_w )
 	m_sprite_bank = data;
 }
  
+ // R#10R - screen control: mosaic & sprite
+READ8_MEMBER( ygv608_device::screen_ctrl_mosaic_sprite_r )
+{
+	return (m_sprite_aux_reg << 6) | ((m_sprite_aux_mode == true) << 5) | ((m_sprite_disable == true) << 4) 
+	                               | (m_mosaic_bplane << 2) | (m_mosaic_aplane & 3);
+} 
+
+// R#10W - screen control: mosaic & sprite
+WRITE8_MEMBER( ygv608_device::screen_ctrl_mosaic_sprite_w )
+{
+	// check mosaic
+	m_mosaic_aplane = data & 3;
+	m_mosaic_bplane = (data & 0xc) >> 2;
+	if(m_mosaic_aplane || m_mosaic_bplane)
+		popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
+
+	m_sprite_disable = BIT(data, 4);
+	m_sprite_aux_mode = BIT(data, 5);
+	m_sprite_aux_reg = (data & 0xc0) >> 6;
+}
+
+// R#13W - border color
+WRITE8_MEMBER( ygv608_device::border_color_w )
+{
+	m_border_color = data;
+}
+
 // R#14R interrupt mask control
 READ8_MEMBER( ygv608_device::irq_mask_r )
 {
@@ -2111,39 +2158,12 @@ void ygv608_device::SetPreShortcuts( int reg, int data )
 
 // Set any "short-cut" variables after we have updated the YGV608 registers
 // - these are used only in optimisation of the emulation
-
+// TODO: actually this is legacy code that needs to go away
 void ygv608_device::SetPostShortcuts(int reg )
 {
 
 	switch (reg)
 	{
-	case 0:
-	{
-		uint8_t yTile = m_regs.s.r0 & r0_pny;
-
-		if (yTile >= m_page_y)
-		logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine().describe_context(),
-			yTile, m_page_y );
-		yTile &= (m_page_y - 1);
-		m_regs.s.r0 &= ~r0_pny;
-		m_regs.s.r0 |= yTile;
-	}
-	break;
-
-	case 1:
-	{
-		uint8_t xTile = m_regs.s.r1 & r1_pnx;
-
-		if (xTile >= m_page_x)
-		logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine().describe_context(),
-			xTile, m_page_x );
-		xTile &= (m_page_x - 1);
-		m_regs.s.r1 &= ~r1_pnx;
-		m_regs.s.r1 |= xTile;
-	}
-	break;
-
-
 
 	case 7:
 		m_na8_mask = ((m_regs.s.r7 & r7_flip) ? 0x03 : 0x0f );
@@ -2218,7 +2238,7 @@ void ygv608_device::ShowYGV608Registers()
 		"\tR#00: $%02X : PNYA(%d),B/A(%c),PNY(%d)\n",
 		m_regs.b[0],
 		m_regs.s.r0 & r0_pnya,
-		((m_regs.s.r0 & r0_b_a) ? 'B' : 'A' ),
+		((m_plane_select_access == true) ? 'B' : 'A' ),
 		m_regs.s.r0 & r0_pny);
 
 	logerror(

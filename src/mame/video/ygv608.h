@@ -42,6 +42,10 @@ public:
 	DECLARE_WRITE8_MEMBER(system_control_w);
 
 	// register section
+	DECLARE_READ8_MEMBER(pattern_name_table_x_r);
+	DECLARE_WRITE8_MEMBER(pattern_name_table_x_w);
+	DECLARE_READ8_MEMBER(pattern_name_table_y_r);
+	DECLARE_WRITE8_MEMBER(pattern_name_table_y_w);
 	DECLARE_READ8_MEMBER(sprite_address_r);
 	DECLARE_WRITE8_MEMBER(sprite_address_w);
 	DECLARE_READ8_MEMBER(scroll_address_r);
@@ -50,6 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_address_w);
 	DECLARE_READ8_MEMBER(sprite_bank_r);
 	DECLARE_WRITE8_MEMBER(sprite_bank_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_mosaic_sprite_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_mosaic_sprite_w);	
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -62,7 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(roz_ay_w);
 	DECLARE_WRITE8_MEMBER(roz_dy_w);
 	DECLARE_WRITE8_MEMBER(roz_dyx_w);
-	
+	DECLARE_WRITE8_MEMBER(border_color_w);
+
 	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);
 
@@ -247,12 +254,12 @@ private:
 	uint8_t m_screen_resize;  // screen requires resize
 	uint8_t m_tilemap_resize; // tilemap requires resize
 	
-	/* These were statically allocated in the r/w routines, looks hackish? */
+	/* These were statically allocated in the r/w routines */
 	int p0_state_r,m_color_state_r;
 	int p0_state_w,m_color_state_w;
 	int pattern_name_base_r,pattern_name_base_w; 	 /* pattern name table base address */
 	
-	// new variable handling starts here
+	// === new variable handling starts here ===
 	uint8_t m_register_address; /**< RN: Register address select */
 	bool m_register_autoinc_r;  /**< RRAI: Register address auto-increment on read */
 	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */
@@ -268,7 +275,19 @@ private:
 	uint8_t m_palette_address;	/**< CC: color palette access pointer */
 	uint8_t m_sprite_address;	/**< SAA: sprite attribute table access pointer */
 	uint8_t m_sprite_bank;		/**< SBA: sprite generator base address (MA20 to MA13) */
-
+	uint8_t m_xtile_ptr;		/**< PNX: X coordinate of pattern space */
+	uint8_t m_ytile_ptr;		/**< PNY: Y coordinate of pattern space */
+	bool m_xtile_autoinc;		/**< PNXA: Permits auto-increment in X coordinate */
+	bool m_ytile_autoinc;		/**< PNXA: Permits auto-increment in Y coordinate */
+	bool m_plane_select_access; /**< B/(A): A/B plane access select */
+	
+	uint8_t m_mosaic_aplane;	/**< MCA: mosaic factor applied to A plane */
+	uint8_t m_mosaic_bplane;	/**< MCA: mosaic factor applied to B plane */
+	bool m_sprite_disable;		/**< SPRD: disables the sprite plane display */
+	bool m_sprite_aux_mode;		/**< SPAS: if 0 aux bits selects size, if 1 selects flipping */
+	uint8_t m_sprite_aux_reg;	/**< SPA: auxiliary bits of sprite attribute table */
+	uint8_t m_border_color;		/**< BDC: border color */
+	
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;
@@ -277,9 +296,10 @@ private:
 	emu_timer					*m_raster_timer;
 	
 	void screen_configure();		/**< Adjust screen parameters based off CRTC ones */
-	attotime raster_sync_offset();	/**< adjust based off raster & CRTC parameters */
-	void vblank_irq_check();
-	void raster_irq_check();
+	attotime raster_sync_offset();	/**< Adjust timing based off raster & CRTC parameters */
+	void vblank_irq_check();		/**< mask + pend check for vblank irq */
+	void raster_irq_check();		/**< mask + pend check for raster irq */
+	void pattern_name_autoinc_check();	/**< check autoinc for tile pointers */
 	
 	enum
 	{

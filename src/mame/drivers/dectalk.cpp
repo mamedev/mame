@@ -135,29 +135,8 @@ DTC-01 LEDs
 *    It will then write currently loaded settings to nvram and execute a store, so do it after the defaults are loaded
 * $1a7ae - default nvram image, without checksum (0x80 bytes)
 *******************************************************************************/
-/*the 68k memory map is such:
-0x000000-0x007fff: E22 low, E8 high
-0x008000-0x00ffff: E21 low, E7 high
-0x010000-0x017fff: E20 low, E6 high
-0x018000-0x01ffff: E19 low, E5 high
-0x020000-0x027fff: E18 low, E4 high
-0x028000-0x02ffff: E17 low, E3 high
-0x030000-0x037fff: E16 low, E2 high
-0x038000-0x03ffff: E15 low, E1 high
-mirrrored at 0x040000-0x07ffff
-ram/nvram/speech mapping:
-0x080000-0x083fff: e36 low, e49 high
-0x084000-0x087fff: e35 low, e48 high
-0x088000-0x08bfff: e34 low, e47 high
-0x08c000-0x08ffff: e33 low, e46 high
-0x090000-0x093fff: e32 low, e45 high
-0x094000-0x097fff: LED/SW/NVR
-0x098000-0x09bfff: 2681 DUART
-0x09c000-0x09ffff: DTMF and TMS32010 (TLC, SPC)
-mirrored at 0x0a0000-0x0fffff x3
-entire space mirrored at 0x100000-0x7fffff
-0x800000-0xffffff is open bus?
 
+/*
 interrupts:
 68k has an interrupt priority decoder attached to it:
 TLC is INT level 4
@@ -332,13 +311,14 @@ public:
 	DECLARE_READ16_MEMBER(spc_infifo_data_r);
 	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
 	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
-	DECLARE_DRIVER_INIT(dectalk);
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
-	void dectalk_outfifo_check ();
-	void dectalk_clear_all_fifos(  );
-	void dectalk_semaphore_w ( uint16_t data );
-	uint16_t dectalk_outfifo_r (  );
+	emu_timer *m_outfifo_read_timer;
+	void dectalk_outfifo_check();
+	void dectalk_clear_all_fifos();
+	void dectalk_semaphore_w(uint16_t data);
+	uint16_t dectalk_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
 protected:
@@ -468,6 +448,33 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 	m_tlc_dtmf = 0; // TODO
 	m_duart_inport = 0xF;
 	m_duart_outport = 0;
+}
+
+void dectalk_state::machine_start()
+{
+	m_outfifo_read_timer = timer_alloc(TIMER_OUTFIFO_READ);
+	m_outfifo_read_timer->adjust(attotime::from_hz(10000));
+	save_item(NAME(m_infifo));
+	save_item(NAME(m_infifo_count));
+	save_item(NAME(m_infifo_tail_ptr));
+	save_item(NAME(m_infifo_head_ptr));
+	save_item(NAME(m_outfifo));
+	save_item(NAME(m_outfifo_count));
+	save_item(NAME(m_outfifo_tail_ptr));
+	save_item(NAME(m_outfifo_head_ptr));
+	save_item(NAME(m_infifo_semaphore));
+	save_item(NAME(m_spc_error_latch));
+	save_item(NAME(m_m68k_spcflags_latch));
+	save_item(NAME(m_m68k_tlcflags_latch));
+	save_item(NAME(m_simulate_outfifo_error));
+	save_item(NAME(m_tlc_tonedetect));
+	save_item(NAME(m_tlc_ringdetect));
+	save_item(NAME(m_tlc_dtmf));
+	save_item(NAME(m_duart_inport));
+	save_item(NAME(m_duart_outport));
+	save_item(NAME(m_hack_self_test));
+	dectalk_clear_all_fifos();
+	m_simulate_outfifo_error = 0;
 }
 
 void dectalk_state::machine_reset()
@@ -756,9 +763,19 @@ READ_LINE_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls7
 Address maps (x = ignored; * = selects address within this range)
 68k address map:
 a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
-0   x   x   x   0   x   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
-0   x   x   x   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  RAM (first 4 chip pairs)
-0   x   x   x   1   x   x   1   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  RAM (last chip pair)
+0   x   x   x   0   x   0   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM a=0:E8, a=1:E22
+0   x   x   x   0   x   0   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM E7,E21
+0   x   x   x   0   x   0   1   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM E6,E20
+0   x   x   x   0   x   0   1   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM E5,E19
+0   x   x   x   0   x   1   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM E4,E18
+0   x   x   x   0   x   1   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM E3,E17
+0   x   x   x   0   x   1   1   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM E2,E16
+0   x   x   x   0   x   1   1   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM E1,E15
+0   x   x   x   1   x   x   0   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   a       RW  RAM E36,E49
+0   x   x   x   1   x   x   0   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   a       RW  RAM E35,E48
+0   x   x   x   1   x   x   0   1   0   *   *   *   *   *   *   *   *   *   *   *   *   *   a       RW  RAM E34,E47
+0   x   x   x   1   x   x   0   1   1   *   *   *   *   *   *   *   *   *   *   *   *   *   a       RW  RAM E33,E46
+0   x   x   x   1   x   x   1   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   a       RW  RAM E32,E45
 0   x   x   x   1   x   x   1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   0       W   Status LED <d7-d0>
 0   x   x   x   1   x   x   1   0   1   x   x   x   x   0   *   *   *   *   *   *   *   *   1       RW  NVRAM (read/write volatile ram, does not store to eeprom)
 0   x   x   x   1   x   x   1   0   1   x   x   x   x   1   *   *   *   *   *   *   *   *   1       RW  NVRAM (all reads do /recall from eeprom, all writes do /store to eeprom)
@@ -767,6 +784,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   0   1   0?      W   SPC fifo write (clocks fifo)
 0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   0   *       RW  TLC flags: ring detect (readonly, d15), ring detected irq enable (readwrite, d14), answer phone (readwrite, d8), tone detected (readonly, d7), tone detected irq enable (readwrite, d6) [see schematic sheet 6]
 0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   1   *       R   TLC tone chip read, reads on bits d0-d7 only, d4-d7 are tied low; d15-d8 are probably open bus
+1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x           OPEN BUS
               |               |               |               |               |
 */
 
@@ -845,7 +863,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
-	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
+	m_outfifo_read_timer->adjust(attotime::from_hz(10000));
 	m_dac->write(data >> 4);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
@@ -854,14 +872,6 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	    duart68681_rx_break(duart, 1, 1);
 	else
 	    duart68681_rx_break(duart, 1, 0);*/
-}
-
-/* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT_MEMBER(dectalk_state,dectalk)
-{
-	dectalk_clear_all_fifos();
-	m_simulate_outfifo_error = 0;
-	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }
 
 static MACHINE_CONFIG_START( dectalk )
@@ -941,13 +951,6 @@ ROM_START( dectalk )
 	ROMX_LOAD("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510106E5" @ E1
 	ROMX_LOAD("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510098E5" @ E15
 
-	/* the undumped 2.0 (beta?) version likely has roms:
-	23-091e5.e22, 23-092e5.e21, 23-093e5.e20, 23-094e5.e19,
-	23-099e5.e8, 23-100e5.e7, 23-101e5.e6, 23-102e5.e5
-	and shares the 23-103e5 thru 106e5, and 095e5 thru 098e5 roms with
-	the 2.0 version above
-	*/
-
 	// DECtalk DTC-01 firmware v1.8 (first half: 05Dec83 tag; second half: 11Oct83 tag), all roms are 27128 eproms
 	ROM_SYSTEM_BIOS( 1, "v18", "DTC-01 Version 1.8")
 	ROMX_LOAD("23-063e5.e8", 0x00000, 0x4000, CRC(9f5ca045) SHA1(1b1b9c1e092c44329b385fb04001e13422eb8d39), ROM_SKIP(1) | ROM_BIOS(2))
@@ -968,18 +971,16 @@ ROM_START( dectalk )
 	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(2))
 
 	ROM_REGION(0x2000,"dsp", 0)
-	// NEWER/final? firmware 'later 2.0'; this firmware DOES WORK.
+	// Final? firmware from 2.0 dectalk firmware units; this firmware clips with the 1.8 dectalk firmware
 	// this firmware seems to have some leftover test garbage mapped into its space, which is not present on the dtc-01 board
-	// it writes 0x0000 to 0x90 on start
-	// it writes a sequence of values to 0xFF down to 0xE9
-	// it wants something readable mapped at 0x08 or else it waits for an interrupt
-	// Is this the same firmware as on the tms320P15 on the dtc-07 or a backported variant of such?
+	// it writes 0x0000 to 0x90 on start, and it writes a sequence of values to 0xFF down to 0xE9
+	// it also wants something readable mapped at 0x08 (for debug purposes?) or else it waits for an interrupt (as the older firmware always does)
 	ROM_LOAD16_BYTE("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18))
 	ROM_LOAD16_BYTE("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43))
-	// DECtalk DTC-01 'klsyn' tms32010 firmware 'earlier 2.0', both proms are 82s191 equivalent; this firmware DOES WORK.
+	// older dsp firmware from earlier dectalk firmware 2.0 units, both proms are 82s191 equivalent; this firmware clips with the 1.8 dectalk firmware
 	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
-	// older dsp firmware from dectalk firmware 1.8; this firmware DOES WORK, and even works with 2.0 dectalk firmware! its a bit quieter than the others, though.
+	// older dsp firmware from dectalk firmware 1.8 units; while this firmware works with 2.0 dectalk firmware, its a bit quieter than the proper one. 
 	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
 	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
 
@@ -1011,4 +1012,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING )
+COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

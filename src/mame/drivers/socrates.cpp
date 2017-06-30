@@ -13,16 +13,15 @@ TODO:
       apparently does away with the melody mode); the chip is running at
       800khz clock/10khz output with between 1 and 4 t6684F vsm roms
       attached; create a sound driver for this!
-    * fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
     * hook up mouse
     * add waitstates for ram access (lack of this causes the system to run
       way too fast)
       This will require some probing with the LA and the fluke to figure out
       how many cycles the waitstates are for for rom/ram/etc access.
     * figure out what bit 6 of the status register actually does; is this an
-      ir mcu flag?
-    * keyboard IR decoder MCU is HLE'd for now, needs decap and cpu core (it
-      is rather tms1000 or CIC-like iirc)
+      ir mcu busy flag?
+    * keyboard IR decoder MCU is HLE'd for now, needs decap and cpu core
+    * iqunlimz keyboard MCU simulation does not handle key repeats
 
 
   Socrates Educational Video System
@@ -44,15 +43,15 @@ TODO:
 
         Banked rom area (4000-7fff) bankswitching
         Bankswitching is achieved by writing to I/O port 0 (mirrored on 1-7)
-    Bank       ROM_REGION        Contents
-    0          0x00000 - 0x03fff System ROM page 0
-    1          0x04000 - 0x07fff System ROM page 1
-    2          0x08000 - 0x0bfff System ROM page 2
+        Bank       ROM_REGION        Contents
+        0          0x00000 - 0x03fff System ROM page 0
+        1          0x04000 - 0x07fff System ROM page 1
+        2          0x08000 - 0x0bfff System ROM page 2
         ... etc ...
-    E          0x38000 - 0x38fff System ROM page E
-    F          0x3c000 - 0x3ffff System ROM page F
-       10          0x40000 - 0x43fff Expansion Cartridge page 0 (cart ROM 0x0000-0x3fff)
-       11          0x44000 - 0x47fff Expansion Cartridge page 1 (cart ROM 0x4000-0x7fff)
+        E          0x38000 - 0x38fff System ROM page E
+        F          0x3c000 - 0x3ffff System ROM page F
+        10         0x40000 - 0x43fff Expansion Cartridge page 0 (cart ROM 0x0000-0x3fff)
+        11         0x44000 - 0x47fff Expansion Cartridge page 1 (cart ROM 0x4000-0x7fff)
         ... etc ...
 
         Banked ram area (z80 0x8000-0xbfff window 0 and z80 0xc000-0xffff window 1)
@@ -99,6 +98,7 @@ class socrates_state : public driver_device
 public:
 	enum
 	{
+		TIMER_KBMCU_SIM,
 		TIMER_CLEAR_SPEECH,
 		TIMER_CLEAR_IRQ
 	};
@@ -114,7 +114,8 @@ public:
 		m_rombank1(*this, "rombank1"),
 		m_rombank2(*this, "rombank2"),
 		m_rambank1(*this, "rambank1"),
-		m_rambank2(*this, "rambank2")
+		m_rambank2(*this, "rambank2"),
+		m_kbdrow(*this, "IN%u", 0)
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
@@ -127,17 +128,18 @@ public:
 	optional_device<address_map_bank_device> m_rombank2; // iqunlimz only
 	required_device<address_map_bank_device> m_rambank1;
 	required_device<address_map_bank_device> m_rambank2;
+	optional_ioport_array<0xC> m_kbdrow;
 
 	rgb_t m_palette_val[256];
 
-	uint8_t m_data[8];
 	uint8_t m_rom_bank[2];
 	uint8_t m_ram_bank;
 	uint16_t m_scroll_offset;
-	uint8_t m_kb_latch_low[2];
-	uint8_t m_kb_latch_high[2];
-	uint8_t m_kb_latch_mouse;
-	uint8_t m_kbmcu_rscount; // how many pokes the kbmcu has taken in the last frame
+	uint16_t m_kb_spi_buffer;
+	bool m_kb_spi_request;
+	uint8_t m_kbmcu_type; // 0 for socrates, 1 for iqunlimz
+	uint16_t m_oldkeyvalue; // previous key pressed
+	uint16_t m_keyrepeat_holdoffcounter; // keyrepeat holdoff countdown
 	uint8_t m_io40_latch; // what was last written to speech reg (for open bus)?
 	uint8_t m_speech_running; // is speech synth talking?
 	uint32_t m_speech_address; // address in speech space
@@ -151,36 +153,47 @@ public:
 	DECLARE_WRITE8_MEMBER(common_ram_bank_w);
 	DECLARE_READ8_MEMBER(socrates_cart_r);
 	DECLARE_READ8_MEMBER(read_f3);
-	DECLARE_WRITE8_MEMBER(kbmcu_strobe);
+	DECLARE_WRITE8_MEMBER(kbmcu_reset);
 	DECLARE_READ8_MEMBER(status_and_speech);
 	DECLARE_WRITE8_MEMBER(speech_command);
-	DECLARE_READ8_MEMBER(socrates_keyboard_low_r);
-	DECLARE_READ8_MEMBER(socrates_keyboard_high_r);
-	DECLARE_WRITE8_MEMBER(socrates_keyboard_clear);
+	DECLARE_READ8_MEMBER(keyboard_buffer_read);
+	DECLARE_WRITE8_MEMBER(keyboard_buffer_update);
+	void kbmcu_sim_reset();
+	void kbmcu_sim_fifo_enqueue(uint16_t data);
+	uint16_t kbmcu_sim_fifo_dequeue();
+	uint16_t kbmcu_sim_fifo_peek();
+	void kbmcu_sim_fifo_head_clear();
 	DECLARE_WRITE8_MEMBER(reset_speech);
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
 	DECLARE_DRIVER_INIT(socrates);
+	DECLARE_DRIVER_INIT(iqunlimz);
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(socrates);
 	uint32_t screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
+	TIMER_CALLBACK_MEMBER(kbmcu_sim_cb);
 	TIMER_CALLBACK_MEMBER(clear_speech_cb);
 	TIMER_CALLBACK_MEMBER(clear_irq_cb);
 	void socrates_update_kb();
 	void socrates_check_kb_latch();
 	rgb_t socrates_create_color(uint8_t color);
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	emu_timer *m_kbmcu_sim_timer;
+	emu_timer *m_clear_speech_timer;
+	emu_timer *m_clear_irq_timer;
 
 	struct
 	{
-		uint8_t   buffer[8];
-		int     head;
-		int     tail;
+		uint16_t   buffer[8];
+		uint8_t    head;
+		uint8_t    tail;
+		uint8_t    count;
 	} m_kb_queue;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -193,8 +206,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( colors_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_clear );
 	DECLARE_READ8_MEMBER( video_regs_r );
 	DECLARE_WRITE8_MEMBER( video_regs_w );
 	DECLARE_READ8_MEMBER( status_r );
@@ -212,81 +223,130 @@ private:
 
 /* Defines */
 
+// number of mcu "full cycles" before key repeat
+#define KEYREPEAT_HOLDOFF 0x1f
+// number of mcu "full cycles" between key repeats
+#define KEYREPEAT_REPEAT 1
+
 /* Components */
 
 /* Devices */
 
-void socrates_state::socrates_update_kb(  )
+/******************************************************************************
+
+Socrates Keyboard MCU simulation
+
+*******************************************************************************
+the tmp50c40 MCU seems to have an 8? word, 12 bit wide internal fifo, which is fed by IR decoded from the 
+remote keyboard. The socrates reads this data out via SPI? by asserting a /cs? bit when keyboard_buffer_update
+is written to.
+the bits are returned in two registers, handled by keyboard_buffer_read
+bits are read out in the following order:
+offset0  offset1
+76543210 76543210
+HHHHMMMM F000LLLL
+where HHHH is the high nybble, MMMM is the middle nybble, LLLL is the low nybble
+and F is the fifo status, 1 if the fifo had any data in it at all, and 0 if not
+if the fifo is empty, the mcu shifts out nothing, and the spi reg holds 00000000 00000001
+******************************************************************************/
+
+/******************************************************************************
+
+IQUnlimited Keyboard MCU simulation
+
+*******************************************************************************
+iq unlimited has a different mcu than socrates, which has an 8-word 8-bit wide
+fifo instead.
+As in socrates, the bits are returned in two registers, handled by keyboard_buffer_read
+bits are read out in the following order:
+offset0  offset1
+76543210 76543210
+HHHHLLLL F000KACS
+where HHHH is the high nybble, LLLL is the low nybble, KACS is capslock, alt, ctrl and shift,
+and F is the fifo status, 1 if the fifo had any data in it at all, and 0 if not.
+KACS are NOT from the fifo, but a live status of the key states.
+F is also binary ORed with the vblank state???
+if the fifo is empty, the mcu shifts out nothing, and the spi reg holds 00000000 F000KACS
+******************************************************************************/
+
+void socrates_state::kbmcu_sim_reset()
 {
-	static const char *const rownames[] = { "keyboard_40", "keyboard_41", "keyboard_42", "keyboard_43", "keyboard_44" };
-	int row, keyvalue, powerof2;
-	int shift = 0;
-	// first check that the kb latch[1] is clear; if it isn't, don't touch it!
-	if ((m_kb_latch_low[1] != 0) || (m_kb_latch_high[1] != 1)) return;
-	// next check for joypad buttons
-	keyvalue = ioport("keyboard_jp")->read();
-	if (keyvalue != 0)
+	m_kb_queue.head = m_kb_queue.tail = m_kb_queue.count = 0;
+	for (uint8_t i = 0; i < (sizeof(m_kb_queue.buffer)/sizeof(m_kb_queue.buffer[0])); i++)
+		m_kb_queue.buffer[i]=0;
+}
+
+
+void socrates_state::kbmcu_sim_fifo_enqueue(uint16_t data)
+{
+	//logerror("kbmcu_sim_fifo_enqueue called with %02x, fifo count was %d\n", data, m_kb_queue.count);
+	if (m_kb_queue.count < 8)
 	{
-		m_kb_latch_low[1] = (keyvalue & 0xFF0)>>4;
-		m_kb_latch_high[1] = 0x80 | (keyvalue & 0xF);
-		return; // get out of this function; due to the way key priorities work, we're done here.
-	}
-	// next check for mouse movement.
-	// this isn't written yet, so write me please!
-	// next check if shift is down
-	shift = ioport("keyboard_50")->read();
-	// find key low and high byte ok keyboard section
-	for (row = 4; row>=0; row--)
-	{
-		keyvalue = ioport(rownames[row])->read();
-		if (keyvalue != 0)
-		{
-			for (powerof2 = 9; powerof2 >= 0; powerof2--)
-			{
-				if ((keyvalue&(1<<powerof2)) == (1<<powerof2))
-				{
-					m_kb_latch_low[1] = (shift?0x50:0x40)+row;
-					m_kb_latch_high[1] = (0x80 | powerof2);
-					return; // get out of the for loop; due to the way key priorities work, we're done here.
-				}
-			}
-		}
-	}
-	// no key was pressed... check if shift was hit then?
-	if (shift != 0)
-	{
-		m_kb_latch_low[1] = 0x50;
-		m_kb_latch_high[1] = 0x80;
+		m_kb_queue.buffer[m_kb_queue.tail] = data;
+		m_kb_queue.tail = (m_kb_queue.tail + 1) % (sizeof(m_kb_queue.buffer)/sizeof(m_kb_queue.buffer[0]));
+		m_kb_queue.count++;
 	}
 }
 
-void socrates_state::socrates_check_kb_latch(  ) // if kb[1] is full and kb[0] is not, shift [1] to [0] and clear [1]
+uint16_t socrates_state::kbmcu_sim_fifo_dequeue()
 {
-	if (((m_kb_latch_low[1] != 0) || (m_kb_latch_high[1] != 1)) &&
-	((m_kb_latch_low[0] == 0) && (m_kb_latch_high[0] == 1)))
-	{
-		m_kb_latch_low[0] = m_kb_latch_low[1];
-		m_kb_latch_low[1] = 0;
-		m_kb_latch_high[0] = m_kb_latch_high[1];
-		m_kb_latch_high[1] = 1;
-	}
+	if (m_kb_queue.count == 0) fatalerror("kbmcu_sim_fifo_dequeue called with queue count of zero. This should never happen, contact MAMEDEV!");
+	uint16_t retval = m_kb_queue.buffer[m_kb_queue.head];
+	m_kb_queue.count--;
+	m_kb_queue.head = (m_kb_queue.head + 1) % (sizeof(m_kb_queue.buffer)/sizeof(m_kb_queue.buffer[0]));
+	//logerror("kbmcu_sim_fifo_dequeue was called, returning %02x, fifo count is now %d\n", retval, m_kb_queue.count);
+	return retval;
 }
 
-void socrates_state::machine_reset()
+uint16_t socrates_state::kbmcu_sim_fifo_peek()
 {
-	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
+	if (m_kb_queue.count == 0) fatalerror("kbmcu_sim_fifo_peek called with queue count of zero. This should never happen, contact MAMEDEV!");
+	uint16_t retval = m_kb_queue.buffer[m_kb_queue.head];
+	//logerror("kbmcu_sim_fifo_peek was called, returning %02x, fifo count is now %d\n", retval, m_kb_queue.count);
+	return retval;
+}
 
+void socrates_state::kbmcu_sim_fifo_head_clear()
+{
+	m_kb_queue.buffer[m_kb_queue.head] = 0;
+}
+
+void socrates_state::machine_start()
+{
+	m_kbmcu_sim_timer = timer_alloc(TIMER_KBMCU_SIM);
+	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL_21_4772MHz/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
+	m_clear_speech_timer = timer_alloc(TIMER_CLEAR_SPEECH);
+	m_clear_irq_timer = timer_alloc(TIMER_CLEAR_IRQ);
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_scroll_offset));
+	save_item(NAME(m_kb_spi_request));
+	save_item(NAME(m_kb_spi_buffer));
+	save_item(NAME(m_oldkeyvalue));
+	save_item(NAME(m_keyrepeat_holdoffcounter));
+	save_item(NAME(m_io40_latch));
+	save_item(NAME(m_speech_running));
+	save_item(NAME(m_speech_address));
+	save_item(NAME(m_speech_settings));
+	save_item(NAME(m_speech_dummy_read));
+	save_item(NAME(m_speech_load_address_count));
+	save_item(NAME(m_speech_load_settings_count));
 	m_rom_bank[0] = m_rom_bank[1] = 0x0;
 	m_rombank1->set_bank(0x0); // actually set semi-randomly on real console but we need to initialize it somewhere...
 	m_ram_bank = 0;
 	m_rambank1->set_bank(0x0);// the actual console sets it semi randomly on power up, and the bios cleans it up.
 	m_rambank2->set_bank(0x0);
-	m_kb_latch_low[0] = 0xFF;
-	m_kb_latch_high[0] = 0x8F;
-	m_kb_latch_low[1] = 0x00;
-	m_kb_latch_high[1] = 0x01;
-	m_kb_latch_mouse = 0;
-	m_kbmcu_rscount = 0;
+	// ASIC SPI buffer starts with garbage in it for one word, simulate this
+	m_kb_spi_buffer = 0xFF8F;
+}
+
+void socrates_state::machine_reset()
+{
+	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
+	kbmcu_sim_reset();
+	m_kb_spi_request = true;
+	m_oldkeyvalue = 0;
+	m_keyrepeat_holdoffcounter = KEYREPEAT_HOLDOFF;
 	m_io40_latch = 0;
 	m_speech_running = 0;
 	m_speech_address = 0;
@@ -300,6 +360,9 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
+	case TIMER_KBMCU_SIM:
+		kbmcu_sim_cb(ptr, param);
+		break;
 	case TIMER_CLEAR_SPEECH:
 		clear_speech_cb(ptr, param);
 		break;
@@ -318,8 +381,19 @@ DRIVER_INIT_MEMBER(socrates_state,socrates)
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
 		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-// init sound channels to both be on lowest pitch and max volume
-	m_maincpu->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_kbmcu_type = 0;
+}
+
+DRIVER_INIT_MEMBER(socrates_state,iqunlimz)
+{
+	uint8_t *gfx = memregion("vram")->base();
+
+	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen... is this even right for the iqunlimz? */
+	for (int i = 0; i < 0x20000; i++)
+		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+	//m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_kbmcu_type = 1;
 }
 
 READ8_MEMBER(socrates_state::common_rom_bank_r)
@@ -350,6 +424,7 @@ WRITE8_MEMBER(socrates_state::common_ram_bank_w)
 
 READ8_MEMBER(socrates_state::socrates_cart_r)
 {
+	///TODO: do m_rombank->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac)); style stuff
 	// demangle the offset, offset passed is bits 11111111 11111111 00000000 00000000
 	// where . is 0                               EDCBA987 65432.10 FEDCBA98 76543210
 	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
@@ -367,25 +442,16 @@ READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mes
 	return 0xF3;
 }
 
-WRITE8_MEMBER(socrates_state::kbmcu_strobe) // strobe the keyboard MCU
+WRITE8_MEMBER(socrates_state::kbmcu_reset) // reset the keyboard MCU, clear its fifo
 {
 	//logerror("0x%04X: kbmcu written with %02X!\n", m_maincpu->pc(), data); //if (m_maincpu->pc() != 0x31D)
-	// if two writes happen within one frame, reset the keyboard latches
-	m_kbmcu_rscount++;
-	if (m_kbmcu_rscount > 1)
-	{
-		m_kb_latch_low[0] = 0x00;
-		m_kb_latch_high[0] = 0x01;
-		m_kb_latch_low[1] = 0x00;
-		m_kb_latch_high[1] = 0x01;
-		m_kb_latch_mouse = 0;
-	}
+	kbmcu_sim_reset();
 }
 
 READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
-// bit 6 - unknown, usually set, may involve the writes to 0x30, possibly some sort of fixed-length timer?
+// bit 6 - unknown, usually set, possibly mcu ready state?
 // bit 5 - vblank status, high when not in vblank
 // bit 4 - hblank status, high when not in hblank
 // bit 3 - speech chip bit 3
@@ -396,7 +462,7 @@ uint8_t *speechromint = memregion("speechint")->base();
 uint8_t *speechromext = memregion("speechext")->base();
 	int temp = 0;
 	temp |= (m_speech_running)?0x80:0;
-	temp |= 0x40; // unknown, possibly IR mcu busy
+	temp |= (1)?0x40:0; // unknown, possibly IR mcu ready?
 	temp |= (m_screen->vblank())?0:0x20;
 	temp |= (m_screen->hblank())?0:0x10;
 	switch(m_io40_latch&0xF0) // what was last opcode sent?
@@ -511,7 +577,7 @@ SEL 5 4 3 2 1 0
 		case 0x80: case 0x88: case 0x90: case 0x98: case 0xA0: case 0xA8: case 0xB0: case 0xB8:
 			/* 'dumb' mode speech command: write me: start talking */
 			m_speech_running = 1;
-			timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
+			m_clear_speech_timer->adjust(attotime::from_seconds(4)); // hack
 			break;
 		case 0xC0: case 0xC8: // ADLD: load address to vsm
 			m_speech_address |= (((int)data&0xF)<<(m_speech_load_address_count*4))<<1;
@@ -526,7 +592,7 @@ SEL 5 4 3 2 1 0
 			break;
 		case 0xF0: // SPEAK
 			m_speech_running = 1;
-			timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
+			m_clear_speech_timer->adjust(attotime::from_seconds(4)); // hack
 			break;
 		case 0xF8: // RESET
 			m_speech_running = 0;
@@ -543,26 +609,24 @@ SEL 5 4 3 2 1 0
 	m_io40_latch = data;
 }
 
-READ8_MEMBER(socrates_state::socrates_keyboard_low_r)// keyboard code low
+READ8_MEMBER( socrates_state::keyboard_buffer_read )
 {
-	socrates_update_kb();
-	socrates_check_kb_latch();
-	return m_kb_latch_low[0];
+	if (m_kbmcu_type == 0)
+	{
+		if (offset == 1) return m_kb_spi_buffer&0xFF;
+		else return (m_kb_spi_buffer&0xFF00)>>8;
+	}
+	else // (m_kbmcu_type == 1) // iqunlimz hack, the system won't work without this?!?!
+	{
+		if (offset == 1) return (m_screen->vblank()?0x80:0)|(m_kbdrow[0]->read()&0xf);
+		else return (m_kb_spi_buffer&0xFF00)>>8;
+	}
 }
 
-READ8_MEMBER(socrates_state::socrates_keyboard_high_r)// keyboard code high
+WRITE8_MEMBER( socrates_state::keyboard_buffer_update )
 {
-	socrates_update_kb();
-	socrates_check_kb_latch();
-	return m_kb_latch_high[0];
-}
-
-WRITE8_MEMBER(socrates_state::socrates_keyboard_clear)// keyboard latch shift/clear
-{
-	m_kb_latch_low[0] = m_kb_latch_low[1];
-	m_kb_latch_high[0] = m_kb_latch_high[1];
-	m_kb_latch_low[1] = 0;
-	m_kb_latch_high[1] = 1;
+	m_kb_spi_request = true;
+	m_kb_spi_buffer = 0x0001;
 }
 
 WRITE8_MEMBER(socrates_state::reset_speech)// i/o 60: reset speech synth
@@ -877,8 +941,7 @@ void iqunlim_state::machine_reset()
 
 	memset(m_colors, 0, 8);
 	memset(m_video_regs, 0, 4);
-	m_kb_queue.head = m_kb_queue.tail = 0;
-
+	kbmcu_sim_reset();
 }
 
 WRITE8_MEMBER( iqunlim_state::colors_w )
@@ -895,36 +958,9 @@ INPUT_CHANGED_MEMBER( iqunlim_state::send_input )
 
 	if (newval)
 	{
-		m_kb_queue.buffer[m_kb_queue.tail] = data;
-		m_kb_queue.tail = (m_kb_queue.tail + 1) % sizeof(m_kb_queue.buffer);
+		kbmcu_sim_fifo_enqueue(data<<4);
 	}
 }
-
-WRITE8_MEMBER( iqunlim_state::keyboard_clear )
-{
-	if(m_kb_queue.head != m_kb_queue.tail)
-		m_kb_queue.head = (m_kb_queue.head + 1) % sizeof(m_kb_queue.buffer);
-}
-
-READ8_MEMBER( iqunlim_state::keyboard_r )
-{
-	uint8_t data = 0;
-
-	switch(offset)
-	{
-		case 0:
-			if(m_kb_queue.head != m_kb_queue.tail)
-				data = m_kb_queue.buffer[m_kb_queue.head];
-			break;
-		case 1:
-			data = (m_kb_queue.head != m_kb_queue.tail ? 0x80 : 0) | (ioport("IN0")->read() & 0x7f);
-			if (m_screen->vblank()) data |= 0x80;   // FIXME
-			break;
-	}
-
-	return data;
-}
-
 
 /******************************************************************************
  Address Maps
@@ -967,11 +1003,10 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	0xC0 produces a DMC wave read from an unknown address at around 342hz
 	<todo: test the others, maybe take samples?>
 	*/
-	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, kbmcu_strobe) AM_MIRROR (0xf) /* resets the keyboard IR decoder MCU */
-	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
-	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
-	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_high_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above, unlatches same as above */
+	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR(0xE)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, kbmcu_reset) AM_MIRROR(0xF) /* resets the keyboard IR decoder MCU */
+	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xF) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	AM_RANGE(0x50, 0x51) AM_READWRITE(keyboard_buffer_read, keyboard_buffer_update) AM_MIRROR(0xE) /* Keyboard fifo read, pop fifo on write */
 	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module, or perhaps fire an NMI?  */
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
@@ -1001,13 +1036,16 @@ static ADDRESS_MAP_START( iqunlimz_io , AS_IO, 8, iqunlim_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x06)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x07)
-	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR (0x08)
-	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR (0x0e)
-	AM_RANGE(0x50, 0x51) AM_READWRITE(keyboard_r, keyboard_clear)
-	AM_RANGE(0x70, 0x73) AM_READWRITE(video_regs_r, video_regs_w) AM_MIRROR (0x0c)
+	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR(0x08)
+	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR(0x0E)
+	// 30: writes an incrementing value here, once per keypress?
+	// 40: some sort of serial select/reset or enable, related to 0x60
+	AM_RANGE(0x50, 0x51) AM_READWRITE(keyboard_buffer_read, keyboard_buffer_update) AM_MIRROR(0xE)
+	// 60: some sort of serial read/write port, related to 0x40
+	AM_RANGE(0x70, 0x73) AM_READWRITE(video_regs_r, video_regs_w) AM_MIRROR(0x0C)
 	AM_RANGE(0x80, 0x81) AM_WRITENOP // LCD
 	AM_RANGE(0xb1, 0xb1) AM_WRITENOP
-	AM_RANGE(0xa0, 0xa0) AM_READ(status_r) AM_MIRROR(0x0f)
+	AM_RANGE(0xa0, 0xa0) AM_READ(status_r) AM_MIRROR(0x0F)
 	AM_RANGE(0xe0, 0xe7) AM_WRITE(colors_w) AM_MIRROR(0x08)
 ADDRESS_MAP_END
 
@@ -1101,99 +1139,99 @@ B0  81  both buttons click (mouse movement in queue, will be in regs after next 
 */
 static INPUT_PORTS_START( socrates )
 
-	PORT_START("keyboard_jp") // joypad keys
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Left D-pad Right") // 00 81
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Left D-pad Up") // 00 82
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Left D-pad Left") // 00 84
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Left D-pad Down") // 00 88
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Right D-pad Down") // 01 80
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Right D-pad Left") // 02 80
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Right D-pad Up") // 04 80
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Right D-pad Right") // 08 80
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Left D-pad Button") // 10 80
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Right D-pad Button") // 20 80
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN5") // joypad keys
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Left D-pad Right") // 00 81
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Left D-pad Up") // 00 82
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Left D-pad Left") // 00 84
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Left D-pad Down") // 00 88
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Right D-pad Down") // 01 80
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Right D-pad Left") // 02 80
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Right D-pad Up") // 04 80
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Right D-pad Right") // 08 80
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Left D-pad Button") // 10 80
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Right D-pad Button") // 20 80
+	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 	/* alt w/left and right keypad keys swapped
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Left D-pad Right") // 00 81
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Left D-pad Up") // 00 82
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left D-pad Left") // 00 84
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Left D-pad Down") // 00 88
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Right D-pad Down") // 01 80
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Right D-pad Left") // 02 80
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Right D-pad Up") // 04 80
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Right D-pad Right") // 08 80
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Left D-pad Button") // 10 80
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Right D-pad Button") // 20 80
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Left D-pad Right") // 00 81
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Left D-pad Up") // 00 82
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left D-pad Left") // 00 84
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Left D-pad Down") // 00 88
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Right D-pad Down") // 01 80
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Right D-pad Left") // 02 80
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Right D-pad Up") // 04 80
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Right D-pad Right") // 08 80
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Left D-pad Button") // 10 80
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Right D-pad Button") // 20 80
+	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 	*/
 
-	PORT_START("keyboard_50") // lowest 'row' (technically the shift key is on the 5th row but it has its own keycode)
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT") // 5x xx
-	PORT_BIT(0xfffffffe, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN6") // lowest 'row' (technically the shift key is on the 5th row but it has its own keycode)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT") // 5x xx
+	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keyboard_40") // 5th row
-	PORT_BIT(0x00000003, IP_ACTIVE_HIGH, IPT_UNUSED) // 40 80 and 40 81
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_NAME("SPACE") // 40 82
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_NAME("Z") // 40 83
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_NAME("Y") // 40 84
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_NAME("X") // 40 85
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_NAME("W") // 40 86
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_NAME("V") // 40 87
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_NAME("U") // 40 88
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_NAME("T") // 40 89
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN0") // 5th row
+	PORT_BIT(0x0003, IP_ACTIVE_HIGH, IPT_UNUSED) // 40 80 and 40 81
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_NAME("SPACE") // 40 82
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_NAME("Z") // 40 83
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_NAME("Y") // 40 84
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_NAME("X") // 40 85
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_NAME("W") // 40 86
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_NAME("V") // 40 87
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_NAME("U") // 40 88
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_NAME("T") // 40 89
+	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keyboard_41") // 4th row
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_NAME("J/Ti") // 41 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("S") // 41 81
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("R") // 41 82
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_NAME("Q/NEW") // 41 83
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_NAME("P/PLAY") // 41 84
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_NAME("O/PAUSE") // 41 85
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_NAME("N/Fa'") // 41 86
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_NAME("M/Mi'") // 41 87
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_NAME("L/Re'") // 41 88
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_NAME("K/Do'") // 41 89
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN1") // 4th row
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_NAME("J/Ti") // 41 80
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("S") // 41 81
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("R") // 41 82
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_NAME("Q/NEW") // 41 83
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_NAME("P/PLAY") // 41 84
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_NAME("O/PAUSE") // 41 85
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_NAME("N/Fa'") // 41 86
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_NAME("M/Mi'") // 41 87
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_NAME("L/Re'") // 41 88
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_NAME("K/Do'") // 41 89
+	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keyboard_42") // 3rd row
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_NAME("A/So.") // 42 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('-') PORT_NAME("-/.") // 42 81
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_NAME("I/La") // 42 82
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_NAME("H/So") // 42 83
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_NAME("G/Fa") // 42 84
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_NAME("F/Mi") // 42 85
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_NAME("E/Re") // 42 86
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_NAME("D/Do") // 42 87
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_NAME("C/Ti.") // 42 88
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_NAME("B/La.") // 42 89
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN2") // 3rd row
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_NAME("A/So.") // 42 80
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('-') PORT_NAME("-/.") // 42 81
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_NAME("I/La") // 42 82
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_NAME("H/So") // 42 83
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_NAME("G/Fa") // 42 84
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_NAME("F/Mi") // 42 85
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_NAME("E/Re") // 42 86
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_NAME("D/Do") // 42 87
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_NAME("C/Ti.") // 42 88
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_NAME("B/La.") // 42 89
+	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keyboard_43") // 2nd row
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_NAME("1") // 43 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_NAME("0") // 43 81
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_NAME("9") // 43 82
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_NAME("8") // 43 83
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_NAME("7") // 43 84
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_NAME("6") // 43 85
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("5") // 43 86
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("4") // 43 87
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("3") // 43 88
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("2") // 43 89
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN3") // 2nd row
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_NAME("1") // 43 80
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_NAME("0") // 43 81
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_NAME("9") // 43 82
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_NAME("8") // 43 83
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_NAME("7") // 43 84
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_NAME("6") // 43 85
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("5") // 43 86
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("4") // 43 87
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("3") // 43 88
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("2") // 43 89
+	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keyboard_44") // 1st row
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_NAME("+") // 44 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_UNUSED) // 44 81
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("ENTER") // 44 82
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME("MENU") // 44 83
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) PORT_NAME("ANSWER") // 44 84
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_NAME("HELP") // 44 85
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("ERASE") // 44 86
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("/") // 44 87
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME("*") // 44 88
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("-") // 44 89
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN4") // 1st row
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_NAME("+") // 44 80
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_UNUSED) // 44 81
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("ENTER") // 44 82
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME("MENU") // 44 83
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) PORT_NAME("ANSWER") // 44 84
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_NAME("HELP") // 44 85
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("ERASE") // 44 86
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("/") // 44 87
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME("*") // 44 88
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("-") // 44 89
+	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	// mouse goes here
 INPUT_PORTS_END
@@ -1319,9 +1357,90 @@ TIMER_CALLBACK_MEMBER(socrates_state::clear_irq_cb)
 INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), TIMER_CLEAR_IRQ);
-// 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
-	m_kbmcu_rscount = 0; // clear the mcu poke count
+	m_clear_irq_timer->adjust(m_maincpu->cycles_to_attotime(44));
+	// 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
+}
+
+TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
+{
+	// timer rate is a massive guess; we're assuming the mcu runs at the same speed as the cpu does,
+	// and the refresh rate depends on instructions per loop of mcu, which we've randomly guessed is 60 cycles.
+	m_kbmcu_sim_timer->adjust(m_maincpu->cycles_to_attotime(3000));
+	/// TODO: dump the mcu and get rid of this...
+	if (m_kbmcu_type == 0)
+	{
+		// socrates keyboard MCU simulation: if a keyboard key is pressed, enqueue it into the fifo as needed
+		uint16_t keyvalue = 0;
+		// check for joypad buttons
+		keyvalue = m_kbdrow[5]->read();
+		if (keyvalue == 0) // if joypad wasn't pushed...
+		{
+			// next check for mouse movement.
+			/// TODO: this isn't written yet
+			// next check for basic keyboard "4x xx" stuff
+			// check if shift is down
+			keyvalue = (m_kbdrow[6]->read())?0x500:0;
+			bool keyfound = false;
+			// find what row and bit we're on...
+			for (int8_t row = 4; row>=0; row--)
+			{
+				uint16_t tempkey = m_kbdrow[row]->read();
+				if (tempkey != 0)
+				{
+					for (int8_t powerof2 = 9; ((powerof2 >= 0) && (keyfound == false)); powerof2--) // continue until we find the first key only
+					{
+						if ((tempkey&(1<<powerof2)) == (1<<powerof2))
+						{
+							keyvalue |= (0x400 | (row<<4) | powerof2);
+							keyfound = true;
+						}
+					}
+				}
+			}
+		}
+		if (keyvalue != 0) // if a key is down...
+		{
+			if (keyvalue == m_oldkeyvalue) // and its the same key as it was the last run...
+			{
+				if (m_keyrepeat_holdoffcounter > 0) // and the key repeat holdoff counter is > 0...
+				{
+					m_keyrepeat_holdoffcounter--; // decrement the holdoff counter
+				}
+				else // the key repeat holdoff counter is zero
+				{
+					kbmcu_sim_fifo_enqueue(0x1000|keyvalue); // queue the key with bit 12 set as a flag that this is a repeat
+					m_keyrepeat_holdoffcounter += KEYREPEAT_REPEAT; // increment the holdoff counter by the repeat value
+				}
+			}
+			else // it isn't the same key as it was the last run
+			{
+				kbmcu_sim_fifo_enqueue(keyvalue); // queue the key
+				m_keyrepeat_holdoffcounter = KEYREPEAT_HOLDOFF; // reset the holdoff counter
+				m_oldkeyvalue = keyvalue; // set this new key to be the 'previous key'
+			}
+		}
+		else // keyvalue is zero, reset the holdoff counter
+		{
+			m_keyrepeat_holdoffcounter = KEYREPEAT_HOLDOFF;
+			m_oldkeyvalue = keyvalue; // set this new key to be the 'previous key'
+		}
+	}
+	//else // m_kbmcu_type = 1 // this is currently hacked around by the input system so no code here
+	//{
+	//}
+
+	if ((m_kb_spi_request) && (m_kb_queue.count > 0)) // if the console requested data from the MCU AND the MCU has data to send...
+	{
+		uint16_t tempbuffer = 0;
+		m_kb_spi_request = false;
+		tempbuffer = kbmcu_sim_fifo_peek();
+		if (tempbuffer&0x1000) // repeat bit was set
+		{
+			kbmcu_sim_fifo_head_clear(); // clear the head byte of the fifo, but leave it enqueued so it is returned next time. socrates wants this...
+		}
+		else tempbuffer = kbmcu_sim_fifo_dequeue();
+		m_kb_spi_buffer = ((tempbuffer&0xFF0)<<4)|(tempbuffer&0xF)|0x80;
+	}
 }
 
 static MACHINE_CONFIG_START( socrates )
@@ -1331,7 +1450,6 @@ static MACHINE_CONFIG_START( socrates )
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
-	//MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
 
 	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(socrates_rombank_map)
@@ -1488,7 +1606,7 @@ ROM_START(socrates)
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	/* english speech cart has a green QC sticker */
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
@@ -1509,7 +1627,7 @@ ROM_START(socratfc)
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
 	ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
@@ -1532,7 +1650,7 @@ ROM_START(profweis)
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
 	ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, CRC(5ff0fdc6) SHA1(8ef128561a846762a20e3fe9513a4a22aaadc7f6))
@@ -1555,10 +1673,10 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT      COMPANY                  FULLNAME                             FLAGS
-COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English NTSC, no title copyright
-COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // French Canandian NTSC, 1988 title copyright
-COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology/Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // German PAL, 1988 title copyright
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
+COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
+COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology/Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 
-COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlim_state,  0,        "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlim_state,  iqunlimz, "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

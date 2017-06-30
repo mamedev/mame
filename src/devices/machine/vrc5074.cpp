@@ -218,8 +218,8 @@ void vrc5074_device::device_start()
 
 	// Save states
 	// m_sdram
-	save_pointer(NAME(m_sdram[0].data()), m_sdram_size[0] / 4);
-	save_pointer(NAME(m_sdram[1].data()), m_sdram_size[1] / 4);
+	save_item(NAME(m_sdram[0]));
+	save_item(NAME(m_sdram[1]));
 	save_item(NAME(m_cpu_regs));
 	save_item(NAME(m_serial_regs));
 	save_item(NAME(m_nile_irq_state));
