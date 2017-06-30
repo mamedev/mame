@@ -169,6 +169,7 @@ enum {
 };
 
 
+// TODO: move these into enums
 // R#7(md)
 #define MD_2PLANE_8BIT      0x00
 #define MD_2PLANE_16BIT     0x02
@@ -203,8 +204,8 @@ enum {
 #define PTS_MASK          0xc0
 
 // R#10
-#define SPAS_SPRITESIZE    0
-#define SPAS_SPRITEREVERSE 1
+#define SPAS_SPRITESIZE    false
+#define SPAS_SPRITEREVERSE true
 
 // R#10(spas)=1
 #define SZ_8X8            0x00
@@ -373,6 +374,9 @@ static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 	AM_RANGE( 4,  4) AM_READWRITE(scroll_address_r,scroll_address_w)
 	AM_RANGE( 5,  5) AM_READWRITE(palette_address_r,palette_address_w)
 	AM_RANGE( 6,  6) AM_READWRITE(sprite_bank_r,sprite_bank_w)
+	
+	// screen control	
+	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_mosaic_sprite_r, screen_ctrl_mosaic_sprite_w)
 	
 	// interrupt section
 	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w) 
@@ -963,8 +967,8 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int i;
 
 	/* ensure that sprites are enabled */
-	if( ((m_regs.s.r7 & r7_dspe) == 0 ) || (m_regs.s.r10 & r10_sprd))
-	return;
+	if( ((m_regs.s.r7 & r7_dspe) == 0 ) || (m_sprite_disable == true))
+		return;
 
 	/* draw sprites */
 	spriteClip &= cliprect;
@@ -977,10 +981,10 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	sx = ( (int)(sa->attr & 0x02) << 7 ) | (int)sa->sx;
 	sy = ( ( ( (int)(sa->attr & 0x01) << 8 ) | (int)sa->sy ) + 1 ) & 0x1ff;
 	attr = (sa->attr & 0x0c) >> 2;
-	g_attr = (m_regs.s.r10 & r10_spa) >> 6;
+	g_attr = m_sprite_aux_reg & 3;
 	spf = (m_regs.s.r12 & r12_spf) >> 6;
 
-	if ((m_regs.s.r10 & r10_spas) == SPAS_SPRITESIZE )
+	if (m_sprite_aux_mode == SPAS_SPRITESIZE )
 	{
 		size = g_attr;
 		flipx = (attr & SZ_HORIZREVERSE) != 0;
@@ -993,7 +997,8 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		flipy = (g_attr & SZ_VERTREVERSE) != 0;
 	}
 
-	switch( size ) {
+	switch( size ) 
+	{
 	case SZ_8X8 :
 		code = ( (int)m_sprite_bank << 8 ) | (int)sa->sn;
 		if (spf != 0)
@@ -1585,6 +1590,8 @@ WRITE8_MEMBER( ygv608_device::palette_data_w )
 	if (++m_color_state_w == 3)
 	{
 		m_color_state_w = 0;
+//		if(m_colour_palette[m_palette_address][0] & 0x80) // Transparency designation, none of the Namco games enables it?
+		
 		palette().set_pen_color(m_palette_address,
 			pal6bit( m_colour_palette[m_palette_address][0] ),
 			pal6bit( m_colour_palette[m_palette_address][1] ),
@@ -1761,8 +1768,10 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_y_w )
 	//	logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine().describe_context(),
 	//		yTile, m_page_y );
 	m_ytile_ptr &= m_page_y -1;
-	m_ytile_autoinc = BIT(data,7); 
-	m_plane_select_access = BIT(data,6);
+	m_ytile_autoinc = BIT(data,7);
+	m_plane_select_access = BIT(data,6);	
+	if(m_ytile_autoinc == true && m_xtile_autoinc == true)
+		logerror("%s: Warning both X/Y Tiles autoinc enabled!\n",this->tag());
 }
 
  // R#1R - Pattern Name Table Access pointer X
@@ -1780,6 +1789,8 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
 	//		xTile, m_page_x );
 	m_xtile_ptr &= m_page_x -1;
 	m_xtile_autoinc = BIT(data,7); 
+	if(m_ytile_autoinc == true && m_xtile_autoinc == true)
+		logerror("%s: Warning both X/Y Tiles autoinc enabled!\n",this->tag());
 }
 
  
@@ -1830,6 +1841,26 @@ READ8_MEMBER( ygv608_device::sprite_bank_r )
 WRITE8_MEMBER( ygv608_device::sprite_bank_w )
 {
 	m_sprite_bank = data;
+}
+ 
+ // R#10R - screen control: mosaic & sprite
+READ8_MEMBER( ygv608_device::screen_ctrl_mosaic_sprite_r )
+{
+	return (m_sprite_aux_reg << 6) | ((m_sprite_aux_mode == true) << 5) | ((m_sprite_disable == true) << 4) 
+	                               | (m_mosaic_bplane << 2) | (m_mosaic_aplane & 3);
+} 
+
+WRITE8_MEMBER( ygv608_device::screen_ctrl_mosaic_sprite_w )
+{
+	// check mosaic
+	m_mosaic_aplane = data & 3;
+	m_mosaic_bplane = (data & 0xc) >> 2;
+	if(m_mosaic_aplane || m_mosaic_bplane)
+		popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
+
+	m_sprite_disable = BIT(data, 4);
+	m_sprite_aux_mode = BIT(data, 5);
+	m_sprite_aux_reg = (data & 0xc0) >> 6;
 }
  
 // R#14R interrupt mask control

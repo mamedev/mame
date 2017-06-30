@@ -54,6 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_address_w);
 	DECLARE_READ8_MEMBER(sprite_bank_r);
 	DECLARE_WRITE8_MEMBER(sprite_bank_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_mosaic_sprite_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_mosaic_sprite_w);	
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -278,6 +280,11 @@ private:
 	bool m_ytile_autoinc;		/**< PNXA: Permits auto-increment in Y coordinate */
 	bool m_plane_select_access; /**< B/(A): A/B plane access select */
 	
+	uint8_t m_mosaic_aplane;	/**< MCA: mosaic factor applied to A plane */
+	uint8_t m_mosaic_bplane;	/**< MCA: mosaic factor applied to B plane */
+	bool m_sprite_disable;		/**< SPRD: disables the sprite plane display */
+	bool m_sprite_aux_mode;		/**< SPAS: if 0 aux bits selects size, if 1 selects flipping */
+	uint8_t m_sprite_aux_reg;	/**< SPA: auxiliary bits of sprite attribute table */
 	
 	// screen section
 	devcb_write_line            m_vblank_handler;
