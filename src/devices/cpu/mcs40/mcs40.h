@@ -94,9 +94,9 @@ class mcs40_cpu_device_base : public cpu_device
 public:
 	// configuration helpers
 	template <typename Obj> static devcb_base &set_4289_pm_cb(device_t &device, Obj &&cb)
-	{ return downcast<mcs40_cpu_device_base &>(device).set_4289_pm_cb(std::forward<Obj>(cb)); }
+	{ return downcast<mcs40_cpu_device_base &>(device).m_4289_pm_cb.set_callback(std::forward<Obj>(cb)); }
 	template <typename Obj> static devcb_base &set_4289_f_l_cb(device_t &device, Obj &&cb)
-	{ return downcast<mcs40_cpu_device_base &>(device).set_4289_f_l_cb(std::forward<Obj>(cb)); }
+	{ return downcast<mcs40_cpu_device_base &>(device).m_4289_f_l_cb.set_callback(std::forward<Obj>(cb)); }
 
 	// 4008/4009 or 4289 outputs
 	u8 get_4289_a() const { return m_4289_a; } // 8-bit address

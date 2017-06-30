@@ -9,6 +9,7 @@
  *****************************************************************************/
 #include "emu.h"
 #include "mcs40.h"
+
 #include "debugger.h"
 
 
@@ -179,7 +180,7 @@ void mcs40_cpu_device_base::device_start()
 
 	state_add(STATE_GENPC, "PC", m_pc).mask(m_pc_mask).callimport().callexport();
 	state_add(STATE_GENPCBASE, "CURPC", m_pcbase).mask(m_pc_mask).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_genflags).mask(0x07U).noshow().callimport().callexport().formatstr("%3s");
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_genflags).mask(0x07U).noshow().callimport().callexport().formatstr("%4s");
 	state_add(I4004_A, "A", m_a).mask(0x0fU);
 	for (unsigned i = 0; (m_index_reg_cnt >> 1) > i; ++i)
 	{
@@ -362,6 +363,7 @@ void mcs40_cpu_device_base::state_import(device_state_entry const &entry)
 		}
 		break;
 	case STATE_GENFLAGS:
+		m_stop_ff = BIT(m_genflags, 3);
 		m_c = BIT(m_genflags, 1);
 		m_test = BIT(m_genflags, 0) ? ASSERT_LINE : CLEAR_LINE;
 		break;
@@ -381,7 +383,11 @@ void mcs40_cpu_device_base::state_export(device_state_entry const &entry)
 		m_pc = rom_bank() | pc();
 		break;
 	case STATE_GENFLAGS:
-		m_genflags = (m_a ? 0x00 : 0x04) | (m_c ? 0x02 : 0x00) | ((CLEAR_LINE != m_test) ? 0x01 : 0x00);
+		m_genflags =
+				(m_stop_ff ? 0x08 : 0x00) |
+				(m_a ? 0x00 : 0x04) |
+				(m_c ? 0x02 : 0x00) |
+				((CLEAR_LINE != m_test) ? 0x01 : 0x00);
 		break;
 	}
 }
@@ -391,7 +397,12 @@ void mcs40_cpu_device_base::state_string_export(device_state_entry const &entry,
 	switch (entry.index())
 	{
 	case STATE_GENFLAGS:
-		str = util::string_format("%c%c%c", m_a ? '.' : 'Z', m_c ? 'C' : '.', (CLEAR_LINE != m_test) ? 'T' : '.');
+		str = util::string_format(
+				"%c%c%c%c",
+				m_stop_ff ? 'S' : '.',
+				m_a ? '.' : 'Z',
+				m_c ? 'C' : '.',
+				(CLEAR_LINE != m_test) ? 'T' : '.');
 		break;
 	}
 }
