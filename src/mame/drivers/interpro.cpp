@@ -265,8 +265,8 @@ READ8_MEMBER(interpro_state::scsi_r)
 #if NEW_SCSI
 	switch (offset >> 6)
 	{
-	case 0x0: return m_scsi->tcount_lo_r(space, 0);
-	case 0x1: return m_scsi->tcount_hi_r(space, 0);
+	case 0x0: return m_scsi->tcounter_lo_r(space, 0);
+	case 0x1: return m_scsi->tcounter_hi_r(space, 0);
 	case 0x2: return m_scsi->fifo_r(space, 0);
 	case 0x3: return m_scsi->command_r(space, 0);
 	case 0x4: return m_scsi->status_r(space, 0);
