@@ -335,10 +335,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
-	void dectalk_outfifo_check ();
-	void dectalk_clear_all_fifos(  );
-	void dectalk_semaphore_w ( uint16_t data );
-	uint16_t dectalk_outfifo_r (  );
+	emu_timer *m_outfifo_read_timer;
+	void dectalk_outfifo_check();
+	void dectalk_clear_all_fifos();
+	void dectalk_semaphore_w(uint16_t data);
+	uint16_t dectalk_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
 protected:
@@ -472,9 +473,29 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 
 void dectalk_state::machine_start()
 {
+	m_outfifo_read_timer = timer_alloc(TIMER_OUTFIFO_READ);
+	m_outfifo_read_timer->adjust(attotime::from_hz(10000));
+	save_item(NAME(m_infifo));
+	save_item(NAME(m_infifo_count));
+	save_item(NAME(m_infifo_tail_ptr));
+	save_item(NAME(m_infifo_head_ptr));
+	save_item(NAME(m_outfifo));
+	save_item(NAME(m_outfifo_count));
+	save_item(NAME(m_outfifo_tail_ptr));
+	save_item(NAME(m_outfifo_head_ptr));
+	save_item(NAME(m_infifo_semaphore));
+	save_item(NAME(m_spc_error_latch));
+	save_item(NAME(m_m68k_spcflags_latch));
+	save_item(NAME(m_m68k_tlcflags_latch));
+	save_item(NAME(m_simulate_outfifo_error));
+	save_item(NAME(m_tlc_tonedetect));
+	save_item(NAME(m_tlc_ringdetect));
+	save_item(NAME(m_tlc_dtmf));
+	save_item(NAME(m_duart_inport));
+	save_item(NAME(m_duart_outport));
+	save_item(NAME(m_hack_self_test));
 	dectalk_clear_all_fifos();
 	m_simulate_outfifo_error = 0;
-	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }
 
 void dectalk_state::machine_reset()
@@ -852,7 +873,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
-	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
+	m_outfifo_read_timer->adjust(attotime::from_hz(10000));
 	m_dac->write(data >> 4);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
@@ -1010,4 +1031,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING )
+COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
