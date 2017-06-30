@@ -1284,16 +1284,16 @@ ROM_START( gnw_mc25 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
-	ROM_REGION( 100015, "svg", 0)
-	ROM_LOAD( "gnw_mc25.svg", 0, 100015, CRC(7cd5017b) SHA1(8a43a80c0b6261173fd113ff282f7fa6336ec67c) )
+	ROM_REGION( 99701, "svg", 0)
+	ROM_LOAD( "gnw_mc25.svg", 0, 99701, CRC(390f53fb) SHA1(8eba84b7b084c3a1b26840a93030eeaf7ee89227) )
 ROM_END
 
 ROM_START( gnw_eg26 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
-	ROM_REGION( 100530, "svg", 0)
-	ROM_LOAD( "gnw_eg26.svg", 0, 100530, CRC(94270071) SHA1(ff94833cecf503eeb819d6be8a3de45cb10907f2) )
+	ROM_REGION( 100220, "svg", 0)
+	ROM_LOAD( "gnw_eg26.svg", 0, 100220, CRC(b53664a3) SHA1(4d45f4f78a9c6d3ee1e6bdac64cbb1fbea5ba4ba) )
 ROM_END
 
 ROM_START( nupogodi )
@@ -1353,8 +1353,8 @@ ROM_START( gnw_dj101 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dj-101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
 
-	ROM_REGION( 277247, "svg", 0)
-	ROM_LOAD( "gnw_dj101.svg", 0, 277247, CRC(144a3b1a) SHA1(43789d5aedb6c2d2bacd1b730bcdcd06e54b0b6a) )
+	ROM_REGION( 276947, "svg", 0)
+	ROM_LOAD( "gnw_dj101.svg", 0, 276947, CRC(9e1eb311) SHA1(f5004626549ea1f60fae87751bcad375580b7423) )
 ROM_END
 
 
