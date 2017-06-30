@@ -289,7 +289,7 @@ static INPUT_PORTS_START( cocean1a ) /* 10 */
 	/* Switches 6 to 8 are shown as completly blank and "Don't change" */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( clocknch )
+static INPUT_PORTS_START( clocknchj )
 	PORT_INCLUDE( decocass )
 
 	PORT_MODIFY("DSW2")
@@ -302,6 +302,15 @@ static INPUT_PORTS_START( clocknch )
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x02, "30000" )
 	/* Switches 4, 5, 6, 7 & 8 are listed as "Not Used" and "Don't Change" */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( clocknch )
+	PORT_INCLUDE( clocknchj )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x08, 0x08, "Game Speed" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "Slow" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cprogolf )
@@ -679,6 +688,188 @@ static INPUT_PORTS_START( cfboy0a1 ) /* 12 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 	/* Switches 6 to 8 are shown as "Country Code" (A to F) and "Don't Change" */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ctisland )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "15000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x02, "25000" )
+	PORT_DIPSETTING(    0x00, "30000"  )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cppicf )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x06, "30000" )
+	PORT_DIPSETTING(    0x04, "50000" )
+	PORT_DIPSETTING(    0x02, "70000" )
+	PORT_DIPNAME( 0x10, 0x10, "Infinite Lives" )                        PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( clapapa )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cburnrub )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x02, "20000" )
+	PORT_DIPSETTING(    0x00, "30000" )
+	PORT_DIPSETTING(    0x06, "Every 30000" )
+	PORT_DIPSETTING(    0x04, "Every 70000" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )               PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cmanhat )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "6" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cluckypo )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Show Dealer Hand" )                      PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( czeroize )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR ( None ) )
+	PORT_DIPSETTING(    0x04, "50000" )
+	PORT_DIPSETTING(    0x02, "70000" )
+	PORT_DIPSETTING(    0x00, "90000"  )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cflyball )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR ( None ) )
+	PORT_DIPSETTING(    0x06, "20000" )
+	PORT_DIPSETTING(    0x04, "50000" )
+	PORT_DIPSETTING(    0x02, "70000" )
+	PORT_DIPNAME( 0x08, 0x08, "Push Backs" )                            PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cdiscon1 )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR ( None ) )
+	PORT_DIPSETTING(    0x06, "10000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x02, "30000" )
+	PORT_DIPNAME( 0x08, 0x08, "Music Weapons" )                         PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( csweetht )
+	PORT_INCLUDE( cdiscon1 )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x08, 0x08, "Music Weapons" )                         PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x00, "8" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( chwy )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( castfant )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cptennis )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cprobowl )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Show Bonus Instructions" )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	/* other dips not verified */
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -1892,64 +2083,64 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "DECO Cassette System", MACHINE_IS_BIOS_ROOT )
 /* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette) (US)", 0 )
-/* 01 */ GAME( 1980, chwy,      decocass, chwy,     decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette) (US)", 0 )
+/* 01 */ GAME( 1980, chwy,      decocass, chwy,     chwy,     decocass_state, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette) (US)", 0 )
 /* 02 */ // 1980.12 Sengoku Ninjatai
-/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 /* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_state, decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette) (US)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
 /* 06 */ // 1980.12 Nebula
-/* 07 */ GAME( 1981, castfant,  decocass, castfant, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
+/* 07 */ GAME( 1981, castfant,  decocass, castfant, castfant, decocass_state, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
 /* 08 */ // 1981.03 The Tower
 /* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_state, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
 /* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1981, clocknchj, clocknch, clocknchj,clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (Japan)", 0 )
+/*    */ GAME( 1981, clocknchj, clocknch, clocknchj,clocknchj,decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (Japan)", 0 )
 /* 12 */ GAME( 1981, cfboy0a1,  decocass, cfboy0a1, cfboy0a1, decocass_state, decocass, ROT270, "Data East Corporation", "Flash Boy (vertical) (DECO Cassette MD) (No.12/Ver.0/Set.1,Japan)", 0 )
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (Japan)", 0 )
 /* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, decocass_state, cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette) (Japan)", 0 )
-/* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette) (US)", 0 )
-/* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 1)", 0 )
-/*    */ GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 )
-/*    */ GAME( 1981, ctisland3, ctisland, ctisland3,decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Region D)", 0 ) /* region code 'D' unknown region */
+/* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, cluckypo, decocass_state, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette) (US)", 0 )
+/* 16 */ GAME( 1981, ctisland,  decocass, ctisland, ctisland, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1981, ctisland2, ctisland, ctisland, ctisland, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 ) /* newer? has instructions in attract */
+/*    */ GAME( 1981, ctisland3, ctisland, ctisland3,ctisland, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Region D)", 0 ) /* region code 'D' unknown region */
 /* 17 */ // 1981.10 Bobbitto
 /* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_state, decocass, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", MACHINE_NOT_WORKING )
-/* 19 */ GAME( 1982, cdiscon1,  decocass, cdiscon1, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1982, csweetht,  cdiscon1, cdiscon1, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette) (US)", 0 )
+/* 19 */ GAME( 1982, cdiscon1,  decocass, cdiscon1, cdiscon1, decocass_state, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, csweetht,  cdiscon1, cdiscon1, csweetht, decocass_state, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette) (US)", 0 )
 /* 20 */ GAME( 1982, ctornado,  decocass, ctornado, ctornado, decocass_state, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette) (US)", 0 )
 /* 21 */ GAME( 1982, cmissnx,   decocass, cmissnx,  cmissnx,  decocass_state, decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette) (US)", 0 )
-/* 22 */ GAME( 1982, cptennis,  decocass, cptennis, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1982, cptennisj, cptennis, cptennis, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (Japan)", 0 )
+/* 22 */ GAME( 1982, cptennis,  decocass, cptennis, cptennis, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, cptennisj, cptennis, cptennis, cptennis, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (Japan)", 0 )
 /* 23 */ GAME( 1982, cprogolf18,cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "18 Challenge Pro Golf (DECO Cassette) (Japan)", 0 ) // 1982.?? 18 Hole Pro Golf
 /* 24 */ // 1982.07 Tsumego Kaisyou
 /* 25 */ GAME( 1982, cadanglr,  decocass, cfishing, cfishing, decocass_state, decocass, ROT270, "Data East Corporation", "Angler Dangler (DECO Cassette) (US)", 0 )
 /* 25 */ GAME( 1982, cfishing,  cadanglr, cfishing, cfishing, decocass_state, decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette) (Japan)", 0 )
 /* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass_state, decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass_state, decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette) (Japan)", 0 )
-/* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 1)", 0 )
-/*    */ GAME( 1982, cburnrub2, cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 2)", 0 )
-/*    */ GAME( 1982, cburnrubj, cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (Japan)", 0 )
-/*    */ GAME( 1982, cbnj,      cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette) (US)", 0 ) // was marked 'Japan' but uses the type B (US) bios
+/* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, cburnrub, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 1)", 0 ) /* large stylized red title (newer release?) */
+/*    */ GAME( 1982, cburnrub2, cburnrub, cburnrub, cburnrub, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 2)", 0 ) /* large monochrome title (original release?) */
+/*    */ GAME( 1982, cburnrubj, cburnrub, cburnrub, cburnrub, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (Japan)", 0 ) /* large monochrome title (original release?) */
+/*    */ GAME( 1982, cbnj,      cburnrub, cburnrub, cburnrub, decocass_state, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette) (US)", 0 ) /* name was changed from Burnin' Rubber to Bump 'n' Jump (newest release?) */
 /* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Cluster Buster (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1983, cgraplopj, cgraplop, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (DECO Cassette) (Japan)", 0 )
-/*    */ GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (no title screen) (DECO Cassette) (US)", 0 ) // a version with title screen exists, see reference videos
-/* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette) (US)" , 0) /* Displays 'La-Pa-Pa during attract */
-/*    */ GAME( 1983, clapapa2,  clapapa,  clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette) (US)" , 0) /* Displays 'Rootin' Tootin' during attract */
+/*    */ GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (no title screen) (DECO Cassette) (US)", 0 ) /* before name was changed to Cluster Buster? */
+/* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  clapapa,  decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette) (US)" , 0) /* Displays 'La-Pa-Pa during attract */
+/*    */ GAME( 1983, clapapa2,  clapapa,  clapapa,  clapapa,  decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette) (US)" , 0) /* Displays 'Rootin' Tootin' during attract */
 /* 30 */ GAME( 1983, cskater,   decocass, cskater,  cskater,  decocass_state, decocass, ROT270, "Data East Corporation", "Skater (DECO Cassette) (Japan)", 0 )
-/* 31 */ GAME( 1983, cprobowl,  decocass, cprobowl, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette) (US)", 0 )
+/* 31 */ GAME( 1983, cprobowl,  decocass, cprobowl, cprobowl, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette) (US)", 0 )
 /* 32 */ GAME( 1983, cnightst,  decocass, cnightst, cnightst, decocass_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 1)", 0 )
 /*    */ GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 2)", 0 )
 /* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (Japan)", 0 )
 /* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_state, decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette) (Japan)", MACHINE_WRONG_COLORS )
-/* 35 */ GAME( 1985, cflyball,  decocass, cflyball, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
+/* 35 */ GAME( 1985, cflyball,  decocass, cflyball, cflyball, decocass_state, decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
 /* 36 */ // 1984.04 Genesis/Boomer Rang'r
-/* 37 */ GAME( 1983, czeroize,  decocass, czeroize, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette) (US)", 0 )
+/* 37 */ GAME( 1983, czeroize,  decocass, czeroize, czeroize, decocass_state, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette) (US)", 0 )
 /* 38 */ GAME( 1984, cscrtry,   decocass, type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 1)", 0 )
 /*    */ GAME( 1984, cscrtry2,  cscrtry,  type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 2)", 0 )
-/* 39 */ GAME( 1984, cppicf,    decocass, cppicf,   decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 1)", 0 )
-/*    */ GAME( 1984, cppicf2,   cppicf,   cppicf,   decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 2)", 0 )
+/* 39 */ GAME( 1984, cppicf,    decocass, cppicf,   cppicf,   decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1984, cppicf2,   cppicf,   cppicf,   cppicf,   decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 2)", 0 )
 /* 40 */ GAME( 1984, cfghtice,  decocass, cfghtice, cfghtice, decocass_state, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette) (US)", 0 )
 /* 41 */ GAME( 1984, coozumou,  decocass, type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette) (Japan)", 0 )
 /* 42 */ // 1984.08 Hellow Gateball // not a typo, this is official spelling
