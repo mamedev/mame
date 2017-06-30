@@ -1679,4 +1679,4 @@ COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, 
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 
-COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlim_state,  iqunlimz, "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlim_state,  iqunlimz, "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
