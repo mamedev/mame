@@ -79,8 +79,8 @@ namespace
 		}
 
 	private:
-		WRITE8_MEMBER(write_left)	{ m_ldac->write(data); }
-		WRITE8_MEMBER(write_right)	{ m_rdac->write(data); }
+		WRITE8_MEMBER(write_left)   { m_ldac->write(data); }
+		WRITE8_MEMBER(write_right)  { m_rdac->write(data); }
 
 		// internal state
 		required_device<dac_byte_interface> m_ldac;

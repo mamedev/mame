@@ -205,7 +205,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 					state.gfxdev[state.gfxset.devcount].palette[slot] = state.palette.interface;
 					state.gfxdev[state.gfxset.devcount].color_count[slot] = state.palette.interface->entries() / gfx->granularity();
 					if (!state.gfxdev[state.gfxset.devcount].color_count[slot])
-						state.gfxdev[state.gfxset.devcount].color_count[slot] = 1;						
+						state.gfxdev[state.gfxset.devcount].color_count[slot] = 1;
 				}
 			}
 			if (++state.gfxset.devcount == MAX_GFX_DECODERS)

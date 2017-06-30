@@ -34,16 +34,12 @@ public:
 	// execute based on the incoming argc/argv
 	int execute(std::vector<std::string> &args);
 
-	// should we parse slot options for the auxillary verb in question?
-	static bool parse_slot_options_for_auxverb(const std::string &auxverb);
-
 private:
 	struct info_command_struct
 	{
 		const char *option;
 		int min_args;
 		int max_args;
-		bool specify_system;
 		void (cli_frontend::*function)(const std::vector<std::string> &args);
 		const char *usage;
 	};
@@ -72,7 +68,7 @@ private:
 	void execute_commands(const char *exename);
 	void display_help(const char *exename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
-	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
+	void start_execution(mame_machine_manager *manager, const std::vector<std::string> &args);
 	static const info_command_struct *find_command(const std::string &s);
 
 	// internal state

@@ -7,19 +7,18 @@ M14 Hardware (c) 1979 Irem
 driver by Angelo Salese
 
 TODO:
-- Sound (very likely to be discrete);
+- Actual discrete sound emulation;
 - Colors might be not 100% accurate (needs screenshots from the real thing);
 - What are the high 4 bits in the colorram for? They are used on the mahjong tiles only,
   left-over or something more important?
-- I'm not sure about the hopper hook-up, it could also be that the player should press
-  start + button 1 + ron buttons (= 0x43) instead of being "automatic";
-- Inputs are grossly mapped;
+- I/Os are grossly mapped;
 - ball and paddle drawing are a guesswork;
 
 Notes:
 - Unlike most Arcade games, if you call a ron but you don't have a legit hand you'll automatically
   lose the match. This is commonly named chombo in rii'chi mahjong rules;
-
+- After getting a completed hand, press start 1 + ron + discard at the same time to go back 
+  into attract mode (!);
 
 ==============================================================================================
 x (Mystery Rom)
@@ -52,6 +51,8 @@ Dumped by Chackn
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "screen.h"
+#include "sound/samples.h"
+#include "speaker.h"
 
 
 class m14_state : public driver_device
@@ -59,38 +60,32 @@ class m14_state : public driver_device
 public:
 	m14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram"),
+		m_color_ram(*this, "color_ram"),
+		m_samples(*this,"samples")
 		{ }
-
-	/* video-related */
-	tilemap_t  *m_m14_tilemap;
-	required_shared_ptr<uint8_t> m_video_ram;
-	required_shared_ptr<uint8_t> m_color_ram;
-
-	/* input-related */
-	uint8_t m_hop_mux;
-	uint8_t m_ballx,m_bally;
-	uint8_t m_paddlex;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
+	required_device<samples_device> m_samples;
 
 	DECLARE_WRITE8_MEMBER(m14_vram_w);
 	DECLARE_WRITE8_MEMBER(m14_cram_w);
 	DECLARE_READ8_MEMBER(m14_rng_r);
-	DECLARE_READ8_MEMBER(input_buttons_r);
-	DECLARE_WRITE8_MEMBER(hopper_w);
+	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(ball_x_w);
 	DECLARE_WRITE8_MEMBER(ball_y_w);
 	DECLARE_WRITE8_MEMBER(paddle_x_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
@@ -103,6 +98,15 @@ public:
 	DECLARE_PALETTE_INIT(m14);
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
+	
+private:
+	/* video-related */
+	tilemap_t  *m_m14_tilemap;
+	
+	/* input-related */
+	//uint8_t m_hop_mux;
+	uint8_t m_ballx,m_bally;
+	uint8_t m_paddlex;
 };
 
 
@@ -219,24 +223,12 @@ READ8_MEMBER(m14_state::m14_rng_r)
 	return (m_screen->frame_number() & 0x7f) | (ioport("IN1")->read() & 0x80);
 }
 
-/* Here routes the hopper & the inputs */
-READ8_MEMBER(m14_state::input_buttons_r)
+WRITE8_MEMBER(m14_state::output_w)
 {
-	if (m_hop_mux)
-	{
-		m_hop_mux = 0;
-		return 0; //0x43 status bits
-	}
-	else
-		return ioport("IN0")->read();
-}
-
-WRITE8_MEMBER(m14_state::hopper_w)
-{
-	/* ---- x--- coin out */
-	/* ---- --x- hopper/input mux? */
+	/* ---- x--- active after calling a winning hand */
+	/* ---- --x- lamp? */
 	/* ---- ---x flip screen */
-	m_hop_mux = data & 2;
+	//m_hop_mux = data & 2;
 	flip_screen_set(data & 1);
 	//popmessage("%02x",data);
 }
@@ -258,6 +250,49 @@ WRITE8_MEMBER(m14_state::paddle_x_w)
 
 /*************************************
  *
+ *  Sound section
+ *
+ *************************************/
+
+static const char *const m14_sample_names[] =
+{
+	"*ptrmj",
+	"wall_hit", // 1
+	"tile_hit", // 2
+	"tick",		// 0x40
+	"ball_drop", // 8
+	"paddle_hit",
+	nullptr
+};
+ 
+WRITE8_MEMBER(m14_state::sound_w)
+{	
+	switch(data)
+	{
+		case 1: // wall hit
+			m_samples->start(0,0);
+			break;
+		case 2: // tile hit
+			m_samples->start(1,1);
+			break;
+		case 8: // ball drop
+			m_samples->start(3,3);
+			break;
+		case 0x40: // tick
+			m_samples->start(2,2);
+			break;
+		case 0x80:
+		case 0: // flips with previous, unknown purpose
+			break;
+		default:
+			logerror("%s: Sound start with %02x param\n",m_samples->tag(),data);
+			break;
+	}
+}
+
+ 
+/*************************************
+ *
  *  Memory Map
  *
  *************************************/
@@ -272,10 +307,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m14_io_map, AS_IO, 8, m14_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITE(ball_x_w)
-	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) AM_WRITE(ball_y_w)
+	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0") AM_WRITE(ball_y_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) AM_WRITE(paddle_x_w)
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(hopper_w)
-	AM_RANGE(0xfc, 0xfc) AM_WRITENOP // sound
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(output_w)
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(sound_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -300,7 +335,7 @@ INPUT_CHANGED_MEMBER(m14_state::right_coin_inserted)
 
 static INPUT_PORTS_START( m14 )
 	PORT_START("AN_PADDLE")
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE  ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(5) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire / Discard")
@@ -314,9 +349,7 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )
-	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -379,7 +412,7 @@ INTERRUPT_GEN_MEMBER(m14_state::m14_irq)
 
 void m14_state::machine_start()
 {
-	save_item(NAME(m_hop_mux));
+	//save_item(NAME(m_hop_mux));
 	save_item(NAME(m_ballx));
 	save_item(NAME(m_bally));
 	save_item(NAME(m_paddlex));
@@ -387,7 +420,7 @@ void m14_state::machine_start()
 
 void m14_state::machine_reset()
 {
-	m_hop_mux = 0;
+	//m_hop_mux = 0;
 }
 
 
@@ -414,7 +447,12 @@ static MACHINE_CONFIG_START( m14 )
 
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(m14_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 //  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 //  MCFG_DISCRETE_INTF(m14)
@@ -444,4 +482,4 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptrmj,  0,       m14,  m14, m14_state,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
+GAME( 1979, ptrmj,  0,       m14,  m14, m14_state,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer

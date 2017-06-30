@@ -191,9 +191,7 @@ const char info_xml_creator::s_dtd_string[] =
 
 info_xml_creator::info_xml_creator(emu_options const &options)
 	: m_output(nullptr)
-	, m_lookup_options(options)
 {
-	mame_options::remove_device_options(m_lookup_options);
 }
 
 

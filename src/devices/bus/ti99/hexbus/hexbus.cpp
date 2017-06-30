@@ -88,15 +88,42 @@
     Usage in MAME
     -------------
 
-    Single device usage:
     mame <driver> -hexbus <device>
 
-    Multiple device usage:
-    mame <driver> -hexbus chain -hexbus:chain:1 <device> ... -hexbus:chain:4 <device>
+    Usually the device offers an own hexbus socket, so we can chain devices:
 
-    We currently assume a maximum length of 4 devices which can be increased
-    if desired. The chain positions should be used starting from 1 with no
-    gaps, but this is not enforced.
+    mame <driver> -hexbus <device1> -hexbus:<device1>:hexbus <device2> ...
+
+    The direction towards the console is named "inbound" in the implementation,
+    while the direction towards the end of the chain is named "outbound".
+
+    Implementation
+    --------------
+
+    All lines (ADB0-3, HSK*, BAV*) are pull-down outputs with open collectors,
+    and at the same time also inputs.
+
+    The challenge, compared to other daisy-chained buses, is that the Hexbus
+    is nondirectional. Writing on the bus is sensed by all devices in either
+    direction. Also, reading from the bus is the product of all active output
+    buffers. With no active device, the bus lines are pulled high.
+
+    Every Hexbus device has an interface "device_ti_hexbus_interface" which
+    allows it to plug into a preceding Hexbus socket.
+
+    Since the signal propagation is the same for all devices, there is a
+    parent class "hexbus_chained_device" that calculates the current levels
+    for all bus lines by fetching all values from the attached devices, ANDing
+    them, and propagating them again. This must be done in both directions.
+
+    Reading is simpler, because we assume that changes can only be done by
+    writing to the bus.
+
+    The "hexbus_chained_device" implements the "device_ti_hexbus_interface"
+    and holds references to up to two Hexbus instances, one for each direction.
+    The computer console will not offer an inbound Hexbus connection, only
+    an outbound one, and possibly there is some device that must be connected
+    at the end, without further outbound connections.
 
     References
     ----------
@@ -118,163 +145,162 @@
 // Hexbus instance
 DEFINE_DEVICE_TYPE_NS(TI_HEXBUS, bus::ti99::hexbus, hexbus_device,  "ti_hexbus",  "Hexbus")
 
-// Hexbus daisy chain
-DEFINE_DEVICE_TYPE_NS(TI_HEXBUS_CHAIN, bus::ti99::hexbus, hexbus_chain_device, "ti_hexbus_chain", "Hexbus chain")
-
-// Single slot of the Hexbus
-DEFINE_DEVICE_TYPE_NS(TI_HEXBUS_SLOT, bus::ti99::hexbus, hexbus_slot_device, "ti_hexbus_slot", "Hexbus position")
-
 namespace bus { namespace ti99 { namespace hexbus {
-
-enum
-{
-	NOTCONN = -1
-};
 
 hexbus_device::hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI_HEXBUS, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_master(nullptr),
-	m_slave(nullptr)
+	m_next_dev(nullptr)
 {
 }
 
 void hexbus_device::device_start()
 {
+	m_next_dev = dynamic_cast<device_ti_hexbus_interface *>(get_card_device());
 }
 
-void hexbus_device::device_config_complete()
+/*
+    Write to the hexbus. If the write operation comes from the plugged device,
+    this is an inbound write; otherwise, the write comes from the owner of the
+    hexbus connector, which means an outbound write.
+*/
+void hexbus_device::write(int dir, uint8_t data)
 {
-	m_slave = dynamic_cast<device_ti_hexbus_interface*>(subdevices().first());
-	if (m_slave != nullptr)
-		m_slave->set_hexbus(this);
-}
-
-void hexbus_device::send()
-{
-	uint8_t sum = m_master->get_value();
-	if (m_slave != nullptr)
+	if (dir == INBOUND)
+		m_chain_element->bus_write(INBOUND, data);
+	else
 	{
-		sum &= m_slave->get_value();
-		m_slave->receive(sum);
+		// Is there another Hexbus device?
+		if (m_next_dev != nullptr)
+			m_next_dev->bus_write(OUTBOUND, data);
 	}
-	m_master->receive(sum);
+}
+
+/*
+    Read from the hexbus. If the read operation comes from the plugged device,
+    this is an inbound read; otherwise, the read comes from the owner of the
+    hexbus connector, which means an outbound read.
+*/
+uint8_t hexbus_device::read(int dir)
+{
+	// Default is: all lines pulled up
+	uint8_t value = 0xff;
+
+	if (dir == INBOUND)
+		value = m_chain_element->bus_read(INBOUND);
+	else
+	{
+		// Is there another Hexbus device?
+		if (m_next_dev != nullptr)
+			value = m_next_dev->bus_read(OUTBOUND);
+	}
+	return value;
 }
 
 // ------------------------------------------------------------------------
 
-hexbus_chain_device::hexbus_chain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TI_HEXBUS_CHAIN, tag, owner, clock),
+hexbus_chained_device::hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+	device_t(mconfig, type, tag, owner, clock),
 	device_ti_hexbus_interface(mconfig, *this)
 {
+	m_hexbus_inbound = dynamic_cast<hexbus_device *>(owner);
+	m_myvalue = 0xff;
 }
 
-uint8_t hexbus_chain_device::get_value()
+void hexbus_chained_device::device_start()
 {
-	uint8_t sum = 0xff;
+	m_hexbus_outbound = static_cast<hexbus_device*>(subdevice("hexbus"));
 
-	// Do the wired AND
-	for (device_t &child : subdevices())
+	// Establish callback for inbound propagations
+	m_hexbus_outbound->set_chain_element(this);
+}
+
+/*
+    Called from the Hexbus user, that is, the device that subclasses
+    hexbus_chained_device, like the HX5102
+*/
+void hexbus_chained_device::hexbus_write(uint8_t data)
+{
+	m_myvalue = data;
+
+	uint8_t inbound_value = 0xff;
+	uint8_t outbound_value = 0xff;
+
+	// Determine the current bus level from the values of the
+	// other devices left and right from us
+	if (m_hexbus_inbound != nullptr)
+		inbound_value = m_hexbus_inbound->read(INBOUND);
+
+	if (m_hexbus_outbound != nullptr)
+		outbound_value = m_hexbus_outbound->read(OUTBOUND);
+
+	// What is the new bus level?
+	uint8_t newvalue = inbound_value & outbound_value & m_myvalue;
+
+	// If it changed, propagate to both directions.
+	if (newvalue != m_current_bus_value)
 	{
-		hexbus_slot_device* slot = downcast<hexbus_slot_device *>(&child);
-		sum &= slot->get_value();
-	}
+		hexbus_value_changed(newvalue);
+		m_current_bus_value = newvalue;
 
-	return sum;
+		if (m_hexbus_inbound != nullptr)
+			m_hexbus_inbound->write(INBOUND, m_current_bus_value);
+
+		if (m_hexbus_outbound != nullptr)
+			m_hexbus_outbound->write(OUTBOUND, m_current_bus_value);
+	}
 }
 
-void hexbus_chain_device::receive(uint8_t value)
+/*
+    Called from the Hexbus user, that is, the device that subclasses
+    hexbus_chained_device, like the HX5102
+*/
+uint8_t hexbus_chained_device::hexbus_read()
 {
+	return m_current_bus_value;
+}
+
+/*
+    Called from another hexbus device on the bus
+*/
+uint8_t hexbus_chained_device::bus_read(int dir)
+{
+	uint8_t tmpvalue = 0xff;
+	hexbus_device* hexbuscont = (dir == INBOUND)? m_hexbus_inbound : m_hexbus_outbound;
+
+	if (hexbuscont != nullptr)
+		tmpvalue = hexbuscont->read(dir);
+
+	return m_myvalue & tmpvalue;
+}
+
+/*
+    Called from another hexbus device on the bus
+*/
+void hexbus_chained_device::bus_write(int dir, uint8_t data)
+{
+	hexbus_device* hexbuscont = (dir == INBOUND)? m_hexbus_inbound : m_hexbus_outbound;
+
+	// Notify device
+	if (data != m_current_bus_value)
+		hexbus_value_changed(data);
+
+	m_current_bus_value = data;
+
 	// Propagate
-	for (device_t &child : subdevices())
-	{
-		hexbus_slot_device* slot = downcast<hexbus_slot_device *>(&child);
-		slot->receive(value);
-	}
+	if (hexbuscont != nullptr)
+		hexbuscont->write(dir, data);
 }
 
-void hexbus_chain_device::device_start()
-{
-}
-
-SLOT_INTERFACE_START( ti_hexbus_chain_slot )
-//  SLOT_INTERFACE("hx5102", TI_HX5102)  // not an option yet
-SLOT_INTERFACE_END
-
-MACHINE_CONFIG_MEMBER( hexbus_chain_device::device_add_mconfig )
-	MCFG_HEXBUS_SLOT_ADD( "1", ti_hexbus_chain_slot )
-	MCFG_HEXBUS_SLOT_ADD( "2", ti_hexbus_chain_slot )
-	MCFG_HEXBUS_SLOT_ADD( "3", ti_hexbus_chain_slot )
-	MCFG_HEXBUS_SLOT_ADD( "4", ti_hexbus_chain_slot )
+MACHINE_CONFIG_MEMBER( hexbus_chained_device::device_add_mconfig )
+	MCFG_HEXBUS_ADD("hexbus")
 MACHINE_CONFIG_END
-
-// ------------------------------------------------------------------------
-
-int hexbus_slot_device::get_index_from_tagname()
-{
-	const char *mytag = tag();
-	int maxlen = strlen(mytag);
-	int i;
-	for (i=maxlen-1; i >=0; i--)
-		if (mytag[i] < 48 || mytag[i] > 57) break;
-
-	return atoi(mytag+i+1);
-}
-
-hexbus_slot_device::hexbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI_HEXBUS_SLOT, tag, owner, clock),
-	  device_slot_interface(mconfig, *this),
-	  m_hexbdev(nullptr)
-{
-}
-
-/* Called from the Hexbus instance */
-int hexbus_slot_device::get_index()
-{
-	if (m_hexbdev == nullptr) return NOTCONN;
-	return get_index_from_tagname();
-}
-
-uint8_t hexbus_slot_device::get_value()
-{
-	return (m_hexbdev != nullptr)? m_hexbdev->get_value() : 0xff;
-}
-
-void hexbus_slot_device::receive(uint8_t value)
-{
-	if (m_hexbdev != nullptr)
-		m_hexbdev->receive(value);
-}
-
-void hexbus_slot_device::device_start()
-{
-}
-
-void hexbus_slot_device::device_config_complete()
-{
-	m_hexbus = dynamic_cast<hexbus_device*>(owner());
-	m_hexbdev = dynamic_cast<device_ti_hexbus_interface *>(subdevices().first());
-}
-
-// ------------------------------------------------------------------------
-
-void device_ti_hexbus_interface::interface_config_complete()
-{
-	m_hexbus = dynamic_cast<hexbus_device*>(device().owner());
-}
-
-void device_ti_hexbus_interface::hexbus_send(uint8_t value)
-{
-	m_value = value;
-	m_hexbus->send();
-}
 
 // ------------------------------------------------------------------------
 
 }   }   }  // end namespace bus::ti99::hexbus
 
 SLOT_INTERFACE_START( ti_hexbus_conn )
-//  SLOT_INTERFACE("hx5102", TI_HX5102)  // not an option yet
-	SLOT_INTERFACE("chain", TI_HEXBUS_CHAIN)
+	SLOT_INTERFACE("hx5102", TI_HX5102)
 SLOT_INTERFACE_END
 

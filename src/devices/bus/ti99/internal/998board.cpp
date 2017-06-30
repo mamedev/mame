@@ -2228,13 +2228,14 @@ enum
 };
 
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TI99_OSO, tag, owner, clock),
-	bus::ti99::hexbus::device_ti_hexbus_interface(mconfig, *this),
+	bus::ti99::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_data(0),
 	m_status(0),
 	m_control(0),
 	m_xmit(0)
 {
+	m_hexbus_inbound = nullptr;
+	m_hexbus_outbound = nullptr;
 }
 
 READ8_MEMBER( oso_device::read )
@@ -2276,6 +2277,7 @@ WRITE8_MEMBER( oso_device::write )
 		// write 5FF8: write transmit register
 		if (TRACE_OSO) logerror("Write transmit register %02x\n", data);
 		m_xmit = data;
+		hexbus_write(data);
 		// We set the status register directly in order to prevent lock-ups
 		// until we have a complete Hexbus implementation
 		m_status |= HSKWT;
@@ -2292,13 +2294,20 @@ WRITE8_MEMBER( oso_device::write )
 	}
 }
 
+void oso_device::hexbus_value_changed(uint8_t data)
+{
+	if (TRACE_OSO) logerror("Hexbus value changed to %02x\n", data);
+}
+
 void oso_device::device_start()
 {
 	logerror("Starting\n");
 	m_status = m_xmit = m_control = m_data = 0;
 
-	m_hexbus = downcast<bus::ti99::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
-	m_hexbus->connect_master(this);
+	m_hexbus_outbound = dynamic_cast<bus::ti99::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
+
+	// Establish callback
+	m_hexbus_outbound->set_chain_element(this);
 
 	save_item(NAME(m_data));
 	save_item(NAME(m_status));

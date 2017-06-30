@@ -770,19 +770,19 @@ if (CPUS["IE15"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Intel 4004
---@src/devices/cpu/i4004/i4004.h,CPUS["I4004"] = true
+-- Intel MCS-40
+--@src/devices/cpu/mcs40/mcs40.h,CPUS["MCS40"] = true
 --------------------------------------------------
 
-if (CPUS["I4004"]~=null) then
+if (CPUS["MCS40"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/i4004/i4004.cpp",
-		MAME_DIR .. "src/devices/cpu/i4004/i4004.h",
+		MAME_DIR .. "src/devices/cpu/mcs40/mcs40.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs40/mcs40.h",
 	}
 end
 
-if (CPUS["I4004"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i4004/4004dasm.cpp")
+if (CPUS["MCS40"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs40/mcs40dasm.cpp")
 end
 
 --------------------------------------------------
@@ -1765,7 +1765,7 @@ end
 
 if (CPUS["SM510"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/sm510/sm510.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm510base.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510.h",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510op.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510core.cpp",
@@ -1773,9 +1773,7 @@ if (CPUS["SM510"]~=null) then
 		MAME_DIR .. "src/devices/cpu/sm510/sm500.h",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500op.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/kb1013vk1-2.h",
-		MAME_DIR .. "src/devices/cpu/sm510/kb1013vk1-2op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/kb1013vk1-2core.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm5acore.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590.h",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590op.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590core.cpp",

@@ -2,12 +2,12 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	coco_dcmodem.cpp
+    coco_dcmodem.cpp
 
-	Code for emulating the CoCo Direct Connect Modem PAK
+    Code for emulating the CoCo Direct Connect Modem PAK
 
-	This is just a "skeleton device"; the UART is emulated but pretty much
-	nothing else
+    This is just a "skeleton device"; the UART is emulated but pretty much
+    nothing else
 
 ***************************************************************************/
 
@@ -17,7 +17,7 @@
 
 
 /***************************************************************************
-	CONSTANTS
+    CONSTANTS
 ***************************************************************************/
 
 #define UART_TAG        "uart"
@@ -78,7 +78,7 @@ namespace
 
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 MACHINE_CONFIG_MEMBER(coco_dc_modem_device::device_add_mconfig)

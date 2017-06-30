@@ -15,20 +15,21 @@ enum
 	S2650_HALT, S2650_SI, S2650_FO
 };
 
-/* fake I/O space ports */
+// D/~C (A14) single-bit addresses for non-extended I/O ports
 enum
 {
-	S2650_EXT_PORT      = 0x00ff,   /* M/~IO=0 D/~C=x E/~NE=1 */
-	S2650_CTRL_PORT     = 0x0100,   /* M/~IO=0 D/~C=0 E/~NE=0 */
-	S2650_DATA_PORT     = 0x0101,   /* M/~IO=0 D/~C=1 E/~NE=0 */
-	S2650_SENSE_PORT    = 0x0102    /* Fake Sense Line */
+	S2650_CTRL_PORT = 0,
+	S2650_DATA_PORT = 1
 };
 
 
 DECLARE_DEVICE_TYPE(S2650, s2650_device)
 
 
-#define MCFG_S2650_FLAG_HANDLER(_devcb) \
+#define MCFG_S2650_SENSE_INPUT(_devcb) \
+	devcb = &s2650_device::set_sense_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_S2650_FLAG_OUTPUT(_devcb) \
 	devcb = &s2650_device::set_flag_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_S2650_INTACK_HANDLER(_devcb) \
@@ -41,6 +42,7 @@ public:
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
+	template <class Object> static devcb_base &set_sense_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_sense_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_flag_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_intack_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_intack_handler.set_callback(std::forward<Object>(cb)); }
 
@@ -58,10 +60,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr );
-	}
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -76,7 +75,9 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+	address_space_config m_data_config;
 
+	devcb_read_line m_sense_handler;
 	devcb_write_line m_flag_handler;
 	devcb_write_line m_intack_handler;
 
@@ -94,14 +95,13 @@ private:
 	uint8_t   m_irq_state;
 
 	int     m_icount;
-	address_space *m_program;
 	direct_read_data *m_direct;
-	address_space *m_io;
 
 	// For debugger
 	uint16_t  m_debugger_temp;
 
 	inline void set_psu(uint8_t new_val);
+	inline uint8_t get_psu();
 	inline uint8_t get_sp();
 	inline void set_sp(uint8_t new_sp);
 	inline int check_irq_line();

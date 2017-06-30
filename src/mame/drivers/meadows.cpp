@@ -362,7 +362,7 @@ static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8, meadows_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( minferno_io_map, AS_IO, 8, meadows_state )
+static ADDRESS_MAP_START( minferno_data_map, AS_DATA, 8, meadows_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
@@ -652,7 +652,7 @@ static MACHINE_CONFIG_START( minferno )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
 	MCFG_CPU_PROGRAM_MAP(minferno_main_map)
-	MCFG_CPU_IO_MAP(minferno_io_map)
+	MCFG_CPU_DATA_MAP(minferno_data_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  minferno_interrupt)
 
 	/* video hardware */

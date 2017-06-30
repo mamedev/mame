@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "video/deckarn.h"
+#include "video/decrmc3.h"
 
 class karnov_state : public driver_device
 {
@@ -32,7 +33,7 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<deco_karnovsprites_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	required_device<deco_rmc3_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
@@ -69,7 +70,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(karnov);
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

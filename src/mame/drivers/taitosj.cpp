@@ -256,8 +256,7 @@ ADDRESS_MAP_END
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
 static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07fe) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
-	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x07fe) AM_READ(taitosj_mcu_status_r)
+	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 	AM_IMPORT_FROM( taitosj_main_nomcu_map )
 ADDRESS_MAP_END
 
@@ -289,8 +288,7 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
-	AM_RANGE(0x8801, 0x8801) AM_READ(taitosj_mcu_status_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 	AM_RANGE(0x8802, 0x8802) AM_NOP
 	AM_RANGE(0x8a00, 0x8a5f) AM_WRITEONLY AM_SHARE("colscrolly")
 	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_SHARE("characterram")
@@ -1815,10 +1813,12 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
-	MCFG_M68705_PORTA_W_CB(WRITE8(taitosj_state, taitosj_68705_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(taitosj_state, taitosj_68705_portB_w))
-	MCFG_M68705_PORTC_R_CB(READ8(taitosj_state, taitosj_68705_portC_r))
+	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
+	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
+	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(taitosj_state, mcu_mem_r))
+	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(taitosj_state, mcu_mem_w))
+	MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(WRITELINE(taitosj_state, mcu_intrq_w))
+	MCFG_TAITO_SJ_SECURITY_MCU_BUSRQ_CB(WRITELINE(taitosj_state, mcu_busrq_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END
@@ -2274,7 +2274,7 @@ ROM_START( frontlin )
 	ROM_LOAD( "fl70.u70",     0x0000, 0x1000, CRC(15f4ed8c) SHA1(ec096234e4e594100180eb99c8c57eb97b9f57e2) )
 	ROM_LOAD( "fl71.u71",     0x1000, 0x1000, CRC(c3eb38e7) SHA1(427e5deb6a6e22d8c34923209a818f79d50e59d4) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "aa1.13",       0x0000, 0x0800, CRC(7e78bdd3) SHA1(9eeb0e969fd013b9db074a15b0463216453e9364) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2441,7 +2441,7 @@ ROM_START( elevator ) // 5 board set, using 2732s on both mainboard and square r
 	ROM_REGION( 0x0800, "pal", 0 ) // on GAME BOARD
 	ROM_LOAD( "ww15.pal16l8.ic24.jed.bin",  0x0000, 0x0117, CRC(c3ec20d6) SHA1(4bcdd92ca6b75ba825a7f90b1f35d8dcaeaf8a96) ) // what format is this? jed2bin?
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "ba3__11.mc68705p3.ic4",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC4 on the older Z80+security daughterboard; The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime, on Square ROM board */
@@ -2529,7 +2529,7 @@ ROM_START( elevator4 ) // later 4 board set, with rom data on 2764s, split betwe
 	ROM_REGION( 0x0800, "pal", 0 ) // on GAME BOARD
 	ROM_LOAD( "ww15.pal16l8.ic24.jed.bin",  0x0000, 0x0117, CRC(c3ec20d6) SHA1(4bcdd92ca6b75ba825a7f90b1f35d8dcaeaf8a96) ) // what format is this? jed2bin?
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "ba3__11.mc68705p3.ic24",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC24 on the later CPU BOARD; The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime, on L-shaped rom board */
@@ -2559,7 +2559,7 @@ ROM_START( tinstar )
 	ROM_LOAD( "ts.71",        0x1000, 0x1000, CRC(03c91332) SHA1(3903e876ae02e9aea7ee6854bb4c6407dd7108d6) )
 	ROM_LOAD( "ts.72",        0x2000, 0x1000, CRC(beeed8f3) SHA1(2a18edecabbfd10b3238338cb5554edc8c18d93c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a10-12",       0x0000, 0x0800, CRC(889eefc9) SHA1(1a31aa21c02215410eea27ed52fad67f007ee810) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2603,7 +2603,7 @@ ROM_START( tinstar2 )
 	ROM_LOAD( "a10-29.bin",        0x0000, 0x2000, CRC(771f1a6a) SHA1(c5d1841840ff35e2c20a285b1b7f35150356f50f) )
 	ROM_LOAD( "a10-10.bin",        0x2000, 0x1000, CRC(beeed8f3) SHA1(2a18edecabbfd10b3238338cb5554edc8c18d93c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a10-12",       0x0000, 0x0800, CRC(889eefc9) SHA1(1a31aa21c02215410eea27ed52fad67f007ee810) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2684,7 +2684,7 @@ ROM_START( sfposeid )
 	ROM_LOAD( "a14-10.70",    0x0000, 0x1000, CRC(f1365f35) SHA1(34b3ea03eb9fbf5454858fa6e07ec49a7b3be8b4) )
 	ROM_LOAD( "a14-11.71",    0x1000, 0x1000, CRC(74a12fe2) SHA1(8678ea68bd283b7a63915717cdbbedef0b699198) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a14-12",       0x0000, 0x0800, CRC(091beed8) SHA1(263806aef01bbc258f5cfa92de8a9e355491fb3a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2740,7 +2740,7 @@ ROM_START( kikstart )
 	ROM_LOAD( "a20-11",       0x1000, 0x1000, CRC(8db12dd9) SHA1(3b291d478b3f3f1bf93d95a78506d99a71f36d05) )
 	ROM_LOAD( "a20-12",       0x2000, 0x1000, CRC(e7eeb933) SHA1(26f3904f6d4dc814318221f1c9cd5dcc671fe05a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a20-13.ic91",  0x0000, 0x0800, CRC(3fb6c4fb) SHA1(04b9458f21a793444cd587055e2e3ccfa3f835a2) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */

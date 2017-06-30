@@ -102,30 +102,62 @@ WRITE8_MEMBER(arabian_state::ay8910_portb_w)
  *
  *************************************/
 
-READ8_MEMBER(arabian_state::mcu_port_r_r)
+READ8_MEMBER(arabian_state::mcu_port_r0_r)
 {
-	uint8_t val = m_mcu_port_r[offset];
+	uint8_t val = m_mcu_port_r[0];
 
 	/* RAM mode is enabled */
-	if (offset == 0)
-		val |= 4;
+	val |= 4;
 
 	return val;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_r_w)
+READ8_MEMBER(arabian_state::mcu_port_r1_r)
 {
-	if (offset == 0)
-	{
-		uint32_t ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
+	uint8_t val = m_mcu_port_r[1];
 
-		if (~data & 2)
-			m_custom_cpu_ram[ram_addr] = 0xf0 | m_mcu_port_r[3];
+	return val;
+}
 
-		m_flip_screen = data & 8;
-	}
+READ8_MEMBER(arabian_state::mcu_port_r2_r)
+{
+	uint8_t val = m_mcu_port_r[2];
 
-	m_mcu_port_r[offset] = data & 0x0f;
+	return val;
+}
+
+READ8_MEMBER(arabian_state::mcu_port_r3_r)
+{
+	uint8_t val = m_mcu_port_r[3];
+
+	return val;
+}
+
+WRITE8_MEMBER(arabian_state::mcu_port_r0_w)
+{
+	uint32_t ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
+
+	if (~data & 2)
+		m_custom_cpu_ram[ram_addr] = 0xf0 | m_mcu_port_r[3];
+
+	m_flip_screen = data & 8;
+
+	m_mcu_port_r[0] = data & 0x0f;
+}
+
+WRITE8_MEMBER(arabian_state::mcu_port_r1_w)
+{
+	m_mcu_port_r[1] = data & 0x0f;
+}
+
+WRITE8_MEMBER(arabian_state::mcu_port_r2_w)
+{
+	m_mcu_port_r[2] = data & 0x0f;
+}
+
+WRITE8_MEMBER(arabian_state::mcu_port_r3_w)
+{
+	m_mcu_port_r[3] = data & 0x0f;
 }
 
 READ8_MEMBER(arabian_state::mcu_portk_r)
@@ -199,21 +231,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, arabian_state )
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  MCU port handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, arabian_state )
-	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ(mcu_portk_r)
-	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE(mcu_port_o_w)
-	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE(mcu_port_p_w)
-	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READWRITE(mcu_port_r_r, mcu_port_r_w)
 ADDRESS_MAP_END
 
 
@@ -345,7 +362,17 @@ static MACHINE_CONFIG_START( arabian )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arabian_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("mcu", MB8841, MAIN_OSC/3/2)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MB88XX_READ_K_CB(READ8(arabian_state, mcu_portk_r))
+	MCFG_MB88XX_WRITE_O_CB(WRITE8(arabian_state, mcu_port_o_w))
+	MCFG_MB88XX_WRITE_P_CB(WRITE8(arabian_state, mcu_port_p_w))
+	MCFG_MB88XX_READ_R0_CB(READ8(arabian_state, mcu_port_r0_r))
+	MCFG_MB88XX_WRITE_R0_CB(WRITE8(arabian_state, mcu_port_r0_w))
+	MCFG_MB88XX_READ_R1_CB(READ8(arabian_state, mcu_port_r1_r))
+	MCFG_MB88XX_WRITE_R1_CB(WRITE8(arabian_state, mcu_port_r1_w))
+	MCFG_MB88XX_READ_R2_CB(READ8(arabian_state, mcu_port_r2_r))
+	MCFG_MB88XX_WRITE_R2_CB(WRITE8(arabian_state, mcu_port_r2_w))
+	MCFG_MB88XX_READ_R3_CB(READ8(arabian_state, mcu_port_r3_r))
+	MCFG_MB88XX_WRITE_R3_CB(WRITE8(arabian_state, mcu_port_r3_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

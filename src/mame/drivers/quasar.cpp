@@ -126,9 +126,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( quasar_io, AS_IO, 8, quasar_state )
 	AM_RANGE(0x00, 0x03) AM_READWRITE(quasar_IO_r, video_page_select_w)
 	AM_RANGE(0x08, 0x0b) AM_WRITE(io_page_select_w)
-	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READ(cvs_collision_clear) AM_WRITE(quasar_sh_command_w)
-	AM_RANGE(S2650_CTRL_PORT,  S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITENOP
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( quasar_data, AS_DATA, 8, quasar_state )
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITENOP
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, quasar_sh_command_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -217,9 +219,6 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x80, "Stop at edge" )
 	PORT_DIPSETTING(    0x00, "Wrap Around" )
 
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_START("DSW2")
 #if 0
 	PORT_DIPNAME( 0x0f, 0x00, "Noise to play" )
@@ -300,7 +299,9 @@ static MACHINE_CONFIG_START( quasar )
 	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)  /* 14 mhz crystal divide by 4 on board */
 	MCFG_CPU_PROGRAM_MAP(quasar)
 	MCFG_CPU_IO_MAP(quasar_io)
+	MCFG_CPU_DATA_MAP(quasar_data)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quasar_state,  quasar_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 
 	MCFG_CPU_ADD("soundcpu",I8035,6000000)          /* 6MHz crystal divide by 15 in CPU */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

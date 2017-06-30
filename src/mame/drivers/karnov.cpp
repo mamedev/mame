@@ -826,8 +826,7 @@ static MACHINE_CONFIG_START( karnov )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
+	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
@@ -905,8 +904,7 @@ static MACHINE_CONFIG_START( wndrplnt )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
+	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)

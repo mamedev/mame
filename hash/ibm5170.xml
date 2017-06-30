@@ -1378,6 +1378,204 @@ Missing files come here
 		</part>
 	</software>
 
+	<!-- IBM Extended Density Format not supported -->
+	<software name="pcdos7fr" cloneof="pcdos7" supported="no">
+		<description>PC DOS 7.0 (French)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01fr.img" size="1474560" crc="1189b720" sha1="4571f7b487b9676f098f537b1c13db315f3a81c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk02fr.xdf" size="1884160" crc="3c718740" sha1="d1892229006391e6f3e10b3506bc81ba0f38e85e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk03fr.xdf" size="1884160" crc="6e5eacee" sha1="1af82dc8a2878b52cab145f13c6ccd326edac17b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk04fr.xdf" size="1884160" crc="60196253" sha1="4115dcc740b45c18ed936819fa70ca0f712c0438" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk05fr.xdf" size="1884160" crc="2e8322e4" sha1="08ca6edd8b12e57cda39e80ee60c9e5f955dca4c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- IBM Extended Density Format not supported -->
+	<software name="pcdos7ja" cloneof="pcdos7" supported="no">
+		<description>PC DOS 7.0 (Japanese)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="J7.0/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01ja.img" size="1474560" crc="912ae95f" sha1="d4c2d5e4a1f8bc99bc8d19aa5eca63f55847e8a3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk02ja.xdf" size="1884160" crc="433075f1" sha1="6438e4fb5da243d432721ea317c53c9f2c9ce73f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk03ja.xdf" size="1884160" crc="078a3589" sha1="1f93e8540086ccdfba076ee5d2040914013aa6a8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk04ja.xdf" size="1884160" crc="9ae2ff38" sha1="0b3ea36035a138e0a2b3c98f58b89ba8168292c6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk05ja.xdf" size="1884160" crc="d9e3e5d2" sha1="7d4db930ebf5a9377045dbf229e661481b8d64bf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk06ja.xdf" size="1884160" crc="a66d2c31" sha1="ebf79d56e050365226fadf86dcbcb3d331d471e5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk07ja.xdf" size="1884160" crc="ef5a8f77" sha1="4ca4f6abba4811007b2b4973dc5a3f9d6c09bcdb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk08ja.xdf" size="1884160" crc="a8b54837" sha1="aad9a3ac9e0b063431d1fc074eb5eb88c12da616" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk09ja.xdf" size="1884160" crc="522de6b7" sha1="0a57dee3b2c6c066edabfa808626784c26480f8d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- IBM Extended Density Format not supported -->
+	<software name="pcdos7ko" cloneof="pcdos7" supported="no">
+		<description>PC DOS 7.0 (Korean)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="H7.0, Revision 0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01ko.img" size="1474560" crc="8a26619d" sha1="3b8b1f99fd95d528fbe8c2362e0f093d7553c7c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk02ko.xdf" size="1884160" crc="c8141e01" sha1="566bfcae495d953a9a755a98b3dc5b09d8d67ff3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk03ko.xdf" size="1884160" crc="c510e5f3" sha1="528e1002d1d925567014542593dd5d9e8c06db7d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk04ko.xdf" size="1884160" crc="cc29107b" sha1="78b4fb3cf1cce436117ca2004d4b0810faea200d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk05ko.xdf" size="1884160" crc="6604e2d2" sha1="767752cc417f3753f8f67d30fe09d477a1cf160a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk06ko.xdf" size="1884160" crc="268d64a3" sha1="9d7d4539465b3d9a230383bc3db14cb9d4f00fd8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk07ko.xdf" size="1884160" crc="6dccc9c6" sha1="76fcfaa60159e3d4e1d31460d7f479a473d481e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk08ko.xdf" size="1884160" crc="e425f087" sha1="ed795942e8905d20c668c99b7272574c2de3eae1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- IBM Extended Density Format not supported -->
+	<software name="pcdos7ru" cloneof="pcdos7" supported="no">
+		<description>PC DOS 7.0 (Russian)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.0, Revision 0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01ru.img" size="1474560" crc="bc896ba2" sha1="7b46b003c1053f66b5795b929b9499d5ff64ce1a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk02ru.xdf" size="1884160" crc="1d639788" sha1="90eb1b68716cc4e7e2a3fe16f0b9320f0921361f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk03ru.xdf" size="1884160" crc="beb30c08" sha1="c4ff5ea400c40586ae02e47791aca8afa5e3243e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk04ru.xdf" size="1884160" crc="3ba3f9e4" sha1="b8c34b66c5c15004ec0979e305390e0bd204ad11" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk05ru.xdf" size="1884160" crc="1cea4b53" sha1="1fea56f56cd8620e244633d359f3041c9304a8a7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- IBM Extended Density Format not supported -->
+	<software name="pcdos7engb" cloneof="pcdos7" supported="no">
+		<description>PC DOS 7.0 (UK English)</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01en-GB.img" size="1474560" crc="783911fd" sha1="50def639e87e68ea9445f441197adff105930ac5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk02en-GB.xdf" size="1884160" crc="c9d8011d" sha1="f340232d6df47635d9482a0c7e92e8b2ae3cb9ae" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk03en-GB.xdf" size="1884160" crc="5f3cb76c" sha1="84dcb7af204ef93086ff0e6dc9ff7f804a7f3ce8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk04en-GB.xdf" size="1884160" crc="0efde128" sha1="9e1e5e0f2edcead15ae136eae6bee218f7aba5d5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk05en-GB.xdf" size="1884160" crc="f16ee7c7" sha1="0324ce2ff00f08ff582a1f81dafb7d0b859a46f0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos2k">
 		<description>IBM PC DOS 2000</description>
 		<year>1998</year>
@@ -1572,6 +1770,59 @@ Missing files come here
 		<part name="flop10" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="disk10ko.img" size="1474560" crc="4d016845" sha1="a3f861b5a5a7bc9799f25a58c06ef1879e87a6ce" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- IBM Extended Density Format not supported -->
+	<software name="pcdos2kzhs" cloneof="pcdos2k" supported="no">
+		<description>IBM PC DOS 2000 (Simplified Chinese)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.00, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01zh-Hans.img" size="1474560" crc="e9a01d5c" sha1="e58c85870e5e95190515fcc76a2a78f90bd13f81" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk02zh-Hans.xdf" size="1884160" crc="2e85a011" sha1="d5ca3c422a6964d4cce4e7135ff54d2d71dba80a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk03zh-Hans.xdf" size="1884160" crc="a914947c" sha1="3c15a15aa9995964f00b48f76ae0140187ff4aea" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk04zh-Hans.xdf" size="1884160" crc="2d3555c6" sha1="5a4bc701b141a50db3ff090a4b5438c799c77b71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk05zh-Hans.xdf" size="1884160" crc="6bc1b58f" sha1="13db259ad90fcef3f8d19f0f4aa2c41da63237ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk06zh-Hans.xdf" size="1884160" crc="8abfe174" sha1="13770e75992274be525fad48b2db91a67dc74262" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk07zh-Hans.xdf" size="1884160" crc="1a16a40e" sha1="67c5d7b8174abaf7691a68438a43013c1595f2c0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk08zh-Hans.xdf" size="1884160" crc="6763b25c" sha1="631632510f05f0c3c59315d835a4fdc9e717c6a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1884160">
+				<rom name="Disk09zh-Hans.xdf" size="1884160" crc="97657c9a" sha1="1595d85dbc8d72bdadc1cf3bf960018340d094db" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

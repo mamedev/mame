@@ -18,9 +18,12 @@
         * M4T28-8R128H1 TimeKeeper RTC/CMOS
         * PLX PCI9050 Bus Target Interface Chip (interfaces ISA-style designs to PCI)
         * Midway Zeus-series custom video
-        * TL16c552 dual UART
-        * ADSP-2181 based DCS2 audio (unclear which variant)
-        * PIC16C57 (protection? serial #?)
+		* Actiontec PM560LKI PCI Data/Fax Modem (PCI\VEN_11C1&DEV_0480&SUBSYS_04801668)
+		* TL16c552 dual UART
+		* ADSP-2181 based DCS2 audio (unclear which variant)
+		* Cirrus Logic CS4338 16 bit stereo audio serial DAC, PCB has space for 3 chips (6-channels), only 1 is populated
+		* Maxim MAX192 8 channel 10 bit serial ADC
+		* PIC16C57 (protection? serial #?)
         * Quantum Fireball CX 6.4GB IDE HDD (C/H/S 13328/15/63)
 
     TODO:
@@ -46,7 +49,7 @@
 #include "machine/pci9050.h"
 #include "machine/pci-ide.h"
 #include "video/zeus2.h"
-#include "machine/nvram.h"
+#include "machine/timekpr.h"
 #include "coreutil.h"
 
 // Reset bits
@@ -54,7 +57,8 @@
 #define RESET_ROMBUS        0x02
 #define RESET_ZEUS          0x04
 #define RESET_ROMBUS_IN     0x08
-#define RESET_WDOG          0x10
+#define RESET_IDE           0x10
+#define RESET_DUART         0x20
 
 // IRQ Bits
 #define IOASIC_IRQ_SHIFT    0
@@ -76,6 +80,10 @@
 #define GALILEO_IRQ_NUM         MIPS3_IRQ0
 #define IDE_IRQ_NUM             MIPS3_IRQ4
 
+#define PCI_ID_NILE     ":pci:00.0"
+#define PCI_ID_9050     ":pci:0b.0"
+#define PCI_ID_IDE      ":pci:0c.0"
+
 #define DEBUG_CONSOLE   (0)
 #define LOG_RTC         (0)
 #define LOG_PORT        (0)
@@ -95,7 +103,9 @@ public:
 		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
-		m_rtc(*this, "rtc")
+		m_ide(*this, PCI_ID_IDE),
+		m_rtc(*this, "rtc"),
+		m_io_analog(*this, "AN.%u", 0)
 	{ }
 	DECLARE_DRIVER_INIT(mwskins);
 	virtual void machine_start() override;
@@ -109,8 +119,9 @@ public:
 	optional_device<generic_terminal_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<ns16550_device> m_uart2;
-	required_device<nvram_device> m_rtc;
-	uint8_t m_rtc_data[0x8000];
+	required_device<ide_pci_device> m_ide;
+	required_device<m48t37_device> m_rtc;
+	optional_ioport_array<8> m_io_analog;
 
 	READ8_MEMBER(cmos_r);
 	WRITE8_MEMBER(cmos_w);
@@ -144,6 +155,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
 
 	DECLARE_WRITE_LINE_MEMBER(uart1_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(uart2_irq_callback);
@@ -168,7 +181,7 @@ public:
 READ8_MEMBER(atlantis_state::parallel_r)
 {
 	logerror("%06X: parallel_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0);
-	return 0;
+	return 0x3;
 }
 
 WRITE8_MEMBER(atlantis_state::parallel_w)
@@ -179,8 +192,8 @@ WRITE8_MEMBER(atlantis_state::parallel_w)
 // Expansion ROM
 READ8_MEMBER (atlantis_state::exprom_r)
 {
-	logerror("%06X: exprom_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0);
-	return 0;
+	logerror("%06X: exprom_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0xff);
+	return 0xff;
 }
 
 WRITE8_MEMBER(atlantis_state::exprom_w)
@@ -197,6 +210,9 @@ READ32_MEMBER(atlantis_state::board_ctrl_r)
 	case PLD_REV:
 		// ???
 		data = 0x1;
+		if (LOG_IRQ)
+			logerror("%s:board_ctrl_r read from PLD_REV offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		break;
 	case STATUS:
 		if (LOG_IRQ)
 			logerror("%s:board_ctrl_r read from STATUS offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
@@ -228,8 +244,12 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 				m_dcs->reset_w(CLEAR_LINE);
 			}
 		}
-		if ((changeData & RESET_WDOG) || LOG_IRQ)
-			logerror("%s:board_ctrl_w write to RESET_WDOG offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		if (changeData & RESET_IDE) {
+			if (!(data & RESET_IDE))
+				m_ide->reset();
+		}
+		if ((changeData & RESET_IDE) || LOG_IRQ)
+			logerror("%s:board_ctrl_w write to RESET offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	case VSYNC_CLEAR:
 		//VSYNC_IE (0x1)
@@ -251,6 +271,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 	case IRQ_EN:
 		// Zero bit will clear cause
 		board_ctrl[CAUSE] &= data;
+		board_ctrl[STATUS] &= data;
 		update_asic_irq();
 		if (LOG_IRQ)
 			logerror("%s:board_ctrl_w write to IRQ_EN offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
@@ -287,6 +308,9 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 	case CMOS_UNLOCK:
 		m_cmos_write_enabled = true;
 		break;
+	case WDOG:
+		m_rtc->watchdog_write(space, offset, data);
+		break;
 	default:
 		if (LOG_IRQ)
 			logerror("%s:board_ctrl_w write to offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
@@ -297,36 +321,10 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 
 READ8_MEMBER(atlantis_state::cmos_r)
 {
-	uint8_t result = m_rtc_data[offset];
+	uint8_t result = m_rtc->read(space, offset);
 
-	switch (offset) {
-	case 0x7FF9:
-	case 0x7FFA:
-	case 0x7FFB:
-	case 0x7FFC:
-	case 0x7FFD:
-	case 0x7FFE:
-	case 0x7FFF:
-		if ((m_rtc_data[0x7FF8] & 0x40)==0) {
-			system_time systime;
-			// get the current date/time from the core
-			machine().current_datetime(systime);
-			m_rtc_data[0x7FF9] = dec_2_bcd(systime.local_time.second);
-			m_rtc_data[0x7FFA] = dec_2_bcd(systime.local_time.minute);
-			m_rtc_data[0x7FFB] = dec_2_bcd(systime.local_time.hour);
-
-			m_rtc_data[0x7FFC] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-			m_rtc_data[0x7FFD] = dec_2_bcd(systime.local_time.mday);
-			m_rtc_data[0x7FFE] = dec_2_bcd(systime.local_time.month + 1);
-			m_rtc_data[0x7FFF] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
-			result = m_rtc_data[offset];
-		}
-		break;
-	default:
-		if (LOG_RTC)
-			logerror("%s:RTC read from offset %04X = %08X m_rtc_data[0x7FF8] %02X\n", machine().describe_context(), offset, result, m_rtc_data[0x7FF8]);
-		break;
-	}
+	if (LOG_RTC || ((offset >= 0x7ff0) && (offset != 0x7ff9)))
+		logerror("%s:RTC read from offset %04X = %08X\n", machine().describe_context(), offset, result);
 	return result;
 }
 
@@ -343,31 +341,10 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 			m_serial_count = 0;
 	}
 	else if (m_cmos_write_enabled) {
-		COMBINE_DATA(&m_rtc_data[offset]);
+		m_rtc->write(space, offset, data);
 		m_cmos_write_enabled = false;
-		switch (offset) {
-		case 0x7FF8: // M48T02 time
-			if (data & 0x40) {
-				// get the current date/time from the core
-				machine().current_datetime(systime);
-				m_rtc_data[0x7FF9] = dec_2_bcd(systime.local_time.second);
-				m_rtc_data[0x7FFA] = dec_2_bcd(systime.local_time.minute);
-				m_rtc_data[0x7FFB] = dec_2_bcd(systime.local_time.hour);
-
-				m_rtc_data[0x7FFC] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-				m_rtc_data[0x7FFD] = dec_2_bcd(systime.local_time.mday);
-				m_rtc_data[0x7FFE] = dec_2_bcd(systime.local_time.month + 1);
-				m_rtc_data[0x7FFF] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
-			}
-			if (LOG_RTC)
-				logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
-
-			break;
-		default:
-			if (LOG_RTC)
-				logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
-			break;
-		}
+		if (LOG_RTC || offset >= 0x7ff0)
+			logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
 	}
 }
 
@@ -392,10 +369,13 @@ WRITE32_MEMBER(atlantis_state::user_io_output)
 
 READ32_MEMBER(atlantis_state::user_io_input)
 {
-	// Set user i/o (2) Power Detect?
+	// user io 0: 6016 nCONFIG -- output
+	// user io 1: 6016 nSTATUS -- input
+	// user io 2: 6016 config done -- input
+
+	// Set user i/o (2) Config Done
 	m_user_io_state |= 1 << 2;
 
-	// User I/O 0 = Allow write to red[0]. Serial Write Enable?
 	// Loop user_io(0) to user_io(1)
 	m_user_io_state = (m_user_io_state & ~(0x2)) | ((m_user_io_state & 1) << 1);
 	if (0)
@@ -499,6 +479,37 @@ WRITE_LINE_MEMBER(atlantis_state::ioasic_irq)
 }
 
 /*************************************
+*  Watchdog interrupts
+*************************************/
+WRITE_LINE_MEMBER(atlantis_state::watchdog_irq)
+{
+	if (LOG_IRQ)
+		logerror("%s: atlantis_state::watchdog_irq state = %i\n", machine().describe_context(), state);
+	if (state) {
+		board_ctrl[STATUS] |= (1 << WDOG_IRQ_SHIFT);
+		update_asic_irq();
+	}
+	else {
+		board_ctrl[STATUS] &= ~(1 << WDOG_IRQ_SHIFT);
+		board_ctrl[CAUSE] &= ~(1 << WDOG_IRQ_SHIFT);
+		update_asic_irq();
+	}
+
+}
+
+/*************************************
+*  Watchdog Reset
+*************************************/
+WRITE_LINE_MEMBER(atlantis_state::watchdog_reset)
+{
+	if (state) {
+		printf("atlantis_state::watchdog_reset!!!\n");
+		logerror("atlantis_state::watchdog_reset!!!\n");
+		machine().schedule_soft_reset();
+	}
+}
+
+/*************************************
 *  Programmable interrupt control
 *************************************/
 void atlantis_state::update_asic_irq()
@@ -580,14 +591,21 @@ READ16_MEMBER(atlantis_state::a2d_ctrl_r)
 
 WRITE16_MEMBER(atlantis_state::a2d_ctrl_w)
 {
-	if (data  == 0x8f)
-		m_a2d_data = ioport("AN.1")->read();
-	else
-		m_a2d_data = ioport("AN.0")->read();
+	int index = (data & A2D_CTRL_CHAN_MASK) >> A2D_CTRL_CHAN_SHIFT;
+	m_a2d_data = (m_io_analog[index].read_safe(0));
+	if (board_ctrl[IRQ_EN] & (1 << A2D_IRQ_SHIFT)) {
+		board_ctrl[STATUS] |= (1 << A2D_IRQ_SHIFT);
+		update_asic_irq();
+	}
+	logerror("a2d_ctrl_w: offset = %08x index = %d data = %04x\n", offset, index, data);
 }
 
 READ16_MEMBER(atlantis_state::a2d_data_r)
 {
+	if (board_ctrl[IRQ_EN] & (1 << A2D_IRQ_SHIFT)) {
+		board_ctrl[STATUS] &= ~(1 << A2D_IRQ_SHIFT);
+		update_asic_irq();
+	}
 	return m_a2d_data;
 }
 
@@ -601,8 +619,6 @@ WRITE16_MEMBER(atlantis_state::a2d_data_w)
 *************************************/
 void atlantis_state::machine_start()
 {
-	m_rtc->set_base(m_rtc_data, sizeof(m_rtc_data));
-
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
@@ -732,10 +748,10 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("AN.0")
-	PORT_BIT(0x1ff, 0x100, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0x3ff, 0x200, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1)
 
-	PORT_START("AN.1")
-	PORT_BIT(0x1ff, 0x100, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_START("AN.4")
+	PORT_BIT(0x3ff, 0x200, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1)
 
 	PORT_START("KEYPAD")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)   /* keypad 1 */
@@ -770,10 +786,6 @@ DEVICE_INPUT_DEFAULTS_END
  *
  *************************************/
 
-#define PCI_ID_NILE     ":pci:00.0"
-#define PCI_ID_9050     ":pci:0b.0"
-#define PCI_ID_IDE      ":pci:0c.0"
-
 static MACHINE_CONFIG_START( mwskins )
 
 	/* basic machine hardware */
@@ -792,7 +804,9 @@ static MACHINE_CONFIG_START( mwskins )
 	MCFG_PCI9050_USER_OUTPUT_CALLBACK(DEVWRITE32(":", atlantis_state, user_io_output))
 	MCFG_PCI9050_USER_INPUT_CALLBACK(DEVREAD32(":", atlantis_state, user_io_input))
 
-	MCFG_NVRAM_ADD_0FILL("rtc")
+	MCFG_M48T37_ADD("rtc")
+	MCFG_M48T37_RESET_HANDLER(WRITELINE(atlantis_state, watchdog_reset))
+	MCFG_M48T37_IRQ_HANDLER(WRITELINE(atlantis_state, watchdog_irq))
 
 	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x07, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(":", atlantis_state, ide_irq))
@@ -812,11 +826,12 @@ static MACHINE_CONFIG_START( mwskins )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	//MCFG_DCS2_AUDIO_POLLING_OFFSET(0) /* no place to hook :-( */
+	//MCFG_DCS2_AUDIO_DAC_EXT_FREQ(1000000.0)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_UPPER(325)
+	MCFG_MIDWAY_IOASIC_UPPER(342) //  325
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(atlantis_state, ioasic_irq))
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 	if DEBUG_CONSOLE {

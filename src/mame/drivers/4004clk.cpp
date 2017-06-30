@@ -9,7 +9,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i4004/i4004.h"
+#include "cpu/mcs40/mcs40.h"
+#include "machine/clock.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -19,77 +20,65 @@
 class nixieclock_state : public driver_device
 {
 public:
-	nixieclock_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_input(*this, "INPUT")
-	{ }
+	nixieclock_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag) { }
 
-	required_device<i4004_cpu_device> m_maincpu;
-	required_ioport m_input;
-	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
-	uint16_t m_nixie[16];
-	uint8_t m_timer;
+
+protected:
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
-	uint8_t nixie_to_num(uint16_t val);
-	inline void output_set_nixie_value(int index, int value);
-	inline void output_set_neon_value(int index, int value);
+
+private:
+	static constexpr uint8_t nixie_to_num(uint16_t val)
+	{
+		return
+				(BIT(val, 0)) ? 0 :
+				(BIT(val, 1)) ? 1 :
+				(BIT(val, 2)) ? 2 :
+				(BIT(val, 3)) ? 3 :
+				(BIT(val, 4)) ? 4 :
+				(BIT(val, 5)) ? 5 :
+				(BIT(val, 6)) ? 6 :
+				(BIT(val, 7)) ? 7 :
+				(BIT(val, 8)) ? 8 :
+				(BIT(val, 9)) ? 9 :
+				10;
+	}
+
+	void output_set_nixie_value(int index, int value)
+	{
+		output().set_indexed_value("nixie", index, value);
+	}
+
+	void output_set_neon_value(int index, int value)
+	{
+		output().set_indexed_value("neon", index, value);
+	}
+
+	uint16_t m_nixie[16];
 };
-
-READ8_MEMBER(nixieclock_state::data_r)
-{
-	return m_input->read() & 0x0f;
-}
-
-uint8_t nixieclock_state::nixie_to_num(uint16_t val)
-{
-	if (BIT(val,0)) return 0;
-	if (BIT(val,1)) return 1;
-	if (BIT(val,2)) return 2;
-	if (BIT(val,3)) return 3;
-	if (BIT(val,4)) return 4;
-	if (BIT(val,5)) return 5;
-	if (BIT(val,6)) return 6;
-	if (BIT(val,7)) return 7;
-	if (BIT(val,8)) return 8;
-	if (BIT(val,9)) return 9;
-	return 10;
-}
-
-inline void nixieclock_state::output_set_nixie_value(int index, int value)
-{
-	output().set_indexed_value("nixie", index, value);
-}
-
-inline void nixieclock_state::output_set_neon_value(int index, int value)
-{
-	output().set_indexed_value("neon", index, value);
-}
 
 WRITE8_MEMBER(nixieclock_state::nixie_w)
 {
-	m_nixie[offset] = data;
-	output_set_nixie_value(5,nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]));
-	output_set_nixie_value(4,nixie_to_num((m_nixie[4] << 6) | (m_nixie[3] << 2) | (m_nixie[2] >>2)));
-	output_set_nixie_value(3,nixie_to_num(((m_nixie[7] & 3)<<8) | (m_nixie[6] << 4) | m_nixie[5]));
-	output_set_nixie_value(2,nixie_to_num((m_nixie[9] << 6) | (m_nixie[8] << 2) | (m_nixie[7] >>2)));
-	output_set_nixie_value(1,nixie_to_num(((m_nixie[12] & 3)<<8) | (m_nixie[11] << 4) | m_nixie[10]));
-	output_set_nixie_value(0,nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2)));
+	m_nixie[offset >> 4] = data;
+	output_set_nixie_value(5, nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]));
+	output_set_nixie_value(4, nixie_to_num((m_nixie[4] << 6) | (m_nixie[3] << 2) | (m_nixie[2] >>2)));
+	output_set_nixie_value(3, nixie_to_num(((m_nixie[7] & 3)<<8) | (m_nixie[6] << 4) | m_nixie[5]));
+	output_set_nixie_value(2, nixie_to_num((m_nixie[9] << 6) | (m_nixie[8] << 2) | (m_nixie[7] >>2)));
+	output_set_nixie_value(1, nixie_to_num(((m_nixie[12] & 3)<<8) | (m_nixie[11] << 4) | m_nixie[10]));
+	output_set_nixie_value(0, nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2)));
 }
 
 WRITE8_MEMBER(nixieclock_state::neon_w)
 {
-	output_set_neon_value(0,BIT(data,3));
-	output_set_neon_value(1,BIT(data,2));
-	output_set_neon_value(2,BIT(data,1));
-	output_set_neon_value(3,BIT(data,0));
+	output_set_neon_value(0, BIT(data,3));
+	output_set_neon_value(1, BIT(data,2));
+	output_set_neon_value(2, BIT(data,1));
+	output_set_neon_value(3, BIT(data,0));
 }
 
-static ADDRESS_MAP_START(4004clk_rom, AS_PROGRAM, 8, nixieclock_state)
-	AM_RANGE(0x0000, 0x0FFF) AM_ROM
+static ADDRESS_MAP_START(4004clk_rom, AS_DECRYPTED_OPCODES, 8, nixieclock_state)
+	AM_RANGE(0x0000, 0x0FFF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(4004clk_mem, AS_DATA, 8, nixieclock_state)
@@ -99,10 +88,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 4004clk_io, AS_IO, 8, nixieclock_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0e) AM_WRITE(nixie_w)
-	AM_RANGE(0x00, 0x00) AM_READ(data_r)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(neon_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("dac", dac_bit_interface, write)
+	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_READ_PORT("INPUT")
+	AM_RANGE(0x0000, 0x00ef) AM_MIRROR(0x0700) AM_WRITE(nixie_w)
+	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x0700) AM_WRITE(neon_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x083f) AM_DEVWRITE("dac", dac_bit_interface, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -119,34 +108,17 @@ static INPUT_PORTS_START( 4004clk )
 	PORT_CONFSETTING( 0x08, "60 Hz" )
 INPUT_PORTS_END
 
-/*
-        16ms Int generator
-          __  __
-        _| |_|
-        0 1 0 1
-
-*/
-
-TIMER_DEVICE_CALLBACK_MEMBER(nixieclock_state::timer_callback)
-{
-	m_maincpu->set_test(m_timer);
-	m_timer^=1;
-}
-
 void nixieclock_state::machine_start()
 {
-	m_timer = 0;
-
 	/* register for state saving */
-	save_item(NAME(m_timer));
 	save_pointer(NAME(m_nixie), 6);
 }
 
 static MACHINE_CONFIG_START( 4004clk )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I4004, XTAL_5MHz / 8)
-	MCFG_CPU_PROGRAM_MAP(4004clk_rom)
+	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(4004clk_rom)
 	MCFG_CPU_DATA_MAP(4004clk_mem)
 	MCFG_CPU_IO_MAP(4004clk_io)
 
@@ -159,7 +131,8 @@ static MACHINE_CONFIG_START( 4004clk )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("4004clk_timer", nixieclock_state, timer_callback, attotime::from_hz(120))
+	MCFG_CLOCK_ADD("clk", 60)
+	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I4004_TEST_LINE))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -185,5 +158,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT  COMPANY             FULLNAME            FLAGS */
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT  COMPANY             FULLNAME            FLAGS
 SYST( 2008, 4004clk,  0,      0,       4004clk,   4004clk, nixieclock_state, 0,    "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )

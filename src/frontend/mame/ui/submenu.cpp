@@ -240,8 +240,7 @@ void submenu::handle()
 			{
 			case OPTION_BOOLEAN:
 				changed = true;
-				sm_option.options->set_value(sm_option.name, !strcmp(sm_option.entry->value(),"1") ? "0" : "1", OPTION_PRIORITY_CMDLINE, error_string);
-				sm_option.entry->mark_changed();
+				sm_option.options->set_value(sm_option.name, !strcmp(sm_option.entry->value(),"1") ? "0" : "1", OPTION_PRIORITY_CMDLINE);
 				break;
 			case OPTION_INTEGER:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
@@ -249,8 +248,7 @@ void submenu::handle()
 					changed = true;
 					int i_cur = atoi(sm_option.entry->value());
 					(menu_event->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
-					sm_option.options->set_value(sm_option.name, i_cur, OPTION_PRIORITY_CMDLINE, error_string);
-					sm_option.entry->mark_changed();
+					sm_option.options->set_value(sm_option.name, i_cur, OPTION_PRIORITY_CMDLINE);
 				}
 				break;
 			case OPTION_FLOAT:
@@ -260,17 +258,19 @@ void submenu::handle()
 					f_cur = atof(sm_option.entry->value());
 					if (sm_option.entry->has_range())
 					{
-						f_step = atof(sm_option.entry->minimum());
+						const char *minimum = sm_option.entry->minimum();
+						const char *maximum = sm_option.entry->maximum();
+						f_step = atof(minimum);
 						if (f_step <= 0.0f) {
-							int pmin = getprecisionchr(sm_option.entry->minimum());
-							int pmax = getprecisionchr(sm_option.entry->maximum());
+							int pmin = getprecisionchr(minimum);
+							int pmax = getprecisionchr(maximum);
 							tmptxt = '1' + std::string((pmin > pmax) ? pmin : pmax, '0');
 							f_step = 1 / atof(tmptxt.c_str());
 						}
 					}
 					else
 					{
-						int precision = getprecisionchr(sm_option.entry->default_value());
+						int precision = getprecisionchr(sm_option.entry->default_value().c_str());
 						tmptxt = '1' + std::string(precision, '0');
 						f_step = 1 / atof(tmptxt.c_str());
 					}
@@ -279,8 +279,7 @@ void submenu::handle()
 					else
 						f_cur += f_step;
 					tmptxt = string_format("%g", f_cur);
-					sm_option.options->set_value(sm_option.name, tmptxt.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-					sm_option.entry->mark_changed();
+					sm_option.options->set_value(sm_option.name, tmptxt.c_str(), OPTION_PRIORITY_CMDLINE);
 				}
 				break;
 			case OPTION_STRING:
@@ -293,9 +292,10 @@ void submenu::handle()
 						v_cur = sm_option.value[--cur_value];
 					else
 						v_cur = sm_option.value[++cur_value];
-					sm_option.options->set_value(sm_option.name, v_cur.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-					sm_option.entry->mark_changed();
+					sm_option.options->set_value(sm_option.name, v_cur.c_str(), OPTION_PRIORITY_CMDLINE);
 				}
+				break;
+			default:
 				break;
 			}
 			break;
@@ -391,7 +391,7 @@ void submenu::populate(float &customtop, float &custombottom)
 				break;
 			case OPTION_STRING:
 				{
-					std::string const v_cur(sm_option->entry->value());
+					std::string v_cur(sm_option->entry->value());
 					int const cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));
 					arrow_flags = get_arrow_flags(0, int(unsigned(sm_option->value.size() - 1)), cur_value);
 					item_append(_(sm_option->description),

@@ -58,13 +58,13 @@ public:
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 
 	void set_divider(int val);
-	void set_clock(int val);
 	int get_vclk();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -75,7 +75,6 @@ private:
 
 	uint8_t  m_status;
 
-	uint32_t m_master_clock;    /* master clock frequency */
 	uint32_t m_start_divider;
 	uint32_t m_divider;         /* master clock divider */
 	uint8_t m_adpcm_type;       /* 3/4 bit ADPCM select */

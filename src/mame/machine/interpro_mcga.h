@@ -16,7 +16,7 @@ public:
 	DECLARE_READ16_MEMBER(reg00_r) { return m_reg[0]; }
 	DECLARE_WRITE16_MEMBER(reg00_w) { m_reg[0] = data; }
 
-	enum control_mask 
+	enum control_mask
 	{
 		CONTROL_OPTMASK    = 0x0003,
 		CONTROL_CBITFRCRD  = 0x0004,
@@ -32,7 +32,7 @@ public:
 	DECLARE_READ16_MEMBER(control_r) { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w);
 
-	enum error_mask 
+	enum error_mask
 	{
 		ERROR_SYND  = 0x00ff,
 		ERROR_MMBE  = 0x0100,
@@ -51,7 +51,7 @@ public:
 	DECLARE_READ16_MEMBER(reg30_r) { return m_reg[2]; }
 	DECLARE_WRITE16_MEMBER(reg30_w) { m_reg[2] = data; }
 
-	enum memsize_mask 
+	enum memsize_mask
 	{
 		MEMSIZE_ADDR = 0x007f
 	};
@@ -80,7 +80,7 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 32) override;
 
-	enum control_mask 
+	enum control_mask
 	{
 		CONTROL_CBITFRCRD  = 0x0004,
 		CONTROL_CBITFRCSUB = 0x0008,
@@ -98,7 +98,7 @@ public:
 	};
 	DECLARE_WRITE16_MEMBER(control_w) override;
 
-	enum error_mask 
+	enum error_mask
 	{
 		ERROR_SYND  = 0x00ff,
 		ERROR_MMBE  = 0x0100,
@@ -107,7 +107,7 @@ public:
 		ERROR_VALID = 0x8000
 	};
 
-	enum error_control_mask 
+	enum error_control_mask
 	{
 		ERROR_CONTROL_CYCLE = 0x003f,
 		ERROR_CONTROL_TAG   = 0x01c0

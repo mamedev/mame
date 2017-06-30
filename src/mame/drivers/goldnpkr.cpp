@@ -24,6 +24,7 @@
   * Jack Potten's Poker (set 7, Royale GFX),          198?, Bootleg.
   * Jack Potten's Poker (set 8, Australian),          198?, Bootleg.
   * Jack Potten's Poker (set 9, 'just 4 fun'),        198?, Bootleg.
+  * Jack Potten's Poker (set 10, ICP-1 PCB),          198?, Bootleg.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
@@ -4629,6 +4630,32 @@ ROM_START( potnpkrh )
 	ROM_LOAD( "bprom.bin",    0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
+/* Potten's Poker bootleg set
+   PCB ICP-1 (no encrypted).
+
+  1x R6502P
+  2x MC6821P
+  1x unknown DIL40.
+
+  1x Xtal 10 MHz.
+*/
+ROM_START( potnpkri )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7.16a",   0x2000, 0x1000, CRC(ec5c2a2f) SHA1(e2f7c8f02077e890396223d474456613fade5ae2) )
+	ROM_LOAD( "8.17a",   0x3000, 0x1000, CRC(3cb1031d) SHA1(bb814577f79f26789752ec29d7ae17ddae822222) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",   0x1000, 0x0800, CRC(17d0d174) SHA1(ecf507439b6df950052e65ec014830f0287b98b9) )    /* char ROM */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump OK */
+ROM_END
 
 ROM_START( goodluck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10862,6 +10889,7 @@ GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, goldnpkr_state, 0,        
 GAMEL( 198?, potnpkrf,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 7, Royale GFX)",    0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrg,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 8, Australian)",    0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrh,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 9, 'just 4 fun')",  0,                layout_goldnpkr )
+GAMEL( 198?, potnpkri,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 10, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, 0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, 0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, 0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )

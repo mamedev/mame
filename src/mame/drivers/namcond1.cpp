@@ -9,64 +9,180 @@
             James Jenkins
             Walter Fath
 
-    Currently Supported Games:
-        Namco Classic Vol #1
-        Namco Classic Vol #2
+	abcheck TODOs:
+	- Default eeprom.  AT28C16 writes 0x820 byte nvram, but will only accept 0x800.  Why?
+	- YGV608 brokenness
+	- Hook up controls properly (two buttons only for 3 players, and only 1 coin slot, mapped as player 2)
+	
+	To make abcheck run when the EEPROM is clear:
+	- F2 to enter service mode
+	- Player 3 A/B to navigate to GAME OPTIONS
+	- Player 1 A to enter, Player 1 B to cancel or go back
+	- Go to LOCAL SELECT and choose the Japanese city of your choice (I don't know what it affects yet)
+	- Exit test mode (F2) and reset (F3) and the game will boot
+
+-----------------------------------
+Guru-Readme for Namco ND-1 hardware
+-----------------------------------
+
+Games on this system include...
+Namco Classics Volume 1 (Namco 1995)
+Namco Classics Volume 2 (Namco 1996)
+Abnormal Check          (Namco 1996)
+
 
 PCB Layout
 ----------
+ND-1 GAME PCB
+8655960101 (8655970101) - for Namco Classics 1 & 2
 
-8655960101 (8655970101)
+ND-1 GAME(B) PCB
+8655960401 (8655970401) - for Namco Classics 1 & 2
+
+ND-1 GAME(C) PCB
+8655960500 (8655970500) - for Abnormal Check
 |----------------------------------------|
-|    LA4705        NC1_MAIN0B.14D  68000 |
-|   4558  LC78815  NC1_MAIN1B.13D        |
-|J  POT1                                 |
-|                      AT28C16           |
+|    LA4705           MAIN0       68000  |
+|   4558  LC78815     MAIN1              |
+|J  VR1                                  |
+|   NFA221             AT28C16           |
 |A                                       |
-|                                        |
-|M                                       |
-|                    NC1_CG0.10C    *    |
-|M       M9524LT                         |
-|               POT2                     |
+|   NFA222                               |
+|M                    CG0   CG1*         |
+|          LT1109                        |
+|M  NFA222   LM1203                      |
+|                 VR2                  J3|
 |A                                       |
-|                    YGV608-F            |
-|                                        |
-|                                        |
-|        NC1_VOICE.7B    49.152MHz       |
+|   NFA222           YGV608-F            |
+|   SW1                                  |
+|          VOICE                         |
+|  NFA222*               49.152MHz       |
 |N                  25.326MHz            |
-|A                                       |
-|M       C352                            |
-|C                 MACH210         C416  |
-|O                                       |
-|4                                       |
-|8       H8/3002                 62256   |
-|                  NC1_SUB.1C    62256   |
+|A NFA222*                               |
+|M         C352                          |
+|C NFA221*         MACH210         C416  |
+|O     IR2C24*                           |
+|4   PC410*                        MB3771|
+|8 NFA222*  H8/3002            62256     |
+|    PC410*           SUB      62256     |
 |----------------------------------------|
 Notes:
-      68000 clock  : 12.288MHz (49.152 / 4)
-      H8/3002 clock: 16.384MHz (49.152 / 3)
-      C352 clock:    24.576MHz (49.152 / 2)
-      VSync        : 60Hz
+      68000         - Motorola MC68HC000FN12 Micro-Processor (PLCC68). Clock input 12.288MHz (49.152/4)
+      H8/3002       - Hitachi H8/3002 HD6413002F16 Micro-Controller (QFP100). Clock input 16.384MHz (49.152/3)
+                      Note the H8/3002 has no internal ROM capability.
+      C352          - Namco custom 32-voice 4-channel PCM sound chip (QFP100). Clock input 24.576MHz (49.152/2)
+                      Note this is probably a Micro-Controller with internal ROM.
+      HSync         - 15.4700kHz
+      VSync         - 59.9648Hz
+      J3            - 100-pin connector for daughter board (not populated on Namco Classics 1 & 2)
+      SW1           - 2-position DIP Switch
+      VR1           - Master volume
+      VR2           - Brightness adjustment (video level)
+      LM1203        - National LM1203 RGB VIDEO AMP (DIP28). Note on some PCB revisions there is a capacitor glued on top of this chip.
+      AT28C16       - Atmel 2k x8-bit EEPROM (DIP24)
+      YGV608-F      - Yamaha YVG608-F video controller (QFP100)
+      LT1109        - Linear Technology LT1109A DC/DC converter (SOIC8). Note on some PCB revisions this is not present. If the IC is required there 
+                      is an additional 'SREG PCB' with the LT1109 and other support components present at this location.
+      C416          - Namco custom (QFP176), Memory/DMA Controller
+      MACH210       - AMD MACH211 CPLD, used as Namco "KEYCUS" protection chip (PLCC44) 
+                       - for Namco Classics 1 stamped 'KC001' at 3C
+                       - for Namco Classics 2 stamped 'KC002' at 3C
+                       - for Abnormal Check stamped 'KC008' at 3D
+      62256         - 32k x8-bit SRAM (SOJ28)
+      MB3771        - Fujitsu MB3771 Master Reset IC (SOIC8)
+      IR2C24        - Sharp IR2C24 6-Circuit 320mA Transistor Array with Clamping Diodes and Strobe (SOIC16)
+      PC410         - Sharp PC410 Ultra-high Speed Response OPIC Photocoupler (SOIC5)
+      NFA221        - muRata NFA221 Capacitor Array EMI Suppression Filter
+      NFA222        - muRata NFA222 Capacitor Array EMI Suppression Filter
+      *             - Not populated on Namco Classics 1 & 2
 
-      POT1    : Master volume
-      POT2    : Brightness adjustment (video level)
-      M9524LT : ? possibly some sort of RGB video output chip
-      AT28C16 : 2K x8 EEPROM
-      YGV608-F: Yamaha YVG608-F video controller
-      C352    : Namco custom QFP100
-      C416    : Namco custom QFP176
-      H8/3002 : Hitachi H8/3002 HD6413002F16 QFP100 microcontroller (H8/3002 has no internal ROM capability)
-      MACH210 : PLCC44 CPLD, Namco KEYCUS, stamped 'KC001'
-      62256   : 32K x8 SOJ28 SRAM
-      *       : Unpopulated position for SOP44 Mask ROM 'CG1'
 
-      NC1_MAIN0B.14D: 512K x16 EPROM type 27C240
-      NC1_MAIN1B.13D: 512K x16 EPROM type 27C240
-      NC1_SUB.1C    : 512K x16 EPROM type 27C240
-      NC1_CG0.10C   : 16MBit SOP44 Mask ROM
-      NC1_VOICE.7B  : 16MBit SOP44 Mask ROM
+      ROMs: (note IC locations are different between GAME+GAME(B) and GAME(C) PCBs.
+      
+      Namco Classics Volume 1
+      -------------------------
+      NC2 MAIN0B.14D - 512k x16-bit EPROM type 27C240/27C4002 (for Japan: NC1) (revisions: MAIN0 or MAIN0B)
+      NC2 MAIN1B.13D - 512k x16-bit EPROM type 27C240/27C4002 (for Japan: NC1) (revisions: MAIN1 or MAIN1B)
+      NC1 SUB.1C     - 512k x16-bit EPROM type 27C240/27C4002
+      NC1 CG0.10C    - 16M-bit SOP44 mask ROM
+      NC1 VOICE.7B   - 16M-bit SOP44 mask ROM
 
- *************************************************************/
+      Namco Classics Volume 2
+      -------------------------
+      NCS2 MAIN0B.14D - 512k x16-bit EPROM type 27C240/27C4002 (for Japan: NCS1) (revisions: MAIN0 or MAIN0B)
+      NCS2 MAIN1B.13D - 512k x16-bit EPROM type 27C240/27C4002 (for Japan: NCS1) (revisions: MAIN1 or MAIN1B)
+      NCS1 SUB.1C     - 512k x16-bit EPROM type 27C240/27C4002
+      NCS1 CG0.10C    - 16M-bit SOP44 mask ROM
+      NCS1 VOICE.7B   - 16M-bit SOP44 mask ROM
+
+      Abnormal Check
+      -------------------------
+      AN1 MAIN0B.14E - 512k x16-bit EPROM type 27C240/27C4002
+      AN1 MAIN1B.13E - 512k x16-bit EPROM type 27C240/27C4002
+      AN1 SUB.1D     - 512k x16-bit EPROM type 27C240/27C4002
+      AN1 CG0.10E    - 16M-bit SOP44 mask ROM
+      AN1 CG1.10F    - 16M-bit SOP44 mask ROM
+      AN1 VOICE.7C   - 16M-bit SOP44 mask ROM
+
+
+------------------------------------------------------
+Additional Guru-Readme for Abnormal Check (Namco 1996)
+------------------------------------------------------
+
+Main PCB is common Namco ND-1 hardware documented above.
+Several parts that were not populated on the GAME/GAME(B) PCB near the NAMCO48 connector
+are populated on this revision and the NAMCO48 connector is used.
+Because of the changes the PCB is marked 'GAME(C) PCB' with numbers 8655960500 (8655970500).
+The other main difference is the presence of an extra connector on one edge between
+the 68000 and the C416, labelled J3.
+Most of the parts on the GAME(C) PCB have different locations, however the PCB appears
+to be electrically identical to the earlier revision ND-1 GAME PCB.
+
+There is an extra daughter board 115mm x 110mm plugged into connector J3.
+The PCB is marked "M122 MEM/PRN PCB 1507960103 (1507970103)
+The PCB contains the following parts....
+1x ST 27C4002 EPROM (DIP40 at IC1)
+2x ST M48Z30Y ZEROPOWER RAM (DIP28 at IC2 & IC3)
+2x 74HC244 logic (SOIC20)
+2x Toshiba TD64064 Darlington Driver (SOIC18)
+1x AMD MACH120 CPLD (PLCC68 at IC8)
+1x 10-pin JST connector labelled J11 for connection to the printer.
+1x 20-pin flat cable connector labelled J12 for connection to the printer.
+
+Partial Pinout of J12
+----------------------
+   GND 10b  10a GND
+  ERROR 9b  9a  
+  EMPTY 8b  8a  BUSY
+        7b  7a
+        6b  6a
+        5b  5a
+        4b  4a
+        3b  3a
+   +12V 2b  2a  +5V
+   GND  1b  1a  GND
+
+To get the board to boot some pins on the J12 connector must be set to 0 or 1 (tied to ground or +5V).
+The status can be checked in test mode in the "Printer Test" menu.
+ERROR = HIGH (No Error)
+EMPTY = LOW  (Not Empty)
+BUSY  = LOW  (Ready)
+
+Connected to J11/J12 is a thermal printer. It prints on a roll of 2 1/4" wide thermal paper.
+Bolted onto the metal frame is a small 80mm square PCB. There is no manufacturer name on it
+and only some numbers/letters "32-104C SEC-A"
+The PCB contains the following parts....
+1x 27C010 128k x8-bit EPROM (DIP32 at U9)
+1x 16M-bit mask ROM (SOP44 at U4)
+1x 8-position DIP Switch labelled SW1. Position 2 is on, all others are off
+1x NEC uPC393 Dual Comparitor (SIL9)
+1x Sanyo LB1650 Dual-Directional Motor Driver (DIP16)
+1x Maxim MAX202 RS232 Transceiver (SOIC16)
+1x Toshiba TC55257 32k x8-bit SRAM (TSOP28)
+1x Toshiba TMP95C061AF TLCS90/900 compatible 16-bit Micro-Controller (TQFP100). Note there is no internal ROM capability.
+Some logic, resistors/caps/transistors, some connectors etc.
+
+*************************************************************/
 
 #include "emu.h"
 #include "includes/namcond1.h"
@@ -84,13 +200,30 @@ Notes:
 static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("ygv608", ygv608_device, read, write)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
-#ifdef MAME_DEBUG
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD("ygv608", ygv608_device, debug_trigger_r)
-#endif
 	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( abcheck_map, AS_PROGRAM, 16, namcond1_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
+	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("zpr1")
+	AM_RANGE(0x608000, 0x60ffff) AM_RAM AM_SHARE("zpr2")
+	AM_RANGE(0x780000, 0x780001) AM_READ(printer_r)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
+	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
+	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
+ADDRESS_MAP_END
+
+READ16_MEMBER(namcond1_state::printer_r)
+{ 
+	// bits tested:
+	// bit 2 = 0 for paper cut switch on, 1 for off
+	// bit 4 = 0 for paper OK, 1 for empty
+	// bit 5 = 1 for normal status, 0 for error
+	return 0x0020; 
+}
 
 /*************************************************************/
 
@@ -102,7 +235,7 @@ static INPUT_PORTS_START( namcond1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -110,7 +243,7 @@ static INPUT_PORTS_START( namcond1 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW")
@@ -125,6 +258,26 @@ static INPUT_PORTS_START( namcond1 )
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( abcheck )
+	PORT_INCLUDE( namcond1 )
+	
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_MODIFY("DSW")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
 
@@ -153,12 +306,15 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xc00010, 0xc00011) AM_NOP
 	AM_RANGE(0xc00030, 0xc00031) AM_NOP
 	AM_RANGE(0xc00040, 0xc00041) AM_NOP
+	AM_RANGE(0xffff1a, 0xffff1b) AM_NOP 	// abcheck
+	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP		// ^
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 16, namcond1_state )
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
 	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
+	AM_RANGE(0x14, 0x17) AM_READNOP 		// abcheck
 ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
@@ -176,19 +332,22 @@ INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
   - The level 1 interrupt to the 68k has been measured at 60Hz.
 *******************************************/
 
+WRITE_LINE_MEMBER( namcond1_state::vblank_irq_w )
+{
+	m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
+{
+	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static MACHINE_CONFIG_START( namcond1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_49_152MHz/4)
 	MCFG_CPU_PROGRAM_MAP(namcond1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
-
-	// I've disabled this for now, I don't think it's correct, it breaks ncv2 'game options' in test
-	// mode (and could also be responsible for the random resets?)
-	// also, if you log the timing of it and the scanlines on which the interrupt fires, it doesn't
-	// seem correct for the intended purpose?
-	//MCFG_DEVICE_PERIODIC_INT_DEVICE("ygv608", ygv608_device, timed_interrupt, 1000)
-
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("mcu", H83002, XTAL_49_152MHz/3 )
 	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
@@ -198,12 +357,18 @@ static MACHINE_CONFIG_START( namcond1 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 
+	MCFG_YGV608_ADD("ygv608")
+	MCFG_YGV608_PALETTE("palette")
+	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(namcond1_state, vblank_irq_w))
+	MCFG_YGV608_RASTER_HANDLER(WRITELINE(namcond1_state, raster_irq_w))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.0)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(288, 224)   // maximum display resolution (512x512 in theory)
-	MCFG_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
+	/*
+	H 804 108 576 48 32
+	V 261 26 224 3 0
+	*/
+	MCFG_SCREEN_RAW_PARAMS( XTAL_49_152MHz/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224)
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -220,8 +385,16 @@ static MACHINE_CONFIG_START( namcond1 )
 
 	MCFG_AT28C16_ADD( "at28c16", nullptr )
 
-	MCFG_YGV608_ADD("ygv608")
-	MCFG_YGV608_PALETTE("palette")
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( abcheck, namcond1 )
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_49_152MHz/4)
+	MCFG_CPU_PROGRAM_MAP(abcheck_map)
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+	
+	MCFG_NVRAM_ADD_0FILL("zpr1")
+	MCFG_NVRAM_ADD_0FILL("zpr2")
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )
@@ -301,8 +474,38 @@ ROM_START( ncv2j )
 	ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
+ROM_START( abcheck )
+	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_LOAD( "an1main0b.14e", 0x000000, 0x080000, CRC(f1b9777d) SHA1(b28f4106e1e145dc1aaa5af455b6f991d2b04c59) ) 
+	ROM_LOAD( "an1main1b.13e", 0x080000, 0x080000, CRC(d40ccdcc) SHA1(05f864d84bf34a1722c598378ed8d27fba00f575) ) 
+
+	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
+	ROM_LOAD( "an1sub.1d",    0x000000, 0x080000, CRC(50de9130) SHA1(470b3977f4bf12ca65bc42631ccdf81753ef56fd) ) 
+
+	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
+	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) ) 
+	ROM_LOAD( "an1cg1.10f",   0x200000, 0x200000, CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) ) 
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) ) 
+
+	ROM_REGION( 0x80000, "data", 0 )	// game data?
+	ROM_LOAD( "an1dat0.ic1",  0x000000, 0x080000, CRC(44dc7da1) SHA1(dd57670a2b07c4988ca30bba134931c1701a926f) ) 
+	
+	ROM_REGION( 0x8000, "zpr1", 0 )
+	ROM_LOAD( "m48z30y.ic2",  0x000000, 0x008000, CRC(a816d989) SHA1(c78fe06b049c31cf8de2a79025823dbc0c95d526) ) 
+	
+	ROM_REGION( 0x8000, "zpr2", 0 )
+	ROM_LOAD( "m48z30y.ic3",  0x000000, 0x008000, CRC(bfa687bb) SHA1(463ae40f21b675f3b4155efda9c965b71519a49e) ) 
+
+	ROM_REGION( 0x220000, "printer", 0 )
+	ROM_LOAD( "np-b205_nmc_ver1.00.u9", 0x000000, 0x020000, CRC(445ceb0d) SHA1(49491b936f50577564196992df3a3c93aa3fcc99) ) 
+	ROM_LOAD( "npg1624lc.u4", 0x020000, 0x200000, CRC(7e00254f) SHA1(b0fa8f979e8322d71f842de5358ae2a2e36386f7) ) 
+ROM_END
+
 GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, 0, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )

@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_READ8_MEMBER(switches2_r);
 
-	// PHI register read 
+	// PHI register read
 	DECLARE_READ8_MEMBER(phi_reg_r);
 
 	// Floppy drive interface

@@ -33,7 +33,7 @@ offs_t disasmview_info::selected_address() const
 }
 
 
-void disasmview_info::set_expression(char const *string)
+void disasmview_info::set_expression(const std::string &string)
 {
 	view<debug_view_disasm>()->set_expression(string);
 }

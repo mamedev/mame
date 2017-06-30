@@ -169,7 +169,6 @@
 #define PALETTE_FORMAT_GRBX raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,24,8>)
 #define PALETTE_FORMAT_BGRX raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,16,24>)
 
-
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
@@ -344,6 +343,7 @@ public:
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
 
+	
 private:
 	// internal data
 	int                 m_bytes_per_entry;

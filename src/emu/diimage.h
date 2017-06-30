@@ -213,6 +213,7 @@ public:
 
 	const std::string &instance_name() const { return m_instance_name; }
 	const std::string &brief_instance_name() const { return m_brief_instance_name; }
+	const std::string &cannonical_instance_name() const { return m_canonical_instance_name; }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
@@ -238,6 +239,7 @@ public:
 	}
 
 	bool user_loadable() const { return m_user_loadable; }
+	bool is_reset_and_loading() const { return m_is_reset_and_loading; }
 	const std::string &full_software_name() const { return m_full_software_name; }
 
 protected:
@@ -329,14 +331,17 @@ private:
 
 	util::hash_collection m_hash;
 
-	std::string m_brief_instance_name;
-	std::string m_instance_name;
+	std::string m_instance_name;                // e.g. - "cartridge", "floppydisk2"
+	std::string m_brief_instance_name;          // e.g. - "cart", "flop2"
+	std::string m_canonical_instance_name;      // e.g. - "cartridge1", "floppydisk2" - only used internally in emuopts.cpp
 
 	// in the case of arcade cabinet with fixed carts inserted,
 	// we want to disable command line cart loading...
 	bool m_user_loadable;
 
 	bool m_is_loading;
+
+	bool m_is_reset_and_loading;
 };
 
 // iterator

@@ -103,7 +103,7 @@ CPUS["MINX"] = true
 CPUS["SSEM"] = true
 CPUS["AVR8"] = true
 CPUS["TMS1000"] = true
-CPUS["I4004"] = true
+CPUS["MCS40"] = true
 CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
 CPUS["I8008"] = true
@@ -160,9 +160,9 @@ SOUNDS["YM3812"] = true
 SOUNDS["YM3526"] = true
 SOUNDS["Y8950"] = true
 SOUNDS["YMF262"] = true
---SOUNDS["YMF271"] = true
+SOUNDS["YMF271"] = true
 SOUNDS["YMF278B"] = true
---SOUNDS["YMZ280B"] = true
+SOUNDS["YMZ280B"] = true
 SOUNDS["SN76477"] = true
 SOUNDS["SN76496"] = true
 SOUNDS["POKEY"] = true
@@ -534,6 +534,7 @@ MACHINES["SECFLASH"] = true
 MACHINES["SEIBU_COP"] = true
 --MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
+MACHINES["SMIOC"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
@@ -575,6 +576,7 @@ MACHINES["X2212"] = true
 MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
 MACHINES["YM2148"] = true
+MACHINES["YM3802"] = true
 MACHINES["Z80CTC"] = true
 MACHINES["Z80DART"] = true
 MACHINES["Z80SIO"] = true
@@ -635,6 +637,7 @@ BUSES["BW2"] = true
 BUSES["C64"] = true
 BUSES["CBM2"] = true
 BUSES["CBMIEC"] = true
+BUSES["CBUS"] = true
 BUSES["CENTRONICS"] = true
 BUSES["CGENIE_EXPANSION"] = true
 BUSES["CGENIE_PARALLEL"] = true
@@ -2115,6 +2118,7 @@ createMESSProjects(_target, _subtarget, "intel")
 files {
 	MAME_DIR .. "src/mame/drivers/basic52.cpp",
 	MAME_DIR .. "src/mame/drivers/imds.cpp",
+	MAME_DIR .. "src/mame/drivers/intellec4.cpp",
 	MAME_DIR .. "src/mame/drivers/ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/ipds.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc.cpp",
@@ -2381,14 +2385,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc88va.cpp",
 	MAME_DIR .. "src/mame/drivers/pc100.cpp",
 	MAME_DIR .. "src/mame/drivers/pc9801.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_26.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_26.h",
-	MAME_DIR .. "src/mame/machine/pc9801_86.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_86.h",
-	MAME_DIR .. "src/mame/machine/pc9801_118.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_118.h",
-	MAME_DIR .. "src/mame/machine/pc9801_cbus.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_cbus.h",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_cd.cpp",
@@ -2765,7 +2761,6 @@ files {
 
 createMESSProjects(_target, _subtarget, "sharp")
 files {
-	MAME_DIR .. "src/mame/drivers/hh_sm500.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_sm510.cpp",
 	MAME_DIR .. "src/mame/video/mz700.cpp",
 	MAME_DIR .. "src/mame/drivers/mz700.cpp",

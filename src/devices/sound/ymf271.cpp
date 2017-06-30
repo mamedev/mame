@@ -1276,7 +1276,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			}
 
 			// reload timer
-			m_timA->adjust(attotime::from_hz(m_clock) * (384 * 4 * (256 - m_timerA)), 0);
+			m_timA->adjust(clocks_to_attotime(384 * 4 * (256 - m_timerA)), 0);
 			break;
 
 		case 1:
@@ -1292,7 +1292,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			}
 
 			// reload timer
-			m_timB->adjust(attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB)), 0);
+			m_timB->adjust(clocks_to_attotime(384 * 16 * (256 - m_timerB)), 0);
 			break;
 
 		default:
@@ -1357,14 +1357,14 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 				// timer A load
 				if (~m_enable & data & 1)
 				{
-					attotime period = attotime::from_hz(m_clock) * (384 * 4 * (256 - m_timerA));
+					attotime period = clocks_to_attotime(384 * 4 * (256 - m_timerA));
 					m_timA->adjust((data & 1) ? period : attotime::never, 0);
 				}
 
 				// timer B load
 				if (~m_enable & data & 2)
 				{
-					attotime period = attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB));
+					attotime period = clocks_to_attotime(384 * 16 * (256 - m_timerB));
 					m_timB->adjust((data & 2) ? period : attotime::never, 0);
 				}
 
@@ -1603,20 +1603,23 @@ void ymf271_device::init_tables()
 		double db = 0.75 * (double)i;
 		m_lut_total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
 	}
+}
 
+void ymf271_device::calculate_clock_correction()
+{
 	// timing may use a non-standard XTAL
-	double clock_correction = (double)(STD_CLOCK) / (double)(m_clock);
-	for (i = 0; i < 256; i++)
+	double clock_correction = (clock() != 0) ? (double)(STD_CLOCK) / (double)clock() : 0.0;
+	for (int i = 0; i < 256; i++)
 	{
 		m_lut_lfo[i] = LFO_frequency_table[i] * clock_correction;
 	}
 
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		// attack/release rate in number of samples
 		m_lut_ar[i] = (ARTime[i] * clock_correction * 44100.0) / 1000.0;
 	}
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		// decay rate in number of samples
 		m_lut_dc[i] = (DCTime[i] * clock_correction * 44100.0) / 1000.0;
@@ -1701,8 +1704,6 @@ void ymf271_device::init_state()
 
 void ymf271_device::device_start()
 {
-	m_clock = clock();
-
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
@@ -1744,7 +1745,18 @@ void ymf271_device::device_reset()
 		m_irq_handler(0);
 }
 
-DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271")
+//-------------------------------------------------
+//  device_clock_changed - called whenever the
+//  clock is updated
+//-------------------------------------------------
+
+void ymf271_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 384);
+	calculate_clock_correction();
+}
+
+DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271 OPX")
 
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF271, tag, owner, clock)
@@ -1759,7 +1771,6 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	, m_ext_readlatch(0)
 	, m_mem_base(*this, DEVICE_SELF)
 	, m_mem_size(0)
-	, m_clock(0)
 	, m_timA(nullptr)
 	, m_timB(nullptr)
 	, m_stream(nullptr)

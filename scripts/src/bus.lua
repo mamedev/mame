@@ -2631,6 +2631,8 @@ if (BUSES["X68K"]~=null) then
 		MAME_DIR .. "src/devices/bus/x68k/x68k_neptunex.h",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.cpp",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.h",
+		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.cpp",
+		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.h",
 	}
 end
 
@@ -3083,5 +3085,25 @@ if (BUSES["PC1512"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/cbus/pc9801_cbus.h,BUSES["CBUS"] = true
+---------------------------------------------------
+
+if (BUSES["CBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
 	}
 end

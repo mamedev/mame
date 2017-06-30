@@ -64,6 +64,7 @@
 
 
 TODO:
+  - confirm that bmcfball is the same rom/serial as ssfball (game seems identical)
   - games that rely on the fact that faster/longer strobed elements appear brighter:
     tactix(player 2)
 
@@ -388,7 +389,8 @@ MACHINE_CONFIG_END
   * NEC uCOM-43 MCU, label D553C 031
   * cyan VFD display Emix-102, with bezel
 
-  The game was rereleased in 1982 as Classic Football, with an improved VFD.
+  The game was rereleased in 1982 as Classic Football (ET-0351), with an
+  improved cyan/green/red VFD.
 
   Press the Kick button to start the game, an automatic sequence follows.
   Then choose a formation(A,B,C) and either pass the ball, and/or start
@@ -1694,9 +1696,9 @@ WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 
 WRITE8_MEMBER(mcompgin_state::lcd_w)
 {
-	// E0: HLCD0569 _CS
-	// E1: HLCD0569 clock
-	// E2: HLCD0569 data in
+	// E0: HLCD0530 _CS
+	// E1: HLCD0530 clock
+	// E2: HLCD0530 data in
 	m_lcd->write_cs(data & 1);
 	m_lcd->write_data(data >> 2 & 1);
 	m_lcd->write_clock(data >> 1 & 1);
@@ -2060,7 +2062,7 @@ MACHINE_CONFIG_END
   Tomy(tronic) Tennis (manufactured in Japan)
   * PCB label TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, label D552C 048
-  * VFD display NEC FIP11AM15T tube no. 0F, with overlay
+  * cyan VFD display NEC FIP11AM15T tube no. 0F, with overlay
 
   The initial release of this game was in 1979, known as Pro-Tennis,
   it has a D553 instead of D552, with just a little over 50% ROM used.
@@ -2668,7 +2670,7 @@ ROM_START( ufombs )
 	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
 
 	ROM_REGION( 222395, "svg", 0)
-	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) )
 ROM_END
 
 
@@ -2676,8 +2678,16 @@ ROM_START( ssfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
 
-	ROM_REGION( 330197, "svg", 0)
-	ROM_LOAD( "ssfball.svg", 0, 330197, CRC(cde0d483) SHA1(99d218aab4bb42e97194fdc38e9a0efbcde082de) ) // by kevtris, ver. 25 apr 2016
+	ROM_REGION( 331352, "svg", 0)
+	ROM_LOAD( "ssfball.svg", 0, 331352, CRC(10cffb85) SHA1(c875f73a323d976088ffa1bc19f7bc865d4aac62) )
+ROM_END
+
+ROM_START( bmcfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, BAD_DUMP CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 331352, "svg", 0)
+	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
 ROM_END
 
 
@@ -2685,8 +2695,8 @@ ROM_START( bmsoccer )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
 
-	ROM_REGION( 273804, "svg", 0)
-	ROM_LOAD( "bmsoccer.svg", 0, 273804, CRC(29525b4a) SHA1(2f59d3ed59923a834b7ddcdfb9d61a9818196f2e) ) // by kevtris, ver. 25 apr 2016
+	ROM_REGION( 273796, "svg", 0)
+	ROM_LOAD( "bmsoccer.svg", 0, 273796, CRC(4c88d9f8) SHA1(b4b82f26a09f54cd0b6a9d1c1a46796fbfcb578a) )
 ROM_END
 
 
@@ -2694,8 +2704,8 @@ ROM_START( bmsafari )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
 
-	ROM_REGION( 273889, "svg", 0)
-	ROM_LOAD( "bmsafari.svg", 0, 273889, CRC(c61e26b3) SHA1(467db0396d350fddb46ecf2b1ad60501013c5dff) ) // by kevtris, ver. 25 apr 2016
+	ROM_REGION( 275386, "svg", 0)
+	ROM_LOAD( "bmsafari.svg", 0, 275386, CRC(c24badbc) SHA1(b191f34155d6d4e834e7c6fe715d4bb76198ad72) )
 ROM_END
 
 
@@ -2704,7 +2714,7 @@ ROM_START( splasfgt )
 	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
 
 	ROM_REGION( 246609, "svg", 0)
-	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) )
 ROM_END
 
 
@@ -2713,7 +2723,7 @@ ROM_START( bcclimbr )
 	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
 
 	ROM_REGION( 219971, "svg", 0)
-	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) )
 ROM_END
 
 
@@ -2728,7 +2738,7 @@ ROM_START( invspace )
 	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
 
 	ROM_REGION( 110899, "svg", 0)
-	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) )
 ROM_END
 
 
@@ -2743,7 +2753,7 @@ ROM_START( galaxy2 )
 	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
 
 	ROM_REGION( 325057, "svg", 0)
-	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) )
 ROM_END
 
 ROM_START( galaxy2b )
@@ -2751,7 +2761,7 @@ ROM_START( galaxy2b )
 	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
 
 	ROM_REGION( 266377, "svg", 0)
-	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) )
 ROM_END
 
 
@@ -2760,7 +2770,7 @@ ROM_START( astrocmd )
 	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
 
 	ROM_REGION( 335362, "svg", 0)
-	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) )
 ROM_END
 
 
@@ -2769,7 +2779,7 @@ ROM_START( edracula )
 	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
 
 	ROM_REGION( 794532, "svg", 0)
-	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) )
 ROM_END
 
 
@@ -2796,7 +2806,7 @@ ROM_START( tccombat )
 	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
 
 	ROM_REGION( 210960, "svg", 0)
-	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) )
 ROM_END
 
 
@@ -2804,8 +2814,8 @@ ROM_START( tmtennis )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
 
-	ROM_REGION( 203979, "svg", 0)
-	ROM_LOAD( "tmtennis.svg", 0, 203979, BAD_DUMP CRC(4679487c) SHA1(845e961e309fa9e52c4a856b3e7f5cecd1173a1b) ) // by kevtris, ver. 25 apr 2016 - BAD_DUMP: needs overlay
+	ROM_REGION( 204490, "svg", 0)
+	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(ed0086e9) SHA1(26a5b2f0a9cd70401187146e1495aee80020658b) )
 ROM_END
 
 
@@ -2814,7 +2824,7 @@ ROM_START( tmpacman )
 	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
 
 	ROM_REGION( 230216, "svg", 0)
-	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) )
 ROM_END
 
 
@@ -2823,7 +2833,7 @@ ROM_START( tmscramb )
 	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
 
 	ROM_REGION( 235601, "svg", 0)
-	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
 ROM_END
 
 
@@ -2832,7 +2842,7 @@ ROM_START( tcaveman )
 	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
 
 	ROM_REGION( 306952, "svg", 0)
-	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) )
 ROM_END
 
 
@@ -2841,14 +2851,15 @@ ROM_START( alnchase )
 	ROM_LOAD( "d553c-258", 0x0000, 0x0800, CRC(c5284ff5) SHA1(6a20aaacc9748f0e0335958f3cea482e36153704) )
 
 	ROM_REGION( 576864, "svg", 0)
-	ROM_LOAD( "alnchase.svg", 0, 576864, CRC(fe7c7078) SHA1(0d201eeaeb291ded14c0759d1d3d5b2491cf0792) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "alnchase.svg", 0, 576864, CRC(fe7c7078) SHA1(0d201eeaeb291ded14c0759d1d3d5b2491cf0792) )
 ROM_END
 
 
 
 //    YEAR  NAME      PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
 CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )

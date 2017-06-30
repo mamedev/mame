@@ -2289,7 +2289,7 @@ WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
 	// FIXME: The driver seems to hang using the voodoo vblank signa
 	//if (state)
-	//	mpc8240_interrupt(MPC8240_IRQ0);
+	//  mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
