@@ -101,7 +101,7 @@
 #include "audio/exidy.h"
 #include "includes/victory.h"
 #include "machine/nvram.h"
-
+#include "machine/z80pio.h"
 
 
 /*************************************
@@ -144,10 +144,8 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, victory_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("SW2")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("SW1")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("DIAL")
-	AM_RANGE(0x0a, 0x0a) AM_READ_PORT("COIN")
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("UNUSED")
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio2", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE(lamp_control_w)
 	AM_RANGE(0x14, 0xff) AM_NOP
 ADDRESS_MAP_END
@@ -219,6 +217,15 @@ static MACHINE_CONFIG_START( victory )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	// PIO interrupts are disconnected
+	MCFG_DEVICE_ADD("pio1", Z80PIO, VICTORY_MAIN_CPU_CLOCK) // at K8
+	MCFG_Z80PIO_IN_PA_CB(IOPORT("DIAL"))
+	MCFG_Z80PIO_IN_PB_CB(IOPORT("COIN"))
+
+	MCFG_DEVICE_ADD("pio2", Z80PIO, VICTORY_MAIN_CPU_CLOCK) // at L8
+	MCFG_Z80PIO_IN_PA_CB(IOPORT("BUTTONS"))
+	MCFG_Z80PIO_IN_PB_CB(IOPORT("UNUSED"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
