@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(soundlatch_nmi_r);
 	DECLARE_WRITE8_MEMBER(resint_w);
 	DECLARE_WRITE8_MEMBER(slalom03_oki_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(vclk_w);
+	DECLARE_WRITE_LINE_MEMBER(vck_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -240,12 +240,15 @@ WRITE8_MEMBER(joctronic_state::slalom03_oki_bank_w)
 	m_oki->reset_w(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(joctronic_state::vclk_w)
+WRITE_LINE_MEMBER(joctronic_state::vck_w)
 {
-	m_adpcm_toggle = !m_adpcm_toggle;
-	m_adpcm_select->select_w(m_adpcm_toggle);
-	if (m_adpcm_toggle)
-		m_soundcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	if (state)
+	{
+		m_adpcm_toggle = !m_adpcm_toggle;
+		m_adpcm_select->select_w(m_adpcm_toggle);
+		if (m_adpcm_toggle)
+			m_soundcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
 }
 
 static ADDRESS_MAP_START( joctronic_sound_map, AS_PROGRAM, 8, joctronic_state )
@@ -383,7 +386,7 @@ static MACHINE_CONFIG_START( slalom03 )
 
 	MCFG_SOUND_ADD("oki", MSM5205, XTAL_12MHz/2/16) // 375 kHz
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B) // frequency modifiable during operation
-	MCFG_MSM5205_VCLK_CB(WRITELINE(joctronic_state, vclk_w))
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(joctronic_state, vck_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
