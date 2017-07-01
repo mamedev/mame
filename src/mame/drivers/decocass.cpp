@@ -1533,7 +1533,7 @@ ROM_START( ctisland )
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "ctisland.cas", 0x0000, 0x8000, CRC(3f63b8f8) SHA1(2fd0679ef9750a228ebb098672ab6091fda75804) )
 
-	ROM_REGION( 0x4000, "user3", 0 )      /* roms from the overlay pcb */
+	ROM_REGION( 0xa000, "user3", ROMREGION_ERASEFF )      /* roms from the overlay pcb */
 	ROM_LOAD( "deco-ti.x1",   0x0000, 0x1000, CRC(a7f8aeba) SHA1(0c9ba1a46d0636b36f40fad31638db89f374f778) )
 	ROM_LOAD( "deco-ti.x2",   0x1000, 0x1000, CRC(2a0d3c91) SHA1(552d08fcddddbea5b52fa1e8decd188ae49c86ea) )
 	ROM_LOAD( "deco-ti.x3",   0x2000, 0x1000, CRC(3a26b97c) SHA1(f57e76077806e149a9e455c85e5431eac2d42bc3) )
@@ -1549,7 +1549,7 @@ ROM_START( ctisland2 )
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "ctislnd2.cas", 0x0000, 0x8000, CRC(2854b4c0) SHA1(d3b4e0031dbb2340fbbe396a1ff9b8fbfd63663e) )
 
-	ROM_REGION( 0x4000, "user3", 0 )      /* roms from the overlay pcb */
+	ROM_REGION( 0xa000, "user3", ROMREGION_ERASEFF )      /* roms from the overlay pcb */
 	ROM_LOAD( "deco-ti.x1",   0x0000, 0x1000, CRC(a7f8aeba) SHA1(0c9ba1a46d0636b36f40fad31638db89f374f778) )
 	ROM_LOAD( "deco-ti.x2",   0x1000, 0x1000, CRC(2a0d3c91) SHA1(552d08fcddddbea5b52fa1e8decd188ae49c86ea) )
 	ROM_LOAD( "deco-ti.x3",   0x2000, 0x1000, CRC(3a26b97c) SHA1(f57e76077806e149a9e455c85e5431eac2d42bc3) )
@@ -1565,7 +1565,7 @@ ROM_START( ctisland3 )
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "ctislnd3.cas", 0x0000, 0x8000, CRC(45464e1e) SHA1(03275694d963c7ab0e0f5525e248e69da5f9b591) )
 
-	ROM_REGION( 0x4000, "user3", 0 )      /* roms from the overlay pcb */
+	ROM_REGION( 0xa000, "user3", ROMREGION_ERASEFF )      /* roms from the overlay pcb */
 	ROM_LOAD( "deco-ti.x1",   0x0000, 0x1000, CRC(a7f8aeba) SHA1(0c9ba1a46d0636b36f40fad31638db89f374f778) )
 	ROM_LOAD( "deco-ti.x2",   0x1000, 0x1000, CRC(2a0d3c91) SHA1(552d08fcddddbea5b52fa1e8decd188ae49c86ea) )
 	ROM_LOAD( "deco-ti.x3",   0x2000, 0x1000, CRC(3a26b97c) SHA1(f57e76077806e149a9e455c85e5431eac2d42bc3) )
@@ -1584,8 +1584,17 @@ ROM_START( cexplore )
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "cexplore.cas", 0x0000, 0x8000, CRC(fae49c66) SHA1(4ae69e2f706fdf30204f0aa1277619395cacc21b) )
 
-	ROM_REGION( 0x4000, "user3", 0 )      /* roms from the overlay pcb */
-	ROM_LOAD( "cexplore_overlay_roms", 0x0000, 0x4000, NO_DUMP )
+	ROM_REGION( 0xa000, "user3", ROMREGION_ERASEFF )      /* roms from the overlay pcb */
+	ROM_LOAD( "x1_made_in_japan_18.x1",   0x0000, 0x1000, CRC(f2ca58f0) SHA1(5c9faeca6247b70586dc2a3765805ac96960ac79) )
+	ROM_LOAD( "x2_made_in_japan_18.x2",   0x1000, 0x1000, CRC(75d999bf) SHA1(7c257285d5b69642ec542dc56defdbb1f2072454) )
+	ROM_LOAD( "x3_made_in_japan_18.x3",   0x2000, 0x1000, CRC(941539c6) SHA1(2e879107f56bf258ad90fb83c2ab278027acb0bb) ) // FIXED BITS (1xxxxxxx) (but correct?)
+	ROM_LOAD( "x4_made_in_japan_18.x4",   0x3000, 0x1000, CRC(73388544) SHA1(9c98f79e431d0881e20eac4c6c4177db8973ce20) ) // FIXED BITS (1xxxxxxx) (but correct?)
+	ROM_LOAD( "x5_made_in_japan_18.x5",   0x4000, 0x1000, CRC(b40699c5) SHA1(4934283d2845dbd3ea9a7fa349f663a34fcdfdf8) )
+	ROM_LOAD( "y1_made_in_japan_18.y1",   0x5000, 0x1000, CRC(d887dc50) SHA1(9321e40d208bd029657ab87eaf815f8a09e49b48) )
+	ROM_LOAD( "y2_made_in_japan_18.y2",   0x6000, 0x1000, CRC(fe325d0d) SHA1(3e4aaba87e2aa656346169d512d70083605692c6) )
+	ROM_LOAD( "y3_made_in_japan_18.y3",   0x7000, 0x1000, CRC(7a787ecf) SHA1(5261747823b58be3fabb8d1a8cb4069082f95b30) )
+	ROM_LOAD( "y4_made_in_japan_18.y4",   0x8000, 0x1000, CRC(ac30e8c7) SHA1(f8f53b982df356e5bf2624afe0f8a72635b3b4b3) )
+	ROM_LOAD( "y5_made_in_japan_18.y5",   0x9000, 0x1000, CRC(0a6b8f03) SHA1(09b477579a5fed4c45299b6366141ef4a8c9a410) )
 ROM_END
 
 /* The Following use Dongle Type 2 (CS82-007)
@@ -2015,6 +2024,7 @@ DRIVER_INIT_MEMBER(decocass_state,decocrom)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8_delegate(FUNC(decocass_state::decocass_de0091_w),this));
 	membank("bank1")->configure_entry(0, m_charram);
 	membank("bank1")->configure_entry(1, memregion("user3")->base());
+	membank("bank1")->configure_entry(2, memregion("user3")->base()+0x5000);
 	membank("bank1")->set_entry(0);
 
 	/* install the bank selector */
@@ -2079,7 +2089,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /*    */ GAME( 1981, ctisland2, ctisland, ctisland, ctisland, decocass_type1_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 ) /* newer? has instructions in attract */
 /*    */ GAME( 1981, ctisland3, ctisland, ctisland3,ctisland, decocass_type1_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Region D)", 0 ) /* region code 'D' unknown region */
 /* 17 */ // 1981.10 Bobbitto
-/* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", MACHINE_NOT_WORKING )
+/* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_type1_state, decocrom, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", 0 )
 /* 19 */ GAME( 1982, cdiscon1,  decocass, decocass, cdiscon1, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1982, csweetht,  cdiscon1, decocass, csweetht, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette) (US)", 0 )
 /* 20 */ GAME( 1982, ctornado,  decocass, decocass, ctornado, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette) (US)", 0 )

@@ -1184,28 +1184,27 @@ WRITE8_MEMBER(decocass_state::decocass_e5xx_w)
  *  DE-0091xx daughter board handler
  *
  *  The DE-0091xx daughter board seems to be a read-only ROM board with
- *  two times five 4K ROMs. The only game using it (so far) is
- *  Treasure Island, which has 4 ROMs.
+ *  two times five 4K ROMs. 
+ * 
  *  The board's ROMs are mapped into view for reads between addresses
- *  0x6000 and 0xafff by setting bit0 of address 0xe900.
+ *  0x6000 and 0xafff by setting bits 0 and 1 of address 0xe900.
  *
  ***************************************************************************/
 
 WRITE8_MEMBER(decocass_state::decocass_e900_w)
 {
-	m_de0091_enable = data & 1;
-	membank("bank1")->set_entry(data & 1);
-	/* Perhaps the second row of ROMs is enabled by another bit.
-	 * There is no way to verify this yet, so for now just look
-	 * at bit 0 to enable the daughter board at reads between
-	 * 0x6000 and 0xafff.
-	 */
+	m_de0091_enable = data & 3;
+
+	if (m_de0091_enable == 0x3) // invalid
+		return;
+
+	membank("bank1")->set_entry(data & 3);
 }
 
 WRITE8_MEMBER(decocass_state::decocass_de0091_w)
 {
-	/* don't allow writes to the ROMs */
-	if (!m_de0091_enable)
+	/* don't allow writes to the ROMs - actually cexplore requires us to allow them */
+	//if (!m_de0091_enable)
 		decocass_charram_w(space, offset, data);
 }
 
