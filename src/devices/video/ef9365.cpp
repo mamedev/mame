@@ -166,7 +166,7 @@ const tiny_rom_entry *ef9365_device::device_rom_region() const
 // default address map
 // Up to 512*512 per bitplane, 8 bitplanes max.
 //-------------------------------------------------
-static ADDRESS_MAP_START( ef9365, AS_0, 8, ef9365_device )
+static ADDRESS_MAP_START( ef9365, 0, 8, ef9365_device )
 	AM_RANGE(0x00000, ( ( ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES ) - 1 ) ) AM_RAM
 ADDRESS_MAP_END
 
@@ -175,9 +175,11 @@ ADDRESS_MAP_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *ef9365_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> ef9365_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //**************************************************************************

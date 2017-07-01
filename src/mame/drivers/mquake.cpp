@@ -79,7 +79,7 @@ READ8_MEMBER( mquake_state::es5503_sample_r )
 	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
 
-static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8, mquake_state )
+static ADDRESS_MAP_START( mquake_es5503_map, 0, 8, mquake_state )
 	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
 ADDRESS_MAP_END
 
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( mquake )
 
 	MCFG_ES5503_ADD("es5503", amiga_state::CLK_7M_NTSC)       /* ES5503 is likely mono due to channel strobe used as bank select */
 	MCFG_ES5503_OUTPUT_CHANNELS(1)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mquake_es5503_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, mquake_es5503_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 

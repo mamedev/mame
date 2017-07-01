@@ -228,6 +228,13 @@ DEFINE_DEVICE_TYPE(ARM,    arm_cpu_device,    "arm_le", "ARM (little)")
 DEFINE_DEVICE_TYPE(ARM_BE, arm_be_cpu_device, "arm_be", "ARM (big)")
 
 
+std::vector<std::pair<int, const address_space_config *>> arm_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm_cpu_device(mconfig, ARM, tag, owner, clock, ENDIANNESS_LITTLE)
 {

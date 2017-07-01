@@ -562,7 +562,7 @@ READ16_MEMBER(apollo_state::apollo_atbus_memory_r)
 	uint16_t data;
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
-	data = m_isa->prog16_swap_r(space, offset, mem_mask);
+	data = m_isa->mem16_swap_r(space, offset, mem_mask);
 
 	SLOG2(("apollo_atbus_memory_r at %08x = %04x & %04x", ATBUS_MEMORY_BASE + offset * 2, data, mem_mask));
 	return data;
@@ -573,7 +573,7 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_memory_w)
 	SLOG2(("apollo_atbus_memory_w at %08x = %04x & %04x", ATBUS_MEMORY_BASE + offset*2, data, mem_mask));
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
-	m_isa->prog16_swap_w(space, offset, data, mem_mask);
+	m_isa->mem16_swap_w(space, offset, data, mem_mask);
 }
 
 /***************************************************************************

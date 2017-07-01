@@ -68,7 +68,7 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override;

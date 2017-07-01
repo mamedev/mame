@@ -19,7 +19,7 @@ static void CLIB_DECL ATTR_PRINTF(1,2) nolog(const char *format, ...) {}
 //#define debuglogtimer logerror
 #define debuglogtimer nolog
 
-static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_device )
+static ADDRESS_MAP_START( coldfire_regs_map, 0, 32, mcf5206e_peripheral_device )
 
 
 	AM_RANGE(0x014, 0x017) AM_READWRITE8(ICR1_ICR2_ICR3_ICR4_r,    ICR1_ICR2_ICR3_ICR4_w,    0xffffffff)
@@ -836,9 +836,11 @@ mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mco
 {
 }
 
-const address_space_config *mcf5206e_peripheral_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mcf5206e_peripheral_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //-------------------------------------------------

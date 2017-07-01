@@ -481,7 +481,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ted_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ted_videoram_map, AS_0, 8, plus4_state )
+static ADDRESS_MAP_START( ted_videoram_map, 0, 8, plus4_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(ted_videoram_r)
 ADDRESS_MAP_END
 

@@ -131,6 +131,13 @@ pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag,
 	set_vtlb_dynamic_entries(196);
 }
 
+std::vector<std::pair<int, const address_space_config *>> i386_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
@@ -4005,7 +4012,7 @@ void i386_device::execute_run()
 
 /*************************************************************************/
 
-bool i386_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	bool ret = true;
 	if(spacenum == AS_PROGRAM)

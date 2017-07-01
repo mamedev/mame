@@ -394,12 +394,11 @@ void r3000_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *r3000_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> r3000_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-		return (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le;
-	else
-		return nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le)
+	};
 }
 
 

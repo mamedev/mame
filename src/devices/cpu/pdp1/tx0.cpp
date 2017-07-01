@@ -75,6 +75,13 @@ tx0_64kw_device::tx0_64kw_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> tx0_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 int tx0_device::tx0_read(offs_t address)
 {

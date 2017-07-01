@@ -686,7 +686,7 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( realpunc_hd63484_map, AS_0, 16, taitob_state )
+static ADDRESS_MAP_START( realpunc_hd63484_map, 0, 16, taitob_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 

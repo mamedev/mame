@@ -185,7 +185,7 @@
 	if (device->interface(memory))
 	{
 		NSBox *memoryBox = nil;
-		for (address_spacenum i = AS_0; i < ADDRESS_SPACES; i++)
+		for (int i = 0; i < ADDRESS_SPACES; i++)
 		{
 			if (memory->has_space(i))
 			{

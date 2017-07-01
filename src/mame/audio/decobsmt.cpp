@@ -26,7 +26,7 @@ static ADDRESS_MAP_START( decobsmt_map, AS_PROGRAM, 8, decobsmt_device )
 	AM_RANGE(0x2000, 0xffff) AM_ROM AM_REGION(":soundcpu", 0x2000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bsmt_map, AS_0, 8, decobsmt_device )
+static ADDRESS_MAP_START( bsmt_map, 0, 8, decobsmt_device )
 	AM_RANGE(0x000000, 0xffffff) AM_ROM AM_REGION(":bsmt", 0)
 ADDRESS_MAP_END
 
@@ -53,7 +53,7 @@ MACHINE_CONFIG_MEMBER( decobsmt_device::device_add_mconfig )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_BSMT2000_ADD(BSMT_TAG, 24000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, bsmt_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, bsmt_map)
 	MCFG_BSMT2000_READY_CALLBACK(decobsmt_device, bsmt_ready_callback)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)

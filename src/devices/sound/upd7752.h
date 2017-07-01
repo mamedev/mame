@@ -36,7 +36,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 private:
 	sound_stream *m_stream;

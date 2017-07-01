@@ -86,7 +86,7 @@ DEVICE_ADDRESS_MAP_START( iowr2_map, 8, abc1600_mover_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mover_map, AS_0, 16, abc1600_mover_device )
+static ADDRESS_MAP_START( mover_map, 0, 16, abc1600_mover_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -280,9 +280,11 @@ void abc1600_mover_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *abc1600_mover_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> abc1600_mover_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

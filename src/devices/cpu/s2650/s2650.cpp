@@ -50,23 +50,20 @@ offs_t s2650_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 }
 
 
-const address_space_config *s2650_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> s2650_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
+	return std::vector<std::pair<int, const address_space_config *>> {
 		// Memory-mapped: M/~IO=1
-		case AS_PROGRAM: return &m_program_config;
-
-		// Extended I/O: M/~IO=0 ADR13(E)=1 ADR14=Don't Care
-		case AS_IO: return &m_io_config;
+		std::make_pair(AS_PROGRAM, &m_program_config),
 
 		// Non-extended I/O: M/~IO=0 ADR13(~NE)=0 ADR14=D/~C
 		// "The D/~C line can be used as a 1-bit device address in simple systems."
 		// -- Signetics 2650 Microprocessor databook, page 41
-		case AS_DATA: return &m_data_config;
+		std::make_pair(AS_DATA,    &m_data_config),
 
-		default: return nullptr;
-	}
+		// Extended I/O: M/~IO=0 ADR13(E)=1 ADR14=Don't Care
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 

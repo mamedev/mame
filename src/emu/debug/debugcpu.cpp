@@ -1528,7 +1528,6 @@ device_debug::device_debug(device_t &device)
 	, m_track_mem(false)
 {
 	memset(m_pc_history, 0, sizeof(m_pc_history));
-	memset(m_wplist, 0, sizeof(m_wplist));
 
 	// find out which interfaces we have to work with
 	device.interface(m_exec);
@@ -2113,7 +2112,8 @@ void device_debug::breakpoint_enable_all(bool enable)
 
 int device_debug::watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action)
 {
-	assert(space.spacenum() < ARRAY_LENGTH(m_wplist));
+	if (space.spacenum() >= int(m_wplist.size()))
+		m_wplist.resize(space.spacenum()+1, nullptr);
 
 	// allocate a new one
 	u32 id = m_device.machine().debugger().cpu().get_watchpoint_index();
@@ -2137,7 +2137,7 @@ int device_debug::watchpoint_set(address_space &space, int type, offs_t address,
 bool device_debug::watchpoint_clear(int index)
 {
 	// scan the list to see if we own this breakpoint
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		for (watchpoint **wp = &m_wplist[spacenum]; *wp != nullptr; wp = &(*wp)->m_next)
 			if ((*wp)->m_index == index)
 			{
@@ -2161,7 +2161,7 @@ bool device_debug::watchpoint_clear(int index)
 void device_debug::watchpoint_clear_all()
 {
 	// clear the head until we run out
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		while (m_wplist[spacenum] != nullptr)
 			watchpoint_clear(m_wplist[spacenum]->index());
 }
@@ -2175,7 +2175,7 @@ void device_debug::watchpoint_clear_all()
 bool device_debug::watchpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this watchpoint
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		for (watchpoint *wp = m_wplist[spacenum]; wp != nullptr; wp = wp->next())
 			if (wp->m_index == index)
 			{
@@ -2197,7 +2197,7 @@ bool device_debug::watchpoint_enable(int index, bool enable)
 void device_debug::watchpoint_enable_all(bool enable)
 {
 	// apply the enable to all watchpoints we own
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		for (watchpoint *wp = m_wplist[spacenum]; wp != nullptr; wp = wp->next())
 			watchpoint_enable(wp->index(), enable);
 }
@@ -2369,7 +2369,7 @@ void device_debug::set_track_pc_visited(const offs_t& pc)
 //  'not available'.
 //-------------------------------------------------
 
-offs_t device_debug::track_mem_pc_from_space_address_data(const address_spacenum& space,
+offs_t device_debug::track_mem_pc_from_space_address_data(const int& space,
 															const offs_t& address,
 															const u64& data) const
 {
@@ -2744,7 +2744,7 @@ void device_debug::watchpoint_check(address_space& space, int type, offs_t addre
 	space.machine().debugger().cpu().watchpoint_check(space, type, address, value_to_write, mem_mask, m_wplist);
 }
 
-void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, device_debug::watchpoint** wplist)
+void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist)
 {
 	// if we're within debugger code, don't stop
 	if (m_within_instruction_hook || m_machine.side_effect_disabled())
@@ -3332,7 +3332,7 @@ device_debug::dasm_pc_tag::dasm_pc_tag(const offs_t& address, const u32& crc)
 //  dasm_memory_access - constructor
 //-------------------------------------------------
 
-device_debug::dasm_memory_access::dasm_memory_access(const address_spacenum& address_space,
+device_debug::dasm_memory_access::dasm_memory_access(const int& address_space,
 														const offs_t& address,
 														const u64& data,
 														const offs_t& pc)

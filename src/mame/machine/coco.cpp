@@ -307,7 +307,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 	//
 	// Most of the time, the read below will result in floating_bus_read() being
 	// invoked
-	return m_floating->read8(m_floating->space(address_spacenum::AS_0), offset);
+	return m_floating->read8(m_floating->space(0), offset);
 }
 
 
@@ -317,7 +317,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 
 void coco_state::floating_space_write(offs_t offset, uint8_t data)
 {
-	m_floating->write8(m_floating->space(address_spacenum::AS_0), offset, data);
+	m_floating->write8(m_floating->space(0), offset, data);
 }
 
 
@@ -1240,7 +1240,7 @@ void coco_state::cart_w(bool state)
 
 address_space &coco_state::cartridge_space()
 {
-	return m_floating->space(address_spacenum::AS_0);
+	return m_floating->space(0);
 }
 
 

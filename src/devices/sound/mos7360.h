@@ -49,7 +49,7 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos7360_device, screen_update) \
 	MCFG_DEVICE_ADD(_tag, MOS7360, _clock) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	downcast<mos7360_device *>(device)->set_callbacks(_cpu_tag, DEVCB_##_irq, DEVCB_##_k);
 
@@ -102,7 +102,7 @@ public:
 		m_read_k.set_callback(std::forward<K>(k));
 	}
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	uint8_t read(address_space &space, offs_t offset, int &cs0, int &cs1);
 	void write(address_space &space, offs_t offset, uint8_t data, int &cs0, int &cs1);

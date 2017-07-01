@@ -292,14 +292,17 @@ void m6809_base_device::device_post_load()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *m6809_base_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> m6809_base_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_OPCODES: return has_configured_map(AS_OPCODES) ? &m_sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_sprogram_config)
+		};
+	else
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config)
+		};
 }
 
 

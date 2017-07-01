@@ -140,26 +140,22 @@ void cammu_device::device_start()
 {
 	m_ssw_func.resolve();
 
-	m_main_space = &space(AS_0);
-	m_io_space = &space(AS_1);
-	m_boot_space = &space(AS_2);
+	m_main_space = &space(0);
+	m_io_space = &space(1);
+	m_boot_space = &space(2);
 }
 
 void cammu_device::device_reset()
 {
 }
 
-const address_space_config *cammu_device::memory_space_config (address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> cammu_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_0: return &m_main_space_config;
-	case AS_1: return &m_io_space_config;
-	case AS_2: return &m_boot_space_config;
-	default: break;
-	}
-
-	return nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_main_space_config),
+		std::make_pair(1, &m_io_space_config),
+		std::make_pair(2, &m_boot_space_config)
+	};
 }
 
 READ32_MEMBER(cammu_device::insn_r)

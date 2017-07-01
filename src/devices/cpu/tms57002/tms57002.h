@@ -30,7 +30,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 	virtual uint32_t execute_min_cycles() const override;
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;

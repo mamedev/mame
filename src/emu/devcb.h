@@ -118,7 +118,7 @@ public:
 	bool isnull() const { return (m_type == CALLBACK_NONE); }
 
 	// additional configuration
-	devcb_base &set_space(const char *device, address_spacenum space = AS_0) { m_space_tag = device; m_space_num = space; return *this; }
+	devcb_base &set_space(const char *device, int space = 0) { m_space_tag = device; m_space_num = space; return *this; }
 	devcb_base &set_rshift(int rshift) { m_rshift = rshift; return *this; }
 	devcb_base &set_mask(u64 mask) { m_mask = mask; return *this; }
 	devcb_base &set_xor(u64 xorval) { m_xor = xorval; return *this; }
@@ -226,7 +226,7 @@ protected:
 	const char *        m_target_tag;           // tag of target object
 	u64                 m_target_int;           // integer value of target object
 	const char *        m_space_tag;            // tag of address space device
-	address_spacenum    m_space_num;            // address space number of space device
+	int    m_space_num;            // address space number of space device
 
 	// derived state
 	address_space *     m_space;                // target address space

@@ -88,6 +88,13 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> adsp21062_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 offs_t adsp21062_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

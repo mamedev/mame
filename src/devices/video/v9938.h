@@ -129,7 +129,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	virtual void palette_init() = 0;
 

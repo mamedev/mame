@@ -125,7 +125,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	void send_port(address_space &space, uint8_t offset, uint8_t data);
 	uint8_t read_port(uint8_t offset);

@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, turrett_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( turrett_sound_map, AS_0, 16, turrett_state )
+static ADDRESS_MAP_START( turrett_sound_map, 0, 16, turrett_state )
 	AM_RANGE(0x0000000, 0x7ffffff) AM_RAM AM_SHARE("bank_a")
 	AM_RANGE(0x8000000, 0xfffffff) AM_RAM AM_SHARE("bank_b")
 ADDRESS_MAP_END
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( turrett )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("ttsound", TURRETT, R3041_CLOCK) // ?
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, turrett_sound_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, turrett_sound_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

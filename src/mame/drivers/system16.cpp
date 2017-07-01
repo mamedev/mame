@@ -1365,7 +1365,7 @@ static ADDRESS_MAP_START(sys18bl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys18bl_oki_map, AS_0, 8, segas1x_bootleg_state )
+static ADDRESS_MAP_START( sys18bl_oki_map, 0, 8, segas1x_bootleg_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -2508,7 +2508,7 @@ static MACHINE_CONFIG_START( astormb2 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz clock and pin verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, sys18bl_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, sys18bl_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

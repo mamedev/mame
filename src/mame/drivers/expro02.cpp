@@ -798,7 +798,7 @@ static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, expro02_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, expro02_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -922,7 +922,7 @@ static MACHINE_CONFIG_START( expro02 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_LOW)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -961,7 +961,7 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad_noview2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
 	MCFG_OKIM6295_REPLACE("oki", 1584000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -979,7 +979,7 @@ static MACHINE_CONFIG_DERIVED( galhustl, comad_noview2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galhustl_map)
 	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -991,7 +991,7 @@ static MACHINE_CONFIG_DERIVED( zipzap, comad_noview2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zipzap_map)
 	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SCREEN_MODIFY("screen") // doesn't work with original kaneko_spr implementation

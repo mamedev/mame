@@ -228,7 +228,7 @@ fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_typ
 		m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
 {
 	// add the decrypted opcodes map
-	m_address_map[AS_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
+	set_addrmap(AS_OPCODES, ADDRESS_MAP_NAME(decrypted_opcodes_map));
 }
 
 fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

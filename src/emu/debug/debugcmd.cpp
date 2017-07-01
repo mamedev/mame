@@ -1398,7 +1398,7 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
+		for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
 			if (device.debug()->watchpoint_first(spacenum) != nullptr)
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
@@ -2786,7 +2786,7 @@ void debugger_commands::execute_pcatmem(int ref, const std::vector<std::string> 
 	const u64 data = m_cpu.read_memory(*space, space->address_to_byte(address), native_data_width, true);
 
 	// Recover the pc & print
-	const address_spacenum space_num = (address_spacenum)ref;
+	const int space_num = (int)ref;
 	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(space_num, address, data);
 	if (result != (offs_t)(-1))
 		m_console.printf("%02x\n", result);

@@ -323,16 +323,14 @@ void mcs40_cpu_device_base::execute_run()
     device_memory_interface implementation
 ***********************************************************************/
 
-address_space_config const *mcs40_cpu_device_base::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mcs40_cpu_device_base::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_PROGRAM:            return &m_program_config;
-	case AS_DATA:               return &m_data_config;
-	case AS_IO:                 return &m_io_config;
-	case AS_OPCODES:  return &m_opcodes_config;
-	default:                    return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config),
+		std::make_pair(AS_OPCODES, &m_opcodes_config)
+	};
 }
 
 

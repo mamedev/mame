@@ -75,6 +75,14 @@ f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, dev
 	memset(m_r, 0x00, sizeof(m_r));
 }
 
+std::vector<std::pair<int, const address_space_config *>> f8_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
 
 /******************************************************************************
  * ROMC (ROM cycles)

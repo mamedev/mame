@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, targeth_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, targeth_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -205,7 +205,7 @@ static MACHINE_CONFIG_START( targeth )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

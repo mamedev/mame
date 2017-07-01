@@ -1276,7 +1276,7 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-static ADDRESS_MAP_START(dummy, AS_0, 8, dummy_space_device)
+static ADDRESS_MAP_START(dummy, 0, 8, dummy_space_device)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1298,9 +1298,11 @@ void dummy_space_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *dummy_space_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> dummy_space_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

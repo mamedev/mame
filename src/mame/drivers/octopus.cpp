@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( octopus_sub_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( octopus_vram, AS_0, 8, octopus_state )
+static ADDRESS_MAP_START( octopus_vram, 0, 8, octopus_state )
 	AM_RANGE(0x0000,0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -989,7 +989,7 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, octopus_vram)
+	MCFG_DEVICE_ADDRESS_MAP(0, octopus_vram)
 
 	MCFG_DEVICE_ADD("z80_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)

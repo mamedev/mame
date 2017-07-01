@@ -110,6 +110,13 @@ tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> tms9928a_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_DATA, &m_space_config)
+	};
+}
+
 READ8_MEMBER( tms9928a_device::read )
 {
 	uint8_t value = 0;

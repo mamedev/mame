@@ -60,7 +60,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, msm6255_device )
 ADDRESS_MAP_END
 
 // default address map
-static ADDRESS_MAP_START( msm6255, AS_0, 8, msm6255_device )
+static ADDRESS_MAP_START( msm6255, 0, 8, msm6255_device )
 	AM_RANGE(0x00000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -121,9 +121,11 @@ void msm6255_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *msm6255_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> msm6255_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

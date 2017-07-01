@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                     /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vlm_map, AS_0, 8, ddribble_state )
+static ADDRESS_MAP_START( vlm_map, 0, 8, ddribble_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROMBANK("vlmbank")
 ADDRESS_MAP_END
 
@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( ddribble )
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 
 	MCFG_FILTER_RC_ADD("filter1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( punchout_vlm_map, AS_0, 8, punchout_state )
+static ADDRESS_MAP_START( punchout_vlm_map, 0, 8, punchout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( punchout )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, punchout_vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
 
