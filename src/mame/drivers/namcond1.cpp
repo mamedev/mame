@@ -10,9 +10,8 @@
             Walter Fath
 
 	abcheck TODOs:
-	- Default eeprom.  AT28C16 writes 0x820 byte nvram, but will only accept 0x800.  Why?
 	- YGV608 brokenness
-	- Hook up controls properly (two buttons only for 3 players, and only 1 coin slot, mapped as player 2)
+	- Where is the extra data ROM mapped?
 	
 	To make abcheck run when the EEPROM is clear:
 	- F2 to enter service mode
@@ -497,6 +496,9 @@ ROM_START( abcheck )
 	
 	ROM_REGION( 0x8000, "zpr2", 0 )
 	ROM_LOAD( "m48z30y.ic3",  0x000000, 0x008000, CRC(bfa687bb) SHA1(463ae40f21b675f3b4155efda9c965b71519a49e) ) 
+
+	ROM_REGION( 0x800, "at28c16", 0 )
+	ROM_LOAD( "at28c16.12e",  0x000000, 0x000800, CRC(df92af14) SHA1(1ae8c318f1eb2628e97914d15a06779c7bb87506) )
 
 	ROM_REGION( 0x220000, "printer", 0 )
 	ROM_LOAD( "np-b205_nmc_ver1.00.u9", 0x000000, 0x020000, CRC(445ceb0d) SHA1(49491b936f50577564196992df3a3c93aa3fcc99) ) 
