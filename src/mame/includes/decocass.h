@@ -214,8 +214,6 @@ public:
 		m_type1_map = nullptr;
 	}
 
-public:
-
 	DECLARE_MACHINE_RESET(ctsttape);
 	DECLARE_MACHINE_RESET(chwy);
 	DECLARE_MACHINE_RESET(cdsteljn);
@@ -282,8 +280,6 @@ public:
 		: decocass_state(mconfig, type, tag)
 	{
 	}
-
-public:
 
 	DECLARE_MACHINE_RESET(cfishing);
 	DECLARE_MACHINE_RESET(cbtime);

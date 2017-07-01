@@ -431,7 +431,7 @@ static uint8_t type1_map1100[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1P
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cocean1a) /* 10 */
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DP-1100 map)\n"));
 	m_type1_map = type1_map1100;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
@@ -462,7 +462,7 @@ static uint8_t type1_map1120[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM,T1L
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cfboy0a1) /* 12 */
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DP-1120 map)\n"));
 	m_type1_map = type1_map1120;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
@@ -491,7 +491,7 @@ static uint8_t type1_map_clocknchj[8] = { T1PROM,T1PROM,T1DIRECT,T1LATCHINV,T1PR
 
 MACHINE_RESET_MEMBER(decocass_type1_state,clocknchj) /* 11 */
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (type1_map_clocknchj map)\n"));
 	m_type1_map = type1_map_clocknchj;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
@@ -1380,28 +1380,28 @@ void decocass_nodong_state::machine_reset()
 
 MACHINE_RESET_MEMBER(decocass_type1_state,ctsttape)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	m_type1_map = type1_pass_136_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_type1_state,chwy)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
 	m_type1_map = type1_latch_27_pass_3_inv_2_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cdsteljn)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (A-0061)\n"));
 	m_type1_map = type1_latch_27_pass_3_inv_2_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cterrani)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 straight)\n"));
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
@@ -1410,14 +1410,14 @@ MACHINE_RESET_MEMBER(decocass_type1_state,cterrani)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,castfant)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	m_type1_map = type1_latch_16_pass_3_inv_1_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_type1_state,csuperas)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 4-5)\n"));
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
@@ -1426,14 +1426,14 @@ MACHINE_RESET_MEMBER(decocass_type1_state,csuperas)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cmanhat)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	m_type1_map = type1_latch_xab_pass_x54_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_type1_state,clocknch)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 2-3)\n"));
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,1,3,2,4,5,6,7);
@@ -1442,7 +1442,7 @@ MACHINE_RESET_MEMBER(decocass_type1_state,clocknch)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cprogolf)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 0-1)\n"));
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
@@ -1451,7 +1451,7 @@ MACHINE_RESET_MEMBER(decocass_type1_state,cprogolf)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cprogolfj)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (A-0061 flip 0-1)\n"));
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
@@ -1460,7 +1460,7 @@ MACHINE_RESET_MEMBER(decocass_type1_state,cprogolfj)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cluckypo)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 1-3)\n"));
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,3,2,1,4,5,6,7);
@@ -1469,7 +1469,7 @@ MACHINE_RESET_MEMBER(decocass_type1_state,cluckypo)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,ctisland)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 0-2)\n"));
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(2,1,0,3,4,5,6,7);
@@ -1478,7 +1478,7 @@ MACHINE_RESET_MEMBER(decocass_type1_state,ctisland)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,ctisland3)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 custom)\n"));
 	m_type1_map = type1_latch_ctisland3;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);  // correct for handcrafted prom
@@ -1487,14 +1487,14 @@ MACHINE_RESET_MEMBER(decocass_type1_state,ctisland3)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cexplore)
 {
-	decocass_type1_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
 	m_type1_map = type1_latch_26_pass_5_inv_2_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cfishing)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_01;
 
@@ -1502,7 +1502,7 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cfishing)
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cbtime)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_12;
 
@@ -1510,63 +1510,63 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cbtime)
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cburnrub)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_67;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cgraplop)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_56;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cgraplop2)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_67;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,clapapa)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_34_7;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cskater)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_45;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cprobowl)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_34_0;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cnightst)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_13;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cpsoccer)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_24;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,csdtenis)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_23_56;
 }
@@ -1574,7 +1574,7 @@ MACHINE_RESET_MEMBER(decocass_type3_state,csdtenis)
 MACHINE_RESET_MEMBER(decocass_type3_state,czeroize)
 {
 	uint8_t *mem = memregion("dongle")->base();
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_23_56;
 
@@ -1594,14 +1594,14 @@ MACHINE_RESET_MEMBER(decocass_type3_state,czeroize)
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cppicf)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_01;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cfghtice)
 {
-	decocass_type3_state::machine_reset();
+	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_25;
 }
