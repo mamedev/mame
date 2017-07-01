@@ -36593,7 +36593,8 @@ tfupdate                        // 2004.?? Triforce GDROM Boot Update
 triforce                        // 2002.?? Triforce BIOS
 vs2002ex                        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j                         // 2002.10 Virtua Striker 2002 (Japan)
-vs4                             // 2004.12.02 Virtua Striker 4 (Export)
+vs4                             // 2004.12.02 Virtua Striker 4 (Export) (GDT-0015)
+vs4e                            // 2004.12.03 Virtua Striker 4 (Export) (GDT-0014)
 vs42006                         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
 vs42k6ex                        // 2006.01.31 Virtua Striker 4 Ver.2006 (Export)
 vs4j                            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
