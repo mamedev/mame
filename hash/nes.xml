@@ -80938,7 +80938,7 @@ that the real dumps might surface -->
 
 <!-- ONE BUS based systems are famiclones (of plug-and-play type) which are based on the famicom hw but with a slightly more powerful PPU.
      As they are standalone machines they're contained in nes_vt.cpp rather than the software lists.  The notes below relate to ROMs
-	 extracted from those sets -->
+     extracted from those sets -->
 
 <!-- The following iNES roms are ripped from mc_dgear, so we don't include them (crc is from headerless file):
     * Deformable    [b0716cc2]

@@ -549,10 +549,8 @@
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
 #include "machine/nvram.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 #include "noraut11.lh"
@@ -724,6 +722,23 @@ WRITE8_MEMBER(norautp_state::counterlamps_w)
 //}
 
 
+WRITE_LINE_MEMBER(norautp_state::ppi2_obf_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(norautp_state::ppi2_ack), this), state);
+}
+
+TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
+{
+	m_ppi8255[2]->pc6_w(param);
+	if (param == 0)
+	{
+		uint8_t np_addr = m_ppi8255[2]->pb_r();
+		uint8_t vram_data = m_ppi8255[2]->pa_r();
+		m_np_vram[np_addr] = vram_data;
+	}
+}
+
+#ifdef UNUSED_FUNCTION // old implementation
 /*game waits for /OBF signal (bit 7) to be set.*/
 READ8_MEMBER(norautp_state::test_r)
 {
@@ -749,6 +764,7 @@ WRITE8_MEMBER(norautp_state::vram_addr_w)
 {
 	m_np_addr = data;
 }
+#endif
 
 /* game waits for bit 4 (0x10) to be reset.*/
 READ8_MEMBER(norautp_state::test2_r)
@@ -823,10 +839,10 @@ static ADDRESS_MAP_START( norautp_portmap, AS_IO, 8, norautp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-//  AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
-	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
+	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
+	//AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
+	//AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
+	//AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
 	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
 ADDRESS_MAP_END
 
@@ -967,7 +983,7 @@ static INPUT_PORTS_START( norautp )
 
 	PORT_START("IN2")   /* Only 3 lines: PPI-2; PC0-PC2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_CODE(KEYCODE_9) PORT_NAME("Readout")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("Low Level Hopper")
 
 
@@ -1005,7 +1021,7 @@ static INPUT_PORTS_START( norautrh )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -1059,7 +1075,7 @@ static INPUT_PORTS_START( norautpn )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -1230,14 +1246,11 @@ static MACHINE_CONFIG_START( noraut_base )
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, soundlamps_w))
 
-	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
 	 Group B Mode 0, output;  (see below for lines PC0-PC2) */
-	//MCFG_I8255_IN_PORTA_CB(READ8(norautp_state, vram_data_r)) // VRAM data read
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(norautp_state, vram_data_w))   // VRAM data write
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(norautp_state, vram_addr_w))   // VRAM address write
-	//MCFG_I8255_IN_PORTC_CB(READ8(norautp_state, ppi2_portc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, ppi2_portc_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	MCFG_I8255_OUT_PORTC_CB(WRITELINE(norautp_state, ppi2_obf_w)) MCFG_DEVCB_BIT(7)
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
 	 It means that port A should be bidirectional and port B just as output.
 	 Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */

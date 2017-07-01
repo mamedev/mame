@@ -12,6 +12,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "machine/upd4701.h"
 
 #define MAX_SAMPLES 0x2f        /* max samples */
 
@@ -26,8 +27,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_mainbank(*this, "mainbank")
 		, m_subbank(*this, "subbank")
-		, m_an1(*this, "AN1")
-		, m_an2(*this, "AN2")
 	{ }
 
 	virtual void machine_start() override;
@@ -38,8 +37,6 @@ public:
 
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tnzs);
-
-	DECLARE_READ8_MEMBER(analog_r); // TODO: Move into a subclass
 
 	DECLARE_PALETTE_INIT(prompalette);
 
@@ -52,9 +49,6 @@ protected:
 	optional_device<address_map_bank_device> m_mainbank; /* FIXME: optional because of reuse from cchance.cpp */
 	optional_memory_bank m_subbank; /* FIXME: optional because of reuse from cchance.cpp */
 
-	optional_ioport m_an1; // TODO: Move these into a subclass
-	optional_ioport m_an2;
-
 	/* misc / mcu */
 	int      m_bank2;
 };
@@ -65,6 +59,7 @@ public:
 	tnzs_mcu_state(const machine_config &mconfig, device_type type, const char *tag, bool lockout_level)
 		: tnzs_base_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
+		, m_upd4701(*this, "upd4701")
 		, m_in0(*this, "IN0")
 		, m_in1(*this, "IN1")
 		, m_in2(*this, "IN2")
@@ -80,8 +75,11 @@ public:
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
 
+	DECLARE_READ8_MEMBER(analog_r);
+
 protected:
 	required_device<upi41_cpu_device> m_mcu;
+	optional_device<upd4701_device> m_upd4701;
 
 	required_ioport m_in0;
 	required_ioport m_in1;
@@ -193,11 +191,15 @@ class jpopnics_state : public tnzs_base_state
 public:
 	jpopnics_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tnzs_base_state(mconfig, type, tag)
+		, m_upd4701(*this, "upd4701")
 	{ }
 
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER(subbankswitch_w);
+
+private:
+	required_device<upd4701_device> m_upd4701;
 };
 
 class insectx_state : public tnzs_base_state

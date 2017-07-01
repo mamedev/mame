@@ -2683,6 +2683,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ym3802.h,MACHINES["YM3802"] = true
+---------------------------------------------------
+
+if (MACHINES["YM3802"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ym3802.cpp",
+		MAME_DIR .. "src/devices/machine/ym3802.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/z80ctc.h,MACHINES["Z80CTC"] = true
 ---------------------------------------------------
 
@@ -3177,5 +3189,17 @@ if (MACHINES["K054321"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/k054321.cpp",
 		MAME_DIR .. "src/devices/machine/k054321.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/smioc.h,MACHINES["SMIOC"] = true
+---------------------------------------------------
+
+if (MACHINES["SMIOC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/smioc.cpp",
+		MAME_DIR .. "src/devices/machine/smioc.h",
 	}
 end

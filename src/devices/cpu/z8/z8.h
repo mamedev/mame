@@ -12,17 +12,60 @@
 #pragma once
 
 
-enum
-{
-	Z8_PC, Z8_SP, Z8_RP, Z8_T0, Z8_T1,
+#define MCFG_Z8_PORT_P0_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 0, DEVCB_##_devcb);
 
-	Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
-};
+#define MCFG_Z8_PORT_P1_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P2_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P3_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 3, DEVCB_##_devcb);
+
+
+#define MCFG_Z8_PORT_P0_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P1_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P2_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P3_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 3, DEVCB_##_devcb);
 
 
 class z8_device : public cpu_device
 {
+public:
+	// static configuration
+	template<class Object>
+	static devcb_base &set_input_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < 4);
+		return downcast<z8_device &>(device).m_input_cb[port].set_callback(std::forward<Object>(object));
+	}
+	template<class Object>
+	static devcb_base &set_output_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < 4);
+		return downcast<z8_device &>(device).m_output_cb[port].set_callback(std::forward<Object>(object));
+	}
+
 protected:
+	enum
+	{
+		Z8_PC, Z8_SP, Z8_RP,
+		Z8_IMR, Z8_IRQ, Z8_IPR,
+		Z8_P01M, Z8_P3M, Z8_P2M,
+		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR,
+
+		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
+	};
+
 	// construction/destruction
 	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size);
 
@@ -46,7 +89,6 @@ protected:
 		{
 			case AS_PROGRAM:   return &m_program_config;
 			case AS_DATA:      return &m_data_config;
-			case AS_IO:        return &m_io_config;
 			default:           return nullptr;
 		}
 		return nullptr;
@@ -66,12 +108,14 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
-	address_space *m_io;
+
+	// callbacks
+	devcb_read8 m_input_cb[4];
+	devcb_write8 m_output_cb[4];
 
 	/* registers */
 	uint16_t m_pc;              /* program counter */

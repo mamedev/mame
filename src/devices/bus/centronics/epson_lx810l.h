@@ -97,7 +97,7 @@ private:
 	DECLARE_READ8_MEMBER(an6_r);
 	DECLARE_READ8_MEMBER(an7_r);
 
-	
+
 	/* GATE ARRAY */
 	DECLARE_WRITE16_MEMBER(printhead);
 	DECLARE_WRITE8_MEMBER(pf_stepper);
@@ -134,6 +134,8 @@ private:
 	enum {
 		TIMER_CR
 	};
+
+	emu_timer *m_cr_timer;
 };
 
 // ======================> epson_ap2000_t

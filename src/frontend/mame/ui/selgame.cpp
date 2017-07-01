@@ -116,8 +116,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	if (!moptions.remember_last())
 		reselect_last::reset();
 
-	mui.machine().options().set_value(OPTION_SNAPNAME, "%g/%i", OPTION_PRIORITY_CMDLINE, error_string);
-	mui.machine().options().set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
+	mui.machine().options().set_value(OPTION_SNAPNAME, "%g/%i", OPTION_PRIORITY_CMDLINE);
 
 	ui_globals::curimage_view = FIRST_VIEW;
 	ui_globals::curdats_view = 0;
@@ -155,9 +154,9 @@ menu_select_game::~menu_select_game()
 		filter.append(",").append(c_year::ui[c_year::actual]);
 
 	ui_options &mopt = ui().options();
-	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
+	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
 	ui().save_ui_options();
 }
 
@@ -942,11 +941,10 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 				return;
 			}
 
-			std::string error_string;
 			std::string string_list = string_format("%s:%s:%s:%s", ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->part, ui_swinfo->instance);
-			mopt.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+			mopt.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
 			std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
-			mopt.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+			mopt.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
 			reselect_last::driver = drv.driver().name;
 			reselect_last::software = ui_swinfo->shortname;
 			reselect_last::swlist = ui_swinfo->listname;

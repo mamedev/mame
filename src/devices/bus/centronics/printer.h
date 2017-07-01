@@ -44,6 +44,9 @@ private:
 		TIMER_BUSY
 	};
 
+	emu_timer *m_ack_timer;
+	emu_timer *m_busy_timer;
+
 	int m_strobe;
 	uint8_t m_data;
 	int m_busy;

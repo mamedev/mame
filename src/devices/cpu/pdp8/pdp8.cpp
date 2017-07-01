@@ -44,14 +44,14 @@ CPU_DISASSEMBLE( pdp8 );
 #define OPR_GROUP1_VAL  0000
 #define OPR_GROUP2_VAL  0400
 
-const device_type PDP8CPU = device_creator<pdp8_device>;
+DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "PDP8")
 
 //-------------------------------------------------
 //  pdp8_device - constructor
 //-------------------------------------------------
 
 pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, PDP8CPU, "PDP8CPU", tag, owner, clock, "pdp8_cpu", __FILE__),
+	: cpu_device(mconfig, PDP8, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 12, 12),
 		m_pc(0),
 		m_ac(0),

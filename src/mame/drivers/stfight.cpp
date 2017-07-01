@@ -248,7 +248,8 @@ TODO:
 - stfight/empcity YM2203s should be clocked at 1.5MHz but this results in
   the sound and music being 1/3 of the pitch they should be. The game never
   writes the YM2203s' divider registers yet other games (e.g. Lock-On)
-  suggest the default values are correct. What *is* going on here?
+  suggest the default values are correct.
+  cshootert however, sounds too high-pitched at 1.5MHz*3.
 - Each version of empcity/stfight has a different protection code stored in the
   MCU (at $1D2) so each 68705 will need to be dumped.
   We currently use hacked versions of the empcityu MCU for each different set.
@@ -472,7 +473,7 @@ static MACHINE_CONFIG_START( stfight_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	// HACK! These should be clocked at 1.5Mhz (see TODO list)
+	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)

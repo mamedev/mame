@@ -216,7 +216,7 @@
   E = P0030SG / CD40106BCN
   F = 74HCU04D
   G = 74HC74D
-  
+
 *******************************************************************************
 
   BIG DEAL BELGIEN Version 5.04
@@ -287,7 +287,7 @@
   Xtal 1: 30.000 MHz.
   Xtal 2:  8.000 MHz.
   Xtal 3: 19.660 MHz.
-  
+
   A = LT 0030 / LTC695CN / U18708
   B = NEC Japan / D43256BGU-70LL / 0008XD041
   C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
@@ -366,7 +366,7 @@
   Xtal 1: 30.000 MHz.
   Xtal 2:  8.000 MHz.
   Xtal 3: 19.660 MHz.
-  
+
   A = LT 0030 / LTC695CN / U18708
   B = NEC Japan / D43256BGU-70LL / 0008XD041
   C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN

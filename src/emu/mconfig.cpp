@@ -39,21 +39,20 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		const char *slot_option_name = owner.tag() + 1;
 
 		// figure out which device goes into this slot
-		bool has_option = options.slot_options().count(slot_option_name);
+		bool has_option = options.has_slot_option(slot_option_name);
 		const char *selval;
 		bool is_default;
 		if (!has_option)
 		{
-			// Theoretically we should never get here; in the long run the expectation is that
-			// options.slot_options() should be fully qualified and all options should be
-			// present.  However, we're getting late in the MAME 0.185 development cycle and
-			// I don't want to rip this out (yet)
+			// The only time we should be getting here is when emuopts.cpp is invoking
+			// us to evaluate slot/image options, and the internal state of emuopts.cpp has
+			// not caught up yet
 			selval = slot.default_option();
 			is_default = true;
 		}
 		else
 		{
-			const slot_option &opt = options.slot_options()[slot_option_name];
+			const slot_option &opt = options.slot_option(slot_option_name);
 			selval = opt.value().c_str();
 			is_default = !opt.specified();
 		}

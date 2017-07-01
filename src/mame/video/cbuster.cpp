@@ -22,6 +22,47 @@ void cbuster_state::video_start()
 	m_sprgen->alloc_sprite_bitmap();
 }
 
+/* 
+	Crude Buster palette is a little strange compared to other Data East games 
+	of this period.  Although the digital palette is 8 bits per channel, the  
+	analog 'white' level is set at 0x8e.  In hardware this is done at the 
+	final resistors before the JAMMA connector.  It also suggests that if the
+	game were to use any values above 0x8e (it doesn't) then the final output
+	voltage would be out of spec.  
+	
+	I suspect this setup is actually software compensating for a hardware 
+	design problem.  
+*/
+	
+void cbuster_state::update_palette(int offset)
+{
+	int r = m_paletteram[offset]&0xff;
+	int g = m_paletteram[offset]>>8;
+	int b = m_paletteram_ext[offset]&0xff;
+	
+	if (r>0x8e) r=0x8e;
+	if (g>0x8e) g=0x8e;
+	if (b>0x8e) b=0x8e;
+
+	r = (r * 255) / 0x8e;
+	g = (g * 255) / 0x8e;
+	b = (b * 255) / 0x8e;
+	
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
+}
+
+WRITE16_MEMBER(cbuster_state::cbuster_palette_w)
+{
+	COMBINE_DATA(&m_paletteram[offset]);
+	update_palette(offset);
+}
+	
+WRITE16_MEMBER(cbuster_state::cbuster_palette_ext_w)
+{
+	COMBINE_DATA(&m_paletteram_ext[offset]);
+	update_palette(offset);
+}
+
 uint32_t cbuster_state::screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().dummy_space();

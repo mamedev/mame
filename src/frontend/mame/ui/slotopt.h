@@ -15,6 +15,7 @@
 
 #include "ui/menu.h"
 
+#include <unordered_map>
 
 namespace ui {
 class menu_slot_devices : public menu
@@ -32,6 +33,12 @@ private:
 	const char *get_next_slot(device_slot_interface &slot) const;
 	const char *get_previous_slot(device_slot_interface &slot) const;
 	void set_slot_device(device_slot_interface &slot, const char *val);
+	void record_current_options();
+	bool try_refresh_current_options();
+
+	// variables
+	std::unique_ptr<machine_config>                 m_config;
+	std::unordered_map<std::string, std::string>    m_slot_options;
 };
 
 } // namespace ui

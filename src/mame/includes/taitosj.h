@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
-#include "cpu/m6805/m68705.h"
+#include "machine/taitosjsec.h"
 
 #include "machine/gen_latch.h"
 
@@ -33,7 +33,7 @@ public:
 		m_kikstart_scrollram(*this, "kikstart_scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		m_mcu(*this, "bmcu"),
 		m_dac(*this, "dac"),
 		m_dacvol(*this, "dacvol"),
 		m_ay1(*this, "ay1"),
@@ -63,12 +63,6 @@ public:
 	required_shared_ptr<uint8_t> m_video_priority;
 	required_shared_ptr<uint8_t> m_collision_reg;
 	optional_shared_ptr<uint8_t> m_kikstart_scrollram;
-	uint8_t m_fromz80;
-	uint8_t m_toz80;
-	uint8_t m_zaccept;
-	uint8_t m_zready;
-	uint8_t m_busreq;
-	uint8_t m_portA_out;
 	uint8_t m_spacecr_prot_value;
 	uint8_t m_protection_value;
 	uint32_t m_address;
@@ -91,12 +85,10 @@ public:
 	DECLARE_READ8_MEMBER(taitosj_fake_data_r);
 	DECLARE_WRITE8_MEMBER(taitosj_fake_data_w);
 	DECLARE_READ8_MEMBER(taitosj_fake_status_r);
-	DECLARE_READ8_MEMBER(taitosj_mcu_data_r);
-	DECLARE_WRITE8_MEMBER(taitosj_mcu_data_w);
-	DECLARE_READ8_MEMBER(taitosj_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(taitosj_68705_portA_w);
-	DECLARE_WRITE8_MEMBER(taitosj_68705_portB_w);
-	DECLARE_READ8_MEMBER(taitosj_68705_portC_r);
+	DECLARE_READ8_MEMBER(mcu_mem_r);
+	DECLARE_WRITE8_MEMBER(mcu_mem_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_busrq_w);
 	DECLARE_READ8_MEMBER(spacecr_prot_r);
 	DECLARE_WRITE8_MEMBER(alpine_protection_w);
 	DECLARE_WRITE8_MEMBER(alpinea_bankswitch_w);
@@ -120,9 +112,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(taitosj_mcu_real_data_w);
-	TIMER_CALLBACK_MEMBER(taitosj_mcu_data_real_r);
-	TIMER_CALLBACK_MEMBER(taitosj_mcu_status_real_w);
 	void init_common();
 	void reset_common();
 	void set_pens();
@@ -144,7 +133,7 @@ public:
 	int video_update_common(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<m68705p_device> m_mcu;
+	optional_device<taito_sj_security_mcu_device> m_mcu;
 	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<discrete_device> m_dacvol;
 	required_device<ay8910_device> m_ay1;

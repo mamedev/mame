@@ -51,7 +51,7 @@ public:
 	DECLARE_WRITE16_MEMBER(shadow_config_w) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
 	DECLARE_READ8_MEMBER (smram_ctrl_r) { return m_smramctrl; }
 	DECLARE_WRITE8_MEMBER(smram_ctrl_w) { m_smramctrl = data; remap_cb(); }
-	
+
 	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -59,7 +59,7 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 	DECLARE_ADDRESS_MAP(internal_io_map, 32);
-	
+
 	// southbridge
 	DECLARE_READ8_MEMBER(at_page8_r);
 	DECLARE_WRITE8_MEMBER(at_page8_w);
@@ -111,7 +111,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 	void map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr);
 

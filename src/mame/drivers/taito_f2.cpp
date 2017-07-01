@@ -2635,7 +2635,7 @@ static INPUT_PORTS_START( yesnoj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME( "P2 Yes" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME( "P2 No" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )                 /* printer : paper time-out ? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -5640,7 +5640,7 @@ GAME( 1991, metalbj,    metalb,   metalb,    metalbj,    taitof2_state, 0,      
 
 GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_PRINTER )
 
 GAME( 1992, deadconx,   0,        deadconx,  deadconx,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", MACHINE_SUPPORTS_SAVE )

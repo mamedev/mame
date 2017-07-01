@@ -49,7 +49,7 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")  { }
 
-	DECLARE_READ8_MEMBER(vsync_r);
+	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE8_MEMBER(video_w);
 	int m_line;

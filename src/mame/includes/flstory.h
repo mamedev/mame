@@ -60,16 +60,6 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	/* mcu */
-	uint8_t m_mcu_cmd;
-	uint8_t m_mcu_counter;
-	uint8_t m_mcu_b4_cmd;
-	uint8_t m_mcu_param;
-	uint8_t m_mcu_b2_res;
-	uint8_t m_mcu_b1_res;
-	uint8_t m_mcu_bb_res;
-	uint8_t m_mcu_b5_res;
-	uint8_t m_mcu_b6_res;
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
@@ -77,11 +67,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
-	DECLARE_READ8_MEMBER(rumba_mcu_r);
-	DECLARE_WRITE8_MEMBER(rumba_mcu_w);
-	DECLARE_WRITE8_MEMBER(onna34ro_mcu_w);
-	DECLARE_READ8_MEMBER(onna34ro_mcu_r);
-	DECLARE_READ8_MEMBER(onna34ro_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(victnine_mcu_w);
 	DECLARE_READ8_MEMBER(victnine_mcu_r);
 	DECLARE_READ8_MEMBER(victnine_mcu_status_r);

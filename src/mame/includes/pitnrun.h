@@ -14,7 +14,7 @@ public:
 		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(char_bank_select);
 	DECLARE_WRITE8_MEMBER(scroll_w);
+	DECLARE_WRITE8_MEMBER(scroll_y_w);
 	DECLARE_WRITE8_MEMBER(ha_w);
 	DECLARE_WRITE8_MEMBER(h_heed_w);
 	DECLARE_WRITE8_MEMBER(v_heed_w);

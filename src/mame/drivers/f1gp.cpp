@@ -104,6 +104,8 @@ static ADDRESS_MAP_START( f1gp_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM  AM_SHARE("sharedram")
+	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, f1gp_state )
@@ -181,7 +183,8 @@ static ADDRESS_MAP_START( f1gpb_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff031) AM_NOP //?
+	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( f1gp )
@@ -356,6 +359,9 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
+	m_acia->write_cts(0);
+	m_acia->write_dcd(0);
+
 	save_item(NAME(m_roz_bank));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_gfxctrl));
@@ -397,6 +403,11 @@ static MACHINE_CONFIG_START( f1gp )
 
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
+	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -462,6 +473,11 @@ static MACHINE_CONFIG_START( f1gpb )
 
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
+	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -660,7 +676,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

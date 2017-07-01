@@ -735,6 +735,19 @@ if (BUSES["HPHIL"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/hp_dio/hp_dio.h,BUSES["HPDIO"] = true
+---------------------------------------------------
+
+if (BUSES["HPDIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -830,6 +843,19 @@ if (BUSES["IMI7000"]~=null) then
 		MAME_DIR .. "src/devices/bus/imi7000/imi7000.h",
 		MAME_DIR .. "src/devices/bus/imi7000/imi5000h.cpp",
 		MAME_DIR .. "src/devices/bus/imi7000/imi5000h.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/intellec4/intellec4.h,BUSES["INTELLEC4"] = true
+---------------------------------------------------
+
+if (BUSES["INTELLEC4"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.h",
 	}
 end
 
@@ -2618,6 +2644,8 @@ if (BUSES["X68K"]~=null) then
 		MAME_DIR .. "src/devices/bus/x68k/x68k_neptunex.h",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.cpp",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.h",
+		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.cpp",
+		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.h",
 	}
 end
 
@@ -3070,5 +3098,25 @@ if (BUSES["PC1512"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/cbus/pc9801_cbus.h,BUSES["CBUS"] = true
+---------------------------------------------------
+
+if (BUSES["CBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
 	}
 end

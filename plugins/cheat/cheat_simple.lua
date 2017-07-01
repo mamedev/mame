@@ -1,5 +1,5 @@
 -- converter for simple cheats
--- simple cheats are single address every frame ram, rom or gg,ar cheats in one file called cheat.simple
+-- simple cheats are single/linked address every frame ram, rom or gg,ar cheats in one file called cheat.simple
 --
 -- ram/rom cheat format:  <set name>,<cputag|regiontag>,<hex offset>,<b|w|d|q - size>,<hex value>,<desc>
 -- only program address space is supported, comments are prepended with ;
@@ -9,6 +9,7 @@
 -- gg for game genie -- nes, snes, megadriv, gamegear, gameboy
 -- ar for action replay -- nes, snes, megadriv, gamegear, sms
 --
+-- use "^" as description to link to previous cheat
 -- set name is <softlist>/<entry> like "nes/smb" for softlist items
 -- Don't use commas in the description
 
@@ -22,10 +23,30 @@ function simple.filename(name)
 end
 
 local codefuncs = {}
+local currcheat
 
 local function prepare_rom_cheat(desc, region, addr, val, size, banksize, comp)
-	local cheat = { desc = desc, region = { rom = region } }
-	cheat.script = { off = "if on then rom:write_u8(addr, save) end" }
+	local cheat
+	if desc:sub(1,1) ~= "^" then
+		currcheat = { desc = desc, region = { rom = region } }
+		currcheat.script = { off = string.format([[
+			if on then
+				for k, v in pairs(addrs) do
+					rom:write_u%d(v.addr, v.save)
+				end
+			end]], size),
+			on = string.format([[
+			addrs = {
+			--flag
+			}
+			on = true
+			for k, v in pairs(addrs) do
+				v.save = rom:read_u%d(v.addr)
+				rom:write_u%d(v.addr, v.val)
+			end]], size, size) }
+		cheat = currcheat
+
+	end
 	if banksize and comp then
 		local rom = manager:machine():memory().regions[region]
 		local bankaddr = addr & (banksize - 1)
@@ -43,17 +64,17 @@ local function prepare_rom_cheat(desc, region, addr, val, size, banksize, comp)
 			error("rom cheat compare value not found " .. desc)
 		end
 	end
-	cheat.script.on = string.format([[
-				on = true
-				addr = %d
-				save = rom:read_u%d(addr)
-				rom:write_u8(addr, %d)]], addr, size, val)
+	currcheat.script.on = currcheat.script.on:gsub("%-%-flag", string.format("{addr = %d, val = %d},\n--flag", addr, val), 1)
 	return cheat
 end
 
 local function prepare_ram_cheat(desc, tag, addr, val, size)
-	local cheat = { desc = desc, space = { cpup = { tag = tag, type = "program" } } }
-	cheat.script = { run = "cpup:write_u" .. size .. "(" .. addr .. "," .. val .. ", true)" }
+	local cheat
+	if desc:sub(1,1) ~= "^" then
+		currcheat = { desc = desc, space = { cpup = { tag = tag, type = "program" } }, script = { run = "" } }
+		cheat = currcheat
+	end
+	currcheat.script.run = currcheat.script.run .. " cpup:write_u" .. size .. "(" .. addr .. "," .. val .. ", true)"
 	return cheat
 end
 
@@ -71,13 +92,13 @@ function codefuncs.nes_gg(desc, code)
 	if #code == 6 then
 		addr = ((value >> 4) & 7) | ((value >> 8) & 0x78) | ((value >> 12) & 0x80) | ((value << 8) & 0x700) | ((value << 4) & 0x7800)
 		newval = ((value >> 20) & 7) | (value & 8) | ((value >> 12) & 0x70) | ((value >> 16) & 0x80)
-		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8) 
+		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8)
 	elseif #code == 8 then
 		addr = ((value >> 12) & 7) | ((value >> 16) & 0x78) | ((value >> 20) & 0x80) | (value & 0x700) | ((value >> 4) & 0x7800)
 		newval = ((value >> 28) & 7) | (value & 8) | ((value >> 20) & 0x70) | ((value >> 24) & 0x80)
-		comp = ((value >> 4) & 7) | ((value >> 8) & 8) | ((value << 4) & 0x70) | ((value << 1) & 0x80)
+		comp = ((value >> 4) & 7) | ((value >> 8) & 8) | ((value << 4) & 0x70) | (value & 0x80)
 		-- assume 8K banks, 32K also common but is an easy multiple of 8K
-		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp) 
+		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp)
 	else
 		error("error game genie cheat incorrect length " .. desc)
 	end
@@ -100,7 +121,7 @@ local function snes_prepare_cheat(desc, addr, val)
 	local bank = addr >> 16
 	local offset = addr & 0xffff
 	if ((bank <= 0x3f) and (offset < 0x2000)) or ((bank & 0xfe) == 0x7e) then
-		return prepare_ram_cheat(desc, ":maincpu", addr, val, 8) 
+		return prepare_ram_cheat(desc, ":maincpu", addr, val, 8)
 	end
 	if (manager:machine().devices[":maincpu"].spaces["program"]:read_u8(0xffd5) & 1) == 1 then --hirom
 		if (bank & 0x7f) <= 0x3f and offset >= 0x8000 then
@@ -125,7 +146,7 @@ local function snes_prepare_cheat(desc, addr, val)
 			error("error cheat not rom or ram addr " .. desc)
 		end
 	end
-	return prepare_rom_cheat(desc, ":snsslot:cart:rom", addr, val, 8) 
+	return prepare_rom_cheat(desc, ":snsslot:cart:rom", addr, val, 8)
 end
 
 function codefuncs.snes_gg(desc, code)
@@ -184,7 +205,7 @@ function codefuncs.megadriv_gg(desc, code)
 	end
 	local newval = ((value >> 32) & 0xff) | ((value >> 3) & 0x1f00) | ((value << 5) & 0xe000)
 	local addr = (value & 0xff00ff) | ((value >> 16) & 0xff00)
-	return prepare_rom_cheat(desc, ":mdslot:cart:rom", addr, newval, 16) 
+	return prepare_rom_cheat(desc, ":mdslot:cart:rom", addr, newval, 16)
 end
 
 function codefuncs.megadriv_ar(desc, code)
@@ -221,10 +242,10 @@ local function gbgg_ggcodes(desc, code, region)
 		error("error game genie cheat bad addr " .. desc)
 	end
 	if comp == -1 then
-		return prepare_rom_cheat(desc, region, addr, newval, 8) 
+		return prepare_rom_cheat(desc, region, addr, newval, 8)
 	else
 		-- assume 8K banks
-		return prepare_rom_cheat(desc, region, addr, newval, 8, 8192, comp) 
+		return prepare_rom_cheat(desc, region, addr, newval, 8, 8192, comp)
 	end
 	return cheat
 end
@@ -292,6 +313,7 @@ function simple.conv_cheat(data)
 			end
 		end
 	end
+	currcheat = nil
 	return cheats
 end
 

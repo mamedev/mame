@@ -352,11 +352,10 @@ void menu_add_change_folder::handle()
 				if (m_change)
 				{
 					if (ui().options().exists(s_folders[m_ref].option))
-						ui().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+						ui().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), m_current_path.c_str()) != 0)
 					{
-						machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-						machine().options().mark_changed(s_folders[m_ref].option);
+						machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE);
 					}
 				}
 				else
@@ -371,11 +370,10 @@ void menu_add_change_folder::handle()
 					}
 
 					if (ui().options().exists(s_folders[m_ref].option))
-						ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+						ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), tmppath.c_str()) != 0)
 					{
-						machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-						machine().options().mark_changed(s_folders[m_ref].option);
+						machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
 					}
 				}
 
@@ -592,11 +590,10 @@ void menu_remove_folder::handle()
 		}
 
 		if (ui().options().exists(s_folders[m_ref].option))
-			ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+			ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
 		else if (strcmp(machine().options().value(s_folders[m_ref].option),tmppath.c_str())!=0)
 		{
-			machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-			machine().options().mark_changed(s_folders[m_ref].option);
+			machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
 		}
 
 		reset_parent(reset_options::REMEMBER_REF);

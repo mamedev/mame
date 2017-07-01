@@ -67,9 +67,24 @@ READ8_MEMBER( namco_53xx_device::K_r )
 	return m_k(0);
 }
 
-READ8_MEMBER( namco_53xx_device::Rx_r )
+READ8_MEMBER( namco_53xx_device::R0_r )
 {
-	return (offset < ARRAY_LENGTH(m_in)) ? m_in[offset](0) : 0xff;
+	return m_in[0](0);
+}
+
+READ8_MEMBER( namco_53xx_device::R1_r )
+{
+	return m_in[1](0);
+}
+
+READ8_MEMBER( namco_53xx_device::R2_r )
+{
+	return m_in[2](0);
+}
+
+READ8_MEMBER( namco_53xx_device::R3_r )
+{
+	return m_in[3](0);
 }
 
 WRITE8_MEMBER( namco_53xx_device::O_w )
@@ -118,14 +133,6 @@ READ8_MEMBER( namco_53xx_device::read )
     DEVICE INTERFACE
 ***************************************************************************/
 
-static ADDRESS_MAP_START( namco_53xx_map_io, AS_IO, 8,namco_53xx_device )
-	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(K_r)
-	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(O_w)
-	AM_RANGE(MB88_PORTP,  MB88_PORTP)  AM_WRITE(P_w)
-	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READ(Rx_r)
-ADDRESS_MAP_END
-
-
 ROM_START( namco_53xx )
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "53xx.bin",     0x0000, 0x0400, CRC(b326fecb) SHA1(758d8583d658e4f1df93184009d86c3eb8713899) )
@@ -163,7 +170,13 @@ void namco_53xx_device::device_start()
 
 MACHINE_CONFIG_MEMBER( namco_53xx_device::device_add_mconfig )
 	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_CPU_IO_MAP(namco_53xx_map_io)
+	MCFG_MB88XX_READ_K_CB(READ8(namco_53xx_device, K_r))
+	MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_53xx_device, O_w))
+	MCFG_MB88XX_WRITE_P_CB(WRITE8(namco_53xx_device, P_w))
+	MCFG_MB88XX_READ_R0_CB(READ8(namco_53xx_device, R0_r))
+	MCFG_MB88XX_READ_R1_CB(READ8(namco_53xx_device, R1_r))
+	MCFG_MB88XX_READ_R2_CB(READ8(namco_53xx_device, R2_r))
+	MCFG_MB88XX_READ_R3_CB(READ8(namco_53xx_device, R3_r))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

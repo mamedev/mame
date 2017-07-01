@@ -25139,18 +25139,34 @@
 
 <!-- GOWIN games -->
 <!--
-  Other games (which could coincide with some of the games below without serial)
-  * GS-01 - Song of the Pipa / Magic Ball
-  * GS-07 - Lost Trip
-  * GS-08 - Binary Monsters
-  * GS-09 - ??
-  * GS-10 - Binary Monsters - Adventure of Hell
-  * GS-11 - Magic Lamp (2000)
+  Game list scraped off http://www.gowingame.com.tw using archive.org
 
-  * GS-?? - Binary Monsters 2 (2000)
-  * GS-?? - Binary Monsters 3
-  * GS-?? - Amazing Robot
-  * GS-?? - Crouching Tiger Hidden Dragon (99% this is Tiger A Dragon below)
+  Serial - English                               Traditional Chinese             Simplified Chinese
+
+  * GS01 - Song of the Pipa                      琵琶行
+  * GS02 - Magic Ball                            魔法球                             魔法球
+  * GS03 - Prince Yeh Rude                       耶魯王子                            耶鲁王子
+  * GS04 - Story of Lasama                       拉薩瑪傳奇                           拉萨玛传奇
+  * GS05 - Prince Rainbow                        彩虹戰士                            彩虹战士
+  * GS06 - Fire Dragon                           瓜瓜火龍                            瓜瓜火龙
+  * GS07 - Lost Trip                             迷途之旅                            迷途之旅
+  * GS08 - Binary Monsters                       數碼怪獸Ⅰ代                          数码怪兽I代
+  * GS09 - Amazing Robot                                                         神奇铁金刚
+  * GS10 - Binary Monsters 2 - Adventure of Hell 數碼怪獸Ⅱ代 地獄大冒險                    数码怪兽II代
+  * GS11 - Magic Lamp (2000)                                                     封魔神灯
+  * GS12 - Final Robot                           雷弩機神                            雷弩机神
+  * GS13 - Binary Monsters 3 - School Fighter    數碼怪獸Ⅲ代 熱鬥高校                     数码怪兽III代－热斗高校
+  * GS14 -
+  * GS15 - Journey to the West
+  * GS16 - Dinosaur Genesis
+  * GS17 - Crouching Tiger - Hidden Dragon       臥虎藏龍
+  * GS18 - Stone Age                             石器時代掌機版 - 精靈王誔生
+
+  The following listing is from http://www.nesworld.com/gbx-gowingame.php
+
+  * KKL01 - 三合一大補帖 - 耶魯王子 ・ 拉薩瑪傳奇 ・ 瓜瓜火龍
+  * KKL05 - 三合一大補帖 - 拉薩瑪傳奇 ・ 迷途之旅 ・ 瓜瓜火龍
+
 -->
 
 <!-- For GS-01:  You have to enable the "Skip Logo check", at 0x0423 you have to

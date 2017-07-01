@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( at486 )
 
 	/* Security key */
 	MCFG_DS1205_ADD("multikey")
-	
+
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
 	MCFG_PCI_ROOT_ADD( ":pci")

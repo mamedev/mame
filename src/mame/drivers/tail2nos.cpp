@@ -52,7 +52,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ8(sound_semaphore_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
-//  AM_RANGE(0xfff030, 0xfff031) link comms
+	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )
@@ -210,6 +211,9 @@ void tail2nos_state::machine_start()
 	membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 	membank("bank3")->set_entry(0);
 
+	m_acia->write_cts(0);
+	m_acia->write_dcd(0);
+
 	m_txbank = 0;
 	m_txpalette = 0;
 	m_video_enable = false;
@@ -236,6 +240,11 @@ static MACHINE_CONFIG_START( tail2nos )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2608 */
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
+	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -375,6 +384,6 @@ ROM_START( sformulaa )
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
-GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
+GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version

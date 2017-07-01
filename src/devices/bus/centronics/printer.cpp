@@ -60,7 +60,7 @@ void centronics_printer_device::device_timer(emu_timer &timer, device_timer_id i
 			m_printer->output(m_data);
 
 			/* ready to receive more data, return BUSY to low */
-			timer_set(attotime::from_usec(7), TIMER_BUSY, false);
+			m_busy_timer->adjust(attotime::from_usec(7), false);
 		}
 		break;
 
@@ -71,18 +71,21 @@ void centronics_printer_device::device_timer(emu_timer &timer, device_timer_id i
 		if (param == true)
 		{
 			/* timer to turn ACK low to receive data */
-			timer_set(attotime::from_usec(10), TIMER_ACK, false);
+			m_ack_timer->adjust(attotime::from_usec(10), false);
 		}
 		else
 		{
 			/* timer to return ACK to high state */
-			timer_set(attotime::from_usec(5), TIMER_ACK, true);
+			m_ack_timer->adjust(attotime::from_usec(5), true);
 		}
 	}
 }
 
 void centronics_printer_device::device_start()
 {
+	m_ack_timer = timer_alloc(TIMER_ACK);
+	m_busy_timer = timer_alloc(TIMER_BUSY);
+
 	/* register for state saving */
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_data));
@@ -109,7 +112,7 @@ WRITE_LINE_MEMBER( centronics_printer_device::input_strobe )
 	if (m_strobe == true && state == false && m_busy == false)
 	{
 		/* STROBE has gone low, data is ready */
-		timer_set(attotime::zero, TIMER_BUSY, true);
+		m_busy_timer->adjust(attotime::zero, true);
 	}
 
 	m_strobe = state;

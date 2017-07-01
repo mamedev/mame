@@ -750,6 +750,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
+	<software name="ctodoom">
+		<description>Countdown to Doom (includes Return to Doom &amp; Philosopher's Quest)</description>
+		<year>1991</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Countdown to Doom + Return to Doom + Philosopher's Quest (1991)(Topologika).adf" size="819200" crc="d12b6b7c" sha1="53f95c169bbe9cfa7252d90d6181ced31086f1a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crysmaze">
 		<description>The Crystal Maze (Demo) (Bad Dump?)</description>
 		<year>1993</year>
@@ -1582,6 +1593,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="lander.adf" size="819200" crc="a9444537" sha1="a627ab8a527210a491f8c6fac88d5e3f4ee1d83e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldaydoom">
+		<description>The Last Days of Doom (includes Hezarin)</description>
+		<year>1993</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Last Days of Doom, The + Hezarin (1993)(Topologika).adf" size="819200" crc="2476a335" sha1="273e57d1455648e085fb95a9ae606fc00ad44bae" offset="0" />
 			</dataarea>
 		</part>
 	</software>

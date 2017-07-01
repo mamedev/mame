@@ -2,26 +2,26 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Intel 7220 Bubble Memory Controller emulation
+    Intel 7220 Bubble Memory Controller emulation
 
-	References:
-	- http://www.decadecounter.com/vta/pdf/BPK72UM.pdf
-	- http://www.decadecounter.com/vta/pdf/7220-1.pdf
-	- http://www.decadecounter.com/vta/pdf/7242.pdf
-	- http://www.decadecounter.com/vta/articleview.php?item=359
+    References:
+    - http://www.decadecounter.com/vta/pdf/BPK72UM.pdf
+    - http://www.decadecounter.com/vta/pdf/7220-1.pdf
+    - http://www.decadecounter.com/vta/pdf/7242.pdf
+    - http://www.decadecounter.com/vta/articleview.php?item=359
 
-	Implemented at least partially
-	- commands
-		Read Bubble Data, Write Bubble Data
-		Initialize, Reset FIFO, Abort, Software Reset
-		Read FSA Status, MBM Purge
+    Implemented at least partially
+    - commands
+        Read Bubble Data, Write Bubble Data
+        Initialize, Reset FIFO, Abort, Software Reset
+        Read FSA Status, MBM Purge
 
-	Not implemented
-	- interrupts
-	- DMA
-	- commands
-		Read Seek, Write Seek, Read Corrected Data, all Bootloop-related
-	- access to other than 2 FSA channels at once
+    Not implemented
+    - interrupts
+    - DMA
+    - commands
+        Read Seek, Write Seek, Read Corrected Data, all Bootloop-related
+    - access to other than 2 FSA channels at once
 
 **********************************************************************/
 

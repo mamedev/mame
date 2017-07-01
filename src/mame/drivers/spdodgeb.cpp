@@ -32,12 +32,6 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(spdodgeb_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
-
 WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 {
 	int chip = offset & 1;
@@ -248,7 +242,7 @@ static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") //AM_WRITENOP
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
-	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
+	AM_RANGE(0x3002, 0x3002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(scrollx_lo_w)
 //  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
@@ -433,6 +427,7 @@ static MACHINE_CONFIG_START( spdodgeb )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))

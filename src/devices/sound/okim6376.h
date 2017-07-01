@@ -21,12 +21,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( busy_r );
 	DECLARE_READ_LINE_MEMBER( nar_r );
 
-	void set_frequency(int frequency);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -58,7 +57,6 @@ private:
 	int32_t m_latch;            /* Command data is held before transferring to either channel */
 	uint8_t m_stage[OKIM6376_VOICES];/* If a sample is playing, flag that we have a command staged */
 	sound_stream *m_stream;   /* which stream are we playing on? */
-	uint32_t m_master_clock;    /* master clock frequency */
 	uint8_t m_divisor;          /* can be 8,10,16, and is read out of ROM data */
 	uint8_t m_channel;
 	uint8_t m_nar;              /* Next Address Ready */

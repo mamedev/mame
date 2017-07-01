@@ -120,8 +120,7 @@ okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag,
 		m_latch(0),
 		//m_stage[OKIM6376_VOICES],
 		m_stream(nullptr),
-		m_master_clock(0),
-		m_divisor(0),
+		m_divisor(8),
 		m_channel(0),
 		m_nar(0),
 		m_nartimer(0),
@@ -148,7 +147,6 @@ void okim6376_device::device_start()
 	m_stage[0] = 0;
 	m_stage[1] = 0;
 	m_latch = 0;
-	m_master_clock = clock();
 	m_divisor = divisor_table[0];
 	m_nar = 1;
 	m_nartimer = 0;
@@ -359,7 +357,7 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, 
 
 void okim6376_device::postload()
 {
-	set_frequency(m_master_clock);
+	notify_clock_changed();
 }
 
 void okim6376_device::adpcm_state_save_register(struct ADPCMVoice *voice, int index)
@@ -395,13 +393,11 @@ void okim6376_device::okim6376_state_save_register()
 		save_item(NAME(m_st_update));
 		save_item(NAME(m_ch2));
 		save_item(NAME(m_ch2_update));
-		save_item(NAME(m_master_clock));
 }
 
-void okim6376_device::set_frequency(int frequency)
+void okim6376_device::device_clock_changed()
 {
-	m_master_clock = frequency;
-	m_stream->set_sample_rate(m_master_clock / m_divisor);
+	m_stream->set_sample_rate(clock() / m_divisor);
 }
 
 

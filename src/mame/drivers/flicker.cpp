@@ -21,7 +21,7 @@
 
 #include "emu.h"
 #include "machine/genpin.h"
-#include "cpu/i4004/i4004.h"
+#include "cpu/mcs40/mcs40.h"
 #include "flicker.lh"
 
 class flicker_state : public genpin_class
@@ -48,8 +48,8 @@ private:
 };
 
 
-static ADDRESS_MAP_START( flicker_rom, AS_PROGRAM, 8, flicker_state )
-	AM_RANGE(0x0000, 0x03FF) AM_ROM
+static ADDRESS_MAP_START( flicker_rom, AS_DECRYPTED_OPCODES, 8, flicker_state )
+	AM_RANGE(0x0000, 0x03FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(flicker_map, AS_DATA, 8, flicker_state )
@@ -57,10 +57,10 @@ static ADDRESS_MAP_START(flicker_map, AS_DATA, 8, flicker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flicker_io, AS_IO, 8, flicker_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(port00_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(port01_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(port02_r)
-	AM_RANGE(0x0010, 0x0010) AM_WRITE(port10_w)
+	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_WRITE(port00_w)
+	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0700) AM_WRITE(port01_w)
+	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x0700) AM_READ(port02_r)
+	AM_RANGE(0x1000, 0x103f) AM_MIRROR(0x0800) AM_WRITE(port10_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( flicker )
@@ -116,33 +116,27 @@ INPUT_PORTS_END
 
 READ8_MEMBER( flicker_state::port02_r )
 {
-	offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
-
 	if (offset < 7)
 		return m_switch[offset]->read();
-
-	return 0;
+	else
+		return 0;
 }
 
 WRITE8_MEMBER( flicker_state::port00_w )
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
-	offset = m_maincpu->state_int(I4004_RAM); // we need the full address
 	output().set_digit_value(offset, patterns[data]);
 }
 
 WRITE8_MEMBER( flicker_state::port01_w )
 {
-// The output lines operate the various lamps (44 of them)
-	offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
-
 	uint16_t test_port = m_testport->read() & 0xf81e;
 	uint16_t coin_port = m_coinport->read() & 0x07e0;
 
 	if (BIT(m_coinport->read(), 0) )
 		test_port |= coin_port;
 
-	m_maincpu->set_test(BIT(test_port, offset));
+	m_maincpu->set_input_line(I4004_TEST_LINE, BIT(test_port, offset));
 }
 
 WRITE8_MEMBER( flicker_state::port10_w )
@@ -165,42 +159,37 @@ The coin outputs (A and B) don't activate
 A large amount of data is continuously flowing through here, even when there is no
 sound to produce. We need to change this to just one pulse per actual sound. */
 
-	if (!data && offset == m_out_data)
-		m_out_data = 0;
-	else
+	offset &= 0x0f;
+	if (data != offset)
 	{
-		offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
-		if (data != offset)
+		if (data != m_out_data)
 		{
-			if (data != m_out_data)
+			m_out_data = data;
+			switch (data)
 			{
-				m_out_data = data;
-				switch (data)
-				{
-					case 0x01:
-						m_samples->start(1, 1);
-						break;
-					case 0x02:
-						m_samples->start(2, 2);
-						break;
-					case 0x03:
-						m_samples->start(3, 3);
-						break;
-					case 0x04:
-					case 0x05:
-					case 0x06:
-						m_samples->start(0, 0);
-						break;
-					case 0x07:
-					case 0x08:
-						m_samples->start(5, 5);
-						break;
-					case 0x09:
-						m_samples->start(0, 6);
-						break;
-					default:
-						break;
-				}
+			case 0x01:
+				m_samples->start(1, 1);
+				break;
+			case 0x02:
+				m_samples->start(2, 2);
+				break;
+			case 0x03:
+				m_samples->start(3, 3);
+				break;
+			case 0x04:
+			case 0x05:
+			case 0x06:
+				m_samples->start(0, 0);
+				break;
+			case 0x07:
+			case 0x08:
+				m_samples->start(5, 5);
+				break;
+			case 0x09:
+				m_samples->start(0, 6);
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -210,7 +199,7 @@ sound to produce. We need to change this to just one pulse per actual sound. */
 static MACHINE_CONFIG_START( flicker )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
-	MCFG_CPU_PROGRAM_MAP(flicker_rom)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(flicker_rom)
 	MCFG_CPU_DATA_MAP(flicker_map)
 	MCFG_CPU_IO_MAP(flicker_io)
 	MCFG_NVRAM_ADD_0FILL("nvram")

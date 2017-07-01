@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "video/k051316.h"
 
@@ -22,7 +23,8 @@ public:
 		m_k051316(*this, "k051316"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_acia(*this, "acia") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_txvideoram;
@@ -43,6 +45,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<acia6850_device> m_acia;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
 	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
