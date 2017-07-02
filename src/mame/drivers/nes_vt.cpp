@@ -15,8 +15,8 @@
   VT03 - above + 4bpp sprite / bg modes, enhanced palette
 
   VT08 - ?
-
-  VT09 - 8bpp or direct colour modes?
+  
+  VT09 - alt 4bpp modes?
 
   VT16 - ?
   VT18 - ?
@@ -98,6 +98,11 @@ public:
 	/* OneBus read callbacks for getting sprite and tile data during rendering*/
 	DECLARE_READ8_MEMBER(spr_r);
 	DECLARE_READ8_MEMBER(chr_r);
+
+	/* expansion nametable */
+	std::vector<uint8_t> m_ntram;
+	DECLARE_READ8_MEMBER(nt_r);
+	DECLARE_WRITE8_MEMBER(nt_w);
 
 private:
 	void scanline_irq(int scanline, int vblank, int blanked);
@@ -321,7 +326,16 @@ void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
+/* todo, handle custom VT nametable stuff here */
+READ8_MEMBER(nes_vt_state::nt_r)
+{
+	return m_ntram[offset];
+}
 
+WRITE8_MEMBER(nes_vt_state::nt_w)
+{
+	m_ntram[offset] = data;
+}
 
 void nes_vt_state::machine_start()
 {
@@ -342,8 +356,13 @@ void nes_vt_state::machine_start()
 	save_item(NAME(m_timer_running));
 	save_item(NAME(m_timer_val));
 
+	m_ntram.resize(0x2000);
+	save_item(NAME(m_ntram));
+
 	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::scanline_irq),this));
 // m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
+//	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(nes_vt_state::nt_r),this), write8_delegate(FUNC(nes_vt_state::nt_w),this));
 }
 
 void nes_vt_state::machine_reset()
@@ -371,7 +390,7 @@ void nes_vt_state::machine_reset()
 
 int nes_vt_state::calculate_real_video_address(int addr, int extended, int readtype)
 {
-	// might be a VT09 only feature (8bpp?) but where are the other 4 bits?
+	// might be a VT09 only feature (alt 4bpp mode?)
 	int alt_order = m_ppu->get_201x_reg(0x0) & 0x40;
 
 	if (readtype == 0)
@@ -521,7 +540,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 			}
 			else
 			{
-				finaladdr = (finaladdr << 1) | (va34 << 4);
+				finaladdr = (finaladdr << 1) | va34;
 			}
 		}
 	}
@@ -569,7 +588,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 			}
 			else
 			{
-				finaladdr = (finaladdr << 1) | (va34 << 4);
+				finaladdr = (finaladdr << 1) | va34;
 			}
 
 		}
@@ -1007,6 +1026,11 @@ ROM_START( gprnrs16 )
 	ROM_LOAD( "gprnrs16.bin", 0x00000, 0x2000000, CRC(bdffa40a) SHA1(3d01907211f18e8415171dfc6c1d23cf5952e7bb) )
 ROM_END
 
+ROM_START( vgpocket )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "vgpocket.bin", 0x00000, 0x400000, CRC(843634c6) SHA1(c59dab0e43d364f59eb3a138abb585bc54e5d674) )
+	// there was a dump of a 'secure' area with this, but it was just the top 0x10000 bytes of the existing rom.
+ROM_END
 
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
@@ -1023,6 +1047,7 @@ CONS( 200?, vgtablet,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 // this is VT09 based, and needs 8bpp modes at least
 // it boots, but gfx look wrong due to unsupported mode
 CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, vgpocket,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket (VG-2000)", MACHINE_NOT_WORKING )
 
 // these are NOT VT03, but something newer but based around the same basic designs
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
