@@ -2453,14 +2453,10 @@ void h6280_device::execute_run()
 				{
 					m_irq_pending = 1;
 				}
-#if 0
 				while (m_timer_value <= 0)
 				{
 					m_timer_value += m_timer_load;
 				}
-#else
-				m_timer_value += 128 * 1024;
-#endif
 				set_irq_line(2, ASSERT_LINE);
 			}
 		}
