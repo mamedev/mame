@@ -11137,6 +11137,7 @@ ctornado                        // 20 1982.05 Tornado
 ctsttape                        // ?
 czeroize                        // 37 1983.10 Zeroize
 decocass                        //
+decomult						//
 
 @source:dectalk.cpp
 dectalk                         // 1983 Digital Equipment Corporation
