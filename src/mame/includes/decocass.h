@@ -202,6 +202,7 @@ private:
 	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					int missile_y_adjust, int missile_y_adjust_flip_screen,
 					uint8_t *missile_ram, int interleave);
+protected:
 	void decocass_fno( offs_t offset, uint8_t data );
 };
 
