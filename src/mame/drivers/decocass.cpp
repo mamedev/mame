@@ -1584,7 +1584,7 @@ ROM_START( cexplore )
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "cexplore.cas", 0x0000, 0x8000, CRC(fae49c66) SHA1(4ae69e2f706fdf30204f0aa1277619395cacc21b) )
 
-	ROM_REGION( 0xa000, "user3", ROMREGION_ERASEFF )      /* roms from the overlay pcb */
+	ROM_REGION( 0xa000, "user3", ROMREGION_ERASEFF )      /* roms from the DECO GRO DE-0091C-1 overlay pcb */
 	ROM_LOAD( "x1_made_in_japan_18.x1",   0x0000, 0x1000, CRC(f2ca58f0) SHA1(5c9faeca6247b70586dc2a3765805ac96960ac79) )
 	ROM_LOAD( "x2_made_in_japan_18.x2",   0x1000, 0x1000, CRC(75d999bf) SHA1(7c257285d5b69642ec542dc56defdbb1f2072454) )
 	ROM_LOAD( "x3_made_in_japan_18.x3",   0x2000, 0x1000, CRC(941539c6) SHA1(2e879107f56bf258ad90fb83c2ab278027acb0bb) ) // FIXED BITS (1xxxxxxx) (but correct?)
