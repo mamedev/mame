@@ -2983,6 +2983,18 @@ other points of interest:
 F - 8x analogue inputs
 Probably at some stage of development NAOMI was planned as non-JVS system as well, and inputs must be wired to CN19-21, unpopulated on retail hardware.
 
+Multi-region hack notes:
+These hacks uses 1KB "NAOMIHAT" IPL from HOTD2 proto BIOS to bypass hardware checksum protection and make the rest of ROM moddable.
+Besides IPL it is 2 bytes patch (4 for Naomi2), which enables region-switching function implemented by Sega itself, but left it disabled
+(original enable trigger: if text at 001FFD00 will be NOT equal to "COPYRIGHT (C) SEGA etc...").
+DIP switch settings:
+DSW2 DSW3 DSW4
+OFF  OFF  OFF  Japan
+ON   OFF  OFF  USA
+OFF  ON   OFF  Export
+ON   ON   OFF  Korea
+OFF  OFF  ON   Australia
+
 */
 // game specific bios roms quite clearly don't belong in here.
 // Japan bios is default, because most games require it.
@@ -3034,6 +3046,8 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) ) \
 	ROM_SYSTEM_BIOS( 22, "bios22", "Naomi Unknown Dev board" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) ) \
+	ROM_SYSTEM_BIOS( 23, "bios23", "epr-21576h (multi-region hack)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 23, "epr-21576h_multi.ic27", 0x000000, 0x200000, CRC(cce01f1f) SHA1(cca17119ad13e3a4ef7cb6902a37b65d6a844aee) ) \
 	ROM_REGION( 0x4000, "altera_pof", 0) \
 	ROM_LOAD("315-6188.ic31", 0x0000, 0x2034, CRC(7c9fea46) SHA1(f77c07ae65dfed18c1c4c632c8945be21d02ddaf) )
 
@@ -3158,7 +3172,9 @@ Region byte encoding is as follows:
 	ROM_SYSTEM_BIOS( 8, "bios8", "epr-23607b (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-23607b.ic27",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
 	ROM_SYSTEM_BIOS( 9, "bios9", "epr-23607 (USA)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607.ic27",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607.ic27",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
+	ROM_SYSTEM_BIOS( 10, "bios10", "epr-23605c (multi-region hack)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-23605c_multi.ic27",   0x000000, 0x200000, CRC(353fdbcd) SHA1(a8b7dce572b74e02e65cb949b2c366c87625157f) )
 /*
    First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS if game cartridge exchange was detected
    area 0x1A000-0x1BFFF is write protected and contain 12 bytes of unit-specific unique information (probably serial number, manufacture date, etc),
