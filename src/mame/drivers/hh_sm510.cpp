@@ -6,7 +6,7 @@
   Sharp SM5xx family handhelds.
 
   TODO:
-  - improve LCD segments in SVGs for: gnw_mc25, gnw_eg26, gnw_jr55, exospace
+  - improve LCD segments in SVGs for: gnw_mc25, gnw_eg26, exospace
   - SVG background/foreground vector graphics where possible. Doesn't apply to eg. the
     Konami games where MAME's SVG renderer needs to add support for embedded images.
   - confirm gnw_mc25/gnw_eg26 rom (dumped from Soviet clone, but pretty confident that it's same)
@@ -853,13 +853,13 @@ static MACHINE_CONFIG_START( jr55 )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1225/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1225/2-1)
+	MCFG_SCREEN_SIZE(1920/2, 1229/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1229/2-1)
 
 	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1261/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1261/2-1)
+	MCFG_SCREEN_SIZE(1920/2, 1238/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1238/2-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
@@ -1329,11 +1329,11 @@ ROM_START( gnw_jr55 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "jr-55_cms54c_kms560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
 
-	ROM_REGION( 207397, "svg_top", 0)
-	ROM_LOAD( "gnw_jr55_top.svg", 0, 207397, CRC(715b5bf3) SHA1(2b4ba476ecb2f02835df651a94d6a8b8be74112d) )
+	ROM_REGION( 261499, "svg_top", 0)
+	ROM_LOAD( "gnw_jr55_top.svg", 0, 261499, CRC(3e48708f) SHA1(fc35bd4022327f2061d054c23316d2d6412b25b7) )
 
-	ROM_REGION( 200030, "svg_bottom", 0)
-	ROM_LOAD( "gnw_jr55_bottom.svg", 0, 200030, CRC(0cfefd3f) SHA1(516802d53334582e6c25c96d60afed11351bb1ca) )
+	ROM_REGION( 389658, "svg_bottom", 0)
+	ROM_LOAD( "gnw_jr55_bottom.svg", 0, 389658, CRC(0a5eb4b2) SHA1(498aded148401a624a4ed215126e0d0b27d25d44) )
 ROM_END
 
 
