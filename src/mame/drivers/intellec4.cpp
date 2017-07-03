@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
  Intel INTELLEC® 4/MOD 40
@@ -454,7 +454,7 @@ void intellec4_40_state::trigger_reset()
 }
 
 
-ADDRESS_MAP_START(mod40_program_banks, AS_DECRYPTED_OPCODES, 8, intellec4_40_state)
+ADDRESS_MAP_START(mod40_program_banks, AS_OPCODES, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 
 	// 0x0000...0x0fff MON
