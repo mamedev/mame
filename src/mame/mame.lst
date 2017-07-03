@@ -17036,15 +17036,8 @@ maxideal                        // (c) 1983 American Communications Laboratories
 
 @source:kinst.cpp
 kinst                           // (c) 1994 Rare
-kinst13                         // (c) 1994 Rare
-kinst14                         // (c) 1994 Rare
 kinst2                          // (c) 1995 Rare
-kinst210                        // (c) 1995 Rare
-kinst211                        // (c) 1995 Rare
-kinst213                        // (c) 1995 Rare
-kinst2k3                        // (c) 1995 Rare
-kinst2k4                        // (c) 1995 Rare
-kinstp                          // (c) 1994 Rare
+kinst2uk                        // (c) 1995 Rare
 
 @source:kissproto.cpp
 kissp                           //
