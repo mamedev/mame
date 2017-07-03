@@ -61,6 +61,22 @@ offs_t z8002_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 	return CPU_DISASSEMBLE_NAME(z8000)(this, stream, pc, oprom, opram, options);
 }
 
+std::vector<std::pair<int, const address_space_config *>> z8002_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
+std::vector<std::pair<int, const address_space_config *>> z8001_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 /* opcode execution table */
 std::unique_ptr<z8002_device::Z8000_exec const []> z8002_device::z8000_exec;
@@ -194,7 +210,7 @@ uint32_t z8001_device::adjust_addr_for_nonseg_mode(uint32_t addr)
 	}
 }
 
-uint8_t z8002_device::RDMEM_B(address_spacenum spacenum, uint32_t addr)
+uint8_t z8002_device::RDMEM_B(int spacenum, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	if (spacenum == AS_PROGRAM)
@@ -203,7 +219,7 @@ uint8_t z8002_device::RDMEM_B(address_spacenum spacenum, uint32_t addr)
 		return m_data->read_byte(addr);
 }
 
-uint16_t z8002_device::RDMEM_W(address_spacenum spacenum, uint32_t addr)
+uint16_t z8002_device::RDMEM_W(int spacenum, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -218,7 +234,7 @@ uint16_t z8002_device::RDMEM_W(address_spacenum spacenum, uint32_t addr)
 		return m_data->read_word(addr);
 }
 
-uint32_t z8002_device::RDMEM_L(address_spacenum spacenum, uint32_t addr)
+uint32_t z8002_device::RDMEM_L(int spacenum, uint32_t addr)
 {
 	uint32_t result;
 	addr = adjust_addr_for_nonseg_mode(addr);
@@ -235,7 +251,7 @@ uint32_t z8002_device::RDMEM_L(address_spacenum spacenum, uint32_t addr)
 	}
 }
 
-void z8002_device::WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t value)
+void z8002_device::WRMEM_B(int spacenum, uint32_t addr, uint8_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	if (spacenum == AS_PROGRAM)
@@ -244,7 +260,7 @@ void z8002_device::WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t val
 		m_data->write_byte(addr, value);
 }
 
-void z8002_device::WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t value)
+void z8002_device::WRMEM_W(int spacenum, uint32_t addr, uint16_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -254,7 +270,7 @@ void z8002_device::WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t va
 		m_data->write_word(addr, value);
 }
 
-void z8002_device::WRMEM_L(address_spacenum spacenum, uint32_t addr, uint32_t value)
+void z8002_device::WRMEM_L(int spacenum, uint32_t addr, uint32_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;

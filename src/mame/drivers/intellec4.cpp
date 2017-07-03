@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
  Intel INTELLEC® 4/MOD 40
@@ -454,7 +454,7 @@ void intellec4_40_state::trigger_reset()
 }
 
 
-ADDRESS_MAP_START(mod40_program_banks, AS_DECRYPTED_OPCODES, 8, intellec4_40_state)
+ADDRESS_MAP_START(mod40_program_banks, AS_OPCODES, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 
 	// 0x0000...0x0fff MON
@@ -507,7 +507,7 @@ ADDRESS_MAP_START(mod40_io, AS_IO, 8, intellec4_40_state)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("iobank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_opcodes, AS_DECRYPTED_OPCODES, 8, intellec4_40_state)
+ADDRESS_MAP_START(mod40_opcodes, AS_OPCODES, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("prgbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END

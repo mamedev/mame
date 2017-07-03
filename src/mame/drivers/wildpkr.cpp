@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( tabpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITENOP // only writes 0 at POST
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hd63484_map, AS_0, 16, wildpkr_state )
+static ADDRESS_MAP_START( hd63484_map, 0, 16, wildpkr_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -430,7 +430,7 @@ void wildpkr_state::machine_start()
 }
 
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, wildpkr_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, wildpkr_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

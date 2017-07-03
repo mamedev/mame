@@ -18,6 +18,13 @@ address_map_bank_device::address_map_bank_device( const machine_config &mconfig,
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> address_map_bank_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 DEVICE_ADDRESS_MAP_START(amap8, 8, address_map_bank_device)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read8, write8)
 ADDRESS_MAP_END

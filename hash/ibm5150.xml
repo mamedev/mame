@@ -5632,6 +5632,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="cycles">
+		<description>The Cycles</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Cycles, The (1989)(Accolade).dsk" size="737280" crc="7912f6ea" sha1="372e3ecb424556bd3dea4723138e66f952117cad" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dmnstomb">
 		<description>Demon's Tomb - The Awakening</description>
 		<year>1989</year>
@@ -5731,6 +5742,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="ddribble">
+		<description>Double Dribble</description>
+		<year>1990</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Double Dribble (1990)(Konami).dsk" size="737280" crc="bec01cfc" sha1="308fb5a352c667ed191cfae93ad8964beee6ff05" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="earlweav">
 		<description>Earl Weaver Baseball</description>
 		<year>1989</year>
@@ -5769,6 +5791,38 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] First Samurai.img" size="737280" crc="49264976" sha1="3178d690ad32a3565e4fa6c68a84b4232acea251" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futurwar">
+		<description>Future Wars - Adventures in Time</description>
+		<year>1990</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Future Wars - Adventures in Time (1990)(Interplay)(Disk 1 of 3).dsk" size="368640" crc="c87b4f53" sha1="3b3f301a197e2eac53a52168f5ce86876886b74b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Future Wars - Adventures in Time (1990)(Interplay)(Disk 2 of 3).dsk" size="368640" crc="b5a7f0af" sha1="278554294174dc14c7b96cdf9780d6790ae25b93" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Future Wars - Adventures in Time (1990)(Interplay)(Disk 3 of 3).dsk" size="368640" crc="2f54bdc2" sha1="33fd871aa3607bcb1bad4c3939edf6c06045c29e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gedgsamp">
+		<description>Gamer's Edge Sampler - Catacomb and Dangerous Dave</description>
+		<year>1991</year>
+		<publisher>Softdisk</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gamer's Edge Sampler - Catacomb and Dangerous Dave (1991)(Softdisk).dsk" size="737280" crc="9fb65c57" sha1="f41ef17bc493fcd950b36d0cd3179430b23a0a94" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5893,14 +5947,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="armorik">
-		<description>Les 8 Conquêtes d'Armorik le Viking</description>
-		<year>1988</year>
-		<publisher>Infogrames</publisher>
-		<info name="developer" value="Frédéric Sénégas" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Armorik le Viking (Fr).img" size="368640" crc="3445e3da" sha1="c3496901029e162c0e59a028a28e3c6286ca987f" offset="0"/>
+	<software name="herolanc">
+		<description>Heroes of the Lance</description>
+		<year>1991</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Heroes of the Lance (1991)(SSI)(Disk 1 of 2).dsk" size="737280" crc="7b01edba" sha1="e34f64f9059c0631f41c871bad786e5b3086c359" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Heroes of the Lance (1991)(SSI)(Disk 2 of 2).dsk" size="737280" crc="a11712fe" sha1="45ac0bd7f42e30f0ebd0ebd1c6455afb477ff563" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5914,6 +5973,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Home Alone [Capstone] [1991] [3.5].img" size="737280" crc="4cb8e8c4" sha1="27929ce82de6cbfaa5e45ce3afcde086efe8244a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armorik">
+		<description>Les 8 Conquêtes d'Armorik le Viking</description>
+		<year>1988</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Frédéric Sénégas" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Armorik le Viking (Fr).img" size="368640" crc="3445e3da" sha1="c3496901029e162c0e59a028a28e3c6286ca987f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6080,6 +6151,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="Karateka - IBM Beta (1986-03-03) (ID 952).img" size="368640" crc="bae37409" sha1="2997a137038e9cd98ad95931cbf22b03cb6c6ad7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kbounty">
+		<!-- Dumped via Kryoflux, track 0 shows as modified -->
+		<description>King's Bounty</description>
+		<year>1991</year>
+		<publisher>New World Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="king's bounty.img" size="737280" crc="267624e2" sha1="763a5014008f46f93a13c822377c41965c09a1f8" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -6284,6 +6367,54 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="links">
+		<description>Links - The Challenge of Golf v1.10</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<info name="usage" value="VGA or MCGA required" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Links - The Challenge Of Golf v1.10 (1990)(Access Software)(Disk 1 of 5).dsk" size="368640" crc="ee45b24c" sha1="1f94381f287555e018eb9f760a980372ced8f783" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Links - The Challenge Of Golf v1.10 (1990)(Access Software)(Disk 2 of 5).dsk" size="368640" crc="b1b3956d" sha1="200f051820833203ea20633ed5a6c94df5e71ec4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Links - The Challenge Of Golf v1.10 (1990)(Access Software)(Disk 3 of 5).dsk" size="368640" crc="04c91f40" sha1="529c1df6c7668d827cec1f040086a6038fdb35db" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Links - The Challenge Of Golf v1.10 (1990)(Access Software)(Disk 4 of 5).dsk" size="368640" crc="0a8090f9" sha1="0622d2b227179480691a46a44e36a5c49bf468f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Links - The Challenge Of Golf v1.10 (1990)(Access Software)(Disk 5 of 5).dsk" size="368640" crc="26c18083" sha1="8ff9414b9ca0365a124fd6407025eece4f1ab25d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linksbnt">
+		<description>Links - Championship Course - Bountiful Golf Course</description>
+		<year>1991</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Links - Championship Course - Bountiful Golf Course (1991)(Access Software)(Disk 1 of 2).dsk" size="368640" crc="71c17070" sha1="93b32aed3d000011f38066e0c6e3d1b201a0fc96" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Links - Championship Course - Bountiful Golf Course (1991)(Access Software)(Disk 2 of 2).dsk" size="368640" crc="0c9664aa" sha1="a6977e88cf98a673164d9ac9698585edc01e3dc8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lurkingh">
 		<description>The Lurking Horror</description>
 		<year>1987</year>
@@ -6302,6 +6433,42 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Le Manoir de Mortevielle [5.25].img" size="368640" crc="4eebc049" sha1="1f9a8fe4978b76bf14c674a8f681c58e18fa4443" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meanst">
+		<description>Mean Streets</description>
+		<year>1989</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mean Streets (1989)(Access Software)(Disk 1 of 6).dsk" size="368640" crc="28e7ee39" sha1="ad1f8353a683497905b7cbcb304a2833f8d56252" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mean Streets (1989)(Access Software)(Disk 2 of 6).dsk" size="368640" crc="8ce01fcc" sha1="3858059b7c22ac659e011303328246e58c4aa9a6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mean Streets (1989)(Access Software)(Disk 3 of 6).dsk" size="368640" crc="59121149" sha1="6bac84c2b7037ba1ba65fe6770875f731cd1c45d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mean Streets (1989)(Access Software)(Disk 4 of 6).dsk" size="368640" crc="e953194f" sha1="c831ea1ff6333f45a8575e3959e321e551667b87" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mean Streets (1989)(Access Software)(Disk 5 of 6).dsk" size="368640" crc="060cc1ea" sha1="1f4a85965f99914e6cb902c56b2ba32dad7d73cc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mean Streets (1989)(Access Software)(Disk 6 of 6).dsk" size="368640" crc="081590ba" sha1="1a56175e7c17706a9d66fb4e18becbe99b2df38c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6372,6 +6539,80 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="monopoly">
+		<description>Monopoly v2.00 (Shareware)</description>
+		<year>1989</year>
+		<publisher>TEGL Systems Corporation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Monopoly v2.00 (1989-09-03)(TEGL Systems Corporation)[shareware].dsk" size="368640" crc="8e9dd1fb" sha1="7fe3f54b9b2acf7903033ec3763708a37fc5afcf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="montypyt">
+		<description>Monty Python's Flying Circus</description>
+		<year>1990</year>
+		<publisher>Virgin Games</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Monty Python's Flying Circus (1990)(Virgin Games)(Disk 1 of 2).dsk" size="368640" crc="a5f227b5" sha1="e3b23a09ceed2681c504b78071660dc378051839" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Monty Python's Flying Circus (1990)(Virgin Games)(Disk 2 of 2).dsk" size="368640" crc="c1c40d8c" sha1="b724017f7a314cac625463d1aa106eaeac669288" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ngaiden2">
+		<description>Ninja Gaiden II - The Dark Sword of Chaos</description>
+		<year>1991</year>
+		<publisher>GameTek</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ninja Gaiden II - The Dark Sword of Chaos (1991)(GameTek).dsk" size="737280" crc="f69da21d" sha1="d9a8bc1d5a9d4314c3b4df078fdd7aa7d92a7b6c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nova9">
+		<description>Nova 9 - Return of Gir Draxon</description>
+		<year>1991</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 1 of 6).dsk" size="737280" crc="de0b75ae" sha1="31590a0c27972a3a956ac853276bc2da770ffef8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 2 of 6).dsk" size="737280" crc="b3756c77" sha1="a818d399fa8b9a77a09217bb6a99f18cbf42acfd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 3 of 6).dsk" size="737280" crc="19411f94" sha1="1580aa2a51991b8463fc3179612c9d96341f03d9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 4 of 6).dsk" size="737280" crc="a69a0ec3" sha1="84c32577287f9a581f2ec0fbebe354d27da9a7c5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 5 of 6).dsk" size="737280" crc="1c283926" sha1="b077201788af23bc55af4a76ba55e00495717827" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 6 of 6).dsk" size="737280" crc="095ea434" sha1="16a443f8f8d3471908b1c5dc4850b4b266081ab9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="opwolf">
 		<description>Operation Wolf</description>
 		<year>1989</year>
@@ -6385,6 +6626,28 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Operation Wolf [Taito Corporation] [1989] [5.25] [disk 2 of 2].img" size="368640" crc="61685134" sha1="e0f1f60365e7d2b59b18ab6e7ebde0e98c82a459" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="overnet">
+		<description>Over the Net</description>
+		<year>1991</year>
+		<publisher>Genias</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Over the Net (1991)(Genias).dsk" size="737280" crc="71e8f2d0" sha1="e2b758f7484e602d6ac5b7375b46591f5f7230ee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppursuit">
+		<description>Pharaoh's Pursuit</description>
+		<year>1990</year>
+		<publisher>Lone Star Micro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Pharaoh's Pursuit (1990)(Lone Star Micro).dsk" size="368640" crc="0118fdf4" sha1="23b212ad4defaf5a150ef4aba369d4a804632238" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6637,6 +6900,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="silvblad">
+		<description>Secret of the Silver Blades</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Secret of the Silver Blades (1990)(SSI).dsk" size="737280" crc="fac4327b" sha1="05c4a640183fb83d7c539eefb4f82cb213ebaa9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="agidemos">
 		<description>Sierra Demo</description>
 		<year>1987</year>
@@ -6708,6 +6982,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="spdball2">
+		<description>Speedball II - Brutal Deluxe</description>
+		<year>1990</year>
+		<publisher>Imageworks</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Speedball II - Brutal Deluxe (1990)(Imageworks)(Disk 1 of 2).dsk" size="368640" crc="7076b522" sha1="80e4d60ebe4c948f13897fb74c403b22a2acfceb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Speedball II - Brutal Deluxe (1990)(Imageworks)(Disk 2 of 2).dsk" size="368640" crc="09fc221a" sha1="a71468919cb0d32706de00dae2cc14ca0b471a62" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stargoos">
 		<description>Star Goose!</description>
 		<year>1989</year>
@@ -6774,6 +7064,38 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="sfightmn">
+		<description>Street Fighting Man</description>
+		<year>1989</year>
+		<publisher>Mastertronic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Street Fighting Man (1989)(Mastertronic)(Disk 1 of 2).dsk" size="368640" crc="949cdf13" sha1="89d6b45d0ec0a0ca46a90c27ad9376b827cf68a1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Street Fighting Man (1989)(Mastertronic)(Disk 2 of 2).dsk" size="368640" crc="2e02db73" sha1="17bd0ca7c558e9908a9cb8de19024ade0ef70c24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superc">
+		<description>Super C</description>
+		<year>1990</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Super C (1990)(Konami)(Disk 1 of 2).dsk" size="368640" crc="704de33b" sha1="1a3d942382efb6a7bd03a9dffd13f69b2fa87d77" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Super C (1990)(Konami)(Disk 2 of 2).dsk" size="368640" crc="c52c1b46" sha1="3e3f341b074e291c6847670409617b23764b3554" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superman">
 		<description>Superman - The Man of Steel</description>
 		<year>1989</year>
@@ -6787,6 +7109,55 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Superman - The Man of Steel [1989] [First Star Software] [5.25] [2 of 2].img" size="368640" crc="e904711c" sha1="d66e64bd467b1dd0dedbe613b087e1ea63fcb38f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sshockey">
+		<description>Superstar Ice Hockey</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Superstar Ice Hockey (1987)(Mindscape).dsk" size="368640" crc="1bf48493" sha1="269b6a48ac11705497ce0e94d61430b63fa88ad3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssindsoc">
+		<description>Superstar Indoor Soccer</description>
+		<year>1991</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Superstar Indoor Soccer (1991)(Mindscape).dsk" size="368640" crc="eb4ba702" sha1="9418cb562a635337c1fbdb770c15f4d6a923ac49" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssindspo">
+		<description>Superstar Indoor Sports</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Superstar Indoor Sports (1987)(Mindscape)(Disk 1 of 2).dsk" size="368640" crc="ea6d5fda" sha1="2860445cf86b5fbb9505cc6b2d4f941af3c79046" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Superstar Indoor Sports (1987)(Mindscape)(Disk 2 of 2).dsk" size="368640" crc="83dccd51" sha1="52725b2fdb02b2a4b313f7bd7d981d6a79578735" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssoutsoc">
+		<description>Superstar Outdoor Soccer</description>
+		<year>1991</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Superstar Outdoor Soccer (1991)(Mindscape).dsk" size="368640" crc="e4e0f70f" sha1="48fcb5a65edd641abc7f9c0451e37c00ba94850a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6826,6 +7197,32 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "242382">
 				<rom name="Tetris [1987] [3.5] [1 of 1].td0" size="242382" crc="a64eb149" sha1="a467d7d8bed7bd268374e282de1f92c298b665c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topgold2">
+		<description>Top 10 Solid Gold Volume II</description>
+		<year>1991</year>
+		<publisher>US Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Top 10 Solid Gold Volume II (1991)(US Gold)(Disk 1 of 4).dsk" size="368640" crc="a51f8fb4" sha1="9cad7c597d1025fbb066b8f40c879e01bdede8e5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Top 10 Solid Gold Volume II (1991)(US Gold)(Disk 2 of 4).dsk" size="368640" crc="5b46b6ca" sha1="6b157e8384822874f5fa7a6b8a918fc2a98add67" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Top 10 Solid Gold Volume II (1991)(US Gold)(Disk 3 of 4).dsk" size="368640" crc="48a77034" sha1="53220db6fff4a0165bdd44baac86a374544e3030" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Top 10 Solid Gold Volume II (1991)(US Gold)(Disk 4 of 4).dsk" size="368640" crc="56440dfb" sha1="564bf308941f3fb3a64e7498c4a14c734b6507d4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6886,6 +7283,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Weird Dreams [MicroProse] [1989] [3.5].img" size="737280" crc="cc8996dd" sha1="ecd07fbf4b23ffac08f50c970a9f0acdaf86781c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingfury">
+		<description>Wings of Fury</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wings of Fury (1989)(Broderbund Software).dsk" size="737280" crc="6bd8681a" sha1="43d1e493afb80b25949c5208cd1f7085b40529ef" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6952,6 +7360,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Zany Golf Program Disk 2.bin" size="368640" crc="a8cddc3d" sha1="1302026fe22d921dc4513330d33bc16566b583b8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zool">
+		<description>Zool</description>
+		<year>1993</year>
+		<publisher>Gremlin Graphics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Zool (1993)(Gremlin Graphics).dsk" size="737280" crc="43856c04" sha1="714f5b4d7049b98a1aca94b80a1f32bb1c9da049" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

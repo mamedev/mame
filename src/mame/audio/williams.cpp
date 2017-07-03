@@ -735,7 +735,7 @@ ADDRESS_MAP_END
 //  OKI6295 map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( williams_adpcm_oki_map, AS_0, 8, williams_adpcm_sound_device )
+static ADDRESS_MAP_START( williams_adpcm_oki_map, 0, 8, williams_adpcm_sound_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("oki", 0x60000)
 ADDRESS_MAP_END
@@ -758,7 +758,7 @@ MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, williams_adpcm_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, williams_adpcm_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 MACHINE_CONFIG_END
 

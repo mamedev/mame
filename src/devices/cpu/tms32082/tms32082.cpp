@@ -50,6 +50,19 @@ tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> tms32082_mp_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+std::vector<std::pair<int, const address_space_config *>> tms32082_pp_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 offs_t tms32082_mp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

@@ -116,7 +116,7 @@ void interpro_ioga_device::device_start()
 	// grab the main memory space from the mmu so we can do DMA to/from it
 	device_memory_interface *mmu;
 	siblingdevice("mmu")->interface(mmu);
-	m_memory_space = &mmu->space(AS_0);
+	m_memory_space = &mmu->space(0);
 
 	for (int i = 0; i < IOGA_DMA_CHANNELS; i++)
 	{

@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(SCN2674_VIDEO, scn2674_device, "scn2674", "Signetics SCN2674 
 
 
 // default address map
-static ADDRESS_MAP_START( scn2674_vram, AS_0, 8, scn2674_device )
+static ADDRESS_MAP_START( scn2674_vram, 0, 8, scn2674_device )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -51,6 +51,13 @@ scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, d
 	, m_scanline_timer(nullptr)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(scn2674_vram))
 {
+}
+
+std::vector<std::pair<int, const address_space_config *>> scn2674_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 void scn2674_device::device_start()

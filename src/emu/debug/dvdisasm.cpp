@@ -27,7 +27,7 @@ debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &d
 	: debug_view_source(name, &device),
 		m_disasmintf(dynamic_cast<device_disasm_interface *>(&device)),
 		m_space(device.memory().space(AS_PROGRAM)),
-		m_decrypted_space(device.memory().has_space(AS_DECRYPTED_OPCODES) ? device.memory().space(AS_DECRYPTED_OPCODES) : device.memory().space(AS_PROGRAM))
+		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM))
 {
 }
 

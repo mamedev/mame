@@ -34,7 +34,7 @@
 
 #include <zlib.h>
 
-#define AS_IO16             AS_1
+#define AS_IO16             1
 #define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
 
 class vgmplay_device : public cpu_device
@@ -84,7 +84,7 @@ public:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -559,14 +559,13 @@ void vgmplay_device::execute_set_input(int inputnum, int state)
 {
 }
 
-const address_space_config *vgmplay_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> vgmplay_device::memory_space_config() const
 {
-	switch(spacenum) {
-	case AS_PROGRAM: return &m_file_config;
-	case AS_IO:      return &m_io_config;
-	case AS_IO16:    return &m_io16_config;
-	default:         return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_file_config),
+		std::make_pair(AS_IO,      &m_io_config),
+		std::make_pair(AS_IO16,    &m_io16_config)
+	};
 }
 
 void vgmplay_device::state_import(const device_state_entry &entry)
@@ -1292,27 +1291,27 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_YMZ280B,      vgmplay_device::A_YMZ280B+0x1)   AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segapcm_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, segapcm_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multipcma_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( multipcma_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3fffff) AM_DEVREAD("vgmplay", vgmplay_device, multipcma_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multipcmb_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( multipcmb_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3fffff) AM_DEVREAD("vgmplay", vgmplay_device, multipcmb_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k053260_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( k053260_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k053260_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( okim6295_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( okim6295_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3ffff) AM_DEVREAD("vgmplay", vgmplay_device, okim6295_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c352_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
 ADDRESS_MAP_END
 
@@ -1356,17 +1355,17 @@ static MACHINE_CONFIG_START( vgmplay )
 
 	MCFG_SOUND_ADD("segapcm", SEGAPCM, 4000000)
 	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, segapcm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("multipcma", MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, multipcma_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcma_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("multipcmb", MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, multipcmb_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcmb_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -1418,7 +1417,7 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 
 	MCFG_K053260_ADD("k053260", 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, k053260_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -1431,12 +1430,12 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
 	MCFG_C352_ADD("c352", 1000000, 288)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, c352_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, c352_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_OKIM6295_ADD("okim6295", 1000000, PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, okim6295_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, okim6295_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 

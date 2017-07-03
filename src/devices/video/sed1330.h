@@ -20,7 +20,7 @@
 
 #define MCFG_SED1330_ADD(_tag, _clock, _screen_tag, _map) \
 	MCFG_DEVICE_ADD(_tag, SED1330, _clock) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
+	MCFG_DEVICE_ADDRESS_MAP(0, _map) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
 
@@ -56,7 +56,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t m_data);

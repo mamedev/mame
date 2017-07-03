@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM /*_WRITE(ram_w)*/ AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megasys1D_oki_map, AS_0, 8, megasys1_state )
+static ADDRESS_MAP_START( megasys1D_oki_map, 0, 8, megasys1_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -1803,7 +1803,7 @@ static MACHINE_CONFIG_START( system_D )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, PIN7_HIGH)    /* 2MHz (8MHz / 4) */
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, megasys1D_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, megasys1D_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

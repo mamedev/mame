@@ -779,15 +779,19 @@ static std::unique_ptr<uint8_t[]> SZHVC_sub;
 #include "z180op.hxx"
 
 
-const address_space_config *z180_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> z180_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_IO:                return &m_io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
+	else
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
 }
 
 uint8_t z180_device::z180_readcontrol(offs_t port)
@@ -1998,7 +2002,7 @@ void z180_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_oprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_program;
+	m_oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
 	m_odirect = &m_oprogram->direct();
 	m_iospace = &space(AS_IO);
 
@@ -2548,7 +2552,7 @@ void z180_device::execute_set_input(int irqline, int state)
 }
 
 /* logical to physical address translation */
-bool z180_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool z180_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (spacenum == AS_PROGRAM)
 	{

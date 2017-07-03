@@ -704,7 +704,7 @@ static void m68k_cause_bus_error(m68000_base_device *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_BUS_ERROR);
 }
 
-bool m68000_base_device::memory_translate(address_spacenum space, int intention, offs_t &address)
+bool m68000_base_device::memory_translate(int space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	{
@@ -920,7 +920,7 @@ void m68000_base_device::init_cpu_common(void)
 
 	//this = device;//deviceparam;
 	program = &space(AS_PROGRAM);
-	oprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : program;
+	oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : program;
 	int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68000_base_device::standard_irq_callback_member), this);
 
 	/* disable all MMUs */
@@ -2483,14 +2483,17 @@ void m68000_base_device::execute_set_input(int inputnum, int state)
 }
 
 
-const address_space_config *m68000_base_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> m68000_base_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_oprogram_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_oprogram_config)
+		};
+	else
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config)
+		};
 }
 
 
@@ -2624,7 +2627,7 @@ void m68020pmmu_device::device_start()
 	init_cpu_m68020pmmu();
 }
 
-bool m68020hmmu_device::memory_translate(address_spacenum space, int intention, offs_t &address)
+bool m68020hmmu_device::memory_translate(int space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	{

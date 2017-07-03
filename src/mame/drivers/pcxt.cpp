@@ -388,7 +388,7 @@ static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank_map, AS_0, 8, pcxt_state )
+static ADDRESS_MAP_START( bank_map, 0, 8, pcxt_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("game_prg", 0)
 ADDRESS_MAP_END
 

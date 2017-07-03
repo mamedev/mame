@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, clpoker_state )
 	AM_RANGE(0xc0, 0xc0) AM_READNOP // mystery read at startup
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, clpoker_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, clpoker_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 

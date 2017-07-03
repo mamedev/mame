@@ -157,14 +157,14 @@ static const rgb_t PALETTE_MOS[] =
 
 inline uint8_t mos6560_device::read_videoram(offs_t offset)
 {
-	m_last_data = space(AS_0).read_byte(offset & 0x3fff);
+	m_last_data = space(0).read_byte(offset & 0x3fff);
 
 	return m_last_data;
 }
 
 inline uint8_t mos6560_device::read_colorram(offs_t offset)
 {
-	return space(AS_1).read_byte(offset & 0x3ff);
+	return space(1).read_byte(offset & 0x3ff);
 }
 
 /*-------------------------------------------------
@@ -680,11 +680,11 @@ DEFINE_DEVICE_TYPE(MOS6561,            mos6561_device,            "mos6561",    
 DEFINE_DEVICE_TYPE(MOS656X_ATTACK_UFO, mos656x_attack_ufo_device, "mos656x_attack_ufo", "MOS 656X VIC (Attack UFO)")
 
 // default address maps
-static ADDRESS_MAP_START( mos6560_videoram_map, AS_0, 8, mos6560_device )
+static ADDRESS_MAP_START( mos6560_videoram_map, 0, 8, mos6560_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mos6560_colorram_map, AS_1, 8, mos6560_device )
+static ADDRESS_MAP_START( mos6560_colorram_map, 1, 8, mos6560_device )
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -722,14 +722,12 @@ mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconf
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mos6560_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mos6560_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-		case AS_0: return &m_videoram_space_config;
-		case AS_1: return &m_colorram_space_config;
-		default: return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_videoram_space_config),
+		std::make_pair(1, &m_colorram_space_config)
+	};
 }
 
 

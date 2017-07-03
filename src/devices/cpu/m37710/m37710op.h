@@ -281,7 +281,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_ADC(MODE)                                                        \
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);                              \
 			SRC    = OPER_8_##MODE();                                       \
-			FLAG_C = REG_A + SRC + CFLAG_AS_1();                        \
+			FLAG_C = REG_A + SRC + CFLAG_1();                        \
 			if(FLAG_D)                                                      \
 			{                                                               \
 				if((FLAG_C & 0xf) > 9)                                      \
@@ -297,21 +297,21 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			SRC    = OPER_16_##MODE();                                      \
 			if(!FLAG_D)                                                     \
 			{                                                               \
-				FLAG_C = REG_A + SRC + CFLAG_AS_1();                        \
+				FLAG_C = REG_A + SRC + CFLAG_1();                        \
 				FLAG_V = VFLAG_ADD_16(SRC, REG_A, FLAG_C);                  \
 				FLAG_Z = REG_A = MAKE_UINT_16(FLAG_C);                      \
 				FLAG_N = NFLAG_16(REG_A);                                   \
 				FLAG_C = CFLAG_16(FLAG_C);                                  \
 				BREAKOUT;                                                   \
 			}                                                               \
-			FLAG_C = MAKE_UINT_8(REG_A) + MAKE_UINT_8(SRC) + CFLAG_AS_1();  \
+			FLAG_C = MAKE_UINT_8(REG_A) + MAKE_UINT_8(SRC) + CFLAG_1();  \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C+=6;                                                  \
 			if((FLAG_C & 0xf0) > 0x90)                                      \
 				FLAG_C+=0x60;                                               \
 			FLAG_Z = MAKE_UINT_8(FLAG_C);                                   \
 																			\
-			FLAG_C = MAKE_UINT_8(REG_A>>8) + MAKE_UINT_8(SRC>>8) + CFLAG_AS_1();    \
+			FLAG_C = MAKE_UINT_8(REG_A>>8) + MAKE_UINT_8(SRC>>8) + CFLAG_1();    \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C+=6;                                                  \
 			if((FLAG_C & 0xf0) > 0x90)                                      \
@@ -328,7 +328,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_ADCB(MODE)                                                       \
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);                              \
 			SRC    = OPER_8_##MODE();                                       \
-			FLAG_C = REG_BA + SRC + CFLAG_AS_1();                       \
+			FLAG_C = REG_BA + SRC + CFLAG_1();                       \
 			if(FLAG_D)                                                      \
 			{                                                               \
 				if((FLAG_C & 0xf) > 9)                                      \
@@ -344,21 +344,21 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			SRC    = OPER_16_##MODE();                                      \
 			if(!FLAG_D)                                                     \
 			{                                                               \
-				FLAG_C = REG_BA + SRC + CFLAG_AS_1();                       \
+				FLAG_C = REG_BA + SRC + CFLAG_1();                       \
 				FLAG_V = VFLAG_ADD_16(SRC, REG_BA, FLAG_C);                 \
 				FLAG_Z = REG_BA = MAKE_UINT_16(FLAG_C);                     \
 				FLAG_N = NFLAG_16(REG_BA);                                  \
 				FLAG_C = CFLAG_16(FLAG_C);                                  \
 				BREAKOUT;                                                   \
 			}                                                               \
-			FLAG_C = MAKE_UINT_8(REG_BA) + MAKE_UINT_8(SRC) + CFLAG_AS_1(); \
+			FLAG_C = MAKE_UINT_8(REG_BA) + MAKE_UINT_8(SRC) + CFLAG_1(); \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C+=6;                                                  \
 			if((FLAG_C & 0xf0) > 0x90)                                      \
 				FLAG_C+=0x60;                                               \
 			FLAG_Z = MAKE_UINT_8(FLAG_C);                                   \
 																			\
-			FLAG_C = MAKE_UINT_8(REG_BA>>8) + MAKE_UINT_8(SRC>>8) + CFLAG_AS_1();   \
+			FLAG_C = MAKE_UINT_8(REG_BA>>8) + MAKE_UINT_8(SRC>>8) + CFLAG_1();   \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C+=6;                                                  \
 			if((FLAG_C & 0xf0) > 0x90)                                      \
@@ -1244,12 +1244,12 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #if FLAG_SET_M
 #define OP_ROL()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_C = (REG_A<<1) | CFLAG_AS_1();                             \
+			FLAG_C = (REG_A<<1) | CFLAG_1();                             \
 			FLAG_N = FLAG_Z = REG_A = MAKE_UINT_8(FLAG_C)
 #else
 #define OP_ROL()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_C = (REG_A<<1) | CFLAG_AS_1();                             \
+			FLAG_C = (REG_A<<1) | CFLAG_1();                             \
 			FLAG_Z = REG_A = MAKE_UINT_16(FLAG_C);                          \
 			FLAG_N = NFLAG_16(FLAG_C);                                      \
 			FLAG_C = CFLAG_16(FLAG_C)
@@ -1260,12 +1260,12 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #if FLAG_SET_M
 #define OP_ROLB()                                                           \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_C = (REG_BA<<1) | CFLAG_AS_1();                                \
+			FLAG_C = (REG_BA<<1) | CFLAG_1();                                \
 			FLAG_N = FLAG_Z = REG_BA = MAKE_UINT_8(FLAG_C)
 #else
 #define OP_ROLB()                                                           \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_C = (REG_BA<<1) | CFLAG_AS_1();                                \
+			FLAG_C = (REG_BA<<1) | CFLAG_1();                                \
 			FLAG_Z = REG_BA = MAKE_UINT_16(FLAG_C);                         \
 			FLAG_N = NFLAG_16(FLAG_C);                                      \
 			FLAG_C = CFLAG_16(FLAG_C)
@@ -1287,14 +1287,14 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_ROLM(MODE)                                                       \
 			CLK(CLK_OP + CLK_RMW8 + CLK_W_##MODE);                          \
 			DST = EA_##MODE();                                              \
-			FLAG_C = (read_8_##MODE(DST)<<1) | CFLAG_AS_1();                \
+			FLAG_C = (read_8_##MODE(DST)<<1) | CFLAG_1();                \
 			FLAG_N = FLAG_Z = MAKE_UINT_8(FLAG_C);                          \
 			write_8_##MODE(DST, FLAG_Z)
 #else
 #define OP_ROLM(MODE)                                                       \
 			CLK(CLK_OP + CLK_RMW16 + CLK_W_##MODE);                         \
 			DST = EA_##MODE();                                              \
-			FLAG_C = (read_16_##MODE(DST)<<1) | CFLAG_AS_1();               \
+			FLAG_C = (read_16_##MODE(DST)<<1) | CFLAG_1();               \
 			FLAG_Z = MAKE_UINT_16(FLAG_C);                                  \
 			FLAG_N = NFLAG_16(FLAG_C);                                      \
 			FLAG_C = CFLAG_16(FLAG_C);                                      \
@@ -1389,13 +1389,13 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			FLAG_C = ~FLAG_C;                                               \
 			if(!FLAG_D)                                                     \
 			{                                                               \
-				FLAG_C = REG_A - SRC - CFLAG_AS_1();                        \
+				FLAG_C = REG_A - SRC - CFLAG_1();                        \
 				FLAG_V = VFLAG_SUB_8(SRC, REG_A, FLAG_C);                   \
 				FLAG_N = FLAG_Z = REG_A = MAKE_UINT_8(FLAG_C);              \
 				FLAG_C = ~FLAG_C;                                           \
 				BREAKOUT;                                                   \
 			}                                                               \
-			DST = CFLAG_AS_1();                                             \
+			DST = CFLAG_1();                                             \
 			FLAG_C = REG_A - SRC - DST;                                     \
 			FLAG_V = VFLAG_SUB_8(SRC, REG_A, FLAG_C);                       \
 			if((FLAG_C & 0xf) > 9)                                          \
@@ -1411,21 +1411,21 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			FLAG_C = ~FLAG_C;                                               \
 			if(!FLAG_D)                                                     \
 			{                                                               \
-				FLAG_C = REG_A - SRC - CFLAG_AS_1();                        \
+				FLAG_C = REG_A - SRC - CFLAG_1();                        \
 				FLAG_V = VFLAG_SUB_16(SRC, REG_A, FLAG_C);                  \
 				FLAG_Z = REG_A = MAKE_UINT_16(FLAG_C);                      \
 				FLAG_N = NFLAG_16(REG_A);                                   \
 				FLAG_C = ~CFLAG_16(FLAG_C);                                 \
 				BREAKOUT;                                                   \
 			}                                                               \
-			DST    = CFLAG_AS_1();                                          \
+			DST    = CFLAG_1();                                          \
 			FLAG_C = MAKE_UINT_8(REG_A) - MAKE_UINT_8(SRC) - DST;           \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C-=6;                                                  \
 			if((FLAG_C & 0xf0) > 0x90)                                      \
 				FLAG_C-=0x60;                                               \
 			FLAG_Z = MAKE_UINT_8(FLAG_C);                                   \
-			DST    = CFLAG_AS_1();                                          \
+			DST    = CFLAG_1();                                          \
 			FLAG_C = MAKE_UINT_8(REG_A>>8) - MAKE_UINT_8(SRC>>8) - DST;     \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C-=6;                                                  \
@@ -1448,13 +1448,13 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			FLAG_C = ~FLAG_C;                                               \
 			if(!FLAG_D)                                                     \
 			{                                                               \
-				FLAG_C = REG_BA - SRC - CFLAG_AS_1();                       \
+				FLAG_C = REG_BA - SRC - CFLAG_1();                       \
 				FLAG_V = VFLAG_SUB_8(SRC, REG_BA, FLAG_C);                  \
 				FLAG_N = FLAG_Z = REG_BA = MAKE_UINT_8(FLAG_C);             \
 				FLAG_C = ~FLAG_C;                                           \
 				BREAKOUT;                                                   \
 			}                                                               \
-			DST = CFLAG_AS_1();                                             \
+			DST = CFLAG_1();                                             \
 			FLAG_C = REG_BA - SRC - DST;                                        \
 			FLAG_V = VFLAG_SUB_8(SRC, REG_BA, FLAG_C);                      \
 			if((FLAG_C & 0xf) > 9)                                          \
@@ -1470,21 +1470,21 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			FLAG_C = ~FLAG_C;                                               \
 			if(!FLAG_D)                                                     \
 			{                                                               \
-				FLAG_C = REG_BA - SRC - CFLAG_AS_1();                       \
+				FLAG_C = REG_BA - SRC - CFLAG_1();                       \
 				FLAG_V = VFLAG_SUB_16(SRC, REG_BA, FLAG_C);                 \
 				FLAG_Z = REG_BA = MAKE_UINT_16(FLAG_C);                     \
 				FLAG_N = NFLAG_16(REG_BA);                                  \
 				FLAG_C = ~CFLAG_16(FLAG_C);                                 \
 				BREAKOUT;                                                   \
 			}                                                               \
-			DST    = CFLAG_AS_1();                                          \
+			DST    = CFLAG_1();                                          \
 			FLAG_C = MAKE_UINT_8(REG_BA) - MAKE_UINT_8(SRC) - DST;          \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C-=6;                                                  \
 			if((FLAG_C & 0xf0) > 0x90)                                      \
 				FLAG_C-=0x60;                                               \
 			FLAG_Z = MAKE_UINT_8(FLAG_C);                                   \
-			DST    = CFLAG_AS_1();                                          \
+			DST    = CFLAG_1();                                          \
 			FLAG_C = MAKE_UINT_8(REG_A>>8) - MAKE_UINT_8(SRC>>8) - DST;     \
 			if((FLAG_C & 0xf) > 9)                                          \
 				FLAG_C-=6;                                                  \

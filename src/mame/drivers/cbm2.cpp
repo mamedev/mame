@@ -1172,7 +1172,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, p500_state )
+static ADDRESS_MAP_START( vic_videoram_map, 0, 8, p500_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -1181,7 +1181,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, p500_state )
+static ADDRESS_MAP_START( vic_colorram_map, 1, 8, p500_state )
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -2294,8 +2294,8 @@ static MACHINE_CONFIG_START( p500_ntsc )
 	MCFG_MOS6566_CPU(M6509_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(p500_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, vic_colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
@@ -2410,8 +2410,8 @@ static MACHINE_CONFIG_START( p500_pal )
 	MCFG_MOS6566_CPU(M6509_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(p500_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, vic_colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)

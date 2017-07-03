@@ -108,7 +108,7 @@ public:
 	int renderselect;
 	int listtype_used;
 	int alloc_ctrl_OPB_Mode, alloc_ctrl_PT_OPB, alloc_ctrl_TM_OPB, alloc_ctrl_T_OPB, alloc_ctrl_OM_OPB, alloc_ctrl_O_OPB;
-	receiveddata grab[NUM_BUFFERS];
+	std::unique_ptr<receiveddata[]> grab;
 	int grabsel;
 	int grabsellast;
 	uint32_t paracontrol,paratype,endofstrip,listtype,global_paratype,parameterconfig;

@@ -486,6 +486,12 @@ void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_time
 	m_data = (*m_param)();
 }
 
+std::vector<std::pair<int, const address_space_config *>> netlist_mame_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 void netlist_mame_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

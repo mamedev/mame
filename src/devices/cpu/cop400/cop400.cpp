@@ -314,6 +314,14 @@ cop446c_cpu_device::cop446c_cpu_device(const machine_config &mconfig, const char
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> cop400_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 
 
 /***************************************************************************

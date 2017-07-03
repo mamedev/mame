@@ -40,15 +40,19 @@ void deco16_device::device_start()
 	io = &space(AS_IO);
 }
 
-const address_space_config *deco16_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> deco16_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &program_config;
-	case AS_IO:                return &io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_OPCODES, &sprogram_config),
+			std::make_pair(AS_IO,      &io_config)
+		};
+	else
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_IO,      &io_config)
+		};
 }
 
 #include "cpu/m6502/deco16.hxx"

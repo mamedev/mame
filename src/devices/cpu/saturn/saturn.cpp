@@ -57,6 +57,13 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> saturn_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 offs_t saturn_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

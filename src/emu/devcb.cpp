@@ -26,7 +26,7 @@ devcb_base::devcb_base(device_t &device, u64 defmask)
 		m_target_tag(nullptr),
 		m_target_int(0),
 		m_space_tag(nullptr),
-		m_space_num(AS_0),
+		m_space_num(0),
 		m_space(nullptr),
 		m_rshift(0),
 		m_mask(defmask),
@@ -56,7 +56,7 @@ void devcb_base::reset(callback_type type)
 	m_target_tag = nullptr;
 	m_target_int = 0;
 	m_space_tag = nullptr;
-	m_space_num = AS_0;
+	m_space_num = 0;
 	m_space = nullptr;
 	m_target.ptr = nullptr;
 	m_rshift = 0;

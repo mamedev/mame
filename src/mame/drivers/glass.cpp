@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, glass_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, glass_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( glass )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

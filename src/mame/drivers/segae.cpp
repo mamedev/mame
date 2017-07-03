@@ -363,13 +363,13 @@ static ADDRESS_MAP_START( systeme_map, AS_PROGRAM, 8, systeme_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, systeme_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, systeme_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, systeme_state )
+static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_OPCODES, 8, systeme_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
@@ -396,12 +396,12 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, systeme_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vdp1_map, AS_0, 8, systeme_state )
+static ADDRESS_MAP_START( vdp1_map, 0, 8, systeme_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp1_bank")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vdp2_map, AS_0, 8, systeme_state )
+static ADDRESS_MAP_START( vdp2_map, 0, 8, systeme_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp2_bank")
 ADDRESS_MAP_END
 
@@ -970,12 +970,12 @@ static MACHINE_CONFIG_START( systeme )
 
 	MCFG_DEVICE_ADD("vdp1", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vdp1_map)
 
 	MCFG_DEVICE_ADD("vdp2", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
 	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vdp2_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

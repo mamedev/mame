@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( zx81_map, AS_PROGRAM, 8, zx_state )
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ula_map, AS_DECRYPTED_OPCODES, 8, zx_state )
+static ADDRESS_MAP_START( ula_map, AS_OPCODES, 8, zx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(ula_low_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(ula_high_r)
 ADDRESS_MAP_END

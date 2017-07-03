@@ -724,11 +724,18 @@ static int deco16_pf_update(
 
 		if (tilemap_16x16)
 		{
+			int numrows = rows;
+
+			// cap at tilemap size
+			if (numrows > tilemap_16x16->height())
+				numrows = tilemap_16x16->height();
+
 			tilemap_16x16->set_scroll_cols(1);
-			tilemap_16x16->set_scroll_rows(rows);
+			tilemap_16x16->set_scroll_rows(numrows);
 			tilemap_16x16->set_scrolly(0, scrolly);
 
-			for (offs = 0; offs < rows; offs++)
+
+			for (offs = 0; offs < numrows; offs++)
 				tilemap_16x16->set_scrollx(offs, scrollx + rowscroll_ptr[offs]);
 		}
 
@@ -739,6 +746,10 @@ static int deco16_pf_update(
 			// wolffang uses a larger 8x8 tilemap for the Japanese intro text, everything else seems to need this logic tho?
 			if (!(tilemapsizes & 4))
 				numrows = rows >> 1;
+
+			// cap at tilemap size
+			if (numrows > tilemap_8x8->height())
+				numrows = tilemap_8x8->height();
 
 			tilemap_8x8->set_scroll_cols(1);
 			tilemap_8x8->set_scroll_rows(numrows);

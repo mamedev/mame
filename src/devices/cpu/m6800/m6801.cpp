@@ -294,15 +294,12 @@ hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-const address_space_config *m6801_cpu_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> m6801_cpu_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_IO:                return &m_io_config;
-	default:                   return m6800_cpu_device::memory_space_config(spacenum);
-	}
+	auto r = m6800_cpu_device::memory_space_config();
+	r.emplace_back(std::make_pair(AS_IO, &m_io_config));
+	return r;
 }
-
 
 void m6801_cpu_device::m6800_check_irq2()
 {

@@ -69,6 +69,13 @@ patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, 
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> patinho_feio_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 uint16_t patinho_feio_cpu_device::read_panel_keys_register(){
 	if (!m_rc_read_cb.isnull())
 		m_rc = m_rc_read_cb(0);
