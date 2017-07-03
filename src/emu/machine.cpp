@@ -233,8 +233,12 @@ void running_machine::start()
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
-	// first load ROMs, then populate memory, and finally initialize CPUs
-	// these operations must proceed in this order
+	// configure the address spaces, load ROMs (which needs
+	// width/endianess of the spaces), then populate memory (which
+	// needs rom bases), and finally initialize CPUs (which needs
+	// complete address spaces).  These operations must proceed in this
+	// order
+	m_memory.configure();
 	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
 

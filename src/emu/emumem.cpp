@@ -1559,7 +1559,6 @@ memory_manager::memory_manager(running_machine &machine)
 
 void memory_manager::allocate(device_memory_interface &memory)
 {
-	memory.load_configs();
 	for (int spacenum = 0; spacenum < memory.max_space_count(); ++spacenum)
 	{
 		// if there is a configuration for this space, we need an address space
@@ -1567,6 +1566,19 @@ void memory_manager::allocate(device_memory_interface &memory)
 		if (spaceconfig != nullptr)
 			address_space::allocate(m_spacelist, *this, *spaceconfig, memory, spacenum);
 	}
+}
+
+//-------------------------------------------------
+//  configure - configure the address spaces
+//-------------------------------------------------
+
+void memory_manager::configure()
+{
+	// loop over devices to configure the address spaces
+	memory_interface_iterator iter(machine().root_device());
+	for (device_memory_interface &memory : iter)
+		memory.load_configs();
+	m_machine.m_dummy_space.load_configs();
 }
 
 //-------------------------------------------------
