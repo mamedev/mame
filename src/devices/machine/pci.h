@@ -200,7 +200,10 @@ public:
 	DECLARE_WRITE16_MEMBER(bridge_control_w);
 
 protected:
-	static constexpr int AS_PCI_CONFIG = 0;
+	enum
+	{
+		AS_PCI_CONFIG = 0
+	};
 
 	pci_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

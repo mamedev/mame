@@ -186,10 +186,13 @@ class isa8_device : public device_t,
 					public device_memory_interface
 {
 public:
-	static constexpr int AS_ISA_MEM    = 0;
-	static constexpr int AS_ISA_IO     = 1;
-	static constexpr int AS_ISA_MEMALT = 2;
-	static constexpr int AS_ISA_IOALT  = 3;
+	enum
+	{
+		AS_ISA_MEM    = 0,
+		AS_ISA_IO     = 1,
+		AS_ISA_MEMALT = 2,
+		AS_ISA_IOALT  = 3
+	};
 
 	// construction/destruction
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

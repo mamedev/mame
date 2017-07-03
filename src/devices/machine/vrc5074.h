@@ -72,8 +72,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	static constexpr int AS_PCI_MEM = 1;
-	static constexpr int AS_PCI_IO = 2;
+	enum
+	{
+		AS_PCI_MEM = 1,
+		AS_PCI_IO = 2
+	};
 
 	mips3_device *m_cpu;
 	const char *cpu_tag;

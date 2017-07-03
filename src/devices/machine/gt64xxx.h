@@ -113,8 +113,11 @@ protected:
 
 
 private:
-	static constexpr int AS_PCI_MEM = 1;
-	static constexpr int AS_PCI_IO = 2;
+	enum
+	{
+		AS_PCI_MEM = 1,
+		AS_PCI_IO = 2
+	};
 
 	struct galileo_timer
 	{
