@@ -11137,7 +11137,7 @@ ctornado                        // 20 1982.05 Tornado
 ctsttape                        // ?
 czeroize                        // 37 1983.10 Zeroize
 decocass                        //
-decomult						//
+decomult                        //
 
 @source:dectalk.cpp
 dectalk                         // 1983 Digital Equipment Corporation
@@ -17924,11 +17924,12 @@ unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
 @source:macp.cpp
-glxplay                       //
+glxplay                         //
 glxplay2                        //
 kidnap                          //
 mac_1808                        //
 macgalxy                        //
+macjungl                        //
 macjungn                        //
 nbamac                          //
 spcpnthr                        //
@@ -28248,7 +28249,7 @@ ncv1j                           // (c) 1995 (Japan)
 ncv1j2                          // (c) 1995 (Japan)
 ncv2                            // (c) 1996
 ncv2j                           // (c) 1996 (Japan)
-abcheck							// (c) 1996 (Japan)
+abcheck                         // (c) 1996 (Japan)
 
 @source:namcops2.cpp
 bldyr3b                         //
