@@ -485,7 +485,7 @@ void isa16_device::device_start()
 
 void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
 {
-	int buswidth = m_memwidth;
+	int buswidth = m_iowidth;
 	switch(buswidth)
 	{
 		case 16:

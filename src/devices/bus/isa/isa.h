@@ -226,6 +226,7 @@ public:
 	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
 	void install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
+	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
