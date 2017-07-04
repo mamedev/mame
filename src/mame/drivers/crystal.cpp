@@ -161,6 +161,42 @@ EMUL is an unpopulated 8 pin connector
 EEPROM is a 93C86 16K 5.0v Serial EEPROM (2048x8-bit or 1024x16-bit)
 CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
 
+
+ P's Attack non JAMMA standard 56pin Edge Connector Pinout:
+
+                          56pin Edge Connector
+          Solder Side            |             Parts Side
+------------------------------------------------------------------
+             GND             | A | 1 |             GND
+             GND             | B | 2 |             GND
+             +5              | C | 3 |             +5
+             +5              | D | 4 |             +5
+       Player 1 Start Lamp   | E | 5 |         Coin Lamp
+             +12             | F | 6 |             +12
+------------ KEY ------------| G | 7 |------------ KEY -----------
+       Player 1 Start Lamp   | H | 8 |        Coin Counter
+        L Speaker (-)        | J | 9 |        L Speaker (+)
+        R Speaker (-)        | K | 10|        R Speaker (+)
+        Video VSync          | L | 11|
+        Video Green          | M | 12|        Video Red
+        Video Sync           | N | 13|        Video Blue
+        Service Switch       | P | 14|        Video GND
+        Video HSync          | R | 15|        Test Switch
+                             | S | 16|        Coin Switch
+       Start Player 2        | T | 17|        Start Player 1 
+                             | U | 18|
+                             | V | 19|
+                             | W | 20|
+                             | X | 21|
+                             | Y | 22|
+                             | a | 23|
+                             | b | 24|
+                             | d | 25|
+                             | e | 26|
+             GND             | f | 27|             GND
+             GND             | g | 28|             GND
+
+
 TICKET is a 5 pin connector:
 
   1| +12v
@@ -171,6 +207,8 @@ TICKET is a 5 pin connector:
 
 GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 
+ GUN-1P: Left (Blue) Gun Connector Pinout
+
   1| GND
   2| SW
   3| +5v
@@ -178,7 +216,14 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
   5| SOL
   6| GND
 
+ GUN-2P: Right (Pink) Gun Connector Pinout
 
+  1| GND
+  2| SW
+  3| +5v
+  4| SENS
+  5| SOL
+  6| GND
 
 */
 
