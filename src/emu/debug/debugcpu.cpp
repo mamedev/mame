@@ -767,7 +767,8 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 void debugger_cpu::on_vblank(screen_device &device, bool vblank_state)
 {
 	/* just set a global flag to be consumed later */
-	m_vblank_occurred = true;
+	if (vblank_state)
+		m_vblank_occurred = true;
 }
 
 
