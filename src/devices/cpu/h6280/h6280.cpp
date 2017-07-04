@@ -169,6 +169,13 @@ h6280_device::h6280_device(const machine_config &mconfig, const char *tag, devic
 		m_opcode[op] = s_opcodetable[op];
 }
 
+std::vector<std::pair<int, const address_space_config *>> h6280_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 const h6280_device::ophandler h6280_device::s_opcodetable[256] =
 {
@@ -2564,7 +2571,7 @@ WRITE8_MEMBER( h6280_device::timer_w )
 	}
 }
 
-bool h6280_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (spacenum == AS_PROGRAM)
 		address = translated(address);

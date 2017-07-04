@@ -119,12 +119,6 @@ static ADDRESS_MAP_START( strnskil_map2, AS_PROGRAM, 8, strnskil_state )
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_device, write)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, strnskil_state )
-//  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(mcu_portk_r)
-//  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE(mcu_portr0_r, mcu_portr0_w)
-ADDRESS_MAP_END
-
 /****************************************************************************/
 
 static INPUT_PORTS_START( strnskil )
@@ -383,7 +377,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( banbam, strnskil )
 	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+//  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
+//  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))
+//  MCFG_MB88XX_WRITE_R0_CB(WRITE8(strnskil_state, mcu_portr0_w))
 MACHINE_CONFIG_END
 
 /****************************************************************************/

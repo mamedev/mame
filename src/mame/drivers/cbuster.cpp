@@ -9,8 +9,15 @@
 
   The 'FX' board is filled with 'FU' roms except for the 4 program roms,
   both boards have 'export' stickers which usually indicates a World version.
-  Maybe one is a UK or European version.
+  Maybe one is a UK or European version.  Some boards exist with 'FU-1' roms
+  which are binary identical to the FX roms.  
 
+  The FX/FU-1 roms are largely translation corrections from the first revision:
+  
+  THEIR SOLDIERS ARE ARMED WITH THE ADVANCED AND BIZARRE WEAPONS
+  -> THEIR SOLDIERS ARE ARMED WITH THE MOST ADVANCED AND BIZARRE WEAPONS.
+  etc
+  
   DE-0333-3 PCB
 
   Data East 59 - 64 pin (68k)
@@ -137,8 +144,8 @@ static ADDRESS_MAP_START( twocrude_map, AS_PROGRAM, 16, cbuster_state )
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
 	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
-	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(cbuster_palette_w) AM_SHARE("palette")
+	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(cbuster_palette_ext_w) AM_SHARE("palette_ext")
 	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
 ADDRESS_MAP_END
 
@@ -360,7 +367,8 @@ static MACHINE_CONFIG_START( twocrude )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/24) /* 1.3425MHz Verified */
+	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/24 * 3) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9) /* 3.58MHz Verified */
@@ -379,8 +387,8 @@ MACHINE_CONFIG_END
 
 ROM_START( cbuster )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "fx01.7l", 0x00000, 0x20000, CRC(ddae6d83) SHA1(ce3fed1393b71821730fb8d87869a89c8e07c456) )
-	ROM_LOAD16_BYTE( "fx00.4l", 0x00001, 0x20000, CRC(5bc2c0de) SHA1(fa9c357ae4a5c814b7113df3b2f12982077f3e6b) )
+	ROM_LOAD16_BYTE( "fx01.7l", 0x00000, 0x20000, CRC(ddae6d83) SHA1(ce3fed1393b71821730fb8d87869a89c8e07c456) ) // Same data exists with label fu01-1
+	ROM_LOAD16_BYTE( "fx00.4l", 0x00001, 0x20000, CRC(5bc2c0de) SHA1(fa9c357ae4a5c814b7113df3b2f12982077f3e6b) ) // Same data exists with label fu00-1
 	ROM_LOAD16_BYTE( "fx03.9l", 0x40000, 0x20000, CRC(c3d65bf9) SHA1(99dd650fd4b427bca25a0776fbd6221f93504106) )
 	ROM_LOAD16_BYTE( "fx02.6l", 0x40001, 0x20000, CRC(b875266b) SHA1(a76f8e061392e17394a3f975584823ad39e0097e) )
 

@@ -110,6 +110,7 @@ CPU_DISASSEMBLE( hp_5061_3001 );
 CPU_DISASSEMBLE( hp_nanoprocessor );
 CPU_DISASSEMBLE( hyperstone_generic );
 CPU_DISASSEMBLE( i4004 );
+CPU_DISASSEMBLE( i4040 );
 CPU_DISASSEMBLE( i8008 );
 CPU_DISASSEMBLE( i8051 );
 CPU_DISASSEMBLE( i8052 );
@@ -273,7 +274,7 @@ static const dasm_table_entry dasm_table[] =
 //  { "h8",          _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
 //  { "h8_24",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
 //  { "h8_32",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
-	{ "hc11",        _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
+	{ "hc11",        _8bit,  0, CPU_DISASSEMBLE_NAME(hc11) },
 	{ "hcd62121",    _8bit,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
 	{ "hd61700",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
 	{ "hd6301",      _8bit,  0, CPU_DISASSEMBLE_NAME(hd6301) },
@@ -284,6 +285,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hp_5061_3001",_16be, -1, CPU_DISASSEMBLE_NAME(hp_5061_3001) },
 	{ "hyperstone",  _16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
 	{ "i4004",       _8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
+	{ "i4040",       _8bit,  0, CPU_DISASSEMBLE_NAME(i4040) },
 	{ "i8008",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
 	{ "i8051",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8051) },
 	{ "i8052",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8052) },

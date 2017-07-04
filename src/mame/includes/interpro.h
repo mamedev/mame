@@ -19,19 +19,12 @@
 #include "machine/z80scc.h"
 #include "machine/mc146818.h"
 #include "machine/upd765.h"
-#if NEW_SCSI
-#include "machine/ncr5390.h"
 
+#include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
-#else
-#include "machine/ncr539x.h"
 
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
-#include "bus/scsi/scsihd.h"
-#endif
 #include "bus/rs232/rs232.h"
 
 #include "formats/pc_dsk.h"
@@ -52,6 +45,7 @@
 #define INTERPRO_FDC_TAG        "fdc"
 #define INTERPRO_SCSI_TAG       "scsi"
 #define INTERPRO_SCSI_ADAPTER_TAG    "adapter"
+#define INTERPRO_SCSI_DEVICE_TAG     INTERPRO_SCSI_TAG ":7:" INTERPRO_SCSI_ADAPTER_TAG
 
 #define INTERPRO_IOGA_TAG       "ioga"
 #define INTERPRO_MCGA_TAG       "mcga"
@@ -70,12 +64,8 @@ public:
 		m_scc2(*this, INTERPRO_SCC2_TAG),
 		m_rtc(*this, INTERPRO_RTC_TAG),
 		m_fdc(*this, INTERPRO_FDC_TAG),
-#if NEW_SCSI
 		m_scsibus(*this, INTERPRO_SCSI_TAG),
-		m_scsi(*this, INTERPRO_SCSI_TAG ":7:" INTERPRO_SCSI_ADAPTER_TAG),
-#else
-		m_scsi(*this, INTERPRO_SCSI_ADAPTER_TAG),
-#endif
+		m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG),
 		m_ioga(*this, INTERPRO_IOGA_TAG),
 		m_mcga(*this, INTERPRO_MCGA_TAG),
 		m_sga(*this, INTERPRO_SGA_TAG),
@@ -92,13 +82,8 @@ public:
 	required_device<z80scc_device> m_scc2;
 	required_device<mc146818_device> m_rtc;
 	required_device<n82077aa_device> m_fdc;
-#if NEW_SCSI
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr53c94_device> m_scsi;
-#else
-	required_device<ncr539x_device> m_scsi;
-#endif
-
+	required_device<ncr53c90a_device> m_scsi;
 	required_device<interpro_ioga_device> m_ioga;
 	required_device<interpro_fmcc_device> m_mcga;
 	required_device<interpro_sga_device> m_sga;
@@ -137,9 +122,9 @@ public:
 		CTRL1_FLOPRDY    = 0x0002,
 		CTRL1_LEDENA     = 0x0004,
 		CTRL1_LEDDP      = 0x0008,
-		CTRL1_ETHLOOP    = 0x0010,
+		CTRL1_ETHLOOP    = 0x0010, // remote modem loopback
 		CTRL1_ETHDTR     = 0x0020,
-		CTRL1_ETHRMOD    = 0x0040,
+		CTRL1_ETHRMOD    = 0x0040, // remote modem configured active low
 		CTRL1_CLIPRESET  = 0x0040,
 		CTRL1_FIFOACTIVE = 0x0080
 	};
@@ -176,8 +161,6 @@ public:
 
 	DECLARE_READ8_MEMBER(scsi_r);
 	DECLARE_WRITE8_MEMBER(scsi_w);
-	DECLARE_READ8_MEMBER(scsi_dma_r);
-	DECLARE_WRITE8_MEMBER(scsi_dma_w);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

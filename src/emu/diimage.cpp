@@ -96,7 +96,8 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_create_format(0),
 		m_create_args(nullptr),
 		m_user_loadable(true),
-		m_is_loading(false)
+		m_is_loading(false),
+		m_is_reset_and_loading(false)
 {
 }
 
@@ -1218,6 +1219,9 @@ void device_image_interface::reset_and_load(const std::string &path)
 
 	// and record the new load
 	device().machine().options().image_option(instance_name()).specify(path);
+
+	// record that we're reset and loading
+	m_is_reset_and_loading = true;
 }
 
 

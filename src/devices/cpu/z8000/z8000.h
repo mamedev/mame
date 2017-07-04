@@ -65,15 +65,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			default:         return nullptr;
-		}
-	}
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -126,12 +118,12 @@ protected:
 	inline uint32_t get_addr_operand(int opnum);
 	inline uint32_t get_raw_addr_operand(int opnum);
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr);
-	inline uint8_t RDMEM_B(address_spacenum spacenum, uint32_t addr);
-	inline uint16_t RDMEM_W(address_spacenum spacenum, uint32_t addr);
-	inline uint32_t RDMEM_L(address_spacenum spacenum, uint32_t addr);
-	inline void WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t value);
-	inline void WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t value);
-	inline void WRMEM_L(address_spacenum spacenum, uint32_t addr, uint32_t value);
+	inline uint8_t RDMEM_B(int spacenum, uint32_t addr);
+	inline uint16_t RDMEM_W(int spacenum, uint32_t addr);
+	inline uint32_t RDMEM_L(int spacenum, uint32_t addr);
+	inline void WRMEM_B(int spacenum, uint32_t addr, uint8_t value);
+	inline void WRMEM_W(int spacenum, uint32_t addr, uint16_t value);
+	inline void WRMEM_L(int spacenum, uint32_t addr, uint32_t value);
 	inline uint8_t RDPORT_B(int mode, uint16_t addr);
 	virtual uint16_t RDPORT_W(int mode, uint16_t addr);
 	inline void WRPORT_B(int mode, uint16_t addr, uint8_t value);
@@ -669,16 +661,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_DATA:    return &m_data_config;
-			case AS_IO:      return &m_io_config;
-			default:         return nullptr;
-		}
-	}
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }

@@ -26,14 +26,15 @@
 
 // ======================> sh7604_sci_device
 
-class sh7604_sci_device : public device_t,
-						  public device_memory_interface
+class sh7604_sci_device : public device_t
 {
 public:
 	// construction/destruction
 	sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
+	DECLARE_ADDRESS_MAP( sci_regs, 8 );
+
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
@@ -49,8 +50,6 @@ public:
 	DECLARE_READ8_MEMBER( serial_status_r );
 	DECLARE_WRITE8_MEMBER( serial_ack_w );
 	DECLARE_READ8_MEMBER( receive_data_r );
-
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 protected:
 	enum {

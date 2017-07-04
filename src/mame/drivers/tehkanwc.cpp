@@ -249,10 +249,10 @@ static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0xf812, 0xf812) AM_WRITE(gridiron_led1_w)
 	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
 	AM_RANGE(0xf820, 0xf820) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(sound_command_w)  /* answer from the sound CPU */
-	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
-	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITENOP           /* ?? writes 0x00 or 0xff */
+	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW2") AM_WRITE(sub_cpu_halt_w)
+	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW3") AM_WRITENOP           /* ?? writes 0x00 or 0xff */
 	AM_RANGE(0xf860, 0xf860) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(flipscreen_x_w)
-	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(flipscreen_y_w)
+	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_y_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8, tehkanwc_state )
@@ -290,8 +290,8 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( tehkanwc )
-	PORT_START("DSW1")  /* DSW1 - Active LOW */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_START("DSW2")  /* DSW2 - Active LOW */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING (   0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( 2C_3C ) )
@@ -300,7 +300,7 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_DIPSETTING (   0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING (   0x03, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING (   0x02, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING (   0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x38, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( 2C_3C ) )
@@ -309,19 +309,19 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_DIPSETTING (   0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING (   0x18, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING (   0x10, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Start Credits (P1&P2)/Extra" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Start Credits (P1&P2)/Extra" ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING (   0x80, "1&1/200%" )
 	PORT_DIPSETTING (   0xc0, "1&2/100%" )
 	PORT_DIPSETTING (   0x40, "2&2/100%" )
 	PORT_DIPSETTING (   0x00, "2&3/67%" )
 
-	PORT_START("DSW2")  /* DSW2 - Active LOW */
-	PORT_DIPNAME( 0x03, 0x03, "1P Game Time" )
+	PORT_START("DSW3")  /* DSW3 - Active LOW */
+	PORT_DIPNAME( 0x03, 0x03, "1P Game Time" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING (   0x00, "2:30" )
 	PORT_DIPSETTING (   0x01, "2:00" )
 	PORT_DIPSETTING (   0x03, "1:30" )
 	PORT_DIPSETTING (   0x02, "1:00" )
-	PORT_DIPNAME( 0x7c, 0x7c, "2P Game Time" )
+	PORT_DIPNAME( 0x7c, 0x7c, "2P Game Time" ) PORT_DIPLOCATION("SW3:3,4,5,6,7")
 	PORT_DIPSETTING (   0x00, "5:00/3:00 Extra" )
 	PORT_DIPSETTING (   0x60, "5:00/2:45 Extra" )
 	PORT_DIPSETTING (   0x20, "5:00/2:35 Extra" )
@@ -354,20 +354,20 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_DIPSETTING (   0x78, "1:00/0:45 Extra" )
 	PORT_DIPSETTING (   0x38, "1:00/0:35 Extra" )
 	PORT_DIPSETTING (   0x58, "1:00/0:30 Extra" )
-	PORT_DIPNAME( 0x80, 0x80, "Game Type" )
+	PORT_DIPNAME( 0x80, 0x80, "Game Type" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING (   0x80, "Timer In" )
 	PORT_DIPSETTING (   0x00, "Credit In" )
 
-	PORT_START("DSW3")  /* DSW3 - Active LOW */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_START("DSW1")  /* DSW1 - Active LOW */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING (   0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING (   0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x04, 0x04, "Timer Speed" )
+	PORT_DIPNAME( 0x04, 0x04, "Timer Speed" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING (   0x04, "60/60" )
 	PORT_DIPSETTING (   0x00, "55/60" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x08, DEF_STR( On ) )
 
@@ -394,6 +394,7 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("FAKE")  /* fake port to emulate trackballs with keyboard */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -406,41 +407,68 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tehkanwcd )
+	PORT_INCLUDE( tehkanwc )
+
+	PORT_MODIFY("DSW1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // DSW1 doesn't exist on this PCB?
+
+	PORT_MODIFY("P1BUT") /* IN0 - BUTTON */
+	/* DSW4 in test mode */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW4:1,2")
+	PORT_DIPSETTING (   0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING (   0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING (   0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x04, 0x04, "Timer Speed" ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING (   0x04, "60/60" )
+	PORT_DIPSETTING (   0x00, "55/60" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x08, DEF_STR( On ) )
+
+	PORT_MODIFY("P2BUT") /* IN1 - BUTTON */
+	/* DSW5 in test mode */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW5:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW5:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW5:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW5:4" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( gridiron )
-	PORT_START("DSW1")  /* DSW1 - Active LOW */
-	PORT_DIPNAME( 0x03, 0x03, "Start Credits (P1&P2)/Extra" )
+	PORT_START("DSW2")  /* DSW2 - Active LOW */
+	PORT_DIPNAME( 0x03, 0x03, "Start Credits (P1&P2)/Extra" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING (   0x01, "1&1/200%" )
 	PORT_DIPSETTING (   0x03, "1&2/100%" )
-//  PORT_DIPSETTING (   0x00, "2&1/200%" )              // Is this setting possible ?
+	PORT_DIPSETTING (   0x00, "2&1/200% (duplicate)" )
 	PORT_DIPSETTING (   0x02, "2&2/100%" )
 	/* This Dip Switch only has an effect in a 2 players game.
 	   If offense player selects his formation before defense player,
 	   defense formation time will be set to 3, 5 or 7 seconds.
 	   Check code at 0x3ed9 and table at 0x3f89. */
-	PORT_DIPNAME( 0x0c, 0x0c, "Formation Time (Defense)" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Formation Time (Defense)" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING (   0x0c, "Same as Offense" )
 	PORT_DIPSETTING (   0x00, "7" )
 	PORT_DIPSETTING (   0x08, "5" )
 	PORT_DIPSETTING (   0x04, "3" )
-	PORT_DIPNAME( 0x30, 0x30, "Timer Speed" )
+	PORT_DIPNAME( 0x30, 0x30, "Timer Speed" ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING (   0x30, "60/60" )
 	PORT_DIPSETTING (   0x00, "57/60" )
 	PORT_DIPSETTING (   0x10, "54/60" )
 	PORT_DIPSETTING (   0x20, "50/60" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Formation Time (Offense)" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Formation Time (Offense)" ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING (   0x00, "25" )
 	PORT_DIPSETTING (   0x40, "20" )
 	PORT_DIPSETTING (   0xc0, "15" )
 	PORT_DIPSETTING (   0x80, "10" )
 
-	PORT_START("DSW2")  /* DSW2 - Active LOW */
-	PORT_DIPNAME( 0x03, 0x03, "1P Game Time" )
+	PORT_START("DSW3")  /* DSW3 - Active LOW */
+	PORT_DIPNAME( 0x03, 0x03, "1P Game Time" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING (   0x00, "2:30" )
 	PORT_DIPSETTING (   0x01, "2:00" )
 	PORT_DIPSETTING (   0x03, "1:30" )
 	PORT_DIPSETTING (   0x02, "1:00" )
-	PORT_DIPNAME( 0x7c, 0x7c, "2P Game Time" )
+	PORT_DIPNAME( 0x7c, 0x7c, "2P Game Time" ) PORT_DIPLOCATION("SW3:3,4,5,6,7")
 	PORT_DIPSETTING (   0x60, "5:00/3:00 Extra" )
 	PORT_DIPSETTING (   0x00, "5:00/2:45 Extra" )
 	PORT_DIPSETTING (   0x20, "5:00/2:35 Extra" )
@@ -473,11 +501,11 @@ static INPUT_PORTS_START( gridiron )
 	PORT_DIPSETTING (   0x18, "1:00/0:45 Extra" )
 	PORT_DIPSETTING (   0x38, "1:00/0:35 Extra" )
 	PORT_DIPSETTING (   0x58, "1:00/0:30 Extra" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )      // Check code at 0x14b4
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW3:8")      // Check code at 0x14b4
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 
-	PORT_START("DSW3")  /* no DSW3 */
+	PORT_START("DSW1")  /* no DSW1 */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1X")   /* IN0 - X AXIS */
@@ -510,46 +538,48 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( teedoff )
-	PORT_START("DSW1")  /* DSW1 - Active LOW */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_START("DSW2")  /* DSW2 - Active LOW */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING (   0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING (   0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (   0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x30, 0x30, "Balls" )
+	PORT_DIPNAME( 0x30, 0x30, "Balls" ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING (   0x30, "5" )
 	PORT_DIPSETTING (   0x20, "6" )
 	PORT_DIPSETTING (   0x10, "7" )
 	PORT_DIPSETTING (   0x00, "8" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          // Check code at 0x0c5c
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:7")         // Check code at 0x0c5c
 	PORT_DIPSETTING (   0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING (   0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )      // Check code at 0x5dd0
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")     // Check code at 0x5dd0
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 
-	PORT_START("DSW2")  /* DSW2 - Active LOW */
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x18, 0x18, "Penalty (Over Par)" )        // Check table at 0x2d67
+	PORT_START("DSW3")  /* DSW3 - Active LOW */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPNAME( 0x18, 0x18, "Penalty (Over Par)" ) PORT_DIPLOCATION("SW3:4,5")        // Check table at 0x2d67
 	PORT_DIPSETTING (   0x10, "1/1/2/3/4" )             // +1 / +2 / +3 / +4 / +5 or +6
 	PORT_DIPSETTING (   0x18, "1/2/3/3/4" )
 	PORT_DIPSETTING (   0x08, "1/2/3/4/4" )
 	PORT_DIPSETTING (   0x00, "2/3/3/4/4" )
-	PORT_DIPNAME( 0x20, 0x20, "Bonus Balls (Multiple coins)" )
+	PORT_DIPNAME( 0x20, 0x20, "Bonus Balls (Multiple coins)" ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING (   0x20, DEF_STR( None ) )
 	PORT_DIPSETTING (   0x00, "+1" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Difficulty?" )               // Check table at 0x5df9
+	PORT_DIPNAME( 0xc0, 0xc0, "Difficulty?" )  PORT_DIPLOCATION("SW3:7,8")               // Check table at 0x5df9
 	PORT_DIPSETTING (   0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING (   0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING (   0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( Hardest ) )
 
-	PORT_START("DSW3")  /* no DSW3 */
+	PORT_START("DSW1")  /* no DSW1 */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1X")   /* IN0 - X AXIS */
@@ -941,8 +971,8 @@ ROM_END
 
 
 GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb, tehkanwc, tehkanwc_state, 0,       ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb, tehkanwc, tehkanwc_state, 0,       ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
-GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
 GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
 GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, teedoff,  ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )

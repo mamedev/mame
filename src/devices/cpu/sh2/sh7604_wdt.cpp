@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SH7604_WDT, sh7604_wdt_device, "sh7604wdt", "SH7604 Watchdog 
 //  LIVE DEVICE
 //**************************************************************************
 
-static ADDRESS_MAP_START( wdt_regs, AS_0, 8, sh7604_wdt_device )
+DEVICE_ADDRESS_MAP_START( wdt_regs, 8, sh7604_wdt_device )
 //  AM_RANGE(0x00, 0x00) timer control/status
 //  AM_RANGE(0x01, 0x01) timer counter
 //  AM_RANGE(0x02, 0x02) write only, reset control register
@@ -40,16 +40,7 @@ ADDRESS_MAP_END
 
 sh7604_wdt_device::sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7604_WDT, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_space_config("regs", ENDIANNESS_BIG, 8, 4, 0, nullptr, *ADDRESS_MAP_NAME(wdt_regs))
-
 {
-}
-
-
-const address_space_config *sh7604_wdt_device::memory_space_config(address_spacenum spacenum) const
-{
-	return &m_space_config;
 }
 
 

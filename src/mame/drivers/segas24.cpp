@@ -1182,7 +1182,7 @@ static ADDRESS_MAP_START( hotrod_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xc00010, 0xc00011) AM_MIRROR(0x07ffe0) AM_DEVREADWRITE8("pedaladc", msm6253_device, d7_r, select_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas24_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas24_state )
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 

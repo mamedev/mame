@@ -939,22 +939,12 @@ MACHINE_CONFIG_START( md_ntsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( dcat16_megadriv )
+MACHINE_CONFIG_START( dcat16_megadriv_base )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dcat16_megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
-
-	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
-
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
-
-//  has SD card slot instead?
-//  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
-//  MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/

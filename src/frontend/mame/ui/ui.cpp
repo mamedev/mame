@@ -986,6 +986,7 @@ void mame_ui_manager::draw_profiler(render_container &container)
 
 void mame_ui_manager::start_save_state()
 {
+	ui::menu::stack_reset(machine());
 	show_menu();
 	ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container());
 }
@@ -997,6 +998,7 @@ void mame_ui_manager::start_save_state()
 
 void mame_ui_manager::start_load_state()
 {
+	ui::menu::stack_reset(machine());
 	show_menu();
 	ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container());
 }
@@ -1401,6 +1403,16 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 			void *param = (void *)&exec.device();
 			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
 			sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
+		}
+		for (device_sound_interface &snd : sound_interface_iterator(machine.root_device()))
+		{
+			device_execute_interface *exec;
+			if (!snd.device().interface(exec) && snd.device().unscaled_clock() != 0)
+			{
+				void *param = (void *)&snd.device();
+				std::string str = string_format(_("Overclock %1$s sound"), snd.device().tag());
+				sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
+			}
 		}
 	}
 
@@ -2187,7 +2199,7 @@ void mame_ui_manager::save_main_option()
 	for (const auto &f_entry : machine().options().entries())
 	{
 		const char *value = f_entry->value();
-		if (value && strcmp(value, options.value(f_entry->name().c_str())))
+		if (value && options.exists(f_entry->name()) && strcmp(value, options.value(f_entry->name().c_str())))
 		{
 			options.set_value(f_entry->name(), *f_entry->value(), OPTION_PRIORITY_CMDLINE);
 		}

@@ -43,7 +43,7 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 	}
 }
 
-static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, pecom_state )
+static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8, pecom_state )
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
 ADDRESS_MAP_END
 

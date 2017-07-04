@@ -282,14 +282,6 @@ static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8, jtces40_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM//BANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_io, AS_IO, 8, jtc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_NOP // A8-A15
-	AM_RANGE(0x01, 0x01) AM_NOP // AD0-AD7
-	AM_RANGE(0x02, 0x02) AM_WRITE(p2_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(p3_r, p3_w)
-ADDRESS_MAP_END
-
 /* Input Ports */
 
 static INPUT_PORTS_START( jtc )
@@ -724,7 +716,9 @@ static MACHINE_CONFIG_START( basic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(UB8830D_TAG, UB8830D, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(jtc_mem)
-	MCFG_CPU_IO_MAP(jtc_io)
+	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(jtc_state, p2_w))
+	MCFG_Z8_PORT_P3_READ_CB(READ8(jtc_state, p3_r))
+	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(jtc_state, p3_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -59,7 +59,7 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _map)
 
 #define MCFG_DEVICE_DECRYPTED_OPCODES_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_DECRYPTED_OPCODES, _map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_OPCODES, _map)
 
 
 
@@ -79,46 +79,48 @@ public:
 	virtual ~device_memory_interface();
 
 	// configuration access
-	address_map_constructor address_map(address_spacenum spacenum = AS_0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : nullptr; }
-	const address_space_config *space_config(address_spacenum spacenum = AS_0) const { return memory_space_config(spacenum); }
+	address_map_constructor address_map(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_map.size()) ? m_address_map[spacenum] : nullptr; }
+	const address_space_config *space_config(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_config.size()) ? m_address_config[spacenum] : nullptr; }
+	int max_space_count() const { return m_address_config.size(); }
 
 	// static inline configuration helpers
-	static void static_set_addrmap(device_t &device, address_spacenum spacenum, address_map_constructor map);
+	static void static_set_addrmap(device_t &device, int spacenum, address_map_constructor map);
+	void set_addrmap(int spacenum, address_map_constructor map);
 
 	// basic information getters
-	bool has_space(int index = 0) const { return (m_addrspace[index] != nullptr); }
-	bool has_space(address_spacenum index) const { return (m_addrspace[int(index)] != nullptr); }
-	bool has_configured_map(int index = 0) const { return (m_address_map[index] != nullptr); }
-	bool has_configured_map(address_spacenum index) const { return (m_address_map[int(index)] != nullptr); }
-	address_space &space(int index = 0) const { assert(m_addrspace[index] != nullptr); return *m_addrspace[index]; }
-	address_space &space(address_spacenum index) const { assert(m_addrspace[int(index)] != nullptr); return *m_addrspace[int(index)]; }
+	bool has_space(int index = 0) const { return index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]; }
+	bool has_configured_map(int index = 0) const { return index >= 0 && index < int(m_address_map.size()) && m_address_map[index]; }
+	address_space &space(int index = 0) const { assert(index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]); return *m_addrspace[index]; }
 
 	// address space accessors
-	void set_address_space(address_spacenum spacenum, address_space &space);
+	void set_address_space(int spacenum, address_space &space);
 
 	// address translation
-	bool translate(address_spacenum spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
+	bool translate(int spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
 
 	// deliberately ambiguous functions; if you have the memory interface
 	// just use it
 	device_memory_interface &memory() { return *this; }
 
+	void load_configs();
+
 protected:
 	// required overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const = 0;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const = 0;
 
 	// optional operation overrides
-	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
 
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
 
 	// configuration
-	address_map_constructor m_address_map[ADDRESS_SPACES]; // address maps for each address space
+	std::vector<address_map_constructor> m_address_map; // address maps for each address space
 
 private:
 	// internal state
-	address_space *     m_addrspace[ADDRESS_SPACES]; // reported address spaces
+	std::vector<const address_space_config *> m_address_config; // configuration for each space
+	std::vector<address_space *>              m_addrspace; // reported address spaces
 };
 
 // iterator

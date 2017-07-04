@@ -179,6 +179,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4andycp)
 	//Front door code 39 Cash door code 38
 }
 
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 #define M4ANDYCP_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \

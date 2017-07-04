@@ -7,8 +7,7 @@
   TODO:
   - EXKSA, EXKFA opcodes
   - SM500 data book suggests that R1 divider output is selectable, but how?
-  - unknown which H/O pin is which W output, guessed for now
-  - ACL doesn't work right?
+  - unknown which O group is which W output, guessed for now (segments and H should be ok)
 
 */
 
@@ -36,15 +35,23 @@ ADDRESS_MAP_END
 
 // device definitions
 sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 6 /* o mask */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_2k), 6 /* data width */, ADDRESS_MAP_NAME(data_4x10x4))
+	: sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 7 /* o group pins */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_2k), 6 /* data width */, ADDRESS_MAP_NAME(data_4x10x4))
 {
 }
 
-sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
 	m_write_o(*this),
-	m_o_mask(o_mask)
+	m_o_pins(o_pins)
 {
+}
+
+
+// disasm
+offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+{
+	extern CPU_DISASSEMBLE(sm500);
+	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -91,20 +98,12 @@ void sm500_device::device_reset()
 	sm510_base_device::device_reset();
 
 	// SM500 specific
+	push_stack();
 	op_idiv();
 	m_1s = true;
 	m_cb = 0;
 	m_rsub = false;
 	m_r = 0xf;
-}
-
-
-
-// disasm
-offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
-{
-	extern CPU_DISASSEMBLE(sm500);
-	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -118,11 +117,11 @@ void sm500_device::lcd_update()
 	// 2 columns
 	for (int h = 0; h < 2; h++)
 	{
-		for (int o = 0; o <= m_o_mask; o++)
+		for (int o = 0; o < m_o_pins; o++)
 		{
 			// 4 segments per group
-			u8 seg = h ? m_o[o] : m_ox[o];
-			m_write_o(h << 4 | o, m_bp ? seg : 0, 0xff);
+			u8 seg = h ? m_ox[o] : m_o[o];
+			m_write_o(o << 1 | h, m_bp ? seg : 0, 0xff);
 		}
 	}
 }

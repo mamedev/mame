@@ -790,7 +790,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( portfolio_lcdc )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_lcdc, AS_0, 8, portfolio_state )
+static ADDRESS_MAP_START( portfolio_lcdc, 0, 8, portfolio_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
@@ -1027,7 +1027,7 @@ static MACHINE_CONFIG_START( portfolio )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, portfolio_lcdc)
+	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)
 	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 

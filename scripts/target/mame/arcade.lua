@@ -103,7 +103,7 @@ CPUS["MINX"] = true
 CPUS["SSEM"] = true
 CPUS["AVR8"] = true
 --CPUS["TMS1000"] = true
-CPUS["I4004"] = true
+CPUS["MCS40"] = true
 CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
 CPUS["I8008"] = true
@@ -1629,6 +1629,8 @@ files {
 	MAME_DIR .. "src/mame/machine/deco146.h",
 	MAME_DIR .. "src/mame/video/decbac06.cpp",
 	MAME_DIR .. "src/mame/video/decbac06.h",
+	MAME_DIR .. "src/mame/video/decrmc3.cpp",
+	MAME_DIR .. "src/mame/video/decrmc3.h",
 	MAME_DIR .. "src/mame/video/deco16ic.cpp",
 	MAME_DIR .. "src/mame/video/deco16ic.h",
 	MAME_DIR .. "src/mame/video/decocomn.cpp",
@@ -2792,7 +2794,6 @@ createMAMEProjects(_target, _subtarget, "neogeo")
 files {
 	MAME_DIR .. "src/mame/drivers/neogeo.cpp",
 	MAME_DIR .. "src/mame/includes/neogeo.h",
-	MAME_DIR .. "src/mame/drivers/neodriv.hxx",
 	MAME_DIR .. "src/mame/video/neogeo.cpp",
 	MAME_DIR .. "src/mame/drivers/neopcb.cpp",
 	MAME_DIR .. "src/mame/video/neogeo_spr.cpp",
@@ -3147,6 +3148,7 @@ files {
 	MAME_DIR .. "src/mame/includes/kopunch.h",
 	MAME_DIR .. "src/mame/video/kopunch.cpp",
 	MAME_DIR .. "src/mame/drivers/lindbergh.cpp",
+	MAME_DIR .. "src/mame/drivers/sderby2.cpp",
 	MAME_DIR .. "src/mame/machine/segabb.cpp",
 	MAME_DIR .. "src/mame/machine/segabb.h",
 	MAME_DIR .. "src/mame/machine/megadriv.cpp",

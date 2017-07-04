@@ -65,9 +65,11 @@ void er2055_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *er2055_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> er2055_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

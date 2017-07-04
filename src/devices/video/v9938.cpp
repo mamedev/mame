@@ -132,6 +132,13 @@ v9958_device::v9958_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> v99x8_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_DATA, &m_space_config)
+	};
+}
+
 
 void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {

@@ -1161,12 +1161,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, cave_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, cave_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank1")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, AS_0, 8, cave_state )
+static ADDRESS_MAP_START( oki2_map, 0, 8, cave_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki2bank1")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2bank2")
 ADDRESS_MAP_END
@@ -2307,7 +2307,7 @@ static MACHINE_CONFIG_START( hotdogst )
 
 	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/16, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2410,7 +2410,7 @@ static MACHINE_CONFIG_START( mazinger )
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2463,11 +2463,11 @@ static MACHINE_CONFIG_START( metmqstr )
 
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz / 16 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2713,11 +2713,11 @@ static MACHINE_CONFIG_START( sailormn )
 
 	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 
 
 MACHINE_CONFIG_END

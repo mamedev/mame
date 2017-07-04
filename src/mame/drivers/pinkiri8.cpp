@@ -111,7 +111,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 	address_space_config        m_space_config;
 };
 
@@ -145,9 +145,11 @@ void janshi_vdp_device::device_validity_check(validity_checker &valid) const {}
 void janshi_vdp_device::device_start() {}
 void janshi_vdp_device::device_reset() {}
 
-const address_space_config *janshi_vdp_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> janshi_vdp_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 void pinkiri8_state::video_start() {}

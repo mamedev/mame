@@ -1525,12 +1525,12 @@ static ADDRESS_MAP_START( vfive_v25_mem, AS_PROGRAM, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fixeightbl_oki, AS_0, 8, toaplan2_state )
+static ADDRESS_MAP_START( fixeightbl_oki, 0, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( enmadaio_oki, AS_0, 8, toaplan2_state )
+static ADDRESS_MAP_START( enmadaio_oki, 0, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -3801,7 +3801,7 @@ static MACHINE_CONFIG_START( fixeightbl )
 
 	MCFG_OKIM6295_ADD("oki", XTAL_14MHz/16, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, fixeightbl_oki)
+	MCFG_DEVICE_ADDRESS_MAP(0, fixeightbl_oki)
 MACHINE_CONFIG_END
 
 
@@ -3989,7 +3989,7 @@ static MACHINE_CONFIG_START( enmadaio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, PIN7_LOW) // pin7 not confirmed
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, enmadaio_oki)
+	MCFG_DEVICE_ADDRESS_MAP(0, enmadaio_oki)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

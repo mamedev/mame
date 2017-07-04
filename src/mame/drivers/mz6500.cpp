@@ -132,7 +132,7 @@ static SLOT_INTERFACE_START( mz6500_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, mz6500_state )
+static ADDRESS_MAP_START( upd7220_map, 0, 16, mz6500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( mz6500 )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz6500_state, hgdc_display_pixels)
 
 	MCFG_UPD765A_ADD("upd765", true, true)

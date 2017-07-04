@@ -1407,6 +1407,27 @@ ROM_START( logger ) // actual ROM label has "Century Elect. Ltd. (c)1981", and L
 	CVS_COMMON_ROMS
 ROM_END
 
+ROM_START( loggerr2 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "logger_r2_gp1_11ce.1", 0x0000, CRC(02b0a75e) SHA1(06fbfa3a31e104da86f21ef8f600715224b7f332) ) // hand written LOGGER R2 GP1 11CE
+	ROM_LOAD_STAGGERED( "logger_r2_gp2_5265.2", 0x0400, CRC(3285aa08) SHA1(f5c8496b2d33229572d4442f703a2aaf93f1403f) ) // hand written LOGGER R2 GP2 5265
+	ROM_LOAD_STAGGERED( "logger_r2_gp3_da04.3", 0x0800, CRC(d6a2a442) SHA1(7da009f8d3d4fb0b6624cd46ecae08675c317905) ) // hand written LOGGER R2 GP3 DA04
+	ROM_LOAD_STAGGERED( "logger_r2_gp4_657b.4", 0x0c00, CRC(608b551c) SHA1(f2fde14860606f501ab0046fbe4dca0b97eb2481) ) // hand written LOGGER R2 GP4 657B
+	ROM_LOAD_STAGGERED( "logger_r2_gp5_c2d5.5", 0x1000, CRC(3d8ecdcd) SHA1(c9ea38aee898a4ac6cb6409da819d1a053088526) ) // hand written LOGGER R2 GP5 C2D5
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "logger_sdp1_414a.6", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) ) // hand written LOGGER SDP1 414A
+
+	CVS_ROM_REGION_SPEECH_DATA( "logger_sp1_4626.8", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) ) // hand written LOGGER SP1 4626
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_LOAD( "logger_r2_cp1_d9cf.11", 0x0000, 0x0800, CRC(a1c1eb8c) SHA1(9fa2495b1b245f5889006cfc8857f51e57379cef) ) // hand written LOGGER R2 CP1 D9CF
+	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP2 CD1E
+	ROM_LOAD( "logger_r2_cp3_5535.9",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
+
+	CVS_COMMON_ROMS
+ROM_END
+
 ROM_START( cosmos )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_STAGGERED( "cs-gp1.bin", 0x0000, CRC(7eb96ddf) SHA1(f7456ee1ace03ab98c4e8128d375464122c4df01) )
@@ -1632,7 +1653,8 @@ GAME( 1981, darkwar,   0,        cvs,     darkwar,  cvs_state, 0,         ROT90,
 GAME( 1981, spacefrt,  0,        cvs,     spacefrt, cvs_state, 0,         ROT90, "Century Electronics", "Space Fortress (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, 8ball,     0,        cvs,     8ball,    cvs_state, 0,         ROT90, "Century Electronics", "Video Eight Ball", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, 8ball1,    8ball,    cvs,     8ball,    cvs_state, 0,         ROT90, "Century Electronics", "Video Eight Ball (Rev.1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, logger,    0,        cvs,     logger,   cvs_state, 0,         ROT90, "Century Electronics", "Logger", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, logger,    0,        cvs,     logger,   cvs_state, 0,         ROT90, "Century Electronics", "Logger (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loggerr2,  logger,   cvs,     logger,   cvs_state, 0,         ROT90, "E T Marketing",       "Logger (Rev.2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dazzler,   0,        cvs,     dazzler,  cvs_state, 0,         ROT90, "Century Electronics", "Dazzler", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wallst,    0,        cvs,     wallst,   cvs_state, 0,         ROT90, "Century Electronics", "Wall Street", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, radarzon,  0,        cvs,     radarzon, cvs_state, 0,         ROT90, "Century Electronics", "Radar Zone", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

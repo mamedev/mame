@@ -2213,7 +2213,7 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE(cps3_0xc0000000_ram_w ) AM_SHARE("0xc0000000_ram") /* Executes code from here */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 32, cps3_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 32, cps3_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("bios", 0) // Bios ROM
 	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_SHARE("decrypted_gamerom")
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_ROM AM_SHARE("0xc0000000_ram_decrypted")

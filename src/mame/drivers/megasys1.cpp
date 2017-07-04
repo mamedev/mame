@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM /*_WRITE(ram_w)*/ AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megasys1D_oki_map, AS_0, 8, megasys1_state )
+static ADDRESS_MAP_START( megasys1D_oki_map, 0, 8, megasys1_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -1803,7 +1803,7 @@ static MACHINE_CONFIG_START( system_D )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, PIN7_HIGH)    /* 2MHz (8MHz / 4) */
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, megasys1D_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, megasys1D_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3645,8 +3645,19 @@ ROM_START( rodlandj )
 	ROM_LOAD( "PS89013A.M14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
-/* probably a prototype, original JP key and unscrambled ROMs, incorrect
-   audio matches PCB */
+/*
+
+Prototype or test location. Original Japanese key and unscrambled ROMs, incorrect audio matches actual PCB.
+
+Title is controlled by the value at 0xF0D7A  - 0x00 for Japan region and Rod-Land title / 0x01 for Export and R&T title.
+ These same locations and values work for the Japanese set, but not the Export version.  In R&T 0xF0D7A is initialized to 0x01
+
+To access the hidden Location Test Table, during the attaction mode at the title screen with NO Coins / Credits, use Player 1
+ controls to enter:
+
+  D U B1 D D B2 U U B1 B2
+
+ */
 ROM_START( rittam )
 	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "2.ROM2", 0x000000, 0x020000, CRC(93085af2) SHA1(e49dc1e62c1cec75f192ac4608f69c4361ad739a) )
@@ -4613,7 +4624,7 @@ GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, std
 GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )

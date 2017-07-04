@@ -108,6 +108,14 @@ void hp_nanoprocessor_device::device_reset()
 	dc_update();
 }
 
+std::vector<std::pair<int, const address_space_config *>> hp_nanoprocessor_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
 void hp_nanoprocessor_device::execute_run()
 {
 	do {

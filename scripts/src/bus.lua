@@ -849,6 +849,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/intellec4/intellec4.h,BUSES["INTELLEC4"] = true
+---------------------------------------------------
+
+if (BUSES["INTELLEC4"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/intv/slot.h,BUSES["INTV"] = true
 ---------------------------------------------------
 
@@ -3085,5 +3098,25 @@ if (BUSES["PC1512"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/cbus/pc9801_cbus.h,BUSES["CBUS"] = true
+---------------------------------------------------
+
+if (BUSES["CBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
 	}
 end

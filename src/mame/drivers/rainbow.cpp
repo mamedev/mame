@@ -3206,7 +3206,7 @@ GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
 // Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, rainbow_state)
+static ADDRESS_MAP_START( upd7220_map, 0, 16, rainbow_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 
@@ -3243,7 +3243,7 @@ MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_vide
 MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
 MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
-MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(rainbow_state, hgdc_display_pixels)
 MCFG_VIDEO_SET_SCREEN("screen2") // SET_SCREEN needs to be added after 7720 device in the machine config, not after the screen.
 MCFG_PALETTE_ADD("palette2", 32)

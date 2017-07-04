@@ -22838,6 +22838,7 @@ a contest among doujin programmers...  -->
 		<description>Chourensha 68k (v1.01)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="超連射68K" />
 		<info name="developer" value="Famibe no Yosshin" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -22846,10 +22847,24 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="chorensa100" cloneof="chorensa">
+		<description>Chourensha 68k (v1.00)</description>
+		<year>1995</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="超連射68K" />
+		<info name="developer" value="Famibe no Yosshin" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1261824">
+				<rom name="chourensha 68k v1.00.dim" size="1261824" crc="7ffdadb8" sha1="8bf616f9fead4a776afa9ebc3c8c14f79f69a35f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chorensa045" cloneof="chorensa">
 		<description>Chourensha 68k (v0.45)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="超連射68K" />
 		<info name="developer" value="Famibe no Yosshin" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -22862,6 +22877,7 @@ a contest among doujin programmers...  -->
 		<description>Chourensha 68k (v0.35)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="超連射68K" />
 		<info name="developer" value="Famibe no Yosshin" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -22874,6 +22890,7 @@ a contest among doujin programmers...  -->
 		<description>Chourensha 68k (v0.10)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="超連射68K" />
 		<info name="developer" value="Famibe no Yosshin" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">

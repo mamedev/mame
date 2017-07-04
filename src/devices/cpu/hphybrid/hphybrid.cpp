@@ -152,6 +152,14 @@ hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> hp_hybrid_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
 void hp_hybrid_cpu_device::device_start()
 {
 	m_reg_A = 0;

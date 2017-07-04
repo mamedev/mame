@@ -127,6 +127,14 @@ dsp56k_device::dsp56k_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> dsp56k_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/

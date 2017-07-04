@@ -16,7 +16,7 @@
 
 // I/O ports setup
 
-// LCD segment outputs: H1/2 as a4, O group as a0-a3, O data as d0-d3
+// LCD segment outputs: H1/2 as a0, O group as a1-a4, O data as d0-d3
 #define MCFG_SM500_WRITE_O_CB(_devcb) \
 	devcb = &sm500_device::set_write_o_callback(*device, DEVCB_##_devcb);
 
@@ -83,7 +83,7 @@ public:
 	template <class Object> static devcb_base &set_write_o_callback(device_t &device, Object &&cb) { return downcast<sm500_device &>(device).m_write_o.set_callback(std::forward<Object>(cb)); }
 
 protected:
-	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -99,7 +99,7 @@ protected:
 	devcb_write8 m_write_o;
 	virtual void lcd_update() override;
 
-	int m_o_mask; // number of 4-bit O pins minus 1
+	int m_o_pins; // number of 4-bit O pins
 	u8 m_ox[9];   // W' latch, max 9
 	u8 m_o[9];    // W latch
 	u8 m_cn;
@@ -111,7 +111,7 @@ protected:
 
 	void shift_w();
 	u8 get_digit();
-	void set_su(u8 su) { m_stack[0] = (m_stack[0] & ~0x3c0) | (su << 6); }
+	void set_su(u8 su) { m_stack[0] = (m_stack[0] & ~0x3c0) | (su << 6 & 0x3c0); }
 	u8 get_su() { return m_stack[0] >> 6 & 0xf; }
 	virtual int get_trs_field() { return 0; }
 
@@ -153,7 +153,7 @@ public:
 	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;

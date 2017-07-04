@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/pc9801_86.h"
+#include "bus/cbus/pc9801_86.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 

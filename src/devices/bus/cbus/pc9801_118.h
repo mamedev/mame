@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_PC9801_118_H
-#define MAME_MACHINE_PC9801_118_H
+#ifndef MAME_BUS_CBUS_PC9801_118_H
+#define MAME_BUS_CBUS_PC9801_118_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ DECLARE_DEVICE_TYPE(PC9801_118, pc9801_118_device)
 
 
 
-#endif // MAME_MACHINE_PC9801_118_H
+#endif // MAME_BUS_CBUS_PC9801_118_H

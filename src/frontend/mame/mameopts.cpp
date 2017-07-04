@@ -160,6 +160,10 @@ void mame_options::populate_hashpath_from_args_and_inis(emu_options &options, co
 
 	// parse the command line
 	emu_options temp_options(emu_options::option_support::GENERAL_AND_SYSTEM);
+
+	// pick up whatever changes the osd did to the default inipath
+	temp_options.set_default_value(OPTION_INIPATH, options.ini_path());
+
 	try
 	{
 		temp_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE, true);

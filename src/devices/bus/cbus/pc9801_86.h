@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_PC9801_86_H
-#define MAME_MACHINE_PC9801_86_H
+#ifndef MAME_BUS_CBUS_PC9801_86_H
+#define MAME_BUS_CBUS_PC9801_86_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ DECLARE_DEVICE_TYPE(PC9801_86, pc9801_86_device)
 
 
 
-#endif // MAME_MACHINE_PC9801_86_H
+#endif // MAME_BUS_CBUS_PC9801_86_H

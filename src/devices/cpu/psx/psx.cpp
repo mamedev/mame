@@ -3385,6 +3385,12 @@ void psxcpu_device::set_disable_rom_berr(bool mode)
 	m_disable_rom_berr = mode;
 }
 
+std::vector<std::pair<int, const address_space_config *>> psxcpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+	};
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

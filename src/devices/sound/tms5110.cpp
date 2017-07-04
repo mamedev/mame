@@ -1249,14 +1249,12 @@ void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /******************************************************************************
 
      tms5110_set_frequency -- adjusts the playback frequency
-     TODO: kill this function; we should be adjusting the tms51xx device clock itself,
-     not setting it here!
 
 ******************************************************************************/
 
-void tms5110_device::set_frequency(int frequency)
+void tms5110_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(frequency / 80);
+	m_stream->set_sample_rate(clock() / 80);
 }
 
 

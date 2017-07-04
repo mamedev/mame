@@ -233,8 +233,12 @@ void running_machine::start()
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
-	// first load ROMs, then populate memory, and finally initialize CPUs
-	// these operations must proceed in this order
+	// configure the address spaces, load ROMs (which needs
+	// width/endianess of the spaces), then populate memory (which
+	// needs rom bases), and finally initialize CPUs (which needs
+	// complete address spaces).  These operations must proceed in this
+	// order
+	m_memory.configure();
 	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
 
@@ -1276,7 +1280,7 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-static ADDRESS_MAP_START(dummy, AS_0, 8, dummy_space_device)
+static ADDRESS_MAP_START(dummy, 0, 8, dummy_space_device)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1298,9 +1302,11 @@ void dummy_space_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *dummy_space_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> dummy_space_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

@@ -1726,7 +1726,7 @@ P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No  
 P0-041-1    CA403001A           2xZ80B  61256   27c1000 8742    1x6164      No      05,06   27c1000     N/A         5x X2-005   tnzsop(C)                       http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
 P0-041-A    K1100356A J1100156A 2xZ80B  61256   27c1000 8042    1x6164      No      05,06   23c1000     N/A         5x X2-005   tnzs(j,u)o                      http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
 P0-043A     M6100356A           3xZ80B* 61256   27512** NONE    1x6164      No      05,06   LH534000*   N/A         4x X2-004   tnzs(j,u), kabukiz              http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
-P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    U43???      5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
+P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    N/A         5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
 
 (A) GFX rom mapping is slightly different to P0-022-A pcb, possibly configured
     by a jumper.

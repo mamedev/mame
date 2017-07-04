@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dynduke_state )
 	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, dynduke_state )
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, dynduke_state )
 	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 ADDRESS_MAP_END
 

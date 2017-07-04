@@ -121,7 +121,7 @@ void pdp8_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *pdp8_device::memory_space_config(address_spacenum spacenum) const
+const address_space_config *pdp8_device::memory_space_config(int spacenum) const
 {
 	if (spacenum == AS_PROGRAM)
 	{

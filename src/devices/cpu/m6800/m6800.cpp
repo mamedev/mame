@@ -358,16 +358,18 @@ nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-const address_space_config *m6800_cpu_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> m6800_cpu_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config)
+		};
+	else
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config)
+		};
 }
-
 
 uint32_t m6800_cpu_device::RM16(uint32_t Addr )
 {
@@ -459,7 +461,7 @@ void m6800_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_decrypted_opcodes = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_program;
+	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
 	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
 
 	m_pc.d = 0;

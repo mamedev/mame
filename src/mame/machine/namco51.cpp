@@ -321,14 +321,6 @@ READ8_MEMBER( namco_51xx_device::read )
     DEVICE INTERFACE
 ***************************************************************************/
 
-static ADDRESS_MAP_START( namco_51xx_map_io, AS_IO, 8, namco_51xx_device )
-//  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_51xx_K_r)
-//  AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_51xx_O_w)
-//  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READ(namco_51xx_R0_r)
-//  AM_RANGE(MB88_PORTR2, MB88_PORTR2) AM_READ(namco_51xx_R2_r)
-ADDRESS_MAP_END
-
-
 ROM_START( namco_51xx )
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "51xx.bin",     0x0000, 0x0400, CRC(c2f57ef8) SHA1(50de79e0d6a76bda95ffb02fcce369a79e6abfec) )
@@ -398,7 +390,10 @@ void namco_51xx_device::device_reset()
 
 MACHINE_CONFIG_MEMBER( namco_51xx_device::device_add_mconfig )
 	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_CPU_IO_MAP(namco_51xx_map_io)
+//  MCFG_MB88XX_READ_K_CB(READ8(namco_51xx_device, namco_51xx_K_r))
+//  MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_51xx_device, namco_51xx_O_w))
+//  MCFG_MB88XX_READ_R0_CB(READ8(namco_51xx_device, namco_51xx_R0_r))
+//  MCFG_MB88XX_READ_R2_CB(READ8(namco_51xx_device, namco_51xx_R2_r))
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 

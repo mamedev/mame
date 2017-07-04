@@ -3,8 +3,6 @@
 
 #include "emu.h"
 
-#define NEW_SCSI 1
-
 #include "includes/interpro.h"
 
 #include "debugger.h"
@@ -262,11 +260,10 @@ READ8_MEMBER(interpro_state::rtc_r)
 
 READ8_MEMBER(interpro_state::scsi_r)
 {
-#if NEW_SCSI
 	switch (offset >> 6)
 	{
-	case 0x0: return m_scsi->tcount_lo_r(space, 0);
-	case 0x1: return m_scsi->tcount_hi_r(space, 0);
+	case 0x0: return m_scsi->tcounter_lo_r(space, 0);
+	case 0x1: return m_scsi->tcounter_hi_r(space, 0);
 	case 0x2: return m_scsi->fifo_r(space, 0);
 	case 0x3: return m_scsi->command_r(space, 0);
 	case 0x4: return m_scsi->status_r(space, 0);
@@ -275,19 +272,14 @@ READ8_MEMBER(interpro_state::scsi_r)
 	case 0x7: return m_scsi->fifo_flags_r(space, 0);
 	case 0x8: return m_scsi->conf_r(space, 0);
 	case 0xb: return m_scsi->conf2_r(space, 0);
-	case 0xc: return m_scsi->conf3_r(space, 0);
 	}
 
-	logerror("read unmapped scsi adapter register 0x%x\n", offset >> 6);
-	return 0x00;
-#else
-	return m_scsi->read(space, offset >> 6, mem_mask);
-#endif
+	logerror("scsi: read unmapped register 0x%x (%s)\n", offset >> 6, machine().describe_context());
+	return space.unmap();
 }
 
 WRITE8_MEMBER(interpro_state::scsi_w)
 {
-#if NEW_SCSI
 	switch (offset >> 6)
 	{
 	case 0: m_scsi->tcount_lo_w(space, 0, data); return;
@@ -302,36 +294,9 @@ WRITE8_MEMBER(interpro_state::scsi_w)
 	case 9: m_scsi->clock_w(space, 0, data); return;
 	case 0xa: m_scsi->test_w(space, 0, data); return;
 	case 0xb: m_scsi->conf2_w(space, 0, data); return;
-	case 0xc: m_scsi->conf3_w(space, 0, data); return;
-	case 0xf: m_scsi->fifo_align_w(space, 0, data); return;
 	}
 
-	logerror("unmapped scsi register write 0x%02x data 0x%02x\n", offset >> 6, data);
-#else
-	m_scsi->write(space, offset >> 6, data, mem_mask);
-#endif
-}
-
-READ8_MEMBER(interpro_state::scsi_dma_r)
-{
-#if NEW_SCSI
-	return m_scsi->dma_r();
-#else
-	u8 data = 0;
-
-	m_scsi->dma_read_data(1, &data);
-
-	return data;
-#endif
-}
-
-WRITE8_MEMBER(interpro_state::scsi_dma_w)
-{
-#if NEW_SCSI
-	m_scsi->dma_w(data);
-#else
-	m_scsi->dma_write_data(1, &data);
-#endif
+	logerror("scsi: unmapped register write 0x%02x data 0x%02x (%s)\n", offset >> 6, data, machine().describe_context());
 }
 
 DRIVER_INIT_MEMBER(interpro_state, ip2800)
@@ -345,25 +310,23 @@ DRIVER_INIT_MEMBER(interpro_state, ip2800)
 	// 256 = reports 256M, 32x8
 
 	// grab the main memory space from the mmu
-	address_space &space = m_mmu->space(AS_0);
+	address_space &space = m_mmu->space(0);
 
 	// map the configured ram
 	space.install_ram(0, m_ram->mask(), m_ram->pointer());
 }
 
-#if NEW_SCSI
 static SLOT_INTERFACE_START(interpro_scsi_devices)
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
 	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94)
+	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START(interpro_scsi_adapter)
-	MCFG_DEVICE_CLOCK(XTAL_12_5MHz)
+	MCFG_DEVICE_CLOCK(XTAL_24MHz)
 	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
 	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, drq_scsi))
 MACHINE_CONFIG_END
-#endif
 
 // these maps point the cpu virtual addresses to the mmu
 static ADDRESS_MAP_START(clipper_insn_map, AS_PROGRAM, 32, interpro_state)
@@ -374,7 +337,7 @@ static ADDRESS_MAP_START(clipper_data_map, AS_DATA, 32, interpro_state)
 	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE32(INTERPRO_MMU_TAG, cammu_device, data_r, data_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_common_map, AS_0, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_common_map, 0, 32, interpro_state)
 	AM_RANGE(0x40000000, 0x4000004f) AM_DEVICE(INTERPRO_MCGA_TAG, interpro_fmcc_device, map)
 	AM_RANGE(0x4f007e00, 0x4f007eff) AM_DEVICE(INTERPRO_SGA_TAG, interpro_sga_device, map)
 
@@ -404,7 +367,7 @@ static ADDRESS_MAP_START(interpro_common_map, AS_0, 32, interpro_state)
 ADDRESS_MAP_END
 
 // these maps represent the real main, i/o and boot spaces of the system
-static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_main_map, 0, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE(RAM_TAG)
 
 	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
@@ -413,13 +376,13 @@ static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
 	AM_IMPORT_FROM(interpro_common_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_io_map, AS_1, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_io_map, 1, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_device, map)
 
 	AM_IMPORT_FROM(interpro_common_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_boot_map, AS_2, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_boot_map, 2, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00001fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -443,9 +406,9 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, inta_cb)
 
 	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG, CAMMU_C4T, 0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, interpro_main_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, interpro_io_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_2, interpro_boot_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, interpro_main_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, interpro_io_map)
+	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
 	MCFG_CAMMU_SSW_CB(DEVREAD32(INTERPRO_CPU_TAG, clipper_device, ssw))
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -503,7 +466,6 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// scsi
-#if NEW_SCSI
 	MCFG_NSCSI_BUS_ADD(INTERPRO_SCSI_TAG)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":0", interpro_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":1", interpro_scsi_devices, nullptr, false)
@@ -514,16 +476,6 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":6", interpro_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", interpro_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
-#else
-	MCFG_DEVICE_ADD(INTERPRO_SCSI_TAG, SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD(INTERPRO_SCSI_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD(INTERPRO_SCSI_TAG ":" SCSI_PORT_DEVICE3, "cdrom", SCSICD, SCSI_ID_3)
-
-	MCFG_DEVICE_ADD(INTERPRO_SCSI_ADAPTER_TAG, NCR539X, XTAL_12_5MHz)
-	MCFG_LEGACY_SCSI_PORT(INTERPRO_SCSI_TAG)
-	MCFG_NCR539X_OUT_IRQ_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
-	MCFG_NCR539X_OUT_DRQ_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_scsi))
-#endif
 
 	// i/o gate array
 	MCFG_INTERPRO_IOGA_ADD(INTERPRO_IOGA_TAG)
@@ -531,13 +483,11 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_INTERPRO_IOGA_IRQ_CB(INPUTLINE(INTERPRO_CPU_TAG, INPUT_LINE_IRQ0))
 	//MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_CHANNEL_PLOTTER, unknown)
 
-	// use driver helper functions to wrap scsi adapter dma read/write
-	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SCSI, DEVREAD8("", interpro_state, scsi_dma_r), DEVWRITE8("", interpro_state, scsi_dma_w))
-
+	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SCSI, DEVREAD8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_r), DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_w))
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_FLOPPY, DEVREAD8(INTERPRO_FDC_TAG, n82077aa_device, mdma_r), DEVWRITE8(INTERPRO_FDC_TAG, n82077aa_device, mdma_w))
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SERIAL, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, da_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, da_w))
 	MCFG_INTERPRO_IOGA_FDCTC_CB(DEVWRITELINE(INTERPRO_FDC_TAG, n82077aa_device, tc_line_w))
-	MCFG_INTERPRO_IOGA_DMA_BUS(INTERPRO_CAMMU_TAG, AS_0)
+	MCFG_INTERPRO_IOGA_DMA_BUS(INTERPRO_CAMMU_TAG, 0)
 
 	// memory control gate array
 	MCFG_DEVICE_ADD(INTERPRO_MCGA_TAG, INTERPRO_FMCC, 0)

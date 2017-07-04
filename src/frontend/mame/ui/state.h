@@ -57,6 +57,7 @@ private:
 	const char *                                    m_header;
 	const char *                                    m_footer;
 	bool                                            m_must_exist;
+	bool                                            m_pause_checked;
 	bool                                            m_was_paused;
 
 	static void *itemref_from_file_entry(const file_entry &entry);

@@ -107,12 +107,18 @@ public:
 
 protected:
 	address_space *m_cpu_space;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 
 private:
+	enum
+	{
+		AS_PCI_MEM = 1,
+		AS_PCI_IO = 2
+	};
+
 	struct galileo_timer
 	{
 		emu_timer *     timer;

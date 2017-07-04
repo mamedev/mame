@@ -548,7 +548,7 @@ void sega_315_5195_mapper_device::device_start()
 	if (m_space == nullptr)
 		throw emu_fatalerror("Unable to find program address space on device '%s'", m_cpu.finder_tag());
 
-	m_decrypted_space = m_cpu->has_space(AS_DECRYPTED_OPCODES) ? &m_cpu->space(AS_DECRYPTED_OPCODES) : nullptr;
+	m_decrypted_space = m_cpu->has_space(AS_OPCODES) ? &m_cpu->space(AS_OPCODES) : nullptr;
 
 	// register for saves
 	save_item(NAME(m_regs));

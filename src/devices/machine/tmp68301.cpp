@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
-static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
+static ADDRESS_MAP_START( tmp68301_regs, 0, 16, tmp68301_device )
 //  AM_RANGE(0x000,0x3ff) AM_RAM
 	AM_RANGE(0x094,0x095) AM_READWRITE(imr_r,imr_w)
 	AM_RANGE(0x098,0x099) AM_READWRITE(iisr_r,iisr_w)
@@ -159,9 +159,11 @@ void tmp68301_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *tmp68301_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> tmp68301_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //**************************************************************************
@@ -174,7 +176,7 @@ const address_space_config *tmp68301_device::memory_space_config(address_spacenu
 
 inline uint16_t tmp68301_device::read_word(offs_t address)
 {
-	return space(AS_0).read_word(address << 1);
+	return space(0).read_word(address << 1);
 }
 
 //-------------------------------------------------
@@ -183,7 +185,7 @@ inline uint16_t tmp68301_device::read_word(offs_t address)
 
 inline void tmp68301_device::write_word(offs_t address, uint16_t data)
 {
-	space(AS_0).write_word(address << 1, data);
+	space(0).write_word(address << 1, data);
 }
 
 IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)

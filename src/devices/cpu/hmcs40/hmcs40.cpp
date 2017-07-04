@@ -149,6 +149,13 @@ hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, d
 	: hmcs45_cpu_device(mconfig, HD44828, tag, owner, clock, IS_CMOS)
 { }
 
+std::vector<std::pair<int, const address_space_config *>> hmcs40_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 // disasm
 void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const

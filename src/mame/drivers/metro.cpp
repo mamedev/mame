@@ -712,7 +712,7 @@ ADDRESS_MAP_END
 /*****************/
 
 
-static ADDRESS_MAP_START( ymf278_map, AS_0, 8, metro_state )
+static ADDRESS_MAP_START( ymf278_map, 0, 8, metro_state )
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1680,7 +1680,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouja_okimap, AS_0, 8, metro_state )
+static ADDRESS_MAP_START( mouja_okimap, 0, 8, metro_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -3689,7 +3689,7 @@ static MACHINE_CONFIG_START( msgogo )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -4321,7 +4321,7 @@ static MACHINE_CONFIG_START( mouja )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mouja_okimap)
+	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)

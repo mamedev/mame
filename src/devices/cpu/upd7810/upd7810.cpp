@@ -483,6 +483,13 @@ upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag,
 	m_opXX = s_opXX_78c06;
 }
 
+std::vector<std::pair<int, const address_space_config *>> upd7810_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 offs_t upd7810_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7810 );

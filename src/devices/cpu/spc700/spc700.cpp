@@ -193,7 +193,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define VFLAG_SUB_8(S, D, R)   ((S^D) & (R^D))
 #define VFLAG_SUB_16(S, D, R) (((S^D) & (R^D))>>8)
 
-#define CFLAG_AS_1()     ((FLAG_C>>8)&1)
+#define CFLAG_1()     ((FLAG_C>>8)&1)
 #define CFLAG_AS_NOT_1() (!(FLAG_C&CFLAG_SET))
 
 #define NZFLAG_16(A) (((A)&0x7f) | (((A)>>1)&0x40) | (((A)>>8)&0xff))
@@ -232,6 +232,13 @@ spc700_device::spc700_device(const machine_config &mconfig, const char *tag, dev
 	, m_ppc(0)
 	, m_debugger_temp(0)
 {
+}
+
+std::vector<std::pair<int, const address_space_config *>> spc700_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -449,7 +456,7 @@ void spc700_device::SET_REG_YA(uint32_t value)
 	(FLAG_H& HFLAG_SET)     |   \
 	FLAG_I                  |   \
 	((!FLAG_Z) << 1)        |   \
-	CFLAG_AS_1())
+	CFLAG_1())
 
 /* Set the Process Status Register */
 void spc700_device::SET_REG_P(uint32_t value)
@@ -514,8 +521,8 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 /* ======================================================================== */
 
 #define SUBOP_ADC(A, B)                     \
-	m_spc_int16 = (A) + (B) + CFLAG_AS_1();         \
-	TMP1 = ((A) & 0x0f) + (CFLAG_AS_1());           \
+	m_spc_int16 = (A) + (B) + CFLAG_1();         \
+	TMP1 = ((A) & 0x0f) + (CFLAG_1());           \
 	FLAG_C  = (m_spc_int16 > 0xff) ? CFLAG_SET : 0;     \
 	FLAG_V =  (~((A) ^ (B))) & (((A) ^ m_spc_int16) & 0x80); \
 	FLAG_H = (((m_spc_int16 & 0x0f) - TMP1) & 0x10) >> 1;   \
@@ -1069,14 +1076,14 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 /* Rotate Left the accumulator */
 #define OP_ROL(BCLK)                                                        \
 			CLK(BCLK);                                                      \
-			FLAG_C  = (REG_A<<1) | CFLAG_AS_1();                            \
+			FLAG_C  = (REG_A<<1) | CFLAG_1();                            \
 			FLAG_NZ = REG_A = MAKE_UINT_8(FLAG_C)
 
 /* Rotate Left an operand */
 #define OP_ROLM(BCLK, MODE)                                                 \
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
-			FLAG_C  = (read_8_##MODE(DST)<<1) | CFLAG_AS_1();               \
+			FLAG_C  = (read_8_##MODE(DST)<<1) | CFLAG_1();               \
 			FLAG_NZ = MAKE_UINT_8(FLAG_C);                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
@@ -1100,7 +1107,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 #define OP_SBC(BCLK, MODE)                  \
 			CLK(BCLK);              \
 			SRC     = OPER_8_##MODE();      \
-			TMP2 = REG_A - SRC - (CFLAG_AS_1() ^ 1); \
+			TMP2 = REG_A - SRC - (CFLAG_1() ^ 1); \
 			SUBOP_ADC(REG_A, ~SRC);         \
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
 			REG_A = (uint8_t)m_spc_int16;
@@ -1111,7 +1118,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			SRC     = OPER_8_##SMODE();     \
 			DST     = EA_##DMODE();         \
 			TMP3 = read_8_##DMODE(DST);     \
-			TMP2 = TMP3 - SRC - (CFLAG_AS_1() ^ 1); \
+			TMP2 = TMP3 - SRC - (CFLAG_1() ^ 1); \
 			SUBOP_ADC(~SRC, TMP3);          \
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
 			write_8_##DMODE(DST, (uint8_t)m_spc_int16)

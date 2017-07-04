@@ -42,7 +42,7 @@ void m6502_device::device_start()
 void m6502_device::init()
 {
 	mintf->program  = &space(AS_PROGRAM);
-	mintf->sprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : mintf->program;
+	mintf->sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : mintf->program;
 
 	mintf->direct  = &mintf->program->direct();
 	mintf->sdirect = &mintf->sprogram->direct();
@@ -402,14 +402,17 @@ void m6502_device::execute_set_input(int inputnum, int state)
 }
 
 
-const address_space_config *m6502_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> m6502_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_OPCODES, &sprogram_config)
+		};
+	else
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &program_config)
+		};
 }
 
 

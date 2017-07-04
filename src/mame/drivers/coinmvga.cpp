@@ -617,11 +617,11 @@ INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 *    Machine Drivers     *
 *************************/
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, coinmvga_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, coinmvga_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac2_map, AS_0, 8, coinmvga_state )
+static ADDRESS_MAP_START( ramdac2_map, 0, 8, coinmvga_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

@@ -978,7 +978,7 @@ INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xf0 / 4);
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, magicard_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, magicard_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
