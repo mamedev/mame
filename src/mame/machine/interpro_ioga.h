@@ -60,26 +60,6 @@
 #define IOGA_DMA_FLOPPY  2
 #define IOGA_DMA_SERIAL  3
 
-// dma control register
-
-// are these "commands"?
-#define IOGA_DMA_CTRL_RESET_L 0x61000000 // do not clear bus error bit
-#define IOGA_DMA_CTRL_RESET   0x60400000 // clear bus error bit
-
-// uncertain about these
-#define IOGA_DMA_CTRL_START   0x10000000
-#define IOGA_DMA_CTRL_ENABLE  0x20000000
-#define IOGA_DMA_CTRL_X       0x00800000  // another error bit?
-#define IOGA_DMA_CTRL_Y       0x01000000  // turned off if either of two above are found
-
-#define IOGA_DMA_CTRL_UNK1    0x60000000 // don't know yet
-#define IOGA_DMA_CTRL_UNK2    0x67000600 // forced berr with nmi and interrupts disabled
-#define IOGA_DMA_CTRL_UNK3    0xbf000600 // set by scsidiag before executing scsi "transfer information" command
-
-// read values
-// iogadiag expects 0x64400800 after forced berr with nmi/interrupts disabled
-
-
 class interpro_ioga_device : public device_t
 {
 public:
@@ -117,6 +97,45 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq_scsi) { drq(state, IOGA_DMA_SCSI); }
 	DECLARE_WRITE_LINE_MEMBER(drq_floppy) { drq(state, IOGA_DMA_FLOPPY); }
 
+	enum eth_remap_mask
+	{
+		ETH_REMAP_CHA_FLUSH = 0x00000008,
+		ETH_REMAP_CHA_BUF   = 0x00000010,
+		ETH_REMAP_CHA_QUAD  = 0x00000020,
+		ETH_REMAP_CHA_WTAG  = 0x000001c0,
+		ETH_REMAP_CHA_RTAG  = 0x00000e00,
+		ETH_REMAP_ADDR      = 0xfffff000
+	};
+	DECLARE_READ32_MEMBER(eth_remap_r) { return m_eth_remap; }
+	DECLARE_WRITE32_MEMBER(eth_remap_w);
+
+	enum eth_remap_page_mask
+	{
+		ETH_REMAP_CHB_FLUSH = 0x00000008,
+		ETH_REMAP_CHB_BUF   = 0x00000010,
+		ETH_REMAP_CHB_QUAD  = 0x00000020,
+		ETH_REMAP_CHB_WTAG  = 0x000001c0,
+		ETH_REMAP_CHB_RTAG  = 0x00000e00,
+		ETH_MAP_PAGE        = 0xfffff000
+	};
+	DECLARE_READ32_MEMBER(eth_map_page_r) { return m_eth_map_page; }
+	DECLARE_WRITE32_MEMBER(eth_map_page_w);
+
+	enum eth_control_mask
+	{
+		ETH_CA             = 0x00000001,
+		ETH_MAPEN          = 0x00000002,
+		ETH_REMAP_CHC_BUF  = 0x00000010,
+		ETH_REMAP_CHC_QUAD = 0x00000020,
+		ETH_REMAP_CHC_WTAG = 0x000001c0,
+		ETH_REMAP_CHC_RTAG = 0x00000e00,
+		ETH_BERR           = 0x00001000,
+		ETH_MMBE           = 0x00002000,
+		ETH_RESET          = 0x00004000
+	};
+	DECLARE_READ32_MEMBER(eth_control_r) { return m_eth_control; }
+	DECLARE_WRITE32_MEMBER(eth_control_w);
+
 	DECLARE_READ32_MEMBER(timer_prescaler_r) { return m_prescaler; }
 	DECLARE_READ32_MEMBER(timer0_r) { return m_timer_reg[0]; }
 	DECLARE_READ32_MEMBER(timer1_r);
@@ -126,7 +145,7 @@ public:
 		ARBCTL_BGR_ETHC = 0x0001,
 		ARBCTL_BGR_SCSI = 0x0002,
 		ARBCTL_BGR_PLOT = 0x0004,
-		ARBCTL_BGR_FDC =  0x0008,
+		ARBCTL_BGR_FDC  = 0x0008,
 		ARBCTL_BGR_SER0 = 0x0010,
 		ARBCTL_BGR_SER1 = 0x0020,
 		ARBCTL_BGR_SER2 = 0x0040,
@@ -186,14 +205,19 @@ public:
 
 	enum dma_ctrl_mask
 	{
-		DMA_CTRL_TCZERO = 0x00000001, // transfer count zero
-		DMA_CTRL_BERR   = 0x00400000, // bus error
-		DMA_CTRL_BUSY   = 0x02000000, // set until arbiter grants bus access
+        DMA_CTRL_TCZERO  = 0x00000001, // transfer count zero
+        DMA_CTRL_TAG     = 0x00000e00, // bus tag
+        DMA_CTRL_BERR    = 0x00400000, // bus error
+        DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
 
-		DMA_CTRL_WRITE  = 0x40000000, // indicates memory to device transfer
-		DMA_CTRL_FORCED = 0x60000000,
+        DMA_CTRL_BUSY    = 0x01000000, // cleared when command complete (maybe bus grant required?)
+        DMA_CTRL_WAIT    = 0x02000000, // waiting for bus grant
+        DMA_CTRL_X       = 0x04000000, // set during fdc dma?
 
-		DMA_CTRL_WMASK  = 0xfd000e00  // writable fields
+        DMA_CTRL_VIRTUAL = 0x20000000, // use virtual addressing
+        DMA_CTRL_WRITE   = 0x40000000, // memory to device transfer
+
+        DMA_CTRL_WMASK   = 0xfd000e00  // writable fields
 	};
 	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_PLOTTER); }
 	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, IOGA_DMA_PLOTTER); }
@@ -244,8 +268,8 @@ private:
 	static const device_timer_id IOGA_TIMER_1 = 1;
 	static const device_timer_id IOGA_TIMER_2 = 2;
 	static const device_timer_id IOGA_TIMER_3 = 3;
-	static const device_timer_id IOGA_TIMER_DMA = 4;
-	static const device_timer_id IOGA_CLOCK = 5;
+
+	static const device_timer_id IOGA_CLOCK = 4;
 
 	void set_nmi_line(int state);
 	void set_irq_line(int irq, int state);
@@ -253,13 +277,21 @@ private:
 	void write_timer(int timer, u32 value, device_timer_id id);
 
 	void interrupt_clock();
-	void dma_clock(int channel);
+	void dma_clock();
 
 	void drq(int state, int channel);
 	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_irq_func;
 	address_space *m_memory_space;
 
+	enum dma_states
+	{
+		IDLE,
+		WAIT,
+		COMMAND,
+		TRANSFER,
+		COMPLETE
+	};
 	// dma channels
 	struct dma
 	{
@@ -268,12 +300,13 @@ private:
 		u32 transfer_count;
 		u32 control;
 
-		bool dma_active;
-		int drq_state;
+		dma_states state;
 		devcb_read8 device_r;
 		devcb_write8 device_w;
 
 		const u16 arb_mask;
+		const int channel;
+		const char *name;
 	} m_dma_channel[IOGA_DMA_CHANNELS];
 	u32 m_dma_plotter_eosl;
 
@@ -302,9 +335,6 @@ private:
 	u32 m_timer3_count;
 	emu_timer *m_timer[4];
 
-	// dma state
-	emu_timer *m_dma_timer;
-
 	u32 dma_r(address_space &space, offs_t offset, u32 mem_mask, int channel);
 	void dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);
 
@@ -322,6 +352,10 @@ private:
 
 	bool nmi(int state);
 	bool irq(int state);
+
+	u32 m_eth_remap;
+	u32 m_eth_map_page;
+	u32 m_eth_control;
 };
 
 // device type definition
