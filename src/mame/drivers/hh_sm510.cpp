@@ -1341,11 +1341,11 @@ ROM_START( gnw_mw56 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
 
-	ROM_REGION( 165452, "svg_left", 0)
-	ROM_LOAD( "gnw_mw56_left.svg", 0, 165452, CRC(07fda7f3) SHA1(4c884e57963cef4f22263afd7fe3cd72cd1cd756) )
+	ROM_REGION( 165537, "svg_left", 0)
+	ROM_LOAD( "gnw_mw56_left.svg", 0, 165537, CRC(42fe7fb8) SHA1(91bfb64a1a9f84696acc5cc8c6e7faced5301016) )
 
-	ROM_REGION( 224225, "svg_right", 0)
-	ROM_LOAD( "gnw_mw56_right.svg", 0, 224225, CRC(515e1a7a) SHA1(e63419f6f7784b1a0a75e6e29c806a3abe2d7a42) )
+	ROM_REGION( 224535, "svg_right", 0)
+	ROM_LOAD( "gnw_mw56_right.svg", 0, 224535, CRC(c87fbf47) SHA1(07c3676aaec42ddfd73d3331de415627bd8d0093) )
 ROM_END
 
 
