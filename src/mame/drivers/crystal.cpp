@@ -119,18 +119,18 @@ Notes:
 
 P's Attack (c) 2004 Uniana Co., Ltd
 
-+----------1||||---1|||||--1|||||---------------------------+
++----------54321---654321--654321---------------------------+
 |VOL       TICKET  GUN_1P  GUN_2P                 +---------|
 |                                                 |         |
 +-+                                               |  256MB  |
   |       CC-DAC                                  | Compact |
 +-+                                  EMUL*        |  Flash  |
 |                                                 |         |
-|J          +---+                                 +---------|
-|A          |   |                                           |
-|M          | R |   25.1750MHz              +--------------+|
-|M          | A |                           |     42Pin*   ||
-|A          | M |                           +--------------+|
+|5          +---+                                 +---------|
+|6          |   |                                           |
+|P          | R |   25.1750MHz              +--------------+|
+|I          | A |                           |     42Pin*   ||
+|N          | M |                           +--------------+|
 |           |   |                           +--------------+|
 |C          +---+       +------------+      |     SYS      ||
 |O                      |            |      +--------------+|
@@ -199,30 +199,30 @@ CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
 
 TICKET is a 5 pin connector:
 
-  1| +12v
-  2| IN
+  1| LED
+  2| GND
   3| OUT
-  4| GND
-  5| LED
+  4| IN
+  5| +12v
 
-GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
+GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 
  GUN-1P: Left (Blue) Gun Connector Pinout
 
   1| GND
-  2| SW
-  3| +5v
-  4| SENS
-  5| SOL
+  2| Solenoid
+  3| Sensor
+  4| +5V
+  5| Switch (Trigger)
   6| GND
 
  GUN-2P: Right (Pink) Gun Connector Pinout
 
   1| GND
-  2| SW
-  3| +5v
-  4| SENS
-  5| SOL
+  2| Solenoid
+  3| Sensor
+  4| +5V
+  5| Switch (Trigger)
   6| GND
 
 */
