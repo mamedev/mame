@@ -13,13 +13,13 @@ inputs etc. by stephh
 ----------------------------------------
 
 68000P12 processor
-15mHZ cyrstal next to it
+15mHZ crystal next to it
 
 2 of these:
 
 TPC 1020AFN-084c
 
-32MHz crystal colse to this.
+32MHz crystal close to this.
 
 1 GAL
 5 PROMS  (16S25H)
@@ -73,33 +73,31 @@ TO DO :
 #include "includes/stlforce.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
-
-WRITE16_MEMBER(stlforce_state::eeprom_w)
+WRITE8_MEMBER(stlforce_state::eeprom_w)
 {
-	if( ACCESSING_BITS_0_7 )
-	{
-		m_eeprom->di_write(data & 0x01);
-		m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
-		m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
-	}
+	m_eeprom->di_write(data & 0x01);
+	m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE16_MEMBER(stlforce_state::oki_bank_w)
+WRITE8_MEMBER(stlforce_state::oki_bank_w)
 {
-	m_oki->set_rom_bank((data>>8) & 3);
+	if (m_okibank.found())
+	{
+		m_okibank->set_entry(data & 3);
+	}
 }
 
 static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(stlforce_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(stlforce_mlow_videoram_w) AM_SHARE("mlow_videoram")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(stlforce_mhigh_videoram_w) AM_SHARE("mhigh_videoram")
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(stlforce_tx_videoram_w) AM_SHARE("tx_videoram")
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_SHARE("mlow_videoram")
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_SHARE("mhigh_videoram")
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("tx_videoram")
 	AM_RANGE(0x102800, 0x102fff) AM_RAM /* unknown / ram */
 	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_SHARE("bg_scrollram")
 	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
@@ -111,10 +109,15 @@ static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x109000, 0x11ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUT")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400010, 0x400011) AM_WRITE(eeprom_w)
-	AM_RANGE(0x400012, 0x400013) AM_WRITE(oki_bank_w)
+	AM_RANGE(0x400010, 0x400011) AM_WRITE8(eeprom_w, 0x00ff)
+	AM_RANGE(0x400012, 0x400013) AM_WRITE8(oki_bank_w, 0xff00)
 	AM_RANGE(0x40001e, 0x40001f) AM_WRITENOP // sprites buffer commands
 	AM_RANGE(0x410000, 0x410001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( twinbrat_oki_map, 0, 8, stlforce_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( stlforce )
@@ -193,7 +196,7 @@ static MACHINE_CONFIG_START( stlforce )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)
 	MCFG_CPU_PROGRAM_MAP(stlforce_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stlforce_state,  irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stlforce_state, irq4_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -203,7 +206,7 @@ static MACHINE_CONFIG_START( stlforce )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update_stlforce)
+	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stlforce)
@@ -213,7 +216,7 @@ static MACHINE_CONFIG_START( stlforce )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32 , PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -225,6 +228,9 @@ static MACHINE_CONFIG_DERIVED( twinbrat, stlforce )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)
+
+	MCFG_DEVICE_MODIFY("oki")
+	MCFG_DEVICE_ADDRESS_MAP(0, twinbrat_oki_map)
 MACHINE_CONFIG_END
 
 ROM_START( stlforce )
@@ -245,7 +251,7 @@ ROM_START( stlforce )
 	ROM_LOAD( "stlforce.u33", 0xc0000, 0x40000, CRC(19415cf3) SHA1(31490a1f3321558f82667b63f3963b2ec3fa0c59) )
 
 	/* only one bank */
-	ROM_REGION( 0x80000, "oki", 0 ) /* samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* samples, second half 0xff filled */
 	ROM_LOAD( "stlforce.u1", 0x00000, 0x80000, CRC(0a55edf1) SHA1(091f12e8110c62df22b370a2e710c930ba06e8ca) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -309,20 +315,8 @@ ROM_START( twinbrat )
 	ROM_LOAD( "9.bin",  0x080000, 0x40000, CRC(13194d89) SHA1(95c35b6012f98a64630abb40fd55b24ff8a5e031) )
 	ROM_LOAD( "8.bin",  0x0c0000, 0x40000, CRC(79f14528) SHA1(9c07d9a9e59f69a525bbaec05d74eb8d21bb9563) )
 
-	ROM_REGION( 0x080000, "user1", 0 ) /* Samples */
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples, 0x00000 - 0x20000 fixed, 0x20000 - 0x40000 banked */
 	ROM_LOAD( "1.bin", 0x00000, 0x80000, CRC(76296578) SHA1(04eca78abe60b283269464c0d12815579126ac08) )
-
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
@@ -345,33 +339,24 @@ ROM_START( twinbrata )
 	ROM_LOAD( "9.bin",  0x080000, 0x40000, CRC(13194d89) SHA1(95c35b6012f98a64630abb40fd55b24ff8a5e031) )
 	ROM_LOAD( "8.bin",  0x0c0000, 0x40000, CRC(79f14528) SHA1(9c07d9a9e59f69a525bbaec05d74eb8d21bb9563) )
 
-	ROM_REGION( 0x080000, "user1", 0 ) /* Samples */
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples, 0x00000 - 0x20000 fixed, 0x20000 - 0x40000 banked */
 	ROM_LOAD( "1.bin", 0x00000, 0x80000, CRC(76296578) SHA1(04eca78abe60b283269464c0d12815579126ac08) )
-
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
 ROM_END
 
-DRIVER_INIT_MEMBER(stlforce_state,stlforce)
+DRIVER_INIT_MEMBER(stlforce_state, stlforce)
 {
 	m_sprxoffs = 0;
 }
 
-DRIVER_INIT_MEMBER(stlforce_state,twinbrat)
+DRIVER_INIT_MEMBER(stlforce_state, twinbrat)
 {
 	m_sprxoffs = 9;
+
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
+	m_okibank->set_entry(0);
 }
 
 
