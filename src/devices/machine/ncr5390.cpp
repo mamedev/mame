@@ -25,39 +25,14 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, ncr53c90a_device)
-	// same as 53c90a
-	AM_RANGE(0x0, 0x0) AM_READWRITE(tcounter_lo_r, tcount_lo_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(tcounter_hi_r, tcount_hi_w)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(fifo_r, fifo_w)
-	AM_RANGE(0x3, 0x3) AM_READWRITE(command_r, command_w)
-	AM_RANGE(0x4, 0x4) AM_READWRITE(status_r, bus_id_w)
-	AM_RANGE(0x5, 0x5) AM_READWRITE(istatus_r, timeout_w)
-	AM_RANGE(0x6, 0x6) AM_READWRITE(seq_step_r, sync_period_w)
-	AM_RANGE(0x7, 0x7) AM_READWRITE(fifo_flags_r, sync_offset_w)
-	AM_RANGE(0x8, 0x8) AM_READWRITE(conf_r, conf_w)
-	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
-	AM_RANGE(0xa, 0xa) AM_WRITE(test_w)
+	AM_INHERIT_FROM(ncr5390_device::map)
 
-	// additional in 53c90a
 	AM_RANGE(0xb, 0xb) AM_READWRITE(conf2_r, conf2_w)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, ncr53c94_device)
-	// same as 53c90a
-	AM_RANGE(0x0, 0x0) AM_READWRITE(tcounter_lo_r, tcount_lo_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(tcounter_hi_r, tcount_hi_w)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(fifo_r, fifo_w)
-	AM_RANGE(0x3, 0x3) AM_READWRITE(command_r, command_w)
-	AM_RANGE(0x4, 0x4) AM_READWRITE(status_r, bus_id_w)
-	AM_RANGE(0x5, 0x5) AM_READWRITE(istatus_r, timeout_w)
-	AM_RANGE(0x6, 0x6) AM_READWRITE(seq_step_r, sync_period_w)
-	AM_RANGE(0x7, 0x7) AM_READWRITE(fifo_flags_r, sync_offset_w)
-	AM_RANGE(0x8, 0x8) AM_READWRITE(conf_r, conf_w)
-	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
-	AM_RANGE(0xa, 0xa) AM_WRITE(test_w)
-	AM_RANGE(0xb, 0xb) AM_READWRITE(conf2_r, conf2_w)
+	AM_INHERIT_FROM(ncr53c90a_device::map)
 
-	// additional in 53c94
 	AM_RANGE(0xc, 0xc) AM_READWRITE(conf3_r, conf3_w)
 	AM_RANGE(0xf, 0xf) AM_WRITE(fifo_align_w)
 ADDRESS_MAP_END

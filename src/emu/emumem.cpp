@@ -892,7 +892,7 @@ class address_space_specific : public address_space
 
 public:
 	// construction/destruction
-	address_space_specific(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum)
+	address_space_specific(memory_manager &manager, device_memory_interface &memory, int spacenum)
 		: address_space(manager, memory, spacenum, _Large),
 			m_read(*this, _Large),
 			m_write(*this, _Large),
@@ -1559,13 +1559,26 @@ memory_manager::memory_manager(running_machine &machine)
 
 void memory_manager::allocate(device_memory_interface &memory)
 {
-	for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
+	for (int spacenum = 0; spacenum < memory.max_space_count(); ++spacenum)
 	{
 		// if there is a configuration for this space, we need an address space
 		const address_space_config *spaceconfig = memory.space_config(spacenum);
 		if (spaceconfig != nullptr)
 			address_space::allocate(m_spacelist, *this, *spaceconfig, memory, spacenum);
 	}
+}
+
+//-------------------------------------------------
+//  configure - configure the address spaces
+//-------------------------------------------------
+
+void memory_manager::configure()
+{
+	// loop over devices to configure the address spaces
+	memory_interface_iterator iter(machine().root_device());
+	for (device_memory_interface &memory : iter)
+		memory.load_configs();
+	m_machine.m_dummy_space.load_configs();
 }
 
 //-------------------------------------------------
@@ -1730,7 +1743,7 @@ void memory_manager::bank_reattach()
 //  address_space - constructor
 //-------------------------------------------------
 
-address_space::address_space(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, bool large)
+address_space::address_space(memory_manager &manager, device_memory_interface &memory, int spacenum, bool large)
 	: m_config(*memory.space_config(spacenum)),
 		m_device(memory.device()),
 		m_addrmask(0xffffffffUL >> (32 - m_config.m_addrbus_width)),
@@ -1765,7 +1778,7 @@ address_space::~address_space()
 //  allocate - static smart allocator of subtypes
 //-------------------------------------------------
 
-void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_list,memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum)
+void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_list,memory_manager &manager, const address_space_config &config, device_memory_interface &memory, int spacenum)
 {
 	// allocate one of the appropriate type
 	bool large = (config.addr2byte_end(0xffffffffUL >> (32 - config.m_addrbus_width)) >= (1 << 18));
@@ -2000,7 +2013,7 @@ void address_space::check_address(const char *function, offs_t addrstart, offs_t
 
 void address_space::prepare_map()
 {
-	memory_region *devregion = (m_spacenum == AS_0) ? machine().root_device().memregion(m_device.tag()) : nullptr;
+	memory_region *devregion = (m_spacenum == 0) ? machine().root_device().memregion(m_device.tag()) : nullptr;
 	u32 devregionsize = (devregion != nullptr) ? devregion->bytes() : 0;
 
 	// allocate the address map
@@ -2040,7 +2053,7 @@ void address_space::prepare_map()
 		}
 
 		// if this is a ROM handler without a specified region, attach it to the implicit region
-		if (m_spacenum == AS_0 && entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr)
+		if (m_spacenum == 0 && entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr)
 		{
 			// make sure it fits within the memory region before doing so, however
 			if (entry.m_byteend < devregionsize)
@@ -2830,7 +2843,7 @@ bool address_space::needs_backing_store(const address_map_entry &entry)
 	// if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing
 	memory_region *region = machine().root_device().memregion(m_device.tag());
 	if (entry.m_read.m_type == AMH_RAM ||
-		(entry.m_read.m_type == AMH_ROM && (m_spacenum != AS_0 || region == nullptr || entry.m_addrstart >= region->bytes())))
+		(entry.m_read.m_type == AMH_ROM && (m_spacenum != 0 || region == nullptr || entry.m_addrstart >= region->bytes())))
 		return true;
 
 	// all other cases don't need backing

@@ -657,7 +657,7 @@ WRITE16_MEMBER( qx10_state::vram_w )
 	COMBINE_DATA(&m_video_ram[offset + (0x20000 * bank)]);
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, qx10_state )
+static ADDRESS_MAP_START( upd7220_map, 0, 16, qx10_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_START( qx10 )
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, MAIN_CLK/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(qx10_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(qx10_state, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN("screen")

@@ -786,12 +786,12 @@ void mz3500_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, mz3500_state )
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, mz3500_state )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 16, mz3500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -826,12 +826,12 @@ static MACHINE_CONFIG_START( mz3500 )
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
 	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz3500_state, hgdc_display_pixels)
 
 	/* video hardware */

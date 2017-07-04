@@ -1339,7 +1339,7 @@ ROM_START( fantasyu )
 	ROM_LOAD( "fs_f_11.bin",  0x5000, 0x0800, CRC(3a352e1f) SHA1(af880ce3daed0877d454421bd08c86ff71f6bf72) )
 ROM_END
 
-ROM_START( fantasy )
+ROM_START( fantasyg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.12",         0x3000, 0x1000, CRC(0968ab50) SHA1(f09d03a171349895c5cb69e684901be63d272b32) )
 	ROM_LOAD( "1.7",          0x4000, 0x1000, CRC(de83000e) SHA1(ede1dda46406b4d340f1efea3bc85b2227af9e1d) )
@@ -1653,9 +1653,9 @@ GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, 0, ROT90, 
 GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasy,     0,        fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
-GAME( 1981, fantasyu,    fantasy,  fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyj,    fantasy,  fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, 0, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler,     0,        nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )

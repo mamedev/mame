@@ -44,6 +44,13 @@ namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> namco_c117_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 //-------------------------------------------------
 //  set_cpu_tags - set the tags of the two CPUs
 //  connected to the device

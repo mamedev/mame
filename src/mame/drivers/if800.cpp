@@ -76,7 +76,7 @@ void if800_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, if800_state )
+static ADDRESS_MAP_START( upd7220_map, 0, 16, if800_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
@@ -89,7 +89,7 @@ static MACHINE_CONFIG_START( if800 )
 
 //  MCFG_PIC8259_ADD( "pic8259", if800_pic8259_config )
 	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/4)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(if800_state, hgdc_display_pixels)
 
 	/* video hardware */

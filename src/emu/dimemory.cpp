@@ -122,9 +122,6 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 device_memory_interface::device_memory_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "memory")
 {
-	memset(m_address_map, 0, sizeof(m_address_map));
-	memset(m_addrspace, 0, sizeof(m_addrspace));
-
 	// configure the fast accessor
 	device.interfaces().m_memory = this;
 }
@@ -144,14 +141,24 @@ device_memory_interface::~device_memory_interface()
 //  to connect an address map to a device
 //-------------------------------------------------
 
-void device_memory_interface::static_set_addrmap(device_t &device, address_spacenum spacenum, address_map_constructor map)
+void device_memory_interface::static_set_addrmap(device_t &device, int spacenum, address_map_constructor map)
 {
 	device_memory_interface *memory;
 	if (!device.interface(memory))
 		throw emu_fatalerror("MCFG_DEVICE_ADDRESS_MAP called on device '%s' with no memory interface", device.tag());
-	if (spacenum >= ARRAY_LENGTH(memory->m_address_map))
-		throw emu_fatalerror("MCFG_DEVICE_ADDRESS_MAP called on device '%s' with out-of-range space number %d", device.tag(), spacenum);
-	memory->m_address_map[spacenum] = map;
+	memory->set_addrmap(spacenum, map);
+}
+
+
+//-------------------------------------------------
+//  set_addrmap - connect an address map to a device
+//-------------------------------------------------
+
+void device_memory_interface::set_addrmap(int spacenum, address_map_constructor map)
+{
+	if (spacenum >= int(m_address_map.size()))
+		m_address_map.resize(spacenum+1, nullptr);
+	m_address_map[spacenum] = map;
 }
 
 
@@ -160,10 +167,26 @@ void device_memory_interface::static_set_addrmap(device_t &device, address_space
 //  to a device
 //-------------------------------------------------
 
-void device_memory_interface::set_address_space(address_spacenum spacenum, address_space &space)
+void device_memory_interface::set_address_space(int spacenum, address_space &space)
 {
-	assert(spacenum < ARRAY_LENGTH(m_addrspace));
+	if (spacenum >= int(m_addrspace.size()))
+		m_addrspace.resize(spacenum+1, nullptr);
 	m_addrspace[spacenum] = &space;
+}
+
+
+//-------------------------------------------------
+//  load_configs - retrieve the space configs
+//-------------------------------------------------
+
+void device_memory_interface::load_configs()
+{
+	auto r = memory_space_config();
+	for (const auto &entry : r) {
+		if (entry.first >= int(m_address_config.size()))
+			m_address_config.resize(entry.first + 1);
+		m_address_config[entry.first] = entry.second;
+	}
 }
 
 
@@ -174,7 +197,7 @@ void device_memory_interface::set_address_space(address_spacenum spacenum, addre
 //  translation is supported
 //-------------------------------------------------
 
-bool device_memory_interface::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool device_memory_interface::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	// by default it maps directly
 	return true;
@@ -188,10 +211,12 @@ bool device_memory_interface::memory_translate(address_spacenum spacenum, int in
 
 void device_memory_interface::interface_validity_check(validity_checker &valid) const
 {
+	const_cast<device_memory_interface *>(this)->load_configs();
+
 	// loop over all address spaces
-	for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_address_config.size()); ++spacenum)
 	{
-		if (space_config(spacenum) != nullptr)
+		if (space_config(spacenum))
 		{
 			// construct the map
 			::address_map addrmap(const_cast<device_t &>(device()), spacenum);

@@ -112,15 +112,19 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type ty
 {
 }
 
-const address_space_config *i8086_cpu_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> i8086_cpu_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_IO:                return &m_io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_opcodes_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_opcodes_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
+	else
+		return std::vector<std::pair<int, const address_space_config *>> {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
 }
 
 uint8_t i8086_cpu_device::fetch_op()
@@ -392,7 +396,7 @@ void i8086_common_cpu_device::state_string_export(const device_state_entry &entr
 void i8086_common_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_opcodes = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_program;
+	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
 	m_direct = &m_program->direct();
 	m_direct_opcodes = &m_opcodes->direct();
 	m_io = &space(AS_IO);

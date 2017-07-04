@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(COMPIS_UHRG, compis_uhrg_device, "compis_uhrg", "Compis UHRG"
 //  ADDRESS_MAP( upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_map, AS_0, 16, compis_hrg_device )
+static ADDRESS_MAP_START( hrg_map, 0, 16, compis_hrg_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x00000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uhrg_map, AS_0, 16, compis_uhrg_device )
+static ADDRESS_MAP_START( uhrg_map, 0, 16, compis_uhrg_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -85,7 +85,7 @@ MACHINE_CONFIG_MEMBER( compis_hrg_device::device_add_mconfig )
 	MCFG_SCREEN_UPDATE_DEVICE(UPD7220_TAG, upd7220_device, screen_update)
 
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, 2252500) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, hrg_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, hrg_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_hrg_device, display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
@@ -103,7 +103,7 @@ MACHINE_CONFIG_MEMBER( compis_uhrg_device::device_add_mconfig )
 	MCFG_SCREEN_UPDATE_DEVICE(UPD7220_TAG, upd7220_device, screen_update)
 
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, 2252500*2) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, uhrg_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, uhrg_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_uhrg_device, display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 

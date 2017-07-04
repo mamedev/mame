@@ -235,7 +235,7 @@
 #define NFLAG_8(A)      (A)
 #define NFLAG_16(A)     ((A)>>8)
 
-#define CFLAG_AS_1()    ((FLAG_C>>8)&1)
+#define CFLAG_1()    ((FLAG_C>>8)&1)
 
 
 

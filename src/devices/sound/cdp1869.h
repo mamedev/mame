@@ -88,7 +88,7 @@
 
 #define MCFG_CDP1869_ADD(_tag, _pixclock, _map) \
 		MCFG_DEVICE_ADD(_tag, CDP1869, _pixclock) \
-		MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+		MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_CDP1869_SCREEN_PAL_ADD(_cdptag, _tag, _clock) \
 		MCFG_SCREEN_ADD(_tag, RASTER) \
@@ -224,7 +224,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_sound_interface callbacks
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;

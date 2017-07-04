@@ -3148,6 +3148,7 @@ files {
 	MAME_DIR .. "src/mame/includes/kopunch.h",
 	MAME_DIR .. "src/mame/video/kopunch.cpp",
 	MAME_DIR .. "src/mame/drivers/lindbergh.cpp",
+	MAME_DIR .. "src/mame/drivers/sderby2.cpp",
 	MAME_DIR .. "src/mame/machine/segabb.cpp",
 	MAME_DIR .. "src/mame/machine/segabb.h",
 	MAME_DIR .. "src/mame/machine/megadriv.cpp",

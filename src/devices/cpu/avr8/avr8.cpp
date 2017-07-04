@@ -876,21 +876,13 @@ void avr8_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *avr8_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> avr8_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	else if (spacenum == AS_DATA)
-	{
-		return &m_data_config;
-	}
-	else if (spacenum == AS_IO)
-	{
-		return &m_io_config;
-	}
-	return nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 

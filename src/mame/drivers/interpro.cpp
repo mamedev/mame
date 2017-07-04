@@ -310,7 +310,7 @@ DRIVER_INIT_MEMBER(interpro_state, ip2800)
 	// 256 = reports 256M, 32x8
 
 	// grab the main memory space from the mmu
-	address_space &space = m_mmu->space(AS_0);
+	address_space &space = m_mmu->space(0);
 
 	// map the configured ram
 	space.install_ram(0, m_ram->mask(), m_ram->pointer());
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START(clipper_data_map, AS_DATA, 32, interpro_state)
 	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE32(INTERPRO_MMU_TAG, cammu_device, data_r, data_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_common_map, AS_0, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_common_map, 0, 32, interpro_state)
 	AM_RANGE(0x40000000, 0x4000004f) AM_DEVICE(INTERPRO_MCGA_TAG, interpro_fmcc_device, map)
 	AM_RANGE(0x4f007e00, 0x4f007eff) AM_DEVICE(INTERPRO_SGA_TAG, interpro_sga_device, map)
 
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START(interpro_common_map, AS_0, 32, interpro_state)
 ADDRESS_MAP_END
 
 // these maps represent the real main, i/o and boot spaces of the system
-static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_main_map, 0, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE(RAM_TAG)
 
 	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
@@ -376,13 +376,13 @@ static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
 	AM_IMPORT_FROM(interpro_common_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_io_map, AS_1, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_io_map, 1, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_device, map)
 
 	AM_IMPORT_FROM(interpro_common_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_boot_map, AS_2, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_boot_map, 2, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00001fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -406,9 +406,9 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, inta_cb)
 
 	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG, CAMMU_C4T, 0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, interpro_main_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, interpro_io_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_2, interpro_boot_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, interpro_main_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, interpro_io_map)
+	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
 	MCFG_CAMMU_SSW_CB(DEVREAD32(INTERPRO_CPU_TAG, clipper_device, ssw))
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_FLOPPY, DEVREAD8(INTERPRO_FDC_TAG, n82077aa_device, mdma_r), DEVWRITE8(INTERPRO_FDC_TAG, n82077aa_device, mdma_w))
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SERIAL, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, da_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, da_w))
 	MCFG_INTERPRO_IOGA_FDCTC_CB(DEVWRITELINE(INTERPRO_FDC_TAG, n82077aa_device, tc_line_w))
-	MCFG_INTERPRO_IOGA_DMA_BUS(INTERPRO_CAMMU_TAG, AS_0)
+	MCFG_INTERPRO_IOGA_DMA_BUS(INTERPRO_CAMMU_TAG, 0)
 
 	// memory control gate array
 	MCFG_DEVICE_ADD(INTERPRO_MCGA_TAG, INTERPRO_FMCC, 0)

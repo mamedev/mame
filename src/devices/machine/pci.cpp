@@ -448,9 +448,11 @@ READ8_MEMBER(pci_bridge_device::header_type_r)
 	return 0x01;
 }
 
-const address_space_config *pci_bridge_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> pci_bridge_device::memory_space_config() const
 {
-	return spacenum == AS_PROGRAM ? &configure_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PCI_CONFIG, &configure_space_config)
+	};
 }
 
 device_t *pci_bridge_device::bus_root()
@@ -548,7 +550,7 @@ void pci_bridge_device::map_device(uint64_t memory_window_start, uint64_t memory
 
 void pci_bridge_device::regenerate_config_mapping()
 {
-	address_space *config_space = &space(AS_PROGRAM);
+	address_space *config_space = &space(AS_PCI_CONFIG);
 	config_space->unmap_readwrite(0x00000, 0xfffff);
 	for(int i=0; i<32*8; i++)
 		if(sub_devices[i])
@@ -558,7 +560,7 @@ void pci_bridge_device::regenerate_config_mapping()
 uint32_t pci_bridge_device::do_config_read(uint8_t bus, uint8_t device, uint16_t reg, uint32_t mem_mask)
 {
 	if(sub_devices[device]) {
-		uint32_t data = space(AS_PROGRAM).read_dword((device << 12) | reg, mem_mask);
+		uint32_t data = space(AS_PCI_CONFIG).read_dword((device << 12) | reg, mem_mask);
 		logerror("config_read %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
 		return data;
 	} else
@@ -587,7 +589,7 @@ uint32_t pci_bridge_device::config_read(uint8_t bus, uint8_t device, uint16_t re
 void pci_bridge_device::do_config_write(uint8_t bus, uint8_t device, uint16_t reg, uint32_t data, uint32_t mem_mask)
 {
 	if(sub_devices[device]) {
-		space(AS_PROGRAM).write_dword((device << 12) | reg, data, mem_mask);
+		space(AS_PCI_CONFIG).write_dword((device << 12) | reg, data, mem_mask);
 		logerror("config_write %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
 	}
 }

@@ -103,6 +103,13 @@ tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *ta
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> tlcs90_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 enum    {
 		T90_B,  T90_C,  T90_D,  T90_E,  T90_H,  T90_L,  T90_A,

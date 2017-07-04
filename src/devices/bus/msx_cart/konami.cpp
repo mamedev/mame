@@ -866,7 +866,7 @@ msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_c
 }
 
 
-static ADDRESS_MAP_START( vlm_map, AS_0, 8, msx_cart_keyboard_master_device )
+static ADDRESS_MAP_START( vlm_map, 0, 8, msx_cart_keyboard_master_device )
 	AM_RANGE(0x0000, 0xffff) AM_READ(read_vlm)
 ADDRESS_MAP_END
 
@@ -876,7 +876,7 @@ MACHINE_CONFIG_MEMBER( msx_cart_keyboard_master_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("vlm5030", VLM5030, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 MACHINE_CONFIG_END
 
 

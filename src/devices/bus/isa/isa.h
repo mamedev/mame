@@ -186,6 +186,14 @@ class isa8_device : public device_t,
 					public device_memory_interface
 {
 public:
+	enum
+	{
+		AS_ISA_MEM    = 0,
+		AS_ISA_IO     = 1,
+		AS_ISA_MEMALT = 2,
+		AS_ISA_IOALT  = 3
+	};
+
 	// construction/destruction
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
@@ -203,17 +211,7 @@ public:
 	template <class Object> static devcb_base &set_out_drq3_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_drq3_cb.set_callback(std::forward<Object>(cb)); }
 
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			case AS_DATA:    return &m_program16_config;
-			case AS_3:       return &m_io16_config;
-			default:         fatalerror("isa: invalid memory space!\n");
-		}
-	}
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits = 8)
@@ -228,6 +226,7 @@ public:
 	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
 	void install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
+	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
@@ -244,8 +243,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 
 	// 8 bit accessors for ISA-defined address spaces
-	DECLARE_READ8_MEMBER(prog_r);
-	DECLARE_WRITE8_MEMBER(prog_w);
+	DECLARE_READ8_MEMBER(mem_r);
+	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
@@ -258,12 +257,12 @@ public:
 
 	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
 
-	const address_space_config m_program_config, m_io_config, m_program16_config, m_io16_config;
+	const address_space_config m_mem_config, m_io_config, m_mem16_config, m_io16_config;
 
 protected:
 	isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void install_space(address_spacenum spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	void install_space(int spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -273,8 +272,8 @@ protected:
 	cpu_device   *m_maincpu;
 
 	// address spaces
-	address_space *m_iospace, *m_prgspace;
-	int m_iowidth, m_prgwidth;
+	address_space *m_iospace, *m_memspace;
+	int m_iowidth, m_memwidth;
 	bool m_allocspaces;
 
 	devcb_write_line    m_out_irq2_cb;
@@ -370,17 +369,7 @@ public:
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program16_config;
-			case AS_IO:      return &m_io16_config;
-			case AS_DATA:    return &m_program_config;
-			case AS_3:       return &m_io_config;
-			default:         fatalerror("isa: invalid memory space!\n");
-		}
-	}
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( irq10_w );
 	DECLARE_WRITE_LINE_MEMBER( irq11_w );
@@ -397,13 +386,13 @@ public:
 	void dack16_w(int line,uint16_t data);
 
 	// 16 bit accessors for ISA-defined address spaces
-	DECLARE_READ16_MEMBER(prog16_r);
-	DECLARE_WRITE16_MEMBER(prog16_w);
+	DECLARE_READ16_MEMBER(mem16_r);
+	DECLARE_WRITE16_MEMBER(mem16_w);
 	DECLARE_READ16_MEMBER(io16_r);
 	DECLARE_WRITE16_MEMBER(io16_w);
 	// byte-swapped versions of 16-bit accessors
-	DECLARE_READ16_MEMBER(prog16_swap_r);
-	DECLARE_WRITE16_MEMBER(prog16_swap_w);
+	DECLARE_READ16_MEMBER(mem16_swap_r);
+	DECLARE_WRITE16_MEMBER(mem16_swap_w);
 	DECLARE_READ16_MEMBER(io16_swap_r);
 	DECLARE_WRITE16_MEMBER(io16_swap_w);
 

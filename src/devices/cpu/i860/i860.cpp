@@ -41,6 +41,12 @@ i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> i860_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 void i860_cpu_device::device_start()
 {

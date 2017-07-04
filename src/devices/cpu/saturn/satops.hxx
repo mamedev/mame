@@ -506,7 +506,7 @@ void saturn_device::saturn_equals_zero(int reg, int begin, int count)
 {
 	int i, t;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>0 && begin+count<=16);
+	saturn_assert(begin>=0 && begin<16 && count>0 && begin+count<=16);
 	m_carry=1;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];

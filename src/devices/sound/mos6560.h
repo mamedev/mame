@@ -50,8 +50,8 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6560, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(1, _colorram_map)
 
 #define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -62,8 +62,8 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6561, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(1, _colorram_map)
 
 #define MCFG_MOS656X_ATTACK_UFO_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -74,8 +74,8 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(1, _colorram_map)
 
 
 #define MCFG_MOS6560_POTX_CALLBACK(_read) \
@@ -139,7 +139,7 @@ public:
 	template <class Object> static devcb_base &set_potx_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_poty_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(std::forward<Object>(cb)); }
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

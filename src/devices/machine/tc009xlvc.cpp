@@ -156,7 +156,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
 	tx_tilemap->mark_all_dirty();
 }
 
-static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
+static ADDRESS_MAP_START( tc0091lvc_map8, 0, 8, tc0091lvc_device )
 	AM_RANGE(0x014000, 0x017fff) AM_READWRITE(tc0091lvc_pcg1_r, tc0091lvc_pcg1_w)
 	AM_RANGE(0x018000, 0x018fff) AM_READWRITE(tc0091lvc_vram0_r, tc0091lvc_vram0_w)
 	AM_RANGE(0x019000, 0x019fff) AM_READWRITE(tc0091lvc_vram1_r, tc0091lvc_vram1_w)
@@ -281,9 +281,11 @@ void tc0091lvc_device::device_start()
 	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(&palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
 }
 
-const address_space_config *tc0091lvc_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> tc0091lvc_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

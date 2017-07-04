@@ -1755,7 +1755,7 @@ static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas16b_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas16b_state )
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -1785,7 +1785,7 @@ static ADDRESS_MAP_START( system16b_bootleg_map, AS_PROGRAM, 16, segas16b_state 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_DECRYPTED_OPCODES, 16, segas16b_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_OPCODES, 16, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
@@ -1872,7 +1872,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16b_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, segas16b_state )
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")

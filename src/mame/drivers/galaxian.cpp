@@ -1611,7 +1611,7 @@ static ADDRESS_MAP_START( mooncrst_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( moonqsr_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, galaxian_state )
+static ADDRESS_MAP_START( moonqsr_decrypted_opcodes_map, AS_OPCODES, 8, galaxian_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -2026,7 +2026,7 @@ static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mshuttle_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, galaxian_state )
+static ADDRESS_MAP_START( mshuttle_decrypted_opcodes_map, AS_OPCODES, 8, galaxian_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -4347,10 +4347,7 @@ static INPUT_PORTS_START( froggeram )
 	PORT_DIPSETTING(    0x00, "A 1/1 B 1/1" )
 	PORT_DIPSETTING(    0x08, "A 2/1 B 2/1" )
 	PORT_DIPSETTING(    0x04, "A 1/1 B 2/1" )
-	PORT_DIPUNKNOWN( 0x10, 0x00 )
-	PORT_DIPUNKNOWN( 0x20, 0x00 )
-	PORT_DIPUNKNOWN( 0x40, 0x00 )
-	PORT_DIPUNKNOWN( 0x80, 0x00 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* need for some PPI accesses */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )

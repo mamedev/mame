@@ -118,6 +118,13 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> arm7_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 void arm7_cpu_device::update_reg_ptr()
 {
 	m_reg_group = sRegisterTable[GET_MODE];
@@ -436,7 +443,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 }
 
 
-bool arm7_cpu_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if( spacenum == AS_PROGRAM && ( m_control & COPRO_CTRL_MMU_EN ) )

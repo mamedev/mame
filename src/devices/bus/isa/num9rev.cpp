@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(ISA8_NUM_9_REV, isa8_number_9_rev_device, "number_9_rev", "Number Nine Revolution 512x32/1024x8")
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, isa8_number_9_rev_device )
+static ADDRESS_MAP_START( upd7220_map, 0, 16, isa8_number_9_rev_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -61,7 +61,7 @@ MACHINE_CONFIG_MEMBER( isa8_number_9_rev_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4_433619MHz/2) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(isa8_number_9_rev_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END

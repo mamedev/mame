@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( lcdc_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lcdc_map, AS_0, 8, bw2_state )
+static ADDRESS_MAP_START( lcdc_map, 0, 8, bw2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( bw2 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(bw2_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, XTAL_16MHz)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, lcdc_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")

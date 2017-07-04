@@ -39,9 +39,12 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 
 void taito_en_device::device_start()
 {
+	// TODO: 16Mx32? Not likely!
+	m_es5510_dram = std::make_unique<uint32_t[]>(1<<24);
+
+	save_pointer(NAME(m_es5510_dram.get()), 1<<24);
 	save_item(NAME(m_es5510_dsp_ram));
 	save_item(NAME(m_es5510_gpr));
-	save_item(NAME(m_es5510_dram));
 	save_item(NAME(m_es5510_dol_latch));
 	save_item(NAME(m_es5510_dil_latch));
 	save_item(NAME(m_es5510_dadr_latch));

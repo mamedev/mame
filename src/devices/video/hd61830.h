@@ -55,7 +55,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	uint8_t readbyte(offs_t address) { return space().read_byte(address); }
 	void writebyte(offs_t address, uint8_t data) { space().write_byte(address, data); }

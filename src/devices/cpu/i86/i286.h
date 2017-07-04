@@ -69,7 +69,7 @@ public:
 	i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	typedef delegate<uint32_t (bool)> a20_cb;
 	static void static_set_a20_callback(device_t &device, a20_cb object) { downcast<i80286_cpu_device &>(device).m_a20_callback = object; }
@@ -86,7 +86,7 @@ protected:
 
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int inputnum, int state) override;
-	bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
+	bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	virtual void interrupt(int int_num, int trap = 1) override { if(trap) throw TRAP(int_num, (uint16_t)-1); else interrupt_descriptor(int_num, 0, 0); }
 	virtual uint8_t read_port_byte(uint16_t port) override;

@@ -393,7 +393,7 @@ READ8_MEMBER(mpu4vid_state::vram_r)
 	return m_vid_mainram[offset];
 }
 
-static ADDRESS_MAP_START( mpu4_vram, AS_0, 8, mpu4vid_state )
+static ADDRESS_MAP_START( mpu4_vram, 0, 8, mpu4vid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -1285,7 +1285,7 @@ static MACHINE_CONFIG_START( mpu4_vid )
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mpu4_vram)
+	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
 
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )

@@ -53,6 +53,12 @@ se3208_device::se3208_device(const machine_config &mconfig, const char *tag, dev
 	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
+std::vector<std::pair<int, const address_space_config *>> se3208_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 
 uint32_t se3208_device::read_dword_unaligned(address_space &space, uint32_t address)

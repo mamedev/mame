@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( powerinsb_sound_io_map, AS_IO, 8, powerins_state )
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerinsa_oki_map, AS_0, 8, powerins_state )
+static ADDRESS_MAP_START( powerinsa_oki_map, 0, 8, powerins_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -356,7 +356,7 @@ static MACHINE_CONFIG_DERIVED( powerinsa, powerins )
 	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
 	MCFG_OKIM6295_REPLACE("oki1", 990000, PIN7_LOW) // pin7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, powerinsa_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, powerinsa_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("oki2")

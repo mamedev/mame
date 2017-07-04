@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(UPD7752, upd7752_device, "upd7752", "NEC uPD7752")
 
 
 /* TODO: unknown exact size */
-static ADDRESS_MAP_START( upd7752_ram, AS_0, 8, upd7752_device )
+static ADDRESS_MAP_START( upd7752_ram, 0, 8, upd7752_device )
 //  AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -56,9 +56,11 @@ upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, d
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *upd7752_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> upd7752_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

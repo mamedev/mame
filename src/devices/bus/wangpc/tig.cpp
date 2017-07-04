@@ -83,7 +83,7 @@ const tiny_rom_entry *wangpc_tig_device::device_rom_region() const
 //  UPD7220_INTERFACE( hgdc0_intf )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( upd7220_0_map, AS_0, 16, wangpc_tig_device )
+static ADDRESS_MAP_START( upd7220_0_map, 0, 16, wangpc_tig_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_RAM // frame buffer
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // font memory
@@ -98,7 +98,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( wangpc_tig_device::hgdc_draw_text )
 //  UPD7220_INTERFACE( hgdc1_intf )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, wangpc_tig_device )
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, wangpc_tig_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0xffff) AM_RAM // graphics memory
 ADDRESS_MAP_END
@@ -123,12 +123,12 @@ MACHINE_CONFIG_MEMBER( wangpc_tig_device::device_add_mconfig )
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_DEVICE_ADD(UPD7720_0_TAG, UPD7220, XTAL_52_832MHz/28)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_0_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_0_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(wangpc_tig_device, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(UPD7720_1_TAG, UPD7220, XTAL_52_832MHz/28)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(wangpc_tig_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END

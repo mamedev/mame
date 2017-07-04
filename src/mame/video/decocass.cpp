@@ -373,8 +373,8 @@ WRITE8_MEMBER(decocass_state::decocass_color_missiles_w )
 }
 
 /*
- * D0 - ??
- * D1 - ??
+ * D0 - bg paging
+ * D1 - bg paging
  * D2 - ptn 1/2
  * D3 - BKG ena
  * D4 - center L on
@@ -742,14 +742,15 @@ uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_in
 
 	// LS148 @ 2B (DSP-8 board) sets pen priority
 
+	// priority 0: foreground - should be drawn last in some cases? what breaks with it here?
+	// DSP-8 schematics indicate that this should be priority 4, but that breaks Tornado and Pro Tennis and Mission X (priority vs boats)
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	// priority 1: sprites
 	draw_sprites(bitmap, cliprect, (m_color_center_bot >> 1) & 1, 0, 0, m_fgvideoram, 0x20);
 
 	// priority 2 & 3: missiles
 	draw_missiles(bitmap, cliprect, 1, 0, m_colorram, 0x20);
-
-	// priority 4: foreground
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

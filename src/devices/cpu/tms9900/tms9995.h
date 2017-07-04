@@ -98,7 +98,7 @@ protected:
 	virtual uint32_t      disasm_max_opcode_bytes() const override;
 	virtual offs_t      disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return clocks / 4.0; }
 	uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * 4.0; }

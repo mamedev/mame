@@ -125,10 +125,7 @@ protected:
 	virtual void execute_set_input(int line, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr );
-	}
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;

@@ -233,7 +233,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
 }
 
 // anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
-static ADDRESS_MAP_START( seibucopbl_map, AS_0, 16, seibu_cop_bootleg_device )
+static ADDRESS_MAP_START( seibucopbl_map, 0, 16, seibu_cop_bootleg_device )
 	AM_RANGE(0x01e, 0x01f) AM_RAM // angle step, PC=0xc0186
 	AM_RANGE(0x046, 0x049) AM_READWRITE(d104_move_r,d104_move_w)
 	AM_RANGE(0x070, 0x07f) AM_RAM // DMA registers, PC=0xc0034
@@ -254,9 +254,11 @@ seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig
 
 
 
-const address_space_config *seibu_cop_bootleg_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> seibu_cop_bootleg_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //-------------------------------------------------

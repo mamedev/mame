@@ -129,13 +129,13 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
+	m_mem_config("ISA 8-bit mem", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
 	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, nullptr),
-	m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, nullptr),
+	m_mem16_config("ISA 16-bit mem", ENDIANNESS_LITTLE, 16, 24, 0, nullptr),
 	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, nullptr),
 	m_maincpu(nullptr),
 	m_iospace(nullptr),
-	m_prgspace(nullptr),
+	m_memspace(nullptr),
 	m_out_irq2_cb(*this),
 	m_out_irq3_cb(*this),
 	m_out_irq4_cb(*this),
@@ -153,18 +153,38 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 		m_dma_eop[i] = false;
 	}
 	m_nmi_enabled = false;
-	m_iowidth = m_prgwidth = 0;
+	m_iowidth = m_memwidth = 0;
 	m_allocspaces = false;
 }
 
-READ8_MEMBER(isa8_device::prog_r)
+std::vector<std::pair<int, const address_space_config *>> isa8_device::memory_space_config() const
 {
-	return m_prgspace->read_byte(offset);
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_ISA_MEM,    &m_mem_config),
+		std::make_pair(AS_ISA_IO,     &m_io_config),
+		std::make_pair(AS_ISA_MEMALT, &m_mem16_config),
+		std::make_pair(AS_ISA_IOALT,  &m_io16_config)
+	};
 }
 
-WRITE8_MEMBER(isa8_device::prog_w)
+std::vector<std::pair<int, const address_space_config *>> isa16_device::memory_space_config() const
 {
-	m_prgspace->write_byte(offset, data);
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_ISA_MEM,    &m_mem16_config),
+		std::make_pair(AS_ISA_IO,     &m_io16_config),
+		std::make_pair(AS_ISA_MEMALT, &m_mem_config),
+		std::make_pair(AS_ISA_IOALT,  &m_io_config)
+	};
+}
+
+READ8_MEMBER(isa8_device::mem_r)
+{
+	return m_memspace->read_byte(offset);
+}
+
+WRITE8_MEMBER(isa8_device::mem_w)
+{
+	m_memspace->write_byte(offset, data);
 }
 
 READ8_MEMBER(isa8_device::io_r)
@@ -206,17 +226,17 @@ void isa8_device::device_start()
 
 	if (m_allocspaces)
 	{
-		m_iospace = &space(AS_IO);
-		m_prgspace = &space(AS_PROGRAM);
+		m_iospace = &space(AS_ISA_IO);
+		m_memspace = &space(AS_ISA_MEM);
 		m_iowidth = m_iospace->data_width();
-		m_prgwidth = m_prgspace->data_width();
+		m_memwidth = m_memspace->data_width();
 	}
 	else    // use host CPU's program and I/O spaces directly
 	{
 		m_iospace = &m_maincpu->space(AS_IO);
 		m_iowidth = m_maincpu->space_config(AS_IO)->m_databus_width;
-		m_prgspace = &m_maincpu->space(AS_PROGRAM);
-		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+		m_memspace = &m_maincpu->space(AS_PROGRAM);
+		m_memwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	}
 }
 
@@ -229,20 +249,20 @@ void isa8_device::device_reset()
 }
 
 
-void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void isa8_device::install_space(int spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
 	int buswidth;
 	address_space *space;
 
-	if (spacenum == AS_IO)
+	if (spacenum == AS_ISA_IO)
 	{
 		space = m_iospace;
 		buswidth = m_iowidth;
 	}
-	else if (spacenum == AS_PROGRAM)
+	else if (spacenum == AS_ISA_MEM)
 	{
-		space = m_prgspace;
-		buswidth = m_prgwidth;
+		space = m_memspace;
+		buswidth = m_memwidth;
 	}
 	else
 	{
@@ -277,24 +297,24 @@ void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t 
 
 void isa8_device::install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	install_space(AS_PROGRAM, start, end, rhandler, whandler);
+	install_space(AS_ISA_MEM, start, end, rhandler, whandler);
 }
 
 void isa8_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	install_space(AS_IO, start, end, rhandler, whandler);
+	install_space(AS_ISA_IO, start, end, rhandler, whandler);
 }
 
 
 void isa8_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
-	m_prgspace->install_readwrite_bank(start, end, 0, tag );
-	machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(data);
+	m_memspace->install_readwrite_bank(start, end, 0, tag );
+	machine().root_device().membank(m_memspace->device().siblingtag(tag).c_str())->set_base(data);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end)
 {
-	m_prgspace->unmap_readwrite(start, end);
+	m_memspace->unmap_readwrite(start, end);
 }
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region)
@@ -304,22 +324,22 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const cha
 		uint8_t *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
-		m_prgspace->install_read_bank(start, end, 0, tag);
-		m_prgspace->unmap_write(start, end);
-		machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
+		m_memspace->install_read_bank(start, end, 0, tag);
+		m_memspace->unmap_write(start, end);
+		machine().root_device().membank(m_memspace->device().siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 	}
 }
 
 void isa8_device::unmap_rom(offs_t start, offs_t end)
 {
-	m_prgspace->unmap_read(start, end);
+	m_memspace->unmap_read(start, end);
 }
 
 bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	for(int i = 0; i < size; i += 4096) // 4KB granularity should be enough
-		if(m_prgspace->get_read_ptr(start + i)) return false;
+		if(m_memspace->get_read_ptr(start + i)) return false;
 	return true;
 }
 
@@ -465,7 +485,7 @@ void isa16_device::device_start()
 
 void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
 {
-	int buswidth = m_prgwidth;
+	int buswidth = m_iowidth;
 	switch(buswidth)
 	{
 		case 16:
@@ -490,14 +510,14 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 	}
 }
 
-READ16_MEMBER(isa16_device::prog16_r)
+READ16_MEMBER(isa16_device::mem16_r)
 {
-	return m_prgspace->read_word(offset<<1, mem_mask);
+	return m_memspace->read_word(offset<<1, mem_mask);
 }
 
-WRITE16_MEMBER(isa16_device::prog16_w)
+WRITE16_MEMBER(isa16_device::mem16_w)
 {
-	m_prgspace->write_word(offset<<1, data, mem_mask);
+	m_memspace->write_word(offset<<1, data, mem_mask);
 }
 
 READ16_MEMBER(isa16_device::io16_r)
@@ -510,21 +530,21 @@ WRITE16_MEMBER(isa16_device::io16_w)
 	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::prog16_swap_r)
+READ16_MEMBER(isa16_device::mem16_swap_r)
 {
 	uint16_t rv;
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 
-	rv = m_prgspace->read_word(offset<<1, mem_mask);
+	rv = m_memspace->read_word(offset<<1, mem_mask);
 
 	return (rv<<8) | (rv>>8);
 }
 
-WRITE16_MEMBER(isa16_device::prog16_swap_w)
+WRITE16_MEMBER(isa16_device::mem16_swap_w)
 {
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 	data = (data<<8) | (data>>8);
-	m_prgspace->write_word(offset<<1, data, mem_mask);
+	m_memspace->write_word(offset<<1, data, mem_mask);
 }
 
 READ16_MEMBER(isa16_device::io16_swap_r)

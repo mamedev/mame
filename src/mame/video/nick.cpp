@@ -88,7 +88,7 @@ DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nick_map, AS_0, 8, nick_device )
+static ADDRESS_MAP_START( nick_map, 0, 8, nick_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -204,9 +204,11 @@ void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *nick_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> nick_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

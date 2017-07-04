@@ -277,7 +277,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_PROGRAM) const override { return (spacenum == AS_PROGRAM) ? &m_space_config: nullptr; }
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	address_space_config m_space_config;
 	address_space *m_space;
@@ -299,6 +299,13 @@ protected:
 	uint8_t m_cart;
 	bool m_is_ram_active;
 };
+
+std::vector<std::pair<int, const address_space_config *>> galgames_slot_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_space_config)
+	};
+}
 
 // device type definition
 DEFINE_DEVICE_TYPE(GALGAMES_SLOT, galgames_slot_device, "starpak_slot", "Galaxy Games Slot")
