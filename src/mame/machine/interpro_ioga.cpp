@@ -18,10 +18,13 @@
 #include "emu.h"
 #include "interpro_ioga.h"
 
+// the following enables some hacks which will allow all iogadiag tests to complete successfully, but also breaks scsi dma
+#define IOGA_DMA_DIAG_HACK 0
+
 #define LOG_GENERAL      (1 << 31)
-#define LOG_HWINT_ENABLE 0 //((1<<3) | LOG_GENERAL)
-#define LOG_DMA_ENABLE   ((1<<IOGA_DMA_FLOPPY) | LOG_GENERAL)
-#define LOG_TIMER_ENABLE   0
+#define LOG_HWINT_ENABLE 0
+#define LOG_DMA_ENABLE   0
+#define LOG_TIMER_ENABLE 0
 
 #define VERBOSE 0
 
@@ -657,20 +660,14 @@ void interpro_ioga_device::dma_clock()
 				// clear bus wait flag
 				dma_channel.control &= ~DMA_CTRL_WAIT;
 
-				// start a transfer or complete the command depending on transfer count
-				//if (dma_channel.transfer_count != 0)
-				{
-					LOG_DMA(dma_channel.channel, "dma: transfer %s device begun, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
-						(dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from",
-						dma_channel.channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
+				LOG_DMA(dma_channel.channel, "dma: transfer %s device begun, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
+					(dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from",
+					dma_channel.channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
 
-					dma_channel.state = TRANSFER;
-				}
-				//else
-				//	dma_channel.state = COMPLETE;
+				dma_channel.state = TRANSFER;
 			}
 			else
-				// set the bus grant wait flag (iogadiag test 7.0265)
+				// (7.0265) set the bus grant wait flag
 				dma_channel.control |= DMA_CTRL_WAIT;
 			break;
 
@@ -694,93 +691,74 @@ void interpro_ioga_device::dma_clock()
 				dma_channel.control |= DMA_CTRL_TCZERO;
 				dma_channel.state = COMPLETE;
 			}
-#if 0
+#if IOGA_DMA_DIAG_HACK
 			else
 #define TAG ((dma_channel.control & DMA_CTRL_TAG) >> 3)
 
-				// a hack for forced dma bus error diagnostic tests
+				// hacks for forced dma bus error diagnostic tests
 				if ((dma_channel.control & 0xfe000000 && dma_channel.control & 0xe00) || ((dma_channel.control & DMA_CTRL_WMASK) == 0x41000000))
 				if (dma_channel.real_address & 0xff000000 || dma_channel.real_address == 0)
 				{
 					LOG_DMA(dma_channel.channel, "dma: forced bus error hack, control 0x%08x\n", dma_channel.control);
 
-					// trigger an interrupt (7.0267)
+					// (7.0267) trigger an interrupt
 					m_hwicr[dma_channel.channel + 1] |= IOGA_INTERRUPT_PENDING;
 
-					// set bus error bit (7.0268)
+					// (7.0268) set bus error bit
 					dma_channel.control |= DMA_CTRL_BERR;
 
 					// 7.0269, 7.0276, 7.0281, 7.0289: set error address from virtual or real dma address
-					// HACK: don't set error address for this special case - maybe invalid tag?
+					// HACK: don't set error address for 7.0276 special case
 					if (!(dma_channel.control == 0x65400600 && dma_channel.real_address != 0))
 						m_error_address = dma_channel.control & DMA_CTRL_VIRTUAL ? dma_channel.virtual_address : dma_channel.real_address;
 
-					u8 ct = 0x30;
+					// compute bus error cycle type from control register
+					u8 cycle_type = 0x30;
 					switch ((dma_channel.control >> 24) & 0x8c)
 					{
-					case 0x00: ct |= 2; break;
-					case 0x04: ct |= 1; break;
-					case 0x08: ct |= 3; break;
-					case 0x80: ct |= 4; break;
-					case 0x84: ct |= 8; break;
+					case 0x00: cycle_type |= 2; break;
+					case 0x04: cycle_type |= 1; break;
+					case 0x08: cycle_type |= 3; break;
+					case 0x80: cycle_type |= 4; break;
+					case 0x84: cycle_type |= 8; break;
 					}
 
 					switch (dma_channel.control & ~DMA_CTRL_BERR)
 					{
 					case 0x61000800: // VIRTUAL | WRITE | TAG(3)
-						// trigger an nmi (7.0266)
+						// (7.0266) trigger an nmi
 						m_nmi_pending = true;
 
-						// set error cycle type (7.0270) - expect 0x52f0
-						m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | 0xf0; // 0x52f0 = SNAPOK | BERR | BG(IOD) | TAG(c0=3) | CT(30)
+						// (7.0270) set error cycle type 0x52f0: SNAPOK | BERR | BG(IOD) | TAG(0c0) | CT(30)
+						m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | 0xf0;
 						break;
 
 					case 0x65000600: // VIRTUAL | WRITE | X | TAG(4)
 						if (dma_channel.real_address != 0)
 						{
-							// address: expect 0x7f200000 found 0x007ccd9c (7.0276)
-							// -> do not set error address
-
-							// 7.0275: control register expect 0x64400800
+							// (7.0275) control register expect 0x64400800
 							dma_channel.control &= ~0x600;
 							dma_channel.control |= 0x800;
 
-							// set error cycle type 0x5331 (7.0277)
-							m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | TAG | ct; // 0x5331 = SNAPOK | BERR | BG(IOD) | TAG(100) | CT(31)
+							// (7.0277) set error cycle type 0x5331: SNAPOK | BERR | BG(IOD) | TAG(100) | CT(31)
+							m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | TAG | cycle_type;
 						}
 						else
 						{
-							// set error cycle type 0x62f0 (7.0287)
-							m_error_businfo = BINFO_SNAPOK | BINFO_MMBE | BINFO_BG_IOD | TAG | 0x30; // 0x62f0 = SNAPOK | MMBE | BG(IOD) | TAG(c0) | CT(30)
+							// (7.0287) set error cycle type 0x62f0: SNAPOK | MMBE | BG(IOD) | TAG(0c0) | CT(30)
+							m_error_businfo = BINFO_SNAPOK | BINFO_MMBE | BINFO_BG_IOD | TAG | 0x30;
 						}
 						break;
-#if 0
-					// dma_channel.control (start with 0x41) |
-					// 0x04 -> CT(0x30 | 1)  0000 0100  or  0100 0101  (45)   001 1  001
-					// 0x00 -> CT(0x30 | 2)  0000 0000  or  0100 0001  (41)   000 0  000
-					// 0x08 -> CT(0x30 | 3)  0000 1000  or  0100 1001  (49)   010 2  010
-					// 0x80 -> CT(0x30 | 4)  1000 0000  or  1100 0001  (c1)   100 4  100
-					// 0x84 -> CT(0x30 | 8)  1000 0100  or  1100 0101  (c5)   101 5  101
 
-					// 0x65000000 -> CT(0x30 | 0)                 0110 0101  (65)   001 1
-					//                             x--- xx--      x--- xx--
-					//
-
-					case 0x41000000: // 7.0290: expect 0x5232
-					case 0x49000200: // 7.0290: expect 0x5273
-					case 0x45000400: // 7.0290: expect 0x52b1
-					case 0xc1000600: // 7.0290: expect 0x52f4
-					case 0xc5000800: // 7.0290: expect 0x5338
-#endif
 					default:
-						m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | TAG | ct;
+						m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | TAG | cycle_type;
 						break;
 					}
 
 					dma_channel.state = COMPLETE;
 				}
 #endif
-					break;
+			break;
 
 		case COMPLETE:
 			// clear busy flag
@@ -867,7 +845,7 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 	case 3:
 		LOG_DMA(channel, "dma: channel %d control = 0x%08x (%s)\n", channel, data, machine().describe_context());
 
-		// 7.0272: if bus error flag is set, clear existing bus error (otherwise retain existing state)
+		// (7.0272) if bus error flag is set, clear existing bus error (otherwise retain existing state)
 		if (data & DMA_CTRL_BERR)
 			dma_channel.control = data & DMA_CTRL_WMASK;
 		else
@@ -941,7 +919,7 @@ WRITE32_MEMBER(interpro_ioga_device::eth_control_w)
 {
 	LOG_ETH("eth: control = 0x%08x (%s)\n", data, machine().describe_context());
 
-	/* 7.0202 eth ctrl register input test patterns and expected outputs are:
+	/* (7.0202) eth ctrl register input test patterns and expected outputs are:
 
 	   7809 -> 4000
 
