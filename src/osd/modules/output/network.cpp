@@ -71,7 +71,7 @@ private:
   	msg[ch] = '\0';
   	ch++;
   	std::strncpy(verb, msg, sizeof(verb)-1);
-  	printf("verb = [%s], ", verb);
+  	//printf("verb = [%s], ", verb);
   	
   	while (msg[ch] != ' ')
   	{
@@ -80,7 +80,7 @@ private:
   	
   	ch++;
   	value = atoi(&msg[ch]);
-  	printf("value = %d\n", value);
+  	//printf("value = %d\n", value);
   	
   	if (!std::strcmp(verb, "send_id"))
   	{
@@ -122,7 +122,6 @@ private:
   void do_write(std::size_t length)
   {
 	auto self(shared_from_this());
-	printf("do_write: [%d: %s]\n", (int)length, m_data);
 		asio::async_write(m_socket, asio::buffer(m_data, length),
 		[this, self](std::error_code ec, std::size_t /*length*/)
 		{
