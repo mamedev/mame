@@ -338,5 +338,5 @@ DRIVER_INIT_MEMBER(leapster_state,leapster)
 {
 }
 
-CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    MACHINE_IS_SKELETON )
+CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", MACHINE_IS_SKELETON )

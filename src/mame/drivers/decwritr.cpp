@@ -439,4 +439,4 @@ ROM_END
 //  DRIVERS
 //**************************************************************************
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT  COMPANY                          FULLNAME       FLAGS */
-COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_IS_SKELETON | MACHINE_NOT_WORKING )
+COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_IS_SKELETON )
