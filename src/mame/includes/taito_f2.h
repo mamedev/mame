@@ -7,6 +7,7 @@
 #include "video/tc0280grd.h"
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
+#include "machine/cchip_dev.h"
 
 struct f2_tempsprite
 {
@@ -29,9 +30,9 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_sprite_extension(*this, "sprite_ext"),
 			m_spriteram(*this, "spriteram"),
-			m_cchip2_ram(*this, "cchip2_ram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_cchip(*this, "cchip"),
 			m_oki(*this, "oki"),
 			m_tc0100scn(*this, "tc0100scn"),
 			m_tc0100scn_1(*this, "tc0100scn_1"),
@@ -52,7 +53,6 @@ public:
 	required_shared_ptr<uint16_t> m_spriteram;
 	std::unique_ptr<uint16_t[]>        m_spriteram_buffered;
 	std::unique_ptr<uint16_t[]>        m_spriteram_delayed;
-	optional_shared_ptr<uint16_t> m_cchip2_ram;           // for megablst only
 
 	/* video-related */
 	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
@@ -99,6 +99,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<taito_cchip_device> m_cchip;
 	optional_device<okim6295_device> m_oki;
 	optional_device<tc0100scn_device> m_tc0100scn;
 	optional_device<tc0100scn_device> m_tc0100scn_1;
@@ -124,8 +125,6 @@ public:
 	DECLARE_READ8_MEMBER(driveout_sound_command_r);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	DECLARE_WRITE16_MEMBER(driveout_sound_command_w);
-	DECLARE_WRITE16_MEMBER(cchip2_word_w);
-	DECLARE_READ16_MEMBER(cchip2_word_r);
 	DECLARE_WRITE16_MEMBER(taitof2_sprite_extension_w);
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);

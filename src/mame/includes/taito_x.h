@@ -2,12 +2,17 @@
 // copyright-holders:Howie Cohen, Yochizo
 // thanks-to:Richard Bush
 #include "includes/seta.h"
+#include "machine/cchip_dev.h"
 
 class taitox_state : public seta_state
 {
 public:
 	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seta_state(mconfig, type, tag) { }
+		: seta_state(mconfig, type, tag),
+		m_cchip(*this, "cchip")	
+	{ }
+
+	optional_device<taito_cchip_device> m_cchip;
 
 	DECLARE_READ16_MEMBER(superman_dsw_input_r);
 	DECLARE_READ16_MEMBER(daisenpu_input_r);

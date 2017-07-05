@@ -1629,6 +1629,8 @@ if (CPUS["UPD7810"]~=null) then
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_opcodes.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_table.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_macros.h",
+		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.cpp",
+		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.h",
 	}
 end
 

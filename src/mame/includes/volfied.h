@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "video/pc090oj.h"
+#include "machine/cchip_dev.h"
 #include "screen.h"
 
 class volfied_state : public driver_device
@@ -21,6 +22,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_cchip(*this, "cchip"),
 		m_pc090oj(*this, "pc090oj"),
 		m_screen(*this, "screen") { }
 
@@ -42,6 +44,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<taito_cchip_device> m_cchip;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<screen_device> m_screen;
 
