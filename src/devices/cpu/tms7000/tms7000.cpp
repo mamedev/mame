@@ -19,6 +19,7 @@
 
 #include "emu.h"
 #include "tms7000.h"
+#include "7000dasm.h"
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
 // TMS7020 and TMS7040 are same, but with 2KB and 4KB internal ROM respectively.
@@ -273,10 +274,9 @@ void tms7000_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t tms7000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms7000_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms7000 );
-	return CPU_DISASSEMBLE_NAME(tms7000)(this, stream, pc, oprom, opram, options);
+	return new tms7000_disassembler;
 }
 
 

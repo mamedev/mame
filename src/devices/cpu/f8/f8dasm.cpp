@@ -1,18 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
 #include "emu.h"
-#include "debugger.h"
-#include "f8.h"
+#include "f8dasm.h"
 
-static const char *const rname[16] = {
+const char *const f8_disassembler::rname[16] = {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
 	"R8", "J",  "HU", "HL", "KU", "KL", "QU", "QL"
 };
 
-CPU_DISASSEMBLE(f8)
+u32 f8_disassembler::opcode_alignment() const
 {
-	unsigned size = 0;
-	uint8_t op = oprom[size++];
+	return 1;
+}
+
+offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t base_pc = pc;
+	uint8_t op = opcodes.r8(pc++);
 
 	switch( op )
 	{
@@ -116,40 +120,40 @@ CPU_DISASSEMBLE(f8)
 		util::stream_format(stream, "INC");
 		break;
 	case 0x20: /* 0010 0000 */
-		util::stream_format(stream, "LI   $%02X", oprom[size++]);
+		util::stream_format(stream, "LI   $%02X", opcodes.r8(pc++));
 		break;
 	case 0x21: /* 0010 0001 */
-		util::stream_format(stream, "NI   $%02X", oprom[size++]);
+		util::stream_format(stream, "NI   $%02X", opcodes.r8(pc++));
 		break;
 	case 0x22: /* 0010 0010 */
-		util::stream_format(stream, "OI   $%02X", oprom[size++]);
+		util::stream_format(stream, "OI   $%02X", opcodes.r8(pc++));
 		break;
 	case 0x23: /* 0010 0011 */
-		util::stream_format(stream, "XI   $%02X", oprom[size++]);
+		util::stream_format(stream, "XI   $%02X", opcodes.r8(pc++));
 		break;
 	case 0x24: /* 0010 0100 */
-		util::stream_format(stream, "AI   $%02X", oprom[size++]);
+		util::stream_format(stream, "AI   $%02X", opcodes.r8(pc++));
 		break;
 	case 0x25: /* 0010 0101 */
-		util::stream_format(stream, "CI   $%02X", oprom[size++]);
+		util::stream_format(stream, "CI   $%02X", opcodes.r8(pc++));
 		break;
 	case 0x26: /* 0010 0110 */
-		util::stream_format(stream, "IN   $%02X", oprom[size++]);
+		util::stream_format(stream, "IN   $%02X", opcodes.r8(pc++));
 		break;
 	case 0x27: /* 0010 0111 */
-		util::stream_format(stream, "OUT  $%02X", oprom[size++]);
+		util::stream_format(stream, "OUT  $%02X", opcodes.r8(pc++));
 		break;
 	case 0x28: /* 0010 1000 */
-		util::stream_format(stream, "PI   $%02X%02X", oprom[size + 0], oprom[size + 1]);
-		size += 2;
+		util::stream_format(stream, "PI   $%02X%02X", opcodes.r16(pc));
+		pc += 2;
 		break;
 	case 0x29: /* 0010 1001 */
-		util::stream_format(stream, "JMP  $%02X%02X", oprom[size + 0], oprom[size + 1]);
-		size += 2;
+		util::stream_format(stream, "JMP  $%02X%02X", opcodes.r16(pc));
+		pc += 2;
 		break;
 	case 0x2a: /* 0010 1010 */
-		util::stream_format(stream, "DCI  $%02X%02X", oprom[size + 0], oprom[size + 1]);
-		size += 2;
+		util::stream_format(stream, "DCI  $%02X%02X", opcodes.r16(pc));
+		pc += 2;
 		break;
 	case 0x2b: /* 0010 1011 */
 		util::stream_format(stream, "NOP");
@@ -286,22 +290,22 @@ CPU_DISASSEMBLE(f8)
 
 	case 0x81: /* 1000 0001 */
 	case 0x85: /* 1000 0101 */
-		util::stream_format(stream, "BP   $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BP   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x82: /* 1000 0010 */
-		util::stream_format(stream, "BC   $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BC   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x84: /* 1000 0100 */
-		util::stream_format(stream, "BZ   $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BZ   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x80: /* 1000 0000 */
 	case 0x83: /* 1000 0011 */
 	case 0x86: /* 1000 0110 */
 	case 0x87: /* 1000 0111 */
-		util::stream_format(stream, "BT   $%02X,$%04X", op & 0x07, pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BT   $%02X,$%04X", op & 0x07, base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x88: /* 1000 1000 */
@@ -333,28 +337,28 @@ CPU_DISASSEMBLE(f8)
 		break;
 
 	case 0x8f: /* 1000 1111 */
-		util::stream_format(stream, "BR7  $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BR7  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x90: /* 1001 0000 */
-		util::stream_format(stream, "BR   $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BR   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x91: /* 1001 0001 */
 	case 0x95: /* 1001 0101 */
-		util::stream_format(stream, "BM   $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BM   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x92: /* 1001 0010 */
-		util::stream_format(stream, "BNC  $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BNC  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x94: /* 1001 0100 */
-		util::stream_format(stream, "BNZ  $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BNZ  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x98: /* 1001 1000 */
-		util::stream_format(stream, "BNO  $%04X", pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BNO  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x93: /* 1001 0011 */
@@ -367,7 +371,7 @@ CPU_DISASSEMBLE(f8)
 	case 0x9d: /* 1001 1101 */
 	case 0x9e: /* 1001 1110 */
 	case 0x9f: /* 1001 1111 */
-		util::stream_format(stream, "BF   $%02X,$%04X", op & 0x0f, pc + (int8_t)oprom[size++] + 1);
+		util::stream_format(stream, "BF   $%02X,$%04X", op & 0x0f, base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0xa0: /* 1010 0000 */
@@ -530,5 +534,5 @@ CPU_DISASSEMBLE(f8)
 		break;
 	}
 
-	return size;
+	return pc - base_pc;
 }

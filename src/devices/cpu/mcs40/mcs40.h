@@ -200,10 +200,6 @@ protected:
 	virtual void state_export(device_state_entry const &entry) override;
 	virtual void state_string_export(device_state_entry const &entry, std::string &str) const override;
 
-	// device_disasm_interface implementation
-	virtual u32 disasm_min_opcode_bytes() const override;
-	virtual u32 disasm_max_opcode_bytes() const override;
-
 	// instruction execution
 	virtual bool is_io_op(u8 opr) = 0;
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) = 0;
@@ -378,12 +374,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface implementation
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			uint8_t const *oprom,
-			uint8_t const *opram,
-			uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// mcs40_cpu_device_base implementation
 	virtual bool is_io_op(u8 opr) override;
@@ -417,12 +408,7 @@ public:
 
 protected:
 	// device_disasm_interface implementation
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			uint8_t const *oprom,
-			uint8_t const *opram,
-			uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_execute_interface implementation
 	virtual u32 execute_input_lines() const override;

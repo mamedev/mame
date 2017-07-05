@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "tms34010.h"
+#include "34010dsm.h"
 
 #include "debugger.h"
 #include "screen.h"
@@ -1625,18 +1626,12 @@ void tms340x0_device::state_string_export(const device_state_entry &entry, std::
 	}
 }
 
-
-offs_t tms34010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms34010_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms34010 );
-
-	return CPU_DISASSEMBLE_NAME(tms34010)(this, stream, pc, oprom, opram, options);
+	return new tms34010_disassembler(false);
 }
 
-
-offs_t tms34020_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms34020_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms34020 );
-
-	return CPU_DISASSEMBLE_NAME(tms34020)(this, stream, pc, oprom, opram, options);
+	return new tms34010_disassembler(true);
 }

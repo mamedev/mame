@@ -221,9 +221,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual u32 disasm_min_opcode_bytes() const override { return 2; } // smallest instruction
-	virtual u32 disasm_max_opcode_bytes() const override { return 8; } // largest instruction
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	void set_ssw(u32 data) { m_ssw = (m_ssw & SSW(ID)) | (data & ~SSW(ID)); }
 
@@ -313,7 +311,5 @@ protected:
 DECLARE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device)
 DECLARE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device)
 DECLARE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device)
-
-extern CPU_DISASSEMBLE(clipper);
 
 #endif // MAME_CPU_CLIPPER_CLIPPER_H

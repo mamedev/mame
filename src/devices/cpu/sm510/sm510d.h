@@ -1,0 +1,131 @@
+// license:BSD-3-Clause
+// copyright-holders:hap, Jonathan Gevaryahu
+/*
+
+  Sharp SM5xx MCU family disassembler
+
+*/
+
+#ifndef MAME_CPU_SM510_SM510D_H
+#define MAME_CPU_SM510_SM510D_H
+
+#pragma once
+
+class sm510_common_disassembler : public util::disasm_interface
+{
+public:
+	sm510_common_disassembler() = default;
+	virtual ~sm510_common_disassembler() = default;
+
+	virtual u32 opcode_alignment() const override;
+	virtual u32 interface_flags() const override;
+	virtual u32 page_address_bits() const override;
+	virtual u32 page2_address_bits() const override;
+	virtual offs_t pc_linear_to_real(offs_t pc) const override;
+	virtual offs_t pc_real_to_linear(offs_t pc) const override;
+
+protected:
+	enum e_mnemonics
+	{
+		// SM510 common
+		mILL /* 0! */, mEXT,
+		mLB, mLBL, mSBM, mEXBLA, mINCB, mDECB,
+		mATPL, mRTN0, mRTN1, mTL, mTML, mTM, mT,
+		mEXC, mBDC, mEXCI, mEXCD, mLDA, mLAX, mPTW, mWR, mWS,
+		mKTA, mATBP, mATX, mATL, mATFC, mATR,
+		mADD, mADD11, mADX, mCOMA, mROT, mRC, mSC,
+		mTB, mTC, mTAM, mTMI, mTA0, mTABL, mTIS, mTAL, mTF1, mTF4,
+		mRM, mSM,
+		mPRE, mSME, mRME, mTMEL,
+		mSKIP, mCEND, mIDIV, mDR, mDTA, mCLKLO, mCLKHI,
+
+		// SM500 common
+		mCOMCB, mRTN, mRTNS, mSSR, mTR, mTRS, mRBM,
+		mADDC, mPDTW, mTW, mDTW,
+		mATS, mEXKSA, mEXKFA,
+		mRMF, mSMF, mCOMCN,
+		mTA, mTM2, mTG,
+
+		// SM590 aliases
+		mNOP, mCCTRL, mINBL, mDEBL, mXBLA, mADCS, mTR7,
+		// SM590 uniques
+		mTAX, mLBLX, mMTR, mSTR, mINBM, mDEBM, mRTA, mBLTA, mEXAX, mTBA, mADS, mADC, mLBMX, mTLS
+	};
+
+	static const char *const s_mnemonics[];
+	static const u8 s_bits[];
+	static const u32 s_flags[];
+
+	offs_t common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, const u8 pclen);
+};
+
+class sm510_disassembler : public sm510_common_disassembler
+{
+public:
+	sm510_disassembler() = default;
+	virtual ~sm510_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 sm510_mnemonic[0x100];
+
+};
+
+class sm511_disassembler : public sm510_common_disassembler
+{
+public:
+	sm511_disassembler() = default;
+	virtual ~sm511_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 sm511_mnemonic[0x100];
+	static const u8 sm511_extended[0x10];
+};
+
+class sm500_disassembler : public sm510_common_disassembler
+{
+public:
+	sm500_disassembler() = default;
+	virtual ~sm500_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 sm500_mnemonic[0x100];
+	static const u8 sm500_extended[0x10];
+};
+
+class sm5a_disassembler : public sm510_common_disassembler
+{
+public:
+	sm5a_disassembler() = default;
+	virtual ~sm5a_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 sm5a_mnemonic[0x100];
+	static const u8 sm5a_extended[0x10];
+};
+
+class sm590_disassembler : public sm510_common_disassembler
+{
+public:
+	sm590_disassembler() = default;
+	virtual ~sm590_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+	virtual u32 page_address_bits() const override;
+	virtual u32 page2_address_bits() const override;
+	virtual offs_t pc_linear_to_real(offs_t pc) const override;
+	virtual offs_t pc_real_to_linear(offs_t pc) const override;
+
+private:
+	static const u8 sm590_mnemonic[0x100];
+};
+
+#endif

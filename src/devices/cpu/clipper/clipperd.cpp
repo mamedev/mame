@@ -2,6 +2,7 @@
 // copyright-holders:Patrick Mackinlay
 
 #include "emu.h"
+#include "clipperd.h"
 
 /*
  * TODO
@@ -14,33 +15,20 @@
 // enable C400 instruction decoding
 #define C400_INSTRUCTIONS 1
 
-// the CLIPPER addressing modes (unshifted)
-enum
-{
-	ADDR_MODE_PC32 =  0x10,
-	ADDR_MODE_ABS32 = 0x30,
-	ADDR_MODE_REL32 = 0x60,
-	ADDR_MODE_PC16 =  0x90,
-	ADDR_MODE_REL12 = 0xa0,
-	ADDR_MODE_ABS16 = 0xb0,
-	ADDR_MODE_PCX =   0xd0,
-	ADDR_MODE_RELX =  0xe0
-};
-
 // macros for decoding various operand fields
-#define R1 ((insn[0] & 0x00f0) >> 4)
-#define R2 (insn[0] & 0x000f)
+#define R1 ((opcodes.r16(pc) & 0x00f0) >> 4)
+#define R2 (opcodes.r16(pc) & 0x000f)
 
-#define I16 ((int16_t)insn[1])
-#define I32 (*(int32_t *)&insn[1])
-#define IMM_VALUE (insn[0] & 0x0080 ? I16 : I32)
-#define IMM_SIZE (insn[0] & 0x0080 ? 2 : 4)
+#define I16 (int16_t(opcodes.r16(pc+2)))
+#define I32 (int32_t(opcodes.r32(pc+2)))
+#define IMM_VALUE (opcodes.r16(pc) & 0x0080 ? I16 : I32)
+#define IMM_SIZE (opcodes.r16(pc) & 0x0080 ? 2 : 4)
 
-#define ADDR_MODE (insn[0] & 0x00f0)
-#define ADDR_R2 ((insn[0] & 0x0050) == 0x0010 ? (insn[0] & 0x000f) : (insn[1] & 0x000f))
+#define ADDR_MODE (opcodes.r16(pc) & 0x00f0)
+#define ADDR_R2 ((opcodes.r16(pc) & 0x0050) == 0x0010 ? (opcodes.r16(pc) & 0x000f) : (opcodes.r16(pc+2) & 0x000f))
 #define ADDR_SIZE (ADDR_MODE > ADDR_MODE_REL32 ? 2 : ADDR_MODE == ADDR_MODE_REL32 ? 6 : 4)
-#define ADDR_RX ((insn[1] & 0xf0) >> 4)
-#define ADDR_I12 (((int16_t)insn[1]) >> 4)
+#define ADDR_RX ((opcodes.r16(pc+2) & 0xf0) >> 4)
+#define ADDR_I12 (((int16_t)opcodes.r16(pc+2)) >> 4)
 
 /*
  * Branch condition code mnemonics - the forms beginning with 'c' are
@@ -49,7 +37,7 @@ enum
  * instructions. We use the first form because we can't know which type
  * should be used without some kind of dynamic information.
  */
-static const char *const cc[] =
+const char *const clipper_disassembler::cc[] =
 {
 	"",
 	"clt",  // rgt
@@ -72,13 +60,13 @@ static const char *const cc[] =
 /*
  * Decode an addressing mode into a string.
  */
-std::string address (offs_t pc, u16 *insn)
+std::string clipper_disassembler::address (offs_t pc, const data_buffer &opcodes)
 {
 	switch (ADDR_MODE)
 	{
 	case ADDR_MODE_PC32: return util::string_format("0x%x", pc + I32);
 	case ADDR_MODE_ABS32: return util::string_format("0x%x", I32);
-	case ADDR_MODE_REL32: return util::string_format("%d(r%d)", *(int32_t *)&insn[2], R2);
+	case ADDR_MODE_REL32: return util::string_format("%d(r%d)", opcodes.r32(pc+4), R2);
 	case ADDR_MODE_PC16: return util::string_format("0x%x", pc + I16);
 	case ADDR_MODE_REL12: return util::string_format("%d(r%d)", ADDR_I12, R2);
 	case ADDR_MODE_ABS16: return util::string_format("0x%x", I16);
@@ -96,26 +84,30 @@ std::string address (offs_t pc, u16 *insn)
  * an on-CPU macro instruction ROM. It appears at least some of these macro instructions were removed
  * from the C400 and generate traps which can be used to implement them in software instead.
  */
-CPU_DISASSEMBLE(clipper)
+u32 clipper_disassembler::opcode_alignment() const
 {
-	u16 *insn = (u16 *)oprom;
-	u32 flags = DASMFLAG_SUPPORTED;
+	return 2;
+}
+
+offs_t clipper_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	u32 flags = SUPPORTED;
 	offs_t bytes;
 
-	switch (insn[0] >> 8)
+	switch (opcodes.r16(pc) >> 8)
 	{
 	case 0x00:
-		if (oprom[0] == 0)
+		if (opcodes.r16(pc) == 0)
 			util::stream_format(stream, "noop");
 		else
-			util::stream_format(stream, "noop $%d", oprom[0]);
+			util::stream_format(stream, "noop $%d", opcodes.r16(pc));
 		bytes = 2;
 		break;
 
 	case 0x10: util::stream_format(stream, "movwp   r%d,%s", R2, R1 == 0 ? "psw" : R1 == 1 ? "ssw" : "sswf"); bytes = 2; break;
 	case 0x11: util::stream_format(stream, "movpw   %s,r%d", R1 == 0 ? "psw" : "ssw", R2); bytes = 2; break;
-	case 0x12: util::stream_format(stream, "calls   $%d", insn[0] & 0x7F); bytes = 2; flags |= DASMFLAG_STEP_OVER; break;
-	case 0x13: util::stream_format(stream, "ret     r%d", R2); bytes = 2; flags |= DASMFLAG_STEP_OUT; break;
+	case 0x12: util::stream_format(stream, "calls   $%d", opcodes.r16(pc) & 0x7F); bytes = 2; flags |= STEP_OVER; break;
+	case 0x13: util::stream_format(stream, "ret     r%d", R2); bytes = 2; flags |= STEP_OUT; break;
 	case 0x14: util::stream_format(stream, "pushw   r%d,r%d", R2, R1); bytes = 2; break;
 
 	case 0x16: util::stream_format(stream, "popw    r%d,r%d", R1, R2); bytes = 2; break;
@@ -151,60 +143,60 @@ CPU_DISASSEMBLE(clipper)
 	case 0x3c: util::stream_format(stream, "roti    $%d,r%d", I16, R2); bytes = 4; break;
 	case 0x3d: util::stream_format(stream, "rotli   $%d,r%d:r%d", I16, R2 + 0, R2 + 1); bytes = 4; break;
 
-	case 0x44: util::stream_format(stream, "call    r%d,(r%d)", R2, R1); bytes = 2; flags |= DASMFLAG_STEP_OVER; break;
-	case 0x45: util::stream_format(stream, "call    r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; flags |= DASMFLAG_STEP_OVER; break;
+	case 0x44: util::stream_format(stream, "call    r%d,(r%d)", R2, R1); bytes = 2; flags |= STEP_OVER; break;
+	case 0x45: util::stream_format(stream, "call    r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; flags |= STEP_OVER; break;
 #if C400_INSTRUCTIONS
 	case 0x46: util::stream_format(stream, "loadd2  (r%d),f%d", R1, R2); bytes = 2; break;
-	case 0x47: util::stream_format(stream, "loadd2  %s,f%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x47: util::stream_format(stream, "loadd2  %s,f%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 #endif
 	case 0x48: util::stream_format(stream, "b%-4s   (r%d)", cc[R2], R1); bytes = 2; break;
-	case 0x49: util::stream_format(stream, "b%-4s   %s", cc[ADDR_R2], address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x49: util::stream_format(stream, "b%-4s   %s", cc[ADDR_R2], address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 #if C400_INSTRUCTIONS
 	// delayed branches
 	case 0x4a: util::stream_format(stream, "cdb     r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x4b: util::stream_format(stream, "cdb     r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4b: util::stream_format(stream, "cdb     r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 	case 0x4c: util::stream_format(stream, "cdbeq   r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x4d: util::stream_format(stream, "cdbeq   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4d: util::stream_format(stream, "cdbeq   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 	case 0x4e: util::stream_format(stream, "cdbne   r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x4f: util::stream_format(stream, "cdbne   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4f: util::stream_format(stream, "cdbne   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 	case 0x50: util::stream_format(stream, "db%-4s  (r%d)", cc[R2], R1); bytes = 2; break;
-	case 0x51: util::stream_format(stream, "db%-4s  %s", cc[ADDR_R2], address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x51: util::stream_format(stream, "db%-4s  %s", cc[ADDR_R2], address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 #else
 	// these instructions are in the C300 documentation, but appear to be replaced in the C400
 	case 0x4c: util::stream_format(stream, "bf%s   (r%d)", R2 == 0 ? "any" : "bad", R1); bytes = 2; break;
-	case 0x4d: util::stream_format(stream, "bf%s   %s", ADDR_R2 == 0 ? "any" : "bad", address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4d: util::stream_format(stream, "bf%s   %s", ADDR_R2 == 0 ? "any" : "bad", address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 #endif
 
 	case 0x60: util::stream_format(stream, "loadw   (r%d),r%d", R1, R2); bytes = 2; break;
-	case 0x61: util::stream_format(stream, "loadw   %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x61: util::stream_format(stream, "loadw   %s,r%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x62: util::stream_format(stream, "loada   (r%d),r%d", R1, R2); bytes = 2; break;
-	case 0x63: util::stream_format(stream, "loada   %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x63: util::stream_format(stream, "loada   %s,r%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x64: util::stream_format(stream, "loads   (r%d),f%d", R1, R2); bytes = 2; break;
-	case 0x65: util::stream_format(stream, "loads   %s,f%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x65: util::stream_format(stream, "loads   %s,f%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x66: util::stream_format(stream, "loadd   (r%d),f%d", R1, R2); bytes = 2; break;
-	case 0x67: util::stream_format(stream, "loadd   %s,f%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x67: util::stream_format(stream, "loadd   %s,f%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x68: util::stream_format(stream, "loadb   (r%d),r%d", R1, R2); bytes = 2; break;
-	case 0x69: util::stream_format(stream, "loadb   %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x69: util::stream_format(stream, "loadb   %s,r%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x6a: util::stream_format(stream, "loadbu  (r%d),r%d", R1, R2); bytes = 2; break;
-	case 0x6b: util::stream_format(stream, "loadbu  %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x6b: util::stream_format(stream, "loadbu  %s,r%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x6c: util::stream_format(stream, "loadh   (r%d),r%d", R1, R2); bytes = 2; break;
-	case 0x6d: util::stream_format(stream, "loadh   %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x6d: util::stream_format(stream, "loadh   %s,r%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x6e: util::stream_format(stream, "loadhu  (r%d),r%d", R1, R2); bytes = 2; break;
-	case 0x6f: util::stream_format(stream, "loadhu  %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x6f: util::stream_format(stream, "loadhu  %s,r%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 
 	case 0x70: util::stream_format(stream, "storw   r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x71: util::stream_format(stream, "storw   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x71: util::stream_format(stream, "storw   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 	case 0x72: util::stream_format(stream, "tsts    (r%d),r%d", R1, R2); bytes = 2; break;
-	case 0x73: util::stream_format(stream, "tsts    %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+	case 0x73: util::stream_format(stream, "tsts    %s,r%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 	case 0x74: util::stream_format(stream, "stors   f%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x75: util::stream_format(stream, "stors   f%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x75: util::stream_format(stream, "stors   f%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 	case 0x76: util::stream_format(stream, "stord   f%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x77: util::stream_format(stream, "stord   f%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x77: util::stream_format(stream, "stord   f%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 	case 0x78: util::stream_format(stream, "storb   r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x79: util::stream_format(stream, "storb   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x79: util::stream_format(stream, "storb   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 
 	case 0x7c: util::stream_format(stream, "storh   r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x7d: util::stream_format(stream, "storh   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x7d: util::stream_format(stream, "storh   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
 
 	case 0x80: util::stream_format(stream, "addw    r%d,r%d", R1, R2); bytes = 2; break;
 
@@ -258,7 +250,7 @@ CPU_DISASSEMBLE(clipper)
 	case 0xb4:
 	case 0xb5:
 		// unprivileged macro instructions
-		switch (insn[0] & 0xff)
+		switch (opcodes.r16(pc) & 0xff)
 		{
 		case 0x00: case 0x01: case 0x02: case 0x03:
 		case 0x04: case 0x05: case 0x06: case 0x07:
@@ -288,25 +280,25 @@ CPU_DISASSEMBLE(clipper)
 			util::stream_format(stream, "restd%d", R2);
 			break;
 
-		case 0x30: util::stream_format(stream, "cnvsw   f%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x31: util::stream_format(stream, "cnvrsw  f%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x32: util::stream_format(stream, "cnvtsw  f%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x33: util::stream_format(stream, "cnvws   r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x34: util::stream_format(stream, "cnvdw   f%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x35: util::stream_format(stream, "cnvrdw  f%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x36: util::stream_format(stream, "cnvtdw  f%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x37: util::stream_format(stream, "cnvwd   r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x38: util::stream_format(stream, "cnvsd   f%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x39: util::stream_format(stream, "cnvds   f%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x3a: util::stream_format(stream, "negs    f%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x3b: util::stream_format(stream, "negd    f%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x3c: util::stream_format(stream, "scalbs  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x3d: util::stream_format(stream, "scalbd  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
+		case 0x30: util::stream_format(stream, "cnvsw   f%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x31: util::stream_format(stream, "cnvrsw  f%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x32: util::stream_format(stream, "cnvtsw  f%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x33: util::stream_format(stream, "cnvws   r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x34: util::stream_format(stream, "cnvdw   f%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x35: util::stream_format(stream, "cnvrdw  f%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x36: util::stream_format(stream, "cnvtdw  f%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x37: util::stream_format(stream, "cnvwd   r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x38: util::stream_format(stream, "cnvsd   f%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x39: util::stream_format(stream, "cnvds   f%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x3a: util::stream_format(stream, "negs    f%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x3b: util::stream_format(stream, "negd    f%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x3c: util::stream_format(stream, "scalbs  r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x3d: util::stream_format(stream, "scalbd  r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
 		case 0x3e: util::stream_format(stream, "trapfn"); break;
-		case 0x3f: util::stream_format(stream, "loadfs  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
+		case 0x3f: util::stream_format(stream, "loadfs  r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
 
 		default:
-			util::stream_format(stream, "macro   0x%04x 0x%04x", insn[0], insn[1]);
+			util::stream_format(stream, "macro   0x%04x 0x%04x", opcodes.r16(pc), opcodes.r16(pc+2));
 			break;
 		}
 		bytes = 4;
@@ -314,19 +306,19 @@ CPU_DISASSEMBLE(clipper)
 	case 0xb6:
 	case 0xb7:
 		// privileged macro instructions
-		switch (insn[0] & 0xff)
+		switch (opcodes.r16(pc) & 0xff)
 		{
-		case 0x00: util::stream_format(stream, "movus   r%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x01: util::stream_format(stream, "movsu   r%d,r%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
-		case 0x02: util::stream_format(stream, "saveur  r%d", (insn[1] & 0xf0) >> 4); break;
-		case 0x03: util::stream_format(stream, "restur  r%d", (insn[1] & 0xf0) >> 4); break;
-		case 0x04: util::stream_format(stream, "reti    r%d", (insn[1] & 0xf0) >> 4); flags |= DASMFLAG_STEP_OUT; break;
+		case 0x00: util::stream_format(stream, "movus   r%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x01: util::stream_format(stream, "movsu   r%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
+		case 0x02: util::stream_format(stream, "saveur  r%d", (opcodes.r16(pc+2) & 0xf0) >> 4); break;
+		case 0x03: util::stream_format(stream, "restur  r%d", (opcodes.r16(pc+2) & 0xf0) >> 4); break;
+		case 0x04: util::stream_format(stream, "reti    r%d", (opcodes.r16(pc+2) & 0xf0) >> 4); flags |= STEP_OUT; break;
 		case 0x05: util::stream_format(stream, "wait"); break;
 #if C400_INSTRUCTIONS
-		case 0x07: util::stream_format(stream, "loadts  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
+		case 0x07: util::stream_format(stream, "loadts  r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
 #endif
 		default:
-			util::stream_format(stream, "macro   0x%04x 0x%04x", insn[0], insn[1]);
+			util::stream_format(stream, "macro   0x%04x 0x%04x", opcodes.r16(pc), opcodes.r16(pc+2));
 			break;
 		}
 		bytes = 4;
@@ -338,7 +330,7 @@ CPU_DISASSEMBLE(clipper)
 #endif
 
 	default:
-		util::stream_format(stream, ".word   0x%04x", insn[0]);
+		util::stream_format(stream, ".word   0x%04x", opcodes.r16(pc));
 		bytes = 2;
 		break;
 	}

@@ -17,79 +17,70 @@
 #ifndef MAME_EMU_DIDISASM_H
 #define MAME_EMU_DIDISASM_H
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// Disassembler constants
-constexpr u32 DASMFLAG_SUPPORTED       = 0x80000000;   // are disassembly flags supported?
-constexpr u32 DASMFLAG_STEP_OUT        = 0x40000000;   // this instruction should be the end of a step out sequence
-constexpr u32 DASMFLAG_STEP_OVER       = 0x20000000;   // this instruction should be stepped over by setting a breakpoint afterwards
-constexpr u32 DASMFLAG_OVERINSTMASK    = 0x18000000;   // number of extra instructions to skip when stepping over
-constexpr u32 DASMFLAG_OVERINSTSHIFT   = 27;           // bits to shift after masking to get the value
-constexpr u32 DASMFLAG_LENGTHMASK      = 0x0000ffff;   // the low 16-bits contain the actual length
-
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define DASMFLAG_STEP_OVER_EXTRA(x)         ((x) << DASMFLAG_OVERINSTSHIFT)
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
+#include "disasmintf.h"
 
 #define MCFG_DEVICE_DISASSEMBLE_OVERRIDE(_class, _func) \
-	device_disasm_interface::static_set_dasm_override(*device, dasm_override_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
-
-
+	dynamic_cast<device_disasm_interface *>(device)->set_dasm_override(dasm_override_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<offs_t (device_t &device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options)> dasm_override_delegate;
+typedef device_delegate<offs_t (std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)> dasm_override_delegate;
 
 // ======================> device_disasm_interface
-
+	
 // class representing interface-specific live disasm
 class device_disasm_interface : public device_interface
 {
 public:
 	// construction/destruction
 	device_disasm_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_disasm_interface();
+	virtual ~device_disasm_interface() = default;
 
-	// configuration access
-	u32 min_opcode_bytes() const { return disasm_min_opcode_bytes(); }
-	u32 max_opcode_bytes() const { return disasm_max_opcode_bytes(); }
+	// Override
+	void set_dasm_override(dasm_override_delegate dasm_override);
 
-	// static inline configuration helpers
-	static void static_set_dasm_override(device_t &device, dasm_override_delegate dasm_override);
-
-	// interface for disassembly
-	offs_t disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options = 0);
+	// disassembler request
+	util::disasm_interface *get_disassembler();
 
 protected:
-	// required operation overrides
-	virtual u32 disasm_min_opcode_bytes() const = 0;
-	virtual u32 disasm_max_opcode_bytes() const = 0;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) = 0;
+	// disassembler creation
+	virtual util::disasm_interface *create_disassembler() = 0;
 
-	// interface-level overrides
+	// delegate resolving
 	virtual void interface_pre_start() override;
 
 private:
-	dasm_override_delegate  m_dasm_override;            // provided override function
+	std::unique_ptr<util::disasm_interface> m_disasm;
+	dasm_override_delegate m_dasm_override;
 };
 
 // iterator
 typedef device_interface_iterator<device_disasm_interface> disasm_interface_iterator;
 
+class device_disasm_indirect : public util::disasm_interface
+{
+public:
+	device_disasm_indirect(util::disasm_interface *upper, dasm_override_delegate &dasm_override);
+	virtual ~device_disasm_indirect() = default;
+
+	virtual u32 interface_flags() const override;
+	virtual u32 page_address_bits() const override;
+	virtual u32 page2_address_bits() const override;
+	virtual offs_t pc_linear_to_real(offs_t pc) const override;
+	virtual offs_t pc_real_to_linear(offs_t pc) const override;
+	virtual u8  decrypt8 (u8  value, offs_t pc, bool opcode) const override;
+	virtual u16 decrypt16(u16 value, offs_t pc, bool opcode) const override;
+	virtual u32 decrypt32(u32 value, offs_t pc, bool opcode) const override;
+	virtual u64 decrypt64(u64 value, offs_t pc, bool opcode) const override;
+
+	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	std::unique_ptr<util::disasm_interface> m_disasm;
+	dasm_override_delegate &m_dasm_override;
+};
 
 #endif  /* MAME_EMU_DIDISASM_H */

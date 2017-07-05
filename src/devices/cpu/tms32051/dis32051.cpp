@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
+
 #include "emu.h"
+#include "dis32051.h"
 
 
-
-static const char *const zl_condition_codes[] =
+const char *const tms32051_disassembler::zl_condition_codes[] =
 {
 	// bit 3, 2 (ZL), bit 1, 0 (MASK)
 	"",             // Z=0, L=0, ZM=0, ZL=0
@@ -25,7 +26,7 @@ static const char *const zl_condition_codes[] =
 	"leq",          // Z=1, L=1, ZM=1, ZL=1
 };
 
-static const char *const cv_condition_codes[16] =
+const char *const tms32051_disassembler::cv_condition_codes[16] =
 {
 	"",             // V=0, C=0, VM=0, CM=0
 	"nc",           // V=0, C=0, VM=0, CM=1
@@ -45,7 +46,7 @@ static const char *const cv_condition_codes[16] =
 	"c ov",         // V=1, C=1, VM=1, CM=1
 };
 
-static const char *const tp_condition_codes[4] =
+const char *const tms32051_disassembler::tp_condition_codes[4] =
 {
 	"bio",
 	"tc",
@@ -53,24 +54,13 @@ static const char *const tp_condition_codes[4] =
 	""
 };
 
-
-static offs_t npc;
-static const uint8_t *rombase;
-static offs_t pcbase;
-
-static std::ostream *output;
-
-static uint16_t FETCH(void)
+uint16_t tms32051_disassembler::FETCH(offs_t &npc, const data_buffer &opcodes)
 {
-	uint16_t result = rombase[(npc - pcbase) * 2 + 0] | (rombase[(npc - pcbase) * 2 + 1] << 8);
-	npc++;
-	return result;
+	return opcodes.r16(npc++);
 }
 
-static char *GET_ADDRESS(int addr_mode, int address)
+std::string tms32051_disassembler::GET_ADDRESS(int addr_mode, int address)
 {
-	static char buffer[100];
-
 	if (addr_mode)      // Indirect addressing
 	{
 		int nar = address & 0x7;
@@ -78,48 +68,43 @@ static char *GET_ADDRESS(int addr_mode, int address)
 
 		switch ((address >> 3) & 0xf)
 		{
-			case 0x0:   sprintf(buffer, "*"); break;
-			case 0x1:   sprintf(buffer, "*, ar%d", nar); break;
-			case 0x2:   sprintf(buffer, "*-"); break;
-			case 0x3:   sprintf(buffer, "*-, ar%d", nar); break;
-			case 0x4:   sprintf(buffer, "*+"); break;
-			case 0x5:   sprintf(buffer, "*+, ar%d", nar); break;
-			case 0x8:   sprintf(buffer, "*br0-"); break;
-			case 0x9:   sprintf(buffer, "*br0-, ar%d", nar); break;
-			case 0xa:   sprintf(buffer, "*0-"); break;
-			case 0xb:   sprintf(buffer, "*0-, ar%d", nar); break;
-			case 0xc:   sprintf(buffer, "*0+"); break;
-			case 0xd:   sprintf(buffer, "*0+, ar%d", nar); break;
-			case 0xe:   sprintf(buffer, "*br0+"); break;
-			case 0xf:   sprintf(buffer, "*br0+, ar%d", nar); break;
+			case 0x0:   return util::string_format("*");
+			case 0x1:   return util::string_format("*, ar%d", nar);
+			case 0x2:   return util::string_format("*-");
+			case 0x3:   return util::string_format("*-, ar%d", nar);
+			case 0x4:   return util::string_format("*+");
+			case 0x5:   return util::string_format("*+, ar%d", nar);
+			case 0x8:   return util::string_format("*br0-");
+			case 0x9:   return util::string_format("*br0-, ar%d", nar);
+			case 0xa:   return util::string_format("*0-");
+			case 0xb:   return util::string_format("*0-, ar%d", nar);
+			case 0xc:   return util::string_format("*0+");
+			case 0xd:   return util::string_format("*0+, ar%d", nar);
+			case 0xe:   return util::string_format("*br0+");
+			case 0xf:   return util::string_format("*br0+, ar%d", nar);
 
-			default:    sprintf(buffer, "??? (indirect)"); break;
+			default:    return util::string_format("??? (indirect)");
 		}
 	}
 	else            // Direct addressing
 	{
-		sprintf(buffer, "#%02X", address);
+		return util::string_format("#%02X", address);
 	}
-	return buffer;
 }
 
-static char *GET_SHIFT(int shift)
+std::string tms32051_disassembler::GET_SHIFT(int shift)
 {
-	static char buffer[100];
-
 	if (shift > 0)
 	{
-		sprintf(buffer, ", %d", shift);
+		return util::string_format(", %d", shift);
 	}
 	else
 	{
-		memset(buffer, 0, sizeof(buffer));
+		return "";
 	}
-
-	return buffer;
 }
 
-static void print_condition_codes(bool pp, int zl, int cv, int tp)
+void tms32051_disassembler::print_condition_codes(bool pp, int zl, int cv, int tp)
 {
 	if (*(zl_condition_codes[zl]) != 0)
 	{
@@ -143,7 +128,7 @@ static void print_condition_codes(bool pp, int zl, int cv, int tp)
 	}
 }
 
-static void dasm_group_be(uint16_t opcode)
+void tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
 {
 	int subop = opcode & 0xff;
 
@@ -217,19 +202,19 @@ static void dasm_group_be(uint16_t opcode)
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 					util::stream_format(*output, "intr    %d", opcode & 0x1f); break;
 
-		case 0x80:  util::stream_format(*output, "mpy     #%04X", FETCH()); break;
-		case 0x81:  util::stream_format(*output, "and     #%04X", FETCH() << 16); break;
-		case 0x82:  util::stream_format(*output, "or      #%04X", FETCH() << 16); break;
-		case 0x83:  util::stream_format(*output, "xor     #%04X", FETCH() << 16); break;
-		case 0xc4:  util::stream_format(*output, "rpt     #%04X", FETCH()); break;
-		case 0xc5:  util::stream_format(*output, "rptz    #%04X", FETCH()); break;
-		case 0xc6:  util::stream_format(*output, "rptb    #%04X", FETCH()); break;
+		case 0x80:  util::stream_format(*output, "mpy     #%04X", FETCH(npc, opcodes)); break;
+		case 0x81:  util::stream_format(*output, "and     #%04X", FETCH(npc, opcodes) << 16); break;
+		case 0x82:  util::stream_format(*output, "or      #%04X", FETCH(npc, opcodes) << 16); break;
+		case 0x83:  util::stream_format(*output, "xor     #%04X", FETCH(npc, opcodes) << 16); break;
+		case 0xc4:  util::stream_format(*output, "rpt     #%04X", FETCH(npc, opcodes)); break;
+		case 0xc5:  util::stream_format(*output, "rptz    #%04X", FETCH(npc, opcodes)); break;
+		case 0xc6:  util::stream_format(*output, "rptb    #%04X", FETCH(npc, opcodes)); break;
 
 		default:    util::stream_format(*output, "???     (group be)"); break;
 	}
 }
 
-static void dasm_group_bf(uint16_t opcode)
+void tms32051_disassembler::dasm_group_bf(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
 {
 	int subop = (opcode >>  4) & 0xf;
 	int shift = opcode & 0xf;
@@ -240,7 +225,7 @@ static void dasm_group_bf(uint16_t opcode)
 		{
 			if (opcode & 0x8)
 			{
-				util::stream_format(*output, "lar     ar%d, #%04X", opcode & 0x7, FETCH());
+				util::stream_format(*output, "lar     ar%d, #%04X", opcode & 0x7, FETCH(npc, opcodes));
 			}
 			else
 			{
@@ -261,31 +246,34 @@ static void dasm_group_bf(uint16_t opcode)
 			break;
 		}
 
-		case 0x8:   util::stream_format(*output, "lacc    #%04X", FETCH() << shift); break;
-		case 0x9:   util::stream_format(*output, "add     #%04X", FETCH() << shift); break;
-		case 0xa:   util::stream_format(*output, "sub     #%04X", FETCH() << shift); break;
-		case 0xb:   util::stream_format(*output, "and     #%04X", FETCH() << shift); break;
-		case 0xc:   util::stream_format(*output, "or      #%04X", FETCH() << shift); break;
-		case 0xd:   util::stream_format(*output, "xor     #%04X", FETCH() << shift); break;
+		case 0x8:   util::stream_format(*output, "lacc    #%04X", FETCH(npc, opcodes) << shift); break;
+		case 0x9:   util::stream_format(*output, "add     #%04X", FETCH(npc, opcodes) << shift); break;
+		case 0xa:   util::stream_format(*output, "sub     #%04X", FETCH(npc, opcodes) << shift); break;
+		case 0xb:   util::stream_format(*output, "and     #%04X", FETCH(npc, opcodes) << shift); break;
+		case 0xc:   util::stream_format(*output, "or      #%04X", FETCH(npc, opcodes) << shift); break;
+		case 0xd:   util::stream_format(*output, "xor     #%04X", FETCH(npc, opcodes) << shift); break;
 		case 0xe:   util::stream_format(*output, "bsar    %d", shift+1); break;
 
 		default:    util::stream_format(*output, "???     (group bf)"); break;
 	}
 }
 
-CPU_DISASSEMBLE(tms32051)
+u32 tms32051_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	uint16_t opcode;
 	int baseop;
 	int address, addr_mode;
 
-	pcbase = pc;
-	rombase = oprom;
-	npc = pc;
+	offs_t npc = pc;
 	output = &stream;
 
-	opcode = FETCH();
+	opcode = FETCH(npc, opcodes);
 	baseop = (opcode >> 8) & 0xff;
 
 	addr_mode = (opcode >> 7) & 0x1;
@@ -300,10 +288,10 @@ CPU_DISASSEMBLE(tms32051)
 			break;
 		}
 		case 0x08:  util::stream_format(*output, "lamm    %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0x09:  util::stream_format(*output, "smmr    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0x09:  util::stream_format(*output, "smmr    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 		case 0x0a:  util::stream_format(*output, "subc    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x0b:  util::stream_format(*output, "rpt     %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0x0c:  util::stream_format(*output, "out     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0x0c:  util::stream_format(*output, "out     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 		case 0x0d:  util::stream_format(*output, "ldp     %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x0e:  util::stream_format(*output, "lst     0, %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x0f:  util::stream_format(*output, "lst     1, %s", GET_ADDRESS(addr_mode, address)); break;
@@ -355,10 +343,10 @@ CPU_DISASSEMBLE(tms32051)
 		case 0x59:  util::stream_format(*output, "opl     %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x5a:  util::stream_format(*output, "apl     %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x5b:  util::stream_format(*output, "cpl     %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0x5c:  util::stream_format(*output, "xpl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
-		case 0x5d:  util::stream_format(*output, "opl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
-		case 0x5e:  util::stream_format(*output, "apl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
-		case 0x5f:  util::stream_format(*output, "cpl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0x5c:  util::stream_format(*output, "xpl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
+		case 0x5d:  util::stream_format(*output, "opl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
+		case 0x5e:  util::stream_format(*output, "apl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
+		case 0x5f:  util::stream_format(*output, "cpl     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 
 		case 0x60:  util::stream_format(*output, "addc    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x61:  util::stream_format(*output, "add     %s << 16", GET_ADDRESS(addr_mode, address)); break;
@@ -386,13 +374,13 @@ CPU_DISASSEMBLE(tms32051)
 		case 0x76:  util::stream_format(*output, "pshd    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x77:  util::stream_format(*output, "dmov    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x78:  util::stream_format(*output, "adrk    #%02X", opcode & 0xff); break;
-		case 0x79:  util::stream_format(*output, "b       %04X, %s", FETCH(), GET_ADDRESS(1, address)); break;
-		case 0x7a:  util::stream_format(*output, "call    %04X, %s", FETCH(), GET_ADDRESS(1, address)); flags = DASMFLAG_STEP_OVER; break;
-		case 0x7b:  util::stream_format(*output, "banz    %04X, %s", FETCH(), GET_ADDRESS(1, address)); break;
+		case 0x79:  util::stream_format(*output, "b       %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
+		case 0x7a:  util::stream_format(*output, "call    %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); flags = STEP_OVER; break;
+		case 0x7b:  util::stream_format(*output, "banz    %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
 		case 0x7c:  util::stream_format(*output, "sbrk    #%02X", opcode & 0xff); break;
-		case 0x7d:  util::stream_format(*output, "bd      %04X, %s", FETCH(), GET_ADDRESS(1, address)); break;
-		case 0x7e:  util::stream_format(*output, "calld   %04X, %s", FETCH(), GET_ADDRESS(1, address)); flags = DASMFLAG_STEP_OVER; break;
-		case 0x7f:  util::stream_format(*output, "banzd   %04X, %s", FETCH(), GET_ADDRESS(1, address)); break;
+		case 0x7d:  util::stream_format(*output, "bd      %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
+		case 0x7e:  util::stream_format(*output, "calld   %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); flags = STEP_OVER; break;
+		case 0x7f:  util::stream_format(*output, "banzd   %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
 
 		case 0x80: case 0x81: case 0x82: case 0x83:
 		case 0x84: case 0x85: case 0x86: case 0x87:
@@ -401,7 +389,7 @@ CPU_DISASSEMBLE(tms32051)
 			break;
 		}
 		case 0x88:  util::stream_format(*output, "samm    %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0x89:  util::stream_format(*output, "lmmr    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0x89:  util::stream_format(*output, "lmmr    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 		case 0x8a:  util::stream_format(*output, "popd    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x8b:
 		{
@@ -433,21 +421,21 @@ CPU_DISASSEMBLE(tms32051)
 			break;
 		}
 
-		case 0xa0:  util::stream_format(*output, "norm    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
-		case 0xa2:  util::stream_format(*output, "mac     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0xa0:  util::stream_format(*output, "norm    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
+		case 0xa2:  util::stream_format(*output, "mac     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 		case 0xa3:  util::stream_format(*output, "macd    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0xa4:  util::stream_format(*output, "blpd    %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0xa5:  util::stream_format(*output, "blpd    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0xa5:  util::stream_format(*output, "blpd    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 		case 0xa6:  util::stream_format(*output, "tblr    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0xa7:  util::stream_format(*output, "tblw    %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0xa8:  util::stream_format(*output, "bldd    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
-		case 0xa9:  util::stream_format(*output, "bldd    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0xa8:  util::stream_format(*output, "bldd    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
+		case 0xa9:  util::stream_format(*output, "bldd    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 		case 0xaa:  util::stream_format(*output, "mads    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0xab:  util::stream_format(*output, "madd    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0xac:  util::stream_format(*output, "bldd    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0xad:  util::stream_format(*output, "bldd    %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0xae:  util::stream_format(*output, "splk    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
-		case 0xaf:  util::stream_format(*output, "in      %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
+		case 0xae:  util::stream_format(*output, "splk    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
+		case 0xaf:  util::stream_format(*output, "in      %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH(npc, opcodes)); break;
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
@@ -466,8 +454,8 @@ CPU_DISASSEMBLE(tms32051)
 			util::stream_format(*output, "ldp     #%03X", opcode & 0x1ff);
 			break;
 		}
-		case 0xbe:  dasm_group_be(opcode); break;
-		case 0xbf:  dasm_group_bf(opcode); break;
+		case 0xbe:  dasm_group_be(opcode, npc, opcodes); break;
+		case 0xbf:  dasm_group_bf(opcode, npc, opcodes); break;
 
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
 		{
@@ -477,7 +465,7 @@ CPU_DISASSEMBLE(tms32051)
 			int cv = ((zlcv << 2) & 0xc) | (zlcvmask & 0x3);
 			int tp = (opcode >> 8) & 0x3;
 
-			util::stream_format(*output, "bcnd    %04X", FETCH());
+			util::stream_format(*output, "bcnd    %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
@@ -505,7 +493,7 @@ CPU_DISASSEMBLE(tms32051)
 			int cv = ((zlcv << 2) & 0xc) | (zlcvmask & 0x3);
 			int tp = (opcode >> 8) & 0x3;
 
-			util::stream_format(*output, "cc      %04X", FETCH());
+			util::stream_format(*output, "cc      %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
@@ -527,7 +515,7 @@ CPU_DISASSEMBLE(tms32051)
 				util::stream_format(*output, "retc    ");
 				print_condition_codes(false, zl, cv, tp);
 			}
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 		}
 
@@ -539,7 +527,7 @@ CPU_DISASSEMBLE(tms32051)
 			int cv = ((zlcv << 2) & 0xc) | (zlcvmask & 0x3);
 			int tp = (opcode >> 8) & 0x3;
 
-			util::stream_format(*output, "bcndd   %04X", FETCH());
+			util::stream_format(*output, "bcndd   %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
@@ -552,7 +540,7 @@ CPU_DISASSEMBLE(tms32051)
 			int cv = ((zlcv << 2) & 0xc) | (zlcvmask & 0x3);
 			int tp = (opcode >> 8) & 0x3;
 
-			util::stream_format(*output, "ccd     %04X", FETCH());
+			util::stream_format(*output, "ccd     %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
@@ -574,12 +562,12 @@ CPU_DISASSEMBLE(tms32051)
 				util::stream_format(*output, "retcd   ");
 				print_condition_codes(false, zl, cv, tp);
 			}
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 		}
 
 		default:    util::stream_format(*output, "???     ($%04X)", opcode); break;
 	}
 
-	return (npc-pc) | flags | DASMFLAG_SUPPORTED;
+	return (npc-pc) | flags | SUPPORTED;
 }

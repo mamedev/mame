@@ -50,15 +50,6 @@
 
 
 //**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define CPU_DISASSEMBLE_NAME(name)      cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options)
-#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, stream, pc, oprom, opram, options)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -84,9 +75,6 @@ private:
 	// configured state
 	bool                    m_force_no_drc;             // whether or not to force DRC off
 };
-
-
-typedef offs_t (*cpu_disassemble_func)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options);
 
 
 #endif  /* MAME_EMU_DEVCPU_H */

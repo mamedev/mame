@@ -17,6 +17,7 @@
 
 #include "rspdefs.h"
 
+#include "rsp_dasm.h"
 
 DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "RSP")
 
@@ -150,10 +151,9 @@ device_memory_interface::space_config_vector rsp_device::memory_space_config() c
 	};
 }
 
-offs_t rsp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *rsp_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( rsp );
-	return CPU_DISASSEMBLE_NAME( rsp )(this, stream, pc, oprom, opram, options);
+	return new rsp_disassembler;
 }
 
 void rsp_device::rsp_add_imem(uint32_t *base)
@@ -319,10 +319,10 @@ void rsp_device::unimplemented_opcode(uint32_t op)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		util::ovectorstream string;
-		rsp_dasm_one(string, m_ppc, op);
-		string.put('\0');
-		osd_printf_debug("%08X: %s\n", m_ppc, &string.vec()[0]);
+		std::ostringstream string;
+		rsp_disassembler rspd;
+		rspd.dasm_one(string, m_ppc, op);
+		osd_printf_debug("%08X: %s\n", m_ppc, string.str().c_str());
 	}
 
 #if SAVE_DISASM
@@ -747,13 +747,13 @@ void rsp_device::execute_run()
 			int i, l;
 			static uint32_t prev_regs[32];
 
-			util::ovectorstream string;
-			rsp_dasm_one(string, m_ppc, op);
-			string.put('\0');
+			rsp_disassembler rspd;
+			std::ostringstream string;
+			rspd.dasm_one(string, m_ppc, op);
 
-			fprintf(m_exec_output, "%08X: %s", m_ppc, &string.vec()[0]);
+			fprintf(m_exec_output, "%08X: %s", m_ppc, string.str().c_str());
 
-			l = string.vec().size() - 1;
+			l = string.str().size();
 			if (l < 36)
 			{
 				for (i=l; i < 36; i++)

@@ -46,6 +46,7 @@ TODO:
 
 #include "emu.h"
 #include "minx.h"
+#include "minxd.h"
 #include "debugger.h"
 
 #define FLAG_I  0x80
@@ -234,8 +235,7 @@ void minx_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t minx_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *minx_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( minx );
-	return CPU_DISASSEMBLE_NAME(minx)(this, stream, pc, oprom, opram, options);
+	return new minx_disassembler;
 }

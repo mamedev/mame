@@ -52,6 +52,7 @@ Hitachi HD647180 series:
 
 #include "emu.h"
 #include "z180.h"
+#include "z180dasm.h"
 #include "debugger.h"
 
 //#define VERBOSE 1
@@ -89,13 +90,10 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-
-offs_t z180_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *z180_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( z180 );
-	return CPU_DISASSEMBLE_NAME(z180)(this, stream, pc, oprom, opram, options);
+	return new z180_disassembler;
 }
-
 
 #define CF  0x01
 #define NF  0x02

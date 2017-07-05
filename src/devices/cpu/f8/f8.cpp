@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "f8.h"
+#include "f8dasm.h"
 #include "debugger.h"
 
 #define S   0x01
@@ -2070,10 +2071,9 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 }
 
 
-offs_t f8_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *f8_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( f8 );
-	return CPU_DISASSEMBLE_NAME(f8)(this, stream, pc, oprom, opram, options);
+	return new f8_disassembler;
 }
 
 

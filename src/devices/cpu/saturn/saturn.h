@@ -32,6 +32,7 @@ HP38G             09/??/95              1LT8             Yorke
 
 #pragma once
 
+#include "saturnds.h"
 
 #define SATURN_INT_NONE 0
 #define SATURN_INT_IRQ  1
@@ -72,7 +73,7 @@ enum
 	saturn_device::set_rsi_func(*device, DEVCB_##_rsi);
 
 
-class saturn_device : public cpu_device
+class saturn_device : public cpu_device, public saturn_disassembler::config
 {
 public:
 	// construction/destruction
@@ -109,9 +110,8 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual bool get_nonstandard_mnemonics_mode() const override;
 
 private:
 	address_space_config m_program_config;

@@ -27,118 +27,41 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "6x09dasm.h"
 
-enum m6x09_addressing_mode
-{
-	INH,                // Inherent
-	PSHS, PSHU,         // Push
-	PULS, PULU,         // Pull
-	DIR,                // Direct
-	DIR_IM,             // Direct in memory (6309 only)
-	IND,                // Indexed
-	REL,                // Relative (8 bit)
-	LREL,               // Long relative (16 bit)
-	EXT,                // Extended
-	IMM,                // Immediate
-	IMM_RR,             // Register-to-register
-	IMM_BW,             // Bitwise operations (6309 only)
-	IMM_TFM,            // Transfer from memory (6309 only)
-	PG1,                // Switch to page 1 opcodes
-	PG2                 // Switch to page 2 opcodes
-};
 
-// General, or 6309 only?
-enum m6x09_instruction_level
-{
-	M6x09_GENERAL,
-	HD6309_EXCLUSIVE
-};
+const char *const m6x09_base_disassembler::m6x09_regs[5] = { "X", "Y", "U", "S", "PC" };
 
-// Opcode structure
-class opcodeinfo
-{
-public:
-	constexpr opcodeinfo(uint16_t opcode, uint8_t length, const char *name, m6x09_addressing_mode mode, m6x09_instruction_level level, unsigned flags = 0)
-		: m_opcode(opcode), m_length(length), m_mode(mode), m_level(level), m_flags(flags), m_name(name)
-	{
-	}
+const char *const m6x09_base_disassembler::m6x09_btwregs[5] = { "CC", "A", "B", "inv" };
 
-	uint16_t opcode() const { return m_opcode; }
-	uint8_t length() const { return m_length; }
-	m6x09_addressing_mode mode() const { return m_mode; }
-	m6x09_instruction_level level() const { return m_level; }
-	unsigned flags() const { return m_flags; }
-	const char *name() const { return m_name; }
-
-private:
-	uint16_t                m_opcode;       // 8-bit opcode value
-	uint8_t                 m_length;       // Opcode length in bytes
-	m6x09_addressing_mode   m_mode : 6;     // Addressing mode
-	m6x09_instruction_level m_level : 2;    // General, or 6309 only?
-	unsigned                m_flags;        // Disassembly flags
-	const char *            m_name;         // Opcode name
-};
-static const char *const m6x09_regs[5] = { "X", "Y", "U", "S", "PC" };
-
-static const char *const m6x09_btwregs[5] = { "CC", "A", "B", "inv" };
-
-static const char *const hd6309_tfmregs[16] = {
-		"D",   "X",   "Y",   "U",   "S", "inv", "inv", "inv",
+const char *const m6x09_base_disassembler::hd6309_tfmregs[16] = {
+	"D",   "X",   "Y",   "U",   "S", "inv", "inv", "inv",
 	"inv", "inv", "inv", "inv", "inv", "inv", "inv", "inv"
 };
 
-static const char *const tfm_s[] = { "%s+,%s+", "%s-,%s-", "%s+,%s", "%s,%s+" };
+const char *const m6x09_base_disassembler::tfm_s[] = { "%s+,%s+", "%s-,%s-", "%s+,%s", "%s,%s+" };
 
 //**************************************************************************
 //  BASE CLASS
 //**************************************************************************
 
-// ======================> m6x09_disassembler_base
-
-// base class for M6809/HD6309/Konami disassemblers
-namespace
+u32 m6x09_base_disassembler::opcode_alignment() const
 {
-	class m6x09_disassembler_base
-	{
-	public:
-		m6x09_disassembler_base(const opcodeinfo *opcodes, size_t opcode_count, m6x09_instruction_level level)
-			: m_opcodes(opcodes, opcode_count), m_level(level)
-		{
-		}
-
-		offs_t disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram);
-
-	protected:
-		virtual void indirect(std::ostream &stream, uint8_t pb, const uint8_t *opram, int &p) = 0;
-		virtual void register_register(std::ostream &stream, uint8_t pb) = 0;
-
-	private:
-		util::contiguous_sequence_wrapper<const opcodeinfo> m_opcodes;
-		m6x09_instruction_level m_level;
-
-		const opcodeinfo *fetch_opcode(const uint8_t *oprom, int &p);
-
-		void assert_hd6309_exclusive()
-		{
-			if (m_level < HD6309_EXCLUSIVE)
-				throw false;
-		}
-	};
+	return 1;
 }
 
 //-------------------------------------------------
 //  fetch_opcode
 //-------------------------------------------------
 
-const opcodeinfo *m6x09_disassembler_base::fetch_opcode(const uint8_t *oprom, int &p)
+const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode(const data_buffer &opcodes, offs_t &p)
 {
 	uint16_t page = 0;
 	const opcodeinfo *op = nullptr;
 	while(!op)
 	{
 		// retrieve the opcode
-		uint16_t opcode = page | oprom[p++];
+		uint16_t opcode = page | opcodes.r8(p++);
 
 		// perform the lookup
 		auto iter = std::find_if(
@@ -179,29 +102,28 @@ const opcodeinfo *m6x09_disassembler_base::fetch_opcode(const uint8_t *oprom, in
 //  disassemble - core of the disassembler
 //-------------------------------------------------
 
-offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
+offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint8_t pb;
 	unsigned int ea;
 	int offset;
-	int p = 0;
+	offs_t p = pc;
 
 	// look up the opcode
-	const opcodeinfo *op = fetch_opcode(oprom, p);
+	const opcodeinfo *op = fetch_opcode(opcodes, p);
 	if (!op)
 	{
 		stream << "Illegal Opcode";
-		return p | DASMFLAG_SUPPORTED;
+		return (p - pc) | SUPPORTED;
 	}
 
 	// how many operands do we have?
-	int numoperands = (p == 1)
+	int numoperands = (p - pc == 1)
 		? op->length() - 1
 		: op->length() - 2;
 
-	const uint8_t *operandarray = &opram[p];
+	offs_t ppc = p;
 	p += numoperands;
-	pc += p;
 
 	// output the base instruction name
 	util::stream_format(stream, "%-6s", op->name());
@@ -214,7 +136,7 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 
 	case PSHS:
 	case PSHU:
-		pb = operandarray[0];
+		pb = params.r8(ppc);
 		if (pb & 0x80)
 			util::stream_format(stream, "PC");
 		if (pb & 0x40)
@@ -235,7 +157,7 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 
 	case PULS:
 	case PULU:
-		pb = operandarray[0];
+		pb = params.r8(ppc);
 		if (pb & 0x01)
 			util::stream_format(stream, "CC");
 		if (pb & 0x02)
@@ -255,23 +177,23 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 
 	case DIR:
-		ea = operandarray[0];
+		ea = params.r8(ppc);
 		util::stream_format(stream, "$%02X", ea);
 		break;
 
 	case DIR_IM:
 		assert_hd6309_exclusive();
-		util::stream_format(stream, "#$%02X;", operandarray[0]);
-		util::stream_format(stream, "$%02X", operandarray[1]);
+		util::stream_format(stream, "#$%02X;", params.r8(ppc));
+		util::stream_format(stream, "$%02X", params.r8(ppc + 1));
 		break;
 
 	case REL:
-		offset = (int8_t)operandarray[0];
+		offset = (int8_t)params.r8(ppc);
 		util::stream_format(stream, "$%04X", (pc + offset) & 0xffff);
 		break;
 
 	case LREL:
-		offset = (int16_t)((operandarray[0] << 8) + operandarray[1]);
+		offset = (int16_t)params.r16(ppc);
 		util::stream_format(stream, "$%04X", (pc + offset) & 0xffff);
 		break;
 
@@ -279,13 +201,13 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 		if (numoperands == 3)
 		{
 			assert_hd6309_exclusive();
-			pb = operandarray[0];
-			ea = (operandarray[1] << 8) + operandarray[2];
+			pb = params.r8(ppc);
+			ea = params.r16(ppc+1);
 			util::stream_format(stream, "#$%02X,$%04X", pb, ea);
 		}
 		else if (numoperands == 2)
 		{
-			ea = (operandarray[0] << 8) + operandarray[1];
+			ea = params.r16(ppc);
 			util::stream_format(stream, "$%04X", ea);
 		}
 		break;
@@ -294,52 +216,52 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 		if (numoperands == 2)
 		{
 			assert_hd6309_exclusive();
-			util::stream_format(stream, "#$%02X;", operandarray[0]);
-			pb = operandarray[1];
+			util::stream_format(stream, "#$%02X;", params.r8(ppc));
+			pb = params.r8(ppc+1);
 		}
 		else
 		{
-			pb = operandarray[0];
+			pb = params.r8(ppc);
 		}
 
-		indirect(stream, pb, opram, p);
+		indirect(stream, pb, params, p);
 		break;
 
 	case IMM:
 		if (numoperands == 4)
 		{
-			ea = (operandarray[0] << 24) + (operandarray[1] << 16) + (operandarray[2] << 8) + operandarray[3];
+			ea = params.r32(ppc);
 			util::stream_format(stream, "#$%08X", ea);
 		}
 		else
 		if (numoperands == 2)
 		{
-			ea = (operandarray[0] << 8) + operandarray[1];
+			ea = params.r16(ppc);
 			util::stream_format(stream, "#$%04X", ea);
 		}
 		else
 		if (numoperands == 1)
 		{
-			ea = operandarray[0];
+			ea = params.r8(ppc);
 			util::stream_format(stream, "#$%02X", ea);
 		}
 		break;
 
 	case IMM_RR:
-		pb = operandarray[0];
+		pb = params.r8(ppc);
 		register_register(stream, pb);
 		break;
 
 	case IMM_BW:
-		pb = operandarray[0];
+		pb = params.r8(ppc);
 		util::stream_format(stream, "%s,", m6x09_btwregs[((pb & 0xc0) >> 6)]);
 		util::stream_format(stream, "%d,", (pb & 0x38) >> 3);
 		util::stream_format(stream, "%d,", (pb & 0x07));
-		util::stream_format(stream, "$%02X", operandarray[1]);
+		util::stream_format(stream, "$%02X", params.r8(ppc+1));
 		break;
 
 	case IMM_TFM:
-		pb = operandarray[0];
+		pb = params.r8(ppc);
 		util::stream_format(stream, tfm_s[op->opcode() & 0x07], hd6309_tfmregs[(pb >> 4) & 0xf], hd6309_tfmregs[pb & 0xf]);
 		break;
 
@@ -347,7 +269,7 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 		throw false;
 	}
 
-	return p | op->flags() | DASMFLAG_SUPPORTED;
+	return (p - pc) | op->flags() | SUPPORTED;
 }
 
 
@@ -355,7 +277,7 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 //  M6809/HD6309 disassembler
 //**************************************************************************
 
-static const opcodeinfo m6x09_opcodes[] =
+const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 {
 	// Page 0 opcodes (single byte)
 	{ 0x00, 2, "NEG",   DIR,    M6x09_GENERAL },
@@ -381,7 +303,7 @@ static const opcodeinfo m6x09_opcodes[] =
 	{ 0x13, 1, "SYNC",  INH,    M6x09_GENERAL },
 	{ 0x14, 1, "SEXW",  INH,    HD6309_EXCLUSIVE },
 	{ 0x16, 3, "LBRA",  LREL,   M6x09_GENERAL },
-	{ 0x17, 3, "LBSR",  LREL,   M6x09_GENERAL, DASMFLAG_STEP_OVER },
+	{ 0x17, 3, "LBSR",  LREL,   M6x09_GENERAL, STEP_OVER },
 	{ 0x19, 1, "DAA",   INH,    M6x09_GENERAL },
 	{ 0x1A, 2, "ORCC",  IMM,    M6x09_GENERAL },
 	{ 0x1C, 2, "ANDCC", IMM,    M6x09_GENERAL },
@@ -491,7 +413,7 @@ static const opcodeinfo m6x09_opcodes[] =
 	{ 0x8A, 2, "ORA",   IMM,    M6x09_GENERAL },
 	{ 0x8B, 2, "ADDA",  IMM,    M6x09_GENERAL },
 	{ 0x8C, 3, "CMPX",  IMM,    M6x09_GENERAL },
-	{ 0x8D, 2, "BSR",   REL,    M6x09_GENERAL, DASMFLAG_STEP_OVER },
+	{ 0x8D, 2, "BSR",   REL,    M6x09_GENERAL, STEP_OVER },
 	{ 0x8E, 3, "LDX",   IMM,    M6x09_GENERAL },
 
 	{ 0x90, 2, "SUBA",  DIR,    M6x09_GENERAL },
@@ -507,7 +429,7 @@ static const opcodeinfo m6x09_opcodes[] =
 	{ 0x9A, 2, "ORA",   DIR,    M6x09_GENERAL },
 	{ 0x9B, 2, "ADDA",  DIR,    M6x09_GENERAL },
 	{ 0x9C, 2, "CMPX",  DIR,    M6x09_GENERAL },
-	{ 0x9D, 2, "JSR",   DIR,    M6x09_GENERAL, DASMFLAG_STEP_OVER },
+	{ 0x9D, 2, "JSR",   DIR,    M6x09_GENERAL, STEP_OVER },
 	{ 0x9E, 2, "LDX",   DIR,    M6x09_GENERAL },
 	{ 0x9F, 2, "STX",   DIR,    M6x09_GENERAL },
 
@@ -524,7 +446,7 @@ static const opcodeinfo m6x09_opcodes[] =
 	{ 0xAA, 2, "ORA",   IND,    M6x09_GENERAL },
 	{ 0xAB, 2, "ADDA",  IND,    M6x09_GENERAL },
 	{ 0xAC, 2, "CMPX",  IND,    M6x09_GENERAL },
-	{ 0xAD, 2, "JSR",   IND,    M6x09_GENERAL, DASMFLAG_STEP_OVER },
+	{ 0xAD, 2, "JSR",   IND,    M6x09_GENERAL, STEP_OVER },
 	{ 0xAE, 2, "LDX",   IND,    M6x09_GENERAL },
 	{ 0xAF, 2, "STX",   IND,    M6x09_GENERAL },
 
@@ -541,7 +463,7 @@ static const opcodeinfo m6x09_opcodes[] =
 	{ 0xBA, 3, "ORA",   EXT,    M6x09_GENERAL },
 	{ 0xBB, 3, "ADDA",  EXT,    M6x09_GENERAL },
 	{ 0xBC, 3, "CMPX",  EXT,    M6x09_GENERAL },
-	{ 0xBD, 3, "JSR",   EXT,    M6x09_GENERAL, DASMFLAG_STEP_OVER },
+	{ 0xBD, 3, "JSR",   EXT,    M6x09_GENERAL, STEP_OVER },
 	{ 0xBE, 3, "LDX",   EXT,    M6x09_GENERAL },
 	{ 0xBF, 3, "STX",   EXT,    M6x09_GENERAL },
 
@@ -875,33 +797,17 @@ static const opcodeinfo m6x09_opcodes[] =
 
 // ======================> m6x09_disassembler
 
-// M6809/HD6309 disassembler
-namespace
+m6x09_disassembler::m6x09_disassembler(m6x09_instruction_level level, const char teregs[16][4])
+	: m6x09_base_disassembler(m6x09_opcodes, ARRAY_LENGTH(m6x09_opcodes), level)
+	, m_teregs(*reinterpret_cast<const std::array<std::array<char, 4>, 16> *>(teregs))
 {
-	class m6x09_disassembler : public m6x09_disassembler_base
-	{
-	public:
-		m6x09_disassembler(m6x09_instruction_level level, const char teregs[16][4])
-			: m6x09_disassembler_base(m6x09_opcodes, ARRAY_LENGTH(m6x09_opcodes), level)
-			, m_teregs(*reinterpret_cast<const std::array<std::array<char, 4>, 16> *>(teregs))
-		{
-		}
-
-	protected:
-		virtual void indirect(std::ostream &stream, uint8_t pb, const uint8_t *opram, int &p) override;
-		virtual void register_register(std::ostream &stream, uint8_t pb) override;
-
-	private:
-		const std::array<std::array<char, 4>, 16> &m_teregs;
-	};
-};
-
+}
 
 //-------------------------------------------------
 //  indirect addressing mode for M6809/HD6309
 //-------------------------------------------------
 
-void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const uint8_t *opram, int &p)
+void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p)
 {
 	uint8_t reg = (pb >> 5) & 3;
 	uint8_t pbm = pb & 0x8f;
@@ -924,7 +830,7 @@ void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const uint8_
 				util::stream_format(stream, ",W");
 				break;
 			case 0x01:
-				offset = (int16_t)((opram[p + 0] << 8) + opram[p + 1]);
+				offset = (int16_t)params.r16(p);
 				p += 2;
 				util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
 				util::stream_format(stream, "$%04X,W", (offset < 0) ? -offset : offset);
@@ -973,14 +879,14 @@ void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const uint8_
 		break;
 
 	case 0x88:  // (+/- 7 bit offset),R
-		offset = (int8_t)opram[p++];
+		offset = (int8_t)params.r8(p++);
 		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
 		util::stream_format(stream, "$%02X,", (offset < 0) ? -offset : offset);
 		util::stream_format(stream, "%s", m6x09_regs[reg]);
 		break;
 
 	case 0x89:  // (+/- 15 bit offset),R
-		offset = (int16_t)((opram[p + 0] << 8) + opram[p + 1]);
+		offset = (int16_t)params.r16(p);
 		p += 2;
 		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
 		util::stream_format(stream, "$%04X,", (offset < 0) ? -offset : offset);
@@ -996,13 +902,13 @@ void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const uint8_
 		break;
 
 	case 0x8c:  // (+/- 7 bit offset),PC
-		offset = (int8_t)opram[p++];
+		offset = (int8_t)params.r8(p);
 		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
 		util::stream_format(stream, "$%02X,PC", (offset < 0) ? -offset : offset);
 		break;
 
 	case 0x8d:  // (+/- 15 bit offset),PC
-		offset = (int16_t)((opram[p + 0] << 8) + opram[p + 1]);
+		offset = (int16_t)params.r16(p);
 		p += 2;
 		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
 		util::stream_format(stream, "$%04X,PC", (offset < 0) ? -offset : offset);
@@ -1015,7 +921,7 @@ void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const uint8_
 	case 0x8f:  // address or operations relative to W
 		if (indirect)
 		{
-			ea = (uint16_t)((opram[p + 0] << 8) + opram[p + 1]);
+			ea = (uint16_t)params.r16(p);
 			p += 2;
 			util::stream_format(stream, "$%04X", ea);
 			break;
@@ -1028,7 +934,7 @@ void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const uint8_
 				util::stream_format(stream, ",W");
 				break;
 			case 0x01:
-				offset = (int16_t)((opram[p + 0] << 8) + opram[p + 1]);
+				offset = (int16_t)params.r16(p);
 				p += 2;
 				util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
 				util::stream_format(stream, "$%04X,W", (offset < 0) ? -offset : offset);
@@ -1075,15 +981,15 @@ void m6x09_disassembler::register_register(std::ostream &stream, uint8_t pb)
 //  M6809 disassembler entry point
 //-------------------------------------------------
 
-CPU_DISASSEMBLE(m6809)
+const char m6809_disassembler::m6809_teregs[16][4] =
 {
-	static const char m6809_teregs[16][4] =
-	{
-		"D", "X",  "Y",  "U",   "S",  "PC", "inv", "inv",
-		"A", "B", "CC", "DP", "inv", "inv", "inv", "inv"
-	};
-	m6x09_disassembler disasm(M6x09_GENERAL, m6809_teregs);
-	return disasm.disassemble(stream, pc, oprom, opram);
+	"D", "X",  "Y",  "U",   "S",  "PC", "inv", "inv",
+	"A", "B", "CC", "DP", "inv", "inv", "inv", "inv"
+};
+
+
+m6809_disassembler::m6809_disassembler() : m6x09_disassembler(M6x09_GENERAL, m6809_teregs)
+{
 }
 
 
@@ -1091,15 +997,14 @@ CPU_DISASSEMBLE(m6809)
 //  HD6309 disassembler entry point
 //-------------------------------------------------
 
-CPU_DISASSEMBLE(hd6309)
+const char hd6309_disassembler::hd6309_teregs[16][4] =
 {
-	static const char hd6309_teregs[16][4] =
-	{
-		"D", "X",  "Y",  "U", "S", "PC", "W", "V",
-		"A", "B", "CC", "DP", "0",  "0", "E", "F"
-	};
-	m6x09_disassembler disasm(HD6309_EXCLUSIVE, hd6309_teregs);
-	return disasm.disassemble(stream, pc, oprom, opram);
+	"D", "X",  "Y",  "U", "S", "PC", "W", "V",
+	"A", "B", "CC", "DP", "0",  "0", "E", "F"
+};
+
+hd6309_disassembler::hd6309_disassembler() : m6x09_disassembler(HD6309_EXCLUSIVE, hd6309_teregs)
+{
 }
 
 
@@ -1107,7 +1012,7 @@ CPU_DISASSEMBLE(hd6309)
 //  Konami disassembler
 //**************************************************************************
 
-static const opcodeinfo konami_opcodes[] =
+const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] =
 {
 	{ 0x08, 2, "LEAX",  IND,    M6x09_GENERAL },
 	{ 0x09, 2, "LEAY",  IND,    M6x09_GENERAL },
@@ -1277,9 +1182,9 @@ static const opcodeinfo konami_opcodes[] =
 	{ 0xA6, 2, "ASLW",  IND,    M6x09_GENERAL },
 	{ 0xA7, 2, "ROLW",  IND,    M6x09_GENERAL },
 	{ 0xA8, 2, "JMP",   IND,    M6x09_GENERAL },
-	{ 0xA9, 2, "JSR",   IND,    M6x09_GENERAL, DASMFLAG_STEP_OVER },
-	{ 0xAA, 2, "BSR",   REL,    M6x09_GENERAL, DASMFLAG_STEP_OVER },
-	{ 0xAB, 3, "LBSR",  LREL,   M6x09_GENERAL, DASMFLAG_STEP_OVER },
+	{ 0xA9, 2, "JSR",   IND,    M6x09_GENERAL, STEP_OVER },
+	{ 0xAA, 2, "BSR",   REL,    M6x09_GENERAL, STEP_OVER },
+	{ 0xAB, 3, "LBSR",  LREL,   M6x09_GENERAL, STEP_OVER },
 	{ 0xAC, 2, "DECB,JNZ",   REL,   M6x09_GENERAL },
 	{ 0xAD, 2, "DECX,JNZ",   REL,   M6x09_GENERAL },
 	{ 0xAE, 1, "NOP",   INH,    M6x09_GENERAL },
@@ -1324,27 +1229,15 @@ static const opcodeinfo konami_opcodes[] =
 
 // ======================> konami_disassembler
 
-namespace
+konami_disassembler::konami_disassembler() : m6x09_base_disassembler(konami_opcodes, ARRAY_LENGTH(konami_opcodes), M6x09_GENERAL)
 {
-	// Konami disassembler
-	class konami_disassembler : public m6x09_disassembler_base
-	{
-	public:
-		konami_disassembler()
-			: m6x09_disassembler_base(konami_opcodes, ARRAY_LENGTH(konami_opcodes), M6x09_GENERAL) { }
-
-	protected:
-		virtual void indirect(std::ostream &stream, uint8_t pb, const uint8_t *opram, int &p) override;
-		virtual void register_register(std::ostream &stream, uint8_t pb) override;
-	};
-};
-
+}
 
 //-------------------------------------------------
 //  indirect addressing mode for Konami
 //-------------------------------------------------
 
-void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uint8_t *opram, int &p)
+void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const data_buffer &params, offs_t &p)
 {
 	static const char index_reg[8][3] =
 	{
@@ -1379,7 +1272,7 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 0x04: /* direct - mode */
-				util::stream_format(stream, "[$%02x]", opram[p++]);
+				util::stream_format(stream, "[$%02x]", params.r8(p++));
 				break;
 
 			case 0x07: /* register d */
@@ -1404,7 +1297,7 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 0x04: /* direct - mode */
-				util::stream_format(stream, "$%02x", opram[p++]);
+				util::stream_format(stream, "$%02x", params.r8(p++));
 				break;
 
 			case 0x07: /* register d */
@@ -1441,7 +1334,7 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 4: // post byte offset
-				val = opram[p++];
+				val = params.r8(p++);
 
 				if (val & 0x80)
 					util::stream_format(stream, "[#$-%02x,%s]", 0x100 - val, index_reg[idx]);
@@ -1450,8 +1343,8 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 5: // post word offset
-				val = opram[p++] << 8;
-				val |= opram[p++];
+				val = params.r16(p);
+				p += 2;
 
 				if (val & 0x8000)
 					util::stream_format(stream, "[#$-%04x,%s]", 0x10000 - val, index_reg[idx]);
@@ -1464,8 +1357,8 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 7: // extended
-				val = opram[p++] << 8;
-				val |= opram[p++];
+				val = params.r16(p);
+				p += 2;
 
 				util::stream_format(stream, "[$%04x]", val);
 				break;
@@ -1492,7 +1385,7 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 4: // post byte offset
-				val = opram[p++];
+				val = params.r8(p++);
 
 				if (val & 0x80)
 					util::stream_format(stream, "#$-%02x,%s", 0x100 - val, index_reg[idx]);
@@ -1501,8 +1394,8 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 5: // post word offset
-				val = opram[p++] << 8;
-				val |= opram[p++];
+				val = params.r16(p);
+				p += 2;
 
 				if (val & 0x8000)
 					util::stream_format(stream, "#$-%04x,%s", 0x10000 - val, index_reg[idx]);
@@ -1515,8 +1408,8 @@ void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const uin
 				break;
 
 			case 7: // extended
-				val = opram[p++] << 8;
-				val |= opram[p++];
+				val = params.r16(p);
+				p += 2;
 
 				util::stream_format(stream, "$%04x", val);
 				break;
@@ -1539,15 +1432,4 @@ void konami_disassembler::register_register(std::ostream &stream, uint8_t pb)
 	util::stream_format(stream, "%c,%c",
 		konami_teregs[(pb >> 0) & 0x7],
 		konami_teregs[(pb >> 4) & 0x7]);
-}
-
-
-//-------------------------------------------------
-//  Konami disassembler entry point
-//-------------------------------------------------
-
-CPU_DISASSEMBLE(konami)
-{
-	konami_disassembler disasm;
-	return disasm.disassemble(stream, pc, oprom, opram);
 }

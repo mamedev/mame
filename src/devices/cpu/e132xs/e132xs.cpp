@@ -147,6 +147,7 @@
 #include "debugger.h"
 
 #include "32xsdefs.h"
+#include "32xsdasm.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -1349,36 +1350,13 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hyperstone_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hyperstone_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hyperstone_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hyperstone );
-	return dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP);
+	return new hyperstone_disassembler;
 }
 
 /* Opcodes */

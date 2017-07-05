@@ -17,6 +17,7 @@
 #include "gte.h"
 #include "irq.h"
 #include "sio.h"
+#include "psxdasm.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -140,20 +141,9 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class psxcpu_state
-{
-public:
-	virtual ~psxcpu_state() { }
-
-	virtual uint32_t pc() = 0;
-	virtual uint32_t delayr() = 0;
-	virtual uint32_t delayv() = 0;
-	virtual uint32_t r(int i) = 0;
-};
-
 // ======================> psxcpu_device
 
-class psxcpu_device : public cpu_device, psxcpu_state
+class psxcpu_device : public cpu_device, psxcpu_disassembler::config
 {
 public:
 	// static configuration helpers
@@ -229,9 +219,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// CPU registers
 	uint32_t m_pc;
@@ -408,7 +396,5 @@ DECLARE_DEVICE_TYPE(CXD8661R,  cxd8661r_device)
 DECLARE_DEVICE_TYPE(CXD8606BQ, cxd8606bq_device)
 DECLARE_DEVICE_TYPE(CXD8606CQ, cxd8606cq_device)
 
-
-extern unsigned DasmPSXCPU(psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
 
 #endif // MAME_CPU_PSX_PSX_H

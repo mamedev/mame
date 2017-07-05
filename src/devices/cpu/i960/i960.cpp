@@ -2,9 +2,8 @@
 // copyright-holders:Farfetch'd, R. Belmont
 #include "emu.h"
 #include "i960.h"
+#include "i960dis.h"
 #include "debugger.h"
-
-CPU_DISASSEMBLE( i960  );
 
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
@@ -2209,9 +2208,7 @@ void i960_cpu_device::device_reset()
 	m_rcache_pos = 0;
 }
 
-
-offs_t i960_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i960_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i960 );
-	return CPU_DISASSEMBLE_NAME(i960)(this, stream, pc, oprom, opram, options);
+	return new i960_disassembler;
 }

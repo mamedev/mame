@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "8000dasm.h"
 
 enum
 {
@@ -31,7 +32,7 @@ enum
 #define MCFG_Z8000_MO(_devcb) \
 	devcb = &z8002_device::set_mo_callback(*device, DEVCB_##_devcb);
 
-class z8002_device : public cpu_device
+class z8002_device : public cpu_device, public z8000_disassembler::config
 {
 public:
 	// construction/destruction
@@ -40,12 +41,6 @@ public:
 
 	template <class Object> static devcb_base &set_mo_callback(device_t &device, Object &&cb) { return downcast<z8002_device &>(device).m_mo_out.set_callback(std::forward<Object>(cb)); }
 	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
-
-	struct Z8000_dasm { char const *dasm; uint32_t flags; int size; };
-
-	static void init_tables();
-	static void deinit_tables();
-	static Z8000_dasm dasm(unsigned w);
 
 protected:
 	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult);
@@ -69,9 +64,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+
+	void init_tables();
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -108,7 +103,7 @@ protected:
 
 	void clear_internal_state();
 	void register_debug_state();
-	virtual int segmented_mode();
+	virtual bool get_segmented_mode() const override;
 	static inline uint32_t addr_add(uint32_t addr, uint32_t addend);
 	static inline uint32_t addr_sub(uint32_t addr, uint32_t subtrahend);
 	inline uint16_t RDOP();
@@ -628,22 +623,14 @@ private:
 		int     beg, end, step;
 		int     size, cycles;
 		opcode_func opcode;
-		const char  *dasm;
-		uint32_t dasmflags;
-	};
-
-	/* structure for the opcode execution table / disassembler */
-	struct Z8000_exec {
-		opcode_func opcode;
-		int     cycles;
-		int     size;
-		const char    *dasm;
-		uint32_t dasmflags;
 	};
 
 	/* opcode execution table */
 	static const Z8000_init table[];
-	static std::unique_ptr<Z8000_exec const []> z8000_exec;
+	u16 z8000_exec[0x10000];
+
+	/* zero, sign and parity flags for logical byte operations */
+	u8 z8000_zsp[256];
 };
 
 
@@ -661,12 +648,9 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_disasm_interface overrides
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-
 	address_space_config m_data_config;
 
-	virtual int segmented_mode() override;
+	virtual bool get_segmented_mode() const override;
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr) override;
 	virtual uint16_t RDPORT_W(int mode, uint16_t addr) override;
 	virtual void WRPORT_W(int mode, uint16_t addr, uint16_t value) override;
@@ -677,9 +661,6 @@ protected:
 	virtual uint32_t F_SEG_Z8001() override;
 	virtual uint32_t PSA_ADDR() override;
 	virtual uint32_t read_irq_vector() override;
-
-private:
-	void z8k_disass_mode(int ref, const std::vector<std::string> &params);
 };
 
 

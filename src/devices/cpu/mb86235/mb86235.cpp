@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "mb86235.h"
 #include "mb86235fe.h"
+#include "mb86235d.h"
 
 #include "debugger.h"
 
@@ -234,10 +235,9 @@ void mb86235_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t mb86235_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mb86235_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mb86235 );
-	return CPU_DISASSEMBLE_NAME(mb86235)(this, stream, pc, oprom, opram, options);
+	return new mb86235_disassembler;
 }
 
 

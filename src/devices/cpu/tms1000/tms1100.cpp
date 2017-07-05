@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "tms1100.h"
+#include "tms1k_dasm.h"
 #include "debugger.h"
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
@@ -55,12 +56,10 @@ tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char
 
 
 // disasm
-offs_t tms1100_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *tms1100_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(tms1100);
-	return CPU_DISASSEMBLE_NAME(tms1100)(this, stream, pc, oprom, opram, options);
+	return new tms1100_disassembler;
 }
-
 
 // device_reset
 void tms1100_cpu_device::device_reset()

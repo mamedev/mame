@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "mb88xx.h"
+#include "mb88dasm.h"
 #include "debugger.h"
 
 
@@ -162,10 +163,9 @@ device_memory_interface::space_config_vector mb88_cpu_device::memory_space_confi
 	};
 }
 
-offs_t mb88_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mb88_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mb88 );
-	return CPU_DISASSEMBLE_NAME(mb88)(this, stream, pc, oprom, opram, options);
+	return new mb88_disassembler;
 }
 
 

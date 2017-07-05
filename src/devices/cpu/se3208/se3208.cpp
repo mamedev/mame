@@ -2,6 +2,7 @@
 // copyright-holders:ElSemi
 #include "emu.h"
 #include "se3208.h"
+#include "se3208dis.h"
 
 #include "debugger.h"
 
@@ -1847,8 +1848,7 @@ void se3208_device::execute_set_input( int line, int state )
 		m_IRQ=state;
 }
 
-offs_t se3208_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *se3208_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( se3208 );
-	return CPU_DISASSEMBLE_NAME(se3208)(this, stream, pc, oprom, opram, options);
+	return new se3208_disassembler;
 }

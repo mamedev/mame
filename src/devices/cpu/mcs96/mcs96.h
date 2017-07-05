@@ -41,38 +41,6 @@ protected:
 		F_Z  = 0x8000
 	};
 
-	struct disasm_entry {
-		const char *opcode, *opcode_fe;
-		int mode;
-		offs_t flags;
-	};
-
-	enum {
-		DASM_none,              /* No parameters */
-		DASM_nop_2,             /* One ignored parameter byte */
-		DASM_rel8,              /* Relative, 8 bits */
-		DASM_rel11,             /* Relative, 11 bits */
-		DASM_rel16,             /* Relative, 16 bits */
-		DASM_rrel8,             /* Register + relative, 8 bits */
-		DASM_brrel8,            /* Bit test + register + relative, 8 bits */
-		DASM_direct_1,          /* Register-direct references, 1 operator */
-		DASM_direct_2,          /* Register-direct references, 2 operators */
-		DASM_direct_3,          /* Register-direct references, 3 operators */
-		DASM_immed_1b,          /* Immediate references to byte, 1 operator */
-		DASM_immed_2b,          /* Immediate references to byte, 2 operators */
-		DASM_immed_or_reg_2b,   /* Immediate references to byte or register, 2 operators */
-		DASM_immed_3b,          /* Immediate references to byte, 3 operators */
-		DASM_immed_1w,          /* Immediate references to word, 1 operator */
-		DASM_immed_2w,          /* Immediate references to word, 2 operators */
-		DASM_immed_3w,          /* Immediate references to word, 3 operators */
-		DASM_indirect_1n,       /* Indirect normal, 1 operator */
-		DASM_indirect_1,        /* Indirect, normal or auto-incrementing, 1 operator */
-		DASM_indirect_2,        /* Indirect, normal or auto-incrementing, 2 operators */
-		DASM_indirect_3,        /* Indirect, normal or auto-incrementing, 3 operators */
-		DASM_indexed_1,         /* Indexed, short or long, 1 operator */
-		DASM_indexed_2,         /* Indexed, short or long, 2 operators */
-		DASM_indexed_3         /* Indexed, short or long, 3 operators */
-	};
 
 	mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width);
 
@@ -94,11 +62,6 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
-
-	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries);
 
 	address_space_config program_config;
 	address_space *program;
@@ -122,7 +85,6 @@ protected:
 	virtual uint16_t io_r16(uint8_t adr) = 0;
 
 	void recompute_bcount(uint64_t event_time);
-	static std::string regname(uint8_t reg);
 
 	inline void next(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH; }
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }

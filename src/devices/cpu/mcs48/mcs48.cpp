@@ -85,6 +85,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mcs48.h"
+#include "mcs48dsm.h"
 
 
 /***************************************************************************
@@ -329,17 +330,14 @@ device_memory_interface::space_config_vector mcs48_cpu_device::memory_space_conf
 	};
 }
 
-offs_t mcs48_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mcs48_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mcs48 );
-	return CPU_DISASSEMBLE_NAME(mcs48)(this, stream, pc, oprom, opram, options);
+	return new mcs48_disassembler(false);
 }
 
-
-offs_t upi41_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *upi41_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( upi41 );
-	return CPU_DISASSEMBLE_NAME(upi41)(this, stream, pc, oprom, opram, options);
+	return new mcs48_disassembler(true);
 }
 
 /***************************************************************************

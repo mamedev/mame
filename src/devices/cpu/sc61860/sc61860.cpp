@@ -19,7 +19,7 @@
 
 #include "emu.h"
 #include "sc61860.h"
-
+#include "scdasm.h"
 #include "debugger.h"
 
 
@@ -69,11 +69,9 @@ device_memory_interface::space_config_vector sc61860_device::memory_space_config
 	};
 }
 
-
-offs_t sc61860_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *sc61860_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( sc61860 );
-	return CPU_DISASSEMBLE_NAME(sc61860)(this, stream, pc, oprom, opram, options);
+	return new sc61860_disassembler;
 }
 
 

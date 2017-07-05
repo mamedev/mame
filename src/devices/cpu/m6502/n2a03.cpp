@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "n2a03.h"
+#include "n2a03d.h"
 
 DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "N2A03")
 
@@ -56,9 +57,9 @@ n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, devic
 	program_config.m_internal_map = ADDRESS_MAP_NAME(n2a03_map);
 }
 
-offs_t n2a03_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *n2a03_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new n2a03_disassembler;
 }
 
 void n2a03_device::device_start()

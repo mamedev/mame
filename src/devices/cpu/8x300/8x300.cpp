@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "8x300.h"
+#include "8x300dasm.h"
 #include "debugger.h"
 
 #define FETCHOP(a)         (m_direct->read_word(a))
@@ -590,8 +591,7 @@ void n8x300_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-offs_t n8x300_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *n8x300_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( n8x300 );
-	return CPU_DISASSEMBLE_NAME(n8x300)(this, stream, pc, oprom, opram, options);
+	return new n8x300_disassembler;
 }

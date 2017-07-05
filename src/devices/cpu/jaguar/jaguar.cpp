@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "jaguar.h"
+#include "jagdasm.h"
 
 
 #define LOG_GPU_IO      0
@@ -1436,16 +1437,12 @@ WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
 	}
 }
 
-
-offs_t jaguargpu_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *jaguargpu_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( jaguargpu );
-	return CPU_DISASSEMBLE_NAME(jaguargpu)(this, stream, pc, oprom, opram, options);
+	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_GPU);
 }
 
-
-offs_t jaguardsp_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *jaguardsp_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( jaguardsp );
-	return CPU_DISASSEMBLE_NAME(jaguardsp)(this, stream, pc, oprom, opram, options);
+	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_DSP);
 }

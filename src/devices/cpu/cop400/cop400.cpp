@@ -56,6 +56,10 @@
 #include "emu.h"
 #include "debugger.h"
 #include "cop400.h"
+#include "cop410ds.h"
+#include "cop420ds.h"
+#include "cop424ds.h"
+#include "cop444ds.h"
 
 
 DEFINE_DEVICE_TYPE(COP401, cop401_cpu_device, "cop401", "COP401")
@@ -1362,29 +1366,24 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-offs_t cop400_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *cop400_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( cop410 );
-	extern CPU_DISASSEMBLE( cop420 );
-	extern CPU_DISASSEMBLE( cop444 );
-	extern CPU_DISASSEMBLE( cop424 );
-
 	if ( m_featuremask & COP424C_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop424)(this, stream, pc, oprom, opram, options);
+		return new cop424_disassembler;
 	}
 
 	if ( m_featuremask & COP444L_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop444)(this, stream, pc, oprom, opram, options);
+		return new cop444_disassembler;
 	}
 
 	if ( m_featuremask & COP420_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop420)(this, stream, pc, oprom, opram, options);
+		return new cop420_disassembler;
 	}
 
-	return CPU_DISASSEMBLE_NAME(cop410)(this, stream, pc, oprom, opram, options);
+	return new cop410_disassembler;
 }
 
 READ8_MEMBER( cop400_cpu_device::microbus_rd )

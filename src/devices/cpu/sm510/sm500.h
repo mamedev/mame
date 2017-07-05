@@ -87,7 +87,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 	virtual void clock_melody() override;
@@ -155,7 +155,7 @@ public:
 protected:
 	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual void execute_one() override;
 	virtual int get_trs_field() override { return 1; }
 };

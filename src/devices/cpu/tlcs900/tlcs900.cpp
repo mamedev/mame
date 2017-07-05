@@ -17,6 +17,7 @@ TODO:
 
 #include "emu.h"
 #include "tlcs900.h"
+#include "dasm900.h"
 #include "debugger.h"
 
 
@@ -148,10 +149,9 @@ void tmp95c063_device::device_config_complete()
 }
 
 
-offs_t tlcs900h_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tlcs900h_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tlcs900 );
-	return CPU_DISASSEMBLE_NAME(tlcs900)(this, stream, pc, oprom, opram, options);
+	return new tlcs900_disassembler;
 }
 
 

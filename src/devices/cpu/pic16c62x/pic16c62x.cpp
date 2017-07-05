@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "pic16c62x.h"
+#include "16c62xdsm.h"
 #include "debugger.h"
 
 
@@ -158,10 +159,9 @@ pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *
 }
 
 
-offs_t pic16c62x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *pic16c62x_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( pic16c62x );
-	return CPU_DISASSEMBLE_NAME(pic16c62x)(this, stream, pc, oprom, opram, options);
+	return new pic16c62x_disassembler;
 }
 
 

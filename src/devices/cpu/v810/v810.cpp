@@ -29,6 +29,7 @@
 
 #include "emu.h"
 #include "v810.h"
+#include "v810dasm.h"
 #include "debugger.h"
 
 #define clkIF 3
@@ -54,10 +55,9 @@ device_memory_interface::space_config_vector v810_device::memory_space_config() 
 }
 
 
-offs_t v810_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *v810_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( v810 );
-	return CPU_DISASSEMBLE_NAME(v810)(this, stream, pc, oprom, opram, options);
+	return new v810_disassembler;
 }
 
 

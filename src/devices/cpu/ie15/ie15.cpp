@@ -2,6 +2,7 @@
 // copyright-holders:Sergey Svishchev
 #include "emu.h"
 #include "ie15.h"
+#include "ie15dasm.h"
 
 #include "debugger.h"
 
@@ -149,34 +150,12 @@ void ie15_cpu_device::state_string_export(const device_state_entry &entry, std::
 }
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
+//  create_disassembler
 //-------------------------------------------------
 
-uint32_t ie15_cpu_device::disasm_min_opcode_bytes() const
+util::disasm_interface *ie15_cpu_device::create_disassembler()
 {
-	return 1;
-}
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t ie15_cpu_device::disasm_max_opcode_bytes() const
-{
-	return 2;
-}
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
-//  helper function
-//-------------------------------------------------
-
-offs_t ie15_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( ie15 );
-	return CPU_DISASSEMBLE_NAME(ie15)(nullptr, stream, pc, oprom, opram, 0);
+	return new ie15_disassembler;
 }
 
 //**************************************************************************

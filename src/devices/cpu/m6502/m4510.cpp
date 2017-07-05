@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "m4510.h"
+#include "m4510d.h"
 
 DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "M4510")
 
@@ -26,9 +27,9 @@ m4510_device::m4510_device(const machine_config &mconfig, const char *tag, devic
 	sprogram_config.m_page_shift = 13;
 }
 
-offs_t m4510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m4510_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new m4510_disassembler;
 }
 
 void m4510_device::device_start()

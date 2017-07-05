@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "deco16.h"
+#include "deco16d.h"
 
 #define DECO16_VERBOSE 1
 
@@ -22,11 +23,10 @@ deco16_device::deco16_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-offs_t deco16_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *deco16_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new deco16_disassembler;
 }
-
 
 void deco16_device::device_start()
 {

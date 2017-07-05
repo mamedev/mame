@@ -9,27 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "jaguar.h"
-
-
-/***************************************************************************
-    MEMORY ACCESSORS
-***************************************************************************/
-
-#define ROPCODE(offs)   ((oprom[offs] << 8) | oprom[(offs) + 1])
-
+#include "jagdasm.h"
 
 /***************************************************************************
     STATIC VARIABLES
 ***************************************************************************/
 
-static constexpr unsigned JAGUAR_VARIANT_GPU = 0;
-static constexpr unsigned JAGUAR_VARIANT_DSP = 1;
-
-static const uint8_t convert_zero[32] =
+const uint8_t jaguar_disassembler::convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
 
-static const char *const condition[32] =
+const char *const jaguar_disassembler::condition[32] =
 {
 	"",
 	"nz,",
@@ -72,20 +61,18 @@ static const char *const condition[32] =
     CODE CODE
 ***************************************************************************/
 
-static inline char *signed_16bit(int16_t val)
+std::string jaguar_disassembler::signed_16bit(int16_t val)
 {
-	static char temp[10];
 	if (val < 0)
-		sprintf(temp, "-$%x", -val);
+		return util::string_format("-$%x", -val);
 	else
-		sprintf(temp, "$%x", val);
-	return temp;
+		return util::string_format("$%x", val);
 }
 
-static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const uint8_t *oprom)
+offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
-	int op = ROPCODE(0);
+	int op = opcodes.r16(pc);
 	int reg1 = (op >> 5) & 31;
 	int reg2 = op & 31;
 	int size = 2;
@@ -126,12 +113,12 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 		case 30:    util::stream_format(stream, "cmp     r%d,r%d", reg1, reg2);                 break;
 		case 31:    util::stream_format(stream, "cmpq    %s,r%d", signed_16bit((int16_t)(reg1 << 11) >> 11), reg2);break;
 
-		case 32:    if (variant == JAGUAR_VARIANT_GPU)
+		case 32:    if (m_variant == JAGUAR_VARIANT_GPU)
 					util::stream_format(stream, "sat8    r%d", reg2);
 					else
 					util::stream_format(stream, "subqmod $%x,r%d", convert_zero[reg1], reg2);
 					break;
-		case 33:    if (variant == JAGUAR_VARIANT_GPU)
+		case 33:    if (m_variant == JAGUAR_VARIANT_GPU)
 					util::stream_format(stream, "sat16   r%d", reg2);
 					else
 					util::stream_format(stream, "sat16s  r%d", reg2);
@@ -140,11 +127,11 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 		case 35:    util::stream_format(stream, "moveq   %d,r%d", reg1, reg2);                  break;
 		case 36:    util::stream_format(stream, "moveta  r%d,r%d", reg1, reg2);                 break;
 		case 37:    util::stream_format(stream, "movefa  r%d,r%d", reg1, reg2);                 break;
-		case 38:    util::stream_format(stream, "movei   $%x,r%d", ROPCODE(2) | (ROPCODE(4)<<16), reg2); size = 6; break;
+		case 38:    util::stream_format(stream, "movei   $%x,r%d", opcodes.r32(pc+2), reg2); size = 6; break;
 		case 39:    util::stream_format(stream, "loadb   (r%d),r%d", reg1, reg2);                   break;
 		case 40:    util::stream_format(stream, "loadw   (r%d),r%d", reg1, reg2);                   break;
 		case 41:    util::stream_format(stream, "load    (r%d),r%d", reg1, reg2);                   break;
-		case 42:    if (variant == JAGUAR_VARIANT_GPU)
+		case 42:    if (m_variant == JAGUAR_VARIANT_GPU)
 					util::stream_format(stream, "loadp   (r%d),r%d", reg1, reg2);
 					else
 					util::stream_format(stream, "sat32s  r%d", reg2);
@@ -154,7 +141,7 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 		case 45:    util::stream_format(stream, "storeb  r%d,(r%d)", reg2, reg1);               break;
 		case 46:    util::stream_format(stream, "storew  r%d,(r%d)", reg2, reg1);               break;
 		case 47:    util::stream_format(stream, "store   r%d,(r%d)", reg2, reg1);                   break;
-		case 48:    if (variant == JAGUAR_VARIANT_GPU)
+		case 48:    if (m_variant == JAGUAR_VARIANT_GPU)
 					util::stream_format(stream, "storep  r%d,(r%d)", reg2, reg1);
 					else
 					util::stream_format(stream, "mirror  r%d", reg2);
@@ -172,12 +159,12 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 		case 59:    util::stream_format(stream, "load    (r15+r%d),r%d", reg1, reg2);               break;
 		case 60:    util::stream_format(stream, "store   r%d,(r14+r%d)", reg2, reg1);               break;
 		case 61:    util::stream_format(stream, "store   r%d,(r15+r%d)", reg2, reg1);               break;
-		case 62:    if (variant == JAGUAR_VARIANT_GPU)
+		case 62:    if (m_variant == JAGUAR_VARIANT_GPU)
 					util::stream_format(stream, "sat24   r%d", reg2);
 					else
 					util::stream_format(stream, "illegal");
 					break;
-		case 63:    if (variant == JAGUAR_VARIANT_GPU)
+		case 63:    if (m_variant == JAGUAR_VARIANT_GPU)
 					util::stream_format(stream, reg1 ?
 									"unpack  r%d" :
 									"pack    r%d", reg2);
@@ -186,15 +173,14 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 					break;
 	}
 
-	return size | flags | DASMFLAG_SUPPORTED;
+	return size | flags | SUPPORTED;
 }
 
-CPU_DISASSEMBLE( jaguargpu )
+jaguar_disassembler::jaguar_disassembler(u32 variant) : m_variant(variant)
 {
-	return dasmjag(JAGUAR_VARIANT_GPU, stream, pc, oprom);
 }
 
-CPU_DISASSEMBLE( jaguardsp )
+uint32_t jaguar_disassembler::opcode_alignment() const
 {
-	return dasmjag(JAGUAR_VARIANT_DSP, stream, pc, oprom);
+	return 2;
 }

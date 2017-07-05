@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cpu/i386/i386dasm.h>
 
 /////////////////////////////////////////////////////////////////
 
@@ -39,7 +40,7 @@ enum
 };
 
 
-class i8086_common_cpu_device : public cpu_device
+class i8086_common_cpu_device : public cpu_device, public i386_disassembler::config
 {
 public:
 	template <class Object> static devcb_base &set_lock_handler(device_t &device, Object &&cb)
@@ -134,9 +135,8 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual int get_mode() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;

@@ -9,103 +9,14 @@
 
 
 #include "emu.h"
-#include "debugger.h"
-#include "tms9900.h"
+#include "tms99com.h"
+#include "9900dasm.h"
 
 #define MASK    0x0000ffff
 #define BITS(val,n1,n2) ((val>>(15-(n2))) & (MASK>>(15-((n2)-(n1)))))
 
-enum format_t
-{
-	format_1,   /* 2 address instructions */
-	format_2a,  /* jump instructions */
-	format_2b,  /* bit I/O instructions */
-	format_3_9, /* logical, multiply, and divide instructions */
-	format_4,   /* CRU instructions */
-	format_5,   /* register shift instructions */
-	format_6,   /* single address instructions */
-	format_7,   /* instructions without operands */
-	format_8a,  /* immediate instructions (destination register) */
-	format_8b,  /* immediate instructions (no destination register) */
-	format_9,   /* extended operation instruction */
-	format_10,  /* memory map file instruction */
-	format_11,  /* multiple precision instructions */
-	format_12,  /* string instructions */
-	format_13,  /* multiple precision shift instructions */
-	format_14,  /* bit testing instructions */
-	format_15,  /* invert order of field instruction */
-	format_16,  /* field instructions */
-	format_17,  /* alter register and jump instructions */
-	format_18,  /* single register operand instructions */
-	format_liim,/* format for liim (looks like format 18) */
-	format_19,  /* move address instruction */
-	format_20,  /* list search instructions */
-	format_21,  /* extend precision instruction */
 
-	illegal
-};
-
-/* definitions for flags */
-enum
-{
-	/* processor set on which opcodes are available */
-	ps_any      = 0x01,     /* every processor in the tms9900/ti990 family */
-	ps_mapper   = 0x02,     /* processors with memory mapper (ti990/10, ti990/12,
-	                                and tms99000 with mapper coprocessor) */
-	ps_tms9995  = 0x04,     /* ti990/12, tms9995, and later */
-	ps_tms99000 = 0x08,     /* ti990/12, tms99000, and later */
-	ps_ti990_12 = 0x10,     /* ti990/12 only */
-
-	/* additional flags for special decoding */
-	sd_11       = 0x100,    /* bit 11 should be cleared in li, ai, andi, ori, ci, stwp, stst */
-	sd_11_15    = 0x200     /* bits 11-15 should be cleared in lwpi, limi, idle, rset, rtwp, ckon, ckof, lrex */
-};
-
-struct description_t
-{
-	const char *mnemonic;
-	format_t format;
-	int flags;
-};
-
-
-enum opcodes {
-	/* basic instruction set */
-	_a=0,   _ab,    _c,     _cb,    _s,     _sb,    _soc,   _socb,  _szc,   _szcb,
-	_mov,   _movb,  _coc,   _czc,   _xor,   _mpy,   _div,   _xop,   _b,     _bl,
-	_blwp,  _clr,   _seto,  _inv,   _neg,   _abs,   _swpb,  _inc,   _inct,  _dec,
-	_dect,  _x,     _ldcr,  _stcr,  _sbo,   _sbz,   _tb,    _jeq,   _jgt,   _jh,
-	_jhe,   _jl,    _jle,   _jlt,   _jmp,   _jnc,   _jne,   _jno,   _joc,   _jop,
-	_sla,   _sra,   _src,   _srl,   _ai,    _andi,  _ci,    _li,    _ori,   _lwpi,
-	_limi,  _stst,  _stwp,  _rtwp,  _idle,  _rset,  _ckof,  _ckon,  _lrex,
-
-	/* mapper instruction set */
-	_lds,   _ldd,   _lmf,
-
-	/* tms9995 instruction set */
-	_divs,  _mpys,  _lst,   _lwp,
-
-	/* tms99000 instruction set */
-	_bind,
-
-	/* ti990/12 instruction set */
-	_sram,  _slam,  _rto,   _lto,   _cnto,  _slsl,  _slsp,  _bdc,   _dbc,   _swpm,
-	_xorm,  _orm,   _andm,  _sm,    _am,    _mova,  _emd,   _eint,  _dint,  _stpc,
-	_cs,    _seqb,  _movs,  _lim,   _lcs,   _blsk,  _mvsr,  _mvsk,  _pops,  _pshs,
-
-	_cri,   _cdi,   _negr,  _negd,  _cre,   _cde,   _cer,   _ced,   _nrm,   _tmb,
-	_tcmb,  _tsmb,  _srj,   _arj,   _xit,   _insf,  _xv,    _xf,    _ar,    _cir,
-	_sr,    _mr,    _dr,    _lr,    _str,   _iof,   _sneb,  _crc,   _ts,    _ad,
-	_cid,   _sd,    _md,    _dd,    _ld,    _std,   _ep,
-
-	/* tms9940-only instruction set */
-	_liim,  _dca,   _dcs,
-
-	_ill
-};
-
-
-static const description_t descriptions[144+3+1] =
+const tms9900_disassembler::description_t tms9900_disassembler::descriptions[144+3+1] =
 {
 	/* basic instruction set */
 	{ "a",      format_1,   ps_any },           { "ab",     format_1,   ps_any },
@@ -203,51 +114,51 @@ static const description_t descriptions[144+3+1] =
 };
 
 
-static const enum opcodes ops_4000_ffff_s12[12]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_4000_ffff_s12[12]=
 {
 	_szc,   _szcb,  _s,     _sb,                                    /*4000-7000*/
 	_c,     _cb,    _a,     _ab,    _mov,   _movb,  _soc,   _socb   /*8000-f000*/
 };
 
 
-static const enum opcodes ops_2000_3fff_s10[8]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_2000_3fff_s10[8]=
 {
 	_coc,   _czc,   _xor,   _xop,   _ldcr,  _stcr,  _mpy,   _div    /*2000-3800*/
 };
 
 
-static const enum opcodes ops_1000_1fff_s8[16]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_1000_1fff_s8[16]=
 {
 	_jmp,   _jlt,   _jle,   _jeq,   _jhe,   _jgt,   _jne,   _jnc,   /*1000-1700*/
 	_joc,   _jno,   _jl,    _jh,    _jop,   _sbo,   _sbz,   _tb     /*1800-1f00*/
 };
 
 
-static const enum opcodes ops_0e40_0fff_s6[7]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0e40_0fff_s6[7]=
 {
 			_ad,    _cid,   _sd,    _md,    _dd,    _ld,    _std    /*0e40-0fc0*/
 };
 
 
-static const enum opcodes ops_0e00_0e3f_s4[4]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0e00_0e3f_s4[4]=
 {
 	_iof,   _sneb,  _crc,   _ts                                     /*0e00-0e30*/
 };
 
 
-static const enum opcodes ops_0c40_0dff_s6[7]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0c40_0dff_s6[7]=
 {
 			_ar,    _cir,   _sr,    _mr,    _dr,    _lr,    _str    /*0c40-0dc0*/
 };
 
 
-static const enum opcodes ops_0c10_0c3f_s4[3]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0c10_0c3f_s4[3]=
 {
 			_insf,  _xv,    _xf                                     /*0c10-0c30*/
 };
 
 
-static const enum opcodes ops_0c00_0c0f_s0[16]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0c00_0c0f_s0[16]=
 {
 	_cri,   _cdi,   _negr,  _negd,  _cre,   _cde,   _cer,   _ced,   /*0c00-0c07*/
 	_nrm,   _tmb,   _tcmb,  _tsmb,  _srj,   _arj,   _xit,   _xit    /*0c08-0c0f*/
@@ -255,40 +166,40 @@ static const enum opcodes ops_0c00_0c0f_s0[16]=
 
 
 
-static const enum opcodes ops_0800_0bff_s8[4]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0800_0bff_s8[4]=
 {
 	_sra,   _srl,   _sla,   _src                                    /*0800-0b00*/
 };
 
 
-static const enum opcodes ops_0400_07ff_s6[16]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0400_07ff_s6[16]=
 {
 	_blwp,  _b,     _x,     _clr,   _neg,   _inv,   _inc,   _inct,  /*0400-05c0*/
 	_dec,   _dect,  _bl,    _swpb,  _seto,  _abs,   _lds,   _ldd    /*0600-07c0*/
 };
 
 
-static const enum opcodes ops_0200_03ff_s5[16]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0200_03ff_s5[16]=
 {
 	_li,    _ai,    _andi,  _ori,   _ci,    _stwp,  _stst,  _lwpi,  /*0200-02e0*/
 	_limi,  _lmf,   _idle,  _rset,  _rtwp,  _ckon,  _ckof,  _lrex   /*0300-03e0*/
 };
 
 
-static const enum opcodes ops_0100_01ff_s6[4]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0100_01ff_s6[4]=
 {
 	_ill,   _bind,  _divs,  _mpys                                   /*0100-01c0*/
 };
 
 
-static const enum opcodes ops_0030_00ff_s4[13]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_0030_00ff_s4[13]=
 {
 							_stpc,  _cs,    _seqb,  _movs,  _lim,   /*0030-0070*/
 	_lst,   _lwp,   _lcs,   _blsk,  _mvsr,  _mvsk,  _pops,  _pshs   /*0080-00f0*/
 };
 
 
-static const enum opcodes ops_001c_002f_s0[20]=
+const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_001c_002f_s0[20]=
 {
 									_sram,  _slam,  _rto,   _lto,   /*001c-001f*/
 	_cnto,  _slsl,  _slsp,  _bdc,   _dbc,   _swpm,  _xorm,  _orm,   /*0020-0027*/
@@ -296,17 +207,14 @@ static const enum opcodes ops_001c_002f_s0[20]=
 };
 
 
-
-static int PC;
-
-
-static inline uint16_t readop_arg(const uint8_t *opram, unsigned pc)
+inline uint16_t tms9900_disassembler::readop_arg(const data_buffer &params, offs_t &PC)
 {
-	uint16_t result = opram[PC++ - pc] << 8;
-	return result | opram[PC++ - pc];
+	uint16_t result = params.r16(PC);
+	PC += 2;;
+	return result;
 }
 
-static void print_arg (std::ostream &stream, int mode, int arg, const uint8_t *opram, unsigned pc)
+void tms9900_disassembler::print_arg (std::ostream &stream, int mode, int arg, const data_buffer &params, offs_t &PC)
 {
 	int base;
 
@@ -319,7 +227,7 @@ static void print_arg (std::ostream &stream, int mode, int arg, const uint8_t *o
 			util::stream_format(stream, "*R%d", arg);
 			break;
 		case 0x2:   /* symbolic|indexed */
-			base = readop_arg(opram, pc);
+			base = readop_arg(params, PC);
 			if (arg)    /* indexed */
 				util::stream_format(stream, "@>%04x(R%d)", base, arg);
 			else        /* symbolic (direct) */
@@ -331,11 +239,19 @@ static void print_arg (std::ostream &stream, int mode, int arg, const uint8_t *o
 	}
 }
 
+tms9900_disassembler::tms9900_disassembler(int model) : m_model_id(model)
+{
+}
+
+u32 tms9900_disassembler::opcode_alignment() const
+{
+	return 2;
+}
 
 /*****************************************************************************
  *  Disassemble a single command and return the number of bytes it uses.
  *****************************************************************************/
-static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const uint8_t *oprom, const uint8_t *opram)
+offs_t tms9900_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int OP, OP2, opc;
 	int sarg, darg, smode, dmode;
@@ -355,26 +271,26 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 	    Additionally, ti990/12 and tms9995 will generate an illegal error when bits 12-15 are
 	    non-zero.
 	*/
-	#define BETTER_0200_DECODING (model_id == TI990_10_ID)
-	#define COMPLETE_0200_DECODING (/*(model_id == TI990_12_ID) ||*/ (model_id >= TMS9995_ID))
+	#define BETTER_0200_DECODING (m_model_id == TI990_10_ID)
+	#define COMPLETE_0200_DECODING (/*(m_model_id == TI990_12_ID) ||*/ (m_model_id >= TMS9995_ID))
 
 	int processor_mask = ps_any;
 
-	if ((model_id == TI990_10_ID) /*|| (model_id == TI990_12_ID)*/ || (model_id >= TMS99000_ID))
+	if ((m_model_id == TI990_10_ID) /*|| (m_model_id == TI990_12_ID)*/ || (m_model_id >= TMS99000_ID))
 		processor_mask |= ps_mapper;        /* processors with memory mapper (ti990/10, ti990/12,
 		                                        and tms99000 with mapper coprocessor) */
-	if (/*(model_id == TI990_12_ID) ||*/ (model_id >= TMS9995_ID))
+	if (/*(m_model_id == TI990_12_ID) ||*/ (m_model_id >= TMS9995_ID))
 		processor_mask |= ps_tms9995;       /* ti990/12, tms9995, and later */
 
-	if (/*(model_id == TI990_12_ID) ||*/ (model_id >= TMS99000_ID))
+	if (/*(m_model_id == TI990_12_ID) ||*/ (m_model_id >= TMS99000_ID))
 		processor_mask |= ps_tms99000;      /* ti990/12, tms99000, and later */
 
-	/*if ((model_id == TI990_12_ID))
+	/*if ((m_model_id == TI990_12_ID))
 	    processor_mask |= ps_ti990_12;*/    /* ti990/12, tms99000, and later */
 
-	PC = pc;
-	OP = oprom[PC++ - pc] << 8;
-	OP |= oprom[PC++ - pc];
+	offs_t PC = pc;
+	OP = opcodes.r16(PC);
+	PC += 2;
 
 	/* let's identify the opcode */
 	if (OP >= 0x4000)
@@ -434,7 +350,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 	}
 
 	/* tms9940 replace a few xops with custom instructions */
-	if ((opc == _xop) && ((model_id == TMS9940_ID) || (model_id == TMS9985_ID)))
+	if ((opc == _xop) && ((m_model_id == TMS9940_ID) || (m_model_id == TMS9985_ID)))
 	{
 		switch (BITS(OP,6,9))
 		{
@@ -473,11 +389,11 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 
 	/* bl and blwp instructions are subroutines */
 	if (mnemonic != nullptr && mnemonic[0] == 'b' && mnemonic[1] == 'l')
-		dasmflags = DASMFLAG_STEP_OVER;
+		dasmflags = STEP_OVER;
 
 	/* b *r11 and rtwp are returns */
 	else if (opc == 0x045b || (mnemonic != nullptr && strcmp(mnemonic, "rtwp") == 0))
-		dasmflags = DASMFLAG_STEP_OUT;
+		dasmflags = STEP_OUT;
 
 	switch (format)
 	{
@@ -488,9 +404,9 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		darg = BITS(OP,6,9);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		break;
 
 	case format_2a:     /* jump instructions */
@@ -516,13 +432,13 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		if (format == format_3_9)
 		{
 			util::stream_format(stream, "%-4s ", mnemonic);
-			print_arg(stream, smode, sarg, opram, pc);
+			print_arg(stream, smode, sarg, params, PC);
 			util::stream_format(stream, ",R%d", darg);
 		}
 		else
 		{
 			util::stream_format(stream, "%-4s ", mnemonic);
-			print_arg(stream, smode, sarg, opram, pc);
+			print_arg(stream, smode, sarg, params, PC);
 			util::stream_format(stream, ",%d", darg);
 		}
 		break;
@@ -539,7 +455,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		sarg = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		break;
 
 	case format_7:      /* instructions without operands */
@@ -548,13 +464,13 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 
 	case format_8a:     /* immediate instructions (destination register) */
 		darg = BITS(OP,12,15);
-		sarg = readop_arg(opram, pc);
+		sarg = readop_arg(params, PC);
 
 		util::stream_format(stream, "%-4s R%d,>%04x", mnemonic, darg, sarg);
 		break;
 
 	case format_8b:     /* immediate instructions (no destination register) */
-		sarg = readop_arg(opram, pc);
+		sarg = readop_arg(params, PC);
 
 		util::stream_format(stream, "%-4s >%04x", mnemonic, sarg);
 		break;
@@ -567,7 +483,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		break;
 
 	case format_11:     /* multiple precision instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -576,14 +492,14 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		byte_count = BITS(OP2,0,3);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
 		break;
 
 	case format_12:     /* string instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -593,14 +509,14 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		checkpoint = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d,R%d" : ",R%d,R%d", byte_count, checkpoint);
 		break;
 
 	case format_13:     /* multiple precision shift instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -608,20 +524,20 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		byte_count = BITS(OP2,0,3);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
 		util::stream_format(stream, darg ? ",%d" : ",R%d", darg);
 		break;
 
 	case format_14:     /* bit testing instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
 		darg = BITS(OP2,0,9);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		if (darg == 0x3ff)
 			util::stream_format(stream, ",R0");
 		else
@@ -629,7 +545,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		break;
 
 	case format_15:     /* invert order of field instruction */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -637,13 +553,13 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		bit_width = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, bit_position ? ",(%d," : ",(R%d,", bit_position);
 		util::stream_format(stream, bit_width ? "%d)" : "R%d)", bit_width);
 		break;
 
 	case format_16:     /* field instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -653,15 +569,15 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		bit_width = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, bit_position ? ",(%d," : ",(%d,", bit_position);
 		util::stream_format(stream, bit_width ? "%d)" : "R%d)", bit_width);
 		break;
 
 	case format_17:     /* alter register and jump instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		displacement = (signed char)BITS(OP2,8,15);
 		sarg = BITS(OP2,4,7);
@@ -684,7 +600,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		break;
 
 	case format_19:     /* move address instruction */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -692,16 +608,16 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		darg = BITS(OP2,6,9);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 				break;
 
 	case format_20:     /* list search instructions */
 	{
 			const char *condition_code;
 
-			OP2 = readop_arg(opram, pc);
+			OP2 = readop_arg(params, PC);
 
 			smode = BITS(OP2,10,11);
 			sarg = BITS(OP2,12,15);
@@ -746,9 +662,9 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 			}
 
 			util::stream_format(stream, "%-4s %s,", mnemonic, condition_code);
-			print_arg(stream, smode, sarg, opram, pc);
+			print_arg(stream, smode, sarg, params, PC);
 			util::stream_format(stream, ",");
-			print_arg(stream, dmode, darg, opram, pc);
+			print_arg(stream, dmode, darg, params, PC);
 			break;
 	}
 
@@ -756,7 +672,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 	{
 		int dest_byte_count;
 
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -766,9 +682,9 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		dest_byte_count = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
 		util::stream_format(stream, dest_byte_count ? ",%d" : ",R%d", dest_byte_count);
 		break;
@@ -781,20 +697,5 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		break;
 	}
 
-	return (PC - pc) | DASMFLAG_SUPPORTED | dasmflags;
-}
-
-CPU_DISASSEMBLE( tms9900 )
-{
-	return Dasm9900(stream, pc, TMS9900_ID, oprom, opram);
-}
-
-CPU_DISASSEMBLE( tms9980 )
-{
-	return Dasm9900(stream, pc, TMS9980_ID, oprom, opram);
-}
-
-CPU_DISASSEMBLE( tms9995 )
-{
-	return Dasm9900(stream, pc, TMS9995_ID, oprom, opram);
+	return (PC - pc) | SUPPORTED | dasmflags;
 }
