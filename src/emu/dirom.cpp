@@ -21,9 +21,11 @@ void device_rom_interface::static_set_device_rom_tag(device_t &device, const cha
 	romintf->m_rom_tag = tag;
 }
 
-const address_space_config *device_rom_interface::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> device_rom_interface::memory_space_config() const
 {
-	return spacenum ? nullptr : &m_rom_config;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_rom_config)
+	};
 }
 
 void device_rom_interface::rom_bank_updated()

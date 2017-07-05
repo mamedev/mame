@@ -68,7 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(roz_ay_w);
 	DECLARE_WRITE8_MEMBER(roz_dy_w);
 	DECLARE_WRITE8_MEMBER(roz_dyx_w);
-	
+	DECLARE_WRITE8_MEMBER(border_color_w);
+
 	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);
 
@@ -88,7 +89,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_IO) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 	
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	address_space *m_iospace;
@@ -285,6 +286,7 @@ private:
 	bool m_sprite_disable;		/**< SPRD: disables the sprite plane display */
 	bool m_sprite_aux_mode;		/**< SPAS: if 0 aux bits selects size, if 1 selects flipping */
 	uint8_t m_sprite_aux_reg;	/**< SPA: auxiliary bits of sprite attribute table */
+	uint8_t m_border_color;		/**< BDC: border color */
 	
 	// screen section
 	devcb_write_line            m_vblank_handler;

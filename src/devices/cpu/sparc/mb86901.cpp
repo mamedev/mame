@@ -433,15 +433,11 @@ void mb86901_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *mb86901_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mb86901_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-		case AS_PROGRAM:
-			return &m_program_config;
-		default:
-			return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 

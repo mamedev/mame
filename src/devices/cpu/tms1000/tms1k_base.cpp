@@ -260,6 +260,13 @@ void tms1k_base_device::device_reset()
 	m_power_off(0);
 }
 
+std::vector<std::pair<int, const address_space_config *>> tms1k_base_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 
 //-------------------------------------------------

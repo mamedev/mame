@@ -163,9 +163,12 @@ void vrc5074_device::set_map(int id, const address_map_delegate &map, device_t *
 	m_cs_devices[id - 2] = device;
 }
 
-const address_space_config *vrc5074_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> vrc5074_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : nullptr;
+	auto r = pci_bridge_device::memory_space_config();
+	r.emplace_back(std::make_pair(AS_PCI_MEM, &m_mem_config));
+	r.emplace_back(std::make_pair(AS_PCI_IO, &m_io_config));
+	return r;
 }
 
 void vrc5074_device::device_start()

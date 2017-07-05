@@ -43,9 +43,9 @@ private:
 	required_device<mb87078_device> m_mb87078;
 
 	//todo: hook up cpu/es5510
+	std::unique_ptr<uint32_t[]> m_es5510_dram;
 	uint16_t   m_es5510_dsp_ram[0x200];
 	uint32_t   m_es5510_gpr[0xc0];
-	uint32_t   m_es5510_dram[1<<24];
 	uint32_t   m_es5510_dol_latch;
 	uint32_t   m_es5510_dil_latch;
 	uint32_t   m_es5510_dadr_latch;

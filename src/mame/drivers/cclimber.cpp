@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cclimber_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xba00, 0xba00) AM_READ_PORT("START")  /* maybe a mirror of b800 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yamato_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cclimber_state )
+static ADDRESS_MAP_START( yamato_decrypted_opcodes_map, AS_OPCODES, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( bagmanf_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xb800, 0xb800) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toprollr_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cclimber_state )
+static ADDRESS_MAP_START( toprollr_decrypted_opcodes_map, AS_OPCODES, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0xc000)
 ADDRESS_MAP_END

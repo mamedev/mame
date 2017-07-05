@@ -83,6 +83,13 @@ cquestsnd_cpu_device::cquestsnd_cpu_device(const machine_config &mconfig, const 
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> cquestsnd_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 offs_t cquestsnd_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
@@ -121,6 +128,12 @@ cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const 
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> cquestlin_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 offs_t cquestlin_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
@@ -362,6 +375,12 @@ void cquestrot_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
+std::vector<std::pair<int, const address_space_config *>> cquestrot_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 /***************************************************************************
     LINE DRAWER INITIALIZATION AND SHUTDOWN

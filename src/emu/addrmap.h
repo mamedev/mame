@@ -191,13 +191,13 @@ class address_map
 {
 public:
 	// construction/destruction
-	address_map(device_t &device, address_spacenum spacenum);
+	address_map(device_t &device, int spacenum);
 	address_map(device_t &device, address_map_entry *entry);
 	address_map(const address_space &space, offs_t start, offs_t end, int bits, u64 unitmask, device_t &device, address_map_delegate submap_delegate);
 	~address_map();
 
 	// configuration
-	void configure(address_spacenum _spacenum, u8 _databits);
+	void configure(int _spacenum, u8 _databits);
 
 	// setters
 	void global_mask(offs_t mask);
@@ -209,7 +209,7 @@ public:
 	address_map_entry &range(offs_t start, offs_t end);
 
 	// public data
-	address_spacenum                m_spacenum;     // space number of the map
+	int                m_spacenum;     // space number of the map
 	device_t *                      m_device;       // associated device
 	u8                              m_databits;     // data bits represented by the map
 	u8                              m_unmapval;     // unmapped memory value
@@ -217,7 +217,7 @@ public:
 	simple_list<address_map_entry>  m_entrylist;    // list of entries
 
 	void uplift_submaps(running_machine &machine, device_t &owner, endianness_t endian);
-	void map_validity_check(validity_checker &valid, address_spacenum spacenum) const;
+	void map_validity_check(validity_checker &valid, int spacenum) const;
 };
 
 

@@ -34,11 +34,11 @@ static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpcm1_map, AS_0, 8, segam1audio_device )
+static ADDRESS_MAP_START( mpcm1_map, 0, 8, segam1audio_device )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION(":m1pcm1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpcm2_map, AS_0, 8, segam1audio_device )
+static ADDRESS_MAP_START( mpcm2_map, 0, 8, segam1audio_device )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION(":m1pcm2", 0)
 ADDRESS_MAP_END
 
@@ -63,12 +63,12 @@ MACHINE_CONFIG_MEMBER( segam1audio_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD(MULTIPCM_1_TAG, MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mpcm1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, mpcm1_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD(MULTIPCM_2_TAG, MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mpcm2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, mpcm2_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

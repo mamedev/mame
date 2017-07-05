@@ -215,7 +215,7 @@ List of default vregs (title screen):
 // device type definition
 DEFINE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device, "seibu_crtc", "Seibu CRT Controller")
 
-static ADDRESS_MAP_START( seibu_crtc_vregs, AS_0, 16, seibu_crtc_device )
+static ADDRESS_MAP_START( seibu_crtc_vregs, 0, 16, seibu_crtc_device )
 	AM_RANGE(0x0014, 0x0015) AM_WRITE(decrypt_key_w)
 	AM_RANGE(0x001a, 0x001b) AM_READWRITE(reg_1a_r, reg_1a_w)
 	AM_RANGE(0x001c, 0x001d) AM_WRITE(layer_en_w)
@@ -322,9 +322,11 @@ void seibu_crtc_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *seibu_crtc_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> seibu_crtc_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

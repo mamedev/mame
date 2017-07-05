@@ -72,7 +72,7 @@ DEFINE_DEVICE_TYPE(HD66421, hd66421_device, "hd66421", "Hitachi HD66421 LCD Cont
 
 
 // default address map
-static ADDRESS_MAP_START( hd66421, AS_0, 8, hd66421_device )
+static ADDRESS_MAP_START( hd66421, 0, 8, hd66421_device )
 	AM_RANGE(0x0000, HD66421_RAM_SIZE) AM_RAM
 ADDRESS_MAP_END
 
@@ -81,9 +81,11 @@ ADDRESS_MAP_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *hd66421_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> hd66421_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

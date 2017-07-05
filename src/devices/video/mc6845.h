@@ -19,12 +19,12 @@
 #define MCFG_MOS8563_ADD(_tag, _screen_tag, _clock, _map) \
 	MCFG_DEVICE_ADD(_tag, MOS8563, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_MOS8568_ADD(_tag, _screen_tag, _clock, _map) \
 	MCFG_DEVICE_ADD(_tag, MOS8568, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 
 #define MCFG_MC6845_SHOW_BORDER_AREA(_show) \
@@ -429,7 +429,7 @@ class mos8563_device : public mc6845_device,
 public:
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( status_r );

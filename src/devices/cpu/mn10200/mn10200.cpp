@@ -58,6 +58,14 @@ mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *
 { }
 
 
+std::vector<std::pair<int, const address_space_config *>> mn10200_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+
 // disasm
 void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

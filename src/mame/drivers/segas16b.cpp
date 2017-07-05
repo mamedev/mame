@@ -1405,41 +1405,6 @@ void segas16b_state::ddux_i8751_sim()
 	}
 }
 
-
-//-------------------------------------------------
-//  goldnaxe_i8751_sim - simulate the I8751
-//  from Golden Axe
-//-------------------------------------------------
-
-void segas16b_state::goldnaxe_i8751_sim()
-{
-	// signal a VBLANK to the main CPU
-	m_maincpu->set_input_line(4, HOLD_LINE);
-
-	// they periodically clear the data at 2cd8,2cda,2cdc,2cde and expect the MCU to fill it in
-	if (m_workram[0x2cd8/2] == 0 && m_workram[0x2cda/2] == 0 && m_workram[0x2cdc/2] == 0 && m_workram[0x2cde/2] == 0)
-	{
-		m_workram[0x2cd8/2] = 0x048c;
-		m_workram[0x2cda/2] = 0x159d;
-		m_workram[0x2cdc/2] = 0x26ae;
-		m_workram[0x2cde/2] = 0x37bf;
-	}
-
-	// process any new sound data
-	uint16_t temp = m_workram[0x2cfc/2];
-	if ((temp & 0xff00) != 0x0000)
-	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		m_mapper->write(space, 0x03, temp >> 8);
-		m_workram[0x2cfc/2] = temp & 0x00ff;
-	}
-
-	// read inputs
-	m_workram[0x2cd0/2] = (ioport("P1")->read() << 8) | ioport("P2")->read();
-	m_workram[0x2c96/2] = ioport("SERVICE")->read() << 8;
-}
-
-
 //-------------------------------------------------
 //  tturf_i8751_sim - simulate the I8751
 //  from Tough Turf
@@ -1755,7 +1720,7 @@ static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas16b_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas16b_state )
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -1785,7 +1750,7 @@ static ADDRESS_MAP_START( system16b_bootleg_map, AS_PROGRAM, 16, segas16b_state 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_DECRYPTED_OPCODES, 16, segas16b_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_OPCODES, 16, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
@@ -1872,7 +1837,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16b_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, segas16b_state )
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
@@ -6475,15 +6440,7 @@ ROM_START( goldnaxe2 )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	/* NOT CURRENTLY USED
-
-	   this chip was faulty, the internal checksum routine fails.  actual code looks like it should be 99.99% the
-	   same as the 'goldnaxe' set but unused areas have different garbage fill data, so finding the bad bits is
-	   difficult.
-
-	   Calculated checksum: 5F8F
-      File checksum:       5E8F */
-	ROM_LOAD( "317-0112.c2", 0x00000, 0x1000, BAD_DUMP CRC(d8f2f1c0) SHA1(04594ed5558af63cde62de6cc4020b35b8a5889e) )
+	ROM_LOAD( "317-0112.c2", 0x00000, 0x1000, CRC(bda31044) SHA1(79ba41ac0768c1a55faad2f768120f15bcde4b90) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -8737,17 +8694,6 @@ DRIVER_INIT_MEMBER(segas16b_state,exctleag_5358)
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5704)
-{
-	DRIVER_INIT_CALL(generic_5704);
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::goldnaxe_i8751_sim, this);
-
-	static const uint8_t memory_control_5704[0x10] =
-		{ 0x02,0x00, 0x02,0x08, 0x00,0x1f, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
-	m_i8751_initial_config = memory_control_5704;
-}
-
-
 DRIVER_INIT_MEMBER(segas16b_state,hwchamp_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
@@ -8892,7 +8838,7 @@ GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,goldnaxe, segas16b_state,
 GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US) (FD1094 317-0122)", 0 )
 GAME( 1989, goldnaxej,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 4, Japan) (FD1094 317-0121)", 0 )
 GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 3, World) (FD1094 317-0120)", 0)
-GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,     goldnaxe, segas16b_state,goldnaxe_5704,      ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
+GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,     goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
 GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
 
 GAME( 1987, hwchamp,    0,        system16b,           hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )

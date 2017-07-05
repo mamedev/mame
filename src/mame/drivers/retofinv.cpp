@@ -18,11 +18,7 @@ in the ROMs reveals the following strings:
  COMIX LTD. 1985.
 
 Notes:
-- I derived the ROM names from the board diagram in the manual. There might
-  be some mistakes. The diagram actually shows 4 PROMs on the ROM board
-  (a37-17, -18, -19 and -20), while we only have one: 82s191n. I think it's
-  possible that the single 2KB PROM replaced four 512B PROMs in a later
-  revision of the board.
+- The rom names and locations are derived from PCB pictures.
 
 - The video hardware (especially the sprite system) is quite obviously derived
   from a Namco design.
@@ -30,12 +26,12 @@ Notes:
 - Two bits of tilemap RAM might be used for tile flip, but the game never sets
   them so we can't verify without schematics.
 
-- We don't have a dump of the original MCU. We have a dump from a bootleg MCU,
-  which however cannot be the same as the original. The game works fine with it,
-  but only when the flip screen dip switch is set to off. If it is set to on, it
-  hangs when starting a game because the mcu doesn't answer a command.
-  See MCU code at $206 and $435: when the dip switch is on, the lda #$00 should
-  be replaced by lda #$01.
+- In addition to a dump of the original MCU, we have a dump from a bootleg MCU.
+  The game does work with it, but only when the flip screen dip switch is turned
+  off. If it is set to on, the game hangs when starting a game because the
+  mcu doesn't answer a command.
+  See bootleg MCU code at $206 and $435: when the dip switch is on, the
+  "lda #$00" should be replaced by "lda #$01".
 
 ***************************************************************************/
 
@@ -120,12 +116,16 @@ READ8_MEMBER(retofinv_state::mcu_status_r)
 			((CLEAR_LINE != m_68705->mcu_semaphore_r()) ? 0x20 : 0x00);
 }
 
+/* It is very likely that the main cpu and the sub cpu share the entire
+   8000-ffff address space, each perhaps holding the other in waitstate
+   while accessing it. */
+/* the main cpu code looks for a string at 7b00 (in the space for the
+   empty socket at IC73 from 6000-7fff) and if it finds a particular
+   string there, it jumps to that area, presumably for diagnostic use */
 
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
-	AM_RANGE(0x7b00, 0x7bff) AM_ROM /* space for diagnostic ROM? The code looks */
-									/* for a string here, and jumps if it's present */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
@@ -165,11 +165,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM /* 6116 sram at IC28 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(cpu2_m6000_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn2", sn76496_device, write)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76489a_device, write)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM         /* space for diagnostic ROM */
 ADDRESS_MAP_END
 
@@ -363,19 +363,19 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 static MACHINE_CONFIG_START( retofinv )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, 18432000/6)    /* 3.072 MHz? */
+	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6)   /* 3.072 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)   /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60) // wrong, should be ~128-132 per frame, not 120.
 
-	MCFG_CPU_ADD("68705", TAITO68705_MCU, 18432000/6)    /* 3.072 MHz? */
+	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -383,8 +383,8 @@ static MACHINE_CONFIG_START( retofinv )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_REFRESH_RATE(60.58) // vsync measured at 60.58hz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // not accurate
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
@@ -400,22 +400,26 @@ static MACHINE_CONFIG_START( retofinv )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 18432000/6)
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_18_432MHz/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 18432000/6)
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_18_432MHz/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
+/* bootleg has different palette clut */
+static MACHINE_CONFIG_DERIVED( retofinvb, retofinv )
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
+MACHINE_CONFIG_END
 
-/* bootleg has no mcu */
-static MACHINE_CONFIG_DERIVED( retofinb, retofinv )
+/* bootleg which also has no mcu */
+static MACHINE_CONFIG_DERIVED( retofinvb_nomcu, retofinvb )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
 	MCFG_DEVICE_REMOVE("68705")
 MACHINE_CONFIG_END
-
 
 /***************************************************************************
 
@@ -424,6 +428,60 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( retofinv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a37__03.ic70", 0x0000, 0x2000, CRC(eae7459d) SHA1(c105f6adbd4c09decaad68ed13163d8f9b55e646) )
+	ROM_LOAD( "a37__02.ic71", 0x2000, 0x2000, CRC(72895e37) SHA1(42fb904338e9f92a79d587eac401d456e7fb6e55) )
+	ROM_LOAD( "a37__01.ic72", 0x4000, 0x2000, CRC(505dd20b) SHA1(3a34b1515bb834ff9e2d86b0b43a752d9619307b) )
+	// ic73 socket is empty
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "a37__04.ic62", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
+	// ic63 socket is empty
+	// ic64 socket is empty
+	// ic65 socket is empty
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a37__05.ic17", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
+
+	ROM_REGION( 0x0800, "68705:mcu", 0 )    /* 2k for the microcontroller */
+	ROM_LOAD( "a37__09.ic37", 0x00000, 0x0800, CRC(6a6d008d) SHA1(dce55b65db22ba97cb7b3d6d545575e7945d42ad) ) /* original mc68705p5 from Taito board */
+	/* Interestingly enough, the security bit is NOT set on this MCU, but the
+	part is definitely a 68705P5 from an original Taito pcb running original
+	Taito code! Compare the MCU code to Taito games A17, A22, A23, A24, A30,
+	A34, A45, A47, A50, A54(and A51), A52, A64, A67, A68, probably others too,
+	MCU code between 0x420 and 0x73f is identical, and boot vector is 0x570.
+	The MCU command jump table at 0x740-0x780 differs on each, as does the
+	lookup table at 0x350-0x41f, and the "custom command code area" from
+	0x80-0x34F */
+
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "a37__16.gfxboard.ic61", 0x0000, 0x2000, CRC(4e3f501c) SHA1(2d832f4038ae65bfdeedfab870f6f1176ec6b676) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "a37__10.gfxboard.ic8",  0x0000, 0x2000, CRC(6afdeec8) SHA1(782fe0a8aea48c3c270318b7ba011fc6fce0db7a) )
+	ROM_LOAD( "a37__11.gfxboard.ic9",  0x2000, 0x2000, CRC(d3dc9da3) SHA1(0d98d6e993b5a4845a23802751023b7a593dce29) )
+	ROM_LOAD( "a37__12.gfxboard.ic10", 0x4000, 0x2000, CRC(d10b2eed) SHA1(3809a0adf935a119f9ee0d4c24f1456c35d2a6fa) )
+	ROM_LOAD( "a37__13.gfxboard.ic11", 0x6000, 0x2000, CRC(00ca6b3d) SHA1(08ce5b13d5ebc79cc803949f4ba9e630e6cd92b8) )
+
+	ROM_REGION( 0x04000, "gfx3", 0 )
+	ROM_LOAD( "a37__14.gfxboard.ic55", 0x0000, 0x2000, CRC(ef7f8651) SHA1(2d91057501e5e9c4255e0d55fff0d99c2a5be7e8) )
+	ROM_LOAD( "a37__15.gfxboard.ic56", 0x2000, 0x2000, CRC(03b40905) SHA1(c10d87796e8a6e6a2a37c6fb713821cc87299cc8) )
+
+	ROM_REGION( 0x0300, "palette", 0 )
+	// these three are Fujitsu 7052 PROMS, == 82S129 256x4bit TS proms
+	ROM_LOAD( "a37-06.ic13", 0x0000, 0x0100, CRC(e9643b8b) SHA1(7bbb92a42e7c3effb701fc7b2c24f2470f31b063) )   /* palette red bits  */
+	ROM_LOAD( "a37-07.ic4",  0x0100, 0x0100, CRC(e8f34e11) SHA1(8f438561b8d46ffff00747ed8baf0ebb6a081615) )   /* palette green bits */
+	ROM_LOAD( "a37-08.ic3",  0x0200, 0x0100, CRC(50030af0) SHA1(e748ae0b8702b7d20fb65c254dceee23246b3d13) )   /* palette blue bits   */
+
+	ROM_REGION( 0x0800, "clut", 0 )
+	// these four are Harris 7643 PROMS, == 82S137 1kx4 TS proms and form the tile color lookup tables; address is scrambled slightly.
+	ROM_LOAD_NIB_HIGH(  "a37-17.gfxboard.ic36",  0x0000, 0x0400, CRC(c63cf10e) SHA1(bca8823aef31ab8f4c22201c4efd51f9a4124c8f) )
+	ROM_LOAD_NIB_LOW (  "a37-18.gfxboard.ic37",  0x0000, 0x0400, CRC(6db07bd1) SHA1(05b6728a96fecedae16cb3aa02de642a3a32d99d) )
+	ROM_LOAD_NIB_HIGH(  "a37-19.gfxboard.ic83",  0x0400, 0x0400, CRC(a92aea27) SHA1(98e4726f40fdf0df2008ef03801ee35ede99e893) )
+	ROM_LOAD_NIB_LOW (  "a37-20.gfxboard.ic84",  0x0400, 0x0400, CRC(77a7aaf6) SHA1(61a474f1ad09b89ff8302f2d903b86a90823116c) )
+ROM_END
+
+ROM_START( retofinvb ) // bootleg with black-box reverse-engineered mcu. Unclear what the 'correct' rom labels are for this set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a37-03.70", 0x0000, 0x2000, CRC(eae7459d) SHA1(c105f6adbd4c09decaad68ed13163d8f9b55e646) )
 	ROM_LOAD( "a37-02.71", 0x2000, 0x2000, CRC(72895e37) SHA1(42fb904338e9f92a79d587eac401d456e7fb6e55) )
@@ -436,8 +494,8 @@ ROM_START( retofinv )
 	ROM_LOAD( "a37-05.17", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
 
 	ROM_REGION( 0x0800, "68705:mcu", 0 )    /* 2k for the microcontroller */
-	/* the only available dump is from a bootleg board, and is not the real thing (see notes at top of driver) */
-	ROM_LOAD( "a37-09.37", 0x00000, 0x0800, BAD_DUMP CRC(79bd6ded) SHA1(4967e95b4461c1bfb4e933d1804677799014f77b) )
+	/* this MCU is from a bootleg board and is a 'clean room' reimplementation by bootleggers, and is not 100% functional (flip screen does not work, see notes at top of driver) */
+	ROM_LOAD( "a37-09_bootleg.37", 0x00000, 0x0800, CRC(79bd6ded) SHA1(4967e95b4461c1bfb4e933d1804677799014f77b) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "a37-16.61", 0x0000, 0x2000, CRC(4e3f501c) SHA1(2d832f4038ae65bfdeedfab870f6f1176ec6b676) )
@@ -452,14 +510,16 @@ ROM_START( retofinv )
 	ROM_LOAD( "a37-14.55", 0x0000, 0x2000, CRC(ef7f8651) SHA1(2d91057501e5e9c4255e0d55fff0d99c2a5be7e8) )
 	ROM_LOAD( "a37-15.56", 0x2000, 0x2000, CRC(03b40905) SHA1(c10d87796e8a6e6a2a37c6fb713821cc87299cc8) )
 
-	ROM_REGION( 0x0b00, "proms", 0 )
+	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "a37-06.13", 0x0000, 0x0100, CRC(e9643b8b) SHA1(7bbb92a42e7c3effb701fc7b2c24f2470f31b063) )   /* palette red bits  */
 	ROM_LOAD( "a37-07.4",  0x0100, 0x0100, CRC(e8f34e11) SHA1(8f438561b8d46ffff00747ed8baf0ebb6a081615) )   /* palette green bits */
 	ROM_LOAD( "a37-08.3",  0x0200, 0x0100, CRC(50030af0) SHA1(e748ae0b8702b7d20fb65c254dceee23246b3d13) )   /* palette blue bits   */
-	ROM_LOAD( "82s191n",   0x0300, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )   /* lookup table */
+
+	ROM_REGION( 0x0800, "clut", 0 ) // bootleg uses a single 82s191 2kx8 TS prom for the tile color lookup tables; data is scrambled slightly.
+	ROM_LOAD( "82s191n",   0x0000, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )
 ROM_END
 
-ROM_START( retofinv1 )
+ROM_START( retofinvb1 ) // bootleg with mcu hacked out. Unclear what the 'correct' rom labels are for this set other than the 3 main roms.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "roi.02",  0x0000, 0x2000, CRC(d98fd462) SHA1(fd35e13b7dee58639a01b040b8f84d42bb40b633) )
 	ROM_LOAD( "roi.01b", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) )
@@ -484,17 +544,19 @@ ROM_START( retofinv1 )
 	ROM_LOAD( "a37-14.55", 0x0000, 0x2000, CRC(ef7f8651) SHA1(2d91057501e5e9c4255e0d55fff0d99c2a5be7e8) )
 	ROM_LOAD( "a37-15.56", 0x2000, 0x2000, CRC(03b40905) SHA1(c10d87796e8a6e6a2a37c6fb713821cc87299cc8) )
 
-	ROM_REGION( 0x0b00, "proms", 0 )
+	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "a37-06.13", 0x0000, 0x0100, CRC(e9643b8b) SHA1(7bbb92a42e7c3effb701fc7b2c24f2470f31b063) )   /* palette red bits  */
 	ROM_LOAD( "a37-07.4",  0x0100, 0x0100, CRC(e8f34e11) SHA1(8f438561b8d46ffff00747ed8baf0ebb6a081615) )   /* palette green bits */
 	ROM_LOAD( "a37-08.3",  0x0200, 0x0100, CRC(50030af0) SHA1(e748ae0b8702b7d20fb65c254dceee23246b3d13) )   /* palette blue bits   */
-	ROM_LOAD( "82s191n",   0x0300, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )   /* lookup table */
+
+	ROM_REGION( 0x0800, "clut", 0 ) // bootleg uses a single 82s191 2kx8 TS prom for the tile color lookup tables; data is scrambled slightly.
+	ROM_LOAD( "82s191n",   0x0000, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )
 ROM_END
 
-ROM_START( retofinv2 )
+ROM_START( retofinvb2 ) // bootleg with mcu hacked out. Unclear what the 'correct' rom labels are for this set other than 2 of the 3 main roms.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ri-c.1e", 0x0000, 0x2000, CRC(e3c31260) SHA1(cc8774251c567da2e4a54091223927c95f497fe8) )
-	ROM_LOAD( "roi.01b", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) )
+	ROM_LOAD( "roi.01b", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) ) // likely should be "ri-b.1d"
 	ROM_LOAD( "ri-a.1c", 0x4000, 0x2000, CRC(3ae7c530) SHA1(5d1be375494fa07124071067661c4bfc2d724d54) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -516,15 +578,18 @@ ROM_START( retofinv2 )
 	ROM_LOAD( "a37-14.55", 0x0000, 0x2000, CRC(ef7f8651) SHA1(2d91057501e5e9c4255e0d55fff0d99c2a5be7e8) )
 	ROM_LOAD( "a37-15.56", 0x2000, 0x2000, CRC(03b40905) SHA1(c10d87796e8a6e6a2a37c6fb713821cc87299cc8) )
 
-	ROM_REGION( 0x0b00, "proms", 0 )
+	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "a37-06.13", 0x0000, 0x0100, CRC(e9643b8b) SHA1(7bbb92a42e7c3effb701fc7b2c24f2470f31b063) )   /* palette red bits  */
 	ROM_LOAD( "a37-07.4",  0x0100, 0x0100, CRC(e8f34e11) SHA1(8f438561b8d46ffff00747ed8baf0ebb6a081615) )   /* palette green bits */
 	ROM_LOAD( "a37-08.3",  0x0200, 0x0100, CRC(50030af0) SHA1(e748ae0b8702b7d20fb65c254dceee23246b3d13) )   /* palette blue bits   */
-	ROM_LOAD( "82s191n",   0x0300, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )   /* lookup table */
+
+	ROM_REGION( 0x0800, "clut", 0 ) // bootleg uses a single 82s191 2kx8 TS prom for the tile color lookup tables; data is scrambled slightly.
+	ROM_LOAD( "82s191n",   0x0000, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )
 ROM_END
 
 
 
-GAME( 1985, retofinv, 0,        retofinv, retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinv1,retofinv, retofinb, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinv2,retofinv, retofinb, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv,  0,        retofinv,        retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb, retofinv, retofinvb,       retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb1,retofinv, retofinvb_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb2,retofinv, retofinvb_nomcu, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )

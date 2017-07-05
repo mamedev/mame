@@ -91,15 +91,8 @@ protected:
 	const address_space_config m_space_config;
 
 
-	const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		switch (spacenum)
-		{
-			case AS_IO: return &m_io_space_config;
-			case AS_PROGRAM: return &m_space_config;
-			default: return z80_device::memory_space_config(spacenum);
-		}
-	};
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+
 	required_device<screen_device> m_screen;
 
 private:

@@ -531,17 +531,17 @@ static ADDRESS_MAP_START( io_map_mbutrfly, AS_IO, 8, skylncr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bdream97_opcode_map, AS_DECRYPTED_OPCODES, 8, skylncr_state )
+static ADDRESS_MAP_START( bdream97_opcode_map, AS_OPCODES, 8, skylncr_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(bdream97_opcode_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, skylncr_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, skylncr_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac2_map, AS_0, 8, skylncr_state )
+static ADDRESS_MAP_START( ramdac2_map, 0, 8, skylncr_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 

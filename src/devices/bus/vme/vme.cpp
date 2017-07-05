@@ -205,6 +205,13 @@ SLOT_INTERFACE_END
 
 DEFINE_DEVICE_TYPE(VME, vme_device, "vme", "VME bus")
 
+std::vector<std::pair<int, const address_space_config *>> vme_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_a32_config)
+	};
+}
+
 // static_set_cputag - used to be able to lookup the CPU owning this VME bus
 void vme_device::static_set_cputag(device_t &device, const char *tag)
 {

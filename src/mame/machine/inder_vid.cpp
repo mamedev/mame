@@ -81,7 +81,7 @@ WRITE_LINE_MEMBER(inder_vid_device::m68k_gen_int)
 }
 
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, inder_vid_device )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, inder_vid_device )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 

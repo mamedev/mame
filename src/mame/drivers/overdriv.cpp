@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( overdriv_k053260_map, AS_0, 8, overdriv_state )
+static ADDRESS_MAP_START( overdriv_k053260_map, 0, 8, overdriv_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("k053260", 0)
 ADDRESS_MAP_END
 
@@ -383,12 +383,12 @@ static MACHINE_CONFIG_START( overdriv )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
 	MCFG_K053260_ADD("k053260_1", XTAL_3_579545MHz)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, overdriv_k053260_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MCFG_K053260_ADD("k053260_2", XTAL_3_579545MHz)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, overdriv_k053260_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END

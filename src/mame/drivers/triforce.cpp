@@ -67,7 +67,7 @@ Games on this system include....
 | | 2004 | Virtua Striker 4 (Japan) (Rev C)                                | Sega                                | GDROM | GDT-0013C      | 317-0391-JPN |               |
 | | 2004 | Virtua Striker 4 (Japan) (Rev D)                                | Sega                                | GDROM | GDT-0013D      | 317-0391-JPN |               |
 |*| 2004 | Virtua Striker 4 (Japan) (Rev E)                                | Sega                                | GDROM | GDT-0013E      | 317-0391-JPN |               |
-| | 2004 | Virtua Striker 4 (Export)                                       | Sega                                | GDROM | GDT-0014       |              | 253-5508-0392E|
+|*| 2004 | Virtua Striker 4 (Export)                                       | Sega                                | GDROM | GDT-0014       | 317-0392-EXP | 253-5508-0392E|
 |*| 2004 | Virtua Striker 4 (Export)                                       | Sega                                | GDROM | GDT-0015       | 317-0393-EXP |               |
 | | 2004 | Virtua Striker 4 (Export)                                       | Sega                                | CF    | MDA-G0016      | 317-0393-EXP |               |
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (server)                | Sega / Hitmaker                     | GDROM | GDT-0016       | 317-0403-JPN | 253-5508-0403J|
@@ -85,7 +85,7 @@ Games on this system include....
 |*| 2005 | The Key Of Avalon 2.5: War of the Key (client) (Rev B)          | Sega / Hitmaker                     | GDROM | GDT-0019B      | 317-0403-JPN | 253-5508-0403J|
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan)                               | Sega                                | GDROM | GDT-0020       | 317-0432-JPN | 253-5508-0432J|
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev A)                       | Sega                                | GDROM | GDT-0020A      | 317-0432-JPN | 253-5508-0432J|
-| | 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev B)                       | Sega                                | GDROM | GDT-0020B      | 317-0432-JPN | 253-5508-0432J|
+|*| 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev B)                       | Sega                                | GDROM | GDT-0020B      | 317-0432-JPN | 253-5508-0432J|
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev C)                       | Sega                                | GDROM | GDT-0020C      | 317-0432-JPN | 253-5508-0432J|
 |*| 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev D)                       | Sega                                | GDROM | GDT-0020D      | 317-0432-JPN | 253-5508-0432J|
 |*| 2006 | Virtua Striker 4 Ver.2006 (Export)                              | Sega                                | GDROM | GDT-0021       | 317-0433-EXP | 253-5508-0433E|
@@ -863,6 +863,16 @@ ROM_START( vs4j )
 	ROM_LOAD("317-0391-jpn.data", 0x00, 0x50, CRC(0f2dbb73) SHA1(7b9d66abe85303b3e26b442a3a63feca1a0edbdb) )
 ROM_END
 
+ROM_START( vs4e )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0014", 0, SHA1(e7f7304b1c9075f37b8fed4e8d3f22f7fc0ae5ab) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-0392-exp.pic", 0x00, 0x4000, CRC(c8931261) SHA1(063faea92a987a5b3dc96455494cf5fc13052428) )
+ROM_END
+
 /*
 Title             VIRTUA STRIKER 4
 Media ID          93B2
@@ -938,6 +948,16 @@ ROM_START( avalnc25 )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0403-jpn.data", 0x00, 0x50, CRC(c5071ada) SHA1(70018180b917beec1b2c272f9125fa43fd1a7b00) )
+ROM_END
+
+ROM_START( vs42006b )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0020b", 0, SHA1(ac875c5d8da72e75186790acf839e775050d3591) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0432-jpn.data", 0x00, 0x50, CRC(e3d13191) SHA1(4255c09aad06eb38c16bdec881897404a3a68b37) )
 ROM_END
 
 ROM_START( vs42006 )
@@ -1110,7 +1130,7 @@ ROM_END
 // 0013C    GAME( 2005, vs4jc,    vs4j,     triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev C) (GDT-0013C)", MACHINE_IS_SKELETON )
 // 0013D    GAME( 2005, vs4jd,    vs4j,     triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev D) (GDT-0013D)", MACHINE_IS_SKELETON )
 /* 0013E */ GAME( 2005, vs4j,     triforce, triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev E) (GDT-0013E)", MACHINE_IS_SKELETON )
-// 0014
+/* 0014  */ GAME( 2004, vs4e,     vs4,      triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 (Export) (GDT-0014)", MACHINE_IS_SKELETON )
 /* 0015  */ GAME( 2004, vs4,      triforce, triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 (Export) (GDT-0015)", MACHINE_IS_SKELETON )
 // 0016     GAME( 2004, avalons20,triforce, triforcegd,    triforce, triforce_state, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (server) (GDT-0016)", MACHINE_IS_SKELETON )
 // 0017     GAME( 2004, avalon20o,avalon20, triforcegd,    triforce, triforce_state, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (GDT-0017)", MACHINE_IS_SKELETON )
@@ -1124,7 +1144,7 @@ ROM_END
 /* 0019B */ GAME( 2005, avalnc25, triforce, triforcegd,    triforce, triforce_state, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.5 - War of the Key (client) (Rev B) (GDT-0019B)", MACHINE_IS_SKELETON )
 // 0020     GAME( 2006, vs42006o, vs42006,  triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (GDT-0020)", MACHINE_IS_SKELETON )
 // 0020A    GAME( 2006, vs42006a, vs42006,  triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev A) (GDT-0020A)", MACHINE_IS_SKELETON )
-// 0020B    GAME( 2006, vs42006b, vs42006,  triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev B) (GDT-0020B)", MACHINE_IS_SKELETON )
+/* 0020B */ GAME( 2006, vs42006b, vs42006,  triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev B) (GDT-0020B)", MACHINE_IS_SKELETON )
 // 0020C    GAME( 2006, vs42006c, vs42006,  triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev C) (GDT-0020C)", MACHINE_IS_SKELETON )
 /* 0020D */ GAME( 2006, vs42006,  triforce, triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", MACHINE_IS_SKELETON )
 /* 0021  */ GAME( 2006, vs42k6ex, triforce, triforcegd,    triforce, triforce_state, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Export) (GDT-0021)", MACHINE_IS_SKELETON )

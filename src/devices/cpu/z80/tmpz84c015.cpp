@@ -64,6 +64,13 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> tmpz84c015_device::memory_space_config() const
+{
+	auto r = z80_device::memory_space_config();
+	r.back().second = &m_io_space_config;
+	return r;
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup

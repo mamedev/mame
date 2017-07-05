@@ -106,7 +106,7 @@ void setup_t::register_model(const pstring &model_in)
 void setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 {
 	if (!m_alias.insert({alias, out}).second)
-		log().fatal(MF_1_ADDING_ALIAS_1_TO_ALIAS_LIST, alias);
+		log().fatal(MF_1_ADDING_ALI1_TO_ALIAS_LIST, alias);
 }
 
 void setup_t::register_alias(const pstring &alias, const pstring &out)

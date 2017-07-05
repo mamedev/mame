@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, sg1000a_state )
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_MIRROR(0x400)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, sg1000a_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, sg1000a_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
@@ -412,7 +412,7 @@ static INPUT_PORTS_START( dokidoki )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sderby2 )
+static INPUT_PORTS_START( sderby2s )
 	PORT_INCLUDE( sg1000 )
 
 	PORT_MODIFY("DSW")
@@ -489,7 +489,7 @@ static MACHINE_CONFIG_DERIVED( sg1000ax, sg1000a )
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sderby2, sg1000a )
+static MACHINE_CONFIG_DERIVED( sderby2s, sg1000a )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_10_738635MHz / 3)
 	MCFG_CPU_IO_MAP(sderby2_io_map)
@@ -524,7 +524,7 @@ ROM_START( dokidoki )
 	ROM_LOAD( "epr-7358.ic3",   0x8000, 0x4000, CRC(c6f26b0b) SHA1(3753e05b6e77159832dbe88562ba7a818120d1a3) )
 ROM_END
 
-ROM_START( sderby2 )
+ROM_START( sderby2s )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6450d.ic10",   0x0000, 0x4000, CRC(e56986d3) SHA1(a2dbdc95128cc94a1492e080aeea402f2d4b89fe) )
 	ROM_LOAD( "epr-6504d.ic11",   0x4000, 0x4000, CRC(7bb364b9) SHA1(9f93572b6d999422d93ad5f7a251b4695565651f) )
@@ -551,4 +551,4 @@ DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
 GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Boxing",                  0 )
 GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Pro Wrestling",           0 )
 GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land",           0 )
-GAME( 1985, sderby2,  0, sderby2,  sderby2,  sg1000a_state, sg1000a,  ROT0, "Sega", "Super Derby II (Satellite board)", MACHINE_NOT_WORKING ) // inputs aren't hooked up, probably needs to be connected to the main board anyway
+GAME( 1985, sderby2s, 0, sderby2s, sderby2s, sg1000a_state, sg1000a,  ROT0, "Sega", "Super Derby II (Satellite board)", MACHINE_NOT_WORKING ) // inputs aren't hooked up, probably needs to be connected to the main board anyway

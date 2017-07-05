@@ -63,13 +63,19 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	TIMER_CALLBACK_MEMBER(dma_transfer);
 
 	address_space *m_cpu_space;
 
 private:
+	enum
+	{
+		AS_PCI_MEM = 1,
+		AS_PCI_IO = 2
+	};
+
 	DECLARE_ADDRESS_MAP(cpu_map, 32);
 
 	void map_cpu_space();

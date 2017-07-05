@@ -190,7 +190,7 @@ private:
 	const ay_ym_param *m_par_env;
 	int32_t m_vol_table[NUM_CHANNELS][16];
 	int32_t m_env_table[NUM_CHANNELS][32];
-	int32_t m_vol3d_table[8*32*32*32];
+	std::unique_ptr<int32_t[]> m_vol3d_table;
 	int m_flags;          /* Flags */
 	int m_res_load[3];    /* Load on channel in ohms */
 	devcb_read8 m_port_a_read_cb;

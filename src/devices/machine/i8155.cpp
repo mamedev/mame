@@ -98,7 +98,7 @@ enum
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( i8155, AS_0, 8, i8155_device )
+static ADDRESS_MAP_START( i8155, 0, 8, i8155_device )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -344,9 +344,11 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *i8155_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> i8155_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

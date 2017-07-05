@@ -16,6 +16,13 @@ superfx_device::superfx_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> superfx_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 #define SUPERFX_SFR_OV_SET      ((m_sfr & SUPERFX_SFR_OV) ? 1 : 0)
 #define SUPERFX_SFR_OV_CLEAR    ((m_sfr & SUPERFX_SFR_OV) ? 0 : 1)

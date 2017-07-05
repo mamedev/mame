@@ -640,7 +640,7 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 
 			case 0x06:
 				// memory data
-				space(AS_0).write_byte(m_memadr, data);
+				space(0).write_byte(m_memadr, data);
 				m_memadr = (m_memadr + 1) & 0x3fffff;
 				break;
 

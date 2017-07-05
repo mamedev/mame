@@ -1202,7 +1202,7 @@ void lua_engine::initialize()
 					sol::table sp_table = sol().create_table();
 					if(!memdev)
 						return sp_table;
-					for(address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp)
+					for(int sp = 0; sp < memdev->max_space_count(); ++sp)
 					{
 						if(memdev->has_space(sp))
 							sp_table[memdev->space(sp).name()] = addr_space(memdev->space(sp), *memdev);

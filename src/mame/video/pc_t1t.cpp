@@ -78,7 +78,7 @@ void pcvideo_t1000_device::device_start()
 	m_bank = 0;
 	m_chr_size = 1;
 	m_ra_offset = 256;
-	m_vram->space(AS_0).install_ram(0, 128*1024 - 1, m_ram->pointer());
+	m_vram->space(0).install_ram(0, 128*1024 - 1, m_ram->pointer());
 }
 
 
@@ -94,12 +94,12 @@ void pcvideo_pcjr_device::device_start()
 	if(!strncmp(machine().system().name, "ibmpcjx", 7))
 	{
 		m_jxkanji = machine().root_device().memregion("kanji")->base();
-		m_vram->space(AS_0).install_ram(0, 128*1024 - 1, memshare(":vram")->ptr()); // TODO: fix when this is really understood
+		m_vram->space(0).install_ram(0, 128*1024 - 1, memshare(":vram")->ptr()); // TODO: fix when this is really understood
 	}
 	else
 	{
 		m_jxkanji = nullptr;
-		m_vram->space(AS_0).install_ram(0, 128*1024 - 1, m_ram->pointer());
+		m_vram->space(0).install_ram(0, 128*1024 - 1, m_ram->pointer());
 	}
 }
 
@@ -110,7 +110,7 @@ void pcvideo_pcjr_device::device_start()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START(vram_map, AS_0, 8, pcvideo_t1000_device)
+static ADDRESS_MAP_START(vram_map, 0, 8, pcvideo_t1000_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x20000, 0x3ffff) AM_NOP
 ADDRESS_MAP_END

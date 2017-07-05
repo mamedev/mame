@@ -11137,6 +11137,7 @@ ctornado                        // 20 1982.05 Tornado
 ctsttape                        // ?
 czeroize                        // 37 1983.10 Zeroize
 decocass                        //
+decomult                        //
 
 @source:dectalk.cpp
 dectalk                         // 1983 Digital Equipment Corporation
@@ -17035,15 +17036,8 @@ maxideal                        // (c) 1983 American Communications Laboratories
 
 @source:kinst.cpp
 kinst                           // (c) 1994 Rare
-kinst13                         // (c) 1994 Rare
-kinst14                         // (c) 1994 Rare
 kinst2                          // (c) 1995 Rare
-kinst210                        // (c) 1995 Rare
-kinst211                        // (c) 1995 Rare
-kinst213                        // (c) 1995 Rare
-kinst2k3                        // (c) 1995 Rare
-kinst2k4                        // (c) 1995 Rare
-kinstp                          // (c) 1994 Rare
+kinst2uk                        // (c) 1995 Rare
 
 @source:kissproto.cpp
 kissp                           //
@@ -17923,11 +17917,12 @@ unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
 @source:macp.cpp
-glxplay                       //
+glxplay                         //
 glxplay2                        //
 kidnap                          //
 mac_1808                        //
 macgalxy                        //
+macjungl                        //
 macjungn                        //
 nbamac                          //
 spcpnthr                        //
@@ -20889,6 +20884,7 @@ dynamcopc                       // 1998.09 Dynamite Cop (USA)
 dyndeka2                        // 1998.05 Dynamite Deka 2 (Japan)
 dyndeka2b                       // 1998.05 Dynamite Deka 2 (Japan)
 fvipers                         // 1995.11 Fighting Vipers (Revision D)
+fvipersb                        // 1995.11 Fighting Vipers (Revision B)
 gunblade                        // 1996.04 Gunblade N.Y. (Revision A)
 hotd                            // 1997.03 The House of the Dead
 indy500                         // 1995.07 Indy 500 (Revision A, Newer)
@@ -28246,7 +28242,7 @@ ncv1j                           // (c) 1995 (Japan)
 ncv1j2                          // (c) 1995 (Japan)
 ncv2                            // (c) 1996
 ncv2j                           // (c) 1996 (Japan)
-abcheck							// (c) 1996 (Japan)
+abcheck                         // (c) 1996 (Japan)
 
 @source:namcops2.cpp
 bldyr3b                         //
@@ -28863,6 +28859,7 @@ wldkicks                        // 2000.03 World Kicks (World, WK2 Ver.A)
 wldkicksj                       // 2000.03 World Kicks (Japan, WK1 Ver.A)
 wldkicksu                       // 2000.03 World Kicks (US, WK3 Ver.A)
 wldkickspj                      // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
+wldkickspw                      // 2000.03 World Kicks PCB (World, WKC2 Ver.A)
 wldrider                        // 2001.05 Wild Riders
 wrungp                          // 2001.08 Wave Runner GP
 wrungpo                         // 2001.?? Wave Runner GP (USA, Rev A)
@@ -32141,8 +32138,9 @@ replica1                        // Makerbot Replicator 1 desktop 3d printer
 
 @source:retofinv.cpp
 retofinv                        // A37 (c) 1985 Taito Corporation
-retofinv1                       // bootleg
-retofinv2                       // bootleg
+retofinvb                       // bootleg
+retofinvb1                      // bootleg
+retofinvb2                      // bootleg
 
 @source:rex6000.cpp
 ds2                             //
@@ -32924,6 +32922,9 @@ sderby                          // (c) 1996
 sderbya                         // (c) 1996
 shinygld                        //
 spacewin                        //
+
+@source:sderby2.cpp
+sderby2                         // (c) 1985
 
 @source:sdk80.cpp
 sdk80                           //
@@ -33967,7 +33968,7 @@ sg1000m2                        // Sega SG-1000 Mark II (Japan)
 chboxing                        // (c) 1984
 chwrestl                        // (c) 1985
 dokidoki                        // (c) 1985
-sderby2                         // (c) 1985
+sderby2s                        // (c) 1985
 
 @source:sh4robot.cpp
 sh4robot                        //
@@ -34313,7 +34314,7 @@ victroad                        // A6002      (c) 1986
 worldwar                        // A6004 'WW' (c) 1987
 
 @source:snk6502.cpp
-fantasy                         // (c) 1981 SNK
+fantasyg                        // (c) 1981 SNK
 fantasyj                        // (c) 1981 SNK
 fantasyu                        // (c) 1981 Rock-Ola
 nibbler                         // (c) 1982 Rock-ola (version 9)
@@ -36591,7 +36592,9 @@ tfupdate                        // 2004.?? Triforce GDROM Boot Update
 triforce                        // 2002.?? Triforce BIOS
 vs2002ex                        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j                         // 2002.10 Virtua Striker 2002 (Japan)
-vs4                             // 2004.12.02 Virtua Striker 4 (Export)
+vs4                             // 2004.12.02 Virtua Striker 4 (Export) (GDT-0015)
+vs4e                            // 2004.12.03 Virtua Striker 4 (Export) (GDT-0014)
+vs42006b                        // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev B)
 vs42006                         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
 vs42k6ex                        // 2006.01.31 Virtua Striker 4 Ver.2006 (Export)
 vs4j                            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
@@ -37031,6 +37034,7 @@ tenthdeg                        // (c) 1998 Atari Games (prototype)
 warfa                           // (c) 1999 Atari Games
 warfaa                          // (c) 1999 Atari Games
 warfab                          // (c) 1999 Atari Games
+warfac                          // (c) 1999 Atari Games
 
 @source:vendetta.cpp
 esckids                         // GX975 (c) 1991 (Asia)

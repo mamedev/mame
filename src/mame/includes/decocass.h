@@ -41,7 +41,6 @@ public:
 			m_objectram(*this, "objectram"),
 			m_paletteram(*this, "paletteram")
 	{
-		m_type1_map = nullptr;
 	}
 
 	/* devices */
@@ -113,28 +112,6 @@ public:
 	read8_delegate    m_dongle_r;
 	write8_delegate   m_dongle_w;
 
-	/* dongle type #1 */
-	uint32_t    m_type1_inmap;
-	uint32_t    m_type1_outmap;
-
-	/* dongle type #2: status of the latches */
-	int32_t     m_type2_d2_latch; /* latched 8041-STATUS D2 value */
-	int32_t     m_type2_xx_latch; /* latched value (D7-4 == 0xc0) ? 1 : 0 */
-	int32_t     m_type2_promaddr; /* latched PROM address A0-A7 */
-
-	/* dongle type #3: status and patches */
-	int32_t     m_type3_ctrs;     /* 12 bit counter stage */
-	int32_t     m_type3_d0_latch; /* latched 8041-D0 value */
-	int32_t     m_type3_pal_19;       /* latched 1 for PAL input pin-19 */
-	int32_t     m_type3_swap;
-
-	/* dongle type #4: status */
-	int32_t     m_type4_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
-	int32_t     m_type4_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
-
-	/* dongle type #5: status */
-	int32_t     m_type5_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
-
 	/* DS Telejan */
 	uint8_t     m_mux_data;
 
@@ -150,48 +127,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(decocass);
-	DECLARE_MACHINE_RESET(ctsttape);
-	DECLARE_MACHINE_RESET(cprogolfj);
-	DECLARE_MACHINE_RESET(cdsteljn);
-	DECLARE_MACHINE_RESET(cfishing);
-	DECLARE_MACHINE_RESET(chwy);
-	DECLARE_MACHINE_RESET(cterrani);
-	DECLARE_MACHINE_RESET(castfant);
-	DECLARE_MACHINE_RESET(csuperas);
-	DECLARE_MACHINE_RESET(clocknch);
-	DECLARE_MACHINE_RESET(cprogolf);
-	DECLARE_MACHINE_RESET(cluckypo);
-	DECLARE_MACHINE_RESET(ctisland);
-	DECLARE_MACHINE_RESET(ctisland3);
-	DECLARE_MACHINE_RESET(cexplore);
-	DECLARE_MACHINE_RESET(cdiscon1);
-	DECLARE_MACHINE_RESET(ctornado);
-	DECLARE_MACHINE_RESET(cmissnx);
-	DECLARE_MACHINE_RESET(cptennis);
-	DECLARE_MACHINE_RESET(cbtime);
-	DECLARE_MACHINE_RESET(cburnrub);
-	DECLARE_MACHINE_RESET(cgraplop);
-	DECLARE_MACHINE_RESET(cgraplop2);
-	DECLARE_MACHINE_RESET(clapapa);
-	DECLARE_MACHINE_RESET(cskater);
-	DECLARE_MACHINE_RESET(cprobowl);
-	DECLARE_MACHINE_RESET(cnightst);
-	DECLARE_MACHINE_RESET(cpsoccer);
-	DECLARE_MACHINE_RESET(csdtenis);
-	DECLARE_MACHINE_RESET(czeroize);
-	DECLARE_MACHINE_RESET(cppicf);
-	DECLARE_MACHINE_RESET(cfghtice);
-	DECLARE_MACHINE_RESET(type4);
-	DECLARE_MACHINE_RESET(cbdash);
-	DECLARE_MACHINE_RESET(cflyball);
-	DECLARE_MACHINE_RESET(cmanhat);
-	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
-	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
-	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
+
 	uint32_t screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
-	DECLARE_READ8_MEMBER( decocass_sound_command_main_r );
+	DECLARE_READ8_MEMBER(decocass_sound_command_main_r);
 	DECLARE_READ8_MEMBER(decocass_sound_data_r);
 	DECLARE_READ8_MEMBER(decocass_sound_ack_r);
 	DECLARE_WRITE8_MEMBER(decocass_sound_data_w);
@@ -251,18 +191,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 private:
-	DECLARE_READ8_MEMBER(decocass_type1_r);
-	DECLARE_READ8_MEMBER(decocass_type2_r);
-	DECLARE_WRITE8_MEMBER(decocass_type2_w);
-	DECLARE_READ8_MEMBER(decocass_type3_r);
-	DECLARE_WRITE8_MEMBER(decocass_type3_w);
-	DECLARE_READ8_MEMBER(decocass_type4_r);
-	DECLARE_WRITE8_MEMBER(decocass_type4_w);
-	DECLARE_READ8_MEMBER(decocass_type5_r);
-	DECLARE_WRITE8_MEMBER(decocass_type5_w);
-	DECLARE_READ8_MEMBER(decocass_nodong_r);
-
-	uint8_t* m_type1_map;
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -274,5 +202,207 @@ private:
 	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					int missile_y_adjust, int missile_y_adjust_flip_screen,
 					uint8_t *missile_ram, int interleave);
+protected:
 	void decocass_fno( offs_t offset, uint8_t data );
 };
+
+class decocass_type1_state : public decocass_state
+{
+public:
+	decocass_type1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+		m_type1_map = nullptr;
+	}
+
+	DECLARE_MACHINE_RESET(ctsttape);
+	DECLARE_MACHINE_RESET(chwy);
+	DECLARE_MACHINE_RESET(cdsteljn);
+	DECLARE_MACHINE_RESET(cterrani);
+	DECLARE_MACHINE_RESET(castfant);
+	DECLARE_MACHINE_RESET(csuperas);
+	DECLARE_MACHINE_RESET(cmanhat);
+	DECLARE_MACHINE_RESET(clocknch);
+	DECLARE_MACHINE_RESET(cprogolf);
+	DECLARE_MACHINE_RESET(cprogolfj);
+	DECLARE_MACHINE_RESET(cluckypo);
+	DECLARE_MACHINE_RESET(ctisland);
+	DECLARE_MACHINE_RESET(ctisland3);
+	DECLARE_MACHINE_RESET(cexplore);
+	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
+	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
+	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+
+	DECLARE_READ8_MEMBER(decocass_type1_r);
+
+	/* dongle type #1 */
+	uint32_t    m_type1_inmap;
+	uint32_t    m_type1_outmap;
+	uint8_t* m_type1_map;
+};
+
+
+class decocass_type2_state : public decocass_state
+{
+public:
+	decocass_type2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+
+	DECLARE_READ8_MEMBER(decocass_type2_r);
+	DECLARE_WRITE8_MEMBER(decocass_type2_w);
+
+	/* dongle type #2: status of the latches */
+	int32_t     m_type2_d2_latch; /* latched 8041-STATUS D2 value */
+	int32_t     m_type2_xx_latch; /* latched value (D7-4 == 0xc0) ? 1 : 0 */
+	int32_t     m_type2_promaddr; /* latched PROM address A0-A7 */
+};
+
+
+class decocass_type3_state : public decocass_state
+{
+public:
+	decocass_type3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+	DECLARE_MACHINE_RESET(cfishing);
+	DECLARE_MACHINE_RESET(cbtime);
+	DECLARE_MACHINE_RESET(cburnrub);
+	DECLARE_MACHINE_RESET(cgraplop);
+	DECLARE_MACHINE_RESET(cgraplop2);
+	DECLARE_MACHINE_RESET(clapapa);
+	DECLARE_MACHINE_RESET(cskater);
+	DECLARE_MACHINE_RESET(cprobowl);
+	DECLARE_MACHINE_RESET(cnightst);
+	DECLARE_MACHINE_RESET(cpsoccer);
+	DECLARE_MACHINE_RESET(csdtenis);
+	DECLARE_MACHINE_RESET(czeroize);
+	DECLARE_MACHINE_RESET(cppicf);
+	DECLARE_MACHINE_RESET(cfghtice);
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+
+	DECLARE_READ8_MEMBER(decocass_type3_r);
+	DECLARE_WRITE8_MEMBER(decocass_type3_w);
+
+	/* dongle type #3: status and patches */
+	int32_t     m_type3_ctrs;     /* 12 bit counter stage */
+	int32_t     m_type3_d0_latch; /* latched 8041-D0 value */
+	int32_t     m_type3_pal_19;       /* latched 1 for PAL input pin-19 */
+	int32_t     m_type3_swap;
+};
+
+
+
+class decocass_type4_state : public decocass_state
+{
+public:
+	decocass_type4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+
+	DECLARE_READ8_MEMBER(decocass_type4_r);
+	DECLARE_WRITE8_MEMBER(decocass_type4_w);
+
+	/* dongle type #4: status */
+	int32_t     m_type4_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
+	int32_t     m_type4_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+};
+
+
+class decocass_type5_state : public decocass_state
+{
+public:
+	decocass_type5_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+
+	DECLARE_READ8_MEMBER(decocass_type5_r);
+	DECLARE_WRITE8_MEMBER(decocass_type5_w);
+
+	/* dongle type #5: status */
+	int32_t     m_type5_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+};
+
+
+class decocass_nodong_state : public decocass_state
+{
+public:
+	decocass_nodong_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	DECLARE_READ8_MEMBER(decocass_nodong_r);
+};
+
+
+class decocass_widel_state : public decocass_state
+{
+public:
+	decocass_widel_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+
+	DECLARE_READ8_MEMBER(decocass_widel_r);
+	DECLARE_WRITE8_MEMBER(decocass_widel_w);
+	DECLARE_READ8_MEMBER(decocass_fbc2_r);
+
+	/* dongle type widel: status */
+	int32_t     m_widel_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
+	int32_t     m_widel_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+	uint8_t		m_decomult_bank;
+};
+

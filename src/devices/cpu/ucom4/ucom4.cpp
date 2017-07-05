@@ -107,6 +107,14 @@ upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> ucom4_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 
 // disasm
 void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const

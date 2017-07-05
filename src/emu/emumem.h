@@ -25,22 +25,11 @@
 
 enum { TOTAL_MEMORY_BANKS = 512 };
 
-// address spaces
-enum address_spacenum
-{
-	AS_0,                           // first address space
-	AS_1,                           // second address space
-	AS_2,                           // third address space
-	AS_3,                           // fourth address space
-	ADDRESS_SPACES,                 // maximum number of address spaces
-
-	// alternate address space names for common use
-	AS_PROGRAM = AS_0,              // program address space
-	AS_DATA = AS_1,                 // data address space
-	AS_IO = AS_2,                   // I/O address space
-	AS_DECRYPTED_OPCODES = AS_3     // decrypted opcodes, when separate from data accesses
-};
-DECLARE_ENUM_OPERATORS(address_spacenum)
+// address space names for common use
+constexpr int AS_PROGRAM = 0; // program address space
+constexpr int AS_DATA    = 1; // data address space
+constexpr int AS_IO      = 2; // I/O address space
+constexpr int AS_OPCODES = 3; // (decrypted) opcodes, when separate from data accesses
 
 // read or write constants
 enum class read_or_write
@@ -233,19 +222,19 @@ class address_space
 
 protected:
 	// construction/destruction
-	address_space(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, bool large);
+	address_space(memory_manager &manager, device_memory_interface &memory, int spacenum, bool large);
 
 public:
 	virtual ~address_space();
 	// public allocator
-	static void allocate(std::vector<std::unique_ptr<address_space>> &space_list, memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum);
+	static void allocate(std::vector<std::unique_ptr<address_space>> &space_list, memory_manager &manager, const address_space_config &config, device_memory_interface &memory, int spacenum);
 
 	// getters
 	memory_manager &manager() const { return m_manager; }
 	device_t &device() const { return m_device; }
 	running_machine &machine() const { return m_machine; }
 	const char *name() const { return m_name; }
-	address_spacenum spacenum() const { return m_spacenum; }
+	int spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map.get(); }
 
 	direct_read_data &direct() const { return *m_direct; }
@@ -431,7 +420,7 @@ protected:
 	offs_t                  m_logaddrmask;      // logical address mask
 	offs_t                  m_logbytemask;      // byte-converted logical address mask
 	u64                     m_unmap;            // unmapped value
-	address_spacenum        m_spacenum;         // address space index
+	int        m_spacenum;         // address space index
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
 	std::unique_ptr<direct_read_data> m_direct;    // fast direct-access read info
 	const char *            m_name;             // friendly name of the address space
@@ -654,6 +643,7 @@ class memory_manager
 public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
+	void configure();
 	void initialize();
 
 	// getters

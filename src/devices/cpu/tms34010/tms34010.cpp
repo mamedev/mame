@@ -59,6 +59,12 @@ tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag,
 	m_is_34020 = 1;
 }
 
+std::vector<std::pair<int, const address_space_config *>> tms340x0_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 #include "34010ops.h"
 

@@ -300,6 +300,13 @@ ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> ppc_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -1460,7 +1467,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
     from logical to physical
 -------------------------------------------------*/
 
-bool ppc_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	/* only applies to the program address space */
 	if (spacenum != AS_PROGRAM)

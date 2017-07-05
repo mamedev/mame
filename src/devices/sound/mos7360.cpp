@@ -170,7 +170,7 @@ DEFINE_DEVICE_TYPE(MOS7360, mos7360_device, "mos7360", "MOS 7360 TED")
 
 
 // default address maps
-static ADDRESS_MAP_START( mos7360_videoram_map, AS_0, 8, mos7360_device )
+static ADDRESS_MAP_START( mos7360_videoram_map, 0, 8, mos7360_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -180,13 +180,11 @@ ADDRESS_MAP_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mos7360_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mos7360_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-		case AS_0: return &m_videoram_space_config;
-		default: return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_videoram_space_config)
+	};
 }
 
 
@@ -232,7 +230,7 @@ inline uint8_t mos7360_device::read_ram(offs_t offset)
 	int rom = m_rom;
 	m_rom = 0;
 
-	m_last_data = space(AS_0).read_byte(offset);
+	m_last_data = space(0).read_byte(offset);
 
 	m_rom = rom;
 
@@ -244,7 +242,7 @@ inline uint8_t mos7360_device::read_rom(offs_t offset)
 	int rom = m_rom;
 	m_rom = 1;
 
-	m_last_data = space(AS_0).read_byte(offset);
+	m_last_data = space(0).read_byte(offset);
 
 	m_rom = rom;
 

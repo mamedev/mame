@@ -44,6 +44,7 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 
 	DECLARE_PALETTE_INIT(retofinv);
+	DECLARE_PALETTE_INIT(retofinv_bl);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -10,6 +10,9 @@
 
 #include "output_module.h"
 #include "modules/osdmodule.h"
+#include "modules/lib/osdobj_common.h"
+
+#include "emu.h"
 
 #include <thread>
 #include <set>
@@ -36,9 +39,13 @@ public:
   {
   }
 
-  void start()
+  void start(running_machine &machine)
   {
+  	m_machine = &machine;
 	m_clients->insert(shared_from_this());
+	// now send "hello = 1" to the newly connected client
+	std::strncpy(m_data, "hello = 1\1", max_length);
+	do_write(10);
 	do_read();
   }
 
@@ -49,6 +56,47 @@ private:
 	do_write(msg.size());
   }
 
+  void handle_message(char *msg)
+  {
+  	char verb[1024];
+  	int value;
+  
+  	//printf("handle_message: got [%s]\n", msg);
+  	
+  	std::uint32_t ch = 0;
+  	while (msg[ch] != ' ')
+  	{
+  		ch++;
+  	}
+  	msg[ch] = '\0';
+  	ch++;
+  	std::strncpy(verb, msg, sizeof(verb)-1);
+  	//printf("verb = [%s], ", verb);
+  	
+  	while (msg[ch] != ' ')
+  	{
+  		ch++;
+  	}
+  	
+  	ch++;
+  	value = atoi(&msg[ch]);
+  	//printf("value = %d\n", value);
+  	
+  	if (!std::strcmp(verb, "send_id"))
+  	{
+  		if (value == 0)
+  		{  		
+  			std::snprintf(m_data, max_length, "req_id = %s\1", machine().system().name);
+		}
+		else
+		{
+		  	std::snprintf(m_data, max_length, "req_id = %s\1", machine().output().id_to_name(value));
+		}
+		
+		do_write(std::strlen(m_data));
+  	}	
+  }
+
   void do_read()
   {
 	auto self(shared_from_this());
@@ -57,6 +105,11 @@ private:
 		{
 		  if (!ec)
 		  {
+		  	if (length > 0)
+		  	{
+		  		m_input_m_data[length] = '\0';
+		  		handle_message(m_input_m_data);
+		  	}
 			do_read();
 		  }
 		  else
@@ -69,7 +122,7 @@ private:
   void do_write(std::size_t length)
   {
 	auto self(shared_from_this());
-	asio::async_write(m_socket, asio::buffer(m_data, length),
+		asio::async_write(m_socket, asio::buffer(m_data, length),
 		[this, self](std::error_code ec, std::size_t /*length*/)
 		{
 		  if (ec)
@@ -79,19 +132,23 @@ private:
 		});
   }
 
+  running_machine &machine() const { return *m_machine; }
+
   asio::ip::tcp::socket m_socket;
   enum { max_length = 1024 };
   char m_data[max_length];
   char m_input_m_data[max_length];
   client_set *m_clients;
+  running_machine *m_machine;
 };
 
 class output_network_server
 {
 public:
-  output_network_server(asio::io_context& io_context, short port) :
+  output_network_server(asio::io_context& io_context, short port, running_machine &machine) :
 	m_acceptor(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
   {
+  	m_machine = &machine;
 	do_accept();
   }
 
@@ -109,15 +166,18 @@ private:
 		{
 		  if (!ec)
 		  {
-			std::make_shared<output_session>(std::move(socket),&m_clients)->start();
+			std::make_shared<output_session>(std::move(socket),&m_clients)->start(machine());
 		  }
 
 		  do_accept();
 		});
   }
 
+  running_machine &machine() const { return *m_machine; }
+
   asio::ip::tcp::acceptor m_acceptor;
   client_set m_clients;
+  running_machine *m_machine;
 };
 
 
@@ -143,6 +203,8 @@ public:
 
 	virtual void exit() override
 	{
+		// tell clients MAME is shutting down
+		notify("mamerun", 0);
 		m_io_context->stop();
 		m_working_thread.join();
 		delete m_server;
@@ -154,7 +216,7 @@ public:
 	virtual void notify(const char *outname, int32_t value) override
 	{
 		static char buf[256];
-		sprintf(buf, "%s = %d\n", ((outname==nullptr) ? "none" : outname), value);
+		sprintf(buf, "%s = %d\1", ((outname==nullptr) ? "none" : outname), value);
 		m_server->deliver_to_all(buf);
 	}
 
@@ -162,7 +224,7 @@ public:
 	void process_output()
 	{
 		m_io_context = new asio::io_context();
-		m_server = new output_network_server(*m_io_context, 8000);
+		m_server = new output_network_server(*m_io_context, 8000, machine());
 		m_io_context->run();
 	}
 

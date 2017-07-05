@@ -553,7 +553,7 @@ static ADDRESS_MAP_START(tandy1000_bank_map, AS_PROGRAM, 16, tandy1000_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION( "rom", 0x70000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(biosbank_map, AS_0, 16, tandy1000_state)
+static ADDRESS_MAP_START(biosbank_map, 0, 16, tandy1000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END

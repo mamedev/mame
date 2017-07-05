@@ -378,6 +378,7 @@ static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 	// screen control	
 	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_mosaic_sprite_r, screen_ctrl_mosaic_sprite_w)
 	
+	AM_RANGE(13, 13) AM_WRITE(border_color_w)
 	// interrupt section
 	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w) 
 	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
@@ -496,9 +497,11 @@ void ygv608_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *ygv608_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> ygv608_device::memory_space_config() const
 {
-	return (spacenum == AS_IO) ? &m_io_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_IO, &m_io_space_config)
+	};
 }
 
 inline void ygv608_device::vblank_irq_check()
@@ -1177,7 +1180,8 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	// clip to the current bitmap
 	finalclip.set(0, screen.width() - 1, 0, screen.height() - 1);
 	finalclip &= cliprect;
-	bitmap.fill(0, visarea );
+	// TODO: black/transparent pen if CBDR is 1 and border color is 0
+	bitmap.fill(m_border_color, visarea );
 
 	// punt if not initialized
 	if (m_page_x == 0 || m_page_y == 0)
@@ -1850,6 +1854,7 @@ READ8_MEMBER( ygv608_device::screen_ctrl_mosaic_sprite_r )
 	                               | (m_mosaic_bplane << 2) | (m_mosaic_aplane & 3);
 } 
 
+// R#10W - screen control: mosaic & sprite
 WRITE8_MEMBER( ygv608_device::screen_ctrl_mosaic_sprite_w )
 {
 	// check mosaic
@@ -1862,7 +1867,13 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_mosaic_sprite_w )
 	m_sprite_aux_mode = BIT(data, 5);
 	m_sprite_aux_reg = (data & 0xc0) >> 6;
 }
- 
+
+// R#13W - border color
+WRITE8_MEMBER( ygv608_device::border_color_w )
+{
+	m_border_color = data;
+}
+
 // R#14R interrupt mask control
 READ8_MEMBER( ygv608_device::irq_mask_r )
 {

@@ -118,6 +118,14 @@ am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char
 	m_next_pc = 0;
 }
 
+std::vector<std::pair<int, const address_space_config *>> am29000_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 void am29000_cpu_device::device_start()
 {

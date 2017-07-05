@@ -849,6 +849,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/intellec4/intellec4.h,BUSES["INTELLEC4"] = true
+---------------------------------------------------
+
+if (BUSES["INTELLEC4"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/intv/slot.h,BUSES["INTV"] = true
 ---------------------------------------------------
 

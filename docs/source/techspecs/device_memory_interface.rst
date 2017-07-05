@@ -9,40 +9,57 @@ creating address spaces, to which address maps can be associated.
 It's used for any device that provides a (logically) address/data bus
 other devices can be connected to.  It's mainly, but not only, cpus.
 
-The interface allows for up to four address spaces, numbered 0-3, with
-symbolic names associated to them in emumem.h for historical reasons.
+The interface allows for an unlimited set of address spaces, numbered
+with small positive values.  The IDs should stay small because they
+index vectors to keep the lookup fast.  Spaces number 0-3 have an
+associated constant name:
 
-+------------+-------------+----------------------+
-| Numeric ID | Symbolic ID | Symbolic name        |
-+============+=============+======================+
-| 0          | AS_0        | AS_PROGRAM           |
-+------------+-------------+----------------------+
-| 1          | AS_1        | AS_DATA              |
-+------------+-------------+----------------------+
-| 2          | AS_2        | AS_IO                |
-+------------+-------------+----------------------+
-| 3          | AS_3        | AS_DECRYPTED_OPCODES |
-+------------+-------------+----------------------+
++----+---------------+
+| ID | Name          |
++====+===============+
+| 0  | AS_PROGRAM    |
++----+---------------+
+| 1  | AS_DATA       |
++----+---------------+
+| 2  | AS_IO         |
++----+---------------+
+| 3  | AS_OPCODES    |
++----+---------------+
+
+Spaces 0 and 3, e.g. AS_PROGRAM and AS_OPCODE, are special for the
+debugger and some CPUs.  AS_PROGRAM is use by the debugger and the
+cpus as the space from with the cpu reads its instructions for the
+disassembler.  When present, AS_OPCODE is used by the debugger and
+some cpus to read the opcode part of the instruction.  What opcode
+means is device-dependant, for instance for the z80 it's the initial
+byte(s) which are read with the M1 signal asserted.  For the 68000 is
+means every instruction word plus the PC-relative accesses.  The main,
+but not only, use of AS_OPCODE is to implement hardware decrypting
+instructions separately from the data.
 
 2. Setup
 --------
 
-| const address_space_config *\ **memory_space_config**\ (address_spacenum spacenum) const
+| std::vector<std::pair<int, const address_space_config *>>\ **memory_space_config**\ (int spacenum) const
 
-The device must override that method to provide, for each of the four
-address spaces, either an **address_space_config** describing the
-space's configucation or **nullptr** if the space is not to be
-created.
+The device must override that method to provide a vector of pairs
+comprising of a space number and its associated
+**address_space_config** describing its configuration.  Some examples
+to look up when needed:
+* Standard two-space vector: v60_device
+* Conditional AS_OPCODE: z80_device
+* Inherit config and add a space: m6801_device
+* Inherit config and patch a space: tmpz84c011_device
+
 
 | bool **has_configured_map**\ () const
 | bool **has_configured_map**\ (int index) const
-| bool **has_configured_map**\ (address_spacenum index) const
 
 The **has_configured_map** method allows to test in the
 **memory_space_config** method whether an **address_map** has been
 associated with a given space.  That allows to implement optional
-memory spaces, such as AS_DECRYPTED_OPCODES in certain cpu cores.  The
-parameterless version tests for AS_PROGRAM/AS_0.
+memory spaces, such as AS_OPCODES in certain cpu cores.  The
+parameterless version tests for space 0.
 
 3. Associating maps to spaces
 -----------------------------
@@ -71,29 +88,28 @@ derivative.
 
 | address_space &\ **space**\ () const
 | address_space &\ **space**\ (int index) const
-| address_space &\ **space**\ (address_spacenum index) const
 
 Returns a given address space post-initialization.  The parameterless
 version tests for AS_PROGRAM/AS_0.  Aborts if the space doesn't exist.
 
 | bool **has_space**\ () const
 | bool **has_space**\ (int index) const
-| bool **has_space**\ (address_spacenum index) const
 
 Indicates whether a given space actually exists. The parameterless
 version tests for AS_PROGRAM/AS_0.
 
 
-5. Weird/to deprecate stuff
----------------------------
+5. MMU support for disassembler
+-------------------------------
 
-| bool **translate**\ (address_spacenum spacenum, int intention, offs_t &address)
-| bool **read**\ (address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
-| bool **write**\ (address_spacenum spacenum, offs_t offset, int size, UINT64 value)
-| bool **readop**\ (offs_t offset, int size, UINT64 &value)
+| bool **translate**\ (int spacenum, int intention, offs_t &address)
 
-These methods override how the debugger accesses memory for a cpu.
-Avoid them if you can. Otherwise, prepare for heavy-duty spelunking in
-complicated code.
+Does a logical to physical address translation through the device's
+MMU.  spacenum gives the space number, intention the type of the
+future access (TRANSLATE_(READ|WRITE|FETCH)(|_USER|_DEBUG)) and
+address is an inout parameter with the address to translate and its
+translated version.  Should return true if the translation went
+correctly, false if the address is unmapped.
 
-If really required, should probably be part of cpu_device directly.
+Note that for some historical reason the device itself must override
+the virtual method **memory_translate** with the same signature.

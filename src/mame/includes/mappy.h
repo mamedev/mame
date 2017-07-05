@@ -69,7 +69,6 @@ public:
 	bitmap_ind16 m_sprite_bitmap;
 
 	uint8_t m_scroll;
-	int m_mux;
 
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
@@ -84,11 +83,6 @@ public:
 	DECLARE_WRITE8_MEMBER(superpac_flipscreen_w);
 	DECLARE_READ8_MEMBER(superpac_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(mappy_scroll_w);
-	DECLARE_READ8_MEMBER(dipA_l);
-	DECLARE_READ8_MEMBER(dipA_h);
-	DECLARE_READ8_MEMBER(dipB_mux);
-	DECLARE_READ8_MEMBER(dipB_muxi);
-	DECLARE_WRITE8_MEMBER(out_mux);
 	DECLARE_WRITE8_MEMBER(out_lamps);
 	TILEMAP_MAPPER_MEMBER(superpac_tilemap_scan);
 	TILEMAP_MAPPER_MEMBER(mappy_tilemap_scan);

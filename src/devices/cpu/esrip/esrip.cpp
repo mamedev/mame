@@ -338,13 +338,11 @@ void esrip_device::device_stop()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *esrip_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> esrip_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	return nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+	};
 }
 
 

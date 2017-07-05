@@ -1276,7 +1276,7 @@ ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bfcobra_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, bfcobra_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 

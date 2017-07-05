@@ -399,7 +399,7 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( hd63484_map, AS_0, 16, shanghai_state )
+static ADDRESS_MAP_START( hd63484_map, 0, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -569,8 +569,10 @@ void es5510_device::device_reset() {
 	memset(&ram_pp, 0, sizeof(ram_t));
 }
 
-const address_space_config *es5510_device::memory_space_config(address_spacenum spacenum) const {
-	return nullptr;
+std::vector<std::pair<int, const address_space_config *>> es5510_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+	};
 }
 
 uint64_t es5510_device::execute_clocks_to_cycles(uint64_t clocks) const {
