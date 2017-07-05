@@ -702,8 +702,8 @@ static MACHINE_CONFIG_DERIVED( nupogodi, mc25 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(1724, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1724-1, 0, 1080-1)
+	MCFG_SCREEN_SIZE(1715, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1715-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( exospace, nupogodi )
@@ -773,13 +773,13 @@ static MACHINE_CONFIG_START( dm53 )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1238/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1238/2-1)
+	MCFG_SCREEN_SIZE(1920/2, 1281/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1281/2-1)
 
 	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1219/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1219/2-1)
+	MCFG_SCREEN_SIZE(1920/2, 1236/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1236/2-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
@@ -1300,8 +1300,8 @@ ROM_START( nupogodi )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 123824, "svg", 0)
-	ROM_LOAD( "nupogodi.svg", 0, 123824, CRC(fb227607) SHA1(7b41c83a4b1494d76db18ff649541629de9bdc18) )
+	ROM_REGION( 193418, "svg", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 193418, CRC(f60c3ff2) SHA1(8f2d28796de5b85c9689d25041d31f8fbcadc1f9) )
 ROM_END
 
 ROM_START( exospace )
@@ -1317,11 +1317,11 @@ ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm-53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
-	ROM_REGION( 124103, "svg_top", 0)
-	ROM_LOAD( "gnw_dm53_top.svg", 0, 124103, CRC(53741c86) SHA1(01aa0e97b2ad1bed66a71aeef4426e3f1a42da84) )
+	ROM_REGION( 207439, "svg_top", 0)
+	ROM_LOAD( "gnw_dm53_top.svg", 0, 207439, CRC(cceb4019) SHA1(ccf805dacf7dc8bfe0b46faf41e0db7af82c6b5f) )
 
-	ROM_REGION( 108339, "svg_bottom", 0)
-	ROM_LOAD( "gnw_dm53_bottom.svg", 0, 108339, CRC(b88bf17d) SHA1(105c978722c00c14301661e5ef5051fdfc33e878) )
+	ROM_REGION( 225644, "svg_bottom", 0)
+	ROM_LOAD( "gnw_dm53_bottom.svg", 0, 225644, CRC(2299faa8) SHA1(9b04e90ded918c6eed77f46d117078b846a71aac) )
 ROM_END
 
 
