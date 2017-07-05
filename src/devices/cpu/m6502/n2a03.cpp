@@ -51,9 +51,9 @@ ADDRESS_MAP_END
 
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, N2A03, tag, owner, clock),
-	m_apu(*this, "nesapu"),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(n2a03_map))
+	m_apu(*this, "nesapu")
 {
+	program_config.m_internal_map = ADDRESS_MAP_NAME(n2a03_map);
 }
 
 offs_t n2a03_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
@@ -66,72 +66,13 @@ void n2a03_device::device_start()
 	if(!m_apu->started())
 		throw device_missing_dependencies();
 
-	if(direct_disabled)
-		mintf = new mi_2a03_nd;
-	else
-		mintf = new mi_2a03_normal;
-
-	init();
-}
-
-uint8_t n2a03_device::mi_2a03_normal::read(uint16_t adr)
-{
-	return program->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_normal::read_sync(uint16_t adr)
-{
-	return sdirect->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_normal::read_arg(uint16_t adr)
-{
-	return direct->read_byte(adr);
-}
-
-void n2a03_device::mi_2a03_normal::write(uint16_t adr, uint8_t val)
-{
-	program->write_byte(adr, val);
-}
-
-uint8_t n2a03_device::mi_2a03_nd::read(uint16_t adr)
-{
-	return program->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_nd::read_sync(uint16_t adr)
-{
-	return sprogram->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_nd::read_arg(uint16_t adr)
-{
-	return program->read_byte(adr);
-}
-
-void n2a03_device::mi_2a03_nd::write(uint16_t adr, uint8_t val)
-{
-	program->write_byte(adr, val);
+	m6502_device::device_start();
 }
 
 void n2a03_device::device_clock_changed()
 {
 	m_apu->set_unscaled_clock(clock());
 }
-
-std::vector<std::pair<int, const address_space_config *>> n2a03_device::memory_space_config() const
-{
-	if(has_configured_map(AS_OPCODES))
-		return std::vector<std::pair<int, const address_space_config *>> {
-			std::make_pair(AS_PROGRAM, &program_config),
-			std::make_pair(AS_OPCODES, &sprogram_config)
-		};
-	else
-		return std::vector<std::pair<int, const address_space_config *>> {
-			std::make_pair(AS_PROGRAM, &program_config)
-		};
-}
-
 
 WRITE_LINE_MEMBER(n2a03_device::apu_irq)
 {
