@@ -1191,28 +1191,30 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 
 void running_machine::export_http_api()
 {
-	m_manager.http()->add_http_handler("/api/machine", [this](http_manager::http_request_ptr request, http_manager::http_response_ptr response)
-	{
-		rapidjson::StringBuffer s;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(s);
-		writer.StartObject();
-		writer.Key("name");
-		writer.String(m_basename.c_str());
+	if (m_manager.http()->is_active()) {
+		m_manager.http()->add_http_handler("/api/machine", [this](http_manager::http_request_ptr request, http_manager::http_response_ptr response)
+		{
+			rapidjson::StringBuffer s;
+			rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+			writer.StartObject();
+			writer.Key("name");
+			writer.String(m_basename.c_str());
 
-		writer.Key("devices");
-		writer.StartArray();
+			writer.Key("devices");
+			writer.StartArray();
 
-		device_iterator iter(this->root_device());
-		for (device_t &device : iter)
-			writer.String(device.tag());
+			device_iterator iter(this->root_device());
+			for (device_t &device : iter)
+				writer.String(device.tag());
 
-		writer.EndArray();
-		writer.EndObject();
+			writer.EndArray();
+			writer.EndObject();
 		
-		response->set_status(200);
-		response->set_content_type("application/json");
-		response->set_body(s.GetString());
-	});
+			response->set_status(200);
+			response->set_content_type("application/json");
+			response->set_body(s.GetString());
+		});
+	}
 }
 
 //**************************************************************************

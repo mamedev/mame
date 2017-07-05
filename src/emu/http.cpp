@@ -257,7 +257,7 @@ struct websocket_connection_impl : public http_manager::websocket_connection {
 };
 
 http_manager::http_manager(bool active, short port, const char *root)
-  : m_io_context(std::make_shared<asio::io_context>()), m_root(root)
+  : m_active(active), m_io_context(std::make_shared<asio::io_context>()), m_root(root)
 {
 	if (!active) return;
 
@@ -420,6 +420,8 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 }
 
 void http_manager::serve_document(http_request_ptr request, http_response_ptr response, const std::string &filename) {
+	if (!m_active) return;
+
 	std::ostringstream os;
 	if (read_file(os, filename))
 	{
@@ -435,6 +437,8 @@ void http_manager::serve_document(http_request_ptr request, http_response_ptr re
 void http_manager::serve_template(http_request_ptr request, http_response_ptr response, 
 								  const std::string &filename, substitution substitute, char init, char term)
 {
+	if (!m_active) return;
+
 	// printf("webserver: serving template '%s' at path '%s'\n", filename.c_str(), request->get_path().c_str());
 	std::stringstream ss;
 	if (read_file(ss, filename))
@@ -484,6 +488,8 @@ void http_manager::serve_template(http_request_ptr request, http_response_ptr re
 
 void http_manager::add_http_handler(const std::string &path, http_manager::http_handler handler)
 {
+	if (!m_active) return;
+
 	using namespace std::placeholders;
 	m_server->on_get(path, std::bind(on_get, handler, _1, _2));
 
@@ -492,6 +498,8 @@ void http_manager::add_http_handler(const std::string &path, http_manager::http_
 }
 
 void http_manager::remove_http_handler(const std::string &path) { 
+	if (!m_active) return;
+
 	m_server->remove_handler(path);
 
 	std::lock_guard<std::mutex> lock(m_handlers_mutex);
@@ -499,6 +507,8 @@ void http_manager::remove_http_handler(const std::string &path) {
 }
 
 void http_manager::clear() {
+	if (!m_active) return;
+
 	m_server->clear();
 
 	std::lock_guard<std::mutex> lock(m_handlers_mutex);
@@ -510,6 +520,8 @@ http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::strin
 		http_manager::websocket_message_handler on_message,
 		http_manager::websocket_close_handler on_close,
 		http_manager::websocket_error_handler on_error)  {
+	if (!m_active) return std::shared_ptr<websocket_endpoint_impl>(nullptr);
+
 	auto i = m_endpoints.find(path);
 	if (i == m_endpoints.end()) {
 		using namespace std::placeholders;
@@ -544,5 +556,7 @@ http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::strin
 }
 
 void http_manager::remove_endpoint(const std::string &path) {
+	if (!m_active) return;
+
 	m_endpoints.erase(path);
 }

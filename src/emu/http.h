@@ -156,7 +156,12 @@ public:
 	
 	/** Removes the websocket endpoint at the specified path. */
 	void remove_endpoint(const std::string &path);
+		
+	bool is_active() {
+		return m_active;
+	}
 	
+private:
 	void on_open(http_manager::websocket_endpoint_ptr endpoint, void *onnection);
 
 	void on_message(http_manager::websocket_endpoint_ptr endpoint, void *connection, const std::string& payload, int opcode);
@@ -167,7 +172,8 @@ public:
 	
 	bool read_file(std::ostream &os, const std::string &path);
 	
-private:
+	bool m_active;
+	
 	std::shared_ptr<asio::io_context>   m_io_context;
 	std::unique_ptr<webpp::http_server> m_server;
 	std::unique_ptr<webpp::ws_server>   m_wsserver;

@@ -125,16 +125,21 @@ public:
 		m_version("1")
 	{
 		using namespace std::placeholders;
-		m_server->add_endpoint("/esqpanel/socket", 
-				std::bind(&esqpanel_external_panel_server::on_open, this, _1),
-				std::bind(&esqpanel_external_panel_server::on_message, this, _1, _2, _3),
-				std::bind(&esqpanel_external_panel_server::on_close, this, _1, _2, _3),
-				std::bind(&esqpanel_external_panel_server::on_error, this, _1, _2)
-				);
+		if (m_server->is_active()) {
+			m_server->add_endpoint("/esqpanel/socket", 
+					std::bind(&esqpanel_external_panel_server::on_open, this, _1),
+					std::bind(&esqpanel_external_panel_server::on_message, this, _1, _2, _3),
+					std::bind(&esqpanel_external_panel_server::on_close, this, _1, _2, _3),
+					std::bind(&esqpanel_external_panel_server::on_error, this, _1, _2)
+					);
+		}
 	}
 
 	virtual ~esqpanel_external_panel_server()
 	{
+		if (m_server->is_active()) {
+			m_server->remove_endpoint("/esqpanel/socket");
+		}
 	}
 
 	void send_to_all(char c)
@@ -417,19 +422,21 @@ void esqpanel_device::device_start()
 {
 	m_write_tx.resolve_safe();
 	m_write_analog.resolve_safe();
-
+	
 	m_external_panel_server = new esqpanel_external_panel_server(machine().manager().http());
-	m_external_panel_server->set_keyboard(owner()->shortname());
-	m_external_panel_server->set_index("/esqpanel/FrontPanel.html");
-	m_external_panel_server->add_http_template("/esqpanel/FrontPanel.html", get_front_panel_html_file());
-	m_external_panel_server->add_http_document("/esqpanel/FrontPanel.js", get_front_panel_js_file());
-	m_external_panel_server->set_content_provider([this](std::ostream& o)
-	{
-		return write_contents(o);
-	});
+	if (machine().manager().http()->is_active()) {
+		m_external_panel_server->set_keyboard(owner()->shortname());
+		m_external_panel_server->set_index("/esqpanel/FrontPanel.html");
+		m_external_panel_server->add_http_template("/esqpanel/FrontPanel.html", get_front_panel_html_file());
+		m_external_panel_server->add_http_document("/esqpanel/FrontPanel.js", get_front_panel_js_file());
+		m_external_panel_server->set_content_provider([this](std::ostream& o)
+		{
+			return write_contents(o);
+		});
 
-	m_external_timer = timer_alloc(ESQPANEL_EXTERNAL_TIMER_ID);
-	m_external_timer->enable(false);
+		m_external_timer = timer_alloc(ESQPANEL_EXTERNAL_TIMER_ID);
+		m_external_timer->enable(false);
+	}
 }
 
 
@@ -452,8 +459,10 @@ void esqpanel_device::device_reset()
 	attotime sample_time(0, ATTOSECONDS_PER_MILLISECOND);
 	attotime initial_delay(0, ATTOSECONDS_PER_MILLISECOND);
 
-	m_external_timer->adjust(initial_delay, 0, sample_time);
-	m_external_timer->enable(true);
+	if (m_external_timer) {
+		m_external_timer->adjust(initial_delay, 0, sample_time);
+		m_external_timer->enable(true);
+	}
 }
 
 //-------------------------------------------------
