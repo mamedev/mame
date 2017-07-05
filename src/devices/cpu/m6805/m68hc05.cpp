@@ -542,14 +542,14 @@ u64 m68hc05_device::execute_cycles_to_clocks(u64 cycles) const
 }
 
 
-offs_t m68hc05_device::disasm_disassemble(
+offs_t m68hc05_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		u32 options)
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, opcodes, params, options);
 }
 
 
@@ -777,14 +777,14 @@ void m68hc05c4_device::device_start()
 }
 
 
-offs_t m68hc05c4_device::disasm_disassemble(
+offs_t m68hc05c4_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		u32 options)
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
+	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, opcodes, params, options, m68hc05c4_syms);
 }
 
 
@@ -845,15 +845,15 @@ void m68hc05c8_device::device_start()
 }
 
 
-offs_t m68hc05c8_device::disasm_disassemble(
+offs_t m68hc05c8_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		u32 options)
 {
 	// same I/O registers as MC68HC05C4
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
+	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, opcodes, params, options, m68hc05c4_syms);
 }
 
 
@@ -937,12 +937,12 @@ void m68hc705c8a_device::device_reset()
 }
 
 
-offs_t m68hc705c8a_device::disasm_disassemble(
+offs_t m68hc705c8a_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		u32 options)
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc705c8a_syms);
+	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, opcodes, params, options, m68hc705c8a_syms);
 }

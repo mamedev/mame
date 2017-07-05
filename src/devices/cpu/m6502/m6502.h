@@ -145,9 +145,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual uint32_t opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options) override;
 
 	address_space_config program_config, sprogram_config;
 
@@ -172,7 +171,7 @@ protected:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	offs_t disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
+	offs_t disassemble_generic(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options, const disasm_entry *table);
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
 	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }

@@ -175,17 +175,16 @@ std::string mcs96_device::regname(uint8_t reg)
 	return res;
 }
 
-offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries)
+offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options, const disasm_entry *entries)
 {
 	bool prefix_fe = false;
 	int off = 0;
-	if(oprom[0] == 0xfe && entries[oprom[1]].opcode_fe) {
+	if(opcodes.r8(pc) == 0xfe && entries[opcodes.r8(pc+1)].opcode_fe) {
 		prefix_fe = true;
 		pc++;
 		off++;
-		oprom++;
 	}
-	const disasm_entry &e = entries[oprom[0]];
+	const disasm_entry &e = entries[opcodes.r8(pc)];
 	uint32_t flags = e.flags | DASMFLAG_SUPPORTED;
 	util::stream_format(stream, "%s", prefix_fe ? e.opcode_fe : e.opcode);
 
@@ -195,12 +194,12 @@ offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const uint8
 		break;
 
 	case DASM_nop_2:
-		util::stream_format(stream, " %02x", oprom[1]);
+		util::stream_format(stream, " %02x", opcodes.r8(pc+1));
 		flags |= 2;
 		break;
 
 	case DASM_rel8: {
-		int delta = oprom[1];
+		int delta = opcodes.r8(pc+1);
 		if(delta & 0x80)
 			delta -= 0x100;
 		util::stream_format(stream, " %04x", (pc+2+delta) & 0xffff);
@@ -209,7 +208,7 @@ offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const uint8
 	}
 
 	case DASM_rel11: {
-		int delta = ((oprom[0] << 8) | oprom[1]) & 0x7ff;
+		int delta = ((opcodes.r8(pc) << 8) | opcodes.r8(pc+1)) & 0x7ff;
 		if(delta & 0x400)
 			delta -= 0x800;
 		util::stream_format(stream, " %04x", (pc+2+delta) & 0xffff);
@@ -218,191 +217,191 @@ offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const uint8
 	}
 
 	case DASM_rel16: {
-		int delta = oprom[1] | (oprom[2] << 8);
+		int delta = opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8);
 		util::stream_format(stream, " %04x", (pc+3+delta) & 0xffff);
 		flags |= 3;
 		break;
 	}
 
 	case DASM_rrel8: {
-		int delta = oprom[2];
+		int delta = opcodes.r8(pc+2);
 		if(delta & 0x80)
 			delta -= 0x100;
-		util::stream_format(stream, " %s, %04x", regname(oprom[1]), (pc+3+delta) & 0xffff);
+		util::stream_format(stream, " %s, %04x", regname(opcodes.r8(pc+1)), (pc+3+delta) & 0xffff);
 		flags |= 3;
 		break;
 	}
 
 	case DASM_brrel8: {
-		int delta = oprom[2];
+		int delta = opcodes.r8(pc+2);
 		if(delta & 0x80)
 			delta -= 0x100;
-		util::stream_format(stream, " %d, %s, %04x", oprom[0] & 7, regname(oprom[1]), (pc+3+delta) & 0xffff);
+		util::stream_format(stream, " %d, %s, %04x", opcodes.r8(pc) & 7, regname(opcodes.r8(pc+1)), (pc+3+delta) & 0xffff);
 		flags |= 3;
 		break;
 	}
 
 	case DASM_direct_1:
-		util::stream_format(stream, " %s", regname(oprom[1]));
+		util::stream_format(stream, " %s", regname(opcodes.r8(pc+1)));
 		flags |= 2;
 		break;
 
 	case DASM_direct_2:
-		util::stream_format(stream, " %s, %s", regname(oprom[2]), regname(oprom[1]));
+		util::stream_format(stream, " %s, %s", regname(opcodes.r8(pc+2)), regname(opcodes.r8(pc+1)));
 		flags |= 3;
 		break;
 
 	case DASM_direct_3:
-		util::stream_format(stream, " %s, %s, %s", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]));
+		util::stream_format(stream, " %s, %s, %s", regname(opcodes.r8(pc+3)), regname(opcodes.r8(pc+2)), regname(opcodes.r8(pc+1)));
 		flags |= 4;
 		break;
 
 	case DASM_immed_1b:
-		util::stream_format(stream, " #%02x", oprom[1]);
+		util::stream_format(stream, " #%02x", opcodes.r8(pc+1));
 		flags |= 2;
 		break;
 
 	case DASM_immed_2b:
-		util::stream_format(stream, " %s, #%02x", regname(oprom[2]), oprom[1]);
+		util::stream_format(stream, " %s, #%02x", regname(opcodes.r8(pc+2)), opcodes.r8(pc+1));
 		flags |= 3;
 		break;
 
 	case DASM_immed_or_reg_2b:
-		if(oprom[1] >= 0x10)
-			util::stream_format(stream, " %s, %s", regname(oprom[2]), regname(oprom[1]));
+		if(opcodes.r8(pc+1) >= 0x10)
+			util::stream_format(stream, " %s, %s", regname(opcodes.r8(pc+2)), regname(opcodes.r8(pc+1)));
 		else
-			util::stream_format(stream, " %s, #%02x", regname(oprom[2]), oprom[1]);
+			util::stream_format(stream, " %s, #%02x", regname(opcodes.r8(pc+2)), opcodes.r8(pc+1));
 		flags |= 3;
 		break;
 
 	case DASM_immed_3b:
-		util::stream_format(stream, " %s, %s, #%02x", regname(oprom[3]), regname(oprom[2]), oprom[1]);
+		util::stream_format(stream, " %s, %s, #%02x", regname(opcodes.r8(pc+3)), regname(opcodes.r8(pc+2)), opcodes.r8(pc+1));
 		flags |= 4;
 		break;
 
 	case DASM_immed_1w:
-		util::stream_format(stream, " #%02x%02x", oprom[2], oprom[1]);
+		util::stream_format(stream, " #%02x%02x", opcodes.r8(pc+2), opcodes.r8(pc+1));
 		flags |= 3;
 		break;
 
 	case DASM_immed_2w:
-		util::stream_format(stream, " %s, #%02x%02x", regname(oprom[3]), oprom[2], oprom[1]);
+		util::stream_format(stream, " %s, #%02x%02x", regname(opcodes.r8(pc+3)), opcodes.r8(pc+2), opcodes.r8(pc+1));
 		flags |= 4;
 		break;
 
 	case DASM_immed_3w:
-		util::stream_format(stream, " %s, %s, #%02x%02x", regname(oprom[4]), regname(oprom[3]), oprom[2], oprom[1]);
+		util::stream_format(stream, " %s, %s, #%02x%02x", regname(opcodes.r8(pc+4)), regname(opcodes.r8(pc+3)), opcodes.r8(pc+2), opcodes.r8(pc+1));
 		flags |= 5;
 		break;
 
 	case DASM_indirect_1n:
-		util::stream_format(stream, " [%s]", regname(oprom[1]));
+		util::stream_format(stream, " [%s]", regname(opcodes.r8(pc+1)));
 		flags |= 2;
 		break;
 
 	case DASM_indirect_1:
-		if(oprom[1] & 0x01) {
-			util::stream_format(stream, " [%s]+", regname(oprom[1]-1));
+		if(opcodes.r8(pc+1) & 0x01) {
+			util::stream_format(stream, " [%s]+", regname(opcodes.r8(pc+1)-1));
 			flags |= 2;
 		} else {
-			util::stream_format(stream, " [%s]", regname(oprom[1]));
+			util::stream_format(stream, " [%s]", regname(opcodes.r8(pc+1)));
 			flags |= 2;
 		}
 		break;
 
 	case DASM_indirect_2:
-		if(oprom[1] & 0x01) {
-			util::stream_format(stream, " %s, [%s]+", regname(oprom[2]), regname(oprom[1]-1));
+		if(opcodes.r8(pc+1) & 0x01) {
+			util::stream_format(stream, " %s, [%s]+", regname(opcodes.r8(pc+2)), regname(opcodes.r8(pc+1)-1));
 			flags |= 3;
 		} else {
-			util::stream_format(stream, " %s, [%s]", regname(oprom[2]), regname(oprom[1]));
+			util::stream_format(stream, " %s, [%s]", regname(opcodes.r8(pc+2)), regname(opcodes.r8(pc+1)));
 			flags |= 3;
 		}
 		break;
 
 	case DASM_indirect_3:
-		if(oprom[1] & 0x01) {
-			util::stream_format(stream, " %s, %s, [%s]+", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]-1));
+		if(opcodes.r8(pc+1) & 0x01) {
+			util::stream_format(stream, " %s, %s, [%s]+", regname(opcodes.r8(pc+3)), regname(opcodes.r8(pc+2)), regname(opcodes.r8(pc+1)-1));
 			flags |= 4;
 		} else {
-			util::stream_format(stream, " %s, %s, [%s]", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]));
+			util::stream_format(stream, " %s, %s, [%s]", regname(opcodes.r8(pc+3)), regname(opcodes.r8(pc+2)), regname(opcodes.r8(pc+1)));
 			flags |= 4;
 		}
 		break;
 
 	case DASM_indexed_1:
-		if(oprom[1] & 0x01) {
-			if(oprom[1] == 0x01)
-				util::stream_format(stream, " %02x%02x", oprom[3], oprom[2]);
+		if(opcodes.r8(pc+1) & 0x01) {
+			if(opcodes.r8(pc+1) == 0x01)
+				util::stream_format(stream, " %02x%02x", opcodes.r8(pc+3), opcodes.r8(pc+2));
 			else
-				util::stream_format(stream, " %02x%02x[%s]", oprom[3], oprom[2], regname(oprom[1]-1));
+				util::stream_format(stream, " %02x%02x[%s]", opcodes.r8(pc+3), opcodes.r8(pc+2), regname(opcodes.r8(pc+1)-1));
 			flags |= 4;
 		} else {
-			int delta = oprom[2];
+			int delta = opcodes.r8(pc+2);
 			if(delta & 0x80)
 				delta -= 0x100;
-			if(oprom[1] == 0x00) {
+			if(opcodes.r8(pc+1) == 0x00) {
 				if(delta < 0)
 					util::stream_format(stream, " %04x", delta & 0xffff);
 				else
 					util::stream_format(stream, " %02x", delta);
 			} else {
 				if(delta < 0)
-					util::stream_format(stream, " -%02x[%s]", -delta, regname(oprom[1]));
+					util::stream_format(stream, " -%02x[%s]", -delta, regname(opcodes.r8(pc+1)));
 				else
-					util::stream_format(stream, " %02x[%s]", delta, regname(oprom[1]));
+					util::stream_format(stream, " %02x[%s]", delta, regname(opcodes.r8(pc+1)));
 			}
 			flags |= 3;
 		}
 		break;
 
 	case DASM_indexed_2:
-		if(oprom[1] & 0x01) {
-			if(oprom[1] == 0x01)
-				util::stream_format(stream, " %s, %02x%02x", regname(oprom[4]), oprom[3], oprom[2]);
+		if(opcodes.r8(pc+1) & 0x01) {
+			if(opcodes.r8(pc+1) == 0x01)
+				util::stream_format(stream, " %s, %02x%02x", regname(opcodes.r8(pc+4)), opcodes.r8(pc+3), opcodes.r8(pc+2));
 			else
-				util::stream_format(stream, " %s, %02x%02x[%s]", regname(oprom[4]), oprom[3], oprom[2], regname(oprom[1]-1));
+				util::stream_format(stream, " %s, %02x%02x[%s]", regname(opcodes.r8(pc+4)), opcodes.r8(pc+3), opcodes.r8(pc+2), regname(opcodes.r8(pc+1)-1));
 			flags |= 5;
 		} else {
-			int delta = oprom[2];
+			int delta = opcodes.r8(pc+2);
 			if(delta & 0x80)
 				delta -= 0x100;
-			if(oprom[1] == 0x00) {
+			if(opcodes.r8(pc+1) == 0x00) {
 				if(delta < 0)
-					util::stream_format(stream, " %s, %04x", regname(oprom[3]), delta & 0xffff);
+					util::stream_format(stream, " %s, %04x", regname(opcodes.r8(pc+3)), delta & 0xffff);
 				else
-					util::stream_format(stream, " %s, %02x", regname(oprom[3]), delta);
+					util::stream_format(stream, " %s, %02x", regname(opcodes.r8(pc+3)), delta);
 			} else {
 				if(delta < 0)
-					util::stream_format(stream, " %s, -%02x[%s]", regname(oprom[3]), -delta, regname(oprom[1]));
+					util::stream_format(stream, " %s, -%02x[%s]", regname(opcodes.r8(pc+3)), -delta, regname(opcodes.r8(pc+1)));
 				else
-					util::stream_format(stream, " %s, %02x[%s]", regname(oprom[3]), delta, regname(oprom[1]));
+					util::stream_format(stream, " %s, %02x[%s]", regname(opcodes.r8(pc+3)), delta, regname(opcodes.r8(pc+1)));
 			}
 			flags |= 4;
 		}
 		break;
 
 	case DASM_indexed_3:
-		if(oprom[1] & 0x01) {
-			if(oprom[1] == 0x01)
-				util::stream_format(stream, " %s, %s, %02x%02x", regname(oprom[5]),  regname(oprom[4]), oprom[3], oprom[2]);
+		if(opcodes.r8(pc+1) & 0x01) {
+			if(opcodes.r8(pc+1) == 0x01)
+				util::stream_format(stream, " %s, %s, %02x%02x", regname(opcodes.r8(pc+5)),  regname(opcodes.r8(pc+4)), opcodes.r8(pc+3), opcodes.r8(pc+2));
 			else
-				util::stream_format(stream, " %s, %s, %02x%02x[%s]", regname(oprom[5]), regname(oprom[4]), oprom[3], oprom[2], regname(oprom[1]-1));
+				util::stream_format(stream, " %s, %s, %02x%02x[%s]", regname(opcodes.r8(pc+5)), regname(opcodes.r8(pc+4)), opcodes.r8(pc+3), opcodes.r8(pc+2), regname(opcodes.r8(pc+1)-1));
 			flags |= 6;
 		} else {
-			int delta = oprom[2];
+			int delta = opcodes.r8(pc+2);
 			if(delta & 0x80)
 				delta -= 0x100;
-			if(oprom[1] == 0x00) {
+			if(opcodes.r8(pc+1) == 0x00) {
 				if(delta < 0)
-					util::stream_format(stream, " %s, %s, %04x", regname(oprom[4]), regname(oprom[3]), delta & 0xffff);
+					util::stream_format(stream, " %s, %s, %04x", regname(opcodes.r8(pc+4)), regname(opcodes.r8(pc+3)), delta & 0xffff);
 				else
-					util::stream_format(stream, " %s, %s, %02x", regname(oprom[4]), regname(oprom[3]), delta);
+					util::stream_format(stream, " %s, %s, %02x", regname(opcodes.r8(pc+4)), regname(opcodes.r8(pc+3)), delta);
 			} else {
 				if(delta < 0)
-					util::stream_format(stream, " %s, %s, -%02x[%s]", regname(oprom[4]), regname(oprom[3]), -delta, regname(oprom[1]));
+					util::stream_format(stream, " %s, %s, -%02x[%s]", regname(opcodes.r8(pc+4)), regname(opcodes.r8(pc+3)), -delta, regname(opcodes.r8(pc+1)));
 				else
-					util::stream_format(stream, " %s, %s, %02x[%s]", regname(oprom[4]), regname(oprom[3]), delta, regname(oprom[1]));
+					util::stream_format(stream, " %s, %s, %02x[%s]", regname(opcodes.r8(pc+4)), regname(opcodes.r8(pc+3)), delta, regname(opcodes.r8(pc+1)));
 			}
 			flags |= 5;
 		}
@@ -416,14 +415,9 @@ offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const uint8
 	return flags+off;
 }
 
-uint32_t mcs96_device::disasm_min_opcode_bytes() const
+uint32_t mcs96_device::opcode_alignment() const
 {
 	return 1;
-}
-
-uint32_t mcs96_device::disasm_max_opcode_bytes() const
-{
-	return 7;
 }
 
 void mcs96_device::io_w8(uint8_t adr, uint8_t data)

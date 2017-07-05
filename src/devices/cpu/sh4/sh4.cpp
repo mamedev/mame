@@ -54,7 +54,6 @@ void sh34_base_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, v
 
 
 CPU_DISASSEMBLE( sh4 );
-CPU_DISASSEMBLE( sh4be );
 
 
 DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "SH-3 (little)")
@@ -166,29 +165,12 @@ sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-offs_t sh34_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh34_base_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4 );
 
-	return CPU_DISASSEMBLE_NAME(sh4)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4)(this, stream, pc, opcodes, params, options);
 }
-
-
-offs_t sh3be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( sh4be );
-
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
-}
-
-
-offs_t sh4be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( sh4be );
-
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
-}
-
 
 /* Called for unimplemented opcodes */
 void sh34_base_device::TODO(const uint16_t opcode)

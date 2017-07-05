@@ -9,9 +9,9 @@ h8s2000_device::h8s2000_device(const machine_config &mconfig, device_type type, 
 	has_exr = true;
 }
 
-offs_t h8s2000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t h8s2000_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, opcodes, params, options, disasm_entries);
 }
 
 #include "cpu/h8/h8s2000.hxx"

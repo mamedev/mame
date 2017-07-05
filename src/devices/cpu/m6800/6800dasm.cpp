@@ -160,17 +160,11 @@ static const uint8_t table[0x104][3] = {
 	{stx,imx,0}
 };
 
-/* some macros to keep things short */
-#define OP      oprom[0]
-#define ARG1    opram[1]
-#define ARG2    opram[2]
-#define ARGW    (opram[1]<<8) + opram[2]
-
-static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const uint8_t *oprom, const uint8_t *opram)
+static unsigned Dasm680x (int subtype, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params)
 {
 	uint32_t flags = 0;
 	int invalid_mask;
-	int code = OP;
+	int code = opcodes.r8(pc);
 	uint8_t opcode, args, invalid;
 
 	switch( subtype )
@@ -218,28 +212,28 @@ static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const 
 	switch( args )
 	{
 		case rel:  /* relative */
-			util::stream_format(stream, "$%04X", pc + (int8_t)ARG1 + 2);
+			util::stream_format(stream, "$%04X", pc + (int8_t)params.r8(pc+1) + 2);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imb:  /* immediate (byte) */
-			util::stream_format(stream, "#$%02X", ARG1);
+			util::stream_format(stream, "#$%02X", params.r8(pc+1));
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imw:  /* immediate (word) */
-			util::stream_format(stream, "#$%04X", ARGW);
+			util::stream_format(stream, "#$%04X", params.r16(pc+1));
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case idx:  /* indexed + byte offset */
-			util::stream_format(stream, "(x+$%02X)", ARG1);
+			util::stream_format(stream, "(x+$%02X)", params.r8(pc+1));
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imx:  /* immediate, indexed + byte offset */
-			util::stream_format(stream, "#$%02X,(x+$%02x)", ARG1, ARG2);
+			util::stream_format(stream, "#$%02X,(x+$%02x)", params.r8(pc+1), params.r8(pc+2));
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case dir:  /* direct address */
-			util::stream_format(stream, "$%02X", ARG1);
+			util::stream_format(stream, "$%02X", params.r8(pc+1));
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imd:  /* immediate, direct address */
-			util::stream_format(stream, "#$%02X,$%02X", ARG1, ARG2);
+			util::stream_format(stream, "#$%02X,$%02X", params.r8(pc+1), params.r8(pc+2));
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case ext:  /* extended address */
-			util::stream_format(stream, "$%04X", ARGW);
+			util::stream_format(stream, "$%04X", params.r16(pc+1));
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case sx1:  /* byte from address (s + 1) */
 			util::stream_format(stream, "(s+1)");
@@ -251,40 +245,40 @@ static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const 
 
 CPU_DISASSEMBLE( m6800 )
 {
-	return Dasm680x(6800,stream,pc,oprom,opram);
+	return Dasm680x(6800,stream,pc,opcodes,params);
 }
 
 CPU_DISASSEMBLE( m6801 )
 {
-	return Dasm680x(6801,stream,pc,oprom,opram);
+	return Dasm680x(6801,stream,pc,opcodes,params);
 }
 
 CPU_DISASSEMBLE( m6802 )
 {
-	return Dasm680x(6802,stream,pc,oprom,opram);
+	return Dasm680x(6802,stream,pc,opcodes,params);
 }
 
 CPU_DISASSEMBLE( m6803 )
 {
-	return Dasm680x(6803,stream,pc,oprom,opram);
+	return Dasm680x(6803,stream,pc,opcodes,params);
 }
 
 CPU_DISASSEMBLE( m6808 )
 {
-	return Dasm680x(6808,stream,pc,oprom,opram);
+	return Dasm680x(6808,stream,pc,opcodes,params);
 }
 
 CPU_DISASSEMBLE( hd6301 )
 {
-	return Dasm680x(6301,stream,pc,oprom,opram);
+	return Dasm680x(6301,stream,pc,opcodes,params);
 }
 
 CPU_DISASSEMBLE( hd63701 )
 {
-	return Dasm680x(63701,stream,pc,oprom,opram);
+	return Dasm680x(63701,stream,pc,opcodes,params);
 }
 
 CPU_DISASSEMBLE( nsc8105 )
 {
-	return Dasm680x(8105,stream,pc,oprom,opram);
+	return Dasm680x(8105,stream,pc,opcodes,params);
 }

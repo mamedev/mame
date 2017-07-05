@@ -376,7 +376,7 @@ static offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t 
 
 CPU_DISASSEMBLE(hp_hybrid)
 {
-	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
+	uint16_t opcode = opcodes.r16(pc);
 	offs_t res;
 
 	res = disassemble_table(opcode, pc, dis_table, false, stream);
@@ -393,7 +393,7 @@ CPU_DISASSEMBLE(hp_hybrid)
 
 CPU_DISASSEMBLE(hp_5061_3001)
 {
-	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
+	uint16_t opcode = opcodes.r16(pc);
 	offs_t res;
 
 	res = disassemble_table(opcode, pc, dis_table_emc, true, stream);

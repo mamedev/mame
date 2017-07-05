@@ -201,11 +201,11 @@ CPU_DISASSEMBLE(lr35902)
 
 	//symbol = nullptr;
 
-	op = oprom[pos++];
+	op = opcodes.r8(pos++);
 	op1 = 0; /* keep GCC happy */
 
 	if( op == 0xcb ) {
-		op = oprom[pos++];
+		op = opcodes.r8(pos++);
 		d = &mnemonic_cb[op];
 	} else {
 		d = &mnemonic_main[op];
@@ -220,12 +220,12 @@ CPU_DISASSEMBLE(lr35902)
 				util::stream_format(stream, "$%02X,$%02X", op, op1);
 				break;
 			case 'A':
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'B':   /* Byte op arg */
-				ea = opram[pos++];
+				ea = params.r8(pos++);
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case '(':   /* Memory byte at (...) */
@@ -235,7 +235,7 @@ CPU_DISASSEMBLE(lr35902)
 				} else if( !strncmp( src, "(hl)", 4) ) {
 				} else if( !strncmp( src, "(sp)", 4) ) {
 				} else if( !strncmp( src, "(F)", 3) ) {
-					ea = 0xFF00 + opram[pos++];
+					ea = 0xFF00 + params.r8(pos++);
 					util::stream_format(stream, "$%02X", ea);
 					src++;
 				} else if( !strncmp( src, "(C)", 3) ) {
@@ -244,12 +244,12 @@ CPU_DISASSEMBLE(lr35902)
 				}
 				break;
 			case 'N':   /* Immediate 16 bit */
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (int8_t) opram[pos++];
+				offset = (int8_t) params.r8(pos++);
 				util::stream_format(stream, "$%04X", pc + offset + 2);
 				break;
 			case 'V':   /* Restart vector */
@@ -257,7 +257,7 @@ CPU_DISASSEMBLE(lr35902)
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'W':   /* Memory address word */
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;

@@ -3665,14 +3665,14 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 }
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t z80_device::disasm_disassemble( std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
+offs_t z80_device::disassemble( std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options )
 {
 	extern CPU_DISASSEMBLE( z80 );
-	return CPU_DISASSEMBLE_NAME(z80)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(z80)(this, stream, pc, opcodes, params, options);
 }
 
 

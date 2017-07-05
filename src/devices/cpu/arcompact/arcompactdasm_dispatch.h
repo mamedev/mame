@@ -6,15 +6,14 @@
 
 \*********************************/
 
-#define DASM_OPS_16 std::ostream &stream, offs_t pc, uint16_t op, const uint8_t* oprom
-#define DASM_OPS_32 std::ostream &stream, offs_t pc, uint32_t op, const uint8_t* oprom
-#define DASM_PARAMS stream, pc, op, oprom
+#define DASM_OPS_16 std::ostream &stream, offs_t pc, uint16_t op, const device_disasm_interface::data_buffer &opcodes
+#define DASM_OPS_32 std::ostream &stream, offs_t pc, uint32_t op, const device_disasm_interface::data_buffer &opcodes
+#define DASM_PARAMS stream, pc, op, opcodes
 
 #define LIMM_REG 62
 
 #define GET_LIMM_32 \
-	limm = oprom[6] | (oprom[7] << 8); \
-	limm |= (oprom[4] << 16) | (oprom[5] << 24);
+	limm = opcodes.r32(pc+2);
 
 
 int arcompact_handle00_dasm(DASM_OPS_32);

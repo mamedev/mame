@@ -106,10 +106,9 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual void disasm_disassemble_param(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, int type, uint16_t val);
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual uint32_t opcode_alignment() const override { return 1; }
+	virtual void disassemble_param(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options, int type, uint16_t val);
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options) override;
 
 
 	uint32_t m_debugger_temp;

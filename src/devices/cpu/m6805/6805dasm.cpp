@@ -145,14 +145,14 @@ offs_t disassemble(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		lvl level,
 		std::pair<u16, char const *> const symbols[],
 		std::size_t symbol_count)
 {
-	u8 const code = oprom[0];
+	u8 const code = opcodes.r8(pc);
 
 	if (!disasm[code].name || (disasm[code].level > level))
 	{
@@ -188,30 +188,30 @@ offs_t disassemble(
 		case md::BTR:   // bit test and relative branch
 			bit = (code >> 1) & 7;
 			util::stream_format(stream, "%d,", bit);
-			format_address(stream, opram[1], symbols, symbol_count);
-			util::stream_format(stream, ",$%03X", pc + 3 + s8(opram[2]));
+			format_address(stream, params.r8(pc+1), symbols, symbol_count);
+			util::stream_format(stream, ",$%03X", pc + 3 + s8(params.r8(pc+2)));
 			return 3 | flags | DASMFLAG_SUPPORTED;
 
 		case md::BIT:   // bit test
 			bit = (code >> 1) & 7;
 			util::stream_format(stream, "%d,", bit);
-			format_address(stream, opram[1], symbols, symbol_count);
+			format_address(stream, params.r8(pc+1), symbols, symbol_count);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 
 		case md::REL:   // relative
-			util::stream_format(stream, "$%03X", pc + 2 + s8(opram[1]));
+			util::stream_format(stream, "$%03X", pc + 2 + s8(params.r8(pc+1)));
 			return 2 | flags | DASMFLAG_SUPPORTED;
 
 		case md::IMM:   // immediate
-			util::stream_format(stream, "#$%02X", opram[1]);
+			util::stream_format(stream, "#$%02X", params.r8(pc+1));
 			return 2 | flags | DASMFLAG_SUPPORTED;
 
 		case md::DIR:   // direct (zero page address)
-			format_address(stream, opram[1], symbols, symbol_count);
+			format_address(stream, params.r8(pc+1), symbols, symbol_count);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 
 		case md::EXT:   // extended (16 bit address)
-			ea = (opram[1] << 8) + opram[2];
+			ea = params.r16(pc+1);
 			format_address(stream, ea, symbols, symbol_count);
 			return 3 | flags | DASMFLAG_SUPPORTED;
 
@@ -220,11 +220,11 @@ offs_t disassemble(
 			return 1 | flags | DASMFLAG_SUPPORTED;
 
 		case md::IX1:   // indexed + byte (zero page)
-			util::stream_format(stream, "(x+$%02X)", opram[1]);
+			util::stream_format(stream, "(x+$%02X)", params.r8(pc+1));
 			return 2 | flags | DASMFLAG_SUPPORTED;
 
 		case md::IX2:   // indexed + word (16 bit address)
-			ea = (opram[1] << 8) + opram[2];
+			ea = params.r8(pc+16);
 			util::stream_format(stream, "(x+$%04X)", ea);
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		}
@@ -241,41 +241,41 @@ offs_t CPU_DISASSEMBLE_NAME(m6805)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const symbols[],
 		std::size_t symbol_count)
 {
-	return disassemble(device, stream, pc, oprom, opram, options, lvl::HMOS, symbols, symbol_count);
+	return disassemble(device, stream, pc, opcodes, params, options, lvl::HMOS, symbols, symbol_count);
 }
 
 offs_t CPU_DISASSEMBLE_NAME(m146805)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const symbols[],
 		std::size_t symbol_count)
 {
-	return disassemble(device, stream, pc, oprom, opram, options, lvl::CMOS, symbols, symbol_count);
+	return disassemble(device, stream, pc, opcodes, params, options, lvl::CMOS, symbols, symbol_count);
 }
 
 offs_t CPU_DISASSEMBLE_NAME(m68hc05)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const symbols[],
 		std::size_t symbol_count)
 {
-	return disassemble(device, stream, pc, oprom, opram, options, lvl::HC, symbols, symbol_count);
+	return disassemble(device, stream, pc, opcodes, params, options, lvl::HC, symbols, symbol_count);
 }
 
-CPU_DISASSEMBLE(m6805)   { return CPU_DISASSEMBLE_NAME(m6805)  (device, stream, pc, oprom, opram, options, nullptr, 0); }
-CPU_DISASSEMBLE(m146805) { return CPU_DISASSEMBLE_NAME(m146805)(device, stream, pc, oprom, opram, options, nullptr, 0); }
-CPU_DISASSEMBLE(m68hc05) { return CPU_DISASSEMBLE_NAME(m68hc05)(device, stream, pc, oprom, opram, options, nullptr, 0); }
+CPU_DISASSEMBLE(m6805)   { return CPU_DISASSEMBLE_NAME(m6805)  (device, stream, pc, opcodes, params, options, nullptr, 0); }
+CPU_DISASSEMBLE(m146805) { return CPU_DISASSEMBLE_NAME(m146805)(device, stream, pc, opcodes, params, options, nullptr, 0); }
+CPU_DISASSEMBLE(m68hc05) { return CPU_DISASSEMBLE_NAME(m68hc05)(device, stream, pc, opcodes, params, options, nullptr, 0); }

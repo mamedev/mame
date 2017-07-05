@@ -138,11 +138,11 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const override;
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const override;
 
-	virtual offs_t disasm_disassemble(
+	virtual offs_t disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const u8 *oprom,
-			const uint8_t *opram,
+			const data_buffer &opcodes,
+			const data_buffer &params,
 			u32 options) override;
 
 	virtual void interrupt() override;
@@ -229,11 +229,11 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
+	virtual offs_t disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const u8 *oprom,
-			const u8 *opram,
+			const data_buffer &opcodes,
+			const data_buffer &params,
 			u32 options) override;
 };
 
@@ -250,11 +250,11 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
+	virtual offs_t disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const u8 *oprom,
-			const u8 *opram,
+			const data_buffer &opcodes,
+			const data_buffer &params,
 			u32 options) override;
 };
 
@@ -274,11 +274,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual offs_t disasm_disassemble(
+	virtual offs_t disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const u8 *oprom,
-			const u8 *opram,
+			const data_buffer &opcodes,
+			const data_buffer &params,
 			u32 options) override;
 };
 

@@ -202,11 +202,11 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
+	virtual offs_t disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
+			const device_disasm_interface::data_buffer &opcodes,
+			const device_disasm_interface::data_buffer &params,
 			uint32_t options) override;
 };
 
@@ -240,11 +240,11 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
+	virtual offs_t disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
+			const device_disasm_interface::data_buffer &opcodes,
+			const device_disasm_interface::data_buffer &params,
 			uint32_t options) override;
 };
 
@@ -268,11 +268,11 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
+	virtual offs_t disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
+			const device_disasm_interface::data_buffer &opcodes,
+			const device_disasm_interface::data_buffer &params,
 			uint32_t options) override;
 };
 

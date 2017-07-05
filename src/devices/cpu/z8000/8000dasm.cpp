@@ -21,9 +21,9 @@ static int n[16];   /* opcode nibbles */
 static int b[8];    /* opcode bytes */
 static int w[4];    /* opcode words */
 
-static void GET_OP(const uint8_t *oprom, int i, unsigned offset)
+static void GET_OP(const device_disasm_interface::data_buffer &opcodes, int i, unsigned new_pc)
 {
-	uint16_t opcode = (oprom[offset] << 8) | oprom[offset + 1];
+	uint16_t opcode = opcodes.r16(new_pc);
 	w[i] = opcode;
 	b[i*2+0] = opcode >> 8;
 	b[i*2+1] = opcode & 0xff;
@@ -60,7 +60,7 @@ CPU_DISASSEMBLE(z8000)
 
 	z8002_device::init_tables();
 
-	GET_OP(oprom, 0, new_pc - pc);
+	GET_OP(opcodes, 0, new_pc);
 	new_pc += 2;
 	switch (pc)
 	{
@@ -75,8 +75,8 @@ CPU_DISASSEMBLE(z8000)
 			break;
 		default:
 			o = z8002_device::dasm(w[0]);
-			if (o.size > 1) { GET_OP(oprom, 1, new_pc - pc); new_pc += 2; }
-			if (o.size > 2) { GET_OP(oprom, 2, new_pc - pc); new_pc += 2; }
+			if (o.size > 1) { GET_OP(opcodes, 1, new_pc); new_pc += 2; }
+			if (o.size > 2) { GET_OP(opcodes, 2, new_pc); new_pc += 2; }
 			src = o.dasm;
 			flags = o.flags;
 
@@ -200,7 +200,7 @@ CPU_DISASSEMBLE(z8000)
 								old_w = w[i];
 								for (j = i; j < o.size; j++)
 									w[j] = w[j + 1];
-								GET_OP(oprom, o.size - 1, new_pc - pc);
+								GET_OP(opcodes, o.size - 1, new_pc);
 								new_pc += 2;
 								w[i] = ((old_w & 0x7f00) << 16) | (w[i] & 0xffff);
 							}

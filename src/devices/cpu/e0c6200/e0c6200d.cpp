@@ -112,7 +112,7 @@ static char* decode_param(u16 opcode, int param, char* buffer)
 
 CPU_DISASSEMBLE(e0c6200)
 {
-	u16 op = (oprom[1] | oprom[0] << 8) & 0xfff;
+	u16 op = opcodes.r16(pc) & 0xfff;
 
 	int m;
 	int p1 = -1;

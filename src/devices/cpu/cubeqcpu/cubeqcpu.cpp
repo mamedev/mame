@@ -91,10 +91,10 @@ device_memory_interface::space_config_vector cquestsnd_cpu_device::memory_space_
 }
 
 
-offs_t cquestsnd_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cquestsnd_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cquestsnd );
-	return CPU_DISASSEMBLE_NAME(cquestsnd)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(cquestsnd)(this, stream, pc, opcodes, params, options);
 }
 
 
@@ -112,10 +112,10 @@ READ16_MEMBER( cquestrot_cpu_device::linedata_r )
 }
 
 
-offs_t cquestrot_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cquestrot_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cquestrot );
-	return CPU_DISASSEMBLE_NAME(cquestrot)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(cquestrot)(this, stream, pc, opcodes, params, options);
 }
 
 
@@ -135,10 +135,10 @@ device_memory_interface::space_config_vector cquestlin_cpu_device::memory_space_
 	};
 }
 
-offs_t cquestlin_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cquestlin_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cquestlin );
-	return CPU_DISASSEMBLE_NAME(cquestlin)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(cquestlin)(this, stream, pc, opcodes, params, options);
 }
 
 

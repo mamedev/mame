@@ -16,8 +16,8 @@
 CPU_DISASSEMBLE(mb88)
 {
 	unsigned startpc = pc;
-	uint8_t op = oprom[pc++ - startpc];
-	uint8_t arg = oprom[pc - startpc];
+	uint8_t op = opcodes.r8(pc++);
+	uint8_t arg = opcodes.r8(pc);
 
 	switch( op )
 	{

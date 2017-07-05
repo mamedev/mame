@@ -665,17 +665,17 @@ const Entry Entry::table_fd[0x100]={
 
 CPU_DISASSEMBLE(lh5801)
 {
-	int pos = 0;
+	offs_t pos = pc;
 	int oper;
 	uint16_t absolut;
 	const Entry *entry;
 	int temp;
 
-	oper=oprom[pos++];
+	oper=opcodes.r8(pos++);
 	entry=Entry::table+oper;
 
 	if (Entry::table[oper].ins==Entry::PREFD) {
-		oper=oprom[pos++];
+		oper=opcodes.r8(pos++);
 		entry=Entry::table_fd+oper;
 	}
 	switch (entry->ins) {
@@ -691,59 +691,59 @@ CPU_DISASSEMBLE(lh5801)
 			util::stream_format(stream, "%s %s", entry->ins_name(),entry->reg_name());break;
 		case Entry::RegImm:
 			util::stream_format(stream, "%s %s,%02x", entry->ins_name(),
-					entry->reg_name(), oprom[pos++]);
+					entry->reg_name(), opcodes.r8(pos++));
 			break;
 		case Entry::RegImm16:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %s,%04x", entry->ins_name(),entry->reg_name(),absolut );
 			break;
 		case Entry::Vec:
-			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(),oprom[pos++]);break;
+			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(),opcodes.r8(pos++));break;
 		case Entry::Vej:
 			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(), oper);break;
 		case Entry::Imm:
-			util::stream_format(stream, "%s %02x", entry->ins_name(),oprom[pos++]);break;
+			util::stream_format(stream, "%s %02x", entry->ins_name(),opcodes.r8(pos++));break;
 		case Entry::Imm16:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %04x", entry->ins_name(),absolut);break;
 		case Entry::RelP:
-			temp=oprom[pos++];
+			temp=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos+temp);break;
 		case Entry::RelM:
-			temp=oprom[pos++];
+			temp=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos-temp);break;
 		case Entry::Abs:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s (%04x)", entry->ins_name(),absolut);break;
 		case Entry::ME1Abs:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s #(%04x)", entry->ins_name(),absolut);break;
 		case Entry::AbsImm:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s (%04x),%02x", entry->ins_name(),absolut,
-					oprom[pos++]);break;
+					opcodes.r8(pos++));break;
 		case Entry::ME1AbsImm:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s #(%04x),%02x", entry->ins_name(),absolut,
-					oprom[pos++]);break;
+					opcodes.r8(pos++));break;
 		case Entry::ME0:
 			util::stream_format(stream, "%s (%s)", entry->ins_name(),entry->reg_name());break;
 		case Entry::ME0Imm:
-			util::stream_format(stream, "%s (%s),%02x", entry->ins_name(),entry->reg_name(),oprom[pos++]);
+			util::stream_format(stream, "%s (%s),%02x", entry->ins_name(),entry->reg_name(),opcodes.r8(pos++));
 			break;
 		case Entry::ME1:
 			util::stream_format(stream, "%s #(%s)", entry->ins_name(),entry->reg_name());break;
 		case Entry::ME1Imm:
-			util::stream_format(stream, "%s #(%s),%02x", entry->ins_name(),entry->reg_name(),oprom[pos++]);
+			util::stream_format(stream, "%s #(%s),%02x", entry->ins_name(),entry->reg_name(),opcodes.r8(pos++));
 			break;
 		}
 	}
 
-	return pos;
+	return pos - pc;
 }

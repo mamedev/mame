@@ -278,13 +278,11 @@ offs_t score7_cpu_device::disasm(std::ostream &stream, offs_t pc, uint32_t opcod
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t score7_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t score7_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	uint32_t opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-
-	return disasm(stream, pc, opcode);
+	return disasm(stream, pc, opcodes.r32(pc));
 }

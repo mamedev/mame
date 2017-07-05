@@ -1152,22 +1152,7 @@ static const M68HC11_OPCODE opcode_table_page4[256] =
 
 /*****************************************************************************/
 
-static const uint8_t *rombase;
-
-static uint8_t fetch(void)
-{
-	return *rombase++;
-}
-
-static uint16_t fetch16(void)
-{
-	uint16_t w;
-	w = (rombase[0] << 8) | rombase[1];
-	rombase+=2;
-	return w;
-}
-
-static uint32_t decode_opcode(std::ostream &stream, uint32_t pc, const M68HC11_OPCODE *op_table)
+static uint32_t decode_opcode(std::ostream &stream, offs_t pc, offs_t &cpc, const device_disasm_interface::data_buffer &opcodes, const M68HC11_OPCODE *op_table)
 {
 	uint8_t imm8, mask;
 	int8_t rel8;
@@ -1183,90 +1168,92 @@ static uint32_t decode_opcode(std::ostream &stream, uint32_t pc, const M68HC11_O
 	switch(op_table->address_mode)
 	{
 		case EA_IMM8:
-			imm8 = fetch();
+			imm8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s 0x%02X", op_table->mnemonic, imm8);
 			break;
 
 		case EA_IMM16:
-			imm16 = fetch16();
+			imm16 = opcodes.r16(cpc++);
+			cpc += 2;
 			util::stream_format(stream, "%s 0x%04X", op_table->mnemonic, imm16);
 			break;
 
 		case EA_DIRECT:
-			imm8 = fetch();
+			imm8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (0x%04X)", op_table->mnemonic, imm8);
 			break;
 
 		case EA_EXT:
-			imm16 = fetch16();
+			imm16 = opcodes.r16(cpc++);
+			cpc += 2;
 			util::stream_format(stream, "%s (0x%04X)", op_table->mnemonic, imm16);
 			break;
 
 		case EA_IND_X:
-			imm8 = fetch();
+			imm8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (X+0x%02X)", op_table->mnemonic, imm8);
 			break;
 
 		case EA_REL:
-			rel8 = fetch();
+			rel8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s [0x%04X]", op_table->mnemonic, pc+2+rel8);
 			break;
 
 		case EA_DIRECT_IMM8:
-			imm8 = fetch();
-			mask = fetch();
+			imm8 = opcodes.r8(cpc++);
+			mask = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (0x%04X), 0x%02X", op_table->mnemonic, imm8, mask);
 			break;
 
 		case EA_IND_X_IMM8:
-			imm8 = fetch();
-			mask = fetch();
+			imm8 = opcodes.r8(cpc++);
+			mask = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (X+0x%02X), 0x%02X", op_table->mnemonic, imm8, mask);
 			break;
 
 		case EA_DIRECT_IMM8_REL:
-			imm8 = fetch();
-			mask = fetch();
-			rel8 = fetch();
+			imm8 = opcodes.r8(cpc++);
+			mask = opcodes.r8(cpc++);
+			rel8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (0x%04X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+4+rel8);
 			break;
 
 		case EA_IND_X_IMM8_REL:
-			imm8 = fetch();
-			mask = fetch();
-			rel8 = fetch();
+			imm8 = opcodes.r8(cpc++);
+			mask = opcodes.r8(cpc++);
+			rel8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (X+0x%02X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+4+rel8);
 			break;
 
 		case EA_IND_Y:
-			imm8 = fetch();
+			imm8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (Y+0x%02X)", op_table->mnemonic, imm8);
 			break;
 
 		case EA_IND_Y_IMM8:
-			imm8 = fetch();
-			mask = fetch();
+			imm8 = opcodes.r8(cpc++);
+			mask = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (Y+0x%02X), 0x%02X", op_table->mnemonic, imm8, mask);
 			break;
 
 		case EA_IND_Y_IMM8_REL:
-			imm8 = fetch();
-			mask = fetch();
-			rel8 = fetch();
+			imm8 = opcodes.r8(cpc++);
+			mask = opcodes.r8(cpc++);
+			rel8 = opcodes.r8(cpc++);
 			util::stream_format(stream, "%s (Y+0x%02X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+2+rel8);
 			break;
 
 		case PAGE2:
-			op2 = fetch();
-			return decode_opcode(stream, pc, &opcode_table_page2[op2]);
+			op2 = opcodes.r8(cpc++);
+			return decode_opcode(stream, pc, cpc, opcodes, &opcode_table_page2[op2]);
 
 		case PAGE3:
-			op2 = fetch();
-			return decode_opcode(stream, pc, &opcode_table_page3[op2]);
+			op2 = opcodes.r8(cpc++);
+			return decode_opcode(stream, pc, cpc, opcodes, &opcode_table_page3[op2]);
 
 		case PAGE4:
-			op2 = fetch();
-			return decode_opcode(stream, pc, &opcode_table_page4[op2]);
+			op2 = opcodes.r8(cpc++);
+			return decode_opcode(stream, pc, cpc, opcodes, &opcode_table_page4[op2]);
 
 		default:
 			util::stream_format(stream, "%s", op_table->mnemonic);
@@ -1279,10 +1266,10 @@ CPU_DISASSEMBLE(hc11)
 	uint32_t flags;
 	uint8_t opcode;
 
-	rombase = oprom;
+	offs_t cpc = pc;
 
-	opcode = fetch();
-	flags = decode_opcode(stream, pc, &opcode_table[opcode]);
+	opcode = opcodes.r8(cpc++);
+	flags = decode_opcode(stream, pc, cpc, opcodes, &opcode_table[opcode]);
 
-	return (rombase-oprom) | flags | DASMFLAG_SUPPORTED;
+	return (cpc - pc) | flags | DASMFLAG_SUPPORTED;
 }

@@ -146,10 +146,10 @@ static const s8 s_next_pc_7[0x80] =
 
 // common disasm
 
-static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, const u8 pclen)
+static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params, const u8 pclen)
 {
 	// get raw opcode
-	u8 op = oprom[0];
+	u8 op = opcodes.r8(pc);
 	u8 instr = lut_mnemonic[op];
 	int len = 1;
 
@@ -158,8 +158,19 @@ static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended
 	u16 param = mask;
 	if (bits >= 8)
 	{
-		// note: doesn't work with lfsr pc
-		param = oprom[1];
+		if (pclen == 6)
+		{
+			int feed = ((pc >> 1 ^ pc) & 1) ? 0 : 0x20;
+			pc = feed | (pc >> 1 & 0x1f) | (pc & ~0x3f);
+		}
+		else if (pclen == 7)
+		{
+			int feed = ((pc >> 1 ^ pc) & 1) ? 0 : 0x40;
+			pc = feed | (pc >> 1 & 0x3f) | (pc & ~0x7f);
+		}
+		else
+			abort();
+		param = params.r8(pc);
 		len++;
 	}
 
@@ -230,7 +241,7 @@ static const u8 sm510_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(sm510)
 {
-	return sm510_common_disasm(sm510_mnemonic, nullptr, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm510_mnemonic, nullptr, stream, pc, opcodes, params, 6);
 }
 
 
@@ -272,7 +283,7 @@ CPU_DISASSEMBLE(sm511)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x30, sm511_extended, 0x10);
 
-	return sm510_common_disasm(sm511_mnemonic, ext, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm511_mnemonic, ext, stream, pc, opcodes, params, 6);
 }
 
 
@@ -314,7 +325,7 @@ CPU_DISASSEMBLE(sm500)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm500_extended, 0x10);
 
-	return sm510_common_disasm(sm500_mnemonic, ext, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm500_mnemonic, ext, stream, pc, opcodes, params, 6);
 }
 
 
@@ -356,7 +367,7 @@ CPU_DISASSEMBLE(sm5a)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm5a_extended, 0x10);
 
-	return sm510_common_disasm(sm5a_mnemonic, ext, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm5a_mnemonic, ext, stream, pc, opcodes, params, 6);
 }
 
 
@@ -389,5 +400,5 @@ static const u8 sm590_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(sm590)
 {
-	return sm510_common_disasm(sm590_mnemonic, nullptr, stream, pc, oprom, opram, 7);
+	return sm510_common_disasm(sm590_mnemonic, nullptr, stream, pc, opcodes, params, 7);
 }

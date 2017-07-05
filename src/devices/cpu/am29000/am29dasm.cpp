@@ -119,7 +119,7 @@ static const char* get_spr(int spid)
 
 CPU_DISASSEMBLE(am29000)
 {
-	uint32_t op = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[2] << 8) | oprom[3];
+	uint32_t op = opcodes.r32(pc);
 	uint32_t flags = 0;
 
 	switch (op >> 24)

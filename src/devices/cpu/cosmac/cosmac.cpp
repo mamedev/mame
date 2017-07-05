@@ -479,42 +479,30 @@ void cosmac_device::state_string_export(const device_state_entry &entry, std::st
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
+//  opcode_alignment - opcode alignment, in pc units
 //-------------------------------------------------
 
-uint32_t cosmac_device::disasm_min_opcode_bytes() const
+uint32_t cosmac_device::opcode_alignment() const
 {
 	return 1;
 }
 
 
 //-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t cosmac_device::disasm_max_opcode_bytes() const
-{
-	return 3;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t cdp1801_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cdp1801_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cdp1801 );
-	return CPU_DISASSEMBLE_NAME( cdp1801 )(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME( cdp1801 )(this, stream, pc, opcodes, params, options);
 }
 
-offs_t cdp1802_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cdp1802_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cdp1802 );
-	return CPU_DISASSEMBLE_NAME( cdp1802 )(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME( cdp1802 )(this, stream, pc, opcodes, params, options);
 }
 
 

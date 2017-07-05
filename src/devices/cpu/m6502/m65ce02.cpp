@@ -23,9 +23,9 @@ m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-offs_t m65ce02_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m65ce02_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, opcodes, params, options, disasm_entries);
 }
 
 void m65ce02_device::init()

@@ -1603,8 +1603,8 @@ void hcd62121_cpu_device::execute_run()
 }
 
 
-offs_t hcd62121_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, uint32_t options)
+offs_t hcd62121_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(hcd62121);
-	return CPU_DISASSEMBLE_NAME(hcd62121)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hcd62121)(this, stream, pc, opcodes, params, options);
 }

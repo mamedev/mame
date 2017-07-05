@@ -158,9 +158,12 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual u32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual u32 opcode_alignment() const override { return 1; }
+	virtual u32 disasm_interface_flags() const override { return DASMINTF_NONLINEAR_PC|DASMINTF_PAGED; }
+	virtual u32 disasm_page_address_bits() const override { return 6; }
+	virtual offs_t disasm_pc_linear_to_real(offs_t pc) const override;
+	virtual offs_t disasm_pc_real_to_linear(offs_t pc) const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;

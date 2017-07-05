@@ -64,15 +64,15 @@ void device_disasm_interface::static_set_dasm_override(device_t &device, dasm_ov
 //  disassemble - interface for disassembly
 //-------------------------------------------------
 
-offs_t device_disasm_interface::disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+offs_t device_disasm_interface::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options)
 {
 	offs_t result = 0;
 
 	// check for disassembler override
 	if (!m_dasm_override.isnull())
-		result = m_dasm_override(device(), stream, pc, oprom, opram, options);
+		result = m_dasm_override(device(), stream, pc, opcodes, params, options);
 	if (result == 0)
-		result = disasm_disassemble(stream, pc, oprom, opram, options);
+		result = disassemble(stream, pc, opcodes, params, options);
 
 	// make sure we get good results
 	assert((result & DASMFLAG_LENGTHMASK) != 0);
@@ -90,3 +90,49 @@ offs_t device_disasm_interface::disassemble(std::ostream &stream, offs_t pc, con
 
 	return result;
 }
+
+u32 device_disasm_interface::disasm_interface_flags() const
+{
+	return 0;
+}
+
+u32 device_disasm_interface::disasm_page_address_bits() const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_page_address_bits called", device().tag());
+}
+
+u32 device_disasm_interface::disasm_page2_address_bits() const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_page2_address_bits called", device().tag());
+}
+
+offs_t device_disasm_interface::disasm_pc_linear_to_real(offs_t pc) const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_pc_linear_to_real called", device().tag());
+}
+
+offs_t device_disasm_interface::disasm_pc_real_to_linear(offs_t pc) const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_pc_real_to_linear called", device().tag());
+}
+
+u8 device_disasm_interface::disasm_decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_decrypt8 called", device().tag());
+}
+
+u16 device_disasm_interface::disasm_decrypt16(u16 value, offs_t pc, bool opcode) const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_decrypt16 called", device().tag());
+}
+
+u32 device_disasm_interface::disasm_decrypt32(u32 value, offs_t pc, bool opcode) const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_decrypt32 called", device().tag());
+}
+
+u64 device_disasm_interface::disasm_decrypt64(u64 value, offs_t pc, bool opcode) const
+{
+	throw emu_fatalerror("%s: unimplemented disasm_decrypt64 called", device().tag());
+}
+

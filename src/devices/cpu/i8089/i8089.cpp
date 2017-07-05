@@ -144,13 +144,13 @@ device_memory_interface::space_config_vector i8089_device::memory_space_config()
 }
 
 //-------------------------------------------------
-//  disasm_disassemble - disassembler
+//  disassemble - disassembler
 //-------------------------------------------------
 
-offs_t i8089_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i8089_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(i8089);
-	return CPU_DISASSEMBLE_NAME(i8089)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(i8089)(this, stream, pc, opcodes, params, options);
 }
 
 //-------------------------------------------------

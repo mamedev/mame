@@ -230,7 +230,7 @@ public:
 	void ScanInKeyboard(void);
 	void dgn_beta_frame_interrupt (int data);
 
-	offs_t dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+	offs_t dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params, int options);
 
 private:
 	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);

@@ -3514,20 +3514,15 @@ uint32_t tms9995_device::execute_input_lines() const
 	return 2;
 }
 
-uint32_t tms9995_device::disasm_min_opcode_bytes() const
+uint32_t tms9995_device::opcode_alignment() const
 {
 	return 2;
 }
 
-uint32_t tms9995_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-offs_t tms9995_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms9995_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms9995 );
-	return CPU_DISASSEMBLE_NAME(tms9995)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms9995)(this, stream, pc, opcodes, params, options);
 }
 
 

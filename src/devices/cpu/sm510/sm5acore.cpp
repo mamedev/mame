@@ -63,10 +63,10 @@ kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *
 
 
 // disasm
-offs_t sm5a_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+offs_t sm5a_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options)
 {
 	extern CPU_DISASSEMBLE(sm5a);
-	return CPU_DISASSEMBLE_NAME(sm5a)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sm5a)(this, stream, pc, opcodes, params, options);
 }
 
 

@@ -44,8 +44,8 @@ CPU_DISASSEMBLE(v810)
 	uint32_t flags = 0;
 	uint32_t opc,opc2;
 	unsigned size;
-	opc = oprom[0] | (oprom[1] << 8);
-	opc2 = oprom[2] | (oprom[3] << 8);
+	opc = opcodes.r16(pc);
+	opc2 = opcodes.r16(pc+2);
 
 	switch(opc>>10)
 	{

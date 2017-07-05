@@ -114,9 +114,6 @@ struct GROUP_OP {
 	const I386_OPCODE *opcode;
 };
 
-static const uint8_t *opcode_ptr;
-static const uint8_t *opcode_ptr_base;
-
 static const I386_OPCODE i386_opcode_table1[256] =
 {
 	// 0x00
@@ -1980,7 +1977,6 @@ static int operand_size;
 static int address_prefix;
 static int operand_prefix;
 static int max_length;
-static uint64_t pc;
 static uint8_t modrm;
 static uint32_t segment;
 static offs_t dasm_flags;
@@ -1993,66 +1989,46 @@ static uint8_t curmode;
 #define MODRM_REG2  (modrm & 0x7)
 #define MODRM_MOD   ((modrm >> 6) & 0x3)
 
-static inline uint8_t FETCH(void)
+static inline uint8_t FETCH(offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
-	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
+	if ((pc - base_pc) + 1 > max_length)
 		return 0xff;
+	uint8_t d = opcodes.r8(pc);
 	pc++;
-	return *opcode_ptr++;
-}
-
-#if 0
-static inline uint16_t FETCH16(void)
-{
-	uint16_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
-		return 0xffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
-	opcode_ptr += 2;
-	pc += 2;
-	return d;
-}
-#endif
-
-static inline uint32_t FETCH32(void)
-{
-	uint32_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)
-		return 0xffffffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
-	opcode_ptr += 4;
-	pc += 4;
 	return d;
 }
 
-static inline uint8_t FETCHD(void)
+static inline uint16_t FETCH16(offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
-	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
-		return 0xff;
-	pc++;
-	return *opcode_ptr++;
-}
-
-static inline uint16_t FETCHD16(void)
-{
-	uint16_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
+	if ((pc - base_pc) + 2 > max_length)
 		return 0xffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
-	opcode_ptr += 2;
+	uint16_t d = opcodes.r16(pc);
 	pc += 2;
 	return d;
 }
 
-static inline uint32_t FETCHD32(void)
+static inline uint32_t FETCH32(offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)
+	if ((pc - base_pc) + 4 > max_length)
 		return 0xffffffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
-	opcode_ptr += 4;
+	uint32_t d = opcodes.r32(pc);
 	pc += 4;
 	return d;
+}
+
+static inline uint8_t FETCHD(offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
+{
+	return FETCH(base_pc, pc, opcodes);
+}
+
+static inline uint16_t FETCHD16(offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
+{
+	return FETCH16(base_pc, pc, opcodes);
+}
+
+static inline uint32_t FETCHD32(offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
+{
+	return FETCH32(base_pc, pc, opcodes);
 }
 
 static char *hexstring(uint32_t value, int digits)
@@ -2097,18 +2073,18 @@ static char *shexstring(uint32_t value, int digits, bool always)
 	return buffer;
 }
 
-static void handle_sib_byte(std::ostream &stream, uint8_t mod)
+static void handle_sib_byte(std::ostream &stream, uint8_t mod, offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t i32;
 	uint8_t scale, i, base;
-	uint8_t sib = FETCHD();
+	uint8_t sib = FETCHD(base_pc, pc, opcodes);
 
 	scale = (sib >> 6) & 0x3;
 	i = ((sib >> 3) & 0x7) | sibex;
 	base = (sib & 0x7) | rmex;
 
 	if (base == 5 && mod == 0) {
-		i32 = FETCH32();
+		i32 = FETCHD32(base_pc, pc, opcodes);
 		util::stream_format(stream, "%s", hexstring(i32, 0));
 	} else if (base != 5 || mod != 3)
 		util::stream_format(stream, "%s", i386_reg[address_size][base]);
@@ -2120,14 +2096,14 @@ static void handle_sib_byte(std::ostream &stream, uint8_t mod)
 	}
 }
 
-static void handle_modrm(std::ostream &stream)
+static void handle_modrm(std::ostream &stream, offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	int8_t disp8;
 	int16_t disp16;
 	int32_t disp32;
 	uint8_t mod, rm;
 
-	modrm = FETCHD();
+	modrm = FETCHD(base_pc, pc, opcodes);
 	mod = (modrm >> 6) & 0x3;
 	rm = (modrm & 0x7) | rmex;
 
@@ -2147,26 +2123,26 @@ static void handle_modrm(std::ostream &stream)
 	util::stream_format(stream, "[" );
 	if( address_size == 2 ) {
 		if ((rm & 7) == 4)
-			handle_sib_byte(stream, mod );
+			handle_sib_byte(stream, mod, base_pc, pc, opcodes);
 		else if ((rm & 7) == 5 && mod == 0) {
-			disp32 = FETCHD32();
+			disp32 = FETCHD32(base_pc, pc, opcodes);
 			util::stream_format(stream, "rip%s", shexstring(disp32, 0, true));
 		} else
 			util::stream_format(stream, "%s", i386_reg[2][rm]);
 		if( mod == 1 ) {
-			disp8 = FETCHD();
+			disp8 = FETCHD(base_pc, pc, opcodes);
 			if (disp8 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
-			disp32 = FETCHD32();
+			disp32 = FETCHD32(base_pc, pc, opcodes);
 			if (disp32 != 0)
 				util::stream_format(stream, "%s", shexstring(disp32, 0, true) );
 		}
 	} else if (address_size == 1) {
 		if ((rm & 7) == 4)
-			handle_sib_byte(stream, mod );
+			handle_sib_byte(stream, mod, base_pc, pc, opcodes);
 		else if ((rm & 7) == 5 && mod == 0) {
-			disp32 = FETCHD32();
+			disp32 = FETCHD32(base_pc, pc, opcodes);
 			if (curmode == 64)
 				util::stream_format(stream, "eip%s", shexstring(disp32, 0, true) );
 			else
@@ -2174,11 +2150,11 @@ static void handle_modrm(std::ostream &stream)
 		} else
 			util::stream_format(stream, "%s", i386_reg[1][rm]);
 		if( mod == 1 ) {
-			disp8 = FETCHD();
+			disp8 = FETCHD(base_pc, pc, opcodes);
 			if (disp8 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
-			disp32 = FETCHD32();
+			disp32 = FETCHD32(base_pc, pc, opcodes);
 			if (disp32 != 0)
 				util::stream_format(stream, "%s", shexstring(disp32, 0, true) );
 		}
@@ -2193,7 +2169,7 @@ static void handle_modrm(std::ostream &stream)
 			case 5: util::stream_format(stream, "di" ); break;
 			case 6:
 				if( mod == 0 ) {
-					disp16 = FETCHD16();
+					disp16 = FETCHD16(base_pc, pc, opcodes);
 					util::stream_format(stream, "%s", hexstring((unsigned) (uint16_t) disp16, 0) );
 				} else {
 					util::stream_format(stream, "bp" );
@@ -2202,11 +2178,11 @@ static void handle_modrm(std::ostream &stream)
 			case 7: util::stream_format(stream, "bx" ); break;
 		}
 		if( mod == 1 ) {
-			disp8 = FETCHD();
+			disp8 = FETCHD(base_pc, pc, opcodes);
 			if (disp8 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
-			disp16 = FETCHD16();
+			disp16 = FETCHD16(base_pc, pc, opcodes);
 			if (disp16 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp16, 0, true) );
 		}
@@ -2214,14 +2190,14 @@ static void handle_modrm(std::ostream &stream)
 	util::stream_format(stream, "]" );
 }
 
-static void handle_modrm(std::string &buffer)
+static void handle_modrm(std::string &buffer, offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	std::stringstream stream;
-	handle_modrm(stream);
+	handle_modrm(stream, base_pc, pc, opcodes);
 	buffer = stream.str();
 }
 
-static void handle_param(std::ostream &stream, uint32_t param)
+static void handle_param(std::ostream &stream, uint32_t param, offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	uint8_t i8;
 	uint16_t i16;
@@ -2378,63 +2354,63 @@ static void handle_param(std::ostream &stream, uint32_t param)
 			break;
 
 		case PARAM_I4:
-			i8 = FETCHD();
+			i8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%d", i8 & 0x0f );
 			break;
 
 		case PARAM_I8:
-			i8 = FETCHD();
+			i8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((int8_t)i8, 0, false) );
 			break;
 
 		case PARAM_I16:
-			i16 = FETCHD16();
+			i16 = FETCHD16(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((int16_t)i16, 0, false) );
 			break;
 
 		case PARAM_UI8:
-			i8 = FETCHD();
+			i8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((uint8_t)i8, 0, false) );
 			break;
 
 		case PARAM_UI16:
-			i16 = FETCHD16();
+			i16 = FETCHD16(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((uint16_t)i16, 0, false) );
 			break;
 
 		case PARAM_IMM64:
 			if (operand_size == 2) {
-				uint32_t lo32 = FETCHD32();
-				i32 = FETCHD32();
+				uint32_t lo32 = FETCHD32(base_pc, pc, opcodes);
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring64(lo32, i32) );
 			} else if( operand_size ) {
-				i32 = FETCHD32();
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i32, 0) );
 			} else {
-				i16 = FETCHD16();
+				i16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i16, 0) );
 			}
 			break;
 
 		case PARAM_IMM:
 			if( operand_size ) {
-				i32 = FETCHD32();
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i32, 0) );
 			} else {
-				i16 = FETCHD16();
+				i16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i16, 0) );
 			}
 			break;
 
 		case PARAM_ADDR:
 			if( operand_size ) {
-				addr = FETCHD32();
-				ptr = FETCHD16();
+				addr = FETCHD32(base_pc, pc, opcodes);
+				ptr = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s:", hexstring(ptr, 4) );
 				util::stream_format(stream, "%s", hexstring(addr, 0) );
 			} else {
-				addr = FETCHD16();
-				ptr = FETCHD16();
+				addr = FETCHD16(base_pc, pc, opcodes);
+				ptr = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s:", hexstring(ptr, 4) );
 				util::stream_format(stream, "%s", hexstring(addr, 0) );
 			}
@@ -2442,17 +2418,17 @@ static void handle_param(std::ostream &stream, uint32_t param)
 
 		case PARAM_REL:
 			if( operand_size ) {
-				d32 = FETCHD32();
+				d32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstringpc(pc + d32) );
 			} else {
 				/* make sure to keep the relative offset within the segment */
-				d16 = FETCHD16();
+				d16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstringpc((pc & 0xFFFF0000) | ((pc + d16) & 0x0000FFFF)) );
 			}
 			break;
 
 		case PARAM_REL8:
-			d8 = FETCHD();
+			d8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", hexstringpc(pc + d8) );
 			break;
 
@@ -2468,10 +2444,10 @@ static void handle_param(std::ostream &stream, uint32_t param)
 			}
 
 			if( address_size ) {
-				i32 = FETCHD32();
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "[%s]", hexstring(i32, 0) );
 			} else {
-				i16 = FETCHD16();
+				i16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "[%s]", hexstring(i16, 0) );
 			}
 			break;
@@ -2536,7 +2512,7 @@ static void handle_param(std::ostream &stream, uint32_t param)
 	}
 }
 
-static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
+static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2, offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	switch (op1 & 0x7)
 	{
@@ -2545,8 +2521,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fadd    dword ptr %s", modrm_string); break;
@@ -2581,8 +2556,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fld     dword ptr %s", modrm_string); break;
@@ -2645,8 +2619,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fiadd   dword ptr %s", modrm_string); break;
@@ -2689,8 +2662,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fild    dword ptr %s", modrm_string); break;
@@ -2739,8 +2711,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fadd    qword ptr %s", modrm_string); break;
@@ -2786,8 +2757,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fld     qword ptr %s", modrm_string); break;
@@ -2830,8 +2800,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fiadd   word ptr %s", modrm_string); break;
@@ -2879,8 +2848,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fild    word ptr %s", modrm_string); break;
@@ -2913,7 +2881,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 	}
 }
 
-static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t op1)
+static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t op1, offs_t base_pc, offs_t &pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	int i;
 	uint8_t op2;
@@ -2931,8 +2899,8 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 				regex = (op1 << 1) & 8;
 				sibex = (op1 << 2) & 8;
 				rmex = (op1 << 3) & 8;
-				op2 = FETCH();
-				decode_opcode(stream, &i386_opcode_table1[op2], op1 );
+				op2 = FETCH(base_pc, pc, opcodes);
+				decode_opcode(stream, &i386_opcode_table1[op2], op1, base_pc, pc, opcodes);
 				return;
 			}
 			break;
@@ -2944,8 +2912,8 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 				operand_size ^= 1;
 				operand_prefix = 1;
 			}
-			op2 = FETCH();
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			op2 = FETCH(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case ADDR_SIZE:
@@ -2958,23 +2926,23 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 					address_size ^= 3;
 				address_prefix = 1;
 			}
-			op2 = FETCH();
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			op2 = FETCH(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case TWO_BYTE:
-			if (&opcode_ptr[-2] >= opcode_ptr_base)
-				pre0f = opcode_ptr[-2];
-			op2 = FETCHD();
-			decode_opcode(stream, &i386_opcode_table2[op2], op1 );
+			if (pc - 2 >= base_pc)
+				pre0f = opcodes.r8(pc-2);
+			op2 = FETCHD(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table2[op2], op1, base_pc, pc, opcodes);
 			return;
 
 		case THREE_BYTE:
-			op2 = FETCHD();
-			if (opcode_ptr[-2] == 0x38)
-				decode_opcode(stream, &i386_opcode_table0F38[op2], op1 );
+			op2 = FETCHD(base_pc, pc, opcodes);
+			if (opcodes.r8(pc-2) == 0x38)
+				decode_opcode(stream, &i386_opcode_table0F38[op2], op1, base_pc, pc, opcodes);
 			else
-				decode_opcode(stream, &i386_opcode_table0F3A[op2], op1 );
+				decode_opcode(stream, &i386_opcode_table0F3A[op2], op1, base_pc, pc, opcodes);
 			return;
 
 		case SEG_CS:
@@ -2985,39 +2953,39 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 		case SEG_SS:
 			rex = regex = sibex = rmex = 0;
 			segment = op->flags;
-			op2 = FETCH();
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			op2 = FETCH(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case PREFIX:
-			op2 = FETCH();
+			op2 = FETCH(base_pc, pc, opcodes);
 			if ((op2 != 0x0f) && (op2 != 0x90))
 				util::stream_format(stream, "%-7s ", op->mnemonic );
 			if ((op2 == 0x90) && !pre0f)
 				pre0f = op1;
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case GROUP:
-			handle_modrm( modrm_string );
+			handle_modrm(modrm_string, base_pc, pc, opcodes);
 			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
 				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
 					if (op->flags & GROUP_MOD)
-						decode_opcode(stream, &group_op_table[i].opcode[MODRM_MOD], op1 );
+						decode_opcode(stream, &group_op_table[i].opcode[MODRM_MOD], op1, base_pc, pc, opcodes);
 					else
-						decode_opcode(stream, &group_op_table[i].opcode[MODRM_REG1], op1 );
+						decode_opcode(stream, &group_op_table[i].opcode[MODRM_REG1], op1, base_pc, pc, opcodes);
 					return;
 				}
 			}
 			goto handle_unknown;
 
 		case FPU:
-			op2 = FETCHD();
-			handle_fpu(stream, op1, op2);
+			op2 = FETCHD(base_pc, pc, opcodes);
+			handle_fpu(stream, op1, op2, base_pc, pc, opcodes);
 			return;
 
 		case MODRM:
-			handle_modrm( modrm_string );
+			handle_modrm(modrm_string, base_pc, pc, opcodes);
 			break;
 	}
 
@@ -3044,17 +3012,17 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 	dasm_flags = op->dasm_flags;
 
 	if( op->param1 != 0 ) {
-		handle_param(stream, op->param1 );
+		handle_param(stream, op->param1, base_pc, pc, opcodes);
 	}
 
 	if( op->param2 != 0 ) {
 		util::stream_format(stream, "," );
-		handle_param(stream, op->param2 );
+		handle_param(stream, op->param2, base_pc, pc, opcodes);
 	}
 
 	if( op->param3 != 0 ) {
 		util::stream_format(stream, "," );
-		handle_param(stream, op->param3 );
+		handle_param(stream, op->param3, base_pc, pc, opcodes);
 	}
 	return;
 
@@ -3062,11 +3030,12 @@ handle_unknown:
 	util::stream_format(stream, "???");
 }
 
-int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const uint8_t *oprom, int mode)
+int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const device_disasm_interface::data_buffer &opcodes, int mode)
 {
+	offs_t base_pc = eip;
+	offs_t pc = eip;
 	uint8_t op;
 
-	opcode_ptr = opcode_ptr_base = oprom;
 	switch(mode)
 	{
 		case 1: /* 8086/8088/80186/80188 */
@@ -3095,7 +3064,6 @@ int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const uint8_t *oprom, i
 			max_length = 15;
 			break;
 	}
-	pc = eip;
 	dasm_flags = 0;
 	segment = 0;
 	curmode = mode;
@@ -3104,28 +3072,28 @@ int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const uint8_t *oprom, i
 	address_prefix = 0;
 	operand_prefix = 0;
 
-	op = FETCH();
+	op = FETCH(base_pc, pc, opcodes);
 
-	decode_opcode( stream, &i386_opcode_table1[op], op );
-	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
+	decode_opcode( stream, &i386_opcode_table1[op], op, base_pc, pc, opcodes);
+	return (pc-base_pc) | dasm_flags | DASMFLAG_SUPPORTED;
 }
 
-int i386_dasm_one(std::ostream &stream, offs_t eip, const uint8_t *oprom, int mode)
+int i386_dasm_one(std::ostream &stream, offs_t eip, const device_disasm_interface::data_buffer &opcodes, int mode)
 {
-	return i386_dasm_one_ex(stream, eip, oprom, mode);
+	return i386_dasm_one_ex(stream, eip, opcodes, mode);
 }
 
 CPU_DISASSEMBLE( x86_16 )
 {
-	return i386_dasm_one_ex(stream, pc, oprom, 16);
+	return i386_dasm_one_ex(stream, pc, opcodes, 16);
 }
 
 CPU_DISASSEMBLE( x86_32 )
 {
-	return i386_dasm_one_ex(stream, pc, oprom, 32);
+	return i386_dasm_one_ex(stream, pc, opcodes, 32);
 }
 
 CPU_DISASSEMBLE( x86_64 )
 {
-	return i386_dasm_one_ex(stream, pc, oprom, 64);
+	return i386_dasm_one_ex(stream, pc, opcodes, 64);
 }

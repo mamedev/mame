@@ -223,14 +223,8 @@ static const u8 i4_value[16] =
 	0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
 };
 
-static offs_t tms1k_dasm(std::ostream &stream, const u8 *oprom, const u8 *lut_mnemonic, u16 opcode_mask)
+static offs_t tms1k_dasm(std::ostream &stream, u16 op, const u8 *lut_mnemonic, bool shift)
 {
-	// get current opcode
-	int pos = 0;
-	u16 op = oprom[pos++];
-	if (opcode_mask & 0x100)
-		op = (op << 8 | oprom[pos++]) & 0x1ff;
-
 	// convert to mnemonic/param
 	u16 instr = lut_mnemonic[op];
 	util::stream_format(stream, "%-8s ", s_mnemonic[instr]);
@@ -247,7 +241,7 @@ static offs_t tms1k_dasm(std::ostream &stream, const u8 *oprom, const u8 *lut_mn
 			util::stream_format(stream, "%d", i4_value[op & 0x0f]);
 			break;
 		case zB7:
-			if (opcode_mask & 0x100)
+			if (shift)
 				util::stream_format(stream, "$%02X", op << 1 & 0xfe);
 			else
 				util::stream_format(stream, "$%02X", op & 0x3f);
@@ -256,26 +250,26 @@ static offs_t tms1k_dasm(std::ostream &stream, const u8 *oprom, const u8 *lut_mn
 			break;
 	}
 
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return s_flags[instr] | DASMFLAG_SUPPORTED;
 }
 
 
 CPU_DISASSEMBLE(tms1000)
 {
-	return tms1k_dasm(stream, oprom, tms1000_mnemonic, 0xff);
+	return 1 | tms1k_dasm(stream, opcodes.r8(pc), tms1000_mnemonic, false);
 }
 
 CPU_DISASSEMBLE(tms1100)
 {
-	return tms1k_dasm(stream, oprom, tms1100_mnemonic, 0xff);
+	return 1 | tms1k_dasm(stream, opcodes.r8(pc), tms1100_mnemonic, false);
 }
 
 CPU_DISASSEMBLE(tms0980)
 {
-	return tms1k_dasm(stream, oprom, tms0980_mnemonic, 0x1ff);
+	return 1 | tms1k_dasm(stream, opcodes.r16(pc) & 0x1ff, tms0980_mnemonic, true);
 }
 
 CPU_DISASSEMBLE(tp0320)
 {
-	return tms1k_dasm(stream, oprom, tp0320_mnemonic, 0x1ff);
+	return 1 | tms1k_dasm(stream, opcodes.r16(pc) & 0x1ff, tp0320_mnemonic, true);
 }

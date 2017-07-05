@@ -254,10 +254,10 @@ device_memory_interface::space_config_vector tms32025_device::memory_space_confi
 }
 
 
-offs_t tms32025_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms32025_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32025 );
-	return CPU_DISASSEMBLE_NAME(tms32025)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms32025)(this, stream, pc, opcodes, params, options);
 }
 
 READ16_MEMBER( tms32025_device::drr_r)

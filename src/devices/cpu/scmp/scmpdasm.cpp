@@ -10,20 +10,17 @@
 
 #include "emu.h"
 
-#define OP(A)   oprom[(A) - PC]
-#define ARG(A)  opram[(A) - PC]
-
 CPU_DISASSEMBLE(scmp)
 {
 	unsigned PC = pc;
-	uint8_t op = OP(pc++);
+	uint8_t op = opcodes.r8(pc++);
 	uint8_t ptr = op & 3;
 
 	if (BIT(op,7)) {
 		// two bytes instructions
 		char as[10];
 		char aspr[10];
-		uint8_t arg = ARG(pc); pc++;
+		uint8_t arg = params.r8(pc); pc++;
 		if (arg==0x80) {
 			sprintf(as,"E");
 		} else {

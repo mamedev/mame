@@ -1408,6 +1408,6 @@ CPU_DISASSEMBLE(se3208)
 	Context.ER=0;
 
 	Context.PC=pc;
-	Opcode=oprom[0] | (oprom[1] << 8);
+	Opcode=opcodes.r16(pc);
 	return 2 | ((*DecodeOp(Opcode))(Opcode, stream)) | DASMFLAG_SUPPORTED;
 }

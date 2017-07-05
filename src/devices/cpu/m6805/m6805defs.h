@@ -120,8 +120,8 @@ offs_t CPU_DISASSEMBLE_NAME(m146805)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const symbols[],
 		std::size_t symbol_count);
@@ -130,8 +130,8 @@ offs_t CPU_DISASSEMBLE_NAME(m68hc05)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const symbols[],
 		std::size_t symbol_count);
@@ -140,8 +140,8 @@ offs_t CPU_DISASSEMBLE_NAME(m6805)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const symbols[],
 		std::size_t symbol_count);
@@ -151,12 +151,12 @@ inline offs_t CPU_DISASSEMBLE_NAME(m6805)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const (&symbols)[N])
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(device, stream, pc, oprom, opram, options, symbols, N);
+	return CPU_DISASSEMBLE_NAME(m6805)(device, stream, pc, opcodes, params, options, symbols, N);
 }
 
 template <size_t N>
@@ -164,12 +164,12 @@ inline offs_t CPU_DISASSEMBLE_NAME(m146805)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const (&symbols)[N])
 {
-	return CPU_DISASSEMBLE_NAME(m146805)(device, stream, pc, oprom, opram, options, symbols, N);
+	return CPU_DISASSEMBLE_NAME(m146805)(device, stream, pc, opcodes, params, options, symbols, N);
 }
 
 template <size_t N>
@@ -177,12 +177,12 @@ inline offs_t CPU_DISASSEMBLE_NAME(m68hc05)(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		std::pair<u16, char const *> const (&symbols)[N])
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(device, stream, pc, oprom, opram, options, symbols, N);
+	return CPU_DISASSEMBLE_NAME(m68hc05)(device, stream, pc, opcodes, params, options, symbols, N);
 }
 
 #endif // MAME_CPU_M6805_M6805DEFS_H

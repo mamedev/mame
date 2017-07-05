@@ -2721,9 +2721,5 @@ void adsp21062_device::sharcop_idle()
 
 void adsp21062_device::sharcop_unimplemented()
 {
-	extern CPU_DISASSEMBLE(sharc);
-	std::ostringstream dasm;
-	CPU_DISASSEMBLE_NAME(sharc)(nullptr, dasm, m_core->pc, nullptr, nullptr, 0);
-	osd_printf_debug("SHARC: %08X: %s\n", m_core->pc, dasm.str().c_str());
 	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (uint16_t)(m_core->opcode >> 32), (uint32_t)(m_core->opcode), m_core->pc);
 }

@@ -345,7 +345,5 @@ offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 
 CPU_DISASSEMBLE( rsp )
 {
-	uint32_t op = *(uint32_t *)opram;
-	op = big_endianize_int32(op);
-	return rsp_dasm_one(stream, pc, op);
+	return rsp_dasm_one(stream, pc, opcodes.r32(pc));
 }

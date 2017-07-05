@@ -252,8 +252,8 @@ CPU_DISASSEMBLE(dsp16a)
 {
 	uint8_t opSize = 1;
 	uint32_t dasmflags = 0;
-	uint16_t op  = oprom[0] | (oprom[1] << 8);
-	uint16_t op2 = oprom[2] | (oprom[3] << 8);
+	uint16_t op  = opcodes.r16(pc);
+	uint16_t op2 = opcodes.r16(pc+1);
 
 	// TODO: Test for previous "if CON" instruction and tab the next instruction in?
 

@@ -14,7 +14,7 @@
 
 CPU_DISASSEMBLE(upd7725)
 {
-	uint32_t opcode = oprom[2] | (oprom[1] << 8) | (oprom[0] << 16);
+	uint32_t opcode = opcodes.r32(pc);
 	uint32_t type = (opcode >> 22);
 
 //  printf("dasm: PC %x opcode %08x\n", pc, opcode);

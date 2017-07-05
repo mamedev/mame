@@ -136,10 +136,10 @@ void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-offs_t ucom4_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+offs_t ucom4_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options)
 {
 	extern CPU_DISASSEMBLE(ucom4);
-	return CPU_DISASSEMBLE_NAME(ucom4)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(ucom4)(this, stream, pc, opcodes, params, options);
 }
 
 

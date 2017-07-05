@@ -205,9 +205,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; } // smallest instruction
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; } // largest instruction
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual uint32_t opcode_alignment() const override { return 2; } // smallest instruction
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options) override;
 
 	void set_ssw(u32 data) { m_ssw = (m_ssw & SSW(ID)) | (data & ~SSW(ID)); }
 

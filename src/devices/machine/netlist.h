@@ -175,9 +175,8 @@ protected:
 	ATTR_HOT virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	ATTR_COLD virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	ATTR_COLD virtual uint32_t disasm_max_opcode_bytes() const override { return 1; }
-	ATTR_COLD virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	ATTR_COLD virtual uint32_t opcode_alignment() const override { return 1; }
+	ATTR_COLD virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

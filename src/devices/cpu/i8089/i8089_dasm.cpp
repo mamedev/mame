@@ -13,16 +13,16 @@
 class i8089_instruction
 {
 public:
-	i8089_instruction(offs_t pc, const uint8_t *oprom) :
-		m_oprom(oprom), m_ppc(pc), m_pc(0), m_flags(DASMFLAG_SUPPORTED)
+	i8089_instruction(offs_t pc, const device_disasm_interface::data_buffer &opcodes) :
+		m_opcodes(opcodes), m_ppc(pc), m_pc(0), m_flags(DASMFLAG_SUPPORTED)
 	{
 		// instruction
-		m_brp = (oprom[0] >> 5) & 0x07;
-		m_wb  = (oprom[0] >> 3) & 0x03;
-		m_aa  = (oprom[0] >> 1) & 0x03;
-		m_w   = (oprom[0] >> 0) & 0x01;
-		m_opc = (oprom[1] >> 2) & 0x3f;
-		m_mm  = (oprom[1] >> 0) & 0x03;
+		m_brp = (opcodes.r8(pc)   >> 5) & 0x07;
+		m_wb  = (opcodes.r8(pc)   >> 3) & 0x03;
+		m_aa  = (opcodes.r8(pc)   >> 1) & 0x03;
+		m_w   = (opcodes.r8(pc)   >> 0) & 0x01;
+		m_opc = (opcodes.r8(pc+1) >> 2) & 0x3f;
+		m_mm  = (opcodes.r8(pc+1) >> 0) & 0x03;
 
 		// clear buffers
 		memset(m_buffer, 0, sizeof(m_buffer));
@@ -37,7 +37,7 @@ public:
 	int flags() const { return m_flags; }
 
 private:
-	const uint8_t *m_oprom;
+	const device_disasm_interface::data_buffer &m_opcodes;
 
 	char m_buffer[256];
 	char m_offset[100];
@@ -74,7 +74,7 @@ private:
 	// fetch 1-byte value
 	uint8_t fetch_value8()
 	{
-		uint8_t i = m_oprom[m_pc];
+		uint8_t i = m_opcodes.r8(m_pc);
 		m_pc += 1;
 		return i;
 	}
@@ -82,7 +82,7 @@ private:
 	// fetch 2-byte value
 	uint16_t fetch_value16()
 	{
-		uint16_t i = m_oprom[m_pc] | m_oprom[m_pc + 1] << 8;
+		uint16_t i = m_opcodes.r16(m_pc);
 		m_pc += 2;
 		return i;
 	}
@@ -101,7 +101,7 @@ private:
 		switch (m_aa)
 		{
 		case 0: sprintf(m_offset, "[%s]", mm_name[m_mm]); break;
-		case 1: sprintf(m_offset, "[%s].%02x", mm_name[m_mm], m_oprom[m_pc]); m_pc++; break;
+		case 1: sprintf(m_offset, "[%s].%02x", mm_name[m_mm], m_opcodes.r8(m_pc)); m_pc++; break;
 		case 2: sprintf(m_offset, "[%s+ix]", mm_name[m_mm]); break;
 		case 3: sprintf(m_offset, "[%s+ix+]", mm_name[m_mm]); break;
 		}
@@ -353,7 +353,7 @@ private:
 			{
 				offset();
 
-				auto tmp = new i8089_instruction(m_pc, m_oprom + m_pc);
+				auto tmp = new i8089_instruction(m_pc, m_opcodes);
 				m_pc += tmp->length();
 				std::string sub = tmp->buffer();
 
@@ -440,7 +440,7 @@ const char *i8089_instruction::m_reg[] =
 
 CPU_DISASSEMBLE(i8089)
 {
-	std::unique_ptr<i8089_instruction> i = std::make_unique<i8089_instruction>(pc, oprom);
+	std::unique_ptr<i8089_instruction> i = std::make_unique<i8089_instruction>(pc, opcodes);
 	stream << i->buffer();
 	offs_t result = i->length() | i->flags();
 	return result;

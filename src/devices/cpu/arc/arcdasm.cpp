@@ -182,8 +182,7 @@ static const char *regnames[0x40] =
 
 CPU_DISASSEMBLE(arc)
 {
-	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	op = big_endianize_int32(op);
+	uint32_t op = opcodes.r32(pc);
 
 	uint8_t opcode = ARC_OPERATION;
 

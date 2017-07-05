@@ -40,3 +40,13 @@ void deco_cpu7_device::mi_decrypt::write(uint16_t adr, uint8_t val)
 	program->write_byte(adr, val);
 	had_written = true;
 }
+
+u32 deco_cpu7_device::disasm_interface_flags() const
+{
+	return DASMINTF_SPLIT_DECRYPTION;
+}
+
+u8 deco_cpu7_device::disasm_decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	return opcode && static_cast<mi_decrypt *>(mintf)->had_written && ((pc & 0x104) == 0x104) ? BITSWAP8(value,6,5,3,4,2,7,1,0) : value;
+}

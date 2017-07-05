@@ -55,10 +55,10 @@ z8001_device::z8001_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-offs_t z8002_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t z8002_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( z8000 );
-	return CPU_DISASSEMBLE_NAME(z8000)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(z8000)(this, stream, pc, opcodes, params, options);
 }
 
 device_memory_interface::space_config_vector z8002_device::memory_space_config() const

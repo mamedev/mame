@@ -636,14 +636,11 @@ static void i860_dasm_tab_replacer(std::ostream &stream, const std::string &buf,
 }
 
 
-static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params, int options)
 {
 	std::stringstream stream;
 
-	uint32_t insn = (oprom[0] << 0) |
-		(oprom[1] << 8)  |
-		(oprom[2] << 16) |
-		(oprom[3] << 24);
+	uint32_t insn = opcodes.r32(pc);
 
 	int unrecognized_op = 1;
 	int upper_6bits = (insn >> 26) & 0x3f;
@@ -694,5 +691,5 @@ static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream
 
 CPU_DISASSEMBLE(i860)
 {
-	return internal_disasm_i860(device, stream, pc, oprom, opram, options);
+	return internal_disasm_i860(device, stream, pc, opcodes, params, options);
 }

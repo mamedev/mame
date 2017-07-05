@@ -25,10 +25,6 @@
 
 #include "emu.h"
 
-#define RDOP(addr)   (oprom[addr - pc])
-#define RDBYTE(addr) (opram[addr - pc])
-#define RDWORD(addr) (opram[addr - pc] | ( oprom[(addr) + 1 - pc] << 8 ))
-
 enum addr_mode {
 	_non=0,      /* no additional arguments */
 	_acc,        /* accumulator */
@@ -147,10 +143,11 @@ static const unsigned char op6280[512]=
 CPU_DISASSEMBLE(h6280)
 {
 	uint32_t flags = 0;
-	int PC, OP, opc, arg;
+	offs_t PC;
+	int OP, opc, arg;
 
 	PC = pc;
-	OP = RDOP(PC);
+	OP = opcodes.r8(PC);
 	OP = OP << 1;
 	PC++;
 
@@ -171,79 +168,79 @@ CPU_DISASSEMBLE(h6280)
 			util::stream_format(stream, "%s", token[opc]);
 			break;
 		case _rel:
-			util::stream_format(stream, "%-5s$%04X", token[opc], (PC + 1 + (signed char)RDBYTE(PC)) & 0xffff);
+			util::stream_format(stream, "%-5s$%04X", token[opc], (PC + 1 + (signed char)params.r8(PC)) & 0xffff);
 			PC+=1;
 			break;
 		case _imm:
-			util::stream_format(stream, "%-5s#$%02X", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s#$%02X", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpg:
-			util::stream_format(stream, "%-5s$%02X", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s$%02X", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpx:
-			util::stream_format(stream, "%-5s$%02X,x", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s$%02X,x", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpy:
-			util::stream_format(stream, "%-5s$%02X,y", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s$%02X,y", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _idx:
-			util::stream_format(stream, "%-5s($%02X,x)", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s($%02X,x)", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _idy:
-			util::stream_format(stream, "%-5s($%02X),y", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s($%02X),y", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpi:
-			util::stream_format(stream, "%-5s($%02X)", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s($%02X)", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _abs:
-			util::stream_format(stream, "%-5s$%04X", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s$%04X", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _abx:
-			util::stream_format(stream, "%-5s$%04X,x", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s$%04X,x", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _aby:
-			util::stream_format(stream, "%-5s$%04X,y", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s$%04X,y", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _ind:
-			util::stream_format(stream, "%-5s($%04X)", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s($%04X)", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _iax:
-			util::stream_format(stream, "%-5s($%04X),X", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s($%04X),X", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _blk:
-			util::stream_format(stream, "%-5s$%04X $%04X $%04X", token[opc], RDWORD(PC), RDWORD(PC+2), RDWORD(PC+4));
+			util::stream_format(stream, "%-5s$%04X $%04X $%04X", token[opc], params.r16(PC), params.r16(PC+2), params.r16(PC+4));
 			PC+=6;
 			break;
 		case _zrl:
-			util::stream_format(stream, "%-5s$%02X $%04X", token[opc], RDBYTE(PC), (PC + 2 + (signed char)RDBYTE(PC+1)) & 0xffff);
+			util::stream_format(stream, "%-5s$%02X $%04X", token[opc], params.r8(PC), (PC + 2 + (signed char)params.r8(PC+1)) & 0xffff);
 			PC+=2;
 			break;
 		case _imz:
-			util::stream_format(stream, "%-5s#$%02X $%02X", token[opc], RDBYTE(PC), RDBYTE(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%02X", token[opc], params.r8(PC), params.r8(PC+1));
 			PC+=2;
 			break;
 		case _izx:
-			util::stream_format(stream, "%-5s#$%02X $%02X,x", token[opc], RDBYTE(PC), RDBYTE(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%02X,x", token[opc], params.r8(PC), params.r8(PC+1));
 			PC+=2;
 			break;
 		case _ima:
-			util::stream_format(stream, "%-5s#$%02X $%04X", token[opc], RDBYTE(PC), RDWORD(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%04X", token[opc], params.r8(PC), params.r16(PC+1));
 			PC+=3;
 			break;
 		case _imx:
-			util::stream_format(stream, "%-5s#$%02X $%04X,x", token[opc], RDBYTE(PC), RDWORD(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%04X,x", token[opc], params.r8(PC), params.r16(PC+1));
 			PC+=3;
 			break;
 

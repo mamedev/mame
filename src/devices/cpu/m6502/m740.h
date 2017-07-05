@@ -45,7 +45,7 @@ public:
 
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options) override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 	virtual void execute_set_input(int inputnum, int state) override;

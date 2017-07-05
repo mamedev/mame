@@ -96,10 +96,10 @@ device_memory_interface::space_config_vector adsp21062_device::memory_space_conf
 	};
 }
 
-offs_t adsp21062_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t adsp21062_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sharc );
-	return CPU_DISASSEMBLE_NAME(sharc)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sharc)(this, stream, pc, opcodes, params, options);
 }
 
 void adsp21062_device::enable_recompiler()

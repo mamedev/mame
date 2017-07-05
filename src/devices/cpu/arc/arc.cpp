@@ -26,10 +26,10 @@ arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-offs_t arc_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arc_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arc );
-	return CPU_DISASSEMBLE_NAME(arc)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(arc)(this, stream, pc, opcodes, params, options);
 }
 
 

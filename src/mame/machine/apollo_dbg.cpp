@@ -11,6 +11,7 @@
 #define VERBOSE 1
 
 #include "emu.h"
+#include "debug/debugbuf.h"
 #include "includes/apollo.h"
 #include "cpu/m68000/m68kcpu.h"
 
@@ -1034,11 +1035,10 @@ static const char* get_svc_call(m68000_base_device *m68k, int trap_no,
 	return sb;
 }
 
+// WTF?
 static const std::string &disassemble(m68000_base_device *m68k, offs_t pc, std::string& sb)
 {
-	uint8_t oprom[10];
-	uint8_t opram[10];
-	uint32_t options = 0;
+	debug_disasm_buffer buffer(*m68k);
 
 	// remember bus error state
 	uint32_t tmp_buserror_occurred = m68k->mmu_tmp_buserror_occurred;
@@ -1047,25 +1047,9 @@ static const std::string &disassemble(m68000_base_device *m68k, offs_t pc, std::
 	m68k->mmu_tmp_buserror_occurred = 0;
 	m68k->mmu_tmp_rw = 1;
 
-	int i;
-	for (i = 0; i < sizeof(oprom); i++)
-	{
-		oprom[i] = opram[i] = m68k->read8(pc + i);
-		if (m68k->mmu_tmp_buserror_occurred)
-		{
-			sb = string_format("- (apollo_disassemble failed at %08x)", pc + i);
-
-			// restore previous bus error state
-			m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;
-			m68k->mmu_tmp_buserror_address = tmp_buserror_address;
-
-			return sb;
-		}
-	}
-
-	std::ostringstream stream;
-	m68k->disassemble(stream, pc, oprom, opram, options);
-	sb = stream.str();
+	offs_t next_pc, size;
+	u32 info;
+	buffer.disassemble(pc, sb, next_pc, size, info);
 
 	// restore previous bus error state
 	m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;

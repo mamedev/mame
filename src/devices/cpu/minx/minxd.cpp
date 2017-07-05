@@ -367,53 +367,53 @@ case R_XI:  util::stream_format(stream, "%cXI", fill); break;         \
 case R_YI:  util::stream_format(stream, "%cYI", fill); break;         \
 case R_PC:  util::stream_format(stream, "%cPC", fill); break;         \
 case I_8:            /* 8 bit immediate */              \
-	ea = oprom[pos++];                      \
+	ea = opcodes.r8(pos++);                      \
 	util::stream_format(stream, "%c$%02X", fill, ea);         \
 	break;                              \
 case I_16:           /* 16 bit immediate */             \
-	ea = oprom[pos++];                      \
-	ea += oprom[pos++] << 8;                    \
+	ea = opcodes.r8(pos++);                      \
+	ea += opcodes.r8(pos++) << 8;                    \
 	util::stream_format(stream, "%c$%04X", fill, ea);         \
 	break;                              \
 case D_8:            /* PC + 8 bit displacement (signed) */     \
-	ofs8 = oprom[pos++];                        \
+	ofs8 = opcodes.r8(pos++);                        \
 	util::stream_format(stream, "%c$%04X", fill, pc + pos - 1 + ofs8);    \
 	break;                              \
 case D_16:           /* PC + 16 bit displacement */         \
-	ea = oprom[pos++];                      \
-	ea += oprom[pos++] << 8;                    \
+	ea = opcodes.r8(pos++);                      \
+	ea += opcodes.r8(pos++) << 8;                    \
 	ea = ea - 1;                            \
 	util::stream_format(stream, "%c$%04X", fill, pc + pos + ea);      \
 	break;                              \
 case S_8:            /* SP + 8 bit displacement (signed) */     \
-	ea = oprom[pos++];                      \
+	ea = opcodes.r8(pos++);                      \
 	util::stream_format(stream, "%cSP+$%02X", fill, ea);          \
 	break;                              \
 case M_IHL: util::stream_format(stream, "%c[I+HL]", fill); break;     \
 case M_N8:           /* [I+N+ofs8] */                   \
-	ea = oprom[pos++];                      \
+	ea = opcodes.r8(pos++);                      \
 	util::stream_format(stream, "%c[I+N+$%02X]", fill, ea);       \
 	break;                              \
 case M_I16:          /* [I+ofs16] */                    \
-	ea = oprom[pos++];                      \
-	ea += oprom[pos++] << 8;                    \
+	ea = opcodes.r8(pos++);                      \
+	ea += opcodes.r8(pos++) << 8;                    \
 	util::stream_format(stream, "%c[I+$%04X]", fill, ea);         \
 	break;                              \
 case M_X:   util::stream_format(stream, "%c[X]", fill); break;        \
 case M_Y:   util::stream_format(stream, "%c[Y]", fill); break;        \
 case M_X8:           /* [X + 8 bit displacement (signed)] */        \
-	ea = oprom[pos++];                      \
+	ea = opcodes.r8(pos++);                      \
 	util::stream_format(stream, "%c[X+$%02X]", fill, ea);         \
 	break;                              \
 case M_Y8:           /* [Y + 8 bit displacement (signed)] */        \
-	ea = oprom[pos++];                      \
+	ea = opcodes.r8(pos++);                      \
 	util::stream_format(stream, "%c[Y+$%02X]", fill, ea);         \
 	break;                              \
 case M_XL:  util::stream_format(stream, "%c[X+L]", fill); break;      \
 case M_YL:  util::stream_format(stream, "%c[Y+L]", fill); break;      \
 case M_16:           /* [16bit] */                  \
-	ea = oprom[pos++];                      \
-	ea += oprom[pos++] << 8;                    \
+	ea = opcodes.r8(pos++);                      \
+	ea += opcodes.r8(pos++) << 8;                    \
 	util::stream_format(stream, "%c[$%04X]", fill, ea);           \
 	break;                              \
 case M_HL:  util::stream_format(stream, "%c[HL]", fill); break;       \
@@ -426,17 +426,17 @@ CPU_DISASSEMBLE(minx)
 	uint8_t op, op1;
 	int8_t  ofs8;
 	uint16_t ea;
-	int pos = 0;
+	offs_t pos = pc;
 
-	op1 = op = oprom[pos++];
+	op1 = op = opcodes.r8(pos++);
 
 	switch (op) {
 	case 0xCE:
-		op = oprom[pos++];
+		op = opcodes.r8(pos++);
 		instr = &mnemonic_ce[op];
 		break;
 	case 0xCF:
-		op = oprom[pos++];
+		op = opcodes.r8(pos++);
 		instr = &mnemonic_cf[op];
 		break;
 	default:
@@ -460,5 +460,5 @@ CPU_DISASSEMBLE(minx)
 			HANDLE_ARGUMENT;
 		}
 	}
-	return pos | s_flags[instr->mnemonic] | DASMFLAG_SUPPORTED;
+	return (pos - pc) | s_flags[instr->mnemonic] | DASMFLAG_SUPPORTED;
 }

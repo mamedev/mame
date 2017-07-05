@@ -1208,13 +1208,8 @@ static uint32_t sharc_dasm_one(std::ostream &stream, offs_t pc, uint64_t opcode)
 
 CPU_DISASSEMBLE( sharc )
 {
-	uint64_t op;
 	uint32_t flags;
 
-	op = ((uint64_t)oprom[0] << 0)  | ((uint64_t)oprom[1] << 8) |
-			((uint64_t)oprom[2] << 16) | ((uint64_t)oprom[3] << 24) |
-			((uint64_t)oprom[4] << 32) | ((uint64_t)oprom[5] << 40);
-
-	flags = sharc_dasm_one(stream, pc, op);
+	flags = sharc_dasm_one(stream, pc, opcodes.r64(pc));
 	return 1 | flags | DASMFLAG_SUPPORTED;
 }

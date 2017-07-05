@@ -14,6 +14,7 @@
 #include "debugcmd.h"
 #include "debugcon.h"
 #include "debugcpu.h"
+#include "debugbuf.h"
 #include "express.h"
 #include "debughlp.h"
 #include "debugvw.h"
@@ -2403,10 +2404,7 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &params)
 {
 	u64 offset, length, bytes = 1;
-	int minbytes, maxbytes, byteswidth;
-	address_space *space, *decrypted_space;
-	FILE *f;
-	int j;
+	address_space *space;
 
 	/* validate parameters */
 	if (!validate_number_parameter(params[1], offset))
@@ -2417,10 +2415,6 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 		return;
 	if (!validate_cpu_space_parameter(params.size() > 4 ? params[4].c_str() : nullptr, AS_PROGRAM, space))
 		return;
-	if (space->device().memory().has_space(AS_OPCODES))
-		decrypted_space = &space->device().memory().space(AS_OPCODES);
-	else
-		decrypted_space = space;
 
 	/* determine the width of the bytes */
 	device_disasm_interface *dasmintf;
@@ -2429,104 +2423,72 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 		m_console.printf("No disassembler available for %s\n", space->device().name());
 		return;
 	}
-	minbytes = dasmintf->min_opcode_bytes();
-	maxbytes = dasmintf->max_opcode_bytes();
-	byteswidth = 0;
-	if (bytes)
+
+	/* build the data, check the maximum size of the opcodes and disasm */
+	std::vector<offs_t> pcs;
+	std::vector<std::string> instructions;
+	std::vector<std::string> tpc;
+	std::vector<std::string> topcodes;
+	int max_opcodes_size = 0;
+	int max_disasm_size = 0;
+
+	debug_disasm_buffer buffer(space->device());
+
+	for (u64 i = 0; i < length; )
 	{
-		byteswidth = (maxbytes + (minbytes - 1)) / minbytes;
-		byteswidth *= (2 * minbytes) + 1;
+		std::string instruction;
+		offs_t next_offset;
+		offs_t size;
+		u32 info;
+		buffer.disassemble(offset, instruction, next_offset, size, info);
+		pcs.push_back(offset);
+		instructions.emplace_back(instruction);
+		tpc.emplace_back(buffer.pc_to_string(offset));
+		topcodes.emplace_back(buffer.data_to_string(offset, size, true));
+
+		int osize = topcodes.back().size();
+		if(osize > max_opcodes_size)
+			max_opcodes_size = osize;
+
+		int dsize = instructions.back().size();
+		if(dsize > max_disasm_size)
+			max_disasm_size = dsize;
+
+		i += size;
+		offset = next_offset;
 	}
 
-	/* open the file */
-	f = fopen(params[0].c_str(), "w");
-	if (!f)
+	/* write the data */
+	std::ofstream f(params[0]);
+	if (!f.good())
 	{
-		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
 
-	/* now write the data out */
-	util::ovectorstream output;
-	util::ovectorstream disasm;
-	output.reserve(512);
-	for (u64 i = 0; i < length; )
+	if (bytes)
 	{
-		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
-		const char *comment;
-		offs_t tempaddr;
-		int numbytes = 0;
-		output.clear();
-		output.rdbuf()->clear();
-		disasm.clear();
-		disasm.seekp(0);
-
-		/* print the address */
-		stream_format(output, "%0*X: ", space->logaddrchars(), u32(space->byte_to_address(pcbyte)));
-
-		/* make sure we can translate the address */
-		tempaddr = pcbyte;
-		if (space->device().memory().translate(space->spacenum(), TRANSLATE_FETCH_DEBUG, tempaddr))
+		for(unsigned int i=0; i != pcs.size(); i++)
 		{
-			{
-				u8 opbuf[64], argbuf[64];
-
-				/* fetch the bytes up to the maximum */
-				for (numbytes = 0; numbytes < maxbytes; numbytes++)
-				{
-					opbuf[numbytes] = m_cpu.read_opcode(*decrypted_space, pcbyte + numbytes, 1);
-					argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
-				}
-
-				/* disassemble the result */
-				i += numbytes = dasmintf->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
-			}
-
-			/* print the bytes */
-			if (bytes)
-			{
-				auto const startdex = output.tellp();
-				numbytes = space->address_to_byte(numbytes);
-				for (j = 0; j < numbytes; j += minbytes)
-					stream_format(output, "%0*X ", minbytes * 2, m_cpu.read_opcode(*decrypted_space, pcbyte + j, minbytes));
-				if ((output.tellp() - startdex) < byteswidth)
-					stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
-				stream_format(output, "  ");
-			}
-		}
-		else
-		{
-			disasm << "<unmapped>";
-			i += minbytes;
-		}
-
-		/* add the disassembly */
-		disasm.put('\0');
-		stream_format(output, "%s", &disasm.vec()[0]);
-
-		/* attempt to add the comment */
-		comment = space->device().debug()->comment_text(tempaddr);
-		if (comment != nullptr)
-		{
-			/* somewhat arbitrary guess as to how long most disassembly lines will be [column 60] */
-			if (output.tellp() < 60)
-			{
-				/* pad the comment space out to 60 characters and null-terminate */
-				while (output.tellp() < 60) output.put(' ');
-
-				stream_format(output, "// %s", comment);
-			}
+			const char *comment = space->device().debug()->comment_text(pcs[i]);
+			if (comment)
+				util::stream_format(f, "%s: %-*s %-*s // %s\n", tpc[i], max_opcodes_size, topcodes[i], max_disasm_size, instructions[i], comment);
 			else
-				stream_format(output, "\t// %s", comment);
+				util::stream_format(f, "%s: %-*s %s\n", tpc[i], max_opcodes_size, topcodes[i], instructions[i]);
 		}
-
-		/* output the result */
-		auto const &text(output.vec());
-		fprintf(f, "%.*s\n", int(unsigned(text.size())), &text[0]);
+	}
+	else
+	{
+		for(unsigned int i=0; i != pcs.size(); i++)
+		{
+			const char *comment = space->device().debug()->comment_text(pcs[i]);
+			if (comment)
+				util::stream_format(f, "%s: %-*s // %s\n", tpc[i], max_disasm_size, instructions[i], comment);
+			else
+				util::stream_format(f, "%s: %s\n", tpc[i], instructions[i]);
+		}
 	}
 
-	/* close the file */
-	fclose(f);
 	m_console.printf("Data dumped successfully\n");
 }
 
@@ -2640,13 +2602,9 @@ void debugger_commands::execute_traceflush(int ref, const std::vector<std::strin
 void debugger_commands::execute_history(int ref, const std::vector<std::string> &params)
 {
 	/* validate parameters */
-	address_space *space, *decrypted_space;
+	address_space *space;
 	if (!validate_cpu_space_parameter(!params.empty() ? params[0].c_str() : nullptr, AS_PROGRAM, space))
 		return;
-	if (space->device().memory().has_space(AS_OPCODES))
-		decrypted_space = &space->device().memory().space(AS_OPCODES);
-	else
-		decrypted_space = space;
 
 	u64 count = device_debug::HISTORY_SIZE;
 	if (params.size() > 1 && !validate_number_parameter(params[1], count))
@@ -2665,25 +2623,19 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
 		m_console.printf("No disassembler available for %s\n", space->device().name());
 		return;
 	}
-	int maxbytes = dasmintf->max_opcode_bytes();
+
+	debug_disasm_buffer buffer(space->device());
+	
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);
+		std::string instruction;
+		offs_t next_offset;
+		offs_t size;
+		u32 info;
+		buffer.disassemble(pc, instruction, next_offset, size, info);
 
-		/* fetch the bytes up to the maximum */
-		offs_t pcbyte = space->address_to_byte(pc) & space->bytemask();
-		u8 opbuf[64], argbuf[64];
-		for (int numbytes = 0; numbytes < maxbytes; numbytes++)
-		{
-			opbuf[numbytes] = m_cpu.read_opcode(*decrypted_space, pcbyte + numbytes, 1);
-			argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
-		}
-
-		util::ovectorstream buffer;
-		dasmintf->disassemble(buffer, pc, opbuf, argbuf);
-		buffer.put('\0');
-
-		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, &buffer.vec()[0]);
+		m_console.printf("%s: %s\n", buffer.pc_to_string(pc), instruction);
 	}
 }
 

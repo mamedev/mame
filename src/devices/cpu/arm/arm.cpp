@@ -22,7 +22,6 @@
 #include "debugger.h"
 
 CPU_DISASSEMBLE( arm );
-CPU_DISASSEMBLE( arm_be );
 
 #define ARM_DEBUG_CORE 0
 #define ARM_DEBUG_COPRO 0
@@ -1562,15 +1561,8 @@ void arm_cpu_device::HandleCoPro( uint32_t insn )
 }
 
 
-offs_t arm_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arm_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arm );
-	return CPU_DISASSEMBLE_NAME(arm)(this, stream, pc, oprom, opram, options);
-}
-
-
-offs_t arm_be_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( arm_be );
-	return CPU_DISASSEMBLE_NAME(arm_be)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(arm)(this, stream, pc, opcodes, params, options);
 }

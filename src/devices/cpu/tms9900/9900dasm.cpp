@@ -296,17 +296,14 @@ static const enum opcodes ops_001c_002f_s0[20]=
 };
 
 
-
-static int PC;
-
-
-static inline uint16_t readop_arg(const uint8_t *opram, unsigned pc)
+static inline uint16_t readop_arg(const device_disasm_interface::data_buffer &params, offs_t &PC)
 {
-	uint16_t result = opram[PC++ - pc] << 8;
-	return result | opram[PC++ - pc];
+	uint16_t result = params.r16(PC);
+	PC += 2;;
+	return result;
 }
 
-static void print_arg (std::ostream &stream, int mode, int arg, const uint8_t *opram, unsigned pc)
+static void print_arg (std::ostream &stream, int mode, int arg, const device_disasm_interface::data_buffer &params, offs_t &PC)
 {
 	int base;
 
@@ -319,7 +316,7 @@ static void print_arg (std::ostream &stream, int mode, int arg, const uint8_t *o
 			util::stream_format(stream, "*R%d", arg);
 			break;
 		case 0x2:   /* symbolic|indexed */
-			base = readop_arg(opram, pc);
+			base = readop_arg(params, PC);
 			if (arg)    /* indexed */
 				util::stream_format(stream, "@>%04x(R%d)", base, arg);
 			else        /* symbolic (direct) */
@@ -335,7 +332,7 @@ static void print_arg (std::ostream &stream, int mode, int arg, const uint8_t *o
 /*****************************************************************************
  *  Disassemble a single command and return the number of bytes it uses.
  *****************************************************************************/
-static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const uint8_t *oprom, const uint8_t *opram)
+static unsigned Dasm9900 (std::ostream &stream, offs_t pc, int model_id, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params)
 {
 	int OP, OP2, opc;
 	int sarg, darg, smode, dmode;
@@ -372,9 +369,9 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 	/*if ((model_id == TI990_12_ID))
 	    processor_mask |= ps_ti990_12;*/    /* ti990/12, tms99000, and later */
 
-	PC = pc;
-	OP = oprom[PC++ - pc] << 8;
-	OP |= oprom[PC++ - pc];
+	offs_t PC = pc;
+	OP = opcodes.r16(PC);
+	PC += 2;
 
 	/* let's identify the opcode */
 	if (OP >= 0x4000)
@@ -488,9 +485,9 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		darg = BITS(OP,6,9);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		break;
 
 	case format_2a:     /* jump instructions */
@@ -516,13 +513,13 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		if (format == format_3_9)
 		{
 			util::stream_format(stream, "%-4s ", mnemonic);
-			print_arg(stream, smode, sarg, opram, pc);
+			print_arg(stream, smode, sarg, params, PC);
 			util::stream_format(stream, ",R%d", darg);
 		}
 		else
 		{
 			util::stream_format(stream, "%-4s ", mnemonic);
-			print_arg(stream, smode, sarg, opram, pc);
+			print_arg(stream, smode, sarg, params, PC);
 			util::stream_format(stream, ",%d", darg);
 		}
 		break;
@@ -539,7 +536,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		sarg = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		break;
 
 	case format_7:      /* instructions without operands */
@@ -548,13 +545,13 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 
 	case format_8a:     /* immediate instructions (destination register) */
 		darg = BITS(OP,12,15);
-		sarg = readop_arg(opram, pc);
+		sarg = readop_arg(params, PC);
 
 		util::stream_format(stream, "%-4s R%d,>%04x", mnemonic, darg, sarg);
 		break;
 
 	case format_8b:     /* immediate instructions (no destination register) */
-		sarg = readop_arg(opram, pc);
+		sarg = readop_arg(params, PC);
 
 		util::stream_format(stream, "%-4s >%04x", mnemonic, sarg);
 		break;
@@ -567,7 +564,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		break;
 
 	case format_11:     /* multiple precision instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -576,14 +573,14 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		byte_count = BITS(OP2,0,3);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
 		break;
 
 	case format_12:     /* string instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -593,14 +590,14 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		checkpoint = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d,R%d" : ",R%d,R%d", byte_count, checkpoint);
 		break;
 
 	case format_13:     /* multiple precision shift instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -608,20 +605,20 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		byte_count = BITS(OP2,0,3);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
 		util::stream_format(stream, darg ? ",%d" : ",R%d", darg);
 		break;
 
 	case format_14:     /* bit testing instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
 		darg = BITS(OP2,0,9);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		if (darg == 0x3ff)
 			util::stream_format(stream, ",R0");
 		else
@@ -629,7 +626,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		break;
 
 	case format_15:     /* invert order of field instruction */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -637,13 +634,13 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		bit_width = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, bit_position ? ",(%d," : ",(R%d,", bit_position);
 		util::stream_format(stream, bit_width ? "%d)" : "R%d)", bit_width);
 		break;
 
 	case format_16:     /* field instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -653,15 +650,15 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		bit_width = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, bit_position ? ",(%d," : ",(%d,", bit_position);
 		util::stream_format(stream, bit_width ? "%d)" : "R%d)", bit_width);
 		break;
 
 	case format_17:     /* alter register and jump instructions */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		displacement = (signed char)BITS(OP2,8,15);
 		sarg = BITS(OP2,4,7);
@@ -684,7 +681,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		break;
 
 	case format_19:     /* move address instruction */
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -692,16 +689,16 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		darg = BITS(OP2,6,9);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 				break;
 
 	case format_20:     /* list search instructions */
 	{
 			const char *condition_code;
 
-			OP2 = readop_arg(opram, pc);
+			OP2 = readop_arg(params, PC);
 
 			smode = BITS(OP2,10,11);
 			sarg = BITS(OP2,12,15);
@@ -746,9 +743,9 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 			}
 
 			util::stream_format(stream, "%-4s %s,", mnemonic, condition_code);
-			print_arg(stream, smode, sarg, opram, pc);
+			print_arg(stream, smode, sarg, params, PC);
 			util::stream_format(stream, ",");
-			print_arg(stream, dmode, darg, opram, pc);
+			print_arg(stream, dmode, darg, params, PC);
 			break;
 	}
 
@@ -756,7 +753,7 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 	{
 		int dest_byte_count;
 
-		OP2 = readop_arg(opram, pc);
+		OP2 = readop_arg(params, PC);
 
 		smode = BITS(OP2,10,11);
 		sarg = BITS(OP2,12,15);
@@ -766,9 +763,9 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 		dest_byte_count = BITS(OP,12,15);
 
 		util::stream_format(stream, "%-4s ", mnemonic);
-		print_arg(stream, smode, sarg, opram, pc);
+		print_arg(stream, smode, sarg, params, PC);
 		util::stream_format(stream, ",");
-		print_arg(stream, dmode, darg, opram, pc);
+		print_arg(stream, dmode, darg, params, PC);
 		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
 		util::stream_format(stream, dest_byte_count ? ",%d" : ",R%d", dest_byte_count);
 		break;
@@ -786,15 +783,15 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 
 CPU_DISASSEMBLE( tms9900 )
 {
-	return Dasm9900(stream, pc, TMS9900_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9900_ID, opcodes, params);
 }
 
 CPU_DISASSEMBLE( tms9980 )
 {
-	return Dasm9900(stream, pc, TMS9980_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9980_ID, opcodes, params);
 }
 
 CPU_DISASSEMBLE( tms9995 )
 {
-	return Dasm9900(stream, pc, TMS9995_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9995_ID, opcodes, params);
 }

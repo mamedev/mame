@@ -12,8 +12,8 @@
 
 CPU_DISASSEMBLE(cop424)
 {
-	uint8_t opcode = oprom[0];
-	uint8_t next_opcode = oprom[1];
+	uint8_t opcode = opcodes.r8(pc);
+	uint8_t next_opcode = opcodes.r8(pc+1);
 	uint16_t address;
 	uint32_t flags = 0;
 	int bytes = 1;

@@ -115,8 +115,8 @@ static const u8 ucom4_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(ucom4)
 {
-	int pos = 0;
-	u8 op = oprom[pos++];
+	offs_t pos = pc;
+	u8 op = opcodes.r8(pos++);
 	u8 instr = ucom4_mnemonic[op];
 
 	util::stream_format(stream,"%-4s ", s_mnemonics[instr]);
@@ -128,7 +128,7 @@ CPU_DISASSEMBLE(ucom4)
 		u16 param = op & ((1 << (bits % 10)) - 1);
 		if (bits / 10)
 		{
-			u8 op2 = oprom[pos++];
+			u8 op2 = opcodes.r8(pos++);
 			param = (param << (bits / 10)) | (op2 & ((1 << (bits / 10)) - 1));
 			bits = (bits % 10) + (bits / 10);
 		}
@@ -148,5 +148,5 @@ CPU_DISASSEMBLE(ucom4)
 			util::stream_format(stream, "$%03X", param);
 	}
 
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return (pos - pc) | s_flags[instr] | DASMFLAG_SUPPORTED;
 }

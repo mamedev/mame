@@ -80,8 +80,7 @@
 // this is as messed up as the rest of the 16-bit alignment in LE mode...
 
 #define GET_LIMM \
-	limm = oprom[4] | (oprom[5] << 8); \
-	limm |= (oprom[2] << 16) | (oprom[3] << 24);
+	limm = opcodes.r32(pc+2);
 #define PC_ALIGNED32 \
 	(pc&0xfffffffc)
 

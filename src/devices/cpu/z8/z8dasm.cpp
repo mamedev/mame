@@ -50,8 +50,8 @@ static const char *const CONDITION_CODE[16] =
 #define DA      "%04Xh"
 #define RA      "%04Xh"
 
-#define B0      oprom[0]
-#define B1      oprom[1]
+#define B0      opcodes.r8(pos)
+#define B1      opcodes.r8(pos+1)
 #define B0H     (B0 >> 4)
 #define B0L     (B0 & 0x0f)
 #define OPH     (opcode >> 4)
@@ -74,7 +74,7 @@ static const char *const CONDITION_CODE[16] =
 
 #define illegal                     util::stream_format(stream, "Illegal")
 #define mnemonic(_mnemonic)         util::stream_format(stream, "%-5s", _mnemonic)
-#define bytes(_count)               oprom += (_count - 1)
+#define bytes(_count)               pos += (_count - 1)
 #define step_over                   flags = DASMFLAG_STEP_OVER
 #define step_out                    flags = DASMFLAG_STEP_OUT
 
@@ -84,9 +84,9 @@ static const char *const CONDITION_CODE[16] =
 
 CPU_DISASSEMBLE(z8)
 {
-	const uint8_t *startrom = oprom;
+	offs_t pos = pc;
 	uint32_t flags = 0;
-	uint8_t opcode = *oprom++;
+	uint8_t opcode = opcodes.r8(pos++);
 	int argc = 0;
 
 	switch (pc)
@@ -97,7 +97,7 @@ CPU_DISASSEMBLE(z8)
 	case 0x0006:
 	case 0x0008:
 	case 0x000a:
-		util::stream_format(stream, "IRQ%u Vector %04Xh", pc / 2, opcode << 8 | *oprom++); break;
+		util::stream_format(stream, "IRQ%u Vector %04Xh", pc / 2, opcode << 8 | opcodes.r8(pos++)); break;
 	default:
 		switch (opcode)
 		{
@@ -375,5 +375,5 @@ CPU_DISASSEMBLE(z8)
 		}
 	}
 
-	return (oprom - startrom) | flags | DASMFLAG_SUPPORTED;
+	return (pos - pc) | flags | DASMFLAG_SUPPORTED;
 }

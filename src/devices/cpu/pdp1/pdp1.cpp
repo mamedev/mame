@@ -418,10 +418,10 @@ void pdp1_device::device_config_complete()
 }
 
 
-offs_t pdp1_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t pdp1_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( pdp1 );
-	return CPU_DISASSEMBLE_NAME(pdp1)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(pdp1)(this, stream, pc, opcodes, params, options);
 }
 
 

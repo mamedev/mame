@@ -155,8 +155,6 @@ static char *dis_decode_reg(unsigned long iCode, char* tmpStr,unsigned char cnt)
 	return tmpStr;
 }
 
-#define READ32(dis,offs) ((dis)->oprom[(offs) + 0] | ((dis)->oprom[(offs) + 1] << 8) | ((dis)->oprom[(offs) + 2] << 16) | ((dis)->oprom[(offs) + 3] << 24))
-
 static void i960_disassemble(disassemble_t *diss)
 {
 	unsigned char op,op2;
@@ -167,7 +165,7 @@ static void i960_disassemble(disassemble_t *diss)
 	char tmpStr[256];
 	long i;
 
-	iCode = READ32(diss,0);
+	iCode = diss->opcodes.r32(diss->IP);
 	op = (unsigned char) (iCode >> 24);
 	op2 = (unsigned char) (iCode >> 7)&0xf;
 
@@ -218,19 +216,19 @@ static void i960_disassemble(disassemble_t *diss)
 			switch (model)
 			{
 			case 0:
-				util::stream_format(diss->stream, "%-8s%s,0x%x",NEM,REG_DST, READ32(diss,4));
+				util::stream_format(diss->stream, "%-8s%s,0x%x",NEM,REG_DST, diss->opcodes.r32(diss->IP + 4));
 				diss->IPinc = 8;
 				break;
 			case 1:
-				util::stream_format(diss->stream, "%-8s%s,0x%x(%s)",NEM,REG_DST, READ32(diss,4),REG_ABASE);
+				util::stream_format(diss->stream, "%-8s%s,0x%x(%s)",NEM,REG_DST, diss->opcodes.r32(diss->IP + 4),REG_ABASE);
 				diss->IPinc = 8;
 				break;
 			case 2:
-				util::stream_format(diss->stream, "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_REG2,(iCode>>7)&0x7);
+				util::stream_format(diss->stream, "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, diss->opcodes.r32(diss->IP + 4),REG_REG2,(iCode>>7)&0x7);
 				diss->IPinc = 8;
 				break;
 			case 3:
-				util::stream_format(diss->stream, "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_ABASE,REG_REG2,(iCode>>7)&0x7);
+				util::stream_format(diss->stream, "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, diss->opcodes.r32(diss->IP + 4),REG_ABASE,REG_REG2,(iCode>>7)&0x7);
 				diss->IPinc = 8;
 				break;
 			default:
@@ -295,7 +293,7 @@ static void i960_disassemble(disassemble_t *diss)
 
 CPU_DISASSEMBLE(i960)
 {
-	disassemble_t dis(stream, pc, oprom);
+	disassemble_t dis(stream, pc, opcodes);
 
 	i960_disassemble(&dis);
 

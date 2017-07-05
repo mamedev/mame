@@ -235,7 +235,7 @@ static void aluconst(std::ostream &stream, int dest, int op)
 /* execute instructions on this CPU until icount expires */
 CPU_DISASSEMBLE(adsp21xx)
 {
-	unsigned int op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16);
+	unsigned int op = opcodes.r32(pc);
 	unsigned dasmflags = 0;
 	int temp;
 

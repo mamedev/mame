@@ -123,7 +123,7 @@ void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::s
 }
 
 
-offs_t xxx_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint32_t *oprom, const uint32_t *opram, uint32_t options)
+offs_t xxx_cpu_device::disassemble(char *buffer, offs_t pc, const uint32_t *oprom, const uint32_t *opram, uint32_t options)
 {
-	return CPU_DISASSEMBLE_NAME(xxx)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(xxx)(this, buffer, pc, opcodes, params, options);
 }

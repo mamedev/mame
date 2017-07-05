@@ -148,10 +148,10 @@ void tmp95c063_device::device_config_complete()
 }
 
 
-offs_t tlcs900h_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tlcs900h_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tlcs900 );
-	return CPU_DISASSEMBLE_NAME(tlcs900)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tlcs900)(this, stream, pc, opcodes, params, options);
 }
 
 

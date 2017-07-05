@@ -13,13 +13,6 @@
 
 
 /***************************************************************************
-    MEMORY ACCESSORS
-***************************************************************************/
-
-#define ROPCODE(offs)   ((oprom[offs] << 8) | oprom[(offs) + 1])
-
-
-/***************************************************************************
     STATIC VARIABLES
 ***************************************************************************/
 
@@ -82,10 +75,10 @@ static inline char *signed_16bit(int16_t val)
 	return temp;
 }
 
-static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const uint8_t *oprom)
+static unsigned dasmjag(int variant, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t flags = 0;
-	int op = ROPCODE(0);
+	int op = opcodes.r16(pc);
 	int reg1 = (op >> 5) & 31;
 	int reg2 = op & 31;
 	int size = 2;
@@ -140,7 +133,7 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 		case 35:    util::stream_format(stream, "moveq   %d,r%d", reg1, reg2);                  break;
 		case 36:    util::stream_format(stream, "moveta  r%d,r%d", reg1, reg2);                 break;
 		case 37:    util::stream_format(stream, "movefa  r%d,r%d", reg1, reg2);                 break;
-		case 38:    util::stream_format(stream, "movei   $%x,r%d", ROPCODE(2) | (ROPCODE(4)<<16), reg2); size = 6; break;
+		case 38:    util::stream_format(stream, "movei   $%x,r%d", opcodes.r32(pc+2), reg2); size = 6; break;
 		case 39:    util::stream_format(stream, "loadb   (r%d),r%d", reg1, reg2);                   break;
 		case 40:    util::stream_format(stream, "loadw   (r%d),r%d", reg1, reg2);                   break;
 		case 41:    util::stream_format(stream, "load    (r%d),r%d", reg1, reg2);                   break;
@@ -191,10 +184,10 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 
 CPU_DISASSEMBLE( jaguargpu )
 {
-	return dasmjag(JAGUAR_VARIANT_GPU, stream, pc, oprom);
+	return dasmjag(JAGUAR_VARIANT_GPU, stream, pc, opcodes);
 }
 
 CPU_DISASSEMBLE( jaguardsp )
 {
-	return dasmjag(JAGUAR_VARIANT_DSP, stream, pc, oprom);
+	return dasmjag(JAGUAR_VARIANT_DSP, stream, pc, opcodes);
 }

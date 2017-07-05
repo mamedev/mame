@@ -66,9 +66,5 @@ static offs_t ssem_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 
 CPU_DISASSEMBLE( ssem )
 {
-	uint32_t op = (*(uint8_t *)(opram + 0) << 24) |
-				(*(uint8_t *)(opram + 1) << 16) |
-				(*(uint8_t *)(opram + 2) <<  8) |
-				(*(uint8_t *)(opram + 3) <<  0);
-	return ssem_dasm_one(stream, pc, op);
+	return ssem_dasm_one(stream, pc, opcodes.r32(pc));
 }

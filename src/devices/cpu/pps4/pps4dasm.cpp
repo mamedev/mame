@@ -12,9 +12,6 @@
  *****************************************************************************/
 #include "emu.h"
 
-#define OP(A)   oprom[(A) - PC]
-#define ARG(A)  opram[(A) - PC]
-
 typedef enum pps4_token_e {
 	t_AD,       t_ADC,      t_ADSK,     t_ADCSK,    t_ADI,
 	t_DC,       t_AND,      t_OR,       t_EOR,      t_COMP,
@@ -371,7 +368,7 @@ CPU_DISASSEMBLE(pps4)
 {
 	uint32_t flags = 0;
 	unsigned PC = pc;
-	uint8_t op = OP(pc++);
+	uint8_t op = opcodes.r8(pc++);
 	uint32_t tok = table[op];
 
 	if (0 == (tok & t_MASK)) {
@@ -422,13 +419,13 @@ CPU_DISASSEMBLE(pps4)
 
 	if (tok & t_I8) {
 		// 8 bit immediate I/O port address
-		uint8_t arg = ARG(pc++);
+		uint8_t arg = params.r8(pc++);
 		util::stream_format(stream, "%02x", arg);
 	}
 
 	if (tok & t_I8c) {
 		// 8 bit immediate offset into page
-		uint16_t arg = ~ARG(pc++) & 255;
+		uint16_t arg = ~params.r8(pc++) & 255;
 		util::stream_format(stream, "%02x", arg);
 	}
 

@@ -218,9 +218,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual uint32_t opcode_alignment() const override { return 4; }
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options) override;
 
 	// CPU registers
 	uint32_t m_pc;
@@ -397,6 +396,6 @@ DECLARE_DEVICE_TYPE(CXD8606BQ, cxd8606bq_device)
 DECLARE_DEVICE_TYPE(CXD8606CQ, cxd8606cq_device)
 
 
-extern unsigned DasmPSXCPU(psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
+extern unsigned DasmPSXCPU(psxcpu_state *state, std::ostream &stream, uint32_t pc, const device_disasm_interface::data_buffer &opcodes);
 
 #endif // MAME_CPU_PSX_PSX_H

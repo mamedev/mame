@@ -331,7 +331,7 @@ static const char *get_bit_address( uint8_t arg )
 
 #endif
 
-static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
+static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params)
 {
 	uint32_t flags = 0;
 	unsigned PC = pc;
@@ -340,7 +340,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 	uint16_t addr;
 	int8_t rel;
 
-	op = oprom[PC++ - pc];
+	op = opcodes.r8(PC++);
 	switch( op )
 	{
 		//NOP
@@ -357,15 +357,15 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		case 0xa1:
 		case 0xc1:
 		case 0xe1:
-			addr = opram[PC++ - pc];
+			addr = params.r8(PC++);
 			addr|= (PC & 0xf800) | ((op & 0xe0) << 3);
 			util::stream_format(stream, "ajmp  $%04X", addr);
 			break;
 
 		//LJMP code addr
 		case 0x02:              /* 1: 0000 0010 */
-			addr = (opram[PC++ - pc]<<8) & 0xff00;
-			addr|= opram[PC++ - pc];
+			addr = (params.r8(PC++)<<8) & 0xff00;
+			addr|= params.r8(PC++);
 			util::stream_format(stream, "ljmp  $%04X", addr);
 			break;
 
@@ -381,7 +381,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//INC data addr
 		case 0x05:              /* 1: 0000 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "inc   %s", sym);
 			break;
 
@@ -405,8 +405,8 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//JBC bit addr, code addr
 		case 0x10:              /* 1: 0001 0000 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
-			rel  = opram[PC++ - pc];
+			sym = get_bit_address(mem_names, params.r8(PC++));
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "jbc   %s,$%04X", sym, PC + rel);
 			break;
 
@@ -419,15 +419,15 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		case 0xb1:
 		case 0xd1:
 		case 0xf1:
-			util::stream_format(stream, "acall $%04X", (PC & 0xf800) | ((op & 0xe0) << 3) | opram[PC - pc]);
+			util::stream_format(stream, "acall $%04X", (PC & 0xf800) | ((op & 0xe0) << 3) | params.r8(PC));
 			PC++;
 			flags = DASMFLAG_STEP_OVER;
 			break;
 
 		//LCALL code addr
 		case 0x12:              /* 1: 0001 0010 */
-			addr = (opram[PC++ - pc]<<8) & 0xff00;
-			addr|= opram[PC++ - pc];
+			addr = (params.r8(PC++)<<8) & 0xff00;
+			addr|= params.r8(PC++);
 			util::stream_format(stream, "lcall $%04X", addr);
 			flags = DASMFLAG_STEP_OVER;
 			break;
@@ -444,7 +444,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//DEC data addr
 		case 0x15:              /* 1: 0001 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "dec   %s", sym);
 			break;
 
@@ -469,8 +469,8 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//JB  bit addr, code addr
 		case 0x20:              /* 1: 0010 0000 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
-			rel  = opram[PC++ - pc];
+			sym = get_bit_address(mem_names, params.r8(PC++));
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "jb    %s,$%04X", sym, (PC + rel));
 			break;
 
@@ -487,12 +487,12 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//ADD A, #data
 		case 0x24:              /* 1: 0010 0100 */
-			util::stream_format(stream, "add   a,#$%02X", opram[PC++ - pc]);
+			util::stream_format(stream, "add   a,#$%02X", params.r8(PC++));
 			break;
 
 		//ADD A, data addr
 		case 0x25:              /* 1: 0010 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "add   a,%s", sym);
 			break;
 
@@ -517,8 +517,8 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//JNB bit addr, code addr
 		case 0x30:              /* 1: 0011 0000 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
-			rel  = opram[PC++ - pc];
+			sym = get_bit_address(mem_names, params.r8(PC++));
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "jnb   %s,$%04X", sym, (PC + rel));
 			break;
 
@@ -535,12 +535,12 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//ADDC A, #data
 		case 0x34:              /* 1: 0011 0100 */
-			util::stream_format(stream, "addc  a,#$%02X", opram[PC++ - pc]);
+			util::stream_format(stream, "addc  a,#$%02X", params.r8(PC++));
 			break;
 
 		//ADDC A, data addr
 		case 0x35:              /* 1: 0011 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "addc  a,%s", sym);
 			break;
 
@@ -564,31 +564,31 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//JC code addr
 		case 0x40:              /* 1: 0100 0000 */
-			rel = opram[PC++ - pc];
+			rel = params.r8(PC++);
 			util::stream_format(stream, "jc    $%04X", PC + rel);
 			break;
 
 		//ORL data addr, A
 		case 0x42:              /* 1: 0100 0010 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "orl   %s,a", sym);
 			break;
 
 		//ORL data addr, #data
 		case 0x43:              /* 1: 0100 0011 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
-			util::stream_format(stream, "orl   %s,#$%02X", sym, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
+			util::stream_format(stream, "orl   %s,#$%02X", sym, params.r8(PC++));
 			break;
 
 		//Unable to Test
 		//ORL A, #data
 		case 0x44:              /* 1: 0100 0100 */
-			util::stream_format(stream, "orl   a,#$%02X", opram[PC++ - pc]);
+			util::stream_format(stream, "orl   a,#$%02X", params.r8(PC++));
 			break;
 
 		//ORL A, data addr
 		case 0x45:              /* 1: 0100 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "orl   a,%s", sym);
 			break;
 
@@ -612,32 +612,32 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//JNC code addr
 		case 0x50:              /* 1: 0101 0000 */
-			rel = opram[PC++ - pc];
+			rel = params.r8(PC++);
 			util::stream_format(stream, "jnc   $%04X", PC + rel);
 			break;
 
 		//Unable to test
 		//ANL data addr, A
 		case 0x52:              /* 1: 0101 0010 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "anl   %s,a", sym);
 			break;
 
 		//Unable to test
 		//ANL data addr, #data
 		case 0x53:              /* 1: 0101 0011 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
-			util::stream_format(stream, "anl   %s,#$%02X", sym, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
+			util::stream_format(stream, "anl   %s,#$%02X", sym, params.r8(PC++));
 			break;
 
 		//ANL A, #data
 		case 0x54:              /* 1: 0101 0100 */
-			util::stream_format(stream, "anl   a,#$%02X", opram[PC++ - pc]);
+			util::stream_format(stream, "anl   a,#$%02X", params.r8(PC++));
 			break;
 
 		//ANL A, data addr
 		case 0x55:              /* 1: 0101 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "anl   a,%s", sym);
 			break;
 
@@ -662,31 +662,31 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//JZ code addr
 		case 0x60:              /* 1: 0110 0000 */
-			rel = opram[PC++ - pc];
+			rel = params.r8(PC++);
 			util::stream_format(stream, "jz    $%04X", PC + rel);
 			break;
 
 		//Unable to test
 		//XRL data addr, A
 		case 0x62:              /* 1: 0110 0010 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "xrl   %s,a", sym);
 			break;
 
 		//XRL data addr, #data
 		case 0x63:              /* 1: 0110 0011 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
-			util::stream_format(stream, "xrl   %s,#$%02X", sym, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
+			util::stream_format(stream, "xrl   %s,#$%02X", sym, params.r8(PC++));
 			break;
 
 		//XRL A, #data
 		case 0x64:              /* 1: 0110 0100 */
-			util::stream_format(stream, "xrl   a,#$%02X", opram[PC++ - pc]);
+			util::stream_format(stream, "xrl   a,#$%02X", params.r8(PC++));
 			break;
 
 		//XRL A, data addr
 		case 0x65:              /* 1: 0110 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "xrl   a,%s", sym);
 			break;
 
@@ -711,14 +711,14 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//JNZ code addr
 		case 0x70:              /* 1: 0111 0000 */
-			rel = opram[PC++ - pc];
+			rel = params.r8(PC++);
 			util::stream_format(stream, "jnz   $%04X", PC + rel);
 			break;
 
 		//Unable to test
 		//ORL C, bit addr
 		case 0x72:              /* 1: 0111 0010 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "orl   c,%s", sym);
 			break;
 
@@ -730,20 +730,20 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//MOV A, #data
 		case 0x74:              /* 1: 0111 0100 */
-			util::stream_format(stream, "mov   a,#$%02X", opram[PC++ - pc]);
+			util::stream_format(stream, "mov   a,#$%02X", params.r8(PC++));
 			break;
 
 		//MOV data addr, #data
 		case 0x75:              /* 1: 0111 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
-			util::stream_format(stream, "mov   %s,#$%02X", sym, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
+			util::stream_format(stream, "mov   %s,#$%02X", sym, params.r8(PC++));
 			break;
 
 		//Unable to test
 		//MOV @R0/@R1, #data    /* 1: 0111 011i */
 		case 0x76:
 		case 0x77:
-			util::stream_format(stream, "mov   @r%d,#$%02X", op&1, opram[PC++ - pc]);
+			util::stream_format(stream, "mov   @r%d,#$%02X", op&1, params.r8(PC++));
 			break;
 
 		//MOV R0 to R7, #data   /* 1: 0111 1rrr */
@@ -755,18 +755,18 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		case 0x7d:
 		case 0x7e:
 		case 0x7f:
-			util::stream_format(stream, "mov   r%d,#$%02X", (op & 7), opram[PC++ - pc]);
+			util::stream_format(stream, "mov   r%d,#$%02X", (op & 7), params.r8(PC++));
 			break;
 
 		//SJMP code addr
 		case 0x80:              /* 1: 1000 0000 */
-			rel = opram[PC++ - pc];
+			rel = params.r8(PC++);
 			util::stream_format(stream, "sjmp  $%04X", PC + rel);
 			break;
 
 		//ANL C, bit addr
 		case 0x82:              /* 1: 1000 0010 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "anl   c,%s", sym);
 			break;
 
@@ -782,8 +782,8 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//MOV data addr, data addr  (Note: 1st address is src, 2nd is dst, but the mov command works as mov dst,src)
 		case 0x85:              /* 1: 1000 0101 */
-			sym  = get_data_address(mem_names, opram[PC++ - pc]);
-			sym2 = get_data_address(mem_names, opram[PC++ - pc]);
+			sym  = get_data_address(mem_names, params.r8(PC++));
+			sym2 = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   %s,%s", sym2, sym);
 			break;
 
@@ -791,7 +791,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		//MOV data addr, @R0/@R1/* 1: 1000 011i */
 		case 0x86:
 		case 0x87:
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   %s,@r%d", sym, op&1);
 			break;
 
@@ -804,20 +804,20 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		case 0x8d:
 		case 0x8e:
 		case 0x8f:
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   %s,r%d", sym, op&7);
 			break;
 
 		//MOV DPTR, #data16
 		case 0x90:              /* 1: 1001 0000 */
-			addr = (opram[PC++ - pc]<<8) & 0xff00;
-			addr|= opram[PC++ - pc];
+			addr = (params.r8(PC++)<<8) & 0xff00;
+			addr|= params.r8(PC++);
 			util::stream_format(stream, "mov   dptr,#$%04X", addr);
 			break;
 
 		//MOV bit addr, C
 		case 0x92:              /* 1: 1001 0010 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   %s,c", sym);
 			break;
 
@@ -828,12 +828,12 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//SUBB A, #data
 		case 0x94:              /* 1: 1001 0100 */
-			util::stream_format(stream, "subb  a,#$%02X", opram[PC++ - pc]);
+			util::stream_format(stream, "subb  a,#$%02X", params.r8(PC++));
 			break;
 
 		//SUBB A, data addr
 		case 0x95:              /* 1: 1001 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "subb  a,%s", sym);
 			break;
 
@@ -859,13 +859,13 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		//Unable to test
 		//ORL C, /bit addr
 		case 0xa0:                /* 1: 1010 0000 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "orl   c,/%s", sym);
 			break;
 
 		//MOV C, bit addr
 		case 0xa2:                /* 1: 1010 0010 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   c,%s", sym);
 			break;
 
@@ -888,7 +888,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		//MOV @R0/@R1, data addr  /* 1: 1010 011i */
 		case 0xa6:
 		case 0xa7:
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   @r%d,%s", op&1, sym);
 			break;
 
@@ -901,19 +901,19 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		case 0xad:
 		case 0xae:
 		case 0xaf:
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   r%d,%s", op&7, sym);
 			break;
 
 		//ANL C,/bit addr
 		case 0xb0:                       /* 1: 1011 0000 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "anl   c,/%s", sym);
 			break;
 
 		//CPL bit addr
 		case 0xb2:                       /* 1: 1011 0010 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "cpl   %s", sym);
 			break;
 
@@ -925,15 +925,15 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//CJNE A, #data, code addr
 		case 0xb4:                       /* 1: 1011 0100 */
-			data = opram[PC++ - pc];
-			rel  = opram[PC++ - pc];
+			data = params.r8(PC++);
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  a,#$%02X,$%04X", data, PC + rel);
 			break;
 
 		//CJNE A, data addr, code addr
 		case 0xb5:                       /* 1: 1011 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
-			rel  = opram[PC++ - pc];
+			sym = get_data_address(mem_names, params.r8(PC++));
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  a,%s,$%04X", sym, PC + rel);
 			break;
 
@@ -941,8 +941,8 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		//CJNE @R0/@R1, #data, code addr /* 1: 1011 011i */
 		case 0xb6:
 		case 0xb7:
-			data = opram[PC++ - pc];
-			rel  = opram[PC++ - pc];
+			data = params.r8(PC++);
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  @r%d,#$%02X,$%04X", op&1, data, PC + rel);
 			break;
 
@@ -955,20 +955,20 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		case 0xbd:
 		case 0xbe:
 		case 0xbf:
-			data = opram[PC++ - pc];
-			rel  = opram[PC++ - pc];
+			data = params.r8(PC++);
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  r%d,#$%02X,$%04X", op&7, data, PC + rel);
 			break;
 
 		//PUSH data addr
 		case 0xc0:                      /* 1: 1100 0000 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "push  %s", sym);
 			break;
 
 		//CLR bit addr
 		case 0xc2:                      /* 1: 1100 0010 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "clr   %s", sym);
 			break;
 
@@ -984,7 +984,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//XCH A, data addr
 		case 0xc5:                      /* 1: 1100 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "xch   a,%s", sym);
 			break;
 
@@ -1008,13 +1008,13 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//POP data addr
 		case 0xd0:                      /* 1: 1101 0000 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "pop   %s", sym);
 			break;
 
 		//SETB bit addr
 		case 0xd2:                      /* 1: 1101 0010 */
-			sym = get_bit_address(mem_names, opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "setb  %s", sym);
 			break;
 
@@ -1031,8 +1031,8 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//DJNZ data addr, code addr
 		case 0xd5:                      /* 1: 1101 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
-			rel  = opram[PC++ - pc];
+			sym = get_data_address(mem_names, params.r8(PC++));
+			rel  = params.r8(PC++);
 			util::stream_format(stream, "djnz  %s,$%04X", sym, PC + rel);
 			flags = DASMFLAG_STEP_OVER;
 			break;
@@ -1052,7 +1052,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 		case 0xdd:
 		case 0xde:
 		case 0xdf:
-			rel = opram[PC++ - pc];
+			rel = params.r8(PC++);
 			util::stream_format(stream, "djnz  r%d,$%04X", op&7, (PC + rel));
 			flags = DASMFLAG_STEP_OVER;
 			break;
@@ -1076,7 +1076,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//MOV A, data addr
 		case 0xe5:                      /* 1: 1110 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   a,%s", sym);
 			break;
 
@@ -1118,7 +1118,7 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 
 		//MOV data addr, A
 		case 0xf5:                      /* 1: 1111 0101 */
-			sym = get_data_address(mem_names, opram[PC++ - pc]);
+			sym = get_data_address(mem_names, params.r8(PC++));
 			util::stream_format(stream, "mov   %s,a", sym);
 			break;
 
@@ -1157,7 +1157,7 @@ CPU_DISASSEMBLE( i8051 )
 		init_mem_names( FEATURE_NONE, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, opcodes, params);
 }
 
 CPU_DISASSEMBLE( i8052 )
@@ -1170,7 +1170,7 @@ CPU_DISASSEMBLE( i8052 )
 		init_mem_names( FEATURE_I8052, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, opcodes, params);
 }
 
 CPU_DISASSEMBLE( i80c51 )
@@ -1183,7 +1183,7 @@ CPU_DISASSEMBLE( i80c51 )
 		init_mem_names( FEATURE_CMOS, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, opcodes, params);
 }
 
 CPU_DISASSEMBLE( i80c52 )
@@ -1196,7 +1196,7 @@ CPU_DISASSEMBLE( i80c52 )
 		init_mem_names( FEATURE_I8052 | FEATURE_CMOS | FEATURE_I80C52, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, opcodes, params);
 }
 
 CPU_DISASSEMBLE( ds5002fp )
@@ -1209,5 +1209,5 @@ CPU_DISASSEMBLE( ds5002fp )
 		init_mem_names( FEATURE_DS5002FP | FEATURE_CMOS, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, opcodes, params);
 }

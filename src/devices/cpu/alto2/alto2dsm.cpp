@@ -207,14 +207,11 @@ static const char *addrname(int a)
 	return dst;
 }
 
-offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t alto2_cpu_device::disassemble(std::ostream &main_stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	std::ostringstream stream;
 
-	uint32_t mir = (static_cast<uint32_t>(oprom[0]) << 24) |
-			(static_cast<uint32_t>(oprom[1]) << 16) |
-			(static_cast<uint32_t>(oprom[2]) << 8) |
-			(static_cast<uint32_t>(oprom[3]) << 0);
+	uint32_t mir = opcodes.r32(pc);
 	int rsel = (mir >> 27) & 31;
 	int aluf = (mir >> 23) & 15;
 	int bs = (mir >> 20) & 7;
@@ -223,11 +220,7 @@ offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc
 	int t = (mir >> 11) & 1;
 	int l = (mir >> 10) & 1;
 	offs_t next = mir & 1023;
-	const uint8_t* src = oprom - 4 * pc + 4 * next;
-	uint32_t next2 =  (static_cast<uint32_t>(src[0]) << 24) |
-			(static_cast<uint32_t>(src[1]) << 16) |
-			(static_cast<uint32_t>(src[2]) << 8) |
-			(static_cast<uint32_t>(src[3]) << 0);
+	uint32_t next2 =  opcodes.r32(next);
 	uint16_t prefetch = next2 & 1023;
 	offs_t result = 1 | DASMFLAG_SUPPORTED;
 	uint8_t pa;

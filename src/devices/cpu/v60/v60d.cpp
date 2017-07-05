@@ -26,26 +26,6 @@ static const char *const v60_reg_names[69] = {
 	"ADTMR1","Reserved","Reserved","Reserved"
 };
 
-static const uint8_t *rombase;
-static offs_t pcbase;
-
-#define readop(a)   rombase[(a) - pcbase]
-
-static signed char read8(unsigned pc)
-{
-	return readop(pc);
-}
-
-static signed short read16(unsigned pc)
-{
-	return readop(pc) | (readop(pc+1) << 8);
-}
-
-static signed int read32(unsigned pc)
-{
-	return readop(pc) | (readop(pc+1) << 8)| (readop(pc+2) << 16)| (readop(pc+3) << 24);
-}
-
 static void out_AM_Register(int reg, std::ostream &stream)
 {
 	stream << v60_reg_names[reg];
@@ -97,12 +77,12 @@ static void out_AM_DisplacementIndexed(int rn, int rx, int disp, int opsize, std
 		util::stream_format(stream, "%s%X[%s](%s)", disp >= 0 ? "" : "-", disp >= 0 ? disp : -disp,v60_reg_names[rn], v60_reg_names[rx]);
 }
 
-static void out_AM_PCDisplacement(unsigned pc, int disp, int opsize, std::ostream &stream)
+static void out_AM_PCDisplacement(offs_t pc, int disp, int opsize, std::ostream &stream)
 {
 	util::stream_format(stream, "%X%s[PC]", pc+disp, opsize & 0x80 ? "@" : "");
 }
 
-static void out_AM_PCDisplacementIndexed(unsigned pc, int disp, int rx, int opsize, std::ostream &stream)
+static void out_AM_PCDisplacementIndexed(offs_t pc, int disp, int rx, int opsize, std::ostream &stream)
 {
 	if(opsize & 0x80)
 		util::stream_format(stream, "%s@%X[PC]", v60_reg_names[rx], pc+disp);
@@ -126,12 +106,12 @@ static void out_AM_DisplacementIndirectIndexed(int rn, int rx, int disp, int ops
 		util::stream_format(stream, "[%s%X[%s]](%s)", disp >= 0 ? "" : "-", disp >= 0 ? disp : -disp,v60_reg_names[rn], v60_reg_names[rx]);
 }
 
-static void out_AM_PCDisplacementIndirect(unsigned pc, int disp, int opsize, std::ostream &stream)
+static void out_AM_PCDisplacementIndirect(offs_t pc, int disp, int opsize, std::ostream &stream)
 {
 	util::stream_format(stream, "%s[%X[PC]]", opsize & 0x80 ? "@" : "", pc+disp);
 }
 
-static void out_AM_PCDisplacementIndirectIndexed(unsigned pc, int disp, int rx, int opsize, std::ostream &stream)
+static void out_AM_PCDisplacementIndirectIndexed(offs_t pc, int disp, int rx, int opsize, std::ostream &stream)
 {
 	if(opsize & 0x80)
 		util::stream_format(stream, "%s@[%X[PC]]", v60_reg_names[rx], pc+disp);
@@ -148,7 +128,7 @@ static void out_AM_DoubleDisplacement(int reg, int disp2, int disp1, int opsize,
 			v60_reg_names[reg]);
 }
 
-static void out_AM_PCDoubleDisplacement(unsigned pc, int disp2, int disp1, int opsize, std::ostream &stream)
+static void out_AM_PCDoubleDisplacement(offs_t pc, int disp2, int disp1, int opsize, std::ostream &stream)
 {
 	util::stream_format(stream, "%s%X%s[%X[PC]]",
 			disp1 >= 0 ? "" : "-", disp1 >= 0 ? disp1 : -disp1,
@@ -196,21 +176,21 @@ static void out_AM_Immediate(unsigned value, int opsize, std::ostream &stream)
 	util::stream_format(stream, "#%X", value);
 }
 
-static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, std::ostream &stream)
+static int decode_AM(unsigned ipc, offs_t pc, int m, int opsize, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	unsigned char mod = readop(pc);
+	unsigned char mod = opcodes.r8(pc);
 	if(m) {
 		switch(mod>>5) {
 		case 0: // Double displacement (8 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, read8(pc+1), read8(pc+2), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r8(pc+1), opcodes.r8(pc+2), opsize, stream);
 			return 3;
 
 		case 1: // Double displacement (16 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, read16(pc+1), read16(pc+3), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r16(pc+1), opcodes.r16(pc+3), opsize, stream);
 			return 5;
 
 		case 2: // Double displacement (32 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, read32(pc+1), read32(pc+5), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r32(pc+1), opcodes.r32(pc+5), opsize, stream);
 			return 9;
 
 		case 3: // Register
@@ -226,69 +206,69 @@ static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, std::ostream 
 			return 1;
 
 		case 6:
-			switch (readop(pc+1)>>5)
+			switch (opcodes.r8(pc+1)>>5)
 				{
 				case 0: // Displacement indexed (8 bit)
-					out_AM_DisplacementIndexed(readop(pc+1)&0x1F, mod&0x1F, read8(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r8(pc+2), opsize, stream);
 					return 3;
 
 				case 1: // Displacement indexed (16 bit)
-					out_AM_DisplacementIndexed(readop(pc+1)&0x1F, mod&0x1F, read16(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r16(pc+2), opsize, stream);
 					return 4;
 
 				case 2: // Displacement indexed (32 bit)
-					out_AM_DisplacementIndexed(readop(pc+1)&0x1F, mod&0x1F, read32(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r32(pc+2), opsize, stream);
 					return 6;
 
 				case 3: // Register indirect indexed
-					out_AM_RegisterIndirectIndexed(readop(pc+1)&0x1F, mod&0x1F, opsize, stream);
+					out_AM_RegisterIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opsize, stream);
 					return 2;
 
 				case 4: // Displacement indirect indexed (8 bit)
-					out_AM_DisplacementIndirectIndexed(readop(pc+1)&0x1F, mod&0x1F, read8(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r8(pc+2), opsize, stream);
 					return 3;
 
 				case 5: // Displacement indirect indexed (16 bit)
-					out_AM_DisplacementIndirectIndexed(readop(pc+1)&0x1F, mod&0x1F, read16(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r16(pc+2), opsize, stream);
 					return 4;
 
 				case 6: // Displacement indirect indexed (32 bit)
-					out_AM_DisplacementIndirectIndexed(readop(pc+1)&0x1F, mod&0x1F, read32(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r32(pc+2), opsize, stream);
 					return 6;
 
 				case 7:
-					switch (readop(pc+1)&0x1F)
+					switch (opcodes.r8(pc+1)&0x1F)
 						{
 						case 16: // PC Displacement Indexed (8 bit)
-							out_AM_PCDisplacementIndexed(ipc, read8(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, opcodes.r8(pc+2), mod&0x1F, opsize, stream);
 							return 3;
 
 						case 17: // PC Displacement Indexed (16 bit)
-							out_AM_PCDisplacementIndexed(ipc, read16(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, opcodes.r16(pc+2), mod&0x1F, opsize, stream);
 							return 4;
 
 						case 18: // PC Displacement Indexed (32 bit)
-							out_AM_PCDisplacementIndexed(ipc, read32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, opcodes.r32(pc+2), mod&0x1F, opsize, stream);
 							return 6;
 
 						case 19: // Direct Address Indexed
-							out_AM_DirectAddressIndexed(read32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_DirectAddressIndexed(opcodes.r32(pc+2), mod&0x1F, opsize, stream);
 							return 6;
 
 						case 24: // PC Displacement Indirect Indexed(8 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, read8(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r8(pc+2), mod&0x1F, opsize, stream);
 							return 3;
 
 						case 25: // PC Displacement Indirect Indexed (16 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, read16(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r16(pc+2), mod&0x1F, opsize, stream);
 							return 4;
 
 						case 26: // PC Displacement Indirect Indexed (32 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, read32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r32(pc+2), mod&0x1F, opsize, stream);
 							return 6;
 
 						case 27: // Direct Address Deferred Indexed
-							out_AM_DirectAddressDeferredIndexed(read32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_DirectAddressDeferredIndexed(opcodes.r32(pc+2), mod&0x1F, opsize, stream);
 							return 6;
 
 						default:
@@ -308,15 +288,15 @@ static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, std::ostream 
 	} else {
 		switch(mod>>5) {
 		case 0: // Displacement (8 bit)
-			out_AM_Displacement(mod&0x1F, read8(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, opcodes.r8(pc+1), opsize, stream);
 			return 2;
 
 		case 1: // Displacement (16 bit)
-			out_AM_Displacement(mod&0x1F, read16(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, opcodes.r16(pc+1), opsize, stream);
 			return 3;
 
 		case 2: // Displacement (32 bit)
-			out_AM_Displacement(mod&0x1F, read32(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, opcodes.r32(pc+1), opsize, stream);
 			return 5;
 
 		case 3: // Register indirect
@@ -324,15 +304,15 @@ static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, std::ostream 
 			return 1;
 
 		case 4: // Displacement indirect (8 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, read8(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r8(pc+1), opsize, stream);
 			return 2;
 
 		case 5: // Displacement indirect (16 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, read16(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r16(pc+1), opsize, stream);
 			return 3;
 
 		case 6: // Displacement indirect (32 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, read32(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r32(pc+1), opsize, stream);
 			return 5;
 
 		case 7:
@@ -357,34 +337,34 @@ static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, std::ostream 
 				return 1;
 
 			case 16: // PC Displacement (8 bit)
-				out_AM_PCDisplacement(ipc, read8(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, opcodes.r8(pc+1), opsize, stream);
 				return 2;
 
 			case 17: // PC Displacement (16 bit)
-				out_AM_PCDisplacement(ipc, read16(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, opcodes.r16(pc+1), opsize, stream);
 				return 3;
 
 			case 18: // PC Displacement (32 bit)
-				out_AM_PCDisplacement(ipc, read32(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, opcodes.r32(pc+1), opsize, stream);
 				return 5;
 
 			case 19: // Direct Address
-				out_AM_DirectAddress(read32(pc+1), opsize, stream);
+				out_AM_DirectAddress(opcodes.r32(pc+1), opsize, stream);
 				return 5;
 
 
 			case 20:
 				switch(opsize&0x7F) {
 				case 0: // Immediate (8 bit)
-					out_AM_Immediate(read8(pc+1), opsize, stream);
+					out_AM_Immediate(opcodes.r8(pc+1), opsize, stream);
 					return 2;
 
 				case 1: // Immediate (16 bit)
-					out_AM_Immediate(read16(pc+1), opsize, stream);
+					out_AM_Immediate(opcodes.r16(pc+1), opsize, stream);
 					return 3;
 
 				case 2: // Immediate (32 bit)
-					out_AM_Immediate(read32(pc+1), opsize, stream);
+					out_AM_Immediate(opcodes.r32(pc+1), opsize, stream);
 					return 5;
 
 				default:
@@ -393,31 +373,31 @@ static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, std::ostream 
 				}
 
 			case 24: // PC Displacement Indirect (8 bit)
-				out_AM_PCDisplacementIndirect(ipc, read8(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, opcodes.r8(pc+1), opsize, stream);
 				return 2;
 
 			case 25: // PC Displacement Indirect (16 bit)
-				out_AM_PCDisplacementIndirect(ipc, read16(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, opcodes.r16(pc+1), opsize, stream);
 				return 3;
 
 			case 26: // PC Displacement Indirect (32 bit)
-				out_AM_PCDisplacementIndirect(ipc, read32(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, opcodes.r32(pc+1), opsize, stream);
 				return 5;
 
 			case 27: // Direct Address Deferred
-				out_AM_DirectAddressDeferred(read32(pc+1), opsize, stream);
+				out_AM_DirectAddressDeferred(opcodes.r32(pc+1), opsize, stream);
 				return 5;
 
 			case 28: // PC Double Displacement (8 bit)
-				out_AM_PCDoubleDisplacement(ipc, read8(pc+1), read8(pc+2), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, opcodes.r8(pc+1), opcodes.r8(pc+2), opsize, stream);
 				return 3;
 
 			case 29: // PC Double Displacement (16 bit)
-				out_AM_PCDoubleDisplacement(ipc, read16(pc+1), read16(pc+3), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, opcodes.r16(pc+1), opcodes.r16(pc+3), opsize, stream);
 				return 5;
 
 			case 30: // PC Double Displacement (32 bit)
-				out_AM_PCDoubleDisplacement(ipc, read32(pc+1), read32(pc+5), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, opcodes.r32(pc+1), opcodes.r32(pc+5), opsize, stream);
 				return 9;
 
 			default:
@@ -433,92 +413,92 @@ static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, std::ostream 
 }
 
 
-static int decode_F1(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F1(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	unsigned char code = readop(pc);
+	unsigned char code = opcodes.r8(pc);
 	util::stream_format(stream, "%-8s", opnm);
 	if(code & 0x20) {
-		int ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, stream) + 2;
+		int ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, opcodes, stream) + 2;
 		stream << ", ";
 		out_AM_Register(code & 0x1f, stream);
 		return ret;
 	} else {
 		out_AM_Register(code & 0x1f, stream);
 		stream << ", ";
-		return decode_AM(ipc, pc+1, code & 0x40, opsize1, stream) + 2;
+		return decode_AM(ipc, pc+1, code & 0x40, opsize1, opcodes, stream) + 2;
 	}
 }
 
-static int decode_F2(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F2(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	int ret;
-	unsigned char code = readop(pc);
+	unsigned char code = opcodes.r8(pc);
 	util::stream_format(stream, "%-8s", opnm);
-	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, stream);
+	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, opcodes, stream);
 	stream << ", ";
-	ret += decode_AM(ipc, pc+1+ret, code & 0x20, opsize2, stream);
+	ret += decode_AM(ipc, pc+1+ret, code & 0x20, opsize2, opcodes, stream);
 	return ret+2;
 }
 
-static int decode_F1F2(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F1F2(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	if(readop(pc) & 0x80)
-		return decode_F2(opnm, opsize1, opsize2, ipc, pc, stream);
+	if(opcodes.r8(pc) & 0x80)
+		return decode_F2(opnm, opsize1, opsize2, ipc, pc, opcodes, stream);
 	else
-		return decode_F1(opnm, opsize1, opsize2, ipc, pc, stream);
+		return decode_F1(opnm, opsize1, opsize2, ipc, pc, opcodes, stream);
 }
 
-static int decode_F3(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F3(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "%-8s", opnm);
-	return decode_AM(ipc, pc, readop(pc-1) & 1, opsize1, stream) + 1;
+	return decode_AM(ipc, pc, opcodes.r8(pc-1) & 1, opsize1, opcodes, stream) + 1;
 }
 
-static int decode_F4a(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F4a(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc+read8(pc));
+	util::stream_format(stream, "%-8s%X", opnm, ipc+opcodes.r8(pc));
 	return 2;
 }
 
-static int decode_F4b(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F4b(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc+read16(pc));
+	util::stream_format(stream, "%-8s%X", opnm, ipc+opcodes.r16(pc));
 	return 3;
 }
 
-static int decode_F5(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F5(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	stream << opnm;
 	return 1;
 }
 
-static int decode_F6(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F6(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%s, %X[PC]", opnm, v60_reg_names[readop(pc) & 0x1f], ipc+read16(pc+1));
+	util::stream_format(stream, "%-8s%s, %X[PC]", opnm, v60_reg_names[opcodes.r8(pc) & 0x1f], ipc+opcodes.r16(pc+1));
 	return 4;
 }
 
-static int decode_F7a(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F7a(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	int ret;
-	unsigned char code = readop(pc);
+	unsigned char code = opcodes.r8(pc);
 	unsigned char code2;
 
 	util::stream_format(stream, "%-8s", opnm);
-	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, stream);
+	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, opcodes, stream);
 	stream << ", ";
 
-	code2 = readop(pc+1+ret);
+	code2 = opcodes.r8(pc+1+ret);
 	if(code2 & 0x80)
 		out_AM_Register(code2 & 0x1f, stream);
 	else
 		out_AM_Immediate(code2, 1, stream);
 	stream << ", ";
 
-	ret += decode_AM(ipc, pc+2+ret, code & 0x20, opsize2, stream);
+	ret += decode_AM(ipc, pc+2+ret, code & 0x20, opsize2, opcodes, stream);
 	stream << ", ";
 
-	code2 = readop(pc+2+ret);
+	code2 = opcodes.r8(pc+2+ret);
 	if(code2 & 0x80)
 		out_AM_Register(code2 & 0x1f, stream);
 	else
@@ -527,42 +507,42 @@ static int decode_F7a(const char *opnm, int opsize1, int opsize2, unsigned ipc, 
 	return ret+4;
 }
 
-static int decode_F7b(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F7b(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	int ret;
-	unsigned char code = readop(pc);
+	unsigned char code = opcodes.r8(pc);
 	unsigned char code2;
 
 	util::stream_format(stream, "%-8s", opnm);
-	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, stream);
+	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, opcodes, stream);
 	stream << ", ";
 
-	code2 = readop(pc+1+ret);
+	code2 = opcodes.r8(pc+1+ret);
 	if(code2 & 0x80)
 		out_AM_Register(code2 & 0x1f, stream);
 	else
 		out_AM_Immediate(code2, 1, stream);
 	stream << ", ";
 
-	ret += decode_AM(ipc, pc+2+ret, code & 0x20, opsize2, stream);
+	ret += decode_AM(ipc, pc+2+ret, code & 0x20, opsize2, opcodes, stream);
 
 	return ret+3;
 }
 
-static int decode_F7c(const char *opnm, int opsize1, int opsize2, unsigned ipc, unsigned pc, std::ostream &stream)
+static int decode_F7c(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	int ret;
-	unsigned char code = readop(pc);
+	unsigned char code = opcodes.r8(pc);
 	unsigned char code2;
 
 	util::stream_format(stream, "%-8s", opnm);
-	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, stream);
+	ret = decode_AM(ipc, pc+1, code & 0x40, opsize1, opcodes, stream);
 	stream << ", ";
 
-	ret += decode_AM(ipc, pc+1+ret, code & 0x20, opsize2, stream);
+	ret += decode_AM(ipc, pc+1+ret, code & 0x20, opsize2, opcodes, stream);
 	stream << ", ";
 
-	code2 = readop(pc+1+ret);
+	code2 = opcodes.r8(pc+1+ret);
 	if(code2 & 0x80)
 		out_AM_Register(code2 & 0x1f, stream);
 	else
@@ -571,70 +551,70 @@ static int decode_F7c(const char *opnm, int opsize1, int opsize2, unsigned ipc, 
 	return ret+3;
 }
 
-static int dopUNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dopUNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "$%02X", readop(pc));
+	util::stream_format(stream, "$%02X", opcodes.r8(pc));
 	return 1;
 }
 
-static int dop58UNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop58UNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$58");
 	return 1;
 }
 
-static int dop59UNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop59UNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$59");
 	return 1;
 }
 
-static int dop5AUNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5AUNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$5A");
 	return 1;
 }
 
-static int dop5BUNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5BUNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$5B");
 	return 1;
 }
 
-static int dop5CUNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5CUNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$5C");
 	return 1;
 }
 
-static int dop5DUNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5DUNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$5D");
 	return 1;
 }
 
-static int dop5EUNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5EUNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$5E");
 	return 1;
 }
 
-static int dop5FUNHANDLED(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5FUNHANDLED(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
 	util::stream_format(stream, "$5F");
 	return 1;
 }
 
 #define DEFINE_EASY_OPCODE(name, opnm, ftype, opsize1, opsize2) \
-	static int dop ## name(unsigned ipc, unsigned pc, std::ostream &stream) \
+	static int dop ## name(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) \
 	{ \
-		return decode_ ## ftype(opnm, opsize1, opsize2, ipc, pc, stream); \
+		return decode_ ## ftype(opnm, opsize1, opsize2, ipc, pc, opcodes, stream); \
 	}
 
 #define DEFINE_EASY_OPCODE_EX(name, opnm, ftype, opsize1, opsize2, flags) \
-	static int dop ## name(unsigned ipc, unsigned pc, std::ostream &stream) \
+	static int dop ## name(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) \
 	{ \
-		return decode_ ## ftype(opnm, opsize1, opsize2, ipc, pc, stream) | (flags); \
+		return decode_ ## ftype(opnm, opsize1, opsize2, ipc, pc, opcodes, stream) | (flags); \
 	}
 
 #define DEFINE_TRIPLE_OPCODE(name, string, ftype) \
@@ -862,7 +842,7 @@ DEFINE_EASY_OPCODE(XORBSD, "xorbsd", F7b, 0x80, 0x80)
 DEFINE_EASY_OPCODE(XORNBSU, "xornbsu", F7b, 0x80, 0x80)
 DEFINE_EASY_OPCODE(XORNBSD, "xornbsd", F7b, 0x80, 0x80)
 
-static int (*const dasm_optable_58[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_58[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopCMPCB,
 	/* 0x01 */ dopCMPCFB,
@@ -898,7 +878,7 @@ static int (*const dasm_optable_58[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop58UNHANDLED
 };
 
-static int (*const dasm_optable_59[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_59[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopADDDC,
 	/* 0x01 */ dopSUBDC,
@@ -934,7 +914,7 @@ static int (*const dasm_optable_59[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop59UNHANDLED
 };
 
-static int (*const dasm_optable_5A[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_5A[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopCMPCH,
 	/* 0x01 */ dopCMPCFH,
@@ -970,7 +950,7 @@ static int (*const dasm_optable_5A[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop5AUNHANDLED
 };
 
-static int (*const dasm_optable_5B[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_5B[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopSCH0BSU,
 	/* 0x01 */ dopSCH0BSD,
@@ -1006,7 +986,7 @@ static int (*const dasm_optable_5B[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop5BUNHANDLED
 };
 
-static int (*const dasm_optable_5C[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_5C[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopCMPFS,
 	/* 0x01 */ dop5CUNHANDLED,
@@ -1042,7 +1022,7 @@ static int (*const dasm_optable_5C[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop5CUNHANDLED
 };
 
-static int (*const dasm_optable_5D[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_5D[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopCMPBFS,
 	/* 0x01 */ dopCMPBFZ,
@@ -1078,7 +1058,7 @@ static int (*const dasm_optable_5D[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop5DUNHANDLED
 };
 
-static int (*const dasm_optable_5E[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_5E[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopCMPFL,
 	/* 0x01 */ dop5EUNHANDLED,
@@ -1114,7 +1094,7 @@ static int (*const dasm_optable_5E[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop5EUNHANDLED
 };
 
-static int (*const dasm_optable_5F[32])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_5F[32])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopCVTWS,
 	/* 0x01 */ dopCVTSW,
@@ -1150,7 +1130,7 @@ static int (*const dasm_optable_5F[32])(unsigned ipc, unsigned pc, std::ostream 
 	/* 0x1F */ dop5FUNHANDLED
 };
 
-static int (*const dasm_optable_C6[8])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_C6[8])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x0 */ dopDBV,
 	/* 0x1 */ dopDBL,
@@ -1162,7 +1142,7 @@ static int (*const dasm_optable_C6[8])(unsigned ipc, unsigned pc, std::ostream &
 	/* 0x7 */ dopDBLE
 };
 
-static int (*const dasm_optable_C7[8])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable_C7[8])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x0 */ dopDBNV,
 	/* 0x1 */ dopDBNL,
@@ -1174,57 +1154,57 @@ static int (*const dasm_optable_C7[8])(unsigned ipc, unsigned pc, std::ostream &
 	/* 0x7 */ dopDBGT
 };
 
-static int dop58(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop58(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_58[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_58[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dop59(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop59(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_59[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_59[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dop5A(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5A(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_5A[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_5A[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dop5B(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5B(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_5B[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_5B[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dop5C(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5C(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_5C[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_5C[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dop5D(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5D(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_5D[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_5D[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dop5E(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5E(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_5E[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_5E[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dop5F(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dop5F(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_5F[readop(pc) & 0x1f](ipc, pc, stream);
+	return dasm_optable_5F[opcodes.r8(pc) & 0x1f](ipc, pc, opcodes, stream);
 }
 
-static int dopC6(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dopC6(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_C6[readop(pc) >> 5](ipc, pc, stream);
+	return dasm_optable_C6[opcodes.r8(pc) >> 5](ipc, pc, opcodes, stream);
 }
 
-static int dopC7(unsigned ipc, unsigned pc, std::ostream &stream)
+static int dopC7(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream)
 {
-	return dasm_optable_C7[readop(pc) >> 5](ipc, pc, stream);
+	return dasm_optable_C7[opcodes.r8(pc) >> 5](ipc, pc, opcodes, stream);
 }
 
-static int (*const dasm_optable[256])(unsigned ipc, unsigned pc, std::ostream &stream) =
+static int (*const dasm_optable[256])(unsigned ipc, offs_t pc, const device_disasm_interface::data_buffer &opcodes, std::ostream &stream) =
 {
 	/* 0x00 */ dopHALT,
 	/* 0x01 */ dopLDTASK,
@@ -1486,14 +1466,10 @@ static int (*const dasm_optable[256])(unsigned ipc, unsigned pc, std::ostream &s
 
 CPU_DISASSEMBLE(v60)
 {
-	rombase = oprom;
-	pcbase = pc;
-	return dasm_optable[oprom[0]](pc, pc+1, stream) | DASMFLAG_SUPPORTED;
+	return dasm_optable[opcodes.r8(pc)](pc, pc+1, opcodes, stream) | DASMFLAG_SUPPORTED;
 }
 
 CPU_DISASSEMBLE(v70)
 {
-	rombase = oprom;
-	pcbase = pc;
-	return dasm_optable[oprom[0]](pc, pc+1, stream) | DASMFLAG_SUPPORTED;
+	return dasm_optable[opcodes.r8(pc)](pc, pc+1, opcodes, stream) | DASMFLAG_SUPPORTED;
 }

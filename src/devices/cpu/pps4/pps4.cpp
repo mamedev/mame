@@ -139,10 +139,10 @@ void pps4_device::W(u8 data)
 	m_SAG = 0;
 }
 
-offs_t pps4_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+offs_t pps4_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options)
 {
 	extern CPU_DISASSEMBLE( pps4 );
-	return CPU_DISASSEMBLE_NAME(pps4)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(pps4)(this, stream, pc, opcodes, params, options);
 }
 
 /**

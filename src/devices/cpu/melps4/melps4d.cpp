@@ -102,7 +102,7 @@ static const uint8_t m58846_opmap[0xc0] =
 
 CPU_DISASSEMBLE(m58846)
 {
-	uint16_t op = (oprom[0] | oprom[1] << 8) & 0x1ff;
+	uint16_t op = opcodes.r16(pc) & 0x1ff;
 
 	// get opcode
 	uint8_t instr;

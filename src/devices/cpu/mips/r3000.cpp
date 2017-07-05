@@ -453,41 +453,24 @@ void r3000_device::state_string_export(const device_state_entry &entry, std::str
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
+//  opcode_alignment - opcode alignment, in pc units
 //-------------------------------------------------
 
-uint32_t r3000_device::disasm_min_opcode_bytes() const
+uint32_t r3000_device::opcode_alignment() const
 {
 	return 4;
 }
 
 
 //-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t r3000_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t r3000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t r3000_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	extern CPU_DISASSEMBLE( r3000le );
-	extern CPU_DISASSEMBLE( r3000be );
-
-	if (m_endianness == ENDIANNESS_BIG)
-		return CPU_DISASSEMBLE_NAME(r3000be)(this, stream, pc, oprom, opram, options);
-	else
-		return CPU_DISASSEMBLE_NAME(r3000le)(this, stream, pc, oprom, opram, options);
+	extern CPU_DISASSEMBLE( r3000 );
+	return CPU_DISASSEMBLE_NAME(r3000)(this, stream, pc, opcodes, params, options);
 }
 
 

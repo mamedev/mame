@@ -237,7 +237,7 @@ CPU_DISASSEMBLE(tms32010)
 	if (!OpInizialized) InitDasm32010();
 
 	op = -1;                /* no matching opcode */
-	code = (oprom[0] << 8) | oprom[1];
+	code = opcodes.r16(pc);
 	for ( i = 0; i < MAX_OPS; i++)
 	{
 		if ((code & Op[i].mask) == Op[i].bits)
@@ -260,7 +260,7 @@ CPU_DISASSEMBLE(tms32010)
 	{
 		bit = 31;
 		code <<= 16;
-		code |= (opram[2] << 8) | opram[3];
+		code |= opcodes.r16(pc+1);
 		cnt++;
 	}
 	else

@@ -21,6 +21,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual u32 disasm_interface_flags() const override;
+	virtual u8 disasm_decrypt8(u8 value, offs_t pc, bool opcode) const override;
 };
 
 DECLARE_DEVICE_TYPE(DECO_CPU6, deco_cpu6_device)

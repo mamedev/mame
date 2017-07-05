@@ -409,13 +409,12 @@ static void format_alu_op(int aluop, int a, const char *dst_text, const char *a_
 	}
 }
 
-static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t *oprom)
+static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	output = &stream;
 	uint32_t flags = 0;
 
-	uint64_t op = ((uint64_t)(oprom[0]) << 56) | ((uint64_t)(oprom[1]) << 48) | ((uint64_t)(oprom[2]) << 40) | ((uint64_t)(oprom[3]) << 32) |
-				((uint64_t)(oprom[4]) << 24) | ((uint64_t)(oprom[5]) << 16) | ((uint64_t)(oprom[6]) << 8) | ((uint64_t)(oprom[7]));
+	uint64_t op = opcodes.r64(pc);
 
 	switch (op >> 60)
 	{
@@ -700,5 +699,5 @@ static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t 
 
 CPU_DISASSEMBLE(tms32082_pp)
 {
-	return tms32082_disasm_pp(stream, pc, oprom);
+	return tms32082_disasm_pp(stream, pc, opcodes);
 }

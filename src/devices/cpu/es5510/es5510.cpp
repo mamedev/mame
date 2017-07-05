@@ -924,17 +924,12 @@ void es5510_device::execute_run() {
 	}
 }
 
-uint32_t es5510_device::disasm_min_opcode_bytes() const
+uint32_t es5510_device::opcode_alignment() const
 {
 	return 6;
 }
 
-uint32_t es5510_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-offs_t es5510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t es5510_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	return pc;
 }

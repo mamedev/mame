@@ -392,12 +392,6 @@ static uint32_t arm_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode )
 
 CPU_DISASSEMBLE( arm )
 {
-	uint32_t opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	return 4 | arm_disasm(stream, pc, opcode);
-}
-
-CPU_DISASSEMBLE( arm_be )
-{
-	uint32_t opcode = oprom[3] | (oprom[2] << 8) | (oprom[1] << 16) | (oprom[0] << 24);
+	uint32_t opcode = opcodes.r32(pc);
 	return 4 | arm_disasm(stream, pc, opcode);
 }

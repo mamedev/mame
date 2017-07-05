@@ -18,9 +18,9 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-offs_t i8x9x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i8x9x_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	return disasm_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return disasm_generic(stream, pc, opcodes, params, options, disasm_entries);
 }
 
 device_memory_interface::space_config_vector i8x9x_device::memory_space_config() const

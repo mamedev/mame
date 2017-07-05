@@ -55,10 +55,10 @@ tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char
 
 
 // disasm
-offs_t tms1100_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+offs_t tms1100_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options)
 {
 	extern CPU_DISASSEMBLE(tms1100);
-	return CPU_DISASSEMBLE_NAME(tms1100)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms1100)(this, stream, pc, opcodes, params, options);
 }
 
 

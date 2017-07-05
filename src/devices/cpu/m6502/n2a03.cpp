@@ -56,9 +56,9 @@ n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, devic
 	program_config.m_internal_map = ADDRESS_MAP_NAME(n2a03_map);
 }
 
-offs_t n2a03_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t n2a03_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, opcodes, params, options, disasm_entries);
 }
 
 void n2a03_device::device_start()

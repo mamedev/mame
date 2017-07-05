@@ -134,10 +134,10 @@ device_memory_interface::space_config_vector tms32010_device::memory_space_confi
 	};
 }
 
-offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms32010_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32010 );
-	return CPU_DISASSEMBLE_NAME(tms32010)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms32010)(this, stream, pc, opcodes, params, options);
 }
 
 

@@ -81,7 +81,7 @@ CPU_DISASSEMBLE(cquestsnd)
 		"       ",
 	};
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 	uint32_t inslow = inst & 0xffffffff;
 	uint32_t inshig = inst >> 32;
 
@@ -185,7 +185,7 @@ CPU_DISASSEMBLE(cquestrot)
 		"???   "
 	};
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 	uint32_t inslow = inst & 0xffffffff;
 	uint32_t inshig = inst >> 32;
 
@@ -272,7 +272,7 @@ CPU_DISASSEMBLE(cquestlin)
 		"BRES  ",
 	};
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 	uint32_t inslow = inst & 0xffffffff;
 	uint32_t inshig = inst >> 32;
 

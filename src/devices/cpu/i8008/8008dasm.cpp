@@ -10,9 +10,6 @@
 
 #include "emu.h"
 
-#define OP(A)   oprom[(A) - PC]
-#define ARG(A)  opram[(A) - PC]
-
 static const char reg[] = { 'a', 'b', 'c', 'd', 'e', 'h', 'l', 'm' };
 static const char flag_names[] = { 'c', 'z', 's', 'p' };
 
@@ -20,7 +17,7 @@ CPU_DISASSEMBLE(i8008)
 {
 	uint32_t flags = 0;
 	unsigned PC = pc;
-	uint8_t op = OP(pc++);
+	uint8_t op = opcodes.r8(pc++);
 	switch (op >> 6)
 	{
 		case 0x03:  // starting with 11
@@ -65,28 +62,28 @@ CPU_DISASSEMBLE(i8008)
 						case 3 :    util::stream_format(stream, "r%c%c",(BIT(op,5) ? 't' : 'f'),flag_names[(op>>3)&3]); break;
 						case 4 :    {
 										switch((op >> 3) & 7) {
-											case 0 :    util::stream_format(stream, "adi %02x",ARG(pc)); pc++; break;
-											case 1 :    util::stream_format(stream, "aci %02x",ARG(pc)); pc++; break;
-											case 2 :    util::stream_format(stream, "sui %02x",ARG(pc)); pc++; break;
-											case 3 :    util::stream_format(stream, "sbi %02x",ARG(pc)); pc++; break;
-											case 4 :    util::stream_format(stream, "ndi %02x",ARG(pc)); pc++; break;
-											case 5 :    util::stream_format(stream, "xri %02x",ARG(pc)); pc++; break;
-											case 6 :    util::stream_format(stream, "ori %02x",ARG(pc)); pc++; break;
-											case 7 :    util::stream_format(stream, "cpi %02x",ARG(pc)); pc++; break;
+											case 0 :    util::stream_format(stream, "adi %02x",params.r8(pc)); pc++; break;
+											case 1 :    util::stream_format(stream, "aci %02x",params.r8(pc)); pc++; break;
+											case 2 :    util::stream_format(stream, "sui %02x",params.r8(pc)); pc++; break;
+											case 3 :    util::stream_format(stream, "sbi %02x",params.r8(pc)); pc++; break;
+											case 4 :    util::stream_format(stream, "ndi %02x",params.r8(pc)); pc++; break;
+											case 5 :    util::stream_format(stream, "xri %02x",params.r8(pc)); pc++; break;
+											case 6 :    util::stream_format(stream, "ori %02x",params.r8(pc)); pc++; break;
+											case 7 :    util::stream_format(stream, "cpi %02x",params.r8(pc)); pc++; break;
 										}
 									}
 									break;
 						case 5 :    util::stream_format(stream, "rst %02x",(op>>3) & 7); break;
-						case 6 :    util::stream_format(stream, "l%ci %02x",reg[(op >> 3) & 7],ARG(pc)); pc++; break;
+						case 6 :    util::stream_format(stream, "l%ci %02x",reg[(op >> 3) & 7],params.r8(pc)); pc++; break;
 						case 7 :    util::stream_format(stream, "ret"); break;
 					}
 					break;
 		case 0x01:  // starting with 01
 					switch(op & 7) {
-						case 0 :    util::stream_format(stream, "j%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
-						case 2 :    util::stream_format(stream, "c%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
-						case 4 :    util::stream_format(stream, "jmp %02x%02x",ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
-						case 6 :    util::stream_format(stream, "cal %02x%02x",ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
+						case 0 :    util::stream_format(stream, "j%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
+						case 2 :    util::stream_format(stream, "c%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
+						case 4 :    util::stream_format(stream, "jmp %02x%02x",params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
+						case 6 :    util::stream_format(stream, "cal %02x%02x",params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
 						case 1 :
 						case 3 :
 						case 5 :

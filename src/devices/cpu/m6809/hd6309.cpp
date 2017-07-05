@@ -285,11 +285,10 @@ void hd6309_device::device_post_load()
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
+//  opcode_alignment - opcode alignment, in pc units
 //-------------------------------------------------
 
-uint32_t hd6309_device::disasm_min_opcode_bytes() const
+uint32_t hd6309_device::opcode_alignment() const
 {
 	return 1;
 }
@@ -297,26 +296,14 @@ uint32_t hd6309_device::disasm_min_opcode_bytes() const
 
 
 //-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hd6309_device::disasm_max_opcode_bytes() const
-{
-	return 5;
-}
-
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hd6309_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hd6309_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd6309 );
-	return CPU_DISASSEMBLE_NAME(hd6309)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hd6309)(this, stream, pc, opcodes, params, options);
 }
 
 

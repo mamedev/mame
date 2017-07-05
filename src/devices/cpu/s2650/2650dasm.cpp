@@ -11,11 +11,6 @@
 
 #include "emu.h"
 
-static const uint8_t *rambase;
-static offs_t pcbase;
-
-#define readarg(A)  (rambase[(A) - pcbase])
-
 /* Set this to 1 to disassemble using Z80 style mnemonics */
 #define HJB     0
 
@@ -58,11 +53,11 @@ static char *SYM(int addr)
 }
 
 /* format an immediate */
-static char *IMM(int pc)
+static char *IMM(offs_t pc, const device_disasm_interface::data_buffer &params)
 {
 	static char buff[32];
 
-	sprintf(buff, "$%02x", readarg(pc));
+	sprintf(buff, "$%02x", params.r8(pc));
 	return buff;
 }
 
@@ -70,11 +65,11 @@ static char *IMM(int pc)
 static const char cc[4] = { 'z', 'p', 'm', 'a' };
 
 /* format an immediate for PSL */
-static char *IMM_PSL(int pc)
+static char *IMM_PSL(offs_t pc, const device_disasm_interface::data_buffer &params)
 {
 	static char buff[32];
 	char *p = buff;
-	int v = readarg(pc);
+	int v = params.r8(pc);
 
 	if (v == 0xff) {
 		p += sprintf(p, "all");
@@ -104,11 +99,11 @@ static char *IMM_PSL(int pc)
 }
 
 /* format an immediate for PSU (processor status upper) */
-static char *IMM_PSU(int pc)
+static char *IMM_PSU(offs_t pc, const device_disasm_interface::data_buffer &params)
 {
 	static char buff[32];
 	char *p = buff;
-	int v = readarg(pc);
+	int v = params.r8(pc);
 
 	if (v == 0xff) {
 		p += sprintf(p, "all");
@@ -142,29 +137,29 @@ static const char cc[4] = { '0', '1', '2', '3' };
 #endif
 
 /* format an relative address */
-static char *REL(int pc)
+static char *REL(offs_t pc, const device_disasm_interface::data_buffer &params)
 {
 static char buff[32];
-int o = readarg(pc);
+int o = params.r8(pc);
 	sprintf(buff, "%s%s", (o&0x80)?"*":"", SYM((pc&0x6000)+((pc+1+rel[o])&0x1fff)));
 	return buff;
 }
 
 /* format an relative address (implicit page 0) */
-static char *REL0(int pc)
+static char *REL0(offs_t pc, const device_disasm_interface::data_buffer &params)
 {
 static char buff[32];
-int o = readarg(pc);
+int o = params.r8(pc);
 	sprintf(buff, "%s%s", (o&0x80)?"*":"", SYM((rel[o]) & 0x1fff));
 	return buff;
 }
 
 /* format a destination register and an absolute address */
-static char *ABS(int load, int r, int pc)
+static char *ABS(int load, int r, offs_t pc, const device_disasm_interface::data_buffer &params)
 {
 	static char buff[32];
-	int h = readarg(pc);
-	int l = readarg((pc&0x6000)+((pc+1)&0x1fff));
+	int h = params.r8(pc);
+	int l = params.r8((pc&0x6000)+((pc+1)&0x1fff));
 	int a = (pc & 0x6000) + ((h & 0x1f) << 8) + l;
 
 #if HJB
@@ -207,11 +202,11 @@ static char *ABS(int load, int r, int pc)
 }
 
 /* format an (branch) absolute address */
-static char *ADR(int pc)
+static char *ADR(offs_t pc, const device_disasm_interface::data_buffer &params)
 {
 	static char buff[32];
-	int h = readarg(pc);
-	int l = readarg((pc&0x6000)+((pc+1)&0x1fff));
+	int h = params.r8(pc);
+	int l = params.r8((pc&0x6000)+((pc+1)&0x1fff));
 	int a = ((h & 0x7f) << 8) + l;
 	if (h & 0x80)
 		sprintf(buff, "*%s", SYM(a));
@@ -225,11 +220,8 @@ CPU_DISASSEMBLE(s2650)
 {
 	uint32_t flags = 0;
 	int PC = pc;
-	int op = oprom[0];
+	int op = opcodes.r8(pc);
 	int rv = op & 3;
-
-	rambase = opram;
-	pcbase = PC;
 
 	pc += 1;
 	switch (op)
@@ -243,25 +235,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x04: case 0x05: case 0x06: case 0x07:
 #if HJB
-			util::stream_format(stream, "ld   r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "ld   r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "lodi,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "lodi,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 #if HJB
-			util::stream_format(stream, "ld   r%d,(%s)", rv, REL(pc));
+			util::stream_format(stream, "ld   r%d,(%s)", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "lodr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "lodr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 #if HJB
-			util::stream_format(stream, "ld   %s", ABS(1,rv,pc));
+			util::stream_format(stream, "ld   %s", ABS(1,rv,pc, params));
 #else
-			util::stream_format(stream, "loda,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "loda,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -300,22 +292,22 @@ CPU_DISASSEMBLE(s2650)
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
 #if HJB
 			if (rv == 3)
-				util::stream_format(stream, "jr   %s", REL(pc));
+				util::stream_format(stream, "jr   %s", REL(pc, params));
 			else
-				util::stream_format(stream, "jr   %c,%s", cc[rv], REL(pc));
+				util::stream_format(stream, "jr   %c,%s", cc[rv], REL(pc, params));
 #else
-			util::stream_format(stream, "bctr,%c %s", cc[rv], REL(pc));
+			util::stream_format(stream, "bctr,%c %s", cc[rv], REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 #if HJB
 			if (rv == 3)
-				util::stream_format(stream, "jp   %s", ADR(pc));
+				util::stream_format(stream, "jp   %s", ADR(pc, params));
 			else
-				util::stream_format(stream, "jp   %c,%s", cc[rv], ADR(pc));
+				util::stream_format(stream, "jp   %c,%s", cc[rv], ADR(pc, params));
 #else
-			util::stream_format(stream, "bcta,%c %s", cc[rv], ADR(pc));
+			util::stream_format(stream, "bcta,%c %s", cc[rv], ADR(pc, params));
 #endif
 			pc+=2;
 			break;
@@ -328,25 +320,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x24: case 0x25: case 0x26: case 0x27:
 #if HJB
-			util::stream_format(stream, "xor  r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "xor  r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "eori,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "eori,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x28: case 0x29: case 0x2a: case 0x2b:
 #if HJB
-			util::stream_format(stream, "xor  r%d,(%s)", rv, REL(pc));
+			util::stream_format(stream, "xor  r%d,(%s)", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "eorr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "eorr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 #if HJB
-			util::stream_format(stream, "xor  %s", ABS(1,rv,pc));
+			util::stream_format(stream, "xor  %s", ABS(1,rv,pc, params));
 #else
-			util::stream_format(stream, "eora,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "eora,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -371,11 +363,11 @@ CPU_DISASSEMBLE(s2650)
 		case 0x38: case 0x39: case 0x3a: case 0x3b:
 #if HJB
 			if (rv == 3)
-				util::stream_format(stream, "calr %s", REL(pc));
+				util::stream_format(stream, "calr %s", REL(pc, params));
 			else
-				util::stream_format(stream, "calr %c,%s", cc[rv], REL(pc));
+				util::stream_format(stream, "calr %c,%s", cc[rv], REL(pc, params));
 #else
-			util::stream_format(stream, "bstr,%c %s", cc[rv], REL(pc));
+			util::stream_format(stream, "bstr,%c %s", cc[rv], REL(pc, params));
 #endif
 			pc+=1;
 			flags = DASMFLAG_STEP_OVER;
@@ -383,11 +375,11 @@ CPU_DISASSEMBLE(s2650)
 		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 #if HJB
 			if (rv == 3)
-				util::stream_format(stream, "call %s", ADR(pc));
+				util::stream_format(stream, "call %s", ADR(pc, params));
 			else
-				util::stream_format(stream, "call %c,%s", cc[rv], ADR(pc));
+				util::stream_format(stream, "call %c,%s", cc[rv], ADR(pc, params));
 #else
-			util::stream_format(stream, "bsta,%c %s", cc[rv], ADR(pc));
+			util::stream_format(stream, "bsta,%c %s", cc[rv], ADR(pc, params));
 #endif
 			pc+=2;
 			flags = DASMFLAG_STEP_OVER;
@@ -404,25 +396,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x44: case 0x45: case 0x46: case 0x47:
 #if HJB
-			util::stream_format(stream, "and  r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "and  r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "andi,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "andi,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x48: case 0x49: case 0x4a: case 0x4b:
 #if HJB
-			util::stream_format(stream, "and  r%d,(%s)", rv, REL(pc));
+			util::stream_format(stream, "and  r%d,(%s)", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "andr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "andr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 #if HJB
-			util::stream_format(stream, "and  %s", ABS(1,rv,pc));
+			util::stream_format(stream, "and  %s", ABS(1,rv,pc, params));
 #else
-			util::stream_format(stream, "anda,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "anda,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -435,25 +427,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x54: case 0x55: case 0x56: case 0x57:
 #if HJB
-			util::stream_format(stream, "in   r%d,(%s)", rv, IMM(pc));
+			util::stream_format(stream, "in   r%d,(%s)", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "rede,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "rede,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x58: case 0x59: case 0x5a: case 0x5b:
 #if HJB
-			util::stream_format(stream, "jrnz r%d,%s", rv, REL(pc));
+			util::stream_format(stream, "jrnz r%d,%s", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "brnr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "brnr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 #if HJB
-			util::stream_format(stream, "jpnz r%d,%s", rv, ADR(pc));
+			util::stream_format(stream, "jpnz r%d,%s", rv, ADR(pc, params));
 #else
-			util::stream_format(stream, "brna,%d %s", rv, ADR(pc));
+			util::stream_format(stream, "brna,%d %s", rv, ADR(pc, params));
 #endif
 			pc+=2;
 			break;
@@ -466,25 +458,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x64: case 0x65: case 0x66: case 0x67:
 #if HJB
-			util::stream_format(stream, "or   r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "or   r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "iori,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "iori,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x68: case 0x69: case 0x6a: case 0x6b:
 #if HJB
-			util::stream_format(stream, "or   r%d,(%s)", rv, REL(pc));
+			util::stream_format(stream, "or   r%d,(%s)", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "iorr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "iorr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 #if HJB
-			util::stream_format(stream, "or   %s", ABS(1,rv,pc));
+			util::stream_format(stream, "or   %s", ABS(1,rv,pc, params));
 #else
-			util::stream_format(stream, "iora,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "iora,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -497,50 +489,50 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x74:
 #if HJB
-			util::stream_format(stream, "res  psu,%s", IMM_PSU(pc));
+			util::stream_format(stream, "res  psu,%s", IMM_PSU(pc, params));
 #else
-			util::stream_format(stream, "cpsu   %s", IMM_PSU(pc));
+			util::stream_format(stream, "cpsu   %s", IMM_PSU(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x75:
 #if HJB
-			util::stream_format(stream, "res  psl,%s", IMM_PSL(pc));
+			util::stream_format(stream, "res  psl,%s", IMM_PSL(pc, params));
 #else
-			util::stream_format(stream, "cpsl   %s", IMM_PSL(pc));
+			util::stream_format(stream, "cpsl   %s", IMM_PSL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x76:
 #if HJB
-			util::stream_format(stream, "set  psu,%s", IMM_PSU(pc));
+			util::stream_format(stream, "set  psu,%s", IMM_PSU(pc, params));
 #else
-			util::stream_format(stream, "ppsu   %s", IMM_PSU(pc));
+			util::stream_format(stream, "ppsu   %s", IMM_PSU(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x77:
 #if HJB
-			util::stream_format(stream, "set  psl,%s", IMM_PSL(pc));
+			util::stream_format(stream, "set  psl,%s", IMM_PSL(pc, params));
 #else
-			util::stream_format(stream, "ppsl   %s", IMM_PSL(pc));
+			util::stream_format(stream, "ppsl   %s", IMM_PSL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 #if HJB
-			util::stream_format(stream, "call r%d-nz,%s", rv, REL(pc));
+			util::stream_format(stream, "call r%d-nz,%s", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "bsnr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "bsnr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 #if HJB
-			util::stream_format(stream, "call r%d-nz,%s", rv, ADR(pc));
+			util::stream_format(stream, "call r%d-nz,%s", rv, ADR(pc, params));
 #else
-			util::stream_format(stream, "bsna,%d %s", rv, ADR(pc));
+			util::stream_format(stream, "bsna,%d %s", rv, ADR(pc, params));
 #endif
 			pc+=2;
 			flags = DASMFLAG_STEP_OVER;
@@ -554,25 +546,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x84: case 0x85: case 0x86: case 0x87:
 #if HJB
-			util::stream_format(stream, "add  r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "add  r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "addi,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "addi,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x88: case 0x89: case 0x8a: case 0x8b:
 #if HJB
-			util::stream_format(stream, "add  r%d,(%s)", rv, REL(pc));
+			util::stream_format(stream, "add  r%d,(%s)", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "addr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "addr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 #if HJB
-			util::stream_format(stream, "add  %s", ABS(1,rv,pc));
+			util::stream_format(stream, "add  %s", ABS(1,rv,pc, params));
 #else
-			util::stream_format(stream, "adda,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "adda,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -606,33 +598,33 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0x98: case 0x99: case 0x9a:
 #if HJB
-			util::stream_format(stream, "jr   n%c,%s", cc[rv], REL(pc));
+			util::stream_format(stream, "jr   n%c,%s", cc[rv], REL(pc, params));
 #else
-			util::stream_format(stream, "bcfr,%c %s", cc[rv], REL(pc));
+			util::stream_format(stream, "bcfr,%c %s", cc[rv], REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x9b:
 #if HJB
-			util::stream_format(stream, "jr0  %s", REL0(pc));
+			util::stream_format(stream, "jr0  %s", REL0(pc, params));
 #else
-			util::stream_format(stream, "zbrr   %s", REL0(pc));
+			util::stream_format(stream, "zbrr   %s", REL0(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0x9c: case 0x9d: case 0x9e:
 #if HJB
-			util::stream_format(stream, "jp   n%c,%s", cc[rv], ADR(pc));
+			util::stream_format(stream, "jp   n%c,%s", cc[rv], ADR(pc, params));
 #else
-			util::stream_format(stream, "bcfa,%c %s", cc[rv], ADR(pc));
+			util::stream_format(stream, "bcfa,%c %s", cc[rv], ADR(pc, params));
 #endif
 			pc+=2;
 			break;
 		case 0x9f:
 #if HJB
-			util::stream_format(stream, "jp   %s+r3", ADR(pc));
+			util::stream_format(stream, "jp   %s+r3", ADR(pc, params));
 #else
-			util::stream_format(stream, "bxa    %s", ADR(pc));
+			util::stream_format(stream, "bxa    %s", ADR(pc, params));
 #endif
 			pc+=2;
 			break;
@@ -645,25 +637,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 #if HJB
-			util::stream_format(stream, "sub  r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "sub  r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "subi,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "subi,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0xa8: case 0xa9: case 0xaa: case 0xab:
 #if HJB
-			util::stream_format(stream, "sub  r%d,(%s)", rv, REL(pc));
+			util::stream_format(stream, "sub  r%d,(%s)", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "subr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "subr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0xac: case 0xad: case 0xae: case 0xaf:
 #if HJB
-			util::stream_format(stream, "sub  %s", ABS(1,rv,pc));
+			util::stream_format(stream, "sub  %s", ABS(1,rv,pc, params));
 #else
-			util::stream_format(stream, "suba,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "suba,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -676,17 +668,17 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0xb4:
 #if HJB
-			util::stream_format(stream, "bit  psu,%s", IMM_PSU(pc));
+			util::stream_format(stream, "bit  psu,%s", IMM_PSU(pc, params));
 #else
-			util::stream_format(stream, "tpsu   %s", IMM_PSU(pc));
+			util::stream_format(stream, "tpsu   %s", IMM_PSU(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0xb5:
 #if HJB
-			util::stream_format(stream, "bit  psl,%s", IMM_PSL(pc));
+			util::stream_format(stream, "bit  psl,%s", IMM_PSL(pc, params));
 #else
-			util::stream_format(stream, "tpsl   %s", IMM_PSL(pc));
+			util::stream_format(stream, "tpsl   %s", IMM_PSL(pc, params));
 #endif
 			pc+=1;
 			break;
@@ -699,36 +691,36 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0xb8: case 0xb9: case 0xba:
 #if HJB
-			util::stream_format(stream, "calr n%c,%s", cc[rv], REL(pc));
+			util::stream_format(stream, "calr n%c,%s", cc[rv], REL(pc, params));
 #else
-			util::stream_format(stream, "bsfr,%c %s", cc[rv], REL(pc));
+			util::stream_format(stream, "bsfr,%c %s", cc[rv], REL(pc, params));
 #endif
 			pc+=1;
 			flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xbb:
 #if HJB
-			util::stream_format(stream, "cal0 %s", REL0(pc));
+			util::stream_format(stream, "cal0 %s", REL0(pc, params));
 #else
-			util::stream_format(stream, "zbsr   %s", REL0(pc));
+			util::stream_format(stream, "zbsr   %s", REL0(pc, params));
 #endif
 			pc+=1;
 			flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xbc: case 0xbd: case 0xbe:
 #if HJB
-			util::stream_format(stream, "call n%c,%s", cc[rv], ADR(pc));
+			util::stream_format(stream, "call n%c,%s", cc[rv], ADR(pc, params));
 #else
-			util::stream_format(stream, "bsfa,%c %s", cc[rv], ADR(pc));
+			util::stream_format(stream, "bsfa,%c %s", cc[rv], ADR(pc, params));
 #endif
 			pc+=2;
 			flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xbf:
 #if HJB
-			util::stream_format(stream, "call %s+r3", ADR(pc));
+			util::stream_format(stream, "call %s+r3", ADR(pc, params));
 #else
-			util::stream_format(stream, "bsxa   %s", ADR(pc));
+			util::stream_format(stream, "bsxa   %s", ADR(pc, params));
 #endif
 			pc+=2;
 			flags = DASMFLAG_STEP_OVER;
@@ -752,9 +744,9 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
 #if HJB
-			util::stream_format(stream, "ld   (%s),r%d", REL(pc), rv);
+			util::stream_format(stream, "ld   (%s),r%d", REL(pc, params), rv);
 #else
-			util::stream_format(stream, "strr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "strr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
@@ -762,7 +754,7 @@ CPU_DISASSEMBLE(s2650)
 #if HJB
 			util::stream_format(stream, "ld   %s", ABS(0,rv,pc));
 #else
-			util::stream_format(stream, "stra,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "stra,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -775,26 +767,26 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 #if HJB
-			util::stream_format(stream, "out  (%s),r%d", IMM(pc), rv);
+			util::stream_format(stream, "out  (%s),r%d", IMM(pc, params), rv);
 #else
-			util::stream_format(stream, "wrte,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "wrte,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0xd8: case 0xd9: case 0xda: case 0xdb:
 #if HJB
-			util::stream_format(stream, "ijnz r%d,%s", rv, REL(pc));
+			util::stream_format(stream, "ijnz r%d,%s", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "birr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "birr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xdc: case 0xdd: case 0xde: case 0xdf:
 #if HJB
-			util::stream_format(stream, "ijnz r%d,%s", rv, ADR(pc));
+			util::stream_format(stream, "ijnz r%d,%s", rv, ADR(pc, params));
 #else
-			util::stream_format(stream, "bira,%d %s", rv, ADR(pc));
+			util::stream_format(stream, "bira,%d %s", rv, ADR(pc, params));
 #endif
 			pc+=2;
 			flags = DASMFLAG_STEP_OVER;
@@ -808,25 +800,25 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 #if HJB
-			util::stream_format(stream, "cp   r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "cp   r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "comi,%d %s", rv, IMM(pc));
+			util::stream_format(stream, "comi,%d %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0xe8: case 0xe9: case 0xea: case 0xeb:
 #if HJB
-			util::stream_format(stream, "cp   r%d,(%s)", rv, REL(pc));
+			util::stream_format(stream, "cp   r%d,(%s)", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "comr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "comr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0xec: case 0xed: case 0xee: case 0xef:
 #if HJB
-			util::stream_format(stream, "cp   %s", ABS(1,rv,pc));
+			util::stream_format(stream, "cp   %s", ABS(1,rv,pc, params));
 #else
-			util::stream_format(stream, "coma,%s", ABS(1,rv,pc));
+			util::stream_format(stream, "coma,%s", ABS(1,rv,pc, params));
 #endif
 			pc+=2;
 			break;
@@ -839,26 +831,26 @@ CPU_DISASSEMBLE(s2650)
 			break;
 		case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 #if HJB
-			util::stream_format(stream, "test r%d,%s", rv, IMM(pc));
+			util::stream_format(stream, "test r%d,%s", rv, IMM(pc, params));
 #else
-			util::stream_format(stream, "tmi,%d  %s", rv, IMM(pc));
+			util::stream_format(stream, "tmi,%d  %s", rv, IMM(pc, params));
 #endif
 			pc+=1;
 			break;
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb:
 #if HJB
-			util::stream_format(stream, "djnz r%d,%s", rv, REL(pc));
+			util::stream_format(stream, "djnz r%d,%s", rv, REL(pc, params));
 #else
-			util::stream_format(stream, "bdrr,%d %s", rv, REL(pc));
+			util::stream_format(stream, "bdrr,%d %s", rv, REL(pc, params));
 #endif
 			pc+=1;
 			flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xfc: case 0xfd: case 0xfe: case 0xff:
 #if HJB
-			util::stream_format(stream, "djnz r%d,%s", rv, ADR(pc));
+			util::stream_format(stream, "djnz r%d,%s", rv, ADR(pc, params));
 #else
-			util::stream_format(stream, "bdra,%d %s", rv, ADR(pc));
+			util::stream_format(stream, "bdra,%d %s", rv, ADR(pc, params));
 #endif
 			pc+=2;
 			flags = DASMFLAG_STEP_OVER;

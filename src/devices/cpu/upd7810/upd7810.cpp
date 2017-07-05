@@ -519,28 +519,28 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 	};
 }
 
-offs_t upd7810_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t upd7810_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7810 );
-	return CPU_DISASSEMBLE_NAME(upd7810)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(upd7810)(this, stream, pc, opcodes, params, options);
 }
 
-offs_t upd7807_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t upd7807_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7807 );
-	return CPU_DISASSEMBLE_NAME(upd7807)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(upd7807)(this, stream, pc, opcodes, params, options);
 }
 
-offs_t upd7801_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t upd7801_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7801 );
-	return CPU_DISASSEMBLE_NAME(upd7801)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(upd7801)(this, stream, pc, opcodes, params, options);
 }
 
-offs_t upd78c05_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t upd78c05_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd78c05 );
-	return CPU_DISASSEMBLE_NAME(upd78c05)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(upd78c05)(this, stream, pc, opcodes, params, options);
 }
 
 WRITE8_MEMBER(upd7810_device::pa_w)

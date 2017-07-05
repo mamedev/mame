@@ -45,15 +45,15 @@ static const char *const adr_a[]=
 static const char number_2_hex[]=
 { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-#define SATURN_PEEKOP_DIS8(v)   v = (int8_t)( oprom[pos] | ( oprom[pos+1] << 4 ) ); pos+= 2;
+#define SATURN_PEEKOP_DIS8(v)   v = (int8_t)( opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) ); pos+= 2;
 
-#define SATURN_PEEKOP_DIS12(v)  v = oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ); \
+#define SATURN_PEEKOP_DIS12(v)  v = opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) | ( opcodes.r8(pos+2) << 8 ); \
 								pos += 3;                                                       \
 								if ( v & 0x0800 )   v = -0x1000 + v;
 
-#define SATURN_PEEKOP_DIS16(v)  v = (int16_t)( oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ) | ( oprom[pos+3] << 12 ) ); pos += 4;
+#define SATURN_PEEKOP_DIS16(v)  v = (int16_t)( opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) | ( opcodes.r8(pos+2) << 8 ) | ( opcodes.r8(pos+3) << 12 ) ); pos += 4;
 
-#define SATURN_PEEKOP_ADR(v)    v = oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ) | ( oprom[pos+3] << 12 ) | ( oprom[pos+4] << 16 ); pos += 5;
+#define SATURN_PEEKOP_ADR(v)    v = opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) | ( opcodes.r8(pos+2) << 8 ) | ( opcodes.r8(pos+3) << 12 ) | ( opcodes.r8(pos+4) << 16 ); pos += 5;
 
 
 // don't split branch and return, source relies on this ordering
@@ -593,7 +593,7 @@ static const char *field_2_string(int adr_enum)
 	return nullptr;
 }
 
-static const OPCODE opcodes[][0x10]= {
+static const OPCODE opcs[][0x10]= {
 	{
 		// first digit
 		{ Opcode0 },
@@ -1274,15 +1274,15 @@ CPU_DISASSEMBLE(saturn)
 	int cont=1; // operation still not complete disassembled
 	char bin[10]; int binsize=0; // protocollizing fetched nibbles
 	char number[17];
-	const OPCODE *level=opcodes[0]; //pointer to current digit
+	const OPCODE *level=opcs[0]; //pointer to current digit
 	int op; // currently fetched nibble
-	int pos = 0;
+	offs_t pos = pc;
 
 	int i,c,v;
 
 	while (cont)
 	{
-		op = oprom[pos++] & 0xf;
+		op = opcodes.r8(pos++) & 0xf;
 		level+=op;
 		switch (level->sel) {
 		case Illegal:
@@ -1319,42 +1319,42 @@ CPU_DISASSEMBLE(saturn)
 				stream << mnemonics[level->mnemonic].name[set];
 				break;
 			case Imm:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], oprom[pos++]);
+				util::stream_format(stream, mnemonics[level->mnemonic].name[set], opcodes.r8(pos++));
 				break;
 			case ImmCount:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], oprom[pos++]+1);
+				util::stream_format(stream, mnemonics[level->mnemonic].name[set], opcodes.r8(pos++)+1);
 				break;
 			case AdrImmCount:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], field_2_string(adr), oprom[pos++]+1);
+				util::stream_format(stream, mnemonics[level->mnemonic].name[set], field_2_string(adr), opcodes.r8(pos++)+1);
 				break;
 			case AdrCount: // mnemonics have string %s for address field
-				snprintf(number,sizeof(number),"%x",oprom[pos++]+1);
+				snprintf(number,sizeof(number),"%x",opcodes.r8(pos++)+1);
 				util::stream_format(stream, mnemonics[level->mnemonic].name[set], number);
 				break;
 			case Imm2:
-				v=oprom[pos++];
-				v|=oprom[pos++]<<4;
+				v=opcodes.r8(pos++);
+				v|=opcodes.r8(pos++)<<4;
 				util::stream_format(stream, mnemonics[level->mnemonic].name[set], v);
 				break;
 			case Imm4:
-				v=oprom[pos++];
-				v|=oprom[pos++]<<4;
-				v|=oprom[pos++]<<8;
-				v|=oprom[pos++]<<12;
+				v=opcodes.r8(pos++);
+				v|=opcodes.r8(pos++)<<4;
+				v|=opcodes.r8(pos++)<<8;
+				v|=opcodes.r8(pos++)<<12;
 				util::stream_format(stream, mnemonics[level->mnemonic].name[set], v);
 				break;
 			case Imm5:
-				v=oprom[pos++];
-				v|=oprom[pos++]<<4;
-				v|=oprom[pos++]<<8;
-				v|=oprom[pos++]<<12;
-				v|=oprom[pos++]<<16;
+				v=opcodes.r8(pos++);
+				v|=opcodes.r8(pos++)<<4;
+				v|=opcodes.r8(pos++)<<8;
+				v|=opcodes.r8(pos++)<<12;
+				v|=opcodes.r8(pos++)<<16;
 				util::stream_format(stream, mnemonics[level->mnemonic].name[set], v);
 				break;
 			case ImmCload:
-				c=i=oprom[pos++] & 0xf;
+				c=i=opcodes.r8(pos++) & 0xf;
 				number[i+1]=0;
-				for (;i>=0; i--) number[i]=number_2_hex[oprom[pos++] & 0xf];
+				for (;i>=0; i--) number[i]=number_2_hex[opcodes.r8(pos++) & 0xf];
 				util::stream_format(stream, mnemonics[level->mnemonic].name[set], c+1, number);
 				break;
 			case Dis3:
@@ -1409,7 +1409,7 @@ CPU_DISASSEMBLE(saturn)
 				}
 				break;
 			case TestBranchRet:
-				i=oprom[pos++];
+				i=opcodes.r8(pos++);
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
 					util::stream_format(stream, mnemonics[level->mnemonic+1].name[set], i);
@@ -1419,7 +1419,7 @@ CPU_DISASSEMBLE(saturn)
 				}
 				break;
 			case ImmBranch:
-				i=oprom[pos++];
+				i=opcodes.r8(pos++);
 				SATURN_PEEKOP_DIS8(v);
 				c=(pc+pos-2+v)&0xfffff;
 				util::stream_format(stream, mnemonics[level->mnemonic].name[set], i, c);
@@ -1452,19 +1452,19 @@ CPU_DISASSEMBLE(saturn)
 				util::stream_format(stream, mnemonics[level->mnemonic].name[set], W );
 				break;
 			case AdrA:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_a[oprom[pos++] & 0x7] );
+				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_a[opcodes.r8(pos++) & 0x7] );
 				break;
 			case AdrAF:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_af[oprom[pos++] & 0xf] );
+				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_af[opcodes.r8(pos++) & 0xf] );
 				break;
 			case AdrB:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_b[oprom[pos++] & 0x7] );
+				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_b[opcodes.r8(pos++) & 0x7] );
 				break;
 			}
 			break;
 		}
-		level = opcodes[level->sel];
+		level = opcs[level->sel];
 	}
 
-	return pos;
+	return pos - pc;
 }

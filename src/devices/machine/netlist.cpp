@@ -1045,7 +1045,7 @@ ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cy
 	return cycles;
 }
 
-ATTR_COLD offs_t netlist_mame_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+ATTR_COLD offs_t netlist_mame_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	//char tmp[16];
 	unsigned startpc = pc;

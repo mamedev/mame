@@ -50,14 +50,11 @@ static const char *FLOATOP_ROUND[4] =
 };
 
 static std::ostream *output;
-static const uint8_t *opdata;
-static int opbytes;
 
-static uint32_t fetch(void)
+static uint32_t fetch(offs_t &pos, const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t d = ((uint32_t)(opdata[0]) << 24) | ((uint32_t)(opdata[1]) << 16) | ((uint32_t)(opdata[2]) << 8) | opdata[3];
-	opdata += 4;
-	opbytes += 4;
+	uint32_t d = opcodes.r32(pos);
+	pos += 4;
 	return d;
 }
 
@@ -192,14 +189,13 @@ static char* format_vector_op(uint32_t op, uint32_t imm32)
 	return buffer;
 }
 
-static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t *oprom)
+static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes)
 {
 	output = &stream;
-	opdata = oprom;
-	opbytes = 0;
+	offs_t pos = pc;
 	uint32_t flags = 0;
 
-	uint32_t op = fetch();
+	uint32_t op = fetch(pos, opcodes);
 
 	int rd = (op >> 27) & 0x1f;
 	int link = rd;
@@ -310,7 +306,7 @@ static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t 
 
 			uint32_t imm32 = 0;
 			if (op & (1 << 12))     // fetch 32-bit immediate if needed
-				imm32 = fetch();
+				imm32 = fetch(pos, opcodes);
 
 			int m = op & (1 << 15) ? 0 : 1;
 			int s = op & (1 << 11) ? 0 : 1;
@@ -502,10 +498,10 @@ static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t 
 		}
 	}
 
-	return opbytes | flags | DASMFLAG_SUPPORTED;
+	return (pos - pc) | flags | DASMFLAG_SUPPORTED;
 }
 
 CPU_DISASSEMBLE(tms32082_mp)
 {
-	return tms32082_disasm_mp(stream, pc, oprom);
+	return tms32082_disasm_mp(stream, pc, opcodes);
 }

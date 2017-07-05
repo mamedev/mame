@@ -2336,7 +2336,7 @@ bool tlcs870_device::stream_arg(std::ostream &stream, uint32_t pc, const char *p
 	return false;
 }
 
-void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, int type, uint16_t val)
+void tlcs870_device::disassemble_param(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options, int type, uint16_t val)
 {
 	int basetype = type & MODE_MASK;
 
@@ -2377,7 +2377,7 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 	}
 }
 
-offs_t tlcs870_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tlcs870_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	m_addr = pc;
 
@@ -2387,14 +2387,14 @@ offs_t tlcs870_device::disasm_disassemble(std::ostream &stream, offs_t pc, const
 
 	if (m_param1_type)
 	{
-		disasm_disassemble_param(stream, pc, oprom, opram, options, m_param1_type, m_param1);
+		disassemble_param(stream, pc, opcodes, params, options, m_param1_type, m_param1);
 	}
 
 	if (m_param2_type)
 	{
 		if (m_param1_type) util::stream_format(stream, ",");
 
-		disasm_disassemble_param(stream, pc, oprom, opram, options, m_param2_type, m_param2);
+		disassemble_param(stream, pc, opcodes, params, options, m_param2_type, m_param2);
 
 	}
 

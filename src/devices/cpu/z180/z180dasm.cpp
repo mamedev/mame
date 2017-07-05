@@ -395,45 +395,44 @@ CPU_DISASSEMBLE(z180)
 {
 	const z80dasm *d;
 	const char *src, *ixy;
-	unsigned PC = pc;
 	int8_t offset = 0;
 	uint8_t op, op1 = 0;
 	uint16_t ea;
-	int pos = 0;
+	offs_t pos = pc;
 	uint32_t flags = 0;
 
 	ixy = "oops!!";
 
-	op = oprom[pos++];
+	op = opcodes.r8(pos++);
 
 	switch (op)
 	{
 	case 0xcb:
-		op = oprom[pos++];
+		op = opcodes.r8(pos++);
 		d = &mnemonic_cb[op];
 		break;
 	case 0xed:
-		op1 = oprom[pos++];
+		op1 = opcodes.r8(pos++);
 		d = &mnemonic_ed[op1];
 		break;
 	case 0xdd:
 		ixy = "ix";
-		op1 = oprom[pos++];
+		op1 = opcodes.r8(pos++);
 		if( op1 == 0xcb )
 		{
-			offset = (int8_t) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
+			offset = (int8_t) params.r8(pos++);
+			op1 = params.r8(pos++); /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];
 		break;
 	case 0xfd:
 		ixy = "iy";
-		op1 = oprom[pos++];
+		op1 = opcodes.r8(pos++);
 		if( op1 == 0xcb )
 		{
-			offset = (int8_t) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
+			offset = (int8_t) params.r8(pos++);
+			op1 = params.r8(pos++); /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];
@@ -455,25 +454,25 @@ CPU_DISASSEMBLE(z180)
 				util::stream_format(stream, "$%02x,$%02x", op, op1);
 				break;
 			case 'A':
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'B':   /* Byte op arg */
-				ea = opram[pos++];
+				ea = params.r8(pos++);
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'N':   /* Immediate 16 bit */
-				ea = opram[pos] + ( opram[pos+1] << 8 );
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (int8_t) opram[pos++];
-				util::stream_format(stream, "$%05X", PC + offset + 2);
+				offset = (int8_t) params.r8(pos++);
+				util::stream_format(stream, "$%05X", pc + offset + 2);
 				break;
 			case 'P':   /* Port number */
-				ea = opram[pos++];
+				ea = params.r8(pos++);
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'V':   /* Restart vector */
@@ -481,12 +480,12 @@ CPU_DISASSEMBLE(z180)
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'W':   /* Memory address word */
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%05X", ea);
 				break;
 			case 'X':
-				offset = (int8_t) opram[pos++];
+				offset = (int8_t) params.r8(pos++);
 			case 'Y':
 				util::stream_format(stream,"(%s%c$%02x)", ixy, sign(offset), offs(offset));
 				break;
@@ -511,5 +510,5 @@ CPU_DISASSEMBLE(z180)
 	else if (d->mnemonic == zRETN || d->mnemonic == zRET || d->mnemonic == zRETI)
 		flags = DASMFLAG_STEP_OUT;
 
-	return pos | flags | DASMFLAG_SUPPORTED;
+	return (pos - pc) | flags | DASMFLAG_SUPPORTED;
 }

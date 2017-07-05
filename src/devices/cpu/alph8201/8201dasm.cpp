@@ -359,7 +359,7 @@ CPU_DISASSEMBLE(alpha8201)
 
 	if (!OpInizialized) InitDasm8201();
 
-	code = oprom[0];
+	code = opcodes.r8(pc);
 	op = -1;    /* no matching opcode */
 	for ( i = 0; i < MAX_OPS; i++)
 	{
@@ -382,7 +382,7 @@ CPU_DISASSEMBLE(alpha8201)
 
 	if (Op[op].type & 0x10)
 	{
-		disp = opram[1];
+		disp = params.r8(pc+1);
 		cnt++;
 	}
 	else

@@ -84,7 +84,7 @@ static const oprandinfo of[] = {
 /* 45 */ { {" *R%u",    "",         "",         ""},        {UI8, DONE, DONE, DONE} }
 };
 
-static const tms7000_opcodeinfo opcodes[] = {
+static const tms7000_opcodeinfo opcs[] = {
 	{0x69, "ADC", 0, 0 },
 	{0x19, "ADC", 1, 0 },
 	{0x39, "ADC", 2, 0 },
@@ -370,14 +370,14 @@ static const tms7000_opcodeinfo opcodes[] = {
 CPU_DISASSEMBLE(tms7000)
 {
 	int opcode, i/*, size = 1*/;
-	int pos = 0;
+	offs_t pos = pc;
 	char tmpbuf[32];
 
-	opcode = oprom[pos++];
+	opcode = opcodes.r8(pos++);
 
-	for( i=0; i<sizeof(opcodes) / sizeof(tms7000_opcodeinfo); i++ )
+	for( i=0; i<sizeof(opcs) / sizeof(tms7000_opcodeinfo); i++ )
 	{
-		if( opcode == opcodes[i].opcode )
+		if( opcode == opcs[i].opcode )
 		{
 			/* We found a match */
 
@@ -387,9 +387,9 @@ CPU_DISASSEMBLE(tms7000)
 			uint16_t  c;
 			int16_t   d;
 
-			util::stream_format(stream, "%s", opcodes[i].name);
+			util::stream_format(stream, "%s", opcs[i].name);
 
-			j=opcodes[i].operand;
+			j=opcs[i].operand;
 
 			for( k=0; k<4; k++ )
 			{
@@ -401,34 +401,34 @@ CPU_DISASSEMBLE(tms7000)
 						util::stream_format(stream, "%s", of[j].opstr[k]);
 						break;
 					case UI8:
-						a = (uint8_t)opram[pos++];
+						a = (uint8_t)params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (unsigned int)a);
 						break;
 					case I8:
-						b = (int8_t)opram[pos++];
+						b = (int8_t)params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (int8_t)b);
 						break;
 					case UI16:
-						c = (uint16_t)opram[pos++];
+						c = (uint16_t)params.r8(pos++);
 						c <<= 8;
-						c += opram[pos++];
+						c += params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (unsigned int)c);
 						break;
 					case I16:
-						d = (int16_t)opram[pos++];
+						d = (int16_t)params.r8(pos++);
 						d <<= 8;
-						d += opram[pos++];
+						d += params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (signed int)d);
 						break;
 					case PCREL:
-						b = (int8_t)opram[pos++];
+						b = (int8_t)params.r8(pos++);
 						sprintf(tmpbuf, "$%04X", pc+2+k+b);
 						util::stream_format(stream, of[j].opstr[k], tmpbuf);
 						break;
 					case PCABS:
-						c = (uint16_t)opram[pos++];
+						c = (uint16_t)params.r8(pos++);
 						c <<= 8;
-						c += opram[pos++];
+						c += params.r8(pos++);
 						sprintf(tmpbuf, "$%04X", c);
 						util::stream_format(stream, of[j].opstr[k], tmpbuf);
 						break;
@@ -438,11 +438,11 @@ CPU_DISASSEMBLE(tms7000)
 						break;
 				}
 			}
-			return pos | opcodes[i].s_flag | DASMFLAG_SUPPORTED;
+			return (pos - pc) | opcs[i].s_flag | DASMFLAG_SUPPORTED;
 		}
 	}
 
 	/* No Match */
 	stream << "Illegal Opcode";
-	return pos | DASMFLAG_SUPPORTED;
+	return (pos - pc) | DASMFLAG_SUPPORTED;
 }

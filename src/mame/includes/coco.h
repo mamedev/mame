@@ -132,8 +132,8 @@ public:
 	virtual address_space &cartridge_space() override;
 
 	// disassembly override
-	static offs_t os9_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
-	offs_t dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+	static offs_t os9_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params, int options);
+	offs_t dasm_override(device_t &device, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params, int options);
 
 protected:
 	// device-level overrides

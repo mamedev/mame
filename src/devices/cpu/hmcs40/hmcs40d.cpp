@@ -186,7 +186,7 @@ static const u8 hmcs40_mnemonic[0x400] =
 
 CPU_DISASSEMBLE(hmcs40)
 {
-	u16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
+	u16 op = opcodes.r16(pc) & 0x3ff;
 	u8 instr = hmcs40_mnemonic[op];
 	s8 bits = s_bits[instr];
 
@@ -226,6 +226,5 @@ CPU_DISASSEMBLE(hmcs40)
 		}
 	}
 
-	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return 1 | s_flags[instr] | DASMFLAG_SUPPORTED;
 }

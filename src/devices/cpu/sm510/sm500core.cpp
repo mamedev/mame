@@ -48,10 +48,10 @@ sm500_device::sm500_device(const machine_config &mconfig, device_type type, cons
 
 
 // disasm
-offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+offs_t sm500_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options)
 {
 	extern CPU_DISASSEMBLE(sm500);
-	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, opcodes, params, options);
 }
 
 

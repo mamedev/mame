@@ -5416,13 +5416,13 @@ const char *const regname[32] =
 	"illegal", "TMM",     "PT",      "illegal"
 };
 
-offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const uint8_t *oprom, const uint8_t *opram, bool is_7810 )
+offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params, bool is_7810 )
 {
-	unsigned idx = 0;
-	const uint8_t op = oprom[idx++];
+	offs_t idx = pc;
+	const uint8_t op = opcodes.r8(idx++);
 	const dasm_s *desc = &dasmXX[op];
 	if (desc->is_prefix())
-		desc = &desc->prefix_get(oprom[idx++]);
+		desc = &desc->prefix_get(opcodes.r8(idx++));
 
 	util::stream_format(stream, "%-8.8s", desc->name());
 
@@ -5439,19 +5439,19 @@ offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const
 			switch (*a)
 			{
 			case 'a':   /* address V * 256 + offset */
-				op2 = opram[idx++];
+				op2 = params.r8(idx++);
 				util::stream_format(stream, "VV:%02X", op2);
 				break;
 			case 'b':   /* immediate byte */
-				util::stream_format(stream, "$%02X", opram[idx++]);
+				util::stream_format(stream, "$%02X", params.r8(idx++));
 				break;
 			case 'w':   /* immediate word */
-				ea = opram[idx++];
-				ea += opram[idx++] << 8;
+				ea = params.r8(idx++);
+				ea += params.r8(idx++) << 8;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'd':   /* JRE address */
-				op2 = oprom[idx++];
+				op2 = opcodes.r8(idx++);
 				offset = (op & 1) ? -(256 - op2): + op2;
 				util::stream_format(stream, "$%04X", ( pc + idx + offset ) & 0xFFFF );
 				break;
@@ -5460,7 +5460,7 @@ offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const
 				util::stream_format(stream, "($%04X)", ea);
 				break;
 			case 'f':   /* CALF address */
-				op2 = oprom[idx++];
+				op2 = opcodes.r8(idx++);
 				ea = 0x800 + 0x100 * (op & 0x07) + op2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
@@ -5469,7 +5469,7 @@ offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const
 				util::stream_format(stream, "$%04X", ( pc + idx + offset ) & 0xFFFF );
 				break;
 			case 'i':   /* bit manipulation */
-				op2 = oprom[idx++];
+				op2 = opcodes.r8(idx++);
 				util::stream_format(stream, "%s,%d", regname[op2 & 0x1f], op2 >> 5);
 				break;
 			default:
@@ -5480,27 +5480,27 @@ offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const
 			stream << *a;
 	}
 
-	return idx | flags | DASMFLAG_SUPPORTED;
+	return (idx - pc) | flags | DASMFLAG_SUPPORTED;
 }
 
 } // anonymous namespace
 
 CPU_DISASSEMBLE( upd7810 )
 {
-	return Dasm( stream, pc, dasm_s::XX_7810, oprom, opram, true );
+	return Dasm( stream, pc, dasm_s::XX_7810, opcodes, params, true );
 }
 
 CPU_DISASSEMBLE( upd7807 )
 {
-	return Dasm( stream, pc, dasm_s::XX_7807, oprom, opram, true );
+	return Dasm( stream, pc, dasm_s::XX_7807, opcodes, params, true );
 }
 
 CPU_DISASSEMBLE( upd7801 )
 {
-	return Dasm( stream, pc, dasm_s::XX_7801, oprom, opram, false );
+	return Dasm( stream, pc, dasm_s::XX_7801, opcodes, params, false );
 }
 
 CPU_DISASSEMBLE( upd78c05 )
 {
-	return Dasm( stream, pc, dasm_s::XX_78c05, oprom, opram, false );
+	return Dasm( stream, pc, dasm_s::XX_78c05, opcodes, params, false );
 }

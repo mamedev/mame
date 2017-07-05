@@ -700,5 +700,5 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 
 CPU_DISASSEMBLE( dsp32c )
 {
-	return dasm_dsp32(stream, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
+	return dasm_dsp32(stream, pc, opcodes.r32(pc));
 }

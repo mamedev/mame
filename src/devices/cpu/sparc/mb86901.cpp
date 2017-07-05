@@ -520,36 +520,23 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
+//  opcode_alignment - opcode alignment, in pc units
 //-------------------------------------------------
 
-uint32_t mb86901_device::disasm_min_opcode_bytes() const
+uint32_t mb86901_device::opcode_alignment() const
 {
 	return 4;
 }
 
 
 //-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t mb86901_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t mb86901_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mb86901_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	uint32_t op = *reinterpret_cast<const uint32_t *>(oprom);
-	return m_dasm.dasm(stream, pc, big_endianize_int32(op));
+	return m_dasm.dasm(stream, pc, opcodes.r32(pc));
 }
 
 

@@ -27,7 +27,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options) override;
 };
 
 class tms1070_cpu_device : public tms1000_cpu_device

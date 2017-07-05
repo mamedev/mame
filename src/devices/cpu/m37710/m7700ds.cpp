@@ -348,24 +348,6 @@ const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix89[256] =
 
 } // anonymous namespace
 
-static inline unsigned int read_8(const uint8_t *oprom, unsigned int offset)
-{
-	return oprom[offset];
-}
-
-static inline unsigned int read_16(const uint8_t *oprom, unsigned int offset)
-{
-	unsigned int val = read_8(oprom, offset);
-	return val | (read_8(oprom, offset+1)<<8);
-}
-
-static inline unsigned int read_24(const uint8_t *oprom, unsigned int offset)
-{
-	unsigned int val = read_8(oprom, offset);
-	val |= (read_8(oprom, offset+1)<<8);
-	return val | (read_8(oprom, offset+2)<<16);
-}
-
 static inline char* int_8_str(unsigned int val)
 {
 	static char str[20];
@@ -395,14 +377,14 @@ static inline char* int_16_str(unsigned int val)
 }
 
 
-int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag)
+int m7700_disassemble(std::ostream &stream, offs_t pc, unsigned int pb, const device_disasm_interface::data_buffer &opcodes, int m_flag, int x_flag)
 {
 	unsigned int instruction;
 	const m7700_opcode_struct *opcode;
 	int var;
 	signed char varS;
 	int length = 1;
-	unsigned int address;
+	offs_t address;
 	//unsigned int start;
 	uint32_t flags = 0;
 
@@ -410,7 +392,7 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 	address = pc | pb;
 	//start = address;
 
-	instruction = read_8(oprom,0);
+	instruction = opcodes.r8(address);
 
 	// check for prefixes
 	switch (instruction)
@@ -418,16 +400,14 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 	case 0x42:
 		address++;
 		length++;
-		oprom++;
-		instruction = read_8(oprom,0);
+		instruction = opcodes.r8(address);
 		opcode = &m7700_opcode_struct::get_prefix42(instruction);
 		break;
 
 	case 0x89:
 		address++;
 		length++;
-		oprom++;
-		instruction = read_8(oprom,0);
+		instruction = opcodes.r8(address);
 		opcode = &m7700_opcode_struct::get_prefix89(instruction);
 		break;
 
@@ -454,181 +434,181 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 			util::stream_format(stream, " B");
 			break;
 		case RELB:
-			varS = read_8(oprom,1);
+			varS = opcodes.r8(address + 1);
 			length++;
 			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			break;
 		case RELW:
 		case PER :
-			var = read_16(oprom,1);
+			var = opcodes.r16(address + 1);
 			length += 2;
 			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + var)&0xffff), int_16_str(var));
 			break;
 		case IMM :
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x", read_16(oprom,1));
+				util::stream_format(stream, " #$%04x", opcodes.r16(address + 1));
 				length += 2;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x", read_8(oprom,1));
+				util::stream_format(stream, " #$%02x", opcodes.r8(address + 1));
 				length++;
 			}
 			break;
 		case BBCD:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				varS = read_8(oprom,4);
+				varS = opcodes.r8(address + 4);
 				length += 4;
-				util::stream_format(stream, " #$%04x, $%02x, %06x (%s)", read_16(oprom,2), read_8(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%04x, $%02x, %06x (%s)", opcodes.r16(address + 2), opcodes.r8(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			else
 			{
-				varS = read_8(oprom,3);
+				varS = opcodes.r8(address + 3);
 				length += 3;
-				util::stream_format(stream, " #$%02x, $%02x, %06x (%s)", read_8(oprom,2), read_8(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%02x, $%02x, %06x (%s)", opcodes.r8(address + 2), opcodes.r8(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			break;
 		case BBCA:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
 				length += 5;
-				varS = read_8(oprom,5);
-				util::stream_format(stream, " #$%04x, $%04x, %06x (%s)", read_16(oprom,3), read_16(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				varS = opcodes.r8(address + 5);
+				util::stream_format(stream, " #$%04x, $%04x, %06x (%s)", opcodes.r16(address + 3), opcodes.r16(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			else
 			{
 				length += 4;
-				varS = read_8(oprom,4);
-				util::stream_format(stream, " #$%02x, $%04x, %06x (%s)", read_8(oprom,3), read_16(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				varS = opcodes.r8(address + 4);
+				util::stream_format(stream, " #$%02x, $%04x, %06x (%s)", opcodes.r8(address + 3), opcodes.r16(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			break;
 		case LDM4:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%02x", read_16(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%04x, $%02x", opcodes.r16(address + 2), opcodes.r8(address + 1));
 				length += 3;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%02x", read_8(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%02x, $%02x", opcodes.r8(address + 2), opcodes.r8(address + 1));
 				length += 2;
 			}
 			break;
 		case LDM5:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%04x", read_16(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%04x, $%04x", opcodes.r16(address + 3), opcodes.r16(address + 1));
 				length += 4;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%04x", read_8(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%02x, $%04x", opcodes.r8(address + 3), opcodes.r16(address + 1));
 				length += 3;
 			}
 			break;
 		case LDM4X:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%02x, X", read_16(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%04x, $%02x, X", opcodes.r16(address + 2), opcodes.r8(address + 1));
 				length += 3;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%02x, X", read_8(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%02x, $%02x, X", opcodes.r8(address + 2), opcodes.r8(address + 1));
 				length += 2;
 			}
 			break;
 		case LDM5X:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%04x, X", read_16(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%04x, $%04x, X", opcodes.r16(address + 3), opcodes.r16(address + 1));
 				length += 4;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%04x, X", read_8(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%02x, $%04x, X", opcodes.r8(address + 3), opcodes.r16(address + 1));
 				length += 3;
 			}
 			break;
 		case A   :
 		case PEA :
-			util::stream_format(stream, " $%04x", read_16(oprom,1));
+			util::stream_format(stream, " $%04x", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AI  :
-			util::stream_format(stream, " ($%04x)", read_16(oprom,1));
+			util::stream_format(stream, " ($%04x)", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AL  :
-			util::stream_format(stream, " $%06x", read_24(oprom,1));
+			util::stream_format(stream, " $%06x", opcodes.r32(address + 1) & 0xffffff);
 			length += 3;
 			break;
 		case ALX :
-			util::stream_format(stream, " $%06x,X", read_24(oprom,1));
+			util::stream_format(stream, " $%06x,X", opcodes.r32(address + 1) & 0xffffff);
 			length += 3;
 			break;
 		case AX  :
-			util::stream_format(stream, " $%04x,X", read_16(oprom,1));
+			util::stream_format(stream, " $%04x,X", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AXI :
-			util::stream_format(stream, " ($%04x,X)", read_16(oprom,1));
+			util::stream_format(stream, " ($%04x,X)", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AY  :
-			util::stream_format(stream, " $%04x,Y", read_16(oprom,1));
+			util::stream_format(stream, " $%04x,Y", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case D   :
-			util::stream_format(stream, " $%02x", read_8(oprom,1));
+			util::stream_format(stream, " $%02x", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DI  :
 		case PEI :
-			util::stream_format(stream, " ($%02x)", read_8(oprom,1));
+			util::stream_format(stream, " ($%02x)", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DIY :
-			util::stream_format(stream, " ($%02x),Y", read_8(oprom,1));
+			util::stream_format(stream, " ($%02x),Y", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DLI :
-			util::stream_format(stream, " [$%02x]", read_8(oprom,1));
+			util::stream_format(stream, " [$%02x]", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DLIY:
-			util::stream_format(stream, " [$%02x],Y", read_8(oprom,1));
+			util::stream_format(stream, " [$%02x],Y", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DX  :
-			util::stream_format(stream, " $%02x,X", read_8(oprom,1));
+			util::stream_format(stream, " $%02x,X", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DXI :
-			util::stream_format(stream, " ($%02x,X)", read_8(oprom,1));
+			util::stream_format(stream, " ($%02x,X)", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DY  :
-			util::stream_format(stream, " $%02x,Y", read_8(oprom,1));
+			util::stream_format(stream, " $%02x,Y", opcodes.r8(address + 1));
 			length++;
 			break;
 		case S   :
-			util::stream_format(stream, " %s,S", int_8_str(read_8(oprom,1)));
+			util::stream_format(stream, " %s,S", int_8_str(opcodes.r8(address + 1)));
 			length++;
 			break;
 		case SIY :
-			util::stream_format(stream, " (%s,S),Y", int_8_str(read_8(oprom,1)));
+			util::stream_format(stream, " (%s,S),Y", int_8_str(opcodes.r8(address + 1)));
 			length++;
 			break;
 		case SIG :
-			util::stream_format(stream, " #$%02x", read_8(oprom,1));
+			util::stream_format(stream, " #$%02x", opcodes.r8(address + 1));
 			length++;
 			break;
 		case MVN :
 		case MVP :
-			util::stream_format(stream, " $%02x, $%02x", read_8(oprom,2), read_8(oprom,1));
+			util::stream_format(stream, " $%02x, $%02x", opcodes.r8(address + 2), opcodes.r8(address + 1));
 			length += 2;
 			break;
 	}
@@ -638,5 +618,5 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 
 CPU_DISASSEMBLE(m37710_generic)
 {
-	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, 0, 0);
+	return m7700_disassemble(stream, (pc&0xffff), pc>>16, opcodes, 0, 0);
 }

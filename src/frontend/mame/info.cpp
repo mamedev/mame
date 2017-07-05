@@ -25,6 +25,7 @@
 #include "xmlfile.h"
 
 #include <ctype.h>
+#include <fstream>
 
 
 #define XML_ROOT                "mame"
@@ -555,10 +556,12 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 
 void info_xml_creator::output_devices(device_type_set const *filter)
 {
+	std::ofstream table("table.csv");
+
 	// get config for empty machine
 	machine_config config(GAME_NAME(___empty), m_lookup_options);
 
-	auto const action = [this, &config] (device_type type)
+	auto const action = [this, &config, &table] (device_type type)
 			{
 				// add it at the root of the machine config
 				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
@@ -567,6 +570,24 @@ void info_xml_creator::output_devices(device_type_set const *filter)
 				for (device_t &device : device_iterator(*dev))
 					if (!device.configured())
 						device.config_complete();
+
+				// let's see if it's intereting
+				device_memory_interface *const memory(dynamic_cast<device_memory_interface *>(dev));
+				device_disasm_interface *const disasm(dynamic_cast<device_disasm_interface *>(dev));
+				if (memory && disasm)
+				{
+					address_space_config const *program(memory->space_config(AS_PROGRAM));
+					if(program) {
+						const char *tn = dev->type().type().name();
+						strtol(tn, (char **)&tn, 10);
+						table
+							<< dev->shortname() << ' '
+							<< tn << ' '
+							<< (dev->source() + 15) << ' ';
+						table << int(program->m_addrbus_shift);
+						table << ' ' << disasm->opcode_alignment() << '\n';
+					}
+				}
 
 				// print details and remove it
 				output_one_device(config, *dev, dev->tag());

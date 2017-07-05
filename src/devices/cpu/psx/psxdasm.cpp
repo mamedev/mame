@@ -160,15 +160,10 @@ static uint32_t jump_address( psxcpu_state *state, uint32_t pc, uint32_t op )
 	return ( nextpc & 0xf0000000 ) + ( INS_TARGET( op ) << 2 );
 }
 
-static uint32_t fetch_op( const uint8_t *opram )
-{
-	return ( opram[ 3 ] << 24 ) | ( opram[ 2 ] << 16 ) | ( opram[ 1 ] << 8 ) | ( opram[ 0 ] << 0 );
-}
-
-static char *upper_address( uint32_t op, const uint8_t *opram )
+static char *upper_address( uint32_t op, offs_t pos, const device_disasm_interface::data_buffer &opcodes )
 {
 	static char s_address[ 20 ];
-	uint32_t nextop = fetch_op( opram );
+	uint32_t nextop = opcodes.r32( pos );
 
 	if( INS_OP( nextop ) == OP_ORI && INS_RT( op ) == INS_RS( nextop ) )
 	{
@@ -186,15 +181,13 @@ static char *upper_address( uint32_t op, const uint8_t *opram )
 	return s_address;
 }
 
-unsigned DasmPSXCPU( psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram )
+unsigned DasmPSXCPU( psxcpu_state *state, std::ostream &stream, offs_t pc, const device_disasm_interface::data_buffer &opcodes )
 {
 	uint32_t op;
-	const uint8_t *oldopram;
 	uint32_t flags = 0;
-
-	oldopram = opram;
-	op = fetch_op( opram );
-	opram += 4;
+	offs_t pos = pc;
+	op = opcodes.r32( pos );
+	pos += 4;
 
 	std::streampos current_pos = stream.tellp();
 
@@ -372,7 +365,7 @@ unsigned DasmPSXCPU( psxcpu_state *state, std::ostream &stream, uint32_t pc, con
 		util::stream_format( stream, "xori    %s,%s,$%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
 		break;
 	case OP_LUI:
-		util::stream_format( stream, "lui     %s,%s", s_cpugenreg[ INS_RT( op ) ], upper_address( op, opram ) );
+		util::stream_format( stream, "lui     %s,%s", s_cpugenreg[ INS_RT( op ) ], upper_address( op, pos, opcodes ) );
 		break;
 	case OP_COP0:
 		switch( INS_RS( op ) )
@@ -683,11 +676,11 @@ unsigned DasmPSXCPU( psxcpu_state *state, std::ostream &stream, uint32_t pc, con
 		util::stream_format(stream, "dw      $%08x", op);
 	}
 
-	return ( opram - oldopram ) | flags | DASMFLAG_SUPPORTED;
+	return ( pos - pc ) | flags | DASMFLAG_SUPPORTED;
 }
 
 
 CPU_DISASSEMBLE( psxcpu_generic )
 {
-	return DasmPSXCPU( nullptr, stream, pc, opram );
+	return DasmPSXCPU( nullptr, stream, pc, opcodes );
 }

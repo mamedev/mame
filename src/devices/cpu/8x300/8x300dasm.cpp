@@ -44,7 +44,7 @@ static inline bool is_src_rot(uint16_t opcode)
 CPU_DISASSEMBLE(n8x300)
 {
 	unsigned startpc = pc;
-	uint16_t opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
+	uint16_t opcode = opcodes.r16(pc);
 	uint8_t inst = opcode >> 13;
 	pc+=2;
 

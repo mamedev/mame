@@ -606,5 +606,5 @@ unsigned DasmSH2(std::ostream &stream, unsigned pc, uint16_t opcode)
 
 CPU_DISASSEMBLE(sh2)
 {
-	return DasmSH2(stream, pc, (oprom[0] << 8) | oprom[1]);
+	return DasmSH2(stream, pc, opcodes.r16(pc));
 }

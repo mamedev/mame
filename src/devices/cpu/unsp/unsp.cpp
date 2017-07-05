@@ -30,10 +30,10 @@ device_memory_interface::space_config_vector unsp_device::memory_space_config() 
 	};
 }
 
-offs_t unsp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t unsp_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( unsp );
-	return CPU_DISASSEMBLE_NAME(unsp)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(unsp)(this, stream, pc, opcodes, params, options);
 }
 
 

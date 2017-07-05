@@ -239,7 +239,7 @@ static void scudsp_dasm_prefix( const char* format, char* buffer, uint32_t *data
 
 CPU_DISASSEMBLE(scudsp)
 {
-	uint32_t op = oprom[0]<<24|oprom[1]<<16|oprom[2]<<8|oprom[3]<<0;
+	uint32_t op = opcodes.r32(pc);
 	unsigned size = 1;
 //  const char *sym, *sym2;
 	char temp_buffer[64];

@@ -34,7 +34,7 @@ static std::string get_memadr(uint32_t opcode, char type)
 CPU_DISASSEMBLE(tms57002)
 {
 	std::streampos original_pos = stream.tellp();
-	uint32_t opcode = opram[0] | (opram[1] << 8) | (opram[2] << 16);
+	uint32_t opcode = opcodes.r32(pc);
 	uint8_t fa = opcode >> 18;
 	if(fa == 0x3f) {
 		switch((opcode >> 11) & 0x7f) { // category 3

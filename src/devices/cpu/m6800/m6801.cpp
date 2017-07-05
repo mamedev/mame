@@ -1260,31 +1260,31 @@ void m6801_cpu_device::m6801_clock_serial()
 }
 
 
-offs_t m6801_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6801_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6801 );
-	return CPU_DISASSEMBLE_NAME(m6801)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6801)(this, stream, pc, opcodes, params, options);
 }
 
 
-offs_t m6803_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6803_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6803 );
-	return CPU_DISASSEMBLE_NAME(m6803)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6803)(this, stream, pc, opcodes, params, options);
 }
 
 
-offs_t hd6301_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hd6301_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd6301 );
-	return CPU_DISASSEMBLE_NAME(hd6301)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hd6301)(this, stream, pc, opcodes, params, options);
 }
 
 
-offs_t hd63701_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hd63701_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd63701 );
-	return CPU_DISASSEMBLE_NAME(hd63701)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hd63701)(this, stream, pc, opcodes, params, options);
 }
 
 void hd63701_cpu_device::TAKE_TRAP()

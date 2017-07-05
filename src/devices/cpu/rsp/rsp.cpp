@@ -150,10 +150,10 @@ device_memory_interface::space_config_vector rsp_device::memory_space_config() c
 	};
 }
 
-offs_t rsp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t rsp_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( rsp );
-	return CPU_DISASSEMBLE_NAME( rsp )(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME( rsp )(this, stream, pc, opcodes, params, options);
 }
 
 void rsp_device::rsp_add_imem(uint32_t *base)

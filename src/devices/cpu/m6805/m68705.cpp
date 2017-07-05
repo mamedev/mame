@@ -697,14 +697,14 @@ void m68705p_device::device_start()
 	state_add(M68705_MOR, "MOR", get_user_rom()[0x0784]).mask(0xff);
 }
 
-offs_t m68705p_device::disasm_disassemble(
+offs_t m68705p_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		uint32_t options)
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705p_syms);
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, opcodes, params, options, m68705p_syms);
 }
 
 
@@ -776,14 +776,14 @@ void m68705u_device::device_start()
 	// TODO: MISC register
 }
 
-offs_t m68705u_device::disasm_disassemble(
+offs_t m68705u_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		uint32_t options)
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705u_syms);
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, opcodes, params, options, m68705u_syms);
 }
 
 
@@ -834,14 +834,14 @@ void m68705r_device::device_start()
 	// TODO: ADC
 }
 
-offs_t m68705r_device::disasm_disassemble(
+offs_t m68705r_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		uint32_t options)
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705r_syms);
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, opcodes, params, options, m68705r_syms);
 }
 
 

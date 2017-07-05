@@ -967,14 +967,9 @@ bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address
 }
 
 
-offs_t mips3_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mips3_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	uint32_t op = *(uint32_t *)oprom;
-	if (m_bigendian)
-		op = big_endianize_int32(op);
-	else
-		op = little_endianize_int32(op);
-	return dasmmips3(stream, pc, op);
+	return dasmmips3(stream, pc, opcodes.r32(pc));
 }
 
 

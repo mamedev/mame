@@ -378,17 +378,8 @@ static unsigned dasmr3k(std::ostream &stream, unsigned pc, uint32_t op)
 }
 
 
-CPU_DISASSEMBLE( r3000be )
+CPU_DISASSEMBLE( r3000 )
 {
-	uint32_t op = *(uint32_t *)oprom;
-	op = big_endianize_int32(op);
-	return dasmr3k(stream, pc, op);
-}
-
-
-CPU_DISASSEMBLE( r3000le )
-{
-	uint32_t op = *(uint32_t *)oprom;
-	op = little_endianize_int32(op);
+	uint32_t op = opcodes.r32(pc);
 	return dasmr3k(stream, pc, op);
 }

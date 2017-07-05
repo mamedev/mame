@@ -47,7 +47,7 @@ static inline char *src2(uint32_t op, int scale)
 
 CPU_DISASSEMBLE(asap)
 {
-	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+	uint32_t op = opcodes.r32(pc);
 	int opcode = op >> 27;
 	int cond = (op >> 21) & 1;
 	int rdst = (op >> 22) & 31;
@@ -62,10 +62,10 @@ CPU_DISASSEMBLE(asap)
 		case 0x01:  util::stream_format(stream, "b%s    $%08x", condition[rdst & 15], pc + ((int32_t)(op << 10) >> 8));   break;
 		case 0x02:  if ((op & 0x003fffff) == 3)
 					{
-						uint32_t nextop = oprom[4] | (oprom[5] << 8) | (oprom[6] << 16) | (oprom[7] << 24);
+						uint32_t nextop = opcodes.r32(pc+4);
 						if ((nextop >> 27) == 0x10 && ((nextop >> 22) & 31) == rdst && (nextop & 0xffff) == 0)
 						{
-							uint32_t nextnextop = oprom[8] | (oprom[9] << 8) | (oprom[10] << 16) | (oprom[11] << 24);
+							uint32_t nextnextop = opcodes.r32(pc+8);
 							util::stream_format(stream, "llit%s $%08x,%s", setcond[cond], nextnextop, reg[rdst]);
 							return 12 | DASMFLAG_STEP_OVER | DASMFLAG_SUPPORTED;
 						}

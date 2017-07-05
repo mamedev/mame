@@ -1318,20 +1318,10 @@ static uint32_t thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
 
 CPU_DISASSEMBLE( arm7arm )
 {
-	return arm7_disasm(stream, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24)) | 4;
-}
-
-CPU_DISASSEMBLE( arm7arm_be )
-{
-	return arm7_disasm(stream, pc, oprom[3] | (oprom[2] << 8) | (oprom[1] << 16) | (oprom[0] << 24)) | 4;
+	return arm7_disasm(stream, pc, opcodes.r32(pc));
 }
 
 CPU_DISASSEMBLE( arm7thumb )
 {
-	return thumb_disasm(stream, pc, oprom[0] | (oprom[1] << 8)) | 2;
-}
-
-CPU_DISASSEMBLE( arm7thumb_be )
-{
-	return thumb_disasm(stream, pc, oprom[1] | (oprom[0] << 8)) | 2;
+	return thumb_disasm(stream, pc, opcodes.r16(pc));
 }

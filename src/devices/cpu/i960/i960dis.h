@@ -5,13 +5,13 @@
 
 struct disassemble_t
 {
-	disassemble_t(std::ostream &s, unsigned long ip, const uint8_t *opr)
-		: stream(s), IP(ip), oprom(opr) { }
+	disassemble_t(std::ostream &s, unsigned long ip, const device_disasm_interface::data_buffer &opc)
+		: stream(s), IP(ip), opcodes(opc) { }
 
 	std::ostream    &stream;    // output stream
 	unsigned long   IP;
 	unsigned long   IPinc;
-	const uint8_t *oprom;
+	const device_disasm_interface::data_buffer &opcodes;
 	uint32_t disflags;
 };
 

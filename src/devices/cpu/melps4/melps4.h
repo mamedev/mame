@@ -135,8 +135,9 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
+	virtual uint32_t opcode_alignment() const override { return 1; }
+	virtual u32 disasm_interface_flags() const override { return DASMINTF_PAGED; }
+	virtual u32 disasm_page_address_bits() const override { return 7; }
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;

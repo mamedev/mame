@@ -88,14 +88,14 @@ offs_t disassemble(
 		cpu_device *device,
 		std::ostream &stream,
 		offs_t pc,
-		u8 const *oprom,
-		u8 const *opram,
+		const device_disasm_interface::data_buffer &opcodes,
+		const device_disasm_interface::data_buffer &params,
 		int options,
 		level lvl,
 		unsigned pcmask)
 {
 	offs_t npc(pc + 1);
-	u8 const opcode(oprom[0]);
+	u8 const opcode(opcodes.r8(pc));
 	op const &base_op(f_ops[(opcode >> 4) & 0x0f]);
 	op const &ext_op((base_op.m_format == format::EXT) ? base_op.m_ext[opcode & 0x0f] : base_op);
 	op const desc((ext_op.m_level > lvl) ? f_opx_f[0x0f] : ext_op);
@@ -118,26 +118,26 @@ offs_t disassemble(
 		break;
 	case format::REGPAGE:
 		npc++;
-		util::stream_format(stream, "%-3s r%01x,$%03x", desc.m_name, imm4, oprom[1] | (npc & 0x0f00U));
+		util::stream_format(stream, "%-3s r%01x,$%03x", desc.m_name, imm4, opcodes.r8(pc+1) | (npc & 0x0f00U));
 		break;
 	case format::PAIR:
 		util::stream_format(stream, "%-3s r%01xr%01x", desc.m_name, pair, pair + 1U);
 		break;
 	case format::PAIRIMM:
 		npc++;
-		util::stream_format(stream, "%-3s r%01xr%01x,$%02x", desc.m_name, pair, pair + 1, oprom[1]);
+		util::stream_format(stream, "%-3s r%01xr%01x,$%02x", desc.m_name, pair, pair + 1, opcodes.r8(pc+1));
 		break;
 	case format::ABS:
 		npc++;
-		util::stream_format(stream, "%-3s $%03x", desc.m_name, ((u16(opcode) & 0x0fU) << 8) | oprom[1]);
+		util::stream_format(stream, "%-3s $%03x", desc.m_name, ((u16(opcode) & 0x0fU) << 8) | opcodes.r8(pc+1));
 		break;
 	case format::PAGE:
 		npc++;
-		util::stream_format(stream, "%-3s $%03x", desc.m_name, oprom[1] | (npc & 0x0f00U));
+		util::stream_format(stream, "%-3s $%03x", desc.m_name, opcodes.r8(pc+1) | (npc & 0x0f00U));
 		break;
 	case format::COND:
 		npc++;
-		util::stream_format(stream, "%-3s %s,$%03x", desc.m_name, f_cond[imm4], oprom[1] | (npc & 0x0f00U));
+		util::stream_format(stream, "%-3s %s,$%03x", desc.m_name, f_cond[imm4], opcodes.r8(pc+1) | (npc & 0x0f00U));
 		break;
 	default:
 		throw false;
@@ -158,5 +158,5 @@ offs_t disassemble(
 } // anonymous namespace
 
 
-CPU_DISASSEMBLE(i4004) { return disassemble(device, stream, pc, oprom, opram, options, level::I4004, 0x0fffU); }
-CPU_DISASSEMBLE(i4040) { return disassemble(device, stream, pc, oprom, opram, options, level::I4040, 0x1fffU); }
+CPU_DISASSEMBLE(i4004) { return disassemble(device, stream, pc, opcodes, params, options, level::I4004, 0x0fffU); }
+CPU_DISASSEMBLE(i4040) { return disassemble(device, stream, pc, opcodes, params, options, level::I4040, 0x1fffU); }

@@ -45,7 +45,7 @@ CPU_DISASSEMBLE(esrip)
 	};
 #endif
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 
 	uint32_t inst_hi = inst >> 32;
 	uint32_t inst_lo = inst & 0xffffffff;

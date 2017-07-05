@@ -419,16 +419,10 @@ void mcs40_cpu_device_base::state_string_export(device_state_entry const &entry,
     device_disasm_interface implementation
 ***********************************************************************/
 
-u32 mcs40_cpu_device_base::disasm_min_opcode_bytes() const
+u32 mcs40_cpu_device_base::opcode_alignment() const
 {
 	return 1U;
 }
-
-u32 mcs40_cpu_device_base::disasm_max_opcode_bytes() const
-{
-	return 2U;
-}
-
 
 /***********************************************************************
     register access
@@ -874,15 +868,15 @@ void i4004_cpu_device::execute_set_input(int inputnum, int state)
     device_disasm_interface implementation
 ***********************************************************************/
 
-offs_t i4004_cpu_device::disasm_disassemble(
+offs_t i4004_cpu_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		uint8_t const *oprom,
-		uint8_t const *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		uint32_t options)
 {
 	extern CPU_DISASSEMBLE(i4004);
-	return CPU_DISASSEMBLE_NAME(i4004)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(i4004)(this, stream, pc, opcodes, params, options);
 }
 
 
@@ -1190,15 +1184,15 @@ void i4040_cpu_device::execute_set_input(int inputnum, int state)
     device_disasm_interface implementation
 ***********************************************************************/
 
-offs_t i4040_cpu_device::disasm_disassemble(
+offs_t i4040_cpu_device::disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		uint8_t const *oprom,
-		uint8_t const *opram,
+		const data_buffer &opcodes,
+		const data_buffer &params,
 		uint32_t options)
 {
 	extern CPU_DISASSEMBLE(i4040);
-	return CPU_DISASSEMBLE_NAME(i4040)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(i4040)(this, stream, pc, opcodes, params, options);
 }
 
 

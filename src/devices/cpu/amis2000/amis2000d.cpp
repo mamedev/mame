@@ -102,8 +102,7 @@ static const u8 s2000_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(amis2000)
 {
-	int pos = 0;
-	u8 op = oprom[pos++];
+	u8 op = opcodes.r8(pc);
 	u8 instr = s2000_mnemonic[op];
 
 	util::stream_format(stream, "%-5s ", s_mnemonics[instr]);
@@ -128,5 +127,5 @@ CPU_DISASSEMBLE(amis2000)
 			util::stream_format(stream, "$%02X", param);
 	}
 
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return 1 | s_flags[instr] | DASMFLAG_SUPPORTED;
 }

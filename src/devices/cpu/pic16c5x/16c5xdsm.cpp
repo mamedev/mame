@@ -26,14 +26,6 @@
 #include "emu.h"
 #include <ctype.h>
 
-static const uint8_t *rombase;
-static const uint8_t *rambase;
-static offs_t pcbase;
-#define READOP16(A)  (rombase[(A) - pcbase] | (rombase[(A) + 1 - pcbase] << 8))
-#define READARG16(A) (rambase[(A) - pcbase] | (rambase[(A) + 1 - pcbase] << 8))
-
-
-
 typedef unsigned char byte;
 typedef unsigned short int word;
 
@@ -161,14 +153,10 @@ CPU_DISASSEMBLE(pic16c5x)
 	const char *cp;             /* character pointer in OpFormats */
 	uint32_t flags = 0;
 
-	rombase = oprom;
-	rambase = opram;
-	pcbase = 2*pc;
-
 	if (!OpInizialized) InitDasm16C5x();
 
 	op = -1;                /* no matching opcode */
-	code = READOP16(2*pc);
+	code = opcodes.r16(pc);
 	for ( i = 0; i < MAX_OPS; i++)
 	{
 		if ((code & Op[i].mask) == Op[i].bits)
@@ -191,7 +179,7 @@ CPU_DISASSEMBLE(pic16c5x)
 	{
 		bit = 27;
 		code <<= 16;
-		code |= READARG16(2*(pc+cnt));
+		code |= params.r16(pc+cnt);
 		cnt++;
 	}
 	else

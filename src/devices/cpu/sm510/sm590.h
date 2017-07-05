@@ -101,7 +101,11 @@ protected:
 	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	virtual void device_reset() override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual u32 disasm_page_address_bits() const override { return 7; }
+	virtual u32 disasm_page2_address_bits() const override { return 2; }
+	virtual offs_t disasm_pc_linear_to_real(offs_t pc) const override;
+	virtual offs_t disasm_pc_real_to_linear(offs_t pc) const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options) override;
 	virtual void init_divider() override { }
 	virtual void init_lcd_driver() override { }
 	virtual void init_melody() override { }

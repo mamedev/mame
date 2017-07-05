@@ -1282,7 +1282,7 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-offs_t cop400_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cop400_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cop410 );
 	extern CPU_DISASSEMBLE( cop420 );
@@ -1291,20 +1291,20 @@ offs_t cop400_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, co
 
 	if ( m_featuremask & COP424C_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop424)(this, stream, pc, oprom, opram, options);
+		return CPU_DISASSEMBLE_NAME(cop424)(this, stream, pc, opcodes, params, options);
 	}
 
 	if ( m_featuremask & COP444L_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop444)(this, stream, pc, oprom, opram, options);
+		return CPU_DISASSEMBLE_NAME(cop444)(this, stream, pc, opcodes, params, options);
 	}
 
 	if ( m_featuremask & COP420_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop420)(this, stream, pc, oprom, opram, options);
+		return CPU_DISASSEMBLE_NAME(cop420)(this, stream, pc, opcodes, params, options);
 	}
 
-	return CPU_DISASSEMBLE_NAME(cop410)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(cop410)(this, stream, pc, opcodes, params, options);
 }
 
 READ8_MEMBER( cop400_cpu_device::microbus_rd )

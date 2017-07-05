@@ -30,8 +30,6 @@ constexpr u32 DASMFLAG_OVERINSTMASK    = 0x18000000;   // number of extra instru
 constexpr u32 DASMFLAG_OVERINSTSHIFT   = 27;           // bits to shift after masking to get the value
 constexpr u32 DASMFLAG_LENGTHMASK      = 0x0000ffff;   // the low 16-bits contain the actual length
 
-
-
 //**************************************************************************
 //  MACROS
 //**************************************************************************
@@ -45,7 +43,7 @@ constexpr u32 DASMFLAG_LENGTHMASK      = 0x0000ffff;   // the low 16-bits contai
 //**************************************************************************
 
 #define MCFG_DEVICE_DISASSEMBLE_OVERRIDE(_class, _func) \
-	device_disasm_interface::static_set_dasm_override(*device, dasm_override_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
+	device_disasm_interface::static_set_dasm_override(*device, device_disasm_interface::dasm_override_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
 
 
 
@@ -53,34 +51,56 @@ constexpr u32 DASMFLAG_LENGTHMASK      = 0x0000ffff;   // the low 16-bits contai
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<offs_t (device_t &device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options)> dasm_override_delegate;
-
 // ======================> device_disasm_interface
 
 // class representing interface-specific live disasm
 class device_disasm_interface : public device_interface
 {
 public:
+	class data_buffer {
+	public:
+		virtual ~data_buffer() = default;
+		virtual u8  r8 (offs_t pc) const = 0;
+		virtual u16 r16(offs_t pc) const = 0;
+		virtual u32 r32(offs_t pc) const = 0;
+		virtual u64 r64(offs_t pc) const = 0;
+	};
+
+	enum {
+		DASMINTF_NONLINEAR_PC        = 0x00000001,
+		DASMINTF_PAGED               = 0x00000002,
+		DASMINTF_PAGED2LEVEL         = 0x00000006,
+		DASMINTF_INTERNAL_DECRYPTION = 0x00000008,
+		DASMINTF_SPLIT_DECRYPTION    = 0x00000018
+	};
+
+	typedef device_delegate<offs_t (device_t &device, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, int options)> dasm_override_delegate;
+
 	// construction/destruction
 	device_disasm_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_disasm_interface();
 
 	// configuration access
-	u32 min_opcode_bytes() const { return disasm_min_opcode_bytes(); }
-	u32 max_opcode_bytes() const { return disasm_max_opcode_bytes(); }
+	virtual u32 opcode_alignment() const = 0;
 
 	// static inline configuration helpers
 	static void static_set_dasm_override(device_t &device, dasm_override_delegate dasm_override);
 
 	// interface for disassembly
-	offs_t disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options = 0);
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, u32 options = 0) = 0;
+
+	// optional operation overrides
+	virtual u32 disasm_interface_flags() const;
+	virtual u32 disasm_page_address_bits() const;
+	virtual u32 disasm_page2_address_bits() const;
+	virtual offs_t disasm_pc_linear_to_real(offs_t pc) const;
+	virtual offs_t disasm_pc_real_to_linear(offs_t pc) const;
+	virtual u8  disasm_decrypt8 (u8  value, offs_t pc, bool opcode) const;
+	virtual u16 disasm_decrypt16(u16 value, offs_t pc, bool opcode) const;
+	virtual u32 disasm_decrypt32(u32 value, offs_t pc, bool opcode) const;
+	virtual u64 disasm_decrypt64(u64 value, offs_t pc, bool opcode) const;
 
 protected:
-	// required operation overrides
-	virtual u32 disasm_min_opcode_bytes() const = 0;
-	virtual u32 disasm_max_opcode_bytes() const = 0;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) = 0;
-
 	// interface-level overrides
 	virtual void interface_pre_start() override;
 

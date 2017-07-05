@@ -126,16 +126,6 @@
 /* =============================== PROTOTYPES ============================= */
 /* ======================================================================== */
 
-/* Read data at the PC and increment PC */
-uint32_t  read_imm_8(void);
-uint32_t  read_imm_16(void);
-uint32_t  read_imm_32(void);
-
-/* Read data at the PC but don't imcrement the PC */
-uint32_t  peek_imm_8(void);
-uint32_t  peek_imm_16(void);
-uint32_t  peek_imm_32(void);
-
 /* make signed integers 100% portably */
 static int make_int_8(int value);
 static int make_int_16(int value);
@@ -147,15 +137,15 @@ static char* make_signed_hex_str_16(uint32_t val);
 static char* make_signed_hex_str_32(uint32_t val);
 
 /* make string of ea mode */
-static char* get_ea_mode_str(uint32_t instruction, uint32_t size);
+static char* get_ea_mode_str(const device_disasm_interface::data_buffer &opcodes, uint32_t instruction, uint32_t size);
 
 char* get_ea_mode_str_8(uint32_t instruction);
 char* get_ea_mode_str_16(uint32_t instruction);
 char* get_ea_mode_str_32(uint32_t instruction);
 
 /* make string of immediate value */
-static char* get_imm_str_s(uint32_t size);
-static char* get_imm_str_u(uint32_t size);
+static char* get_imm_str_s(const device_disasm_interface::data_buffer &opcodes, uint32_t size);
+static char* get_imm_str_u(const device_disasm_interface::data_buffer &opcodes, uint32_t size);
 
 char* get_imm_str_s8(void);
 char* get_imm_str_s16(void);
@@ -169,7 +159,7 @@ static int DECL_SPEC compare_nof_true_bits(const void *aptr, const void *bptr);
 /* used to build opcode handler jump table */
 struct opcode_struct
 {
-	void (*opcode_handler)(void); /* handler function */
+	void (*opcode_handler)(const device_disasm_interface::data_buffer &opcodes); /* handler function */
 	uint32_t mask;                    /* mask on opcode */
 	uint32_t match;                   /* what to match after masking */
 	uint32_t ea_mask;                 /* what ea modes are allowed */
@@ -182,7 +172,7 @@ struct opcode_struct
 /* ======================================================================== */
 
 /* Opcode handler jump table */
-static void (*g_instruction_table[0x10000])(void);
+static void (*g_instruction_table[0x10000])(const device_disasm_interface::data_buffer &opcodes);
 /* Flag if disassembler initialized */
 static int  g_initialized = 0;
 
@@ -192,7 +182,6 @@ static uint32_t g_cpu_pc;        /* program counter */
 static uint32_t g_cpu_ir;        /* instruction register */
 static uint32_t g_cpu_type;
 static uint32_t g_opcode_type;
-static const unsigned char* g_rawop;
 static uint32_t g_rawbasepc;
 
 /* used by ops like asr, ror, addq, etc */
@@ -238,59 +227,52 @@ static const char *const g_mmucond[16] =
 	if(!(g_cpu_type & ALLOWED_CPU_TYPES))   \
 	{                                       \
 		if((g_cpu_ir & 0xf000) == 0xf000)   \
-			d68000_1111();                  \
-		else d68000_illegal();              \
+			d68000_1111(opcodes);           \
+		else d68000_illegal(opcodes);       \
 		return;                             \
 	}
 
-static uint32_t dasm_read_imm_8(uint32_t advance)
+static uint32_t dasm_read_imm_8(const device_disasm_interface::data_buffer &opcodes, uint32_t advance)
 {
-	uint32_t result;
-	result = g_rawop[g_cpu_pc + 1 - g_rawbasepc];
+	uint32_t result = opcodes.r8(g_cpu_pc + 1);
 	g_cpu_pc += advance;
 	return result;
 }
 
-static uint32_t dasm_read_imm_16(uint32_t advance)
+static uint32_t dasm_read_imm_16(const device_disasm_interface::data_buffer &opcodes, uint32_t advance)
 {
-	uint32_t result;
-	result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 8) |
-				g_rawop[g_cpu_pc + 1 - g_rawbasepc];
+	uint32_t result = opcodes.r16(g_cpu_pc);
 	g_cpu_pc += advance;
 	return result;
 }
 
-static uint32_t dasm_read_imm_32(uint32_t advance)
+static uint32_t dasm_read_imm_32(const device_disasm_interface::data_buffer &opcodes, uint32_t advance)
 {
-	uint32_t result;
-	result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 24) |
-				(g_rawop[g_cpu_pc + 1 - g_rawbasepc] << 16) |
-				(g_rawop[g_cpu_pc + 2 - g_rawbasepc] << 8) |
-				g_rawop[g_cpu_pc + 3 - g_rawbasepc];
+	uint32_t result = opcodes.r32(g_cpu_pc);
 	g_cpu_pc += advance;
 	return result;
 }
 
-#define read_imm_8()  dasm_read_imm_8(2)
-#define read_imm_16() dasm_read_imm_16(2)
-#define read_imm_32() dasm_read_imm_32(4)
+#define read_imm_8(opcodes)  dasm_read_imm_8(opcodes, 2)
+#define read_imm_16(opcodes) dasm_read_imm_16(opcodes, 2)
+#define read_imm_32(opcodes) dasm_read_imm_32(opcodes, 4)
 
-#define peek_imm_8()  dasm_read_imm_8(0)
-#define peek_imm_16() dasm_read_imm_16(0)
-#define peek_imm_32() dasm_read_imm_32(0)
+#define peek_imm_8(opcodes)  dasm_read_imm_8(opcodes, 0)
+#define peek_imm_16(opcodes) dasm_read_imm_16(opcodes, 0)
+#define peek_imm_32(opcodes) dasm_read_imm_32(opcodes, 0)
 
 /* Fake a split interface */
-#define get_ea_mode_str_8(instruction) get_ea_mode_str(instruction, 0)
-#define get_ea_mode_str_16(instruction) get_ea_mode_str(instruction, 1)
-#define get_ea_mode_str_32(instruction) get_ea_mode_str(instruction, 2)
+#define get_ea_mode_str_8(opcodes, instruction) get_ea_mode_str(opcodes, instruction, 0)
+#define get_ea_mode_str_16(opcodes, instruction) get_ea_mode_str(opcodes, instruction, 1)
+#define get_ea_mode_str_32(opcodes, instruction) get_ea_mode_str(opcodes, instruction, 2)
 
-#define get_imm_str_s8() get_imm_str_s(0)
-#define get_imm_str_s16() get_imm_str_s(1)
-#define get_imm_str_s32() get_imm_str_s(2)
+#define get_imm_str_s8(opcodes) get_imm_str_s(opcodes, 0)
+#define get_imm_str_s16(opcodes) get_imm_str_s(opcodes, 1)
+#define get_imm_str_s32(opcodes) get_imm_str_s(opcodes, 2)
 
-#define get_imm_str_u8() get_imm_str_u(0)
-#define get_imm_str_u16() get_imm_str_u(1)
-#define get_imm_str_u32() get_imm_str_u(2)
+#define get_imm_str_u8(opcodes) get_imm_str_u(opcodes, 0)
+#define get_imm_str_u16(opcodes) get_imm_str_u(opcodes, 1)
+#define get_imm_str_u32(opcodes) get_imm_str_u(opcodes, 2)
 
 static int sext_7bit_int(int value)
 {
@@ -365,32 +347,32 @@ static char* make_signed_hex_str_32(uint32_t val)
 
 
 /* make string of immediate value */
-static char* get_imm_str_s(uint32_t size)
+static char* get_imm_str_s(const device_disasm_interface::data_buffer &opcodes, uint32_t size)
 {
 	static char str[15];
 	if(size == 0)
-		sprintf(str, "#%s", make_signed_hex_str_8(read_imm_8()));
+		sprintf(str, "#%s", make_signed_hex_str_8(read_imm_8(opcodes)));
 	else if(size == 1)
-		sprintf(str, "#%s", make_signed_hex_str_16(read_imm_16()));
+		sprintf(str, "#%s", make_signed_hex_str_16(read_imm_16(opcodes)));
 	else
-		sprintf(str, "#%s", make_signed_hex_str_32(read_imm_32()));
+		sprintf(str, "#%s", make_signed_hex_str_32(read_imm_32(opcodes)));
 	return str;
 }
 
-static char* get_imm_str_u(uint32_t size)
+static char* get_imm_str_u(const device_disasm_interface::data_buffer &opcodes, uint32_t size)
 {
 	static char str[15];
 	if(size == 0)
-		sprintf(str, "#$%x", read_imm_8() & 0xff);
+		sprintf(str, "#$%x", read_imm_8(opcodes) & 0xff);
 	else if(size == 1)
-		sprintf(str, "#$%x", read_imm_16() & 0xffff);
+		sprintf(str, "#$%x", read_imm_16(opcodes) & 0xffff);
 	else
-		sprintf(str, "#$%x", read_imm_32() & 0xffffffff);
+		sprintf(str, "#$%x", read_imm_32(opcodes) & 0xffffffff);
 	return str;
 }
 
 /* Make string of effective address mode */
-static char* get_ea_mode_str(uint32_t instruction, uint32_t size)
+static char* get_ea_mode_str(const device_disasm_interface::data_buffer &opcodes, uint32_t instruction, uint32_t size)
 {
 	static char b1[64];
 	static char b2[64];
@@ -433,11 +415,11 @@ static char* get_ea_mode_str(uint32_t instruction, uint32_t size)
 			break;
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 		/* address register indirect with displacement*/
-			sprintf(mode, "(%s,A%d)", make_signed_hex_str_16(read_imm_16()), instruction&7);
+			sprintf(mode, "(%s,A%d)", make_signed_hex_str_16(read_imm_16(opcodes)), instruction&7);
 			break;
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 		/* address register indirect with index */
-			extension = read_imm_16();
+			extension = read_imm_16(opcodes);
 
 			if((g_cpu_type & M68010_LESS) && EXT_INDEX_SCALE(extension))
 			{
@@ -459,8 +441,8 @@ static char* get_ea_mode_str(uint32_t instruction, uint32_t size)
 					break;
 				}
 
-				base = EXT_BASE_DISPLACEMENT_PRESENT(extension) ? (EXT_BASE_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
-				outer = EXT_OUTER_DISPLACEMENT_PRESENT(extension) ? (EXT_OUTER_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
+				base = EXT_BASE_DISPLACEMENT_PRESENT(extension) ? (EXT_BASE_DISPLACEMENT_LONG(extension) ? read_imm_32(opcodes) : read_imm_16(opcodes)) : 0;
+				outer = EXT_OUTER_DISPLACEMENT_PRESENT(extension) ? (EXT_OUTER_DISPLACEMENT_LONG(extension) ? read_imm_32(opcodes) : read_imm_16(opcodes)) : 0;
 				if(EXT_BASE_REGISTER_PRESENT(extension))
 					sprintf(base_reg, "A%d", instruction&7);
 				else
@@ -535,21 +517,21 @@ static char* get_ea_mode_str(uint32_t instruction, uint32_t size)
 			break;
 		case 0x38:
 		/* absolute short address */
-			sprintf(mode, "$%x.w", read_imm_16());
+			sprintf(mode, "$%x.w", read_imm_16(opcodes));
 			break;
 		case 0x39:
 		/* absolute long address */
-			sprintf(mode, "$%x.l", read_imm_32());
+			sprintf(mode, "$%x.l", read_imm_32(opcodes));
 			break;
 		case 0x3a:
 		/* program counter with displacement */
-			temp_value = read_imm_16();
+			temp_value = read_imm_16(opcodes);
 			sprintf(mode, "(%s,PC)", make_signed_hex_str_16(temp_value));
 			sprintf(g_helper_str, "; ($%x)", (make_int_16(temp_value) + g_cpu_pc-2) & 0xffffffff);
 			break;
 		case 0x3b:
 		/* program counter with index */
-			extension = read_imm_16();
+			extension = read_imm_16(opcodes);
 
 			if((g_cpu_type & M68010_LESS) && EXT_INDEX_SCALE(extension))
 			{
@@ -570,8 +552,8 @@ static char* get_ea_mode_str(uint32_t instruction, uint32_t size)
 					strcpy(mode, "0");
 					break;
 				}
-				base = EXT_BASE_DISPLACEMENT_PRESENT(extension) ? (EXT_BASE_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
-				outer = EXT_OUTER_DISPLACEMENT_PRESENT(extension) ? (EXT_OUTER_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
+				base = EXT_BASE_DISPLACEMENT_PRESENT(extension) ? (EXT_BASE_DISPLACEMENT_LONG(extension) ? read_imm_32(opcodes) : read_imm_16(opcodes)) : 0;
+				outer = EXT_OUTER_DISPLACEMENT_PRESENT(extension) ? (EXT_OUTER_DISPLACEMENT_LONG(extension) ? read_imm_32(opcodes) : read_imm_16(opcodes)) : 0;
 				if(EXT_BASE_REGISTER_PRESENT(extension))
 					strcpy(base_reg, "PC");
 				else
@@ -639,7 +621,7 @@ static char* get_ea_mode_str(uint32_t instruction, uint32_t size)
 			break;
 		case 0x3c:
 		/* Immediate */
-			sprintf(mode, "%s", get_imm_str_u(size));
+			sprintf(mode, "%s", get_imm_str_u(opcodes, size));
 			break;
 		default:
 			invalid_mode = 1;
@@ -691,314 +673,314 @@ static char* get_ea_mode_str(uint32_t instruction, uint32_t size)
  * al  : absolute long
  */
 
-static void d68000_illegal(void)
+static void d68000_illegal(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "dc.w    $%04x; ILLEGAL", g_cpu_ir);
 }
 
-static void d68000_1010(void)
+static void d68000_1010(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "dc.w    $%04x; opcode 1010", g_cpu_ir);
 }
 
 
-static void d68000_1111(void)
+static void d68000_1111(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "dc.w    $%04x; opcode 1111", g_cpu_ir);
 }
 
 
-static void d68000_abcd_rr(void)
+static void d68000_abcd_rr(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "abcd    D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
 
-static void d68000_abcd_mm(void)
+static void d68000_abcd_mm(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "abcd    -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_add_er_8(void)
+static void d68000_add_er_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "add.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "add.b   %s, D%d", get_ea_mode_str_8(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
 
-static void d68000_add_er_16(void)
+static void d68000_add_er_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "add.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "add.w   %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_add_er_32(void)
+static void d68000_add_er_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "add.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "add.l   %s, D%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_add_re_8(void)
+static void d68000_add_re_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "add.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "add.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_add_re_16(void)
+static void d68000_add_re_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "add.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "add.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_add_re_32(void)
+static void d68000_add_re_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "add.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "add.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_adda_16(void)
+static void d68000_adda_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "adda.w  %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "adda.w  %s, A%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_adda_32(void)
+static void d68000_adda_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "adda.l  %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "adda.l  %s, A%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addi_8(void)
+static void d68000_addi_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_s8();
-	sprintf(g_dasm_str, "addi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_s8(opcodes);
+	sprintf(g_dasm_str, "addi.b  %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_addi_16(void)
+static void d68000_addi_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_s16();
-	sprintf(g_dasm_str, "addi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
+	char* str = get_imm_str_s16(opcodes);
+	sprintf(g_dasm_str, "addi.w  %s, %s", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_addi_32(void)
+static void d68000_addi_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_s32();
-	sprintf(g_dasm_str, "addi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
+	char* str = get_imm_str_s32(opcodes);
+	sprintf(g_dasm_str, "addi.l  %s, %s", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_addq_8(void)
+static void d68000_addq_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "addq.b  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "addq.b  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_addq_16(void)
+static void d68000_addq_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "addq.w  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "addq.w  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_addq_32(void)
+static void d68000_addq_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "addq.l  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "addq.l  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_addx_rr_8(void)
+static void d68000_addx_rr_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "addx.b  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_rr_16(void)
+static void d68000_addx_rr_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "addx.w  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_rr_32(void)
+static void d68000_addx_rr_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "addx.l  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_mm_8(void)
+static void d68000_addx_mm_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "addx.b  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_mm_16(void)
+static void d68000_addx_mm_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "addx.w  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_mm_32(void)
+static void d68000_addx_mm_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "addx.l  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_er_8(void)
+static void d68000_and_er_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "and.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "and.b   %s, D%d", get_ea_mode_str_8(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_er_16(void)
+static void d68000_and_er_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "and.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "and.w   %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_er_32(void)
+static void d68000_and_er_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "and.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "and.l   %s, D%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_re_8(void)
+static void d68000_and_re_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "and.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "and.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_and_re_16(void)
+static void d68000_and_re_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "and.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "and.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_and_re_32(void)
+static void d68000_and_re_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "and.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "and.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_andi_8(void)
+static void d68000_andi_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u8();
-	sprintf(g_dasm_str, "andi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_u8(opcodes);
+	sprintf(g_dasm_str, "andi.b  %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_andi_16(void)
+static void d68000_andi_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u16();
-	sprintf(g_dasm_str, "andi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
+	char* str = get_imm_str_u16(opcodes);
+	sprintf(g_dasm_str, "andi.w  %s, %s", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_andi_32(void)
+static void d68000_andi_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u32();
-	sprintf(g_dasm_str, "andi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
+	char* str = get_imm_str_u32(opcodes);
+	sprintf(g_dasm_str, "andi.l  %s, %s", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_andi_to_ccr(void)
+static void d68000_andi_to_ccr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "andi    %s, CCR", get_imm_str_u8());
+	sprintf(g_dasm_str, "andi    %s, CCR", get_imm_str_u8(opcodes));
 }
 
-static void d68000_andi_to_sr(void)
+static void d68000_andi_to_sr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "andi    %s, SR", get_imm_str_u16());
+	sprintf(g_dasm_str, "andi    %s, SR", get_imm_str_u16(opcodes));
 }
 
-static void d68000_asr_s_8(void)
+static void d68000_asr_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asr.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asr_s_16(void)
+static void d68000_asr_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asr.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asr_s_32(void)
+static void d68000_asr_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asr.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asr_r_8(void)
+static void d68000_asr_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asr.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asr_r_16(void)
+static void d68000_asr_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asr.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asr_r_32(void)
+static void d68000_asr_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asr.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asr_ea(void)
+static void d68000_asr_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "asr.w   %s", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "asr.w   %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_asl_s_8(void)
+static void d68000_asl_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asl.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asl_s_16(void)
+static void d68000_asl_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asl.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asl_s_32(void)
+static void d68000_asl_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asl.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asl_r_8(void)
+static void d68000_asl_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asl.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asl_r_16(void)
+static void d68000_asl_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asl.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asl_r_32(void)
+static void d68000_asl_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "asl.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asl_ea(void)
+static void d68000_asl_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "asl.w   %s", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "asl.w   %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_bcc_8(void)
+static void d68000_bcc_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "b%-2s     $%x", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + make_int_8(g_cpu_ir));
 }
 
-static void d68000_bcc_16(void)
+static void d68000_bcc_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
-	sprintf(g_dasm_str, "b%-2s     $%x", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + make_int_16(read_imm_16()));
+	sprintf(g_dasm_str, "b%-2s     $%x", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + make_int_16(read_imm_16(opcodes)));
 }
 
-static void d68020_bcc_32(void)
+static void d68020_bcc_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "b%-2s     $%x; (2+)", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + read_imm_32());
+	sprintf(g_dasm_str, "b%-2s     $%x; (2+)", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + read_imm_32(opcodes));
 }
 
-static void d68000_bchg_r(void)
+static void d68000_bchg_r(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "bchg    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "bchg    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_bchg_s(void)
+static void d68000_bchg_s(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u8();
-	sprintf(g_dasm_str, "bchg    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_u8(opcodes);
+	sprintf(g_dasm_str, "bchg    %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_bclr_r(void)
+static void d68000_bclr_r(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "bclr    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "bclr    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_bclr_s(void)
+static void d68000_bclr_s(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u8();
-	sprintf(g_dasm_str, "bclr    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_u8(opcodes);
+	sprintf(g_dasm_str, "bclr    %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68010_bkpt(void)
+static void d68010_bkpt(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	sprintf(g_dasm_str, "bkpt #%d; (1+)", g_cpu_ir&7);
 }
 
-static void d68020_bfchg(void)
+static void d68020_bfchg(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1006,7 +988,7 @@ static void d68020_bfchg(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1016,10 +998,10 @@ static void d68020_bfchg(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bfchg   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bfchg   %s {%s:%s}; (2+)", get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68020_bfclr(void)
+static void d68020_bfclr(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1027,7 +1009,7 @@ static void d68020_bfclr(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1037,10 +1019,10 @@ static void d68020_bfclr(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bfclr   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bfclr   %s {%s:%s}; (2+)", get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68020_bfexts(void)
+static void d68020_bfexts(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1048,7 +1030,7 @@ static void d68020_bfexts(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1058,10 +1040,10 @@ static void d68020_bfexts(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bfexts  D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bfexts  D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68020_bfextu(void)
+static void d68020_bfextu(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1069,7 +1051,7 @@ static void d68020_bfextu(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1079,10 +1061,10 @@ static void d68020_bfextu(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bfextu  D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bfextu  D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68020_bfffo(void)
+static void d68020_bfffo(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1090,7 +1072,7 @@ static void d68020_bfffo(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1100,10 +1082,10 @@ static void d68020_bfffo(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bfffo   D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bfffo   D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68020_bfins(void)
+static void d68020_bfins(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1111,7 +1093,7 @@ static void d68020_bfins(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1121,10 +1103,10 @@ static void d68020_bfins(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bfins   D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bfins   D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68020_bfset(void)
+static void d68020_bfset(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1132,7 +1114,7 @@ static void d68020_bfset(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1142,10 +1124,10 @@ static void d68020_bfset(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bfset   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bfset   %s {%s:%s}; (2+)", get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68020_bftst(void)
+static void d68020_bftst(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	char offset[3];
@@ -1153,7 +1135,7 @@ static void d68020_bftst(void)
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
 
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_B(extension))
 		sprintf(offset, "D%d", (extension>>6)&7);
@@ -1163,106 +1145,106 @@ static void d68020_bftst(void)
 		sprintf(width, "D%d", extension&7);
 	else
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
-	sprintf(g_dasm_str, "bftst   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
+	sprintf(g_dasm_str, "bftst   %s {%s:%s}; (2+)", get_ea_mode_str_8(opcodes, g_cpu_ir), offset, width);
 }
 
-static void d68000_bra_8(void)
+static void d68000_bra_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "bra     $%x", temp_pc + make_int_8(g_cpu_ir));
 }
 
-static void d68000_bra_16(void)
+static void d68000_bra_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
-	sprintf(g_dasm_str, "bra     $%x", temp_pc + make_int_16(read_imm_16()));
+	sprintf(g_dasm_str, "bra     $%x", temp_pc + make_int_16(read_imm_16(opcodes)));
 }
 
-static void d68020_bra_32(void)
+static void d68020_bra_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "bra     $%x; (2+)", temp_pc + read_imm_32());
+	sprintf(g_dasm_str, "bra     $%x; (2+)", temp_pc + read_imm_32(opcodes));
 }
 
-static void d68000_bset_r(void)
+static void d68000_bset_r(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "bset    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "bset    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_bset_s(void)
+static void d68000_bset_s(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u8();
-	sprintf(g_dasm_str, "bset    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_u8(opcodes);
+	sprintf(g_dasm_str, "bset    %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_bsr_8(void)
+static void d68000_bsr_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "bsr     $%x", temp_pc + make_int_8(g_cpu_ir));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_bsr_16(void)
+static void d68000_bsr_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
-	sprintf(g_dasm_str, "bsr     $%x", temp_pc + make_int_16(read_imm_16()));
+	sprintf(g_dasm_str, "bsr     $%x", temp_pc + make_int_16(read_imm_16(opcodes)));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_bsr_32(void)
+static void d68020_bsr_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "bsr     $%x; (2+)", temp_pc + read_imm_32());
+	sprintf(g_dasm_str, "bsr     $%x; (2+)", temp_pc + read_imm_32(opcodes));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_btst_r(void)
+static void d68000_btst_r(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "btst    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "btst    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_btst_s(void)
+static void d68000_btst_s(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u8();
-	sprintf(g_dasm_str, "btst    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_u8(opcodes);
+	sprintf(g_dasm_str, "btst    %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_callm(void)
+static void d68020_callm(const device_disasm_interface::data_buffer &opcodes)
 {
 	char* str;
 	LIMIT_CPU_TYPES(M68020_ONLY);
-	str = get_imm_str_u8();
+	str = get_imm_str_u8(opcodes);
 
-	sprintf(g_dasm_str, "callm   %s, %s; (2)", str, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "callm   %s, %s; (2)", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_cas_8(void)
+static void d68020_cas_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	sprintf(g_dasm_str, "cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_8(g_cpu_ir));
+	extension = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_cas_16(void)
+static void d68020_cas_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	sprintf(g_dasm_str, "cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_16(g_cpu_ir));
+	extension = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68020_cas_32(void)
+static void d68020_cas_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	sprintf(g_dasm_str, "cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_32(g_cpu_ir));
+	extension = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68020_cas2_16(void)
+static void d68020_cas2_16(const device_disasm_interface::data_buffer &opcodes)
 {
 /* CAS2 Dc1:Dc2,Du1:Dc2:(Rn1):(Rn2)
 f e d c b a 9 8 7 6 5 4 3 2 1 0
@@ -1272,62 +1254,62 @@ f e d c b a 9 8 7 6 5 4 3 2 1 0
 
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_32();
+	extension = read_imm_32(opcodes);
 	sprintf(g_dasm_str, "cas2.w  D%d:D%d:D%d:D%d, (%c%d):(%c%d); (2+)",
 		(extension>>16)&7, extension&7, (extension>>22)&7, (extension>>6)&7,
 		BIT_1F(extension) ? 'A' : 'D', (extension>>28)&7,
 		BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68020_cas2_32(void)
+static void d68020_cas2_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_32();
+	extension = read_imm_32(opcodes);
 	sprintf(g_dasm_str, "cas2.l  D%d:D%d:D%d:D%d, (%c%d):(%c%d); (2+)",
 		(extension>>16)&7, extension&7, (extension>>22)&7, (extension>>6)&7,
 		BIT_1F(extension) ? 'A' : 'D', (extension>>28)&7,
 		BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68000_chk_16(void)
+static void d68000_chk_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "chk.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "chk.w   %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_chk_32(void)
+static void d68020_chk_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "chk.l   %s, D%d; (2+)", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "chk.l   %s, D%d; (2+)", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_chk2_cmp2_8(void)
+static void d68020_chk2_cmp2_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	sprintf(g_dasm_str, "%s.b  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_8(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+	extension = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "%s.b  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_8(opcodes, g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68020_chk2_cmp2_16(void)
+static void d68020_chk2_cmp2_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	sprintf(g_dasm_str, "%s.w  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_16(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+	extension = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "%s.w  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_16(opcodes, g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68020_chk2_cmp2_32(void)
+static void d68020_chk2_cmp2_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	sprintf(g_dasm_str, "%s.l  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_32(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+	extension = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "%s.l  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_32(opcodes, g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68040_cinv(void)
+static void d68040_cinv(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 
@@ -1350,234 +1332,234 @@ static void d68040_cinv(void)
 	}
 }
 
-static void d68000_clr_8(void)
+static void d68000_clr_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "clr.b   %s", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "clr.b   %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_clr_16(void)
+static void d68000_clr_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "clr.w   %s", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "clr.w   %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_clr_32(void)
+static void d68000_clr_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "clr.l   %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "clr.l   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_cmp_8(void)
+static void d68000_cmp_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "cmp.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "cmp.b   %s, D%d", get_ea_mode_str_8(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmp_16(void)
+static void d68000_cmp_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "cmp.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "cmp.w   %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmp_32(void)
+static void d68000_cmp_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "cmp.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "cmp.l   %s, D%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpa_16(void)
+static void d68000_cmpa_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "cmpa.w  %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "cmpa.w  %s, A%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpa_32(void)
+static void d68000_cmpa_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "cmpa.l  %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "cmpa.l  %s, A%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpi_8(void)
+static void d68000_cmpi_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_s8();
-	sprintf(g_dasm_str, "cmpi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_s8(opcodes);
+	sprintf(g_dasm_str, "cmpi.b  %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_cmpi_pcdi_8(void)
-{
-	char* str;
-	LIMIT_CPU_TYPES(M68010_PLUS);
-	str = get_imm_str_s8();
-	sprintf(g_dasm_str, "cmpi.b  %s, %s; (2+)", str, get_ea_mode_str_8(g_cpu_ir));
-}
-
-static void d68020_cmpi_pcix_8(void)
+static void d68020_cmpi_pcdi_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	str = get_imm_str_s8();
-	sprintf(g_dasm_str, "cmpi.b  %s, %s; (2+)", str, get_ea_mode_str_8(g_cpu_ir));
+	str = get_imm_str_s8(opcodes);
+	sprintf(g_dasm_str, "cmpi.b  %s, %s; (2+)", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_cmpi_16(void)
-{
-	char* str;
-	str = get_imm_str_s16();
-	sprintf(g_dasm_str, "cmpi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
-}
-
-static void d68020_cmpi_pcdi_16(void)
+static void d68020_cmpi_pcix_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	str = get_imm_str_s16();
-	sprintf(g_dasm_str, "cmpi.w  %s, %s; (2+)", str, get_ea_mode_str_16(g_cpu_ir));
+	str = get_imm_str_s8(opcodes);
+	sprintf(g_dasm_str, "cmpi.b  %s, %s; (2+)", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_cmpi_pcix_16(void)
+static void d68000_cmpi_16(const device_disasm_interface::data_buffer &opcodes)
+{
+	char* str;
+	str = get_imm_str_s16(opcodes);
+	sprintf(g_dasm_str, "cmpi.w  %s, %s", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
+}
+
+static void d68020_cmpi_pcdi_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	str = get_imm_str_s16();
-	sprintf(g_dasm_str, "cmpi.w  %s, %s; (2+)", str, get_ea_mode_str_16(g_cpu_ir));
+	str = get_imm_str_s16(opcodes);
+	sprintf(g_dasm_str, "cmpi.w  %s, %s; (2+)", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_cmpi_32(void)
-{
-	char* str;
-	str = get_imm_str_s32();
-	sprintf(g_dasm_str, "cmpi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
-}
-
-static void d68020_cmpi_pcdi_32(void)
+static void d68020_cmpi_pcix_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	str = get_imm_str_s32();
-	sprintf(g_dasm_str, "cmpi.l  %s, %s; (2+)", str, get_ea_mode_str_32(g_cpu_ir));
+	str = get_imm_str_s16(opcodes);
+	sprintf(g_dasm_str, "cmpi.w  %s, %s; (2+)", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68020_cmpi_pcix_32(void)
+static void d68000_cmpi_32(const device_disasm_interface::data_buffer &opcodes)
+{
+	char* str;
+	str = get_imm_str_s32(opcodes);
+	sprintf(g_dasm_str, "cmpi.l  %s, %s", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
+}
+
+static void d68020_cmpi_pcdi_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	str = get_imm_str_s32();
-	sprintf(g_dasm_str, "cmpi.l  %s, %s; (2+)", str, get_ea_mode_str_32(g_cpu_ir));
+	str = get_imm_str_s32(opcodes);
+	sprintf(g_dasm_str, "cmpi.l  %s, %s; (2+)", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_cmpm_8(void)
+static void d68020_cmpi_pcix_32(const device_disasm_interface::data_buffer &opcodes)
+{
+	char* str;
+	LIMIT_CPU_TYPES(M68010_PLUS);
+	str = get_imm_str_s32(opcodes);
+	sprintf(g_dasm_str, "cmpi.l  %s, %s; (2+)", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
+}
+
+static void d68000_cmpm_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "cmpm.b  (A%d)+, (A%d)+", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpm_16(void)
+static void d68000_cmpm_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "cmpm.w  (A%d)+, (A%d)+", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpm_32(void)
+static void d68000_cmpm_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "cmpm.l  (A%d)+, (A%d)+", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68020_cpbcc_16(void)
+static void d68020_cpbcc_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	uint32_t new_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	new_pc += make_int_16(read_imm_16());
-	sprintf(g_dasm_str, "%db%-4s  %s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[g_cpu_ir&0x3f], get_imm_str_s16(), new_pc, extension);
+	extension = read_imm_16(opcodes);
+	new_pc += make_int_16(read_imm_16(opcodes));
+	sprintf(g_dasm_str, "%db%-4s  %s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[g_cpu_ir&0x3f], get_imm_str_s16(opcodes), new_pc, extension);
 }
 
-static void d68020_cpbcc_32(void)
+static void d68020_cpbcc_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	uint32_t new_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
-	new_pc += read_imm_32();
-	sprintf(g_dasm_str, "%db%-4s  %s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[g_cpu_ir&0x3f], get_imm_str_s16(), new_pc, extension);
+	extension = read_imm_16(opcodes);
+	new_pc += read_imm_32(opcodes);
+	sprintf(g_dasm_str, "%db%-4s  %s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[g_cpu_ir&0x3f], get_imm_str_s16(opcodes), new_pc, extension);
 }
 
-static void d68020_cpdbcc(void)
+static void d68020_cpdbcc(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension1;
 	uint32_t extension2;
 	uint32_t new_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension1 = read_imm_16();
-	extension2 = read_imm_16();
-	new_pc += make_int_16(read_imm_16());
-	sprintf(g_dasm_str, "%ddb%-4s D%d,%s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], g_cpu_ir&7, get_imm_str_s16(), new_pc, extension2);
+	extension1 = read_imm_16(opcodes);
+	extension2 = read_imm_16(opcodes);
+	new_pc += make_int_16(read_imm_16(opcodes));
+	sprintf(g_dasm_str, "%ddb%-4s D%d,%s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], g_cpu_ir&7, get_imm_str_s16(opcodes), new_pc, extension2);
 }
 
-static void d68020_cpgen(void)
+static void d68020_cpgen(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "%dgen    %s; (2-3)", (g_cpu_ir>>9)&7, get_imm_str_u32());
+	sprintf(g_dasm_str, "%dgen    %s; (2-3)", (g_cpu_ir>>9)&7, get_imm_str_u32(opcodes));
 }
 
-static void d68020_cprestore(void)
-{
-	LIMIT_CPU_TYPES(M68020_PLUS);
-	if (((g_cpu_ir>>9)&7) == 1)
-	{
-		sprintf(g_dasm_str, "frestore %s", get_ea_mode_str_8(g_cpu_ir));
-	}
-	else
-	{
-		sprintf(g_dasm_str, "%drestore %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
-	}
-}
-
-static void d68020_cpsave(void)
+static void d68020_cprestore(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	if (((g_cpu_ir>>9)&7) == 1)
 	{
-		sprintf(g_dasm_str, "fsave   %s", get_ea_mode_str_8(g_cpu_ir));
+		sprintf(g_dasm_str, "frestore %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 	}
 	else
 	{
-		sprintf(g_dasm_str, "%dsave   %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+		sprintf(g_dasm_str, "%drestore %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 	}
 }
 
-static void d68020_cpscc(void)
+static void d68020_cpsave(const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t extension1;
-	uint32_t extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension1 = read_imm_16();
-	extension2 = read_imm_16();
-	sprintf(g_dasm_str, "%ds%-4s  %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_ea_mode_str_8(g_cpu_ir), extension2);
+	if (((g_cpu_ir>>9)&7) == 1)
+	{
+		sprintf(g_dasm_str, "fsave   %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
+	}
+	else
+	{
+		sprintf(g_dasm_str, "%dsave   %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
+	}
 }
 
-static void d68020_cptrapcc_0(void)
+static void d68020_cpscc(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension1;
 	uint32_t extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension1 = read_imm_16();
-	extension2 = read_imm_16();
+	extension1 = read_imm_16(opcodes);
+	extension2 = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "%ds%-4s  %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_ea_mode_str_8(opcodes, g_cpu_ir), extension2);
+}
+
+static void d68020_cptrapcc_0(const device_disasm_interface::data_buffer &opcodes)
+{
+	uint32_t extension1;
+	uint32_t extension2;
+	LIMIT_CPU_TYPES(M68020_PLUS);
+	extension1 = read_imm_16(opcodes);
+	extension2 = read_imm_16(opcodes);
 	sprintf(g_dasm_str, "%dtrap%-4s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], extension2);
 }
 
-static void d68020_cptrapcc_16(void)
+static void d68020_cptrapcc_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension1;
 	uint32_t extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension1 = read_imm_16();
-	extension2 = read_imm_16();
-	sprintf(g_dasm_str, "%dtrap%-4s %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_imm_str_u16(), extension2);
+	extension1 = read_imm_16(opcodes);
+	extension2 = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "%dtrap%-4s %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_imm_str_u16(opcodes), extension2);
 }
 
-static void d68020_cptrapcc_32(void)
+static void d68020_cptrapcc_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension1;
 	uint32_t extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension1 = read_imm_16();
-	extension2 = read_imm_16();
-	sprintf(g_dasm_str, "%dtrap%-4s %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_imm_str_u32(), extension2);
+	extension1 = read_imm_16(opcodes);
+	extension2 = read_imm_16(opcodes);
+	sprintf(g_dasm_str, "%dtrap%-4s %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_imm_str_u32(opcodes), extension2);
 }
 
-static void d68040_cpush(void)
+static void d68040_cpush(const device_disasm_interface::data_buffer &opcodes)
 {
 	static const char *cachetype[4] = { "nop", "data", "inst", "both" };
 
@@ -1599,135 +1581,135 @@ static void d68040_cpush(void)
 	}
 }
 
-static void d68000_dbra(void)
+static void d68000_dbra(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
-	sprintf(g_dasm_str, "dbra    D%d, $%x", g_cpu_ir & 7, temp_pc + make_int_16(read_imm_16()));
+	sprintf(g_dasm_str, "dbra    D%d, $%x", g_cpu_ir & 7, temp_pc + make_int_16(read_imm_16(opcodes)));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_dbcc(void)
+static void d68000_dbcc(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
-	sprintf(g_dasm_str, "db%-2s    D%d, $%x", g_cc[(g_cpu_ir>>8)&0xf], g_cpu_ir & 7, temp_pc + make_int_16(read_imm_16()));
+	sprintf(g_dasm_str, "db%-2s    D%d, $%x", g_cc[(g_cpu_ir>>8)&0xf], g_cpu_ir & 7, temp_pc + make_int_16(read_imm_16(opcodes)));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_divs(void)
+static void d68000_divs(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "divs.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "divs.w  %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_divu(void)
+static void d68000_divu(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "divu.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "divu.w  %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68020_divl(void)
+static void d68020_divl(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_A(extension))
-		sprintf(g_dasm_str, "div%c.l  %s, D%d:D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), extension&7, (extension>>12)&7);
+		sprintf(g_dasm_str, "div%c.l  %s, D%d:D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(opcodes, g_cpu_ir), extension&7, (extension>>12)&7);
 	else if((extension&7) == ((extension>>12)&7))
-		sprintf(g_dasm_str, "div%c.l  %s, D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), (extension>>12)&7);
+		sprintf(g_dasm_str, "div%c.l  %s, D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(opcodes, g_cpu_ir), (extension>>12)&7);
 	else
-		sprintf(g_dasm_str, "div%cl.l %s, D%d:D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), extension&7, (extension>>12)&7);
+		sprintf(g_dasm_str, "div%cl.l %s, D%d:D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(opcodes, g_cpu_ir), extension&7, (extension>>12)&7);
 }
 
-static void d68000_eor_8(void)
+static void d68000_eor_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "eor.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "eor.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_eor_16(void)
+static void d68000_eor_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "eor.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "eor.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_eor_32(void)
+static void d68000_eor_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "eor.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "eor.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_eori_8(void)
+static void d68000_eori_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u8();
-	sprintf(g_dasm_str, "eori.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_u8(opcodes);
+	sprintf(g_dasm_str, "eori.b  %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_eori_16(void)
+static void d68000_eori_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u16();
-	sprintf(g_dasm_str, "eori.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
+	char* str = get_imm_str_u16(opcodes);
+	sprintf(g_dasm_str, "eori.w  %s, %s", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_eori_32(void)
+static void d68000_eori_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u32();
-	sprintf(g_dasm_str, "eori.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
+	char* str = get_imm_str_u32(opcodes);
+	sprintf(g_dasm_str, "eori.l  %s, %s", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_eori_to_ccr(void)
+static void d68000_eori_to_ccr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "eori    %s, CCR", get_imm_str_u8());
+	sprintf(g_dasm_str, "eori    %s, CCR", get_imm_str_u8(opcodes));
 }
 
-static void d68000_eori_to_sr(void)
+static void d68000_eori_to_sr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "eori    %s, SR", get_imm_str_u16());
+	sprintf(g_dasm_str, "eori    %s, SR", get_imm_str_u16(opcodes));
 }
 
-static void d68000_exg_dd(void)
+static void d68000_exg_dd(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "exg     D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_exg_aa(void)
+static void d68000_exg_aa(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "exg     A%d, A%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_exg_da(void)
+static void d68000_exg_da(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "exg     D%d, A%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ext_16(void)
+static void d68000_ext_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ext.w   D%d", g_cpu_ir&7);
 }
 
-static void d68000_ext_32(void)
+static void d68000_ext_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ext.l   D%d", g_cpu_ir&7);
 }
 
-static void d68020_extb_32(void)
+static void d68020_extb_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "extb.l  D%d; (2+)", g_cpu_ir&7);
 }
 
-static void d68881_ftrap(void)
+static void d68881_ftrap(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint16_t w2, w3;
 	uint32_t l2;
 
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	w2 = read_imm_16();
+	w2 = read_imm_16(opcodes);
 
 	switch (g_cpu_ir & 0x7)
 	{
 		case 2: // word operand
-			w3 = read_imm_16();
+			w3 = read_imm_16(opcodes);
 			sprintf(g_dasm_str, "ftrap%s.w   $%04x", g_cpcc[w2 & 0x3f], w3);
 			break;
 
 		case 3: // long word operand
-			l2 = read_imm_32();
+			l2 = read_imm_32(opcodes);
 			sprintf(g_dasm_str, "ftrap%s.l   $%08x", g_cpcc[w2 & 0x3f], l2);
 			break;
 
@@ -1737,7 +1719,7 @@ static void d68881_ftrap(void)
 	}
 }
 
-static void d68040_fpu(void)
+static void d68040_fpu(const device_disasm_interface::data_buffer &opcodes)
 {
 	char float_data_format[8][3] =
 	{
@@ -1747,7 +1729,7 @@ static void d68040_fpu(void)
 	char mnemonic[40];
 	uint32_t w2, src, dst_reg;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	w2 = read_imm_16();
+	w2 = read_imm_16(opcodes);
 
 	src = (w2 >> 10) & 0x7;
 	dst_reg = (w2 >> 7) & 0x7;
@@ -1825,7 +1807,7 @@ static void d68040_fpu(void)
 
 			if (w2 & 0x4000)
 			{
-				sprintf(g_dasm_str, "%s%s   %s, FP%d", mnemonic, float_data_format[src], get_ea_mode_str_32(g_cpu_ir), dst_reg);
+				sprintf(g_dasm_str, "%s%s   %s, FP%d", mnemonic, float_data_format[src], get_ea_mode_str_32(opcodes, g_cpu_ir), dst_reg);
 			}
 			else
 			{
@@ -1839,15 +1821,15 @@ static void d68040_fpu(void)
 			switch ((w2>>10)&7)
 			{
 				case 3:     // packed decimal w/fixed k-factor
-					sprintf(g_dasm_str, "fmove%s   FP%d, %s {#%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir), sext_7bit_int(w2&0x7f));
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s {#%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(opcodes, g_cpu_ir), sext_7bit_int(w2&0x7f));
 					break;
 
 				case 7:     // packed decimal w/dynamic k-factor (register)
-					sprintf(g_dasm_str, "fmove%s   FP%d, %s {D%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir), (w2>>4)&7);
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s {D%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(opcodes, g_cpu_ir), (w2>>4)&7);
 					break;
 
 				default:
-					sprintf(g_dasm_str, "fmove%s   FP%d, %s", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir));
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(opcodes, g_cpu_ir));
 					break;
 			}
 			break;
@@ -1855,7 +1837,7 @@ static void d68040_fpu(void)
 
 		case 0x4:   // ea to control
 		{
-			sprintf(g_dasm_str, "fmovem.l   %s, ", get_ea_mode_str_32(g_cpu_ir));
+			sprintf(g_dasm_str, "fmovem.l   %s, ", get_ea_mode_str_32(opcodes, g_cpu_ir));
 			if (w2 & 0x1000) strcat(g_dasm_str, "fpcr");
 			if (w2 & 0x0800) strcat(g_dasm_str, "/fpsr");
 			if (w2 & 0x0400) strcat(g_dasm_str, "/fpiar");
@@ -1869,7 +1851,7 @@ static void d68040_fpu(void)
 			if (w2 & 0x0800) strcat(g_dasm_str, "/fpsr");
 			if (w2 & 0x0400) strcat(g_dasm_str, "/fpiar");
 			strcat(g_dasm_str, ", ");
-			strcat(g_dasm_str, get_ea_mode_str_32(g_cpu_ir));
+			strcat(g_dasm_str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 			break;
 		}
 
@@ -1879,13 +1861,13 @@ static void d68040_fpu(void)
 
 			if ((w2>>11) & 1)   // dynamic register list
 			{
-				sprintf(g_dasm_str, "fmovem.x   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (w2>>4)&7);
+				sprintf(g_dasm_str, "fmovem.x   %s, D%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (w2>>4)&7);
 			}
 			else    // static register list
 			{
 				int i;
 
-				sprintf(g_dasm_str, "fmovem.x   %s, ", get_ea_mode_str_32(g_cpu_ir));
+				sprintf(g_dasm_str, "fmovem.x   %s, ", get_ea_mode_str_32(opcodes, g_cpu_ir));
 
 				for (i = 0; i < 8; i++)
 				{
@@ -1912,7 +1894,7 @@ static void d68040_fpu(void)
 
 			if ((w2>>11) & 1)   // dynamic register list
 			{
-				sprintf(g_dasm_str, "fmovem.x   D%d, %s", (w2>>4)&7, get_ea_mode_str_32(g_cpu_ir));
+				sprintf(g_dasm_str, "fmovem.x   D%d, %s", (w2>>4)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 			}
 			else    // static register list
 			{
@@ -1937,7 +1919,7 @@ static void d68040_fpu(void)
 				}
 
 				strcat(g_dasm_str, ", ");
-				strcat(g_dasm_str, get_ea_mode_str_32(g_cpu_ir));
+				strcat(g_dasm_str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 			}
 			break;
 		}
@@ -1950,169 +1932,169 @@ static void d68040_fpu(void)
 	}
 }
 
-static void d68000_jmp(void)
+static void d68000_jmp(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "jmp     %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "jmp     %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_jsr(void)
+static void d68000_jsr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "jsr     %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "jsr     %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_lea(void)
+static void d68000_lea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "lea     %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "lea     %s, A%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_link_16(void)
+static void d68000_link_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "link    A%d, %s", g_cpu_ir&7, get_imm_str_s16());
+	sprintf(g_dasm_str, "link    A%d, %s", g_cpu_ir&7, get_imm_str_s16(opcodes));
 }
 
-static void d68020_link_32(void)
+static void d68020_link_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "link    A%d, %s; (2+)", g_cpu_ir&7, get_imm_str_s32());
+	sprintf(g_dasm_str, "link    A%d, %s; (2+)", g_cpu_ir&7, get_imm_str_s32(opcodes));
 }
 
-static void d68000_lsr_s_8(void)
+static void d68000_lsr_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsr.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsr_s_16(void)
+static void d68000_lsr_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsr.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsr_s_32(void)
+static void d68000_lsr_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsr.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsr_r_8(void)
+static void d68000_lsr_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsr.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsr_r_16(void)
+static void d68000_lsr_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsr.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsr_r_32(void)
+static void d68000_lsr_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsr.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsr_ea(void)
+static void d68000_lsr_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "lsr.w   %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "lsr.w   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_lsl_s_8(void)
+static void d68000_lsl_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsl.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsl_s_16(void)
+static void d68000_lsl_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsl.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsl_s_32(void)
+static void d68000_lsl_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsl.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsl_r_8(void)
+static void d68000_lsl_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsl.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsl_r_16(void)
+static void d68000_lsl_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsl.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsl_r_32(void)
+static void d68000_lsl_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "lsl.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsl_ea(void)
+static void d68000_lsl_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "lsl.w   %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "lsl.w   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_move_8(void)
+static void d68000_move_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_ea_mode_str_8(g_cpu_ir);
-	sprintf(g_dasm_str, "move.b  %s, %s", str, get_ea_mode_str_8(((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
+	char* str = get_ea_mode_str_8(opcodes, g_cpu_ir);
+	sprintf(g_dasm_str, "move.b  %s, %s", str, get_ea_mode_str_8(opcodes, ((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
 }
 
-static void d68000_move_16(void)
+static void d68000_move_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_ea_mode_str_16(g_cpu_ir);
-	sprintf(g_dasm_str, "move.w  %s, %s", str, get_ea_mode_str_16(((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
+	char* str = get_ea_mode_str_16(opcodes, g_cpu_ir);
+	sprintf(g_dasm_str, "move.w  %s, %s", str, get_ea_mode_str_16(opcodes, ((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
 }
 
-static void d68000_move_32(void)
+static void d68000_move_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_ea_mode_str_32(g_cpu_ir);
-	sprintf(g_dasm_str, "move.l  %s, %s", str, get_ea_mode_str_32(((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
+	char* str = get_ea_mode_str_32(opcodes, g_cpu_ir);
+	sprintf(g_dasm_str, "move.l  %s, %s", str, get_ea_mode_str_32(opcodes, ((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
 }
 
-static void d68000_movea_16(void)
+static void d68000_movea_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "movea.w %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "movea.w %s, A%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_movea_32(void)
+static void d68000_movea_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "movea.l %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "movea.l %s, A%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_move_to_ccr(void)
+static void d68000_move_to_ccr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "move    %s, CCR", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "move    %s, CCR", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68010_move_fr_ccr(void)
+static void d68010_move_fr_ccr(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	sprintf(g_dasm_str, "move    CCR, %s; (1+)", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "move    CCR, %s; (1+)", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_move_fr_sr(void)
+static void d68000_move_fr_sr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "move    SR, %s", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "move    SR, %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_move_to_sr(void)
+static void d68000_move_to_sr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "move    %s, SR", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "move    %s, SR", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_move_fr_usp(void)
+static void d68000_move_fr_usp(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "move    USP, A%d", g_cpu_ir&7);
 }
 
-static void d68000_move_to_usp(void)
+static void d68000_move_to_usp(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "move    A%d, USP", g_cpu_ir&7);
 }
 
-static void d68010_movec(void)
+static void d68010_movec(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	const char* reg_name;
 	const char* processor;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	switch(extension & 0xfff)
 	{
@@ -2255,9 +2237,9 @@ static void d68010_movec(void)
 		sprintf(g_dasm_str, "movec %s, %c%d; (%s)", reg_name, BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, processor);
 }
 
-static void d68000_movem_pd_16(void)
+static void d68000_movem_pd_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t data = read_imm_16();
+	uint32_t data = read_imm_16(opcodes);
 	char buffer[40];
 	uint32_t first;
 	uint32_t run_length;
@@ -2300,12 +2282,12 @@ static void d68000_movem_pd_16(void)
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
 		}
 	}
-	sprintf(g_dasm_str, "movem.w %s, %s", buffer, get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "movem.w %s, %s", buffer, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_movem_pd_32(void)
+static void d68000_movem_pd_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t data = read_imm_16();
+	uint32_t data = read_imm_16(opcodes);
 	char buffer[40];
 	uint32_t first;
 	uint32_t run_length;
@@ -2348,12 +2330,12 @@ static void d68000_movem_pd_32(void)
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
 		}
 	}
-	sprintf(g_dasm_str, "movem.l %s, %s", buffer, get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "movem.l %s, %s", buffer, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_movem_er_16(void)
+static void d68000_movem_er_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t data = read_imm_16();
+	uint32_t data = read_imm_16(opcodes);
 	char buffer[40];
 	uint32_t first;
 	uint32_t run_length;
@@ -2396,12 +2378,12 @@ static void d68000_movem_er_16(void)
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
 		}
 	}
-	sprintf(g_dasm_str, "movem.w %s, %s", get_ea_mode_str_16(g_cpu_ir), buffer);
+	sprintf(g_dasm_str, "movem.w %s, %s", get_ea_mode_str_16(opcodes, g_cpu_ir), buffer);
 }
 
-static void d68000_movem_er_32(void)
+static void d68000_movem_er_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t data = read_imm_16();
+	uint32_t data = read_imm_16(opcodes);
 	char buffer[40];
 	uint32_t first;
 	uint32_t run_length;
@@ -2444,12 +2426,12 @@ static void d68000_movem_er_32(void)
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
 		}
 	}
-	sprintf(g_dasm_str, "movem.l %s, %s", get_ea_mode_str_32(g_cpu_ir), buffer);
+	sprintf(g_dasm_str, "movem.l %s, %s", get_ea_mode_str_32(opcodes, g_cpu_ir), buffer);
 }
 
-static void d68000_movem_re_16(void)
+static void d68000_movem_re_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t data = read_imm_16();
+	uint32_t data = read_imm_16(opcodes);
 	char buffer[40];
 	uint32_t first;
 	uint32_t run_length;
@@ -2492,12 +2474,12 @@ static void d68000_movem_re_16(void)
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
 		}
 	}
-	sprintf(g_dasm_str, "movem.w %s, %s", buffer, get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "movem.w %s, %s", buffer, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_movem_re_32(void)
+static void d68000_movem_re_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	uint32_t data = read_imm_16();
+	uint32_t data = read_imm_16(opcodes);
 	char buffer[40];
 	uint32_t first;
 	uint32_t run_length;
@@ -2540,251 +2522,251 @@ static void d68000_movem_re_32(void)
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
 		}
 	}
-	sprintf(g_dasm_str, "movem.l %s, %s", buffer, get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "movem.l %s, %s", buffer, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_movep_re_16(void)
+static void d68000_movep_re_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "movep.w D%d, ($%x,A%d)", (g_cpu_ir>>9)&7, read_imm_16(), g_cpu_ir&7);
+	sprintf(g_dasm_str, "movep.w D%d, ($%x,A%d)", (g_cpu_ir>>9)&7, read_imm_16(opcodes), g_cpu_ir&7);
 }
 
-static void d68000_movep_re_32(void)
+static void d68000_movep_re_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "movep.l D%d, ($%x,A%d)", (g_cpu_ir>>9)&7, read_imm_16(), g_cpu_ir&7);
+	sprintf(g_dasm_str, "movep.l D%d, ($%x,A%d)", (g_cpu_ir>>9)&7, read_imm_16(opcodes), g_cpu_ir&7);
 }
 
-static void d68000_movep_er_16(void)
+static void d68000_movep_er_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "movep.w ($%x,A%d), D%d", read_imm_16(), g_cpu_ir&7, (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "movep.w ($%x,A%d), D%d", read_imm_16(opcodes), g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_movep_er_32(void)
+static void d68000_movep_er_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "movep.l ($%x,A%d), D%d", read_imm_16(), g_cpu_ir&7, (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "movep.l ($%x,A%d), D%d", read_imm_16(opcodes), g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68010_moves_8(void)
+static void d68010_moves_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 	if(BIT_B(extension))
-		sprintf(g_dasm_str, "moves.b %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_8(g_cpu_ir));
+		sprintf(g_dasm_str, "moves.b %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 	else
-		sprintf(g_dasm_str, "moves.b %s, %c%d; (1+)", get_ea_mode_str_8(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+		sprintf(g_dasm_str, "moves.b %s, %c%d; (1+)", get_ea_mode_str_8(opcodes, g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68010_moves_16(void)
+static void d68010_moves_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 	if(BIT_B(extension))
-		sprintf(g_dasm_str, "moves.w %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_16(g_cpu_ir));
+		sprintf(g_dasm_str, "moves.w %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_16(opcodes, g_cpu_ir));
 	else
-		sprintf(g_dasm_str, "moves.w %s, %c%d; (1+)", get_ea_mode_str_16(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+		sprintf(g_dasm_str, "moves.w %s, %c%d; (1+)", get_ea_mode_str_16(opcodes, g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68010_moves_32(void)
+static void d68010_moves_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 	if(BIT_B(extension))
-		sprintf(g_dasm_str, "moves.l %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_32(g_cpu_ir));
+		sprintf(g_dasm_str, "moves.l %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 	else
-		sprintf(g_dasm_str, "moves.l %s, %c%d; (1+)", get_ea_mode_str_32(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+		sprintf(g_dasm_str, "moves.l %s, %c%d; (1+)", get_ea_mode_str_32(opcodes, g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68000_moveq(void)
+static void d68000_moveq(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "moveq   #%s, D%d", make_signed_hex_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68040_move16_pi_pi(void)
+static void d68040_move16_pi_pi(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68040_PLUS);
-	sprintf(g_dasm_str, "move16  (A%d)+, (A%d)+; (4)", g_cpu_ir&7, (read_imm_16()>>12)&7);
+	sprintf(g_dasm_str, "move16  (A%d)+, (A%d)+; (4)", g_cpu_ir&7, (read_imm_16(opcodes)>>12)&7);
 }
 
-static void d68040_move16_pi_al(void)
+static void d68040_move16_pi_al(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68040_PLUS);
-	sprintf(g_dasm_str, "move16  (A%d)+, %s; (4)", g_cpu_ir&7, get_imm_str_u32());
+	sprintf(g_dasm_str, "move16  (A%d)+, %s; (4)", g_cpu_ir&7, get_imm_str_u32(opcodes));
 }
 
-static void d68040_move16_al_pi(void)
+static void d68040_move16_al_pi(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68040_PLUS);
-	sprintf(g_dasm_str, "move16  %s, (A%d)+; (4)", get_imm_str_u32(), g_cpu_ir&7);
+	sprintf(g_dasm_str, "move16  %s, (A%d)+; (4)", get_imm_str_u32(opcodes), g_cpu_ir&7);
 }
 
-static void d68040_move16_ai_al(void)
+static void d68040_move16_ai_al(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68040_PLUS);
-	sprintf(g_dasm_str, "move16  (A%d), %s; (4)", g_cpu_ir&7, get_imm_str_u32());
+	sprintf(g_dasm_str, "move16  (A%d), %s; (4)", g_cpu_ir&7, get_imm_str_u32(opcodes));
 }
 
-static void d68040_move16_al_ai(void)
+static void d68040_move16_al_ai(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68040_PLUS);
-	sprintf(g_dasm_str, "move16  %s, (A%d); (4)", get_imm_str_u32(), g_cpu_ir&7);
+	sprintf(g_dasm_str, "move16  %s, (A%d); (4)", get_imm_str_u32(opcodes), g_cpu_ir&7);
 }
 
-static void d68000_muls(void)
+static void d68000_muls(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "muls.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "muls.w  %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_mulu(void)
+static void d68000_mulu(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "mulu.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "mulu.w  %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68020_mull(void)
+static void d68020_mull(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	extension = read_imm_16();
+	extension = read_imm_16(opcodes);
 
 	if(BIT_A(extension))
-		sprintf(g_dasm_str, "mul%c.l %s, D%d-D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), extension&7, (extension>>12)&7);
+		sprintf(g_dasm_str, "mul%c.l %s, D%d-D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(opcodes, g_cpu_ir), extension&7, (extension>>12)&7);
 	else
-		sprintf(g_dasm_str, "mul%c.l  %s, D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), (extension>>12)&7);
+		sprintf(g_dasm_str, "mul%c.l  %s, D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(opcodes, g_cpu_ir), (extension>>12)&7);
 }
 
-static void d68000_nbcd(void)
+static void d68000_nbcd(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "nbcd    %s", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "nbcd    %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_neg_8(void)
+static void d68000_neg_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "neg.b   %s", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "neg.b   %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_neg_16(void)
+static void d68000_neg_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "neg.w   %s", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "neg.w   %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_neg_32(void)
+static void d68000_neg_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "neg.l   %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "neg.l   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_negx_8(void)
+static void d68000_negx_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "negx.b  %s", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "negx.b  %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_negx_16(void)
+static void d68000_negx_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "negx.w  %s", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "negx.w  %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_negx_32(void)
+static void d68000_negx_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "negx.l  %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "negx.l  %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_nop(void)
+static void d68000_nop(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "nop");
 }
 
-static void d68000_not_8(void)
+static void d68000_not_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "not.b   %s", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "not.b   %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_not_16(void)
+static void d68000_not_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "not.w   %s", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "not.w   %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_not_32(void)
+static void d68000_not_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "not.l   %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "not.l   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_or_er_8(void)
+static void d68000_or_er_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "or.b    %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "or.b    %s, D%d", get_ea_mode_str_8(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_or_er_16(void)
+static void d68000_or_er_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "or.w    %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "or.w    %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_or_er_32(void)
+static void d68000_or_er_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "or.l    %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "or.l    %s, D%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_or_re_8(void)
+static void d68000_or_re_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "or.b    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "or.b    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_or_re_16(void)
+static void d68000_or_re_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "or.w    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "or.w    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_or_re_32(void)
+static void d68000_or_re_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "or.l    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "or.l    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_ori_8(void)
+static void d68000_ori_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u8();
-	sprintf(g_dasm_str, "ori.b   %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_u8(opcodes);
+	sprintf(g_dasm_str, "ori.b   %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_ori_16(void)
+static void d68000_ori_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u16();
-	sprintf(g_dasm_str, "ori.w   %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
+	char* str = get_imm_str_u16(opcodes);
+	sprintf(g_dasm_str, "ori.w   %s, %s", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_ori_32(void)
+static void d68000_ori_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_u32();
-	sprintf(g_dasm_str, "ori.l   %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
+	char* str = get_imm_str_u32(opcodes);
+	sprintf(g_dasm_str, "ori.l   %s, %s", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_ori_to_ccr(void)
+static void d68000_ori_to_ccr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "ori     %s, CCR", get_imm_str_u8());
+	sprintf(g_dasm_str, "ori     %s, CCR", get_imm_str_u8(opcodes));
 }
 
-static void d68000_ori_to_sr(void)
+static void d68000_ori_to_sr(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "ori     %s, SR", get_imm_str_u16());
+	sprintf(g_dasm_str, "ori     %s, SR", get_imm_str_u16(opcodes));
 }
 
-static void d68020_pack_rr(void)
+static void d68020_pack_rr(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "pack    D%d, D%d, %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
+	sprintf(g_dasm_str, "pack    D%d, D%d, %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16(opcodes));
 }
 
-static void d68020_pack_mm(void)
+static void d68020_pack_mm(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "pack    -(A%d), -(A%d), %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
+	sprintf(g_dasm_str, "pack    -(A%d), -(A%d), %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16(opcodes));
 }
 
-static void d68000_pea(void)
+static void d68000_pea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "pea     %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "pea     %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
 // this is a 68040-specific form of PFLUSH
-static void d68040_pflush(void)
+static void d68040_pflush(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 
@@ -2798,445 +2780,445 @@ static void d68040_pflush(void)
 	}
 }
 
-static void d68000_reset(void)
+static void d68000_reset(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "reset");
 }
 
-static void d68000_ror_s_8(void)
+static void d68000_ror_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ror.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_ror_s_16(void)
+static void d68000_ror_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ror.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7],g_cpu_ir&7);
 }
 
-static void d68000_ror_s_32(void)
+static void d68000_ror_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ror.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_ror_r_8(void)
+static void d68000_ror_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ror.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ror_r_16(void)
+static void d68000_ror_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ror.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ror_r_32(void)
+static void d68000_ror_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "ror.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ror_ea(void)
+static void d68000_ror_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "ror.w   %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "ror.w   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_rol_s_8(void)
+static void d68000_rol_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rol.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_rol_s_16(void)
+static void d68000_rol_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rol.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_rol_s_32(void)
+static void d68000_rol_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rol.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_rol_r_8(void)
+static void d68000_rol_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rol.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_rol_r_16(void)
+static void d68000_rol_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rol.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_rol_r_32(void)
+static void d68000_rol_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rol.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_rol_ea(void)
+static void d68000_rol_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "rol.w   %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "rol.w   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_roxr_s_8(void)
+static void d68000_roxr_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxr.b  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxr_s_16(void)
+static void d68000_roxr_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxr.w  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
 
-static void d68000_roxr_s_32(void)
+static void d68000_roxr_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxr.l  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxr_r_8(void)
+static void d68000_roxr_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxr.b  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxr_r_16(void)
+static void d68000_roxr_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxr.w  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxr_r_32(void)
+static void d68000_roxr_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxr.l  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxr_ea(void)
+static void d68000_roxr_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "roxr.w  %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "roxr.w  %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_roxl_s_8(void)
+static void d68000_roxl_s_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxl.b  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxl_s_16(void)
+static void d68000_roxl_s_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxl.w  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxl_s_32(void)
+static void d68000_roxl_s_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxl.l  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxl_r_8(void)
+static void d68000_roxl_r_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxl.b  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxl_r_16(void)
+static void d68000_roxl_r_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxl.w  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxl_r_32(void)
+static void d68000_roxl_r_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "roxl.l  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxl_ea(void)
+static void d68000_roxl_ea(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "roxl.w  %s", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "roxl.w  %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68010_rtd(void)
+static void d68010_rtd(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68010_PLUS);
-	sprintf(g_dasm_str, "rtd     %s; (1+)", get_imm_str_s16());
+	sprintf(g_dasm_str, "rtd     %s; (1+)", get_imm_str_s16(opcodes));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_rte(void)
+static void d68000_rte(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rte");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68020_rtm(void)
+static void d68020_rtm(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_ONLY);
 	sprintf(g_dasm_str, "rtm     %c%d; (2+)", BIT_3(g_cpu_ir) ? 'A' : 'D', g_cpu_ir&7);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_rtr(void)
+static void d68000_rtr(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rtr");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_rts(void)
+static void d68000_rts(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "rts");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_sbcd_rr(void)
+static void d68000_sbcd_rr(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "sbcd    D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sbcd_mm(void)
+static void d68000_sbcd_mm(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "sbcd    -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_scc(void)
+static void d68000_scc(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "s%-2s     %s", g_cc[(g_cpu_ir>>8)&0xf], get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "s%-2s     %s", g_cc[(g_cpu_ir>>8)&0xf], get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_stop(void)
+static void d68000_stop(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "stop    %s", get_imm_str_s16());
+	sprintf(g_dasm_str, "stop    %s", get_imm_str_s16(opcodes));
 }
 
-static void d68000_sub_er_8(void)
+static void d68000_sub_er_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "sub.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "sub.b   %s, D%d", get_ea_mode_str_8(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sub_er_16(void)
+static void d68000_sub_er_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "sub.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "sub.w   %s, D%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sub_er_32(void)
+static void d68000_sub_er_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "sub.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "sub.l   %s, D%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sub_re_8(void)
+static void d68000_sub_re_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "sub.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "sub.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_sub_re_16(void)
+static void d68000_sub_re_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "sub.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "sub.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_sub_re_32(void)
+static void d68000_sub_re_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "sub.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "sub.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_suba_16(void)
+static void d68000_suba_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "suba.w  %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "suba.w  %s, A%d", get_ea_mode_str_16(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_suba_32(void)
+static void d68000_suba_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "suba.l  %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
+	sprintf(g_dasm_str, "suba.l  %s, A%d", get_ea_mode_str_32(opcodes, g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subi_8(void)
+static void d68000_subi_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_s8();
-	sprintf(g_dasm_str, "subi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
+	char* str = get_imm_str_s8(opcodes);
+	sprintf(g_dasm_str, "subi.b  %s, %s", str, get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_subi_16(void)
+static void d68000_subi_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_s16();
-	sprintf(g_dasm_str, "subi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
+	char* str = get_imm_str_s16(opcodes);
+	sprintf(g_dasm_str, "subi.w  %s, %s", str, get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_subi_32(void)
+static void d68000_subi_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	char* str = get_imm_str_s32();
-	sprintf(g_dasm_str, "subi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
+	char* str = get_imm_str_s32(opcodes);
+	sprintf(g_dasm_str, "subi.l  %s, %s", str, get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_subq_8(void)
+static void d68000_subq_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "subq.b  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "subq.b  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_subq_16(void)
+static void d68000_subq_16(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "subq.w  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "subq.w  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_subq_32(void)
+static void d68000_subq_32(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "subq.l  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "subq.l  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_subx_rr_8(void)
+static void d68000_subx_rr_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "subx.b  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_rr_16(void)
+static void d68000_subx_rr_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "subx.w  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_rr_32(void)
+static void d68000_subx_rr_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "subx.l  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_mm_8(void)
+static void d68000_subx_mm_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "subx.b  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_mm_16(void)
+static void d68000_subx_mm_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "subx.w  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_mm_32(void)
+static void d68000_subx_mm_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "subx.l  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_swap(void)
+static void d68000_swap(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "swap    D%d", g_cpu_ir&7);
 }
 
-static void d68000_tas(void)
+static void d68000_tas(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "tas     %s", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "tas     %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_trap(void)
+static void d68000_trap(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "trap    #$%x", g_cpu_ir&0xf);
 }
 
-static void d68020_trapcc_0(void)
+static void d68020_trapcc_0(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "trap%-2s; (2+)", g_cc[(g_cpu_ir>>8)&0xf]);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_trapcc_16(void)
+static void d68020_trapcc_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "trap%-2s  %s; (2+)", g_cc[(g_cpu_ir>>8)&0xf], get_imm_str_u16());
+	sprintf(g_dasm_str, "trap%-2s  %s; (2+)", g_cc[(g_cpu_ir>>8)&0xf], get_imm_str_u16(opcodes));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_trapcc_32(void)
+static void d68020_trapcc_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "trap%-2s  %s; (2+)", g_cc[(g_cpu_ir>>8)&0xf], get_imm_str_u32());
+	sprintf(g_dasm_str, "trap%-2s  %s; (2+)", g_cc[(g_cpu_ir>>8)&0xf], get_imm_str_u32(opcodes));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_trapv(void)
+static void d68000_trapv(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "trapv");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_tst_8(void)
+static void d68000_tst_8(const device_disasm_interface::data_buffer &opcodes)
 {
-	sprintf(g_dasm_str, "tst.b   %s", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.b   %s", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_pcdi_8(void)
-{
-	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(g_cpu_ir));
-}
-
-static void d68020_tst_pcix_8(void)
+static void d68020_tst_pcdi_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_i_8(void)
+static void d68020_tst_pcix_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68000_tst_16(void)
-{
-	sprintf(g_dasm_str, "tst.w   %s", get_ea_mode_str_16(g_cpu_ir));
-}
-
-static void d68020_tst_a_16(void)
+static void d68020_tst_i_8(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_pcdi_16(void)
+static void d68000_tst_16(const device_disasm_interface::data_buffer &opcodes)
+{
+	sprintf(g_dasm_str, "tst.w   %s", get_ea_mode_str_16(opcodes, g_cpu_ir));
+}
+
+static void d68020_tst_a_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_pcix_16(void)
+static void d68020_tst_pcdi_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_i_16(void)
+static void d68020_tst_pcix_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68000_tst_32(void)
-{
-	sprintf(g_dasm_str, "tst.l   %s", get_ea_mode_str_32(g_cpu_ir));
-}
-
-static void d68020_tst_a_32(void)
+static void d68020_tst_i_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_pcdi_32(void)
+static void d68000_tst_32(const device_disasm_interface::data_buffer &opcodes)
+{
+	sprintf(g_dasm_str, "tst.l   %s", get_ea_mode_str_32(opcodes, g_cpu_ir));
+}
+
+static void d68020_tst_a_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_pcix_32(void)
+static void d68020_tst_pcdi_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68020_tst_i_32(void)
+static void d68020_tst_pcix_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
+	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(opcodes, g_cpu_ir));
 }
 
-static void d68000_unlk(void)
+static void d68020_tst_i_32(const device_disasm_interface::data_buffer &opcodes)
+{
+	LIMIT_CPU_TYPES(M68020_PLUS);
+	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(opcodes, g_cpu_ir));
+}
+
+static void d68000_unlk(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "unlk    A%d", g_cpu_ir&7);
 }
 
-static void d68020_unpk_rr(void)
+static void d68020_unpk_rr(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "unpk    D%d, D%d, %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
+	sprintf(g_dasm_str, "unpk    D%d, D%d, %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16(opcodes));
 }
 
-static void d68020_unpk_mm(void)
+static void d68020_unpk_mm(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "unpk    -(A%d), -(A%d), %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
+	sprintf(g_dasm_str, "unpk    -(A%d), -(A%d), %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16(opcodes));
 }
 
 
@@ -3249,13 +3231,13 @@ static void d68020_unpk_mm(void)
 // PMOVE 3: 011xxxx000000000
 // PTEST:   100xxxxxxxxxxxxx
 // PFLUSHR:  1010000000000000
-static void d68851_p000(void)
+static void d68851_p000(const device_disasm_interface::data_buffer &opcodes)
 {
 	char* str;
-	uint16_t modes = read_imm_16();
+	uint16_t modes = read_imm_16(opcodes);
 
 	// do this after fetching the second PMOVE word so we properly get the 3rd if necessary
-	str = get_ea_mode_str_32(g_cpu_ir);
+	str = get_ea_mode_str_32(opcodes, g_cpu_ir);
 
 	if ((modes & 0xfde0) == 0x2000) // PLOAD
 	{
@@ -3344,48 +3326,48 @@ static void d68851_p000(void)
 	}
 }
 
-static void d68851_pbcc16(void)
+static void d68851_pbcc16(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 
-	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_16(read_imm_16()));
+	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_16(read_imm_16(opcodes)));
 }
 
-static void d68851_pbcc32(void)
+static void d68851_pbcc32(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
 
-	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_32(read_imm_32()));
+	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_32(read_imm_32(opcodes)));
 }
 
-static void d68851_pdbcc(void)
+static void d68851_pdbcc(const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t temp_pc = g_cpu_pc;
-	uint16_t modes = read_imm_16();
+	uint16_t modes = read_imm_16(opcodes);
 
-	sprintf(g_dasm_str, "pb%s %x", g_mmucond[modes&0xf], temp_pc + make_int_16(read_imm_16()));
+	sprintf(g_dasm_str, "pb%s %x", g_mmucond[modes&0xf], temp_pc + make_int_16(read_imm_16(opcodes)));
 }
 
 // PScc:  0000000000xxxxxx
-static void d68851_p001(void)
+static void d68851_p001(const device_disasm_interface::data_buffer &opcodes)
 {
 	sprintf(g_dasm_str, "MMU 001 group");
 }
 
 // fbcc is 68040 and 68881
-static void d68040_fbcc_16()
+static void d68040_fbcc_16(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68030_PLUS);
 	uint32_t temp_pc = g_cpu_pc;
-	int16_t disp = make_int_16(read_imm_16());
+	int16_t disp = make_int_16(read_imm_16(opcodes));
 	sprintf(g_dasm_str, "fb%-s   $%x", g_cpcc[g_cpu_ir & 0x3f], temp_pc + disp);
 }
 
-static void d68040_fbcc_32()
+static void d68040_fbcc_32(const device_disasm_interface::data_buffer &opcodes)
 {
 	LIMIT_CPU_TYPES(M68030_PLUS);
 	uint32_t temp_pc = g_cpu_pc;
-	uint32_t disp = read_imm_32();
+	uint32_t disp = read_imm_32(opcodes);
 	sprintf(g_dasm_str, "fb%-s   $%x", g_cpcc[g_cpu_ir & 0x3f], temp_pc + disp);
 }
 
@@ -3829,7 +3811,7 @@ static void build_opcode_table(void)
 /* ======================================================================== */
 
 /* Disasemble one instruction at pc and store in str_buff */
-static unsigned int m68k_disassemble(std::ostream &stream, unsigned int pc, unsigned int cpu_type)
+static unsigned int m68k_disassemble(std::ostream &stream, unsigned int pc, const device_disasm_interface::data_buffer &opcodes, unsigned int cpu_type)
 {
 	if(!g_initialized)
 	{
@@ -3872,31 +3854,19 @@ static unsigned int m68k_disassemble(std::ostream &stream, unsigned int pc, unsi
 
 	g_cpu_pc = pc;
 	g_helper_str[0] = 0;
-	g_cpu_ir = read_imm_16();
+	g_cpu_ir = read_imm_16(opcodes);
 	g_opcode_type = 0;
-	g_instruction_table[g_cpu_ir]();
+	g_instruction_table[g_cpu_ir](opcodes);
 	util::stream_format(stream, "%s%s", g_dasm_str, g_helper_str);
 	return COMBINE_OPCODE_FLAGS(g_cpu_pc - pc);
 }
 
-#ifdef UNUSED_FUNCTION
-char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type)
-{
-	static char buff[100];
-	buff[0] = 0;
-	m68k_disassemble(buff, pc, cpu_type);
-	return buff;
-}
-#endif
-
-unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
+unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const device_disasm_interface::data_buffer &opcodes, const device_disasm_interface::data_buffer &params, unsigned int cpu_type)
 {
 	unsigned int result;
 
-	g_rawop = opdata;
 	g_rawbasepc = pc;
-	result = m68k_disassemble(stream, pc, cpu_type);
-	g_rawop = nullptr;
+	result = m68k_disassemble(stream, pc, opcodes, cpu_type);
 	return result;
 }
 
@@ -4114,42 +4084,42 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 
 CPU_DISASSEMBLE( m68000 )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68000);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_68000);
 }
 
 CPU_DISASSEMBLE( m68008 )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68008);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_68008);
 }
 
 CPU_DISASSEMBLE( m68010 )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68010);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_68010);
 }
 
 CPU_DISASSEMBLE( m68020 )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68020);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_68020);
 }
 
 CPU_DISASSEMBLE( m68030 )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68030);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_68030);
 }
 
 CPU_DISASSEMBLE( m68040 )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68040);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_68040);
 }
 
 CPU_DISASSEMBLE( m68340 )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_FSCPU32);
 }
 
 CPU_DISASSEMBLE( coldfire )
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
+	return m68k_disassemble_raw(stream, pc, opcodes, params, M68K_CPU_TYPE_COLDFIRE);
 }
 
 /* ======================================================================== */

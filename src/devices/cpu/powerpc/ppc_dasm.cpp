@@ -1172,7 +1172,5 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 
 CPU_DISASSEMBLE( powerpc )
 {
-	uint32_t op = *(uint32_t *)oprom;
-	op = big_endianize_int32(op);
-	return ppc_dasm_one(stream, pc, op);
+	return ppc_dasm_one(stream, pc, opcodes.r32(pc));
 }

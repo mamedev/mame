@@ -278,7 +278,6 @@ private:
 
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
-	u32 dasm_wrapped(std::string &buffer, offs_t pc);
 	void errorlog_write_line(const char *line);
 
 	// breakpoint and watchpoint helpers

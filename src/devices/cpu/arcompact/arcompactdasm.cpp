@@ -26,7 +26,7 @@ CPU_DISASSEMBLE(arcompact)
 {
 	int size;
 
-	uint32_t op = oprom[0] | (oprom[1] << 8);
+	uint32_t op = opcodes.r16(pc);
 
 	uint8_t instruction = ARCOMPACT_OPERATION;
 
@@ -34,7 +34,7 @@ CPU_DISASSEMBLE(arcompact)
 	{
 		size = 4;
 		op <<= 16;
-		op |= oprom[2] | (oprom[3] << 8);
+		op |= opcodes.r16(pc+2);
 
 		op &= ~0xf8000000;
 

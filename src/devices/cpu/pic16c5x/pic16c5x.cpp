@@ -183,10 +183,10 @@ device_memory_interface::space_config_vector pic16c5x_device::memory_space_confi
 	};
 }
 
-offs_t pic16c5x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t pic16c5x_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( pic16c5x );
-	return CPU_DISASSEMBLE_NAME(pic16c5x)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(pic16c5x)(this, stream, pc, opcodes, params, options);
 }
 
 

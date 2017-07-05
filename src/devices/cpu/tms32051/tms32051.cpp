@@ -117,10 +117,10 @@ tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag,
 }
 
 
-offs_t tms32051_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms32051_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32051 );
-	return CPU_DISASSEMBLE_NAME(tms32051)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms32051)(this, stream, pc, opcodes, params, options);
 }
 
 

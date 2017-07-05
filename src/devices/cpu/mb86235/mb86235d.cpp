@@ -717,8 +717,6 @@ static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
 
 CPU_DISASSEMBLE(mb86235)
 {
-	uint64_t op = *(uint64_t*)oprom;
-	op = little_endianize_int64(op);
-
+	uint64_t op = opcodes.r32(pc);
 	return dasm_mb86235(stream, pc, op);
 }

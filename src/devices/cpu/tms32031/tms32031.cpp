@@ -553,36 +553,24 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
+//  opcode_alignment - opcode alignment, in pc units
 //-------------------------------------------------
 
-uint32_t tms3203x_device::disasm_min_opcode_bytes() const
+uint32_t tms3203x_device::opcode_alignment() const
 {
-	return 4;
+	return 1;
 }
 
 
 //-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t tms3203x_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t tms3203x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms3203x_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms3203x );
-	return CPU_DISASSEMBLE_NAME(tms3203x)(this, stream, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms3203x)(this, stream, pc, opcodes, params, options);
 }
 
 

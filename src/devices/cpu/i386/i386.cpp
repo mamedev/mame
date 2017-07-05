@@ -4021,9 +4021,9 @@ bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 	return ret;
 }
 
-offs_t i386_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i386_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	return i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
+	return i386_dasm_one(stream, pc, opcodes, m_sreg[CS].d ? 32 : 16);
 }
 
 
