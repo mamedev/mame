@@ -215,8 +215,9 @@ namespace webpp {
 			}
 		};
 	public:
-		/// Warning: do not add or remove endpoints after start() is called
-		std::map<regex_orderable, Endpoint> endpoint;
+		/// Warning: do not access (red or write) m_endpoint without holding m_endpoint_mutex
+		std::map<regex_orderable, Endpoint> m_endpoint;
+		std::mutex m_endpoint_mutex;
 
 		virtual void start() {
 			if(!io_context)
@@ -247,7 +248,8 @@ namespace webpp {
 			acceptor->close();
 			io_context->stop();
 
-			for(auto& p: endpoint)
+			std::lock_guard<std::mutex> lock(m_endpoint_mutex);
+			for(auto& p: m_endpoint)
 				p.second.connections.clear();
 		}
 
@@ -310,7 +312,8 @@ namespace webpp {
 
 		std::unordered_set<std::shared_ptr<Connection> > get_connections() {
 			std::unordered_set<std::shared_ptr<Connection> > all_connections;
-			for(auto& e: endpoint) {
+			std::lock_guard<std::mutex> lock(m_endpoint_mutex);
+			for(auto& e: m_endpoint) {
 				std::lock_guard<std::mutex> lock(e.second.connections_mutex);
 				all_connections.insert(e.second.connections.begin(), e.second.connections.end());
 			}
@@ -425,10 +428,11 @@ namespace webpp {
 				}
 			}
 		}
-
+		
 		void write_handshake(const std::shared_ptr<Connection> &connection, const std::shared_ptr<asio::streambuf> &read_buffer) {
 			//Find path- and method-match, and generate response
-			for (auto &regex_endpoint : endpoint) {
+			std::lock_guard<std::mutex> lock(m_endpoint_mutex);
+			for (auto &regex_endpoint : m_endpoint) {
 				std::smatch path_match;
 				if(std::regex_match(connection->path, path_match, regex_endpoint.first)) {
 					auto write_buffer = std::make_shared<asio::streambuf>();
