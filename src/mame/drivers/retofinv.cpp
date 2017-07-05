@@ -124,7 +124,7 @@ READ8_MEMBER(retofinv_state::mcu_status_r)
    string there, it jumps to that area, presumably for diagnostic use */
 
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM 
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
@@ -383,8 +383,8 @@ static MACHINE_CONFIG_START( retofinv )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_REFRESH_RATE(60.58) // vsync measured at 60.58hz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // not accurate
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
