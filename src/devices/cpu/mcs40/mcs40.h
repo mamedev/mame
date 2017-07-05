@@ -25,6 +25,31 @@ enum
     CONFIGURATION MACROS
 ***********************************************************************/
 
+#define MCS40BUS_FUNC(cls, fnc) \
+		mcs40_cpu_device_base::bus_cycle_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, (cls *)nullptr)
+
+
+#define MCFG_I4004_ROM_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_ROM, map)
+
+#define MCFG_I4004_RAM_MEMORY_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_RAM_MEMORY, map)
+
+#define MCFG_I4004_ROM_PORTS_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_ROM_PORTS, map)
+
+#define MCFG_I4004_RAM_STATUS_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_RAM_STATUS, map)
+
+#define MCFG_I4004_RAM_PORTS_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_RAM_PORTS, map)
+
+#define MCFG_I4004_PROGRAM_MEMORY_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_PROGRAM_MEMORY, map)
+
+#define MCFG_I4004_BUS_CYCLE_CB(obj) \
+		i4004_cpu_device::set_bus_cycle_cb(*device, (MCS40BUS_##obj));
+
 #define MCFG_I4004_SYNC_CB(obj) \
 		devcb = &i4004_cpu_device::set_sync_cb(*device, DEVCB_##obj);
 
@@ -49,6 +74,27 @@ enum
 #define MCFG_I4004_4289_F_L_CB(obj) \
 		devcb = &i4004_cpu_device::set_4289_f_l_cb(*device, DEVCB_##obj);
 
+
+#define MCFG_I4040_ROM_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_ROM, map)
+
+#define MCFG_I4040_RAM_MEMORY_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_RAM_MEMORY, map)
+
+#define MCFG_I4040_ROM_PORTS_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_ROM_PORTS, map)
+
+#define MCFG_I4040_RAM_STATUS_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_RAM_STATUS, map)
+
+#define MCFG_I4040_RAM_PORTS_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_RAM_PORTS, map)
+
+#define MCFG_I4040_PROGRAM_MEMORY_MAP(map) \
+		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_PROGRAM_MEMORY, map)
+
+#define MCFG_I4040_BUS_CYCLE_CB(obj) \
+		i4040_cpu_device::set_bus_cycle_cb(*device, (MCS40BUS_##obj));
 
 #define MCFG_I4040_SYNC_CB(obj) \
 		devcb = &i4040_cpu_device::set_sync_cb(*device, DEVCB_##obj);
@@ -92,11 +138,30 @@ enum
 class mcs40_cpu_device_base : public cpu_device
 {
 public:
+	enum {
+		AS_ROM              = AS_PROGRAM,
+		AS_RAM_MEMORY       = AS_DATA,
+		AS_ROM_PORTS        = AS_IO,
+		AS_RAM_STATUS       = AS_OPCODES + 1,
+		AS_RAM_PORTS,
+		AS_PROGRAM_MEMORY
+	};
+	enum class phase { A1, A2, A3, M1, M2, X1, X2, X3 };
+
+	// step isn't a real signal, but realistically anything watching the bus will have a counter to track it
+	typedef device_delegate<void (phase step, u8 sync, u8 data)> bus_cycle_delegate;
+
 	// configuration helpers
+	template <typename Obj> static void set_bus_cycle_cb(device_t &device, Obj &&cb)
+	{ downcast<mcs40_cpu_device_base &>(device).m_bus_cycle_cb = std::forward<Obj>(cb); }
 	template <typename Obj> static devcb_base &set_4289_pm_cb(device_t &device, Obj &&cb)
 	{ return downcast<mcs40_cpu_device_base &>(device).m_4289_pm_cb.set_callback(std::forward<Obj>(cb)); }
 	template <typename Obj> static devcb_base &set_4289_f_l_cb(device_t &device, Obj &&cb)
 	{ return downcast<mcs40_cpu_device_base &>(device).m_4289_f_l_cb.set_callback(std::forward<Obj>(cb)); }
+
+	// chip select outputs
+	u8 get_cm_rom() const { return m_cm_rom; }
+	u8 get_cm_ram() const { return m_cm_ram; }
 
 	// 4008/4009 or 4289 outputs
 	u8 get_4289_a() const { return m_4289_a; } // 8-bit address
@@ -143,7 +208,7 @@ protected:
 	virtual bool is_io_op(u8 opr) = 0;
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) = 0;
 	virtual void do_cycle2(u8 opr, u8 opa, u8 arg) = 0;
-	virtual void do_io(u8 opr, u8 opa) = 0;
+	virtual u8 do_io(u8 opr, u8 opa) = 0;
 
 	// register access
 	u8 get_a() const;
@@ -207,8 +272,6 @@ private:
 		I4040_SRC
 	};
 
-	enum class phase { A1, A2, A3, M1, M2, X1, X2, X3 };
-
 	// instruction phases
 	void do_a1();
 	void do_a2();
@@ -230,9 +293,12 @@ private:
 	void update_4289_f_l(u8 val);
 
 	// address spaces
-	address_space_config    m_program_config, m_data_config, m_io_config, m_opcodes_config;
-	address_space           *m_program, *m_data, *m_io, *m_opcodes;
+	address_space_config    m_space_config[7];
+	address_space           *m_spaces[7];
 	direct_read_data        *m_direct;
+
+	// bus snooping callback
+	bus_cycle_delegate      m_bus_cycle_cb;
 
 	// output callbacks
 	devcb_write_line        m_sync_cb;
@@ -323,7 +389,7 @@ protected:
 	virtual bool is_io_op(u8 opr) override;
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
 	virtual void do_cycle2(u8 opr, u8 opa, u8 arg) override;
-	virtual void do_io(u8 opr, u8 opa) override;
+	virtual u8 do_io(u8 opr, u8 opa) override;
 
 	// configuration helpers
 	using mcs40_cpu_device_base::set_sync_cb;

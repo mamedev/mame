@@ -9,18 +9,14 @@
  *****************************************************************************/
 #include "emu.h"
 #include "mcs40.h"
-
 #include "debugger.h"
 
 
 /*
 MCS-40 uses an unusual scheme for memory.  RAMs contain four registers,
 each of which has 16 memory characters and 4 status characters (all
-characters are 4 bits wide).  We represent a register as 16 bytes,
-storing memory characters in the low nybbles and status characters in
-the high nybbles of the first four bytes.  This necessitates a
-read/modify/write on each write, as MAME doesn't cater for nybble lane
-select.
+characters are 4 bits wide).  We represent memory and status as separate
+address spaces, storing one nybble per byte.
 
 I/O is similarly unusual.  It's assumed that there's one 4-bit I/O port
 per 256 bytes of ROM.  The upper four bits of RC select the ROM I/O port
@@ -30,24 +26,28 @@ upper two bits of RC along with the lower three bits of CR select the
 RAM output port for WMP instructions.  This isn't too bad, but it's
 complicated by the GPIO peripherals.  These chips respond to WRR/RDR,
 but can be wired to the CM-RAM lines, so they can be selected by the
-combination of the lower three bits of RC along with the upper four bits
+combination of the lower three bits of CR along with the upper four bits
 of RC.  On top of this, the 4289 latches the entire RC value on its A
 outputs at X1, allowing for a flat 8-bit I/O space using the WRR/RDR
-instructions, as well as having CM lines for devices selection.  This
+instructions, as well as having CM lines for device selection.  This
 means we need 12 bits to represent the entire range of possibilities
-using the WRR/RDR instructions.  At this point, we're placing the
-ROM/RAM select in bit 12, CR in bits 11-8, and RC in bits 7-0.  Ideally
-we'd be able to put the RAM output ports in a separate address space,
-but we're already running out.
+using the WRR/RDR instructions.
 
-         CR     RC
-4001: 0 B--- RRRR----
-4002: 1 -CCC RR------
-4207: 0 BCCC 11PP----
-4209: 0 BCCC 11PP----
-4211: 0 BCCC 11PP----
-4289: 0 B--- AAAAAAAA
-4308: 0 B--- RRPP----
+The WRR/RDR instructions operate on a flat 11- or 12-bit address space,
+depending on whether the CPU has ROM banking support.  You can use
+AM_MIRROR to mask out unused chip select lines, and then shift the
+offset to mask out unused RC bits.
+
+       CR     RC
+4001: B--- RRRR----
+4207: BCCC 11PP----
+4209: BCCC 11PP----
+4211: BCCC 11PP----
+4289: B--- AAAAAAAA
+4308: B--- RRPP----
+
+The WMP instruction operates on a 5-bit address space - three low bits
+of CR and two high bits of RC.
 
 The "program memory" space is separate from the instruction, I/O and
 opcode spaces.  It's accessed via a 4008/4009 pair, or a 4289.  With a
@@ -65,7 +65,6 @@ write-back, using the RC value as the address and the first/last signal
 as nybble lane select.
 
 TODO: 4040 interrupt support (including BBS, EIN, DIN instructions)
-TODO: expose data bus
 */
 
 
@@ -93,11 +92,17 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 		unsigned index_reg_cnt,
 		unsigned cr_mask)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 11, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 13, 0)
-	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, rom_width, 0)
-	, m_program(nullptr), m_data(nullptr), m_io(nullptr), m_opcodes(nullptr), m_direct(nullptr)
+	, m_space_config{
+			{ "rom",     ENDIANNESS_LITTLE, 8, u8(rom_width),     0 },
+			{ "ram",     ENDIANNESS_LITTLE, 8, u8(11),            0 },
+			{ "romport", ENDIANNESS_LITTLE, 8, u8(rom_width - 1), 0 },
+			{ "unused",  ENDIANNESS_LITTLE, 8, u8(0),             0 },
+			{ "status",  ENDIANNESS_LITTLE, 8, u8(9),             0 },
+			{ "ramport", ENDIANNESS_LITTLE, 8, u8(5),             0 },
+			{ "program", ENDIANNESS_LITTLE, 8, u8(rom_width - 3), 0 }, }
+	, m_spaces{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }
+	, m_direct(nullptr)
+	, m_bus_cycle_cb()
 	, m_sync_cb(*this)
 	, m_cm_rom_cb{ { *this }, { *this } }
 	, m_cm_ram_cb{ { *this }, { *this }, { *this }, { *this }, }
@@ -130,12 +135,15 @@ void mcs40_cpu_device_base::device_start()
 {
 	m_icountptr = &m_icount;
 
-	m_program = &space(AS_PROGRAM);
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
-	m_opcodes = &space(AS_OPCODES);
-	m_direct = &m_opcodes->direct();
+	m_spaces[AS_ROM]            = &space(AS_ROM);
+	m_spaces[AS_RAM_MEMORY]     = &space(AS_RAM_MEMORY);
+	m_spaces[AS_ROM_PORTS]      = &space(AS_ROM_PORTS);
+	m_spaces[AS_RAM_STATUS]     = &space(AS_RAM_STATUS);
+	m_spaces[AS_RAM_PORTS]      = &space(AS_RAM_PORTS);
+	m_spaces[AS_PROGRAM_MEMORY] = &space(AS_PROGRAM_MEMORY);
+	m_direct = &m_spaces[AS_ROM]->direct();
 
+	m_bus_cycle_cb.bind_relative_to(*owner());
 	m_sync_cb.resolve_safe();
 	m_cm_rom_cb[0].resolve_safe();
 	m_cm_rom_cb[1].resolve_safe();
@@ -326,11 +334,12 @@ void mcs40_cpu_device_base::execute_run()
 std::vector<std::pair<int, const address_space_config *>> mcs40_cpu_device_base::memory_space_config() const
 {
 	return std::vector<std::pair<int, const address_space_config *>> {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config),
-		std::make_pair(AS_IO,      &m_io_config),
-		std::make_pair(AS_OPCODES, &m_opcodes_config)
-	};
+			std::make_pair(AS_ROM,            &m_space_config[AS_ROM]),
+			std::make_pair(AS_RAM_MEMORY,     &m_space_config[AS_RAM_MEMORY]),
+			std::make_pair(AS_ROM_PORTS,      &m_space_config[AS_ROM_PORTS]),
+			std::make_pair(AS_RAM_STATUS,     &m_space_config[AS_RAM_STATUS]),
+			std::make_pair(AS_RAM_PORTS,      &m_space_config[AS_RAM_PORTS]),
+			std::make_pair(AS_PROGRAM_MEMORY, &m_space_config[AS_PROGRAM_MEMORY]) };
 }
 
 
@@ -528,40 +537,39 @@ inline void mcs40_cpu_device_base::set_rc(u8 val)
 
 inline u8 mcs40_cpu_device_base::read_memory()
 {
-	return m_data->read_byte((u16(m_cr & 0x7U) << 8) | m_latched_rc) & 0x0fU;
+	return m_spaces[AS_RAM_MEMORY]->read_byte((u16(m_cr & 0x7U) << 8) | m_latched_rc) & 0x0fU;
 }
 
 inline void mcs40_cpu_device_base::write_memory(u8 val)
 {
-	u16 const addr((u16(m_cr & 0x7U) << 8) | m_latched_rc);
-	m_data->write_byte(addr, (m_data->read_byte(addr) & 0xf0U) | (val & 0x0fU));
+	m_spaces[AS_RAM_MEMORY]->write_byte((u16(m_cr & 0x7U) << 8) | m_latched_rc, val & 0x0fU);
 }
 
 inline u8 mcs40_cpu_device_base::read_status()
 {
-	u16 const addr((((u16(m_cr) << 8) | m_latched_rc) & 0x07f0U) | (m_opa & 0x0003U));
-	return (m_data->read_byte(addr) >> 4) & 0x0fU;
+	u16 const addr((((u16(m_cr) << 6) | (m_latched_rc >> 2)) & 0x01fcU) | (m_opa & 0x0003U));
+	return m_spaces[AS_RAM_STATUS]->read_byte(addr) & 0x0fU;
 }
 
 inline void mcs40_cpu_device_base::write_status(u8 val)
 {
-	u16 const addr((((u16(m_cr) << 8) | m_latched_rc) & 0x07f0U) | (m_opa & 0x0003U));
-	m_data->write_byte(addr, (m_data->read_byte(addr) & 0x0fU) | (val << 4));
+	u16 const addr((((u16(m_cr) << 6) | (m_latched_rc >> 2)) & 0x01fcU) | (m_opa & 0x0003U));
+	m_spaces[AS_RAM_STATUS]->write_byte(addr, val & 0x0fU);
 }
 
 inline u8 mcs40_cpu_device_base::read_rom_port()
 {
-	return m_io->read_byte((u16(m_cr) << 8) | m_latched_rc) & 0x0fU;
+	return m_spaces[AS_ROM_PORTS]->read_byte((u16(m_cr) << 8) | m_latched_rc) & 0x0fU;
 }
 
 inline void mcs40_cpu_device_base::write_rom_port(u8 val)
 {
-	m_io->write_byte((u16(m_cr) << 8) | m_latched_rc, val & 0x0fU);
+	m_spaces[AS_ROM_PORTS]->write_byte((u16(m_cr) << 8) | m_latched_rc, val & 0x0fU);
 }
 
 inline void mcs40_cpu_device_base::write_memory_port(u8 val)
 {
-	m_io->write_byte(0x1000U | (u16(m_cr) << 8) | m_latched_rc, val & 0x0fU);
+	m_spaces[AS_RAM_PORTS]->write_byte(((m_cr << 2) & 0x1cU) | (m_latched_rc >> 6), val & 0x0fU);
 }
 
 
@@ -615,43 +623,38 @@ inline void mcs40_cpu_device_base::do_a1()
 	m_sync_cb(1);
 	update_4289_pm(1U);
 	update_4289_f_l(1U);
-	// low nybble of ROM address is output here
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::A1, 1U, m_rom_addr & 0x000fU);
 }
 
 inline void mcs40_cpu_device_base::do_a2()
 {
-	// mid nybble of ROM address is output here
 	m_4289_a = (m_4289_a & 0x0fU) | (m_rom_addr & 0xf0U);
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::A2, 1U, (m_rom_addr >> 4) & 0x000fU);
 }
 
 inline void mcs40_cpu_device_base::do_a3()
 {
-	// high nybble of ROM address is output here
 	m_4289_c = (m_rom_addr >> 8) & 0x0fU;
 	update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
+	update_cm_ram(f_cm_ram_table[m_cr & 0x07U]);
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::A3, 1U, (m_rom_addr >> 8) & 0x000fU);
 }
 
 inline void mcs40_cpu_device_base::do_m1()
 {
-	// OPR is read here
 	if (!m_extended_cm || (cycle::OP != m_cycle))
-		update_cm_rom(0x03);
-	else
-		update_cm_ram(f_cm_ram_table[m_cr & 0x07U]);
-	// TODO: split this up into two nybble reads - MAME doesn't support this
+	{
+		update_cm_rom(0x03U);
+		update_cm_rom(0x0fU);
+	}
+	// TODO: just read the high nybble here - MAME doesn't support this
 	u8 const read = m_direct->read_byte(rom_bank() | m_rom_addr);
 	if (cycle::OP == m_cycle)
 	{
-		if (m_stop_ff)
-		{
-			m_opr = 0x0U;
-			m_opa = 0x0U;
-		}
-		else
-		{
-			m_opr = read >> 4;
-			m_opa = read & 0x0fU;
-		}
+		m_opr = (m_stop_ff) ? 0x0U : (read >> 4);
 		m_io_pending = is_io_op(m_opr);
 	}
 	else
@@ -659,11 +662,18 @@ inline void mcs40_cpu_device_base::do_m1()
 		m_arg = read;
 	}
 	m_decoded_halt = false;
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::M1, 1U, (read >> 4) & 0x0fU);
 }
 
 inline void mcs40_cpu_device_base::do_m2()
 {
-	// OPA is read here
+	// TODO: just read the low nybble here - MAME doesn't support this
+	u8 const read = m_direct->read_byte(rom_bank() | m_rom_addr);
+	if (cycle::OP == m_cycle)
+		m_opa = (m_stop_ff) ? 0x0U : (read & 0x0fU);
+	else
+		m_arg = read;
 	if (m_io_pending)
 	{
 		update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
@@ -671,13 +681,20 @@ inline void mcs40_cpu_device_base::do_m2()
 	}
 	m_resume = m_stop_latch && (CLEAR_LINE == m_stp);
 	m_stop_latch = CLEAR_LINE != m_stp;
-	if (!m_stop_ff && (cycle::IN != m_cycle))
-		m_rom_addr = pc() = (pc() + 1) & 0x0fff;
+	if (!m_stop_ff)
+	{
+		if (cycle::IN != m_cycle)
+			pc() = (pc() + 1) & 0x0fff;
+		m_rom_addr = pc();
+	}
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::M2, 1U, read & 0x0fU);
 }
 
 inline void mcs40_cpu_device_base::do_x1()
 {
-	// A or OPA is output here
+	// FIXME: is 4004 output on the second cycle of two-cycle instruction OPA or low nybble of the argument?
+	u8 const output(m_extended_cm ? m_a : (cycle::OP == m_cycle) ? m_opa : m_arg);
 	update_cy(m_c);
 	update_cm_rom(0x03U);
 	update_cm_ram(0x0fU);
@@ -704,20 +721,23 @@ inline void mcs40_cpu_device_base::do_x1()
 		update_4289_f_l(m_4289_first ? 0x01 : 0x00);
 		m_4289_first = !m_4289_first;
 		if (pmem::READ == m_program_op)
-			m_arg = m_program->read_byte(program_addr()) & 0x0fU;
+			m_arg = m_spaces[AS_PROGRAM_MEMORY]->read_byte(program_addr()) & 0x0fU;
 		else
 			assert(pmem::WRITE == m_program_op);
 	}
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::X1, 1U, output);
 }
 
 void mcs40_cpu_device_base::do_x2()
 {
+	u8 output((m_new_rc >> 4) & 0x0fU); // FIXME: what appears on the bus if it isn't SRC, I/O or program memory access?
 	if (m_io_pending)
 	{
 		assert(phase::X2 == m_phase);
 		assert(m_latched_rc == m_new_rc);
 		assert(!m_rc_pending);
-		do_io(m_opr, m_opa);
+		output = do_io(m_opr, m_opa);
 		m_io_pending = false;
 	}
 	if (m_rc_pending)
@@ -725,13 +745,18 @@ void mcs40_cpu_device_base::do_x2()
 		update_cm_rom(BIT(m_cr, 3) ? 0x01U : 0x02U);
 		update_cm_ram(f_cm_ram_table[m_cr & 0x07U]);
 		m_latched_rc = (m_latched_rc & 0x0fU) | (m_new_rc & 0xf0U);
+		output = (m_new_rc >> 4) & 0x0fU;
 	}
 	else
 	{
 		assert(m_latched_rc == m_new_rc);
 	}
 	if (pmem::READ == m_program_op)
-		set_a(m_arg);
+		set_a(output = m_arg & 0x0fU);
+	else if (pmem::WRITE == m_program_op)
+		output = get_a();
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::X2, 1U, output);
 }
 
 void mcs40_cpu_device_base::do_x3()
@@ -749,7 +774,7 @@ void mcs40_cpu_device_base::do_x3()
 		assert(m_latched_rc == m_new_rc);
 	}
 	if (pmem::WRITE == m_program_op)
-		m_program->write_byte(program_addr(), get_a());
+		m_spaces[AS_PROGRAM_MEMORY]->write_byte(program_addr(), get_a());
 	if (!m_stop_ff && m_decoded_halt)
 	{
 		m_stop_ff = true;
@@ -761,6 +786,8 @@ void mcs40_cpu_device_base::do_x3()
 		m_stp_ack_cb(1U);
 	}
 	m_resume = false;
+	if (!m_bus_cycle_cb.isnull())
+		m_bus_cycle_cb(phase::X3, 0U, m_new_rc & 0x0fU); // FIXME: what appears on the bus if it isn't SRC?
 }
 
 
@@ -1049,7 +1076,7 @@ void i4004_cpu_device::do_cycle2(u8 opr, u8 opa, u8 arg)
 		break;
 
 	case 0x3: // FIN
-		assert(BIT(opa, 0));
+		assert(!BIT(opa, 0));
 		index_reg_pair(opa >> 1) = arg;
 		break;
 
@@ -1076,46 +1103,57 @@ void i4004_cpu_device::do_cycle2(u8 opr, u8 opa, u8 arg)
 	}
 }
 
-void i4004_cpu_device::do_io(u8 opr, u8 opa)
+u8 i4004_cpu_device::do_io(u8 opr, u8 opa)
 {
 	assert(0xe == opr);
+	u8 result;
 	switch (opa)
 	{
 	case 0x0: // WRM
-		write_memory(get_a());
-		break;
+		result = get_a();
+		write_memory(result);
+		return result;
 	case 0x1: // WMP
-		write_memory_port(get_a());
-		break;
+		result = get_a();
+		write_memory_port(result);
+		return result;
 	case 0x2: // WRR
-		write_rom_port(get_a());
-		break;
+		result = get_a();
+		write_rom_port(result);
+		return result;
 	case 0x3: // WPM
-		break;
+		// FIXME: with early 4002 chips this overwrites memory
+		return get_a();
 	case 0x4: // WR0
 	case 0x5: // WR1
 	case 0x6: // WR2
 	case 0x7: // WR3
-		write_status(get_a());
-		break;
+		result = get_a();
+		write_status(result);
+		return result;
 	case 0x8: // SBM
-		set_a_c(get_a() + (read_memory() ^ 0x0fU) + (get_c() ^ 0x01U));
-		break;
+		result = read_memory();
+		set_a_c(get_a() + (result ^ 0x0fU) + (get_c() ^ 0x01U));
+		return result;
 	case 0x9: // RDM
-		set_a(read_memory());
-		break;
+		result = read_memory();
+		set_a(result);
+		return result;
 	case 0xa: // RDR
-		set_a(read_rom_port());
-		break;
+		result = read_rom_port();
+		set_a(result);
+		return result;
 	case 0xb: // ADM
-		set_a_c(get_a() + read_memory() + get_c());
-		break;
+		result = read_memory();
+		set_a_c(get_a() + result + get_c());
+		return result;
 	case 0xc: // RD0
 	case 0xd: // RD1
 	case 0xe: // RD2
 	case 0xf: // RD3
-		set_a(read_status());
-		break;
+		result = read_status();
+		set_a(result);
+		return result;
 	default: // something is badly wrong if we get here
 		throw false;
 	}

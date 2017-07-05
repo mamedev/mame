@@ -99,23 +99,31 @@ WRITE8_MEMBER(busicom_state::printer_ctrl_w)
 {
 }
 
-static ADDRESS_MAP_START(busicom_rom, AS_OPCODES, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_rom, i4004_cpu_device::AS_ROM, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x04FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(busicom_mem, AS_DATA, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_mem, i4004_cpu_device::AS_RAM_MEMORY, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07F) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( busicom_io , AS_IO, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_stat, i4004_cpu_device::AS_RAM_STATUS, 8, busicom_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x01F) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( busicom_rp, i4004_cpu_device::AS_ROM_PORTS, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_WRITE(shifter_w) // ROM0 I/O
 	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0700) AM_READWRITE(keyboard_r,printer_ctrl_w) // ROM1 I/O
 	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x0700) AM_READ(printer_r)  // ROM2 I/O
-	AM_RANGE(0x1000, 0x103f) AM_MIRROR(0x0700) AM_WRITE(printer_w) // RAM0 output
-	AM_RANGE(0x1040, 0x105f) AM_MIRROR(0x0800) AM_WRITE(status_w)  // RAM1 output
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( busicom_mp, i4004_cpu_device::AS_RAM_PORTS, 8, busicom_state )
+	AM_RANGE(0x00, 0x00) AM_WRITE(printer_w) // RAM0 output
+	AM_RANGE(0x01, 0x01) AM_WRITE(status_w)  // RAM1 output
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -214,10 +222,11 @@ void busicom_state::machine_reset()
 static MACHINE_CONFIG_START( busicom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, 750000)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(busicom_rom)
-	MCFG_CPU_DATA_MAP(busicom_mem)
-	MCFG_CPU_IO_MAP(busicom_io)
-
+	MCFG_I4004_ROM_MAP(busicom_rom)
+	MCFG_I4004_RAM_MEMORY_MAP(busicom_mem)
+	MCFG_I4004_ROM_PORTS_MAP(busicom_rp)
+	MCFG_I4004_RAM_STATUS_MAP(busicom_stat)
+	MCFG_I4004_RAM_PORTS_MAP(busicom_mp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
