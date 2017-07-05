@@ -73,6 +73,40 @@ void device_sound_interface::static_reset_routes(device_t &device)
 
 
 //-------------------------------------------------
+//  static_add_reference_input - configuration
+//  helper to add a new fixed reference input
+//-------------------------------------------------
+
+void device_sound_interface::static_add_reference_input(device_t &device, u32 input, double level)
+{
+	// find our sound interface
+	device_sound_interface *sound;
+	if (!device.interface(sound))
+		throw emu_fatalerror("MCFG_SOUND_REFERENCE_INPUT called on device '%s' with no sound interface", device.tag());
+
+	// append a new reference input to the list
+	sound->m_ref_list.push_back(std::make_unique<sound_reference_input>(input, level));
+}
+
+
+//-------------------------------------------------
+//  static_reset_reference_inputs - configuration
+//  helper to remove all fixed reference inputs
+//-------------------------------------------------
+
+void device_sound_interface::static_reset_reference_inputs(device_t &device)
+{
+	// find our sound interface
+	device_sound_interface *sound;
+	if (!device.interface(sound))
+		throw emu_fatalerror("MCFG_SOUND_REFERENCE_INPUTS_RESET called on device '%s' with no sound interface", device.tag());
+
+	// reset the reference input list
+	sound->m_ref_list.clear();
+}
+
+
+//-------------------------------------------------
 //  stream_alloc - allocate a stream implicitly
 //  associated with this device
 //-------------------------------------------------
@@ -298,6 +332,19 @@ void device_sound_interface::interface_pre_start()
 
 void device_sound_interface::interface_post_start()
 {
+	// iterate over reference inputs
+	for (auto &ref : refs())
+	{
+		// find the input stream to connect to
+		int streaminputnum;
+		sound_stream *inputstream = input_to_stream_input(ref->m_input, streaminputnum);
+		if (inputstream == nullptr)
+			fatalerror("Sound device '%s' fixes non-existant input %d\n", device().tag(), ref->m_input);
+
+		// set the reference input
+		inputstream->set_input(streaminputnum, nullptr, 0, 1.0, stream_sample_t(ref->m_level * 32768));
+	}
+
 	// iterate over all the sound devices
 	for (device_sound_interface &sound : sound_interface_iterator(m_device.machine().root_device()))
 	{
@@ -367,6 +414,21 @@ device_sound_interface::sound_route::sound_route(int output, int input, float ga
 {
 }
 
+
+
+//**************************************************************************
+//  FIXED REFERENCE INPUTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  sound_reference_input - constructor
+//-------------------------------------------------
+
+device_sound_interface::sound_reference_input::sound_reference_input(u32 input, double level)
+	: m_input(input),
+		m_level(level)
+{
+}
 
 
 //**************************************************************************

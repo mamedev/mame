@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "csd.h"
-#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -46,8 +45,7 @@ MACHINE_CONFIG_MEMBER(midway_cheap_squeak_deluxe_device::device_add_mconfig)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_cheap_squeak_deluxe_device, irq_w))
 
 	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

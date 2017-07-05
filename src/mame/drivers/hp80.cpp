@@ -14,7 +14,6 @@
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "machine/1ma6.h"
 #include "bus/hp80_optroms/hp80_optrom.h"
 #include "softlist.h"
@@ -1354,9 +1353,7 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac" , DAC_1BIT , 0)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
 	MCFG_SOUND_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
 

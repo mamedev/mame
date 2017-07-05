@@ -225,10 +225,10 @@ int sound_stream::input_source_outputnum(int inputnum) const
 //  set_input - configure a stream's input
 //-------------------------------------------------
 
-void sound_stream::set_input(int index, sound_stream *input_stream, int output_index, float gain)
+void sound_stream::set_input(int index, sound_stream *input_stream, int output_index, float gain, stream_sample_t level)
 {
-	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag(),
-			index, (void *)input_stream, output_index, (double) gain));
+	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f, %d)\n", (void *)this, m_device.tag(),
+			index, (void *)input_stream, output_index, (double) gain, level));
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
@@ -247,6 +247,7 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 	input.m_source = (input_stream != nullptr) ? &input_stream->m_output[output_index] : nullptr;
 	input.m_gain = int(0x100 * gain);
 	input.m_user_gain = 0x100;
+	input.m_default_level = level;
 
 	// update the dependent info
 	if (input.m_source != nullptr)
@@ -442,7 +443,7 @@ void sound_stream::apply_sample_rate_changes()
 
 	// clear out the buffer
 	for (auto & elem : m_output)
-		memset(&elem.m_buffer[0], 0, m_max_samples_per_update * sizeof(elem.m_buffer[0]));
+		std::fill(&elem.m_buffer[0], &elem.m_buffer[m_max_samples_per_update], 0);
 }
 
 
@@ -537,11 +538,8 @@ void sound_stream::allocate_resample_buffers()
 		m_resample_bufalloc = bufsize;
 
 		// iterate over outputs and realloc their buffers
-		for (auto & elem : m_input) {
-			unsigned int old_size = elem.m_resample.size();
-			elem.m_resample.resize(m_resample_bufalloc);
-			memset(&elem.m_resample[old_size], 0, (m_resample_bufalloc - old_size)*sizeof(elem.m_resample[0]));
-		}
+		for (auto & elem : m_input)
+			elem.m_resample.resize(m_resample_bufalloc, elem.m_default_level);
 	}
 }
 
@@ -561,11 +559,8 @@ void sound_stream::allocate_output_buffers()
 		m_output_bufalloc = bufsize;
 
 		// iterate over outputs and realloc their buffers
-		for (auto & elem : m_output) {
-			unsigned int old_size = elem.m_buffer.size();
-			elem.m_buffer.resize(m_output_bufalloc);
-			memset(&elem.m_buffer[old_size], 0, (m_output_bufalloc - old_size)*sizeof(elem.m_buffer[0]));
-		}
+		for (auto & elem : m_output)
+			elem.m_buffer.resize(m_output_bufalloc, 0);
 	}
 }
 
@@ -581,7 +576,7 @@ void sound_stream::postload()
 
 	// make sure our output buffers are fully cleared
 	for (auto & elem : m_output)
-		memset(&elem.m_buffer[0], 0, m_output_bufalloc * sizeof(elem.m_buffer[0]));
+		std::fill(&elem.m_buffer[0], &elem.m_buffer[m_output_bufalloc], 0);
 
 	// recompute the sample indexes to make sense
 	m_output_sampindex = m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample;
@@ -654,7 +649,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, u32 
 	stream_sample_t *dest = &input.m_resample[0];
 	if (input.m_source == nullptr)
 	{
-		memset(dest, 0, numsamples * sizeof(*dest));
+		std::fill(&dest[0], &dest[numsamples], input.m_default_level);
 		return &input.m_resample[0];
 	}
 
@@ -776,7 +771,8 @@ sound_stream::stream_input::stream_input()
 	: m_source(nullptr),
 		m_latency_attoseconds(0),
 		m_gain(0x100),
-		m_user_gain(0x100)
+		m_user_gain(0x100),
+		m_default_level(0)
 {
 }
 
