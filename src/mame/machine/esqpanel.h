@@ -8,6 +8,8 @@
 #include "machine/esqvfd.h"
 #include "machine/esqlcd.h"
 
+#include <vector>
+
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
@@ -27,7 +29,16 @@
 #define MCFG_ESQPANEL2X40_REPLACE(_tag) \
 	MCFG_DEVICE_REPLACE(_tag, ESQPANEL2X40, 0)
 
-#define MCFG_ESQPANEL_2X40_REMOVE(_tag) \
+#define MCFG_ESQPANEL2X40_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
+
+#define MCFG_ESQPANEL2X40_VFX_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ESQPANEL2X40_VFX, 0)
+
+#define MCFG_ESQPANEL2X40_VFX_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, ESQPANEL2X40_VFX, 0)
+
+#define MCFG_ESQPANEL2X40_VFX_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ESQPANEL2X16_SQ1_ADD(_tag) \
@@ -51,11 +62,20 @@
 
 // ======================> esqpanel_device
 
+class esqpanel_external_panel_server;
+
 class esqpanel_device : public device_t, public device_serial_interface
 {
 public:
-	template <class Object> static devcb_base &set_tx_wr_callback(device_t &device, Object &&cb) { return downcast<esqpanel_device &>(device).m_write_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_analog_wr_callback(device_t &device, Object &&cb) { return downcast<esqpanel_device &>(device).m_write_analog.set_callback(std::forward<Object>(cb)); }
+	template <class Object>
+	static devcb_base &set_tx_wr_callback(device_t &device, Object &&cb) { 
+		return downcast<esqpanel_device &>(device).m_write_tx.set_callback(std::forward<Object>(cb));
+	}
+	
+	template <class Object>
+	static devcb_base &set_analog_wr_callback(device_t &device, Object &&cb) { 
+		return downcast<esqpanel_device &>(device).m_write_analog.set_callback(std::forward<Object>(cb)); 
+	}
 
 	void xmit_char(uint8_t data);
 	void set_analog_value(offs_t offset, uint16_t value);
@@ -67,6 +87,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_stop() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
@@ -76,7 +97,17 @@ protected:
 
 	virtual void send_to_display(uint8_t data) = 0;
 
-	bool m_eps_mode;
+	void check_external_panel_server();
+
+	virtual const std::string get_front_panel_html_file() const { return ""; }
+	virtual const std::string get_front_panel_js_file() const { return ""; }
+	virtual bool write_contents(std::ostream &o) { return false; }
+
+	std::vector<uint8_t> m_light_states;
+
+  	bool m_eps_mode;
+  		  
+	esqpanel_external_panel_server *m_external_panel_server;
 
 private:
 	static const int XMIT_RING_SIZE = 16;
@@ -89,6 +120,8 @@ private:
 	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;
+
+	emu_timer *m_external_timer;
 };
 
 class esqpanel1x22_device : public esqpanel_device {
@@ -113,6 +146,26 @@ protected:
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
 	required_device<esq2x40_device> m_vfd;
+};
+
+class esqpanel2x40_vfx_device : public esqpanel_device {
+public:
+	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
+
+	virtual const std::string get_front_panel_html_file() const override { return "/esqpanel/vfx/FrontPanel.html"; }
+	virtual const std::string get_front_panel_js_file() const override { return "/esqpanel/vfx/FrontPanel.js"; }
+	virtual bool write_contents(std::ostream &o) override;
+
+	required_device<esq2x40_device> m_vfd;
+
+private:
+	static const char *html;
+	static const char *js;
 };
 
 class esqpanel2x40_sq1_device : public esqpanel_device {
@@ -142,6 +195,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(ESQPANEL1X22,     esqpanel1x22_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X40,     esqpanel2x40_device)
+DECLARE_DEVICE_TYPE(ESQPANEL2X40_VFX, esqpanel2x40_vfx_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X40_SQ1, esqpanel2x40_sq1_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X16_SQ1, esqpanel2x16_sq1_device)
 
