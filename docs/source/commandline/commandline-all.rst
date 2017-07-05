@@ -208,6 +208,19 @@ OSD CLI options
 
 
 
+OSD output options
+------------------
+
+**\-output**
+
+	Chooses how MAME will handle processing of output notifiers.
+	
+	you can choose from: auto, none, console or network
+	
+	Note that network port is fixed at 8000.
+
+
+
 Configuration options
 ---------------------
 
