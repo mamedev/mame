@@ -32138,8 +32138,9 @@ replica1                        // Makerbot Replicator 1 desktop 3d printer
 
 @source:retofinv.cpp
 retofinv                        // A37 (c) 1985 Taito Corporation
-retofinv1                       // bootleg
-retofinv2                       // bootleg
+retofinvb                       // bootleg
+retofinvb1                      // bootleg
+retofinvb2                      // bootleg
 
 @source:rex6000.cpp
 ds2                             //
