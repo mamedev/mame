@@ -159,7 +159,6 @@ public:
 
 	void on_open(http_manager::websocket_connection_ptr connection)
 	{
-		// printf("accepting incoming connection\n");
 		using namespace std::placeholders;
 
 		std::lock_guard<std::recursive_mutex> lock(m_mutex);
@@ -234,13 +233,11 @@ public:
 
 	void on_document_request(http_manager::http_request_ptr request, http_manager::http_response_ptr response, const std::string &filename)
 	{
-		// printf("serving document '%s' for path '%s'\n", filename.c_str(), request->get_path().c_str());
 		m_server->serve_document(request, response, filename);
 	}
 
 	void on_template_request(http_manager::http_request_ptr request, http_manager::http_response_ptr response, const std::string &filename)
 	{
-		// printf("serving template '%s' for path '%s'\n", filename.c_str(), request->get_path().c_str());
 		using namespace std::placeholders;
 		m_server->serve_template(request, response, filename, std::bind(&esqpanel_external_panel_server::get_template_value, this, _1), '$', '$');
 	}
@@ -284,7 +281,6 @@ public:
 		m_server->remove_http_handler(path);
 		if (filename != "")
 		{
-			// printf("adding document '%s' at path '%s\n", filename.c_str(), path.c_str());
 			using namespace std::placeholders;
 			m_server->add_http_handler(path, std::bind(&esqpanel_external_panel_server::on_document_request, this, _1, _2, filename));
 		}
@@ -295,7 +291,6 @@ public:
 		m_server->remove_http_handler(path);
 		if (filename != "")
 		{
-			// printf("adding template '%s' at path '%s\n", filename.c_str(), path.c_str());
 			using namespace std::placeholders;
 			m_server->add_http_handler(path, std::bind(&esqpanel_external_panel_server::on_template_request, this, _1, _2, filename));
 		}

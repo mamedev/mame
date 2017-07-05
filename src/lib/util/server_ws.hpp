@@ -53,7 +53,7 @@ namespace webpp {
 	public:
 		virtual ~SocketServerBase() {}
 
-		class SendStream : public std::ostream {
+		class SendStream : public std::ostream, public std::enable_shared_from_this<SendStream> {
 			friend class SocketServerBase<socket_type>;
 
 			asio::streambuf streambuf;
@@ -65,7 +65,7 @@ namespace webpp {
 		};
 
 
-		class Connection {
+		class Connection : public std::enable_shared_from_this<Connection> {
 			friend class SocketServerBase<socket_type>;
 			friend class SocketServer<socket_type>;
 
@@ -80,6 +80,10 @@ namespace webpp {
 
 			std::string remote_endpoint_address;
 			unsigned short remote_endpoint_port;
+			
+			std::shared_ptr<Connection> ptr() {
+				return this->shared_from_this();
+			}
 
 		private:
 			explicit Connection(socket_type *socket): remote_endpoint_port(0), socket(socket), strand(socket->get_io_service()), closed(false) { }
@@ -143,7 +147,7 @@ namespace webpp {
 			}
 		};
 
-		class Message : public std::istream {
+		class Message : public std::istream, public std::enable_shared_from_this<Message> {
 			friend class SocketServerBase<socket_type>;
 
 		public:
@@ -163,7 +167,7 @@ namespace webpp {
 			asio::streambuf streambuf;
 		};
 
-		class Endpoint {
+		class Endpoint : public std::enable_shared_from_this<Endpoint> {
 			friend class SocketServerBase<socket_type>;
 			std::unordered_set<std::shared_ptr<Connection> > connections;
 			std::mutex connections_mutex;

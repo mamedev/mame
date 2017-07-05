@@ -91,6 +91,8 @@ public:
 	
 		/** Closes this open Websocket connection. */
 		virtual void close() = 0;
+		
+		virtual ~websocket_connection() { }
 	};
 	typedef std::shared_ptr<websocket_connection> websocket_connection_ptr;
 
@@ -155,9 +157,9 @@ public:
 	/** Removes the websocket endpoint at the specified path. */
 	void remove_endpoint(const std::string &path);
 	
-	void on_open(http_manager::websocket_endpoint_ptr endpoint, void *connection);
+	void on_open(http_manager::websocket_endpoint_ptr endpoint, void *onnection);
 
-	void on_message(http_manager::websocket_endpoint_ptr endpoint, void *connection, void *message);
+	void on_message(http_manager::websocket_endpoint_ptr endpoint, void *connection, const std::string& payload, int opcode);
 
 	void on_close(http_manager::websocket_endpoint_ptr endpoint, void *connection, int status, const std::string& reason);
 

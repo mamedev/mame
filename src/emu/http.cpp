@@ -14,6 +14,10 @@ HTTP server handling
 #include <fstream>
 #include <modules/lib/osdobj_common.h>
 
+#include <inttypes.h>
+#include <stdint.h>
+
+
 const static struct mapping
 {
 	const char* extension;
@@ -218,6 +222,7 @@ struct http_response_impl : public http_manager::http_response {
 struct websocket_endpoint_impl : public http_manager::websocket_endpoint {
 	/** The underlying edpoint. */
 	std::shared_ptr<webpp::ws_server::Endpoint> m_endpoint;
+	
 	websocket_endpoint_impl(std::shared_ptr<webpp::ws_server::Endpoint> endpoint, 
 		http_manager::websocket_open_handler on_open,
 		http_manager::websocket_message_handler on_message,
@@ -347,25 +352,24 @@ static void on_get(http_manager::http_handler handler, std::shared_ptr<webpp::ht
 	response_impl->send();
 }
 
-void http_manager::on_open(http_manager::websocket_endpoint_ptr endpoint, void *conn) {
+void http_manager::on_open(http_manager::websocket_endpoint_ptr endpoint, void *connection) {
 	std::lock_guard<std::mutex> lock(m_connections_mutex);
 	webpp::ws_server *ws_server = m_wsserver.get();
-	std::shared_ptr<webpp::ws_server::Connection> connection(static_cast<webpp::ws_server::Connection *>(conn));
-	http_manager::websocket_connection_ptr connection_impl = m_connections[conn] = 
-		std::make_shared<websocket_connection_impl>(ws_server, connection);
+	// Keep an oening shared_ptr to the Connection, so it won't go away while we are using it.
+	std::shared_ptr<webpp::ws_server::Connection> conn = (static_cast<webpp::ws_server::Connection *>(connection))->ptr();
+	http_manager::websocket_connection_ptr connection_impl = std::make_shared<websocket_connection_impl>(ws_server, conn);
+	m_connections[connection] = connection_impl;
+		
 	if (endpoint->on_open) {
 		endpoint->on_open(connection_impl);
 	}
 }
 
-void http_manager::on_message(http_manager::websocket_endpoint_ptr endpoint, void *connection, void *msg) {
+void http_manager::on_message(http_manager::websocket_endpoint_ptr endpoint, void *connection, const std::string &payload, int opcode) {
 	if (endpoint->on_message) {
 		std::lock_guard<std::mutex> lock(m_connections_mutex);
 		auto i = m_connections.find(connection);
 		if (i != m_connections.end()) {
-			std::shared_ptr<webpp::ws_server::Message> message(static_cast<webpp::ws_server::Message *>(msg));
-			std::string payload = message->string();
-			int opcode = message->fin_rsv_opcode & 0x0f;
 			http_manager::websocket_connection_ptr websocket_connection_impl = (*i).second;
 			endpoint->on_message(websocket_connection_impl, payload, opcode);
 		}
@@ -377,11 +381,12 @@ void http_manager::on_close(http_manager::websocket_endpoint_ptr endpoint, void 
 	std::lock_guard<std::mutex> lock(m_connections_mutex);
 	auto i = m_connections.find(connection);
 	if (i != m_connections.end()) {
-		if (endpoint->on_message) {
+		if (endpoint->on_close) {
 			http_manager::websocket_connection_ptr websocket_connection_impl = (*i).second;
 			endpoint->on_close(websocket_connection_impl, status, reason);
 		}
-		m_connections.erase(i);
+		
+		m_connections.erase(connection);
 	}
 }
 
@@ -394,7 +399,8 @@ void http_manager::on_error(http_manager::websocket_endpoint_ptr endpoint, void 
 			http_manager::websocket_connection_ptr websocket_connection_impl = (*i).second;
 			endpoint->on_error(websocket_connection_impl, error_code);
 		}
-		m_connections.erase(i);
+
+		m_connections.erase(connection);
 	}
 }
 
@@ -513,20 +519,22 @@ http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::strin
 		std::shared_ptr<webpp::ws_server::Endpoint> endpoint_ptr(&endpoint);
 		auto endpoint_impl = std::make_shared<websocket_endpoint_impl>(endpoint_ptr, on_open, on_message, on_close, on_error);
 
-		endpoint.on_open = [&](std::shared_ptr<webpp::ws_server::Connection> conn) {
-			this->on_open(endpoint_impl, static_cast<void *>(conn.get()));
+		endpoint.on_open = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn) {
+			this->on_open(endpoint_impl, conn.get());
 		};
 		
-		endpoint.on_message = [&](std::shared_ptr<webpp::ws_server::Connection> conn, std::shared_ptr<webpp::ws_server::Message> msg) {
-			this->on_message(endpoint_impl, static_cast<void *>(conn.get()), static_cast<void *>(msg.get()));
+		endpoint.on_message = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn, std::shared_ptr<webpp::ws_server::Message> message) {
+			std::string payload = message->string();
+			int opcode = message->fin_rsv_opcode & 0x0f;
+			this->on_message(endpoint_impl, conn.get(), payload, opcode);
 		};
 		
-		endpoint.on_close =  [&](std::shared_ptr<webpp::ws_server::Connection> conn, int status, const std::string& reason) {
-			this->on_close(endpoint_impl, static_cast<void *>(conn.get()), status, reason);
+		endpoint.on_close = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn, int status, const std::string& reason) {
+			this->on_close(endpoint_impl, conn.get(), status, reason);
 		};
 		
-		endpoint.on_error =  [&](std::shared_ptr<webpp::ws_server::Connection> conn, const std::error_code& error_code) {
-			this->on_error(endpoint_impl, static_cast<void *>(conn.get()), error_code);
+		endpoint.on_error = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn, const std::error_code& error_code) {
+			this->on_error(endpoint_impl, conn.get(), error_code);
 		};
 		
 		m_endpoints[path] = endpoint_impl;
@@ -534,4 +542,8 @@ http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::strin
 	} else {
 		return (*i).second;
 	}
+}
+
+void http_manager::remove_endpoint(const std::string &path) {
+	m_endpoints.erase(path);
 }
