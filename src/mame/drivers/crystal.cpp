@@ -174,14 +174,14 @@ CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
        Player 1 Start Lamp   | E | 5 |         Coin Lamp
              +12             | F | 6 |             +12
 ------------ KEY ------------| G | 7 |------------ KEY -----------
-       Player 1 Start Lamp   | H | 8 |        Coin Counter
+       Player 2 Start Lamp   | H | 8 |        Coin Counter
         L Speaker (-)        | J | 9 |        L Speaker (+)
         R Speaker (-)        | K | 10|        R Speaker (+)
-        Video VSync          | L | 11|
+     Video Vertical Sync     | L | 11|
         Video Green          | M | 12|        Video Red
         Video Sync           | N | 13|        Video Blue
         Service Switch       | P | 14|        Video GND
-        Video HSync          | R | 15|        Test Switch
+    Video Horizontal Sync    | R | 15|        Test Switch
                              | S | 16|        Coin Switch
        Start Player 2        | T | 17|        Start Player 1 
                              | U | 18|
