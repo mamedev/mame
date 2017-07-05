@@ -26,6 +26,8 @@ class mame_machine_manager;
 // cli_frontend handles command-line processing and emulator execution
 class cli_frontend
 {
+	static const char s_softlist_xml_dtd[];
+
 public:
 	// construction/destruction
 	cli_frontend(emu_options &options, osd_interface &osd);
