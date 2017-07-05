@@ -803,6 +803,8 @@ static MACHINE_CONFIG_START( superman )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_TAITO_CCHIP_DEV_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,superman)
@@ -1051,8 +1053,8 @@ ROM_START( superman )
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, uPD78C11 with embedded 4K maskrom, 8k eprom, 8k RAM)  */
-	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage difference, see notes above */
@@ -1074,8 +1076,8 @@ ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage di
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
-	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 ROM_START( supermanj ) /* Shows a Japan copyright notice */
@@ -1097,8 +1099,8 @@ ROM_START( supermanj ) /* Shows a Japan copyright notice */
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
-	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 /*

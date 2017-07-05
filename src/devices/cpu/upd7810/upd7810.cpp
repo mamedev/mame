@@ -383,7 +383,11 @@ DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "uPD78C05")
 DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "uPD78C06")
 
 
-upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+static ADDRESS_MAP_START( upd_internal_map, AS_PROGRAM, 8, upd7810_device )
+	AM_RANGE(0xff00, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_to_func(*this)
 	, m_co0_func(*this)
@@ -409,12 +413,11 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pd_out_cb(*this)
 	, m_pf_out_cb(*this)
 	, m_pt_in_cb(*this)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
 {
 }
 
-upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7810, tag, owner, clock)
+void upd7810_device::configure_ops()
 {
 	m_opXX = s_opXX_7810;
 	m_op48 = s_op48;
@@ -426,8 +429,12 @@ upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, d
 	m_op74 = s_op74;
 }
 
-upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7807, tag, owner, clock)
+upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd7810_device(mconfig, UPD7810, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+{
+}
+
+void upd7807_device::configure_ops()
 {
 	m_opXX = s_opXX_7807;
 	m_op48 = s_op48;
@@ -439,8 +446,13 @@ upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, d
 	m_op74 = s_op74;
 }
 
-upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7801, tag, owner, clock)
+
+upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd7810_device(mconfig, UPD7807, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+{
+}
+
+void upd7801_device::configure_ops()
 {
 	m_op48 = s_op48_7801;
 	m_op4C = s_op4C_7801;
@@ -452,8 +464,12 @@ upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, d
 	m_opXX = s_opXX_7801;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd78c05_device(mconfig, UPD78C05, tag, owner, clock)
+upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd7810_device(mconfig, UPD7801, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+{
+}
+
+void upd78c05_device::configure_ops()
 {
 	m_op48 = s_op48_78c05;
 	m_op4C = s_op4C_78c05;
@@ -465,13 +481,17 @@ upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag,
 	m_opXX = s_opXX_78c05;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, type, tag, owner, clock)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd78c05_device(mconfig, UPD78C05, tag, owner, clock)
 {
 }
 
-upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd78c05_device(mconfig, UPD78C06, tag, owner, clock)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: upd7810_device(mconfig, type, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+{
+}
+
+void upd78c06_device::configure_ops()
 {
 	m_op48 = s_op48_78c06;
 	m_op4C = s_op4C_78c06;
@@ -481,6 +501,11 @@ upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag,
 	m_op70 = s_op70_78c06;
 	m_op74 = s_op74_78c06;
 	m_opXX = s_opXX_78c06;
+}
+
+upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd78c05_device(mconfig, UPD78C06, tag, owner, clock)
+{
 }
 
 std::vector<std::pair<int, const address_space_config *>> upd7810_device::memory_space_config() const
@@ -1571,6 +1596,8 @@ void upd7810_device::base_device_start()
 	m_pf_out_cb.resolve_safe();
 
 	m_pt_in_cb.resolve_safe(0); // TODO: uPD7807 only
+
+	configure_ops();
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));

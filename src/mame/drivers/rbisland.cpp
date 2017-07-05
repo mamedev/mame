@@ -637,6 +637,8 @@ static MACHINE_CONFIG_START( rbisland )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
 
+	MCFG_TAITO_CCHIP_DEV_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 
@@ -686,7 +688,7 @@ static MACHINE_CONFIG_START( jumping )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
-
+	
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough unless otherwise */
 
 
@@ -724,7 +726,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( jumpingi, jumping )
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
-		MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -740,8 +742,8 @@ ROM_START( rbisland )
 	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )
-	ROM_LOAD( "cchip_b22-15.53",            0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
@@ -765,8 +767,8 @@ ROM_START( rbislando )
 	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )
-	ROM_LOAD( "cchip_b22-15.53",            0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
@@ -790,8 +792,8 @@ ROM_START( rbislande )
 	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )
-	ROM_LOAD( "cchip_b39-05.53",            0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b39-05.53",            0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )

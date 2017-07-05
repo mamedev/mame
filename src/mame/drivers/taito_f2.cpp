@@ -614,34 +614,6 @@ WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 	}
 }
 
-/***************************************************************************
-
-    Mega Blast cchip emulation
-
-    C-Chip simply used as RAM, the game doesn't even bother to change banks.
-    It does read the chip id though. The dump is confirmed to be from an
-    original board.
-
-***************************************************************************/
-
-WRITE16_MEMBER(taitof2_state::cchip2_word_w)
-{
-	logerror("cchip2_w pc: %06x offset %04x: %02x\n", space.device().safe_pc(), offset, data);
-
-	COMBINE_DATA(&m_cchip2_ram[offset]);
-}
-
-READ16_MEMBER(taitof2_state::cchip2_word_r)
-{
-	/* C-Chip ID */
-	if (offset == 0x401)
-		return 0x01;
-
-	logerror("cchip2_r offset: %04x\n", offset);
-
-	return m_cchip2_ram[offset];
-}
-
 
 /***********************************************************
                      MEMORY STRUCTURES
@@ -681,7 +653,8 @@ static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x120000, 0x12000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_SHARE("cchip2_ram")
+	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE8("cchip", taito_cchip_device, mem_r, mem_w, 0x00ff)
+	AM_RANGE(0x180800, 0x180fff) AM_DEVREADWRITE8("cchip", taito_cchip_device, asic_r, asic_w, 0x00ff)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x40001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
@@ -2958,6 +2931,8 @@ static MACHINE_CONFIG_DERIVED( megab, taito_f2_tc0220ioc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megab_map)
 
+	MCFG_TAITO_CCHIP_DEV_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)
 	MCFG_SCREEN_MODIFY("screen")
@@ -3986,6 +3961,9 @@ ROM_START( megablst )
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )
 	ROM_LOAD16_BYTE( "c11-11.38",  0x40001, 0x20000, CRC(263ecbf9) SHA1(b49c59058d6d11ea0d9f9b041789e381e5742905) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
 
@@ -4019,6 +3997,9 @@ ROM_START( megablstu )
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )
 	ROM_LOAD16_BYTE( "c11-10.38",  0x40001, 0x20000, CRC(bf379a43) SHA1(2a0294e55c2ce514caa2885b728e6387311ed482) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
 
@@ -4043,6 +4024,9 @@ ROM_START( megablstj )
 	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) ) // c11-08.19
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) ) // c11-06.16
 	ROM_LOAD16_BYTE( "c11-09.38",  0x40001, 0x20000, CRC(c830aad5) SHA1(967ad3e052572300f5f49375e5f8348f2d595680) ) // c11-09.18
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
