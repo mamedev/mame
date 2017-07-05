@@ -11,8 +11,8 @@
 
 DECLARE_DEVICE_TYPE(TAITO_CCHIP_DEV, taito_cchip_device)
 
-#define MCFG_TAITO_CCHIP_DEV_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TAITO_CCHIP_DEV, 0)
+#define MCFG_TAITO_CCHIP_DEV_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, TAITO_CCHIP_DEV, _clock)
 
 
 class taito_cchip_device :  public device_t

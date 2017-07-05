@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( cchip_map, AS_PROGRAM, 8, taito_cchip_device )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_MEMBER( taito_cchip_device::device_add_mconfig )
-	MCFG_CPU_ADD("upd7811", UPD7811, XTAL_20MHz/4) // ? Mhz (guess)
+	MCFG_CPU_ADD("upd7811", UPD7811, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(cchip_map)
 #ifndef CCHIP_TEST
 	MCFG_DEVICE_DISABLE() 
