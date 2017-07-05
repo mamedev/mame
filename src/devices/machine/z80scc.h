@@ -631,6 +631,8 @@ protected:
 	// SCC specifics
 	int m_ph;       // Point high command to access regs 08-0f
 	uint8_t m_zc;
+
+	void check_waitrequest();
 };
 
 
