@@ -11,9 +11,9 @@
   Inputs from US Patent 4093232
   Some clues from PinMAME
 
-  Note: If F3 pressed, or you start the system, it will remember any
-        credits from last time. However, you still need to insert a coin
-        before the start button will work.
+  Note: If F3 pressed, it will remember any credits from last time.
+        However, you still need to insert a coin before the start button
+        will work.
 
   The input/output multiplexing on this machine is quite clever.  RAM0
   output connected to two 1-of-16 decoders.  These are strobed using
@@ -51,11 +51,16 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(coins_in);
 
+	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
+
+protected:
+	virtual void driver_start() override;
+
 private:
 	required_device<i4004_cpu_device>   m_maincpu;
 	required_ioport                     m_testport;
 	required_ioport                     m_coinport;
-	required_ioport_array<7>            m_switch;
+	required_ioport_array<16>           m_switch;
 
 	bool    m_cm_ram1 = false, m_cm_ram2 = false;
 	u8      m_ram0_output = 0U, m_rom0_output = 0U, m_rom1_output = 0U;
@@ -88,66 +93,160 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( flicker )
 	PORT_START("TEST")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Door Slam")     PORT_CODE(KEYCODE_HOME)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Door Slam")     PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 	PORT_BIT(0x001c, IP_ACTIVE_HIGH, IPT_UNKNOWN)  // called "two coins", "three coins", "four coins" in patent, purpose unknown
 	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, flicker_state, coins_in, nullptr)
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_TILT)
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Credit Button")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Credit Button")                         PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 	PORT_BIT(0x6000, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Test")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Test")                                  PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 
 	// The coin slot would be connected to one of the lines via a wire jumper on a terminal strip
 	PORT_START("COIN")
-	PORT_CONFNAME(0x3f, 0x01, DEF_STR(Coinage))
+	PORT_CONFNAME(0x3f, 0x01, DEF_STR(Coinage)) PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 	PORT_CONFSETTING(   0x01, DEF_STR(1C_1C))
 	PORT_CONFSETTING(   0x02, DEF_STR(1C_2C))
 	PORT_CONFSETTING(   0x04, DEF_STR(1C_3C))
 	PORT_CONFSETTING(   0x08, DEF_STR(1C_4C))
 	PORT_CONFSETTING(   0x10, DEF_STR(1C_5C))
 	PORT_CONFSETTING(   0x20, DEF_STR(1C_6C))
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN1)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 
 	PORT_START("SWITCH.0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left Lane Target") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/B\" Target")    PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left Lane 1000")   PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/A\" Target")    PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left Lane Target") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/B\" Target")    PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left Lane 1000")   PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/A\" Target")    PORT_CODE(KEYCODE_Y)
 
 	PORT_START("SWITCH.1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right Lane Target") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/C\" Target")     PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right Lane 1000")   PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/D\" Target")     PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right Lane Target") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/C\" Target")     PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right Lane 1000")   PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"/D\" Target")     PORT_CODE(KEYCODE_A)
 
 	PORT_START("SWITCH.2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Spinner")           PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x000e, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Spinner")           PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x0e, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("SWITCH.3")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("10's Target")       PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("100's Target")      PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Pot Bumper")        PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("3000 Hole")         PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("10's Target")       PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("100's Target")      PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Pot Bumper")        PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("3000 Hole")         PORT_CODE(KEYCODE_H)
 
 	PORT_START("SWITCH.4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("1000 Bonus")        PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("500 Targets")       PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Out Hole")          PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("1000 Bonus")        PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("500 Targets")       PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Out Hole")          PORT_CODE(KEYCODE_X)
 
 	PORT_START("SWITCH.5")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left 500 Out")      PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left Bumper")       PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right 500 Out")     PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right Bumper")      PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left 500 Out")      PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Left Bumper")       PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right 500 Out")     PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("Right Bumper")      PORT_CODE(KEYCODE_V)
 
 	PORT_START("SWITCH.6")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"A\" Target")      PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"B\" Target")      PORT_CODE(KEYCODE_N)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"C\" Target")      PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"D\" Target")      PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"A\" Target")      PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"B\" Target")      PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"C\" Target")      PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)  PORT_NAME("\"D\" Target")      PORT_CODE(KEYCODE_COMMA)
 
-	// TODO: what are the other things in this matrix?  FIVE-BALL, STRAIGHT, 15K-110K, etc.
+	PORT_START("SWITCH.7")
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("SWITCH.8")
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("SWITCH.9")
+	PORT_CONFNAME(0x01, 0x00, "Balls")
+	PORT_CONFSETTING(   0x00, "3")
+	PORT_CONFSETTING(   0x01, "5")
+	PORT_BIT(0x0e, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("SWITCH.A")
+	PORT_CONFNAME(0x01, 0x00, "Straight")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+	PORT_CONFNAME(0x02, 0x00, "Add-A-Ball")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x02, DEF_STR(On))
+	PORT_CONFNAME(0x04, 0x00, "Replay")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x04, DEF_STR(On))
+	PORT_CONFNAME(0x08, 0x00, "Match")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x08, DEF_STR(On))
+
+	PORT_START("SWITCH.B")
+	PORT_CONFNAME(0x01, 0x00, "15K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+	PORT_CONFNAME(0x02, 0x00, "20K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x02, DEF_STR(On))
+	PORT_CONFNAME(0x04, 0x00, "25K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x04, DEF_STR(On))
+	PORT_CONFNAME(0x08, 0x00, "30K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x08, DEF_STR(On))
+
+	PORT_START("SWITCH.C")
+	PORT_CONFNAME(0x01, 0x00, "35K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+	PORT_CONFNAME(0x02, 0x00, "40K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x02, DEF_STR(On))
+	PORT_CONFNAME(0x04, 0x00, "45K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x04, DEF_STR(On))
+	PORT_CONFNAME(0x08, 0x00, "50K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x08, DEF_STR(On))
+
+	PORT_START("SWITCH.D")
+	PORT_CONFNAME(0x01, 0x00, "55K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+	PORT_CONFNAME(0x02, 0x00, "60K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x02, DEF_STR(On))
+	PORT_CONFNAME(0x04, 0x00, "65K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x04, DEF_STR(On))
+	PORT_CONFNAME(0x08, 0x00, "70K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x08, DEF_STR(On))
+
+	PORT_START("SWITCH.E")
+	PORT_CONFNAME(0x01, 0x00, "75K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+	PORT_CONFNAME(0x02, 0x00, "80K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x02, DEF_STR(On))
+	PORT_CONFNAME(0x04, 0x00, "85K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x04, DEF_STR(On))
+	PORT_CONFNAME(0x08, 0x00, "90K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x08, DEF_STR(On))
+
+	PORT_START("SWITCH.F")
+	PORT_CONFNAME(0x01, 0x00, "95K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+	PORT_CONFNAME(0x02, 0x00, "100K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x02, DEF_STR(On))
+	PORT_CONFNAME(0x04, 0x00, "105K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x04, DEF_STR(On))
+	PORT_CONFNAME(0x08, 0x00, "110K")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x08, DEF_STR(On))
 INPUT_PORTS_END
 
 
@@ -192,17 +291,9 @@ WRITE_LINE_MEMBER(flicker_state::cm_ram1_w)
 		{
 			// TODO: BIT(m_rom1_output, 0) -> COIN ACC.
 		}
-		// TODO: these should be hooked up to input changed members as well
 		m_maincpu->set_input_line(I4004_TEST_LINE, BIT(m_testport->read(), m_mux_col));
 	}
 	m_cm_ram1 = !state;
-}
-
-
-CUSTOM_INPUT_MEMBER(flicker_state::coins_in)
-{
-	u8 const coins(m_coinport->read());
-	return BIT(coins, 7) ? (coins & 0x3f) : 0;
 }
 
 
@@ -248,6 +339,30 @@ WRITE_LINE_MEMBER(flicker_state::cm_ram2_w)
 }
 
 
+CUSTOM_INPUT_MEMBER(flicker_state::coins_in)
+{
+	u8 const coins(m_coinport->read());
+	return BIT(coins, 7) ? (coins & 0x3f) : 0;
+}
+
+
+INPUT_CHANGED_MEMBER(flicker_state::test_changed)
+{
+	m_maincpu->set_input_line(I4004_TEST_LINE, BIT(m_testport->read(), m_mux_col));
+}
+
+
+void flicker_state::driver_start()
+{
+	save_item(NAME(m_cm_ram1));
+	save_item(NAME(m_cm_ram2));
+	save_item(NAME(m_ram0_output));
+	save_item(NAME(m_rom0_output));
+	save_item(NAME(m_rom1_output));
+	save_item(NAME(m_relay_drive));
+}
+
+
 static MACHINE_CONFIG_START(flicker)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
@@ -258,9 +373,6 @@ static MACHINE_CONFIG_START(flicker)
 	MCFG_I4004_RAM_PORTS_MAP(flicker_ram_ports)
 	MCFG_I4004_CM_RAM1_CB(WRITELINE(flicker_state, cm_ram1_w))
 	MCFG_I4004_CM_RAM2_CB(WRITELINE(flicker_state, cm_ram2_w))
-
-	MCFG_NVRAM_ADD_0FILL("memory")
-	MCFG_NVRAM_ADD_0FILL("status")
 
 	// video
 	MCFG_DEFAULT_LAYOUT(layout_flicker)
@@ -276,4 +388,4 @@ ROM_START(flicker)
 ROM_END
 
 //    YEAR   GAME      PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION  COMPANY                            DESCRIPTION            FLAGS
-GAME( 1974,  flicker,  0,      flicker,  flicker, flicker_state,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1974,  flicker,  0,      flicker,  flicker, flicker_state,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
