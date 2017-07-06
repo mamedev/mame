@@ -225,11 +225,15 @@ void esq2x40_device::write_char(int data)
 		switch (data)
 		{
 			case 0xd0:  // blink start
-				m_curattr = AT_BLINK;
+				m_curattr |= AT_BLINK;
 				break;
 
 			case 0xd1:  // blink stop (cancel all attribs on VFX+)
 				m_curattr = 0; //&= ~AT_BLINK;
+				break;
+
+			case 0xd2:  // blinking underline on VFX
+				m_curattr |= AT_BLINK | AT_UNDERLINE;
 				break;
 
 			case 0xd3:  // start underline
@@ -277,6 +281,41 @@ void esq2x40_device::write_char(int data)
 
 	update_display();
 }
+
+bool esq2x40_device::write_contents(std::ostream &o)
+{
+	o.put((char) 0xd6); // clear screen
+
+	uint8_t attrs = 0;
+	for (int row = 0; row < 2; row++)
+	{
+		o.put((char) (0x80 + (40 * row))); // move to first column this row
+
+		for (int col = 0; col < 40; col++)
+		{
+			if (m_attrs[row][col] != attrs)
+			{
+				attrs = m_attrs[row][col];
+
+				o.put((char) 0xd1); // all attributes off
+
+				if (attrs & AT_BLINK)
+				{
+					o.put((char) 0xd0); // blink on
+				}
+
+				if (attrs & AT_UNDERLINE)
+				{
+					o.put((char) 0xd3); // underline
+				}
+			}
+
+			o.put((char) (m_chars[row][col] + ' '));
+		}
+	}
+	return true;
+}
+
 
 esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40, tag, owner, clock)
 {

@@ -28,7 +28,8 @@ public:
 
 	virtual void write_char(int data) = 0;
 	virtual void update_display();
-
+	virtual bool write_contents(std::ostream &o) { return false; }
+	
 	uint32_t conv_segments(uint16_t segin);
 
 protected:
@@ -71,6 +72,7 @@ public:
 	esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(int data) override;
+	virtual bool write_contents(std::ostream &o) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
