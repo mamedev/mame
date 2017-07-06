@@ -74,7 +74,7 @@ Bugs (all of these looks BTANBs):
 - flip screen doesn't work properly,
   game code explicitly sets flip screen off & the correlated work RAM buffer at 0xee2 no matter the dip setting
   
-- some service mode items are buggy or not functioning properly;
+- some service mode items are buggy or not functioning properly (font, color, inputs, sound, 2nd item);
 
 */
 
@@ -116,7 +116,6 @@ public:
 	DECLARE_READ8_MEMBER(blackt96_soundio_port02_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port02_w);
 	
-	
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	void tile_callback(int &tile, int& fx, int& fy, int& region);
 
@@ -129,8 +128,6 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-
 };
 
 TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
@@ -207,8 +204,8 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tilemapram") // text tilemap
 	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
-
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 ADDRESS_MAP_END
 
