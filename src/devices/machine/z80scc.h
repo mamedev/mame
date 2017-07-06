@@ -653,7 +653,7 @@ public:
 	template <class Object> static devcb_base &set_out_txdb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_dtrb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_rtsb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_weqb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_wreqb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wreqb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_wreqb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_syncb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rxdrqa_cb.set_callback(std::forward<Object>(cb)); }
