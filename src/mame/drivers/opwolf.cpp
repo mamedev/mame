@@ -918,6 +918,31 @@ MACHINE_CONFIG_END
                     DRIVERS
 ***************************************************************************/
 
+/* 
+
+Note about current c-chip eprom dump 
+
+the current dump is bad because data with address bit 0x200 set is missing (always read out as 0xff)
+
+you can however locate some of the tables used by the current simulation code in the rom
+
+for example
+
+Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B
+00001128                 07 80 02 09 03 00 4C
+00001134  01 00 04 00 10 07 80 02 09 03 00 4C 
+00001140  01 40 04 00 20                      
+
+is the following data from machine/opwolf.cpp
+
+static const uint16_t level_data_04[] = {
+  0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
+  0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
+
+however without the correct dump of the cchip eprom we can't run the actual cchip code
+
+*/
+
 ROM_START( opwolf )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
