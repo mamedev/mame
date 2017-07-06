@@ -30,7 +30,7 @@ public:
 		, m_ram_port_banks(*this, "mpbank")
 		, m_bus(*this, "bus")
 		, m_tty(*this, "tty")
-		, m_ram(*this, "ram")
+		, m_ram(*this, "ram"), m_memory(*this, "memory"), m_status(*this, "status")
 		, m_sw_mode(*this, "MODE")
 		, m_sw_control(*this, "CONTROL")
 		, m_sw_addr_data(*this, "ADDRDAT")
@@ -64,6 +64,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_stop);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_single_step);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(sw_reset_mode);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_mon);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_ram);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_prom);
@@ -94,6 +95,7 @@ private:
 		BIT_SW_STOP = 0,
 		BIT_SW_SINGLE_STEP,
 		BIT_SW_RESET,
+		BIT_SW_RESET_MODE,
 		BIT_SW_MON,
 		BIT_SW_RAM,
 		BIT_SW_PROM,
@@ -106,26 +108,12 @@ private:
 		BIT_SW_CMA_ENABLE,
 		BIT_SW_CMA_WRITE
 	};
-	enum : ioport_value
-	{
-		MASK_SW_STOP        = 1U << BIT_SW_STOP,
-		MASK_SW_SINGLE_STEP = 1U << BIT_SW_SINGLE_STEP,
-		MASK_SW_RESET       = 1U << BIT_SW_RESET,
-		MASK_SW_MON         = 1U << BIT_SW_MON,
-		MASK_SW_RAM         = 1U << BIT_SW_RAM,
-		MASK_SW_PROM        = 1U << BIT_SW_PROM,
-
-		MASK_SW_DECR        = 1U << BIT_SW_DECR,
-		MASK_SW_INCR        = 1U << BIT_SW_INCR,
-		MASK_SW_LOAD        = 1U << BIT_SW_LOAD,
-		MASK_SW_CMA_ENABLE  = 1U << BIT_SW_CMA_ENABLE,
-		MASK_SW_CMA_WRITE   = 1U << BIT_SW_CMA_WRITE
-	};
 
 	TIMER_CALLBACK_MEMBER(single_step_expired);
 	TIMER_CALLBACK_MEMBER(reset_expired);
 
 	void trigger_reset();
+	void check_4002_reset();
 	void reset_panel();
 	void display_address(u16 value, u16 mask);
 	void display_instruction(u8 value, u8 mask);
@@ -138,7 +126,7 @@ private:
 	required_device<bus::intellec4::univ_bus_device>    m_bus;
 	required_device<rs232_port_device>                  m_tty;
 
-	required_shared_ptr<u8>         m_ram;
+	required_shared_ptr<u8>         m_ram, m_memory, m_status;
 
 	required_ioport                 m_sw_mode, m_sw_control, m_sw_addr_data, m_sw_passes;
 
@@ -167,7 +155,7 @@ private:
 
 	// current state of mode switches
 	bool    m_sw_stop = false;
-	bool    m_sw_reset = false;
+	bool    m_sw_reset = false, m_sw_reset_mode = false;
 	bool    m_sw_mon = false, m_sw_ram = false, m_sw_prom = false;
 	bool    m_sw_run = false;
 };
@@ -352,7 +340,8 @@ WRITE_LINE_MEMBER(intellec4_40_state::bus_test)
 
 WRITE_LINE_MEMBER(intellec4_40_state::bus_reset_4002)
 {
-	// FIXME: this will clear 4002 RAMs (data space)
+	m_bus_reset_4002 = 0 == state;
+	check_4002_reset();
 }
 
 WRITE_LINE_MEMBER(intellec4_40_state::bus_user_reset)
@@ -397,6 +386,16 @@ INPUT_CHANGED_MEMBER(intellec4_40_state::sw_reset)
 	if (!newval && oldval)
 		trigger_reset();
 	m_sw_reset = !bool(newval);
+}
+
+INPUT_CHANGED_MEMBER(intellec4_40_state::sw_reset_mode)
+{
+	m_sw_reset_mode = bool(newval);
+	if (m_cpu_reset)
+	{
+		m_bus->reset_4002_in(m_sw_reset_mode ? 0 : 1);
+		check_4002_reset();
+	}
 }
 
 INPUT_CHANGED_MEMBER(intellec4_40_state::sw_mon)
@@ -580,6 +579,7 @@ void intellec4_40_state::driver_start()
 
 	save_item(NAME(m_sw_stop));
 	save_item(NAME(m_sw_reset));
+	save_item(NAME(m_sw_reset_mode));
 	save_item(NAME(m_sw_mon));
 	save_item(NAME(m_sw_ram));
 	save_item(NAME(m_sw_run));
@@ -595,6 +595,7 @@ void intellec4_40_state::driver_reset()
 	ioport_value const sw_mode(m_sw_mode->read()), sw_control(m_sw_control->read());
 	m_sw_stop       = BIT(~sw_mode,    BIT_SW_STOP);
 	m_sw_reset      = BIT(~sw_mode,    BIT_SW_RESET);
+	m_sw_reset_mode = BIT( sw_mode,    BIT_SW_RESET_MODE);
 	m_sw_mon        = BIT(~sw_mode,    BIT_SW_MON);
 	m_sw_ram        = BIT(~sw_mode,    BIT_SW_RAM);
 	m_sw_prom       = BIT(~sw_mode,    BIT_SW_PROM);
@@ -625,6 +626,7 @@ void intellec4_40_state::driver_reset()
 	m_bus->test_in(1);
 	m_bus->stop_in((m_sw_stop && !m_single_step) ? 0 : 1);
 	m_bus->cpu_reset_in(m_cpu_reset ? 0 : 1);
+	m_bus->reset_4002_in((m_cpu_reset && m_sw_reset_mode) ? 0 : 1);
 
 	// set front panel LEDs
 	machine().output().set_value("led_status_ptr_valid",  m_pointer_valid);
@@ -654,7 +656,11 @@ TIMER_CALLBACK_MEMBER(intellec4_40_state::reset_expired)
 		m_cpu_reset = false;
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		m_bus->cpu_reset_in(1);
-		// FIXME: can cause 4002 reset as well
+		if (m_sw_reset_mode)
+		{
+			m_bus->reset_4002_in(1);
+			check_4002_reset();
+		}
 	}
 }
 
@@ -672,8 +678,22 @@ void intellec4_40_state::trigger_reset()
 			m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			m_bus->cpu_reset_in(0);
 			reset_panel();
-			// FIXME: can cause 4002 reset as well
+			if (m_sw_reset_mode)
+			{
+				m_bus->reset_4002_in(0);
+				check_4002_reset();
+			}
 		}
+	}
+}
+
+void intellec4_40_state::check_4002_reset()
+{
+	// FIXME: this really takes multiple cycles to erase, and prevents writes while held
+	if ((m_cpu_reset && m_sw_reset_mode) || m_bus_reset_4002)
+	{
+		std::fill_n(&m_memory[0], m_memory.bytes(), 0U);
+		std::fill_n(&m_status[0], m_memory.bytes(), 0U);
 	}
 }
 
@@ -851,7 +871,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mod40_ram_memory, mcs40_cpu_device_base::AS_RAM_MEMORY, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x00ff) AM_RAM // 4 * 4002
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("memory") // 4 * 4002
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mod40_rom_ports, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_40_state)
@@ -861,7 +881,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mod40_ram_status, mcs40_cpu_device_base::AS_RAM_STATUS, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x003f) AM_RAM // 4 * 4002
+	AM_RANGE(0x0000, 0x003f) AM_RAM AM_SHARE("status") // 4 * 4002
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mod40_ram_ports, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_40_state)
@@ -937,9 +957,10 @@ INPUT_PORTS_START(intlc440)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("STOP")             PORT_CODE(KEYCODE_LEFT)      PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_stop,        0)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("SINGLE STEP")      PORT_CODE(KEYCODE_RIGHT)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_single_step, 0)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("RESET")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_reset,       0)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("MON")              PORT_CODE(KEYCODE_1_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_mon,         0)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("RAM")              PORT_CODE(KEYCODE_2_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_ram,         0)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("PROM")             PORT_CODE(KEYCODE_3_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_prom,        0)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("RESET MODE")                                    PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_reset_mode,  0)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("MON")              PORT_CODE(KEYCODE_1_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_mon,         0)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("RAM")              PORT_CODE(KEYCODE_2_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_ram,         0)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("PROM")             PORT_CODE(KEYCODE_3_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_prom,        0)
 
 	PORT_START("CONTROL")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("RUN")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_40_state, sw_run,         0)

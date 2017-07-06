@@ -90,6 +90,7 @@ Intel INTELLEC® 4/MOD 40 layout
 	<element name="label_write"><text string="WRITE"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<element name="label_reset"><text string="RESET"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_reset_mode"><text string="MODE"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<element name="label_address">
 		<text string="ADDRESS" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
@@ -118,6 +119,13 @@ Intel INTELLEC® 4/MOD 40 layout
 	</element>
 	<element name="label_disable">
 		<text string="DISABLE" align="2"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<element name="label_system">
+		<text string="SYSTEM" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_cpu">
+		<text string="CPU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
 	</element>
 
 	<element name="label_addr_data">
@@ -259,6 +267,9 @@ Intel INTELLEC® 4/MOD 40 layout
 
 		<cpanel element="label_reset_ctrl"><bounds left="664" top="296" right="724" bottom="304" /></cpanel>
 		<cpanel element="label_reset"><bounds left="666" top="312" right="691" bottom="319" /></cpanel>
+		<cpanel element="label_reset_mode"><bounds left="697" top="312" right="722" bottom="319" /></cpanel>
+		<cpanel element="label_system"><bounds left="727" top="321" right="783" bottom="328" /></cpanel>
+		<cpanel element="label_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
 
 		<cpanel name="led_address_a3_3" element="led">
 			<bounds left="81" top="79" right="92" bottom="86" />
@@ -442,13 +453,13 @@ Intel INTELLEC® 4/MOD 40 layout
 			<bounds left="479" top="240" right="504" bottom="286" />
 		</cpanel>
 
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0008">
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0010">
 			<bounds left="573" top="240" right="598" bottom="286" />
 		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0010">
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0020">
 			<bounds left="604" top="240" right="629" bottom="286" />
 		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0020">
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0040">
 			<bounds left="635" top="240" right="660" bottom="286" />
 		</cpanel>
 
@@ -497,6 +508,9 @@ Intel INTELLEC® 4/MOD 40 layout
 
 		<cpanel element="switch" inputtag="MODE" inputmask="0x0004">
 			<bounds left="666" top="322" right="691" bottom="368" />
+		</cpanel>
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0008">
+			<bounds left="697" top="322" right="722" bottom="368" />
 		</cpanel>
 
 		<screen index="0"><bounds left="0" top="400" right="1000" bottom="1150" /></screen>
@@ -622,6 +636,9 @@ Intel INTELLEC® 4/MOD 40 layout
 
 		<cpanel element="label_reset_ctrl"><bounds left="664" top="296" right="724" bottom="304" /></cpanel>
 		<cpanel element="label_reset"><bounds left="666" top="312" right="691" bottom="319" /></cpanel>
+		<cpanel element="label_reset_mode"><bounds left="697" top="312" right="722" bottom="319" /></cpanel>
+		<cpanel element="label_system"><bounds left="727" top="321" right="783" bottom="328" /></cpanel>
+		<cpanel element="label_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
 
 		<cpanel name="led_address_a3_3" element="led">
 			<bounds left="81" top="79" right="92" bottom="86" />
@@ -805,13 +822,13 @@ Intel INTELLEC® 4/MOD 40 layout
 			<bounds left="479" top="240" right="504" bottom="286" />
 		</cpanel>
 
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0008">
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0010">
 			<bounds left="573" top="240" right="598" bottom="286" />
 		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0010">
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0020">
 			<bounds left="604" top="240" right="629" bottom="286" />
 		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0020">
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0040">
 			<bounds left="635" top="240" right="660" bottom="286" />
 		</cpanel>
 
@@ -860,6 +877,9 @@ Intel INTELLEC® 4/MOD 40 layout
 
 		<cpanel element="switch" inputtag="MODE" inputmask="0x0004">
 			<bounds left="666" top="322" right="691" bottom="368" />
+		</cpanel>
+		<cpanel element="switch" inputtag="MODE" inputmask="0x0008">
+			<bounds left="697" top="322" right="722" bottom="368" />
 		</cpanel>
 	</view>
 </mamelayout>
