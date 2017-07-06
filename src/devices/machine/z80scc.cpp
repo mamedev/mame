@@ -174,12 +174,12 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_out_txda_cb(*this),
 	m_out_dtra_cb(*this),
 	m_out_rtsa_cb(*this),
-	m_out_wrdya_cb(*this),
+	m_out_wreqa_cb(*this),
 	m_out_synca_cb(*this),
 	m_out_txdb_cb(*this),
 	m_out_dtrb_cb(*this),
 	m_out_rtsb_cb(*this),
-	m_out_wrdyb_cb(*this),
+	m_out_wreqb_cb(*this),
 	m_out_syncb_cb(*this),
 	m_out_int_cb(*this),
 	m_out_rxdrqa_cb(*this),
@@ -249,12 +249,12 @@ void z80scc_device::device_start()
 	m_out_txda_cb.resolve_safe();
 	m_out_dtra_cb.resolve_safe();
 	m_out_rtsa_cb.resolve_safe();
-	m_out_wrdya_cb.resolve_safe();
+	m_out_wreqa_cb.resolve_safe();
 	m_out_synca_cb.resolve_safe();
 	m_out_txdb_cb.resolve_safe();
 	m_out_dtrb_cb.resolve_safe();
 	m_out_rtsb_cb.resolve_safe();
-	m_out_wrdyb_cb.resolve_safe();
+	m_out_wreqb_cb.resolve_safe();
 	m_out_syncb_cb.resolve_safe();
 	m_out_int_cb.resolve_safe();
 	m_out_rxdrqa_cb.resolve_safe();
@@ -1136,6 +1136,8 @@ void z80scc_channel::tra_complete()
 				set_rts(1);
 		}
 
+		check_waitrequest();
+
 		if (m_wr1 & WR1_TX_INT_ENABLE && m_tx_int_disarm == 0)
 		{
 			if ((m_uart->m_variant & z80scc_device::SET_ESCC) &&
@@ -1790,9 +1792,11 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	LOG("- External Interrupt Enable %u\n", (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
 	LOG("- Transmit Interrupt Enable %u\n", (data & WR1_TX_INT_ENABLE) ? 1 : 0);
 	LOG("- Parity is special condition %u\n", (data & WR1_PARITY_IS_SPEC_COND) ? 1 : 0);
-	LOG("- Wait/Ready Enable %u\n", (data & WR1_WRDY_ENABLE) ? 1 : 0);
-	LOG("- Wait/Ready Function %s\n", (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait");
-	LOG("- Wait/Ready on %s\n", (data & WR1_WRDY_ON_RX_TX) ? "Receive" : "Transmit");
+	LOG("- Wait/DMA Request Enable %u\n", (data & WR1_WREQ_ENABLE) ? 1 : 0);
+	LOG("- Wait/DMA Request Function %s\n", (data & WR1_WREQ_FUNCTION) ? "Request" : "Wait");
+	LOG("- Wait/DMA Request on %s\n", (data & WR1_WREQ_ON_RX_TX) ? "Receive" : "Transmit");
+
+	check_waitrequest();
 
 	switch (data & WR1_RX_INT_MODE_MASK)
 	{
@@ -2410,6 +2414,8 @@ void z80scc_channel::data_write(uint8_t data)
 		m_rr1 &= ~RR1_ALL_SENT; // All is definitelly not sent anymore
 	}
 
+	check_waitrequest();
+
 	/* Transmitter enabled?  */
 	if (m_wr5 & WR5_TX_ENABLE)
 	{
@@ -2856,4 +2862,33 @@ WRITE_LINE_MEMBER(z80scc_channel::write_rx)
 	//only use rx_w when self-clocked
 	if(m_rxc != 0 || m_brg_rate != 0)
 		device_serial_interface::rx_w(state);
+}
+
+/*
+ * This is a partial implementation of the "wait/dma request" functionality of the SCC controlled by
+ * bits D7, D6 and D5 in WR1. This implementation is sufficient to support DMA request on transmit
+ * used by the InterPro driver.
+ *
+ * TODO:
+ *  - wait function (D6=0)
+ *  - wait/request function on receive (D5=1)
+ */
+void z80scc_channel::check_waitrequest()
+{
+	// don't do anything if wait/request function is not enabled
+	if ((m_wr1 & WR1_WREQ_ENABLE) == 0)
+		return;
+
+	// wait/request function for receive not implemented
+	if (m_wr1 & WR1_WREQ_ON_RX_TX)
+		return;
+
+	// if dma request function is enabled
+	if (m_wr1 & WR1_WREQ_FUNCTION)
+	{
+		// assert /W//REQ if transmit buffer is empty, clear if it's not
+		int state = (m_rr0 & RR0_TX_BUFFER_EMPTY) ? ASSERT_LINE : CLEAR_LINE;
+
+		(m_index ? m_uart->m_out_wreqb_cb : m_uart->m_out_wreqa_cb)(state);
+	}
 }

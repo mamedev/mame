@@ -98,8 +98,8 @@
 #define MCFG_Z80SCC_OUT_RTSA_CB(_devcb) \
 	devcb = &z80scc_device::set_out_rtsa_callback(*device, DEVCB_##_devcb);
 
-#define MCFG_Z80SCC_OUT_WRDYA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_wrdya_callback(*device, DEVCB_##_devcb);
+#define MCFG_Z80SCC_OUT_WREQA_CB(_devcb) \
+	devcb = &z80scc_device::set_out_wreqa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_SYNCA_CB(_devcb) \
 	devcb = &z80scc_device::set_out_synca_callback(*device, DEVCB_##_devcb);
@@ -120,8 +120,8 @@
 #define MCFG_Z80SCC_OUT_RTSB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_rtsb_callback(*device, DEVCB_##_devcb);
 
-#define MCFG_Z80SCC_OUT_WRDYB_CB(_devcb) \
-	devcb = &z80scc_device::set_out_wrdyb_callback(*device, DEVCB_##_devcb);
+#define MCFG_Z80SCC_OUT_WREQB_CB(_devcb) \
+	devcb = &z80scc_device::set_out_wreqb_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_SYNCB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_syncb_callback(*device, DEVCB_##_devcb);
@@ -412,9 +412,9 @@ protected:
 		WR1_RX_INT_FIRST    = 0x08,
 		WR1_RX_INT_ALL      = 0x10,
 		WR1_RX_INT_PARITY   = 0x18,
-		WR1_WRDY_ON_RX_TX   = 0x20,
-		WR1_WRDY_FUNCTION   = 0x40,
-		WR1_WRDY_ENABLE     = 0x80
+		WR1_WREQ_ON_RX_TX   = 0x20,
+		WR1_WREQ_FUNCTION   = 0x40,
+		WR1_WREQ_ENABLE     = 0x80
 	};
 
 	enum
@@ -587,6 +587,7 @@ protected:
 	int get_rx_word_length();
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
+	void check_waitrequest();
 
 	// receiver state
 	uint8_t m_rx_data_fifo[8];    // receive data FIFO
@@ -647,12 +648,12 @@ public:
 	template <class Object> static devcb_base &set_out_txda_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_txda_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_dtra_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_dtra_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_rtsa_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rtsa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_wrdya_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_wrdya_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wreqa_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_wreqa_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_synca_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_synca_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_txdb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_dtrb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_rtsb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_wrdyb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_wrdyb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wreqb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_wreqb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_syncb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rxdrqa_cb.set_callback(std::forward<Object>(cb)); }
@@ -777,13 +778,13 @@ protected:
 	devcb_write_line    m_out_txda_cb;
 	devcb_write_line    m_out_dtra_cb;
 	devcb_write_line    m_out_rtsa_cb;
-	devcb_write_line    m_out_wrdya_cb;
+	devcb_write_line    m_out_wreqa_cb;
 	devcb_write_line    m_out_synca_cb;
 
 	devcb_write_line    m_out_txdb_cb;
 	devcb_write_line    m_out_dtrb_cb;
 	devcb_write_line    m_out_rtsb_cb;
-	devcb_write_line    m_out_wrdyb_cb;
+	devcb_write_line    m_out_wreqb_cb;
 	devcb_write_line    m_out_syncb_cb;
 
 	devcb_write_line    m_out_int_cb;
