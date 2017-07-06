@@ -107,7 +107,7 @@ public:
 	tilemap_t  *m_tx_tilemap;
 	
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(tx_vram_w);
 	
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
@@ -166,10 +166,10 @@ uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_in
 }
 
 
-WRITE16_MEMBER(blackt96_state::blackt96_80000_w)
+WRITE8_MEMBER(blackt96_state::sound_cmd_w)
 {
 	// TO sound MCU?
-	//printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
+	// printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
 }
 
 
@@ -198,7 +198,7 @@ WRITE16_MEMBER(blackt96_state::tx_vram_w)
 
 static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE(blackt96_80000_w) // soundlatch
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE8(sound_cmd_w,0xff00) // soundlatch
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE8(output_w,0x00ff) // COIN INPUT
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ( random_r ) // unk, from sound? - called in tandem with result discarded, watchdog?
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READ( random_r ) // unk, from sound? / 
@@ -285,7 +285,7 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_DIPSETTING(      0x1000, "Never Finish" )
 	PORT_DIPSETTING(      0x2000, "Demo Sound Off" )
 	PORT_DIPSETTING(      0x3000, "Stop Video" )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2") // 'Level'
+	PORT_DIPNAME( 0xc000, 0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2") // 'Level'
 	PORT_DIPSETTING(      0x8000, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x4000, "3" )
