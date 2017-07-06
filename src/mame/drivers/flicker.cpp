@@ -20,6 +20,22 @@
   CM-RAM1 and CM-RAM2.  There is no RAM or I/O mapped there - the
   additional chip select lines are just used to strobe the decoders.
 
+  The programming seems to be incomplete with some bugs and omissions.
+  - If you score 10 then 1000 at start, the hundreds digit will be blank.
+    It will fix itself during the natural course of play.
+  - If you enable the Match digit, and it doesn't match, the knocker
+    will continually bang away. Works correctly if the match succeeds.
+  - The 15k to 110k switches are presumed to be the score at which a free
+    game is granted, but none of that works.
+    - Setting 45K and 50K can award credits
+    - Setting 65K and 70K does something
+  - The "Add-a-ball, Replay, Straight" switches have unknown function,
+    and don't seem to do anything.
+  - If you press some keys before starting a game, you'll be awarded the
+    points when the game starts.
+  - So, the only settings that are known to work are the games per coin,
+    and the 3/5 balls per game.
+
 *************************************************************************/
 
 #include "emu.h"
