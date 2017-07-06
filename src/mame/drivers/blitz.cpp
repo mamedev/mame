@@ -18,10 +18,7 @@
 ***************************************************************************************************
 
   Mega Double Poker is distributed as standalone PCB, or as upgrade kit for
-  modified Golden Poker boards. The game has an undumped MC68705P5 MCU, so
-  the emulation should be impossible till this device can be decapped and
-  properly dumped.
-
+  modified Golden Poker boards.
 
 ***************************************************************************************************
 
@@ -763,8 +760,8 @@ ROM_START( megadpkr )
 	ROM_REGION( 0x10000, "cpubank", 0 )
 	ROM_LOAD( "mega-3.u3",  0x8000, 0x8000, CRC(ff0a46c6) SHA1(df053c323c0e2dd0e41e22286d38e889bfda3aa5) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the undumped 68705 microcontroller */
-	ROM_LOAD( "mega-1.u1",  0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 68705P5 microcontroller */
+	ROM_LOAD( "mega-1.u11",  0x0000, 0x0800, CRC(621a7971) SHA1(49121f7b0d428a825ccd219622dcc4abe3572968) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x2000, 0x000000 ) /* filling the R-G bitplanes */
@@ -812,8 +809,8 @@ ROM_START( megadpkrb )
 	ROM_REGION( 0x10000, "cpubank", 0 )
 	ROM_LOAD( "u3.bin", 0x8000, 0x8000, CRC(c973e345) SHA1(aae9da8cbaf0cf07086e5acacf9052e49fbdd896) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the undumped 68705 microcontroller */
-	ROM_LOAD( "u11.bin",  0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 68705P5 microcontroller - might not be for this set */
+	ROM_LOAD( "mega-1.u11",  0x0000, 0x0800, CRC(621a7971) SHA1(49121f7b0d428a825ccd219622dcc4abe3572968) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x2000, 0x0000 ) /* filling the R-G bitplanes */
