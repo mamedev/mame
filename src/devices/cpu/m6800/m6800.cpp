@@ -57,17 +57,21 @@ TODO:
 
     Chip                RAM     NVRAM   ROM     SCI     r15-f   ports
     -----------------------------------------------------------------
-    MC6800              -       -       -       no      no      4
-    MC6802              128     32      -       no      no      4
-    MC6802NS            128     -       -       no      no      4
-    MC6808              -       -       -       no      no      4
+    MC6800              -       -       -       no      no      -
+    MC6802              128     32      -       no      no      -
+    MC6802NS            128     -       -       no      no      -
+    MC6808              -       -       -       no      no      -
 
     MC6801              128     64      2K      yes     no      4
-    MC68701             128     64      -       yes     no      4
+    MC68701             128     64      2K      yes     no      4
     MC6803              128     64      -       yes     no      4
+    MC6803NR            -       -       -       yes     no      4
 
     MC6801U4            192     32      4K      yes     yes     4
     MC6803U4            192     32      -       yes     yes     4
+
+    MC68120             128(DP) -       2K      yes     IPC     3
+    MC68121             128(DP) -       -       yes     IPC     3
 
     HD6801              128     64      2K      yes     no      4
     HD6301V             128     -       4K      yes     no      4

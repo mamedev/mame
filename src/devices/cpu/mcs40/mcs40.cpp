@@ -681,12 +681,9 @@ inline void mcs40_cpu_device_base::do_m2()
 	}
 	m_resume = m_stop_latch && (CLEAR_LINE == m_stp);
 	m_stop_latch = CLEAR_LINE != m_stp;
-	if (!m_stop_ff)
-	{
-		if (cycle::IN != m_cycle)
-			pc() = (pc() + 1) & 0x0fff;
-		m_rom_addr = pc();
-	}
+	if (!m_stop_ff && (cycle::IN != m_cycle))
+		pc() = (pc() + 1) & 0x0fff;
+	m_rom_addr = pc();
 	if (!m_bus_cycle_cb.isnull())
 		m_bus_cycle_cb(phase::M2, 1U, read & 0x0fU);
 }

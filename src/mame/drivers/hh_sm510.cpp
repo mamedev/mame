@@ -1300,8 +1300,8 @@ ROM_START( nupogodi )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 202767, "svg", 0)
-	ROM_LOAD( "nupogodi.svg", 0, 202767, CRC(ad503446) SHA1(f42965605808025fca9a0883f12f0ec2ca04abc7) )
+	ROM_REGION( 202839, "svg", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 202839, CRC(4c8a38ce) SHA1(cdb5cbbef0f71584d89a5acfea73dd21a72d2318) )
 ROM_END
 
 ROM_START( exospace )
@@ -1317,8 +1317,8 @@ ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm-53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
-	ROM_REGION( 209959, "svg_top", 0)
-	ROM_LOAD( "gnw_dm53_top.svg", 0, 209959, CRC(37a01f7f) SHA1(ca3012b06543b92d0fc854f1ad5c7458fc3ac07b) )
+	ROM_REGION( 207524, "svg_top", 0)
+	ROM_LOAD( "gnw_dm53_top.svg", 0, 207524, CRC(07a19adb) SHA1(605b73d79639bbe6a2e88e3186d677ad0e0a5a86) )
 
 	ROM_REGION( 227954, "svg_bottom", 0)
 	ROM_LOAD( "gnw_dm53_bottom.svg", 0, 227954, CRC(906121e9) SHA1(1319226f9259cc179e2336308e1ab279d6b4097e) )
