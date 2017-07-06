@@ -98,9 +98,6 @@ This chip *ALWAYS* has a bypass capacitor (ceramic, 104, 0.10 uF) soldered on to
 #include "emu.h"
 #include "machine/cchip_dev.h"
 
-// uncomment to run code from cchip mask rom
-//#define CCHIP_TEST
-
 DEFINE_DEVICE_TYPE(TAITO_CCHIP_DEV, taito_cchip_device, "cchip", "Taito TC0030CMD (C-Chip)")
 
 taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -113,11 +110,8 @@ taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char
 
 ROM_START( taito_cchip )
 	ROM_REGION( 0x1000, "upd7811", 0 )
-#ifdef CCHIP_TEST
-	ROM_LOAD( "cchip_upd78c11.rom", 0x0000, 0x1000, CRC(11111111) SHA1(1111111111111111111111111111111111111111) )
-#else
-	ROM_LOAD( "cchip_upd78c11.rom", 0x0000, 0x1000, NO_DUMP )
-#endif
+	// optically extracted, the internal checksum passes, although that doesn't rule out the possibility of error
+	ROM_LOAD( "cchip_upd78c11.bin", 0x0000, 0x1000, CRC(43021521) SHA1(73bc4b46cd2d6805ec926f39f22af00e38a3f822) )
 ROM_END
 
 
@@ -127,7 +121,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(taito_cchip_device::asic_r)
 {
-	logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
+	if (offset != 0x001) // prevent logerror spam for now
+		logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
 
 	if (offset == 0x001) // megablst
 		return 0x01;
@@ -167,9 +162,6 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_MEMBER( taito_cchip_device::device_add_mconfig )
 	MCFG_CPU_ADD("upd7811", UPD7811, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(cchip_map)
-#ifndef CCHIP_TEST
-	MCFG_DEVICE_DISABLE() 
-#endif
 
 	MCFG_DEVICE_ADD("upd4464_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(cchip_ram_bank)
