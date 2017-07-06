@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_gray"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.9" blue="0.15" /></disk>
+		<disk state="0"><color red="0.08" green="0.07" blue="0.015" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0.01" right="8.99" top="0.01" bottom="8.99" />
+
+		<bezel element="static_gray"><bounds x="0" y="2.9" width="9" height="0.2" /></bezel>
+		<bezel element="static_gray"><bounds x="0" y="5.9" width="9" height="0.2" /></bezel>
+		<bezel element="static_gray"><bounds x="2.9" y="0" width="0.2" height="9" /></bezel>
+		<bezel element="static_gray"><bounds x="5.9" y="0" width="0.2" height="9" /></bezel>
+
+		<bezel name="0.0" element="led"><bounds x="1" y="1" width="1" height="1" /></bezel>
+		<bezel name="0.1" element="led"><bounds x="4" y="1" width="1" height="1" /></bezel>
+		<bezel name="0.2" element="led"><bounds x="7" y="1" width="1" height="1" /></bezel>
+		<bezel name="0.3" element="led"><bounds x="1" y="4" width="1" height="1" /></bezel>
+		<bezel name="0.4" element="led"><bounds x="4" y="4" width="1" height="1" /></bezel>
+		<bezel name="0.5" element="led"><bounds x="7" y="4" width="1" height="1" /></bezel>
+		<bezel name="0.6" element="led"><bounds x="1" y="7" width="1" height="1" /></bezel>
+		<bezel name="0.7" element="led"><bounds x="4" y="7" width="1" height="1" /></bezel>
+		<bezel name="0.8" element="led"><bounds x="7" y="7" width="1" height="1" /></bezel>
+
+	</view>
+</mamelayout>
