@@ -116,9 +116,9 @@ static const help_item static_help_list[] =
 		"  save <filename>,<address>,<length>[,<cpu>] -- save binary program memory to the given file\n"
 		"  saved <filename>,<address>,<length>[,<cpu>] -- save binary data memory to the given file\n"
 		"  savei <filename>,<address>,<length>[,<cpu>] -- save binary I/O memory to the given file\n"
-		"  load <filename>,<address>,<length>[,<cpu>] -- load binary program memory from the given file\n"
-		"  loadd <filename>,<address>,<length>[,<cpu>] -- load binary data memory from the given file\n"
-		"  loadi <filename>,<address>,<length>[,<cpu>] -- load binary I/O memory from the given file\n"
+		"  load <filename>,<address>[,<length>,<cpu>] -- load binary program memory from the given file\n"
+		"  loadd <filename>,<address>[,<length>,<cpu>] -- load binary data memory from the given file\n"
+		"  loadi <filename>,<address>[,<length>,<cpu>] -- load binary I/O memory from the given file\n"
 		"  map <address> -- map logical program address to physical address and bank\n"
 		"  mapd <address> -- map logical data address to physical address and bank\n"
 		"  mapi <address> -- map logical I/O address to physical address and bank\n"
@@ -627,7 +627,7 @@ static const help_item static_help_list[] =
 	{
 		"load",
 		"\n"
-		"  load[{d|i}] <filename>,<address>,<length>[,<cpu>]\n"
+		"  load[{d|i}] <filename>,<address>[,<length>,<cpu>]\n"
 		"\n"
 		"The load/loadd/loadi commands load raw memory from the binary file specified in the <filename> "
 		"parameter. 'load' will load program space memory, while 'loadd' will load data space memory "

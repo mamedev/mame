@@ -20,6 +20,7 @@
 #include "natkeyboard.h"
 #include "render.h"
 #include <ctype.h>
+#include <fstream>
 
 
 
@@ -206,10 +207,10 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 
-	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loado",     CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loado",     CMDFLAG_NONE, AS_OPCODES, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
 
 	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
@@ -1684,44 +1685,51 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 
 void debugger_commands::execute_load(int ref, const std::vector<std::string> &params)
 {
-	u64 offset, endoffset, length;
+	u64 offset, endoffset, length = 0;
 	address_space *space;
-	FILE *f;
 	u64 i;
 
-	/* validate parameters */
+	// validate parameters
 	if (!validate_number_parameter(params[1], offset))
 		return;
-	if (!validate_number_parameter(params[2], length))
+	if (params.size() > 2 && !validate_number_parameter(params[2], length))
 		return;
 	if (!validate_cpu_space_parameter((params.size() > 3) ? params[3].c_str() : nullptr, ref, space))
 		return;
 
-	/* determine the addresses to read */
-	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
-	offset = space->address_to_byte(offset) & space->bytemask();
-
-	/* open the file */
-	f = fopen(params[0].c_str(), "rb");
-	if (!f)
+	// open the file
+	std::ifstream f;
+	f.open(params[0], std::ifstream::in | std::ifstream::binary);
+	if (f.fail())
 	{
 		m_console.printf("Error opening file '%s'\n", params[0].c_str());
 		return;
 	}
 
-	/* now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1) */
-	u8 byte;
-	for (i = offset; i <= endoffset || endoffset == offset - 1 ; i++)
+	// determine the file size, if not specified
+	if (params.size() <= 2)
 	{
-		fread(&byte, 1, 1, f);
-		/* check if end of file has been reached and stop loading if it has */
-		if (feof(f))
-			break;
-		m_cpu.write_byte(*space, i, byte, true);
+		f.seekg(0, std::ios::end);
+		length = f.tellg();
+		f.seekg(0);
 	}
-	/* close the file */
-	fclose(f);
-	if ( i == offset)
+
+	// determine the addresses to read
+	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+	offset = space->address_to_byte(offset) & space->bytemask();
+
+	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
+	for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
+	{
+		char byte;
+		f.read(&byte, 1);
+		if (f)
+			m_cpu.write_byte(*space, i, byte, true);
+	}
+
+	if (!f.good())
+		m_console.printf("I/O error, load failed\n");
+	else if (i == offset)
 		m_console.printf("Length specified too large, load failed\n");
 	else
 		m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, i-1);
