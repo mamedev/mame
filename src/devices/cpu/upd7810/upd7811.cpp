@@ -7,6 +7,7 @@
 
 */
 
+#include "emu.h"
 #include "upd7811.h"
 
 /*

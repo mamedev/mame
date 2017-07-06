@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
 
-#ifndef MAME_CPU_UPD7811
-#define MAME_CPU_UPD7811
+#ifndef MAME_CPU_UPD7811_H
+#define MAME_CPU_UPD7811_H
 
 #pragma once
 
@@ -17,4 +17,4 @@ public:
 	upd7811_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-#endif
+#endif // MAME_CPU_UPD7811_H
