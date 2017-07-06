@@ -442,7 +442,7 @@ public:
 	optional_device<generic_slot_device> m_cart;
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
-	void power_off();
+	virtual void power_off() override;
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
@@ -552,6 +552,12 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 // common/snspell
 
+void tispeak_state::power_off()
+{
+	hh_tms1k_state::power_off();
+	m_tms5100->reset();
+}
+
 void tispeak_state::prepare_display()
 {
 	u16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
@@ -586,15 +592,6 @@ READ8_MEMBER(tispeak_state::snspell_read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[8]->read() | read_inputs(8);
-}
-
-
-void tispeak_state::power_off()
-{
-	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_tms5100->reset();
-
-	m_power_on = false;
 }
 
 

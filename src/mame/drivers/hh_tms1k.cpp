@@ -396,22 +396,23 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 	return ret;
 }
 
-
-// devices with a TMS0980 can auto power-off
-
-WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
-{
-	if (state)
-	{
-		m_power_on = false;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-}
-
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	m_power_on = (bool)(uintptr_t)param;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
+{
+	// devices with a TMS0980 can auto power-off
+	if (state)
+		power_off();
+}
+
+void hh_tms1k_state::power_off()
+{
+	m_power_on = false;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -6382,22 +6383,64 @@ public:
 
 WRITE16_MEMBER(arcmania_state::write_r)
 {
+	// R1-R9: leds
+	display_matrix(9, 1, data >> 1, 1);
 }
 
 WRITE16_MEMBER(arcmania_state::write_o)
 {
+	// O0-O2(tied together): speaker out
+	m_speaker->level_w(data & 7);
+
+	// O3,O4,O6: input mux
+	m_inp_mux = (data >> 3 & 3) | (data >> 4 & 4);
+	
+	// O5: power off when low (turn back on with button row 1)
+	if (~data & 0x20)
+		power_off();
 }
 
 READ8_MEMBER(arcmania_state::read_k)
 {
-	return 0;
+	// K: multiplexed inputs
+	return read_inputs(3);
 }
 
 
 // config
 
-static INPUT_PORTS_START( arcmania )
+/* physical button layout and labels is like this:
 
+    (orange)    (orange)    (orange)
+    [1]         [2]         [3]
+
+    (red)       (yellow)    (blue)
+    [RUN]                   [SNEAK
+     AMUK]                   ATTACK]
+
+    (green)     (yellow)    (purple)
+    [Alien                  [Rattler]
+     Raiders]
+*/
+
+static INPUT_PORTS_START( arcmania )
+	PORT_START("IN.0") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Alien Raiders")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Yellow Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Rattler")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Run Amuk")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Yellow Button 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Sneak Attack")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // O6 (also O5 to power)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Orange Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Orange Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Orange Button 3") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const s16 arcmania_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
@@ -6405,13 +6448,14 @@ static const s16 arcmania_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*
 static MACHINE_CONFIG_START( arcmania )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=56K, C=100pF
+	MCFG_CPU_ADD("maincpu", TMS1100, 250000) // approximation - RC osc. R=56K, C=100pF
 	MCFG_TMS1XXX_READ_K_CB(READ8(arcmania_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(arcmania_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(arcmania_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	//MCFG_DEFAULT_LAYOUT(layout_arcmania)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
