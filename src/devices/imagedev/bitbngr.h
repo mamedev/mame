@@ -47,7 +47,7 @@ private:
 };
 
 #define MCFG_BITBANGER_INTERFACE(_interface) \
-	bitbanger_image_device::static_set_interface(*device, _interface);
+	bitbanger_device::static_set_interface(*device, _interface);
 
 // device type definition
 DECLARE_DEVICE_TYPE(BITBANGER, bitbanger_device)
