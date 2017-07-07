@@ -16,27 +16,29 @@
 #include "logmacro.h"
 
 // Bit manipulation
-static constexpr unsigned BIT_MASK(unsigned n)
-{
-	return 1U << n;
-}
+namespace {
+	static constexpr unsigned BIT_MASK(unsigned n)
+	{
+		return 1U << n;
+	}
 
-template<typename T> void BIT_CLR(T& w , unsigned n)
-{
-	w &= ~(T)BIT_MASK(n);
-}
+	template<typename T> void BIT_CLR(T& w , unsigned n)
+	{
+		w &= ~(T)BIT_MASK(n);
+	}
 
-template<typename T> void BIT_SET(T& w , unsigned n)
-{
-	w |= (T)BIT_MASK(n);
-}
+	template<typename T> void BIT_SET(T& w , unsigned n)
+	{
+		w |= (T)BIT_MASK(n);
+	}
 
-template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)
-{
-	if (bit) {
-		BIT_SET(w , n);
-	} else {
-		BIT_CLR(w , n);
+	template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)
+	{
+		if (bit) {
+			BIT_SET(w , n);
+		} else {
+			BIT_CLR(w , n);
+		}
 	}
 }
 
@@ -108,6 +110,7 @@ protected:
 	uint8_t m_crt_sts;
 	uint8_t m_crt_ctl;
 	uint8_t m_crt_read_byte;
+	memory_bank *m_rombank;
 	uint8_t m_empty_bank[ 0x2000 ];
 	bool m_global_int_en;
 	uint16_t m_int_req;
@@ -157,12 +160,13 @@ void hp85_state::machine_start()
 	m_video_mem.resize(VIDEO_MEM_SIZE);
 
 	// ROM in bank 0 is always present (it's part of system ROMs)
-	membank("rombank")->configure_entry(0 , m_rom00);
+	m_rombank = membank("rombank");
+	m_rombank->configure_entry(0 , m_rom00);
 
 	memset(&m_empty_bank[ 0 ] , 0xff , sizeof(m_empty_bank));
 
 	// All other entries in rombank (01-FF) not present for now
-	membank("rombank")->configure_entries(1 , 255 , m_empty_bank , 0);
+	m_rombank->configure_entries(1 , 255 , m_empty_bank , 0);
 }
 
 void hp85_state::machine_reset()
@@ -173,7 +177,7 @@ void hp85_state::machine_reset()
 	m_crt_ctl = BIT_MASK(CRT_CTL_POWERDN_BIT) | BIT_MASK(CRT_CTL_WIPEOUT_BIT);
 	m_crt_read_byte = 0;
 	// Clear RSELEC
-	membank("rombank")->set_entry(0xff);
+	m_rombank->set_entry(0xff);
 
 	m_int_req = 0;
 	m_int_serv = 0;
@@ -390,7 +394,7 @@ WRITE8_MEMBER(hp85_state::crtc_w)
 
 WRITE8_MEMBER(hp85_state::rselec_w)
 {
-	membank("rombank")->set_entry(data);
+	m_rombank->set_entry(data);
 }
 
 // Outer index: key position [0..79] = r * 8 + c

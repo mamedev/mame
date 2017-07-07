@@ -82,27 +82,29 @@ enum {
 };
 
 // Bit manipulation
-static constexpr unsigned BIT_MASK(unsigned n)
-{
-	return 1U << n;
-}
+namespace {
+	static constexpr unsigned BIT_MASK(unsigned n)
+	{
+		return 1U << n;
+	}
 
-template<typename T> void BIT_CLR(T& w , unsigned n)
-{
-	w &= ~(T)BIT_MASK(n);
-}
+	template<typename T> void BIT_CLR(T& w , unsigned n)
+	{
+		w &= ~(T)BIT_MASK(n);
+	}
 
-template<typename T> void BIT_SET(T& w , unsigned n)
-{
-	w |= (T)BIT_MASK(n);
-}
+	template<typename T> void BIT_SET(T& w , unsigned n)
+	{
+		w |= (T)BIT_MASK(n);
+	}
 
-template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)
-{
-	if (bit) {
-		BIT_SET(w , n);
-	} else {
-		BIT_CLR(w , n);
+	template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)
+	{
+		if (bit) {
+			BIT_SET(w , n);
+		} else {
+			BIT_CLR(w , n);
+		}
 	}
 }
 
