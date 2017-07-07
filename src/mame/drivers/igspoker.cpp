@@ -121,6 +121,7 @@ public:
 	DECLARE_DRIVER_INIT(igs_ncs);
 	DECLARE_DRIVER_INIT(number10);
 	DECLARE_DRIVER_INIT(pktet346);
+	DECLARE_DRIVER_INIT(tet341);
 	DECLARE_DRIVER_INIT(cpokert);
 	DECLARE_DRIVER_INIT(chleague);
 	DECLARE_DRIVER_INIT(cska);
@@ -2582,6 +2583,52 @@ ROM_START( citalcup )
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 ROM_END
 
+/*
+
+IGS Tetris. PCB NO-T0039
+
+Chips
+1 x CPU not visible
+1x 8255
+1x IGS 003
+1x IGS 002
+1x AMT 001
+1x YM2413 (sound)
+1x oscillator 12.000MHz
+1x oscillator 3.579545
+
+*/
+
+ROM_START( igstet341 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetris_v-341r.u23",  0x00000, 0x10000, CRC(3a9762e6) SHA1(9307bfba4c715075edc4e3b892acf49d08b14266) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "tetris_1.u4",  0x40000, 0x20000, CRC(6bf90dd5) SHA1(280eb3a54cf5e4fbeeee25d87b10900bba360641) )
+	ROM_LOAD( "tetris_2.u5",  0x20000, 0x20000, CRC(7079e79e) SHA1(bc44c446e8a7ee9cb75695ca1c1a27f78e4b3e30) )
+	ROM_LOAD( "tetris_3.u6",  0x00000, 0x20000, CRC(8159768d) SHA1(b28026afa8206adbc381dfa461eea842354ea5b6) )
+
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+
+ROM_END
+
+DRIVER_INIT_MEMBER(igspoker_state, tet341)
+{
+	int A;
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (A = 0; A < 0x10000; A++)
+	{
+		rom[A] ^= 0x01;
+		if ((A & 0x0060) == 0x0020) rom[A] ^= 0x20;
+		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
+		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
+	}
+	memset(&rom[0xf000], 0, 0x1000);
+
+	/* Patch trap */
+	rom[0xbb86] = 0xc3;
+}
 
 ROM_START( pktet346 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2709,5 +2756,6 @@ GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs,  igspoker_state, igs_ncs2, 
 GAMEL( 1998, stellecu,  0,        number10, number10, igspoker_state, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                        MACHINE_NOT_WORKING, layout_igspoker )
 
 GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
+GAMEL( 199?, igstet341, pktet346, pktetris, pktet346, igspoker_state, tet341,   ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
 
 GAMEL( 1992, kungfu,    0,        igspoker, cpoker,   igspoker_state, kungfu,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker )
