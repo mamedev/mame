@@ -23,17 +23,9 @@ Supported games:
   Last Striker            East Technology Corp. 1989
   Balloon Brothers        East Technology Corp. 199?
 
-Please tell me the games worked on this board.
-
 
 This file contains routines to interface with the Taito Controller Chip
 (or "Command Chip") version 1. It's currently used by Superman.
-[Further cchip emulation is in machine/rainbow.c, machine/volfied.c,
-drivers/opwolf.c and drivers/taito_f2.c]
-
-According to Richard Bush, the C-Chip is an encrypted Z80 which communicates
-with the main board as a protection feature.
-
 
 Superman (revised SJ 060601)
 --------
