@@ -21,7 +21,7 @@ In this archive are different versions.
 Version 3.2, 8.3, 18.5, and 25.2.
 
 Hardware Specs: MC6809P, MC6845P, MB8146A x 3
-Sound: AY-3-8912
+Sound: AY-3-8912A
 
 */
 
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
 	AM_RANGE(0x2041, 0x2041) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x2060, 0x2060) AM_WRITE(rombank_w)
 	AM_RANGE(0x2070, 0x2070) AM_READ_PORT("UNK2")
-	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("aysnd", ay8912_device, address_data_w)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
 	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( usg185_map, AS_PROGRAM, 8, usgames_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8912_device, address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")
 	AM_RANGE(0x2410, 0x2410) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x2420, 0x2420) AM_WRITE(lamps1_w)
@@ -246,7 +246,7 @@ static MACHINE_CONFIG_START( usg32 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_SOUND_ADD("aysnd", AY8912, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
