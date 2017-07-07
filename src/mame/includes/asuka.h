@@ -5,14 +5,21 @@
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ASUKA_H
+#define MAME_INCLUDES_ASUKA_H
 
+#pragma once
+
+
+#include "machine/taitocchip.h"
 #include "machine/taitoio.h"
+
 #include "sound/msm5205.h"
 #include "machine/74157.h"
 #include "video/pc090oj.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
-#include "machine/cchip_dev.h"
+
 
 class asuka_state : public driver_device
 {
@@ -98,3 +105,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_ASUKA_H

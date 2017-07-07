@@ -96,12 +96,12 @@ This chip *ALWAYS* has a bypass capacitor (ceramic, 104, 0.10 uF) soldered on to
 */
 
 #include "emu.h"
-#include "machine/cchip_dev.h"
+#include "machine/taitocchip.h"
 
-DEFINE_DEVICE_TYPE(TAITO_CCHIP_DEV, taito_cchip_device, "cchip", "Taito TC0030CMD (C-Chip)")
+DEFINE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device, "cchip", "Taito TC0030CMD (C-Chip)")
 
 taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TAITO_CCHIP_DEV, tag, owner, clock),
+	: device_t(mconfig, TAITO_CCHIP, tag, owner, clock),
 	m_upd7811(*this, "upd7811"),
 	m_upd4464_bank(*this, "upd4464_bank"),
 	m_upd4464(*this, "upd4464")

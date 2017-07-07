@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( volfied )
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MCFG_TAITO_CCHIP_DEV_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 

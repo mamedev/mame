@@ -1,22 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
+#ifndef MAME_INCLUDES_TAITO_F2_H
+#define MAME_INCLUDES_TAITO_F2_H
+
+#pragma once
+
+
+#include "machine/taitocchip.h"
 #include "machine/taitoio.h"
+
 #include "sound/okim6295.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
 #include "video/tc0280grd.h"
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
-#include "machine/cchip_dev.h"
 
-struct f2_tempsprite
-{
-	int code, color;
-	int flipx, flipy;
-	int x, y;
-	int zoomx, zoomy;
-	int primask;
-};
 
 class taitof2_state : public driver_device
 {
@@ -24,6 +23,15 @@ public:
 	enum
 	{
 		TIMER_TAITOF2_INTERRUPT6
+	};
+
+	struct f2_tempsprite
+	{
+		int code, color;
+		int flipx, flipy;
+		int x, y;
+		int zoomx, zoomy;
+		int primask;
 	};
 
 	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -186,3 +194,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_TAITO_F2_H

@@ -5,9 +5,13 @@
     Volfied
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_VOLFIED_H
+#define MAME_INCLUDES_VOLFIED_H
 
+#pragma once
+
+#include "machine/taitocchip.h"
 #include "video/pc090oj.h"
-#include "machine/cchip_dev.h"
 #include "screen.h"
 
 class volfied_state : public driver_device
@@ -71,3 +75,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_VOLFIED_H

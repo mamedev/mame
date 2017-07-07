@@ -5,10 +5,17 @@
     Rainbow Islands
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_RBISLAND_H
+#define MAME_INCLUDES_RBISLAND_H
+
+#pragma once
+
+
+#include "machine/taitocchip.h"
 
 #include "video/pc080sn.h"
 #include "video/pc090oj.h"
-#include "machine/cchip_dev.h"
+
 
 class rbisland_state : public driver_device
 {
@@ -72,3 +79,6 @@ public:
 	void request_goalin_data(  );
 	void rbisland_cchip_init( int version );
 };
+
+
+#endif // MAME_INCLUDES_RBISLAND_H

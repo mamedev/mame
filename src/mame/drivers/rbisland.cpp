@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( rbisland )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
 
-	MCFG_TAITO_CCHIP_DEV_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 

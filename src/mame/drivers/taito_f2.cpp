@@ -2931,7 +2931,7 @@ static MACHINE_CONFIG_DERIVED( megab, taito_f2_tc0220ioc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megab_map)
 
-	MCFG_TAITO_CCHIP_DEV_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)

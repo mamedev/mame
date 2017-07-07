@@ -5,10 +5,18 @@
     Operation Wolf
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_OPWOLF_H
+#define MAME_INCLUDES_OPWOLF_H
+
+#pragma once
+
+
+#include "machine/taitocchip.h"
+
 #include "sound/msm5205.h"
 #include "video/pc080sn.h"
 #include "video/pc090oj.h"
-#include "machine/cchip_dev.h"
+
 
 class opwolf_state : public driver_device
 {
@@ -126,3 +134,6 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+
+#endif // MAME_INCLUDES_OPWOLF_H

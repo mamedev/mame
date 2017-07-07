@@ -835,7 +835,7 @@ static MACHINE_CONFIG_START( bonzeadv )
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)    /* sound CPU, also required for test mode */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_z80_map)
 
-	MCFG_TAITO_CCHIP_DEV_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

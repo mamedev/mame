@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Jonathan Gevaryahu
 
-#ifndef MAME_MACHINE_CCHIP_DEV_H
-#define MAME_MACHINE_CCHIP_DEV_H
+#ifndef MAME_MACHINE_TAITOCCHIP_H
+#define MAME_MACHINE_TAITOCCHIP_H
 
 #pragma once
 
 #include "cpu/upd7810/upd7811.h"
 #include "machine/bankdev.h"
 
-DECLARE_DEVICE_TYPE(TAITO_CCHIP_DEV, taito_cchip_device)
+DECLARE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device)
 
-#define MCFG_TAITO_CCHIP_DEV_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, TAITO_CCHIP_DEV, _clock)
+#define MCFG_TAITO_CCHIP_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, TAITO_CCHIP, _clock)
 
 
 class taito_cchip_device :  public device_t
