@@ -4425,7 +4425,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/bgt.cpp",
 	MAME_DIR .. "src/mame/drivers/bingoman.cpp",
 	MAME_DIR .. "src/mame/drivers/bingor.cpp",
-	MAME_DIR .. "src/mame/drivers/blitz.cpp",
 	MAME_DIR .. "src/mame/drivers/blitz68k.cpp",
 	MAME_DIR .. "src/mame/drivers/buster.cpp",
 	MAME_DIR .. "src/mame/drivers/calomega.cpp",

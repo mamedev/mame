@@ -8693,10 +8693,6 @@ bladestl                        // GX797 (c) 1987
 bladestle                       // GX797 (c) 1987
 bladestll                       // GX797 (c) 1987
 
-@source:blitz.cpp
-megadpkr                        // (c) 1990 Blitz System Inc
-megadpkrb                       // (c) 1990 Blitz System Inc
-
 @source:blitz68k.cpp
 bankrob                         // (c) 1993 Entertainment Technology Corp.
 bankroba                        // (c) 1993 Entertainment Technology Corp.
@@ -13740,6 +13736,8 @@ goldnpkb                        // (c) 1981 Bonanza
 goldnpkr                        // (c) 1981 Bonanza
 goodluck                        // Unknown
 maverik                         // 198?, Unknown
+megadpkr                        // (c) 1990 Blitz System Inc
+megadpkrb                       // (c) 1990 Blitz System Inc
 ngold                           // 198? Unknown
 ngolda                          // 198? Unknown
 ngoldb                          // 198? Unknown
