@@ -183,7 +183,7 @@ CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
         Service Switch       | P | 14|        Video GND
     Video Horizontal Sync    | R | 15|        Test Switch
                              | S | 16|        Coin Switch
-       Start Player 2        | T | 17|        Start Player 1 
+       Start Player 2        | T | 17|        Start Player 1
                              | U | 18|
                              | V | 19|
                              | W | 20|

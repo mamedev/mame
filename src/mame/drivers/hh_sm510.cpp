@@ -48,7 +48,7 @@ public:
 	// misc common
 	u16 m_inp_mux;                  // multiplexed inputs mask
 	int m_inp_lines;                // number of input mux columns
-	
+
 	u8 read_inputs(int columns);
 
 	virtual void update_k_line();
@@ -124,7 +124,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 {
 	u8 z_mask = (1 << m_display_z_len) - 1;
 	u8 zx_len = 1 << (m_display_x_len + m_display_z_len);
-	
+
 	for (int zx = 0; zx < zx_len; zx++)
 	{
 		for (int y = 0; y < m_display_y_len; y++)
@@ -153,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 				char buf[0x10];
 				sprintf(buf, "%d.%d.%d", zx >> m_display_z_len, y, zx & z_mask);
 				output().set_value(buf, active_state);
-				
+
 				m_display_cache[y][zx] = active_state;
 			}
 		}

@@ -68,13 +68,13 @@ class esqpanel_device : public device_t, public device_serial_interface
 {
 public:
 	template <class Object>
-	static devcb_base &set_tx_wr_callback(device_t &device, Object &&cb) { 
+	static devcb_base &set_tx_wr_callback(device_t &device, Object &&cb) {
 		return downcast<esqpanel_device &>(device).m_write_tx.set_callback(std::forward<Object>(cb));
 	}
-	
+
 	template <class Object>
-	static devcb_base &set_analog_wr_callback(device_t &device, Object &&cb) { 
-		return downcast<esqpanel_device &>(device).m_write_analog.set_callback(std::forward<Object>(cb)); 
+	static devcb_base &set_analog_wr_callback(device_t &device, Object &&cb) {
+		return downcast<esqpanel_device &>(device).m_write_analog.set_callback(std::forward<Object>(cb));
 	}
 
 	void xmit_char(uint8_t data);
@@ -105,8 +105,8 @@ protected:
 
 	std::vector<uint8_t> m_light_states;
 
-  	bool m_eps_mode;
-  		  
+	bool m_eps_mode;
+
 	esqpanel_external_panel_server *m_external_panel_server;
 
 private:

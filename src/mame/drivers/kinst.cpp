@@ -21,9 +21,9 @@
 Guru-Readme for Killer Instinct 1 / Killer Instinct 2
 Rare/Nintendo, 1994/1995
 
-This is a fighting game using a hard drive to hold the graphics + code, 
+This is a fighting game using a hard drive to hold the graphics + code,
 running on hardware made by Midway Manufacturing.
-The hardware is using similar PCB technology to other Midway games 
+The hardware is using similar PCB technology to other Midway games
 of the era such as San Francisco Rush, Mortal Kombat 3, Cruis'n Exotica,
 War Gods etc. The majority of the IC's on the PCB are surface mounted.
 
@@ -114,7 +114,7 @@ Notes:
       LED1     - H/Drive Activity LED
       LED2     - Sound Activity LED
       H/Drive  - 2.5" IDE Hard Drive with 44-pin connector. Note the model is checked by the program and the game will not run unless it finds
-                 the correct model. There is a modified Boot ROM available that allows it to work with any model HDD or a cheap Chinese $2 CF>IDE44 
+                 the correct model. There is a modified Boot ROM available that allows it to work with any model HDD or a cheap Chinese $2 CF>IDE44
                  adapter. A cheap Chinese $5 SD>IDE44 adapter can also be used.
                    - For KI1, Seagate Marathon 2.5" IDE hard drive, model ST9150AG (131MB formatted capacity)
                      C/H/S = 419/13/47 = 131076608 bytes, labelled 'L1 KILLER INSTINCT DISK (C)1984 NINTENDO/RARE'
@@ -127,12 +127,12 @@ Notes:
                    - For KI labelled 'KI-U96 A-19489 (C)1994 NINTENDO/RARE' (PLCC44)
                    - For KI2 labelled 'K12-U96 A-20351 (C)1996 NINTENDO/RARE' (PLCC44). Note if the PCB has this chip it is a dedicated KI2 PCB.
                      If the software is replaced with KI 1 (boot ROM and HDD) the board will boot but immediately jumps to test mode and then freezes.
-                     Also, the top title "Killer Instinct" flashes rapidly. If the sticker on U96 is missing (so can't be identified as a KI 2) and 
+                     Also, the top title "Killer Instinct" flashes rapidly. If the sticker on U96 is missing (so can't be identified as a KI 2) and
                      someone has tried to make it run KI 1 and it has the above symptoms, it is likely a dedicated KI 2 PCB.
       EPM7032y - Altera EPM7032LC44-15T CPLD labelled 'K12-U1 A-20383 (C)1996 NINTENDO/RARE' (PLCC44)
                  This IC is mounted on a small PCB (5772-14668-01) and connected between the IDE44 interface on the main board and the IDE44 Hard Drive.
-                 It is used only with the KI2 conversion kit. This is mainly a protection device to stop game swaps on a KI 1 PCB. However if the 
-                 sub board is removed and all the EPROMs and HDD are changed, the main board will run Killer Instinct, providing U96 is the correct 
+                 It is used only with the KI2 conversion kit. This is mainly a protection device to stop game swaps on a KI 1 PCB. However if the
+                 sub board is removed and all the EPROMs and HDD are changed, the main board will run Killer Instinct, providing U96 is the correct
                  chip for KI. If U96 is the type for KI2, then the main board will only run KI2 and can't be converted to KI.
       HSync    - 15.3846kHz
       VSync    - 58.9634Hz
@@ -166,10 +166,10 @@ Notes:
 
       BOOT ROMs for IDE HDD to Compact Flash conversion
       -------------------------------------------------
-      Killer Instinct: 
+      Killer Instinct:
       U98 - ST 27C4001 or 27C040 EPROM. File name = KI_L15DI.U98, CRC32 = 230F55FB
 
-      Killer Instinct 2 Dedicated PCB (U96 labelled 'K12-U96 A-20351') 
+      Killer Instinct 2 Dedicated PCB (U96 labelled 'K12-U96 A-20351')
       U98 - ST 27C4001 or 27C040 EPROM. File name = KI2_L14P.U98.BIN, CRC32 = D80C937A
 
       Killer Instinct 2 on Killer Instinct 1 PCB (U96 labelled 'KI-U96 A-19489') with KI 2 protection PCB 5772-14668-01

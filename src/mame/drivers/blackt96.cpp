@@ -61,7 +61,7 @@ Bugs (all of these looks BTANBs):
  00E8E0: 6700 001A                  beq     $e8fc
  00E8E4: 0C39 000F 00C0 008E        cmpi.b  #$f, $c0008e.l
  00E8EC: 6700 000E                  beq     $e8fc
- 00E8F0: 33FC 2000 00C0 1982        move.w  #$2000, $c01982.l	// timer inited again???
+ 00E8F0: 33FC 2000 00C0 1982        move.w  #$2000, $c01982.l   // timer inited again???
  00E8F8: 6100 0118                  bsr     $ea12
  00E8FC: 4E75                       rts
 ---
@@ -73,7 +73,7 @@ Bugs (all of these looks BTANBs):
 
 - flip screen doesn't work properly,
   game code explicitly sets flip screen off & the correlated work RAM buffer at 0xee2 no matter the dip setting
-  
+
 - some service mode items are buggy or not functioning properly (font, color, inputs, sound, 2nd item);
 
 */
@@ -103,19 +103,19 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<snk68_spr_device> m_sprites;
-	
+
 	tilemap_t  *m_tx_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(tx_vram_w);
-	
+
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
 	DECLARE_READ8_MEMBER(blackt96_soundio_port01_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
 	DECLARE_READ8_MEMBER(blackt96_soundio_port02_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port02_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	void tile_callback(int &tile, int& fx, int& fy, int& region);
 
@@ -158,7 +158,7 @@ uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_in
 
 	m_sprites->draw_sprites_all(bitmap, cliprect);
 	m_tx_tilemap->draw(screen,bitmap, cliprect, 0, 0);
-	
+
 	return 0;
 }
 
@@ -183,8 +183,8 @@ WRITE8_MEMBER(blackt96_state::output_w)
 	m_sprites->set_flip(data & 0x08);
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
-	
-//	printf("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
+
+//  printf("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
 }
 
 WRITE16_MEMBER(blackt96_state::tx_vram_w)
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE8(sound_cmd_w,0xff00) // soundlatch
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE8(output_w,0x00ff) // COIN INPUT
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ( random_r ) // unk, from sound? - called in tandem with result discarded, watchdog?
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READ( random_r ) // unk, from sound? / 
+	AM_RANGE(0x0e8000, 0x0e8001) AM_READ( random_r ) // unk, from sound? /
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2") AM_WRITENOP // service mode, left-over?
 

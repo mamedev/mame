@@ -1209,7 +1209,7 @@ void running_machine::export_http_api()
 
 			writer.EndArray();
 			writer.EndObject();
-		
+
 			response->set_status(200);
 			response->set_content_type("application/json");
 			response->set_body(s.GetString());

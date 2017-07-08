@@ -6426,7 +6426,7 @@ WRITE16_MEMBER(arcmania_state::write_o)
 
 	// O3,O4,O6: input mux
 	m_inp_mux = (data >> 3 & 3) | (data >> 4 & 4);
-	
+
 	// O5: power off when low (turn back on with button row 1)
 	if (~data & 0x20)
 		power_off();

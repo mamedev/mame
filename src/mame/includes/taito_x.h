@@ -14,7 +14,7 @@ class taitox_state : public seta_state
 public:
 	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seta_state(mconfig, type, tag),
-		m_cchip(*this, "cchip")	
+		m_cchip(*this, "cchip")
 	{ }
 
 	optional_device<taito_cchip_device> m_cchip;

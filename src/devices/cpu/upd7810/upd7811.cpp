@@ -3,7 +3,7 @@
 
 /*
 
-	uPD7811 - variant of uPD7810 with internal ROM
+    uPD7811 - variant of uPD7810 with internal ROM
 
 */
 
@@ -11,15 +11,15 @@
 #include "upd7811.h"
 
 /*
-	the MODE pins can cause this to work with external ROM instead
-	todo: document MODE pins
-	
-	M0  M1
+    the MODE pins can cause this to work with external ROM instead
+    todo: document MODE pins
 
-	0   0 -
-	0   1 -
-	1   0 -
-	1   1 -
+    M0  M1
+
+    0   0 -
+    0   1 -
+    1   0 -
+    1   1 -
 
 */
 

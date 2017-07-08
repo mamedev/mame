@@ -54,16 +54,16 @@ private:
 
 	// State of processor
 	uint8_t m_reg[ 64 ];// Registers R00-R77
-	uint8_t m_arp;		// ARP register (6 bits)
-	uint8_t m_drp;		// DRP register (6 bits)
-	uint8_t m_reg_E;	// E register (4 bits)
-	uint16_t m_flags;	// Flags
-	uint16_t m_genpc;	// PC
+	uint8_t m_arp;      // ARP register (6 bits)
+	uint8_t m_drp;      // DRP register (6 bits)
+	uint8_t m_reg_E;    // E register (4 bits)
+	uint16_t m_flags;   // Flags
+	uint16_t m_genpc;   // PC
 
 	// Burst memory accesses
-	bool m_flatten;		// Consecutive accesses to memory are "flattened"
-	uint16_t m_start_addr;	// Start address of burst
-	uint16_t m_curr_addr;	// Current address in burst
+	bool m_flatten;         // Consecutive accesses to memory are "flattened"
+	uint16_t m_start_addr;  // Start address of burst
+	uint16_t m_curr_addr;   // Current address in burst
 
 	// Effective Addresses
 	// When b17 = 0, b15..b0 hold 16-bit memory address

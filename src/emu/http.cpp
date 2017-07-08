@@ -130,28 +130,28 @@ public:
 		m_query = m_request->path.find('?');
 		m_path_end = m_query == std::string::npos ? m_query_end : m_query;
 	}
-	
+
 	/** Retrieves the requested resource. */
 	virtual const std::string get_resource() {
 		// The entire resource: path, query and fragment.
 		return m_request->path;
 	}
-	
+
 	/** Returns the path part of the requested resource. */
 	virtual const std::string get_path() {
 		return m_request->path.substr(0, m_path_end);
 	}
-	
+
 	/** Returns the query part of the requested resource. */
 	virtual const std::string get_query() {
 		return m_query == std::string::npos ? "" : m_request->path.substr(m_query, m_query_end);
 	}
-	
+
 	/** Returns the fragment part of the requested resource. */
 	virtual const std::string get_fragment() {
 		return m_fragment == std::string::npos ? "" : m_request->path.substr(m_fragment);
 	}
-	
+
 	/** Retrieves a header from the HTTP request. */
 	virtual const std::string get_header(const std::string &header_name) {
 		auto i = m_request->header.find(header_name);
@@ -171,7 +171,7 @@ public:
 		}
 		return result;
 	}
-		
+
 	/** Returns the body that was submitted with the HTTP request. */
 	virtual const std::string get_body() {
 		// TODO(cbrunschen): What to return here - http_server::Request has a 'content' feld that is never filled in!
@@ -193,7 +193,7 @@ struct http_response_impl : public http_manager::http_response {
 	virtual void set_status(int status) {
 		m_status = status;
 	}
-	
+
 	/** Sets the HTTP content type to be returned to the client. */
 	virtual void set_content_type(const std::string &content_type) {
 		m_content_type = content_type;
@@ -209,7 +209,7 @@ struct http_response_impl : public http_manager::http_response {
 	virtual void append_body(const std::string &body) {
 		m_body << body;
 	}
-	
+
 	/** Sends the response to the client. */
 	void send() {
 		m_response->type(m_content_type);
@@ -221,12 +221,12 @@ struct http_response_impl : public http_manager::http_response {
 struct websocket_endpoint_impl : public http_manager::websocket_endpoint {
 	/** The underlying edpoint. */
 	std::shared_ptr<webpp::ws_server::Endpoint> m_endpoint;
-	
-	websocket_endpoint_impl(std::shared_ptr<webpp::ws_server::Endpoint> endpoint, 
+
+	websocket_endpoint_impl(std::shared_ptr<webpp::ws_server::Endpoint> endpoint,
 		http_manager::websocket_open_handler on_open,
 		http_manager::websocket_message_handler on_message,
 		http_manager::websocket_close_handler on_close,
-		http_manager::websocket_error_handler on_error) 
+		http_manager::websocket_error_handler on_error)
 	: m_endpoint(endpoint) {
 		this->on_open = on_open;
 		this->on_message = on_message;
@@ -240,7 +240,7 @@ struct websocket_connection_impl : public http_manager::websocket_connection {
 	webpp::ws_server *m_wsserver;
 	/* The underlying Commection. */
 	std::shared_ptr<webpp::ws_server::Connection> m_connection;
-	websocket_connection_impl(webpp::ws_server *server, std::shared_ptr<webpp::ws_server::Connection> connection) 
+	websocket_connection_impl(webpp::ws_server *server, std::shared_ptr<webpp::ws_server::Connection> connection)
 		: m_wsserver(server), m_connection(connection) { }
 
 	/** Sends a message to the client that is connected on the other end of this Websocket connection. */
@@ -358,7 +358,7 @@ void http_manager::on_open(http_manager::websocket_endpoint_ptr endpoint, void *
 	std::shared_ptr<webpp::ws_server::Connection> conn = (static_cast<webpp::ws_server::Connection *>(connection))->ptr();
 	http_manager::websocket_connection_ptr connection_impl = std::make_shared<websocket_connection_impl>(ws_server, conn);
 	m_connections[connection] = connection_impl;
-		
+
 	if (endpoint->on_open) {
 		endpoint->on_open(connection_impl);
 	}
@@ -384,7 +384,7 @@ void http_manager::on_close(http_manager::websocket_endpoint_ptr endpoint, void 
 			http_manager::websocket_connection_ptr websocket_connection_impl = (*i).second;
 			endpoint->on_close(websocket_connection_impl, status, reason);
 		}
-		
+
 		m_connections.erase(connection);
 	}
 }
@@ -434,7 +434,7 @@ void http_manager::serve_document(http_request_ptr request, http_response_ptr re
 	}
 }
 
-void http_manager::serve_template(http_request_ptr request, http_response_ptr response, 
+void http_manager::serve_template(http_request_ptr request, http_response_ptr response,
 								  const std::string &filename, substitution substitute, char init, char term)
 {
 	if (!m_active) return;
@@ -494,10 +494,10 @@ void http_manager::add_http_handler(const std::string &path, http_manager::http_
 	m_server->on_get(path, std::bind(on_get, handler, _1, _2));
 
 	std::lock_guard<std::mutex> lock(m_handlers_mutex);
-	m_handlers.emplace(path, handler);		
+	m_handlers.emplace(path, handler);
 }
 
-void http_manager::remove_http_handler(const std::string &path) { 
+void http_manager::remove_http_handler(const std::string &path) {
 	if (!m_active) return;
 
 	m_server->remove_handler(path);
@@ -515,7 +515,7 @@ void http_manager::clear() {
 	m_handlers.clear();
 }
 
-http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::string &path, 
+http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::string &path,
 		http_manager::websocket_open_handler on_open,
 		http_manager::websocket_message_handler on_message,
 		http_manager::websocket_close_handler on_close,
@@ -533,21 +533,21 @@ http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::strin
 		endpoint.on_open = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn) {
 			this->on_open(endpoint_impl, conn.get());
 		};
-		
+
 		endpoint.on_message = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn, std::shared_ptr<webpp::ws_server::Message> message) {
 			std::string payload = message->string();
 			int opcode = message->fin_rsv_opcode & 0x0f;
 			this->on_message(endpoint_impl, conn.get(), payload, opcode);
 		};
-		
+
 		endpoint.on_close = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn, int status, const std::string& reason) {
 			this->on_close(endpoint_impl, conn.get(), status, reason);
 		};
-		
+
 		endpoint.on_error = [&, this, endpoint_impl](std::shared_ptr<webpp::ws_server::Connection> conn, const std::error_code& error_code) {
 			this->on_error(endpoint_impl, conn.get(), error_code);
 		};
-		
+
 		m_endpoints[path] = endpoint_impl;
 		return endpoint_impl;
 	} else {

@@ -29,7 +29,7 @@ public:
 	virtual void write_char(int data) = 0;
 	virtual void update_display();
 	virtual bool write_contents(std::ostream &o) { return false; }
-	
+
 	uint32_t conv_segments(uint16_t segin);
 
 protected:

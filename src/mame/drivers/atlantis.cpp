@@ -18,12 +18,12 @@
         * M4T28-8R128H1 TimeKeeper RTC/CMOS
         * PLX PCI9050 Bus Target Interface Chip (interfaces ISA-style designs to PCI)
         * Midway Zeus-series custom video
-		* Actiontec PM560LKI PCI Data/Fax Modem (PCI\VEN_11C1&DEV_0480&SUBSYS_04801668)
-		* TL16c552 dual UART
-		* ADSP-2181 based DCS2 audio (unclear which variant)
-		* Cirrus Logic CS4338 16 bit stereo audio serial DAC, PCB has space for 3 chips (6-channels), only 1 is populated
-		* Maxim MAX192 8 channel 10 bit serial ADC
-		* PIC16C57 (protection? serial #?)
+        * Actiontec PM560LKI PCI Data/Fax Modem (PCI\VEN_11C1&DEV_0480&SUBSYS_04801668)
+        * TL16c552 dual UART
+        * ADSP-2181 based DCS2 audio (unclear which variant)
+        * Cirrus Logic CS4338 16 bit stereo audio serial DAC, PCB has space for 3 chips (6-channels), only 1 is populated
+        * Maxim MAX192 8 channel 10 bit serial ADC
+        * PIC16C57 (protection? serial #?)
         * Quantum Fireball CX 6.4GB IDE HDD (C/H/S 13328/15/63)
 
     TODO:

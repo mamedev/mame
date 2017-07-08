@@ -126,7 +126,7 @@ public:
 	{
 		using namespace std::placeholders;
 		if (m_server->is_active()) {
-			m_server->add_endpoint("/esqpanel/socket", 
+			m_server->add_endpoint("/esqpanel/socket",
 					std::bind(&esqpanel_external_panel_server::on_open, this, _1),
 					std::bind(&esqpanel_external_panel_server::on_message, this, _1, _2, _3),
 					std::bind(&esqpanel_external_panel_server::on_close, this, _1, _2, _3),
@@ -320,7 +320,7 @@ public:
 	{
 		return m_version;
 	}
-	
+
 	bool get_template_value(std::string &s)
 	{
 		if (s == "keyboard")
@@ -422,7 +422,7 @@ void esqpanel_device::device_start()
 {
 	m_write_tx.resolve_safe();
 	m_write_analog.resolve_safe();
-	
+
 	m_external_panel_server = new esqpanel_external_panel_server(machine().manager().http());
 	if (machine().manager().http()->is_active()) {
 		m_external_panel_server->set_keyboard(owner()->shortname());
@@ -536,7 +536,7 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 		// 2 = On
 		// 3 = Blinking
 		m_light_states[lightNumber] = (data & 0xc0) >> 6;
-		
+
 		// TODO: do something with the button information!
 		// printf("Setting light %d to %s\n", lightNumber, lightState == 3 ? "Blink" : lightState == 2 ? "On" : "Off");
 		m_bButtonLightSecondByte = false;

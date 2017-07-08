@@ -109,32 +109,32 @@ namespace {
 }
 
 // Bits in m_flags
-static constexpr unsigned FLAGS_DCM_BIT		= 0;	// Decimal/binary mode
-static constexpr unsigned FLAGS_CY_BIT		= 1;	// Carry
-static constexpr unsigned FLAGS_OVF_BIT		= 2;	// Overflow
-static constexpr unsigned FLAGS_LSB_BIT		= 3;	// LSB
-static constexpr unsigned FLAGS_MSB_BIT		= 4;	// MSB
-static constexpr unsigned FLAGS_Z_BIT		= 5;	// Zero
-static constexpr unsigned FLAGS_LDZ_BIT		= 6;	// Left digit zero
-static constexpr unsigned FLAGS_RDZ_BIT		= 7;	// Right digit zero
-static constexpr unsigned FLAGS_IRL_BIT		= 8;	// Interrupt request
+static constexpr unsigned FLAGS_DCM_BIT     = 0;    // Decimal/binary mode
+static constexpr unsigned FLAGS_CY_BIT      = 1;    // Carry
+static constexpr unsigned FLAGS_OVF_BIT     = 2;    // Overflow
+static constexpr unsigned FLAGS_LSB_BIT     = 3;    // LSB
+static constexpr unsigned FLAGS_MSB_BIT     = 4;    // MSB
+static constexpr unsigned FLAGS_Z_BIT       = 5;    // Zero
+static constexpr unsigned FLAGS_LDZ_BIT     = 6;    // Left digit zero
+static constexpr unsigned FLAGS_RDZ_BIT     = 7;    // Right digit zero
+static constexpr unsigned FLAGS_IRL_BIT     = 8;    // Interrupt request
 
 // Special registers
-static constexpr unsigned REG_BANK_PTR		= 0;	// R0: register bank pointer
-static constexpr unsigned REG_INDEX_SCRATCH	= 2;	// R2 & R3: index scratch registers
-static constexpr unsigned REG_PC			= 4;	// R4 & R5: PC
-static constexpr unsigned REG_SP			= 6;	// R6 & R7: return stack pointer
+static constexpr unsigned REG_BANK_PTR      = 0;    // R0: register bank pointer
+static constexpr unsigned REG_INDEX_SCRATCH = 2;    // R2 & R3: index scratch registers
+static constexpr unsigned REG_PC            = 4;    // R4 & R5: PC
+static constexpr unsigned REG_SP            = 6;    // R6 & R7: return stack pointer
 
 // Bit in address values that specifies external address (0) or internal register (1)
-static constexpr unsigned GP_REG_BIT	= 17;
-static constexpr unsigned GP_REG_MASK	= BIT_MASK(GP_REG_BIT);
-static constexpr unsigned ADDR_MASK		= 0xffff;
+static constexpr unsigned GP_REG_BIT    = 17;
+static constexpr unsigned GP_REG_MASK   = BIT_MASK(GP_REG_BIT);
+static constexpr unsigned ADDR_MASK     = 0xffff;
 
 // Mask of bits in ARP & DRP
-static constexpr uint8_t ARP_DRP_MASK	= 0x3f;
+static constexpr uint8_t ARP_DRP_MASK   = 0x3f;
 
 // Mask of bits in E
-static constexpr uint8_t E_MASK	= 0xf;
+static constexpr uint8_t E_MASK = 0xf;
 
 DEFINE_DEVICE_TYPE(HP_CAPRICORN , capricorn_cpu_device , "capricorn" , "HP-Capricorn")
 
@@ -483,44 +483,44 @@ uint8_t capricorn_cpu_device::sub_bcd_bytes(uint8_t first , uint8_t second , boo
 	return (ld << 4) | rd;
 }
 
-#define OP_ITERATION_START_FWD(idx , multi)						\
-	unsigned boundary = multi ? get_upper_boundary() : m_drp;	\
-	BIT_SET(m_flags , FLAGS_Z_BIT);								\
-	bool first = true;											\
+#define OP_ITERATION_START_FWD(idx , multi)                     \
+	unsigned boundary = multi ? get_upper_boundary() : m_drp;   \
+	BIT_SET(m_flags , FLAGS_Z_BIT);                             \
+	bool first = true;                                          \
 	for (unsigned idx = m_drp; idx <= boundary; idx++)
 
-#define OP_ITERATION_START_REV(idx , multi)					\
-	int boundary = multi ? get_lower_boundary() : m_drp;	\
-	BIT_SET(m_flags , FLAGS_Z_BIT);							\
-	bool first = true;										\
+#define OP_ITERATION_START_REV(idx , multi)                 \
+	int boundary = multi ? get_lower_boundary() : m_drp;    \
+	BIT_SET(m_flags , FLAGS_Z_BIT);                         \
+	bool first = true;                                      \
 	for (int idx = m_drp; idx >= boundary; idx--)
 
-#define OP1_GET(idx , op1)						\
-	m_icount--;									\
+#define OP1_GET(idx , op1)                      \
+	m_icount--;                                 \
 	uint8_t op1 = m_reg[ idx ];
 
-#define OP2_GET(idx , ea , op1 , op2)			\
-	m_icount--;									\
-	uint8_t op1 = m_reg[ idx ];					\
+#define OP2_GET(idx , ea , op1 , op2)           \
+	m_icount--;                                 \
+	uint8_t op1 = m_reg[ idx ];                 \
 	uint8_t op2 = RM(ea);
 
-#define RES_SET(idx , res)						\
+#define RES_SET(idx , res)                      \
 	m_reg[ idx ] = res;
 
-#define OP_ITERATION_END_FWD(res)				\
-	if (first) {								\
-		update_flags_right(res);				\
-		first = false;							\
-	}											\
-	update_flags_left(res);						\
+#define OP_ITERATION_END_FWD(res)               \
+	if (first) {                                \
+		update_flags_right(res);                \
+		first = false;                          \
+	}                                           \
+	update_flags_left(res);                     \
 	update_flags_every(res);
 
-#define OP_ITERATION_END_REV(res)				\
-	if (first) {								\
-		update_flags_left(res);					\
-		first = false;							\
-	}											\
-	update_flags_right(res);					\
+#define OP_ITERATION_END_REV(res)               \
+	if (first) {                                \
+		update_flags_left(res);                 \
+		first = false;                          \
+	}                                           \
+	update_flags_right(res);                    \
 	update_flags_every(res);
 
 void capricorn_cpu_device::do_AN_op(ea_addr_t ea)

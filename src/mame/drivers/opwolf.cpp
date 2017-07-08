@@ -918,9 +918,9 @@ MACHINE_CONFIG_END
                     DRIVERS
 ***************************************************************************/
 
-/* 
+/*
 
-Note about current c-chip eprom dump 
+Note about current c-chip eprom dump
 
 the current dump is bad because data with address bit 0x200 set is missing (always read out as 0xff)
 
@@ -930,8 +930,8 @@ for example
 
 Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B
 00001128                 07 80 02 09 03 00 4C
-00001134  01 00 04 00 10 07 80 02 09 03 00 4C 
-00001140  01 40 04 00 20                      
+00001134  01 00 04 00 10 07 80 02 09 03 00 4C
+00001140  01 40 04 00 20
 
 is the following data from machine/opwolf.cpp
 

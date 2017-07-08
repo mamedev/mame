@@ -64,18 +64,18 @@ CLK is supplied with a 12MHZ oscillator on operation wolf
 (move below MODE notes to upd7811.cpp?)
 
 The four Mode0/Mode1 combinations are:
-	LOW/LOW		78c11 mem map is 4k external rom (i.e. the eprom inside the c-chip) from 0x0000-0x0FFF;
-				the low 4 bits of port F are used, to provide the high 4 address bits.
-				speculation: likely the eprom can be banked so the low or high half is visible here, 
-				or possibly one fixed window and 3 variable windows, managed by the asic?
-	LOW/HIGH	78c11 mem map boots to internal rom (mask rom inside the 78c11 inside the c-chip) from
-				0x0000-0x0fff but the memory map is under full mcu control and can select any of the
-				four modes (internal only, 4k external, 16k external, 64k external)
+    LOW/LOW     78c11 mem map is 4k external rom (i.e. the eprom inside the c-chip) from 0x0000-0x0FFF;
+                the low 4 bits of port F are used, to provide the high 4 address bits.
+                speculation: likely the eprom can be banked so the low or high half is visible here,
+                or possibly one fixed window and 3 variable windows, managed by the asic?
+    LOW/HIGH    78c11 mem map boots to internal rom (mask rom inside the 78c11 inside the c-chip) from
+                0x0000-0x0fff but the memory map is under full mcu control and can select any of the
+                four modes (internal only, 4k external, 16k external, 64k external)
 The following two modes are unusable on the c-chip:
-	HIGH/LOW	78c11 mem map is 16k external rom from 0x0000-0x3FFF;
-				the low 6 bits of port F are used, to provide the high 6 address bits.
-	HIGH/HIGH	78c11 mem map is 64k external rom from 0x0000-0xFFFF;
-				all 8 bits of port F are used to provide the high 8 address bits.
+    HIGH/LOW    78c11 mem map is 16k external rom from 0x0000-0x3FFF;
+                the low 6 bits of port F are used, to provide the high 6 address bits.
+    HIGH/HIGH   78c11 mem map is 64k external rom from 0x0000-0xFFFF;
+                all 8 bits of port F are used to provide the high 8 address bits.
 VPP is only used for programming the 27c64, do not tie it to 18v or you will probably overwrite the 27c64 with garbage.
 
 (see http://www.cpcwiki.eu/index.php/UPD7810/uPD7811 )

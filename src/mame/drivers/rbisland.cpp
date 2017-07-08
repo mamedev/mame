@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( jumping )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
-	
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough unless otherwise */
 
 

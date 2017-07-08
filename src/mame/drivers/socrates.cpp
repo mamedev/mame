@@ -237,7 +237,7 @@ private:
 Socrates Keyboard MCU simulation
 
 *******************************************************************************
-the tmp50c40 MCU seems to have an 8? word, 12 bit wide internal fifo, which is fed by IR decoded from the 
+the tmp50c40 MCU seems to have an 8? word, 12 bit wide internal fifo, which is fed by IR decoded from the
 remote keyboard. The socrates reads this data out via SPI? by asserting a /cs? bit when keyboard_buffer_update
 is written to.
 the bits are returned in two registers, handled by keyboard_buffer_read

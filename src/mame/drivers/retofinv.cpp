@@ -54,7 +54,7 @@ Notes:
                          | 14| R |
       Joystick Right     | 15| S |
       Joystick Left      | 16| T |
-                         | 17| U | 
+                         | 17| U |
                          | 18| V |
                          | 19| W |
                          | 20| X |
@@ -81,7 +81,7 @@ Notes:
                          | 14| R |
                          | 15| S |
                          | 16| T |
-                         | 17| U | 
+                         | 17| U |
       +5V                | 18| V |     +5V
 
 

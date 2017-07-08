@@ -80,7 +80,7 @@ namespace webpp {
 
 			std::string remote_endpoint_address;
 			unsigned short remote_endpoint_port;
-			
+
 			std::shared_ptr<Connection> ptr() {
 				return this->shared_from_this();
 			}
@@ -432,7 +432,7 @@ namespace webpp {
 				}
 			}
 		}
-		
+
 		void write_handshake(const std::shared_ptr<Connection> &connection, const std::shared_ptr<asio::streambuf> &read_buffer) {
 			//Find path- and method-match, and generate response
 			std::lock_guard<std::mutex> lock(m_endpoint_mutex);
