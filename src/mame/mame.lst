@@ -30052,6 +30052,7 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
+compc10							// 1984 Commodore PC-10, PC-20 and PC-30
 dgone                           // 1984 Data General/One
 eagle1600                       //
 ibm5550                         //
