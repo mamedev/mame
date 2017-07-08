@@ -14830,6 +14830,9 @@ hprotr8a                        //
 @source:hpz80unk.cpp
 hpz80unk                        //
 
+@source:hp80.cpp
+hp85                            //
+
 @source:hshavoc.cpp
 hshavoc                         // (c) 1993 Data East
 
