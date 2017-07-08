@@ -25,7 +25,7 @@ enum
     CONFIGURATION MACROS
 ***********************************************************************/
 
-#define MCS40BUS_FUNC(cls, fnc) \
+#define MCS40CB_BUSCYCLE(cls, fnc) \
 		mcs40_cpu_device_base::bus_cycle_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, (cls *)nullptr)
 
 
@@ -48,7 +48,7 @@ enum
 		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_PROGRAM_MEMORY, map)
 
 #define MCFG_I4004_BUS_CYCLE_CB(obj) \
-		i4004_cpu_device::set_bus_cycle_cb(*device, (MCS40BUS_##obj));
+		i4004_cpu_device::set_bus_cycle_cb(*device, (MCS40CB_##obj));
 
 #define MCFG_I4004_SYNC_CB(obj) \
 		devcb = &i4004_cpu_device::set_sync_cb(*device, DEVCB_##obj);
@@ -94,7 +94,7 @@ enum
 		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_PROGRAM_MEMORY, map)
 
 #define MCFG_I4040_BUS_CYCLE_CB(obj) \
-		i4040_cpu_device::set_bus_cycle_cb(*device, (MCS40BUS_##obj));
+		i4040_cpu_device::set_bus_cycle_cb(*device, (MCS40CB_##obj));
 
 #define MCFG_I4040_SYNC_CB(obj) \
 		devcb = &i4040_cpu_device::set_sync_cb(*device, DEVCB_##obj);

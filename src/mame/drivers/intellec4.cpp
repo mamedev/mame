@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(intlc440)
 	MCFG_I4040_RAM_STATUS_MAP(mod40_ram_status)
 	MCFG_I4040_RAM_PORTS_MAP(mod40_ram_ports)
 	MCFG_I4040_PROGRAM_MEMORY_MAP(mod40_program_memory)
-	MCFG_I4040_BUS_CYCLE_CB(FUNC(intellec4_40_state, bus_cycle));
+	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(intellec4_40_state, bus_cycle));
 	MCFG_I4040_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
 	MCFG_I4040_STP_ACK_CB(WRITELINE(intellec4_40_state, stp_ack))
 
