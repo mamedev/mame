@@ -699,7 +699,7 @@ bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
 	m_vfd->write_contents(o);
 	for (int i = 0; i < m_light_states.size(); i++)
 	{
-		o.put(0xff);
+		o.put(char(0xff));
 		o.put((m_light_states[i] << 6) | i);
 	}
 	return true;
