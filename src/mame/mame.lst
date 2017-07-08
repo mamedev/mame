@@ -12490,7 +12490,9 @@ feagv2                          //
 feagv2a                         //
 feagv7                          //
 feagv9                          //
-fexcel68k                       //
+fex68k                          //
+fex68km2                        //
+fex68km3                        //
 
 @source:fidelmcs48.cpp
 fscc6                           //
