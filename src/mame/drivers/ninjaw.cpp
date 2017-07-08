@@ -1031,8 +1031,8 @@ ROM_END
 
 ROM_START( ninjaw1 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 256K for 68000 CPUA code */
-	ROM_LOAD16_BYTE( "b31_30.35", 0x00000, 0x10000, CRC(056edd9f) SHA1(8922cede80b31ce0f7a00c8cab13d835464c6058) ) /* For these 2 roms:  Same code base as the Japaneses set below */
-	ROM_LOAD16_BYTE( "b31_43.32", 0x00001, 0x10000, CRC(56ae37a6) SHA1(ddd5be455682df2c63721facee813be652863aa5) ) /* For these 2 roms:  original Taito rom, 1 byte region change  */
+	ROM_LOAD16_BYTE( "b31_30.35", 0x00000, 0x10000, CRC(056edd9f) SHA1(8922cede80b31ce0f7a00c8cab13d835464c6058) ) /* For these 2 roms:  Same code base as the Japanese set below */
+	ROM_LOAD16_BYTE( "b31_43.32", 0x00001, 0x10000, CRC(56ae37a6) SHA1(ddd5be455682df2c63721facee813be652863aa5) ) /* For these 2 roms:  original Taito rom, 1 byte region change */
 	ROM_LOAD16_BYTE( "b31_29.34", 0x20000, 0x10000, CRC(f2941a37) SHA1(cf1f231d9caddc903116a8b654f49181ca459697) )
 	ROM_LOAD16_BYTE( "b31_27.31", 0x20001, 0x10000, CRC(2f3ff642) SHA1(7d6775b51d96b459b163d8fde2385b0e3f5242ca) )
 
