@@ -1,10 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
- Intel INTELLEC® 4/MOD 40
+ Intel INTELLEC® 4
+
+ The MOD 4 system has a 4004/4008/4009 chipset.  It has front panel
+ switches for holding or pulsing the CPU's TEST line, and a CPU LED
+ driven by clock phase 2.
+
+ The MOD 40 system has a 4040/4289 chipset.  It replaces the TEST
+ switches with STOP and SINGLE STEP switches, and replaces the CPU LED
+ with a RUN LED that's lit when the CPU isn't acknowledging a STOP or
+ HALT condition.
+
+ The MOD 4 and MOD 40 systems use the same monitor PROM.  The monitor
+ program doesn't use any 4040-specific features, and the console RAM
+ readback feature avoids the need for the RPM instruction by latching
+ the data and reading it through the ROM port space.
 
  Set the terminal for 110 1/8/N/2 to talk to the monitor.
- It only likes to see uppercase letters, digits, comma, and carriage return.
+ It only accepts uppercase letters, digits, comma, and carriage return.
  Paper tape reader run/stop is sent to RTS on the serial port.
  */
 #include "emu.h"
@@ -822,7 +836,7 @@ void intellec4_40_state::display_pointer(u8 value, u8 mask)
 }
 
 
-ADDRESS_MAP_START(mod40_program_banks, mcs40_cpu_device_base::AS_ROM, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_program_banks, mcs40_cpu_device_base::AS_ROM, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 
 	// 0x0000...0x0fff MON
@@ -836,7 +850,7 @@ ADDRESS_MAP_START(mod40_program_banks, mcs40_cpu_device_base::AS_ROM, 8, intelle
 	// 0x3000...0x3fff unmapped in case someone presses two mode switches at once
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_rom_port_banks, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_rom_port_banks, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 
 	// 0x0000...0x0fff MON
@@ -851,7 +865,7 @@ ADDRESS_MAP_START(mod40_rom_port_banks, mcs40_cpu_device_base::AS_ROM_PORTS, 8, 
 	// 0x3000...0x3fff unused
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_ram_port_banks, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_ram_port_banks, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_40_state)
 	// 0x00...0x1f MON
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x60) AM_WRITE(ram0_out)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x60) AM_WRITE(ram1_out)
@@ -864,31 +878,31 @@ ADDRESS_MAP_START(mod40_ram_port_banks, mcs40_cpu_device_base::AS_RAM_PORTS, 8, 
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START(mod40_rom, mcs40_cpu_device_base::AS_ROM, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_rom, mcs40_cpu_device_base::AS_ROM, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("prgbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_ram_memory, mcs40_cpu_device_base::AS_RAM_MEMORY, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_ram_memory, mcs40_cpu_device_base::AS_RAM_MEMORY, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("memory") // 4 * 4002
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_rom_ports, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_rom_ports, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("rpbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_ram_status, mcs40_cpu_device_base::AS_RAM_STATUS, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_ram_status, mcs40_cpu_device_base::AS_RAM_STATUS, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x003f) AM_RAM AM_SHARE("status") // 4 * 4002
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_ram_ports, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_ram_ports, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_40_state)
 	AM_RANGE(0x00, 0x1f) AM_DEVICE("mpbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(mod40_program_memory, mcs40_cpu_device_base::AS_PROGRAM_MEMORY, 8, intellec4_40_state)
+ADDRESS_MAP_START(intellec4_program_memory, mcs40_cpu_device_base::AS_PROGRAM_MEMORY, 8, intellec4_40_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(pm_read, pm_write)
 ADDRESS_MAP_END
@@ -896,32 +910,32 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(intlc440)
 	MCFG_CPU_ADD("maincpu", I4040, 5185000. / 7)
-	MCFG_I4040_ROM_MAP(mod40_rom)
-	MCFG_I4040_RAM_MEMORY_MAP(mod40_ram_memory)
-	MCFG_I4040_ROM_PORTS_MAP(mod40_rom_ports)
-	MCFG_I4040_RAM_STATUS_MAP(mod40_ram_status)
-	MCFG_I4040_RAM_PORTS_MAP(mod40_ram_ports)
-	MCFG_I4040_PROGRAM_MEMORY_MAP(mod40_program_memory)
+	MCFG_I4040_ROM_MAP(intellec4_rom)
+	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)
+	MCFG_I4040_ROM_PORTS_MAP(intellec4_rom_ports)
+	MCFG_I4040_RAM_STATUS_MAP(intellec4_ram_status)
+	MCFG_I4040_RAM_PORTS_MAP(intellec4_ram_ports)
+	MCFG_I4040_PROGRAM_MEMORY_MAP(intellec4_program_memory)
 	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(intellec4_40_state, bus_cycle));
 	MCFG_I4040_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
 	MCFG_I4040_STP_ACK_CB(WRITELINE(intellec4_40_state, stp_ack))
 
 	MCFG_DEVICE_ADD("prgbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mod40_program_banks)
+	MCFG_DEVICE_PROGRAM_MAP(intellec4_program_banks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_DEVICE_ADD("rpbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mod40_rom_port_banks)
+	MCFG_DEVICE_PROGRAM_MAP(intellec4_rom_port_banks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_DEVICE_ADD("mpbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mod40_ram_port_banks)
+	MCFG_DEVICE_PROGRAM_MAP(intellec4_ram_port_banks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(7)
@@ -1010,5 +1024,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE               INIT  COMPANY  FULLNAME            FLAGS
-COMP( 1974?, intlc440, 0,      0,      intlc440, intlc440, intellec4_40_state, 0,    "Intel", "INTELLEC 4/MOD40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE               INIT  COMPANY  FULLNAME             FLAGS
+COMP( 1974?, intlc440, 0,      0,      intlc440, intlc440, intellec4_40_state, 0,    "Intel", "INTELLEC 4/MOD 40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )

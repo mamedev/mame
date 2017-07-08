@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
-INTELLEC® 4/MOD 40 Universal Slot
+INTELLEC® 4 Universal Slot
 
                          1    2  /TEST
                   GND    3    4  GND
@@ -82,6 +82,8 @@ I/O 0...I/O 3           I/O lines to 4289 on CPU board (bidirectional I/O data)
 /USER RESET             Input to control board, edge sensitive, wired or (cards should pull low to assert)
 
 other pins connected between universal slots but not connected to CPU or control cards
+pins 73 and 74 are connected between cards but not otherwise used on MOD 4 systems
+interrupt request/acknowledge are supposedly connected somewhere on MOD 40 systems
 */
 #ifndef MAME_BUS_INTELLEC4_INTELLEC4_H
 #define MAME_BUS_INTELLEC4_INTELLEC4_H

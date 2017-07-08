@@ -99,7 +99,7 @@ class LayoutError(Exception):
 
 class LayoutChecker(Minifyer):
     VARPATTERN = re.compile('^~scr(0|[1-9][0-9]*)(native[xy]aspect|width|height)~$')
-    SHAPES = frozenset(('disk', 'led16seg', 'led7seg', 'rect'))
+    SHAPES = frozenset(('disk', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
     OBJECTS = frozenset(('backdrop', 'bezel', 'cpanel', 'marquee', 'overlay'))
 
     def __init__(self, output, **kwargs):
@@ -109,6 +109,8 @@ class LayoutChecker(Minifyer):
         self.elements = { }
         self.views = { }
         self.referenced = { }
+        self.have_bounds = [ ]
+        self.have_color = [ ]
 
     def formatLocation(self):
         return '%s:%d:%d' % (self.locator.getSystemId(), self.locator.getLineNumber(), self.locator.getColumnNumber())
@@ -127,6 +129,10 @@ class LayoutChecker(Minifyer):
         return None
 
     def checkBounds(self, attrs):
+        if self.have_bounds[-1]:
+            self.handleError('Duplicate element bounds')
+        else:
+            self.have_bounds[-1] = True
         left = self.checkBoundsDimension(attrs, 'left')
         top = self.checkBoundsDimension(attrs, 'top')
         right = self.checkBoundsDimension(attrs, 'right')
@@ -181,6 +187,8 @@ class LayoutChecker(Minifyer):
         self.elements.clear()
         self.views.clear()
         self.referenced.clear()
+        del self.have_bounds[:]
+        del self.have_color[:]
         super(LayoutChecker, self).endDocument()
 
     def startElement(self, name, attrs):
@@ -207,6 +215,10 @@ class LayoutChecker(Minifyer):
             if 'bounds' == name:
                 self.checkBounds(attrs)
             elif 'color' == name:
+                if self.have_color[-1]:
+                    self.handleError('Duplicate bounds element')
+                else:
+                    self.have_color[-1] = True
                 self.checkColorChannel(attrs, 'red')
                 self.checkColorChannel(attrs, 'green')
                 self.checkColorChannel(attrs, 'blue')
@@ -215,6 +227,8 @@ class LayoutChecker(Minifyer):
         elif self.in_element:
             if name in self.SHAPES:
                 self.in_shape = True
+                self.have_bounds.append(False)
+                self.have_color.append(False)
             elif 'text' == name:
                 if 'string' not in attrs:
                     self.handleError('Element bounds missing attribute string')
@@ -226,6 +240,8 @@ class LayoutChecker(Minifyer):
                     except:
                         self.handleError('Element text attribute align "%s" is not an integer' % (attrs['align'], ))
                 self.in_shape = True
+                self.have_bounds.append(False)
+                self.have_color.append(False)
             else:
                 self.ignored_depth = 1
         elif self.in_view:
@@ -235,6 +251,7 @@ class LayoutChecker(Minifyer):
                 elif attrs['element'] not in self.referenced:
                     self.referenced[attrs['element']] = self.formatLocation()
                 self.in_object = True
+                self.have_bounds.append(False)
             elif 'screen' == name:
                 if 'index' in attrs:
                     try:
@@ -244,6 +261,7 @@ class LayoutChecker(Minifyer):
                     except:
                         self.handleError('Element screen attribute index "%s" is not an integer' % (attrs['index'], ))
                 self.in_object = True
+                self.have_bounds.append(False)
             elif 'bounds' == name:
                 self.checkBounds(attrs)
                 self.ignored_depth = 1
@@ -267,6 +285,7 @@ class LayoutChecker(Minifyer):
                 else:
                     self.views[attrs['name']] = self.formatLocation()
             self.in_view = True
+            self.have_bounds.append(False)
         else:
             self.ignored_depth = 1
         super(LayoutChecker, self).startElement(name, attrs)
@@ -276,12 +295,16 @@ class LayoutChecker(Minifyer):
             self.ignored_depth -= 1
         elif self.in_object:
             self.in_object = False
+            self.have_bounds.pop()
         elif self.in_shape:
             self.in_shape = False
+            self.have_bounds.pop()
+            self.have_color.pop()
         elif self.in_element:
             self.in_element = False
         elif self.in_view:
             self.in_view = False
+            self.have_bounds.pop()
         elif self.in_layout:
             for element in self.referenced:
                 if element not in self.elements:
