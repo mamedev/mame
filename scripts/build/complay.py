@@ -11,6 +11,11 @@ import xml.sax.saxutils
 import zlib
 
 
+# workaround for version incompatibility
+if sys.version_info > (3, ):
+    long = int
+
+
 class ErrorHandler(object):
     def __init__(self, **kwargs):
         super(ErrorHandler, self).__init__(**kwargs)
