@@ -29393,6 +29393,7 @@ vgtablet
 gprnrs1
 gprnrs16
 vgpocket
+vgpmini
 
 @source:newbrain.cpp
 newbrain                        //

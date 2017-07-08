@@ -46,6 +46,9 @@
   Add more Famiclone roms here, there should be plenty more dumps of VTxx
   based systems floating about.
 
+  Make sure that none of the unenhanced sets were actually sold as cartridges
+  instead, there is a lack of information for some of the older dumps and
+  still some dumps in nes.xml that might belong here.
 
   NON-bugs (same happens on real hardware)
 
@@ -67,6 +70,7 @@ class nes_vt_state : public nes_base_state
 public:
 	nes_vt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: nes_base_state(mconfig, type, tag)
+		, m_ntram(nullptr)
 		, m_ppu(*this, "ppu")
 		, m_apu(*this, "apu")
 		, m_prg(*this, "prg")
@@ -99,12 +103,13 @@ public:
 	DECLARE_READ8_MEMBER(spr_r);
 	DECLARE_READ8_MEMBER(chr_r);
 
-	/* expansion nametable */
-	std::vector<uint8_t> m_ntram;
+private:
+
+	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
+	std::unique_ptr<uint8_t[]> m_ntram;
 	DECLARE_READ8_MEMBER(nt_r);
 	DECLARE_WRITE8_MEMBER(nt_w);
 
-private:
 	void scanline_irq(int scanline, int vblank, int blanked);
 	uint8_t m_410x[0xc];
 
@@ -356,8 +361,8 @@ void nes_vt_state::machine_start()
 	save_item(NAME(m_timer_running));
 	save_item(NAME(m_timer_val));
 
-	m_ntram.resize(0x2000);
-	save_item(NAME(m_ntram));
+	m_ntram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_ntram.get()), 0x2000);
 
 	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::scanline_irq),this));
 // m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
@@ -1032,6 +1037,12 @@ ROM_START( vgpocket )
 	// there was a dump of a 'secure' area with this, but it was just the top 0x10000 bytes of the existing rom.
 ROM_END
 
+ROM_START( vgpmini )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "vgpmini.bin", 0x00000, 0x400000, CRC(a1121843) SHA1(c96013ae6cf2f8173e65a167d45685cb61536d36) )
+	// there was a dump of a 'secure' area with this, but it was just the bottom 0x10000 bytes of the existing rom.
+ROM_END
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1048,6 +1059,7 @@ CONS( 200?, vgtablet,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 // it boots, but gfx look wrong due to unsupported mode
 CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
 CONS( 200?, vgpocket,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket (VG-2000)", MACHINE_NOT_WORKING )
+CONS( 200?, vgpmini,   0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket Mini (VG-1500)", MACHINE_NOT_WORKING )
 
 // these are NOT VT03, but something newer but based around the same basic designs
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
