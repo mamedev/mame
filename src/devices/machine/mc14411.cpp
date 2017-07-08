@@ -138,27 +138,12 @@ void mc14411_device::device_reset()
 //-------------------------------------------------
 void mc14411_device::device_timer (emu_timer &timer, device_timer_id id, int32_t param, void *ptr)
 {
-	switch(id)
+	if (id >= F1 && id <= F16)
 	{
-	case F1:
-	case F2:
-	case F3:
-	case F4:
-	case F5:
-	case F6:
-	case F7:
-	case F8:
-	case F9:
-	case F10:
-	case F11:
-	case F12:
-	case F13:
-	case F14:
-	case F15:
-	case F16:
 		(m_out_fx_cbs[id])(m_fx_state[id]++ & 1);
-		break;
-	case TIMER_ID_RESET:
+	}
+	else if (id == TIMER_ID_RESET)
+	{
 		// NOTE: This check could be triggered by either faulty hardware design or non accurate emulation so is just informative if the reset line is handled
 		//       explicitelly instead of relying on calling device_reset
 		if (!(m_reset == ASSERT_LINE))
@@ -166,10 +151,10 @@ void mc14411_device::device_timer (emu_timer &timer, device_timer_id id, int32_t
 			LOG("Reset pulse is too short, should be 900nS minimum");
 			logerror("Reset pulse is too short, should be 900nS minimum");
 		}
-		break;
-	default:
+	}
+	else
+	{
 		LOG("Unhandled Timer ID %d\n", id);
-		break;
 	}
 }
 
