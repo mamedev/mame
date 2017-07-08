@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders:Roberto Fresca,AJR
 /**************************************************************************************************
 
   MEGA DOUBLE POKER (BLITZ SYSTEM INC.)
@@ -253,8 +253,10 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-//#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "machine/6821pia.h"
+#include "machine/bankdev.h"
+#include "machine/timekpr.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -271,26 +273,44 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_cpubank(*this, "cpubank"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_mcu(*this, "mcu"),
+		m_bankdev(*this, "bankdev"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_cpubank_xor(0),
+		m_portc_data(0x0f)
 	{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
+	required_region_ptr<uint8_t> m_cpubank;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<m68705p_device> m_mcu;
+	required_device<address_map_bank_device> m_bankdev;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
-	DECLARE_WRITE8_MEMBER(megadpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(megadpkr_colorram_w);
-	DECLARE_READ8_MEMBER(megadpkr_mux_port_r);
+
+	uint8_t m_cpubank_xor;
+	uint8_t m_portc_data;
+
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
+	DECLARE_WRITE8_MEMBER(mcu_command_w);
+	DECLARE_WRITE8_MEMBER(mcu_portb_w);
+	DECLARE_WRITE8_MEMBER(mcu_portc_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(blitz);
 	uint32_t screen_update_megadpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -298,13 +318,13 @@ public:
 *               Video Hardware               *
 *********************************************/
 
-WRITE8_MEMBER(blitz_state::megadpkr_videoram_w)
+WRITE8_MEMBER(blitz_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(blitz_state::megadpkr_colorram_w)
+WRITE8_MEMBER(blitz_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -396,7 +416,7 @@ PALETTE_INIT_MEMBER(blitz_state, blitz)
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(blitz_state::megadpkr_mux_port_r)
+READ8_MEMBER(blitz_state::mux_port_r)
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -440,15 +460,51 @@ WRITE8_MEMBER(blitz_state::sound_w)
 
 
 /*********************************************
+*       MCU Commands & Program Banking       *
+*********************************************/
+
+READ8_MEMBER(blitz_state::cpubank_decrypt_r)
+{
+	return m_cpubank[offset] ^ m_cpubank_xor;
+}
+
+WRITE8_MEMBER(blitz_state::mcu_command_w)
+{
+	m_mcu->pa_w(space, 0, data);
+	if (BIT(m_portc_data, 0))
+	{
+		m_mcu->set_input_line(M6805_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+	}
+}
+
+WRITE8_MEMBER(blitz_state::mcu_portb_w)
+{
+	m_cpubank_xor = data;
+}
+
+WRITE8_MEMBER(blitz_state::mcu_portc_w)
+{
+	if (!BIT(data, 0))
+	{
+		m_mcu->set_input_line(M6805_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+
+	m_bankdev->set_bank((BIT(data, 2) << 1) | BIT(data, 3));
+
+	m_portc_data = data;
+}
+
+
+/*********************************************
 *           Memory Map Information           *
 *********************************************/
 
 static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
-//  ADDRESS_MAP_GLOBAL_MASK(0x7fff) // seems that hardware is playing with A14 & A15 CPU lines...
-
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
-//  AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-//  AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 
@@ -458,116 +514,18 @@ static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
     AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
     AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bankdev", address_map_bank_device, read8, write8)
+	AM_RANGE(0x8000, 0xbfff) AM_READNOP AM_WRITE(mcu_command_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-/*
-
-  0844-0847 / 0848-084b --> PIAS?
-  10f4-10f7 / 10f8-10fb --> PIAS?
-
-  Also 47f4-47f7 & 47f8-47fb are treated as PIA offsets... (code at $6eaf and $6f74)
-
-
-  $80ff --> register, comm ack, or bankswitching?
-
-
-  FE99: 78            sei            ; set IRQ
-  FE9A: 4E 2F 02      lsr  $022F
-  FE9D: D8            cld
-  FE9E: A2 FF         ldx  #$FF
-  FEA0: 9A            txs
-  FEA1: A9 00         lda  #$00
-  FEA3: 8D 25 02      sta  $0225
-  FEA6: A9 F7         lda  #$F7      ; load 0xf7
-  FEA8: 9D 00 80      sta  $8000,x   ; store at $80ff ($00ff if A15 is disconnected)
-  FEAB: 20 4E EE      jsr  $EE4E     ; delay for sync
-  FEAE: AD 98 46      lda  $4698     ; load from $4698
-  FEB1: C9 A2         cmp  #$A2      ; compare with 0xa2
-  FEB3: D0 F1         bne  $FEA6     ; if not ---> again to $fea6
-  FEB5: A9 F4         lda  #$F4      ; load 0xf4
-  FEB7: 9D 00 80      sta  $8000,x   ; store at $80ff ($00ff if A15 is disconnected)
-  FEBA: 20 4E EE      jsr  $EE4E     ; delay for sync
-  FEBD: AD 98 46      lda  $4698     ; load from $4698
-  FEC0: C9 45         cmp  #$45      ; compare with 0x45
-  FEC2: D0 E2         bne  $FEA6     ; if not ---> again to $fea6
-  FEC4: 20 4E EE      jsr  $EE4E     ; delay for sync
-  FEC7: 20 4E EE      jsr  $EE4E     ; delay for sync
-  FECA: A9 00         lda  #$00
-  FECC: 85 C1         sta  $C1
-  FECE: 85 C2         sta  $C2
-  FED0: 85 E0         sta  $E0
-  FED2: A9 10         lda  #$10      ; load 0x10
-  FED4: 85 1C         sta  $1C
-  FED6: 9D 00 80      sta  $8000,x   ; store at $80ff ($00ff if A15 is disconnected)
-  FED9: 20 4E EE      jsr  $EE4E     ; delay for sync
-  FEDC: A9 00         lda  #$00      ; load 0x00
-  FEDE: 9D 00 80      sta  $8000,x   ; store at $80ff ($00ff if A15 is disconnected)
-  FEE1: 20 4E EE      jsr  $EE4E     ; delay for sync
-  FEE4: 20 4E EE      jsr  $EE4E     ; delay for sync
-  FEE7: 4C 3F 62      jmp  $623F     ; transfer the control to $623f (no valid code there. RTS in the alt program)
-
-
-  Some routines are writing to $47xx that should be ROM space.
-
-  Also some pieces of code are copying code to the first 0x80 bytes of the stack and execute from there.
-  The code is so obfuscated. The copied code is using undocumented opcodes as LAX.
-
-  EEDA: A2 00         ldx  #$00
-  EEDC: BD 22 EF      lda  $EF22,x
-  EEDF: 9D 00 01      sta  $0100,x
-  EEE2: E8            inx
-  EEE3: E0 80         cpx  #$80
-  EEE5: D0 F5         bne  $EEDC
-  EEE7: 78            sei
-  EEE8: 20 00 01      jsr  $0100
-  EEEB: 58            cli
-
-  Here the copied subroutine:
-
-  EF22: 38            sec
-  EF23: B0 08         bcs  $EF2D
-  EF25: C5 3A         cmp  $3A
-  EF27: A3 5C         lax  ($5C,x)  ------> Indexed LAX???
-  EF29: C5 3A         cmp  $3A
-  EF2B: A3 5C         lax  ($5C,x)  ------> Indexed LAX???
-  EF2D: AD F7 47      lda  $47F7
-  EF30: A2 00         ldx  #$00
-  EF32: BD 03 01      lda  $0103,x
-  EF35: A0 08         ldy  #$08
-  EF37: 8D F7 47      sta  $47F7
-  EF3A: 6A            ror  a
-  EF3B: 88            dey
-  EF3C: D0 F9         bne  $EF37
-  EF3E: E8            inx
-  EF3F: E0 08         cpx  #$08
-  EF41: D0 EF         bne  $EF32
-  EF43: A2 00         ldx  #$00
-  EF45: A0 08         ldy  #$08
-  EF47: AD F7 47      lda  $47F7
-  EF4A: 4A            lsr  a
-  EF4B: 76 B0         ror  $B0,x
-  EF4D: 88            dey
-  EF4E: D0 F7         bne  $EF47
-  EF50: E8            inx
-  EF51: E0 08         cpx  #$08
-  EF53: D0 F0         bne  $EF45
-  EF55: A9 00         lda  #$00
-  EF57: 85 B0         sta  $B0
-  EF59: 60            rts
-
-*/
-
-
-/*
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, blitz_state )
-    ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-    AM_RANGE(0x0080, 0x07ff) AM_ROM
+static ADDRESS_MAP_START( megadpkr_banked_map, AS_PROGRAM, 8, blitz_state )
+	AM_RANGE(0x00000, 0x07fff) AM_READ(cpubank_decrypt_r)
+	AM_RANGE(0x08000, 0x087ff) AM_DEVREADWRITE("timekpr", m48t02_device, read, write)
 ADDRESS_MAP_END
-*/
 
 
 /*********************************************
@@ -577,44 +535,36 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( megadpkr )
 	/* Multiplexed - 4x5bits */
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-2") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-3") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not used?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Coins Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-7") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-8") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-7") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-8") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Menu")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not used?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Note")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Credit")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coupon")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW1")
 	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
@@ -704,15 +654,22 @@ static MACHINE_CONFIG_START( megadpkr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(megadpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz_state, irq0_line_hold)
 
-//  MCFG_CPU_ADD("mcu", M68705, CPU_CLOCK) /* unknown */
-//  MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(megadpkr_banked_map)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_ADD("mcu", M68705P5, CPU_CLOCK) /* unknown */
+	MCFG_M68705_PORTB_W_CB(WRITE8(blitz_state, mcu_portb_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(blitz_state, mcu_portc_w))
+
+	MCFG_M48T02_ADD("timekpr")
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(blitz_state, megadpkr_mux_port_r))
+	MCFG_PIA_READPA_HANDLER(READ8(blitz_state, mux_port_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blitz_state, lamps_a_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
@@ -756,9 +713,8 @@ ROM_START( megadpkr )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program ROM */
 	ROM_LOAD( "mega-2.u2",  0x8000, 0x8000, CRC(2b133b92) SHA1(97bc21c42897cfd13c0247e239aebb18f73cde91) )
 
-	/* sharing the same space, but not totally understood... banked through MCU? */
-	ROM_REGION( 0x10000, "cpubank", 0 )
-	ROM_LOAD( "mega-3.u3",  0x8000, 0x8000, CRC(ff0a46c6) SHA1(df053c323c0e2dd0e41e22286d38e889bfda3aa5) )
+	ROM_REGION( 0x8000, "cpubank", 0 ) /* banked through MCU */
+	ROM_LOAD( "mega-3.u3",  0x0000, 0x8000, CRC(ff0a46c6) SHA1(df053c323c0e2dd0e41e22286d38e889bfda3aa5) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 68705P5 microcontroller */
 	ROM_LOAD( "mega-1.u11",  0x0000, 0x0800, CRC(621a7971) SHA1(49121f7b0d428a825ccd219622dcc4abe3572968) )
@@ -805,9 +761,8 @@ ROM_START( megadpkrb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program ROM */
 	ROM_LOAD( "u2.bin", 0x8000, 0x8000, CRC(0efdf472) SHA1(4b1ae10427c2ae8d7cbbe525a6b30973372d4420) )
 
-	/* sharing the same space, but not totally understood... banked through MCU? */
-	ROM_REGION( 0x10000, "cpubank", 0 )
-	ROM_LOAD( "u3.bin", 0x8000, 0x8000, CRC(c973e345) SHA1(aae9da8cbaf0cf07086e5acacf9052e49fbdd896) )
+	ROM_REGION( 0x8000, "cpubank", 0 ) /* banked through MCU */
+	ROM_LOAD( "u3.bin", 0x0000, 0x8000, CRC(c973e345) SHA1(aae9da8cbaf0cf07086e5acacf9052e49fbdd896) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 68705P5 microcontroller - might not be for this set */
 	ROM_LOAD( "mega-1.u11",  0x0000, 0x0800, CRC(621a7971) SHA1(49121f7b0d428a825ccd219622dcc4abe3572968) )
@@ -831,5 +786,5 @@ ROM_END
 *********************************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE        INIT  ROT    COMPANY              FULLNAME                                     FLAGS */
-GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
