@@ -83,6 +83,7 @@ VPP is only used for programming the 27c64, do not tie it to 18v or you will pro
 
 C-chip EXTERNAL memory map (it acts as a device mapped to ram; dtack is asserted on /cs for a 68k):
 0x000-0x3FF = RW ram window, a 1k window into the 8k byte sram inside the c-chip; the 'bank' visible is selected by 0x600 below
+0x400-0x403 = "ASIC RAM", 4 bytes of ram on the asic
 0x400 = unknown, no idea if /DTACK is asserted for R or W here
 0x401 = RW 'test command/status register', writing a 0x02 here starts test mode, will return 0x01 set if ok/ready for command and 0x04 set if error; this register is very likely handled by the internal rom in the upd78c11 itself rather than the eprom, and probably tests the sram and the 78c11 internal ram, among other things.
 Current guess: 0x401 is actually attached to the high 2 bits of the PF register; bit 0 is pf6 out, bit 1 is pf6 in (attached to pf6 thru a resistor?), bit 2 is pf7 out, bit 3 is pf7 in (attached to pf7 through a resistor). The 78c11 (I'm guessing) reads pf6 and pf7 once per int; if pf6-in is set it reruns the startup selftest, clears pf6-out, then re-sets it. if there is an error, it also sets pf7.
@@ -121,13 +122,11 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(taito_cchip_device::asic_r)
 {
-	if (offset != 0x001) // prevent logerror spam for now
+	if ((offset != 0x001) && (!machine().side_effect_disabled())) // prevent logerror spam for now
 		logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
-
-	if (offset == 0x001) // megablst
-		return 0x01;
-
-	return 0x00;
+	if (offset<0x200) // 400-5ff is asic 'ram'
+		return m_asic_ram[offset&3];
+	return 0x00; // 600-7ff is read-only(?) asic banking reg, may read as open bus or never assert /DTACK on read?
 }
 
 WRITE8_MEMBER(taito_cchip_device::asic_w)
@@ -138,6 +137,8 @@ WRITE8_MEMBER(taito_cchip_device::asic_w)
 		logerror("cchip set bank to %02x\n", data & 0x7);
 		m_upd4464_bank->set_bank(data & 0x7);
 	}
+	else
+		m_asic_ram[offset&3] = data;
 }
 
 READ8_MEMBER(taito_cchip_device::mem_r)
@@ -175,6 +176,8 @@ MACHINE_CONFIG_END
 void taito_cchip_device::device_start()
 {
 	m_upd4464_bank->set_bank(0);
+	save_item(NAME(m_asic_ram));
+	m_asic_ram[0] = m_asic_ram[1] = m_asic_ram[2] = m_asic_ram[3] = 0;
 }
 
 void taito_cchip_device::device_reset()

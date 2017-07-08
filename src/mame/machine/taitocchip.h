@@ -37,6 +37,7 @@ private:
 	required_device<cpu_device> m_upd7811;
 	required_device<address_map_bank_device> m_upd4464_bank;
 	required_shared_ptr<uint8_t> m_upd4464;
+	uint8_t m_asic_ram[4];
 };
 
 #endif // MAME_MACHINE_CCHIP_DEV_H
