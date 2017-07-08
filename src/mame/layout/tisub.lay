@@ -94,6 +94,7 @@
 		</text>
 	</element>
 
+	<!-- FIXME - duplicate name of element on line 63
 	<element name="start" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
@@ -110,6 +111,7 @@
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
+	-->
 
 	<element name="unknown" defstate="0">
 		<rect state="1">

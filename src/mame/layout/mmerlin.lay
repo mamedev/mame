@@ -52,6 +52,7 @@
 		</text>
 	</element>
 
+	<!-- FIXME - duplicate name of element on line 55
 	<element name="panel_0">
 		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
 		<disk>
@@ -63,6 +64,7 @@
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
+	-->
 
 	<element name="panel_1">
 		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
