@@ -71,8 +71,7 @@ Intel INTELLEC® 4/MOD 40 layout
 
 	<element name="label_mon"><text string="MON"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="label_ram"><text string="RAM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="label_prom"><text string="PROM"><color red="1.0" green="1.0" blue="1.0" /></text>
-	</element>
+	<element name="label_prom"><text string="PROM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<element name="label_passes"><text string="PASSES"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
@@ -124,7 +123,7 @@ Intel INTELLEC® 4/MOD 40 layout
 	<element name="label_system">
 		<text string="SYSTEM" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
 	</element>
-	<element name="label_cpu">
+	<element name="label_reset_cpu">
 		<text string="CPU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
 	</element>
 
@@ -269,7 +268,7 @@ Intel INTELLEC® 4/MOD 40 layout
 		<cpanel element="label_reset"><bounds left="666" top="312" right="691" bottom="319" /></cpanel>
 		<cpanel element="label_reset_mode"><bounds left="697" top="312" right="722" bottom="319" /></cpanel>
 		<cpanel element="label_system"><bounds left="727" top="321" right="783" bottom="328" /></cpanel>
-		<cpanel element="label_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
+		<cpanel element="label_reset_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
 
 		<cpanel name="led_address_a3_3" element="led">
 			<bounds left="81" top="79" right="92" bottom="86" />
@@ -638,7 +637,7 @@ Intel INTELLEC® 4/MOD 40 layout
 		<cpanel element="label_reset"><bounds left="666" top="312" right="691" bottom="319" /></cpanel>
 		<cpanel element="label_reset_mode"><bounds left="697" top="312" right="722" bottom="319" /></cpanel>
 		<cpanel element="label_system"><bounds left="727" top="321" right="783" bottom="328" /></cpanel>
-		<cpanel element="label_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
+		<cpanel element="label_reset_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
 
 		<cpanel name="led_address_a3_3" element="led">
 			<bounds left="81" top="79" right="92" bottom="86" />
