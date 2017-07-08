@@ -95,6 +95,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_rom00;
+	required_memory_bank m_rombank;
 	required_ioport m_io_key0;
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
@@ -110,7 +111,6 @@ protected:
 	uint8_t m_crt_sts;
 	uint8_t m_crt_ctl;
 	uint8_t m_crt_read_byte;
-	memory_bank *m_rombank;
 	uint8_t m_empty_bank[ 0x2000 ];
 	bool m_global_int_en;
 	uint16_t m_int_req;
@@ -146,6 +146,7 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 	  m_screen(*this , "screen"),
 	  m_palette(*this , "palette"),
 	  m_rom00(*this , "rom00"),
+	  m_rombank(*this , "rombank"),
 	  m_io_key0(*this , "KEY0"),
 	  m_io_key1(*this , "KEY1"),
 	  m_io_key2(*this , "KEY2"),
@@ -160,7 +161,6 @@ void hp85_state::machine_start()
 	m_video_mem.resize(VIDEO_MEM_SIZE);
 
 	// ROM in bank 0 is always present (it's part of system ROMs)
-	m_rombank = membank("rombank");
 	m_rombank->configure_entry(0 , m_rom00);
 
 	memset(&m_empty_bank[ 0 ] , 0xff , sizeof(m_empty_bank));
