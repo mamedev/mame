@@ -315,7 +315,7 @@ Intel INTELLEC® 4/MOD 40 layout
 		<cpanel name="led_status_search" element="led">
 			<bounds left="580" top="79" right="591" bottom="86" />
 		</cpanel>
-		<cpanel name="led_status_run" element="led">
+		<cpanel name="led_status_cpu" element="led">
 			<bounds left="611" top="79" right="622" bottom="86" />
 		</cpanel>
 		<cpanel name="led_status_ptr_valid" element="led">
@@ -685,7 +685,7 @@ Intel INTELLEC® 4/MOD 40 layout
 		<cpanel name="led_status_search" element="led">
 			<bounds left="580" top="79" right="591" bottom="86" />
 		</cpanel>
-		<cpanel name="led_status_run" element="led">
+		<cpanel name="led_status_cpu" element="led">
 			<bounds left="611" top="79" right="622" bottom="86" />
 		</cpanel>
 		<cpanel name="led_status_ptr_valid" element="led">

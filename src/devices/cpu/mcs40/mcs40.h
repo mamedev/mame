@@ -293,9 +293,9 @@ private:
 	void update_4289_f_l(u8 val);
 
 	// address spaces
-	address_space_config    m_space_config[7];
-	address_space           *m_spaces[7];
-	direct_read_data        *m_direct;
+	address_space_config const  m_space_config[7];
+	address_space               *m_spaces[7];
+	direct_read_data            *m_direct;
 
 	// bus snooping callback
 	bus_cycle_delegate      m_bus_cycle_cb;

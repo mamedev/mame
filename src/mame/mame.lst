@@ -15071,6 +15071,7 @@ instantm                        //
 instruct                        //
 
 @source:intellec4.cpp
+intlc44                         //
 intlc440                        //
 
 @source:interact.cpp
