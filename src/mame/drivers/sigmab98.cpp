@@ -2928,14 +2928,17 @@ DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 ***************************************************************************/
 
 ROM_START( gocowboy )
+	ROM_REGION( 0x80000, "mainbios", 0 )
+	ROM_LOAD( "go_go_cowboy_gpt_2c9c.u3", 0x000000, 0x080000, CRC(ad9b1de6) SHA1(24809ec3a579d28189a98190db70a33217e4f8bc) ) /* uses custom BIOS */
+	
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
-	ROM_LOAD( "29f040.u021", 0x00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "em702l01.u021", 0x00000, 0x200000, CRC(4c4289fe) SHA1(517b5a1e9d91e7ed322b4792d863e7abda835d4a) )
 
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "go_go_cowboy_gpt_2c9c.u3", 0, 0x80000, CRC(ad9b1de6) SHA1(24809ec3a579d28189a98190db70a33217e4f8bc) )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
-	ROM_LOAD( "29f040.u016", 0x00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "em701l01.u016", 0x00000, 0x200000, CRC(c1f07320) SHA1(734717140e66ddcf0bded1489156c51cdaf1b50c) )
 ROM_END
 
 
