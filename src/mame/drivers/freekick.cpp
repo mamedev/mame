@@ -468,7 +468,9 @@ static INPUT_PORTS_START( omega )
 	PORT_DIPSETTING(    0x80, "1 Coin/50 Credits" )
 
 	PORT_START("DSW3") // omega has a third dipswitch array, similar to the later freekick hw below
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW3:1") // Prints "NORMAL" & "EMPTY" to title screen... medal/hopper status?
+	PORT_DIPNAME( 0x01, 0x01, "Hopper Status?" )        PORT_DIPLOCATION("SW3:1") // Prints "NORMAL" & "EMPTY" to title screen when set to ON ... medal/hopper status?
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Invulnerability" )     PORT_DIPLOCATION("SW3:2") // Ball always bounces up, player never dies
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -476,10 +478,11 @@ static INPUT_PORTS_START( omega )
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW3:4")
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW3:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW3:7")
-	PORT_DIPNAME( 0x80, 0x80, "Prize Version")     PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Prize Version")     PORT_DIPLOCATION("SW3:7,8") // Multiple settings for payout level?
+	PORT_DIPSETTING(    0xc0, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, "On Setting 1" )
+	PORT_DIPSETTING(    0x40, "On Setting 2" )
+	PORT_DIPSETTING(    0x00, "On Setting 3" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( freekck )
