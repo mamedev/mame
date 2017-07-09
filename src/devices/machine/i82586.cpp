@@ -79,4 +79,3 @@ void i82596_device::device_reset()
 {
 	i82586_base_device::device_reset();
 }
-
