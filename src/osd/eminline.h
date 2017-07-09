@@ -9,14 +9,16 @@
 
 ***************************************************************************/
 
-#ifndef __EMINLINE__
-#define __EMINLINE__
+#ifndef MAME_OSD_EMINLINE_H
+#define MAME_OSD_EMINLINE_H
+
+#pragma once
 
 #include "osdcomm.h"
 #include "osdcore.h"
 
 #if !defined(MAME_NOASM)
-/* we come with implementations for GCC x86 and PPC */
+
 #if defined(__GNUC__)
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -27,9 +29,7 @@
 #error "no matching assembler implementations found - please compile with NOASM=1"
 #endif
 
-#else
-
-#if defined(_MSC_VER)
+#elif defined(_MSC_VER)
 
 #if (defined(_M_IX86) || defined(_M_X64))
 #include "eivcx86.h"
@@ -43,8 +43,7 @@
 
 #endif
 
-#endif
-#endif
+#endif // !defined(MAME_NOASM)
 
 
 /***************************************************************************
@@ -57,9 +56,9 @@
 -------------------------------------------------*/
 
 #ifndef mul_32x32
-static inline int64_t mul_32x32(int32_t a, int32_t b)
+inline int64_t mul_32x32(int32_t a, int32_t b)
 {
-	return (int64_t)a * (int64_t)b;
+	return int64_t(a) * int64_t(b);
 }
 #endif
 
@@ -71,9 +70,9 @@ static inline int64_t mul_32x32(int32_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32
-static inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
+inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
 {
-	return (uint64_t)a * (uint64_t)b;
+	return uint64_t(a) * uint64_t(b);
 }
 #endif
 
@@ -85,9 +84,9 @@ static inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_hi
-static inline int32_t mul_32x32_hi(int32_t a, int32_t b)
+inline int32_t mul_32x32_hi(int32_t a, int32_t b)
 {
-	return (uint32_t)(((int64_t)a * (int64_t)b) >> 32);
+	return uint32_t((int64_t(a) * int64_t(b)) >> 32);
 }
 #endif
 
@@ -99,9 +98,9 @@ static inline int32_t mul_32x32_hi(int32_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_hi
-static inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
+inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
 {
-	return (uint32_t)(((uint64_t)a * (uint64_t)b) >> 32);
+	return uint32_t((uint64_t(a) * uint64_t(b)) >> 32);
 }
 #endif
 
@@ -114,9 +113,9 @@ static inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_shift
-static inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
+inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	return (int32_t)(((int64_t)a * (int64_t)b) >> shift);
+	return int32_t((int64_t(a) * int64_t(b)) >> shift);
 }
 #endif
 
@@ -129,9 +128,9 @@ static inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_shift
-static inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
+inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	return (uint32_t)(((uint64_t)a * (uint64_t)b) >> shift);
+	return uint32_t((uint64_t(a) * uint64_t(b)) >> shift);
 }
 #endif
 
@@ -142,9 +141,9 @@ static inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef div_64x32
-static inline int32_t div_64x32(int64_t a, int32_t b)
+inline int32_t div_64x32(int64_t a, int32_t b)
 {
-	return a / (int64_t)b;
+	return a / int64_t(b);
 }
 #endif
 
@@ -155,9 +154,9 @@ static inline int32_t div_64x32(int64_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef divu_64x32
-static inline uint32_t divu_64x32(uint64_t a, uint32_t b)
+inline uint32_t divu_64x32(uint64_t a, uint32_t b)
 {
-	return a / (uint64_t)b;
+	return a / uint64_t(b);
 }
 #endif
 
@@ -169,10 +168,10 @@ static inline uint32_t divu_64x32(uint64_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef div_64x32_rem
-static inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
+inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
 {
-	int32_t res = div_64x32(a, b);
-	*remainder = a - ((int64_t)b * res);
+	int32_t const res = div_64x32(a, b);
+	*remainder = a - (int64_t(b) * res);
 	return res;
 }
 #endif
@@ -185,10 +184,10 @@ static inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
 -------------------------------------------------*/
 
 #ifndef divu_64x32_rem
-static inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
+inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
 {
-	uint32_t res = divu_64x32(a, b);
-	*remainder = a - ((uint64_t)b * res);
+	uint32_t const res = divu_64x32(a, b);
+	*remainder = a - (uint64_t(b) * res);
 	return res;
 }
 #endif
@@ -201,9 +200,9 @@ static inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainde
 -------------------------------------------------*/
 
 #ifndef div_32x32_shift
-static inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
+inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	return ((int64_t)a << shift) / (int64_t)b;
+	return (int64_t(a) << shift) / int64_t(b);
 }
 #endif
 
@@ -215,9 +214,9 @@ static inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef divu_32x32_shift
-static inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
+inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	return ((uint64_t)a << shift) / (uint64_t)b;
+	return (uint64_t(a) << shift) / uint64_t(b);
 }
 #endif
 
@@ -228,7 +227,7 @@ static inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef mod_64x32
-static inline int32_t mod_64x32(int64_t a, int32_t b)
+inline int32_t mod_64x32(int64_t a, int32_t b)
 {
 	return a - (b * div_64x32(a, b));
 }
@@ -241,7 +240,7 @@ static inline int32_t mod_64x32(int64_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef modu_64x32
-static inline uint32_t modu_64x32(uint64_t a, uint32_t b)
+inline uint32_t modu_64x32(uint64_t a, uint32_t b)
 {
 	return a - (b * divu_64x32(a, b));
 }
@@ -254,7 +253,7 @@ static inline uint32_t modu_64x32(uint64_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef recip_approx
-static inline float recip_approx(float value)
+inline float recip_approx(float value)
 {
 	return 1.0f / value;
 }
@@ -272,10 +271,10 @@ static inline float recip_approx(float value)
 -------------------------------------------------*/
 
 #ifndef count_leading_zeros
-static inline uint8_t count_leading_zeros(uint32_t val)
+inline uint8_t count_leading_zeros(uint32_t val)
 {
 	uint8_t count;
-	for (count = 0; (int32_t)val >= 0; count++) val <<= 1;
+	for (count = 0; int32_t(val) >= 0; count++) val <<= 1;
 	return count;
 }
 #endif
@@ -287,7 +286,7 @@ static inline uint8_t count_leading_zeros(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef count_leading_ones
-static inline uint8_t count_leading_ones(uint32_t val)
+inline uint8_t count_leading_ones(uint32_t val)
 {
 	uint8_t count;
 	for (count = 0; (int32_t)val < 0; count++) val <<= 1;
@@ -308,10 +307,10 @@ static inline uint8_t count_leading_ones(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef get_profile_ticks
-static inline int64_t get_profile_ticks(void)
+inline int64_t get_profile_ticks()
 {
 	return osd_ticks();
 }
 #endif
 
-#endif /* __EMINLINE__ */
+#endif // MAME_OSD_EMINLINE_H
