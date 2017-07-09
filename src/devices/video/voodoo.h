@@ -1428,6 +1428,8 @@ enum
 #define MCFG_VOODOO_STALL_CB(_devcb) \
 	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_VOODOO_PCIINT_CB(_devcb) \
+	devcb = &voodoo_device::static_set_pciint_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -1446,12 +1448,10 @@ public:
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
 	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &static_set_stall_callback(device_t &device, Object &&cb)  { return downcast<voodoo_device &>(device).m_stall.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_pciint_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_pciint.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
-
-	// access to legacy token
-	void common_start_voodoo(uint8_t type);
 
 	uint8_t               m_fbmem;
 	uint8_t               m_tmumem0;
@@ -1460,12 +1460,14 @@ public:
 	const char *        m_cputag;
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
+	// This is for internally generated PCI interrupts in Voodoo3
+	devcb_write_line   m_pciint;
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
 	TIMER_CALLBACK_MEMBER( vblank_callback );
 
-	static void voodoo_postload(voodoo_device *vd);
+	void voodoo_postload();
 
 	int voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int voodoo_get_type();
@@ -1473,12 +1475,14 @@ public:
 	void voodoo_set_init_enable(uint32_t newval);
 
 protected:
-	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
 
 	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
 
+	struct tmu_shared_state;
 
 	struct voodoo_stats
 	{
@@ -1566,6 +1570,7 @@ protected:
 	struct tmu_state
 	{
 		void recompute_texture_params();
+		void init(uint8_t vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		int32_t prepare();
 		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, int64_t ITERS, int64_t ITERT, int64_t ITERW, int32_t &lod);
 		rgbaint_t combineTexture(const uint32_t TEXMODE, rgbaint_t c_local, rgbaint_t c_other, int32_t lod);
@@ -1782,19 +1787,18 @@ protected:
 
 	// not all of these need to be static, review.
 
-	static void check_stalled_cpu(voodoo_device* vd, attotime current_time);
+	void check_stalled_cpu(attotime current_time);
 	static void flush_fifos( voodoo_device* vd, attotime current_time);
 	static void init_fbi(voodoo_device *vd, fbi_state *f, void *memory, int fbmem);
 	static int32_t register_w(voodoo_device *vd, offs_t offset, uint32_t data);
 	static int32_t swapbuffer(voodoo_device *vd, uint32_t data);
-	static void init_tmu(voodoo_device *vd, tmu_state *t, voodoo_reg *reg, void *memory, int tmem);
 	static int32_t lfb_w(voodoo_device *vd, offs_t offset, uint32_t data, uint32_t mem_mask);
 	static int32_t texture_w(voodoo_device *vd, offs_t offset, uint32_t data);
-	static int32_t lfb_direct_w(voodoo_device *vd, offs_t offset, uint32_t data, uint32_t mem_mask);
+	int32_t lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	static int32_t banshee_2d_w(voodoo_device *vd, offs_t offset, uint32_t data);
-	static void stall_cpu(voodoo_device *vd, int state, attotime current_time);
+	void stall_cpu(int state, attotime current_time);
 	void soft_reset();
-	static void recompute_video_memory(voodoo_device *vd);
+	void recompute_video_memory();
 	static int32_t fastfill(voodoo_device *vd);
 	static int32_t triangle(voodoo_device *vd);
 	static int32_t begin_triangle(voodoo_device *vd);
@@ -1843,7 +1847,7 @@ public:
 	uint8_t               index;                  /* index of board */
 	screen_device *screen;              /* the screen we are acting on */
 	device_t *cpu;                  /* the CPU we interact with */
-	uint8_t               vd_type;                   /* type of system */
+	const uint8_t         vd_type;                   /* type of system */
 	uint8_t               chipmask;               /* mask for which chips are available */
 	uint32_t              freq;                   /* operating frequency */
 	attoseconds_t       attoseconds_per_cycle;  /* attoseconds per cycle */
@@ -1884,10 +1888,6 @@ class voodoo_1_device : public voodoo_device
 {
 public:
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -1895,9 +1895,6 @@ class voodoo_2_device : public voodoo_device
 {
 public:
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -1917,10 +1914,9 @@ public:
 	DECLARE_WRITE8_MEMBER(banshee_vga_w);
 
 protected:
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
 
 	// device-level overrides
-	virtual void device_start() override;
 	DECLARE_READ32_MEMBER( banshee_agp_r );
 	DECLARE_WRITE32_MEMBER( banshee_agp_w );
 };
@@ -1930,10 +1926,6 @@ class voodoo_3_device : public voodoo_banshee_device
 {
 public:
 	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 

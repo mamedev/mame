@@ -191,14 +191,9 @@ void esqvfd_device::update_display()
 
 /* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
-static MACHINE_CONFIG_START(esq2x40)
+MACHINE_CONFIG_MEMBER(esq2x40_device::device_add_mconfig)
 	MCFG_DEFAULT_LAYOUT(layout_esq2by40)
 MACHINE_CONFIG_END
-
-machine_config_constructor esq2x40_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( esq2x40 );
-}
 
 void esq2x40_device::write_char(int data)
 {
@@ -230,11 +225,15 @@ void esq2x40_device::write_char(int data)
 		switch (data)
 		{
 			case 0xd0:  // blink start
-				m_curattr = AT_BLINK;
+				m_curattr |= AT_BLINK;
 				break;
 
 			case 0xd1:  // blink stop (cancel all attribs on VFX+)
 				m_curattr = 0; //&= ~AT_BLINK;
+				break;
+
+			case 0xd2:  // blinking underline on VFX
+				m_curattr |= AT_BLINK | AT_UNDERLINE;
 				break;
 
 			case 0xd3:  // start underline
@@ -283,6 +282,41 @@ void esq2x40_device::write_char(int data)
 	update_display();
 }
 
+bool esq2x40_device::write_contents(std::ostream &o)
+{
+	o.put((char) 0xd6); // clear screen
+
+	uint8_t attrs = 0;
+	for (int row = 0; row < 2; row++)
+	{
+		o.put((char) (0x80 + (40 * row))); // move to first column this row
+
+		for (int col = 0; col < 40; col++)
+		{
+			if (m_attrs[row][col] != attrs)
+			{
+				attrs = m_attrs[row][col];
+
+				o.put((char) 0xd1); // all attributes off
+
+				if (attrs & AT_BLINK)
+				{
+					o.put((char) 0xd0); // blink on
+				}
+
+				if (attrs & AT_UNDERLINE)
+				{
+					o.put((char) 0xd3); // underline
+				}
+			}
+
+			o.put((char) (m_chars[row][col] + ' '));
+		}
+	}
+	return true;
+}
+
+
 esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40, tag, owner, clock)
 {
 	m_rows = 2;
@@ -291,14 +325,10 @@ esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, d
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
 
-static MACHINE_CONFIG_START(esq1x22)
+MACHINE_CONFIG_MEMBER(esq1x22_device::device_add_mconfig)
 	MCFG_DEFAULT_LAYOUT(layout_esq1by22)
 MACHINE_CONFIG_END
 
-machine_config_constructor esq1x22_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( esq1x22 );
-}
 
 void esq1x22_device::write_char(int data)
 {
@@ -343,10 +373,9 @@ esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, d
 }
 
 /* SQ-1 display, I think it's really an LCD but we'll deal with it for now */
-machine_config_constructor esq2x40_sq1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( esq2x40 );  // we use the normal 2x40 layout
-}
+MACHINE_CONFIG_MEMBER(esq2x40_sq1_device::device_add_mconfig)
+	MCFG_DEFAULT_LAYOUT(layout_esq2by40)  // we use the normal 2x40 layout
+MACHINE_CONFIG_END
 
 void esq2x40_sq1_device::write_char(int data)
 {

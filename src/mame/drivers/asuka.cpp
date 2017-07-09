@@ -315,6 +315,15 @@ WRITE16_MEMBER(asuka_state::cadash_share_w)
 }
 
 
+WRITE8_MEMBER(asuka_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
+
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
@@ -826,6 +835,7 @@ static MACHINE_CONFIG_START( bonzeadv )
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)    /* sound CPU, also required for test mode */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_z80_map)
 
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -890,6 +900,7 @@ static MACHINE_CONFIG_START( asuka )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -964,6 +975,7 @@ static MACHINE_CONFIG_START( cadash )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1027,6 +1039,7 @@ static MACHINE_CONFIG_START( mofflott )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1097,6 +1110,7 @@ static MACHINE_CONFIG_START( galmedes )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1159,6 +1173,7 @@ static MACHINE_CONFIG_START( eto )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1217,6 +1232,9 @@ ROM_START( bonzeadv )
 	/* 0x040000 - 0x7ffff is intentionally empty */
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
 
@@ -1225,8 +1243,6 @@ ROM_START( bonzeadv )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
-
-	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
@@ -1241,6 +1257,9 @@ ROM_START( bonzeadvo )
 	/* 0x040000 - 0x7ffff is intentionally empty */
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
 
@@ -1249,8 +1268,6 @@ ROM_START( bonzeadvo )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
-
-	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
@@ -1265,6 +1282,9 @@ ROM_START( bonzeadvu )
 	/* 0x040000 - 0x7ffff is intentionally empty */
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
 
@@ -1273,8 +1293,6 @@ ROM_START( bonzeadvu )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
-
-	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
@@ -1289,6 +1307,9 @@ ROM_START( jigkmgri )
 	/* 0x040000 - 0x7ffff is intentionally empty */
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* Tiles (8 x 8) */
 
@@ -1297,8 +1318,6 @@ ROM_START( jigkmgri )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
-
-	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
@@ -1316,6 +1335,9 @@ ROM_START( bonzeadvp ) /* Labels consists of hand written checksum values of the
 	ROM_LOAD16_BYTE( "a418.ic23",  0xc0001, 0x20000, CRC(51b02be6) SHA1(20e3423aea359f3ca92dd24f4f87351d93c279b6) ) // ^
 	ROM_LOAD16_BYTE( "0e7e.ic28",  0xc0000, 0x20000, CRC(dc1f9fd0) SHA1(88addfa2c3bb854efd88a3556d23a7607b6ec848) ) // ^
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP ) /* is the C-Chip the same as the final? */
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abbe.ic9",   0x00000, 0x20000, CRC(50e6581c) SHA1(230724d65c9b1ea5d72117dca077464dd599ad68) ) // first 2 == first half b41-03.1 but split
 	ROM_LOAD16_BYTE( "0ac8.ic15",  0x00001, 0x20000, CRC(29002fc4) SHA1(5ddbefc0d173865802362990e99a3b542c096412) ) // ^
@@ -1330,8 +1352,6 @@ ROM_START( bonzeadvp ) /* Labels consists of hand written checksum values of the
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // missing from dump /* banked */
-
-	/* is the C-Chip the same as the final? */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "6089.ic17",  0x00000, 0x20000, CRC(b092783c) SHA1(e13f765e2884b6194926bf982595de18376ffef9) ) // these 4 == b41-04.48 but split

@@ -20,10 +20,10 @@
 
 #define MCFG_HD63484_ADD(_tag, _clock, _map) \
 	MCFG_DEVICE_ADD(_tag, HD63484, _clock) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_HD63484_ADDRESS_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_HD63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
 	hd63484_device::static_set_display_callback(*device, hd63484_device::display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -61,7 +61,7 @@ public:
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 protected:
 	// device-level overrides

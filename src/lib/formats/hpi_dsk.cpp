@@ -2,45 +2,45 @@
 // copyright-holders: Ansgar Kückes, F. Ulivi
 /*********************************************************************
 
-	hpi_dsk.cpp
+    hpi_dsk.cpp
 
-	HP9895A "HPI" disk images
+    HP9895A "HPI" disk images
 
-	CHS = 77/2/30
-	Sector size 256 bytes
-	Cell size 2 µs
-	Gap1 = 16 x 0x00
-	Gap2 = 34 x 0x00
-	Gap3 = ~490 x 0x00 (depends on actual rotation speed)
-	Sync = 4 x 0x00 + 4 x 0xff
-	ID AM = 0x0e clock + 0x70 data
-	Data AM = 0x0e clock + 0x50 data
-	DefectTrack AM = 0x0e clock + 0xf0 data
-	CRC-16 excludes address markers
-	MMFM/M2FM encoding (LS bit first)
+    CHS = 77/2/30
+    Sector size 256 bytes
+    Cell size 2 µs
+    Gap1 = 16 x 0x00
+    Gap2 = 34 x 0x00
+    Gap3 = ~490 x 0x00 (depends on actual rotation speed)
+    Sync = 4 x 0x00 + 4 x 0xff
+    ID AM = 0x0e clock + 0x70 data
+    Data AM = 0x0e clock + 0x50 data
+    DefectTrack AM = 0x0e clock + 0xf0 data
+    CRC-16 excludes address markers
+    MMFM/M2FM encoding (LS bit first)
 
-	The order of sectors in a track depends on the interleave factor
-	which is the distance (in number of sectors) between two consecutively
-	numbered sectors. Interleave factor is specified at formatting time.
-	The default factor is 7. The order of sectors for this factor is:
-	0, 13, 26, 9, 22, 5, 18, 1, 14, 27, 10, 23, 6, 19, 2,
-	15, 28, 11, 24, 7, 20, 3, 16, 29, 12, 25, 8, 21, 4, 17
+    The order of sectors in a track depends on the interleave factor
+    which is the distance (in number of sectors) between two consecutively
+    numbered sectors. Interleave factor is specified at formatting time.
+    The default factor is 7. The order of sectors for this factor is:
+    0, 13, 26, 9, 22, 5, 18, 1, 14, 27, 10, 23, 6, 19, 2,
+    15, 28, 11, 24, 7, 20, 3, 16, 29, 12, 25, 8, 21, 4, 17
 
-	<Track> := [Index hole]|Sector0|Gap2|Sector1|Gap2|...|Sector29|Gap3|
+    <Track> := [Index hole]|Sector0|Gap2|Sector1|Gap2|...|Sector29|Gap3|
 
-	<Sector> := ID field|Gap1|Data field
+    <Sector> := ID field|Gap1|Data field
 
-	<ID field> := Sync|ID AM|Track no.|Sector no.|CRC-16|0x00
+    <ID field> := Sync|ID AM|Track no.|Sector no.|CRC-16|0x00
 
-	<Data field> := Sync|Data AM|Data|CRC-16|0x00
+    <Data field> := Sync|Data AM|Data|CRC-16|0x00
 
-	This format is just a raw image of every sector on a HP-formatted
-	8" floppy disk. Files with this format have no header/trailer and
-	are exactly 1182720 bytes in size (30 sectors, 2 heads, 77 tracks,
-	256 bytes per sector). There's also a "reduced" version holding
-	just 75 cylinders.
-	When loading, the disk image is translated to MMFM encoding so
-	that it can be loaded into HP9895 emulator.
+    This format is just a raw image of every sector on a HP-formatted
+    8" floppy disk. Files with this format have no header/trailer and
+    are exactly 1182720 bytes in size (30 sectors, 2 heads, 77 tracks,
+    256 bytes per sector). There's also a "reduced" version holding
+    just 75 cylinders.
+    When loading, the disk image is translated to MMFM encoding so
+    that it can be loaded into HP9895 emulator.
 
 *********************************************************************/
 
@@ -51,20 +51,20 @@
 #define VERBOSE 0
 #define LOG(...)  do { if (VERBOSE) printf(__VA_ARGS__); } while (false)
 
-constexpr unsigned IL_OFFSET	= 0x12;	// Position of interleave factor in HPI image (2 bytes, big-endian)
-constexpr unsigned DEFAULT_IL	= 7;	// Default interleaving factor
-constexpr unsigned CELL_SIZE	= 1200;	// Bit cell size (1 µs)
-constexpr uint8_t  ID_AM        = 0x70;	// ID address mark
-constexpr uint8_t  DATA_AM		= 0x50;	// Data address mark
-constexpr uint8_t  AM_CLOCK		= 0x0e;	// Clock pattern of AM
-constexpr uint32_t ID_CD_PATTERN= 0x55552a54;	// C/D pattern of 0xff + ID_AM
-constexpr uint32_t DATA_CD_PATTERN = 0x55552a44;	// C/D pattern of 0xff + DATA_AM
-constexpr unsigned GAP1_SIZE	= 17;	// Size of gap 1 (+1)
-constexpr unsigned GAP2_SIZE	= 35;	// Size of gap 2 (+1)
-constexpr int ID_DATA_OFFSET = 30 * 16;	// Nominal distance (in cells) between ID & DATA AM
+constexpr unsigned IL_OFFSET    = 0x12; // Position of interleave factor in HPI image (2 bytes, big-endian)
+constexpr unsigned DEFAULT_IL   = 7;    // Default interleaving factor
+constexpr unsigned CELL_SIZE    = 1200; // Bit cell size (1 µs)
+constexpr uint8_t  ID_AM        = 0x70; // ID address mark
+constexpr uint8_t  DATA_AM      = 0x50; // Data address mark
+constexpr uint8_t  AM_CLOCK     = 0x0e; // Clock pattern of AM
+constexpr uint32_t ID_CD_PATTERN= 0x55552a54;   // C/D pattern of 0xff + ID_AM
+constexpr uint32_t DATA_CD_PATTERN = 0x55552a44;    // C/D pattern of 0xff + DATA_AM
+constexpr unsigned GAP1_SIZE    = 17;   // Size of gap 1 (+1)
+constexpr unsigned GAP2_SIZE    = 35;   // Size of gap 2 (+1)
+constexpr int ID_DATA_OFFSET = 30 * 16; // Nominal distance (in cells) between ID & DATA AM
 // Size of image file (holding 77 cylinders)
 constexpr unsigned HPI_IMAGE_SIZE = HPI_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
-constexpr unsigned HPI_RED_TRACKS = 75;	// Reduced number of tracks
+constexpr unsigned HPI_RED_TRACKS = 75; // Reduced number of tracks
 // Size of reduced image file (holding 75 cylinders)
 constexpr unsigned HPI_RED_IMAGE_SIZE = HPI_RED_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
 
@@ -89,7 +89,7 @@ int hpi_format::identify(io_generic *io, uint32_t form_factor)
 
 bool hpi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	image->set_variant(floppy_image::DSDD);	// We actually need to derive the variant from the image size depending on the form factor
+	image->set_variant(floppy_image::DSDD); // We actually need to derive the variant from the image size depending on the form factor
 
 	uint64_t size = io_generic_size(io);
 	unsigned cylinders;
@@ -396,35 +396,35 @@ bool hpi_format::get_next_sector(const uint8_t *bitstream , int bitstream_size ,
 // to move forward in the interleaved sector list when beginning a new track.
 // There are different offsets for tracks on head 0 and tracks on head 1.
 const uint8_t hpi_format::m_track_skew[ HPI_SECTORS - 1 ][ HPI_HEADS ] = {
-	{ 0x1c , 0x18 },	// Interleave = 1
-	{ 0x1c , 0x18 },	// Interleave = 2
-	{ 0x1c , 0x18 },	// Interleave = 3 
-	{ 0x1d , 0x1a },	// Interleave = 4
-	{ 0x1a , 0x18 },	// Interleave = 5
-	{ 0x19 , 0x18 },	// Interleave = 6
-	{ 0x00 , 0x00 },	// Interleave = 7
-	{ 0x1d , 0x1d },	// Interleave = 8
-	{ 0x1c , 0x1c },	// Interleave = 9
-	{ 0x15 , 0x15 },	// Interleave = 10
-	{ 0x00 , 0x00 },	// Interleave = 11
-	{ 0x19 , 0x19 },	// Interleave = 12
-	{ 0x00 , 0x00 },	// Interleave = 13
-	{ 0x1d , 0x1d },	// Interleave = 14
-	{ 0x10 , 0x10 },	// Interleave = 15
-	{ 0x1d , 0x1d },	// Interleave = 16
-	{ 0x00 , 0x00 },	// Interleave = 17
-	{ 0x19 , 0x19 },	// Interleave = 18
-	{ 0x00 , 0x00 },	// Interleave = 19
-	{ 0x15 , 0x15 },	// Interleave = 20
-	{ 0x1c , 0x1c },	// Interleave = 21
-	{ 0x1d , 0x1d },	// Interleave = 22
-	{ 0x00 , 0x00 },	// Interleave = 23
-	{ 0x19 , 0x19 },	// Interleave = 24
-	{ 0x1a , 0x1a },	// Interleave = 25
-	{ 0x1d , 0x1d },	// Interleave = 26
-	{ 0x1c , 0x1c },	// Interleave = 27
-	{ 0x1d , 0x1d },	// Interleave = 28
-	{ 0x00 , 0x00 }		// Interleave = 29
+	{ 0x1c , 0x18 },    // Interleave = 1
+	{ 0x1c , 0x18 },    // Interleave = 2
+	{ 0x1c , 0x18 },    // Interleave = 3
+	{ 0x1d , 0x1a },    // Interleave = 4
+	{ 0x1a , 0x18 },    // Interleave = 5
+	{ 0x19 , 0x18 },    // Interleave = 6
+	{ 0x00 , 0x00 },    // Interleave = 7
+	{ 0x1d , 0x1d },    // Interleave = 8
+	{ 0x1c , 0x1c },    // Interleave = 9
+	{ 0x15 , 0x15 },    // Interleave = 10
+	{ 0x00 , 0x00 },    // Interleave = 11
+	{ 0x19 , 0x19 },    // Interleave = 12
+	{ 0x00 , 0x00 },    // Interleave = 13
+	{ 0x1d , 0x1d },    // Interleave = 14
+	{ 0x10 , 0x10 },    // Interleave = 15
+	{ 0x1d , 0x1d },    // Interleave = 16
+	{ 0x00 , 0x00 },    // Interleave = 17
+	{ 0x19 , 0x19 },    // Interleave = 18
+	{ 0x00 , 0x00 },    // Interleave = 19
+	{ 0x15 , 0x15 },    // Interleave = 20
+	{ 0x1c , 0x1c },    // Interleave = 21
+	{ 0x1d , 0x1d },    // Interleave = 22
+	{ 0x00 , 0x00 },    // Interleave = 23
+	{ 0x19 , 0x19 },    // Interleave = 24
+	{ 0x1a , 0x1a },    // Interleave = 25
+	{ 0x1d , 0x1d },    // Interleave = 26
+	{ 0x1c , 0x1c },    // Interleave = 27
+	{ 0x1d , 0x1d },    // Interleave = 28
+	{ 0x00 , 0x00 }     // Interleave = 29
 };
 
 const floppy_format_type FLOPPY_HPI_FORMAT = &floppy_image_format_creator<hpi_format>;

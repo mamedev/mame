@@ -76,6 +76,8 @@
 
 #include "nld_r2r_dac.h"
 
+#include "nld_schmitt.h"
+
 #include "nld_tristate.h"
 
 #include "nld_log.h"

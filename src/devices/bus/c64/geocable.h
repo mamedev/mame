@@ -30,12 +30,12 @@ public:
 	// construction/destruction
 	c64_geocable_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_pet_user_port_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER(input_c) override { m_centronics->write_data0(state); }

@@ -126,7 +126,7 @@ void disasmwin_info::draw_contents(HDC dc)
 }
 
 
-void disasmwin_info::process_string(char const *string)
+void disasmwin_info::process_string(const std::string &string)
 {
 	// set the string to the disasm view
 	downcast<disasmview_info *>(m_views[0].get())->set_expression(string);

@@ -40,7 +40,10 @@ public:
 	template <class Object> static devcb_base &set_p_port_callback(device_t &device, Object &&cb) { return downcast<namco_53xx_device &>(device).m_p.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ8_MEMBER( Rx_r );
+	DECLARE_READ8_MEMBER( R0_r );
+	DECLARE_READ8_MEMBER( R1_r );
+	DECLARE_READ8_MEMBER( R2_r );
+	DECLARE_READ8_MEMBER( R3_r );
 	DECLARE_WRITE8_MEMBER( O_w );
 	DECLARE_WRITE8_MEMBER( P_w );
 
@@ -51,7 +54,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER( irq_clear );
 private:

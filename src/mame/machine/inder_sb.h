@@ -39,11 +39,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dac2_rombank_write);
 	DECLARE_WRITE8_MEMBER(dac3_rombank_write);
 
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch0);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch1);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch2);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch3);
-
 	DECLARE_READ8_MEMBER(megaphx_02cc_hack_r);
 	DECLARE_READ8_MEMBER(megaphx_02e6_hack_r);
 	DECLARE_READ8_MEMBER(megaphx_0309_hack_r);
@@ -57,11 +52,9 @@ public:
 	void update_sound_irqs(void);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-
 
 private:
 	uint8_t m_soundbank[4];
@@ -71,6 +64,11 @@ private:
 	uint8_t m_soundback;
 
 	int m_soundirq;
+
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch0);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch1);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch2);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch3);
 };
 
 #endif // MAME_MACHINE_INDER_SB_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * cpc_ssa1.c  --  Amstrad SSA-1 Speech Synthesiser, dk'Tronics Speech Synthesiser
+ * cpc_ssa1.cpp  --  Amstrad SSA-1 Speech Synthesiser, dk'Tronics Speech Synthesiser
  *
  *  Created on: 16/07/2011
  *
@@ -115,7 +115,7 @@ const tiny_rom_entry *cpc_dkspeech_device::device_rom_region() const
 }
 
 // device machine config
-static MACHINE_CONFIG_START( cpc_ssa1 )
+MACHINE_CONFIG_MEMBER( cpc_ssa1_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sp0256",SP0256,XTAL_3_12MHz)
 	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(cpc_ssa1_device, lrq_cb))
@@ -131,7 +131,7 @@ static MACHINE_CONFIG_START( cpc_ssa1 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cpc_dkspeech )
+MACHINE_CONFIG_MEMBER( cpc_dkspeech_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sp0256",SP0256,XTAL_4MHz)  // uses the CPC's clock from pin 50 of the expansion port
 	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(cpc_dkspeech_device, lrq_cb))
@@ -147,15 +147,6 @@ static MACHINE_CONFIG_START( cpc_dkspeech )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_ssa1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_ssa1 );
-}
-
-machine_config_constructor cpc_dkspeech_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_dkspeech );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

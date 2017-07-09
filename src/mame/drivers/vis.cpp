@@ -25,7 +25,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void dack16_w(int line, uint16_t data) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 private:
 	required_device<dac_word_interface> m_rdac;
 	required_device<dac_word_interface> m_ldac;
@@ -130,7 +130,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-static MACHINE_CONFIG_START( vis_pcm_config )
+MACHINE_CONFIG_MEMBER( vis_audio_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf262", YMF262, XTAL_14_31818MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -143,11 +143,6 @@ static MACHINE_CONFIG_START( vis_pcm_config )
 	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-machine_config_constructor vis_audio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vis_pcm_config );
-}
 
 READ8_MEMBER(vis_audio_device::pcm_r)
 {
@@ -234,15 +229,15 @@ public:
 	DECLARE_WRITE8_MEMBER(vga_w);
 	DECLARE_READ8_MEMBER(visvgamem_r);
 	DECLARE_WRITE8_MEMBER(visvgamem_w);
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void recompute_params() override;
 private:
 	void vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	int m_extcnt;
 	uint8_t m_extreg;
@@ -262,17 +257,12 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	m_screen.set_tag("screen");
 }
 
-static MACHINE_CONFIG_START( vis_vga_config )
+MACHINE_CONFIG_MEMBER( vis_vga_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
-
-machine_config_constructor vis_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vis_vga_config );
-}
 
 void vis_vga_device::recompute_params()
 {

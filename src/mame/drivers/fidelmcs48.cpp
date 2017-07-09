@@ -71,12 +71,12 @@ WRITE8_MEMBER(fidelmcs48_state::sc6_mux_w)
 {
 	// P24-P27: 7442 A-D
 	u16 sel = 1 << (data >> 4 & 0xf) & 0x3ff;
-	
+
 	// 7442 0-8: input mux, 7seg data
 	m_inp_mux = sel & 0x1ff;
 	m_7seg_data = sel & 0x7f;
 	sc6_prepare_display();
-	
+
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 }

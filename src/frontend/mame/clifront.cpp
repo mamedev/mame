@@ -68,6 +68,9 @@
 #define CLICOMMAND_GETSOFTLIST          "getsoftlist"
 #define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
 
+// command options
+#define CLIOPTION_DTD                   "dtd"
+
 
 namespace {
 //**************************************************************************
@@ -107,6 +110,9 @@ const options_entry cli_option_entries[] =
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft",   "0",       OPTION_COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST    ";glist",   "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ CLICOMMAND_VERIFYSOFTLIST ";vlist",   "0",       OPTION_COMMAND,    "verify software list by name" },
+
+	{ nullptr,                              nullptr,   OPTION_HEADER,     "FRONTEND COMMAND OPTIONS" },
+	{ CLIOPTION_DTD,                        "1",       OPTION_BOOLEAN,    "include DTD in XML output" },
 	{ nullptr }
 };
 
@@ -190,26 +196,30 @@ cli_frontend::cli_frontend(emu_options &options, osd_interface &osd)
 
 cli_frontend::~cli_frontend()
 {
-	// nuke any device options since they will leak memory
-	mame_options::remove_device_options(m_options);
 }
 
-void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<std::string> &args)
+void cli_frontend::start_execution(mame_machine_manager *manager, const std::vector<std::string> &args)
 {
-	std::string option_errors;
+	std::ostringstream option_errors;
+
+	// because softlist evaluation relies on hashpath being populated, we are going to go through
+	// a special step to force it to be evaluated
+	mame_options::populate_hashpath_from_args_and_inis(m_options, args);
 
 	// parse the command line, adding any system-specific options
-	if (!mame_options::parse_command_line(m_options, args, option_errors))
+	try
+	{
+		m_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
+	}
+	catch (options_exception &ex)
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
-		if (m_options.command().empty() && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+		if (m_options.command().empty() && mame_options::system(m_options) == nullptr && !m_options.attempted_system_name().empty())
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.attempted_system_name().c_str());
 
 		// otherwise, error on the options
-		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", strtrimspace(option_errors).c_str());
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message().c_str());
 	}
-	if (!option_errors.empty())
-		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
 	// determine the base name of the EXE
 	std::string exename = core_filename_extract_base(args[0], true);
@@ -232,8 +242,11 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 
 	manager->start_luaengine();
 
-	if (!option_errors.empty())
-		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
+	if (option_errors.tellp() > 0)
+	{
+		std::string option_errors_string = option_errors.str();
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors_string).c_str());
+	}
 
 	// if we can't find it, give an appropriate error
 	const game_driver *system = mame_options::system(m_options);
@@ -269,16 +282,19 @@ int cli_frontend::execute(std::vector<std::string> &args)
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
 		// reason for failure, offer some suggestions
-		if (m_result == EMU_ERR_NO_SUCH_GAME && *(m_options.system_name()) != 0 && !core_iswildstr(m_options.system_name()) && mame_options::system(m_options) == nullptr)
+		if (m_result == EMU_ERR_NO_SUCH_GAME
+			&& !m_options.attempted_system_name().empty()
+			&& !core_iswildstr(m_options.attempted_system_name().c_str())
+			&& mame_options::system(m_options) == nullptr)
 		{
 			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);
 			int matches[16];
-			drivlist.find_approximate_matches(m_options.system_name(), ARRAY_LENGTH(matches), matches);
+			drivlist.find_approximate_matches(m_options.attempted_system_name().c_str(), ARRAY_LENGTH(matches), matches);
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
-					"supported machines (best match first):\n\n", m_options.system_name());
+					"supported machines (best match first):\n\n", m_options.attempted_system_name().c_str());
 			for (auto & matche : matches)
 				if (matche != -1)
 					osd_printf_error("%-18s%s\n", drivlist.driver(matche).name, drivlist.driver(matche).type.fullname());
@@ -320,7 +336,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 void cli_frontend::listxml(const std::vector<std::string> &args)
 {
 	// create the XML and print it to stdout
-	info_xml_creator creator(m_options);
+	info_xml_creator creator(m_options, m_options.bool_value(CLIOPTION_DTD));
 	creator.output(stdout, args);
 }
 
@@ -412,7 +428,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	{
 		int clone_of = drivlist.clone();
 		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
-			osd_printf_info("%-16s %-8s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
+			osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 	}
 }
 
@@ -458,7 +474,10 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-20s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		if (clone_of != -1)
+			osd_printf_info("%-20s %-16s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		else
+			osd_printf_info("%-20s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name);
 	}
 }
 
@@ -769,25 +788,33 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config()->root_device()))
 		{
 			if (slot.fixed()) continue;
+
+			// build a list of user-selectable options
+			std::vector<device_slot_option *> option_list;
+			for (auto &option : slot.option_list())
+				if (option.second->selectable())
+					option_list.push_back(option.second.get());
+
+			// sort them by name
+			std::sort(option_list.begin(), option_list.end(), [](device_slot_option *opt1, device_slot_option *opt2) {
+				return strcmp(opt1->name(), opt2->name()) < 0;
+			});
+
+
 			// output the line, up to the list of extensions
 			printf("%-16s %-16s ", first ? drivlist.driver().name : "", slot.device().tag()+1);
 
 			bool first_option = true;
 
 			// get the options and print them
-			for (auto &option : slot.option_list())
+			for (device_slot_option *opt : option_list)
 			{
-				if (option.second->selectable())
-				{
-					std::unique_ptr<device_t> dev = option.second->devtype()(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
-					dev->config_complete();
-					if (first_option)
-						printf("%-16s %s\n", option.second->name(),dev->name());
-					else
-						printf("%-34s%-16s %s\n", "", option.second->name(),dev->name());
+				if (first_option)
+					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
+				else
+					printf("%-34s%-16s %s\n", "", opt->name(), opt->devtype().fullname());
 
-					first_option = false;
-				}
+				first_option = false;
 			}
 			if (first_option)
 				printf("%-16s %s\n", "[none]","No options available");
@@ -819,7 +846,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
-	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(34,'-').c_str());
+	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(31,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -1034,7 +1061,9 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 		osd_printf_info("%u samplesets found, %u were OK.\n", correct, correct);
 	}
 }
-#define SOFTLIST_XML_BEGIN "<?xml version=\"1.0\"?>\n" \
+
+const char cli_frontend::s_softlist_xml_dtd[] =
+				"<?xml version=\"1.0\"?>\n" \
 				"<!DOCTYPE softwarelists [\n" \
 				"<!ELEMENT softwarelists (softwarelist*)>\n" \
 				"\t<!ELEMENT softwarelist (software+)>\n" \
@@ -1089,8 +1118,7 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 				"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n" \
 				"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n" \
 				"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n" \
-				"]>\n\n" \
-				"<softwarelists>\n"
+				"]>\n\n";
 
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
@@ -1235,7 +1263,13 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 			if (list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
-					if (isfirst) { fprintf(out, SOFTLIST_XML_BEGIN); isfirst = false; }
+					if (isfirst)
+					{
+						if (m_options.bool_value(CLIOPTION_DTD))
+							fprintf(out, s_softlist_xml_dtd);
+						fprintf(out, "<softwarelists>\n");
+						isfirst = false;
+					}
 					output_single_softlist(out, swlistdev);
 				}
 	}
@@ -1342,7 +1376,13 @@ void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
-					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = false; }
+					if (isfirst)
+					{
+						if (m_options.bool_value(CLIOPTION_DTD))
+							fprintf(out, s_softlist_xml_dtd);
+						fprintf(out, "<softwarelists>\n");
+						isfirst = false;
+					}
 					output_single_softlist(out, swlistdev);
 				}
 	}
@@ -1430,8 +1470,7 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 	// create our own copy of options for the purposes of ROM identification
 	// so we are not "polluted" with driver-specific slot/image options
 	emu_options options;
-	std::string error_string;
-	options.set_value(OPTION_MEDIAPATH, m_options.media_path(), OPTION_PRIORITY_DEFAULT, error_string);
+	options.set_value(OPTION_MEDIAPATH, m_options.media_path(), OPTION_PRIORITY_DEFAULT);
 
 	media_identifier ident(options);
 
@@ -1452,31 +1491,31 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 
 
 //-------------------------------------------------
-//	find_command
+//  find_command
 //-------------------------------------------------
 
 const cli_frontend::info_command_struct *cli_frontend::find_command(const std::string &s)
 {
 	static const info_command_struct s_info_commands[] =
 	{
-		{ CLICOMMAND_LISTXML,           0, -1, false,	&cli_frontend::listxml,          "[pattern] ..." },
-		{ CLICOMMAND_LISTFULL,          0,  1, false,	&cli_frontend::listfull,         "[system name]" },
-		{ CLICOMMAND_LISTSOURCE,        0,  1, false,	&cli_frontend::listsource,       "[system name]" },
-		{ CLICOMMAND_LISTCLONES,        0,  1, false,	&cli_frontend::listclones,       "[system name]" },
-		{ CLICOMMAND_LISTBROTHERS,      0,  1, false,	&cli_frontend::listbrothers,     "[system name]" },
-		{ CLICOMMAND_LISTCRC,           0,  1, false,	&cli_frontend::listcrc,          "[system name]" },
-		{ CLICOMMAND_LISTDEVICES,       0,  1, true,	&cli_frontend::listdevices,      "[system name]" },
-		{ CLICOMMAND_LISTSLOTS,         0,  1, true,	&cli_frontend::listslots,        "[system name]" },
-		{ CLICOMMAND_LISTROMS,          0, -1, false,	&cli_frontend::listroms,         "[pattern] ..." },
-		{ CLICOMMAND_LISTSAMPLES,       0,  1, false,	&cli_frontend::listsamples,      "[system name]" },
-		{ CLICOMMAND_VERIFYROMS,        0, -1, false,	&cli_frontend::verifyroms,       "[pattern] ..." },
-		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, false,	&cli_frontend::verifysamples,    "[system name|*]" },
-		{ CLICOMMAND_LISTMEDIA,         0,  1, true,	&cli_frontend::listmedia,        "[system name]" },
-		{ CLICOMMAND_LISTSOFTWARE,      0,  1, false,	&cli_frontend::listsoftware,     "[system name]" },
-		{ CLICOMMAND_VERIFYSOFTWARE,    0,  1, false,	&cli_frontend::verifysoftware,   "[system name|*]" },
-		{ CLICOMMAND_ROMIDENT,          1,  1, false,	&cli_frontend::romident,         "(file or directory path)" },
-		{ CLICOMMAND_GETSOFTLIST,       0,  1, false,	&cli_frontend::getsoftlist,      "[system name|*]" },
-		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, false,	&cli_frontend::verifysoftlist,   "[system name|*]" }
+		{ CLICOMMAND_LISTXML,           0, -1, &cli_frontend::listxml,          "[pattern] ..." },
+		{ CLICOMMAND_LISTFULL,          0,  1, &cli_frontend::listfull,         "[system name]" },
+		{ CLICOMMAND_LISTSOURCE,        0,  1, &cli_frontend::listsource,       "[system name]" },
+		{ CLICOMMAND_LISTCLONES,        0,  1, &cli_frontend::listclones,       "[system name]" },
+		{ CLICOMMAND_LISTBROTHERS,      0,  1, &cli_frontend::listbrothers,     "[system name]" },
+		{ CLICOMMAND_LISTCRC,           0,  1, &cli_frontend::listcrc,          "[system name]" },
+		{ CLICOMMAND_LISTDEVICES,       0,  1, &cli_frontend::listdevices,      "[system name]" },
+		{ CLICOMMAND_LISTSLOTS,         0,  1, &cli_frontend::listslots,        "[system name]" },
+		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[pattern] ..." },
+		{ CLICOMMAND_LISTSAMPLES,       0,  1, &cli_frontend::listsamples,      "[system name]" },
+		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[pattern] ..." },
+		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, &cli_frontend::verifysamples,    "[system name|*]" },
+		{ CLICOMMAND_LISTMEDIA,         0,  1, &cli_frontend::listmedia,        "[system name]" },
+		{ CLICOMMAND_LISTSOFTWARE,      0,  1, &cli_frontend::listsoftware,     "[system name]" },
+		{ CLICOMMAND_VERIFYSOFTWARE,    0,  1, &cli_frontend::verifysoftware,   "[system name|*]" },
+		{ CLICOMMAND_ROMIDENT,          1,  1, &cli_frontend::romident,         "(file or directory path)" },
+		{ CLICOMMAND_GETSOFTLIST,       0,  1, &cli_frontend::getsoftlist,      "[system name|*]" },
+		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, &cli_frontend::verifysoftlist,   "[system name|*]" }
 	};
 
 	for (const auto &info_command : s_info_commands)
@@ -1485,17 +1524,6 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 			return &info_command;
 	}
 	return nullptr;
-}
-
-
-//-------------------------------------------------
-//	parse_slot_options_for_auxverb
-//-------------------------------------------------
-
-bool cli_frontend::parse_slot_options_for_auxverb(const std::string &auxverb)
-{
-	const info_command_struct *command = find_command(auxverb);
-	return command && command->specify_system;
 }
 
 
@@ -1534,10 +1562,10 @@ void cli_frontend::execute_commands(const char *exename)
 	}
 
 	// other commands need the INIs parsed
-	std::string option_errors;
+	std::ostringstream option_errors;
 	mame_options::parse_standard_inis(m_options,option_errors);
-	if (!option_errors.empty())
-		osd_printf_error("%s\n", option_errors.c_str());
+	if (option_errors.tellp() > 0)
+		osd_printf_error("%s\n", option_errors.str().c_str());
 
 	// createconfig?
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)

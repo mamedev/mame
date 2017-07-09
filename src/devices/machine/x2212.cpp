@@ -16,11 +16,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( x2212_sram_map, AS_0, 8, x2212_device )
+static ADDRESS_MAP_START( x2212_sram_map, 0, 8, x2212_device )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x2212_e2prom_map, AS_1, 8, x2212_device )
+static ADDRESS_MAP_START( x2212_e2prom_map, 1, 8, x2212_device )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -76,8 +76,8 @@ void x2212_device::device_start()
 {
 	save_item(NAME(m_store));
 	save_item(NAME(m_array_recall));
-	m_sram = &space(AS_0);
-	m_e2prom = &space(AS_1);
+	m_sram = &space(0);
+	m_e2prom = &space(1);
 }
 
 
@@ -86,9 +86,12 @@ void x2212_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *x2212_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> x2212_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_sram_space_config : (spacenum == 1) ? &m_e2prom_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_sram_space_config),
+		std::make_pair(1, &m_e2prom_space_config)
+	};
 }
 
 

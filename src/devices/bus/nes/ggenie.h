@@ -32,15 +32,16 @@ public:
 	void scanline_irq(int scanline, int vblank, int blanked) override { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->scanline_irq(scanline, vblank, blanked); }
 	void ppu_latch(offs_t offset) override { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->ppu_latch(offset); }
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual void pcb_reset() override;
 	virtual void pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted) override;
 
-private:
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
 	// emulate the Game Genie!
 	required_device<nes_cart_slot_device> m_ggslot;
 

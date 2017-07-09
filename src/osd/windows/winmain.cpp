@@ -515,23 +515,20 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options.bench();
-	std::string error_string;
 	if (bench > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// determine if we are profiling, and adjust options appropriately
 	int profile = options.profile();
 	if (profile > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// thread priority

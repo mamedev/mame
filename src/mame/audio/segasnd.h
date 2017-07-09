@@ -131,7 +131,7 @@ private:
 	device_t                *m_maincpu;
 	u8                      m_in_latch;             // input latch
 	u8                      m_out_latch;            // output latch
-	u8				        m_last_p2_value;        // current P2 output value
+	u8                      m_last_p2_value;        // current P2 output value
 	optional_shared_ptr<u8> m_program_ram;          // pointer to program RAM
 	required_shared_ptr<u8> m_work_ram;             // pointer to work RAM
 	u8                      m_work_ram_bank;        // currently selected work RAM bank

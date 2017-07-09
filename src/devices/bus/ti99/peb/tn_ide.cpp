@@ -51,8 +51,9 @@ enum
 	cru_reg_reset = 0x80
 };
 
-nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_IDE, tag, owner, clock), m_ata_irq(false),
+nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_IDE, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_cru_register(0), m_rtc(nullptr),
 	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false),
 	m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
@@ -344,17 +345,6 @@ void nouspikel_ide_interface_device::device_reset()
 	m_tms9995_mode =  false; // (device->type()==TMS9995);
 }
 
-MACHINE_CONFIG_START( tn_ide )
-	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
-	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
-	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
-
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
-
 INPUT_PORTS_START( tn_ide )
 	PORT_START( "CRUIDE" )
 	PORT_DIPNAME( 0x1f00, 0x1000, "IDE CRU base" )
@@ -376,10 +366,16 @@ INPUT_PORTS_START( tn_ide )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 INPUT_PORTS_END
 
-machine_config_constructor nouspikel_ide_interface_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tn_ide );
-}
+MACHINE_CONFIG_MEMBER( nouspikel_ide_interface_device::device_add_mconfig )
+	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
+	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
+	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
+
+	MCFG_RAM_ADD(RAMREGION)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
 
 ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
 {

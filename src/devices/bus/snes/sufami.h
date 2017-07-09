@@ -17,8 +17,6 @@ public:
 	// construction/destruction
 	sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
@@ -28,6 +26,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<sns_sufami_cart_slot_device> m_slot1;

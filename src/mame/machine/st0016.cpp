@@ -49,6 +49,15 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 }
 
 
+std::vector<std::pair<int, const address_space_config *>> st0016_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_space_config),
+		std::make_pair(AS_IO,      &m_io_space_config)
+	};
+}
+
+
 
 
 //-------------------------------------------------
@@ -106,7 +115,7 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 }
 
 /* CPU interface */
-static MACHINE_CONFIG_START( st0016_cpu )
+MACHINE_CONFIG_MEMBER( st0016_cpu_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
@@ -117,17 +126,6 @@ static MACHINE_CONFIG_START( st0016_cpu )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
-
-machine_config_constructor st0016_cpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( st0016_cpu );
-}
-
-
-
-
-
-
 
 
 static const gfx_layout charlayout =
@@ -593,7 +591,7 @@ void st0016_cpu_device::startup()
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	set_gfx(gfx_index, std::make_unique<gfx_element>(palette(), charlayout, m_charram.get(), 0, 0x40, 0));
+	set_gfx(gfx_index, std::make_unique<gfx_element>(&palette(), charlayout, m_charram.get(), 0, 0x40, 0));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;

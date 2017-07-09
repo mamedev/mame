@@ -2,11 +2,11 @@
 // copyright-holders: David Haywood, Uki, Dirk Best
 /***************************************************************************
 
-	Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
-	© 1987 Sanritsu
+    Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
+    © 1987 Sanritsu
 
-	Kiki-Ippatsu Mayumi-chan (危機一髪真由美ちゃん)
-	© 1988 Victory L.L.C. (developed by Sanritsu)
+    Kiki-Ippatsu Mayumi-chan (危機一髪真由美ちゃん)
+    © 1988 Victory L.L.C. (developed by Sanritsu)
 
     TODO:
     - Figure out the rest of the dip switches
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, chinsan_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, chinsan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END

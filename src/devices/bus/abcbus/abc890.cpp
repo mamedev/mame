@@ -24,10 +24,10 @@ DEFINE_DEVICE_TYPE(ABC856,             abc856_device,             "abc856", "ABC
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc890 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc890 )
+MACHINE_CONFIG_MEMBER( abc890_device::device_add_mconfig )
 	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, nullptr)
@@ -39,21 +39,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor abc890_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc890 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( abc_expansion_unit )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( abc_expansion_unit )
+MACHINE_CONFIG_MEMBER( abc_expansion_unit_device::device_add_mconfig )
 	MCFG_ABCBUS_SLOT_ADD("io1", abc80_cards, "abc830")
 	MCFG_ABCBUS_SLOT_ADD("io2", abc80_cards, nullptr)
 	MCFG_ABCBUS_SLOT_ADD("io3", abc80_cards, nullptr)
@@ -65,21 +54,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor abc_expansion_unit_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc_expansion_unit );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( abc894 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( abc894 )
+MACHINE_CONFIG_MEMBER( abc894_device::device_add_mconfig )
 	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, nullptr)
@@ -87,21 +65,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor abc894_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc894 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( abc850 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( abc850 )
+MACHINE_CONFIG_MEMBER( abc850_device::device_add_mconfig )
 	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "abc850fdd")
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "xebec")
 	MCFG_DEVICE_CARD_DEFAULT_BIOS("xebec", "ro202")
@@ -114,21 +81,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor abc850_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc850 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( abc852 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( abc852 )
+MACHINE_CONFIG_MEMBER( abc852_device::device_add_mconfig )
 	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "abc850fdd")
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "xebec")
 	MCFG_DEVICE_CARD_DEFAULT_BIOS("xebec", "basf6185")
@@ -141,21 +97,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor abc852_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc852 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( abc856 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( abc856 )
+MACHINE_CONFIG_MEMBER( abc856_device::device_add_mconfig )
 	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "abc850fdd")
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "xebec")
 	MCFG_DEVICE_CARD_DEFAULT_BIOS("xebec", "micr1325")
@@ -165,17 +110,6 @@ static MACHINE_CONFIG_START( abc856 )
 	MCFG_ABCBUS_SLOT_ADD("io6", abcbus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_ADD("io7", abcbus_cards, nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc856_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc856 );
-}
 
 
 

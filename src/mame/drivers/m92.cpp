@@ -212,37 +212,6 @@ psoldier dip locations still need verification.
 #include "speaker.h"
 
 
-// I haven't managed to find a way to keep nbbatman happy when using the proper upd71059c device
-// so we just use an ugly hack and get the vector base from it for now until this is properly resolved.
-#define USE_HACKED_IRQS
-
-#ifdef USE_HACKED_IRQS
-
-#define M92_TRIGGER_IRQ0 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+0 ); /* VBL interrupt */
-#define M92_TRIGGER_IRQ1 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+1 ); /* Sprite buffer complete interrupt */
-#define M92_TRIGGER_IRQ2 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+2 ); /* Raster interrupt */
-#define M92_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
-// not used due to HOLD LINE logic
-#define M92_CLEAR_IRQ0 ;
-#define M92_CLEAR_IRQ1 ;
-#define M92_CLEAR_IRQ2 ;
-#define M92_CLEAR_IRQ3 ;
-
-#else
-
-#define M92_TRIGGER_IRQ0 m_upd71059c->ir0_w(1);
-#define M92_TRIGGER_IRQ1 m_upd71059c->ir1_w(1);
-#define M92_TRIGGER_IRQ2 m_upd71059c->ir2_w(1);
-#define M92_TRIGGER_IRQ3 m_upd71059c->ir3_w(1);
-// not sure when these should happen, probably the source of our issues
-#define M92_CLEAR_IRQ0 m_upd71059c->ir0_w(0);
-#define M92_CLEAR_IRQ1 m_upd71059c->ir1_w(0);
-#define M92_CLEAR_IRQ2 m_upd71059c->ir2_w(0);
-#define M92_CLEAR_IRQ3 m_upd71059c->ir3_w(0);
-
-#endif
-
-
 /*****************************************************************************/
 
 MACHINE_START_MEMBER(m92_state,m92)
@@ -266,21 +235,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 	if (scanline == m_raster_irq_position)
 	{
 		m_screen->update_partial(scanline);
-		M92_TRIGGER_IRQ2
+		m_upd71059c->ir2_w(1);
 	}
 	else
 	{
-		M92_CLEAR_IRQ2
-
 		/* VBLANK interrupt */
 		if (scanline == m_screen->visible_area().max_y + 1)
 		{
 			m_screen->update_partial(scanline);
-			M92_TRIGGER_IRQ0
+			m_upd71059c->ir0_w(1);
 		}
 		else
 		{
-			M92_CLEAR_IRQ0
+			m_upd71059c->ir0_w(0);
 		}
 
 	}
@@ -345,6 +312,7 @@ WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 READ16_MEMBER(m92_state::m92_sound_status_r)
 {
 //logerror("%06x: read sound status\n",space.device().safe_pc());
+	m_upd71059c->ir3_w(0);
 	return m_sound_status;
 }
 
@@ -365,7 +333,7 @@ WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)
 WRITE16_MEMBER(m92_state::m92_sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
-	M92_TRIGGER_IRQ3
+	m_upd71059c->ir3_w(1);
 
 }
 
@@ -958,12 +926,6 @@ GFXDECODE_END
 
 
 /***************************************************************************/
-
-void m92_state::m92_sprite_interrupt()
-{
-	M92_TRIGGER_IRQ1
-}
-
 
 static MACHINE_CONFIG_START( m92 )
 
@@ -2245,14 +2207,11 @@ DRIVER_INIT_MEMBER(m92_state,m92)
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(&ROM[0xa0000]);
-
-	m_game_kludge = 0;
 }
 
 /* different address map (no bank1) */
 DRIVER_INIT_MEMBER(m92_state,lethalth)
 {
-	m_game_kludge = 0;
 }
 
 /* has bankswitching */
@@ -2262,8 +2221,6 @@ DRIVER_INIT_MEMBER(m92_state,m92_bank)
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
-
-	m_game_kludge = 0;
 }
 
 /* has bankswitching, has eeprom, needs sprite kludge */
@@ -2276,8 +2233,6 @@ DRIVER_INIT_MEMBER(m92_state,majtitl2)
 
 	/* This game has an eeprom on the game board */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf3fff, read16_delegate(FUNC(m92_state::m92_eeprom_r),this), write16_delegate(FUNC(m92_state::m92_eeprom_w),this));
-
-	m_game_kludge = 2;
 }
 
 /* TODO: figure out actual address map and other differences from real Irem h/w */
@@ -2285,8 +2240,6 @@ DRIVER_INIT_MEMBER(m92_state,ppan)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0xa0000]);
-
-	m_game_kludge = 0;
 }
 
 /***************************************************************************/

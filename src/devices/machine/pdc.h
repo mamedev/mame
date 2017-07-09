@@ -36,23 +36,11 @@ public:
 	/* Constructor and Destructor */
 	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	/* Optional information overrides */
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	/* Callbacks */
 	template <class Object> static devcb_base &m68k_r_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_r_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &m68k_w_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_w_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* Read and Write members */
-	DECLARE_WRITE_LINE_MEMBER(i8237_hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(i8237_eop_w);
-	DECLARE_READ8_MEMBER(i8237_dma_mem_r);
-	DECLARE_WRITE8_MEMBER(i8237_dma_mem_w);
-	DECLARE_READ8_MEMBER(i8237_fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(i8237_fdc_dma_w);
-
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
 
 	DECLARE_READ8_MEMBER(p0_7_r);
@@ -63,12 +51,6 @@ public:
 	DECLARE_READ8_MEMBER(p38_r);
 	DECLARE_READ8_MEMBER(p39_r);
 	DECLARE_WRITE8_MEMBER(p50_5f_w);
-
-	DECLARE_READ8_MEMBER(m68k_dma_r);
-	DECLARE_WRITE8_MEMBER(m68k_dma_w);
-
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	/* Main CPU accessible registers */
 	uint8_t reg_p0;
@@ -87,6 +69,24 @@ protected:
 	/* Device-level overrides */
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	/* Optional information overrides */
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(i8237_hreq_w);
+	DECLARE_WRITE_LINE_MEMBER(i8237_eop_w);
+	DECLARE_READ8_MEMBER(i8237_dma_mem_r);
+	DECLARE_WRITE8_MEMBER(i8237_dma_mem_w);
+	DECLARE_READ8_MEMBER(i8237_fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(i8237_fdc_dma_w);
+
+	DECLARE_READ8_MEMBER(m68k_dma_r);
+	DECLARE_WRITE8_MEMBER(m68k_dma_w);
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	/* Protected variables */
 	//uint32_t fdd_68k_dma_address;
@@ -99,7 +99,7 @@ protected:
 	//required_device<floppy_connector> m_floppy;
 	//required_device<floppy_image_device> m_floppy;
 	optional_device<hdc9224_device> m_hdc9224;
-	mfm_harddisk_device*    m_harddisk;
+	//mfm_harddisk_device*    m_harddisk;
 	required_shared_ptr<uint8_t> m_pdc_ram;
 
 	/* Callbacks */

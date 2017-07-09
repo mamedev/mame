@@ -27,7 +27,7 @@ public:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 	optional_shared_ptr<uint8_t> m_b_sharedram;
-	
+
 	uint8_t           m_pedal_value[2];
 	uint8_t           m_playfield_tile_bank;
 

@@ -50,9 +50,10 @@ public:
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual void power_off();
 
 	// display common
-	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
 	int m_display_maxy;             // display matrix number of rows
 	int m_display_maxx;             // display matrix number of columns (max 31 for now)
 

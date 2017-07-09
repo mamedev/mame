@@ -26,17 +26,6 @@
 
 class dmac_hdc_device : public device_t
 {
-public:
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	DECLARE_READ8_MEMBER( dmac_scsi_r );
-	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
-	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
-
 protected:
 	// construction/destruction
 	dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -44,6 +33,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// to slot
 	virtual void cfgout_w(int state) = 0;
@@ -61,6 +54,13 @@ protected:
 	required_device<wd33c93_device> m_wdc;
 
 	std::vector<uint8_t> m_ram;
+
+private:
+	DECLARE_READ8_MEMBER( dmac_scsi_r );
+	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
+	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
+	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
 };
 
 // ======================> a590_device

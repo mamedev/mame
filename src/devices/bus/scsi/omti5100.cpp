@@ -176,13 +176,7 @@ void omti5100_device::WriteData( uint8_t *data, int dataLength )
 	}
 }
 
-static MACHINE_CONFIG_START( omti5100 )
+MACHINE_CONFIG_MEMBER( omti5100_device::device_add_mconfig )
 	MCFG_HARDDISK_ADD("image0")
 	MCFG_HARDDISK_ADD("image1")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor omti5100_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( omti5100 );
-}

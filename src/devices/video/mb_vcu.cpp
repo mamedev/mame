@@ -43,12 +43,12 @@ void mb_vcu_device::static_set_palette_tag(device_t &device, const char *tag)
 }
 
 
-static ADDRESS_MAP_START( mb_vcu_vram, AS_0, 8, mb_vcu_device )
+static ADDRESS_MAP_START( mb_vcu_vram, 0, 8, mb_vcu_device )
 	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mb_vcu_pal_ram, AS_1, 8, mb_vcu_device )
+static ADDRESS_MAP_START( mb_vcu_pal_ram, 1, 8, mb_vcu_device )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
 	AM_RANGE(0x0400, 0x04ff) AM_RAM
@@ -91,14 +91,12 @@ WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mb_vcu_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mb_vcu_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-		case AS_0: return &m_videoram_space_config;
-		case AS_1: return &m_paletteram_space_config;
-		default: return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_videoram_space_config),
+		std::make_pair(1, &m_paletteram_space_config)
+	};
 }
 
 //**************************************************************************
@@ -111,7 +109,7 @@ const address_space_config *mb_vcu_device::memory_space_config(address_spacenum 
 
 inline uint8_t mb_vcu_device::read_byte(offs_t address)
 {
-	return space(AS_0).read_byte(address);
+	return space(0).read_byte(address);
 }
 
 //-------------------------------------------------
@@ -120,7 +118,7 @@ inline uint8_t mb_vcu_device::read_byte(offs_t address)
 
 inline void mb_vcu_device::write_byte(offs_t address, uint8_t data)
 {
-	space(AS_0).write_byte(address, data);
+	space(0).write_byte(address, data);
 }
 
 //-------------------------------------------------
@@ -129,7 +127,7 @@ inline void mb_vcu_device::write_byte(offs_t address, uint8_t data)
 
 inline uint8_t mb_vcu_device::read_io(offs_t address)
 {
-	return space(AS_1).read_byte(address);
+	return space(1).read_byte(address);
 }
 
 //-------------------------------------------------
@@ -138,7 +136,7 @@ inline uint8_t mb_vcu_device::read_io(offs_t address)
 
 inline void mb_vcu_device::write_io(offs_t address, uint8_t data)
 {
-	space(AS_1).write_byte(address, data);
+	space(1).write_byte(address, data);
 }
 
 

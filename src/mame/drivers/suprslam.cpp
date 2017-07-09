@@ -95,28 +95,6 @@ EB26IC73.BIN    27C240      /  Main Program
 
 /*** SOUND *******************************************************************/
 
-WRITE16_MEMBER(suprslam_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-#if 0
-READ16_MEMBER(suprslam_state::pending_command_r)
-{
-	return pending_command;
-}
-#endif
-
-WRITE8_MEMBER(suprslam_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
-
 WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x03);
@@ -134,7 +112,7 @@ static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_SHARE("screen_vregs")
 	AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
 	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)
-	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
+	AM_RANGE(0xff9000, 0xff9001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xffa000, 0xffafff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
@@ -150,7 +128,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -276,7 +254,6 @@ void suprslam_state::machine_start()
 {
 	save_item(NAME(m_screen_bank));
 	save_item(NAME(m_bg_bank));
-	save_item(NAME(m_pending_command));
 	save_item(NAME(m_spr_ctrl));
 
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
@@ -286,7 +263,6 @@ void suprslam_state::machine_reset()
 {
 	m_screen_bank = 0;
 	m_bg_bank = 0;
-	m_pending_command = 0;
 }
 
 static MACHINE_CONFIG_START( suprslam )
@@ -333,6 +309,8 @@ static MACHINE_CONFIG_START( suprslam )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

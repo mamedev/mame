@@ -17,8 +17,6 @@ class msx_cart_majutsushi_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_majutsushi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
@@ -28,6 +26,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void restore_banks();
 

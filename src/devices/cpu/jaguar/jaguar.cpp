@@ -173,6 +173,13 @@ jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, const 
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> jaguar_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 void jaguar_cpu_device::update_register_banks()
 {

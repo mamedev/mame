@@ -145,13 +145,13 @@ static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8, atari_jsa_iii_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jsa3_oki1_map, AS_0, 8, atari_jsa_iii_device )
+static ADDRESS_MAP_START( jsa3_oki1_map, 0, 8, atari_jsa_iii_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki1lo")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki1hi")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jsa3_oki2_map, AS_0, 8, atari_jsa_iiis_device )
+static ADDRESS_MAP_START( jsa3_oki2_map, 0, 8, atari_jsa_iiis_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki2lo")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2hi")
 ADDRESS_MAP_END
@@ -619,7 +619,7 @@ WRITE8_MEMBER( atari_jsa_i_device::wrio_w )
 	if (m_tms5220 != nullptr)
 	{
 		int count = 5 | ((data >> 2) & 2);
-		m_tms5220->set_frequency(JSA_MASTER_CLOCK*2 / (16 - count));
+		m_tms5220->set_unscaled_clock(JSA_MASTER_CLOCK*2 / (16 - count));
 		m_tms5220->wsq_w((data >> 1) & 1);
 		m_tms5220->rsq_w((data >> 2) & 1);
 	}
@@ -921,7 +921,7 @@ MACHINE_CONFIG_MEMBER( atari_jsa_iii_device::device_add_mconfig )
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60, 0)
 
 	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki1_map)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 0)
 MACHINE_CONFIG_END
 
@@ -966,5 +966,5 @@ MACHINE_CONFIG_MEMBER( atari_jsa_iiis_device::device_add_mconfig )
 
 	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 1)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
 MACHINE_CONFIG_END

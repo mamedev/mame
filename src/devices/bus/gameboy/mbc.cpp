@@ -64,6 +64,7 @@ gb_rom_mbc2_device::gb_rom_mbc2_device(const machine_config &mconfig, const char
 
 gb_rom_mbc3_device::gb_rom_mbc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gb_rom_mbc_device(mconfig, GB_ROM_MBC3, tag, owner, clock)
+	, m_rtc_ready(0)
 {
 }
 

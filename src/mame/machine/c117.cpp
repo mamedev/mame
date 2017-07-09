@@ -26,11 +26,6 @@ two 6809s and as the reset generator for the entire system.
 #include "machine/c117.h"
 
 
-static MACHINE_CONFIG_START( namco_c117 )
-	MCFG_WATCHDOG_ADD("watchdog")
-MACHINE_CONFIG_END
-
-
 DEFINE_DEVICE_TYPE(NAMCO_C117, namco_c117_device, "namco_c117", "Namco C117 MMU")
 
 
@@ -47,6 +42,13 @@ namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *
 	m_subcpu_tag(nullptr),
 	m_watchdog(*this, "watchdog")
 {
+}
+
+std::vector<std::pair<int, const address_space_config *>> namco_c117_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 //-------------------------------------------------
@@ -115,14 +117,12 @@ void namco_c117_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor namco_c117_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( namco_c117 );
-}
+MACHINE_CONFIG_MEMBER( namco_c117_device::device_add_mconfig )
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 
 READ8_MEMBER(namco_c117_device::main_r)

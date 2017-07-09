@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6502.c
+    n2a03.cpp
 
     6502, NES variant
 
@@ -51,9 +51,9 @@ ADDRESS_MAP_END
 
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, N2A03, tag, owner, clock),
-	m_apu(*this, "nesapu"),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(n2a03_map))
+	m_apu(*this, "nesapu")
 {
+	program_config.m_internal_map = ADDRESS_MAP_NAME(n2a03_map);
 }
 
 offs_t n2a03_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
@@ -66,69 +66,13 @@ void n2a03_device::device_start()
 	if(!m_apu->started())
 		throw device_missing_dependencies();
 
-	if(direct_disabled)
-		mintf = new mi_2a03_nd;
-	else
-		mintf = new mi_2a03_normal;
-
-	init();
-}
-
-uint8_t n2a03_device::mi_2a03_normal::read(uint16_t adr)
-{
-	return program->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_normal::read_sync(uint16_t adr)
-{
-	return sdirect->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_normal::read_arg(uint16_t adr)
-{
-	return direct->read_byte(adr);
-}
-
-void n2a03_device::mi_2a03_normal::write(uint16_t adr, uint8_t val)
-{
-	program->write_byte(adr, val);
-}
-
-uint8_t n2a03_device::mi_2a03_nd::read(uint16_t adr)
-{
-	return program->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_nd::read_sync(uint16_t adr)
-{
-	return sprogram->read_byte(adr);
-}
-
-uint8_t n2a03_device::mi_2a03_nd::read_arg(uint16_t adr)
-{
-	return program->read_byte(adr);
-}
-
-void n2a03_device::mi_2a03_nd::write(uint16_t adr, uint8_t val)
-{
-	program->write_byte(adr, val);
+	m6502_device::device_start();
 }
 
 void n2a03_device::device_clock_changed()
 {
 	m_apu->set_unscaled_clock(clock());
 }
-
-const address_space_config *n2a03_device::memory_space_config(address_spacenum spacenum) const
-{
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
-}
-
 
 WRITE_LINE_MEMBER(n2a03_device::apu_irq)
 {
@@ -141,19 +85,14 @@ READ8_MEMBER(n2a03_device::apu_read_mem)
 	return mintf->program->read_byte(offset);
 }
 
-static MACHINE_CONFIG_START( n2a03_device )
+MACHINE_CONFIG_MEMBER( n2a03_device::device_add_mconfig )
 	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
 	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(n2a03_device, apu_irq))
 	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(n2a03_device, apu_read_mem))
- 
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
 
 MACHINE_CONFIG_END
-
-machine_config_constructor n2a03_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( n2a03_device );
-}
 
 
 #include "cpu/m6502/n2a03.hxx"

@@ -464,12 +464,12 @@ WRITE8_MEMBER( hd6345_device::register_w )
 
 inline uint8_t mos8563_device::read_videoram(offs_t offset)
 {
-	return space(AS_0).read_byte(offset);
+	return space(0).read_byte(offset);
 }
 
 inline void mos8563_device::write_videoram(offs_t offset, uint8_t data)
 {
-	space(AS_0).write_byte(offset, data);
+	space(0).write_byte(offset, data);
 }
 
 
@@ -1425,17 +1425,15 @@ void mos8568_device::device_reset() { mos8563_device::device_reset(); }
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mos8563_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mos8563_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_0: return &m_videoram_space_config;
-	default: return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_videoram_space_config),
+	};
 }
 
 // default address maps
-static ADDRESS_MAP_START( mos8563_videoram_map, AS_0, 8, mos8563_device )
+static ADDRESS_MAP_START( mos8563_videoram_map, 0, 8, mos8563_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

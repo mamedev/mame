@@ -100,7 +100,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<mips3_device> m_maincpu;
@@ -182,7 +182,7 @@ ioport_constructor ioc2_device::device_input_ports() const
 	return INPUT_PORTS_NAME(front_panel);
 }
 
-MACHINE_CONFIG_START( ioc2_device )
+MACHINE_CONFIG_MEMBER( ioc2_device::device_add_mconfig )
 	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
@@ -214,10 +214,6 @@ MACHINE_CONFIG_START( ioc2_device )
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(KBDC_TAG, kbdc8042_device, write_out2))
 MACHINE_CONFIG_END
 
-machine_config_constructor ioc2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(ioc2_device);
-}
 
 ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id)
 	: device_t(mconfig, type, tag, owner, clock)

@@ -5,13 +5,21 @@
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ASUKA_H
+#define MAME_INCLUDES_ASUKA_H
 
+#pragma once
+
+
+#include "machine/taitocchip.h"
 #include "machine/taitoio.h"
+
 #include "sound/msm5205.h"
 #include "machine/74157.h"
 #include "video/pc090oj.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
+
 
 class asuka_state : public driver_device
 {
@@ -26,6 +34,7 @@ public:
 		m_cadash_shared_ram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_cchip(*this, "cchip"),
 		m_msm(*this, "msm"),
 		m_adpcm_select(*this, "adpcm_select"),
 		m_sound_data(*this, "ymsnd"),
@@ -57,6 +66,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<taito_cchip_device> m_cchip;
 	optional_device<msm5205_device> m_msm;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_region_ptr<u8> m_sound_data;
@@ -64,6 +74,7 @@ public:
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
 	DECLARE_READ16_MEMBER(cadash_share_r);
@@ -94,3 +105,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_ASUKA_H

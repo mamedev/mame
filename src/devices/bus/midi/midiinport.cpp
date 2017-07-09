@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    midiinport.c
+    midiinport.cpp
 
     MIDI In serial port - glues the image device to the pluggable serial port
 
@@ -20,12 +20,7 @@ midiin_port_device::midiin_port_device(const machine_config &mconfig, const char
 {
 }
 
-static MACHINE_CONFIG_START(midiin_port_config)
+MACHINE_CONFIG_MEMBER(midiin_port_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("midiinimg", MIDIIN, 0)
 	MCFG_MIDIIN_INPUT_CB(WRITELINE(midiin_port_device, read))
 MACHINE_CONFIG_END
-
-machine_config_constructor midiin_port_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(midiin_port_config);
-}

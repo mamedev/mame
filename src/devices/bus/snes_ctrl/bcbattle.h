@@ -28,13 +28,13 @@ public:
 	// construction/destruction
 	snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint8_t read_pin4() override;
 	virtual void write_strobe(uint8_t data) override;

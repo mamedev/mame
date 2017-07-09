@@ -393,24 +393,13 @@ READ8_MEMBER(nes_lz93d50_24c01_device::read_m)
 //  SERIAL I2C DEVICE
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( bandai_i2c_24c01 )
+MACHINE_CONFIG_MEMBER( nes_lz93d50_24c01_device::device_add_mconfig )
 	MCFG_24C01_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-machine_config_constructor nes_lz93d50_24c01_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bandai_i2c_24c01 );
-}
-
-
-MACHINE_CONFIG_START( bandai_i2c_24c02 )
+MACHINE_CONFIG_MEMBER( nes_lz93d50_24c02_device::device_add_mconfig )
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
-
-machine_config_constructor nes_lz93d50_24c02_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bandai_i2c_24c02 );
-}
 
 
 /*-------------------------------------------------

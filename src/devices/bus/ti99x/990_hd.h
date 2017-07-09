@@ -25,7 +25,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	int get_id_from_device( device_t *device );
 
@@ -46,7 +46,7 @@ protected:
 
 private:
 	// max disk units per controller: 4 is the protocol limit, but it may be overridden if more than one controller is used
-    static constexpr unsigned MAX_DISK_UNIT = 4;
+	static constexpr unsigned MAX_DISK_UNIT = 4;
 
 	enum format_t
 	{

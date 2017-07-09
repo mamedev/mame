@@ -25,14 +25,9 @@ void psx_controller_port_device::device_config_complete()
 	m_dev = dynamic_cast<device_psx_controller_interface *>(get_card_device());
 }
 
-static MACHINE_CONFIG_START( psx_memory_card )
+MACHINE_CONFIG_MEMBER( psx_controller_port_device::device_add_mconfig )
 	MCFG_PSXCARD_ADD("card")
 MACHINE_CONFIG_END
-
-machine_config_constructor psx_controller_port_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( psx_memory_card );
-}
 
 void psx_controller_port_device::disable_card(bool state)
 {

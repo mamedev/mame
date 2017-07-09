@@ -527,6 +527,8 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "emu.h"
 #include "includes/segas32.h"
 
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "cpu/nec/v25.h"
@@ -535,7 +537,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
-//#include "machine/mb89352.h"
+#include "machine/mb89352.h"
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
@@ -547,6 +549,11 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 #include "radr.lh"
 
+/*
+ * TODO: Kokoroji hangs if CD comms are handled with current mb89352 core.
+ * We currently hide this behind a compile switch to aid development
+ */
+#define S32_KOKOROJI_TEST_CD 0
 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
@@ -2366,6 +2373,8 @@ MACHINE_CONFIG_MEMBER(segas32_trackball_state::device_add_mconfig)
 	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX3")
 	MCFG_UPD4701_PORTY("TRACKY3")
+
+	// 837-8685 I/O board has an unpopulated space for a fourth UPD4701A
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
@@ -2479,12 +2488,34 @@ WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 		machine().output().set_lamp_value(8 + i, BIT(data, i));
 }
 
+WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
+{
+	printf("%02x IRQ\n",state);
+	// TODO: sent!
+}
+
+WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
+{
+	printf("%02x DRQ\n",state);
+}
+
 static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP //AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	#if S32_KOKOROJI_TEST_CD
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	#else
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP
+	#endif
 	AM_RANGE(0xc00060, 0xc0006f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
+
+static MACHINE_CONFIG_START( cdrom_config )
+	MCFG_DEVICE_MODIFY( "cdda" )
+	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 0.30 )
+	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 0.30 )
+MACHINE_CONFIG_END
+
 
 MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
@@ -2492,7 +2523,14 @@ MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
 
-	//MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
+	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_MB89352A_IRQ_CB(WRITELINE(segas32_cd_state, scsi_irq_w))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(segas32_cd_state, scsi_drq_w))
+
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
@@ -4056,7 +4094,7 @@ ROM_START( kokoroj2 )
 	ROMX_LOAD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) , ROM_SKIP(6)|ROM_GROUPWORD )
 
 	/* AUDIO CD */
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "mainpcb:scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "cdp-00146", 0, SHA1(0b37e0ea2380ecd9abef2ccd6a8096d76d2ba344) )
 ROM_END
 
@@ -5603,7 +5641,7 @@ GAME( 1993, jparkj,    jpark,    sega_system32_analog, jpark, segas32_new_state,
 GAME( 1993, jparkja,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, jparkjc,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, kokoroj2,  0,        sega_system32_cd,  kokoroj2, segas32_new_state, radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
+GAME( 1993, kokoroj2,  0,        sega_system32_cd,  kokoroj2, segas32_new_state, radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 
 GAME( 1990, radm,      0,        sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
 GAME( 1990, radmu,     radm,     sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )

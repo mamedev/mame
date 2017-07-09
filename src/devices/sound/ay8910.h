@@ -5,21 +5,6 @@
 
 #pragma once
 
-
-/*
-AY-3-8910A: 2 I/O ports
-AY-3-8912A: 1 I/O port
-AY-3-8913A: 0 I/O port
-AY-3-8914:  same as 8910 except for different register mapping and two bit envelope enable / volume field
-AY8930: upper compatible with 8910.
-In extended mode, it has higher resolution and duty ratio setting
-YM2149: higher resolution, selectable clock divider
-YM3439: same as 2149
-YMZ284: 0 I/O port, different clock divider
-YMZ294: 0 I/O port
-OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
-*/
-
 #define ALL_8910_CHANNELS -1
 
 /* Internal resistance at Volume level 7. */
@@ -29,20 +14,20 @@ OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : difference
 
 /*
  * The following is used by all drivers not reviewed yet.
- * This will like the old behaviour, output between
+ * This will like the old behavior, output between
  * 0 and 7FFF
  */
 #define AY8910_LEGACY_OUTPUT        (0x01)
 
 /*
- * Specifing the next define will simulate the special
+ * Specifying the next define will simulate the special
  * cross channel mixing if outputs are tied together.
  * The driver will only provide one stream in this case.
  */
 #define AY8910_SINGLE_OUTPUT        (0x02)
 
 /*
- * The following define is the default behaviour.
+ * The following define is the default behavior.
  * Output level 0 is 0V and 7ffff corresponds to 5V.
  * Use this to specify that a discrete mixing stage
  * follows.
@@ -205,7 +190,7 @@ private:
 	const ay_ym_param *m_par_env;
 	int32_t m_vol_table[NUM_CHANNELS][16];
 	int32_t m_env_table[NUM_CHANNELS][32];
-	int32_t m_vol3d_table[8*32*32*32];
+	std::unique_ptr<int32_t[]> m_vol3d_table;
 	int m_flags;          /* Flags */
 	int m_res_load[3];    /* Load on channel in ohms */
 	devcb_read8 m_port_a_read_cb;

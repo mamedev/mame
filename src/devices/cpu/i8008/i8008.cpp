@@ -139,11 +139,12 @@ void i8008_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *i8008_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> i8008_device::memory_space_config() const
 {
-	return  (spacenum == AS_PROGRAM) ? &m_program_config :
-			(spacenum == AS_IO) ? &m_io_config :
-			nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 //-------------------------------------------------

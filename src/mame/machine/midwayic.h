@@ -64,19 +64,20 @@ public:
 	// construction/destruction
 	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_READ8_MEMBER(read_b);
 	DECLARE_READ8_MEMBER(read_c);
 	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
-
-protected:
-	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
 };
 
 
@@ -159,6 +160,7 @@ public:
 	static void static_set_auto_ack(device_t &device, uint8_t auto_ack) { downcast<midway_ioasic_device &>(device).m_auto_ack = auto_ack; }
 	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_irq_callback.set_callback(object); }
 	template<class _Object> static devcb_base &set_serial_tx_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_serial_tx_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_aux_output_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_aux_output_cb.set_callback(object); }
 
 	void set_shuffle_state(int state);
 	void fifo_w(uint16_t data);
@@ -192,6 +194,7 @@ private:
 	void update_ioasic_irq();
 
 	devcb_write8    m_serial_tx_cb;
+	devcb_write32   m_aux_output_cb;
 
 	uint32_t  m_reg[16];
 	uint8_t   m_has_dcs;
@@ -239,6 +242,9 @@ DECLARE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device)
 
 #define MCFG_MIDWAY_IOASIC_OUT_TX_CB(_devcb) \
 	devcb = &midway_ioasic_device::set_serial_tx_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_MIDWAY_IOASIC_AUX_OUT_CB(_devcb) \
+	devcb = &midway_ioasic_device::set_aux_output_callback(*device, DEVCB_##_devcb);
 
 
 enum

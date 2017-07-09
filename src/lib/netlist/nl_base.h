@@ -1186,8 +1186,11 @@ namespace netlist
 	// queue_t
 	// -----------------------------------------------------------------------------
 
+	/* We don't need a thread-safe queue currently. Parallel processing of
+	 * solvers will update inputs after parallel processing.
+	 */
 	class detail::queue_t :
-			public timed_queue<pqentry_t<net_t *, netlist_time>>,
+			public timed_queue<pqentry_t<net_t *, netlist_time>, false>,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{

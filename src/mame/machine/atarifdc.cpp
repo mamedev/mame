@@ -735,10 +735,6 @@ static const floppy_interface atari_floppy_interface =
 	"floppy_5_25"
 };
 
-static MACHINE_CONFIG_START( atari_fdc )
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
-MACHINE_CONFIG_END
-
 legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int drive)
 {
 	switch(drive) {
@@ -784,11 +780,9 @@ void atari_fdc_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor atari_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( atari_fdc  );
-}
+MACHINE_CONFIG_MEMBER( atari_fdc_device::device_add_mconfig )
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
+MACHINE_CONFIG_END

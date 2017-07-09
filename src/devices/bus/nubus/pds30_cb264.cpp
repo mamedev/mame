@@ -15,13 +15,6 @@
 
 #define VRAM_SIZE   (0x200000)
 
-MACHINE_CONFIG_START( cb264se30 )
-	MCFG_SCREEN_ADD( CB264SE30_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264se30_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
 
 ROM_START( cb264se30 )
 	ROM_REGION(0x8000, CB264SE30_ROM_REGION, 0)
@@ -36,14 +29,16 @@ DEFINE_DEVICE_TYPE(PDS030_CB264SE30, nubus_cb264se30_device, "pd3_c264", "Raster
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_cb264se30_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cb264se30 );
-}
+MACHINE_CONFIG_MEMBER( nubus_cb264se30_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( CB264SE30_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264se30_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -65,6 +60,7 @@ const tiny_rom_entry *nubus_cb264se30_device::device_rom_region() const
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nubus_cb264se30_device(mconfig, PDS030_CB264SE30, tag, owner, clock)
 {
+	(void)m_toggle;
 }
 
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

@@ -115,6 +115,7 @@ public:
 	DECLARE_WRITE16_MEMBER(airsys_gradram_w);
 	DECLARE_READ16_MEMBER(stick_input_r);
 	DECLARE_READ16_MEMBER(stick2_input_r);
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(dsp_flags_w);
 	DECLARE_WRITE16_MEMBER(dma_regs_w);

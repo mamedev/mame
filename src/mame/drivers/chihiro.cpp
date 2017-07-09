@@ -35,7 +35,7 @@ Games on this system include....
 | | 2004     | Wangan Midnight Maximum Tune (Export)              | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
 | | 2004     | Wangan Midnight Maximum Tune (Export) (Rev A)      | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
 |*| 2004     | Wangan Midnight Maximum Tune (Export) (Rev B)      | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
-| | 2004     | OutRun 2 Special Tours (Japan)                     | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
+|*| 20040909 | OutRun 2 Special Tours (Japan)                     | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
 |*| 20041229 | OutRun 2 Special Tours (Japan) (Rev A)             | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
 |*| 2004     | Ghost Squad                                        | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
 |*| 20041209 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
@@ -2053,6 +2053,16 @@ ROM_START( wangmid )
 	ROM_LOAD("crp1231lr10_ver0110.ic2", 0, 0x20000, CRC(0d30707c) SHA1(425e25c6203d0b400d12391916db3f7cdad00f7a) ) // H8/3003 code
 ROM_END
 
+ROM_START( outr2stjo )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0011", 0, SHA1(b2cc163109c7f218ce83c76cd995c34e5d2f2812) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0396-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
+ROM_END
+
 ROM_START( outr2stj )
 	CHIHIRO_BIOS
 
@@ -2243,12 +2253,21 @@ ROM_END
 ROM_START( questofd )
 	CHIHIRO_BIOS
 
+	// "Quest of D"
+	// DVD QOD 1.01C
+	// CDV-10005C
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "cdv-10005c", 0, SHA1(b30238cf8697fb7313fedbe75b70641e9418090f) )
+	DISK_IMAGE_READONLY( "cdv-10005c", 0, SHA1(b30238cf8697fb7313fedbe75b70641e9418090f) ) // DVD
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C621A (317-0376-JPN)
 	ROM_LOAD("317-0376-jpn.pic", 0x00, 0x4000, CRC(c6914d97) SHA1(e86897efcca86f303117d1ead6ede53ac410add8) )
+
+	// "Quest of D"
+	// DVD QOD FIRMWARE UPDATE
+	// CDV-10018
+	DISK_REGION("update")
+	DISK_IMAGE_READONLY( "cdv-10018", 0, SHA1(46b00118450f68d5e9319ee3111db47efe3c3098) ) // DVD
 ROM_END
 
 ROM_START( gundcb79 )
@@ -2284,7 +2303,7 @@ ROM_START( qofd3 )
 	// DVD QOD 3.02
 	// CDV-10026D
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "cdv-10026d", 0, SHA1(b079778f7837100a9b4fa2a536a4efc7817dd2d2) )	// DVD
+	DISK_IMAGE_READONLY( "cdv-10026d", 0, SHA1(b079778f7837100a9b4fa2a536a4efc7817dd2d2) )  // DVD
 
 	// satellite Chihiro security PIC is missing
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
@@ -2294,13 +2313,13 @@ ROM_START( qofd3 )
 	// CD QOD3 VERSION UPDATE
 	// CDP-10062
 	DISK_REGION("update")
-	DISK_IMAGE_READONLY( "cdp-10062", 0, SHA1(abe337cb8782155c4cb92895ba22454a175d479d) )	// CD
+	DISK_IMAGE_READONLY( "cdp-10062", 0, SHA1(abe337cb8782155c4cb92895ba22454a175d479d) )   // CD
 
 	// "Quest of D Ver. 2.0"
 	// DVD QOD CHECK DISC
 	// CDV-10028
 	DISK_REGION("check")
-	DISK_IMAGE_READONLY( "cdv-10028", 0, SHA1(9f0f64cb4278cf51a42a21f880cda82b585c63f6) )	// DVD
+	DISK_IMAGE_READONLY( "cdv-10028", 0, SHA1(9f0f64cb4278cf51a42a21f880cda82b585c63f6) )   // DVD
 ROM_END
 
 ROM_START( gundcb83 )
@@ -2336,7 +2355,7 @@ ROM_START( qofdtbk )
 	// DVD QOD VS
 	// CDV-10035B
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "cdv-10035b", 0, SHA1(710776b88e7403193c1e0889bbd2d15fc8a92880) )	// DVD
+	DISK_IMAGE_READONLY( "cdv-10035b", 0, SHA1(710776b88e7403193c1e0889bbd2d15fc8a92880) )  // DVD
 
 	// satellite Chihiro security PIC
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
@@ -2348,13 +2367,13 @@ ROM_START( qofdtbk )
 	// CD QOD VS VERSION UPDATE
 	// CDP-10078
 	DISK_REGION("update")
-	DISK_IMAGE_READONLY( "cdp-10078", 0, SHA1(f7dde6a95c8b9087f984f92248c22a3b148ef645) )	// CD
+	DISK_IMAGE_READONLY( "cdp-10078", 0, SHA1(f7dde6a95c8b9087f984f92248c22a3b148ef645) )   // CD
 
 	// "Quest of D The Battle Kingdom"
 	// CD QOD SERVICE END
 	// CDP-10136
 	DISK_REGION("serv_end")
-	DISK_IMAGE_READONLY( "cdp-10136", 0, SHA1(3bfb6258bf9c08e1c8056183d02fe8aa3b65db49) )	// CD
+	DISK_IMAGE_READONLY( "cdp-10136", 0, SHA1(3bfb6258bf9c08e1c8056183d02fe8aa3b65db49) )   // CD
 ROM_END
 
 ROM_START( gundcb83b )
@@ -2399,7 +2418,7 @@ ROM_END
 // 0009A    GAME( 2004, wangmida, wangmid,  chihirogd,    chihiro, chihiro_state, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev A) (GDX-0009A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0009B */ GAME( 2004, wangmid,  chihiro,  chihirogd,    chihiro, chihiro_state, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev B) (GDX-0009B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0010
-// 0011     GAME( 2004, outr2stjo,outr2st,  chihirogd,    chihiro, chihiro_state, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (GDX-0011)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+/* 0011  */ GAME( 2004, outr2stjo,outr2st,  chihirogd,    chihiro, chihiro_state, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (GDX-0011)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0011A */ GAME( 2004, outr2stj, outr2st,  chihirogd,    chihiro, chihiro_state, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (Rev A) (GDX-0011A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0012  */ GAME( 2004, ghostsqo, ghostsqu, chihirogd,    chihiro, chihiro_state, 0, ROT0, "Sega",                     "Ghost Squad (GDX-0012)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0012A */ GAME( 2004, ghostsqu, chihiro,  chihirogd,    chihiro, chihiro_state, 0, ROT0, "Sega",                     "Ghost Squad (Rev A) (GDX-0012A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

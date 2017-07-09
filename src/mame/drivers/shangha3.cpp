@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Shanghai 3           (c)1993 Sunsoft     (68000     AY8910 OKI6295)
+Shanghai 3           (c)1993 Sunsoft     (68000     YM2149 OKI6295)
 Hebereke no Popoon   (c)1994 Sunsoft     (68000 Z80 YM3438 OKI6295)
 Blocken              (c)1994 KID / Visco (68000 Z80 YM3438 OKI6295)
 
@@ -132,9 +132,9 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
-	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8("aysnd", ay8910_device, data_w, 0x00ff)
-	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8("aysnd", ay8910_device, address_w, 0x00ff)
+	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8("aysnd", ym2149_device, data_r, 0x00ff)
+	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8("aysnd", ym2149_device, data_w, 0x00ff)
+	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8("aysnd", ym2149_device, address_w, 0x00ff)
 	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( shangha3 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_48MHz/32) // 1.5MHz
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_48MHz/32) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

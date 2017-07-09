@@ -2921,6 +2921,23 @@ DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 	m_timer1_vector = 0x1c;
 }
 
+/***************************************************************************
+
+  Go Go Cowboy
+
+***************************************************************************/
+
+ROM_START( gocowboy )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "29f040.u021", 0x00000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "go_go_cowboy_gpt_2c9c.u3", 0, 0x80000, CRC(ad9b1de6) SHA1(24809ec3a579d28189a98190db70a33217e4f8bc) )
+
+	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
+	ROM_LOAD( "29f040.u016", 0x00000, 0x200000, NO_DUMP )
+ROM_END
+
 
 /***************************************************************************
 
@@ -2943,3 +2960,4 @@ GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, RO
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
 GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
 GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
+GAME( 2000, gocowboy, 0,        sammymdl, sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Go Go Cowboy",                      MACHINE_NOT_WORKING ) // only partially dumped

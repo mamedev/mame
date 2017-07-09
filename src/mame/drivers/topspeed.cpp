@@ -192,7 +192,7 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 READ8_MEMBER(topspeed_state::input_bypass_r)
 {
 	// Read port number
-	uint8_t port = m_tc0220ioc->port_r(space, 0);
+	uint8_t port = m_tc0040ioc->port_r(space, 0);
 	uint16_t steer = 0xff80 + m_steer.read_safe(0);
 
 	switch (port)
@@ -204,7 +204,7 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0220ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r(space, offset);
 	}
 }
 
@@ -247,6 +247,14 @@ WRITE16_MEMBER(topspeed_state::motor_w)
 {
 	// Writes $900000-25 and $900200-219
 	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", space.device().safe_pc(), data, offset);
+}
+
+WRITE8_MEMBER(topspeed_state::coins_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -396,8 +404,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x880000, 0x880001) AM_READ8(input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
-	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x880000, 0x880001) AM_READ8(input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(motor_r, motor_w)
 ADDRESS_MAP_END
 
@@ -594,12 +602,13 @@ static MACHINE_CONFIG_START( topspeed )
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(topspeed_state, coins_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

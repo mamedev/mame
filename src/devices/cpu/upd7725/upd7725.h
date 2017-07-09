@@ -99,7 +99,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -187,8 +187,8 @@ private:
 	int m_icount;
 	bool m_irq; // old irq line state, for detecting rising edges.
 	// m_irq_firing: if an irq has fired; 0 = not fired or has already finished firing
-	// 1 = next opcode is the first half of int firing 'NOP+push pc'
-	// 2 = next opcode is the second half of int firing 'JMP 0100'
+	// 1 = next opcode is the first half of int firing 'NOP'
+	// 2 = next opcode is the second half of int firing 'CALL 0100'
 	int m_irq_firing;
 	address_space *m_program, *m_data;
 	direct_read_data *m_direct;

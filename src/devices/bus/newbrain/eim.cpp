@@ -64,10 +64,10 @@ const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( newbrain_eim )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( newbrain_eim )
+MACHINE_CONFIG_MEMBER( newbrain_eim_device::device_add_mconfig )
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/8)
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxc))
@@ -98,18 +98,6 @@ static MACHINE_CONFIG_START( newbrain_eim )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("96K")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor newbrain_eim_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( newbrain_eim );
-}
-
 
 
 //**************************************************************************

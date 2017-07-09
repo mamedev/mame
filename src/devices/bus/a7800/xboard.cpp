@@ -106,7 +106,7 @@ void a78_xm_device::device_reset()
 }
 
 
-static MACHINE_CONFIG_START( a78_xb )
+MACHINE_CONFIG_MEMBER( a78_xboard_device::device_add_mconfig )
 	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	MCFG_SPEAKER_STANDARD_MONO("xb_speaker")
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( a78_xb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a78_xm )
+MACHINE_CONFIG_MEMBER( a78_xm_device::device_add_mconfig )
 	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	MCFG_SPEAKER_STANDARD_MONO("xb_speaker")
@@ -127,15 +127,6 @@ static MACHINE_CONFIG_START( a78_xm )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
 MACHINE_CONFIG_END
 
-machine_config_constructor a78_xboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_xb );
-}
-
-machine_config_constructor a78_xm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_xm );
-}
 
 /*-------------------------------------------------
  mapper specific handlers

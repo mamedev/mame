@@ -16,10 +16,6 @@ public:
 	// construction/destruction
 	intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	// reading and writing
 	// actual IntelliVoice access
 	virtual DECLARE_READ16_MEMBER(read_speech) override;
@@ -51,7 +47,10 @@ public:
 	virtual void late_subslot_setup() override;
 
 protected:
+	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	required_device<sp0256_device> m_speech;

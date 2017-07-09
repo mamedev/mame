@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    midioutport.c
+    midioutport.cpp
 
     MIDI Out serial port - glues the image device to the pluggable serial port
 
@@ -20,11 +20,6 @@ midiout_port_device::midiout_port_device(const machine_config &mconfig, const ch
 {
 }
 
-static MACHINE_CONFIG_START(midiout_port_config)
+MACHINE_CONFIG_MEMBER(midiout_port_device::device_add_mconfig)
 	MCFG_MIDIOUT_ADD("midioutimg")
 MACHINE_CONFIG_END
-
-machine_config_constructor midiout_port_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(midiout_port_config);
-}

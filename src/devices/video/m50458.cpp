@@ -29,7 +29,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(M50458, m50458_device, "m50458", "Mitsubishi M50458 OSD")
 
-static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
+static ADDRESS_MAP_START( m50458_vram, 0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
 	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
 	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
@@ -137,9 +137,11 @@ const tiny_rom_entry *m50458_device::device_rom_region() const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *m50458_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> m50458_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //**************************************************************************

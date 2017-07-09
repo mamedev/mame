@@ -66,13 +66,11 @@ WRITE32_MEMBER(lpc210x_device::flash_w)
 }
 
 
-const address_space_config *lpc210x_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> lpc210x_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	default:                   return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -277,10 +275,5 @@ void lpc210x_device::write_timer(address_space &space, int timer, int offset, ui
 
 
 
-static MACHINE_CONFIG_START( lpc210x )
+MACHINE_CONFIG_MEMBER( lpc210x_device::device_add_mconfig )
 MACHINE_CONFIG_END
-
-machine_config_constructor lpc210x_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( lpc210x );
-}

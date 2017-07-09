@@ -66,11 +66,10 @@ const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cgenie_fdc )
+MACHINE_CONFIG_MEMBER( cgenie_fdc_device::device_add_mconfig )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
 
 	MCFG_FD1793_ADD("fd1793", XTAL_1MHz)
@@ -89,11 +88,6 @@ static MACHINE_CONFIG_START( cgenie_fdc )
 
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "cgenie_flop_rom")
 MACHINE_CONFIG_END
-
-machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cgenie_fdc );
-}
 
 
 //**************************************************************************

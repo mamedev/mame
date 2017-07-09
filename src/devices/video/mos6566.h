@@ -218,7 +218,7 @@ public:
 	template <class Object> static devcb_base &set_aec_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_k_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_k.set_callback(std::forward<Object>(cb)); }
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

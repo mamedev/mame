@@ -19,18 +19,12 @@
 DEFINE_DEVICE_TYPE(TTL166, ttl166_device, "ttl166", "SN54/74166")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ttl166 )
+MACHINE_CONFIG_MEMBER( ttl166_device::device_add_mconfig )
 	MCFG_TIMER_DRIVER_ADD("timer", ttl166_device, qh_output)
 MACHINE_CONFIG_END
-
-machine_config_constructor ttl166_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ttl166 );
-}
 
 
 //**************************************************************************

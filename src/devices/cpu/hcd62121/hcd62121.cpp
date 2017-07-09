@@ -73,6 +73,12 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> hcd62121_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 u8 hcd62121_cpu_device::read_op()
 {

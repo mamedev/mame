@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MM1_KEYBOARD, mm1_keyoard_device, "mm1kb", "MikroMikko 1 keyboard")
+DEFINE_DEVICE_TYPE(MM1_KEYBOARD, mm1_keyboard_device, "mm1kb", "MikroMikko 1 keyboard")
 
 
 //-------------------------------------------------
@@ -34,7 +34,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *mm1_keyoard_device::device_rom_region() const
+const tiny_rom_entry *mm1_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( mm1_keyboard );
 }
@@ -51,30 +51,19 @@ static const char *const mm1_kb_sample_names[] =
 	nullptr
 };
 
-bool mm1_keyoard_device::first_time = true;
+bool mm1_keyboard_device::first_time = true;
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( mm1_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mm1_keyboard )
+MACHINE_CONFIG_MEMBER( mm1_keyboard_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("keyboard_and_chassis_sounds", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(mm1_kb_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor mm1_keyoard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mm1_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -193,7 +182,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor mm1_keyoard_device::device_input_ports() const
+ioport_constructor mm1_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( mm1_keyboard );
 }
@@ -205,10 +194,10 @@ ioport_constructor mm1_keyoard_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  mm1_keyoard_device - constructor
+//  mm1_keyboard_device - constructor
 //-------------------------------------------------
 
-mm1_keyoard_device::mm1_keyoard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm1_keyboard_device::mm1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MM1_KEYBOARD, tag, owner, clock),
 	m_write_kbst(*this),
 	m_samples(*this, "keyboard_and_chassis_sounds"),
@@ -230,7 +219,7 @@ enum
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void mm1_keyoard_device::device_start()
+void mm1_keyboard_device::device_start()
 {
 	// resolve callbacks
 	m_write_kbst.resolve_safe();
@@ -240,7 +229,7 @@ void mm1_keyoard_device::device_start()
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 
 	// add notification request for system shut down (to play back the power switch sound once more)
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mm1_keyoard_device::shut_down_mm1, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mm1_keyboard_device::shut_down_mm1, this));
 
 	// state saving
 	save_item(NAME(m_sense));
@@ -248,7 +237,7 @@ void mm1_keyoard_device::device_start()
 	save_item(NAME(m_data));
 }
 
-void mm1_keyoard_device::shut_down_mm1()
+void mm1_keyboard_device::shut_down_mm1()
 {
 	m_samples->start(1, 1); // pretty useless this, as far as there is no way to delay the shut down process...
 }
@@ -257,7 +246,7 @@ void mm1_keyoard_device::shut_down_mm1()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mm1_keyoard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mm1_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// handle scan timer
 	uint8_t data = 0xff;

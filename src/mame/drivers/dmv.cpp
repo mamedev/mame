@@ -554,7 +554,7 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 	m_slot7->keyint_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, dmv_state )
+static ADDRESS_MAP_START( upd7220_map, 0, 16, dmv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_START( dmv )
 
 	// devices
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_5MHz/2) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
 

@@ -85,7 +85,7 @@ DEFINE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device, "ti99_iop
 namespace bus { namespace ti99 { namespace internal {
 
 ioport_device::ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   bus8z_device(mconfig, TI99_IOPORT, tag, owner, clock),
+	:   device_t(mconfig, TI99_IOPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_console_extint(*this),
 		m_console_ready(*this),
@@ -169,5 +169,9 @@ WRITE_LINE_MEMBER(ioport_attached_device::set_ready)
 
 SLOT_INTERFACE_START( ti99_io_port )
 	SLOT_INTERFACE("peb", TI99_PERIBOX)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START( ti99_io_port_ev )
+	SLOT_INTERFACE("peb", TI99_PERIBOX_EV)
 SLOT_INTERFACE_END
 

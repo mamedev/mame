@@ -64,11 +64,6 @@ void sms_ctrl_adaptor_device::peripheral_w(uint8_t data)
 }
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( sms_ctrl_adaptor_device::th_pin_w )
 {
 	m_port->th_pin_w(state);
@@ -81,14 +76,13 @@ READ32_MEMBER( sms_ctrl_adaptor_device::pixel_r )
 }
 
 
-static MACHINE_CONFIG_START( sms_adp_slot )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( sms_ctrl_adaptor_device::device_add_mconfig )
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl", sms_control_port_devices, "joypad")
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(sms_ctrl_adaptor_device, th_pin_w))
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_ctrl_adaptor_device, pixel_r))
 MACHINE_CONFIG_END
 
-
-machine_config_constructor sms_ctrl_adaptor_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sms_adp_slot );
-}

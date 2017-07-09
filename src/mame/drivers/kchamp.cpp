@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, kchamp_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( kchampvs )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(kchamp_state, msmint))         /* interrupt function */
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(kchamp_state, msmint))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

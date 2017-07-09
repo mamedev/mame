@@ -45,21 +45,9 @@ WRITE8_MEMBER(f1gp_state::f1gp_sh_bankswitch_w)
 }
 
 
-WRITE8_MEMBER(f1gp_state::sound_command_w)
-{
-	m_pending_command = 1;
-	m_soundlatch->write(space, offset, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 READ8_MEMBER(f1gp_state::command_pending_r)
 {
-	return (m_pending_command ? 0xff : 0);
-}
-
-WRITE8_MEMBER(f1gp_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
+	return (m_soundlatch->pending_r() ? 0xff : 0);
 }
 
 
@@ -86,7 +74,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff002, 0xfff005) AM_WRITE(f1gp_fgscroll_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(command_pending_r, sound_command_w, 0x00ff)
+	AM_RANGE(0xfff008, 0xfff009) AM_READ8(command_pending_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 	AM_RANGE(0xfff040, 0xfff05f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
@@ -106,7 +94,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(command_pending_r, sound_command_w, 0x00ff)
+	AM_RANGE(0xfff008, 0xfff009) AM_READ8(command_pending_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW3")
 	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)
@@ -116,6 +104,8 @@ static ADDRESS_MAP_START( f1gp_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM  AM_SHARE("sharedram")
+	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, f1gp_state )
@@ -128,7 +118,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, f1gp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp2
-	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -193,7 +183,8 @@ static ADDRESS_MAP_START( f1gpb_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff031) AM_NOP //?
+	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( f1gp )
@@ -368,7 +359,9 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
-	save_item(NAME(m_pending_command));
+	m_acia->write_cts(0);
+	m_acia->write_dcd(0);
+
 	save_item(NAME(m_roz_bank));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_gfxctrl));
@@ -384,7 +377,6 @@ MACHINE_START_MEMBER(f1gp_state,f1gp)
 
 MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 {
-	m_pending_command = 0;
 	m_roz_bank = 0;
 	m_flipscreen = 0;
 	m_gfxctrl = 0;
@@ -411,6 +403,11 @@ static MACHINE_CONFIG_START( f1gp )
 
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
+	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -448,6 +445,8 @@ static MACHINE_CONFIG_START( f1gp )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -474,6 +473,11 @@ static MACHINE_CONFIG_START( f1gpb )
 
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
+	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -672,7 +676,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

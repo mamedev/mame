@@ -160,7 +160,7 @@ PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
 
 
 // default address map
-static ADDRESS_MAP_START( sega315_5124, AS_0, 8, sega315_5124_device )
+static ADDRESS_MAP_START( sega315_5124, 0, 8, sega315_5124_device )
 	AM_RANGE(0x0000, VRAM_SIZE-1) AM_RAM
 ADDRESS_MAP_END
 
@@ -197,6 +197,14 @@ sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const ch
 sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega315_5124_device(mconfig, SEGA315_5378, tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true)
 {
+}
+
+
+std::vector<std::pair<int, const address_space_config *>> sega315_5124_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

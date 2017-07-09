@@ -138,7 +138,19 @@ static GFXDECODE_START( pgc )
 	GFXDECODE_REVERSEBITS("chargen", 0, pgc_charlayout, 0, 1)
 GFXDECODE_END
 
-MACHINE_CONFIG_START( pcvideo_pgc )
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional Graphics Controller")
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_pgc_device::device_add_mconfig )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pgc_map)
 	MCFG_CPU_IO_MAP(pgc_io)
@@ -161,23 +173,6 @@ MACHINE_CONFIG_START( pcvideo_pgc )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgc)
 	MCFG_PALETTE_ADD( "palette", 256 )
 MACHINE_CONFIG_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional Graphics Controller")
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_pgc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_pgc );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

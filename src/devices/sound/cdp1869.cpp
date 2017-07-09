@@ -78,7 +78,7 @@ DEVICE_ADDRESS_MAP_START( page_map, 8, cdp1869_device )
 ADDRESS_MAP_END
 
 // default address map
-static ADDRESS_MAP_START( cdp1869, AS_0, 8, cdp1869_device )
+static ADDRESS_MAP_START( cdp1869, 0, 8, cdp1869_device )
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -460,9 +460,11 @@ void cdp1869_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *cdp1869_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> cdp1869_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

@@ -46,11 +46,6 @@ static ADDRESS_MAP_START(finalchs_mem , AS_PROGRAM, 8, isa8_finalchs_device)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( finalchs_config )
-	MCFG_CPU_ADD("maincpu",M65C02,5000000)
-	MCFG_CPU_PROGRAM_MAP(finalchs_mem)
-MACHINE_CONFIG_END
-
 ROM_START(finalchs)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098))
@@ -72,14 +67,13 @@ WRITE8_MEMBER( isa8_finalchs_device::finalchs_w )
 DEFINE_DEVICE_TYPE(ISA8_FINALCHS, isa8_finalchs_device, "isa_finalchs", "Final Chess Card")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa8_finalchs_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( finalchs_config );
-}
+MACHINE_CONFIG_MEMBER( isa8_finalchs_device::device_add_mconfig )
+	MCFG_CPU_ADD("maincpu",M65C02,5000000)
+	MCFG_CPU_PROGRAM_MAP(finalchs_mem)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

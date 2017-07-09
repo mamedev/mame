@@ -90,7 +90,7 @@ public:
 
 	template <class Object> static devcb_base &set_res_rd_callback(device_t &device, Object &&cb) { return downcast<sam6883_device &>(device).m_read_res.set_callback(std::forward<Object>(cb)); }
 
-	static void configure_cpu(device_t &device, const char *tag, address_spacenum space)
+	static void configure_cpu(device_t &device, const char *tag, int space)
 	{
 		sam6883_device &dev = downcast<sam6883_device &>(device);
 		dev.m_cpu_tag = tag;
@@ -156,7 +156,7 @@ private:
 	{
 	public:
 		sam_space(sam6883_device &owner);
-		void point(const sam_bank *bank, uint16_t offset, uint32_t length = ~0);
+		void point(const sam_bank &bank, uint16_t offset, uint32_t length = ~0);
 
 	private:
 		sam6883_device &    m_owner;
@@ -165,11 +165,11 @@ private:
 		uint32_t              m_length;
 
 		address_space &cpu_space() const;
-		void point_specific_bank(const sam_bank *bank, uint32_t offset, uint32_t mask, memory_bank *&memory_bank, uint32_t addrstart, uint32_t addrend, bool is_write);
+		void point_specific_bank(const sam_bank &bank, uint32_t offset, uint32_t mask, memory_bank *&memory_bank, uint32_t addrstart, uint32_t addrend, bool is_write);
 	};
 
 	const char *        m_cpu_tag;
-	address_spacenum    m_cpu_space_ref;
+	int    m_cpu_space_ref;
 
 	// incidentals
 	address_space *             m_cpu_space;

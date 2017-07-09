@@ -166,6 +166,7 @@ Added Multiple Coin Feature:
 #include "includes/fromance.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
 #include "speaker.h"
@@ -175,8 +176,11 @@ class pipedrm_state : public fromance_state
 {
 public:
 	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fromance_state(mconfig, type, tag)
+		: fromance_state(mconfig, type, tag),
+		m_soundlatch(*this, "soundlatch")
 	{ }
+
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_MACHINE_START(pipedrm);
 	DECLARE_MACHINE_RESET(pipedrm);
@@ -184,12 +188,7 @@ public:
 	DECLARE_DRIVER_INIT(hatris);
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
-	TIMER_CALLBACK_MEMBER( delayed_command_w );
-	DECLARE_WRITE8_MEMBER( sound_command_w );
-	DECLARE_WRITE8_MEMBER( sound_command_nonmi_w );
-	DECLARE_WRITE8_MEMBER( pending_command_clear_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
-	DECLARE_READ8_MEMBER( sound_command_r );
 };
 
 
@@ -234,49 +233,10 @@ WRITE8_MEMBER(pipedrm_state::sound_bankswitch_w )
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(pipedrm_state::delayed_command_w)
-{
-	m_sound_command = param & 0xff;
-	m_pending_command = 1;
-
-	/* Hatris polls commands *and* listens to the NMI; this causes it to miss */
-	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
-	/* sound board. */
-	if (param & 0x100)
-		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-
-WRITE8_MEMBER(pipedrm_state::sound_command_w )
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipedrm_state::delayed_command_w),this), data | 0x100);
-}
-
-
-WRITE8_MEMBER(pipedrm_state::sound_command_nonmi_w )
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipedrm_state::delayed_command_w),this), data);
-}
-
-
-WRITE8_MEMBER(pipedrm_state::pending_command_clear_w )
-{
-	m_pending_command = 0;
-	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-
 READ8_MEMBER(pipedrm_state::pending_command_r )
 {
-	return m_pending_command;
+	return m_soundlatch->pending_r();
 }
-
-
-READ8_MEMBER(pipedrm_state::sound_command_r )
-{
-	return m_sound_command;
-}
-
 
 
 /*************************************
@@ -297,7 +257,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, pipedrm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_WRITE(sound_command_w)
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE(pipedrm_bankswitch_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("DSW1")
@@ -324,8 +284,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, pipedrm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x16, 0x16) AM_READ(sound_command_r)
-	AM_RANGE(0x17, 0x17) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x16, 0x16) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x17, 0x17) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -333,8 +293,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hatris_sound_portmap, AS_IO, 8, pipedrm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READ(sound_command_r)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(pending_command_r, pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x05, 0x05) AM_READ(pending_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 
@@ -586,18 +546,11 @@ MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 	membank("bank2")->configure_entries(0, 2, memregion("sub")->base() + 0x10000, 0x8000);
 	membank("bank2")->set_entry(0);
 
-	/* state save */
-	save_item(NAME(m_pending_command));
-	save_item(NAME(m_sound_command));
-
 	/* video-related elements are saved in video_start */
 }
 
 MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 {
-	m_pending_command = 0;
-	m_sound_command = 0;
-
 	m_flipscreen_old = -1;
 	m_scrollx_ofs = 0x159;
 	m_scrolly_ofs = 0x10;
@@ -653,6 +606,10 @@ static MACHINE_CONFIG_START( pipedrm )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -696,6 +653,13 @@ static MACHINE_CONFIG_START( hatris )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	// Hatris polls commands *and* listens to the NMI; this causes it to miss
+	// sound commands. It's possible the NMI isn't really hooked up on the YM2608
+	// sound board.
+	//MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("sub", 0))
@@ -913,7 +877,6 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 
 DRIVER_INIT_MEMBER(pipedrm_state,hatris)
 {
-	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x20, write8_delegate(FUNC(pipedrm_state::sound_command_nonmi_w),this));
 	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));
 }
 

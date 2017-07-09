@@ -87,7 +87,7 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 
 
 // default address map
-static ADDRESS_MAP_START( ppu2c0x, AS_0, 8, ppu2c0x_device )
+static ADDRESS_MAP_START( ppu2c0x, 0, 8, ppu2c0x_device )
 	AM_RANGE(0x0000, 0x3eff) AM_RAM
 	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(palette_read, palette_write)
 //  AM_RANGE(0x0000, 0x3fff) AM_RAM
@@ -98,9 +98,11 @@ ADDRESS_MAP_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *ppu2c0x_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> ppu2c0x_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -351,14 +353,14 @@ void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool
 
 		switch (color_emphasis)
 		{
-			case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-			case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-			case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-			case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-			case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-			case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-			case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-			case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+		    case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+		    case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+		    case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+		    case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+		    case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+		    case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+		    case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+		    case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
 		}
 		*/
 
@@ -621,7 +623,7 @@ void ppu2c0x_device::draw_tile(uint8_t *line_priority, int color_byte, int color
 
 			// priority marking
 			if (pix)
-				line_priority[start_x + i] |= 0x02;			
+				line_priority[start_x + i] |= 0x02;
 		}
 		dest++;
 	}

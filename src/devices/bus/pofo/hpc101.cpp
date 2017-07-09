@@ -30,10 +30,10 @@ DEFINE_DEVICE_TYPE(POFO_HPC101, pofo_hpc101_device, "pofo_hpc101", "Atari Portfo
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( hpc101 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hpc101 )
+MACHINE_CONFIG_MEMBER( pofo_hpc101_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(M82C55A_TAG, I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_ctrl_out", output_latch_device, write))
@@ -55,17 +55,6 @@ static MACHINE_CONFIG_START( hpc101 )
 	MCFG_OUTPUT_LATCH_BIT2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_init))
 	MCFG_OUTPUT_LATCH_BIT3_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_select_in))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pofo_hpc101_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hpc101 );
-}
 
 
 //**************************************************************************

@@ -64,26 +64,15 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( apricot_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( apricot_keyboard )
+MACHINE_CONFIG_MEMBER( apricot_keyboard_device::device_add_mconfig )
 #ifdef UPD7507_EMULATED
 	MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
 	MCFG_CPU_IO_MAP(apricot_keyboard_io)
 #endif
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor apricot_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( apricot_keyboard );
-}
 
 
 //-------------------------------------------------

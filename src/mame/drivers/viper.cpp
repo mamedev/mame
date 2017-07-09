@@ -86,7 +86,7 @@
         mocapglf            Security code error
         mocapb,j            Crash after self checks
         p911                "Distribution error"
-		p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
+        p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
         p9112               RTC self check bad
         popn9               Doesn't boot: bad CHD?
         sscopex/sogeki      Security code error
@@ -434,6 +434,7 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
+	WRITE_LINE_MEMBER(voodoo_pciint);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
 #if VIPER_DEBUG_EPIC_REGS
@@ -2242,10 +2243,10 @@ INPUT_PORTS_END
 // TODO: left/right escape, 2nd service switch?
 INPUT_PORTS_START( jpark3 )
 	PORT_INCLUDE( viper )
-	
+
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	
+
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
@@ -2278,7 +2279,6 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 {
 	mpc8240_interrupt(MPC8240_IRQ0);
@@ -2287,7 +2287,16 @@ INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 
 WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
-	mpc8240_interrupt(MPC8240_IRQ4);
+	// FIXME: The driver seems to hang using the voodoo vblank signa
+	//if (state)
+	//  mpc8240_interrupt(MPC8240_IRQ0);
+	//mpc8240_interrupt(MPC8240_IRQ3);
+}
+
+WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
+{
+	if (state)
+		mpc8240_interrupt(MPC8240_IRQ4);
 }
 
 void viper_state::machine_start()
@@ -2325,7 +2334,7 @@ static MACHINE_CONFIG_START( viper )
 	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
 	MCFG_PPC_BUS_FREQUENCY(100000000)
 	MCFG_CPU_PROGRAM_MAP(viper_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state,  viper_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
@@ -2338,6 +2347,7 @@ static MACHINE_CONFIG_START( viper )
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("maincpu")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(viper_state,voodoo_vblank))
+	MCFG_VOODOO_PCIINT_CB(WRITELINE(viper_state, voodoo_pciint))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2412,7 +2422,7 @@ ROM_START(ppp2nd)
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 	// byte 0x1e (0) JAA (1) AAA
 	// byte 0x1f (1) rental
-	
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ata:0:hdd:image" )

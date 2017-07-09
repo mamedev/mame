@@ -2438,7 +2438,7 @@ ROM_START( olysoc92b )
 	ROM_LOAD32_BYTE( "1", 0x000000, 0x040000, CRC(d4f37bf2) SHA1(af06364a602bd0ac2b9506de792bef003281e9d4) ) // == cupsocb    Seibu Cup Soccer (set 3)
 	ROM_LOAD32_BYTE( "2", 0x000001, 0x040000, CRC(6967d6f9) SHA1(292f59cf501064cdfb20acd8295fee7e93c9bc95) ) // same as Seibu Cup Soccer (set 3) except last byte is 02 instead of 01
 	ROM_LOAD32_BYTE( "3", 0x000002, 0x040000, CRC(226f65f9) SHA1(106a2f807aaf0f2e1fbcb1ffec6ccf4d2d7addd8) ) // == cupsocb    Seibu Cup Soccer (set 3)
-	ROM_LOAD32_BYTE( "4", 0x000003, 0x040000, CRC(8ff16a9e) SHA1(c29986cec74e183d18eaaf69ba6ca20b75590298) ) // == cupsocb    Seibu Cup Soccer (set 3)
+	ROM_LOAD32_BYTE( "4", 0x000003, 0x040000, CRC(8ff16a9e) SHA1(c29986cec74e183d18eaaf69ba6ca20b75590298) ) // sldh == cupsocb    Seibu Cup Soccer (set 3)
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "7",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
@@ -2447,7 +2447,7 @@ ROM_START( olysoc92b )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "6", 0x000000, 0x010000, CRC(7edb1700) SHA1(db30c01fc0e5b9f3c2d6139f89ec88936bc75b38) )
-	ROM_LOAD16_BYTE( "5", 0x000001, 0x010000, CRC(ec21c8dc) SHA1(93a9bf13d7c53e76762307c028f427ff2888629c) )
+	ROM_LOAD16_BYTE( "5", 0x000001, 0x010000, CRC(ec21c8dc) SHA1(93a9bf13d7c53e76762307c028f427ff2888629c) )  // sldh
 
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )

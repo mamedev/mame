@@ -106,7 +106,7 @@ void setup_t::register_model(const pstring &model_in)
 void setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 {
 	if (!m_alias.insert({alias, out}).second)
-		log().fatal(MF_1_ADDING_ALIAS_1_TO_ALIAS_LIST, alias);
+		log().fatal(MF_1_ADDING_ALI1_TO_ALIAS_LIST, alias);
 }
 
 void setup_t::register_alias(const pstring &alias, const pstring &out)
@@ -413,7 +413,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 
 devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
-	nl_assert(inp.is_analog());
+	nl_assert(inp.is_logic());
 
 	logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 	devices::nld_base_proxy *proxy = incast.get_proxy();

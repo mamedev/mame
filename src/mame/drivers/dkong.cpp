@@ -918,7 +918,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( s2650_io_map, AS_IO, 8, dkong_state )
 	AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( s2650_data_map, AS_DATA, 8, dkong_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(s2650_data_w)
 ADDRESS_MAP_END
 
@@ -1239,9 +1241,6 @@ static INPUT_PORTS_START( hunchbkd )
 	PORT_DIPSETTING(    0x08, "40000" )
 	PORT_DIPSETTING(    0x0c, "80000" )
 
-	PORT_START("SENSE") /* Sense */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
 
@@ -1283,9 +1282,6 @@ static INPUT_PORTS_START( shootgal )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START("SENSE") /* Sense */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
 
@@ -1316,9 +1312,6 @@ static INPUT_PORTS_START( sbdk )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
 
-	PORT_START("SENSE") /* Sense */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
 
@@ -1334,9 +1327,6 @@ static INPUT_PORTS_START( herbiedk )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-
-	PORT_START("SENSE") /* Sense */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1368,9 +1358,6 @@ static INPUT_PORTS_START( herodk )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
-
-	PORT_START("SENSE") /* Sense */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1467,9 +1454,6 @@ static INPUT_PORTS_START( spclforc )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 
-	PORT_START("SENSE") /* Sense */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
 
@@ -1499,9 +1483,6 @@ static INPUT_PORTS_START( 8ballact )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:!8" )
-
-	PORT_START("SENSE") /* Sense */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1846,7 +1827,9 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 	MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
 	MCFG_CPU_PROGRAM_MAP(s2650_map)
 	MCFG_CPU_IO_MAP(s2650_io_map)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(dkong_state, s2650_fo_w))
+	MCFG_CPU_DATA_MAP(s2650_data_map)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dkong_state, s2650_fo_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  s2650_interrupt)
 
 	MCFG_DEVICE_MODIFY("dma8257")
@@ -1856,7 +1839,12 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( spclforc, s2650 )
+static MACHINE_CONFIG_DERIVED( herbiedk, s2650 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( spclforc, herbiedk )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("soundcpu")
@@ -3410,13 +3398,13 @@ GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, 0,        ROT
 GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, 0,        ROT180, "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 2650 based */
-GAME( 1984, herbiedk,  huncholy, s2650,     herbiedk, dkong_state, 0,        ROT90,  "Century Electronics / Seatongrove Ltd",             "Herbie at the Olympics (DK conversion)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herbiedk,  huncholy, herbiedk,  herbiedk, dkong_state, 0,        ROT90,  "Century Electronics / Seatongrove Ltd",             "Herbie at the Olympics (DK conversion)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbkd,  hunchbak, s2650,     hunchbkd, dkong_state, 0,        ROT90,  "Century Electronics",                               "Hunchback (DK conversion)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sbdk,      superbik, s2650,     sbdk,     dkong_state, 0,        ROT90,  "Century Electronics",                               "Super Bike (DK conversion)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state, herodk,   ROT90,  "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, 0,        ROT90,  "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 8ballact,  0,        s2650,     8ballact, dkong_state, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DK conversion)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 8ballact2, 8ballact, s2650,     8ballact, dkong_state, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DKJr conversion)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DK conversion)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DKJr conversion)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, 0,        ROT180, "Seatongrove Ltd (Zaccaria license)",                "Shooting Gallery",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

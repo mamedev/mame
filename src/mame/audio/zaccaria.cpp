@@ -2,6 +2,7 @@
 // copyright-holders:Vas Crabb
 #include "emu.h"
 #include "audio/zaccaria.h"
+#include "audio/nl_zac1b11142.h"
 
 #include "cpu/m6800/m6800.h"
 #include "machine/clock.h"
@@ -323,6 +324,10 @@ zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, 
 	, m_audiocpu(*this, "audiocpu")
 	, m_pia_1i(*this, "pia_1i")
 	, m_speech(*this, "speech")
+	, m_ioa(*this, "sound_nl:ioa%u", 0)
+	, m_level(*this, "sound_nl:level")
+	, m_levelt(*this, "sound_nl:levelt")
+	, m_sw1(*this, "sound_nl:sw1")
 	, m_inputs(*this, "1B11142")
 	, m_host_command(0)
 {
@@ -353,20 +358,22 @@ WRITE_LINE_MEMBER(zac1b11142_audio_device::ressound_w)
 
 WRITE8_MEMBER(zac1b11142_audio_device::ay_4g_porta_w)
 {
-	// TODO: (data & 0x07) controls tromba mix volume
-	// TODO: (data & 0x08) controls cassa gate
-	// TODO: (data & 0x10) controls rullante gate
+	m_ioa[0]->write_line(BIT(data, 0)); // tromba mix volume
+	m_ioa[1]->write_line(BIT(data, 1)); //   "     "    "
+	m_ioa[2]->write_line(BIT(data, 2)); //   "     "    "
+	m_ioa[3]->write_line(BIT(data, 3)); // cassa gate
+	m_ioa[4]->write_line(BIT(data, 4)); // rullante gate
 }
 
 WRITE8_MEMBER(zac1b11142_audio_device::ay_4h_porta_w)
 {
-	// TODO: data & 0x01 controls LEVEL
-	// TODO: data & 0x02 controls LEVELT
+	m_level->write_line(BIT(data, 0)); // output level
+	m_levelt->write_line(BIT(data, 1)); // tromba level
 }
 
 WRITE8_MEMBER(zac1b11142_audio_device::ay_4h_portb_w)
 {
-	// TODO: data & 0x01 controls ANAL3 filter
+	m_sw1->write_line(BIT(data, 0)); // ANAL3 filter
 }
 
 READ8_MEMBER(zac1b11142_audio_device::host_command_r)
@@ -401,12 +408,16 @@ MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
 
 	MCFG_DEVICE_MODIFY("melodypsg1")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4g_porta_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15, 0)
+	MCFG_SOUND_ROUTE_EX(0, "sound_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "sound_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "sound_nl", 1.0, 2)
 
 	MCFG_DEVICE_MODIFY("melodypsg2")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_portb_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15, 0)
+	MCFG_SOUND_ROUTE_EX(0, "sound_nl", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(1, "sound_nl", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(2, "sound_nl", 1.0, 5)
 
 	MCFG_CPU_ADD("audiocpu", M6802, XTAL_3_579545MHz) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b11142_audio_map)
@@ -426,7 +437,30 @@ MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
 	MCFG_TMS52XX_IRQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, cb1_w))
 	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, ca2_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.80, 0)
-}
+
+	MCFG_SOUND_ADD("sound_nl", NETLIST_SOUND, 48000)
+	MCFG_NETLIST_SETUP(zac1b11142)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 0)
+
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa0",   "I_IOA0.IN",   0)
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa1",   "I_IOA1.IN",   0)
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa2",   "I_IOA2.IN",   0)
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa3",   "I_IOA3.IN",   0)
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa4",   "I_IOA4.IN",   0)
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "level",  "I_LEVEL.IN",  0)
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "levelt", "I_LEVELT.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "sw1",    "I_SW1.IN",    0)
+
+	MCFG_NETLIST_STREAM_INPUT("sound_nl", 0, "R_AY4G_A.R")
+	MCFG_NETLIST_STREAM_INPUT("sound_nl", 1, "R_AY4G_B.R")
+	MCFG_NETLIST_STREAM_INPUT("sound_nl", 2, "R_AY4G_C.R")
+	MCFG_NETLIST_STREAM_INPUT("sound_nl", 3, "R_AY4H_A.R")
+	MCFG_NETLIST_STREAM_INPUT("sound_nl", 4, "R_AY4H_B.R")
+	MCFG_NETLIST_STREAM_INPUT("sound_nl", 5, "R_AY4H_C.R")
+
+	MCFG_NETLIST_STREAM_OUTPUT("sound_nl", 0, "P1.2")
+	MCFG_NETLIST_ANALOG_MULT_OFFSET(3000.0 * 10.0, 0.0) // FIXME: no clue what numbers to use here
+MACHINE_CONFIG_END
 
 ioport_constructor zac1b11142_audio_device::device_input_ports() const
 {

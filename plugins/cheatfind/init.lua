@@ -149,22 +149,24 @@ function cheatfind.startplugin()
 		end
 
 		for i = 1, olddata.size do
-			local old = string.unpack(format, olddata.block, i)
-			local new = string.unpack(format, newdata.block, i)
-			local oldc, newc = old, new
-			local comp = false
-			local addr = olddata.start + i - 1
-			if not bcd or (check_bcd(old) and check_bcd(new)) then
-				if bcd then
-					oldc = frombcd(old)
-					newc = frombcd(new)
-				end
-				if cfoper[oper](newc, oldc, val, addr) then
-					ret[#ret + 1] = { addr = addr,
-					oldval = old,
-					newval = new,
-					bitmask = bitmask }
-					ref[ret[#ret].addr] = #ret
+			local oldstat, old = pcall(string.unpack, format, olddata.block, i)
+			local newstat, new = pcall(string.unpack, format, newdata.block, i)
+			if oldstat and newstat then
+				local oldc, newc = old, new
+				local comp = false
+				local addr = olddata.start + i - 1
+				if not bcd or (check_bcd(old) and check_bcd(new)) then
+					if bcd then
+						oldc = frombcd(old)
+						newc = frombcd(new)
+					end
+					if cfoper[oper](newc, oldc, val, addr) then
+						ret[#ret + 1] = { addr = addr,
+						oldval = old,
+						newval = new,
+						bitmask = bitmask }
+						ref[ret[#ret].addr] = #ret
+					end
 				end
 			end
 		end

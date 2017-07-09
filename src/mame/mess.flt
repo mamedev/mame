@@ -13,6 +13,7 @@ abc1600.cpp
 abc80.cpp
 abc80x.cpp
 ac1.cpp
+accomm.cpp
 aceex.cpp
 acrnsys1.cpp
 adam.cpp
@@ -143,6 +144,7 @@ d6809.cpp
 dai.cpp
 daruma.cpp
 datum.cpp
+dbox.cpp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
@@ -183,6 +185,7 @@ et3400.cpp
 eti660.cpp
 eurocom2.cpp
 europc.cpp
+eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
@@ -224,6 +227,7 @@ goupil.cpp
 gp2x.cpp
 gp32.cpp
 grfd2301.cpp
+gridcomp.cpp
 h19.cpp
 h8.cpp
 h89.cpp
@@ -235,7 +239,6 @@ hh_cop400.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
-hh_sm500.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
@@ -253,6 +256,7 @@ hp9k.cpp
 hp9k_3xx.cpp
 hprot1.cpp
 hpz80unk.cpp
+hp80.cpp
 ht68k.cpp
 huebler.cpp
 hunter2.cpp
@@ -273,6 +277,7 @@ indiana.cpp
 indigo.cpp
 indy_indigo2.cpp
 instruct.cpp
+intellec4.cpp
 interact.cpp
 interpro.cpp
 intv.cpp

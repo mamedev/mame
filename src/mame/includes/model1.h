@@ -38,6 +38,7 @@ public:
 		, m_dsbz80(*this, DSBZ80_TAG)
 		, m_tgp(*this, "tgp")
 		, m_screen(*this, "screen")
+		, m_io_timer(*this, "iotimer")
 		, m_mr2(*this, "mr2")
 		, m_mr(*this, "mr")
 		, m_display_list0(*this, "display_list0")
@@ -58,6 +59,7 @@ public:
 
 	DECLARE_READ16_MEMBER(network_ctl_r);
 	DECLARE_WRITE16_MEMBER(network_ctl_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(io_command_acknowledge);
 
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
@@ -188,6 +190,8 @@ private:
 	bool m_dump;
 	bool m_swa;
 
+	uint8_t m_io_command;
+
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
@@ -196,6 +200,7 @@ private:
 	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;
 	required_device<screen_device> m_screen;
+	required_device<timer_device> m_io_timer;
 
 	required_shared_ptr<uint16_t> m_mr2;
 	required_shared_ptr<uint16_t> m_mr;

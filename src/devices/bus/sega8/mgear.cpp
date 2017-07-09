@@ -37,16 +37,8 @@ void sega8_mgear_device::device_reset()
 {
 }
 
-/*-------------------------------------------------
- mapper specific handlers
- -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sub_slot )
+MACHINE_CONFIG_MEMBER( sega8_mgear_device::device_add_mconfig )
 	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_CONFIG_END
-
-machine_config_constructor sega8_mgear_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sub_slot );
-}

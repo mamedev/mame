@@ -14,8 +14,16 @@
  *  probably too low.  I suspect that screen is not really
  *  512 pixels wide -- most likely 384, which would give 60Hz
  *
- *  Some of the graphics, like the starfield, is clocked with the
- *  12MHz signal, effectively doubling the horizontal resolution
+ *  Based on photographs of the PCB, and analysis of videos of
+ *  actual gameplay, the horizontal screen really is 384 clocks.
+ *
+ *  However, some of the graphics, like the starfield, are
+ *  clocked with the 12MHz signal.  This effectively doubles
+ *  the horizontal resolution:
+ *
+ *                             6.048Mhz clocks     12.096Mhz clocks
+ *  Horizontal Visible Area    384 (0x180)         768 (0x300)
+ *  Horizontal Blanking Time   128 (0x080)         256 (0x100)
  */
 
 #include "sound/discrete.h"
@@ -24,8 +32,8 @@
 
 #define STARSHP1_MASTER_CLOCK       (12096000)
 #define STARSHP1_CPU_CLOCK          (STARSHP1_MASTER_CLOCK / 16)
-#define STARSHP1_PIXEL_CLOCK        (STARSHP1_MASTER_CLOCK / 2)
-#define STARSHP1_HTOTAL             (0x200)
+#define STARSHP1_PIXEL_CLOCK        (STARSHP1_MASTER_CLOCK)
+#define STARSHP1_HTOTAL             (0x300)
 #define STARSHP1_HBEND              (0x000)
 #define STARSHP1_HBSTART            (0x200)
 #define STARSHP1_VTOTAL             (0x106)

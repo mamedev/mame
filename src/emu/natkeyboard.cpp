@@ -365,9 +365,7 @@ void natural_keyboard::set_in_use(bool usage)
 	{
 		// update active usage
 		m_in_use = usage;
-		std::string error;
-		machine().options().set_value(OPTION_NATURAL_KEYBOARD, usage, OPTION_PRIORITY_CMDLINE, error);
-		assert(error.empty());
+		machine().options().set_value(OPTION_NATURAL_KEYBOARD, usage, OPTION_PRIORITY_CMDLINE);
 
 		// lock out (or unlock) all keyboard inputs
 		for (auto &port : machine().ioport().ports())

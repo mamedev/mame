@@ -18,48 +18,52 @@
 
 ****************************************************************************
 
-Killer Instinct 1 / Killer Instinct 2
+Guru-Readme for Killer Instinct 1 / Killer Instinct 2
 Rare/Nintendo, 1994/1995
+
+This is a fighting game using a hard drive to hold the graphics + code,
+running on hardware made by Midway Manufacturing.
+The hardware is using similar PCB technology to other Midway games
+of the era such as San Francisco Rush, Mortal Kombat 3, Cruis'n Exotica,
+War Gods etc. The majority of the IC's on the PCB are surface mounted.
 
 PCB Layout
 ----------
 
-This is a fighting game using a hard drive to hold the graphics + code, running on
-what appears to be Williams Electronics manufactured hardware.
-
 KILLER INSTINCT V4.0
 5770-14397-03
 (C)1994 Nintendo/Rare
-(sticker - MIDWAY GAMES 44464 I457034  A-20333)
+(sticker - MIDWAY GAMES 44464 I457034 A-20333)
+(sticker from another PCB - MIDWAY GAMES 44447 635095)
 |---------------------------------------------------------------|
-|       LED1  LED2       GAL          U10    U11    U12    U13  |
-|  TDA7240   TL084  AD1851  10MHz                               |
+|J1 J2       LED1 LED2     GAL               U10  U11  U12  U13 |
+|TDA7240 TL084  AD1851  10MHz                                   |
+|                      |--------|  6116                         |
+|                      |ANALOG  |  6116                         |
+|                      |DEVICES |  6116                         |
+|                      |ADSP2105|            U33  U34  U35  U36 |
 |                      |--------|                               |
-|                      |ANALOG  |                               |
-|                      |DEVICES |                               |
-|                      |ADSP2105|                               |
-|                      |--------|                               |
-|J3                                   U33    U34    U35    U36  |
-|               71256 71256 71256 71256                         |
-|               71256 71256 71256 71256      MT4C4001  MT4C4001 |
-|J              71256 71256 71256 71256      MT4C4001  MT4C4001 |
-|A              71256 71256 71256 71256      MT4C4001  MT4C4001 |
-|M                                           MT4C4001  MT4C4001 |
-|M    ULN2064B                               MT4C4001  MT4C4001 |
-|A                                           MT4C4001  MT4C4001 |
-|          *1                                MT4C4001  MT4C4001 |
-|                        *5                  MT4C4001  MT4C4001 |
-|                                                               |
-|                               50MHz                       JP30|
-|              *4                MAX705                         |
-|                                 JP32  *2        *3        U98 |
-|  DSW1  DSW2                                                   |
-|       J7       J8           J6        S3                      |
+|J3                                                             |
+|-|             71256 71256 71256 71256                         |
+  |             71256 71256 71256 71256      MT4C4001  MT4C4001 |
+|-|             71256 71256 71256 71256      MT4C4001  MT4C4001 |
+| ULN2064B      71256 71256 71256 71256      MT4C4001  MT4C4001 |
+|                                            MT4C4001  MT4C4001 |
+|J      |----|                               MT4C4001  MT4C4001 |
+|A      |EPM |                               MT4C4001  MT4C4001 |
+|M      |7096|        |------|               MT4C4001  MT4C4001 |
+|M      |----|        |R4600 | 49FCT805      MT4C4001  MT4C4001 |
+|A           |----|   |      |                                  |
+|            |EPM |   |------|  50MHz   |----|   |----|     JP30|
+|-|          |7032|             MAX705  |EPM |   |EPM |         |
+  |          |x---|             JP32    |7128|   |7128|   U98   |
+|-|DSW1  DSW2                 J6        |x---|   |y---|         |
+|       J7       J8           J9    S3                          |
 |---------------------|---------------|-------------------------|
                       |     IDE44     |
-                      |               |
-                      |       *6      |
-                      |               |
+                      |               | <---- Conversion board to convert KI1 into KI2
+                      |    EPM7032y   |       PCB Number: 5772-14668-01
+                      |               |       Used only with KI 2 software on KI 1 PCB
                       |     IDE44     |
                       |-|-----------|-|
                         |||||||||||||
@@ -70,54 +74,73 @@ KILLER INSTINCT V4.0
                         |||||||||||||
                         |||||||||||||
                         |||||||||||||
-                  |-----|||||||||||||-----|
-                  |     |-----------|     |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |        Seagate        |
-                  |                       |
-                  |        ST9420AG       |
-                  |                       |
-                  |      2.5" H/Drive     |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |                       |
-                  |-----------------------|
-
+                      |-|||||||||||||-|
+                      | |-----------| |
+                      |               |
+                      |   Seagate     |
+                      |   ST9150AG    |
+                      |      or       | <---- Can be replaced with a IDE44>CF adapter or IDE44>SD adapter
+                      |   ST9420AG    |       if the factory boot ROM is replaced with the "ANY-IDE" boot ROM.
+                      |               |       Note there are different "ANY-IDE" boot ROMs for KI and KI 2.
+                      | 2.5" H/Drive  |
+                      |               |
+                      |               |
+                      |---------------|
 Notes:
-      GAL - GAL20V8 labelled 'KI-U1 A-19802' (DIP24)
-      MT4C4001 - 1M x4 DRAM (SOJ28)
-      71256 - IDT 71256 32k x8 SRAM (SOJ28)
-      JP30 - 3 pin jumper to configure boot ROM. Set to 1-2. Settings are 1-2 = 4MBit. 2-3 = 8MBit.
-      JP32 - 2 pin jumper to disable Watch Dog (Hard-wired on the PCB shorted 1-2)
-      ADSP2105 - Analog Devices ADSP-2105 (PLCC68)
-      J7 - 15 pin connector for player 3 controls
-      J3 - 10 pin connector for extra controls
-      J6 - 44 pin connector for 2.5" IDE hard drive
-      H/drive - Seagate Marathon 2.5" IDE hard drive, model ST9420AG
-        -for KI2, labelled 'L2.1 KILLER INSTINCT 2 DISK (C)1985 NINTENDO/RARE) CHS - 988/16/52 - 420.8MB
-      For KI1 - H/drive - Seagate Marathon 2.5" IDE hard drive, model ST9150AG
-
-      J8 - 8 pin connector for coin 3-4
-      S3 - Reset push-button switch
-      LED1 - H/Drive activity LED
-      LED2 - Sound Active LED
-      *1 Altera EPM7096LC68-10 labelled 'KI-U92 A-19488 (C)1994 NINTENDO/RARE' (PLCC68)
-      *2 Altera MAX EPM7128ELC84-10 labelled 'KI-U103 A-19486 (C)1994 NINTENDO/RARE' (PLCC68)
-      *3 Altera MAX EPM7128ELC84-10 labelled 'KI-U103 A-19486 (C)1994 NINTENDO/RARE' (PLCC68)
-      *4 Altera EPM7032LC44 -15T labelled 'K12-U96 A-20351 (C)1996 NINTENDO/RARE' (PLCC44)
-      *5 MIPS 4600-based CPU, heatsinked (QFP208)
-      *6 Altera EPM7032LC44 -15T labelled 'K12-U1 A-20383 (C)1996 NINTENDO/RARE' (PLCC44)
-         - This is an updated hard drive controller sub board used only with KI2
+      R4600    - Integrated Device Technology IDT79R4600-100MS R4600 CPU running at 100MHz, with heatsink (QFP208)
+      GAL      - Lattice GAL20V8 labelled 'KI-U1 A-19802 (C)1994 Nintendo/Rare' (DIP24)
+      MT4C4001 - Micron Technology 1M x4-bit Fast Page Mode DRAM (SOJ28)
+      71256    - Integrated Device Technology IDT71256SA20Y 32k x8-bit SRAM (SOJ28). Alternative: Mosel MS62256A-20RC 32k x8-bit SRAM (SOJ28)
+      6116     - Integrated Device Technology IDT6116SA25SO 2k x8-bit SRAM (SOP24)
+      ADSP2105 - Analog Devices ADSP-2105KP-40. Clock input 10.000MHz (PLCC68)
+      49FCT805 - Integrated Device Technology IDT49FCT805 Non-Inverting Buffer/Clock Driver with Two Independent Output Banks and Tri-State Control (SOIC20)
+      TDA7240  - ST Microelectronics TDA7240A 20W Mono Bridge Audio Amplifier IC (DIL4+3). Note the cabinet has two speakers but the generated sound is mono.
+      TL084    - Texas Instruments TL084 General Purpose J-FET Quad Operational Amplifier (DIP14)
+      AD1851   - Analog Devices AD1851 Monolithic PCM Audio DAC (DIP16)
+      ULN2064B - ST Microelectronics ULN2064B 50V 1.5A Quad Darlington Switch (DIP16)
+      MAX705   - Maxim MAX705 Microprocessor Supervisory Circuit / Reset Chip (DIP8)
+      J1       - 2 pin position for connector labelled 'LINE OUT' but not populated
+      J2       - 2 pin position for connector labelled 'AUX IN' but not populated
+      J3       - 10 pin connector for extra controls; coin interlock (pin 6), bill in (pin 5), volume minus (pin 2), volume plus (pin 3)
+      J6       - 44 pin connector for 2.5" IDE hard drive
+      J7       - 15 pin connector marked 'PLAYER 3' but used for player 1 'low' buttons (pins 7, 8, 9) and player 2 'low' buttons (pins 11, 12, 13)
+                 Note the 3 'high' buttons for player 1 and player 2 are on the JAMMA connector. JAMMA pins 25 & 26 top and bottom have no connection.
+      J8       - 8 pin connector for coin 3 (pin 2) and coin 4 (pin 6). Probably used for Bill Acceptors etc.
+      J9       - Position for 40 pin IDE connector for 3.5" IDE hard drive, but not populated. Note the connector can be added and used with a
+                 3.5" IDE HDD but the power for the HDD must be provided separately.
+      JP30     - 3 pin jumper to configure Boot ROM. Set to 1-2. Settings are 1-2 = 4MBit (27C4001/27C040) or 2-3 = 8MBit (27C080)
+      JP32     - 2 pin jumper to disable Watch Dog (Hard-wired on the PCB shorted 1-2)
+      S3       - Reset push-button switch
+      LED1     - H/Drive Activity LED
+      LED2     - Sound Activity LED
+      H/Drive  - 2.5" IDE Hard Drive with 44-pin connector. Note the model is checked by the program and the game will not run unless it finds
+                 the correct model. There is a modified Boot ROM available that allows it to work with any model HDD or a cheap Chinese $2 CF>IDE44
+                 adapter. A cheap Chinese $5 SD>IDE44 adapter can also be used.
+                   - For KI1, Seagate Marathon 2.5" IDE hard drive, model ST9150AG (131MB formatted capacity)
+                     C/H/S = 419/13/47 = 131076608 bytes, labelled 'L1 KILLER INSTINCT DISK (C)1984 NINTENDO/RARE'
+                   - For KI2, Seagate Marathon 2.5" IDE hard drive, model ST9420AG (420.8MB formatted capacity)
+                     C/H/S = 988/16/52 = 420872192 bytes, labelled 'L2.1 KILLER INSTINCT 2 DISK (C)1985 NINTENDO/RARE'
+      EPM7096  - Altera EPM7096LC68-10 labelled 'KI-U92 A-19488 (C)1994 NINTENDO/RARE' (PLCC68)
+      EPM7128x - Altera MAX EPM7128ELC84-10 CPLD labelled 'KI-U103 A-19486 (C)1994 NINTENDO/RARE' (PLCC84)
+      EPM7128y - Altera MAX EPM7128ELC84-10 CPLD labelled 'KI-U104 A-19487 (C)1994 NINTENDO/RARE' (PLCC84)
+      EPM7032x - Altera EPM7032LC44-15T CPLD
+                   - For KI labelled 'KI-U96 A-19489 (C)1994 NINTENDO/RARE' (PLCC44)
+                   - For KI2 labelled 'K12-U96 A-20351 (C)1996 NINTENDO/RARE' (PLCC44). Note if the PCB has this chip it is a dedicated KI2 PCB.
+                     If the software is replaced with KI 1 (boot ROM and HDD) the board will boot but immediately jumps to test mode and then freezes.
+                     Also, the top title "Killer Instinct" flashes rapidly. If the sticker on U96 is missing (so can't be identified as a KI 2) and
+                     someone has tried to make it run KI 1 and it has the above symptoms, it is likely a dedicated KI 2 PCB.
+      EPM7032y - Altera EPM7032LC44-15T CPLD labelled 'K12-U1 A-20383 (C)1996 NINTENDO/RARE' (PLCC44)
+                 This IC is mounted on a small PCB (5772-14668-01) and connected between the IDE44 interface on the main board and the IDE44 Hard Drive.
+                 It is used only with the KI2 conversion kit. This is mainly a protection device to stop game swaps on a KI 1 PCB. However if the
+                 sub board is removed and all the EPROMs and HDD are changed, the main board will run Killer Instinct, providing U96 is the correct
+                 chip for KI. If U96 is the type for KI2, then the main board will only run KI2 and can't be converted to KI.
+      HSync    - 15.3846kHz
+      VSync    - 58.9634Hz
 
       ROMs
       ----
+
+      Killer Instinct:
       U10 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U10 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U11 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U11 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U12 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U12 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
@@ -126,7 +149,31 @@ Notes:
       U34 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U34 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U35 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U35 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
       U36 - ST 27C4001 EPROM labelled 'L1 KILLER INSTINCT U36 MUSIC/SPCH (C) 1994 Nintendo/Rare' (DIP32)
-      U98 - ST 27C4001 EPROM labelled 'L1.4 KILLER INSTINCT U98 ROM 1 (C) 1994 Nintendo/Rare' (DIP32)
+      U98 - ST 27C4001 EPROM labelled 'L1.5D KILLER INSTINCT U98 ROM 1 (C) 1994 Nintendo/Rare' (DIP32)
+            Note earlier revisions exist, this is the last revision.
+
+      Killer Instinct 2:
+      U10 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U10 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U11 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U11 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U12 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U12 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U13 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U13 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U33 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U33 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U34 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U34 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U35 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U35 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U36 - ST 27C4001 EPROM labelled 'L1.0 KILLER INSTINCT 2 U36 MUSIC/SPCH (C) 1995 Nintendo/Rare' (DIP32)
+      U98 - ST 27C4001 EPROM labelled 'L1.4 KILLER INSTINCT 2 U98 (C) 1995 Nintendo/Rare' (DIP32)
+            Note earlier revisions exist, this is the last revision.
+
+      BOOT ROMs for IDE HDD to Compact Flash conversion
+      -------------------------------------------------
+      Killer Instinct:
+      U98 - ST 27C4001 or 27C040 EPROM. File name = KI_L15DI.U98, CRC32 = 230F55FB
+
+      Killer Instinct 2 Dedicated PCB (U96 labelled 'K12-U96 A-20351')
+      U98 - ST 27C4001 or 27C040 EPROM. File name = KI2_L14P.U98.BIN, CRC32 = D80C937A
+
+      Killer Instinct 2 on Killer Instinct 1 PCB (U96 labelled 'KI-U96 A-19489') with KI 2 protection PCB 5772-14668-01
+      U98 - ST 27C4001 or 27C040 EPROM. File name = KI2_D14P.U98, CRC32 = D716D428
 
 ***************************************************************************/
 
@@ -167,17 +214,17 @@ public:
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
 	emu_timer *m_irq0_stop_timer;
-	DECLARE_READ32_MEMBER(kinst_control_r);
-	DECLARE_WRITE32_MEMBER(kinst_control_w);
-	DECLARE_READ32_MEMBER(kinst_ide_r);
-	DECLARE_WRITE32_MEMBER(kinst_ide_w);
-	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
-	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
+	DECLARE_READ32_MEMBER(control_r);
+	DECLARE_WRITE32_MEMBER(control_w);
+	DECLARE_READ32_MEMBER(ide_r);
+	DECLARE_WRITE32_MEMBER(ide_w);
+	DECLARE_READ32_MEMBER(ide_extra_r);
+	DECLARE_WRITE32_MEMBER(ide_extra_w);
 	DECLARE_DRIVER_INIT(kinst);
 	DECLARE_DRIVER_INIT(kinst2);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
@@ -223,28 +270,6 @@ void kinst_state::machine_start()
 
 void kinst_state::machine_reset()
 {
-	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	uint16_t *identify_device = hdd->identify_device_buffer();
-
-	if (strncmp(machine().system().name, "kinst2", 6) != 0)
-	{
-		/* kinst: tweak the model number so we pass the check */
-		identify_device[27] = ('S' << 8) | 'T';
-		identify_device[28] = ('9' << 8) | '1';
-		identify_device[29] = ('5' << 8) | '0';
-		identify_device[30] = ('A' << 8) | 'G';
-		identify_device[31] = (' ' << 8) | ' ';
-	}
-	else
-	{
-		/* kinst2: tweak the model number so we pass the check */
-		identify_device[10] = ('0' << 8) | '0';
-		identify_device[11] = ('S' << 8) | 'T';
-		identify_device[12] = ('9' << 8) | '1';
-		identify_device[13] = ('5' << 8) | '0';
-		identify_device[14] = ('A' << 8) | 'G';
-	}
-
 	/* set a safe base location for video */
 	m_video_base = &m_rambase[0x30000/4];
 }
@@ -257,7 +282,7 @@ void kinst_state::machine_reset()
  *
  *************************************/
 
-uint32_t kinst_state::screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kinst_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 
@@ -315,25 +340,25 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::kinst_ide_r)
+READ32_MEMBER(kinst_state::ide_r)
 {
 	return m_ata->read_cs0(space, offset / 2, mem_mask);
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_ide_w)
+WRITE32_MEMBER(kinst_state::ide_w)
 {
 	m_ata->write_cs0(space, offset / 2, data, mem_mask);
 }
 
 
-READ32_MEMBER(kinst_state::kinst_ide_extra_r)
+READ32_MEMBER(kinst_state::ide_extra_r)
 {
 	return m_ata->read_cs1(space, 6, 0xff);
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
+WRITE32_MEMBER(kinst_state::ide_extra_w)
 {
 	m_ata->write_cs1(space, 6, data, 0xff);
 }
@@ -346,7 +371,7 @@ WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::kinst_control_r)
+READ32_MEMBER(kinst_state::control_r)
 {
 	uint32_t result;
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
@@ -381,7 +406,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_control_w)
+WRITE32_MEMBER(kinst_state::control_w)
 {
 	uint32_t olddata;
 
@@ -425,9 +450,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")
-	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_SHARE("control")
-	AM_RANGE(0x10000100, 0x1000013f) AM_READWRITE(kinst_ide_r, kinst_ide_w)
-	AM_RANGE(0x10000170, 0x10000173) AM_READWRITE(kinst_ide_extra_r, kinst_ide_extra_w)
+	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(control_r, control_w) AM_SHARE("control")
+	AM_RANGE(0x10000100, 0x1000013f) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x10000170, 0x10000173) AM_READWRITE(ide_extra_r, ide_extra_w)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
@@ -686,7 +711,7 @@ static MACHINE_CONFIG_START( kinst )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(kinst_state, screen_update_kinst)
+	MCFG_SCREEN_UPDATE_DRIVER(kinst_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
@@ -705,64 +730,17 @@ MACHINE_CONFIG_END
 
 ROM_START( kinst )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_DEFAULT_BIOS("v1.5d")
+	ROM_SYSTEM_BIOS(0, "v1.5d", "Killer Instinct (v1.5d)")
 	ROM_LOAD( "ki-l15d.u98", 0x00000, 0x80000, CRC(7b65ca3d) SHA1(607394d4ba1713f38c2cb5159303cace9cde991e) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
-	ROM_LOAD16_BYTE( "u11-l1", 0x200000, 0x80000, CRC(0b5e05df) SHA1(0595909cb667c38ac7c8c7bd0646b28899e27777) )
-	ROM_LOAD16_BYTE( "u12-l1", 0x400000, 0x80000, CRC(d05ce6ad) SHA1(7a8ee405c118fd176b66353fa7bfab888cc63cd2) )
-	ROM_LOAD16_BYTE( "u13-l1", 0x600000, 0x80000, CRC(7d0954ea) SHA1(ea4d1f153eb284f1bcfc5295fbce316bba6083f4) )
-	ROM_LOAD16_BYTE( "u33-l1", 0x800000, 0x80000, CRC(8bbe4f0c) SHA1(b22e365bc8d58a80eaac226be14b4bb8d9a04844) )
-	ROM_LOAD16_BYTE( "u34-l1", 0xa00000, 0x80000, CRC(b2e73603) SHA1(ee439f5162a2b3379d3f802328017bb3c68547d2) )
-	ROM_LOAD16_BYTE( "u35-l1", 0xc00000, 0x80000, CRC(0aaef4fc) SHA1(48c4c954ac9db648f28ad64f9845e19ec432eec3) )
-	ROM_LOAD16_BYTE( "u36-l1", 0xe00000, 0x80000, CRC(0577bb60) SHA1(cc78070cc41701e9a91fde5cfbdc7e1e83354854) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst", 0, SHA1(81d833236e994528d1482979261401b198d1ca53) )
-ROM_END
-
-
-ROM_START( kinst14 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_SYSTEM_BIOS(1, "v1.4", "Killer Instinct (v1.4)")
 	ROM_LOAD( "ki-l14.u98", 0x00000, 0x80000, CRC(afedb75f) SHA1(07254f20707377f7195e64675eb6458e663c1a9a) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
-	ROM_LOAD16_BYTE( "u11-l1", 0x200000, 0x80000, CRC(0b5e05df) SHA1(0595909cb667c38ac7c8c7bd0646b28899e27777) )
-	ROM_LOAD16_BYTE( "u12-l1", 0x400000, 0x80000, CRC(d05ce6ad) SHA1(7a8ee405c118fd176b66353fa7bfab888cc63cd2) )
-	ROM_LOAD16_BYTE( "u13-l1", 0x600000, 0x80000, CRC(7d0954ea) SHA1(ea4d1f153eb284f1bcfc5295fbce316bba6083f4) )
-	ROM_LOAD16_BYTE( "u33-l1", 0x800000, 0x80000, CRC(8bbe4f0c) SHA1(b22e365bc8d58a80eaac226be14b4bb8d9a04844) )
-	ROM_LOAD16_BYTE( "u34-l1", 0xa00000, 0x80000, CRC(b2e73603) SHA1(ee439f5162a2b3379d3f802328017bb3c68547d2) )
-	ROM_LOAD16_BYTE( "u35-l1", 0xc00000, 0x80000, CRC(0aaef4fc) SHA1(48c4c954ac9db648f28ad64f9845e19ec432eec3) )
-	ROM_LOAD16_BYTE( "u36-l1", 0xe00000, 0x80000, CRC(0577bb60) SHA1(cc78070cc41701e9a91fde5cfbdc7e1e83354854) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst", 0, SHA1(81d833236e994528d1482979261401b198d1ca53) )
-ROM_END
-
-
-ROM_START( kinst13 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_SYSTEM_BIOS(2, "v1.3", "Killer Instinct (v1.3)")
 	ROM_LOAD( "ki-l13.u98", 0x00000, 0x80000, CRC(65f7ea31) SHA1(7f21620a512549db6821a0b4fa53681a767b7974) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
-	ROM_LOAD16_BYTE( "u11-l1", 0x200000, 0x80000, CRC(0b5e05df) SHA1(0595909cb667c38ac7c8c7bd0646b28899e27777) )
-	ROM_LOAD16_BYTE( "u12-l1", 0x400000, 0x80000, CRC(d05ce6ad) SHA1(7a8ee405c118fd176b66353fa7bfab888cc63cd2) )
-	ROM_LOAD16_BYTE( "u13-l1", 0x600000, 0x80000, CRC(7d0954ea) SHA1(ea4d1f153eb284f1bcfc5295fbce316bba6083f4) )
-	ROM_LOAD16_BYTE( "u33-l1", 0x800000, 0x80000, CRC(8bbe4f0c) SHA1(b22e365bc8d58a80eaac226be14b4bb8d9a04844) )
-	ROM_LOAD16_BYTE( "u34-l1", 0xa00000, 0x80000, CRC(b2e73603) SHA1(ee439f5162a2b3379d3f802328017bb3c68547d2) )
-	ROM_LOAD16_BYTE( "u35-l1", 0xc00000, 0x80000, CRC(0aaef4fc) SHA1(48c4c954ac9db648f28ad64f9845e19ec432eec3) )
-	ROM_LOAD16_BYTE( "u36-l1", 0xe00000, 0x80000, CRC(0577bb60) SHA1(cc78070cc41701e9a91fde5cfbdc7e1e83354854) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst", 0, SHA1(81d833236e994528d1482979261401b198d1ca53) )
-ROM_END
-
-
-ROM_START( kinstp )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_SYSTEM_BIOS(3, "proto v4.7", "Killer Instinct (proto v4.7)")
 	ROM_LOAD( "ki-p47.u98", 0x00000, 0x80000, CRC(05e67bcb) SHA1(501e69b3026394f69229a6e9866c1037502b86bb) )
+	ROM_SYSTEM_BIOS(4, "v1.5d AnyIDE", "Killer Instinct (v1.5d AnyIDE)") // unofficial version, allows use of alternate hard drives or CF cards
+	ROM_LOAD( "ki_l15di.u98", 0x00000, 0x80000, CRC(230f55fb) SHA1(f5f12311aae922d12f98d72ac8fdd77b7b084af2) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
@@ -781,102 +759,17 @@ ROM_END
 
 ROM_START( kinst2 )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_DEFAULT_BIOS("v1.4")
+	ROM_SYSTEM_BIOS(0, "v1.4", "Killer Instinct 2 (v1.4)")
 	ROM_LOAD( "ki2-l14.u98", 0x00000, 0x80000, CRC(27d0285e) SHA1(aa7a2a9d72a47dd0ea2ee7b2776b79288060b179) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
-	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
-	ROM_LOAD16_BYTE( "ki2_l1.u13", 0x600000, 0x80000, CRC(3fe6327b) SHA1(7ff164fc2f079d039921594be92208973d43aa03) )
-	ROM_LOAD16_BYTE( "ki2_l1.u33", 0x800000, 0x80000, CRC(6f4dcdcf) SHA1(0ab6dbfb76e9fa2db072e287864ad1f9d514dd9b) )
-	ROM_LOAD16_BYTE( "ki2_l1.u34", 0xa00000, 0x80000, CRC(5db48206) SHA1(48456a7b6592c40bc9c664dcd2ee2cfd91942811) )
-	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
-ROM_END
-
-
-ROM_START( kinst2k4 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
-	ROM_LOAD( "ki2-l14k.u98", 0x00000, 0x80000, CRC(9cbd00a8) SHA1(926dce4bb9016331ea40d3c337a9ace896f07493) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
-	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
-	ROM_LOAD16_BYTE( "ki2_l1.u13", 0x600000, 0x80000, CRC(3fe6327b) SHA1(7ff164fc2f079d039921594be92208973d43aa03) )
-	ROM_LOAD16_BYTE( "ki2_l1.u33", 0x800000, 0x80000, CRC(6f4dcdcf) SHA1(0ab6dbfb76e9fa2db072e287864ad1f9d514dd9b) )
-	ROM_LOAD16_BYTE( "ki2_l1.u34", 0xa00000, 0x80000, CRC(5db48206) SHA1(48456a7b6592c40bc9c664dcd2ee2cfd91942811) )
-	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
-ROM_END
-
-
-ROM_START( kinst213 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_SYSTEM_BIOS(1, "v1.3", "Killer Instinct 2 (v1.3)")
 	ROM_LOAD( "ki2-l13.u98", 0x00000, 0x80000, CRC(25ebde3b) SHA1(771d150fb4de0a2ceb279954b9545458e93e2405) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
-	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
-	ROM_LOAD16_BYTE( "ki2_l1.u13", 0x600000, 0x80000, CRC(3fe6327b) SHA1(7ff164fc2f079d039921594be92208973d43aa03) )
-	ROM_LOAD16_BYTE( "ki2_l1.u33", 0x800000, 0x80000, CRC(6f4dcdcf) SHA1(0ab6dbfb76e9fa2db072e287864ad1f9d514dd9b) )
-	ROM_LOAD16_BYTE( "ki2_l1.u34", 0xa00000, 0x80000, CRC(5db48206) SHA1(48456a7b6592c40bc9c664dcd2ee2cfd91942811) )
-	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
-ROM_END
-
-
-ROM_START( kinst2k3 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
-	ROM_LOAD( "ki2-l13k.u98", 0x00000, 0x80000, CRC(3b4f16fc) SHA1(c28416f94453fd1f73ba01025276a04610569d12) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
-	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
-	ROM_LOAD16_BYTE( "ki2_l1.u13", 0x600000, 0x80000, CRC(3fe6327b) SHA1(7ff164fc2f079d039921594be92208973d43aa03) )
-	ROM_LOAD16_BYTE( "ki2_l1.u33", 0x800000, 0x80000, CRC(6f4dcdcf) SHA1(0ab6dbfb76e9fa2db072e287864ad1f9d514dd9b) )
-	ROM_LOAD16_BYTE( "ki2_l1.u34", 0xa00000, 0x80000, CRC(5db48206) SHA1(48456a7b6592c40bc9c664dcd2ee2cfd91942811) )
-	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
-ROM_END
-
-
-ROM_START( kinst211 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_SYSTEM_BIOS(2, "v1.1", "Killer Instinct 2 (v1.1)")
 	ROM_LOAD( "ki2-l11.u98", 0x00000, 0x80000, CRC(0cb8de1e) SHA1(fe447f4b1d29b524f57c5ba1890652ef6afff88a) )
-
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
-	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
-	ROM_LOAD16_BYTE( "ki2_l1.u13", 0x600000, 0x80000, CRC(3fe6327b) SHA1(7ff164fc2f079d039921594be92208973d43aa03) )
-	ROM_LOAD16_BYTE( "ki2_l1.u33", 0x800000, 0x80000, CRC(6f4dcdcf) SHA1(0ab6dbfb76e9fa2db072e287864ad1f9d514dd9b) )
-	ROM_LOAD16_BYTE( "ki2_l1.u34", 0xa00000, 0x80000, CRC(5db48206) SHA1(48456a7b6592c40bc9c664dcd2ee2cfd91942811) )
-	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
-	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
-ROM_END
-
-
-ROM_START( kinst210 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_SYSTEM_BIOS(3, "v1.0", "Killer Instinct 2 (v1.0)")
 	ROM_LOAD( "ki2-l10.u98", 0x00000, 0x80000, CRC(b17b4b3d) SHA1(756629cd1b51ae50f2b9818765dd3d277c3019b3) )
+	ROM_SYSTEM_BIOS(4, "v1.4 AnyIDE", "Killer Instinct 2 (v1.4 AnyIDE)")
+	ROM_LOAD( "ki2_l14p.u98", 0x00000, 0x80000, CRC(d80c937a) SHA1(85a009638f2eada4c63240fc30a9e7be59afab7f) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
@@ -893,6 +786,29 @@ ROM_START( kinst210 )
 ROM_END
 
 
+ROM_START( kinst2uk )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
+	ROM_DEFAULT_BIOS("v1.4k")
+	ROM_SYSTEM_BIOS(0, "v1.4k", "Killer Instinct 2 (v1.4k, upgrade kit)")
+	ROM_LOAD( "ki2-l14k.u98", 0x00000, 0x80000, CRC(9cbd00a8) SHA1(926dce4bb9016331ea40d3c337a9ace896f07493) )
+	ROM_SYSTEM_BIOS(1, "v1.3k", "Killer Instinct 2 (v1.3k, upgrade kit)")
+	ROM_LOAD( "ki2-l13k.u98", 0x00000, 0x80000, CRC(3b4f16fc) SHA1(c28416f94453fd1f73ba01025276a04610569d12) )
+	ROM_SYSTEM_BIOS(2, "v1.4 AnyIDE", "Killer Instinct 2 (v1.4k, upgrade kit AnyIDE)")
+	ROM_LOAD( "ki2_d14p.u98", 0x00000, 0x80000, CRC(d716d428) SHA1(1a3b000fdc35b3824a0c8142ba9b496490894543) )
+
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
+	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
+	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
+	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
+	ROM_LOAD16_BYTE( "ki2_l1.u13", 0x600000, 0x80000, CRC(3fe6327b) SHA1(7ff164fc2f079d039921594be92208973d43aa03) )
+	ROM_LOAD16_BYTE( "ki2_l1.u33", 0x800000, 0x80000, CRC(6f4dcdcf) SHA1(0ab6dbfb76e9fa2db072e287864ad1f9d514dd9b) )
+	ROM_LOAD16_BYTE( "ki2_l1.u34", 0xa00000, 0x80000, CRC(5db48206) SHA1(48456a7b6592c40bc9c664dcd2ee2cfd91942811) )
+	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
+	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
+ROM_END
 
 /*************************************
  *
@@ -906,6 +822,16 @@ DRIVER_INIT_MEMBER(kinst_state,kinst)
 
 	/* set up the control register mapping */
 	m_control_map = kinst_control_map;
+
+	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
+	uint16_t *identify_device = hdd->identify_device_buffer();
+
+	/* kinst: tweak the model number so we pass the check */
+	identify_device[27] = ('S' << 8) | 'T';
+	identify_device[28] = ('9' << 8) | '1';
+	identify_device[29] = ('5' << 8) | '0';
+	identify_device[30] = ('A' << 8) | 'G';
+	identify_device[31] = (' ' << 8) | ' ';
 }
 
 
@@ -922,6 +848,16 @@ DRIVER_INIT_MEMBER(kinst_state,kinst2)
 
 	/* set up the control register mapping */
 	m_control_map = kinst2_control_map;
+
+	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
+	uint16_t *identify_device = hdd->identify_device_buffer();
+
+	/* kinst2: tweak the model number so we pass the check */
+	identify_device[10] = ('0' << 8) | '0';
+	identify_device[11] = ('S' << 8) | 'T';
+	identify_device[12] = ('9' << 8) | '1';
+	identify_device[13] = ('5' << 8) | '0';
+	identify_device[14] = ('A' << 8) | 'G';
 }
 
 
@@ -932,14 +868,10 @@ DRIVER_INIT_MEMBER(kinst_state,kinst2)
  *
  *************************************/
 
-GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.5d)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, kinst14,  kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, kinst13,  kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, kinstp,   kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (proto v4.7)", MACHINE_SUPPORTS_SAVE )
+ // versions selectable by changing bioses
 
-GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst2k4, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.4k, upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst213, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst2k3, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.3k, upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst211, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst210, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, kinst,   ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

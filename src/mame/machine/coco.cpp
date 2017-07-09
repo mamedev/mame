@@ -92,6 +92,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
 	m_cassette(*this, "cassette"),
+	m_floating(*this, FLOATING_TAG),
 	m_rs232(*this, RS232_TAG),
 	m_vhd_0(*this, VHD0_TAG),
 	m_vhd_1(*this, VHD1_TAG),
@@ -99,7 +100,8 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_beckerportconfig(*this, BECKERPORT_TAG),
 	m_keyboard(*this, "row%u", 0),
 	m_joystick_type_control(*this, CTRL_SEL_TAG),
-	m_joystick_hires_control(*this, HIRES_INTF_TAG)
+	m_joystick_hires_control(*this, HIRES_INTF_TAG),
+	m_in_floating_bus_read(false)
 {
 }
 
@@ -125,10 +127,10 @@ void coco_state::analog_port_start(analog_input_t *analog, const char *rx_tag, c
 
 void coco_state::device_start()
 {
-	/* call base device_start */
+	// call base device_start
 	driver_device::device_start();
 
-	/* look up analog ports */
+	// look up analog ports
 	analog_port_start(&m_joystick, JOYSTICK_RX_TAG, JOYSTICK_RY_TAG,
 		JOYSTICK_LX_TAG, JOYSTICK_LY_TAG, JOYSTICK_BUTTONS_TAG);
 	analog_port_start(&m_rat_mouse, RAT_MOUSE_RX_TAG, RAT_MOUSE_RY_TAG,
@@ -136,15 +138,17 @@ void coco_state::device_start()
 	analog_port_start(&m_diecom_lightgun, DIECOM_LIGHTGUN_RX_TAG, DIECOM_LIGHTGUN_RY_TAG,
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
-	/* timers */
+	// timers
 	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);
 	m_hiresjoy_transition_timer[1] = timer_alloc(TIMER_HIRES_JOYSTICK_Y);
 	m_diecom_lightgun_timer = timer_alloc(TIMER_DIECOM_LIGHTGUN);
 
-	/* cart base update */
+	// cart slot
 	m_cococart->set_cart_base_update(cococart_base_update_delegate(&coco_state::update_cart_base, this));
+	m_cococart->set_line_delay(cococart_slot_device::line::NMI, 12);    // 12 allowed one more instruction to finished after the line is pulled
+	m_cococart->set_line_delay(cococart_slot_device::line::HALT, 6);    // 6 allowed one more instruction to finished after the line is pulled
 
-	/* save state support */
+	// save state support
 	save_item(NAME(m_dac_output));
 	save_item(NAME(m_hiresjoy_ca));
 	save_item(NAME(m_dclg_previous_bit));
@@ -247,7 +251,7 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // CoCo 1/2 you should get $F627 instead.
 //-------------------------------------------------
 
-uint8_t coco_state::floating_bus_read(void)
+uint8_t coco_state::floating_bus_read()
 {
 	uint8_t result;
 
@@ -264,25 +268,22 @@ uint8_t coco_state::floating_bus_read(void)
 		// prevent stack overflows
 		m_in_floating_bus_read = true;
 
-		// set up the ability to read address spaces
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-
 		// get the previous and current PC
 		uint16_t prev_pc = m_maincpu->pcbase();
 		uint16_t pc = m_maincpu->pc();
 
 		// get the byte; and skip over header bytes
-		uint8_t byte = program.read_byte(prev_pc);
+		uint8_t byte = cpu_address_space().read_byte(prev_pc);
 		if ((byte == 0x10) || (byte == 0x11))
-			byte = program.read_byte(++prev_pc);
+			byte = cpu_address_space().read_byte(++prev_pc);
 
 		// check to see if the opcode specifies the indexed addressing mode, and the secondary byte
 		// specifies no-offset
 		bool is_nooffset_indexed = (((byte & 0xF0) == 0x60) || ((byte & 0xF0) == 0xA0) || ((byte & 0xF0) == 0xE0))
-			&& ((program.read_byte(prev_pc + 1) & 0xBF) == 0x84);
+			&& ((cpu_address_space().read_byte(prev_pc + 1) & 0xBF) == 0x84);
 
 		// finally read the byte
-		result = program.read_byte(is_nooffset_indexed ? pc : 0xFFFF);
+		result = cpu_address_space().read_byte(is_nooffset_indexed ? pc : 0xFFFF);
 
 		// we're done reading
 		m_in_floating_bus_read = false;
@@ -290,6 +291,31 @@ uint8_t coco_state::floating_bus_read(void)
 	return result;
 }
 
+
+//-------------------------------------------------
+//  floating_space_read
+//-------------------------------------------------
+
+uint8_t coco_state::floating_space_read(offs_t offset)
+{
+	// The "floating space" is intended to be a catch all for address space
+	// not handled by the normal CoCo infrastructure, but may be read directly
+	// by cartridge hardware and other miscellany
+	//
+	// Most of the time, the read below will result in floating_bus_read() being
+	// invoked
+	return m_floating->read8(m_floating->space(0), offset);
+}
+
+
+//-------------------------------------------------
+//  floating_space_write
+//-------------------------------------------------
+
+void coco_state::floating_space_write(offs_t offset, uint8_t data)
+{
+	m_floating->write8(m_floating->space(0), offset, data);
+}
 
 
 /***************************************************************************
@@ -309,7 +335,7 @@ uint8_t coco_state::floating_bus_read(void)
 
 READ8_MEMBER( coco_state::ff00_read )
 {
-	return m_pia_0->read(space, offset, mem_mask);
+	return pia_0().read(space, offset, mem_mask);
 }
 
 
@@ -320,7 +346,7 @@ READ8_MEMBER( coco_state::ff00_read )
 
 WRITE8_MEMBER( coco_state::ff00_write )
 {
-	m_pia_0->write(space, offset, data, mem_mask);
+	pia_0().write(space, offset, data, mem_mask);
 }
 
 
@@ -419,7 +445,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 
 READ8_MEMBER( coco_state::ff20_read )
 {
-	return m_pia_1->read(space, offset, mem_mask);
+	return pia_1().read(space, offset, mem_mask);
 }
 
 
@@ -431,7 +457,7 @@ READ8_MEMBER( coco_state::ff20_read )
 WRITE8_MEMBER( coco_state::ff20_write )
 {
 	/* write to the PIA */
-	m_pia_1->write(space, offset, data, mem_mask);
+	pia_1().write(space, offset, data, mem_mask);
 
 	/* we have to do this to do something that approximates the cartridge Q line behavior */
 	m_cococart->twiddle_q_lines();
@@ -472,7 +498,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 	//  to access 32K of ram, and also allows the cocoe driver to access
 	//  the full 64K, as this uses Color Basic 1.2, which can configure 64K rams
 	bool memory_sense = (ram_size >= 0x4000 && ram_size <= 0x7FFF)
-		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x40));
+		|| (ram_size >= 0x8000 && (pia_0().b_output() & 0x40));
 
 	// serial in (PB0)
 	bool serial_in = (m_rs232 != nullptr) && (m_rs232->rxd_r() ? true : false);
@@ -579,7 +605,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
 
 bool coco_state::irq_get_line(void)
 {
-	return m_pia_0->irq_a_state() || m_pia_0->irq_b_state();
+	return pia_0().irq_a_state() || pia_0().irq_b_state();
 }
 
 
@@ -593,7 +619,7 @@ void coco_state::recalculate_irq(void)
 	bool line = irq_get_line();
 	if (LOG_INTERRUPTS)
 		logerror("recalculate_irq():  line=%d\n", line ? 1 : 0);
-	m_maincpu->set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
+	maincpu().set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -605,7 +631,7 @@ void coco_state::recalculate_irq(void)
 
 bool coco_state::firq_get_line(void)
 {
-	return m_pia_1->irq_a_state() || m_pia_1->irq_b_state();
+	return pia_1().irq_a_state() || pia_1().irq_b_state();
 }
 
 
@@ -619,7 +645,7 @@ void coco_state::recalculate_firq(void)
 	bool line = firq_get_line();
 	if (LOG_INTERRUPTS)
 		logerror("recalculate_firq():  line=%d\n", line ? 1 : 0);
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
+	maincpu().set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -671,7 +697,7 @@ void coco_state::update_sound(void)
 	uint8_t cart_sound = (bCartSoundEnable ? 0x20 : 0);
 
 	/* determine the value to send to the DAC (this is used by the Joystick read as well as audio out) */
-	m_dac_output = (m_pia_1->a_output() & 0xFC) >> 2;
+	m_dac_output = (pia_1().a_output() & 0xFC) >> 2;
 	uint8_t dac_sound =  (status == SOUNDMUX_ENABLE ? m_dac_output : 0);
 
 	/* The CoCo uses the main 6-bit DAC for both audio output and joystick axis position measurement.
@@ -846,8 +872,8 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 
 void coco_state::poll_keyboard(void)
 {
-	uint8_t pia0_pb = m_pia_0->b_output();
-	uint8_t pia0_pb_z = m_pia_0->port_b_z_mask();
+	uint8_t pia0_pb = pia_0().b_output();
+	uint8_t pia0_pb_z = pia_0().port_b_z_mask();
 
 	uint8_t pia0_pa = 0x7F;
 	uint8_t pia0_pa_z = 0x7F;
@@ -894,7 +920,7 @@ void coco_state::poll_keyboard(void)
 
 void coco_state::update_keyboard_input(uint8_t value, uint8_t z)
 {
-	m_pia_0->set_a_input(value, z);
+	pia_0().set_a_input(value, z);
 }
 
 
@@ -1046,7 +1072,7 @@ void coco_state::poll_hires_joystick(void)
 			break;
 
 		case HIRES_RIGHT_COCOMAX3:
-			newvalue = (m_pia_0->a_output() & 0x04);
+			newvalue = (pia_0().a_output() & 0x04);
 			joystick_index = 0;
 			is_cocomax3 = true;
 			break;
@@ -1058,7 +1084,7 @@ void coco_state::poll_hires_joystick(void)
 			break;
 
 		case HIRES_LEFT_COCOMAX3:
-			newvalue = (m_pia_0->a_output() & 0x08);
+			newvalue = (pia_0().a_output() & 0x08);
 			joystick_index = 1;
 			is_cocomax3 = true;
 			break;
@@ -1082,7 +1108,7 @@ void coco_state::poll_hires_joystick(void)
 			double value = m_joystick.input(joystick_index, axis) / 255.0;
 			value *= is_cocomax3 ? 2500.0 : 4160.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
-			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 8;
+			attotime duration = maincpu().clocks_to_attotime((uint64_t) value) * 8;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)
@@ -1104,7 +1130,7 @@ void coco_state::poll_hires_joystick(void)
 //  current_vhd
 //-------------------------------------------------
 
-coco_vhd_image_device *coco_state::current_vhd(void)
+coco_vhd_image_device *coco_state::current_vhd()
 {
 	switch(m_vhd_select)
 	{
@@ -1130,7 +1156,7 @@ READ8_MEMBER( coco_state::ff60_read )
 	}
 	else
 	{
-		result = floating_bus_read();
+		result = floating_space_read(0xFF60 + offset);
 	}
 
 	return result;
@@ -1153,6 +1179,10 @@ WRITE8_MEMBER( coco_state::ff60_write )
 		/* writes to $FF86 will switch the VHD */
 		m_vhd_select = data;
 	}
+	else
+	{
+		floating_space_write(0xFF60 + offset, data);
+	}
 }
 
 
@@ -1172,9 +1202,8 @@ READ8_MEMBER( coco_state::ff40_read )
 		return m_beckerport->read(space, offset-1, mem_mask);
 	}
 
-	return m_cococart->read(space, offset, mem_mask);
+	return m_cococart->scs_read(space, offset, mem_mask);
 }
-
 
 
 //-------------------------------------------------
@@ -1188,9 +1217,8 @@ WRITE8_MEMBER( coco_state::ff40_write )
 		return m_beckerport->write(space, offset-1, data, mem_mask);
 	}
 
-	m_cococart->write(space, offset, data, mem_mask);
+	m_cococart->scs_write(space, offset, data, mem_mask);
 }
-
 
 
 //-------------------------------------------------
@@ -1199,8 +1227,19 @@ WRITE8_MEMBER( coco_state::ff40_write )
 
 void coco_state::cart_w(bool state)
 {
-	m_pia_1->cb1_w(state);
+	pia_1().cb1_w(state);
 }
+
+
+//-------------------------------------------------
+//  cartridge_space
+//-------------------------------------------------
+
+address_space &coco_state::cartridge_space()
+{
+	return m_floating->space(0);
+}
+
 
 /***************************************************************************
   DISASSEMBLY OVERRIDE (OS9 syscalls)

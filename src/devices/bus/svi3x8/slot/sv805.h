@@ -31,13 +31,13 @@ public:
 	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
 	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
 
-	DECLARE_WRITE_LINE_MEMBER( uart_intr_w );
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( uart_intr_w );
+
 	required_device<ins8250_device> m_uart;
 	required_device<rs232_port_device> m_rs232;
 };

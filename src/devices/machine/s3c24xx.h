@@ -160,17 +160,17 @@ protected:
 
 	struct uart_t
 	{
-		static constexpr offs_t ULCON   = 0X00 / 4; // UART Line Control
-		static constexpr offs_t UCON    = 0X04 / 4; // UART Control
-		static constexpr offs_t UFCON   = 0X08 / 4; // UART FIFO Control
-		static constexpr offs_t UMCON   = 0X0c / 4; // UART Modem Control
-		static constexpr offs_t UTRSTAT = 0X10 / 4; // UART Tx/Rx Status
-		static constexpr offs_t UERSTAT = 0X14 / 4; // UART Rx Error Status
-		static constexpr offs_t UFSTAT  = 0X18 / 4; // UART FIFO Status
-		static constexpr offs_t UMSTAT  = 0X1c / 4; // UART Modem Status
-		static constexpr offs_t UTXH    = 0X20 / 4; // UART Transmission Hold
-		static constexpr offs_t URXH    = 0X24 / 4; // UART Receive Buffer
-		static constexpr offs_t UBRDIV  = 0X28 / 4; // UART Baud Rate Divisor
+		static constexpr offs_t ULCON   = 0x00 / 4; // UART Line Control
+		static constexpr offs_t UCON    = 0x04 / 4; // UART Control
+		static constexpr offs_t UFCON   = 0x08 / 4; // UART FIFO Control
+		static constexpr offs_t UMCON   = 0x0c / 4; // UART Modem Control
+		static constexpr offs_t UTRSTAT = 0x10 / 4; // UART Tx/Rx Status
+		static constexpr offs_t UERSTAT = 0x14 / 4; // UART Rx Error Status
+		static constexpr offs_t UFSTAT  = 0x18 / 4; // UART FIFO Status
+		static constexpr offs_t UMSTAT  = 0x1c / 4; // UART Modem Status
+		static constexpr offs_t UTXH    = 0x20 / 4; // UART Transmission Hold
+		static constexpr offs_t URXH    = 0x24 / 4; // UART Receive Buffer
+		static constexpr offs_t UBRDIV  = 0x28 / 4; // UART Baud Rate Divisor
 
 		void reset();
 

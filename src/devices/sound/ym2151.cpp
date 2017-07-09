@@ -382,18 +382,6 @@ void ym2151_device::init_tables()
 		}
 	}
 
-	/* calculate timers' deltas */
-	for (int i=0; i<1024; i++)
-	{
-		/* ASG 980324: changed to compute both tim_A_tab and timer_A_time */
-		timer_A_time[i] = attotime::from_hz(clock()) * (64 * (1024 - i));
-	}
-	for (int i=0; i<256; i++)
-	{
-		/* ASG 980324: changed to compute both tim_B_tab and timer_B_time */
-		timer_B_time[i] = attotime::from_hz(clock()) * (1024 * (256 - i));
-	}
-
 	/* calculate noise periods table */
 	for (int i=0; i<32; i++)
 	{
@@ -401,6 +389,21 @@ void ym2151_device::init_tables()
 		j = 32-j;
 		j = (65536.0 / (double)(j*32.0));   /* number of samples per one shift of the shift register */
 		noise_tab[i] = j * 64;    /* number of chip clock cycles per one shift */
+	}
+}
+
+void ym2151_device::calculate_timers()
+{
+	/* calculate timers' deltas */
+	for (int i=0; i<1024; i++)
+	{
+		/* ASG 980324: changed to compute both tim_A_tab and timer_A_time */
+		timer_A_time[i] = clocks_to_attotime(64 * (1024 - i));
+	}
+	for (int i=0; i<256; i++)
+	{
+		/* ASG 980324: changed to compute both tim_B_tab and timer_B_time */
+		timer_B_time[i] = clocks_to_attotime(1024 * (256 - i));
 	}
 }
 
@@ -1018,6 +1021,12 @@ void ym2151_device::device_start()
 	save_item(NAME(irqlinestate));
 
 	save_item(NAME(connect));
+}
+
+void ym2151_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 64);
+	calculate_timers();
 }
 
 

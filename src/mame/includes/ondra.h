@@ -5,9 +5,10 @@
  * includes/ondra.h
  *
  ****************************************************************************/
+#ifndef MAME_INCLUDES_ONDRA_H
+#define MAME_INCLUDES_ONDRA_H
 
-#ifndef ONDRA_H_
-#define ONDRA_H_
+#pragma once
 
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
@@ -15,8 +16,12 @@
 class ondra_state : public driver_device
 {
 public:
-	ondra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ondra_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_video_enable(0),
+		m_bank1_status(0),
+		m_bank2_status(0),
+		m_nmi_check_timer(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
@@ -24,34 +29,31 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
-		m_line0(*this, "LINE0"),
-		m_line1(*this, "LINE1"),
-		m_line2(*this, "LINE2"),
-		m_line3(*this, "LINE3"),
-		m_line4(*this, "LINE4"),
-		m_line5(*this, "LINE5"),
-		m_line6(*this, "LINE6"),
-		m_line7(*this, "LINE7"),
-		m_line8(*this, "LINE8"),
-		m_line9(*this, "LINE9"),
-		m_nmi(*this, "NMI") { }
+		m_lines(*this, "LINE%u", 0),
+		m_nmi(*this, "NMI")
+	{
+	}
 
-	uint8_t m_video_enable;
-	uint8_t m_bank1_status;
-	uint8_t m_bank2_status;
-	emu_timer *m_nmi_check_timer;
 	DECLARE_READ8_MEMBER(ondra_keyboard_r);
 	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_0a_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ondra_interrupt);
 	TIMER_CALLBACK_MEMBER(nmi_check_callback);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void ondra_update_banks();
+
+	uint8_t m_video_enable;
+	uint8_t m_bank1_status;
+	uint8_t m_bank2_status;
+	emu_timer *m_nmi_check_timer;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -59,19 +61,8 @@ protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_ioport m_line0;
-	required_ioport m_line1;
-	required_ioport m_line2;
-	required_ioport m_line3;
-	required_ioport m_line4;
-	required_ioport m_line5;
-	required_ioport m_line6;
-	required_ioport m_line7;
-	required_ioport m_line8;
-	required_ioport m_line9;
+	required_ioport_array<10> m_lines;
 	required_ioport m_nmi;
-
-	void ondra_update_banks();
 };
 
-#endif
+#endif // MAME_INCLUDES_ONDRA_H

@@ -32,7 +32,7 @@
 #define MCFG_SM510_WRITE_S_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
 
-// 2-bit R melody output port
+// 2/4-bit R (melody) output port
 #define MCFG_SM510_WRITE_R_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
 
@@ -145,7 +145,7 @@ protected:
 	virtual void execute_one() { } // -> child class
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_disasm_interface overrides
 	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
@@ -155,6 +155,9 @@ protected:
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
+
+	virtual void reset_vector() { do_branch(3, 7, 0); }
+	virtual void wakeup_vector() { do_branch(1, 0, 0); } // after halt
 
 	int m_prgwidth;
 	int m_datawidth;
@@ -190,6 +193,7 @@ protected:
 	bool m_bc;
 
 	u16 get_lcd_row(int column, u8* ram);
+	virtual void lcd_update();
 	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
 	virtual void init_lcd_driver();
 

@@ -208,16 +208,6 @@ static ADDRESS_MAP_START( microsoft_natural_io, AS_IO, 8, pc_kbd_microsoft_natur
 ADDRESS_MAP_END
 
 
-/*****************************************************************************
-    MACHINE CONFIG
-*****************************************************************************/
-
-MACHINE_CONFIG_START( microsoft_natural )
-	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(microsoft_natural_io)
-MACHINE_CONFIG_END
-
-
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
@@ -264,14 +254,13 @@ void pc_kbd_microsoft_natural_device::device_reset()
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor pc_kbd_microsoft_natural_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( microsoft_natural );
-}
+MACHINE_CONFIG_MEMBER( pc_kbd_microsoft_natural_device::device_add_mconfig )
+	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL_6MHz)
+	MCFG_CPU_IO_MAP(microsoft_natural_io)
+MACHINE_CONFIG_END
 
 
 ioport_constructor pc_kbd_microsoft_natural_device::device_input_ports() const

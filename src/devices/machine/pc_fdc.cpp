@@ -19,12 +19,6 @@
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
 DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
-static MACHINE_CONFIG_START( cfg )
-	MCFG_UPD765A_ADD("upd765", false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc_fdc_family_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc_fdc_family_device, drq_w))
-MACHINE_CONFIG_END
-
 DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_family_device)
 ADDRESS_MAP_END
 
@@ -67,10 +61,11 @@ void pc_fdc_family_device::dma_w(uint8_t data)
 	fdc->dma_w(data);
 }
 
-machine_config_constructor pc_fdc_family_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(cfg);
-}
+MACHINE_CONFIG_MEMBER( pc_fdc_family_device::device_add_mconfig )
+	MCFG_UPD765A_ADD("upd765", false, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc_fdc_family_device, irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc_fdc_family_device, drq_w))
+MACHINE_CONFIG_END
 
 void pc_fdc_family_device::device_start()
 {

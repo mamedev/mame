@@ -66,15 +66,10 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, abc1600_mac_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( abc1600_mac )
+MACHINE_CONFIG_MEMBER( abc1600_mac_device::device_add_mconfig )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
 MACHINE_CONFIG_END
-
-machine_config_constructor abc1600_mac_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc1600_mac );
-}
 
 
 //-------------------------------------------------
@@ -164,9 +159,11 @@ void abc1600_mac_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *abc1600_mac_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> abc1600_mac_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_space_config)
+	};
 }
 
 

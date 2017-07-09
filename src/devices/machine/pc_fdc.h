@@ -41,8 +41,6 @@ public:
 	WRITE8_MEMBER(dor_w);
 	READ8_MEMBER(dir_r);
 	WRITE8_MEMBER(ccr_w);
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
 	required_device<upd765a_device> fdc;
 
@@ -51,7 +49,11 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( irq_w );
+	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
 	bool irq, drq, fdc_drq, fdc_irq;
 	devcb_write_line intrq_cb, drq_cb;

@@ -479,7 +479,7 @@ ADDRESS_MAP_END
   E1:  W    Reels enable/disable register
  */
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, goldstar_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, goldstar_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -8540,7 +8540,7 @@ static MACHINE_CONFIG_START( lucky8 )
 	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_SOUND_ADD("aysnd", YM2149, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
@@ -10557,18 +10557,18 @@ ROM_START( cmast99b )
 ROM_END
 
 /*
-	A-Plan
-	(C) 1993 WeaShing H.K.
+    A-Plan
+    (C) 1993 WeaShing H.K.
 
-	TMP91P640 @ 5MHz or 10MHz (or SDIP64 gfx chip of some kind?)
-	Z80 [clock probably 12/4]
-	8255 x2
-	YM2149 [clock probably 12/8]
-	12MHz and 10MHz XTALs
-	6116 2kx8 SRAM x4
-	BPROM 82S129 x2
-	8-position DIPSW x5
-	PCB number only says 'WEASHING'
+    TMP91P640 @ 5MHz or 10MHz (or SDIP64 gfx chip of some kind?)
+    Z80 [clock probably 12/4]
+    8255 x2
+    YM2149 [clock probably 12/8]
+    12MHz and 10MHz XTALs
+    6116 2kx8 SRAM x4
+    BPROM 82S129 x2
+    8-position DIPSW x5
+    PCB number only says 'WEASHING'
 */
 
 ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.

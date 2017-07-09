@@ -218,6 +218,8 @@ WRITE8_MEMBER( aussiebyte_state::port1c_w )
 WRITE8_MEMBER( aussiebyte_state::port20_w )
 {
 	m_speaker->level_w(BIT(data, 7));
+	m_rtc->cs_w(BIT(data, 0));
+	m_rtc->hold_w(BIT(data, 0));
 }
 
 READ8_MEMBER( aussiebyte_state::port28_r )
@@ -232,23 +234,19 @@ READ8_MEMBER( aussiebyte_state::port28_r )
 ************************************************************/
 READ8_MEMBER( aussiebyte_state::rtc_r )
 {
-	m_rtc->cs_w(1);
 	m_rtc->read_w(1);
 	m_rtc->address_w(offset);
 	uint8_t data = m_rtc->data_r(space,0);
 	m_rtc->read_w(0);
-	m_rtc->cs_w(0);
 	return data;
 }
 
 WRITE8_MEMBER( aussiebyte_state::rtc_w )
 {
-	m_rtc->cs_w(1);
 	m_rtc->address_w(offset);
 	m_rtc->data_w(space,0,data);
 	m_rtc->write_w(1);
 	m_rtc->write_w(0);
-	m_rtc->cs_w(0);
 }
 
 /***********************************************************

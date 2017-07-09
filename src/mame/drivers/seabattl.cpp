@@ -267,10 +267,9 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, read_data, write_data)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )
+static ADDRESS_MAP_START( seabattl_data_map, AS_DATA, 8, seabattl_state )
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( seabattl_collision_r, seabattl_control_w )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( seabattl_collision_clear_r, seabattl_collision_clear_w )
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 READ8_MEMBER(seabattl_state::seabattl_collision_r)
@@ -423,9 +422,6 @@ static INPUT_PORTS_START( seabattl )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "DS1:5")
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DS1:8" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -482,8 +478,9 @@ static MACHINE_CONFIG_START( seabattl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)
 	MCFG_CPU_PROGRAM_MAP(seabattl_map)
-	MCFG_CPU_IO_MAP(seabattl_io_map)
+	MCFG_CPU_DATA_MAP(seabattl_data_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
 	MCFG_S2636_OFFSETS(-13, -29)

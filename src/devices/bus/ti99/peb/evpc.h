@@ -26,7 +26,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class snug_enhanced_video_device : public ti_expansion_card_device, public device_nvram_interface
+class snug_enhanced_video_device : public device_t, public device_ti99_peribox_card_interface, public device_nvram_interface
 {
 public:
 	snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -34,11 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
-
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
-	DECLARE_WRITE_LINE_MEMBER( video_interrupt_in );
 
 	TIMER_DEVICE_CALLBACK_MEMBER( hblank_interrupt );
 
@@ -58,13 +55,17 @@ protected:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void nvram_default() override;
 	void nvram_read(emu_file &file) override;
 	void nvram_write(emu_file &file) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( ready_line );
+
+	DECLARE_WRITE_LINE_MEMBER( video_interrupt_in );
+
 	int     m_address;
 	int     m_dsr_page;
 	bool    m_inDsrArea;

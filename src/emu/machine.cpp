@@ -233,8 +233,12 @@ void running_machine::start()
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
-	// first load ROMs, then populate memory, and finally initialize CPUs
-	// these operations must proceed in this order
+	// configure the address spaces, load ROMs (which needs
+	// width/endianess of the spaces), then populate memory (which
+	// needs rom bases), and finally initialize CPUs (which needs
+	// complete address spaces).  These operations must proceed in this
+	// order
+	m_memory.configure();
 	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
 
@@ -339,8 +343,6 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
-
-		m_manager.http()->update();
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
@@ -1189,26 +1191,30 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 
 void running_machine::export_http_api()
 {
-	m_manager.http()->add("/api/machine", [this](std::string)
-	{
-		rapidjson::StringBuffer s;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(s);
-		writer.StartObject();
-		writer.Key("name");
-		writer.String(m_basename.c_str());
+	if (m_manager.http()->is_active()) {
+		m_manager.http()->add_http_handler("/api/machine", [this](http_manager::http_request_ptr request, http_manager::http_response_ptr response)
+		{
+			rapidjson::StringBuffer s;
+			rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+			writer.StartObject();
+			writer.Key("name");
+			writer.String(m_basename.c_str());
 
-		writer.Key("devices");
-		writer.StartArray();
+			writer.Key("devices");
+			writer.StartArray();
 
-		device_iterator iter(this->root_device());
-		for (device_t &device : iter)
-			writer.String(device.tag());
+			device_iterator iter(this->root_device());
+			for (device_t &device : iter)
+				writer.String(device.tag());
 
-		writer.EndArray();
-		writer.EndObject();
+			writer.EndArray();
+			writer.EndObject();
 
-		return std::make_tuple(std::string(s.GetString()), 200, "application/json");
-	});
+			response->set_status(200);
+			response->set_content_type("application/json");
+			response->set_body(s.GetString());
+		});
+	}
 }
 
 //**************************************************************************
@@ -1276,7 +1282,7 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-static ADDRESS_MAP_START(dummy, AS_0, 8, dummy_space_device)
+static ADDRESS_MAP_START(dummy, 0, 8, dummy_space_device)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1298,9 +1304,11 @@ void dummy_space_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *dummy_space_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> dummy_space_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

@@ -211,6 +211,8 @@ public:
 
 	// public interfaces
 	void load_boot_data(uint8_t *srcdata, uint32_t *dstdata);
+	// Returns base address for circular dag
+	uint32_t get_ibase(int index) { return m_base[index]; };
 
 protected:
 	enum
@@ -492,7 +494,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx) override;
@@ -515,7 +517,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx) override;
@@ -536,7 +538,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx) override;

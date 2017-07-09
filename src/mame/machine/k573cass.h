@@ -105,7 +105,7 @@ protected:
 	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<x76f041_device> m_x76f041;
@@ -131,7 +131,7 @@ public:
 	ADC083X_INPUT_CB(punchmania_inputs_callback);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<ds2401_device> m_ds2401;
@@ -196,7 +196,7 @@ protected:
 	konami573_cassette_y_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<x76f100_device> m_x76f100;
@@ -222,7 +222,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<ds2401_device> m_ds2401;
@@ -247,7 +247,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<zs01_device> m_zs01;

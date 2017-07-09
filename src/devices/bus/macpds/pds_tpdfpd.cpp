@@ -41,14 +41,6 @@
 
 #define VRAM_SIZE   (256*1024)  // PCB has a jumper for 1MByte; may require different EPROMs
 
-MACHINE_CONFIG_START( sedisplay )
-	MCFG_SCREEN_ADD( SEDISPLAY_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, macpds_sedisplay_device, screen_update)
-	MCFG_SCREEN_SIZE(1280, 960)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 870-1)
-MACHINE_CONFIG_END
-
 ROM_START( sedisplay )
 	ROM_REGION(0x10000, SEDISPLAY_ROM_REGION, ROMREGION_16BIT|ROMREGION_BE)
 	ROM_LOAD16_BYTE( "tfd_fpd-asic_u6_297-0205-a_v4_1", 0x0000, 0x8000, CRC(fd363f45) SHA1(3c4c596654647ee6ce1880de329aa675d298dc26) )
@@ -63,14 +55,16 @@ DEFINE_DEVICE_TYPE(PDS_SEDISPLAY, macpds_sedisplay_device, "pds_sefp", "Radius S
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor macpds_sedisplay_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sedisplay );
-}
+MACHINE_CONFIG_MEMBER( macpds_sedisplay_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( SEDISPLAY_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, macpds_sedisplay_device, screen_update)
+	MCFG_SCREEN_SIZE(1280, 960)
+	MCFG_SCREEN_REFRESH_RATE(70)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 870-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

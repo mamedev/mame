@@ -18,7 +18,7 @@
 
 #include "bus/ti99/ti99defs.h"
 #include "machine/tmc0430.h"
-#include "gromport.h"
+#include "bus/ti99/gromport/gromport.h"
 #include "bus/ti99/internal/ioport.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -67,7 +67,7 @@ private:
 	required_device<bus::ti99::internal::ioport_device> m_ioport;
 
 	// Link to the cartridge port (aka GROM port)
-	required_device<gromport_device> m_gromport;
+	required_device<bus::ti99::gromport::gromport_device> m_gromport;
 
 	// Memory expansion (internal, 16 bit)
 	required_device<ram_device> m_ram16b;

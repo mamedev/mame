@@ -121,6 +121,7 @@ namespace netlist
 				f = true;
 			}
 		}
+		//FIXME: Use power terminals!
 		if (!f)
 			log().warning(MW_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
 		else

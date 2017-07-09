@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( pcx_vid_io, AS_IO, 8, pcx_video_device )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcx_vram, AS_0, 8, pcx_video_device )
+static ADDRESS_MAP_START( pcx_vram, 0, 8, pcx_video_device )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -162,7 +162,7 @@ MACHINE_CONFIG_MEMBER( pcx_video_device::device_add_mconfig )
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(16)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcx_video_device, display_pixels)
 	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, pcx_vram)
+	MCFG_DEVICE_ADDRESS_MAP(0, pcx_vram)
 MACHINE_CONFIG_END
 
 
@@ -401,7 +401,7 @@ void pcd_video_device::device_start()
 {
 	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0xff00);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, read8_delegate(FUNC(pcd_video_device::vram_r), this), write8_delegate(FUNC(pcd_video_device::vram_w), this), 0xffff);
-	set_gfx(0, std::make_unique<gfx_element>(palette(), pcd_charlayout, &m_charram[0], 0, 1, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), pcd_charlayout, &m_charram[0], 0, 1, 0));
 }
 
 void pcd_video_device::device_reset()

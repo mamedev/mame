@@ -18,10 +18,10 @@ namespace netlist
 	NETLIB_OBJECT(9316)
 	{
 		NETLIB_CONSTRUCTOR(9316)
-		, m_cnt(*this, "m_cnt", 0)
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(9316, clk))
 		, m_ENT(*this, "ENT")
 		, m_LOADQ(*this, "LOADQ")
+		, m_cnt(*this, "m_cnt", 0)
 		, m_ENP(*this, "ENP")
 		, m_CLRQ(*this, "CLRQ")
 		, m_A(*this, "A", NETLIB_DELEGATE(9316, noop))
@@ -39,11 +39,12 @@ namespace netlist
 		NETLIB_HANDLERI(clk);
 		NETLIB_HANDLERI(noop) { }
 
-		state_var<unsigned> m_cnt;
 		logic_input_t m_CLK;
 
 		logic_input_t m_ENT;
 		logic_input_t m_LOADQ;
+
+		state_var<unsigned> m_cnt;
 
 		logic_input_t m_ENP;
 		logic_input_t m_CLRQ;

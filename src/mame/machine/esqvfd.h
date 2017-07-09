@@ -28,6 +28,7 @@ public:
 
 	virtual void write_char(int data) = 0;
 	virtual void update_display();
+	virtual bool write_contents(std::ostream &o) { return false; }
 
 	uint32_t conv_segments(uint16_t segin);
 
@@ -61,7 +62,7 @@ public:
 	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 };
@@ -71,9 +72,10 @@ public:
 	esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(int data) override;
+	virtual bool write_contents(std::ostream &o) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class esq2x40_sq1_device : public esqvfd_device {
@@ -83,7 +85,7 @@ public:
 	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	bool m_wait87shift, m_wait88shift;

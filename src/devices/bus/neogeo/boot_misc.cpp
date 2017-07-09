@@ -48,15 +48,9 @@ void neogeo_bootleg_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( bootleg_cart )
+MACHINE_CONFIG_MEMBER( neogeo_bootleg_cart_device::device_add_mconfig )
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 MACHINE_CONFIG_END
-
-machine_config_constructor neogeo_bootleg_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bootleg_cart );
-}
-
 
 
 /*************************************************
@@ -213,15 +207,10 @@ void neogeo_mslug3b6_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->cmc42_gfx_decrypt(spr_region, spr_region_size, MSLUG3_GFX_KEY);
 }
 
-static MACHINE_CONFIG_START( mslug3b6_cart )
+MACHINE_CONFIG_MEMBER( neogeo_mslug3b6_cart_device::device_add_mconfig )
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 MACHINE_CONFIG_END
-
-machine_config_constructor neogeo_mslug3b6_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mslug3b6_cart );
-}
 
 
 /*************************************************
@@ -245,16 +234,11 @@ void neogeo_ms5plus_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->sx_decrypt(fix_region, fix_region_size, 1);
 }
 
-static MACHINE_CONFIG_START( ms5plus_cart )
+MACHINE_CONFIG_MEMBER( neogeo_ms5plus_cart_device::device_add_mconfig )
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")
 MACHINE_CONFIG_END
-
-machine_config_constructor neogeo_ms5plus_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ms5plus_cart );
-}
 
 
 /*************************************************

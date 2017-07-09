@@ -32,11 +32,6 @@ public:
 	// construction/destruction
 	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_READ8_MEMBER( dio_r );
 	DECLARE_WRITE8_MEMBER( dio_w );
 	DECLARE_READ8_MEMBER( riot1_pa_r );
@@ -45,14 +40,17 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
 	c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_atn(int state) override;
@@ -76,6 +74,9 @@ protected:
 	int m_daco;                         // not data accepted output
 	int m_atna;                         // attention acknowledge
 	int m_ifc;
+
+private:
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 
@@ -87,9 +88,11 @@ public:
 	// construction/destruction
 	c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
@@ -102,10 +105,12 @@ public:
 	// construction/destruction
 	c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
@@ -118,10 +123,12 @@ public:
 	// construction/destruction
 	sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 

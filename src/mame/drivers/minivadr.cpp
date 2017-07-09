@@ -108,9 +108,9 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( minivadr )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,24000000 / 6)        /* 4 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(minivadr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", minivadr_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", minivadr_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -132,7 +132,7 @@ MACHINE_CONFIG_END
 
 ROM_START( minivadr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d26-01.bin", 0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
+	ROM_LOAD( "d26-01.ic7", 0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
 ROM_END
 
 

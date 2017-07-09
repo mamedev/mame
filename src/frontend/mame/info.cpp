@@ -189,11 +189,10 @@ const char info_xml_creator::s_dtd_string[] =
 //  info_xml_creator - constructor
 //-------------------------------------------------
 
-info_xml_creator::info_xml_creator(emu_options const &options)
-	: m_output(nullptr)
-	, m_lookup_options(options)
+info_xml_creator::info_xml_creator(emu_options const &options, bool dtd)
+	: m_output(nullptr),
+		m_dtd(dtd)
 {
-	mame_options::remove_device_options(m_lookup_options);
 }
 
 
@@ -211,12 +210,12 @@ void info_xml_creator::output(FILE *out, std::vector<std::string> const &pattern
 	// track which patterns match machines
 	driver_enumerator drivlist(m_lookup_options);
 	std::vector<bool> matched(patterns.size(), false);
-	auto const included = [&patterns, &drivlist, &matched] () -> bool
+	size_t exact_matches = 0;
+	auto const included = [&patterns, &drivlist, &matched, &exact_matches] (char const *const name) -> bool
 	{
 		if (patterns.empty())
 			return true;
 
-		char const *const name = drivlist.driver().name;
 		bool result = false;
 		auto it = matched.begin();
 		for (std::string const &pat : patterns)
@@ -224,7 +223,12 @@ void info_xml_creator::output(FILE *out, std::vector<std::string> const &pattern
 			if (!core_strwildcmp(pat.c_str(), name))
 			{
 				result = true;
-				*it = true;
+				if (!*it)
+				{
+					*it = true;
+					if (!core_iswildstr(pat.c_str()))
+						++exact_matches;
+				}
 			}
 			++it;
 		}
@@ -235,7 +239,7 @@ void info_xml_creator::output(FILE *out, std::vector<std::string> const &pattern
 	bool first = true;
 	while (drivlist.next())
 	{
-		if (included())
+		if (included(drivlist.driver().name))
 		{
 			if (first)
 			{
@@ -243,6 +247,24 @@ void info_xml_creator::output(FILE *out, std::vector<std::string> const &pattern
 				first = false;
 			}
 			output_one(drivlist, devfilter.get());
+
+			// stop looking if we found everything specified
+			if (!patterns.empty() && exact_matches == patterns.size())
+				break;
+		}
+	}
+
+	// iterate through the device types if not everything matches a driver
+	if (!patterns.empty() && exact_matches != patterns.size())
+	{
+		for (device_type type : registered_device_types)
+		{
+			if (included(type.shortname()))
+			{
+				devfilter->insert(&type);
+				if (exact_matches == patterns.size())
+					break;
+			}
 		}
 	}
 
@@ -304,13 +326,16 @@ void info_xml_creator::output(FILE *out, driver_enumerator &drivlist, bool nodev
 
 void info_xml_creator::output_header()
 {
-	// output the DTD
-	fprintf(m_output, "<?xml version=\"1.0\"?>\n");
-	std::string dtd(s_dtd_string);
-	strreplace(dtd, "__XML_ROOT__", XML_ROOT);
-	strreplace(dtd, "__XML_TOP__", XML_TOP);
+	if (m_dtd)
+	{
+		// output the DTD
+		fprintf(m_output, "<?xml version=\"1.0\"?>\n");
+		std::string dtd(s_dtd_string);
+		strreplace(dtd, "__XML_ROOT__", XML_ROOT);
+		strreplace(dtd, "__XML_TOP__", XML_TOP);
 
-	fprintf(m_output, "%s\n\n", dtd.c_str());
+		fprintf(m_output, "%s\n\n", dtd.c_str());
+	}
 
 	// top-level tag
 	fprintf(m_output, "<%s build=\"%s\" debug=\""
@@ -1630,7 +1655,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 			{
 				if (devtypes || (listed && option.second->selectable()))
 				{
-					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), 0);
+					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), option.second->clock());
 					if (!dev->configured())
 						dev->config_complete();
 

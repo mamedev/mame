@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cabal_state )
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( cabalbl2_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl2_predecrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cabal_state )
+static ADDRESS_MAP_START( cabalbl2_predecrypted_opcodes_map, AS_OPCODES, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0x2000)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END

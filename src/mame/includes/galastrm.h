@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
 #include "machine/eepromser.h"
-#include "machine/watchdog.h"
 
 #include "video/poly.h"
 #include "video/tc0100scn.h"
@@ -57,7 +56,6 @@ public:
 		m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_watchdog(*this, "watchdog"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -69,14 +67,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint16_t m_coin_word;
 	uint16_t m_frame_counter;
 	int m_tc0110pcr_addr;
 	int m_tc0610_0_addr;
@@ -97,11 +93,10 @@ public:
 	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
 	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
 	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
-	DECLARE_WRITE32_MEMBER(galastrm_input_w);
 	DECLARE_READ32_MEMBER(galastrm_adstick_ctrl_r);
 	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	DECLARE_WRITE8_MEMBER(coin_word_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

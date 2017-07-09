@@ -221,6 +221,7 @@ MACHINE_CONFIG_START( zorba )
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_I8275_IRQ_CALLBACK(DEVWRITELINE("irq0", input_merger_active_high_device, in1_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// Floppies
 	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)

@@ -331,8 +331,6 @@ protected:
 	std::vector<uint16_t> m_prg_bank_map;
 };
 
-void nes_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
-
 // ======================> nes_cart_slot_device
 
 class nes_cart_slot_device : public device_t,
@@ -364,7 +362,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "nes_cart"; }
 	virtual const char *file_extensions() const override { return "nes,unf,unif"; }
-	virtual device_image_partialhash_func get_partial_hash() const override { return &nes_partialhash; }
+	virtual u32 unhashed_header_length() const override { return 16; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;

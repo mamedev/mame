@@ -31,29 +31,6 @@ h83008_device::h83008_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-static MACHINE_CONFIG_START(h83008)
-	MCFG_H8H_INTC_ADD("intc")
-	MCFG_H8_ADC_3006_ADD("adc", "intc", 23)
-	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x80, 0x80)
-	MCFG_H8_PORT_ADD("port7", h8_device::PORT_7, 0xff, 0x00)
-	MCFG_H8_PORT_ADD("port8", h8_device::PORT_8, 0xf0, 0xe0)
-	MCFG_H8_PORT_ADD("port9", h8_device::PORT_9, 0xc0, 0xc0)
-	MCFG_H8_PORT_ADD("porta", h8_device::PORT_A, 0x80, 0x00)
-	MCFG_H8_PORT_ADD("portb", h8_device::PORT_B, 0x00, 0x00)
-	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_0", "intc", 36, 38, 39, "timer8_1", h8_timer8_channel_device::CHAIN_OVERFLOW, true,  false)
-	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_1", "intc", 37, 38, 39, "timer8_0", h8_timer8_channel_device::CHAIN_A,        false, false)
-	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_2", "intc", 40, 42, 43, "timer8_3", h8_timer8_channel_device::CHAIN_OVERFLOW, false, true)
-	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_3", "intc", 41, 42, 43, "timer8_2", h8_timer8_channel_device::CHAIN_A,        false, true)
-	MCFG_H8_TIMER16_ADD("timer16", 3, 0xf8)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:0", 2, 2, "intc", 24)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:1", 2, 2, "intc", 28)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:2", 2, 2, "intc", 32)
-	MCFG_H8_SCI_ADD("sci0", "intc", 52, 53, 54, 55)
-	MCFG_H8_SCI_ADD("sci1", "intc", 56, 57, 58, 59)
-	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 20, h8_watchdog_device::H)
-MACHINE_CONFIG_END
-
 DEVICE_ADDRESS_MAP_START(map, 16, h83008_device)
 	AM_RANGE(0xfee002, 0xfee003) AM_DEVWRITE8(    "port4",     h8_port_device,                     ddr_w,   0x00ff)
 	AM_RANGE(0xfee004, 0xfee005) AM_DEVWRITE8(    "port6",     h8_port_device,                     ddr_w,   0x00ff)
@@ -136,10 +113,28 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83008_device)
 	AM_RANGE(0xffffe8, 0xffffe9) AM_DEVREADWRITE8("adc",       h8_adc_device,             adcr_r,  adcr_w,  0x00ff)
 ADDRESS_MAP_END
 
-machine_config_constructor h83008_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(h83008);
-}
+MACHINE_CONFIG_MEMBER(h83008_device::device_add_mconfig)
+	MCFG_H8H_INTC_ADD("intc")
+	MCFG_H8_ADC_3006_ADD("adc", "intc", 23)
+	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x80, 0x80)
+	MCFG_H8_PORT_ADD("port7", h8_device::PORT_7, 0xff, 0x00)
+	MCFG_H8_PORT_ADD("port8", h8_device::PORT_8, 0xf0, 0xe0)
+	MCFG_H8_PORT_ADD("port9", h8_device::PORT_9, 0xc0, 0xc0)
+	MCFG_H8_PORT_ADD("porta", h8_device::PORT_A, 0x80, 0x00)
+	MCFG_H8_PORT_ADD("portb", h8_device::PORT_B, 0x00, 0x00)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_0", "intc", 36, 38, 39, "timer8_1", h8_timer8_channel_device::CHAIN_OVERFLOW, true,  false)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_1", "intc", 37, 38, 39, "timer8_0", h8_timer8_channel_device::CHAIN_A,        false, false)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_2", "intc", 40, 42, 43, "timer8_3", h8_timer8_channel_device::CHAIN_OVERFLOW, false, true)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_3", "intc", 41, 42, 43, "timer8_2", h8_timer8_channel_device::CHAIN_A,        false, true)
+	MCFG_H8_TIMER16_ADD("timer16", 3, 0xf8)
+	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:0", 2, 2, "intc", 24)
+	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:1", 2, 2, "intc", 28)
+	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:2", 2, 2, "intc", 32)
+	MCFG_H8_SCI_ADD("sci0", "intc", 52, 53, 54, 55)
+	MCFG_H8_SCI_ADD("sci1", "intc", 56, 57, 58, 59)
+	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 20, h8_watchdog_device::H)
+MACHINE_CONFIG_END
 
 void h83008_device::execute_set_input(int inputnum, int state)
 {

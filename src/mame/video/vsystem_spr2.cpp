@@ -129,7 +129,7 @@ void vsystem_spr2_device::sprite_attributes::handle_xsize_map_inc()
 }
 
 template<class BitmapClass>
-void vsystem_spr2_device::turbofrc_draw_sprites_common(uint16_t const *spriteram3,  int spriteram3_bytes, int spritepalettebank, BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+void vsystem_spr2_device::turbofrc_draw_sprites_common(uint16_t const *spriteram3,  int spriteram3_bytes, int spritepalettebank, BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param, bool flip_screen)
 {
 	int attr_start, first;
 	first = 4 * spriteram3[0x1fe];
@@ -187,7 +187,15 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common(uint16_t const *spriteram
 			usepri = pri_param;
 		}
 
-
+		bool fx = m_curr_sprite.flipx != 0;
+		bool fy = m_curr_sprite.flipy != 0;
+		if (flip_screen)
+		{
+			m_curr_sprite.ox = 308 - m_curr_sprite.ox;
+			m_curr_sprite.oy = 208 - m_curr_sprite.oy;
+			fx = !fx;
+			fy = !fy;
+		}
 
 		m_curr_sprite.color += 16 * spritepalettebank;
 
@@ -196,38 +204,29 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common(uint16_t const *spriteram
 
 		for (y = 0; y <= m_curr_sprite.ysize; y++)
 		{
-			int sx, sy;
-
-			if (m_curr_sprite.flipy)
-				sy = ((m_curr_sprite.oy + m_curr_sprite.zoomy * (m_curr_sprite.ysize - y)/2 + 16) & 0x1ff) - 16;
-			else
-				sy = ((m_curr_sprite.oy + m_curr_sprite.zoomy * y / 2 + 16) & 0x1ff) - 16;
+			int cy = m_curr_sprite.flipy ? (m_curr_sprite.ysize - y) : y;
+			int sy = ((m_curr_sprite.oy + m_curr_sprite.zoomy * (flip_screen ? -cy : cy) / 2 + 16) & 0x1ff) - 16;
 
 			for (x = 0; x <= m_curr_sprite.xsize; x++)
 			{
-				int curr;
+				int cx = m_curr_sprite.flipx ? (m_curr_sprite.xsize - x) : x;
+				int sx = ((m_curr_sprite.ox + m_curr_sprite.zoomx * (flip_screen ? -cx : cx) / 2 + 16) & 0x1ff) - 16;
 
-				if (m_curr_sprite.flipx)
-					sx = ((m_curr_sprite.ox + m_curr_sprite.zoomx * (m_curr_sprite.xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else
-					sx = ((m_curr_sprite.ox + m_curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
-
-				curr = m_newtilecb(m_curr_sprite.map++);
-
+				int curr = m_newtilecb(m_curr_sprite.map++);
 
 				if (m_pritype == 0 || m_pritype == 1 || m_pritype == 2) // pdrawgfx cases
 				{
-					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x000,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
-					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x200,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
-					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x000,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
-					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x200,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
+					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x000,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
+					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x200,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
+					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x000,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
+					m_gfxdecode->gfx(m_gfx_region)->prio_zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x200,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,  priority_bitmap,usepri,15);
 				}
 				else // drawgfx cases (welltris, pipedrm)
 				{
-					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x000,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
-					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x200,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
-					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x000,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
-					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, m_curr_sprite.flipx,m_curr_sprite.flipy, sx-0x200,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
+					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x000,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
+					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x200,sy-0x000, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
+					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x000,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
+					m_gfxdecode->gfx(m_gfx_region)->zoom_transpen(bitmap,cliprect, curr, m_curr_sprite.color, fx, fy, sx-0x200,sy-0x200, m_curr_sprite.zoomx << 11, m_curr_sprite.zoomy << 11,15);
 				}
 
 			}
@@ -236,12 +235,12 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common(uint16_t const *spriteram
 	}
 }
 
-void vsystem_spr2_device::turbofrc_draw_sprites(uint16_t const *spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+void vsystem_spr2_device::turbofrc_draw_sprites(uint16_t const *spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param, bool flip_screen)
 {
-	turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param );
+	turbofrc_draw_sprites_common(spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param, flip_screen);
 }
 
-void vsystem_spr2_device::turbofrc_draw_sprites(uint16_t const *spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+void vsystem_spr2_device::turbofrc_draw_sprites(uint16_t const *spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param, bool flip_screen)
 {
-	turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param );
+	turbofrc_draw_sprites_common(spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param, flip_screen);
 }

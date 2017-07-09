@@ -270,6 +270,23 @@ public:
 	DECLARE_WRITE8_MEMBER(adlib_w);
 	DECLARE_READ8_MEMBER(joy_r);
 	DECLARE_WRITE8_MEMBER(joy_w);
+
+	// DMA overrides
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line,uint8_t data) override;
+	virtual void eop_w(int state) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(midi_txirq);
 	DECLARE_WRITE_LINE_MEMBER(midi_rxirq);
 	DECLARE_WRITE_LINE_MEMBER(wavetable_irq);
@@ -283,22 +300,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
-	// DMA overrides
-	virtual uint8_t dack_r(int line) override;
-	virtual void dack_w(int line,uint8_t data) override;
-	virtual void eop_w(int state) override;
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
-
-private:
 	required_device<gf1_device> m_gf1;
 
 	uint8_t m_irq_status;

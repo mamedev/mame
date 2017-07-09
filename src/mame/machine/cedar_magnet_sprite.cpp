@@ -199,7 +199,7 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port9c_w)
 //  printf("%s:sprite_port9c_w %02x\n", machine().describe_context(), data);
 }
 
-static MACHINE_CONFIG_START( cedar_magnet_sprite )
+MACHINE_CONFIG_MEMBER( cedar_magnet_sprite_device::device_add_mconfig )
 	MCFG_CPU_ADD("spritecpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_sprite_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_sprite_io)
@@ -283,12 +283,6 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::pio2_pb_w)
 	// yes, it ends up banking the ram right out from under itself during startup execution...
 	// during this time the main cpu is waiting in a loop, after which it copies the startup code again, and reboots it.
 	m_sprite_ram_bankdev->set_bank(data & 0x03);
-}
-
-
-machine_config_constructor cedar_magnet_sprite_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cedar_magnet_sprite );
 }
 
 

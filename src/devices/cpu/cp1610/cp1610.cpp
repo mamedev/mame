@@ -3401,6 +3401,12 @@ cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
+std::vector<std::pair<int, const address_space_config *>> cp1610_cpu_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

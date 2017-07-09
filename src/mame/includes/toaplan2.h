@@ -21,11 +21,6 @@
 class toaplan2_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RAISE_IRQ
-	};
-
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
@@ -87,8 +82,6 @@ public:
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 
-	emu_timer * m_raise_irq_timer;
-
 	tilemap_t *m_tx_tilemap;    /* Tilemap for extra-text-layer */
 	DECLARE_READ16_MEMBER(video_count_r);
 	DECLARE_WRITE8_MEMBER(toaplan2_coin_w);
@@ -109,9 +102,7 @@ public:
 	DECLARE_READ8_MEMBER(fixeight_region_r);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(bgaregga_soundlatch_w);
 	DECLARE_READ8_MEMBER(bgaregga_E01D_r);
-	DECLARE_WRITE8_MEMBER(bgaregga_E00C_w);
 	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
 	DECLARE_WRITE16_MEMBER(batrider_z80_busreq_w);
 	DECLARE_READ16_MEMBER(batrider_z80rom_r);
@@ -166,18 +157,14 @@ public:
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
+	IRQ_CALLBACK_MEMBER(fixeightbl_irq_ack);
+	IRQ_CALLBACK_MEMBER(pipibibsbl_irq_ack);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
-	void toaplan2_vblank_irq(int irq_line);
 
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

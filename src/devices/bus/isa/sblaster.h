@@ -169,15 +169,17 @@ public:
 	// construction/destruction
 	isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_READ8_MEMBER(saa1099_16_r);
 	DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
 	DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	// internal state
 	required_device<saa1099_device> m_saa1099_1;
@@ -190,11 +192,12 @@ public:
 	// construction/destruction
 	isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class sb16_device : public sb_device,
@@ -230,11 +233,12 @@ public:
 	// construction/destruction
 	isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition

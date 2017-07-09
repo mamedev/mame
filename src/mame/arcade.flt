@@ -133,7 +133,6 @@ bishi.cpp
 bking.cpp
 blackt96.cpp
 bladestl.cpp
-blitz.cpp
 blitz68k.cpp
 blktiger.cpp
 blmbycar.cpp
@@ -359,6 +358,7 @@ exprraid.cpp
 exterm.cpp
 extrema.cpp
 exzisus.cpp
+ez2d.cpp
 f1gp.cpp
 f-32.cpp
 famibox.cpp
@@ -749,8 +749,19 @@ mpu12wbk.cpp
 mpu2.cpp
 mpu3.cpp
 mpu4.cpp
+mpu4avan.cpp
+mpu4bwb.cpp
+mpu4concept.cpp
+mpu4crystal.cpp
 mpu4dealem.cpp
+mpu4empire.cpp
+mpu4mdm.cpp
+mpu4misc.cpp
+mpu4mod2sw.cpp
+mpu4mod4yam.cpp
 mpu4plasma.cpp
+mpu4sw.cpp
+mpu4union.cpp
 mpu4vid.cpp
 mpu5.cpp
 mquake.cpp
@@ -950,6 +961,7 @@ rohga.cpp
 rollerg.cpp
 rollext.cpp
 rollrace.cpp
+ron.cpp
 rotaryf.cpp
 roul.cpp
 route16.cpp
@@ -990,6 +1002,7 @@ scramble.cpp
 scregg.cpp
 scyclone.cpp
 sderby.cpp
+sderby2.cpp
 seabattl.cpp
 sealy.cpp
 seattle.cpp
@@ -1082,6 +1095,7 @@ speedspn.cpp
 speglsht.cpp
 spiders.cpp
 spinb.cpp
+spirit76.cpp
 splash.cpp
 splus.cpp
 spoker.cpp
@@ -1254,6 +1268,7 @@ ultratnk.cpp
 ultrsprt.cpp
 umipoker.cpp
 undrfire.cpp
+unianapc.cpp
 unico.cpp
 unkhorse.cpp
 upscope.cpp

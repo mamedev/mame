@@ -19,19 +19,6 @@ static SLOT_INTERFACE_START( microdisc_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( microdisc )
-	MCFG_FD1793_ADD("fdc", XTAL_8MHz/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(microdisc_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(microdisc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(microdisc_device, fdc_hld_w))
-	MCFG_WD_FDC_FORCE_READY
-
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
-MACHINE_CONFIG_END
-
 DEVICE_ADDRESS_MAP_START(map, 8, microdisc_device)
 	AM_RANGE(0x310, 0x313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x314, 0x314) AM_READWRITE(port_314_r, port_314_w)
@@ -79,10 +66,18 @@ const tiny_rom_entry *microdisc_device::device_rom_region() const
 	return ROM_NAME( microdisc );
 }
 
-machine_config_constructor microdisc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( microdisc );
-}
+MACHINE_CONFIG_MEMBER( microdisc_device::device_add_mconfig )
+	MCFG_FD1793_ADD("fdc", XTAL_8MHz/8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(microdisc_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(microdisc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(microdisc_device, fdc_hld_w))
+	MCFG_WD_FDC_FORCE_READY
+
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+MACHINE_CONFIG_END
 
 void microdisc_device::remap()
 {

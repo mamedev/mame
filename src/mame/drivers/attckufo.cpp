@@ -50,11 +50,11 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, attckufo_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, attckufo_state )
+static ADDRESS_MAP_START( vic_videoram_map, 0, 8, attckufo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, attckufo_state )
+static ADDRESS_MAP_START( vic_colorram_map, 1, 8, attckufo_state )
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 

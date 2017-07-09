@@ -127,24 +127,14 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( snes_dsp )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( snes_dsp_lorom )
+MACHINE_CONFIG_MEMBER( sns_rom20_necdsp_device::device_add_mconfig )
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
 	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sns_rom20_necdsp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
-}
 
 READ8_MEMBER( sns_rom20_necdsp_device::chip_read )
 {
@@ -191,26 +181,15 @@ static ADDRESS_MAP_START( dsp_data_map_hirom, AS_DATA, 16, sns_rom21_necdsp_devi
 	AM_RANGE(0x0000, 0x03ff) AM_READ(necdsp_data_r)
 ADDRESS_MAP_END
 
-
 //-------------------------------------------------
-//  MACHINE_DRIVER( snes_dsp )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( snes_dsp_hirom )
+MACHINE_CONFIG_MEMBER( sns_rom21_necdsp_device::device_add_mconfig )
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_hirom)
 	MCFG_CPU_DATA_MAP(dsp_data_map_hirom)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sns_rom21_necdsp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_hirom );
-}
 
 READ8_MEMBER( sns_rom21_necdsp_device::chip_read )
 {
@@ -312,39 +291,21 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( snes_st010 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( snes_st010 )
+MACHINE_CONFIG_MEMBER( sns_rom_seta10dsp_device::device_add_mconfig )
 	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
 	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
 	MCFG_CPU_DATA_MAP(st01x_data_map)
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  MACHINE_DRIVER( snes_st011 )
-//-------------------------------------------------
 
-static MACHINE_CONFIG_START( snes_st011 )
+MACHINE_CONFIG_MEMBER( sns_rom_seta11dsp_device::device_add_mconfig )
 	MCFG_CPU_ADD("dsp", UPD96050, 15000000)
 	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
 	MCFG_CPU_DATA_MAP(st01x_data_map)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sns_rom_seta10dsp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_st010 );
-}
-
-machine_config_constructor sns_rom_seta11dsp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_st011 );
-}
 
 
 // To make faster DSP access to its internal rom, let's install read banks and map m_bios there with correct byte order
@@ -444,45 +405,53 @@ sns_rom_seta11dsp_legacy_device::sns_rom_seta11dsp_legacy_device(const machine_c
 }
 
 
-machine_config_constructor sns_rom20_necdsp1_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
-}
+MACHINE_CONFIG_MEMBER( sns_rom20_necdsp1_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom20_necdsp1b_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
-}
+MACHINE_CONFIG_MEMBER( sns_rom20_necdsp1b_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom20_necdsp2_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
-}
+MACHINE_CONFIG_MEMBER( sns_rom20_necdsp2_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom20_necdsp3_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
-}
+MACHINE_CONFIG_MEMBER( sns_rom20_necdsp3_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom20_necdsp4_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
-}
+MACHINE_CONFIG_MEMBER( sns_rom20_necdsp4_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom21_necdsp1_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_hirom );
-}
+MACHINE_CONFIG_MEMBER( sns_rom21_necdsp1_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_hirom)
+	MCFG_CPU_DATA_MAP(dsp_data_map_hirom)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom_seta10dsp_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_st010 );
-}
+MACHINE_CONFIG_MEMBER( sns_rom_seta10dsp_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
+	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
+	MCFG_CPU_DATA_MAP(st01x_data_map)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom_seta11dsp_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_st011 );
-}
+MACHINE_CONFIG_MEMBER( sns_rom_seta11dsp_legacy_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsp", UPD96050, 15000000)
+	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
+	MCFG_CPU_DATA_MAP(st01x_data_map)
+MACHINE_CONFIG_END
 
 
 ROM_START( snes_dsp1 )

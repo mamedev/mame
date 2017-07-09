@@ -407,7 +407,19 @@ static MACHINE_CONFIG_DERIVED( genesis_tmss, ms_megadriv )
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","TMSS")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( dcat16_megadriv )
+	MCFG_FRAGMENT_ADD( dcat16_megadriv_base )
 
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
+
+	MCFG_SCREEN_MODIFY("megadriv")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+
+//  has SD card slot instead?
+//  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
+//  MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -439,6 +451,13 @@ ROM_START(genesis_tmss)
 
 	ROM_REGION16_BE(0x4000, "tmss", ROMREGION_ERASEFF)
 	ROM_LOAD( "tmss_usa.bin", 0x0000,  0x4000, CRC(5f5e64eb) SHA1(453fca4e1db6fae4a10657c4451bccbb71955628) )
+ROM_END
+
+ROM_START(dcat16)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "MG6025.U1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
+
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*************************************
@@ -1087,3 +1106,6 @@ CONS( 1994, multmega,   cdx,       0,      md_scd,          md, md_cons_state,  
 CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1995, 32x_mcd,    32x_scd,   0,      md_32x_scd,      md, md_cons_state,     md_eur,    "Sega",   "Mega-CD with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 1994, 32x_mcdj,   32x_scd,   0,      mdj_32x_scd,     md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
+
+/* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
+CONS( 200?, dcat16,    0,         0,      dcat16_megadriv,     md, md_cons_state,     genesis,   "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )

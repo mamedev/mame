@@ -166,8 +166,6 @@ private:
 	char const *const m_source;
 
 	device_type_impl *m_next;
-	device_type_impl *m_parent = nullptr, *m_left = nullptr, *m_right = nullptr;
-	bool m_colour = false;
 
 public:
 	device_type_impl(std::nullptr_t)
@@ -498,7 +496,6 @@ protected:
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_add_mconfig(machine_config &config);
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();

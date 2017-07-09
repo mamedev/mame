@@ -22,12 +22,6 @@ public:
 	// construction/destruction
 	macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 protected:
 	macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -36,10 +30,17 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
 	DECLARE_READ16_MEMBER(sedisplay_r);
 	DECLARE_WRITE16_MEMBER(sedisplay_w);
 	DECLARE_READ16_MEMBER(ramdac_r);
 	DECLARE_WRITE16_MEMBER(ramdac_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint32_t m_vbl_disable;

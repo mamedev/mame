@@ -117,7 +117,6 @@ class psx_controller_port_device :  public device_t,
 {
 public:
 	psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	typedef delegate<void ()> void_cb;
 	void ack() { if(!ack_cb.isnull()) ack_cb(); }
@@ -137,6 +136,8 @@ protected:
 	virtual void device_start() override {}
 	virtual void device_reset() override { m_tx = true; }
 	virtual void device_config_complete() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	void_cb ack_cb;

@@ -225,11 +225,11 @@ DEFINE_DEVICE_TYPE(MOS8566, mos8566_device, "mos8566", "MOS 8566 VIC-II")
 
 
 // default address maps
-static ADDRESS_MAP_START( mos6566_videoram_map, AS_0, 8, mos6566_device )
+static ADDRESS_MAP_START( mos6566_videoram_map, 0, 8, mos6566_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mos6566_colorram_map, AS_1, 8, mos6566_device )
+static ADDRESS_MAP_START( mos6566_colorram_map, 1, 8, mos6566_device )
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -239,14 +239,12 @@ ADDRESS_MAP_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mos6566_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> mos6566_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-		case AS_0: return &m_videoram_space_config;
-		case AS_1: return &m_colorram_space_config;
-		default: return nullptr;
-	}
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_videoram_space_config),
+		std::make_pair(1, &m_colorram_space_config)
+	};
 }
 
 
@@ -283,14 +281,14 @@ inline void mos6566_device::clear_interrupt( int mask )
 inline uint8_t mos6566_device::read_videoram(offs_t offset)
 {
 	//logerror("cycle %u VRAM %04x BA %u AEC %u\n", m_cycle, offset & 0x3fff, m_ba, m_aec);
-	m_last_data = space(AS_0).read_byte(offset & 0x3fff);
+	m_last_data = space(0).read_byte(offset & 0x3fff);
 
 	return m_last_data;
 }
 
 inline uint8_t mos6566_device::read_colorram(offs_t offset)
 {
-	return space(AS_1).read_byte(offset & 0x3ff);
+	return space(1).read_byte(offset & 0x3ff);
 }
 
 // Idle access

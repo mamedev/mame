@@ -405,7 +405,12 @@ static ADDRESS_MAP_START(sb16_io, AS_IO, 8, sb16_lle_device)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( sb16 )
+const tiny_rom_entry *sb16_lle_device::device_rom_region() const
+{
+	return ROM_NAME( sb16 );
+}
+
+MACHINE_CONFIG_MEMBER( sb16_lle_device::device_add_mconfig )
 	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL_24MHz)
 	MCFG_CPU_IO_MAP(sb16_io)
 
@@ -421,16 +426,6 @@ static MACHINE_CONFIG_START( sb16 )
 
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
-
-const tiny_rom_entry *sb16_lle_device::device_rom_region() const
-{
-	return ROM_NAME( sb16 );
-}
-
-machine_config_constructor sb16_lle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sb16 );
-}
 
 READ8_MEMBER( sb16_lle_device::host_data_r )
 {

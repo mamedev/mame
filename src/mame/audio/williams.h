@@ -65,10 +65,6 @@ private:
 	uint8_t m_talkback;
 
 	DECLARE_WRITE8_MEMBER(talkback_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb);
-
 };
 
 
@@ -126,8 +122,6 @@ private:
 	uint8_t m_talkback;
 	uint8_t m_audio_sync;
 	uint8_t m_sound_int_state;
-
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 };
 
 
@@ -173,6 +167,4 @@ private:
 	uint8_t m_latch;
 	uint8_t m_talkback;
 	uint8_t m_sound_int_state;
-
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 };

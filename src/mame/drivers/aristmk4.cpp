@@ -2305,8 +2305,8 @@ ROM_START( cgold2 )
 	ROM_LOAD("3vlsh076_a.u46", 0x08000, 0x2000, CRC(9580c2c2) SHA1(8a010fb9e349c066e1af53ed9aa659dbf7dbf17e))
 	ROM_LOAD("3vlsh076.u47",   0x0a000, 0x2000, CRC(f3cb845a) SHA1(288f7fe991bb60194a9ef9e8c9b2b18ebbd3b49c)) // matches cgold
 
-        // Note: cgold tiles are not a perfect match, cgold2 needs dollar and cent signs in tiles 0x64 and 0x65 respectively, which cgold does not have. This causes a garbled graphics in the denomination.
-        // Tiles 0x27F and 0x280 are cent and dollar signs, but these are unused by the game.
+		// Note: cgold tiles are not a perfect match, cgold2 needs dollar and cent signs in tiles 0x64 and 0x65 respectively, which cgold does not have. This causes a garbled graphics in the denomination.
+		// Tiles 0x27F and 0x280 are cent and dollar signs, but these are unused by the game.
 
 		/* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )

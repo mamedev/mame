@@ -862,7 +862,7 @@ static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, jpopnics_state )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 
-	AM_RANGE(0xf000, 0xf003) AM_READ(analog_r)
+	AM_RANGE(0xf000, 0xf003) AM_DEVREAD("upd4701", upd4701_device, read_xy)
 ADDRESS_MAP_END
 
 /* RAM/ROM bank that maps at 0x8000-0xbfff on maincpu */
@@ -890,17 +890,6 @@ MACHINE_CONFIG_END
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define COMMON_COIN1(coinstate)\
-	PORT_START("COIN1")\
-	PORT_BIT( 0x01, coinstate, IPT_COIN1 )\
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-#define COMMON_COIN2(coinstate)\
-	PORT_START("COIN2")\
-	PORT_BIT( 0x01, coinstate, IPT_COIN2 )\
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 
 static INPUT_PORTS_START( plumppop )
 	/* 0xb001 (CPU1) port 0 -> 0xef0e (shared RAM) */
@@ -961,14 +950,17 @@ static INPUT_PORTS_START( plumppop )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
 INPUT_PORTS_END
 
 
@@ -1003,8 +995,12 @@ static INPUT_PORTS_START( extrmatn )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 
@@ -1045,20 +1041,22 @@ static INPUT_PORTS_START( arknoid2 )
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, right_w)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, left_w)
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w)
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT   ( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15)
-	PORT_BIT   ( 0x1000, IP_ACTIVE_LOW,  IPT_COIN2 )    /* Mirrored for service mode */
-	PORT_BIT   ( 0x2000, IP_ACTIVE_HIGH, IPT_SERVICE1 ) /* Mirrored for service mode */
-	PORT_BIT   ( 0x4000, IP_ACTIVE_LOW,  IPT_COIN1 )    /* Mirrored for service mode */
-	PORT_BIT   ( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT   ( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
-	PORT_BIT   ( 0xf000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( arknid2u )
@@ -1098,8 +1096,12 @@ static INPUT_PORTS_START( drtoppel )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drtopplu )
@@ -1182,8 +1184,12 @@ static INPUT_PORTS_START( chukatai )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chukatau )
@@ -1291,8 +1297,12 @@ static INPUT_PORTS_START( tnzsjo )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_LOW)
-	COMMON_COIN2(IP_ACTIVE_LOW)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tnzsop )
@@ -1458,17 +1468,11 @@ static INPUT_PORTS_START( jpopnics )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("COIN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("COIN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
 INPUT_PORTS_END
 
 
@@ -1578,7 +1582,13 @@ static MACHINE_CONFIG_DERIVED( extrmatn, tnzs )
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( arknoid2, extrmatn )
+static MACHINE_CONFIG_DERIVED( plumppop, extrmatn )
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("AN1")
+	MCFG_UPD4701_PORTY("AN2")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( arknoid2, plumppop )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arknoid2_state, mcu_interrupt)
@@ -1682,6 +1692,10 @@ static MACHINE_CONFIG_DERIVED( jpopnics, tnzs_base )
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(jpopnics_sub_map)
 
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("AN1")
+	MCFG_UPD4701_PORTY("AN2")
+
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(1024)
@@ -1712,7 +1726,7 @@ P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No  
 P0-041-1    CA403001A           2xZ80B  61256   27c1000 8742    1x6164      No      05,06   27c1000     N/A         5x X2-005   tnzsop(C)                       http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
 P0-041-A    K1100356A J1100156A 2xZ80B  61256   27c1000 8042    1x6164      No      05,06   23c1000     N/A         5x X2-005   tnzs(j,u)o                      http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
 P0-043A     M6100356A           3xZ80B* 61256   27512** NONE    1x6164      No      05,06   LH534000*   N/A         4x X2-004   tnzs(j,u), kabukiz              http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
-P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    U43???      5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
+P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    N/A         5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
 
 (A) GFX rom mapping is slightly different to P0-022-A pcb, possibly configured
     by a jumper.
@@ -1720,7 +1734,7 @@ P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No  
     PCB, but with a daughterboard which converts four of the 23c1000 gfx ROM
     sockets into 8 27c1000 eprom sockets, and DOES use color PROMs!
     The other pcb set uses P0-028-A pcb and 23c1000 mask roms and color RAM,
-    but has lower rom id numbers. The higher numbered set  was likely created
+    but has lower rom id numbers. The higher numbered set was likely created
     by Taito to 'use up' a stock of older P0-025-A pcbs.
 (C) This is a development/prototype PCB, hence it has 32 pin sockets for the
     gfx ROMs as 27c1000 eproms, instead of 28 pin sockets for 23c1000 mask
@@ -2774,7 +2788,7 @@ ROM_END
 
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, plumppop,  0,        extrmatn, plumppop, extrmatn_state, 0, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, plumppop,  0,        plumppop, plumppop, extrmatn_state, 0, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, jpopnics_state, 0, ROT0,   "Nics",              "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, extrmatn_state, 0, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )

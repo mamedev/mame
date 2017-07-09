@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
 ADDRESS_MAP_END
 
 // when M1 is active: read opcodes
-static ADDRESS_MAP_START( bios_mem, AS_DECRYPTED_OPCODES, 8, vixen_state )
+static ADDRESS_MAP_START( bios_mem, AS_OPCODES, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READ(opram_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(oprom_r)

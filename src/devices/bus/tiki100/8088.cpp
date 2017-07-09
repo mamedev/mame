@@ -65,22 +65,11 @@ ADDRESS_MAP_END
 //  MACHINE_CONFIG_START( tiki100_8088 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( tiki100_8088 )
+MACHINE_CONFIG_MEMBER( tiki100_8088_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8088_TAG, I8088, 6000000)
 	MCFG_CPU_PROGRAM_MAP(i8088_mem)
 	MCFG_CPU_IO_MAP(i8088_io)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor tiki100_8088_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tiki100_8088 );
-}
 
 
 

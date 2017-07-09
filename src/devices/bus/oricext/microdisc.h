@@ -15,15 +15,10 @@ public:
 	microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdisc_device();
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_ADDRESS_MAP(map, 8);
 	DECLARE_WRITE8_MEMBER(port_314_w);
 	DECLARE_READ8_MEMBER(port_314_r);
 	DECLARE_READ8_MEMBER(port_318_r);
-
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
 
 protected:
 	enum {
@@ -46,9 +41,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	const tiny_rom_entry *device_rom_region() const override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void remap();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 };
 
 #endif // MAME_BUS_ORICEXT_MICRODISC_H

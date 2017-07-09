@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( avigo_io, AS_IO, 8, avigo_state)
 	AM_RANGE(0x005, 0x006) AM_READWRITE( bank1_r, bank1_w )
 	AM_RANGE(0x007, 0x008) AM_READWRITE( bank2_r, bank2_w )
 	AM_RANGE(0x009, 0x009) AM_READWRITE( ad_control_status_r, ad_control_status_w )
-	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
+	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
 	AM_RANGE(0x028, 0x028) AM_WRITE( speaker_w )
 	AM_RANGE(0x02d, 0x02d) AM_READ( ad_data_r )
 	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( avigo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */

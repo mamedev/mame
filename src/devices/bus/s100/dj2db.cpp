@@ -98,10 +98,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( s100_dj2db )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( s100_dj2db )
+MACHINE_CONFIG_MEMBER( s100_dj2db_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL_5_0688MHz)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
 
@@ -114,17 +114,6 @@ static MACHINE_CONFIG_START( s100_dj2db )
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor s100_dj2db_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s100_dj2db );
-}
 
 
 //-------------------------------------------------

@@ -149,7 +149,7 @@ public:
 	virtual void device_stop() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// address spaces
 	const address_space_config m_program_config, m_oprogram_config;
@@ -395,7 +395,7 @@ public:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_memory_interface overrides
-	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address) override;
+	virtual bool memory_translate(int space, int intention, offs_t &address) override;
 };
 
 
@@ -596,7 +596,7 @@ public:
 
 	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
-	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address) override;
+	virtual bool memory_translate(int space, int intention, offs_t &address) override;
 
 	// device-level overrides
 	virtual void device_start() override;

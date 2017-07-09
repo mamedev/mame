@@ -393,7 +393,7 @@ READ8_MEMBER(mpu4vid_state::vram_r)
 	return m_vid_mainram[offset];
 }
 
-static ADDRESS_MAP_START( mpu4_vram, AS_0, 8, mpu4vid_state )
+static ADDRESS_MAP_START( mpu4_vram, 0, 8, mpu4vid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -438,7 +438,7 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(*m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
 }
 
 EF9369_COLOR_UPDATE( mpu4vid_state::ef9369_color_update )
@@ -1174,8 +1174,7 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
@@ -1192,8 +1191,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM /* The Mating Game has an extra 256kB RAM on the program card */
 //  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
@@ -1212,8 +1210,7 @@ static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 //  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
@@ -1230,8 +1227,7 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
@@ -1289,7 +1285,7 @@ static MACHINE_CONFIG_START( mpu4_vid )
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mpu4_vram)
+	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
 
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )

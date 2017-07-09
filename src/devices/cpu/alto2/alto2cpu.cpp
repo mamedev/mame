@@ -794,15 +794,13 @@ static const prom_load_t pl_madr_a91 =
 // device_memory_interface overrides
 //-------------------------------------------------
 
-const address_space_config*alto2_cpu_device::memory_space_config(address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> alto2_cpu_device::memory_space_config() const
 {
-	if (AS_0 == spacenum)
-		return &m_ucode_config;
-	if (AS_1 == spacenum)
-		return &m_const_config;
-	if (AS_2 == spacenum)
-		return &m_iomem_config;
-	return nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_ucode_config),
+		std::make_pair(1, &m_const_config),
+		std::make_pair(2, &m_iomem_config)
+	};
 }
 
 //-------------------------------------------------
@@ -812,7 +810,7 @@ const address_space_config*alto2_cpu_device::memory_space_config(address_spacenu
 void alto2_cpu_device::device_start()
 {
 	// get a pointer to the IO address space
-	m_iomem = &space(AS_2);
+	m_iomem = &space(2);
 
 	// Decode 2 pages of micro code PROMs to CROM
 	// If m_cram_config == 1 or 3, only the first page will be used

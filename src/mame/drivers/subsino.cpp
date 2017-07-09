@@ -224,6 +224,7 @@ To Do:
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "sound/3812intf.h"
+#include "video/ramdac.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -277,8 +278,6 @@ public:
 	uint8_t m_flash_val;
 	uint8_t m_flash_packet;
 	uint8_t m_flash_packet_start;
-	int m_colordac_offs;
-	std::unique_ptr<uint8_t[]> m_stbsub_colorram;
 
 	ticket_dispenser_device *m_hopper;
 
@@ -294,7 +293,6 @@ public:
 	DECLARE_WRITE8_MEMBER(flash_w);
 	DECLARE_READ8_MEMBER(hwcheck_r);
 	DECLARE_WRITE8_MEMBER(subsino_out_c_w);
-	DECLARE_WRITE8_MEMBER(colordac_w);
 	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
 	DECLARE_READ8_MEMBER(reel_scrollattr_r);
 	DECLARE_DRIVER_INIT(stbsub);
@@ -832,13 +830,8 @@ static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
 
-	AM_RANGE( 0x0d000, 0x0d000 ) AM_READ_PORT( "SW1" )
-	AM_RANGE( 0x0d001, 0x0d001 ) AM_READ_PORT( "SW2" )
-	AM_RANGE( 0x0d002, 0x0d002 ) AM_READ_PORT( "SW3" )
-
-	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
-	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INA" )
-	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INB" )
+	AM_RANGE( 0x0d000, 0x0d002 ) AM_DEVREAD("ppi1", i8255_device, read)
+	AM_RANGE( 0x0d004, 0x0d006 ) AM_DEVREAD("ppi2", i8255_device, read)
 
 	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE(subsino_out_b_w )
 	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE(subsino_out_a_w )
@@ -859,13 +852,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
-	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "SW2" )
-	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "SW3" )
-
-	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "SW4" )
-	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
-	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
+	AM_RANGE( 0x09000, 0x09002 ) AM_DEVREAD("ppi1", i8255_device, read)
+	AM_RANGE( 0x09004, 0x09006 ) AM_DEVREAD("ppi2", i8255_device, read)
 
 	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE(subsino_out_b_w )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE(subsino_out_a_w )
@@ -894,12 +882,9 @@ this event makes the game to reset without any money in the bank.
 static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_WRITE(subsino_out_a_w )
-	AM_RANGE( 0x09001, 0x09001 ) AM_WRITE(subsino_out_b_w )
-	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INC" )
+	AM_RANGE( 0x09000, 0x09003 ) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INB" )
-
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "SW1" )
 	AM_RANGE( 0x09007, 0x09007 ) AM_READ_PORT( "SW2" )
 	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "SW3" )
@@ -1036,13 +1021,8 @@ WRITE8_MEMBER(subsino_state::subsino_out_c_w)
 static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
-	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "SW2" )
-	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "SW3" )
-
-	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "SW4" )
-	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
-	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
+	AM_RANGE( 0x09000, 0x09002 ) AM_DEVREAD("ppi1", i8255_device, read)
+	AM_RANGE( 0x09004, 0x09006 ) AM_DEVREAD("ppi2", i8255_device, read)
 
 	/* 0x09008: is marked as OUTPUT C in the test mode. */
 	AM_RANGE( 0x09008, 0x09008 ) AM_WRITE(subsino_out_c_w )
@@ -1074,34 +1054,9 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_SHARE("reel3_ram")
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER(subsino_state::colordac_w)
-{
-	switch ( offset )
-	{
-		case 0:
-			m_colordac_offs = data * 3;
-			break;
-
-		case 1:
-			m_stbsub_colorram[m_colordac_offs] = data;
-			m_palette->set_pen_color(m_colordac_offs/3,
-				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+0]),
-				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+1]),
-				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+2])
-			);
-			m_colordac_offs = (m_colordac_offs+1) % (256*3);
-			break;
-
-		case 2:
-			// ff?
-			break;
-
-		case 3:
-			break;
-	}
-}
-
+static ADDRESS_MAP_START( ramdac_map, 0, 8, subsino_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
+ADDRESS_MAP_END
 
 // this stuff is banked..
 // not 100% sure on the bank bits.. other bits are also set
@@ -1159,13 +1114,8 @@ static ADDRESS_MAP_START( stbsub_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
 
-	AM_RANGE( 0x0d000, 0x0d000 ) AM_READ_PORT( "SW1" )
-	AM_RANGE( 0x0d001, 0x0d001 ) AM_READ_PORT( "SW2" )
-	AM_RANGE( 0x0d002, 0x0d002 ) AM_READ_PORT( "SW3" )
-
-	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
-	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
-	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
+	AM_RANGE( 0x0d000, 0x0d002 ) AM_DEVREAD("ppi1", i8255_device, read)
+	AM_RANGE( 0x0d004, 0x0d006 ) AM_DEVREAD("ppi2", i8255_device, read)
 
 	AM_RANGE( 0x0d008, 0x0d008 ) AM_RAM AM_SHARE("stbsub_out_c")
 
@@ -1174,7 +1124,9 @@ static ADDRESS_MAP_START( stbsub_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
+	AM_RANGE( 0x0d010, 0x0d010 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE( 0x0d011, 0x0d011 ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE( 0x0d012, 0x0d012 ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE("ymsnd", ym3812_device, write)
 
@@ -1200,20 +1152,18 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
 
-	AM_RANGE( 0x0d000, 0x0d000 ) AM_READ_PORT( "SW1" )
-	AM_RANGE( 0x0d001, 0x0d001 ) AM_READ_PORT( "SW2" )
-	AM_RANGE( 0x0d002, 0x0d002 ) AM_READ_PORT( "SW3" )
+	AM_RANGE( 0x0d000, 0x0d002 ) AM_DEVREAD("ppi1", i8255_device, read)
+	AM_RANGE( 0x0d004, 0x0d006 ) AM_DEVREAD("ppi2", i8255_device, read)
 
-	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
-	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
-	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x0d008, 0x0d008 ) AM_RAM AM_SHARE("stbsub_out_c")
 //  AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE
 //  AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE
 //  AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
+	AM_RANGE( 0x0d010, 0x0d010 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE( 0x0d011, 0x0d011 ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE( 0x0d012, 0x0d012 ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
 //  AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
 
@@ -2804,6 +2754,13 @@ static MACHINE_CONFIG_START( victor21 )
 	MCFG_CPU_PROGRAM_MAP(victor21_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(subsino_state, subsino_out_a_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(subsino_state, subsino_out_b_w))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INC"))
+
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
@@ -2879,6 +2836,16 @@ static MACHINE_CONFIG_START( srider )
 	MCFG_CPU_PROGRAM_MAP(srider_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
+
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("INA"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INB"))
+
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
@@ -2921,6 +2888,16 @@ static MACHINE_CONFIG_START( tisub )
 	MCFG_CPU_PROGRAM_MAP(tisub_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
+
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("INA"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INB"))
+
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
@@ -2952,6 +2929,16 @@ static MACHINE_CONFIG_START( stbsub )
 	MCFG_CPU_PROGRAM_MAP(stbsub_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
+
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("INB"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INA"))
+
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
@@ -2967,6 +2954,8 @@ static MACHINE_CONFIG_START( stbsub )
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	//MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
+
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
@@ -3552,7 +3541,7 @@ Chips:
 
 2x custom QFP44 label SUBSINOSS9100
 1x custom DIP42 label SUBSINOSS9101
-2x D8255AC-2 (are they 8255 equivalent?)
+2x D8255AC-2 (equivalent to 8255)
 1x custom QFP44 label K-665 (sound)(equivalent to OKI M6295)
 1x custom DIP24 label SM64 (sound)(equivalent to YM3812)
 1x custom DIP8 label K-664 (sound)(equivalent to YM3014)
@@ -3843,8 +3832,6 @@ DRIVER_INIT_MEMBER(subsino_state,stbsub)
 	rom[0x957] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
@@ -3859,8 +3846,6 @@ DRIVER_INIT_MEMBER(subsino_state, stisub)
 	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x0FA0] = 0x28;
 	rom[0x0FA1] = 0x1d; //patch protection check
-
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
@@ -3881,8 +3866,6 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 	rom[0xa84] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
@@ -3902,8 +3885,6 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 	rom[0xa88] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
@@ -3916,8 +3897,6 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 
 DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);

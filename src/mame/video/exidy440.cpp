@@ -52,7 +52,6 @@ VIDEO_START_MEMBER(exidy440_state,exidy440)
 	memset(m_local_paletteram.get(), 0, 512 * 2);
 
 	m_collide_firq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exidy440_state::collide_firq_callback), this));
-	m_beam_firq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exidy440_state::beam_firq_callback), this));
 }
 
 
@@ -433,7 +432,7 @@ uint32_t exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_in
 		attotime time = screen.time_until_pos(beamy, beamx) - increment * 6;
 		for (i = 0; i <= 12; i++)
 		{
-			m_beam_firq_timer->adjust(time, beamx);
+			machine().scheduler().timer_set(time, timer_expired_delegate(FUNC(exidy440_state::beam_firq_callback),this), beamx);
 			time += increment;
 		}
 	}

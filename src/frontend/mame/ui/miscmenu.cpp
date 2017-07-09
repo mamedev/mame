@@ -127,12 +127,10 @@ void menu_bios_selection::handle()
 			if (val>cnt) val=1;
 			dev->set_system_bios(val);
 			if (strcmp(dev->tag(),":")==0) {
-				std::string error;
-				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
-				assert(error.empty());
+				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE);
 			} else {
 				const char *slot_option_name = dev->owner()->tag() + 1;
-				machine().options().slot_options()[slot_option_name].set_bios(string_format("%d", val - 1));
+				machine().options().slot_option(slot_option_name).set_bios(string_format("%d", val - 1));
 			}
 			reset(reset_options::REMEMBER_REF);
 		}
@@ -671,15 +669,14 @@ void menu_export::populate(float &customtop, float &custombottom)
 menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container &container, const game_driver *prev, float _x0, float _y0)
 	: menu(mui, container)
 	, m_drv(prev)
-	, m_opts(mui.machine().options())
 	, x0(_x0)
 	, y0(_y0)
 	, m_curbios(0)
 	, m_fav_reset(false)
 {
 	// parse the INI file
-	std::string error;
-	mame_options::parse_standard_inis(m_opts,error, m_drv);
+	std::ostringstream error;
+	mame_options::parse_standard_inis(m_opts, error, m_drv);
 	setup_bios();
 }
 
@@ -750,9 +747,7 @@ void menu_machine_configure::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			(menu_event->iptkey == IPT_UI_LEFT) ? --m_curbios : ++m_curbios;
-			std::string error;
-			m_opts.set_value(OPTION_BIOS, m_bios[m_curbios].second, OPTION_PRIORITY_CMDLINE, error);
-			m_opts.mark_changed(OPTION_BIOS);
+			m_opts.set_value(OPTION_BIOS, m_bios[m_curbios].second, OPTION_PRIORITY_CMDLINE);
 			reset(reset_options::REMEMBER_POSITION);
 		}
 	}
@@ -914,8 +909,7 @@ void menu_plugins_configure::handle()
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
 			int oldval = plugins.int_value((const char*)menu_event->itemref);
-			std::string error_string;
-			plugins.set_value((const char*)menu_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE, error_string);
+			plugins.set_value((const char*)menu_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE);
 			changed = true;
 		}
 	}
@@ -931,13 +925,13 @@ void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
 	plugin_options& plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins)
+	for (auto &curentry : plugins.entries())
 	{
-		if (!curentry.is_header())
+		if (curentry->type() != OPTION_HEADER)
 		{
-			auto enabled = std::string(curentry.value()) == "1";
-			item_append(curentry.description(), enabled ? _("On") : _("Off"),
-				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry.name());
+			auto enabled = !strcmp(curentry->value(), "1");
+			item_append(curentry->description(), enabled ? _("On") : _("Off"),
+				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry->name().c_str());
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);

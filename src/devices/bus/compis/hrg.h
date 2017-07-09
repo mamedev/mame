@@ -29,17 +29,15 @@ public:
 	// construction/destruction
 	compis_hrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
-
 protected:
 	compis_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_compis_graphics_card_interface overrides
 	virtual uint8_t pcs6_6_r(address_space &space, offs_t offset) override;
@@ -50,6 +48,9 @@ protected:
 	required_shared_ptr<uint16_t> m_video_ram;
 
 	uint8_t m_unk_video;
+
+private:
+	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
 };
 
 
@@ -61,9 +62,11 @@ public:
 	// construction/destruction
 	compis_uhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
 };
 

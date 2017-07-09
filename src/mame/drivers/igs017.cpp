@@ -1125,7 +1125,7 @@ static ADDRESS_MAP_START( iqblocka_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, igs017_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, igs017_state )
 	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 

@@ -14,11 +14,6 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( dmv_k803 )
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(dmv_k803_device, rtc_irq_w))
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( dmv_k803 )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0f, 0x09, "K803 IFSEL" )  PORT_DIPLOCATION("S:!4,S:!3,S:!2,S:!1")
@@ -77,14 +72,13 @@ void dmv_k803_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k803_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k803 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k803_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(dmv_k803_device, rtc_irq_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

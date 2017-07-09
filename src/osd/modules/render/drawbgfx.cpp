@@ -85,7 +85,6 @@ renderer_bgfx::renderer_bgfx(std::shared_ptr<osd_window> w)
 	, m_avi_writer(nullptr)
 	, m_avi_target(nullptr)
 {
-	m_options = downcast<osd_options &>(assert_window()->machine().options());
 }
 
 //============================================================

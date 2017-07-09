@@ -356,17 +356,6 @@ static ADDRESS_MAP_START( keytronic_pc3270_io, AS_IO, 8, pc_kbd_keytronic_pc3270
 ADDRESS_MAP_END
 
 
-/*****************************************************************************
-    MACHINE CONFIG
-*****************************************************************************/
-
-MACHINE_CONFIG_START( keytronic_pc3270 )
-	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
-	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
-	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
-MACHINE_CONFIG_END
-
-
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
@@ -430,14 +419,14 @@ void pc_kbd_keytronic_pc3270_device::device_reset()
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor pc_kbd_keytronic_pc3270_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( keytronic_pc3270 );
-}
+MACHINE_CONFIG_MEMBER( pc_kbd_keytronic_pc3270_device::device_add_mconfig )
+	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
+	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
+	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
+MACHINE_CONFIG_END
 
 
 ioport_constructor pc_kbd_keytronic_pc3270_device::device_input_ports() const

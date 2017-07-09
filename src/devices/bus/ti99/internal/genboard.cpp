@@ -211,9 +211,6 @@ namespace bus { namespace ti99 { namespace internal {
 #define TRACE_VIDEOWS 0
 #define TRACE_PFM 0
 
-#define SRAM_PAR_TAG  ":sram"
-#define DRAM_PAR_TAG  ":dram"
-
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GENEVE_MAPPER, tag, owner, clock), m_gromwaddr_LSB(false),
 	m_gromraddr_LSB(false),
@@ -240,16 +237,16 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 	m_ready(*this),
 	m_waitcount(0),
 	m_ext_waitcount(0),
-	m_clock(*owner, GCLOCK_TAG),
+	m_clock(*owner, GENEVE_CLOCK_TAG),
 	m_cpu(*owner, "maincpu"),
-	m_pfm512(*owner, PFM512_TAG),
-	m_pfm512a(*owner, PFM512A_TAG),
-	m_sound(*owner, TISOUNDCHIP_TAG),
-	m_keyboard(*owner, GKEYBOARD_TAG),
-	m_video(*owner, VDP_TAG),
-	m_peribox(*owner, PERIBOX_TAG),
-	m_sram(*this, SRAM_PAR_TAG),
-	m_dram(*this, DRAM_PAR_TAG)
+	m_pfm512(*owner, GENEVE_PFM512_TAG),
+	m_pfm512a(*owner, GENEVE_PFM512A_TAG),
+	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_keyboard(*owner, GENEVE_KEYBOARD_TAG),
+	m_video(*owner, TI_VDP_TAG),
+	m_peribox(*owner, TI_PERIBOX_TAG),
+	m_sram(*this, GENEVE_SRAM_PAR_TAG),
+	m_dram(*this, GENEVE_DRAM_PAR_TAG)
 {
 	m_eprom = nullptr;
 }
@@ -1485,8 +1482,8 @@ void geneve_mapper_device::device_reset()
 			fatalerror("genboard: GenMod boot ROM missing\n");
 		}
 		m_genmod = true;
-		m_turbo = ((machine().root_device().ioport("GENMODDIPS")->read() & GM_TURBO)!=0);
-		m_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GM_TIM)!=0);
+		m_turbo = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TURBO)!=0);
+		m_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TIM)!=0);
 	}
 
 	switch (machine().root_device().ioport("SRAM")->read())

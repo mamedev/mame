@@ -19,7 +19,7 @@ Notes:
 #include "includes/skykid.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "screen.h"

@@ -66,10 +66,10 @@ void intv_voice_device::late_subslot_setup()
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( intellivoice )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( intellivoice )
+MACHINE_CONFIG_MEMBER( intv_voice_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono_voice")
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -78,17 +78,6 @@ static MACHINE_CONFIG_START( intellivoice )
 
 	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor intv_voice_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( intellivoice );
-}
 
 
 ROM_START( intellivoice )

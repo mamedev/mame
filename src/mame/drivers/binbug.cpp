@@ -79,7 +79,7 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
-	DECLARE_READ8_MEMBER(binbug_serial_r);
+	DECLARE_READ_LINE_MEMBER(binbug_serial_r);
 	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -99,7 +99,7 @@ WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
 {
 }
 
-READ8_MEMBER( binbug_state::binbug_serial_r )
+READ_LINE_MEMBER( binbug_state::binbug_serial_r )
 {
 	return m_rs232->rxd_r() & (m_cass->input() < 0.03);
 }
@@ -117,10 +117,9 @@ static ADDRESS_MAP_START(binbug_mem, AS_PROGRAM, 8, binbug_state)
 	AM_RANGE( 0x7c00, 0x7fff) AM_RAM AM_SHARE("attribram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(binbug_io, AS_IO, 8, binbug_state)
+static ADDRESS_MAP_START(binbug_data, AS_DATA, 8, binbug_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(binbug_ctrl_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(binbug_serial_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -297,8 +296,9 @@ static MACHINE_CONFIG_START( binbug )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(binbug_mem)
-	MCFG_CPU_IO_MAP(binbug_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(binbug_state, binbug_serial_w))
+	MCFG_CPU_DATA_MAP(binbug_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(binbug_state, binbug_serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(binbug_state, binbug_serial_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())

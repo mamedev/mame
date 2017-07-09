@@ -31,6 +31,7 @@
 #define DEVCB_INPUTLINE(_tag, _line) devcb_base::inputline_desc(_tag, _line)
 #define DEVCB_ASSERTLINE(_tag, _line) devcb_base::assertline_desc(_tag, _line)
 #define DEVCB_CLEARLINE(_tag, _line) devcb_base::clearline_desc(_tag, _line)
+#define DEVCB_HOLDLINE(_tag, _line) devcb_base::holdline_desc(_tag, _line)
 #define DEVCB_VCC DEVCB_CONSTANT(1)
 #define DEVCB_GND DEVCB_CONSTANT(0)
 
@@ -104,7 +105,8 @@ protected:
 		CALLBACK_CONSTANT,
 		CALLBACK_INPUTLINE,
 		CALLBACK_ASSERTLINE,
-		CALLBACK_CLEARLINE
+		CALLBACK_CLEARLINE,
+		CALLBACK_HOLDLINE
 	};
 
 	// construction/destruction
@@ -116,7 +118,7 @@ public:
 	bool isnull() const { return (m_type == CALLBACK_NONE); }
 
 	// additional configuration
-	devcb_base &set_space(const char *device, address_spacenum space = AS_0) { m_space_tag = device; m_space_num = space; return *this; }
+	devcb_base &set_space(const char *device, int space = 0) { m_space_tag = device; m_space_num = space; return *this; }
 	devcb_base &set_rshift(int rshift) { m_rshift = rshift; return *this; }
 	devcb_base &set_mask(u64 mask) { m_mask = mask; return *this; }
 	devcb_base &set_xor(u64 xorval) { m_xor = xorval; return *this; }
@@ -180,6 +182,14 @@ public:
 		int m_inputnum;
 	};
 
+	class holdline_desc
+	{
+	public:
+		holdline_desc(const char *tag, int inputnum) { m_tag = tag; m_inputnum = inputnum; }
+		const char *m_tag;
+		int m_inputnum;
+	};
+
 	// shared callback setters
 	devcb_base &set_callback(null_desc null) { reset(CALLBACK_NONE); return *this; }
 	devcb_base &set_callback(ioport_desc ioport) { reset(CALLBACK_IOPORT); m_target_tag = ioport.m_tag; return *this; }
@@ -216,7 +226,7 @@ protected:
 	const char *        m_target_tag;           // tag of target object
 	u64                 m_target_int;           // integer value of target object
 	const char *        m_space_tag;            // tag of address space device
-	address_spacenum    m_space_num;            // address space number of space device
+	int    m_space_num;            // address space number of space device
 
 	// derived state
 	address_space *     m_space;                // target address space
@@ -300,6 +310,7 @@ public:
 	devcb_base &set_callback(inputline_desc inputline) { reset(CALLBACK_INPUTLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
 	devcb_base &set_callback(assertline_desc inputline) { reset(CALLBACK_ASSERTLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
 	devcb_base &set_callback(clearline_desc inputline) { reset(CALLBACK_CLEARLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
+	devcb_base &set_callback(holdline_desc inputline) { reset(CALLBACK_HOLDLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
 	devcb_write_base &chain_alloc();
 
 	// resolution
@@ -326,6 +337,7 @@ private:
 	void write_inputline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_assertline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_clearline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_holdline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 
 	// configuration
 	write_line_delegate m_writeline;            // copy of registered line writer

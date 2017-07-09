@@ -195,6 +195,13 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	set_vtlb_fixed_entries(2 * m_tlbentries + 2);
 }
 
+std::vector<std::pair<int, const address_space_config *>> mips3_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 void mips3_device::device_stop()
 {
@@ -945,7 +952,7 @@ void mips3_device::device_reset()
 }
 
 
-bool mips3_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	/* only applies to the program address space */
 	if (spacenum == AS_PROGRAM)

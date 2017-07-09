@@ -77,7 +77,7 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
 	// the first AM_NOP in each range is in fact the TLB in the C3 CAMMU
 
-	AM_RANGE(0x800, 0x8ff) AM_NOP 
+	AM_RANGE(0x800, 0x8ff) AM_NOP
 	AM_RANGE(0x904, 0x907) AM_READWRITE(d_s_pdo_r, d_s_pdo_w)
 	AM_RANGE(0x908, 0x90b) AM_READWRITE(d_u_pdo_r, d_u_pdo_w)
 	AM_RANGE(0x910, 0x913) AM_READWRITE(d_fault_r, d_fault_w)
@@ -140,26 +140,22 @@ void cammu_device::device_start()
 {
 	m_ssw_func.resolve();
 
-	m_main_space = &space(AS_0);
-	m_io_space = &space(AS_1);
-	m_boot_space = &space(AS_2);
+	m_main_space = &space(0);
+	m_io_space = &space(1);
+	m_boot_space = &space(2);
 }
 
 void cammu_device::device_reset()
 {
 }
 
-const address_space_config *cammu_device::memory_space_config (address_spacenum spacenum) const
+std::vector<std::pair<int, const address_space_config *>> cammu_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_0: return &m_main_space_config;
-	case AS_1: return &m_io_space_config;
-	case AS_2: return &m_boot_space_config;
-	default: break;
-	}
-
-	return nullptr;
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_main_space_config),
+		std::make_pair(1, &m_io_space_config),
+		std::make_pair(2, &m_boot_space_config)
+	};
 }
 
 READ32_MEMBER(cammu_device::insn_r)
@@ -281,7 +277,7 @@ READ32_MEMBER(cammu_device::data_r)
 	case 3:
 		return m_main_space->read_dword(ra, mem_mask);
 
-	case 4: 
+	case 4:
 		return m_io_space->read_dword(ra, mem_mask);
 
 	case 5:
