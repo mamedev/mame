@@ -41,7 +41,7 @@ public:
 
   void start(running_machine &machine)
   {
-  	m_machine = &machine;
+	m_machine = &machine;
 	m_clients->insert(shared_from_this());
 	// now send "hello = 1" to the newly connected client
 	std::strncpy(m_data, "hello = 1\1", max_length);
@@ -58,43 +58,43 @@ private:
 
   void handle_message(char *msg)
   {
-  	char verb[1024];
-  	int value;
-  
-  	//printf("handle_message: got [%s]\n", msg);
-  	
-  	std::uint32_t ch = 0;
-  	while (msg[ch] != ' ')
-  	{
-  		ch++;
-  	}
-  	msg[ch] = '\0';
-  	ch++;
-  	std::strncpy(verb, msg, sizeof(verb)-1);
-  	//printf("verb = [%s], ", verb);
-  	
-  	while (msg[ch] != ' ')
-  	{
-  		ch++;
-  	}
-  	
-  	ch++;
-  	value = atoi(&msg[ch]);
-  	//printf("value = %d\n", value);
-  	
-  	if (!std::strcmp(verb, "send_id"))
-  	{
-  		if (value == 0)
-  		{  		
-  			std::snprintf(m_data, max_length, "req_id = %s\1", machine().system().name);
+	char verb[1024];
+	int value;
+
+	//printf("handle_message: got [%s]\n", msg);
+
+	std::uint32_t ch = 0;
+	while (msg[ch] != ' ')
+	{
+		ch++;
+	}
+	msg[ch] = '\0';
+	ch++;
+	std::strncpy(verb, msg, sizeof(verb)-1);
+	//printf("verb = [%s], ", verb);
+
+	while (msg[ch] != ' ')
+	{
+		ch++;
+	}
+
+	ch++;
+	value = atoi(&msg[ch]);
+	//printf("value = %d\n", value);
+
+	if (!std::strcmp(verb, "send_id"))
+	{
+		if (value == 0)
+		{
+			std::snprintf(m_data, max_length, "req_id = %s\1", machine().system().name);
 		}
 		else
 		{
-		  	std::snprintf(m_data, max_length, "req_id = %s\1", machine().output().id_to_name(value));
+			std::snprintf(m_data, max_length, "req_id = %s\1", machine().output().id_to_name(value));
 		}
-		
+
 		do_write(std::strlen(m_data));
-  	}	
+	}
   }
 
   void do_read()
@@ -105,11 +105,11 @@ private:
 		{
 		  if (!ec)
 		  {
-		  	if (length > 0)
-		  	{
-		  		m_input_m_data[length] = '\0';
-		  		handle_message(m_input_m_data);
-		  	}
+			if (length > 0)
+			{
+				m_input_m_data[length] = '\0';
+				handle_message(m_input_m_data);
+			}
 			do_read();
 		  }
 		  else
@@ -148,7 +148,7 @@ public:
   output_network_server(asio::io_context& io_context, short port, running_machine &machine) :
 	m_acceptor(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
   {
-  	m_machine = &machine;
+	m_machine = &machine;
 	do_accept();
   }
 

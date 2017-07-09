@@ -13,8 +13,8 @@
 #include "tilemap.h"
 #include "screen.h"
 
-class ygv608_device : public device_t, 
-                      public device_gfx_interface,
+class ygv608_device : public device_t,
+					  public device_gfx_interface,
 					  public device_memory_interface
 {
 public:
@@ -29,7 +29,7 @@ public:
 	DECLARE_READ8_MEMBER(scroll_data_r);
 	DECLARE_READ8_MEMBER(palette_data_r);
 	DECLARE_READ8_MEMBER(register_data_r);
-//	DECLARE_READ8_MEMBER(register_select_r);
+//  DECLARE_READ8_MEMBER(register_select_r);
 	DECLARE_READ8_MEMBER(status_port_r);
 	DECLARE_READ8_MEMBER(system_control_r);
 	DECLARE_WRITE8_MEMBER(pattern_name_table_w);
@@ -55,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER(sprite_bank_r);
 	DECLARE_WRITE8_MEMBER(sprite_bank_w);
 	DECLARE_READ8_MEMBER(screen_ctrl_mosaic_sprite_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_mosaic_sprite_w);	
+	DECLARE_WRITE8_MEMBER(screen_ctrl_mosaic_sprite_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -84,13 +84,13 @@ public:
 	{
 		return downcast<ygv608_device &>(device).m_raster_handler.set_callback(std::forward<Object>(cb));
 	}
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
-	
+
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	address_space *m_iospace;
 private:
@@ -253,84 +253,84 @@ private:
 
 	uint8_t m_screen_resize;  // screen requires resize
 	uint8_t m_tilemap_resize; // tilemap requires resize
-	
+
 	/* These were statically allocated in the r/w routines */
 	int p0_state_r,m_color_state_r;
 	int p0_state_w,m_color_state_w;
-	int pattern_name_base_r,pattern_name_base_w; 	 /* pattern name table base address */
-	
+	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
+
 	// === new variable handling starts here ===
 	uint8_t m_register_address; /**< RN: Register address select */
 	bool m_register_autoinc_r;  /**< RRAI: Register address auto-increment on read */
 	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */
-	uint8_t m_screen_status; 	/**< CD: status port r/w */
-	
-	bool m_raster_irq_mask;		/**< IEP: raster irq mask (INT1 occurs if 1) */
-	bool m_vblank_irq_mask;		/**< IEV: vblank irq mask (INT0 occurs if 1) */
-	int m_raster_irq_hpos;		/**< IH: horizontal position where raster irq occurs x 32 */
-	int m_raster_irq_vpos;		/**< IV: vertical position where raster irq occurs */
-	bool m_raster_irq_mode; 	/**< FPM: if 1 vertical position becomes invalid for raster irqs (irqs occur for every line) */
-	
-	uint8_t m_scroll_address;	/**< SCA: scroll table access pointer */
-	uint8_t m_palette_address;	/**< CC: color palette access pointer */
-	uint8_t m_sprite_address;	/**< SAA: sprite attribute table access pointer */
-	uint8_t m_sprite_bank;		/**< SBA: sprite generator base address (MA20 to MA13) */
-	uint8_t m_xtile_ptr;		/**< PNX: X coordinate of pattern space */
-	uint8_t m_ytile_ptr;		/**< PNY: Y coordinate of pattern space */
-	bool m_xtile_autoinc;		/**< PNXA: Permits auto-increment in X coordinate */
-	bool m_ytile_autoinc;		/**< PNXA: Permits auto-increment in Y coordinate */
+	uint8_t m_screen_status;    /**< CD: status port r/w */
+
+	bool m_raster_irq_mask;     /**< IEP: raster irq mask (INT1 occurs if 1) */
+	bool m_vblank_irq_mask;     /**< IEV: vblank irq mask (INT0 occurs if 1) */
+	int m_raster_irq_hpos;      /**< IH: horizontal position where raster irq occurs x 32 */
+	int m_raster_irq_vpos;      /**< IV: vertical position where raster irq occurs */
+	bool m_raster_irq_mode;     /**< FPM: if 1 vertical position becomes invalid for raster irqs (irqs occur for every line) */
+
+	uint8_t m_scroll_address;   /**< SCA: scroll table access pointer */
+	uint8_t m_palette_address;  /**< CC: color palette access pointer */
+	uint8_t m_sprite_address;   /**< SAA: sprite attribute table access pointer */
+	uint8_t m_sprite_bank;      /**< SBA: sprite generator base address (MA20 to MA13) */
+	uint8_t m_xtile_ptr;        /**< PNX: X coordinate of pattern space */
+	uint8_t m_ytile_ptr;        /**< PNY: Y coordinate of pattern space */
+	bool m_xtile_autoinc;       /**< PNXA: Permits auto-increment in X coordinate */
+	bool m_ytile_autoinc;       /**< PNXA: Permits auto-increment in Y coordinate */
 	bool m_plane_select_access; /**< B/(A): A/B plane access select */
-	
-	uint8_t m_mosaic_aplane;	/**< MCA: mosaic factor applied to A plane */
-	uint8_t m_mosaic_bplane;	/**< MCA: mosaic factor applied to B plane */
-	bool m_sprite_disable;		/**< SPRD: disables the sprite plane display */
-	bool m_sprite_aux_mode;		/**< SPAS: if 0 aux bits selects size, if 1 selects flipping */
-	uint8_t m_sprite_aux_reg;	/**< SPA: auxiliary bits of sprite attribute table */
-	uint8_t m_border_color;		/**< BDC: border color */
-	
+
+	uint8_t m_mosaic_aplane;    /**< MCA: mosaic factor applied to A plane */
+	uint8_t m_mosaic_bplane;    /**< MCA: mosaic factor applied to B plane */
+	bool m_sprite_disable;      /**< SPRD: disables the sprite plane display */
+	bool m_sprite_aux_mode;     /**< SPAS: if 0 aux bits selects size, if 1 selects flipping */
+	uint8_t m_sprite_aux_reg;   /**< SPA: auxiliary bits of sprite attribute table */
+	uint8_t m_border_color;     /**< BDC: border color */
+
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;
-	screen_device				*m_screen;
-	emu_timer					*m_vblank_timer;
-	emu_timer					*m_raster_timer;
-	
-	void screen_configure();		/**< Adjust screen parameters based off CRTC ones */
-	attotime raster_sync_offset();	/**< Adjust timing based off raster & CRTC parameters */
-	void vblank_irq_check();		/**< mask + pend check for vblank irq */
-	void raster_irq_check();		/**< mask + pend check for raster irq */
-	void pattern_name_autoinc_check();	/**< check autoinc for tile pointers */
-	
+	screen_device               *m_screen;
+	emu_timer                   *m_vblank_timer;
+	emu_timer                   *m_raster_timer;
+
+	void screen_configure();        /**< Adjust screen parameters based off CRTC ones */
+	attotime raster_sync_offset();  /**< Adjust timing based off raster & CRTC parameters */
+	void vblank_irq_check();        /**< mask + pend check for vblank irq */
+	void raster_irq_check();        /**< mask + pend check for raster irq */
+	void pattern_name_autoinc_check();  /**< check autoinc for tile pointers */
+
 	enum
 	{
 		VBLANK_TIMER,
 		RASTER_TIMER
 	};
-	
+
 	struct {
-		int htotal;				/**< HTL: horizontal total number of dots x 2 */
-		int vtotal;				/**< VTL: vertical total number of lines x 1 */
-		int display_hstart;		/**< HDS: horizontal display starting position x 2*/
-		int display_vstart;		/**< VDS: vertical display starting position x 1 */
-		int display_width;		/**< HDW: horizontal display size x 16 */
-		int display_height;		/**< VDW: vertical display size x 8 */
-		int display_hsync;		/**< HSW: horizontal sync signal x 16 */
-		int display_vsync;		/**< VSW: vertical sync signal x 1 */
-		int border_width;		/**< HBW: horizontal border size x 16 */
-		int border_height;		/**< VBW: vertical border size x 8 */
+		int htotal;             /**< HTL: horizontal total number of dots x 2 */
+		int vtotal;             /**< VTL: vertical total number of lines x 1 */
+		int display_hstart;     /**< HDS: horizontal display starting position x 2*/
+		int display_vstart;     /**< VDS: vertical display starting position x 1 */
+		int display_width;      /**< HDW: horizontal display size x 16 */
+		int display_height;     /**< VDW: vertical display size x 8 */
+		int display_hsync;      /**< HSW: horizontal sync signal x 16 */
+		int display_vsync;      /**< VSW: vertical sync signal x 1 */
+		int border_width;       /**< HBW: horizontal border size x 16 */
+		int border_height;      /**< VBW: vertical border size x 8 */
 	}m_crtc;
-	
+
 	// rotation, zoom shortcuts
-	uint32_t m_ax;				/**< AX */
-	uint32_t m_dx;				/**< DX */
-	uint32_t m_dxy;				/**< DXY */
-	uint32_t m_ay;				/**< AY */
-	uint32_t m_dy;				/**< DY */
-	uint32_t m_dyx;				/**< DYX */
+	uint32_t m_ax;              /**< AX */
+	uint32_t m_dx;              /**< DX */
+	uint32_t m_dxy;             /**< DXY */
+	uint32_t m_ay;              /**< AY */
+	uint32_t m_dy;              /**< DY */
+	uint32_t m_dyx;             /**< DYX */
 
 	// raw register versions of above
-	uint32_t m_raw_ax; 
-	uint16_t m_raw_dx; 
+	uint32_t m_raw_ax;
+	uint16_t m_raw_dx;
 	uint16_t m_raw_dxy;
 	uint32_t m_raw_ay;
 	uint16_t m_raw_dy;
@@ -363,5 +363,5 @@ DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 #define MCFG_YGV608_RASTER_HANDLER( _intcallb ) \
 	devcb = &ygv608_device::static_set_raster_callback( *device, DEVCB_##_intcallb );
 
-	
+
 #endif

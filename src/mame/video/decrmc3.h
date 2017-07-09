@@ -9,8 +9,8 @@
 ****************************************************************************
 
     Data East RM-C3 is a custom resistor pack used to convert a digital
-	palette to an analog output.  The conversion is non-linear with high bits
-	weighted a little more than low bits compared to linear.
+    palette to an analog output.  The conversion is non-linear with high bits
+    weighted a little more than low bits compared to linear.
 
 ******************************************************************************/
 
@@ -28,7 +28,7 @@
 #define MCFG_DECO_RMC3_ADD(_tag, _entries) \
 	MCFG_DEVICE_ADD(_tag, DECO_RMC3, 0) \
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(_entries)
-	
+
 #define MCFG_DECO_RMC3_MODIFY MCFG_DEVICE_MODIFY
 
 #define MCFG_DECO_RMC3_SET_PALETTE_SIZE(_entries) \
@@ -43,8 +43,8 @@
 	deco_rmc3_device::static_set_prom_region(*device, "^" _region); \
 	deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(FUNC(deco_rmc3_device::palette_init_proms), downcast<deco_rmc3_device *>(device)));
 
-//#define MCFG_DECO_RMC3_INIT_OWNER(_class, _method) 
-//	deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, downcast<_class *>(owner)));
+//#define MCFG_DECO_RMC3_INIT_OWNER(_class, _method)
+//  deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, downcast<_class *>(owner)));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -110,16 +110,16 @@ protected:
 private:
 	void update_for_write(offs_t byte_offset, int bytes_modified, bool indirect = false);
 	rgb_t deco_rgb_decoder(u32 raw);
-	
+
 	// configuration state
 	u32                 m_entries;              // number of entries in the palette
 	u32                 m_indirect_entries;     // number of indirect colors in the palette
-//	bool                m_enable_shadows;       // are shadows enabled?
-//	bool                m_enable_hilights;      // are hilights enabled?
-//	int                 m_membits;              // width of palette RAM, if different from native
-//	bool                m_membits_supplied;     // true if membits forced in static config
-//	endianness_t        m_endianness;           // endianness of palette RAM, if different from native
-//	bool                m_endianness_supplied;  // true if endianness forced in static config
+//  bool                m_enable_shadows;       // are shadows enabled?
+//  bool                m_enable_hilights;      // are hilights enabled?
+//  int                 m_membits;              // width of palette RAM, if different from native
+//  bool                m_membits_supplied;     // true if membits forced in static config
+//  endianness_t        m_endianness;           // endianness of palette RAM, if different from native
+//  bool                m_endianness_supplied;  // true if endianness forced in static config
 	optional_memory_region m_prom_region;       // region where the color PROMs are
 	deco_rmc3_palette_init_delegate m_init;
 

@@ -136,7 +136,8 @@
   * Super 98 (3-hands, ICP-1),                        199?, Unknown.
   * unknown animal-themed game (bottom),              199?, Unknown.
   * unknown animal-themed game (top),                 199?, Unknown.
-
+  * Mega Double Poker (conversion kit, set 1),        1990, Blitz System Inc.
+  * Mega Double Poker (conversion kit, set 2),        1990, Blitz System Inc.
 
 ************************************************************************************
 
@@ -617,6 +618,200 @@
 
 ************************************************************************************
 
+  Mega Double Poker is distributed as standalone PCB, or as upgrade kit for
+  modified Golden Poker boards.
+
+  Hardware Notes (Mega Double Poker, kit):
+
+  - CPU:            1x R6502AP.
+  - MCU:            1x MC68705P5S.
+  - Video:          1x MC6845.
+  - RAM:            4x uPD2114LC or similar
+  - I/O             2x 6821 PIAs.
+  - prg ROMs:       2x 2732 (32KB) or similar.
+  - gfx ROMs:       3x 2732 (32KB) or similar.
+  - sound:          (discrete).
+  - battery backup: 2x S8423
+
+
+  PCB Layout: Main board.
+   _______________________________________________________________________________
+  |   _________                                                                   |
+  |  |         |               -- DIP SW x8 --                                    |
+  |  | Battery |   _________   _______________   _________  _________   ________  |
+  |  |   055   |  | 74LS32  | |1|2|3|4|5|6|7|8| | HCF4011 || HCF4096 | | LM339N | |
+  |  |_________|  |_________| |_|_|_|_|_|_|_|_| |_________||_________| |________| |
+  |       _________     _________   _________   _________                         |
+  |      | 74LS138 |   | S-8423  | | 74LS08N | | 74LS(XX)|                        |
+  |      |_________|   |_________| |_________| |_________|                        |
+  |  _______________    _________   ____________________                      ____|
+  | |               |  | S-8423  | |                    |                    |
+  | |     2732      |  |_________| |       6502P        |                    |
+  | |_______________|   _________  |____________________|                    |
+  |  _______________   |  7432   |  ____________________                     |____
+  | |               |  |_________| |                    |                     ____|
+  | |     2732      |   _________  |       6821P        |                     ____|
+  | |_______________|  | 74LS157 | |____________________|                     ____|
+  |  _______________   |_________|  ____________________                      ____|
+  | |               |   _________  |                    |                     ____|
+  | |     2732      |  | 74LS157 | |       6821P        |                     ____|
+  | |_______________|  |_________| |____________________|                     ____|
+  |  _______________    _________   ____________________                      ____|
+  | |               |  | 74LS157 | |                    |                     ____|
+  | |     2732      |  |_________| |       6845SP       |                     ____|
+  | |_______________|   _________  |____________________|                     ____|
+  |                    | 2114-LC |                                            ____| 28x2
+  |                    |_________|                                            ____| connector
+  |       _________     _________                                             ____|
+  |      | 74LS245 |   | 2114-LC |                                            ____|
+  |      |_________|   |_________|                                            ____|
+  |       _________     _________               _________                     ____|
+  |      | 74LS245 |   | 2114-LC |             | 74LS174 |                    ____|
+  |      |_________|   |_________|             |_________|                    ____|
+  |  ________________   _________   _________   _________                     ____|
+  | |                | | 2114-LC | | 74LS08H | | TI (XX) | <-- socketed.      ____|
+  | |      2716      | |_________| |_________| |_________|       PROM         ____|
+  | |________________|              _________   _________                     ____|
+  |  ________________              | 74LS04P | | 74LS174 |                    ____|
+  | |                |             |_________| |_________|                    ____|
+  | |      2716      |              _________   _________                     ____|
+  | |________________|             | 74166P  | | 74LS86C |                    ____|
+  |  ________________              |_________| |_________|                    ____|
+  | |                |              _________    _______                     |
+  | |      2716      |             | 74166P  |  | 555TC |                    |
+  | |________________|             |_________|  |_______|                    |
+  |  ________________                                                        |____
+  | |                |                                                        ____|
+  | |      2716      |              _________   _________      ________       ____| 5x2
+  | |________________|             | 74166P  | |  7407N  |    | LM380N |      ____| connector
+  |                                |_________| |_________|    |________|      ____|
+  |  ________  ______               _________   _________      ___            ____|
+  | | 74LS04 || osc. |             | 74LS193 | |  7407N  |    /   \          |
+  | |________||10 MHz|             |_________| |_________|   | POT |         |
+  |           |______|                                        \___/          |
+  |__________________________________________________________________________|
+
+
+  PCB Layout: Daughterboard.
+   ________________________________________________________
+  |                                ::::::::::::::::::::    |
+  |   __________                     40-pin connector      |
+  |  | GD74LS04 | U8                                       |
+  |  |__________|                                          |
+  |   ____________                ______________________   |
+  |  |KS74HCTLS08N| U9           |                      |  |
+  |  |____________|              |     R6502AP (U6)     |  |
+  |   ____________               |______________________|  |
+  |  |KS74HCTLS32N| U10                                    |
+  |  |____________|                                        |
+  |   _____________                                        |
+  |  |KS74HCTLS74AN| U11                            _______|
+  |  |_____________|         _______________       |
+  |   _____________         |  Unknown RAM  |      |
+  |  |KS74HCTLS139N| U12    |     (U5)      |      |
+  |  |_____________|        |_______________|      |
+  |                          _________________     |
+  |                         |   27C256 (U2)   |    |
+  |                         |     MEGA-2      |    |
+  |                         |_________________|    |
+  |                          _________________     |
+  |                         |   27C256 (U3)   |    |
+  |     _____________       |     MEGA-3      |    |
+  |    |KS74HCTLS374N|      |_________________|    |
+  |    |_____________|       _________________     |
+  |      U13                |Empty Socket (U4)|    |
+  |                         |  'SPARE EPROM'  |    |
+  |   _______               |_________________|    |
+  |  |       |                                     |
+  |  |MC68705|   ____________                      |
+  |  |  P5S  |  |KS74HCTLS86N| U14                 |
+  |  |       |  |____________|                     |
+  |  |MEGA-1 |   ____________     _____________    |
+  |  |       |  |KS74HCTLS86N|   |KS74HCTLS245N|   |
+  |  | (U1)  |  |____________|   |_____________|   |
+  |  |_______|    U15              U16  __         |
+  |                                    /--\ BLITZ  |
+  | Model B0-BL-01B                    \__/ SYSTEM |
+  |________________________________________________|
+
+
+  Connections... (pins in parenthesis)
+  ------------------------------------
+
+  The following diagrams are still incomplete and could have errors.
+  At simple sight, mega-2.u2 & mega-3.u3 ROMs are sharing the same
+  addressing space, but /CE line for both devices are connected to
+  the same places... Need to be traced from the scratch.
+
+  Also CPU lines A14 & A15 should be traced to know the addressing
+  system accuratelly.
+
+
+                                                     CPU  R6502AP (U6)
+                                                   .--------\ /--------.
+  MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20) --|01 VSS   '  /RES 40|--
+                                        MCU (02) --|02 RDY    PH2(O) 39|--
+                                        MCU (04) --|03 PH1(O)    /SO 38|--
+                                                 --|04 /IRQ   PH0(I) 37|--
+                                                 --|05 (NC)     (NC) 36|--
+  MCU (03-06), MEGA-2 (01-27-28), MEGA-3 (01-28) --|06 /NMI     (NC) 35|--
+                                                 --|07 SYNC      R/W 34|--
+  MCU (03-06), MEGA-2 (01-27-28), MEGA-3 (01-28) --|08 VCC        D0 33|-- MEGA-2 (11)
+                        MEGA-2 (10), MEGA-3 (10) --|09 A0         D1 32|-- MEGA-2 (12)
+                        MEGA-2 (09), MEGA-3 (09) --|10 A1         D2 31|--
+                        MEGA-2 (08), MEGA-3 (08) --|11 A2         D3 30|-- MEGA-2 (15)
+                        MEGA-2 (07), MEGA-3 (07) --|12 A3         D4 29|-- MEGA-2 (16)
+                        MEGA-2 (06), MEGA-3 (06) --|13 A4         D5 28|-- MEGA-2 (17)
+                        MEGA-2 (05), MEGA-3 (05) --|14 A5         D6 27|-- MEGA-2 (18)
+                        MEGA-2 (04), MEGA-3 (04) --|15 A6         D7 26|-- MEGA-2 (19)
+                        MEGA-2 (03), MEGA-3 (03) --|16 A7        A15 25|--
+                        MEGA-2 (25), MEGA-3 (25) --|17 A8        A14 24|--
+                        MEGA-2 (24), MEGA-3 (24) --|18 A9        A13 23|-- MEGA-2 (26), MEGA-3 (26)
+                        MEGA-2 (21), MEGA-3 (21) --|19 A10       A12 22|-- MEGA-2 (02), MEGA-3 (02)
+                        MEGA-2 (23), MEGA-3 (23) --|20 A11       VSS 21|-- MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20)
+                                                   '-------------------'
+
+
+                                      MCU MC68705P5S (U1)
+                                     .--------\ /--------.
+  MEGA-2 (12, 20), MEGA-3 (12, 20) --|01 VSS   '  /RES 28|--
+                          CPU (02) --|02 /INT      PA7 27|--
+  MEGA-2 (01, 28), MEGA-3 (01, 28) --|03 VCC       PA6 26|--
+                          CPU (03) --|04 EXTAL     PA5 25|--
+  MEGA-2 (14, 20), MEGA-3 (14, 20) --|05 XTAL      PA4 24|--
+  MEGA-2 (27, 28), MEGA-3 (27, 28) --|06 VPP       PA3 23|--
+  MEGA-2 (14, 20), MEGA-3 (14, 20) --|07 TIMER     PA2 22|--
+                                   --|08 PC0       PA1 21|--
+                                   --|09 PC1       PA0 20|--
+                                   --|10 PC2       PB7 19|--
+                                   --|11 PC3       PB6 18|--
+                                   --|12 PB0       PB5 17|--
+                                   --|13 PB1       PB4 16|--
+                                   --|14 PB2       PB3 15|--
+                                     '-------------------'
+
+
+                         MEGA-2 27C256 (U2)                               MEGA-3 27C256 (U3)
+                        .-------\ /-------.                              .-------\ /-------.
+                      --|01 VPP  '  VCC 28|--                          --|01 VPP  '  VCC 28|--
+                      --|02 A12     A14 27|--                          --|02 A12     A14 27|--
+                      --|03 A7      A13 26|--                          --|03 A7      A13 26|--
+                      --|04 A6       A8 25|--                          --|04 A6       A8 25|--
+                      --|05 A5       A9 24|--                          --|05 A5       A9 24|--
+                      --|06 A4      A11 23|--                          --|06 A4      A11 23|--
+                      --|07 A3      /OE 22|--                          --|07 A3      /OE 22|--
+                      --|08 A2      A10 21|--  .-- MCU (01-05-07)      --|08 A2      A10 21|--  .-- MCU (01-05-07)
+                      --|09 A1      /CE 20|----+-- MEGA-3 (14-20)      --|09 A1      /CE 20|----+-- MEGA-2 (14-20)
+                      --|10 A0       D7 19|--  '-- CPU (01-21)         --|10 A0       D7 19|--  '-- CPU (01-21)
+                      --|11 D0       D6 18|--                          --|11 D0       D6 18|--
+                      --|12 D1       D5 17|--                          --|12 D1       D5 17|--
+  MCU (01-05-07) --.  --|13 D2       D4 16|--      MCU (01-05-07) --.  --|13 D2       D4 16|--
+  MEGA-3 (14-20) --+----|14 GND      D3 15|--      MEGA-2 (14-20) --+----|14 GND      D3 15|--
+     CPU (01-21) --'    '-----------------'           CPU (01-21) --'    '-----------------'
+
+
+************************************************************************************
+
 
   -----------------------------------------------
   ***  Memory Map (pmpoker/goldnpkr hardware) ***
@@ -1075,9 +1270,12 @@
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
+#include "machine/bankdev.h"
 #include "machine/nvram.h"
+#include "machine/timekpr.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
@@ -1106,11 +1304,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_mux_data;
-	uint8_t m_pia0_PA_data;
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
 	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
@@ -1158,10 +1351,45 @@ public:
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	tilemap_t *m_bg_tilemap;
+	uint8_t m_mux_data;
+	uint8_t m_pia0_PA_data;
+};
+
+class blitz_state : public goldnpkr_state
+{
+public:
+	blitz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: goldnpkr_state(mconfig, type, tag),
+		m_cpubank(*this, "cpubank"),
+		m_mcu(*this, "mcu"),
+		m_bankdev(*this, "bankdev"),
+		m_cpubank_xor(0),
+		m_portc_data(0x0f)
+	{ }
+
+	required_region_ptr<uint8_t> m_cpubank;
+
+	required_device<m68705p_device> m_mcu;
+	required_device<address_map_bank_device> m_bankdev;
+
+	uint8_t m_cpubank_xor;
+	uint8_t m_portc_data;
+
+	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
+	DECLARE_WRITE8_MEMBER(mcu_command_w);
+	DECLARE_WRITE8_MEMBER(mcu_portb_w);
+	DECLARE_WRITE8_MEMBER(mcu_portc_w);
 };
 
 
@@ -4296,6 +4524,179 @@ static MACHINE_CONFIG_DERIVED( bchancep, goldnpkr_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
+
+/*********************************************
+*                Blitz System                *
+*********************************************/
+
+READ8_MEMBER(blitz_state::cpubank_decrypt_r)
+{
+	return m_cpubank[offset] ^ m_cpubank_xor;
+}
+
+WRITE8_MEMBER(blitz_state::mcu_command_w)
+{
+	m_mcu->pa_w(space, 0, data);
+	if (BIT(m_portc_data, 0))
+	{
+		m_mcu->set_input_line(M6805_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+	}
+}
+
+WRITE8_MEMBER(blitz_state::mcu_portb_w)
+{
+	m_cpubank_xor = data;
+}
+
+WRITE8_MEMBER(blitz_state::mcu_portc_w)
+{
+	if (!BIT(data, 0))
+	{
+		m_mcu->set_input_line(M6805_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+
+	m_bankdev->set_bank((BIT(data, 2) << 1) | BIT(data, 3));
+
+	m_portc_data = data;
+}
+
+
+static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+
+/*  There is another set of PIAs controlled by the code.
+    Maybe they are just mirrors...
+
+    AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+    AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+*/
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
+
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bankdev", address_map_bank_device, read8, write8)
+	AM_RANGE(0x8000, 0xbfff) AM_READNOP AM_WRITE(mcu_command_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( megadpkr_banked_map, AS_PROGRAM, 8, blitz_state )
+	AM_RANGE(0x00000, 0x07fff) AM_READ(cpubank_decrypt_r)
+	AM_RANGE(0x08000, 0x087ff) AM_DEVREADWRITE("timekpr", m48t02_device, read, write)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( megadpkr )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not used?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Coins Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Menu")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not used?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Note")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Credit")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coupon")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( megadpkr )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(megadpkr_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_hold)
+
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(megadpkr_banked_map)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_CPU_ADD("mcu", M68705P5, CPU_CLOCK) /* unknown */
+	MCFG_M68705_PORTB_W_CB(WRITE8(blitz_state, mcu_portb_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(blitz_state, mcu_portc_w))
+
+	MCFG_M48T02_ADD("timekpr")
+
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, lamps_a_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, mux_w))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE((32)*8, (32)*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 /*********************************************
@@ -10459,6 +10860,87 @@ ROM_START( animpkra )
 ROM_END
 
 
+/******************************************
+
+  MEGA DOUBLE POKER
+  BLITZ SYSTEM INC.
+
+  Conversion kit for Golden Poker boards.
+
+******************************************/
+
+ROM_START( megadpkr )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program ROM */
+	ROM_LOAD( "mega-2.u2",  0x8000, 0x8000, CRC(2b133b92) SHA1(97bc21c42897cfd13c0247e239aebb18f73cde91) )
+
+	ROM_REGION( 0x8000, "cpubank", 0 ) /* banked through MCU */
+	ROM_LOAD( "mega-3.u3",  0x0000, 0x8000, CRC(ff0a46c6) SHA1(df053c323c0e2dd0e41e22286d38e889bfda3aa5) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 68705P5 microcontroller */
+	ROM_LOAD( "mega-1.u11",  0x0000, 0x0800, CRC(621a7971) SHA1(49121f7b0d428a825ccd219622dcc4abe3572968) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0x000000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "car1.5a",    0x2000, 0x1000, CRC(29e244d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    /* text chars / cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "car3.2a",    0x0000, 0x1000, CRC(819c06c4) SHA1(45b874554fb487173acf12daa4ff99e49e335362) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "car2.4a",    0x1000, 0x1000, CRC(41eec680) SHA1(3723f66e1def3908f2e6ba2989def229d9846b02) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",   0x2800, 0x2000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the chars rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "m3-7611-5.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Manufacturer : Blitz system
+  Game name :    Mega Double Poker
+  Platform  :    Bonanza golden poker interface
+
+  BoardID
+  BO-BL-01
+
+  Protection:    U11  MC68705P5S  microcontroller with window
+
+  Main CPU:
+  U6  UM6502
+  U5  MK48T02B-15   time/clock backup RAM
+
+  U2.bin  27C256 ROM
+  U3.bin  27C256 ROM
+
+  Graphics IC
+  car1_5a.bin  27C32 ROM
+  car2_4a.bin  27C32 ROM
+  car3_2a.bin  27C32 ROM
+
+  note : MC68705P5S is protected
+*/
+
+ROM_START( megadpkrb )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program ROM */
+	ROM_LOAD( "u2.bin", 0x8000, 0x8000, CRC(0efdf472) SHA1(4b1ae10427c2ae8d7cbbe525a6b30973372d4420) )
+
+	ROM_REGION( 0x8000, "cpubank", 0 ) /* banked through MCU */
+	ROM_LOAD( "u3.bin", 0x0000, 0x8000, CRC(c973e345) SHA1(aae9da8cbaf0cf07086e5acacf9052e49fbdd896) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 68705P5 microcontroller - might not be for this set */
+	ROM_LOAD( "mega-1.u11",  0x0000, 0x0800, CRC(621a7971) SHA1(49121f7b0d428a825ccd219622dcc4abe3572968) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0x0000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "car1_5a.bin",    0x2000, 0x1000, CRC(29e244d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    /* text chars / cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "car3_2a.bin",    0x0000, 0x1000, CRC(819c06c4) SHA1(45b874554fb487173acf12daa4ff99e49e335362) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "car2_4a.bin",    0x1000, 0x1000, CRC(41eec680) SHA1(3723f66e1def3908f2e6ba2989def229d9846b02) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",   0x2800, 0x2000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the chars rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "m3-7611-5.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
 
 /*********************************************
 *                Driver Init                 *
@@ -11018,3 +11500,6 @@ GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, 0,        
 
 GAME(  198?, animpkr,   0,        pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "unknown animal-themed game (bottom)",     MACHINE_NOT_WORKING )  // banked selectable program (bottom).
 GAME(  198?, animpkra,  animpkr,  pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "unknown animal-themed game (top)",        MACHINE_NOT_WORKING )  // banked selectable program (top).
+
+GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    0,        ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
+GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    0,        ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time

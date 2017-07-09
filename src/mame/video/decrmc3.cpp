@@ -211,8 +211,8 @@ void deco_rmc3_device::device_start()
 
 
 
-// This conversion mimics the specific weighting used by the Data East 
-// custom resistor pack marked DECO RM-C3 to convert the digital 
+// This conversion mimics the specific weighting used by the Data East
+// custom resistor pack marked DECO RM-C3 to convert the digital
 // palette for analog output.  It is used on games such as The Real
 // Ghostbusters, Gondomania, Cobra Command, Psychonics Oscar.
 //
@@ -244,7 +244,7 @@ rgb_t deco_rmc3_device::deco_rgb_decoder(u32 raw)
 	u8 r = raw&0xf;
 	u8 g = (raw>>4)&0xf;
 	u8 b = (raw>>8)&0xf;
-	
+
 	r = 0x0e * BIT(r,0) + 0x1f * BIT(r,1) + 0x43 * BIT(r,2) + 0x8f * BIT(r,3);
 	g = 0x0e * BIT(g,0) + 0x1f * BIT(g,1) + 0x43 * BIT(g,2) + 0x8f * BIT(g,3);
 	b = 0x0e * BIT(b,0) + 0x1f * BIT(b,1) + 0x43 * BIT(b,2) + 0x8f * BIT(b,3);

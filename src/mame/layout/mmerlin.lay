@@ -52,18 +52,6 @@
 		</text>
 	</element>
 
-	<element name="panel_0">
-		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
-		<disk>
-			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
-			<color red="0.68" green="0.675" blue="0.66" />
-		</disk>
-		<text string="0">
-			<bounds x="0.1" y="0.13" width="0.83" height="0.16"/>
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-	</element>
-
 	<element name="panel_1">
 		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
 		<disk>

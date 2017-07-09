@@ -343,7 +343,7 @@ public:
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
 
-	
+
 private:
 	// internal data
 	int                 m_bytes_per_entry;

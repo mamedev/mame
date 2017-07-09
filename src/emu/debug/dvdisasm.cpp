@@ -462,7 +462,7 @@ void debug_view_disasm::print(int row, std::string text, int start, int end, u8 
 			*dest++ = { ' ', attrib };
 		else
 			*dest++ = { u8(text[spos]), attrib };
-	}  
+	}
 }
 
 //-------------------------------------------------

@@ -2021,7 +2021,7 @@ static MACHINE_CONFIG_START( lastmisn )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
@@ -2075,7 +2075,7 @@ static MACHINE_CONFIG_START( shackled )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
 
 	/* sound hardware */
@@ -2129,7 +2129,7 @@ static MACHINE_CONFIG_START( gondo )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
 
 	/* sound hardware */
@@ -2183,7 +2183,7 @@ static MACHINE_CONFIG_START( garyoret )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
 
 	/* sound hardware */
@@ -2298,7 +2298,7 @@ static MACHINE_CONFIG_START( csilver )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
@@ -2361,7 +2361,7 @@ static MACHINE_CONFIG_START( oscar )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oscar)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
 
 	/* sound hardware */
@@ -2407,7 +2407,7 @@ static MACHINE_CONFIG_START( srdarwin )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srdarwin)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(144)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
 
 	/* sound hardware */
@@ -2465,7 +2465,7 @@ static MACHINE_CONFIG_START( cobracom )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cobracom)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(256)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
 
 	/* sound hardware */
@@ -3756,7 +3756,7 @@ GAME( 1987, oscarj2,   oscar,    oscar,    oscarj,    dec8_state, oscar,       R
 GAME( 1987, srdarwin,  0,        srdarwin, srdarwin,  dec8_state, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, srdarwinj, srdarwin, srdarwin, srdarwinj, dec8_state, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
 
-// Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release 
+// Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
 GAME( 1988, cobracom,  0,        cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cobracoma, cobracom, cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )

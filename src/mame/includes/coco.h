@@ -153,6 +153,7 @@ protected:
 
 	// accessors
 	cpu_device &maincpu() { return *m_maincpu; }
+	address_space &cpu_address_space() { return maincpu().space(); }
 	pia6821_device &pia_0() { return *m_pia_0; }
 	pia6821_device &pia_1() { return *m_pia_1; }
 	cococart_slot_device &cococart() { return *m_cococart; }

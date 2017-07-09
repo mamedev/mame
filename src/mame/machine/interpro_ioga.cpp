@@ -43,9 +43,9 @@
 #endif
 
 DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
-    AM_RANGE(0x00, 0x03) AM_READWRITE(eth_remap_r, eth_remap_w)
-    AM_RANGE(0x04, 0x07) AM_READWRITE(eth_map_page_r, eth_map_page_w)
-    AM_RANGE(0x08, 0x0b) AM_READWRITE(eth_control_r, eth_control_w)
+	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_remap_r, eth_remap_w)
+	AM_RANGE(0x04, 0x07) AM_READWRITE(eth_map_page_r, eth_map_page_w)
+	AM_RANGE(0x08, 0x0b) AM_READWRITE(eth_control_r, eth_control_w)
 
 	AM_RANGE(0x0c, 0x1b) AM_READWRITE(dma_plotter_r, dma_plotter_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(dma_plotter_eosl_r, dma_plotter_eosl_w)

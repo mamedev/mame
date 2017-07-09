@@ -9,16 +9,16 @@
             James Jenkins
             Walter Fath
 
-	abcheck TODOs:
-	- YGV608 brokenness
-	- Where is the extra data ROM mapped?
-	
-	To make abcheck run when the EEPROM is clear:
-	- F2 to enter service mode
-	- Player 3 A/B to navigate to GAME OPTIONS
-	- Player 1 A to enter, Player 1 B to cancel or go back
-	- Go to LOCAL SELECT and choose the Japanese city of your choice (I don't know what it affects yet)
-	- Exit test mode (F2) and reset (F3) and the game will boot
+    abcheck TODOs:
+    - YGV608 brokenness
+    - Where is the extra data ROM mapped?
+
+    To make abcheck run when the EEPROM is clear:
+    - F2 to enter service mode
+    - Player 3 A/B to navigate to GAME OPTIONS
+    - Player 1 A to enter, Player 1 B to cancel or go back
+    - Go to LOCAL SELECT and choose the Japanese city of your choice (I don't know what it affects yet)
+    - Exit test mode (F2) and reset (F3) and the game will boot
 
 -----------------------------------
 Guru-Readme for Namco ND-1 hardware
@@ -80,10 +80,10 @@ Notes:
       LM1203        - National LM1203 RGB VIDEO AMP (DIP28). Note on some PCB revisions there is a capacitor glued on top of this chip.
       AT28C16       - Atmel 2k x8-bit EEPROM (DIP24)
       YGV608-F      - Yamaha YVG608-F video controller (QFP100)
-      LT1109        - Linear Technology LT1109A DC/DC converter (SOIC8). Note on some PCB revisions this is not present. If the IC is required there 
+      LT1109        - Linear Technology LT1109A DC/DC converter (SOIC8). Note on some PCB revisions this is not present. If the IC is required there
                       is an additional 'SREG PCB' with the LT1109 and other support components present at this location.
       C416          - Namco custom (QFP176), Memory/DMA Controller
-      MACH210       - AMD MACH211 CPLD, used as Namco "KEYCUS" protection chip (PLCC44) 
+      MACH210       - AMD MACH211 CPLD, used as Namco "KEYCUS" protection chip (PLCC44)
                        - for Namco Classics 1 stamped 'KC001' at 3C
                        - for Namco Classics 2 stamped 'KC002' at 3C
                        - for Abnormal Check stamped 'KC008' at 3D
@@ -97,7 +97,7 @@ Notes:
 
 
       ROMs: (note IC locations are different between GAME+GAME(B) and GAME(C) PCBs.
-      
+
       Namco Classics Volume 1
       -------------------------
       NC2 MAIN0B.14D - 512k x16-bit EPROM type 27C240/27C4002 (for Japan: NC1) (revisions: MAIN0 or MAIN0B)
@@ -151,7 +151,7 @@ The PCB contains the following parts....
 Partial Pinout of J12
 ----------------------
    GND 10b  10a GND
-  ERROR 9b  9a  
+  ERROR 9b  9a
   EMPTY 8b  8a  BUSY
         7b  7a
         6b  6a
@@ -216,12 +216,12 @@ static ADDRESS_MAP_START( abcheck_map, AS_PROGRAM, 16, namcond1_state )
 ADDRESS_MAP_END
 
 READ16_MEMBER(namcond1_state::printer_r)
-{ 
+{
 	// bits tested:
 	// bit 2 = 0 for paper cut switch on, 1 for off
 	// bit 4 = 0 for paper OK, 1 for empty
 	// bit 5 = 1 for normal status, 0 for error
-	return 0x0020; 
+	return 0x0020;
 }
 
 /*************************************************************/
@@ -261,7 +261,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( abcheck )
 	PORT_INCLUDE( namcond1 )
-	
+
 	PORT_MODIFY("P1_P2")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A")
@@ -273,7 +273,7 @@ static INPUT_PORTS_START( abcheck )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("DSW")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -305,15 +305,15 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xc00010, 0xc00011) AM_NOP
 	AM_RANGE(0xc00030, 0xc00031) AM_NOP
 	AM_RANGE(0xc00040, 0xc00041) AM_NOP
-	AM_RANGE(0xffff1a, 0xffff1b) AM_NOP 	// abcheck
-	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP		// ^
+	AM_RANGE(0xffff1a, 0xffff1b) AM_NOP     // abcheck
+	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP     // ^
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 16, namcond1_state )
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
 	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
-	AM_RANGE(0x14, 0x17) AM_READNOP 		// abcheck
+	AM_RANGE(0x14, 0x17) AM_READNOP         // abcheck
 ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( namcond1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_49_152MHz/4)
 	MCFG_CPU_PROGRAM_MAP(namcond1_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("mcu", H83002, XTAL_49_152MHz/3 )
 	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( namcond1 )
 	MCFG_YGV608_PALETTE("palette")
 	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(namcond1_state, vblank_irq_w))
 	MCFG_YGV608_RASTER_HANDLER(WRITELINE(namcond1_state, raster_irq_w))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/*
@@ -390,8 +390,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( abcheck, namcond1 )
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_49_152MHz/4)
 	MCFG_CPU_PROGRAM_MAP(abcheck_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
-	
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+
 	MCFG_NVRAM_ADD_0FILL("zpr1")
 	MCFG_NVRAM_ADD_0FILL("zpr2")
 MACHINE_CONFIG_END
@@ -475,34 +475,34 @@ ROM_END
 
 ROM_START( abcheck )
 	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
-	ROM_LOAD( "an1main0b.14e", 0x000000, 0x080000, CRC(f1b9777d) SHA1(b28f4106e1e145dc1aaa5af455b6f991d2b04c59) ) 
-	ROM_LOAD( "an1main1b.13e", 0x080000, 0x080000, CRC(d40ccdcc) SHA1(05f864d84bf34a1722c598378ed8d27fba00f575) ) 
+	ROM_LOAD( "an1main0b.14e", 0x000000, 0x080000, CRC(f1b9777d) SHA1(b28f4106e1e145dc1aaa5af455b6f991d2b04c59) )
+	ROM_LOAD( "an1main1b.13e", 0x080000, 0x080000, CRC(d40ccdcc) SHA1(05f864d84bf34a1722c598378ed8d27fba00f575) )
 
 	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
-	ROM_LOAD( "an1sub.1d",    0x000000, 0x080000, CRC(50de9130) SHA1(470b3977f4bf12ca65bc42631ccdf81753ef56fd) ) 
+	ROM_LOAD( "an1sub.1d",    0x000000, 0x080000, CRC(50de9130) SHA1(470b3977f4bf12ca65bc42631ccdf81753ef56fd) )
 
 	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
-	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) ) 
-	ROM_LOAD( "an1cg1.10f",   0x200000, 0x200000, CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) ) 
+	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) )
+	ROM_LOAD( "an1cg1.10f",   0x200000, 0x200000, CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) ) 
+	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) )
 
-	ROM_REGION( 0x80000, "data", 0 )	// game data?
-	ROM_LOAD( "an1dat0.ic1",  0x000000, 0x080000, CRC(44dc7da1) SHA1(dd57670a2b07c4988ca30bba134931c1701a926f) ) 
-	
+	ROM_REGION( 0x80000, "data", 0 )    // game data?
+	ROM_LOAD( "an1dat0.ic1",  0x000000, 0x080000, CRC(44dc7da1) SHA1(dd57670a2b07c4988ca30bba134931c1701a926f) )
+
 	ROM_REGION( 0x8000, "zpr1", 0 )
-	ROM_LOAD( "m48z30y.ic2",  0x000000, 0x008000, CRC(a816d989) SHA1(c78fe06b049c31cf8de2a79025823dbc0c95d526) ) 
-	
+	ROM_LOAD( "m48z30y.ic2",  0x000000, 0x008000, CRC(a816d989) SHA1(c78fe06b049c31cf8de2a79025823dbc0c95d526) )
+
 	ROM_REGION( 0x8000, "zpr2", 0 )
-	ROM_LOAD( "m48z30y.ic3",  0x000000, 0x008000, CRC(bfa687bb) SHA1(463ae40f21b675f3b4155efda9c965b71519a49e) ) 
+	ROM_LOAD( "m48z30y.ic3",  0x000000, 0x008000, CRC(bfa687bb) SHA1(463ae40f21b675f3b4155efda9c965b71519a49e) )
 
 	ROM_REGION( 0x800, "at28c16", 0 )
 	ROM_LOAD( "at28c16.12e",  0x000000, 0x000800, CRC(df92af14) SHA1(1ae8c318f1eb2628e97914d15a06779c7bb87506) )
 
 	ROM_REGION( 0x220000, "printer", 0 )
-	ROM_LOAD( "np-b205_nmc_ver1.00.u9", 0x000000, 0x020000, CRC(445ceb0d) SHA1(49491b936f50577564196992df3a3c93aa3fcc99) ) 
-	ROM_LOAD( "npg1624lc.u4", 0x020000, 0x200000, CRC(7e00254f) SHA1(b0fa8f979e8322d71f842de5358ae2a2e36386f7) ) 
+	ROM_LOAD( "np-b205_nmc_ver1.00.u9", 0x000000, 0x020000, CRC(445ceb0d) SHA1(49491b936f50577564196992df3a3c93aa3fcc99) )
+	ROM_LOAD( "npg1624lc.u4", 0x020000, 0x200000, CRC(7e00254f) SHA1(b0fa8f979e8322d71f842de5358ae2a2e36386f7) )
 ROM_END
 
 GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

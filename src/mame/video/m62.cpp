@@ -143,10 +143,10 @@ void m62_state::m62_amplify_contrast(bool include_fg)
 
 	pals[0] = m_chr_palette;
 	pals[1] = m_spr_palette;
-	
+
 	if (m_fg_palette && include_fg)
 		pals[2] = m_fg_palette;
-	else	
+	else
 		pals[2] = 0;
 
 	// m62 palette is very dark, so amplify default contrast

@@ -1908,6 +1908,9 @@ ROM_START( mmaze )
 	ROM_LOAD( "mm_obj-1.bin",       0x20000, 0x20000, CRC(1ce49e04) SHA1(fc30a03e443bece11bd86771ebd1fcb40d15b0b9) )
 	ROM_LOAD( "mm_obj-2.bin",       0x40000, 0x20000, CRC(3d3d5de3) SHA1(aa8032f1d99af1d92b0afaa11933548e0d39f03b) )
 	ROM_LOAD( "mm_obj-3.bin",       0x60000, 0x20000, CRC(dac57358) SHA1(5175b66d3622cb56ed7be3568b247195d1485579) )
+	
+	ROM_REGION( 0x0800, "nvram", 0 ) // default NVRAM, avoids TEST PROGRAM INITIALIZE ERROR on boot
+	ROM_LOAD( "mmaze.nv",  0, 0x800,  CRC(73e62b56) SHA1(dd228490cbe5fd57cf7a7fe867e074c75c84ee90) )
 ROM_END
 
 ROM_START( mmaze2 )
@@ -1948,6 +1951,9 @@ ROM_START( mmaze2 )
 	ROM_LOAD( "mm_obj-1.bin",       0x20000, 0x20000, CRC(1ce49e04) SHA1(fc30a03e443bece11bd86771ebd1fcb40d15b0b9) )
 	ROM_LOAD( "mm_obj-2.bin",       0x40000, 0x20000, CRC(3d3d5de3) SHA1(aa8032f1d99af1d92b0afaa11933548e0d39f03b) )
 	ROM_LOAD( "mm_obj-3.bin",       0x60000, 0x20000, CRC(dac57358) SHA1(5175b66d3622cb56ed7be3568b247195d1485579) )
+	
+	ROM_REGION( 0x0800, "nvram", 0 ) // default NVRAM, avoids TEST PROGRAM INITIALIZE ERROR on boot
+	ROM_LOAD( "mmaze.nv",  0, 0x800,  CRC(73e62b56) SHA1(dd228490cbe5fd57cf7a7fe867e074c75c84ee90) )
 ROM_END
 
 /* Bakutotsu Kijuutei */

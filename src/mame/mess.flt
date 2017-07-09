@@ -256,6 +256,7 @@ hp9k.cpp
 hp9k_3xx.cpp
 hprot1.cpp
 hpz80unk.cpp
+hp80.cpp
 ht68k.cpp
 huebler.cpp
 hunter2.cpp

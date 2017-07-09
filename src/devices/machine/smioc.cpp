@@ -24,13 +24,13 @@
         * Memory - Mitsubishi M5M187AJ 046101-35 SRAM 64K X 1?? - U37
     Logic:
         * U8 - 22V10-25JC
-	* U33 - 22V10-25JC
-	* U61 - 22V10-25JC
-	* U63 - 22V10-25JC
-	* U87 - 22V10-20JC
-	* U88 - 22V10-20JC
-	* U102 - 22V10-25JC
-	* U111 - 22V10-25JC
+        * U33 - 22V10-25JC
+        * U61 - 22V10-25JC
+        * U63 - 22V10-25JC
+        * U87 - 22V10-20JC
+        * U88 - 22V10-20JC
+        * U102 - 22V10-25JC
+        * U111 - 22V10-25JC
 
     Switches:
         * S1 - Board reset

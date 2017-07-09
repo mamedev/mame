@@ -426,7 +426,7 @@ void saturn_state::scu_dma_direct(address_space &space, uint8_t dma_ch)
 			m_scu.ist |= (IRQ_DMAILL);
 		return;
 	}
-	   
+
 	DnMV_1(dma_ch);
 
 	/* max size */

@@ -33,6 +33,74 @@ Notes:
   See bootleg MCU code at $206 and $435: when the dip switch is on, the
   "lda #$00" should be replaced by "lda #$01".
 
+
+
+                   Invaders "G" Connector
+    Component Side           |         Solder Side
+------------------------------------------------------------------
+      Ground             | 1 | A |     Ground
+      Video Red          | 2 | B |     Video Ground
+      Video Green        | 3 | C |     Video Blue
+ Negative Composite Sync | 4 | D |
+      Speaker +          | 5 | E |     Speaker -
+---------- KEY ----------| 6 | 6 |---------- KEY ----------
+                         | 7 | H |
+      Coinswitch         | 8 | J |
+                         | 9 | K |
+                         | 10| L |
+                         | 11| M |
+      Start Player 1     | 12| N |      Start Player 2
+                         | 13| P |
+                         | 14| R |
+      Joystick Right     | 15| S |
+      Joystick Left      | 16| T |
+                         | 17| U |
+                         | 18| V |
+                         | 19| W |
+                         | 20| X |
+      Fire               | 21| Y |
+                         | 22| Z |
+
+
+                   Invaders "T" Connector
+    Component Side           |         Solder Side
+------------------------------------------------------------------
+      Ground             | 1 | A |     Ground
+                         | 2 | B |
+                         | 3 | C |
+                         | 4 | D |
+                         | 5 | E |
+                         | 6 | 6 |
+---------- KEY ----------| 7 | H |---------- KEY ----------
+                         | 8 | J |
+                         | 9 | K |
+                         | 10| L |
+                         | 11| M |
+                         | 12| N |
+                         | 13| P |
+                         | 14| R |
+                         | 15| S |
+                         | 16| T |
+                         | 17| U |
+      +5V                | 18| V |     +5V
+
+
+ Invaders "H" Connector
+-----------------------
+ | 1 |  Ground
+ | 2 |  Ground
+ | 3 |
+ | 4 |
+ | 5 |  +5V
+ | 6 |  +5V
+ | 7 |
+ | 8 |
+ | 9 |  +12V
+ | 10|-- Key --
+ | 11|
+ | 12|  +12V
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -207,31 +275,31 @@ static INPUT_PORTS_START( retofinv )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("DSW-A (RB3):1,2")
 	PORT_DIPSETTING(    0x03, "30k, 80k & every 80k" )
 	PORT_DIPSETTING(    0x02, "30k, 80k" )
 	PORT_DIPSETTING(    0x01, "30k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )   PORT_DIPLOCATION("DSW-A (RB3):3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )   PORT_DIPLOCATION("DSW-A (RB3):4,5")
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )   // according to manual
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )   PORT_DIPLOCATION("DSW-A (RB3):6")   // according to manual
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )   PORT_DIPLOCATION("DSW-A (RB3):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )   PORT_DIPLOCATION("DSW-A (RB3):8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("DSW-B (RB2):1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
@@ -248,7 +316,7 @@ static INPUT_PORTS_START( retofinv )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("DSW-B (RB2):5,6,7,8")
 	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
@@ -267,28 +335,28 @@ static INPUT_PORTS_START( retofinv )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "Push Start to Skip Stage (Cheat)")
+	PORT_DIPNAME( 0x01, 0x01, "Push Start to Skip Stage (Cheat)")   PORT_DIPLOCATION("DSW-C (RB1):1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )   // according to manual
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )   PORT_DIPLOCATION("DSW-C (RB1):2")   // according to manual
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )   // according to manual
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )   PORT_DIPLOCATION("DSW-C (RB1):3")   // according to manual
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )   // according to manual
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )   PORT_DIPLOCATION("DSW-C (RB1):4")   // according to manual
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Coin Per Play Display" )
+	PORT_DIPNAME( 0x10, 0x10, "Coin Per Play Display" )   PORT_DIPLOCATION("DSW-C (RB1):5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
+	PORT_DIPNAME( 0x20, 0x20, "Year Display" )   PORT_DIPLOCATION("DSW-C (RB1):6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")   PORT_DIPLOCATION("DSW-C (RB1):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )  // unused according to manual
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )   PORT_DIPLOCATION("DSW-C (RB1):8")  // unused according to manual
 	PORT_DIPSETTING(    0x80, "A and B" )
 	PORT_DIPSETTING(    0x00, "A only" )
 INPUT_PORTS_END
@@ -297,7 +365,7 @@ static INPUT_PORTS_START( retofin2 )
 	PORT_INCLUDE( retofinv )
 
 	PORT_MODIFY( "DSW1" )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )   PORT_DIPLOCATION("DSW-A (RB3):4,5")
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x08, "3" )

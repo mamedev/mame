@@ -1428,7 +1428,7 @@ void bios_selection::handle()
 					moptions.set_value(OPTION_SOFTWARENAME,
 						ui_swinfo->listname + ":" + ui_swinfo->shortname,
 						OPTION_PRIORITY_CMDLINE);
-					moptions.set_value(OPTION_SNAPNAME, 
+					moptions.set_value(OPTION_SNAPNAME,
 						ui_swinfo->listname + std::string(PATH_SEPARATOR) + ui_swinfo->shortname,
 						OPTION_PRIORITY_CMDLINE);
 					reselect_last::driver = drivlist.driver().name;

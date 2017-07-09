@@ -34,24 +34,6 @@ public:
 	required_device<nesapu_device> m_apu; // public for vgmplay
 
 protected:
-	class mi_2a03_normal : public memory_interface {
-	public:
-		virtual ~mi_2a03_normal() {}
-		virtual uint8_t read(uint16_t adr) override;
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
-		virtual void write(uint16_t adr, uint8_t val) override;
-	};
-
-	class mi_2a03_nd : public memory_interface {
-	public:
-		virtual ~mi_2a03_nd() {}
-		virtual uint8_t read(uint16_t adr) override;
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
-		virtual void write(uint16_t adr, uint8_t val) override;
-	};
-
 	virtual void device_start() override;
 
 #define O(o) void o ## _full(); void o ## _partial()
@@ -66,11 +48,8 @@ protected:
 #undef O
 
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 private:
-	address_space_config m_program_config;
-
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 	DECLARE_READ8_MEMBER(apu_read_mem);
 

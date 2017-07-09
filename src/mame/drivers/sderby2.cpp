@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( sub_program_map, AS_PROGRAM, 8, sderby2_state )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM // 2KB Tested at 105B
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM // 2KB Tested at 10B7
 
-	AM_RANGE(0xe000, 0xffff) AM_RAM	// Tested at FE8
+	AM_RANGE(0xe000, 0xffff) AM_RAM // Tested at FE8
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_io_map, AS_IO, 8, sderby2_state )

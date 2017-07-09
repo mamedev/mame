@@ -135,6 +135,7 @@ CPUS["SM510"] = true
 CPUS["MB86901"] = true
 CPUS["NANOPROCESSOR"] = true
 CPUS["CLIPPER"] = true
+CPUS["CAPRICORN"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -461,6 +462,7 @@ MACHINES["MB87078"] = true
 MACHINES["MB8795"] = true
 MACHINES["MB89352"] = true
 MACHINES["MB89371"] = true
+MACHINES["MC14411"] = true
 MACHINES["MC146818"] = true
 MACHINES["MC2661"] = true
 MACHINES["MC6843"] = true
@@ -2085,6 +2087,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp9k_3xx.cpp",
 	MAME_DIR .. "src/mame/drivers/hp64k.cpp",
 	MAME_DIR .. "src/mame/drivers/hp_ipc.cpp",
+	MAME_DIR .. "src/mame/drivers/hp80.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")

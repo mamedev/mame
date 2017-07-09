@@ -68,6 +68,9 @@
 #define CLICOMMAND_GETSOFTLIST          "getsoftlist"
 #define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
 
+// command options
+#define CLIOPTION_DTD                   "dtd"
+
 
 namespace {
 //**************************************************************************
@@ -107,6 +110,9 @@ const options_entry cli_option_entries[] =
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft",   "0",       OPTION_COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST    ";glist",   "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ CLICOMMAND_VERIFYSOFTLIST ";vlist",   "0",       OPTION_COMMAND,    "verify software list by name" },
+
+	{ nullptr,                              nullptr,   OPTION_HEADER,     "FRONTEND COMMAND OPTIONS" },
+	{ CLIOPTION_DTD,                        "1",       OPTION_BOOLEAN,    "include DTD in XML output" },
 	{ nullptr }
 };
 
@@ -330,7 +336,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 void cli_frontend::listxml(const std::vector<std::string> &args)
 {
 	// create the XML and print it to stdout
-	info_xml_creator creator(m_options);
+	info_xml_creator creator(m_options, m_options.bool_value(CLIOPTION_DTD));
 	creator.output(stdout, args);
 }
 
@@ -1055,7 +1061,9 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 		osd_printf_info("%u samplesets found, %u were OK.\n", correct, correct);
 	}
 }
-#define SOFTLIST_XML_BEGIN "<?xml version=\"1.0\"?>\n" \
+
+const char cli_frontend::s_softlist_xml_dtd[] =
+				"<?xml version=\"1.0\"?>\n" \
 				"<!DOCTYPE softwarelists [\n" \
 				"<!ELEMENT softwarelists (softwarelist*)>\n" \
 				"\t<!ELEMENT softwarelist (software+)>\n" \
@@ -1110,8 +1118,7 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 				"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n" \
 				"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n" \
 				"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n" \
-				"]>\n\n" \
-				"<softwarelists>\n"
+				"]>\n\n";
 
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
@@ -1256,7 +1263,13 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 			if (list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
-					if (isfirst) { fprintf(out, SOFTLIST_XML_BEGIN); isfirst = false; }
+					if (isfirst)
+					{
+						if (m_options.bool_value(CLIOPTION_DTD))
+							fprintf(out, s_softlist_xml_dtd);
+						fprintf(out, "<softwarelists>\n");
+						isfirst = false;
+					}
 					output_single_softlist(out, swlistdev);
 				}
 	}
@@ -1363,7 +1376,13 @@ void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
-					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = false; }
+					if (isfirst)
+					{
+						if (m_options.bool_value(CLIOPTION_DTD))
+							fprintf(out, s_softlist_xml_dtd);
+						fprintf(out, "<softwarelists>\n");
+						isfirst = false;
+					}
 					output_single_softlist(out, swlistdev);
 				}
 	}

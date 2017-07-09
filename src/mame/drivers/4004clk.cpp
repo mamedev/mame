@@ -17,6 +17,7 @@
 
 #include "4004clk.lh"
 
+
 class nixieclock_state : public driver_device
 {
 public:
@@ -77,21 +78,29 @@ WRITE8_MEMBER(nixieclock_state::neon_w)
 	output_set_neon_value(3, BIT(data,0));
 }
 
-static ADDRESS_MAP_START(4004clk_rom, AS_OPCODES, 8, nixieclock_state)
-	AM_RANGE(0x0000, 0x0FFF) AM_ROM AM_REGION("maincpu", 0)
+static ADDRESS_MAP_START(4004clk_rom, i4004_cpu_device::AS_ROM, 8, nixieclock_state)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(4004clk_mem, AS_DATA, 8, nixieclock_state)
+static ADDRESS_MAP_START(4004clk_mem, i4004_cpu_device::AS_RAM_MEMORY, 8, nixieclock_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007F) AM_RAM
+	AM_RANGE(0x0000, 0x007f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 4004clk_io, AS_IO, 8, nixieclock_state)
+static ADDRESS_MAP_START(4004clk_stat, i4004_cpu_device::AS_RAM_STATUS, 8, nixieclock_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x001f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(4004clk_rp, i4004_cpu_device::AS_ROM_PORTS, 8, nixieclock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0000, 0x00ef) AM_MIRROR(0x0700) AM_WRITE(nixie_w)
 	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x0700) AM_WRITE(neon_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x083f) AM_DEVWRITE("dac", dac_bit_interface, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(4004clk_mp, i4004_cpu_device::AS_RAM_PORTS, 8, nixieclock_state)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_bit_interface, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -118,9 +127,11 @@ static MACHINE_CONFIG_START( 4004clk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(4004clk_rom)
-	MCFG_CPU_DATA_MAP(4004clk_mem)
-	MCFG_CPU_IO_MAP(4004clk_io)
+	MCFG_I4004_ROM_MAP(4004clk_rom)
+	MCFG_I4004_RAM_MEMORY_MAP(4004clk_mem)
+	MCFG_I4004_ROM_PORTS_MAP(4004clk_rp)
+	MCFG_I4004_RAM_STATUS_MAP(4004clk_stat)
+	MCFG_I4004_RAM_PORTS_MAP(4004clk_mp)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_4004clk)

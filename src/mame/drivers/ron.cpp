@@ -7,7 +7,7 @@
     TODO:
     - colors;
     - dip switches;
-	- sound, especially f/f part;
+    - sound, especially f/f part;
 
 ============================================================================
 Debug cheats:

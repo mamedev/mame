@@ -980,7 +980,7 @@ ROM_START( dectalk )
 	// older dsp firmware from earlier dectalk firmware 2.0 units, both proms are 82s191 equivalent; this firmware clips with the 1.8 dectalk firmware
 	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
-	// older dsp firmware from dectalk firmware 1.8 units; while this firmware works with 2.0 dectalk firmware, its a bit quieter than the proper one. 
+	// older dsp firmware from dectalk firmware 1.8 units; while this firmware works with 2.0 dectalk firmware, its a bit quieter than the proper one.
 	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
 	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
 

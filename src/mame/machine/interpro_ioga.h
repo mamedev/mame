@@ -205,19 +205,19 @@ public:
 
 	enum dma_ctrl_mask
 	{
-        DMA_CTRL_TCZERO  = 0x00000001, // transfer count zero
-        DMA_CTRL_TAG     = 0x00000e00, // bus tag
-        DMA_CTRL_BERR    = 0x00400000, // bus error
-        DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
+		DMA_CTRL_TCZERO  = 0x00000001, // transfer count zero
+		DMA_CTRL_TAG     = 0x00000e00, // bus tag
+		DMA_CTRL_BERR    = 0x00400000, // bus error
+		DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
 
-        DMA_CTRL_BUSY    = 0x01000000, // cleared when command complete (maybe bus grant required?)
-        DMA_CTRL_WAIT    = 0x02000000, // waiting for bus grant
-        DMA_CTRL_X       = 0x04000000, // set during fdc dma?
+		DMA_CTRL_BUSY    = 0x01000000, // cleared when command complete (maybe bus grant required?)
+		DMA_CTRL_WAIT    = 0x02000000, // waiting for bus grant
+		DMA_CTRL_X       = 0x04000000, // set during fdc dma?
 
-        DMA_CTRL_VIRTUAL = 0x20000000, // use virtual addressing
-        DMA_CTRL_WRITE   = 0x40000000, // memory to device transfer
+		DMA_CTRL_VIRTUAL = 0x20000000, // use virtual addressing
+		DMA_CTRL_WRITE   = 0x40000000, // memory to device transfer
 
-        DMA_CTRL_WMASK   = 0xfd000e00  // writable fields
+		DMA_CTRL_WMASK   = 0xfd000e00  // writable fields
 	};
 	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_PLOTTER); }
 	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, IOGA_DMA_PLOTTER); }

@@ -8693,10 +8693,6 @@ bladestl                        // GX797 (c) 1987
 bladestle                       // GX797 (c) 1987
 bladestll                       // GX797 (c) 1987
 
-@source:blitz.cpp
-megadpkr                        // (c) 1990 Blitz System Inc
-megadpkrb                       // (c) 1990 Blitz System Inc
-
 @source:blitz68k.cpp
 bankrob                         // (c) 1993 Entertainment Technology Corp.
 bankroba                        // (c) 1993 Entertainment Technology Corp.
@@ -12490,7 +12486,9 @@ feagv2                          //
 feagv2a                         //
 feagv7                          //
 feagv9                          //
-fexcel68k                       //
+fex68k                          //
+fex68km2                        //
+fex68km3                        //
 
 @source:fidelmcs48.cpp
 fscc6                           //
@@ -13738,6 +13736,8 @@ goldnpkb                        // (c) 1981 Bonanza
 goldnpkr                        // (c) 1981 Bonanza
 goodluck                        // Unknown
 maverik                         // 198?, Unknown
+megadpkr                        // (c) 1990 Blitz System Inc
+megadpkrb                       // (c) 1990 Blitz System Inc
 ngold                           // 198? Unknown
 ngolda                          // 198? Unknown
 ngoldb                          // 198? Unknown
@@ -14547,6 +14547,8 @@ nupogodi                        // Elektronika
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
+arcmania                        // Milton Bradley
+arrball                         // A-One LSI
 amaztron                        // Coleco
 astro                           // Kosmos
 bankshot                        // Parker Bros
@@ -14585,7 +14587,7 @@ h2hboxing                       // Coleco
 h2hfootb                        // Coleco
 horseran                        // Mattel
 lostreas                        // Parker Bros
-matchnum                        // A-One
+matchnum                        // A-One LSI
 mathmagi                        // APF
 mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
@@ -14828,6 +14830,9 @@ hprotr8a                        //
 @source:hpz80unk.cpp
 hpz80unk                        //
 
+@source:hp80.cpp
+hp85                            //
+
 @source:hshavoc.cpp
 hshavoc                         // (c) 1993 Data East
 
@@ -15011,6 +15016,7 @@ kungfu                          // (c) 1992 IGS
 number10                        // (c) IGS (Board labeled Playmark Srl)
 numbr10l                        // (c) IGS (Board labeled Playmark Srl)
 pktet346                        // (c) 199? IGS
+igstet341                       // (c) 199? IGS
 stellecu                        // (c) 1998
 
 @source:ikki.cpp
@@ -28382,7 +28388,8 @@ tekken2ub                       // 1995.09 Tekken 2 Ver.B (US, TES3/VER.B)
 tekkenac                        // 1995.01 Tekken (Asia, TE4/VER.C)
 tekkenb                         // 1994.12 Tekken (World, TE2/VER.B)
 tekkenjb                        // 1994.12 Tekken (Japan, TE1/VER.B)
-xevi3dg                         // 1996.05 Xevious 3D/G (Japan, XV31/VER.A)
+xevi3dg                         // 1996.05 Xevious 3D/G (World, XV32/VER.A)
+xevi3dgj                        // 1996.05 Xevious 3D/G (Japan, XV31/VER.A)
 
 @source:namcos12.cpp
 aplarail                        // 1998.12 Attack Pla Rail (Japan, AP1/VER.A)
@@ -29456,6 +29463,7 @@ robokidj3                       //
 @source:ninjaw.cpp
 darius2                         // C07 (c) 1989 Taito Corporation (Japan)
 ninjaw                          // B31 (c) 1987 Taito Corporation Japan (World)
+ninjaw1                         // B31 (c) 1987 Taito Corporation Japan (World)
 ninjawj                         // B31 (c) 1987 Taito Corporation (Japan)
 ninjawu                         // B31 (c) 1987 Taito America Corporation (US)
 
@@ -30043,6 +30051,7 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
+compc10							// 1984 Commodore PC-10, PC-20 and PC-30
 dgone                           // 1984 Data General/One
 eagle1600                       //
 ibm5550                         //
@@ -34067,6 +34076,7 @@ b3rinsya                        // b9805 (c) 1997 Sigma
 dashhero                        // b9811 (c) 1999 Sigma
 dodghero                        // b9802 (c) 1997 Sigma
 gegege                          // b9804 (c) 1997 Sigma / Banpresto
+gocowboy                        // (c) 2000 Sammy
 haekaka                         // (c) 2001 Sammy
 itazuram                        // (c) 2000 Sammy
 pepsiman                        // b9806 (c) 1997 Sigma

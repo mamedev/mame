@@ -1050,11 +1050,11 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 	{
 		if (m_widel_latch)
 		{
-			uint8_t *prom = space.machine().root_device().memregion("dongle")->base();			
+			uint8_t *prom = space.machine().root_device().memregion("dongle")->base();
 
 			data = prom[m_widel_ctrs | (m_decomult_bank << 16)];
 			LOG(3,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x '%c' <- PROM[%04x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.', m_widel_ctrs));
-			
+
 			m_widel_ctrs = (m_widel_ctrs + 1) & 0xffff;
 			if (m_widel_ctrs == 0)
 			{
@@ -1184,8 +1184,8 @@ WRITE8_MEMBER(decocass_state::decocass_e5xx_w)
  *  DE-0091xx daughter board handler
  *
  *  The DE-0091xx daughter board seems to be a read-only ROM board with
- *  two times five 4K ROMs. 
- * 
+ *  two times five 4K ROMs.
+ *
  *  The board's ROMs are mapped into view for reads between addresses
  *  0x6000 and 0xafff by setting bits 0 and 1 of address 0xe900.
  *
@@ -1608,7 +1608,7 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cfghtice)
 
 
 
-// Note, this is a hack, I can't see where the bank bits actually get written out 
+// Note, this is a hack, I can't see where the bank bits actually get written out
 // and the MAME disassembly is currently a mess.
 READ8_MEMBER(decocass_widel_state::decocass_fbc2_r)
 {

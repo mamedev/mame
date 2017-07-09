@@ -720,6 +720,22 @@ if (CPUS["NANOPROCESSOR"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- HP Capricorn
+--@src/devices/cpu/capricorn/capricorn.h,CPUS["CAPRICORN"] = true
+--------------------------------------------------
+
+if (CPUS["CAPRICORN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/capricorn/capricorn.cpp",
+		MAME_DIR .. "src/devices/cpu/capricorn/capricorn.h",
+	}
+end
+
+if (CPUS["CAPRICORN"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/capricorn/capricorn_dasm.cpp")
+end
+
+--------------------------------------------------
 -- Hudsonsoft 6280
 --@src/devices/cpu/h6280/h6280.h,CPUS["H6280"] = true
 --------------------------------------------------
@@ -1629,6 +1645,8 @@ if (CPUS["UPD7810"]~=null) then
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_opcodes.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_table.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_macros.h",
+		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.cpp",
+		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.h",
 	}
 end
 

@@ -48,7 +48,7 @@ public:
 	// misc common
 	u16 m_inp_mux;                  // multiplexed inputs mask
 	int m_inp_lines;                // number of input mux columns
-	
+
 	u8 read_inputs(int columns);
 
 	virtual void update_k_line();
@@ -124,7 +124,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 {
 	u8 z_mask = (1 << m_display_z_len) - 1;
 	u8 zx_len = 1 << (m_display_x_len + m_display_z_len);
-	
+
 	for (int zx = 0; zx < zx_len; zx++)
 	{
 		for (int y = 0; y < m_display_y_len; y++)
@@ -153,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 				char buf[0x10];
 				sprintf(buf, "%d.%d.%d", zx >> m_display_z_len, y, zx & z_mask);
 				output().set_value(buf, active_state);
-				
+
 				m_display_cache[y][zx] = active_state;
 			}
 		}
@@ -702,8 +702,8 @@ static MACHINE_CONFIG_DERIVED( nupogodi, mc25 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(1724, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1724-1, 0, 1080-1)
+	MCFG_SCREEN_SIZE(1715, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1715-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( exospace, nupogodi )
@@ -773,13 +773,13 @@ static MACHINE_CONFIG_START( dm53 )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1238/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1238/2-1)
+	MCFG_SCREEN_SIZE(1920/2, 1281/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1281/2-1)
 
 	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1219/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1219/2-1)
+	MCFG_SCREEN_SIZE(1920/2, 1236/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1236/2-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
@@ -1227,8 +1227,8 @@ ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "cms54c_kms598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
 
-	ROM_REGION( 423308, "svg", 0)
-	ROM_LOAD( "ktopgun.svg", 0, 423308, CRC(1beb2f6c) SHA1(0802dc10b7a28ab1143dde083816e5cea6879a6b) )
+	ROM_REGION( 426017, "svg", 0)
+	ROM_LOAD( "ktopgun.svg", 0, 426017, CRC(21399091) SHA1(58f6359261d7cffe74cebdf961c95b12ffac3bbc) )
 ROM_END
 
 
@@ -1239,8 +1239,8 @@ ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "kms73b_kms773.melody", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
 
-	ROM_REGION( 710421, "svg", 0)
-	ROM_LOAD( "kcontra.svg", 0, 710421, CRC(7926115d) SHA1(5ed98f2a39f43b06e9670b85b7e788466c5b9f36) )
+	ROM_REGION( 713736, "svg", 0)
+	ROM_LOAD( "kcontra.svg", 0, 713736, CRC(1b76b219) SHA1(77e458fa2b1aec65f1cb9d517baf70d9fcf8112a) )
 ROM_END
 
 
@@ -1251,8 +1251,8 @@ ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US51
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "kms73b_kms774.melody", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
 
-	ROM_REGION( 607415, "svg", 0)
-	ROM_LOAD( "ktmnt.svg", 0, 607415, CRC(508cca0d) SHA1(e295abf39a33a5d4d6a41ad8f294d73857262494) )
+	ROM_REGION( 610249, "svg", 0)
+	ROM_LOAD( "ktmnt.svg", 0, 610249, CRC(9e1f391b) SHA1(0783e710df79bba3dafe90f4ed61134bc3a3278a) )
 ROM_END
 
 
@@ -1263,8 +1263,8 @@ ROM_START( kgradius )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "kms73b_kms771.melody", 0x000, 0x100, CRC(4c586b73) SHA1(14c5ab2898013a577f678970a648c374749cc66d) )
 
-	ROM_REGION( 628686, "svg", 0)
-	ROM_LOAD( "kgradius.svg", 0, 628686, CRC(eb0c8778) SHA1(f58e206c443f0514dad988dc04a011f3e4b3ecf5) )
+	ROM_REGION( 633084, "svg", 0)
+	ROM_LOAD( "kgradius.svg", 0, 633084, CRC(c968f3c5) SHA1(fed6cc92ea3e6cc2119de554d8413499c34ca86d) )
 ROM_END
 
 
@@ -1275,8 +1275,8 @@ ROM_START( kloneran )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "kms73b_kms781.melody", 0x000, 0x100, CRC(a393de36) SHA1(55089f04833ccb318524ab2b584c4817505f4019) )
 
-	ROM_REGION( 630174, "svg", 0)
-	ROM_LOAD( "kloneran.svg", 0, 630174, CRC(39254bd1) SHA1(c00605e818e9327cee63d2438be011510ec8ec73) )
+	ROM_REGION( 632841, "svg", 0)
+	ROM_LOAD( "kloneran.svg", 0, 632841, CRC(cf679db7) SHA1(e43e0562bb887b221ab79d9538cb84dd7ffe0120) )
 ROM_END
 
 
@@ -1284,32 +1284,32 @@ ROM_START( gnw_mc25 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
-	ROM_REGION( 99701, "svg", 0)
-	ROM_LOAD( "gnw_mc25.svg", 0, 99701, CRC(390f53fb) SHA1(8eba84b7b084c3a1b26840a93030eeaf7ee89227) )
+	ROM_REGION( 102453, "svg", 0)
+	ROM_LOAD( "gnw_mc25.svg", 0, 102453, CRC(88cc7c49) SHA1(c000d51d1b99750116b97f9bafc0314ea506366d) )
 ROM_END
 
 ROM_START( gnw_eg26 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
-	ROM_REGION( 100220, "svg", 0)
-	ROM_LOAD( "gnw_eg26.svg", 0, 100220, CRC(b53664a3) SHA1(4d45f4f78a9c6d3ee1e6bdac64cbb1fbea5ba4ba) )
+	ROM_REGION( 102848, "svg", 0)
+	ROM_LOAD( "gnw_eg26.svg", 0, 102848, CRC(742c2605) SHA1(984d430ad2ff47ad7a3f9b25b7d3f3d51b10cca5) )
 ROM_END
 
 ROM_START( nupogodi )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 123824, "svg", 0)
-	ROM_LOAD( "nupogodi.svg", 0, 123824, CRC(fb227607) SHA1(7b41c83a4b1494d76db18ff649541629de9bdc18) )
+	ROM_REGION( 202839, "svg", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 202839, CRC(4c8a38ce) SHA1(cdb5cbbef0f71584d89a5acfea73dd21a72d2318) )
 ROM_END
 
 ROM_START( exospace )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "exospace.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
 
-	ROM_REGION( 63138, "svg", 0)
-	ROM_LOAD( "exospace.svg", 0, 63138, CRC(a17dad7e) SHA1(714bc200b81c8e6bf0c07c0eabf85442a1791e58) )
+	ROM_REGION( 66790, "svg", 0)
+	ROM_LOAD( "exospace.svg", 0, 66790, CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
 
@@ -1317,11 +1317,11 @@ ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm-53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
-	ROM_REGION( 124103, "svg_top", 0)
-	ROM_LOAD( "gnw_dm53_top.svg", 0, 124103, CRC(53741c86) SHA1(01aa0e97b2ad1bed66a71aeef4426e3f1a42da84) )
+	ROM_REGION( 207524, "svg_top", 0)
+	ROM_LOAD( "gnw_dm53_top.svg", 0, 207524, CRC(07a19adb) SHA1(605b73d79639bbe6a2e88e3186d677ad0e0a5a86) )
 
-	ROM_REGION( 108339, "svg_bottom", 0)
-	ROM_LOAD( "gnw_dm53_bottom.svg", 0, 108339, CRC(b88bf17d) SHA1(105c978722c00c14301661e5ef5051fdfc33e878) )
+	ROM_REGION( 227954, "svg_bottom", 0)
+	ROM_LOAD( "gnw_dm53_bottom.svg", 0, 227954, CRC(906121e9) SHA1(1319226f9259cc179e2336308e1ab279d6b4097e) )
 ROM_END
 
 
@@ -1329,11 +1329,11 @@ ROM_START( gnw_jr55 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "jr-55_cms54c_kms560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
 
-	ROM_REGION( 261499, "svg_top", 0)
-	ROM_LOAD( "gnw_jr55_top.svg", 0, 261499, CRC(3e48708f) SHA1(fc35bd4022327f2061d054c23316d2d6412b25b7) )
+	ROM_REGION( 264099, "svg_top", 0)
+	ROM_LOAD( "gnw_jr55_top.svg", 0, 264099, CRC(0d2f6d9e) SHA1(9a6b0b453dd66e31c48799f1712fe3ea435331af) )
 
-	ROM_REGION( 389658, "svg_bottom", 0)
-	ROM_LOAD( "gnw_jr55_bottom.svg", 0, 389658, CRC(0a5eb4b2) SHA1(498aded148401a624a4ed215126e0d0b27d25d44) )
+	ROM_REGION( 391063, "svg_bottom", 0)
+	ROM_LOAD( "gnw_jr55_bottom.svg", 0, 391063, CRC(8214db21) SHA1(e7bb53193bdebd4bba69e399b9633c7dd5884d04) )
 ROM_END
 
 
@@ -1341,11 +1341,11 @@ ROM_START( gnw_mw56 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
 
-	ROM_REGION( 165537, "svg_left", 0)
-	ROM_LOAD( "gnw_mw56_left.svg", 0, 165537, CRC(42fe7fb8) SHA1(91bfb64a1a9f84696acc5cc8c6e7faced5301016) )
+	ROM_REGION( 172381, "svg_left", 0)
+	ROM_LOAD( "gnw_mw56_left.svg", 0, 172381, CRC(6000f1c2) SHA1(7395d89d62cc77f59b9ce12c200cd6748f287f9d) )
 
-	ROM_REGION( 224535, "svg_right", 0)
-	ROM_LOAD( "gnw_mw56_right.svg", 0, 224535, CRC(c87fbf47) SHA1(07c3676aaec42ddfd73d3331de415627bd8d0093) )
+	ROM_REGION( 229866, "svg_right", 0)
+	ROM_LOAD( "gnw_mw56_right.svg", 0, 229866, CRC(7c58f0c2) SHA1(6dd975ecd52ab6fc436b671b6a31007f94628e3d) )
 ROM_END
 
 
@@ -1353,8 +1353,8 @@ ROM_START( gnw_dj101 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dj-101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
 
-	ROM_REGION( 276947, "svg", 0)
-	ROM_LOAD( "gnw_dj101.svg", 0, 276947, CRC(9e1eb311) SHA1(f5004626549ea1f60fae87751bcad375580b7423) )
+	ROM_REGION( 280871, "svg", 0)
+	ROM_LOAD( "gnw_dj101.svg", 0, 280871, CRC(e75adb36) SHA1(2a9854fabb8efab9e11f1f661a09c2cc30de28af) )
 ROM_END
 
 
@@ -1362,8 +1362,8 @@ ROM_START( gnw_ml102 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ml-102_cms54c_kms577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
 
-	ROM_REGION( 359508, "svg", 0)
-	ROM_LOAD( "gnw_ml102.svg", 0, 359508, CRC(04d42f75) SHA1(06d0dd5a6c65eda581746379ccdcf4bc02e26f83) )
+	ROM_REGION( 361742, "svg", 0)
+	ROM_LOAD( "gnw_ml102.svg", 0, 361742, CRC(a9fe2c05) SHA1(ec16081a7444cccd7fa90fda9a94dbcb037c5c67) )
 ROM_END
 
 
@@ -1374,8 +1374,8 @@ ROM_START( gnw_bx301 )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "bx-301_kms73b_kms744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
 
-	ROM_REGION( 258505, "svg", 0)
-	ROM_LOAD( "gnw_bx301.svg", 0, 258505, CRC(b2416cf9) SHA1(c31789e86baad1e2f6b070865d08d9298cf54f69) )
+	ROM_REGION( 265213, "svg", 0)
+	ROM_LOAD( "gnw_bx301.svg", 0, 265213, CRC(90514ce3) SHA1(544b6ffbcf04e847fef8723b603f46769a6a09e4) )
 ROM_END
 
 

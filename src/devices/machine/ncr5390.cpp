@@ -439,7 +439,7 @@ void ncr5390_device::step(bool timeout)
 			dma_set(dma_command ? DMA_IN : DMA_NONE);
 
 			// if it's the last message byte, ACK remains asserted, terminate with function_complete()
-			state =	(xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)) ? INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
+			state = (xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)) ? INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
 
 			recv_byte();
 			break;
