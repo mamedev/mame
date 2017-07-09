@@ -1339,19 +1339,12 @@ ROM_START( omega )
 	ROM_LOAD("2.c10",  0x08000, 0x04000, CRC(dbc0a47f) SHA1(b617c5a10c655e7befaeaecd9ce736e972285e6b)) // 27128
 
 	ROM_REGION(0x600, "proms", 0)
-	ROM_LOAD("tbp24s10n.3e", 0x000, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.3f", 0x000, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.3g", 0x000, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.4e", 0x000, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.4f", 0x000, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.4g", 0x000, 0x100, NO_DUMP)
-	// temporarily using gigas' color proms for now until the proms above get dumped
-	ROM_LOAD( "1.pr", 0x0000, 0x0100, BAD_DUMP CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) // REMOVE when actual proms are dumped
-	ROM_LOAD( "6.pr", 0x0100, 0x0100, BAD_DUMP CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) ) // REMOVE when actual proms are dumped
-	ROM_LOAD( "5.pr", 0x0200, 0x0100, BAD_DUMP CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) ) // REMOVE when actual proms are dumped
-	ROM_LOAD( "4.pr", 0x0300, 0x0100, BAD_DUMP CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) ) // REMOVE when actual proms are dumped
-	ROM_LOAD( "2.pr", 0x0400, 0x0100, BAD_DUMP CRC(5796cc4a) SHA1(39576c4e48fd7ac52fc652a1ae0573db3d878878) ) // REMOVE when actual proms are dumped
-	ROM_LOAD( "3.pr", 0x0500, 0x0100, BAD_DUMP CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) ) // REMOVE when actual proms are dumped
+	ROM_LOAD("tbp24s10n.3f", 0x0000, 0x100, CRC(75ec7472) SHA1(868811e838c570a0f576a0ece249cab2d4274d65) )
+	ROM_LOAD("tbp24s10n.4f", 0x0100, 0x100, CRC(5113a114) SHA1(3a5ab68c93d1f2c05ceb0311e12a54fd124d8435) )
+	ROM_LOAD("tbp24s10n.3g", 0x0200, 0x100, CRC(b6b5d4a0) SHA1(2b7ba59a6c185326e11ce8ccd96b3c8cfd652fdf) )
+	ROM_LOAD("tbp24s10n.4g", 0x0300, 0x100, CRC(931bc299) SHA1(f116f1d6a4324b86b0aae0a5a040236b3a4fd12d) )
+	ROM_LOAD("tbp24s10n.3e", 0x0400, 0x100, CRC(899e089d) SHA1(5a485d3ef7d2102451ff76452cac106061cc5cd6) )
+	ROM_LOAD("tbp24s10n.4e", 0x0500, 0x100, CRC(28321dd8) SHA1(4ba0f6c381ef929a476d4d7aa71b1397c48a644e) )
 ROM_END
 
 
@@ -1396,7 +1389,7 @@ GAME( 1986, gigas,      0,        gigasm,    gigas,    freekick_state, gigas,   
 GAME( 1986, gigasb,     gigas,    gigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, oigas,      gigas ,   oigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Oigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigasm2b,   0,        gigas,     gigasm2,  freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1986, omega,      0,        omega,     omega,    freekick_state, gigas,    ROT270, "Nihon System",                 "Omega",                                MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, omega,      0,        omega,     omega,    freekick_state, gigas,    ROT270, "Nihon System",                 "Omega",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrd,    0,        pbillrd,   pbillrd,  freekick_state, 0,        ROT0,   "Nihon System",                 "Perfect Billiard",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrds,   pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds, ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrdsa,  pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds, ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-5008)", MACHINE_SUPPORTS_SAVE ) // sticker on CPU module different (wrong?) functionality the same
