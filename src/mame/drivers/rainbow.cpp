@@ -8,8 +8,8 @@
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Portions (2013 - 2017) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
 Keyboard & GDC fixes by Cracyc (June - Nov. 2016), Baud rate generator by Shattered (July 2016)
+Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
 
@@ -28,8 +28,8 @@ PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DI
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF JULY 2017
----------------------
+STATE AS OF JANUARY 2017
+------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
 The public domain file RBCONVERT.ZIP documents how model 'A' differs from version B.
@@ -47,7 +47,10 @@ To create a DEC RD50/ST506 compatible image (153 cylinders, 4 heads, 16 sectors,
 >chdman createhd -c none -chs 153,4,16 -ss 512 -o RD50_ST506.chd
 NOTE: use -c none parameter for no compression. No more than 8 heads or 1024 cylinders.
 
-Some BUGS remain: CTRL-SETUP (soft reboot) always triggers ERROR 19 (64 K RAM err.). One explanation is that ZFLIP/ZRESET is
+Some BUGS remain: BIOS autoboot doesnt work at all. It is not possible to boot from a properly formatted
+ winchester with "W" (CPU crash). So there's an issue with the secondary boot loader (for hard disks)...
+
+CTRL-SETUP (soft reboot) always triggers ERROR 19 (64 K RAM err.). One explanation is that ZFLIP/ZRESET is
 handled wrongly, so shared mem. just below $8000 is tainted by Z80 stack data. A reentrance problem?
 
 Occassionally, ERROR 13 -keyboard stuck- appears (for reasons yet unknown).
@@ -892,7 +895,6 @@ void rainbow_state::machine_start()
 	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
 		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
-		rom[0xf4000 + 0x03d8] = 0x00; // unblock BIOS auto boot 
 		rom[0xf4000 + 0x135e] = 0x00; // in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 
 		rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
@@ -2769,8 +2771,6 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	{
 			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_device, cd_ba_w) );
 			printf("\n **** COMM HANDLER INSTALLED **** ");
- 			if(m_p_nvram[0xab]!= 0x00)
- 				popmessage("Autoboot from drive %c", 64 + m_p_nvram[0xab]);
 	}
 
 	// BIT 6: Transfer data from volatile memory to NVM  (PROGRAM: 1 => 0   BIT 6)
