@@ -85,9 +85,6 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 {
-	if (m_gametype == 2) //colt
-		return;
-
 	if (offset & 0x100)
 		m_palette->write_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
