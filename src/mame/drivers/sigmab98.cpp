@@ -55,6 +55,7 @@ Dumped games:
 2000 Pye-nage Taikai              https://youtu.be/oL2OIbrv-KI
 2000 Taihou de Doboon             https://youtu.be/loPP3jt0Ob0
 2001 Hae Hae Ka Ka Ka             https://youtu.be/37IxYCg0tic
+2000 Go Go Cowboy                 https://youtu.be/qYDw2sxNRqE
 
 Games with the same cabinet, or in the Treasure Fall series, which might be on the same hardware:
 
@@ -62,7 +63,6 @@ Games with the same cabinet, or in the Treasure Fall series, which might be on t
 1999 Otakara Locomo               https://youtu.be/J0NwMWO3SdY
 1999 Dokidoki Kingyosukui         https://youtu.be/Z0tOjG_tteU
 2000 Otoshicha Ottotto            https://youtu.be/AybhPHTFvMo
-2000 Go Go Cowboy
 2001 Mushitori Meijin
 2001 Morino Dodgeball Senshuken   https://youtu.be/k98KIRjTYbY
 2001 Waiwai Wanage                https://youtu.be/4GmwPTk_Er4
@@ -2963,4 +2963,4 @@ GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, RO
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
 GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
 GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
-GAME( 2000, gocowboy, 0,        sammymdl, sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Go Go Cowboy",                      MACHINE_NOT_WORKING ) // only partially dumped
+GAME( 2000, gocowboy, 0,        sammymdl, sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Go Go Cowboy",                      MACHINE_NOT_WORKING )
