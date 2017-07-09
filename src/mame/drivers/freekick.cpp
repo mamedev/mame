@@ -787,7 +787,7 @@ static MACHINE_CONFIG_DERIVED( pbillrd, base )
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pbillrds, pbillrd )
+static MACHINE_CONFIG_DERIVED( pbillrdm, pbillrd )
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_12MHz/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
