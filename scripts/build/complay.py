@@ -91,12 +91,6 @@ class XmlError(Exception):
     pass
 
 
-class LayoutError(Exception):
-    def __init__(self, msg, locator):
-        super(LayoutError, self).__init__(
-                '%s:%d:%d: %s' % (locator.getPublicId(), locator.getLineNumber(), locator.getColumnNumber(), msg));
-
-
 class LayoutChecker(Minifyer):
     VARPATTERN = re.compile('^~scr(0|[1-9][0-9]*)(native[xy]aspect|width|height)~$')
     SHAPES = frozenset(('disk', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
