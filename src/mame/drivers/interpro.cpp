@@ -272,6 +272,7 @@ READ8_MEMBER(interpro_state::scsi_r)
 	case 0x7: return m_scsi->fifo_flags_r(space, 0);
 	case 0x8: return m_scsi->conf_r(space, 0);
 	case 0xb: return m_scsi->conf2_r(space, 0);
+	case 0xc: return m_scsi->conf3_r(space, 0);
 	}
 
 	logerror("scsi: read unmapped register 0x%x (%s)\n", offset >> 6, machine().describe_context());
@@ -294,6 +295,8 @@ WRITE8_MEMBER(interpro_state::scsi_w)
 	case 9: m_scsi->clock_w(space, 0, data); return;
 	case 0xa: m_scsi->test_w(space, 0, data); return;
 	case 0xb: m_scsi->conf2_w(space, 0, data); return;
+	case 0xc: m_scsi->conf3_w(space, 0, data); return;
+	case 0xf: m_scsi->fifo_align_w(space, 0, data); return;
 	}
 
 	logerror("scsi: unmapped register write 0x%02x data 0x%02x (%s)\n", offset >> 6, data, machine().describe_context());
@@ -319,7 +322,7 @@ DRIVER_INIT_MEMBER(interpro_state, ip2800)
 static SLOT_INTERFACE_START(interpro_scsi_devices)
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
 	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A)
+	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START(interpro_scsi_adapter)
@@ -352,15 +355,18 @@ static ADDRESS_MAP_START(interpro_common_map, 0, 32, interpro_state)
 	AM_RANGE(0x7f00031c, 0x7f00031f) AM_READWRITE16(sreg_ctrl3_r, sreg_ctrl3_w, 0xffff)
 
 	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
-	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, scc85230_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
+	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(rtc_r, rtc_w, 0xff)
 	AM_RANGE(0x7f000700, 0x7f00077f) AM_READ8(idprom_r, 0xff)
 	AM_RANGE(0x7f001000, 0x7f001fff) AM_READWRITE8(scsi_r, scsi_w, 0x0000ff00)
 
 	AM_RANGE(0x7f0fff00, 0x7f0fffff) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map)
 
-	AM_RANGE(0x08000000, 0x08000fff) AM_NOP // bogus
-	AM_RANGE(0x87000000, 0x8700007f) AM_READ8(slot0_r, 0xff)
+	// this is probably a shared memory region for the i82596
+	AM_RANGE(0x08000000, 0x0800ffff) AM_RAM
+
+	// disable the graphics slot to focus on headless operating system boot
+	//AM_RANGE(0x87000000, 0x8700007f) AM_READ8(slot0_r, 0xff)
 
 	// 2800 (CBUS?) slots are mapped as follows
 	AM_RANGE(0x87000000, 0x8700007f) AM_MIRROR(0x78000000) AM_READWRITE(unmapped_r, unmapped_w)
@@ -416,12 +422,15 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_RAM_EXTRA_OPTIONS("32M,64M,128M,256M")
 
 	// TODO: work out serial port assignments for mouse, console, keyboard and ?
+	// TODO: also work out the correct serial dma channels - scc2chanA has no dma
 	// first serial controller and devices
 	MCFG_SCC85C30_ADD(INTERPRO_SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(INTERPRO_SERIAL1_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(INTERPRO_SERIAL2_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
+	MCFG_Z80SCC_OUT_WREQA_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial1))
+	MCFG_Z80SCC_OUT_WREQB_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial2))
 
 	// is this the keyboard port?
 	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL1_TAG, default_rs232_devices, nullptr) // "keyboard"
@@ -436,21 +445,22 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsb_w))
 
 	// second serial controller and devices
-	MCFG_SCC85230_ADD(INTERPRO_SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC85C30_ADD(INTERPRO_SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(INTERPRO_SERIAL3_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(INTERPRO_SERIAL4_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
+	MCFG_Z80SCC_OUT_WREQB_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial0))
 
 	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL3_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL4_TAG, default_rs232_devices, nullptr) //"terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsb_w))
+	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL4_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, ctsb_w))
 
 	// real-time clock/non-volatile memory
 	MCFG_MC146818_ADD(INTERPRO_RTC_TAG, XTAL_32_768kHz)
@@ -483,9 +493,11 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_INTERPRO_IOGA_IRQ_CB(INPUTLINE(INTERPRO_CPU_TAG, INPUT_LINE_IRQ0))
 	//MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_CHANNEL_PLOTTER, unknown)
 
-	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SCSI, DEVREAD8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_r), DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_w))
+	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SCSI, DEVREAD8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, mdma_r), DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, mdma_w))
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_FLOPPY, DEVREAD8(INTERPRO_FDC_TAG, n82077aa_device, mdma_r), DEVWRITE8(INTERPRO_FDC_TAG, n82077aa_device, mdma_w))
-	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SERIAL, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, da_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, da_w))
+	MCFG_INTERPRO_IOGA_DMA_SERIAL_CB(IOGA_DMA_SERIAL0, DEVREAD8(INTERPRO_SCC2_TAG, z80scc_device, db_r), DEVWRITE8(INTERPRO_SCC2_TAG, z80scc_device, db_w))
+	MCFG_INTERPRO_IOGA_DMA_SERIAL_CB(IOGA_DMA_SERIAL1, DEVREAD8(INTERPRO_SCC2_TAG, z80scc_device, da_r), DEVWRITE8(INTERPRO_SCC2_TAG, z80scc_device, da_w))
+	MCFG_INTERPRO_IOGA_DMA_SERIAL_CB(IOGA_DMA_SERIAL2, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, db_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, db_w))
 	MCFG_INTERPRO_IOGA_FDCTC_CB(DEVWRITELINE(INTERPRO_FDC_TAG, n82077aa_device, tc_line_w))
 	MCFG_INTERPRO_IOGA_DMA_BUS(INTERPRO_CAMMU_TAG, 0)
 
