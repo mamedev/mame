@@ -26,33 +26,49 @@
 #include "i82586.h"
 
 DEFINE_DEVICE_TYPE(I82586, i82586_device, "i82586", "Intel 82586 IEEE 802.3 Ethernet LAN Coprocessor")
-DEFINE_DEVICE_TYPE(I82596, i82596_device, "i82596", "Intel 82596DX and 82596SX High-Performance 32-Bit Local Area Network Coprocessor")
+DEFINE_DEVICE_TYPE(I82596SX, i82596sx_device, "i82596sx", "Intel 82596SX High-Performance 32-Bit Local Area Network Coprocessor")
+DEFINE_DEVICE_TYPE(I82596DX, i82596dx_device, "i82596dx", "Intel 82596DX High-Performance 32-Bit Local Area Network Coprocessor")
 
-i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 datawidth, u8 addrwidth)
 	: device_t(mconfig, type, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
 	device_network_interface(mconfig, *this, 10.0f),
+	m_space_config("shared", ENDIANNESS_LITTLE, datawidth, addrwidth),
 	m_out_irq(*this)
 {}
 
 i82586_device::i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i82586_base_device(mconfig, I82586, tag, owner, clock),
-	m_sma_r(*this),
-	m_sma_w(*this)
+	: i82586_base_device(mconfig, I82586, tag, owner, clock, 16, 24)
 {}
 
-i82596_device::i82596_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i82586_base_device(mconfig, I82596, tag, owner, clock),
-	m_sma_r(*this),
-	m_sma_w(*this)
+i82596_base_device::i82596_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 datawidth, u8 addrwidth)
+	: i82586_base_device(mconfig, type, tag, owner, clock, datawidth, addrwidth)
+{}
+
+i82596sx_device::i82596sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i82596_base_device(mconfig, I82596SX, tag, owner, clock, 16, 32)
+{}
+
+i82596dx_device::i82596dx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i82596_base_device(mconfig, I82596DX, tag, owner, clock, 32, 32)
 {}
 
 void i82586_base_device::device_start()
 {
+	m_space = &space(0);
+
 	m_out_irq.resolve();
 }
 
 void i82586_base_device::device_reset()
 {
+}
+
+std::vector<std::pair<int, const address_space_config *>> i82586_base_device::memory_space_config() const
+{
+	return std::vector<std::pair<int, const address_space_config *>> {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 WRITE_LINE_MEMBER(i82586_base_device::ca)
@@ -62,9 +78,6 @@ WRITE_LINE_MEMBER(i82586_base_device::ca)
 
 void i82586_device::device_start()
 {
-	m_sma_r.resolve();
-	m_sma_w.resolve();
-
 	i82586_base_device::device_start();
 }
 
@@ -73,15 +86,34 @@ void i82586_device::device_reset()
 	i82586_base_device::device_reset();
 }
 
-void i82596_device::device_start()
+void i82596_base_device::device_start()
 {
-	m_sma_r.resolve();
-	m_sma_w.resolve();
-
 	i82586_base_device::device_start();
 }
 
-void i82596_device::device_reset()
+void i82596_base_device::device_reset()
 {
 	i82586_base_device::device_reset();
+}
+
+void i82596_base_device::port(u32 data)
+{
+	switch (data & 0xf)
+	{
+	case 0:
+		// execute a software reset
+		break;
+
+	case 1:
+		// execute a self-test
+		break;
+
+	case 2:
+		// write an alterantive system configuration pointer address
+		break;
+
+	case 3:
+		// write an alternative dump area pointer and perform dump
+		break;
+	}
 }
