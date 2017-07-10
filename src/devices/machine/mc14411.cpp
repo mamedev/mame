@@ -58,7 +58,7 @@
 ***************************************************************************/
 
 const int mc14411_device::s_counter_divider[16] = {
-             ////////// X64 /////// X16 /////// X4 //////// X1 ////////
+             ////////// X64 /////// X16 /////// X8 //////// X1 ////////
 	  3, // F1:     614.4 kHz   153.6 kHz   76800 Hz    9600 Hz
 	  4, // F2:     460.8 kHz   115.2 kHz   57600 Hz    7200 Hz
 	  6, // F3:     307.2 kHz   76800 Hz    36400 Hz    4800 Hz
@@ -164,6 +164,11 @@ void mc14411_device::timer_enable(timer_id i, bool enable)
 		arm_timer(i);
 }
 
+void mc14411_device::timer_disable_all()
+{
+	for (int i = TIMER_F1; i <= TIMER_F16; i++)
+		timer_enable((timer_id) i, false);
+}
 
 //-------------------------------------------------
 //  arm_timer - arm the timer based on selected
@@ -207,6 +212,7 @@ void mc14411_device::device_reset()
 	}
 }
 
+
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
@@ -247,6 +253,38 @@ WRITE8_MEMBER(mc14411_device::rate_select_w)
 	if (m_divider != (data & 3))
 	{
 		m_divider = data & 3;
+		notify_clock_changed();
+	}
+}
+
+
+//------------------------------------------------
+//  rsa_w - set RSA input line
+//------------------------------------------------
+
+WRITE_LINE_MEMBER(mc14411_device::rsa_w)
+{
+	LOGSETUP("%s %02x\n", FUNCNAME, state);
+
+	if ((m_divider & RSA) != (state == ASSERT_LINE ? RSA : 0))
+	{
+		m_divider = (m_divider & ~RSA) | (state == ASSERT_LINE ? RSA : 0);
+		notify_clock_changed();
+	}
+}
+
+
+//------------------------------------------------
+//  rsb_w - set RSB input line
+//------------------------------------------------
+
+WRITE_LINE_MEMBER(mc14411_device::rsb_w)
+{
+	LOGSETUP("%s %02x\n", FUNCNAME, state);
+
+	if ((m_divider & RSB) != (state == ASSERT_LINE ? RSB : 0))
+	{
+		m_divider = (m_divider & ~RSB) | (state == ASSERT_LINE ? RSB : 0);
 		notify_clock_changed();
 	}
 }

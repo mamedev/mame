@@ -92,8 +92,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	DECLARE_WRITE8_MEMBER(rate_select_w);
+	DECLARE_WRITE_LINE_MEMBER(rsa_w);
+	DECLARE_WRITE_LINE_MEMBER(rsb_w);
 
 	void timer_enable(timer_id i, bool enable);
+	void timer_disable_all();
 
 protected:
 	mc14411_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
