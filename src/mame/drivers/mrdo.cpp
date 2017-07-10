@@ -35,11 +35,12 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 
 
 
-/* this looks like some kind of protection. The game doesn't clear the screen */
+/* PAL16R6CN used for protection. The game doesn't clear the screen */
 /* if a read from this address doesn't return the value it expects. */
 READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
+
 	return RAM[space.device().state().state_int(Z80_HL)];
 }
 
@@ -197,6 +198,10 @@ static MACHINE_CONFIG_START( mrdo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mrlo, mrdo )
+	//MCFG_DEVICE_REMOVE("pal16r6")
+MACHINE_CONFIG_END
+
 
 
 /***************************************************************************
@@ -229,6 +234,9 @@ ROM_START( mrdo )
 	ROM_LOAD( "t02--3.bin",   0x0020, 0x0020, CRC(ae263dc0) SHA1(7072c100b9d692f5bb12b0c9e304425f534481e2) )    /* palette (low bits) */
 	ROM_LOAD( "f10--1.bin",   0x0040, 0x0020, CRC(16ee4ca2) SHA1(fcba4d103708b9711452009cd29c4f88d2f64cd3) )    /* sprite color lookup table */
 	ROM_LOAD( "j10--4.bin",   0x0060, 0x0020, CRC(ff7fe284) SHA1(3ac8e30011c1fcba0ee8f4dc932f82296c3ba143) )    /* timing (not used) */
+
+	ROM_REGION( 0x0200, "pal16r6", 0 )
+	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // PAL16R6 converted to GAL16V8
 ROM_END
 
 ROM_START( mrdot )
@@ -255,6 +263,9 @@ ROM_START( mrdot )
 	ROM_LOAD( "t02--3.bin",   0x0020, 0x0020, CRC(ae263dc0) SHA1(7072c100b9d692f5bb12b0c9e304425f534481e2) )    /* palette (low bits) */
 	ROM_LOAD( "f10--1.bin",   0x0040, 0x0020, CRC(16ee4ca2) SHA1(fcba4d103708b9711452009cd29c4f88d2f64cd3) )    /* sprite color lookup table */
 	ROM_LOAD( "j10--4.bin",   0x0060, 0x0020, CRC(ff7fe284) SHA1(3ac8e30011c1fcba0ee8f4dc932f82296c3ba143) )    /* timing (not used) */
+
+	ROM_REGION( 0x0200, "pal16r6", 0 )
+	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // PAL16R6 converted to GAL16V8
 ROM_END
 
 ROM_START( mrdofix )
@@ -281,6 +292,9 @@ ROM_START( mrdofix )
 	ROM_LOAD( "t02--3.bin",   0x0020, 0x0020, CRC(ae263dc0) SHA1(7072c100b9d692f5bb12b0c9e304425f534481e2) )    /* palette (low bits) */
 	ROM_LOAD( "f10--1.bin",   0x0040, 0x0020, CRC(16ee4ca2) SHA1(fcba4d103708b9711452009cd29c4f88d2f64cd3) )    /* sprite color lookup table */
 	ROM_LOAD( "j10--4.bin",   0x0060, 0x0020, CRC(ff7fe284) SHA1(3ac8e30011c1fcba0ee8f4dc932f82296c3ba143) )    /* timing (not used) */
+
+	ROM_REGION( 0x0200, "pal16r6", 0 )
+	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // PAL16R6 converted to GAL16V8
 ROM_END
 
 ROM_START( mrlo )
@@ -333,6 +347,9 @@ ROM_START( mrdu )
 	ROM_LOAD( "t02--3.bin",   0x0020, 0x0020, CRC(ae263dc0) SHA1(7072c100b9d692f5bb12b0c9e304425f534481e2) )    /* palette (low bits) */
 	ROM_LOAD( "f10--1.bin",   0x0040, 0x0020, CRC(16ee4ca2) SHA1(fcba4d103708b9711452009cd29c4f88d2f64cd3) )    /* sprite color lookup table */
 	ROM_LOAD( "j10--4.bin",   0x0060, 0x0020, CRC(ff7fe284) SHA1(3ac8e30011c1fcba0ee8f4dc932f82296c3ba143) )    /* timing (not used) */
+
+	ROM_REGION( 0x0200, "pal16r6", 0 )
+	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) )
 ROM_END
 
 ROM_START( mrdoy )
@@ -359,6 +376,9 @@ ROM_START( mrdoy )
 	ROM_LOAD( "t02--3.bin",   0x0020, 0x0020, CRC(ae263dc0) SHA1(7072c100b9d692f5bb12b0c9e304425f534481e2) )    /* palette (low bits) */
 	ROM_LOAD( "f10--1.bin",   0x0040, 0x0020, CRC(16ee4ca2) SHA1(fcba4d103708b9711452009cd29c4f88d2f64cd3) )    /* sprite color lookup table */
 	ROM_LOAD( "j10--4.bin",   0x0060, 0x0020, CRC(ff7fe284) SHA1(3ac8e30011c1fcba0ee8f4dc932f82296c3ba143) )    /* timing (not used) */
+
+	ROM_REGION( 0x0200, "pal16r6", 0 )
+	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // PAL16R6 converted to GAL16V8
 ROM_END
 
 ROM_START( yankeedo )
@@ -385,6 +405,9 @@ ROM_START( yankeedo )
 	ROM_LOAD( "t02--3.bin",   0x0020, 0x0020, CRC(ae263dc0) SHA1(7072c100b9d692f5bb12b0c9e304425f534481e2) )    /* palette (low bits) */
 	ROM_LOAD( "f10--1.bin",   0x0040, 0x0020, CRC(16ee4ca2) SHA1(fcba4d103708b9711452009cd29c4f88d2f64cd3) )    /* sprite color lookup table */
 	ROM_LOAD( "j10--4.bin",   0x0060, 0x0020, CRC(ff7fe284) SHA1(3ac8e30011c1fcba0ee8f4dc932f82296c3ba143) )    /* timing (not used) */
+
+	ROM_REGION( 0x0200, "pal16r6", 0 )
+	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // PAL16R6 converted to GAL16V8
 ROM_END
 
 
@@ -393,6 +416,6 @@ GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",     
 GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
 GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrlo,     mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
 GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )
