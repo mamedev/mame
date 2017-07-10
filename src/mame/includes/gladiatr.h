@@ -2,7 +2,6 @@
 // copyright-holders:Victor Trucco,Steve Ellenoff,Phil Stroffolino,Tatsuyuki Satoh,Tomasz Slanina,Nicola Salmoria,Vas Crabb
 
 #include "machine/gen_latch.h"
-
 #include "sound/msm5205.h"
 
 
@@ -21,6 +20,10 @@ protected:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_audiocpu(*this, "audiocpu")
+		, m_cctl(*this, "cctl")
+		, m_ccpu(*this, "ccpu")
+		, m_ucpu(*this, "ucpu")
+		, m_csnd(*this, "csnd")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_msm(*this, "msm")
@@ -49,6 +52,10 @@ protected:
 	required_device<cpu_device>             m_maincpu;
 	required_device<cpu_device>             m_subcpu;
 	required_device<cpu_device>             m_audiocpu;
+	optional_device<cpu_device>             m_cctl;
+	optional_device<cpu_device>             m_ccpu;
+	optional_device<cpu_device>             m_ucpu;
+	optional_device<cpu_device>             m_csnd;
 	required_device<gfxdecode_device>       m_gfxdecode;
 	required_device<palette_device>         m_palette;
 	required_device<msm5205_device>         m_msm;

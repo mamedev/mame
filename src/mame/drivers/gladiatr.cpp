@@ -224,7 +224,10 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 	/* bit 7   : SSRST = sound reset ? */
 	/* bit 6-1 : N.C.                  */
 	/* bit 0   : ??                    */
+	m_ccpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_cctl->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
+
 /* YM2203 IRQ */
 WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 {
