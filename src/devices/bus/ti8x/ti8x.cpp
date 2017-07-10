@@ -120,16 +120,23 @@ void device_ti8x_link_port_bit_interface::interface_pre_start()
 {
 	device_ti8x_link_port_interface::interface_pre_start();
 
-	m_error_timer = device().timer_alloc(TIMER_ID_BIT_TIMEOUT);
+	if (!m_error_timer)
+		m_error_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_ti8x_link_port_bit_interface::bit_timeout), this));
+
+	m_bit_phase = IDLE;
+	m_tx_bit_buffer = EMPTY;
+	m_tip_in = m_ring_in = true;
+}
+
+
+void device_ti8x_link_port_bit_interface::interface_post_start()
+{
+	device_ti8x_link_port_interface::interface_post_start();
 
 	device().save_item(NAME(m_bit_phase));
 	device().save_item(NAME(m_tx_bit_buffer));
 	device().save_item(NAME(m_tip_in));
 	device().save_item(NAME(m_ring_in));
-
-	m_bit_phase = IDLE;
-	m_tx_bit_buffer = EMPTY;
-	m_tip_in = m_ring_in = true;
 }
 
 
@@ -143,66 +150,6 @@ void device_ti8x_link_port_bit_interface::interface_pre_reset()
 
 	output_tip(1);
 	output_ring(1);
-}
-
-
-void device_ti8x_link_port_bit_interface::device_timer(
-		emu_timer &timer,
-		device_timer_id id,
-		int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_ID_BIT_TIMEOUT:
-		switch (m_bit_phase)
-		{
-		// something very bad happened (heap smash?)
-		case IDLE:
-		case HOLD_0:
-		case HOLD_1:
-		default:
-			throw false;
-
-		// receive timeout
-		case ACK_0:
-		case ACK_1:
-			LOGBITPROTO("timeout acknowledging %d bit\n", (ACK_0 == m_bit_phase) ? 0 : 1);
-			output_tip(1);
-			output_ring(1);
-			if (m_tip_in && m_ring_in)
-			{
-				check_tx_bit_buffer();
-			}
-			else
-			{
-				LOGBITPROTO("waiting for bus idle\n");
-				m_error_timer->reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
-				m_bit_phase = WAIT_IDLE;
-			}
-			bit_receive_timeout();
-			break;
-
-		// send timeout:
-		case WAIT_IDLE:
-			assert(EMPTY != m_tx_bit_buffer);
-		case WAIT_ACK_0:
-		case WAIT_ACK_1:
-		case WAIT_REL_0:
-		case WAIT_REL_1:
-			LOGBITPROTO("timeout sending bit\n");
-			m_error_timer->reset();
-			m_bit_phase = (m_tip_in && m_ring_in) ? IDLE : WAIT_IDLE;
-			m_tx_bit_buffer = EMPTY;
-			output_tip(1);
-			output_ring(1);
-			bit_send_timeout();
-			break;
-		}
-		break;
-
-	default:
-		break;
-	}
 }
 
 
@@ -452,6 +399,55 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_ring)
 }
 
 
+TIMER_CALLBACK_MEMBER(device_ti8x_link_port_bit_interface::bit_timeout)
+{
+	switch (m_bit_phase)
+	{
+	// something very bad happened (heap smash?)
+	case IDLE:
+	case HOLD_0:
+	case HOLD_1:
+	default:
+		throw false;
+
+	// receive timeout
+	case ACK_0:
+	case ACK_1:
+		LOGBITPROTO("timeout acknowledging %d bit\n", (ACK_0 == m_bit_phase) ? 0 : 1);
+		output_tip(1);
+		output_ring(1);
+		if (m_tip_in && m_ring_in)
+		{
+			check_tx_bit_buffer();
+		}
+		else
+		{
+			LOGBITPROTO("waiting for bus idle\n");
+			m_error_timer->reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
+			m_bit_phase = WAIT_IDLE;
+		}
+		bit_receive_timeout();
+		break;
+
+	// send timeout:
+	case WAIT_IDLE:
+		assert(EMPTY != m_tx_bit_buffer);
+	case WAIT_ACK_0:
+	case WAIT_ACK_1:
+	case WAIT_REL_0:
+	case WAIT_REL_1:
+		LOGBITPROTO("timeout sending bit\n");
+		m_error_timer->reset();
+		m_bit_phase = (m_tip_in && m_ring_in) ? IDLE : WAIT_IDLE;
+		m_tx_bit_buffer = EMPTY;
+		output_tip(1);
+		output_ring(1);
+		bit_send_timeout();
+		break;
+	}
+}
+
+
 void device_ti8x_link_port_bit_interface::check_tx_bit_buffer()
 {
 	assert(m_tip_in);
@@ -506,10 +502,16 @@ void device_ti8x_link_port_byte_interface::interface_pre_start()
 {
 	device_ti8x_link_port_bit_interface::interface_pre_start();
 
+	m_tx_byte_buffer = m_rx_byte_buffer = 0U;
+}
+
+
+void device_ti8x_link_port_byte_interface::interface_post_start()
+{
+	device_ti8x_link_port_bit_interface::interface_post_start();
+
 	device().save_item(NAME(m_tx_byte_buffer));
 	device().save_item(NAME(m_rx_byte_buffer));
-
-	m_tx_byte_buffer = m_rx_byte_buffer = 0U;
 }
 
 

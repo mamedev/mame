@@ -47,11 +47,6 @@ void midiout_device::device_reset()
 	set_tra_rate(0);
 }
 
-void midiout_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
 /*-------------------------------------------------
     call_load
 -------------------------------------------------*/

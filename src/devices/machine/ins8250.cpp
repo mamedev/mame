@@ -560,7 +560,6 @@ void ins8250_uart_device::device_start()
 	set_tra_rate(0);
 	set_rcv_rate(0);
 
-	device_serial_interface::register_save_state(machine().save(), this);
 	save_item(NAME(m_regs.thr));
 	save_item(NAME(m_regs.rbr));
 	save_item(NAME(m_regs.ier));
@@ -602,11 +601,6 @@ void ins8250_uart_device::device_reset()
 	m_out_out2_cb(1);
 }
 
-void ins8250_uart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-		device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
 void ns16550_device::device_start()
 {
 	m_timeout = timer_alloc();
@@ -633,9 +627,7 @@ void ns16550_device::device_reset()
 
 void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(id)
-		device_serial_interface::device_timer(timer, id, param, ptr);
-	else
+	if(!id)
 	{
 		trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
 		m_timeout->adjust(attotime::never);

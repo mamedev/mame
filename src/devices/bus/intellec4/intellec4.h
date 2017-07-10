@@ -117,7 +117,7 @@ to implement the card in both systems.
 #define MCFG_INTELLEC4_UNIV_SLOT_ADD(bus_tag, slot_tag, clock, slot_intf, def_slot) \
 		MCFG_DEVICE_ADD(slot_tag, INTELLEC4_UNIV_SLOT, clock) \
 		MCFG_DEVICE_SLOT_INTERFACE(slot_intf, def_slot, false) \
-		bus::intellec4::univ_slot_device::set_bus_tag(*device, bus_tag);
+		bus::intellec4::univ_slot_device::set_bus_tag(*device, "^" bus_tag);
 
 #define MCFG_INTELLEC4_UNIV_SLOT_REMOVE(slot_tag) \
 		MCFG_DEVICE_REMOVE(slot_tag)
@@ -168,13 +168,19 @@ public:
 
 protected:
 	// device_t implementation
+	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_start() override;
+
+private:
+	required_device<univ_bus_device>    m_bus;
 };
 
 
 class univ_bus_device : public device_t
 {
 public:
+	friend class device_univ_card_interface;
+
 	// address space configuration
 	static void set_rom_space(device_t &device, char const *tag, int space);
 	static void set_rom_ports_space(device_t &device, char const *tag, int space);
@@ -214,6 +220,9 @@ protected:
 	virtual void device_start() override;
 
 private:
+	// helpers for cards
+	unsigned add_card(device_univ_card_interface &card);
+
 	// finding address spaces
 	required_device<device_memory_interface>    m_rom_device, m_rom_ports_device;
 	required_device<device_memory_interface>    m_memory_device, m_status_device, m_ram_ports_device;
@@ -236,6 +245,20 @@ private:
 
 class device_univ_card_interface : public device_slot_card_interface
 {
+protected:
+	friend class univ_slot_device;
+	friend class univ_bus_device;
+
+	device_univ_card_interface(const machine_config &mconfig, device_t &device);
+
+	// device_interface implementation
+	void interface_pre_start() override;
+
+private:
+	void set_bus(univ_bus_device &bus);
+
+	univ_bus_device *m_bus;
+	unsigned        m_index;
 };
 
 } } // namespace bus::intellec4

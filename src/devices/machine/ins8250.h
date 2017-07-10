@@ -51,7 +51,6 @@ protected:
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void set_fcr(uint8_t data) { }
 	virtual void push_tx(uint8_t data) { }

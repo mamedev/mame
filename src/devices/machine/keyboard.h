@@ -47,7 +47,6 @@ protected:
 
 	virtual void interface_pre_start() override;
 	virtual void interface_post_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void start_processing(const attotime &period);
 	void stop_processing();
@@ -66,13 +65,8 @@ protected:
 	bool are_all_keys_up();
 
 private:
-	// device_serial_interface uses 10'000 range
-	enum {
-		TIMER_ID_SCAN = 20'000,
-		TIMER_ID_TYPEMATIC
-	};
-
-	void scan_row();
+	TIMER_CALLBACK_MEMBER(scan_row);
+	TIMER_CALLBACK_MEMBER(typematic);
 
 	emu_timer       *m_scan_timer;
 	emu_timer       *m_typematic_timer;
@@ -109,7 +103,6 @@ protected:
 			u32 clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
 	virtual void send_key(u8 code);

@@ -969,8 +969,6 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_tx_int_disarm));
 	save_item(NAME(m_sync_pattern));
-
-	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 
@@ -1050,10 +1048,6 @@ void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int para
 	default:
 		logerror("Spurious timer %d event\n", id);
 	}
-#else
-	// TODO: Hmmm, either the above default clause is called OR the bellow call is not needed  since we handled our local event anyway...?!
-		// and the above default is not called unless we implement the BRG timer using diserial timer interfaces...
-	device_serial_interface::device_timer(timer, id, param, ptr);
 #endif
 }
 

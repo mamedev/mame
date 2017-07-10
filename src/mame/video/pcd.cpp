@@ -468,8 +468,3 @@ void pcx_video_device::rcv_complete()
 	m_mcu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 	m_mcu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
-
-void pcx_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}

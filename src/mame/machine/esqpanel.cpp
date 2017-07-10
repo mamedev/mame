@@ -483,10 +483,6 @@ void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		check_external_panel_server();
 	}
-	else
-	{
-		device_serial_interface::device_timer(timer, id, param, ptr);
-	}
 }
 
 void esqpanel_device::rcv_complete()    // Rx completed receiving byte

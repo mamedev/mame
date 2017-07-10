@@ -802,8 +802,6 @@ MACHINE_CONFIG_END
 
 void hle_device_base::device_start()
 {
-	device_buffered_serial_interface::register_save_state(machine().save(), this);
-
 	m_click_timer = timer_alloc(CLICK_TIMER_ID);
 
 	save_item(NAME(m_make_count));
@@ -874,8 +872,7 @@ void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int par
 		break;
 
 	default:
-		device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-		device_buffered_serial_interface::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 

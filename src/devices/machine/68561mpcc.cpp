@@ -205,8 +205,6 @@ void mpcc_device::device_start()
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_ecr));
 	LOG(" - MPCC variant %02x\n", m_variant);
-
-	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 //-------------------------------------------------
@@ -259,11 +257,6 @@ void mpcc_device::device_reset()
 /*
  * Serial device implementation
  */
-void mpcc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
 WRITE_LINE_MEMBER(mpcc_device::cts_w)
 {
 	if (state == CLEAR_LINE)

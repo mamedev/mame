@@ -241,12 +241,6 @@ void grid_keyboard_device::device_reset()
 }
 
 
-void grid_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-}
-
-
 void grid_keyboard_device::key_make(u8 row, u8 column)
 {
 	send_translated((row << 4) | column);

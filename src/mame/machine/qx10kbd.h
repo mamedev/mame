@@ -17,7 +17,6 @@ public:
 
 protected:
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void key_make(uint8_t row, uint8_t column) override;
 
 private:

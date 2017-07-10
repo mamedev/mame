@@ -569,7 +569,6 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_sync));
 	save_item(NAME(m_variant));
-	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 
@@ -601,11 +600,6 @@ void z80sio_channel::device_reset()
 	{
 		m_uart->reset_interrupts();
 	}
-}
-
-void z80sio_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 //-------------------------------------------------
