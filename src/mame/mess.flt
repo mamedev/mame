@@ -123,6 +123,7 @@ coco12.cpp
 coco3.cpp
 codata.cpp
 coleco.cpp
+compc.cpp
 compis.cpp
 compucolor.cpp
 comquest.cpp

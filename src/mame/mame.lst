@@ -9795,7 +9795,11 @@ commandou                       // 5/1985 (c) 1985 + Data East license (US)
 commandou2                      // 5/1985 (c) 1985 + Data East license (US)
 sinvasn                         // Europe original?
 sinvasnb                        // bootleg
-mercenario          // bootleg
+mercenario                      // bootleg
+
+@source:compc.cpp
+compc10                         // 1984 Commodore PC-10, PC-20 and PC-30
+pc10iii                         // 1987 Commodore PC-10 III
 
 @source:compgolf.cpp
 compgolf                        // (c) 1985 Data East Corporation (Japan)
@@ -30052,7 +30056,6 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
-compc10							// 1984 Commodore PC-10, PC-20 and PC-30
 dgone                           // 1984 Data General/One
 eagle1600                       //
 ibm5550                         //
@@ -30061,7 +30064,6 @@ mbc16                           // Sanyo MBC-16
 mc1702                          //
 mk88                            //
 olivm15                         //
-pc10iii                         // 1987 Commodore PC-10 III
 pc7000                          // 1985 Sharp PC-7000
 poisk2                          //
 sicpc1605                       //
