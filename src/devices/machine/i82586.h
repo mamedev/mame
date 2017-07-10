@@ -15,7 +15,7 @@ class i82586_base_device :
 	public device_network_interface
 {
 public:
-	template<class _Object> static devcb_base &static_set_out_irq_callback(device_t &device, _Object object) { return downcast<i82586_base_device &>(device).m_out_irq.set_callback(object); }
+	template <class Object> static devcb_base &static_set_out_irq_callback(device_t &device, Object &&cb) { return downcast<i82586_base_device &>(device).m_out_irq.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(ca);
 
@@ -25,9 +25,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
-	address_space_config m_space_config;
+	const address_space_config m_space_config;
 	address_space *m_space;
 
 	devcb_write_line m_out_irq;
