@@ -3215,3 +3215,15 @@ if (MACHINES["SMIOC"]~=null) then
 		MAME_DIR .. "src/devices/machine/smioc.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i82586.h,MACHINES["I82586"] = true
+---------------------------------------------------
+
+if (MACHINES["I82586"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i82586.cpp",
+		MAME_DIR .. "src/devices/machine/i82586.h",
+	}
+end
