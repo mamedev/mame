@@ -129,17 +129,20 @@ void nscsi_harddisk_device::scsi_command()
 		logerror("%s: command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
 					tag(),
 					lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
-		if(lun) {
-			bad_lun();
-			return;
-		}
 
 		int page = scsi_cmdbuf[2];
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
 			memset(scsi_cmdbuf, 0, 148);
-			scsi_cmdbuf[0] = 0x00; // device is direct-access (e.g. hard disk)
+			// From Seagate SCSI Commands Reference Manual (http://www.seagate.com/staticfiles/support/disc/manuals/scsi/100293068a.pdf), page 73:
+			// If the SCSI target device is not capable of supporting a peripheral device connected to this logical unit, the
+			// device server shall set these fields to 7Fh (i.e., PERIPHERAL QUALIFIER field set to 011b and PERIPHERAL DEVICE
+			// TYPE set to 1Fh).
+			if (lun != 0)
+				scsi_cmdbuf[0] = 0x7f;
+			else
+				scsi_cmdbuf[0] = 0x00; // device is direct-access (e.g. hard disk)
 			scsi_cmdbuf[1] = 0x00; // media is not removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x01; // response data format = CCS
