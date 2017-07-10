@@ -37,7 +37,6 @@ private:
 void compc_state::machine_reset()
 {
 	m_portb = 0;
-	m_keyboard->enable(1);
 }
 
 WRITE8_MEMBER(compc_state::pio_w)
@@ -48,7 +47,7 @@ WRITE8_MEMBER(compc_state::pio_w)
 			m_portb = data;
 			m_mb->m_pit8253->write_gate2(BIT(data, 0));
 			m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
-			//m_keyboard->enable(BIT(data, 6));
+			m_keyboard->enable(BIT(data, 6));
 			if(data & 0x80)
 				m_mb->m_pic8259->ir1_w(0);
 			break;
@@ -64,6 +63,9 @@ READ8_MEMBER(compc_state::pio_r)
 		case 0:
 			data = m_keyboard->read(space, 0);
 			break;
+		case 1:
+			data = m_portb;
+			break;
 		case 2:
 			if(BIT(m_portb, 3))
 			{
@@ -75,7 +77,7 @@ READ8_MEMBER(compc_state::pio_r)
 				/* read lo nibble of S2 */
 				data = ioport("DSW0")->read() & 0x0f;
 			}
-			if(m_mb->pit_out2() && BIT(m_portb, 0))
+			if(m_mb->pit_out2())
 				data |= 0x20;
 			break;
 	}
@@ -154,6 +156,14 @@ static MACHINE_CONFIG_START(compc)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
+	MCFG_DEVICE_REMOVE("mb:pit8253")
+	MCFG_DEVICE_ADD("mb:pit8253", FE2010_PIT, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12.0) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12.0) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12.0) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out2_changed))
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "mda", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "lpt", false)

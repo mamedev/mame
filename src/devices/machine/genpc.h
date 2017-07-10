@@ -45,6 +45,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
+	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
+	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+
 protected:
 	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -96,9 +99,6 @@ protected:
 	DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
 	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
 	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
