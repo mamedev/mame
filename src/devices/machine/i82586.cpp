@@ -7,10 +7,16 @@
 * Hopefully this might eventually support all of the following, but initial focus will be 82586 and 82596DX
 * because these are used in the InterPro 2xxx and 6xxx series systems:
 *
-*   - 82586 - 16/24 data/address bus, 6/8/10 MHz, http://www.jbrick.org/82586.pdf (better source to follow)
-*   - 82596SX - 16/32 data/address bus, 16/20 MHz, 
+*   - 82586 - 16/24 data/address bus, 6/8/10 MHz
+*   - 82596SX - 16/32 data/address bus, 16/20 MHz
 *   - 82596DX - 32/32 data/address bus, 25/33 MHz
-*   - 82596CA - 32/32 data/address bus, 16/20/25/33 MHz, https://www.intel.com/assets/pdf/general/82596ca.pdf
+*   - 82596CA - 32/32 data/address bus, 16/20/25/33 MHz
+*
+* Some documents covering the above include:
+*
+*   http://bitsavers.org/pdf/intel/_dataBooks/1991_Microcommunications.pdf
+*   http://bitsavers.org/pdf/intel/_dataBooks/1996_Networking.pdf
+*   https://www.intel.com/assets/pdf/general/82596ca.pdf
 *
 * TODO
 *   - virtually everything
