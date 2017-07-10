@@ -688,7 +688,7 @@ MACHINE_CONFIG_MEMBER(esqpanel2x40_vfx_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqpanel_device(mconfig, ESQPANEL2X40, tag, owner, clock),
+	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
 	m_eps_mode = false;
