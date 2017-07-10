@@ -66,9 +66,9 @@ WRITE32_MEMBER(lpc210x_device::flash_w)
 }
 
 
-std::vector<std::pair<int, const address_space_config *>> lpc210x_device::memory_space_config() const
+device_memory_interface::space_config_vector lpc210x_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }

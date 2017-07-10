@@ -322,9 +322,9 @@ void seibu_crtc_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> seibu_crtc_device::memory_space_config() const
+device_memory_interface::space_config_vector seibu_crtc_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

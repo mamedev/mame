@@ -1569,19 +1569,6 @@ void memory_manager::allocate(device_memory_interface &memory)
 }
 
 //-------------------------------------------------
-//  configure - configure the address spaces
-//-------------------------------------------------
-
-void memory_manager::configure()
-{
-	// loop over devices to configure the address spaces
-	memory_interface_iterator iter(machine().root_device());
-	for (device_memory_interface &memory : iter)
-		memory.load_configs();
-	m_machine.m_dummy_space.load_configs();
-}
-
-//-------------------------------------------------
 //  initialize - initialize the memory system
 //-------------------------------------------------
 

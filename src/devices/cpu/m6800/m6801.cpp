@@ -294,7 +294,7 @@ hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> m6801_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector m6801_cpu_device::memory_space_config() const
 {
 	auto r = m6800_cpu_device::memory_space_config();
 	r.emplace_back(std::make_pair(AS_IO, &m_io_config));

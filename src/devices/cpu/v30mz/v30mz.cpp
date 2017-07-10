@@ -134,9 +134,9 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 	memset(&m_regs, 0x00, sizeof(m_regs));
 }
 
-std::vector<std::pair<int, const address_space_config *>> v30mz_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector v30mz_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_IO,      &m_io_config)
 	};

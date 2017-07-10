@@ -40,16 +40,16 @@ void deco16_device::device_start()
 	io = &space(AS_IO);
 }
 
-std::vector<std::pair<int, const address_space_config *>> deco16_device::memory_space_config() const
+device_memory_interface::space_config_vector deco16_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &program_config),
 			std::make_pair(AS_OPCODES, &sprogram_config),
 			std::make_pair(AS_IO,      &io_config)
 		};
 	else
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &program_config),
 			std::make_pair(AS_IO,      &io_config)
 		};

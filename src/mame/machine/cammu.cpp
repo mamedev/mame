@@ -149,9 +149,9 @@ void cammu_device::device_reset()
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> cammu_device::memory_space_config() const
+device_memory_interface::space_config_vector cammu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_main_space_config),
 		std::make_pair(1, &m_io_space_config),
 		std::make_pair(2, &m_boot_space_config)

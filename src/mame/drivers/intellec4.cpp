@@ -94,7 +94,6 @@ protected:
 		, m_sw_mode(*this, "MODE")
 		, m_program_banks(*this, "prgbank")
 		, m_rom_port_banks(*this, "rpbank")
-		, m_ram_port_banks(*this, "mpbank")
 		, m_tty(*this, "tty")
 		, m_memory(*this, "memory"), m_status(*this, "status")
 		, m_sw_control(*this, "CONTROL")
@@ -115,13 +114,13 @@ private:
 	enum
 	{
 		BANK_PRG_MON = 0,
-		BANK_PRG_RAM,
 		BANK_PRG_PROM,
+		BANK_PRG_RAM,
 		BANK_PRG_NONE,
 
 		BANK_IO_MON = 0,
-		BANK_IO_NEITHER,
 		BANK_IO_PROM,
+		BANK_IO_NEITHER,
 
 		BIT_SW_RESET = 2,
 		BIT_SW_RESET_MODE,
@@ -151,7 +150,7 @@ private:
 	void check_4002_reset();
 	void reset_panel();
 
-	required_device<address_map_bank_device>    m_program_banks, m_rom_port_banks, m_ram_port_banks;
+	required_device<address_map_bank_device>    m_program_banks, m_rom_port_banks;
 	required_device<rs232_port_device>          m_tty;
 
 	required_shared_ptr<u8>     m_memory, m_status;
@@ -196,10 +195,10 @@ ADDRESS_MAP_START(intellec4_program_banks, mcs40_cpu_device_base::AS_ROM, 8, int
 	// 0x0000...0x0fff MON
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("monitor", 0x0000)
 
-	// 0x1000...0x1fff RAM
-	AM_RANGE(0x1000, 0x1fff) AM_READONLY AM_SHARE("ram")
+	// 0x1000...0x1fff PROM
 
-	// 0x2000...0x2fff PROM
+	// 0x1000...0x1fff RAM
+	AM_RANGE(0x2000, 0x2fff) AM_READONLY AM_SHARE("ram")
 
 	// 0x3000...0x3fff unmapped in case someone presses two mode switches at once
 ADDRESS_MAP_END
@@ -212,23 +211,11 @@ ADDRESS_MAP_START(intellec4_rom_port_banks, mcs40_cpu_device_base::AS_ROM_PORTS,
 	AM_RANGE(0x00e0, 0x00ef) AM_MIRROR(0x1f00) AM_READWRITE(rome_in, rome_out)
 	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x1f00) AM_READWRITE(romf_in, romf_out)
 
-	// 0x0800...0x0fff neither
+	// 0x0800...0x0fff PROM
 
-	// 0x1000...0x17ff PROM
+	// 0x1000...0x17ff neither
 
 	// 0x1800...0x1fff unused
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(intellec4_ram_port_banks, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_state)
-	// 0x00...0x1f MON
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x60) AM_WRITE(ram0_out)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x60) AM_WRITE(ram1_out)
-
-	// 0x20...0x3f neither
-
-	// 0x40...0x5f PROM
-
-	// 0x60...0x7f unused
 ADDRESS_MAP_END
 
 
@@ -257,7 +244,8 @@ ADDRESS_MAP_START(intellec4_ram_status, mcs40_cpu_device_base::AS_RAM_STATUS, 8,
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(intellec4_ram_ports, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_state)
-	AM_RANGE(0x00, 0x1f) AM_DEVICE("mpbank", address_map_bank_device, amap8)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ram0_out)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ram1_out)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(intellec4_program_memory, mcs40_cpu_device_base::AS_PROGRAM_MEMORY, 8, intellec4_state)
@@ -285,16 +273,14 @@ MACHINE_CONFIG_START(intellec4)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	MCFG_DEVICE_ADD("mpbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(intellec4_ram_port_banks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(7)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x20)
-
 	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, "terminal")
 
 	MCFG_DEVICE_ADD("bus", INTELLEC4_UNIV_BUS, 518000. / 7)
+	MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE("prgbank", AS_PROGRAM)
+	MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE("rpbank", AS_PROGRAM)
+	MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_MEMORY)
+	MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_STATUS)
+	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_PORTS)
 	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(intellec4_state, bus_reset_4002))
 	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(intellec4_state, bus_user_reset))
 	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j7",  518000. / 7, intellec4_univ_cards, nullptr)
@@ -568,7 +554,6 @@ template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 			{
 				m_program_banks->set_bank(prg_banks[N]);
 				m_rom_port_banks->set_bank(io_banks[N]);
-				m_ram_port_banks->set_bank(io_banks[N]);
 				machine().output().set_value(mode_leds[N], m_ff_prg_mode[N] = true);
 			}
 			trigger_reset();
@@ -577,7 +562,6 @@ template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 		{
 			m_program_banks->set_bank(BANK_PRG_NONE);
 			m_rom_port_banks->set_bank(BANK_IO_NEITHER);
-			m_ram_port_banks->set_bank(BANK_IO_NEITHER);
 		}
 		if ((0U != N) && m_ff_prg_mode[0])
 			machine().output().set_value(mode_leds[0], m_ff_prg_mode[0] = false);

@@ -84,7 +84,7 @@ public:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -559,9 +559,9 @@ void vgmplay_device::execute_set_input(int inputnum, int state)
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> vgmplay_device::memory_space_config() const
+device_memory_interface::space_config_vector vgmplay_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_file_config),
 		std::make_pair(AS_IO,      &m_io_config),
 		std::make_pair(AS_IO16,    &m_io16_config)

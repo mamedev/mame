@@ -217,7 +217,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
 	static constexpr uint32_t OPCODE_BYTES = 8; // actually 6, but emulation requires padding to 64 bits

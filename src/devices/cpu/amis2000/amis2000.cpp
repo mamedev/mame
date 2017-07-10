@@ -68,9 +68,9 @@ amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const ch
 	: amis2000_base_device(mconfig, AMI_S2152, tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4))
 { }
 
-std::vector<std::pair<int, const address_space_config *>> amis2000_base_device::memory_space_config() const
+device_memory_interface::space_config_vector amis2000_base_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};

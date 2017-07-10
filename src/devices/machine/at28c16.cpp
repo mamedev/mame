@@ -57,9 +57,9 @@ at28c16_device::at28c16_device(const machine_config &mconfig, const char *tag, d
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> at28c16_device::memory_space_config() const
+device_memory_interface::space_config_vector at28c16_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

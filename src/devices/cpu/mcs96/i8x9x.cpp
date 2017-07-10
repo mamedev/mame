@@ -23,9 +23,9 @@ offs_t i8x9x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 	return disasm_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
-std::vector<std::pair<int, const address_space_config *>> i8x9x_device::memory_space_config() const
+device_memory_interface::space_config_vector i8x9x_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &program_config),
 		std::make_pair(AS_IO,      &io_config)
 	};

@@ -139,6 +139,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
 	m_dummy_space.set_machine(*this);
+	m_dummy_space.config_complete();
 
 	// set the machine on all devices
 	device_iterator iter(root_device());
@@ -238,7 +239,6 @@ void running_machine::start()
 	// needs rom bases), and finally initialize CPUs (which needs
 	// complete address spaces).  These operations must proceed in this
 	// order
-	m_memory.configure();
 	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
 
@@ -1304,9 +1304,9 @@ void dummy_space_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> dummy_space_device::memory_space_config() const
+device_memory_interface::space_config_vector dummy_space_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

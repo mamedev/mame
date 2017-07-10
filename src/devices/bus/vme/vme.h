@@ -142,7 +142,7 @@ public:
 	static void static_set_cputag(device_t &device, const char *tag);
 	static void static_use_owner_spaces(device_t &device);
 
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	const address_space_config m_a32_config;
 

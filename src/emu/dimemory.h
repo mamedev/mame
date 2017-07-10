@@ -102,16 +102,17 @@ public:
 	// just use it
 	device_memory_interface &memory() { return *this; }
 
-	void load_configs();
-
 protected:
+	using space_config_vector = std::vector<std::pair<int, const address_space_config *>>;
+
 	// required overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const = 0;
+	virtual space_config_vector memory_space_config() const = 0;
 
 	// optional operation overrides
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
 
 	// interface-level overrides
+	virtual void interface_config_complete() override;
 	virtual void interface_validity_check(validity_checker &valid) const override;
 
 	// configuration

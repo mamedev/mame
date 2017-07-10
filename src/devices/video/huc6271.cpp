@@ -66,9 +66,9 @@ void huc6271_device::device_reset()
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> huc6271_device::memory_space_config() const
+device_memory_interface::space_config_vector huc6271_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_DATA, &m_data_space_config)
 	};
 }

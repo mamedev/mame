@@ -897,9 +897,9 @@ void scudsp_cpu_device::execute_run()
 	} while( m_icount > 0 );
 }
 
-std::vector<std::pair<int, const address_space_config *>> scudsp_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector scudsp_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};

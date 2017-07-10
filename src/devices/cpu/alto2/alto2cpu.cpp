@@ -794,9 +794,9 @@ static const prom_load_t pl_madr_a91 =
 // device_memory_interface overrides
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> alto2_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector alto2_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_ucode_config),
 		std::make_pair(1, &m_const_config),
 		std::make_pair(2, &m_iomem_config)

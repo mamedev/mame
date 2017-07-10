@@ -205,9 +205,9 @@ SLOT_INTERFACE_END
 
 DEFINE_DEVICE_TYPE(VME, vme_device, "vme", "VME bus")
 
-std::vector<std::pair<int, const address_space_config *>> vme_device::memory_space_config() const
+device_memory_interface::space_config_vector vme_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_a32_config)
 	};
 }

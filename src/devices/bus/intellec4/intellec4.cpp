@@ -13,6 +13,10 @@ DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_BUS,  bus::intellec4, univ_bus_device,  "in
 
 namespace bus { namespace intellec4 {
 
+/***********************************************************************
+    SLOT DEVICE
+***********************************************************************/
+
 univ_slot_device::univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTELLEC4_UNIV_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
@@ -31,8 +35,62 @@ void univ_slot_device::device_start()
 
 
 
+/***********************************************************************
+    BUS DEVICE
+***********************************************************************/
+
+/*----------------------------------
+  address space configuration
+----------------------------------*/
+
+void univ_bus_device::set_rom_space(device_t &device, char const *tag, int space)
+{
+	univ_bus_device &bus(downcast<univ_bus_device &>(device));
+	bus.m_rom_device.set_tag(tag);
+	bus.m_rom_space = space;
+}
+
+void univ_bus_device::set_rom_ports_space(device_t &device, char const *tag, int space)
+{
+	univ_bus_device &bus(downcast<univ_bus_device &>(device));
+	bus.m_rom_ports_device.set_tag(tag);
+	bus.m_rom_ports_space = space;
+}
+
+void univ_bus_device::set_memory_space(device_t &device, char const *tag, int space)
+{
+	univ_bus_device &bus(downcast<univ_bus_device &>(device));
+	bus.m_memory_device.set_tag(tag);
+	bus.m_memory_space = space;
+}
+
+void univ_bus_device::set_status_space(device_t &device, char const *tag, int space)
+{
+	univ_bus_device &bus(downcast<univ_bus_device &>(device));
+	bus.m_status_device.set_tag(tag);
+	bus.m_status_space = space;
+}
+
+void univ_bus_device::set_ram_ports_space(device_t &device, char const *tag, int space)
+{
+	univ_bus_device &bus(downcast<univ_bus_device &>(device));
+	bus.m_ram_ports_device.set_tag(tag);
+	bus.m_ram_ports_space = space;
+}
+
+
 univ_bus_device::univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTELLEC4_UNIV_BUS, tag, owner, clock)
+	, m_rom_device(*this, finder_base::DUMMY_TAG)
+	, m_rom_ports_device(*this, finder_base::DUMMY_TAG)
+	, m_memory_device(*this, finder_base::DUMMY_TAG)
+	, m_status_device(*this, finder_base::DUMMY_TAG)
+	, m_ram_ports_device(*this, finder_base::DUMMY_TAG)
+	, m_rom_space(-1)
+	, m_rom_ports_space(-1)
+	, m_memory_space(-1)
+	, m_status_space(-1)
+	, m_ram_ports_space(-1)
 	, m_stop_out_cb(*this)
 	, m_test_out_cb(*this)
 	, m_reset_4002_out_cb(*this)
@@ -45,6 +103,10 @@ univ_bus_device::univ_bus_device(machine_config const &mconfig, char const *tag,
 	std::fill(std::begin(m_cards), std::end(m_cards), nullptr);
 }
 
+
+/*----------------------------------
+  input lines
+----------------------------------*/
 
 WRITE_LINE_MEMBER(univ_bus_device::sync_in)
 {
@@ -88,6 +150,24 @@ WRITE_LINE_MEMBER(univ_bus_device::reset_4002_in)
 	// FIXME: distribute to cards
 }
 
+
+/*----------------------------------
+  device_t implementation
+----------------------------------*/
+
+void univ_bus_device::device_validity_check(validity_checker &valid) const
+{
+	if (m_rom_device && !m_rom_device->space_config(m_rom_space))
+		osd_printf_error("ROM space device %s (%s) lacks address space %d config\n", m_rom_device->device().tag(), m_rom_device->device().name(), m_rom_space);
+	if (m_rom_ports_device && !m_rom_ports_device->space_config(m_rom_ports_space))
+		osd_printf_error("ROM ports space device %s (%s) lacks address space %d config\n", m_rom_ports_device->device().tag(), m_rom_ports_device->device().name(), m_rom_ports_space);
+	if (m_memory_device && !m_memory_device->space_config(m_memory_space))
+		osd_printf_error("Memory space device %s (%s) lacks address space %d config\n", m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_space);
+	if (m_status_device && !m_status_device->space_config(m_status_space))
+		osd_printf_error("Status space device %s (%s) lacks address space %d config\n", m_status_device->device().tag(), m_status_device->device().name(), m_status_space);
+	if (m_ram_ports_device && !m_ram_ports_device->space_config(m_ram_ports_space))
+		osd_printf_error("RAM ports space device %s (%s) lacks address space %d config\n", m_ram_ports_device->device().tag(), m_ram_ports_device->device().name(), m_ram_ports_space);
+}
 
 void univ_bus_device::device_start()
 {

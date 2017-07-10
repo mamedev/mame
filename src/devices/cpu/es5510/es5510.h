@@ -124,7 +124,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
 	virtual uint32_t execute_min_cycles() const override;

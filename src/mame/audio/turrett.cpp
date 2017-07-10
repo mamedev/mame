@@ -29,9 +29,9 @@ turrett_device::turrett_device(const machine_config &mconfig, const char *tag, d
 //  memory_space_config - configure address space
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> turrett_device::memory_space_config() const
+device_memory_interface::space_config_vector turrett_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

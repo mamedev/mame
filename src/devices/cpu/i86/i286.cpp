@@ -282,16 +282,16 @@ void i80286_cpu_device::device_start()
 	m_out_shutdown_func.resolve_safe();
 }
 
-std::vector<std::pair<int, const address_space_config *>> i80286_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector i80286_cpu_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_OPCODES, &m_opcodes_config),
 			std::make_pair(AS_IO,      &m_io_config)
 		};
 	else
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_IO,      &m_io_config)
 		};

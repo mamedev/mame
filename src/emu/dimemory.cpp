@@ -176,21 +176,6 @@ void device_memory_interface::set_address_space(int spacenum, address_space &spa
 
 
 //-------------------------------------------------
-//  load_configs - retrieve the space configs
-//-------------------------------------------------
-
-void device_memory_interface::load_configs()
-{
-	auto r = memory_space_config();
-	for (const auto &entry : r) {
-		if (entry.first >= int(m_address_config.size()))
-			m_address_config.resize(entry.first + 1);
-		m_address_config[entry.first] = entry.second;
-	}
-}
-
-
-//-------------------------------------------------
 //  memory_translate - translate from logical to
 //  phyiscal addresses; designed to be overridden
 //  by the actual device implementation if address
@@ -205,14 +190,28 @@ bool device_memory_interface::memory_translate(int spacenum, int intention, offs
 
 
 //-------------------------------------------------
+//  interface_config_complete - perform final
+//  memory configuration setup
+//-------------------------------------------------
+
+void device_memory_interface::interface_config_complete()
+{
+	const space_config_vector r = memory_space_config();
+	for (const auto &entry : r) {
+		if (entry.first >= int(m_address_config.size()))
+			m_address_config.resize(entry.first + 1);
+		m_address_config[entry.first] = entry.second;
+	}
+}
+
+
+//-------------------------------------------------
 //  interface_validity_check - perform validity
 //  checks on the memory configuration
 //-------------------------------------------------
 
 void device_memory_interface::interface_validity_check(validity_checker &valid) const
 {
-	const_cast<device_memory_interface *>(this)->load_configs();
-
 	// loop over all address spaces
 	for (int spacenum = 0; spacenum < int(m_address_config.size()); ++spacenum)
 	{

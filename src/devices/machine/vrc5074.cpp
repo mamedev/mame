@@ -163,7 +163,7 @@ void vrc5074_device::set_map(int id, const address_map_delegate &map, device_t *
 	m_cs_devices[id - 2] = device;
 }
 
-std::vector<std::pair<int, const address_space_config *>> vrc5074_device::memory_space_config() const
+device_memory_interface::space_config_vector vrc5074_device::memory_space_config() const
 {
 	auto r = pci_bridge_device::memory_space_config();
 	r.emplace_back(std::make_pair(AS_PCI_MEM, &m_mem_config));

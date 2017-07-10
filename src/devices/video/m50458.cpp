@@ -137,9 +137,9 @@ const tiny_rom_entry *m50458_device::device_rom_region() const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> m50458_device::memory_space_config() const
+device_memory_interface::space_config_vector m50458_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

@@ -204,9 +204,9 @@ offs_t z8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint
 	return CPU_DISASSEMBLE_NAME(z8)(this, stream, pc, oprom, opram, options);
 }
 
-std::vector<std::pair<int, const address_space_config *>> z8_device::memory_space_config() const
+device_memory_interface::space_config_vector z8_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};

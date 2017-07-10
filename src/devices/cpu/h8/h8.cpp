@@ -236,9 +236,9 @@ void h8_device::internal_update()
 	internal_update(total_cycles());
 }
 
-std::vector<std::pair<int, const address_space_config *>> h8_device::memory_space_config() const
+device_memory_interface::space_config_vector h8_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &program_config),
 		std::make_pair(AS_IO,      &io_config)
 	};

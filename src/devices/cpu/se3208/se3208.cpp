@@ -53,9 +53,9 @@ se3208_device::se3208_device(const machine_config &mconfig, const char *tag, dev
 	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
-std::vector<std::pair<int, const address_space_config *>> se3208_device::memory_space_config() const
+device_memory_interface::space_config_vector se3208_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }

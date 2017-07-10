@@ -157,9 +157,9 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_allocspaces = false;
 }
 
-std::vector<std::pair<int, const address_space_config *>> isa8_device::memory_space_config() const
+device_memory_interface::space_config_vector isa8_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_ISA_MEM,    &m_mem_config),
 		std::make_pair(AS_ISA_IO,     &m_io_config),
 		std::make_pair(AS_ISA_MEMALT, &m_mem16_config),
@@ -167,9 +167,9 @@ std::vector<std::pair<int, const address_space_config *>> isa8_device::memory_sp
 	};
 }
 
-std::vector<std::pair<int, const address_space_config *>> isa16_device::memory_space_config() const
+device_memory_interface::space_config_vector isa16_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_ISA_MEM,    &m_mem16_config),
 		std::make_pair(AS_ISA_IO,     &m_io16_config),
 		std::make_pair(AS_ISA_MEMALT, &m_mem_config),

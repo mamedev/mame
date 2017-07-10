@@ -643,7 +643,6 @@ class memory_manager
 public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
-	void configure();
 	void initialize();
 
 	// getters

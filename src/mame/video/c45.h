@@ -40,7 +40,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	// constants

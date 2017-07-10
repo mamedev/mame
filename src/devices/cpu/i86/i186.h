@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state); }
 
 	// device_memory_interface overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);

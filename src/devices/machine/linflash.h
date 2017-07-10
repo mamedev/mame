@@ -24,7 +24,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_memory_interface overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_space_config;
 	address_space *m_space;

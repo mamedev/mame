@@ -50,9 +50,9 @@ offs_t s2650_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 }
 
 
-std::vector<std::pair<int, const address_space_config *>> s2650_device::memory_space_config() const
+device_memory_interface::space_config_vector s2650_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		// Memory-mapped: M/~IO=1
 		std::make_pair(AS_PROGRAM, &m_program_config),
 

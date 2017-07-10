@@ -195,9 +195,9 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	set_vtlb_fixed_entries(2 * m_tlbentries + 2);
 }
 
-std::vector<std::pair<int, const address_space_config *>> mips3_device::memory_space_config() const
+device_memory_interface::space_config_vector mips3_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }

@@ -110,9 +110,9 @@ tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> tms9928a_device::memory_space_config() const
+device_memory_interface::space_config_vector tms9928a_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_DATA, &m_space_config)
 	};
 }
