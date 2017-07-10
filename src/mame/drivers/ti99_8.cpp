@@ -183,7 +183,7 @@ Known Issues (MZ, 2010-11-07)
 
 #include "bus/ti99/internal/998board.h"
 #include "bus/ti99/gromport/gromport.h"
-#include "bus/ti99/hexbus/hexbus.h"
+#include "bus/hexbus/hexbus.h"
 
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/internal/ioport.h"
