@@ -361,8 +361,8 @@ public:
 
 	void update_sio_irqs();
 
-	DECLARE_WRITE_LINE_MEMBER(vegas_state::watchdog_reset);
-	DECLARE_WRITE_LINE_MEMBER(vegas_state::watchdog_irq);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
 	DECLARE_WRITE32_MEMBER(timekeeper_w);
 	DECLARE_READ32_MEMBER(timekeeper_r);
 	void reset_sio(void);

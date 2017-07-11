@@ -1832,7 +1832,6 @@ READ16_MEMBER( dcs_audio_device::adsp_control_r )
 
 WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 {
-	uint16_t data_change = data ^ m_control_regs[offset];
 	m_control_regs[offset] = data;
 
 	switch (offset)
