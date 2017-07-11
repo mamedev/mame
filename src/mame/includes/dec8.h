@@ -96,7 +96,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lastmisn_i8751_w);
 	DECLARE_WRITE8_MEMBER(shackled_i8751_w);
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
-	DECLARE_WRITE8_MEMBER(srdarwin_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
@@ -108,6 +107,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_READ8_MEMBER(dec8_mcu_from_main_r);
 	DECLARE_WRITE8_MEMBER(dec8_mcu_to_main_w);
+	DECLARE_READ8_MEMBER(srdarwin_mcu_from_main_r);
+	DECLARE_WRITE8_MEMBER(srdarwin_mcu_to_main_w);
 	DECLARE_WRITE8_MEMBER(dec8_bg_data_w);
 	DECLARE_READ8_MEMBER(dec8_bg_data_r);
 	DECLARE_WRITE8_MEMBER(dec8_videoram_w);
