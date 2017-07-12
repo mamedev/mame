@@ -858,7 +858,7 @@ READ8_MEMBER(dec8_state::srdarwin_mcu_from_main_r)
 
 		case 1:
 			ret = 0x00;
-			logerror("%s: dec8_mcu_from_main_r write %02x %02x\n", machine().describe_context(), offset, ret);
+			logerror("%s: srdarwin_mcu_from_main_r %02x %02x\n", machine().describe_context(), offset, ret);
 			break;
 
 		case 2:
@@ -878,7 +878,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
 	if (offset==0) m_i8751_port0=data;
 	else if (offset == 1)
 	{
-		logerror("%s: m_i8751_port1 write %02x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: srdarwin_mcu_to_main_w %02x %02x\n", machine().describe_context(), offset, data);
 	}
 
 	// P2 - controls latches for main CPU communication
