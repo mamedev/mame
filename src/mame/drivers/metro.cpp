@@ -706,7 +706,6 @@ static ADDRESS_MAP_START( metro_sound_map, AS_PROGRAM, 8, metro_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* External ROM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM         /* External RAM */
-	AM_RANGE(0xff00, 0xffff) AM_RAM         /* Internal RAM */
 ADDRESS_MAP_END
 
 /*****************/

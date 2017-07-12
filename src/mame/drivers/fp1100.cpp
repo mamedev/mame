@@ -296,7 +296,6 @@ static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8, fp1100_state )
 	//AM_RANGE(0xec00, 0xefff) "Acknowledge of INT0" doesn't seem to be used
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(colour_control_w)
 	AM_RANGE(0xf400, 0xff7f) AM_ROM AM_REGION("sub_ipl",0x2400)
-	AM_RANGE(0xff80, 0xffff) AM_RAM     /* upd7801 internal RAM */
 ADDRESS_MAP_END
 
 /*
