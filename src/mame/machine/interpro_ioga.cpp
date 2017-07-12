@@ -40,7 +40,7 @@
 #define LOG_INTERRUPT(...)
 #define LOG_TIMER(timer, ...)
 #define LOG_HWINT(interrupt, ...)
-#define LOG_DMA(channel, ...)
+#define LOG_DMA(channel, ...) do {} while(0)
 #define LOG_DMA_SERIAL(channel, ...)
 #define LOG_ETH(...)
 #endif
