@@ -37,49 +37,57 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class mc10_state : public driver_device
+namespace
 {
-public:
-	mc10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_mc6847(*this, "mc6847")
-		, m_ef9345(*this, "ef9345")
-		, m_dac(*this, "dac")
-		, m_ram(*this, RAM_TAG)
-		, m_cassette(*this, "cassette")
-		, m_printer(*this, "printer")
-	{ }
+	class mc10_state : public driver_device
+	{
+	public:
+		mc10_state(const machine_config &mconfig, device_type type, const char *tag)
+			: driver_device(mconfig, type, tag)
+			, m_maincpu(*this, "maincpu")
+			, m_mc6847(*this, "mc6847")
+			, m_ef9345(*this, "ef9345")
+			, m_dac(*this, "dac")
+			, m_ram(*this, RAM_TAG)
+			, m_cassette(*this, "cassette")
+			, m_printer(*this, "printer")
+			, m_pb(*this, "pb%d", 0)
+		{
+		}
 
-	required_device<m6803_cpu_device> m_maincpu;
-	optional_device<mc6847_base_device> m_mc6847;
-	optional_device<ef9345_device> m_ef9345;
-	required_device<dac_bit_interface> m_dac;
-	required_device<ram_device> m_ram;
-	required_device<cassette_image_device> m_cassette;
-	required_device<printer_image_device> m_printer;
+		required_device<m6803_cpu_device> m_maincpu;
+		optional_device<mc6847_base_device> m_mc6847;
+		optional_device<ef9345_device> m_ef9345;
+		required_device<dac_bit_interface> m_dac;
+		required_device<ram_device> m_ram;
+		required_device<cassette_image_device> m_cassette;
+		required_device<printer_image_device> m_printer;
+		required_ioport_array<8> m_pb;
 
-	uint8_t *m_ram_base;
-	uint32_t m_ram_size;
-	uint8_t m_keyboard_strobe;
-	uint8_t m_port2;
+		uint8_t *m_ram_base;
+		uint32_t m_ram_size;
+		uint8_t m_keyboard_strobe;
+		uint8_t m_port2;
 
-	// printer
-	uint8_t m_pr_buffer;
-	uint8_t m_pr_counter;
-	uint8_t m_pr_state;
+		// printer
+		uint8_t m_pr_buffer;
+		uint8_t m_pr_counter;
+		uint8_t m_pr_state;
 
-	DECLARE_READ8_MEMBER( mc10_bfff_r );
-	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
-	DECLARE_READ8_MEMBER( alice90_bfff_r );
-	DECLARE_WRITE8_MEMBER( alice32_bfff_w );
-	DECLARE_READ8_MEMBER( mc10_port1_r );
-	DECLARE_WRITE8_MEMBER( mc10_port1_w );
-	DECLARE_READ8_MEMBER( mc10_port2_r );
-	DECLARE_WRITE8_MEMBER( mc10_port2_w );
-	DECLARE_READ8_MEMBER( mc6847_videoram_r );
-	DECLARE_DRIVER_INIT(mc10);
-	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+		DECLARE_READ8_MEMBER(mc10_bfff_r);
+		DECLARE_WRITE8_MEMBER(mc10_bfff_w);
+		DECLARE_READ8_MEMBER(alice90_bfff_r);
+		DECLARE_WRITE8_MEMBER(alice32_bfff_w);
+		DECLARE_READ8_MEMBER(mc10_port1_r);
+		DECLARE_WRITE8_MEMBER(mc10_port1_w);
+		DECLARE_READ8_MEMBER(mc10_port2_r);
+		DECLARE_WRITE8_MEMBER(mc10_port2_w);
+		DECLARE_READ8_MEMBER(mc6847_videoram_r);
+		DECLARE_DRIVER_INIT(mc10);
+		TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+
+		uint8_t read_keyboard_strobe(bool single_line);
+	};
 };
 
 
@@ -87,48 +95,36 @@ public:
     MEMORY MAPPED I/O
 ***************************************************************************/
 
-READ8_MEMBER( mc10_state::mc10_bfff_r )
+uint8_t mc10_state::read_keyboard_strobe(bool single_line)
 {
+	bool read = false;
 	uint8_t result = 0xff;
 
-	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
-	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
-	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read();
-	if (!BIT(m_keyboard_strobe, 3)) result &= ioport("pb3")->read();
-	if (!BIT(m_keyboard_strobe, 4)) result &= ioport("pb4")->read();
-	if (!BIT(m_keyboard_strobe, 5)) result &= ioport("pb5")->read();
-	if (!BIT(m_keyboard_strobe, 6)) result &= ioport("pb6")->read();
-	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
-
+	for (int i = m_pb.size() - 1; (i >= 0) && (!read || !single_line); i--)
+	{
+		if (!BIT(m_keyboard_strobe, i))
+		{
+			result &= m_pb[i]->read();
+			read = true;
+		}
+	}
 	return result;
+}
+
+
+READ8_MEMBER( mc10_state::mc10_bfff_r )
+{
+	return read_keyboard_strobe(false);
 }
 
 READ8_MEMBER( mc10_state::alice90_bfff_r )
 {
-	uint8_t result = 0xff;
-
-	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
-	else
-	if (!BIT(m_keyboard_strobe, 6)) result &= ioport("pb6")->read();
-	else
-	if (!BIT(m_keyboard_strobe, 5)) result &= ioport("pb5")->read();
-	else
-	if (!BIT(m_keyboard_strobe, 4)) result &= ioport("pb4")->read();
-	else
-	if (!BIT(m_keyboard_strobe, 3)) result &= ioport("pb3")->read();
-	else
-	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read();
-	else
-	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
-	else
-	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
-
-	return result;
+	return read_keyboard_strobe(true);
 }
 
 WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 {
-	/* bit 2 to 6, mc6847 mode lines */
+	// bit 2 to 6, mc6847 mode lines
 	m_mc6847->gm2_w(BIT(data, 2));
 	m_mc6847->intext_w(BIT(data, 2));
 	m_mc6847->gm1_w(BIT(data, 3));
@@ -136,13 +132,13 @@ WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 	m_mc6847->ag_w(BIT(data, 5));
 	m_mc6847->css_w(BIT(data, 6));
 
-	/* bit 7, dac output */
+	// bit 7, dac output
 	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER( mc10_state::alice32_bfff_w )
 {
-	/* bit 7, dac output */
+	// bit 7, dac output
 	m_dac->write(BIT(data, 7));
 }
 
@@ -167,17 +163,17 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 {
 	uint8_t result = 0xeb;
 
-	/* bit 1, keyboard line pa6 */
-	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read() >> 5;
-	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read() >> 5;
-	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read() >> 5;
+	// bit 1, keyboard line pa6
+	if (!BIT(m_keyboard_strobe, 0)) result &= m_pb[0]->read() >> 5;
+	if (!BIT(m_keyboard_strobe, 2)) result &= m_pb[2]->read() >> 5;
+	if (!BIT(m_keyboard_strobe, 7)) result &= m_pb[7]->read() >> 5;
 
-	/* bit 2, printer ots input */
+	// bit 2, printer ots input
 	result |= (m_printer->is_ready() ? 0 : 4);
 
-	/* bit 3, rs232 input */
+	// bit 3, rs232 input
 
-	/* bit 4, cassette input */
+	// bit 4, cassette input
 	result |= ((m_cassette)->input() >= 0 ? 1 : 0) << 4;
 
 	return result;
@@ -185,7 +181,7 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 
 WRITE8_MEMBER( mc10_state::mc10_port2_w )
 {
-	/* bit 0, cassette & printer output */
+	// bit 0, cassette & printer output
 	m_cassette->output( BIT(data, 0) ? +1.0 : -1.0);
 
 	switch (m_pr_state)
