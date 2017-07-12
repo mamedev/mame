@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
-High-speed paper tape reader
+imm4-90 High-Speed Paper Tape Reader
 
 The monitor PROM has support for loading BNPF or Intel HEX from this
 device (use J command to select it), but it doesn't appear in any
-catalogues or manuals I've seen.
+catalogues or manuals I've seen.  Apparently it was announced in
+Computerworld.
 */
 #ifndef MAME_BUS_INTELLEC4_TAPEREADER_H
 #define MAME_BUS_INTELLEC4_TAPEREADER_H
@@ -16,10 +17,10 @@ catalogues or manuals I've seen.
 
 namespace bus { namespace intellec4 {
 
-class tape_reader_device : public device_t, public device_univ_card_interface, public device_image_interface
+class imm4_90_device : public device_t, public device_univ_card_interface, public device_image_interface
 {
 public:
-	tape_reader_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -41,14 +42,18 @@ private:
 	DECLARE_READ8_MEMBER(rom7_in) { return (~m_data >> 4) & 0x0fU; }
 	DECLARE_WRITE8_MEMBER(rom4_out) { advance(BIT(data, 3)); }
 	DECLARE_WRITE_LINE_MEMBER(advance);
+	TIMER_CALLBACK_MEMBER(step);
+
+	emu_timer   *m_step_timer;
 
 	u8      m_data;
 	bool    m_ready;
 	bool    m_advance;
+	bool    m_stepping;
 };
 
 } } // namespace bus::intellec4
 
-DECLARE_DEVICE_TYPE_NS(INTELLEC4_TAPE_READER, bus::intellec4, tape_reader_device)
+DECLARE_DEVICE_TYPE_NS(INTELLEC4_TAPE_READER, bus::intellec4, imm4_90_device)
 
 #endif // MAME_BUS_INTELLEC4_TAPEREADER_H

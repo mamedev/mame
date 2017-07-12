@@ -251,5 +251,5 @@ void device_univ_card_interface::set_bus(univ_bus_device &bus)
 #include "tapereader.h"
 
 SLOT_INTERFACE_START(intellec4_univ_cards)
-	SLOT_INTERFACE("ptreader", INTELLEC4_TAPE_READER)
+	SLOT_INTERFACE("imm4_90", INTELLEC4_TAPE_READER)
 SLOT_INTERFACE_END
