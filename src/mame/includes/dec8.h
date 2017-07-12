@@ -32,7 +32,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_bg_data(*this, "bg_data") { }
+		m_bg_data(*this, "bg_data"),
+		m_coin_port(*this, "I8751") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -169,4 +170,8 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	/* ports */
+	optional_ioport m_coin_port;
 };

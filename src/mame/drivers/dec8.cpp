@@ -810,7 +810,7 @@ READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
 		case 2:
 			return 0xff;
 		case 3:
-			return ioport("I8751")->read();
+			return m_coin_port->read();
 	}
 
 	return 0xff; //compile safe.
@@ -865,7 +865,7 @@ READ8_MEMBER(dec8_state::srdarwin_mcu_from_main_r)
 			ret = 0xff;
 			break;
 		case 3:
-			ret = ioport("I8751")->read();
+			ret = m_coin_port->read();
 			break;
 	}
 
@@ -3493,7 +3493,7 @@ ROM_START( srdarwinj )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
 	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
-		
+
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dy05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
 
