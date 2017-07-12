@@ -72,11 +72,8 @@ public:
 	DECLARE_DRIVER_INIT(starwars);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
-	TIMER_CALLBACK_MEMBER(main_callback);
-	TIMER_CALLBACK_MEMBER(sound_callback);
 	DECLARE_READ8_MEMBER(r6532_porta_r);
 	DECLARE_WRITE8_MEMBER(r6532_porta_w);
-	DECLARE_WRITE_LINE_MEMBER(snd_interrupt);
 	void starwars_mproc_init();
 	void starwars_mproc_reset();
 	void run_mproc();
