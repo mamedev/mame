@@ -73,6 +73,9 @@ Intel INTELLEC® 4/MOD 40 layout
 	<element name="label_ram"><text string="RAM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="label_prom"><text string="PROM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
+	<element name="label_prgm"><text string="PRGM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_pwr"><text string="PWR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
 	<element name="label_passes"><text string="PASSES"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<element name="label_run"><text string="RUN"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -111,6 +114,13 @@ Intel INTELLEC® 4/MOD 40 layout
 	</element>
 	<element name="label_last_ptr">
 		<text string="LAST RAM/ROM POINTER" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<element name="label_on">
+		<text string="ON" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_off">
+		<text string="OFF" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
 	</element>
 
 	<element name="label_enable">
@@ -239,6 +249,12 @@ Intel INTELLEC® 4/MOD 40 layout
 		<cpanel element="label_mon"><bounds left="573" top="230" right="598" bottom="237" /></cpanel>
 		<cpanel element="label_ram"><bounds left="604" top="230" right="629" bottom="237" /></cpanel>
 		<cpanel element="label_prom"><bounds left="635" top="230" right="660" bottom="237" /></cpanel>
+
+		<cpanel element="label_prgm"><bounds left="728" top="214" right="753" bottom="221" /></cpanel>
+		<cpanel element="label_prom"><bounds left="728" top="222" right="753" bottom="229" /></cpanel>
+		<cpanel element="label_pwr"><bounds left="728" top="230" right="753" bottom="237" /></cpanel>
+		<cpanel element="label_on"><bounds left="758" top="239" right="814" bottom="246" /></cpanel>
+		<cpanel element="label_off"><bounds left="758" top="279" right="814" bottom="287" /></cpanel>
 
 		<cpanel element="label_pass_counter"><bounds left="72" top="296" right="194" bottom="304" /></cpanel>
 		<cpanel element="label_passes"><bounds left="74" top="304" right="192" bottom="311" /></cpanel>
@@ -460,6 +476,10 @@ Intel INTELLEC® 4/MOD 40 layout
 		</cpanel>
 		<cpanel element="switch" inputtag="MODE" inputmask="0x0040">
 			<bounds left="635" top="240" right="660" bottom="286" />
+		</cpanel>
+
+		<cpanel element="switch" inputtag="PROM" inputmask="0x0001">
+			<bounds left="728" top="240" right="753" bottom="286" />
 		</cpanel>
 
 		<cpanel element="switch" inputtag="PASSES" inputmask="0x08">
@@ -609,6 +629,12 @@ Intel INTELLEC® 4/MOD 40 layout
 		<cpanel element="label_ram"><bounds left="604" top="230" right="629" bottom="237" /></cpanel>
 		<cpanel element="label_prom"><bounds left="635" top="230" right="660" bottom="237" /></cpanel>
 
+		<cpanel element="label_prgm"><bounds left="728" top="214" right="753" bottom="221" /></cpanel>
+		<cpanel element="label_prom"><bounds left="728" top="222" right="753" bottom="229" /></cpanel>
+		<cpanel element="label_pwr"><bounds left="728" top="230" right="753" bottom="237" /></cpanel>
+		<cpanel element="label_on"><bounds left="758" top="239" right="814" bottom="246" /></cpanel>
+		<cpanel element="label_off"><bounds left="758" top="279" right="814" bottom="287" /></cpanel>
+
 		<cpanel element="label_pass_counter"><bounds left="72" top="296" right="194" bottom="304" /></cpanel>
 		<cpanel element="label_passes"><bounds left="74" top="304" right="192" bottom="311" /></cpanel>
 		<cpanel element="label_3"><bounds left="74" top="312" right="99" bottom="319" /></cpanel>
@@ -829,6 +855,10 @@ Intel INTELLEC® 4/MOD 40 layout
 		</cpanel>
 		<cpanel element="switch" inputtag="MODE" inputmask="0x0040">
 			<bounds left="635" top="240" right="660" bottom="286" />
+		</cpanel>
+
+		<cpanel element="switch" inputtag="PROM" inputmask="0x0001">
+			<bounds left="728" top="240" right="753" bottom="286" />
 		</cpanel>
 
 		<cpanel element="switch" inputtag="PASSES" inputmask="0x08">

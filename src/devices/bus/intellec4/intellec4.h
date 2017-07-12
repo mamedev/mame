@@ -254,6 +254,12 @@ protected:
 	// device_interface implementation
 	void interface_pre_start() override;
 
+	address_space &rom_space()          { return m_bus->m_rom_device->space(m_bus->m_rom_space); }
+	address_space &rom_ports_space()    { return m_bus->m_rom_ports_device->space(m_bus->m_rom_ports_space); }
+	address_space &memory_space()       { return m_bus->m_memory_device->space(m_bus->m_memory_space); }
+	address_space &status_space()       { return m_bus->m_status_device->space(m_bus->m_status_space); }
+	address_space &ram_ports_space()    { return m_bus->m_ram_ports_device->space(m_bus->m_ram_ports_space); }
+
 private:
 	void set_bus(univ_bus_device &bus);
 
