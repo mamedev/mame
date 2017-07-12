@@ -39,7 +39,6 @@
  TODO:
  * Default terminal serial settings
  * Universal slot cards
- * Image device for paper tape reader?
  * Expose general-purpose I/O?
  */
 #include "emu.h"
@@ -232,7 +231,7 @@ ADDRESS_MAP_START(intellec4_program_banks, mcs40_cpu_device_base::AS_ROM, 8, int
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(intellec4_rom_port_banks, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_LOW
+	ADDRESS_MAP_UNMAP_HIGH
 
 	// 0x0000...0x07ff MON
 	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x1f00) AM_READWRITE(rom0_in, rom0_out)
@@ -265,7 +264,7 @@ ADDRESS_MAP_START(intellec4_ram_memory, mcs40_cpu_device_base::AS_RAM_MEMORY, 8,
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(intellec4_rom_ports, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_LOW
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("rpbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
@@ -316,7 +315,7 @@ MACHINE_CONFIG_START(intellec4)
 	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_PORTS)
 	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(intellec4_state, bus_reset_4002))
 	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(intellec4_state, bus_user_reset))
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j7",  518000. / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j7",  518000. / 7, intellec4_univ_cards, "ptreader")
 	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j8",  518000. / 7, intellec4_univ_cards, nullptr)
 	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j9",  518000. / 7, intellec4_univ_cards, nullptr)
 	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j10", 518000. / 7, intellec4_univ_cards, nullptr)
@@ -500,7 +499,7 @@ WRITE8_MEMBER(intellec4_state::pm_write)
 READ8_MEMBER(intellec4_state::rom0_in)
 {
 	// bit 0 of this port is ANDed with the TTY input
-	return m_tty->rxd_r() ? 0x00U : 0x01U;
+	return m_tty->rxd_r() ? 0x0eU : 0x0fU;
 }
 
 READ8_MEMBER(intellec4_state::rom2_in)
@@ -1045,7 +1044,7 @@ private:
 	// current state of signals from bus
 	bool    m_bus_test = false;
 
-    // current state of front panel switches
+	// current state of front panel switches
 	bool    m_sw_hold = false;
 };
 
@@ -1442,6 +1441,11 @@ ROM_START(intlc440)
 ROM_END
 
 } // anonymous namespace
+
+
+/***********************************************************************
+    Machine definitions
+***********************************************************************/
 
 //    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT  STATE        INIT  COMPANY  FULLNAME             FLAGS
 COMP( 1973?, intlc44,  0,      0,      mod4,     mod4,  mod4_state,  0,    "Intel", "INTELLEC 4/MOD 4",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )

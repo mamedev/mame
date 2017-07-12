@@ -869,6 +869,8 @@ if (BUSES["INTELLEC4"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/intellec4/intellec4.cpp",
 		MAME_DIR .. "src/devices/bus/intellec4/intellec4.h",
+		MAME_DIR .. "src/devices/bus/intellec4/tapereader.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/tapereader.h",
 	}
 end
 
