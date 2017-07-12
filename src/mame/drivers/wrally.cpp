@@ -8,6 +8,27 @@ Driver by Manuel Abadia, Mike Coates, Nicola Salmoria and Miguel Angel Horna
 
 Thanks to GAELCO SA for the DS5002FP code and information about the encryption
 
+REF.930217  (also REF.930705)
++-------------------------------------------------+
+|       C1                                  6116  |
+|  VOL  C2                                  6116  |
+|          30MHz                            6116  |
+|    M6295                    +----------+  6116  |
+|     1MHz                    |TMS       |        |
+|      MS6264A                |TPC1020AFN|        |
+|J     MS6264A                |   -084C  |    H8  |
+|A     +------------+         +----------+        |
+|M     |DS5002FP Box|         +----------+        |
+|M     +------------+         |TMS       |    H12 |
+|A            MS6264A         |TPC1020AFN|        |
+|             MS6264A         |   -084C  |        |
+|                             +----------+        |
+|SW1                                  PAL  MS6264A|
+|     24MHz    MC68000P12                  MS6264A|
+|SW2           C22                    6116        |
+|      PAL     C23                    6116        |
++-------------------------------------------------+
+
 Main PCB components:
 ====================
 
@@ -16,7 +37,7 @@ CPUs related:
 * 1xDS5002FP @ D12 (Dallas security processor @ 12 MHz)
 * 1xHM62256ALFP-8T (32KB NVSRAM) @ C11 (encrypted DS5002FP program code)
 * 1xLithium cell
-* 2xMS6264A-20NC (16KB SRAM) @ D14 & D15 (shared memory between M68000 & DS5002FP)
+* 2xMS6264A-20NC (8KB SRAM) @ D14 & D15 (shared memory between M68000 & DS5002FP)
 * 4x74LS157 (Quad 2 input multiplexer) @ F14, F15, F16 & F17 (used to select M68000 or DS5002FP address bus)
 * 4x74LS245 (Octal bus transceiver) @ C14, C15, C16 & C17 (used to store shared RAM data)
 * 2x74LS373 (Octal tristate latch) @ D16 & D17 (used by DS5002FP to access data from shared RAM)
@@ -97,7 +118,7 @@ produces a high clock frequency, slow movements a low freq.
 
 PCB: REF.930217
 
-The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I 13 or larger
+The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or larger
  roms at H8 & H12 for graphics as well as the ability to use different size sound sample
  roms at C1 & C3
 
