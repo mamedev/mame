@@ -14543,12 +14543,16 @@ gnw_jr55                        // Nintendo
 gnw_mc25                        // Nintendo
 gnw_ml102                       // Nintendo
 gnw_mw56                        // Nintendo
+kblades                         // Konami
+kbucky                          // Konami
 kcontra                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
 nupogodi                        // Elektronika
+tddragon                        // Tiger
+tsonic                          // Tiger
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
