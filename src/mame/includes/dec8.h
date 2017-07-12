@@ -32,7 +32,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_bg_data(*this, "bg_data") { }
+		m_bg_data(*this, "bg_data"),
+		m_coin_port(*this, "I8751") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -96,7 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lastmisn_i8751_w);
 	DECLARE_WRITE8_MEMBER(shackled_i8751_w);
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
-	DECLARE_WRITE8_MEMBER(srdarwin_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
@@ -108,6 +108,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_READ8_MEMBER(dec8_mcu_from_main_r);
 	DECLARE_WRITE8_MEMBER(dec8_mcu_to_main_w);
+	DECLARE_READ8_MEMBER(srdarwin_mcu_from_main_r);
+	DECLARE_WRITE8_MEMBER(srdarwin_mcu_to_main_w);
 	DECLARE_WRITE8_MEMBER(dec8_bg_data_w);
 	DECLARE_READ8_MEMBER(dec8_bg_data_r);
 	DECLARE_WRITE8_MEMBER(dec8_videoram_w);
@@ -168,4 +170,8 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	/* ports */
+	optional_ioport m_coin_port;
 };

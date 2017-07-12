@@ -94,7 +94,8 @@ READ8_MEMBER(dec8_state::i8751_l_r)
 
 WRITE8_MEMBER(dec8_state::i8751_reset_w)
 {
-	m_i8751_return = 0;
+	// ? reset the actual MCU?
+	//m_i8751_return = 0;
 }
 
 /******************************************************************************/
@@ -337,114 +338,6 @@ WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::srdarwin_i8751_w)
-{
-	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
-	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
-	int lcred1[2][4] = {{1, 2, 3, 1}, {2, 3, 4, 6}};   /* slot 1 : credits awarded */
-	int lneed2[2][4] = {{1, 1, 1, 2}, {1, 2, 3, 4}};   /* slot 2 : coins needed */
-	int lcred2[2][4] = {{1, 2, 3, 1}, {1, 1, 1, 1}};   /* slot 2 : credits awarded */
-
-	m_i8751_return = 0;
-
-	switch (offset)
-	{
-	case 0: /* High byte */
-		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		break;
-	case 1: /* Low byte */
-		m_i8751_value = (m_i8751_value & 0xff00) | data;
-		break;
-	}
-
-	/* Coins are controlled by the i8751 */
-	if ((ioport("I8751")->read() & 3) == 3) m_latch = 1;
-	if ((ioport("I8751")->read() & 1) != 1 && m_latch)
-	{
-		m_coin1++;
-		m_latch = 0;
-		if (m_coin1>=m_need1)
-		{
-			m_coin1-=m_need1;
-			m_credits+=m_cred1;
-		}
-	}
-	if ((ioport("I8751")->read() & 2) != 2 && m_latch)
-	{
-		m_coin2++;
-		m_latch = 0;
-		if (m_coin2>=m_need2)
-		{
-			m_coin2-=m_need2;
-			m_credits+=m_cred2;
-		}
-	}
-	if (m_credits>99) m_credits=99; /* not handled by main CPU */
-
-	if (m_i8751_value == 0x0000) m_i8751_return = 0;    /* ??? */
-
-	if (m_i8751_value == 0x3063)    { m_i8751_return = 0x9c; m_coinage_id = 0; }  /* Japanese version ID */
-	if (m_i8751_value == 0x306b)    { m_i8751_return = 0x94; m_coinage_id = 1; }  /* World version ID */
-
-	if ((m_i8751_value >> 8) == 0x40) /* Coinage settings */
-	{
-		m_i8751_return = m_i8751_value;
-		m_need1 = lneed1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
-		m_need2 = lneed2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
-		m_cred1 = lcred1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
-		m_cred2 = lcred2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
-	}
-	if (m_i8751_value == 0x5000) { m_i8751_return = ((m_credits / 10) << 4) | (m_credits % 10); } /* Credits request */
-	if (m_i8751_value == 0x6000 && m_credits) { m_i8751_value = -1; m_credits--; }     /* Credits clear */
-
-/*
-    This next value is the index to a series of tables,
-    each table controls the end of level bad guy,
-    wrong values crash the cpu right away via a bogus jump.
-
-    Level number requested is in low byte
-
-    Addresses on left hand side are from the protection vector table which is
-    stored at location 0xf580 in rom dy_01.rom
-
-ba5e (lda #00) = Level 0?
-ba82 (lda #01) = Pyramid boss, Level 1?
-baaa           = No boss appears, game hangs
-bacc (lda #04) = Killer Bee boss, Level 4?
-bae0 (lda #03) = Snake type boss, Level 3?
-baf9           = Double grey thing boss...!
-bb0a           = Single grey thing boss!
-bb18 (lda #00) = Hailstorm from top of screen.
-bb31 (lda #28) = Small hailstorm
-bb47 (ldb #05) = Small hailstorm
-bb5a (lda #08) = Weird square things..
-bb63           = Square things again
-(24)           = Another square things boss..
-(26)           = Clock boss! (level 3)
-(28)           = Big dragon boss, perhaps an end-of-game baddy
-(30)           = 4 things appear at corners, seems to fit with attract mode (level 1)
-(32)           = Grey things teleport onto screen..
-(34)           = Grey thing appears in middle of screen
-(36)           = As above
-(38)           = Circle thing with two pincers
-(40)           = Grey bird
-(42)           = Crash (end of table)
-
-    The table below is hopefully correct thanks to Jose Miguel Morales Farreras,
-    but Boss #6 is uncomfirmed as correct.
-*/
-	if (m_i8751_value == 0x8000) m_i8751_return = 0xf580 +  0; /* Boss #1: Snake + Bees */
-	if (m_i8751_value == 0x8001) m_i8751_return = 0xf580 + 30; /* Boss #2: 4 Corners */
-	if (m_i8751_value == 0x8002) m_i8751_return = 0xf580 + 26; /* Boss #3: Clock */
-	if (m_i8751_value == 0x8003) m_i8751_return = 0xf580 +  2; /* Boss #4: Pyramid */
-	if (m_i8751_value == 0x8004) m_i8751_return = 0xf580 +  6; /* Boss #5: Snake + Head Combo */
-	if (m_i8751_value == 0x8005) m_i8751_return = 0xf580 + 24; /* Boss #6: LED Panels */
-	if (m_i8751_value == 0x8006) m_i8751_return = 0xf580 + 28; /* Boss #7: Dragon */
-	if (m_i8751_value == 0x8007) m_i8751_return = 0xf580 + 32; /* Boss #8: Teleport */
-	if (m_i8751_value == 0x8008) m_i8751_return = 0xf580 + 38; /* Boss #9: Octopus (Pincer) */
-	if (m_i8751_value == 0x8009) m_i8751_return = 0xf580 + 40; /* Boss #10: Bird */
-	if (m_i8751_value == 0x800a) m_i8751_return = 0xf580 + 42; /* End Game(bad address?) */
-}
 
 /******************************************************************************/
 
@@ -808,7 +701,7 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x1800, 0x1801) AM_WRITE(srdarwin_i8751_w)
+	AM_RANGE(0x1800, 0x1801) AM_WRITE(dec8_i8751_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)        /* Maybe.. */
 	AM_RANGE(0x1803, 0x1803) AM_WRITENOP            /* NMI ack */
 	AM_RANGE(0x1804, 0x1804) AM_DEVWRITE("spriteram", buffered_spriteram8_device, write) /* DMA */
@@ -917,7 +810,7 @@ READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
 		case 2:
 			return 0xff;
 		case 3:
-			return ioport("I8751")->read();
+			return m_coin_port->read();
 	}
 
 	return 0xff; //compile safe.
@@ -946,6 +839,73 @@ WRITE8_MEMBER(dec8_state::dec8_mcu_to_main_w)
 
 static ADDRESS_MAP_START( dec8_mcu_io_map, AS_IO, 8, dec8_state )
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
+ADDRESS_MAP_END
+
+/*
+	Super Real Darwin is similar but only appears to have a single port
+*/
+
+READ8_MEMBER(dec8_state::srdarwin_mcu_from_main_r)
+{
+	uint8_t ret = 0;
+
+
+	switch (offset)
+	{
+		case 0:
+			ret = m_i8751_port0;
+			break;
+
+		case 1:
+			ret = 0x00;
+			logerror("%s: srdarwin_mcu_from_main_r %02x %02x\n", machine().describe_context(), offset, ret);
+			break;
+
+		case 2:
+			ret = 0xff;
+			break;
+		case 3:
+			ret = m_coin_port->read();
+			break;
+	}
+
+	return ret;
+}
+
+WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
+{
+	// Outputs P0 and P1 are latched
+	if (offset==0) m_i8751_port0=data;
+	else if (offset == 1)
+	{
+		logerror("%s: srdarwin_mcu_to_main_w %02x %02x\n", machine().describe_context(), offset, data);
+	}
+
+	// P2 - controls latches for main CPU communication
+	if (offset == 2 && (data & 0x10) == 0)
+	{
+		m_i8751_port0 = m_i8751_value >> 8;
+	}
+	if (offset == 2 && (data & 0x20) == 0)
+	{
+		m_i8751_port0 =  m_i8751_value & 0xff;
+	}
+	if (offset==2 && (data&0x40)==0)
+		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+	if (offset==2 && (data&0x80)==0)
+		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port0;
+
+	// P2 - IRQ to main CPU
+	if (offset==2 && (data&0x04)==0)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+
+	// guess, toggled after above.
+	if (offset==2 && (data&0x02)==0)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+static ADDRESS_MAP_START( srdarwin_mcu_io_map, AS_IO, 8, dec8_state )
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(srdarwin_mcu_from_main_r, srdarwin_mcu_to_main_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1634,9 +1594,11 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("I8751") /* Fake port for i8751 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("I8751") /* hooked up on the i8751 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -2390,7 +2352,11 @@ static MACHINE_CONFIG_START( srdarwin )
 	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
+		
+	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz) /* unknown frequency */
+	MCFG_CPU_IO_MAP(srdarwin_mcu_io_map)
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -3526,7 +3492,7 @@ ROM_START( srdarwinj )
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dy05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
