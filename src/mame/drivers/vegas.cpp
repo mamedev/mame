@@ -668,7 +668,7 @@ READ8_MEMBER(vegas_state::sio_r)
 		break;
 	}
 	}
-	if (LOG_SIO && index != 0x4)
+	if (LOG_SIO && (index < 0x1 || index > 0x4))
 		logerror("%08X: sio_r: offset: %08x index: %d result: %02X\n", machine().device("maincpu")->safe_pc(), offset, index, result);
 	return result;
 }
@@ -779,7 +779,7 @@ WRITE8_MEMBER(vegas_state::cpu_io_w)
 		}
 		if (LOG_SIO) {
 			popmessage("System LED: %C", digit);
-			logerror("%08X: cpu_io_w System LED offset %X = %02X '%c'\n", machine().device("maincpu")->safe_pc(), offset, data, digit);
+			//logerror("%08X: cpu_io_w System LED offset %X = %02X '%c'\n", machine().device("maincpu")->safe_pc(), offset, data, digit);
 		}
 	}
 		break;
@@ -1258,17 +1258,17 @@ static INPUT_PORTS_START( nbashowt )
 	PORT_DIPSETTING(      0x0020, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPUNUSED( 0x0040, 0x0040 )
+	PORT_DIPUNUSED( 0x0040, 0x0000 )
 	PORT_DIPNAME( 0x0080, 0x0080, "Game Powerup" )
 	PORT_DIPSETTING(      0x0080, "NBA Showtime" )
 	PORT_DIPSETTING(      0x0000, "NFL Blitz" )
-	PORT_DIPNAME( 0x0100, 0x0100, "Joysticks" )
+	PORT_DIPNAME( 0x0100, 0x0000, "Joysticks" )
 	PORT_DIPSETTING(      0x0100, "8-Way" )
 	PORT_DIPSETTING(      0x0000, "49-Way" )
 	PORT_DIPNAME( 0x0200, 0x0200, "Graphics Mode" )
 	PORT_DIPSETTING(      0x0200, "Med Res" )
 	PORT_DIPSETTING(      0x0000, "Low Res" )
-	PORT_DIPUNUSED(       0x01c00, 0x01c00 )
+	PORT_DIPUNUSED(       0x1c00, 0x1c00 )
 	PORT_DIPNAME( 0x2000, 0x2000, "Number of Players" )
 	PORT_DIPSETTING(      0x2000, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
@@ -1552,7 +1552,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
@@ -1565,7 +1565,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -1578,7 +1578,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
@@ -1591,7 +1591,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -1638,6 +1638,7 @@ static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
 	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nbagold, vegasban)
@@ -1650,6 +1651,7 @@ static MACHINE_CONFIG_DERIVED( nbagold, vegasban)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
 	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2049 , denver )

@@ -635,6 +635,9 @@ void dcs_audio_device::dcs_register_state()
 	save_item(NAME(m_transfer.sum));
 	save_item(NAME(m_transfer.fifo_entries));
 
+	save_item(NAME(m_polling_value));
+	save_item(NAME(m_polling32_value));
+
 	if (m_sram != nullptr)
 		save_pointer(NAME(m_sram), 0x8000*4 / sizeof(m_sram[0]));
 
@@ -650,6 +653,7 @@ void dcs_audio_device::denver_postload()
 	m_data_bank->set_entry(DENV_DM_PG % m_sounddata_banks);
 	dmovlay_remap_memory();
 	denver_alloc_dmadac();
+	install_speedup();
 }
 
 //-------------------------------------------------
@@ -699,8 +703,6 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_timer_period(0),
 	m_timers_fired(0),
 	m_sram(nullptr),
-	m_polling_base(nullptr),
-	m_polling32_base(nullptr),
 	m_internal_program_ram(nullptr),
 	m_external_program_ram(nullptr),
 	m_internal_data_ram(nullptr),
@@ -859,17 +861,8 @@ void dcs2_audio_device::device_start()
 	m_auto_ack = false;
 
 	/* install the speedup handler */
-	if (m_polling_offset) {
-		if (m_rev < 3) {
-			m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r), this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w), this));
-			m_polling_base = m_iram + (m_polling_offset - 0x3800);
-		}
-		else {
-			// ADSP 2181 (DSIO and DENVER) use program memory
-			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset, m_polling_offset, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
-			m_polling32_base = m_internal_program_ram + (m_polling_offset - 0x2000);
-		}
-	}
+	install_speedup();
+
 	/* allocate a watchdog timer for HLE transfers */
 	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0);
 	if (m_transfer.hle_enabled)
@@ -882,6 +875,19 @@ void dcs2_audio_device::device_start()
 	dcs_reset(nullptr, 0);
 }
 
+
+void dcs_audio_device::install_speedup(void)
+{
+	if (m_polling_offset) {
+		if (m_rev < 3) {
+			m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r), this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w), this));
+		}
+		else {
+			// ADSP 2181 (DSIO and DENVER) use program memory
+			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset, m_polling_offset, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
+		}
+	}
+}
 
 void dcs_audio_device::set_auto_ack(int state)
 {
@@ -1026,8 +1032,7 @@ void dcs_audio_device::sdrc_remap_memory()
 	sdrc_update_bank_pointers();
 
 	/* reinstall the polling hotspot */
-	if (m_polling_offset)
-		m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r),this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w),this));
+	install_speedup();
 }
 
 
@@ -2077,26 +2082,26 @@ READ16_MEMBER( dcs_audio_device::dcs_polling_r )
 {
 	if (m_polling_count++ > 5)
 		space.device().execute().eat_cycles(10000);
-	return *m_polling_base;
+	return m_polling_value;
 }
 
 
 WRITE16_MEMBER( dcs_audio_device::dcs_polling_w )
 {
 	m_polling_count = 0;
-	COMBINE_DATA(m_polling_base);
+	COMBINE_DATA(&m_polling_value);
 }
 
 READ32_MEMBER(dcs_audio_device::dcs_polling32_r)
 {
 	space.device().execute().eat_cycles(1000);
-	return *m_polling32_base;
+	return m_polling32_value;
 }
 
 WRITE32_MEMBER(dcs_audio_device::dcs_polling32_w)
 {
 	m_polling_count = 0;
-	COMBINE_DATA(m_polling32_base);
+	COMBINE_DATA(&m_polling32_value);
 }
 
 

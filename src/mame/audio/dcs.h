@@ -50,6 +50,7 @@ public:
 	void dmovlay_remap_memory();
 	WRITE32_MEMBER(dmovlay_callback);
 	void denver_postload(void);
+	void install_speedup(void);
 
 	// non public
 	void dcs_boot();
@@ -207,8 +208,8 @@ protected:
 	uint32_t      m_timers_fired;
 
 	uint16_t *m_sram;
-	uint16_t *m_polling_base;
-	uint32_t *m_polling32_base;
+	uint16_t m_polling_value;
+	uint32_t m_polling32_value;
 	uint32_t *m_internal_program_ram;
 	uint32_t *m_external_program_ram;
 	uint32_t *m_internal_data_ram;
