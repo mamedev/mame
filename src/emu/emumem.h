@@ -649,9 +649,6 @@ public:
 	const std::unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
 	const std::unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
 
-	// dump the internal memory tables to the given file
-	void dump(FILE *file);
-
 	// pointers to a bank pointer (internal usage only)
 	u8 **bank_pointer_addr(u8 index) { return &m_bank_ptr[index]; }
 

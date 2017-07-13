@@ -1695,24 +1695,6 @@ void memory_manager::initialize()
 
 
 //-------------------------------------------------
-//  dump - dump the internal memory tables to the
-//  given file
-//-------------------------------------------------
-
-void memory_manager::dump(FILE *file)
-{
-	// skip if we can't open the file
-	if (file == nullptr)
-		return;
-
-	// loop over address spaces
-	memory_interface_iterator iter(machine().root_device());
-	for (device_memory_interface &memory : iter)
-		memory.dump(file);
-}
-
-
-//-------------------------------------------------
 //  region_alloc - allocates memory for a region
 //-------------------------------------------------
 

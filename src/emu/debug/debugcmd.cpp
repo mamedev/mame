@@ -2915,7 +2915,9 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 	file = fopen(filename, "w");
 	if (file)
 	{
-		m_machine.memory().dump(file);
+		memory_interface_iterator iter(m_machine.root_device());
+		for (device_memory_interface &memory : iter)
+			memory.dump(file);
 		fclose(file);
 	}
 }
