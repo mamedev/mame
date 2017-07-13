@@ -106,6 +106,8 @@ public:
 	virtual bool        must_be_loaded()                const override { return false; }
 	virtual bool        is_reset_on_load()              const override { return false; }
 	virtual char const *file_extensions()               const override { return "rom,bin"; }
+	virtual char const *custom_instance_name()          const override { return "promimage"; }
+	virtual char const *custom_brief_instance_name()    const override { return "prom"; }
 
 protected:
 	virtual void device_start() override;
