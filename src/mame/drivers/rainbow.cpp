@@ -895,7 +895,7 @@ void rainbow_state::machine_start()
 	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
 		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
-		rom[0xf4000 + 0x135e] = 0x00; // Floppy / RX-50 workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
+		rom[0xf4000 + 0x135e] = 0x00; // in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 
 		rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
 
@@ -1073,12 +1073,12 @@ PORT_DIPSETTING(0xE0000, "896 K (100-B MAX.   MEMORY)")
 
 // EXT.COMM.card -or- RD51 HD. controller (marketed later).
 PORT_START("DEC HARD DISK") // BUNDLE_OPTION
-PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK") PORT_TOGGLE
+PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK (#1)") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
 PORT_START("CORVUS HARD DISKS")
-PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS") PORT_TOGGLE
+PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS (#2 to #5)") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
@@ -1142,7 +1142,6 @@ void rainbow_state::machine_reset()
 	uint32_t unmap_start = m_inp8->read();
 
 	// Verify RAM size matches hardware (DIP switches)
-	uint8_t *nv = memregion("maincpu")->base();
 	uint8_t NVRAM_LOCATION;
 	uint32_t check;
 
@@ -1154,8 +1153,8 @@ void rainbow_state::machine_reset()
 		printf("\nWARNING: 896 K is not a valid memory configuration on Rainbow 100 A!\n");
 	}
 
-	check = (unmap_start >> 16)-1;  // guess.
-	NVRAM_LOCATION = nv[0xed084];   // location not verified yet. DMT RAM check tests offset $84 !
+	check = (unmap_start >> 16)-1;    // guess.
+	NVRAM_LOCATION = m_p_nvram[0x84]; // location not verified yet. DMT RAM check tests offset $84 !
 
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
@@ -1163,7 +1162,6 @@ void rainbow_state::machine_reset()
 	program.install_write_handler(RTC_BASE + 0xFE, RTC_BASE + 0xFF, write8_delegate(FUNC(rainbow_state::rtc_w), this));
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
 	#endif
-
 #else
 	printf("\n*** RAINBOW B MODEL ASSUMED (128 - 896 K RAM)\n");
 	if (unmap_start < 0x20000)
@@ -1173,7 +1171,7 @@ void rainbow_state::machine_reset()
 	}
 
 	check = (unmap_start >> 16) - 2;
-	NVRAM_LOCATION = nv[0xed0db];
+	NVRAM_LOCATION = m_p_nvram[0xdb];
 
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
