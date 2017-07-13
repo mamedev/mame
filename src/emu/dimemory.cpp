@@ -163,15 +163,30 @@ void device_memory_interface::set_addrmap(int spacenum, address_map_constructor 
 
 
 //-------------------------------------------------
-//  set_address_space - connect an address space
-//  to a device
+//  dump - dump memory tables to the given file in
+//  human-readable format
 //-------------------------------------------------
 
-void device_memory_interface::set_address_space(int spacenum, address_space &space)
+void device_memory_interface::dump(FILE *file) const
 {
-	if (spacenum >= int(m_addrspace.size()))
-		m_addrspace.resize(spacenum+1, nullptr);
-	m_addrspace[spacenum] = &space;
+	for (auto const &space : m_addrspace)
+		if (space) {
+			fprintf(file,
+					"\n\n"
+					"====================================================\n"
+					"Device '%s' %s address space read handler dump\n"
+					"====================================================\n",
+					device().tag(), space->name());
+			space->dump_map(file, read_or_write::READ);
+
+			fprintf(file,
+					"\n\n"
+					"====================================================\n"
+					"Device '%s' %s address space write handler dump\n"
+					"====================================================\n",
+					device().tag(), space->name());
+			space->dump_map(file, read_or_write::WRITE);
+		}
 }
 
 
