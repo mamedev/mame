@@ -215,7 +215,7 @@ public:
 
 	// immediate operations
 	int run(bool quiet);
-	int run_timeslices(attotime frametime=attotime::zero);
+	void run_timeslices(attotime frametime=attotime::zero);
 	void pause();
 	void resume();
 	void toggle_pause();

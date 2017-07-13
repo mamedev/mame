@@ -415,7 +415,7 @@ int running_machine::run(bool quiet)
 //  machine, optionally for a specific frame time
 //-------------------------------------------------
 
-int running_machine::run_timeslices(attotime frametime)
+void running_machine::run_timeslices(attotime frametime)
 {
 	g_profiler.start(PROFILER_EXTRA);
 
