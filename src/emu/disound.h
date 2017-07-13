@@ -97,8 +97,8 @@ public:
 	// helpers
 	int inputs() const;
 	int outputs() const;
-	sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum);
-	sound_stream *output_to_stream_output(int outputnum, int &stream_outputnum);
+	sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const;
+	sound_stream *output_to_stream_output(int outputnum, int &stream_outputnum) const;
 	void set_input_gain(int inputnum, float gain);
 	void set_output_gain(int outputnum, float gain);
 	int inputnum_from_device(device_t &device, int outputnum = 0) const;

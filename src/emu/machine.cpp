@@ -880,7 +880,7 @@ void running_machine::handle_saveload()
 
 			// open the file
 			emu_file file(m_saveload_searchpath, openflags);
-			auto const filerr = file.open(m_saveload_pending_file.c_str());
+			auto const filerr = file.open(m_saveload_pending_file);
 			if (filerr == osd_file::error::NONE)
 			{
 				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
@@ -1121,7 +1121,7 @@ void running_machine::nvram_load()
 	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram.device()).c_str()) == osd_file::error::NONE)
+		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
 		{
 			nvram.nvram_load(file);
 			file.close();
@@ -1141,7 +1141,7 @@ void running_machine::nvram_save()
 	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(nvram.device()).c_str()) == osd_file::error::NONE)
+		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
 		{
 			nvram.nvram_save(file);
 			file.close();

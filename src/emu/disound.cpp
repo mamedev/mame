@@ -121,7 +121,7 @@ int device_sound_interface::outputs() const
 //  on that stream
 //-------------------------------------------------
 
-sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &stream_inputnum)
+sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &stream_inputnum) const
 {
 	assert(inputnum >= 0);
 
@@ -148,7 +148,7 @@ sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &s
 //  on that stream
 //-------------------------------------------------
 
-sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int &stream_outputnum)
+sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int &stream_outputnum) const
 {
 	assert(outputnum >= 0);
 
