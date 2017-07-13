@@ -352,7 +352,7 @@ int running_machine::run(bool quiet)
 		m_hard_reset_pending = false;
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
-			run_timeslices();
+			run_timeslice();
 		}
 		m_manager.http()->clear();
 
@@ -411,23 +411,16 @@ int running_machine::run(bool quiet)
 }
 
 //-------------------------------------------------
-//  run_timeslices - execute timeslices for this 
-//  machine, optionally for a specific frame time
+//  run_timeslice - execute a single timeslice
 //-------------------------------------------------
 
-void running_machine::run_timeslices(attotime frametime)
+void running_machine::run_timeslice()
 {
 	g_profiler.start(PROFILER_EXTRA);
 
 	// execute CPUs if not paused
 	if (!m_paused) 
-	{
-		const attotime stoptime(m_scheduler.time() + frametime);
-		do
-		{
-			m_scheduler.timeslice();
-		} while (m_scheduler.time() < stoptime);
-	}
+		m_scheduler.timeslice();
 	// otherwise, just pump video updates through
 	else
 		m_video->frame_update();
@@ -1336,7 +1329,14 @@ static running_machine * jsmess_machine;
 
 void js_main_loop()
 {
-	jsmess_machine->run_frame(attotime(0,HZ_TO_ATTOSECONDS(60)));
+	device_scheduler *scheduler;
+	scheduler = &(jsmess_machine->scheduler());
+	const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
+	const attotime stoptime(scheduler->time() + frametime);
+
+	while (scheduler->time() < stoptime) {
+		jsmess_machine->run_timeslice();
+	}
 }
 
 void js_set_main_loop(running_machine * machine) {
