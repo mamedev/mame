@@ -352,7 +352,7 @@ int running_machine::run(bool quiet)
 		m_hard_reset_pending = false;
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
-			run_frame();
+			run_timeslices();
 		}
 		m_manager.http()->clear();
 
@@ -411,19 +411,22 @@ int running_machine::run(bool quiet)
 }
 
 //-------------------------------------------------
-//  run_frame - execute one frame for this machine
+//  run_timeslices - execute timeslices for this 
+//  machine, optionally for a specific frame time
 //-------------------------------------------------
 
-int running_machine::run_frame(attotime frametime)
+int running_machine::run_timeslices(attotime frametime)
 {
 	g_profiler.start(PROFILER_EXTRA);
 
 	// execute CPUs if not paused
-	if (!m_paused) {
-		attotime stoptime(m_scheduler.time() + frametime);
-		while (m_scheduler.time() < stoptime) {
+	if (!m_paused) 
+	{
+		const attotime stoptime(m_scheduler.time() + frametime);
+		do
+		{
 			m_scheduler.timeslice();
-		}
+		} while (m_scheduler.time() < stoptime);
 	}
 	// otherwise, just pump video updates through
 	else
