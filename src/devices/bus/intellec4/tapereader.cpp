@@ -5,7 +5,7 @@
 #include "tapereader.h"
 
 
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_TAPE_READER, bus::intellec4, imm4_90_device, "imm4_90", "Intel imm4-90 High-Speed Paper Tape Reader")
+DEFINE_DEVICE_TYPE_NS(INTELLEC4_TAPE_READER, bus::intellec4, imm4_90_device, "intlc4_imm4_90", "Intel imm4-90 High-Speed Paper Tape Reader")
 
 
 namespace bus { namespace intellec4 {
@@ -50,10 +50,10 @@ void imm4_90_device::device_start()
 	save_item(NAME(m_advance));
 	save_item(NAME(m_stepping));
 
-	rom_ports_space().install_read_handler(0x0040U, 0x004fU, read8_delegate(FUNC(imm4_90_device::rom4_in), this));
-	rom_ports_space().install_read_handler(0x0060U, 0x006fU, read8_delegate(FUNC(imm4_90_device::rom6_in), this));
-	rom_ports_space().install_read_handler(0x0070U, 0x007fU, read8_delegate(FUNC(imm4_90_device::rom7_in), this));
-	rom_ports_space().install_write_handler(0x0040U, 0x004fU, write8_delegate(FUNC(imm4_90_device::rom4_out), this));
+	rom_ports_space().install_read_handler(0x0040U, 0x004fU, 0x0000U, 0x1f00U, 0x0000, read8_delegate(FUNC(imm4_90_device::rom4_in), this));
+	rom_ports_space().install_read_handler(0x0060U, 0x006fU, 0x0000U, 0x1f00U, 0x0000, read8_delegate(FUNC(imm4_90_device::rom6_in), this));
+	rom_ports_space().install_read_handler(0x0070U, 0x007fU, 0x0000U, 0x1f00U, 0x0000, read8_delegate(FUNC(imm4_90_device::rom7_in), this));
+	rom_ports_space().install_write_handler(0x0040U, 0x004fU, 0x0000U, 0x1f00U, 0x0000, write8_delegate(FUNC(imm4_90_device::rom4_out), this));
 }
 
 
