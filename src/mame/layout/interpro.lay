@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0
-copyright-holders:Patrick Mackinlay
+authors:Patrick Mackinlay
 Intergraph InterPro 2x00 layout.
 
 For now, this is only used to display the (internal) diagnostic 7-segment LED. In the future, it
