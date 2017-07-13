@@ -4009,8 +4009,9 @@ protected:
 
 void gpoker_state::prepare_display()
 {
-	set_display_segmask(0x7ff, 0x7f);
-	display_matrix(12, 11, m_o | (m_r >> 3 & 0xf00), m_r & 0x7ff);
+	set_display_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
+	u16 segs = BITSWAP16(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
+	display_matrix(14, 11, segs | (m_r >> 3 & 0xf00), m_r & 0x7ff);
 }
 
 WRITE16_MEMBER(gpoker_state::write_r)
