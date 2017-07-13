@@ -37,6 +37,7 @@
     1x OKI5205 (sound)
     1x crystal resonator POE400B (close to sound)
     1x oscillator 24.000000MHz (close to main)
+    1x Exel XLS28C16AP (backup memory)
     ROMs
     1x M27C2001 (1)
     4x AM27C010 (2,5,6,7)
