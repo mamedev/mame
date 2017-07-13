@@ -289,7 +289,7 @@ protected:
 
 	// miscellaneous
 	void video_flush();
-	const char *describe_context();
+	std::string describe_context() const;
 
 	// setup functions
 	emu_timer *setup_timer(device_timer_id id, double offset, double period);
@@ -501,7 +501,7 @@ private:
 	int32_t get_clocks_since_hsync();
 
 	// debugging
-	const char *scanline_zone_string(scanline_zone zone);
+	std::string scanline_zone_string(scanline_zone zone) const;
 };
 
 // actual base class for MC6847 family of devices

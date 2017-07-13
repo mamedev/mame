@@ -176,7 +176,7 @@ running_machine::~running_machine()
 //  PC
 //-------------------------------------------------
 
-const char *running_machine::describe_context()
+std::string running_machine::describe_context() const
 {
 	device_execute_interface *executing = m_scheduler.currently_executing();
 	if (executing != nullptr)
@@ -185,13 +185,11 @@ const char *running_machine::describe_context()
 		if (cpu != nullptr)
 		{
 			address_space &prg = cpu->space(AS_PROGRAM);
-			m_context = string_format(prg.is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
+			return string_format(prg.is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
 		}
 	}
-	else
-		m_context.assign("(no context)");
 
-	return m_context.c_str();
+	return std::string("(no context)");
 }
 
 

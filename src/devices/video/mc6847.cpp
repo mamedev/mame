@@ -281,9 +281,9 @@ inline void mc6847_friend_device::new_frame()
 //  scanline_zone_string
 //-------------------------------------------------
 
-const char *mc6847_friend_device::scanline_zone_string(scanline_zone zone)
+std::string mc6847_friend_device::scanline_zone_string(scanline_zone zone) const
 {
-	const char *result;
+	std::string result;
 	switch(zone)
 	{
 		case SCANLINE_ZONE_TOP_BORDER:      result = "SCANLINE_ZONE_TOP_BORDER";    break;
@@ -526,14 +526,12 @@ void mc6847_friend_device::video_flush()
 //  describe_context
 //-------------------------------------------------
 
-const char *mc6847_friend_device::describe_context()
+std::string mc6847_friend_device::describe_context() const
 {
-	static char buffer[128];
-	snprintf(buffer, ARRAY_LENGTH(buffer), "%s (scanline %s:%d)",
+	return string_format("%s (scanline %s:%d)",
 		machine().describe_context(),
 		scanline_zone_string((scanline_zone) m_logical_scanline_zone),
 		m_logical_scanline);
-	return buffer;
 }
 
 

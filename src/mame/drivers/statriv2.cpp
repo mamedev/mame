@@ -1252,12 +1252,12 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 			uint8_t result = 0x00;
 			if (offset == 1)
 				result = 0x18;
-			osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
+			logerror("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 			return result;
 		},"write_lambda"),
 		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 		{
-			osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
+			logerror("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 		},"read_lambda")
 	);
 }

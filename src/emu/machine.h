@@ -248,7 +248,7 @@ public:
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	void strlog(const char *str) const;
 	u32 rand();
-	const char *describe_context();
+	std::string describe_context() const;
 	std::string compose_saveload_filename(std::string &&base_filename, const char **searchpath = nullptr);
 
 	// CPU information
@@ -346,7 +346,6 @@ private:
 	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
-	std::string             m_context;              // context string buffer
 	int                     m_sample_rate;          // the digital audio sample rate
 	std::unique_ptr<emu_file>  m_logfile;              // pointer to the active log file
 
