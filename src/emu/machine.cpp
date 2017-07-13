@@ -343,30 +343,16 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
+#if defined(EMSCRIPTEN)
+		// break out to our async javascript loop and halt
+		js_set_main_loop(this);
+#endif
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
-			g_profiler.start(PROFILER_EXTRA);
-
-#if defined(EMSCRIPTEN)
-			// break out to our async javascript loop and halt
-			js_set_main_loop(this);
-#endif
-
-			// execute CPUs if not paused
-			if (!m_paused)
-				m_scheduler.timeslice();
-			// otherwise, just pump video updates through
-			else
-				m_video->frame_update();
-
-			// handle save/load
-			if (m_saveload_schedule != saveload_schedule::NONE)
-				handle_saveload();
-
-			g_profiler.stop();
+			run_frame();
 		}
 		m_manager.http()->clear();
 
@@ -424,6 +410,31 @@ int running_machine::run(bool quiet)
 	return error;
 }
 
+//-------------------------------------------------
+//  run_frame - execute one frame for this machine
+//-------------------------------------------------
+
+int running_machine::run_frame(attotime frametime)
+{
+	g_profiler.start(PROFILER_EXTRA);
+
+	// execute CPUs if not paused
+	if (!m_paused) {
+		attotime stoptime(m_scheduler.time() + frametime);
+		while (m_scheduler.time() < stoptime) {
+			m_scheduler.timeslice();
+		}
+	}
+	// otherwise, just pump video updates through
+	else
+		m_video->frame_update();
+
+	// handle save/load
+	if (m_saveload_schedule != saveload_schedule::NONE)
+		handle_saveload();
+
+	g_profiler.stop();
+}
 
 //-------------------------------------------------
 //  schedule_exit - schedule a clean exit
@@ -1322,17 +1333,7 @@ static running_machine * jsmess_machine;
 
 void js_main_loop()
 {
-	if (jsmess_machine->paused()) {
-		jsmess_machine->video().frame_update();
-		return;
-	}
-
-	device_scheduler * scheduler;
-	scheduler = &(jsmess_machine->scheduler());
-	attotime stoptime(scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60)));
-	while (scheduler->time() < stoptime) {
-		scheduler->timeslice();
-	}
+	jsmess_machine->run_frame(attotime(0,HZ_TO_ATTOSECONDS(60)));
 }
 
 void js_set_main_loop(running_machine * machine) {
