@@ -1751,7 +1751,9 @@ static void generate_memdump(running_machine &machine)
 		FILE *file = fopen("memdump.log", "w");
 		if (file)
 		{
-			machine.memory().dump(file);
+			memory_interface_iterator iter(machine.root_device());
+			for (device_memory_interface &memory : iter)
+				memory.dump(file);
 			fclose(file);
 		}
 	}

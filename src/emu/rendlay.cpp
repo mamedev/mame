@@ -2570,7 +2570,7 @@ layout_file::layout_file(running_machine &machine, util::xml::data_node const &r
 		{
 			m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
 		}
-		catch (emu_fatalerror const &error)
+		catch (emu_fatalerror const &)
 		{
 			// the exception will print its own message before we get here
 		}
