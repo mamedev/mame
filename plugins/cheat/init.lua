@@ -113,7 +113,7 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "r")
+		local file = io.open(lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
 		if not file then
 			return
 		end
@@ -139,7 +139,24 @@ function cheat.startplugin()
 		end
 		if #hotkeys > 0 then
 			local json = require("json")
-			local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "w+")
+			local path = lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)"))
+			local attr = lfs.attributes(path)
+			if not attr then
+				lfs.mkdir(path)
+			elseif attr.mode ~= "directory" then -- uhhh?
+				return
+			end
+			if cheatname:find("/", 1, true) then
+				local softpath = path .. "/" .. cheatname:match("([^/]+)")
+				local attr = lfs.attributes(softpath)
+				if not attr then
+					lfs.mkdir(softpath)
+				elseif attr.mode ~= "directory" then -- uhhh?
+					return
+				end
+			end
+
+			local file = io.open(path .. "/" .. cheatname .. "_hotkeys.json", "w+")
 			if file then
 				file:write(json.stringify(hotkeys, {indent = true}))
 				file:close()
