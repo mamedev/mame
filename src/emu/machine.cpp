@@ -1334,12 +1334,14 @@ void js_main_loop()
 	const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
 	const attotime stoptime(scheduler->time() + frametime);
 
-	while (scheduler->time() < stoptime) {
+	while (scheduler->time() < stoptime)
+	{
 		jsmess_machine->run_timeslice();
 	}
 }
 
-void js_set_main_loop(running_machine * machine) {
+void js_set_main_loop(running_machine * machine)
+{
 	jsmess_machine = machine;
 	EM_ASM (
 		JSMESS.running = true;
@@ -1347,15 +1349,18 @@ void js_set_main_loop(running_machine * machine) {
 	emscripten_set_main_loop(&js_main_loop, 0, 1);
 }
 
-running_machine * js_get_machine() {
+running_machine * js_get_machine()
+{
 	return jsmess_machine;
 }
 
-ui_manager * js_get_ui() {
+ui_manager * js_get_ui()
+{
 	return &(jsmess_machine->ui());
 }
 
-sound_manager * js_get_sound() {
+sound_manager * js_get_sound()
+{
 	return &(jsmess_machine->sound());
 }
 
