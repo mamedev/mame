@@ -1235,7 +1235,7 @@ ROM_START( bublboblp )
 	ROM_LOAD( "a71-25.ic41",  0x0000, 0x0100, BAD_DUMP CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing, on gfx board */ // NEEDS DUMPING, temporarily copied from tokio for now
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "a71-26.ic19",  0x0000, 0x0117, BAD_DUMP CRC(4e1f119c) SHA1(0ac8eb2fdb202951e5f7145f92dfd10fe96b294b) ) // under epoxy; PAL16L8 dumped as truth table, but dump needs converting to .jed; temporarily copied from tokio for now
+	ROM_LOAD( "bublboblp.pal16l8.ic19",  0x0000, 0x0117, CRC(4e1f119c) SHA1(0ac8eb2fdb202951e5f7145f92dfd10fe96b294b) ) // under epoxy; unlabeled, but equations are identical to tokio a71-26.ic19. fusemap was not dumped.
 ROM_END
 
 /*
