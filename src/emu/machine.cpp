@@ -90,7 +90,6 @@
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
 
-void js_set_main_loop(running_machine * machine);
 #endif
 
 
@@ -343,15 +342,15 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
-#if defined(EMSCRIPTEN)
-		// break out to our async javascript loop and halt
-		js_set_main_loop(this);
-#endif
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
+#if defined(EMSCRIPTEN)
+			// break out to our async javascript loop and halt
+			emscripten_set_running_machine(this);
+#endif
 			run_timeslice();
 		}
 		m_manager.http()->clear();
@@ -419,7 +418,7 @@ void running_machine::run_timeslice()
 	g_profiler.start(PROFILER_EXTRA);
 
 	// execute CPUs if not paused
-	if (!m_paused) 
+	if (!m_paused)
 		m_scheduler.timeslice();
 	// otherwise, just pump video updates through
 	else
@@ -1325,43 +1324,57 @@ device_memory_interface::space_config_vector dummy_space_device::memory_space_co
 
 #if defined(EMSCRIPTEN)
 
-static running_machine * jsmess_machine;
+running_machine * running_machine::emscripten_running_machine;
 
-void js_main_loop()
+void running_machine::emscripten_main_loop()
 {
-	device_scheduler *scheduler;
-	scheduler = &(jsmess_machine->scheduler());
+	running_machine *machine = emscripten_running_machine;
+
+	if (machine->paused())
+	{
+		machine->video().frame_update();
+		return;
+	}
+
+	device_scheduler * scheduler;
+	scheduler = &(machine->scheduler());
 	const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
 	const attotime stoptime(scheduler->time() + frametime);
 
 	while (scheduler->time() < stoptime)
 	{
-		jsmess_machine->run_timeslice();
+		machine->run_timeslice();
+
+		if (machine->m_hard_reset_pending ||
+		    machine->m_exit_pending ||
+		    machine->m_saveload_schedule != saveload_schedule::NONE ||
+		    machine->m_paused)
+			break;
 	}
 }
 
-void js_set_main_loop(running_machine * machine)
+void running_machine::emscripten_set_running_machine(running_machine *machine)
 {
-	jsmess_machine = machine;
+	emscripten_running_machine = machine;
 	EM_ASM (
 		JSMESS.running = true;
 	);
-	emscripten_set_main_loop(&js_main_loop, 0, 1);
+	emscripten_set_main_loop(&(emscripten_main_loop), 0, 1);
 }
 
-running_machine * js_get_machine()
+running_machine * running_machine::emscripten_get_running_machine()
 {
-	return jsmess_machine;
+	return emscripten_running_machine;
 }
 
-ui_manager * js_get_ui()
+ui_manager * running_machine::emscripten_get_ui()
 {
-	return &(jsmess_machine->ui());
+	return &(emscripten_running_machine->ui());
 }
 
-sound_manager * js_get_sound()
+sound_manager * running_machine::emscripten_get_sound()
 {
-	return &(jsmess_machine->sound());
+	return &(emscripten_running_machine->sound());
 }
 
 #endif /* defined(EMSCRIPTEN) */
