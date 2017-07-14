@@ -29407,6 +29407,8 @@ mc_sam60
 vgtablet
 gprnrs1
 gprnrs16
+vgpocket
+vgpmini
 
 @source:newbrain.cpp
 newbrain                        //
