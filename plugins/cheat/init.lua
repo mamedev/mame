@@ -121,22 +121,7 @@ function cheat.startplugin()
 		for num, val in ipairs(hotkeys) do
 			for num, cheat in pairs(cheats) do
 				if val.desc == cheat.desc then
-					cheat.hotkeys = {}
-					local keymap = require("cheat/keycodemap")
-					cheat.hotkeys.keys = manager:machine():input():seq_from_tokens(val.keys)
-					local keysstr = {}
-					val.keys:gsub("([^ ]+)", function(s)
-						if s:find("KEYCODE_", 1, true) then
-							keysstr[#keysstr + 1] = keymap[s]
-						elseif s:find("JOYCODE_", 1, true) then
-							local stick, button = s:match("JOYCODE_([0-9]+)_BUTTON([0-9]+)")
-							if stick and button then
-								keysstr[#keysstr + 1] = string.format("Joy%dBut%d", stick, button - 1)
-							end
-						end
-					end)
-					cheat.hotkeys.keysstr = keysstr
-					cheat.hotkeys.pressed = false
+					cheat.hotkeys = {pressed = false, keys = manager:machine():input():seq_from_tokens(val.keys)}
 				end
 			end
 		end
@@ -146,21 +131,7 @@ function cheat.startplugin()
 		local hotkeys = {}
 		for num, cheat in ipairs(cheats) do
 			if cheat.hotkeys then
-				local keymap = require("cheat/keycodemap")
-				local hotkey = {}
-				hotkey.desc = cheat.desc
-				hotkey.keys = ""
-				for num2, key in ipairs(cheat.hotkeys.keysstr) do
-					if #hotkey.keys > 0 then
-						hotkey.keys = hotkey.keys .. " "
-					end
-					if key:find("Joy", 1, true) then
-						local stick, button = key:match("Joy([0-9]+)But([0-9]+)")
-						hotkey.keys = hotkey.keys .. string.format("JOYCODE_%d_BUTTON%d", stick, button + 1)
-					else
-						hotkey.keys = hotkey.keys .. keymap[key]
-					end
-				end
+				local hotkey = {desc = cheat.desc, keys = manager:machine():input():seq_to_tokens(cheat.hotkeys.keys)}
 				if hotkey.keys ~= "" then
 					hotkeys[#hotkeys + 1] = hotkey
 				end
@@ -351,10 +322,6 @@ function cheat.startplugin()
 	end
 
 	local hotkeymenu = false
-	local hotkeysel = 0
-	local hotkey = 1
-	local hotmod = 1
-	local hotmode = 1
 	local hotkeylist = {}
 	local function run_if(func) if func then func() end return func or false end
 	local function is_oneshot(cheat) return cheat.script and not cheat.script.run and not cheat.script.off end
@@ -362,110 +329,22 @@ function cheat.startplugin()
 	local function menu_populate()
 		local menu = {}
 		if hotkeymenu then
-			if hotkeysel > 0 then
-				return hotkeylist[hotkeysel].pop()
-			end
-			local keys = {"1","2","3","4","5","6","7","8","9","0"}
-			local mods = {"LSHFT","RSHFT","LALT","RALT","LCTRL","RCTRL","LWIN","RWIN","MENU"}
-			local mode = {"Key", "Joy"}
-
-			local function hkpopfunc(cheat)
-				local function menu_lim(val, min, max)
-					if min == max then
-						return 0
-					elseif val == min then
-						return "r"
-					elseif val == max then
-						return "l"
-					else
-						return "lr"
-					end
-				end
-
-				local hkmenu = {}
-				hkmenu[1] = {"Set hotkey", "", "off"}
-				hkmenu[2] = {cheat.desc, "", "off"}
-				hkmenu[3] = {"Current Keys", cheat.hotkeys and table.concat(cheat.hotkeys.keysstr, " ") or "None", "off"}
-				hkmenu[4] = {"---", "", "off"}
-				hkmenu[5] = {"Hotkey Type", mode[hotmode], menu_lim(hotmode, 1, 2)}
-				if hotmode == 2 then
-					hkmenu[6] = {"Stick", hotkey, menu_lim(hotkey, 1, 9)}
-					hkmenu[7] = {"Button", hotmod, menu_lim(hotmod, 0, 9)}
-				else
-					hkmenu[6] = {"Key", keys[hotkey], menu_lim(hotkey, 1, #keys)}
-					hkmenu[7] = {"Modifier", mods[hotmod], menu_lim(hotmod, 1, #mods)}
-				end
-				hkmenu[8] = {"---", "", ""}
-				hkmenu[9] = {"Done", "", ""}
-				hkmenu[10] = {"Clear and Exit", "", ""}
-				hkmenu[11] = {"Cancel", "", ""}
-				return hkmenu
-			end
-
-			local function hkcbfunc(cheat, index, event)
-				if event == "right" then
-					if index == 5 and hotmode == 1 then
-						hotmode = 2
-						hotkey = 1
-						hotmod = 0
-						return true
-					elseif index == 6 then
-						hotkey = math.min(hotkey + 1, hotmode == 2 and 9 or #keys)
-						return true
-					elseif index == 7 then
-						hotmod = math.min(hotmod + 1, hotmode == 2 and 9 or #mods)
-						return true
-					end
-				elseif event == "left" then
-					if index == 5 and hotmode == 2 then
-						hotmode = 1
-						hotkey = 1
-						hotmod = 1
-						return true
-					elseif index == 6 then
-						hotkey = math.max(hotkey - 1, 1)
-						return true
-					elseif index == 7 then
-						hotmod = math.max(hotmod - 1, hotmode == 2 and 0 or 1)
-						return true
-					end
-				elseif event == "select" then
-					if index == 9 then
-						local keymap = require("cheat/keycodemap")
-						cheat.hotkeys = {}
-						if hotmode == 2 then
-							cheat.hotkeys.keys = manager:machine():input():seq_from_tokens(string.format("JOYCODE_%d_BUTTON%d", hotkey, hotmod + 1))
-							cheat.hotkeys.keysstr = {string.format("Joy%dBut%d", hotkey, hotmod)}
-						else
-							cheat.hotkeys.keys = manager:machine():input():seq_from_tokens(keymap[keys[hotkey]] .. " " .. keymap[mods[hotmod]])
-							cheat.hotkeys.keysstr = {keys[hotkey], mods[hotmod]}
-						end
-						cheat.hotkeys.pressed = false
-						hotkeysel = 0
-						hotkeymenu = false
-						return true
-					elseif index == 10 then
-						cheat.hotkeys = nil
-						hotkeysel = 0
-						hotkeymenu = false
-						return true
-					elseif index == 11 then
-						hotkeysel = 0
-						return true
-					end
-				end
-				return false
-			end
-
-
 			menu[1] = {"Select cheat to set hotkey", "", "off"}
 			menu[2] = {"---", "", "off"}
 			hotkeylist = {}
+
+			local function hkcbfunc(cheat)
+				local input = manager:machine():input()
+				input:seq_poll_start("switch")
+				local time = os.clock()
+				while (not input:seq_poll()) and (os.clock() < time + 1) do end
+				cheat.hotkeys = {pressed = false, keys = input:seq_poll_final()}
+			end
+
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
-					menu[#menu + 1] = {cheat.desc, " ", ""}
-					hotkeylist[#hotkeylist + 1] = { pop = function() return hkpopfunc(cheat) end,
-													cb = function(index, event) return hkcbfunc(cheat, index, event) end }
+					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager:machine():input():seq_name(cheat.hotkeys.keys) or "None", ""}
+					hotkeylist[#hotkeylist + 1] = function() return hkcbfunc(cheat) end
 				end
 			end
 			menu[#menu + 1] = {"---", "", ""}
@@ -525,13 +404,10 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager:machine():popmessage()
 		if hotkeymenu then
-			if hotkeysel > 0 then
-				return hotkeylist[hotkeysel].cb(index, event)
-			end
 			if event == "select" then
 				index = index - 2
 				if index >= 1 and index <= #hotkeylist then
-					hotkeysel = index
+					hotkeylist[index]()
 					return true
 				elseif index == #hotkeylist + 2 then
 					hotkeymenu = false

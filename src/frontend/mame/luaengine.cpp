@@ -139,6 +139,33 @@ namespace sol
 			}
 		};
 		template <>
+		struct checker<input_item_class>
+		{
+			template <typename Handler>
+			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
+			{
+				return stack::check<const std::string &>(L, index, handler);
+			}
+		};
+		template <>
+		struct getter<input_item_class>
+		{
+			static input_item_class get(lua_State* L, int index, record& tracking)
+			{
+				const std::string item_class =  stack::get<const std::string &>(L, index);
+				if(item_class == "switch")
+					return ITEM_CLASS_SWITCH;
+				else if(item_class == "absolute" || item_class == "abs")
+					return ITEM_CLASS_ABSOLUTE;
+				else if(item_class == "relative" || item_class == "rel")
+					return ITEM_CLASS_RELATIVE;
+				else if(item_class == "maximum" || item_class == "max")
+					return ITEM_CLASS_MAXIMUM;
+				else
+					return ITEM_CLASS_INVALID;
+			}
+		};
+		template <>
 		struct pusher<sol::buffer *>
 		{
 			static int push(lua_State* L, sol::buffer *buff)
@@ -1425,15 +1452,31 @@ void lua_engine::initialize()
 /* machine:input()
  * input:code_from_token(token) - get input_code for KEYCODE_* string token
  * input:code_pressed(code) - get pressed state for input_code
+ * input:code_to_token(code) - get KEYCODE_* string token for code
+ * input:code_name(code) - get code friendly name
  * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
  * input:seq_pressed(seq) - get pressed state for input_seq
+ * input:seq_to_token(seq) - get KEYCODE_* string tokens for seq
+ * input:seq_to_name(seq) - get seq friendly name
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
 			"code_from_token", [](input_manager &input, const char *token) { return sol::make_user(input.code_from_token(token)); },
 			"code_pressed", [](input_manager &input, sol::user<input_code> code) { return input.code_pressed(code); },
+			"code_to_token", [](input_manager &input, sol::user<input_code> code) { return input.code_to_token(code); },
+			"code_name", [](input_manager &input, sol::user<input_code> code) { return input.code_name(code); },
 			"seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return sol::make_user(seq); },
-			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); });
+			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); },
+			"seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); },
+			"seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); },
+			"seq_poll_start", [](input_manager &input, input_item_class cls, sol::object seq) {
+					input_seq *start = nullptr;
+					if(seq.is<sol::user<input_seq>>())
+						start = &seq.as<sol::user<input_seq>>();
+					input.seq_poll_start(cls, start);
+				},
+			"seq_poll", &input_manager::seq_poll,
+			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); });
 
 /* machine:uiinput()
  * uiinput:find_mouse() - returns x, y, button state, ui render target
