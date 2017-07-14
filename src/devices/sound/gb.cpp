@@ -146,6 +146,7 @@ void gameboy_sound_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameboy_sound_device::timer_callback),this));
 	m_timer->adjust(clocks_to_attotime(FRAME_CYCLES/128), 0, clocks_to_attotime(FRAME_CYCLES/128));
 
+	save_item(NAME(m_last_updated));
 	save_item(NAME(m_snd_regs));
 	// sound control
 	save_item(NAME(m_snd_control.on));
@@ -159,6 +160,7 @@ void gameboy_sound_device::device_start()
 	save_item(NAME(m_snd_control.mode3_right));
 	save_item(NAME(m_snd_control.mode4_left));
 	save_item(NAME(m_snd_control.mode4_right));
+	save_item(NAME(m_snd_control.cycles));
 
 	SAVE_CHANNEL(m_snd_1);
 	SAVE_CHANNEL(m_snd_2);
