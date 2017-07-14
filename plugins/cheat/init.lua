@@ -352,10 +352,14 @@ function cheat.startplugin()
 
 			local function hkcbfunc(cheat)
 				local input = manager:machine():input()
+				manager:machine():popmessage("Press button for hotkey or wait to clear")
+				manager:machine():video():frame_update(true)
 				input:seq_poll_start("switch")
 				local time = os.clock()
 				while (not input:seq_poll()) and (os.clock() < time + 1) do end
 				cheat.hotkeys = {pressed = false, keys = input:seq_poll_final()}
+				manager:machine():popmessage()
+				manager:machine():video():frame_update(true)
 			end
 
 			for num, cheat in ipairs(cheats) do
