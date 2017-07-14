@@ -1142,6 +1142,51 @@ ROM_START( tokiob )
 	ROM_LOAD( "a71-25.ic41",  0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing, on gfx board */
 ROM_END
 
+/* 
+   Bubble Bobble prototype on Tokio hardware
+   14.MAY,1986VER 0.0
+ */
+ROM_START( bublboblp )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* main CPU */
+	ROM_LOAD( "maincpu.ic4",   0x00000, 0x8000, CRC(874ddd6c) SHA1(30efef29558c7b2336ec8ab44686e32382d2045a) ) // blank label, under epoxy
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "maincpu.ic5",   0x10000, 0x8000, CRC(588cc602) SHA1(83c83ddace2fddbe16e4fbf8cbdbbb3140ac8192) ) // blank label, under epoxy
+	// ic6 socket is empty, under epoxy
+	// ic7 socket is empty, under epoxy
+	// ic8 socket is empty, under epoxy
+
+	ROM_REGION( 0x10000, "slave", 0 )   /* video CPU */
+	ROM_LOAD( "slave.ic1",   0x00000, 0x8000, CRC(e8187e8f) SHA1(74b0442c61fe7f745ce0014bd5b7948783a323bd) ) // blank label, under epoxy
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* audio CPU */
+	ROM_LOAD( "audiocpu.ic10",  0x0000, 0x08000, CRC(c516c26e) SHA1(8cdeff2b8bb21d8c118f48e43b567a4e5b5e7184) ) // blank label, under epoxy
+
+	// mcu socket is empty
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
+	ROM_LOAD( "c1.ic12",  0x00000, 0x8000, CRC(183d378b) SHA1(e07599212af5d822ed1cb9eba8ca3fc01f13cbe0) )    /* 1st plane */
+	ROM_LOAD( "c3.ic13",  0x08000, 0x8000, CRC(55408ff9) SHA1(1337eaa9f7189ac3192ef7c631a1460b5e02a820) )
+	ROM_LOAD( "c5.ic14",  0x10000, 0x8000, CRC(12cc5949) SHA1(840042304e32125448507b0396ebd8734ea78016) )
+	ROM_LOAD( "c7.ic15",  0x18000, 0x8000, CRC(10e24f35) SHA1(fce643c8aa1838309d82929717fea39d4d6fbd11) )
+	ROM_LOAD( "c9.ic16",  0x20000, 0x8000, CRC(dec95961) SHA1(9f8b84035a85fc3325926c87d7908dedfbe4e80d) )
+	ROM_LOAD( "c11.ic17", 0x28000, 0x8000, CRC(1c49d228) SHA1(3ea40bf82bc42d0ddb8b613e3012fa334a755272) )
+	// ic18 socket is empty
+	// ic19 socket is empty
+	ROM_LOAD( "c0.ic30",  0x40000, 0x8000, CRC(39d0ce8f) SHA1(05d77d2c8ea083851fc5652fe6e4da9645c533e6) )    /* 2nd plane */
+	ROM_LOAD( "c2.ic31",  0x48000, 0x8000, CRC(f705a512) SHA1(b598899b80ab28b1e487325f088fca0ba7994b19) )
+	ROM_LOAD( "c4.ic32",  0x50000, 0x8000, CRC(151df0eb) SHA1(51071fbca7af66cfabd0ab963c385682fd402213) )
+	ROM_LOAD( "c6.ic33",  0x58000, 0x8000, CRC(7b737c1e) SHA1(ae1bf563e1772d4ab50ee52aaacb1a7236f1e4e1) )
+	ROM_LOAD( "c8.ic34",  0x60000, 0x8000, CRC(1320e15d) SHA1(b5da80bc27c053353c701f523f89f704c11c24e9) )
+	ROM_LOAD( "c10.ic35", 0x68000, 0x8000, CRC(29c41387) SHA1(6f7b433a82e34b9daf5ce3f9a28061c64db061f6) )
+	// ic36 socket is empty
+	// ic37 socket is empty
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.ic41",  0x0000, 0x0100, BAD_DUMP CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing, on gfx board */ // NEEDS DUMPING, temporarily copied from tokio for now
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "a71-26.ic19",  0x0000, 0x0117, BAD_DUMP CRC(4e1f119c) SHA1(0ac8eb2fdb202951e5f7145f92dfd10fe96b294b) ) // under epoxy; PAL16L8 dumped as truth table, but dump needs converting to .jed; temporarily copied from tokio for now
+ROM_END
 
 /*
 
@@ -1891,6 +1936,7 @@ GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, tokio,  
 GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, tokio,    ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
+GAME( 1986, bublboblp,  bublbobl, tokiob,   tokio_base, bublbobl_state, tokio,    ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
