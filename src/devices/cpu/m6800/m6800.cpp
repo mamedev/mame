@@ -169,7 +169,6 @@ TODO:
 #define CLR_HNZC    CC&=0xd2
 #define CLR_NZVC    CC&=0xf0
 #define CLR_Z       CC&=0xfb
-#define CLR_NZC     CC&=0xf2
 #define CLR_ZC      CC&=0xfa
 #define CLR_C       CC&=0xfe
 
@@ -274,6 +273,7 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 /* Macros for branch instructions */
 #define BRANCH(f) {IMMBYTE(t);if(f){PC+=SIGNED(t);}}
 #define NXORV  ((CC&0x08)^((CC&0x02)<<2))
+#define NXORC  ((CC&0x08)^((CC&0x01)<<3))
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
