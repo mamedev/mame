@@ -474,22 +474,22 @@ static INPUT_PORTS_START( bublbobl )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy down, present on connector and readable
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy up, present on connector and readable
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tied to +5v
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy 2 down, present on connector and readable
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy 2 up, present on connector and readable
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tied to +5v
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( boblbobl )
@@ -699,6 +699,56 @@ static INPUT_PORTS_START( tokio )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r, nullptr)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r, nullptr)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bublboblp )
+	PORT_INCLUDE( tokio_base )
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW A:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW A:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW A:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW A:5,6")
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW A:7,8")
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW-B:1,2") // code is present to read this and look up a table per level, but unclear if it actually works
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW-B:3,4")
+	PORT_DIPSETTING(    0x08, "20K 80K 300K" )
+	PORT_DIPSETTING(    0x0c, "30K 100K 400K" )
+	PORT_DIPSETTING(    0x04, "40K 200K 500K" )
+	PORT_DIPSETTING(    0x00, "50K 250K 500K" )
+	// then more bonus lives at 1M 2M 3M 4M 5M - for all dip switch settings
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW-B:5,6")
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0x40, 0x40, "Edit Mode" )                 PORT_DIPLOCATION("DSW-B:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW-B:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*************************************
@@ -1142,7 +1192,7 @@ ROM_START( tokiob )
 	ROM_LOAD( "a71-25.ic41",  0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing, on gfx board */
 ROM_END
 
-/* 
+/*
    Bubble Bobble prototype on Tokio hardware
    14.MAY,1986VER 0.0
  */
@@ -1936,7 +1986,7 @@ GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, tokio,  
 GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, tokio,    ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublboblp,  bublbobl, tokiob,   tokio_base, bublbobl_state, tokio,    ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, tokiob,   bublboblp,  bublbobl_state, tokio,    ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
