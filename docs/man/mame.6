@@ -497,6 +497,13 @@ consistent environment for benchmarking MAME performance. In addition,
 upon exit, the \-str option will write a screenshot called final.png
 to the game's snapshot directory.
 .TP
+.B \-seconds_to_skip, \-sts \fIvalue
+This option can be used to skip a fixed number of seconds at game
+start. It tells MAME to run the emulation as fast as possible until
+the specified number of seconds has been emulated. This can be 
+used to speed up the start of games with long power on test sequences.
+
+.TP
 .B \-[no]throttle
 Configures the default thottling setting. When throttling is on, MAME
 attempts to keep the game running at the game's intended speed. When
