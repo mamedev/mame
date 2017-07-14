@@ -74,12 +74,12 @@ univ_bus_device::univ_bus_device(machine_config const &mconfig, char const *tag,
 	, m_memory_space(-1)
 	, m_status_space(-1)
 	, m_ram_ports_space(-1)
-	, m_stop_out_cb(*this)
 	, m_test_out_cb(*this)
+	, m_stop_out_cb(*this)
 	, m_reset_4002_out_cb(*this)
 	, m_user_reset_out_cb(*this)
-	, m_stop(0U)
 	, m_test(0U)
+	, m_stop(0U)
 	, m_reset_4002(0U)
 	, m_user_reset(0U)
 {
@@ -133,44 +133,35 @@ void univ_bus_device::set_ram_ports_space(device_t &device, char const *tag, int
 
 WRITE_LINE_MEMBER(univ_bus_device::sync_in)
 {
-	// FIXME: distribute to cards
-}
-
-WRITE_LINE_MEMBER(univ_bus_device::test_in)
-{
-	if (state)
-		m_test &= ~u16(1U);
-	else
-		m_test |= 1U;
-	// FIXME: distribute to cards
-}
-
-WRITE_LINE_MEMBER(univ_bus_device::stop_in)
-{
-	if (state)
-		m_stop &= ~u16(1U);
-	else
-		m_stop |= 1U;
-	// FIXME: distribute to cards
+	for (device_univ_card_interface *card : m_cards)
+	{
+		if (card)
+			card->sync_in(state);
+		else
+			break;
+	}
 }
 
 WRITE_LINE_MEMBER(univ_bus_device::stop_acknowledge_in)
 {
-	// FIXME: distribute to cards
+	for (device_univ_card_interface *card : m_cards)
+	{
+		if (card)
+			card->stop_acknowledge_in(state);
+		else
+			break;
+	}
 }
 
 WRITE_LINE_MEMBER(univ_bus_device::cpu_reset_in)
 {
-	// FIXME: distribute to cards
-}
-
-WRITE_LINE_MEMBER(univ_bus_device::reset_4002_in)
-{
-	if (state)
-		m_reset_4002 &= ~u16(1U);
-	else
-		m_reset_4002 |= 1U;
-	// FIXME: distribute to cards
+	for (device_univ_card_interface *card : m_cards)
+	{
+		if (card)
+			card->cpu_reset_in(state);
+		else
+			break;
+	}
 }
 
 
@@ -194,10 +185,15 @@ void univ_bus_device::device_validity_check(validity_checker &valid) const
 
 void univ_bus_device::device_start()
 {
-	m_stop_out_cb.resolve_safe();
 	m_test_out_cb.resolve_safe();
+	m_stop_out_cb.resolve_safe();
 	m_reset_4002_out_cb.resolve_safe();
 	m_user_reset_out_cb.resolve_safe();
+
+	save_item(NAME(m_test));
+	save_item(NAME(m_stop));
+	save_item(NAME(m_reset_4002));
+	save_item(NAME(m_user_reset));
 }
 
 
@@ -216,6 +212,98 @@ unsigned univ_bus_device::add_card(device_univ_card_interface &card)
 		}
 	}
 	throw emu_fatalerror("univ_bus_device: maximum number of cards (%u) exceeded\n", unsigned(ARRAY_LENGTH(m_cards)));
+}
+
+void univ_bus_device::set_test(unsigned index, int state)
+{
+	assert(ARRAY_LENGTH(m_cards) >= index);
+	bool const changed(bool(state) != !BIT(m_test, index));
+	if (changed)
+	{
+		u16 const other(m_test & ~(u16(1U) << index));
+		if (state)
+			m_test = other;
+		else
+			m_test |= u16(1U) << index;
+
+		if ((ARRAY_LENGTH(m_cards) != index) && !(other & ~(u16(1U) << ARRAY_LENGTH(m_cards))))
+			m_test_out_cb(state);
+
+		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		{
+			if ((index != card) && !(other & ~(u16(1U) << index)))
+				m_cards[card]->test_in(state);
+		}
+	}
+}
+
+void univ_bus_device::set_stop(unsigned index, int state)
+{
+	assert(ARRAY_LENGTH(m_cards) >= index);
+	bool const changed(bool(state) != !BIT(m_stop, index));
+	if (changed)
+	{
+		u16 const other(m_stop & ~(u16(1U) << index));
+		if (state)
+			m_stop = other;
+		else
+			m_stop |= u16(1U) << index;
+
+		if ((ARRAY_LENGTH(m_cards) != index) && !(other & ~(u16(1U) << ARRAY_LENGTH(m_cards))))
+			m_stop_out_cb(state);
+
+		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		{
+			if ((index != card) && !(other & ~(u16(1U) << index)))
+				m_cards[card]->stop_in(state);
+		}
+	}
+}
+
+void univ_bus_device::set_reset_4002(unsigned index, int state)
+{
+	assert(ARRAY_LENGTH(m_cards) >= index);
+	bool const changed(bool(state) != !BIT(m_reset_4002, index));
+	if (changed)
+	{
+		u16 const other(m_reset_4002 & ~(u16(1U) << index));
+		if (state)
+			m_reset_4002 = other;
+		else
+			m_reset_4002 |= u16(1U) << index;
+
+		if ((ARRAY_LENGTH(m_cards) != index) && !(other & ~(u16(1U) << ARRAY_LENGTH(m_cards))))
+			m_reset_4002_out_cb(state);
+
+		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		{
+			if ((index != card) && !(other & ~(u16(1U) << index)))
+				m_cards[card]->reset_4002_in(state);
+		}
+	}
+}
+
+void univ_bus_device::set_user_reset(unsigned index, int state)
+{
+	assert(ARRAY_LENGTH(m_cards) > index);
+	bool const changed(bool(state) != !BIT(m_user_reset, index));
+	if (changed)
+	{
+		u16 const other(m_user_reset & ~(u16(1U) << index));
+		if (state)
+			m_user_reset = other;
+		else
+			m_user_reset |= u16(1U) << index;
+
+		if (!other)
+			m_user_reset_out_cb(state);
+
+		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		{
+			if ((index != card) && !(other & ~(u16(1U) << index)))
+				m_cards[card]->user_reset_in(state);
+		}
+	}
 }
 
 
@@ -248,10 +336,12 @@ void device_univ_card_interface::set_bus(univ_bus_device &bus)
 
 
 
+#include "insdatastor.h"
 #include "prommemory.h"
 #include "tapereader.h"
 
 SLOT_INTERFACE_START(intellec4_univ_cards)
-	SLOT_INTERFACE("imm4_90", INTELLEC4_TAPE_READER)
+	SLOT_INTERFACE("imm4_22", INTELLEC4_INST_DATA_STORAGE)
 	SLOT_INTERFACE("imm6_26", INTELLEC4_PROM_MEMORY)
+	SLOT_INTERFACE("imm4_90", INTELLEC4_TAPE_READER)
 SLOT_INTERFACE_END

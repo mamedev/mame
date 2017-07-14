@@ -867,6 +867,8 @@ end
 
 if (BUSES["INTELLEC4"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/intellec4/insdatastor.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/insdatastor.h",
 		MAME_DIR .. "src/devices/bus/intellec4/intellec4.cpp",
 		MAME_DIR .. "src/devices/bus/intellec4/intellec4.h",
 		MAME_DIR .. "src/devices/bus/intellec4/prommemory.cpp",

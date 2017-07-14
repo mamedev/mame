@@ -95,7 +95,7 @@
     48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72
     5f  61    77     13   78                79                7a  43  0d    18  1b  1c      5e    32  5a
 
-    0f is a blank key
+    0f has a blank keycap
     backspace immediately above return
     backslash and backtick/tilde at top right of main area
     control on home row, caps lock at bottom left corner of main area

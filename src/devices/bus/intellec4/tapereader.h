@@ -8,8 +8,8 @@ device (use J command to select it), but it doesn't appear in any
 catalogues or manuals I've seen.  Apparently it was announced in
 Computerworld.
 
-In practice you needed a GPIO card (e.g. an imm4-60) to talk to the
-paper taper reader.  To simplify configuration we emulate the I/O
+In practice you needed a GPIO card (e.g. an imm4-60 or imm4-22) to talk
+to the paper taper reader.  To simplify configuration we emulate the I/O
 interface and paper tape reader as a single device.
 */
 #ifndef MAME_BUS_INTELLEC4_TAPEREADER_H

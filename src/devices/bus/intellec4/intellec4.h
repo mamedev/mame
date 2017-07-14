@@ -138,11 +138,11 @@ to implement the card in both systems.
 #define MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE(tag, space) \
 		bus::intellec4::univ_bus_device::set_ram_ports_space(*device, "^" tag, space);
 
-#define MCFG_INTELLEC4_UNIV_BUS_STOP_CB(obj) \
-		bus::intellec4::univ_bus_device::set_stop_out_cb(*device, DEVCB_##obj);
-
 #define MCFG_INTELLEC4_UNIV_BUS_TEST_CB(obj) \
 		bus::intellec4::univ_bus_device::set_test_out_cb(*device, DEVCB_##obj);
+
+#define MCFG_INTELLEC4_UNIV_BUS_STOP_CB(obj) \
+		bus::intellec4::univ_bus_device::set_stop_out_cb(*device, DEVCB_##obj);
 
 #define MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(obj) \
 		bus::intellec4::univ_bus_device::set_reset_4002_out_cb(*device, DEVCB_##obj);
@@ -202,15 +202,15 @@ public:
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER(sync_in);
-	DECLARE_WRITE_LINE_MEMBER(test_in);
-	DECLARE_WRITE_LINE_MEMBER(stop_in);
+	DECLARE_WRITE_LINE_MEMBER(test_in) {set_test(ARRAY_LENGTH(m_cards), state); }
+	DECLARE_WRITE_LINE_MEMBER(stop_in) {set_stop(ARRAY_LENGTH(m_cards), state); }
 	DECLARE_WRITE_LINE_MEMBER(stop_acknowledge_in);
 	DECLARE_WRITE_LINE_MEMBER(cpu_reset_in);
-	DECLARE_WRITE_LINE_MEMBER(reset_4002_in);
+	DECLARE_WRITE_LINE_MEMBER(reset_4002_in) { set_reset_4002(ARRAY_LENGTH(m_cards), state); }
 
 	// output lines
-	DECLARE_READ_LINE_MEMBER(stop_out) const        { return (m_stop        & ~u16(1U)) ? 0 : 1; }
 	DECLARE_READ_LINE_MEMBER(test_out) const        { return (m_test        & ~u16(1U)) ? 0 : 1; }
+	DECLARE_READ_LINE_MEMBER(stop_out) const        { return (m_stop        & ~u16(1U)) ? 0 : 1; }
 	DECLARE_READ_LINE_MEMBER(reset_4002_out) const  { return (m_reset_4002  & ~u16(1U)) ? 0 : 1; }
 	DECLARE_READ_LINE_MEMBER(user_reset_out) const  { return (m_user_reset  & ~u16(1U)) ? 0 : 1; }
 
@@ -222,6 +222,10 @@ protected:
 private:
 	// helpers for cards
 	unsigned add_card(device_univ_card_interface &card);
+	void set_test(unsigned index, int state);
+	void set_stop(unsigned index, int state);
+	void set_reset_4002(unsigned index, int state);
+	void set_user_reset(unsigned index, int state);
 
 	// finding address spaces
 	required_device<device_memory_interface>    m_rom_device, m_rom_ports_device;
@@ -230,8 +234,8 @@ private:
 	int                                         m_memory_space, m_status_space, m_ram_ports_space;
 
 	// output line callbacks
-	devcb_write_line    m_stop_out_cb;
 	devcb_write_line    m_test_out_cb;
+	devcb_write_line    m_stop_out_cb;
 	devcb_write_line    m_reset_4002_out_cb;
 	devcb_write_line    m_user_reset_out_cb;
 
@@ -239,7 +243,7 @@ private:
 	device_univ_card_interface  *m_cards[15];
 
 	// packed line states
-	u16 m_stop, m_test, m_reset_4002, m_user_reset;
+	u16 m_test, m_stop, m_reset_4002, m_user_reset;
 };
 
 
@@ -259,6 +263,19 @@ protected:
 	address_space &memory_space()       { return m_bus->m_memory_device->space(m_bus->m_memory_space); }
 	address_space &status_space()       { return m_bus->m_status_device->space(m_bus->m_status_space); }
 	address_space &ram_ports_space()    { return m_bus->m_ram_ports_device->space(m_bus->m_ram_ports_space); }
+
+	DECLARE_WRITE_LINE_MEMBER(test_out)         { m_bus->set_test(m_index, state); }
+	DECLARE_WRITE_LINE_MEMBER(stop_out)         { m_bus->set_stop(m_index, state); }
+	DECLARE_WRITE_LINE_MEMBER(reset_4002_out)   { m_bus->set_reset_4002(m_index, state); }
+	DECLARE_WRITE_LINE_MEMBER(user_reset_out)   { m_bus->set_user_reset(m_index, state); }
+
+	virtual DECLARE_WRITE_LINE_MEMBER(sync_in)              { }
+	virtual DECLARE_WRITE_LINE_MEMBER(test_in)              { }
+	virtual DECLARE_WRITE_LINE_MEMBER(stop_in)              { }
+	virtual DECLARE_WRITE_LINE_MEMBER(stop_acknowledge_in)  { }
+	virtual DECLARE_WRITE_LINE_MEMBER(cpu_reset_in)         { }
+	virtual DECLARE_WRITE_LINE_MEMBER(reset_4002_in)        { }
+	virtual DECLARE_WRITE_LINE_MEMBER(user_reset_in)        { }
 
 private:
 	void set_bus(univ_bus_device &bus);
