@@ -126,15 +126,15 @@ READ8_MEMBER(konmedal_state::magic_r)
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
 	int codebits = *code;
-	int bs;
-	int bankshifts[4] = { 0, 4, 8, 12 };
-	int mode, data, bank;
+	//int bs;
+	//int bankshifts[4] = { 0, 4, 8, 12 };
+	int mode, data; //, bank;
 
 	m_k056832->read_avac(&mode, &data);
 
 	*color = (codebits >> 12) & 0xf;
-	bs = (codebits & 0xc00) >> 10;
-	bank = (data >> bankshifts[bs]) & 0xf;
+	//bs = (codebits & 0xc00) >> 10;
+	//bank = (data >> bankshifts[bs]) & 0xf;
 	*code = (codebits & 0x3ff); // | (bank << 10);
 }
 
