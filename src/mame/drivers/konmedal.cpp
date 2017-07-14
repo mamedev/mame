@@ -1,24 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /***************************************************************************
+	
+ konmedal.cpp: Konami Z80 based medal games
 
  Tsukande Toru Chicchi (つかんでとるちっち)
  (c) 1995 Konami
+ 
+ Dam Dam Boy
+ (c) 1995 Konami
+ 
  Driver by R. Belmont
 
 Rundown of PCB:
 Main CPU:  Z80
-Sound: YMZ280B
+Sound: YMZ280B or OKIM6295
 
 Konami Custom chips:
 053252 (timing/interrupt controller?)
 054156 (tilemaps)
 054157 (tilemaps)
-
-Inputs:
-
- c702 bit 5 = medal 3 error
- c703 bit 5 = medal 4 error
 
 ***************************************************************************/
 
@@ -27,6 +28,8 @@ Inputs:
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/ymz280b.h"
+#include "sound/okim6295.h"
+#include "sound/k051649.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/konami_helper.h"
 #include "screen.h"
@@ -40,13 +43,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_palette(*this, "palette"),
-		m_ymz(*this, "ymz")
+		m_ymz(*this, "ymz"),
+		m_oki(*this, "oki")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
-	required_device<ymz280b_device> m_ymz;
+	optional_device<ymz280b_device> m_ymz;
+	optional_device<okim6295_device> m_oki;
 
 	DECLARE_PALETTE_INIT(konmedal);
 
@@ -115,7 +120,7 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 
 READ8_MEMBER(konmedal_state::magic_r)
 {
-	return 0xc1;    // checked at 60f before reading a page of the VROM
+	return 0xc1;    // checked at 60f in tsukande before reading a page of the VROM
 }
 
 K056832_CB_MEMBER(konmedal_state::tile_callback)
@@ -130,7 +135,7 @@ K056832_CB_MEMBER(konmedal_state::tile_callback)
 	*color = (codebits >> 12) & 0xf;
 	bs = (codebits & 0xc00) >> 10;
 	bank = (data >> bankshifts[bs]) & 0xf;
-	*code = (codebits & 0x3ff) | (bank << 10);
+	*code = (codebits & 0x3ff); // | (bank << 10);
 }
 
 void konmedal_state::video_start()
@@ -156,6 +161,7 @@ PALETTE_INIT_MEMBER(konmedal_state, konmedal)
 
 	for (i = 0; i < 256; i++)
 	{
+		// this is extremely wrong, see the color test screen
 		palette.set_pen_color(i,
 			PROM[i]<<4,
 			PROM[0x100+i]<<4,
@@ -185,15 +191,50 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
-	AM_RANGE(0xc702, 0xc703) AM_READ(inputs_r)
+	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
+	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
 	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( konmedal )
+static ADDRESS_MAP_START( ddboy_main, AS_PROGRAM, 8, konmedal_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xbfff) AM_RAM // work RAM
+	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
+	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
+	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
+	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
+	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
+	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
+	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xd000, 0xd000) AM_WRITENOP	// ???  writes 00 and 3f every frame
+	AM_RANGE(0xd800, 0xd87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
+	AM_RANGE(0xd880, 0xd889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
+	AM_RANGE(0xd88a, 0xd88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
+	AM_RANGE(0xd88f, 0xd88f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
+	AM_RANGE(0xd8e0, 0xd8ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
+ADDRESS_MAP_END
 
+static INPUT_PORTS_START( konmedal )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	// medal
+	PORT_BIT( 0xd0, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused
+	
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// medal ack
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused
 INPUT_PORTS_END
 
 void konmedal_state::machine_start()
@@ -206,8 +247,7 @@ void konmedal_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( konmedal )
-
+static MACHINE_CONFIG_START( tsukande )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(medal_main)
@@ -240,6 +280,41 @@ static MACHINE_CONFIG_START( konmedal )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( ddboy )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_CPU_PROGRAM_MAP(ddboy_main)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(konmedal_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+	MCFG_K056832_PALETTE("palette")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/14, PIN7_HIGH)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	
+	MCFG_K051649_ADD("k051649", XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+MACHINE_CONFIG_END
+
 ROM_START( tsukande )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "441-d02.4g",   0x000000, 0x020000, CRC(6ed17227) SHA1(4e3f5219cbf6f42c60df38a99f3009fe49f78fc1) )
@@ -261,4 +336,25 @@ ROM_START( tsukande )
 	ROM_LOAD( "441a12.10e",   0x080000, 0x080000, CRC(dc2dd5bc) SHA1(28ef6c96c360d706a4296a686f3f2a54fce61bfb) )
 ROM_END
 
-GAME( 1995, tsukande, 0, konmedal, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
+ROM_START( ddboy )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "342_c02.27c010.4d", 0x000000, 0x020000, CRC(dc33af9f) SHA1(db22f3b28e3aba69f70fd2581c77755373b582d0) ) 
+
+	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) ) 
+	ROM_LOAD32_BYTE( "342_a04.27c010.4g", 0x000003, 0x020000, CRC(a4d4e15e) SHA1(809afab3f2adc58ca5d18e2413b40a6f33bd0cfa) ) 
+	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) ) 
+	ROM_LOAD32_BYTE( "342_a06.27c010.4j", 0x000001, 0x020000, CRC(49f35d66) SHA1(3d5cf3b6eb6a3497609117acd002169a31130418) ) 
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "342_a01.27c010.8b", 0x000000, 0x020000, CRC(e9ce569c) SHA1(ce9b3e60eac3543aca9e82a9ccf77c53a6aff504) ) 
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "342_a07.82s129.13f", 0x000000, 0x000100, CRC(f8c11f4d) SHA1(95061d0af7c8bac702aa48e16c0711719250653f) ) 
+	ROM_LOAD( "342_a08.82s129.14f", 0x000100, 0x000100, CRC(1814db4b) SHA1(08b25f96dc3af15b3fa3c88b2884845abd3ff620) ) 
+	ROM_LOAD( "342_a09.82s129.15f", 0x000200, 0x000100, CRC(21e2dd13) SHA1(721c7fa1a01c810a7ce35b4331d280704b4e04fd) ) 
+	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) ) 
+ROM_END
+
+GAME( 1995, tsukande, 0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
+GAME( 1995, ddboy,    0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy", MACHINE_NOT_WORKING)
