@@ -98,6 +98,7 @@ public:
 	DECLARE_DRIVER_INIT(renaimj);
 	DECLARE_DRIVER_INIT(csplayh7);
 	DECLARE_DRIVER_INIT(junai2);
+	DECLARE_DRIVER_INIT(nichisel);
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
@@ -501,6 +502,7 @@ DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(0x585c/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,nichisel)   { general_init(0x9cd6/2, 0x6018); }
 
 /*
  * Base BIOS root (DVD board is common for all DVD games)
@@ -740,6 +742,27 @@ ROM_START( fuudol )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, CRC(30719630) SHA1(a8c7b6d0304c38691775c5af6c32fbeeefd9f9fa) )
 ROM_END
 
+ROM_START( nichisel )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(95fb8e74) SHA1(79aa45ed1c3bd3e1a83b02afb64268efb386100e) )
+    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(fb84fc3e) SHA1(6b87c3516ceec59ec96012ea6a3d2fa9670a1cb3) )
+
+	DVD_BIOS
+	
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(f94981fd) SHA1(84dae027f10717a084016310cd245bb4c2ee6a56) )
+	
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(5ab63481) SHA1(fc81fbdd1df496813fc0d80bcab6d0434b75d311) )
+    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(50085861) SHA1(b8f99a66a743c9bf66ef307fe4b581586e293fe5) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb80sp", 0, SHA1(48eb9f8adba0ea5f59cfcbdee61c29b4af84ac97) )
+	
+	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+    ROM_LOAD( "palce16v8h.020", 0x000000, 0x040000, CRC(228b98fb) SHA1(53b57a09610425a5bb9d0ffe0f68dce2d9ab3bf6) )
+ROM_END
+
 // 1995
 GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
@@ -770,8 +793,8 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 // 17 : Tsuugakuro no Yuuwaku : Nichibutsu/Love Factory/Just&Just
 /* 17 */ //GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
 // 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
+/* sp */ GAME( 2000, nichisel,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,          ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
 // 19 : Konnano Hajimete! : Nichibutsu/Love Factory
 // 20 : Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic
-// sp : 
