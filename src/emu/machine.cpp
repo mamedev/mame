@@ -343,14 +343,16 @@ int running_machine::run(bool quiet)
 
 		export_http_api();
 
-		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
+
+#if defined(EMSCRIPTEN)
+		// break out to our async javascript loop and halt
+		emscripten_set_running_machine(this);
+#endif
+
+		// run the CPUs until a reset or exit
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
-#if defined(EMSCRIPTEN)
-			// break out to our async javascript loop and halt
-			emscripten_set_running_machine(this);
-#endif
 			run_timeslice();
 		}
 		m_manager.http()->clear();
@@ -1330,27 +1332,40 @@ void running_machine::emscripten_main_loop()
 {
 	running_machine *machine = emscripten_running_machine;
 
-	if (machine->paused())
+	g_profiler.start(PROFILER_EXTRA);
+
+	// execute CPUs if not paused
+	if (!machine->m_paused)
 	{
-		machine->video().frame_update();
-		return;
+		device_scheduler * scheduler;
+		scheduler = &(machine->scheduler());
+		const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
+		const attotime stoptime(scheduler->time() + frametime);
+
+		while (!machine->m_paused && 
+		       !machine->m_hard_reset_pending &&
+		       !machine->m_exit_pending &&
+		       scheduler->time() < stoptime)
+		{
+			machine->m_scheduler.timeslice();
+			// handle save/load
+			if (machine->m_saveload_schedule != saveload_schedule::NONE)
+			{
+				machine->handle_saveload();
+				break;
+			}
+		}
+	}
+	// otherwise, just pump video updates through
+	else
+		machine->m_video->frame_update();
+
+	if (machine->m_exit_pending)
+	{
+		emscripten_cancel_main_loop();
 	}
 
-	device_scheduler * scheduler;
-	scheduler = &(machine->scheduler());
-	const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
-	const attotime stoptime(scheduler->time() + frametime);
-
-	while (scheduler->time() < stoptime)
-	{
-		machine->run_timeslice();
-
-		if (machine->m_hard_reset_pending ||
-		    machine->m_exit_pending ||
-		    machine->m_saveload_schedule != saveload_schedule::NONE ||
-		    machine->m_paused)
-			break;
-	}
+	g_profiler.stop();
 }
 
 void running_machine::emscripten_set_running_machine(running_machine *machine)
