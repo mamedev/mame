@@ -7095,7 +7095,7 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Country" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x00, "USA, Canada, Mexico" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -12925,8 +12925,8 @@ GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, 0,        
 GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
 GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 - Exotic Dream",             MACHINE_NO_COCKTAIL  )
 GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 1)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
-GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 2)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 1)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
+GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 2)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // ""
 GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, 0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, 0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, animaljr,  0,        mmpanic,   animaljr, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
