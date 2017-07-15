@@ -720,7 +720,7 @@ WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 
 READ8_MEMBER(gb_rom_mmm01_device::read_rom)
 {
-	uint16_t romb = m_romb & ~m_romb_nwe;
+	uint16_t romb = m_romb & ~(0x1e0 | m_romb_nwe);
 	uint16_t romb_base = m_romb & (0x1e0 | m_romb_nwe);
 	uint8_t ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
 
