@@ -24,65 +24,65 @@
 #include "formats/coco_cas.h"
 
 
+namespace
+{
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-namespace
+class mc10_state : public driver_device
 {
-	class mc10_state : public driver_device
+public:
+	mc10_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	DECLARE_READ8_MEMBER(mc10_bfff_r);
+	DECLARE_WRITE8_MEMBER(mc10_bfff_w);
+	DECLARE_READ8_MEMBER(mc10_port1_r);
+	DECLARE_WRITE8_MEMBER(mc10_port1_w);
+	DECLARE_READ8_MEMBER(mc10_port2_r);
+	DECLARE_WRITE8_MEMBER(mc10_port2_w);
+	DECLARE_READ8_MEMBER(alice90_bfff_r);
+	DECLARE_WRITE8_MEMBER(alice32_bfff_w);
+
+	DECLARE_READ8_MEMBER(mc6847_videoram_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+
+protected:
+	// device-level overrides
+	virtual void driver_start() override;
+
+private:
+	//printer state
+	enum class printer_state
 	{
-	public:
-		mc10_state(const machine_config &mconfig, device_type type, const char *tag);
-
-		DECLARE_READ8_MEMBER(mc10_bfff_r);
-		DECLARE_WRITE8_MEMBER(mc10_bfff_w);
-		DECLARE_READ8_MEMBER(mc10_port1_r);
-		DECLARE_WRITE8_MEMBER(mc10_port1_w);
-		DECLARE_READ8_MEMBER(mc10_port2_r);
-		DECLARE_WRITE8_MEMBER(mc10_port2_w);
-		DECLARE_READ8_MEMBER(alice90_bfff_r);
-		DECLARE_WRITE8_MEMBER(alice32_bfff_w);
-
-		DECLARE_READ8_MEMBER(mc6847_videoram_r);
-		TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
-
-	protected:
-		// device-level overrides
-		virtual void device_start() override;
-
-	private:
-		//printer state
-		enum class printer_state
-		{
-			WAIT,
-			REC,
-			DONE
-		};
-
-		required_device<m6803_cpu_device> m_maincpu;
-		optional_device<mc6847_base_device> m_mc6847;
-		optional_device<ef9345_device> m_ef9345;
-		required_device<dac_bit_interface> m_dac;
-		required_device<ram_device> m_ram;
-		required_device<cassette_image_device> m_cassette;
-		required_device<printer_image_device> m_printer;
-		required_ioport_array<8> m_pb;
-		required_memory_bank m_bank1;
-		required_memory_bank m_bank2;
-
-		uint8_t *m_ram_base;
-		uint32_t m_ram_size;
-		uint8_t m_keyboard_strobe;
-		uint8_t m_port2;
-
-		// printer
-		uint8_t m_pr_buffer;
-		uint8_t m_pr_counter;
-		printer_state m_pr_state;
-
-		uint8_t read_keyboard_strobe(bool single_line);
+		WAIT,
+		REC,
+		DONE
 	};
+
+	required_device<m6803_cpu_device> m_maincpu;
+	optional_device<mc6847_base_device> m_mc6847;
+	optional_device<ef9345_device> m_ef9345;
+	required_device<dac_bit_interface> m_dac;
+	required_device<ram_device> m_ram;
+	required_device<cassette_image_device> m_cassette;
+	required_device<printer_image_device> m_printer;
+	required_ioport_array<8> m_pb;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+
+	uint8_t *m_ram_base;
+	uint32_t m_ram_size;
+	uint8_t m_keyboard_strobe;
+	uint8_t m_port2;
+
+	// printer
+	uint8_t m_pr_buffer;
+	uint8_t m_pr_counter;
+	uint8_t m_pr_state;
+
+	uint8_t read_keyboard_strobe(bool single_line);
 };
 
 
@@ -164,12 +164,12 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 	if (!BIT(m_keyboard_strobe, 7)) result &= m_pb[7]->read() >> 5;
 
 	// bit 2, printer ots input
-	result |= (m_printer->is_ready() ? 0 : 4);
+	result |= (m_printer->is_ready() ? 1 : 0) << 2;
 
 	// bit 3, rs232 input
 
 	// bit 4, cassette input
-	result |= ((m_cassette)->input() >= 0 ? 1 : 0) << 4;
+	result |= (m_cassette->input() >= 0 ? 1 : 0) << 4;
 
 	return result;
 }
@@ -179,12 +179,12 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 	// bit 0, cassette & printer output
 	m_cassette->output( BIT(data, 0) ? +1.0 : -1.0);
 
-	switch (m_pr_state)
+	switch ((printer_state)m_pr_state)
 	{
 		case printer_state::WAIT:
 			if (BIT(m_port2, 0) && !BIT(data, 0))
 			{
-				m_pr_state = printer_state::REC;
+				m_pr_state = (uint8_t)printer_state::REC;
 				m_pr_counter = 8;
 				m_pr_buffer = 0;
 			}
@@ -193,12 +193,12 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 			if (m_pr_counter--)
 				m_pr_buffer |= (BIT(data,0)<<(7-m_pr_counter));
 			else
-				m_pr_state = printer_state::DONE;
+				m_pr_state = (uint8_t)printer_state::DONE;
 			break;
 		case printer_state::DONE:
 			if (BIT(data,0))
 				m_printer->output(m_pr_buffer);
-			m_pr_state = printer_state::WAIT;
+			m_pr_state = (uint8_t)printer_state::WAIT;
 			break;
 	}
 
@@ -237,17 +237,17 @@ mc10_state::mc10_state(const machine_config &mconfig, device_type type, const ch
 	, m_ram(*this, RAM_TAG)
 	, m_cassette(*this, "cassette")
 	, m_printer(*this, "printer")
-	, m_pb(*this, "pb%d", 0)
+	, m_pb(*this, "pb%u", 0)
 	, m_bank1(*this, "bank1")
 	, m_bank2(*this, "bank2")
 {
 }
 
 
-void mc10_state::device_start()
+void mc10_state::driver_start()
 {
 	// call base device_start
-	driver_device::device_start();
+	driver_device::driver_start();
 
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
@@ -257,7 +257,7 @@ void mc10_state::device_start()
 	/* initialize memory */
 	m_ram_base = m_ram->pointer();
 	m_ram_size = m_ram->size();
-	m_pr_state = printer_state::WAIT;
+	m_pr_state = (uint8_t)printer_state::WAIT;
 
 	m_bank1->set_base(m_ram_base);
 
@@ -271,10 +271,14 @@ void mc10_state::device_start()
 
 	/* register for state saving */
 	save_item(NAME(m_keyboard_strobe));
+	save_item(NAME(m_pr_state));
+	save_item(NAME(m_pr_counter));
 
 	//for alice32 force port4 DDR to 0xff at startup
 	if (!strcmp(machine().system().name, "alice32") || !strcmp(machine().system().name, "alice90"))
 		m_maincpu->m6801_io_w(prg, 0x05, 0xff);
+}
+
 }
 
 
@@ -486,7 +490,6 @@ static INPUT_PORTS_START( alice )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")              PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
-
 
 /***************************************************************************
     MACHINE DRIVERS
