@@ -89,8 +89,6 @@
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
-
-void js_set_main_loop(running_machine * machine);
 #endif
 
 
@@ -342,16 +340,17 @@ int running_machine::run(bool quiet)
 
 		export_http_api();
 
-		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
+
+#if defined(EMSCRIPTEN)
+		// break out to our async javascript loop and halt
+		emscripten_set_running_machine(this);
+#endif
+
+		// run the CPUs until a reset or exit
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
 			g_profiler.start(PROFILER_EXTRA);
-
-#if defined(EMSCRIPTEN)
-			// break out to our async javascript loop and halt
-			js_set_main_loop(this);
-#endif
 
 			// execute CPUs if not paused
 			if (!m_paused)
@@ -421,7 +420,6 @@ int running_machine::run(bool quiet)
 	m_logfile.reset();
 	return error;
 }
-
 
 //-------------------------------------------------
 //  schedule_exit - schedule a clean exit
@@ -1316,41 +1314,71 @@ device_memory_interface::space_config_vector dummy_space_device::memory_space_co
 
 #if defined(EMSCRIPTEN)
 
-static running_machine * jsmess_machine;
+running_machine * running_machine::emscripten_running_machine;
 
-void js_main_loop()
+void running_machine::emscripten_main_loop()
 {
-	if (jsmess_machine->paused()) {
-		jsmess_machine->video().frame_update();
-		return;
+	running_machine *machine = emscripten_running_machine;
+
+	g_profiler.start(PROFILER_EXTRA);
+
+	// execute CPUs if not paused
+	if (!machine->m_paused)
+	{
+		device_scheduler * scheduler;
+		scheduler = &(machine->scheduler());
+
+		// Emscripten will call this function at 60Hz, so step the simulation
+		// forward for the amount of time that has passed since the last frame
+		const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
+		const attotime stoptime(scheduler->time() + frametime);
+
+		while (!machine->m_paused && !machine->scheduled_event_pending() && scheduler->time() < stoptime)
+		{
+			scheduler->timeslice();
+			// handle save/load
+			if (machine->m_saveload_schedule != saveload_schedule::NONE)
+			{
+				machine->handle_saveload();
+				break;
+			}
+		}
+	}
+	// otherwise, just pump video updates through
+	else
+		machine->m_video->frame_update();
+
+	// cancel the emscripten loop if the system has been told to exit
+	if (machine->exit_pending())
+	{
+		emscripten_cancel_main_loop();
 	}
 
-	device_scheduler * scheduler;
-	scheduler = &(jsmess_machine->scheduler());
-	attotime stoptime(scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60)));
-	while (scheduler->time() < stoptime) {
-		scheduler->timeslice();
-	}
+	g_profiler.stop();
 }
 
-void js_set_main_loop(running_machine * machine) {
-	jsmess_machine = machine;
+void running_machine::emscripten_set_running_machine(running_machine *machine)
+{
+	emscripten_running_machine = machine;
 	EM_ASM (
 		JSMESS.running = true;
 	);
-	emscripten_set_main_loop(&js_main_loop, 0, 1);
+	emscripten_set_main_loop(&(emscripten_main_loop), 0, 1);
 }
 
-running_machine * js_get_machine() {
-	return jsmess_machine;
+running_machine * running_machine::emscripten_get_running_machine()
+{
+	return emscripten_running_machine;
 }
 
-ui_manager * js_get_ui() {
-	return &(jsmess_machine->ui());
+ui_manager * running_machine::emscripten_get_ui()
+{
+	return &(emscripten_running_machine->ui());
 }
 
-sound_manager * js_get_sound() {
-	return &(jsmess_machine->sound());
+sound_manager * running_machine::emscripten_get_sound()
+{
+	return &(emscripten_running_machine->sound());
 }
 
 #endif /* defined(EMSCRIPTEN) */
