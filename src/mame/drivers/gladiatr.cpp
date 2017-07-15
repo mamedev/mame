@@ -295,9 +295,10 @@ READ8_MEMBER(gladiatr_state::ucpu_p2_r)
 
 WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
 {
-	// FIXME: active high or active low?  (bootleg MCU never uses these outputs)
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 7));
+	// almost certainly active low (bootleg MCU never uses these outputs, which makes them always high)
+	// coin counters and lockout pass through 4049 inverting buffer at 12L
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(1, !BIT(data, 7));
 }
 
 READ_LINE_MEMBER(gladiatr_state::tclk_r)
@@ -748,7 +749,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
 
 	MCFG_DEVICE_ADD("cctl", I8741, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(3)
