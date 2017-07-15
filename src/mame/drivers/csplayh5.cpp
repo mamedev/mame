@@ -87,18 +87,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	#endif
 
+	DECLARE_DRIVER_INIT(csplayh1);
+
+	DECLARE_DRIVER_INIT(bikiniko);
+	DECLARE_DRIVER_INIT(csplayh5);
+	DECLARE_DRIVER_INIT(csplayh7);
+	DECLARE_DRIVER_INIT(fuudol);
+	DECLARE_DRIVER_INIT(junai);
+	DECLARE_DRIVER_INIT(junai2);
 	DECLARE_DRIVER_INIT(mjgalpri);
 	DECLARE_DRIVER_INIT(mjmania);
-	DECLARE_DRIVER_INIT(csplayh5);
-	DECLARE_DRIVER_INIT(fuudol);
-	DECLARE_DRIVER_INIT(bikiniko);
-	DECLARE_DRIVER_INIT(thenanpa);
-	DECLARE_DRIVER_INIT(junai);
-	DECLARE_DRIVER_INIT(csplayh1);
-	DECLARE_DRIVER_INIT(renaimj);
-	DECLARE_DRIVER_INIT(csplayh7);
-	DECLARE_DRIVER_INIT(junai2);
+	DECLARE_DRIVER_INIT(mogitate);
 	DECLARE_DRIVER_INIT(nichisel);
+	DECLARE_DRIVER_INIT(renaimj);
+	DECLARE_DRIVER_INIT(thenanpa);
+
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
@@ -493,16 +496,19 @@ void csplayh5_state::general_init(int patchaddress, int patchvalue)
 
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(0x6880/2, 0x6020); }
 
-DRIVER_INIT_MEMBER(csplayh5_state,mjgalpri)  { general_init(0x5396/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(0x4cb4/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(0x585c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(0x4cb4/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,nichisel)   { general_init(0x9cd6/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,mjgalpri)  { general_init(0x5396/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,mogitate)  { general_init(0x6ab4/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,nichisel)  { general_init(0x9cd6/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,renaimj)   { general_init(0x568c/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
+
 
 /*
  * Base BIOS root (DVD board is common for all DVD games)
@@ -639,6 +645,27 @@ ROM_START( junai2 )
 ROM_END
 
 
+ROM_START( mogitate )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(42ec6c2e) SHA1(a0279502e1f7e62f072ec6612caf198aa0ae3af7) )
+    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(f71546c6) SHA1(546b0d12e7b1627c96d5a17c015bdbbca1e93232) )
+
+	DVD_BIOS
+	
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+    ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7927c1d6) SHA1(15f0c0051124e7b7667eb721dd12938333b31899) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(ea655990) SHA1(7f59cfab21e8858625e82a9501acc943b07f799c) )
+    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(4c910b86) SHA1(48007f03f4e445b9de15531afe821c1b18fccae1) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8006", 0, SHA1(aa911e46e791d89ce4fed4a32b4b0637ba3a9920) )
+	
+	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
+ROM_END
+
 ROM_START( mjmania )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(7b0f79c5) SHA1(73f23f68db4426b32583a7922abf773d67c76862) )
@@ -658,6 +685,28 @@ ROM_START( mjmania )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563) SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
+ROM_END
+
+ROM_START( renaimj )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(5455e94c) SHA1(97257ed020848611bf9f9637f1eb9ee3433a6e20) )
+	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(285a5651) SHA1(c572a7c82759600e29e31518c69b17ae173c2263) )
+
+	DVD_BIOS
+	
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(614d17b9) SHA1(d6fb4441f55902c2b89b4bec53aae5311d81f07b) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+	ROM_LOAD16_BYTE( "3.ic40",   0x00000, 0x80000, CRC(790aa63d) SHA1(d94b88084311f317d584a33ad5b483403f2bf226) )
+	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(6d1c9efd) SHA1(c9ea9d6e6d34db5635fc55d41e7bb54a41948d27) )
+	// 0x100000 - 0x3fffff empty sockets
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8008", 0, SHA1(49c92cb9b08ee7773f3d93fce0bbecc3c0ae654d) )
+	
+	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal18v8b.020", 0x000000, 0x040000, CRC(0a32a144) SHA1(f3b4a1174adbb2f7b7500adeafa20142f6a16d08) ) 
 ROM_END
 
 ROM_START( bikiniko )
@@ -774,12 +823,12 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 03 */ GAME( 1998, junai,     nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai,           ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
 /* 04 */ GAME( 1998, csplayh5,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,        ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
 /* 05 */ GAME( 1998, junai2,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai2,          ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
-// 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
+/* 06 */ GAME( 1998, mogitate,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mogitate,        ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate", MACHINE_NOT_WORKING )
 
 
 // 1999
 /* 07 */ GAME( 1999, mjmania,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjmania,         ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
-/* 08 */ //GAME( 1995, renaimj,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
+/* 08 */ GAME( 1999, renaimj,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
 /* 09 */ GAME( 1999, bikiniko,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,        ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cosplay Tengoku 6 - Junai hen : Nichibutsu/eic
 /* 11 */ GAME( 1999, thenanpa,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
