@@ -2813,6 +2813,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mz6500.cpp",
 	MAME_DIR .. "src/mame/drivers/zaurus.cpp",
 	MAME_DIR .. "src/mame/machine/pxa255.h",
+	MAME_DIR .. "src/mame/drivers/fontwriter.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sinclair")

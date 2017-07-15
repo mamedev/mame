@@ -12616,6 +12616,9 @@ fmtownsmx                       // FM-Towns II MX
 fmtownssj                       // FM-Towns II SJ
 fmtownsux                       // 1991.11 FM-Towns II UX
 
+@source:fontwriter.cpp
+fw700ger						// (c) Sharp
+
 @source:foodf.cpp
 foodf                           // 136020           (c) 1982        // made by Gencomp
 foodf1                          // 136020           (c) 1982        // made by Gencomp
