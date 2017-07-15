@@ -89,7 +89,6 @@
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
-
 #endif
 
 
@@ -1336,12 +1335,9 @@ void running_machine::emscripten_main_loop()
 		const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
 		const attotime stoptime(scheduler->time() + frametime);
 
-		while (!machine->m_paused && 
-		       !machine->m_hard_reset_pending &&
-		       !machine->m_exit_pending &&
-		       scheduler->time() < stoptime)
+		while (!machine->m_paused && !machine->scheduled_event_pending() && scheduler->time() < stoptime)
 		{
-			machine->m_scheduler.timeslice();
+			scheduler->timeslice();
 			// handle save/load
 			if (machine->m_saveload_schedule != saveload_schedule::NONE)
 			{
@@ -1355,7 +1351,7 @@ void running_machine::emscripten_main_loop()
 		machine->m_video->frame_update();
 
 	// cancel the emscripten loop if the system has been told to exit
-	if (machine->m_exit_pending)
+	if (machine->exit_pending())
 	{
 		emscripten_cancel_main_loop();
 	}
