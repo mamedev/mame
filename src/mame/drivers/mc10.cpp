@@ -24,15 +24,6 @@
 #include "formats/coco_cas.h"
 
 
-//printer state
-enum
-{
-	PRINTER_WAIT,
-	PRINTER_REC,
-	PRINTER_DONE
-};
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -42,18 +33,32 @@ namespace
 	class mc10_state : public driver_device
 	{
 	public:
-		mc10_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag)
-			, m_maincpu(*this, "maincpu")
-			, m_mc6847(*this, "mc6847")
-			, m_ef9345(*this, "ef9345")
-			, m_dac(*this, "dac")
-			, m_ram(*this, RAM_TAG)
-			, m_cassette(*this, "cassette")
-			, m_printer(*this, "printer")
-			, m_pb(*this, "pb%d", 0)
+		mc10_state(const machine_config &mconfig, device_type type, const char *tag);
+
+		DECLARE_READ8_MEMBER(mc10_bfff_r);
+		DECLARE_WRITE8_MEMBER(mc10_bfff_w);
+		DECLARE_READ8_MEMBER(mc10_port1_r);
+		DECLARE_WRITE8_MEMBER(mc10_port1_w);
+		DECLARE_READ8_MEMBER(mc10_port2_r);
+		DECLARE_WRITE8_MEMBER(mc10_port2_w);
+		DECLARE_READ8_MEMBER(alice90_bfff_r);
+		DECLARE_WRITE8_MEMBER(alice32_bfff_w);
+
+		DECLARE_READ8_MEMBER(mc6847_videoram_r);
+		TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+
+	protected:
+		// device-level overrides
+		virtual void device_start() override;
+
+	private:
+		//printer state
+		enum class printer_state
 		{
-		}
+			WAIT,
+			REC,
+			DONE
+		};
 
 		required_device<m6803_cpu_device> m_maincpu;
 		optional_device<mc6847_base_device> m_mc6847;
@@ -63,6 +68,8 @@ namespace
 		required_device<cassette_image_device> m_cassette;
 		required_device<printer_image_device> m_printer;
 		required_ioport_array<8> m_pb;
+		required_memory_bank m_bank1;
+		required_memory_bank m_bank2;
 
 		uint8_t *m_ram_base;
 		uint32_t m_ram_size;
@@ -72,19 +79,7 @@ namespace
 		// printer
 		uint8_t m_pr_buffer;
 		uint8_t m_pr_counter;
-		uint8_t m_pr_state;
-
-		DECLARE_READ8_MEMBER(mc10_bfff_r);
-		DECLARE_WRITE8_MEMBER(mc10_bfff_w);
-		DECLARE_READ8_MEMBER(alice90_bfff_r);
-		DECLARE_WRITE8_MEMBER(alice32_bfff_w);
-		DECLARE_READ8_MEMBER(mc10_port1_r);
-		DECLARE_WRITE8_MEMBER(mc10_port1_w);
-		DECLARE_READ8_MEMBER(mc10_port2_r);
-		DECLARE_WRITE8_MEMBER(mc10_port2_w);
-		DECLARE_READ8_MEMBER(mc6847_videoram_r);
-		DECLARE_DRIVER_INIT(mc10);
-		TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+		printer_state m_pr_state;
 
 		uint8_t read_keyboard_strobe(bool single_line);
 	};
@@ -186,24 +181,24 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 
 	switch (m_pr_state)
 	{
-		case PRINTER_WAIT:
+		case printer_state::WAIT:
 			if (BIT(m_port2, 0) && !BIT(data, 0))
 			{
-				m_pr_state = PRINTER_REC;
+				m_pr_state = printer_state::REC;
 				m_pr_counter = 8;
 				m_pr_buffer = 0;
 			}
 			break;
-		case PRINTER_REC:
+		case printer_state::REC:
 			if (m_pr_counter--)
 				m_pr_buffer |= (BIT(data,0)<<(7-m_pr_counter));
 			else
-				m_pr_state = PRINTER_DONE;
+				m_pr_state = printer_state::DONE;
 			break;
-		case PRINTER_DONE:
+		case printer_state::DONE:
 			if (BIT(data,0))
 				m_printer->output(m_pr_buffer);
-			m_pr_state = PRINTER_WAIT;
+			m_pr_state = printer_state::WAIT;
 			break;
 	}
 
@@ -233,8 +228,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(mc10_state,mc10)
+mc10_state::mc10_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, m_maincpu(*this, "maincpu")
+	, m_mc6847(*this, "mc6847")
+	, m_ef9345(*this, "ef9345")
+	, m_dac(*this, "dac")
+	, m_ram(*this, RAM_TAG)
+	, m_cassette(*this, "cassette")
+	, m_printer(*this, "printer")
+	, m_pb(*this, "pb%d", 0)
+	, m_bank1(*this, "bank1")
+	, m_bank2(*this, "bank2")
 {
+}
+
+
+void mc10_state::device_start()
+{
+	// call base device_start
+	driver_device::device_start();
+
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize keyboard strobe */
@@ -243,15 +257,15 @@ DRIVER_INIT_MEMBER(mc10_state,mc10)
 	/* initialize memory */
 	m_ram_base = m_ram->pointer();
 	m_ram_size = m_ram->size();
-	m_pr_state = PRINTER_WAIT;
+	m_pr_state = printer_state::WAIT;
 
-	membank("bank1")->set_base(m_ram_base);
+	m_bank1->set_base(m_ram_base);
 
 	/* initialize memory expansion */
 	if (m_ram_size == 20*1024)
-		membank("bank2")->set_base(m_ram_base + 0x1000);
+		m_bank2->set_base(m_ram_base + 0x1000);
 	else if (m_ram_size == 24*1024)
-		membank("bank2")->set_base(m_ram_base + 0x2000);
+		m_bank2->set_base(m_ram_base + 0x2000);
 	else  if (m_ram_size != 32*1024)        //ensure that is not alice90
 		prg.nop_readwrite(0x5000, 0x8fff);
 
@@ -606,7 +620,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY              FULLNAME     FLAGS
-COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state, mc10, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, alice,   mc10,    0,      mc10,    alice, mc10_state, mc10, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, alice32, 0,       0,      alice32, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, alice90, alice32, 0,      alice90, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state, 0,    "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alice,   mc10,    0,      mc10,    alice, mc10_state, 0,    "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, alice32, 0,       0,      alice32, alice, mc10_state, 0,    "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,      alice90, alice, mc10_state, 0,    "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
