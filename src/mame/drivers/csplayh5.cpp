@@ -9,7 +9,8 @@
     TODO:
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
-    - csplayh1: inputs doesn't work at all, slower than the others too
+    - csplayh1: inputs doesn't work at all, slower than the others too. 
+	  Probably not a DVD but CD rom game? 
 
     DVD Notes:
     - TMP68301 communicates with h8 via their respective internal serial comms
@@ -86,6 +87,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	#endif
 
+	DECLARE_DRIVER_INIT(mjgalpri);
 	DECLARE_DRIVER_INIT(mjmania);
 	DECLARE_DRIVER_INIT(csplayh5);
 	DECLARE_DRIVER_INIT(fuudol);
@@ -490,6 +492,7 @@ void csplayh5_state::general_init(int patchaddress, int patchvalue)
 
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(0x6880/2, 0x6020); }
 
+DRIVER_INIT_MEMBER(csplayh5_state,mjgalpri)  { general_init(0x5396/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
@@ -499,13 +502,43 @@ DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
 
-/* TODO: correct rom labels*/
+/*
+ * Base BIOS root (DVD board is common for all DVD games)
+ */
+
+#define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+ 
+#define DVD_BIOS \
+	ROM_REGION( 0x20000, "subcpu", 0 ) \
+	ROM_SYSTEM_BIOS( 0,  "vb102",    "va1b102" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "va1b102.u2",   0x00000, 0x20000, CRC(67374715) SHA1(8767cbd81614c2686a1adb70159f909e8ffd634d) ) \
+	ROM_SYSTEM_BIOS( 1,  "vb101",    "va1b101" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "va1b101.u2",   0x00000, 0x20000, CRC(b92a83c8) SHA1(bd6d9adaa74cf7512478838d1bd5a79dbd0c4aa1) ) \
+	ROM_SYSTEM_BIOS( 2,  "va101",    "va1a101" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "va1a101.u2",   0x00000, 0x20000, CRC(36135792) SHA1(1b9c50bd02df8227b228b35cc485efd5a13ec639) )
+
+
+// dummy ROM definition
+ROM_START( nichidvd )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // tmp68301 prg
+	
+	DVD_BIOS
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 ) // z80
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+
+	DISK_REGION( "ide:0:hdd:image" )
+ROM_END
+
+// TODO: this surely uses a different subboard
 ROM_START( csplayh1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x020000, CRC(86ac0289) SHA1(7ae3047fc7ea22705cc5b04d0ec6c792c429e8ee) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x020000, CRC(1f056e64) SHA1(7c5fb318abcd87313ef739dec191af9bcf284f24) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, cd-rom player
 	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
@@ -522,13 +555,33 @@ ROM_START( csplayh1 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, NO_DUMP )
 ROM_END
 
+ROM_START( mjgalpri )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(e8427076) SHA1(9b449599ffac2b67a29fac11d1e85218668d805d) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(653fcc14) SHA1(6231ec5f45a9f5e587dcd00ff85f9bbfae7364ab) )
+	
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+    ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7b9b1887) SHA1(1393a1d79f3cc7ab68275791af4ec16e825056df) )
+
+	DVD_BIOS
+	
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(6497bc8f) SHA1(ce0ecfab8df87f7356aa42648e47ffda53840188) )
+    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(3ac982e8) SHA1(d889d45888cf7bcb5af808f63e9ad41204bd5992) )
+     
+ 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(4c92a523) SHA1(51da73fdfdfccdc070fa8a13163e031438b50876) )
+	
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8001", 0, SHA1(30f356af4e08567273a88758bb0ddd3544eea228) )
+ROM_END
+
 ROM_START( junai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(5923bf2e) SHA1(8fc7b95a44eb792ce03c1bffb9ad56f82d34b470) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(4ac649ee) SHA1(f5b5bccecb6eba5addcf6a57e54deff7f29f6381) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "u2.va1b102",   0x00000, 0x20000, CRC(67374715) SHA1(8767cbd81614c2686a1adb70159f909e8ffd634d) )
+	DVD_BIOS
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a0472ea5) SHA1(0fd04941ff595cffe64357f3a1a9dc1170db8703) )
@@ -547,9 +600,8 @@ ROM_START( csplayh5 )
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(980bf3b0) SHA1(89da7354552f30aaa9d46442972c060b4b0f8979) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(81ca49a4) SHA1(601b6802ab85be61f45a64f5b4c7e1f1ae5ee887) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "u2.va1a101",   0x00000, 0x20000, CRC(36135792) SHA1(1b9c50bd02df8227b228b35cc485efd5a13ec639) )
-
+	DVD_BIOS
+	
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(0b920806) SHA1(95f50ebfb296ba29aaa8079a41f5362cb9e879cc) )
 
@@ -567,8 +619,7 @@ ROM_START( junai2 )
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(b0ce71d6) SHA1(35cff8f8b18312808e2f6b96f02d952b0d1f04a1) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(5a428e91) SHA1(dffce6f0a48cc4110970f124684dcaa267fe1b7f) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+	DVD_BIOS
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a4b07757) SHA1(5010f28d7a80af0cc3f4fd135f777950fb2cf679) )
@@ -591,8 +642,7 @@ ROM_START( mjmania )
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(7b0f79c5) SHA1(73f23f68db4426b32583a7922abf773d67c76862) )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(19192ae7) SHA1(4e9fca04b567c8ef9136a3ab87b21207a44a24c4) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+	DVD_BIOS
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f0c3bb11) SHA1(691a0ff53a9417e69051e9e2bdee7500bc6a746b) )
@@ -613,9 +663,8 @@ ROM_START( bikiniko )
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(b80b5484) SHA1(35769d9502cbe587dad6380c35e535cea1578227) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(13a885af) SHA1(ba8221fab1a37f1937e4399eabe3eaa9093884d3) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "u2.va1b101",   0x00000, 0x20000, CRC(b92a83c8) SHA1(bd6d9adaa74cf7512478838d1bd5a79dbd0c4aa1) )
-
+	DVD_BIOS
+	
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(4a2142d6) SHA1(3a762f7b7cccdb6715b5f59524b04b12694fc130) )
 
@@ -633,8 +682,7 @@ ROM_START( thenanpa )
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(ab0b686f) SHA1(a5681dbacbc60f3eb40e079779967cf69d9cb292) )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(48b65f9a) SHA1(ce35475d3b0e9e8dc69892428f3957d8d3d5f22c) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+	DVD_BIOS
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f44c4095) SHA1(d43e464bd6d614c34791445f8fd4af2f62a4dfc2) )
@@ -655,9 +703,8 @@ ROM_START( csplayh7 )
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(c5ce76a6) SHA1(f8878285d2318c1ec50ba98607eb3f15a7f69913) )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(162f8cff) SHA1(8aa185fd1daa943d0b21fdf6e692f7782bc6dac4) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "va1b102.u2", 0x000000, 0x020000, CRC(67374715) SHA1(8767cbd81614c2686a1adb70159f909e8ffd634d) )
-
+	DVD_BIOS
+	
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(5905b199) SHA1(9155455bc21d23d439c4732549ff1143ee17b9d3) )
 
@@ -677,9 +724,8 @@ ROM_START( fuudol )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(0cab2a72) SHA1(32d098bdd693a11f3cea6bbed3515c4217f40e23) )
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(b1fa335e) SHA1(8a881c9c511fb63b00a3a7e433bae12aa9c2c262) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
-	ROM_LOAD16_WORD_SWAP( "va1b102.u2", 0x000000, 0x020000, CRC(67374715) SHA1(8767cbd81614c2686a1adb70159f909e8ffd634d) )
-
+	DVD_BIOS
+	
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f6442026) SHA1(f49ddeeeaf6fffdccea9ba73bce3ca60c07a7647) )
 
@@ -697,31 +743,35 @@ ROM_END
 // 1995
 GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
+GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,                       ROT0, "Nichibutsu",                            "Nichbutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
+
 // 1998
-// 01 : Mahjong Gal-pri - World Gal-con Grandprix : Nichibutsu/Just&Just
+/* 01 */ GAME( 1998, mjgalpri,  nichidvd,   csplayh5, csplayh5,  csplayh5_state,  mjgalpri, 		ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
-/* 03 */ GAME( 1998, junai,     0,   csplayh5,  csplayh5, csplayh5_state,  junai,           ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,        ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
-/* 05 */ GAME( 1998, junai2,    0,   csplayh5,  csplayh5, csplayh5_state,  junai2,          ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
+/* 03 */ GAME( 1998, junai,     nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai,           ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,        ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
+/* 05 */ GAME( 1998, junai2,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai2,          ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
 // 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
 
 
 // 1999
-/* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5, csplayh5_state,  mjmania,         ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
-/* 08 */ //GAME( 1995, renaimj,   0,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
-/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,        ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjmania,         ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
+/* 08 */ //GAME( 1995, renaimj,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,        ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cosplay Tengoku 6 - Junai hen : Nichibutsu/eic
-/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
-/* 12 */ //GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5, driver_device,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
-/* 13 */ GAME( 1999, csplayh7,  0,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", MACHINE_NOT_WORKING )
+/* 11 */ GAME( 1999, thenanpa,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
+/* 12 */ //GAME( 1999, pokoachu,  nichidvd,   csplayh5,  csplayh5, driver_device,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
+/* 13 */ GAME( 1999, csplayh7,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", MACHINE_NOT_WORKING )
 // 14 : Ai-mode - Pet Shiiku : Nichibutsu/eic
 
 // 2000
-/* 15 */ GAME( 2000, fuudol,    0,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
+/* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 // 16 : Nurete Mitaino... - Net Idol Hen : Nichibutsu/Love Factory
 // 17 : Tsuugakuro no Yuuwaku : Nichibutsu/Love Factory/Just&Just
+/* 17 */ //GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
 // 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
 
 // 2001
 // 19 : Konnano Hajimete! : Nichibutsu/Love Factory
 // 20 : Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic
+// sp : 
