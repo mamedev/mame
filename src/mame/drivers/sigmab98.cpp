@@ -7,7 +7,7 @@
                                                  driver by Luca Elia
 
 CPU     :   TAXAN KY-80 (Yamaha)
-Custom  :   TAXAN KY-3211
+Video   :   TAXAN KY-3211
 Sound   :   YMZ280B
 NVRAM   :   93C46, Battery
 
@@ -36,8 +36,8 @@ Dumped games:
 
 Sammy Kids Medal Series
 
-CPU     :   KL5C80A120FP (Z80 Compatible High Speed Microcontroller)
-Custom  :   TAXAN KY-3211 ?
+CPU     :   Kawasaki KL5C80A120FP (Z80 Compatible High Speed Microcontroller)
+Video   :   TAXAN KY-3211
 Sound   :   OKI M9810B
 NVRAM   :   93C46, Battery
 
@@ -55,7 +55,7 @@ Dumped games:
 2000 Pye-nage Taikai              https://youtu.be/oL2OIbrv-KI
 2000 Taihou de Doboon             https://youtu.be/loPP3jt0Ob0
 2001 Hae Hae Ka Ka Ka             https://youtu.be/37IxYCg0tic
-2000 Go Go Cowboy                 https://youtu.be/qYDw2sxNRqE
+2003 Go Go Cowboy (EN, prize)     https://youtu.be/rymtzmSXjuA
 
 Games with the same cabinet, or in the Treasure Fall series, which might be on the same hardware:
 
@@ -73,6 +73,7 @@ Games with the same cabinet, or in the Treasure Fall series, which might be on t
 2002 Karateman                    https://youtu.be/EIrVHEAv3Sc
 2002 One-touchable
 2002 Perfect Goal (screenless)    https://youtu.be/ilneyp-8dBI
+2003 Go Go Cowboy (JP, medal)     https://youtu.be/qYDw2sxNRqE
 2003 Gun Kids
 2003 Kurukuru Train               https://youtu.be/Ef7TQX4C9fA
 2003 Safari Kingdom (screenless)
@@ -133,6 +134,7 @@ public:
 		m_vregs(*this, "vregs"),
 		m_vtable(*this, "vtable"),
 		m_nvram(*this, "nvram"),
+		m_nvramdev(*this, "nvram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -145,6 +147,7 @@ public:
 	optional_shared_ptr<uint8_t> m_vregs;     // optional as some games allocate it themselves (due to banking)
 	optional_shared_ptr<uint8_t> m_vtable;    // optional as some games allocate it themselves (due to banking)
 	required_shared_ptr<uint8_t> m_nvram;
+	optional_device<nvram_device> m_nvramdev;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	std::vector<uint8_t> m_paletteram;
@@ -198,10 +201,22 @@ public:
 	DECLARE_READ8_MEMBER(unk_34_r);
 	DECLARE_WRITE8_MEMBER(vblank_w);
 	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(sammymdl_coin_w);
+	DECLARE_READ8_MEMBER(sammymdl_coin_counter_r);
+	DECLARE_WRITE8_MEMBER(sammymdl_coin_counter_w);
+	DECLARE_READ8_MEMBER(sammymdl_leds_r);
 	DECLARE_WRITE8_MEMBER(sammymdl_leds_w);
 	DECLARE_WRITE8_MEMBER(sammymdl_hopper_w);
 	DECLARE_READ8_MEMBER(sammymdl_coin_hopper_r);
+
+	DECLARE_WRITE8_MEMBER(gocowboy_rombank_w);
+	DECLARE_READ8_MEMBER(gocowboy_rombank_r);
+	DECLARE_WRITE8_MEMBER(gocowboy_rambank_w);
+	DECLARE_READ8_MEMBER(gocowboy_rambank_r);
+	DECLARE_WRITE8_MEMBER(gocowboy_4400_w);
+	DECLARE_READ8_MEMBER(gocowboy_4400_r);
+	DECLARE_WRITE8_MEMBER(gocowboy_dc00_w);
+	DECLARE_READ8_MEMBER(gocowboy_dc00_r);
+	DECLARE_WRITE8_MEMBER(gocowboy_leds_w);
 
 	DECLARE_WRITE8_MEMBER(haekaka_rombank_w);
 	DECLARE_READ8_MEMBER(haekaka_rombank_r);
@@ -211,7 +226,7 @@ public:
 	DECLARE_READ8_MEMBER(haekaka_b000_r);
 	DECLARE_WRITE8_MEMBER(haekaka_b000_w);
 	DECLARE_WRITE8_MEMBER(haekaka_leds_w);
-	DECLARE_WRITE8_MEMBER(haekaka_coin_w);
+	DECLARE_WRITE8_MEMBER(haekaka_coin_counter_w);
 
 	DECLARE_WRITE8_MEMBER(itazuram_rombank_w);
 	DECLARE_READ8_MEMBER(itazuram_rombank_r);
@@ -244,6 +259,7 @@ public:
 	DECLARE_DRIVER_INIT(animalc);
 	DECLARE_DRIVER_INIT(ucytokyu);
 	DECLARE_DRIVER_INIT(haekaka);
+	DECLARE_DRIVER_INIT(gocowboy);
 
 	DECLARE_MACHINE_RESET(sigmab98);
 	DECLARE_MACHINE_RESET(sammymdl);
@@ -1161,7 +1177,11 @@ void sigmab98_state::show_3_outputs()
 #endif
 }
 // Port 31
-WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
+READ8_MEMBER(sigmab98_state::sammymdl_coin_counter_r)
+{
+	return m_out[0];
+}
+WRITE8_MEMBER(sigmab98_state::sammymdl_coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0,   data  & 0x01 );  // coin1 in
 	machine().bookkeeping().coin_counter_w(1,   data  & 0x02 );  // coin2 in
@@ -1171,11 +1191,17 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
 //  machine().bookkeeping().coin_lockout_w(0, (~data) & 0x10 ); // coin1 lockout
 //  machine().bookkeeping().coin_lockout_w(2, (~data) & 0x20 ); // medal lockout?
 
+//  data & 0x80? (gocowboy)
+
 	m_out[0] = data;
 	show_3_outputs();
 }
 
 // Port 32
+READ8_MEMBER(sigmab98_state::sammymdl_leds_r)
+{
+	return m_out[1];
+}
 WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 {
 	output().set_led_value(0,    data & 0x01);   // button
@@ -1232,13 +1258,309 @@ static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
+	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, sammymdl_leds_w )
 	AM_RANGE( 0x34, 0x34 ) AM_READ(unk_34_r )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
+	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
+ADDRESS_MAP_END
+
+/***************************************************************************
+                               Go Go Cowboy
+***************************************************************************/
+
+// rombank
+WRITE8_MEMBER(sigmab98_state::gocowboy_rombank_w)
+{
+	if (offset == 0)
+	{
+		m_reg = data;
+		return;
+	}
+
+	switch ( m_reg )
+	{
+		case 0x50: // 4400
+			m_rombank = data;
+			switch (data)
+			{
+				case 0x13: // (17800) ROM
+				case 0x15: // (19800) ROM
+					break;
+				default:
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
+			}
+			break;
+
+		case 0x90: // 4400
+			m_rombank = data;
+			switch (data)
+			{
+				case 0x0f: // (13c00) ROM
+					break;
+				case 0x17: // (1bc00) ROM
+					break;
+				default:
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
+			}
+			break;
+
+		case 0xd0: // 4400
+			m_rombank = data;
+			switch (data)
+			{
+				case 0x0f: // (14000) ROM
+					break;
+
+				case 0x5b: // (60000) clears 4400-c3ff
+					break;
+
+				case 0x5d: // (62000) copies 1404 bytes: 4400 <-> e6c6
+					break;
+
+				case 0x6b: // (70000) SPRITERAM + (72000) PALETTERAM + (72800) VTABLE + (73000) VREGS
+					break;
+
+				default:
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
+			}
+			break;
+
+		default:
+			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
+	}
+}
+
+READ8_MEMBER(sigmab98_state::gocowboy_rombank_r)
+{
+	if (offset == 0)
+		return m_reg;
+
+	switch ( m_reg )
+	{
+		case 0x50:
+		case 0x90:
+		case 0xd0:
+			return m_rombank;
+
+		default:
+			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
+			return 0x00;
+	}
+}
+
+READ8_MEMBER(sigmab98_state::gocowboy_4400_r)
+{
+	switch (m_rombank)
+	{
+		// ROM
+		case 0x0f:
+			return memregion("maincpu")->base()[offset + 0x3800 + (m_reg >> 6) * 0x400];
+			break;
+
+		case 0x13:
+			return memregion("maincpu")->base()[offset + 0x7c00];
+			break;
+
+		case 0x15:
+			return memregion("maincpu")->base()[offset + 0x9c00];
+			break;
+
+		case 0x17:
+			return memregion("maincpu")->base()[offset + 0xc000];
+			break;
+
+		case 0x5b: // (60000) clears 4400-c3ff
+			return m_nvram[offset];
+			break;
+
+		case 0x5d: // (62000) copies 1404 bytes: 4400 <-> e6c6
+			if (offset + 0x2000 < 0x80000)
+				return m_nvram[offset + 0x2000];
+			break;
+
+		case 0x6b: // (70000) SPRITERAM + (72000) PALETTERAM + (72800) VTABLE + (73000) VREGS
+			if (offset < 0x1000)
+				return m_spriteram[offset];
+			else if ((offset >= 0x2000) && (offset < 0x2200))
+				return m_paletteram[offset - 0x2000];
+			else if ((offset >= 0x2800) && (offset < 0x2880))
+				return m_vtable[offset - 0x2800];
+			else if (offset >= 0x3000 && offset <= 0x3021)
+				return vregs_r(space, offset - 0x3000);
+			break;
+	}
+
+	logerror("%s: unknown read from %02x with rombank = %02x\n", machine().describe_context(), offset+0x4400, m_rombank);
+	return 0x00;
+}
+
+WRITE8_MEMBER(sigmab98_state::gocowboy_4400_w)
+{
+	switch (m_rombank)
+	{
+		case 0x5b: // (60000) clears 4400-c3ff
+			m_nvram[offset] = data;
+			return;
+
+		case 0x5d: // (62000) copies 1404 bytes: 4400 <-> e6c6
+			if (offset + 0x2000 < 0x80000)
+			{
+				m_nvram[offset + 0x2000] = data;
+				return;
+			}
+			break;
+
+		case 0x6b: // (70000) SPRITERAM + (72000) PALETTERAM + (72800) VTABLE + (73000) VREGS
+			if (offset < 0x1000)
+			{
+				m_spriteram[offset] = data;
+				return;
+			}
+			else if ((offset >= 0x2000) && (offset < 0x2200))
+			{
+				m_palette->write(space, offset-0x2000, data);
+				return;
+			}
+			else if ((offset >= 0x2800) && (offset < 0x2880))
+			{
+				m_vtable[offset-0x2800] = data;
+				return;
+			}
+			else if (offset >= 0x3000 && offset <= 0x3021)
+			{
+				vregs_w(space, offset - 0x3000, data);
+				return;
+			}
+			break;
+	}
+
+	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset + 0x4400, data, m_rombank);
+}
+
+// rambank
+WRITE8_MEMBER(sigmab98_state::gocowboy_rambank_w)
+{
+	if (offset == 0)
+	{
+		m_reg2 = data;
+		return;
+	}
+
+	switch ( m_reg2 )
+	{
+		case 0x76: // dc00
+			m_rambank = data;
+			switch (data)
+			{
+				case 0x52: // (60000) NVRAM
+					break;
+
+				case 0x64: // (72000) PALETTERAM
+					break;
+
+				default:
+					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
+					return;
+			}
+			break;
+
+		default:
+			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
+	}
+}
+
+READ8_MEMBER(sigmab98_state::gocowboy_rambank_r)
+{
+	if (offset == 0)
+		return m_reg2;
+
+	switch ( m_reg2 )
+	{
+		case 0x76:
+			return m_rambank;
+
+		default:
+			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
+			return 0x00;
+	}
+}
+
+READ8_MEMBER(sigmab98_state::gocowboy_dc00_r)
+{
+	switch (m_rambank)
+	{
+		case 0x52: // (60000) NVRAM
+			return m_nvram[offset];
+
+		case 0x64: // (72000) PALETTERAM
+			return m_paletteram[offset];
+	}
+
+	logerror("%s: unknown read from %02x with rombank = %02x\n", machine().describe_context(), offset + 0xdc00, m_rambank);
+	return 0;
+}
+
+WRITE8_MEMBER(sigmab98_state::gocowboy_dc00_w)
+{
+	switch (m_rambank)
+	{
+		case 0x52: // (60000) NVRAM
+			m_nvram[offset] = data;
+			return;
+
+		case 0x64: // (72000) PALETTERAM
+			m_palette->write(space, offset, data);
+			return;
+	}
+
+	logerror("%s: unknown write to %02x = %02x with rambank = %02x\n", machine().describe_context(), offset + 0xdc00, data, m_rambank);
+}
+
+static ADDRESS_MAP_START( gocowboy_map, AS_PROGRAM, 8, sigmab98_state )
+	AM_RANGE(0x0000, 0x43ff) AM_ROM
+
+	AM_RANGE( 0x4400, 0xdbff ) AM_READWRITE(gocowboy_4400_r, gocowboy_4400_w )    // SPRITERAM + PALETTERAM + VTABLE + VREGS | NVRAM
+
+	AM_RANGE( 0xdc00, 0xfbff ) AM_READWRITE(gocowboy_dc00_r, gocowboy_dc00_w ) AM_SHARE("nvram")  // PALETTERAM | NVRAM
+
+	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
+ADDRESS_MAP_END
+
+
+WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
+{
+	output().set_led_value(0,    data & 0x01);   // button
+	output().set_led_value(1,    data & 0x02);   // coin lockout? (after coining up, but not for service coin)
+	output().set_led_value(2,    data & 0x04);   // ? long after a prize is not collected
+	output().set_led_value(3,    data & 0x08);   // ? "don't forget the large prizes"
+
+	// 10 hopper enable?
+	// 20 hopper motor on (active low)?
+	machine().device<ticket_dispenser_device>("hopper_small")->write(space, 0, (!(data & 0x20) && (data & 0x10)) ? 0x00 : 0x80);
+	machine().device<ticket_dispenser_device>("hopper_large")->write(space, 0, (!(data & 0x80) && (data & 0x40)) ? 0x00 : 0x80);
+
+	m_out[1] = data;
+	show_3_outputs();
+}
+
+static ADDRESS_MAP_START( gocowboy_io, AS_IO, 8, sigmab98_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(gocowboy_rombank_r, gocowboy_rombank_w )
+	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(gocowboy_rambank_r, gocowboy_rambank_w )
+
+	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
+	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
+	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, gocowboy_leds_w )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVREADWRITE("oki", okim9810_device, read, write )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
+	AM_RANGE( 0xb0, 0xb0 ) AM_WRITENOP
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
 ADDRESS_MAP_END
 
@@ -1279,7 +1601,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_rombank_w)
 				case 0x1f:
 
 				case 0x65:  // SPRITERAM
-				case 0x67:  // PALETTE RAM + VTABLE + VREGS
+				case 0x67:  // PALETTERAM + VTABLE + VREGS
 					break;
 
 				default:
@@ -1451,7 +1773,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 	show_3_outputs();
 }
 
-WRITE8_MEMBER(sigmab98_state::haekaka_coin_w)
+WRITE8_MEMBER(sigmab98_state::haekaka_coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0,   data & 0x01 );   // medal out
 //                                 data & 0x02 ?
@@ -1477,8 +1799,8 @@ static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE(haekaka_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(haekaka_leds_w )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, haekaka_coin_counter_w )
+	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, haekaka_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
@@ -1724,8 +2046,8 @@ static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
+	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
@@ -1738,7 +2060,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( pyenaget_io, AS_IO, 8, sigmab98_state )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
 	AM_IMPORT_FROM( haekaka_io )
 ADDRESS_MAP_END
 
@@ -1779,7 +2101,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_rombank_w)
 				case 0x1f:
 
 				case 0x64:  // SPRITERAM
-				case 0x66:  // PALETTE RAM + VTABLE
+				case 0x66:  // PALETTERAM + VTABLE
 				case 0x67:  // VREGS
 					break;
 
@@ -1953,8 +2275,8 @@ static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
+	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
@@ -2123,6 +2445,27 @@ static INPUT_PORTS_START( haekaka )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gocowboy )
+	PORT_START("BUTTON")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) // shoot
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(20) // coin
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper_small", ticket_dispenser_device, line_r) // 1/2' pay sensor (small)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper_large", ticket_dispenser_device, line_r) // 3/4' pay sensor (large)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Switch") // capsule test (pressed while booting) / next in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset Switch") // reset backup ram (pressed while booting) / previous in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE  )                           // test mode (keep pressed in game) / select in test mode / service coin 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+INPUT_PORTS_END
 
 /***************************************************************************
 
@@ -2233,6 +2576,7 @@ static MACHINE_CONFIG_START( sammymdl )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
@@ -2272,35 +2616,40 @@ static MACHINE_CONFIG_DERIVED( animalc, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gocowboy, sammymdl )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP( gocowboy_map )
+	MCFG_CPU_IO_MAP( gocowboy_io )
+
+	MCFG_DEVICE_REMOVE("hopper")
+	MCFG_TICKET_DISPENSER_ADD("hopper_small", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper_large", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( haekaka, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( haekaka_io )
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( itazuram, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( itazuram_map )
 	MCFG_CPU_IO_MAP( itazuram_io )
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pyenaget, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( pyenaget_io )
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tdoboon, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tdoboon_map )
 	MCFG_CPU_IO_MAP( tdoboon_io )
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0+4,0xf0+4-1)
@@ -2534,16 +2883,16 @@ DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
 
 ROM_START( tbeastw2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b9808-1b.ic7.bin", 0x00000, 0x20000, CRC(65f7e079) SHA1(d421da3c99d62d3228e1b9c1cfb2de51f0fcc56e) )
+	ROM_LOAD( "b9808-1b.ic7", 0x00000, 0x20000, CRC(65f7e079) SHA1(d421da3c99d62d3228e1b9c1cfb2de51f0fcc56e) )
 
 	ROM_REGION( 0x180000, "sprites", 0 )
-	ROM_LOAD( "b9808-2.ic12.bin", 0x000000, 0x80000, CRC(dda5c2d2) SHA1(1bb21e7251df93b0f502b716e958d81f4e4e46dd) )
-	ROM_LOAD( "b9808-3.ic13.bin", 0x080000, 0x80000, CRC(80df49c6) SHA1(14342be3a176cdf015c0ac07a4f1c109862c67aa) )
-	ROM_LOAD( "b9808-4.ic17.bin", 0x100000, 0x80000, CRC(d90961ea) SHA1(c2f226a528238eafc1ba37200da4ee6ce9b54325) )
+	ROM_LOAD( "b9808-2.ic12", 0x000000, 0x80000, CRC(dda5c2d2) SHA1(1bb21e7251df93b0f502b716e958d81f4e4e46dd) )
+	ROM_LOAD( "b9808-3.ic13", 0x080000, 0x80000, CRC(80df49c6) SHA1(14342be3a176cdf015c0ac07a4f1c109862c67aa) )
+	ROM_LOAD( "b9808-4.ic17", 0x100000, 0x80000, CRC(d90961ea) SHA1(c2f226a528238eafc1ba37200da4ee6ce9b54325) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
-	ROM_LOAD( "b9808-5.ic16.bin", 0x00000, 0x80000, CRC(762c6d5f) SHA1(0d4e35b7f346c8cc0c49163474f34c1fc462998a) )
-	ROM_LOAD( "b9808-6.ic26.bin", 0x80000, 0x80000, CRC(9ed759c9) SHA1(963db80b8a107ce9292bbc776ba91bc76ad82d5b) )
+	ROM_LOAD( "b9808-5.ic16", 0x00000, 0x80000, CRC(762c6d5f) SHA1(0d4e35b7f346c8cc0c49163474f34c1fc462998a) )
+	ROM_LOAD( "b9808-6.ic26", 0x80000, 0x80000, CRC(9ed759c9) SHA1(963db80b8a107ce9292bbc776ba91bc76ad82d5b) )
 ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,tbeastw2)
@@ -2728,7 +3077,7 @@ ROM_END
 ROM_START( animalc )
 	SAMMYMDL_BIOS
 
-	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "vx2302l01.u021", 0x00000, 0x200000, CRC(84cf123b) SHA1(d8b425c93ff1a560e3f92c70d7eb93a05c3581af) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -2758,6 +3107,72 @@ DRIVER_INIT_MEMBER(sigmab98_state,animalc)
 
 /***************************************************************************
 
+  Go Go Cowboy
+
+  Cart:
+
+    ガムボール     <- gumball
+    with プライズ  <- with prize
+    EM5701L01
+    EM5701L01
+
+  PCB:
+
+    Sammy AM3AHF-01 SC MAIN PCB VER2 (Etched)
+    SC MAIN PCB VER2(GUM) 5049-6001-0 (Sticker)
+
+***************************************************************************/
+
+ROM_START( gocowboy )
+	ROM_REGION( 0x80000, "mainbios", 0 )
+	ROM_LOAD( "go_go_cowboy_gpt_2c9c.u3", 0x00000, 0x80000, CRC(ad9b1de6) SHA1(24809ec3a579d28189a98190db70a33217e4f8bc) ) // uses custom BIOS
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "em702l01.u021", 0x000000, 0x200000, CRC(4c4289fe) SHA1(517b5a1e9d91e7ed322b4792d863e7abda835d4a) )
+
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_COPY( "mainbios", 0x00fc00, 0x00000, 0x40000 )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "em701l01.u016", 0x000000, 0x200000, CRC(c1f07320) SHA1(734717140e66ddcf0bded1489156c51cdaf1b50c) )
+
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "st93c46.u6", 0x00, 0x80, CRC(1af2d376) SHA1(afbe953f1a9ff0152fe1092a83482695dbe5e75d) )
+
+	ROM_REGION( 0x5cde, "pld", 0 )
+	ROM_LOAD( "vm1212f01.u5.jed", 0x0000, 0x5cde, CRC(b86a1825) SHA1(cc2e633fb8a24cfc93291a778b0964089f6b8ac7) )
+ROM_END
+
+DRIVER_INIT_MEMBER(sigmab98_state, gocowboy)
+{
+	// RAM banks
+	m_paletteram.resize(0x200);
+	memset(&m_paletteram[0], 0, 0x200);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+
+	m_nvram.allocate(0x8000);
+	memset(m_nvram, 0, 0x8000);
+	m_nvramdev->set_base(m_nvram, 0x8000);
+
+	m_spriteram.allocate(0x1000);
+	memset(m_spriteram, 0, 0x1000);
+
+	m_vregs.allocate(0x22);
+	memset(m_vregs, 0, 0x22);
+
+	m_vtable.allocate(0x80);
+	memset(m_vtable, 0, 0x80);
+
+	m_rombank = 0x6b;
+	m_rambank = 0x52;
+
+	m_vblank_vector = 0x00;
+	m_timer0_vector = 0x02;
+	m_timer1_vector = 0x16;
+}
+
+/***************************************************************************
+
   Itazura Monkey ( VX1902L02 ITZRMONKY 200011211639 SAMMY CORP. AM )
 
   Sammy AM3ADT-01 Memory Card Type 3:
@@ -2768,7 +3183,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,animalc)
 ROM_START( itazuram )
 	SAMMYMDL_BIOS
 
-	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "vx2002l01.u021", 0x00000, 0x200000, CRC(ddbdd2f3) SHA1(91f67a938929be0261442e066e3d2c03b5e9f06a) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -2829,14 +3244,14 @@ DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
 ROM_START( tdoboon )
 	SAMMYMDL_BIOS
 
-	ROM_REGION( 0x1000000, "oki", 0 )
-	ROM_LOAD( "em4210l01.u021.bin", 0x00000, 0x200000, CRC(3523e314) SHA1(d07c5d17d3f285be4cde810547f427e84f98968f) )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "em4210l01.u021", 0x00000, 0x200000, CRC(3523e314) SHA1(d07c5d17d3f285be4cde810547f427e84f98968f) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "em4209l01.u016.bin", 0x00000, 0x200000, CRC(aca220fa) SHA1(7db441add16af554700e597fd9926b6ccd19d628) )   // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "em4209l01.u016", 0x00000, 0x200000, CRC(aca220fa) SHA1(7db441add16af554700e597fd9926b6ccd19d628) )   // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 /***************************************************************************
@@ -2851,7 +3266,7 @@ ROM_END
 ROM_START( pyenaget )
 	SAMMYMDL_BIOS
 
-	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "vx1802l01.u021", 0x00000, 0x200000, CRC(7a22a657) SHA1(2a98085862fd958209253c5401e41eae4f7c06ea) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -2887,14 +3302,14 @@ ROM_END
 ROM_START( haekaka )
 	SAMMYMDL_BIOS
 
-	ROM_REGION( 0x1000000, "oki", 0 )
-	ROM_LOAD( "em4208l01.u021.bin", 0x00000, 0x200000, CRC(d23bb748) SHA1(38d5b6c4b2cd470b3a68574aeca3f9fa9032245e) )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "em4208l01.u021", 0x00000, 0x200000, CRC(d23bb748) SHA1(38d5b6c4b2cd470b3a68574aeca3f9fa9032245e) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "em4207l01.u016.bin", 0x00000, 0x200000, CRC(3876961c) SHA1(3d842c1f63ea5aa7e799967928b86c5fabb4e65e) )
+	ROM_LOAD( "em4207l01.u016", 0x00000, 0x200000, CRC(3876961c) SHA1(3d842c1f63ea5aa7e799967928b86c5fabb4e65e) )
 ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
@@ -2923,27 +3338,6 @@ DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 
 /***************************************************************************
 
-  Go Go Cowboy
-
-***************************************************************************/
-
-ROM_START( gocowboy )
-	ROM_REGION( 0x80000, "mainbios", 0 )
-	ROM_LOAD( "go_go_cowboy_gpt_2c9c.u3", 0x000000, 0x080000, CRC(ad9b1de6) SHA1(24809ec3a579d28189a98190db70a33217e4f8bc) ) /* uses custom BIOS */
-	
-	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
-	ROM_LOAD( "em702l01.u021", 0x00000, 0x200000, CRC(4c4289fe) SHA1(517b5a1e9d91e7ed322b4792d863e7abda835d4a) )
-
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
-
-	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
-	ROM_LOAD( "em701l01.u016", 0x00000, 0x200000, CRC(c1f07320) SHA1(734717140e66ddcf0bded1489156c51cdaf1b50c) )
-ROM_END
-
-
-/***************************************************************************
-
     Game Drivers
 
 ***************************************************************************/
@@ -2963,4 +3357,4 @@ GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, RO
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
 GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
 GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
-GAME( 2000, gocowboy, 0,        sammymdl, sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Go Go Cowboy",                      MACHINE_NOT_WORKING )
+GAME( 2003, gocowboy, sammymdl, gocowboy, gocowboy, sigmab98_state, gocowboy, ROT0, "Sammy",             "Go Go Cowboy (English, prize)",        0 )
