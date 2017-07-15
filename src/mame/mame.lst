@@ -34292,6 +34292,7 @@ iron                            // bootleg
 kinstb                          // bootleg
 mk3snes                         // bootleg
 sblast2b                        // bootleg
+legendsb                        // bootleg
 
 @source:snk.cpp
 alphamis                        // (c) 1985
