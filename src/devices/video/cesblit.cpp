@@ -79,6 +79,13 @@ cesblit_device::cesblit_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+device_memory_interface::space_config_vector cesblit_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_space_config)
+	};
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

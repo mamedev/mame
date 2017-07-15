@@ -277,16 +277,6 @@ void hle_device_base::device_reset()
 }
 
 
-/*--------------------------------------------------
-    hle_device_base::device_timer
-    handle timed events
---------------------------------------------------*/
-
-void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-}
-
 void hle_device_base::hil_write(uint16_t data)
 {
 	int frames = 0;

@@ -1287,6 +1287,13 @@ const util::option_guide &device_image_interface::create_option_guide() const
 
 void device_image_interface::update_names()
 {
+	const char *inst_name = custom_instance_name();
+	const char *brief_name = custom_brief_instance_name();
+	if (inst_name == nullptr)
+		inst_name = device_typename(image_type());
+	if (brief_name == nullptr)
+		brief_name = device_brieftypename(image_type());
+
 	// count instances of the general image type, or device type if custom
 	int count = 0;
 	int index = -1;
@@ -1294,16 +1301,13 @@ void device_image_interface::update_names()
 	{
 		if (this == &image)
 			index = count;
-		if ((image.image_type() == image_type() && custom_instance_name() == nullptr) || (device().type() == image.device().type()))
+		const char *other_name = image.custom_instance_name();
+		if (!other_name)
+			other_name = device_typename(image.image_type());
+
+		if (other_name == inst_name || !strcmp(other_name, inst_name))
 			count++;
 	}
-
-	const char *inst_name = custom_instance_name();
-	const char *brief_name = custom_brief_instance_name();
-	if (inst_name == nullptr)
-		inst_name = device_typename(image_type());
-	if (brief_name == nullptr)
-		brief_name = device_brieftypename(image_type());
 
 	m_canonical_instance_name = string_format("%s%d", inst_name, index + 1);
 	if (count > 1)

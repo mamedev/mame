@@ -72,24 +72,20 @@ static const char *const cc[] =
 /*
  * Decode an addressing mode into a string.
  */
-char *address (offs_t pc, u16 *insn)
+std::string address (offs_t pc, u16 *insn)
 {
-	static char buffer[32];
-
 	switch (ADDR_MODE)
 	{
-	case ADDR_MODE_PC32: sprintf(buffer, "0x%x", pc + I32); break;
-	case ADDR_MODE_ABS32: sprintf(buffer, "0x%x", I32); break;
-	case ADDR_MODE_REL32: sprintf(buffer, "%d(r%d)", *(int32_t *)&insn[2], R2); break;
-	case ADDR_MODE_PC16: sprintf(buffer, "0x%x", pc + I16); break;
-	case ADDR_MODE_REL12: sprintf(buffer, "%d(r%d)", ADDR_I12, R2); break;
-	case ADDR_MODE_ABS16: sprintf(buffer, "0x%x", I16); break;
-	case ADDR_MODE_PCX: sprintf(buffer, "[r%d](pc)", ADDR_RX); break;
-	case ADDR_MODE_RELX: sprintf(buffer, "[r%d](r%d)", ADDR_RX, R2); break;
-	default: sprintf(buffer, "ERROR"); break;
+	case ADDR_MODE_PC32: return util::string_format("0x%x", pc + I32);
+	case ADDR_MODE_ABS32: return util::string_format("0x%x", I32);
+	case ADDR_MODE_REL32: return util::string_format("%d(r%d)", *(int32_t *)&insn[2], R2);
+	case ADDR_MODE_PC16: return util::string_format("0x%x", pc + I16);
+	case ADDR_MODE_REL12: return util::string_format("%d(r%d)", ADDR_I12, R2);
+	case ADDR_MODE_ABS16: return util::string_format("0x%x", I16);
+	case ADDR_MODE_PCX: return util::string_format("[r%d](pc)", ADDR_RX);
+	case ADDR_MODE_RELX: return util::string_format("[r%d](r%d)", ADDR_RX, R2);
+	default: return std::string("ERROR");
 	}
-
-	return buffer;
 }
 
 /*

@@ -587,7 +587,7 @@ void pinball2k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, pinball2k_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, pinball2k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

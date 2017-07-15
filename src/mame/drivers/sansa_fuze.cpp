@@ -69,4 +69,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY    FULLNAME        FLAGS
-CONS( 200?, sanfuze2, 0,      0,      sansa_fuze, sansa_fuze, sansa_fuze_state, 0,    "Sandisk", "Sansa Fuze 2", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+CONS( 200?, sanfuze2, 0,      0,      sansa_fuze, sansa_fuze, sansa_fuze_state, 0,    "Sandisk", "Sansa Fuze 2", MACHINE_IS_SKELETON )

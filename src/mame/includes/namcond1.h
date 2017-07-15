@@ -45,5 +45,5 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( vblank_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( raster_irq_w );
-	INTERRUPT_GEN_MEMBER(mcu_interrupt);	
+	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 };

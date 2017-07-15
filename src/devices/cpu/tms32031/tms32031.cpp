@@ -456,9 +456,11 @@ void tms3203x_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *tms3203x_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector tms3203x_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 

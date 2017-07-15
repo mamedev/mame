@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 #include "screen.h"
+#include "machine/gen_latch.h"
 
 class magmax_state : public driver_device
 {
@@ -14,6 +15,7 @@ public:
 		m_scroll_y(*this, "scroll_y"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
@@ -32,8 +34,7 @@ public:
 	int m_flipscreen;
 	std::unique_ptr<uint32_t[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
-	DECLARE_WRITE16_MEMBER(magmax_sound_w);
-	DECLARE_READ8_MEMBER(magmax_sound_irq_ack);
+	DECLARE_WRITE16_MEMBER(cpu_irq_ack_w);
 	DECLARE_READ8_MEMBER(magmax_sound_r);
 	DECLARE_WRITE16_MEMBER(magmax_vreg_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
@@ -46,6 +47,7 @@ public:
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

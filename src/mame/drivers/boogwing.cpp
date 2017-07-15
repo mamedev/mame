@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, boogwing_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, boogwing_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 

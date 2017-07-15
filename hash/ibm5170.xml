@@ -1200,6 +1200,37 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="pcdos5v" supported="no">
+		<description>IBM Personal Computer DOS (Version J5.00/V) (Japanese)</description>
+		<year>1991</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="c3699994" sha1="f5d5f6350d0609f1de4aecca1a2ff302d3ad5225" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk02.img" size="1228800" crc="43f22565" sha1="e7351387944ecfbbda9efbad9d567896a870a770" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk03.img" size="1228800" crc="714a4d26" sha1="b4e8407368bd1d1f23de38a545096e4a0a8b84e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04.img" size="1474560" crc="571bc8aa" sha1="f223bc7b84ff066c423eddc9dfa60778f82f0a89" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05.img" size="1474560" crc="e24329ac" sha1="fe7c389be39f5461bcb2adf7cf80e5b7b4cbd2b0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos61">
 		<description>IBM DOS (Version 6.1)</description>
 		<year>1993</year>
@@ -2139,29 +2170,6 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos622g" cloneof="msdos622">
-		<!-- KryoFlux dump from original disks, shows as unmodified -->
-		<description>MS-DOS (Version 6.22, German)</description>
-		<year>1994</year>
-		<publisher>Microsoft</publisher>
-		<info name="version" value="6.22" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="MS_DOS_6.22_German_disk1.img" size="1474560" crc="59641924" sha1="df473043d61524d74a8391c4649e7362858b6d81" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="MS_DOS_6.22_German_disk2.img" size="1474560" crc="600c5a02" sha1="2b1b7e938cb8eb7bb4eac35a36bd9415fbfe31d3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="MS_DOS_6.22_German_disk3.img" size="1474560" crc="95f32c5d" sha1="ed1358083d1c56105356e4b029e2beca6d6211da" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="msdos622a" cloneof="msdos622">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>MS-DOS (Version 6.22, Alt)</description>
@@ -2257,6 +2265,60 @@ Missing files come here
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="disk4mu.img" size="1228800" crc="4d7453ab" sha1="f7063a4f9e129ac25013b6b3223e028d758f71aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622de" cloneof="msdos622">
+		<!-- KryoFlux dump from original disks, shows as unmodified -->
+		<description>MS-DOS (Version 6.22, German)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="MS_DOS_6.22_German_disk1.img" size="1474560" crc="59641924" sha1="df473043d61524d74a8391c4649e7362858b6d81" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="MS_DOS_6.22_German_disk2.img" size="1474560" crc="600c5a02" sha1="2b1b7e938cb8eb7bb4eac35a36bd9415fbfe31d3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="MS_DOS_6.22_German_disk3.img" size="1474560" crc="95f32c5d" sha1="ed1358083d1c56105356e4b029e2beca6d6211da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622ptbr" cloneof="msdos622">
+		<description>MS-DOS (Version 6.22, Brazilian Portuguese)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="MS-DOS 6.22 [BR] - Disk 1 of 4 - Installation Disk (Bootable).img" size="1474560" crc="0bd427df" sha1="9bee890cbd06d10d5b751700df17e48b6f516cc4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Tools Disk (1)" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="MS-DOS 6.22 [BR] - Disk 2 of 4 - Tools Disk (1).img" size="1474560" crc="9744e974" sha1="3459d87140b035515255bcde19df03e0c4310495" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Tools Disk (2)" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="MS-DOS 6.22 [BR] - Disk 3 of 4 - Tools Disk (2).img" size="1474560" crc="f92b43b8" sha1="8db7f62bd89130abda581433173b0e329a90e2b7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Supplemental Disk" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="MS-DOS 6.22 [BR] - Disk 4 of 4 - Supplemental Disk.img" size="1474560" crc="491b3f2c" sha1="1b288096d3d59af039c591d68bf1490fbe1929e0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5807,6 +5869,17 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="corncob">
+		<description>Corncob Deluxe</description>
+		<year>1992</year>
+		<publisher>Personal Companion Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Corncob Deluxe (1992)(Personal Companion Software).dsk" size="737280" crc="1020897e" sha1="800e3adc74674d7433f1519b906dd35f3d996567" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmo">
 		<description>Cosmo's Cosmic Adventure - Forbidden Planet</description>
 		<year>1992</year>
@@ -6217,6 +6290,22 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="dune">
+		<description>Dune</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Dune (1992)(Virgin Games)(Disk 1 of 2).dsk" size="1228800" crc="373be931" sha1="484f3e25773caf433616f12c6b56984425270d64" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Dune (1992)(Virgin Games)(Disk 2 of 2).dsk" size="1228800" crc="20804491" sha1="602d01255eb53183f59e32b4c0a1a338c6837230" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dune2">
 		<description>Dune II - The Battle for Arrakis</description>
 		<year>1993</year>
@@ -6366,10 +6455,37 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="gconqust">
+		<description>Global Conquest</description>
+		<year>1992</year>
+		<publisher>Microplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Global Conquest (1992)(Microplay)(Disk 1 of 2).dsk" size="737280" crc="cc34328c" sha1="a575e663a0ef14458c6d956da6e741f47b10176e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Global Conquest (1992)(Microplay)(Disk 2 of 2).dsk" size="737280" crc="30f85fa1" sha1="315ebf4f20a17c9f532c22e9f61d4fe58e98bc7b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gconqstg">
+		<description>Global Conquest Official Strategy Guide</description>
+		<year>1992</year>
+		<publisher>Microplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Global Conquest Official Strategy Guide (1992)(Microplay).dsk" size="737280" crc="53a53988" sha1="71da5ea2a930191c77e4fb1825febe21e7a917b4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goblins">
 		<description>Gobliiins (US - VGA release)</description>
 		<year>1992</year>
-		<publisher>Sierra On-Line, Inc.</publisher>
+		<publisher>Sierra</publisher>
 		<info name="version" value="1.000 09/11/92" />
 		<info name="developer" value="Coktel Vision, M.D.O." />
 		<part name="flop1" interface="floppy_3_5">
@@ -6387,7 +6503,7 @@ Missing files come here
 	<software name="goblins2">
 		<description>Gobliins 2: The Prince Buffoon</description>
 		<year>1993</year>
-		<publisher>Sierra On-Line, Inc.</publisher>
+		<publisher>Sierra</publisher>
 		<info name="version" value="1.000.000 02/10/93" />
 		<info name="developer" value="Coktel Vision, M.D.O." />
 		<part name="flop1" interface="floppy_3_5">
@@ -6405,7 +6521,7 @@ Missing files come here
 	<software name="goblins3">
 		<description>Goblins Quest 3</description>
 		<year>1993</year>
-		<publisher>Sierra On-Line, Inc.</publisher>
+		<publisher>Sierra</publisher>
 		<info name="version" value="1.00" />
 		<info name="developer" value="Coktel Vision" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6703,14 +6819,117 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="kbounty">
-		<!-- Dumped via Kryoflux, track 0 shows as modified -->
-		<description>King's Bounty</description>
-		<year>1991</year>
-		<publisher>New World Computing</publisher>
+	<software name="kingqst5">
+		<description>King's Quest V - Absence Makes the Heart Go Yonder!</description>
+		<year>1990</year>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="king's bounty.img" size="737280" crc="267624e2" sha1="763a5014008f46f93a13c822377c41965c09a1f8" offset="0" status="baddump" />
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "1474560">
+				<!-- has a saved configuration file -->
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 1 of 8).dsk" size="1474560" crc="f5ba7763" sha1="17308670441b68975e62e43fd5e62e450b63aa39" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 2 of 8).dsk" size="1474560" crc="64301d2a" sha1="42b88d1f42166159933ab6732842794592edb4a5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 3 of 8).dsk" size="1474560" crc="a4a83cf3" sha1="b9e93420475e20333735bc45eed5035aebd304cd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 4 of 8).dsk" size="1474560" crc="9471702d" sha1="b7d86ed264c382a6dd5c273665950282f62a7fa1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 5 of 8).dsk" size="1474560" crc="a7db36ba" sha1="71e8917cb7b416cfc550328ef0b4f9dfc5585a39" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 6 of 8).dsk" size="1474560" crc="3eb4d622" sha1="624c19c35a5614f81972d3ef461114462211a4b3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 7 of 8).dsk" size="1474560" crc="c6d32a66" sha1="bf4ad8019fa543046c46cc06002f8b4185fe38b2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 8 of 8).dsk" size="1474560" crc="474c2cc7" sha1="8847d6dc07c49dcc2022c46fb1086c77155c7f47" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst5_525" cloneof="kingqst5">
+		<description>King's Quest V - Absence Makes the Heart Go Yonder! (Re-release)</description>
+		<year>1990</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 9).img" size="1228800" crc="6f17c558" sha1="1a357f90580470d2afd905657087b45eba4beba0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 1).img" size="1228800" crc="ce59191c" sha1="0f02214a7c4358075e49d553c3865be5d6847f8c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 2).img" size="1228800" crc="12977d48" sha1="09b3d3d33c854458249dc1568fe02174646f4ff6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 3).img" size="1228800" crc="56ea7dd6" sha1="6a8910ba2a9c6e07accd09e7636dea43d16c7282" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 4).img" size="1228800" crc="37d3bd46" sha1="0cec3d03ac78aaa063cde53a44f5a5b6b9afee6a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 5).img" size="1228800" crc="2427f41f" sha1="66bac67e2c5c4daa98cf95b6efbeb81d33ee218c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 6).img" size="1228800" crc="62792b08" sha1="ced1e2c11067f29c16fe5ca7e744cb984d68f77d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 7).img" size="1228800" crc="3769b33b" sha1="fa322e80edb7b17a4541d69ca6648a0d3c88dec1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6767,6 +6986,30 @@ Missing files come here
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 4).img" size="1474560" crc="3de1063c" sha1="722230054057db52b1809ce9db7c4eca8d71c65f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lightspd">
+		<description>Lightspeed</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Lightspeed (1990)(MicroProse)(Disk 1 of 3).dsk" size="737280" crc="ccd5011e" sha1="34287faea30e4b8c589f8a18cc9e511d528e439e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Lightspeed (1990)(MicroProse)(Disk 2 of 3).dsk" size="737280" crc="27c65967" sha1="bd4e23ea6f2c64d0f216bb5bab888e6bf558f42d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Lightspeed (1990)(MicroProse)(Disk 3 of 3).dsk" size="737280" crc="b4eea9dc" sha1="fd90aad687eb9a5b248abf4ced745a6286c82f92" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7535,6 +7778,37 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="spectre challenger.img" size="737280" crc="d37944f9" sha1="2afddfbe00625def681655236b545e62cf54c296" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trek25th">
+		<description>Star Trek - 25th Anniversary</description>
+		<year>1992</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Star Trek - 25th Anniversary (1992)(Interplay)(Disk 1 of 5).dsk" size="1228800" crc="cb4848bc" sha1="f3c14bc156b2e2cda22cd5441d48ab4b330cf418" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Star Trek - 25th Anniversary (1992)(Interplay)(Disk 2 of 5).dsk" size="1228800" crc="6818afba" sha1="85d33b6a6c5f7c3c01bef633727021e08157c499" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Star Trek - 25th Anniversary (1992)(Interplay)(Disk 3 of 5).dsk" size="1228800" crc="54341517" sha1="15249e3179068a41536ba0106a393dc779d1a230" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Star Trek - 25th Anniversary (1992)(Interplay)(Disk 4 of 5).dsk" size="1228800" crc="8f53295d" sha1="53c5feb83716b24a3afe79a7f746acb4c00e2b24" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Star Trek - 25th Anniversary (1992)(Interplay)(Disk 5 of 5).dsk" size="1228800" crc="cb1a3a83" sha1="aa3c3fe165e8171d3dcf83dde922d64e2131b425" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -74,7 +74,7 @@ op const f_opx_f[16] = {
 		OP(SIMPLE, I4004, dac), OP(SIMPLE, I4004, tcs), OP(SIMPLE, I4004, stc), OP(SIMPLE, I4004, daa),
 		OP(SIMPLE, I4004, kbp), OP(SIMPLE, I4004, dcl), OP(ILL,    I4004, ill), OP(ILL,    I4004, ill) };
 
-op const f_ops[256] = {
+op const f_ops[16] = {
 		OPX(0),                  OP(COND,    I4004, jcn), OPX(2),                  OPX(3),
 		OP(ABS,     I4004, jun), OP(ABS,     I4004, jms), OP(REG,     I4004, inc), OP(REGPAGE, I4004, isz),
 		OP(REG,     I4004, add), OP(REG,     I4004, sub), OP(REG,     I4004, ld ), OP(REG,     I4004, xch),

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
@@ -12,14 +12,14 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_HEXBUS_HX5102_H
-#define MAME_BUS_TI99_HEXBUS_HX5102_H
+#ifndef MAME_BUS_HEXBUS_HX5102_H
+#define MAME_BUS_HEXBUS_HX5102_H
 
 #pragma once
 
 #include "hexbus.h"
 
-namespace bus { namespace ti99 { namespace hexbus {
+namespace bus { namespace hexbus {
 
 class hx5102_device : public hexbus_chained_device
 {
@@ -28,8 +28,8 @@ public:
 	void hexbus_value_changed(uint8_t data) override;
 };
 
-}   }   }  // end namespace bus::ti99::hexbus
+}   } // end namespace bus::hexbus
 
-DECLARE_DEVICE_TYPE_NS(TI_HX5102, bus::ti99::hexbus, hx5102_device)
+DECLARE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device)
 
-#endif // MAME_BUS_TI99_HEXBUS_HX5102_H
+#endif // MAME_BUS_HEXBUS_HX5102_H

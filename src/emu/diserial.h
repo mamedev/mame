@@ -123,19 +123,16 @@ protected:
 
 	// interface-level overrides
 	virtual void interface_pre_start() override;
-
-	// Must be called from device_timer in the underlying device
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void interface_post_start() override;
 
 	bool m_start_bit_hack_for_external_clocks;
 
 	const char *parity_tostring(parity_t stop_bits);
 	const char *stop_bits_tostring(stop_bits_t stop_bits);
 
-	void register_save_state(save_manager &save, device_t *device);
-
 private:
-	enum { TRA_TIMER_ID = 10000, RCV_TIMER_ID };
+	TIMER_CALLBACK_MEMBER(rcv_clock) { rx_clock_w(!m_rcv_clock_state); }
+	TIMER_CALLBACK_MEMBER(tra_clock) { tx_clock_w(!m_tra_clock_state); }
 
 	u8 m_serial_parity_table[256];
 
@@ -246,17 +243,15 @@ protected:
 		return !m_empty && (m_head == m_tail);
 	}
 
-	void register_save_state(save_manager &save, device_t *device)
+protected:
+	void interface_post_start() override
 	{
-		device_serial_interface::register_save_state(save, device);
+		device_serial_interface::interface_post_start();
 
-		char const *const module(device->name());
-		char const *const tag(device->tag());
-
-		save.save_item(device, module, tag, 0, NAME(m_fifo));
-		save.save_item(device, module, tag, 0, NAME(m_head));
-		save.save_item(device, module, tag, 0, NAME(m_tail));
-		save.save_item(device, module, tag, 0, NAME(m_empty));
+		device().save_item(NAME(m_fifo));
+		device().save_item(NAME(m_head));
+		device().save_item(NAME(m_tail));
+		device().save_item(NAME(m_empty));
 	}
 
 private:

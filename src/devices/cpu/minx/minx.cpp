@@ -81,6 +81,12 @@ minx_cpu_device::minx_cpu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+device_memory_interface::space_config_vector minx_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 uint16_t minx_cpu_device::rd16( uint32_t offset )
 {

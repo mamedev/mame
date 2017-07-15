@@ -125,19 +125,13 @@ protected:
 	device_ti8x_link_port_bit_interface(machine_config const &mconfig, device_t &device);
 
 	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void send_bit(bool data);
 	void accept_bit();
 
 private:
-	enum
-	{
-		TIMER_ID_BIT_TIMEOUT = 20000 // ensure this doesn't clash with device_serial_interface
-	};
-
 	enum bit_phase
 	{
 		IDLE,
@@ -168,6 +162,8 @@ private:
 	virtual void bit_sent() = 0;
 	virtual void bit_received(bool data) = 0;
 
+	TIMER_CALLBACK_MEMBER(bit_timeout);
+
 	void check_tx_bit_buffer();
 
 	emu_timer * m_error_timer;
@@ -183,6 +179,7 @@ protected:
 	device_ti8x_link_port_byte_interface(machine_config const &mconfig, device_t &device);
 
 	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
 
 	void send_byte(u8 data);

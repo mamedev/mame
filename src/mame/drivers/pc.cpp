@@ -62,6 +62,19 @@ Options: 8087 FPU
 Expansion: Expansion box: 2x ISA
 
 
+Commodore PC10 / PC20 / PC30
+Links: http://www.zimmers.net/cbmpics/cpcs.html , https://de.wikipedia.org/wiki/Commodore_PC-10_bis_PC-60 , http://mingos-commodorepage.tumblr.com/post/123656301482/commodore-pc-20-beim-pc-20-handelt-es-sich-um
+http://www.richardlagendijk.nl/cip/computer/item/pc20ii/de
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 256K / 512K / 640K
+BUS: 5x ISA
+Video: MDA
+Mass storage: PC10: 1 or 2x 5.25" 360K , PC20: 1x 360K + 10MB HD, PC30: 1x 360K + 20MB HD
+On board ports: Floppy, serial, parallel, speaker
+Options: 8087 FPU
+
+
 Commodore PC-10 III
 =============
 Links: http://dostalgie.de/downloads/pc10III-20III/PC10III_OM_COMMODORE_EN_DE.pdf ; ftp://ftp.zimmers.net/pub/cbm-pc/documents/PC-8088-Information.txt
@@ -435,7 +448,6 @@ static MACHINE_CONFIG_START( cfg_single_360K )
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
 
-
 //Data General One
 static MACHINE_CONFIG_DERIVED( dgone, pccga )
 	MCFG_DEVICE_MODIFY("isa2")
@@ -716,29 +728,6 @@ ROM_START( compc1 )
 	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
 ROM_END
 
-// Note: Commodore PC20-III, PC10-III and COLT share the same BIOS
-ROM_START( pc10iii )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_DEFAULT_BIOS("v441")
-	ROM_SYSTEM_BIOS(0, "v435", "v4.35")
-	ROMX_LOAD("318085-01.u201", 0x8000, 0x8000, CRC(be752d1e) SHA1(5e5e63cd6d6269816cd691602e4c4d209fe3df67), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "v436", "v4.36")
-	ROMX_LOAD("318085-02.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "v436c", "v4.36c")
-	ROMX_LOAD("318085-04.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(3, "v438", "v4.38")
-	ROMX_LOAD("318085-05.u201", 0x8000, 0x8000, CRC(ae9e6a31) SHA1(853ee251cf230818c407a8d13ef060a21c90a8c1), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(4, "v439", "v4.39")
-	ROMX_LOAD("318085-06.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(5, "v440", "v4.40")
-	ROMX_LOAD("318085-07.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(6, "v441", "v4.41")
-	ROMX_LOAD("318085-08.u201", 0x8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc), ROM_BIOS(7))
-	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("318086-02.u607", 0x0000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6))
-	//ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* temp so you can read the text */
-ROM_END
-
 ROM_START( iskr3104 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 	ROMX_LOAD( "198.bin", 0xc000, 0x2000, CRC(bcfd8e41) SHA1(e21ddf78839aa51fa5feb23f511ff5e2da31b433),ROM_SKIP(1))
@@ -892,7 +881,6 @@ ROM_END
 COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
 COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
 COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
-COMP( 1987,   pc10iii,          ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-10 III",  MACHINE_NOT_WORKING )
 COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
 COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    pc_state, 0,        "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
 COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    pc_state, 0,        "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )

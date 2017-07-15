@@ -2373,6 +2373,8 @@ MACHINE_CONFIG_MEMBER(segas32_trackball_state::device_add_mconfig)
 	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX3")
 	MCFG_UPD4701_PORTY("TRACKY3")
+
+	// 837-8685 I/O board has an unpopulated space for a fourth UPD4701A
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")

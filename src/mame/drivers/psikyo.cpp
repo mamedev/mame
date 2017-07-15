@@ -270,7 +270,7 @@ WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x000000ff, mem_mask);
 }
 
-static ADDRESS_MAP_START( s1945bl_oki_map, AS_0, 8, psikyo_state )
+static ADDRESS_MAP_START( s1945bl_oki_map, 0, 8, psikyo_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -1120,7 +1120,7 @@ static MACHINE_CONFIG_START( s1945bl ) /* Bootleg hardware based on the unprotec
 
 	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_LOW) // ?? clock
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, s1945bl_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
 MACHINE_CONFIG_END
 
 

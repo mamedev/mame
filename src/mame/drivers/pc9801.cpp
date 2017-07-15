@@ -2109,7 +2109,7 @@ WRITE16_MEMBER(pc9801_state::grcg_gvram0_w)
 	upd7220_grcg_w(space, offset | (m_vram_bank << 16), data, mem_mask);
 }
 
-static ADDRESS_MAP_START( ipl_bank, AS_0, 16, pc9801_state )
+static ADDRESS_MAP_START( ipl_bank, 0, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -2534,15 +2534,15 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, pc9801_state )
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, pc9801_state )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_grcg_2_map, AS_0, 16, pc9801_state )
+static ADDRESS_MAP_START( upd7220_grcg_2_map, 0, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(upd7220_grcg_r, upd7220_grcg_w) AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -3353,12 +3353,12 @@ static MACHINE_CONFIG_START( pc9801_common )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
 	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3433,7 +3433,7 @@ static MACHINE_CONFIG_START( pc9801rs )
 	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K,14M")
 
 	MCFG_DEVICE_MODIFY("upd7220_btm")
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_grcg_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_grcg_2_map)
 
 	MCFG_PALETTE_ADD("palette", 16+16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)

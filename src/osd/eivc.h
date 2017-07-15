@@ -8,8 +8,11 @@
 //
 //============================================================
 
-#ifndef __EIVC__
-#define __EIVC__
+#ifndef MAME_OSD_EIVC_H
+#define MAME_OSD_EIVC_H
+
+#pragma once
+
 #include <intrin.h>
 #pragma intrinsic(_BitScanReverse)
 
@@ -25,10 +28,10 @@
 
 #ifndef count_leading_zeros
 #define count_leading_zeros _count_leading_zeros
-static inline uint8_t _count_leading_zeros(uint32_t value)
+inline uint8_t _count_leading_zeros(uint32_t value)
 {
-	uint32_t index;
-	return _BitScanReverse((unsigned long *)&index, value) ? (index ^ 31) : 32;
+	unsigned long index;
+	return _BitScanReverse(&index, value) ? (index ^ 31) : 32;
 }
 #endif
 
@@ -40,11 +43,11 @@ static inline uint8_t _count_leading_zeros(uint32_t value)
 
 #ifndef count_leading_ones
 #define count_leading_ones _count_leading_ones
-static inline uint8_t _count_leading_ones(uint32_t value)
+inline uint8_t _count_leading_ones(uint32_t value)
 {
-	uint32_t index;
-	return _BitScanReverse((unsigned long *)&index, ~value) ? (index ^ 31) : 32;
+	unsigned long index;
+	return _BitScanReverse(&index, ~value) ? (index ^ 31) : 32;
 }
 #endif
 
-#endif /* __EIVC__ */
+#endif // MAME_OSD_EIVC_H

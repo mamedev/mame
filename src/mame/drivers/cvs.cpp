@@ -87,6 +87,9 @@ Additional work
 
 Todo & FIXME:
 
+- Emulate protection properly in later games (reads area 0x73fx);
+- Superbike hangs indefinitely when collecting balloon bonus the 
+  second time around, protection or s2650 core bug?
 - the board most probably has discrete circuits. The 393Hz tone used
   for shots (superbike) and collisions (8ball) is just a guess.
 
@@ -1591,7 +1594,11 @@ DRIVER_INIT_MEMBER(cvs_state,superbik)
 	ROM[0x0168] = 0xc0;
 	ROM[0x0169] = 0xc0;
 	ROM[0x016a] = 0xc0;
-
+	
+	ROM[0x413f] = 0xc0;
+	ROM[0x4140] = 0xc0;
+	ROM[0x4141] = 0xc0;
+	
 	/* and speed up the protection check */
 	ROM[0x0099] = 0xc0;
 	ROM[0x009a] = 0xc0;
@@ -1666,7 +1673,7 @@ GAME( 1982, diggerc,   0,        cvs,     diggerc,  cvs_state, 0,         ROT90,
 GAME( 1983, heartatk,  0,        cvs,     heartatk, cvs_state, 0,         ROT90, "Century Electronics", "Heart Attack", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbak,  0,        cvs,     hunchbak, cvs_state, 0,         ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, cvs_state, hunchbaka, ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, raiders,   0,        cvs,     raiders,  cvs_state, raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, raidersr3, raiders,  cvs,     raiders,  cvs_state, raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, hero,      0,        cvs,     hero,     cvs_state, hero,      ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen

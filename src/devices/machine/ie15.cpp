@@ -208,8 +208,6 @@ READ8_MEMBER(ie15_device::kb_s_lin_r)
 
 void ie15_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_serial_interface::device_timer(timer, id, param, ptr);
-
 	switch (id)
 	{
 	case TIMER_HBLANK:

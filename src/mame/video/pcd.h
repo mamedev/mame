@@ -100,7 +100,6 @@ protected:
 	void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void tra_callback() override;
 	void rcv_complete() override;

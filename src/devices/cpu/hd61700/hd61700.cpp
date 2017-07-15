@@ -120,6 +120,13 @@ hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char
 {
 }
 
+device_memory_interface::space_config_vector hd61700_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 //-------------------------------------------------
 //  device_start - start up the device

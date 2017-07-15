@@ -76,6 +76,7 @@ CPU_DISASSEMBLE( arm7thumb );
 CPU_DISASSEMBLE( arm7thumb_be );
 CPU_DISASSEMBLE( asap );
 CPU_DISASSEMBLE( avr8 );
+CPU_DISASSEMBLE( capricorn );
 CPU_DISASSEMBLE( ccpu );
 CPU_DISASSEMBLE( cdp1801 );
 CPU_DISASSEMBLE( cdp1802 );
@@ -249,6 +250,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "arm7thumbb",  _16be,  0, CPU_DISASSEMBLE_NAME(arm7thumb_be) },
 	{ "asap",        _32le,  0, CPU_DISASSEMBLE_NAME(asap) },
 	{ "avr8",        _16le,  0, CPU_DISASSEMBLE_NAME(avr8) },
+	{ "capricorn",   _8bit,  0, CPU_DISASSEMBLE_NAME(capricorn) },
 	{ "ccpu",        _8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
 	{ "cdp1801",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1801) },
 	{ "cdp1802",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1802) },

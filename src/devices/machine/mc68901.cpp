@@ -472,8 +472,6 @@ void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	if(id >= TIMER_A && id <= TIMER_D)
 		timer_count(id);
-	else
-		device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 

@@ -795,7 +795,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 		if (m_irq_enable & (1<<6)) m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bmcpokr_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcpokr_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

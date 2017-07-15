@@ -97,7 +97,6 @@ void i8251_device::device_start()
 	save_item(NAME(m_br_factor));
 	save_item(NAME(m_rx_data));
 	save_item(NAME(m_tx_data));
-	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 
@@ -675,12 +674,6 @@ READ8_MEMBER(i8251_device::data_r)
 
 	update_rx_ready();
 	return m_rx_data;
-}
-
-
-void i8251_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 

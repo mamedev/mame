@@ -49,6 +49,8 @@ public:
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
 	void dmovlay_remap_memory();
 	WRITE32_MEMBER(dmovlay_callback);
+	void denver_postload(void);
+	void install_speedup(void);
 
 	// non public
 	void dcs_boot();
@@ -66,6 +68,7 @@ public:
 	void dsio_reset();
 	DECLARE_READ16_MEMBER( dsio_r );
 	DECLARE_WRITE16_MEMBER( dsio_w );
+	void denver_alloc_dmadac(void);
 	void denver_reset();
 	DECLARE_READ16_MEMBER( denver_r );
 	DECLARE_WRITE16_MEMBER( denver_w );
@@ -96,6 +99,8 @@ public:
 	WRITE32_MEMBER(sound_tx_callback);
 	DECLARE_READ16_MEMBER( dcs_polling_r );
 	DECLARE_WRITE16_MEMBER( dcs_polling_w );
+	DECLARE_READ32_MEMBER(dcs_polling32_r);
+	DECLARE_WRITE32_MEMBER(dcs_polling32_w);
 	TIMER_DEVICE_CALLBACK_MEMBER( transfer_watchdog_callback );
 	TIMER_CALLBACK_MEMBER( s1_ack_callback2 );
 	TIMER_CALLBACK_MEMBER( s1_ack_callback1 );
@@ -149,14 +154,13 @@ protected:
 	uint8_t       m_rev;
 	offs_t      m_polling_offset;
 	uint32_t      m_polling_count;
-
 	/* sound output */
 	uint8_t       m_channels;
 	uint16_t      m_size;
 	uint16_t      m_incs;
 	dmadac_sound_device *m_dmadac[6];
 	timer_device *m_reg_timer;
-	timer_device *m_sport_timer;
+	timer_device *m_sport0_timer;
 	timer_device *m_internal_timer;
 	int32_t       m_ireg;
 	uint16_t      m_ireg_base;
@@ -204,7 +208,8 @@ protected:
 	uint32_t      m_timers_fired;
 
 	uint16_t *m_sram;
-	uint16_t *m_polling_base;
+	uint16_t m_polling_value;
+	uint32_t m_polling32_value;
 	uint32_t *m_internal_program_ram;
 	uint32_t *m_external_program_ram;
 	uint32_t *m_internal_data_ram;

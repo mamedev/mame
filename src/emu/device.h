@@ -166,8 +166,6 @@ private:
 	char const *const m_source;
 
 	device_type_impl *m_next;
-	device_type_impl *m_parent = nullptr, *m_left = nullptr, *m_right = nullptr;
-	bool m_colour = false;
 
 public:
 	device_type_impl(std::nullptr_t)

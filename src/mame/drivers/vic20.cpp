@@ -362,7 +362,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, vic20_state )
+static ADDRESS_MAP_START( vic_videoram_map, 0, 8, vic20_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -371,7 +371,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, vic20_state )
+static ADDRESS_MAP_START( vic_colorram_map, 1, 8, vic20_state )
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("color_ram")
 ADDRESS_MAP_END
 

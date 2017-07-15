@@ -49,8 +49,6 @@ protected:
 	virtual void key_make(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 private:
 	enum {
 		CMD_REQ_TIME_AND_DATE = 0xe1,

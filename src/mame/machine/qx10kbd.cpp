@@ -36,13 +36,6 @@ void qx10_keyboard_device::device_reset()
 }
 
 
-void qx10_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-	buffered_rs232_device::device_timer(timer, id, param, ptr);
-}
-
-
 void qx10_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	transmit_byte((column << 4) | row);

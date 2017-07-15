@@ -22,9 +22,6 @@
 #define MCFG_MSM6585_VCK_CALLBACK(cb) \
 	devcb = &msm6585_device::set_vck_callback(*device, (DEVCB_##cb));
 
-#define MCFG_MSM6585_VCLK_CB(cb) \
-	devcb = &msm6585_device::set_vck_legacy_callback(*device, (DEVCB_##cb));
-
 
 class msm5205_device : public device_t, public device_sound_interface
 {

@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( stfight_cpu1_map, AS_PROGRAM, 8, stfight_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, stfight_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 

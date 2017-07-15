@@ -90,7 +90,7 @@ public:
 	void set_clockin(int timer, double new_clockin);
 
 protected:
-	pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int chip_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -129,6 +129,13 @@ protected:
 	virtual void readback_command(uint8_t data);
 	pit8253_timer *get_timer(int which);
 
+	enum
+	{
+		I8254,
+		I8253,
+		FE2010
+	};
+
 private:
 	double m_clk0;
 	double m_clk1;
@@ -155,10 +162,11 @@ private:
 	void load_count(pit8253_timer *timer, uint16_t newcount);
 	void gate_w(int gate, int state);
 	void set_clock_signal(int timerno, int state);
+
+	int m_type;
 };
 
 DECLARE_DEVICE_TYPE(PIT8253, pit8253_device)
-
 
 class pit8254_device : public pit8253_device
 {
@@ -171,4 +179,11 @@ protected:
 
 DECLARE_DEVICE_TYPE(PIT8254, pit8254_device)
 
+class fe2010_pit_device : public pit8253_device
+{
+public:
+	fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device)
 #endif // MAME_MACHINE_PIT8253_H

@@ -283,7 +283,7 @@ d7 -
 */
 READ8_MEMBER( amust_state::port09_r )
 {
-	printf("%s\n",machine().describe_context());
+	logerror("%s\n",machine().describe_context());
 	return ioport("P9")->read();
 }
 

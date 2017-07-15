@@ -50,9 +50,9 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/z80dart.h"
-#include "machine/terminal.h"
+#include "machine/z80sio.h"
 
 #define TERMINAL_TAG "terminal"
 
@@ -60,55 +60,31 @@ class sun1_state : public driver_device
 {
 public:
 	sun1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_p_ram(*this, "p_ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_iouart(*this, "iouart")
+		, m_p_ram(*this, "p_ram")
 	{
 	}
-
-	DECLARE_READ16_MEMBER(sun1_upd7201_r);
-	DECLARE_WRITE16_MEMBER(sun1_upd7201_w);
-	void kbd_put(u8 data);
 
 protected:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<upd7201_new_device> m_iouart;
 	required_shared_ptr<uint16_t> m_p_ram;
-	uint8_t m_term_data;
 };
 
-
-
-// Just hack to show output since upd7201 is not implemented yet
-
-READ16_MEMBER( sun1_state::sun1_upd7201_r )
-{
-	uint16_t ret;
-	if (offset == 0)
-	{
-		ret = m_term_data << 8;
-		m_term_data = 0;
-	}
-	else
-		ret = 0xfeff | (m_term_data ? 0x100 : 0);
-
-	return ret;
-}
-
-WRITE16_MEMBER( sun1_state::sun1_upd7201_w )
-{
-	if (offset == 0)
-		m_terminal->write(space, 0, data >> 8);
-}
 
 static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16, sun1_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x00600000, 0x00600007) AM_READWRITE( sun1_upd7201_r, sun1_upd7201_w )
+	AM_RANGE(0x00600000, 0x006000ff) AM_DEVREADWRITE8("iouart", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
+	AM_RANGE(0x00800000, 0x008000ff) AM_UNMAP // AM9513 timer at 5MHz
+	AM_RANGE(0x00a00000, 0x00bfffff) AM_UNMAP // page map
+	AM_RANGE(0x00c00000, 0x00dfffff) AM_UNMAP // segment map
+	AM_RANGE(0x00e00000, 0x00ffffff) AM_UNMAP // context register
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -123,34 +99,46 @@ void sun1_state::machine_reset()
 	memcpy((uint8_t*)m_p_ram.target(),user1,0x4000);
 
 	m_maincpu->reset();
-	m_term_data = 0;
 }
 
-
-void sun1_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 static MACHINE_CONFIG_START( sun1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sun1_state, kbd_put))
+	// UART is actually clocked by AM9513 (channel 4 = port A, channel 5 = port B)
+	MCFG_UPD7201_ADD("iouart", 0, 9600*16, 9600*16, 9600*16, 9600*16)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, dcda_w))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, dcdb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sun1 )
 	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "v10.8.bin", 0x0001, 0x2000, CRC(3528a0f8) SHA1(be437dd93d1a44eccffa6f5e05935119482beab0))
-	ROM_LOAD16_BYTE( "v10.0.bin", 0x0000, 0x2000, CRC(1ad4c52a) SHA1(4bc1a19e8f202378d5d7baa8b95319275c040a6d))
+	ROM_DEFAULT_BIOS("1.0")
 
-	ROM_REGION( 0x4000, "diag", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "8mhzdiag.8.bin", 0x0001, 0x2000, CRC(808a549e) SHA1(d2aba014a5507c1538f2c1a73e1d2524f28034f4))
-	ROM_LOAD16_BYTE( "8mhzdiag.0.bin", 0x0000, 0x2000, CRC(7a92d506) SHA1(5df3800f7083293fc01bb6a7e7538ad425bbebfb))
+	ROM_SYSTEM_BIOS(0, "1.0", "Sun Monitor 1.0")
+	ROMX_LOAD( "v10.8.bin", 0x0001, 0x2000, CRC(3528a0f8) SHA1(be437dd93d1a44eccffa6f5e05935119482beab0), ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD( "v10.0.bin", 0x0000, 0x2000, CRC(1ad4c52a) SHA1(4bc1a19e8f202378d5d7baa8b95319275c040a6d), ROM_SKIP(1)|ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "diag", "Interactive Tests")
+	ROMX_LOAD( "8mhzdiag.8.bin", 0x0001, 0x2000, CRC(808a549e) SHA1(d2aba014a5507c1538f2c1a73e1d2524f28034f4), ROM_SKIP(1)|ROM_BIOS(2))
+	ROMX_LOAD( "8mhzdiag.0.bin", 0x0000, 0x2000, CRC(7a92d506) SHA1(5df3800f7083293fc01bb6a7e7538ad425bbebfb), ROM_SKIP(1)|ROM_BIOS(2))
 
 	ROM_REGION( 0x10000, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "gfxu605.g4.bin",  0x0000, 0x0200, CRC(274b7b3d) SHA1(40d8be2cfcbd03512a05925991bb5030d5d4b5e9))

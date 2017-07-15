@@ -183,6 +183,14 @@ inline u16 sm510_base_device::get_lcd_row(int column, u8* ram)
 	return rowdata;
 }
 
+device_memory_interface::space_config_vector sm510_base_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 void sm510_base_device::lcd_update()
 {
 	// 4 columns

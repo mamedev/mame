@@ -127,11 +127,6 @@ void apollo_kbd_device::device_reset()
 	m_xmit_read = m_xmit_write = 0;
 }
 
-void apollo_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
 /***************************************************************************
  cpu_context - return a string describing the current CPU context
  ***************************************************************************/

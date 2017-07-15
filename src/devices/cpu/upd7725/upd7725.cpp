@@ -206,11 +206,12 @@ void necdsp_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *necdsp_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector necdsp_device::memory_space_config() const
 {
-	return  (spacenum == AS_PROGRAM) ? &m_program_config :
-		(spacenum == AS_DATA) ? &m_data_config :
-		nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
 }
 
 

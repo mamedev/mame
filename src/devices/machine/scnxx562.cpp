@@ -808,8 +808,7 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_uart->m_out_trxcb_cb(m_trxc);
 		break;
 	default:
-		LOGR("Unhandled Timer ID passed to device_serial_interface%d\n", id);
-		device_serial_interface::device_timer(timer, id, param, ptr);
+		LOGR("Unhandled Timer ID %d\n", id);
 		break;
 	}
 	//  LOG("%s %d\n", FUNCNAME, id);

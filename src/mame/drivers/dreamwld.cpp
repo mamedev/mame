@@ -425,12 +425,12 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 	return dat << 24;
 }
 
-static ADDRESS_MAP_START( oki1_map, AS_0, 8, dreamwld_state )
+static ADDRESS_MAP_START( oki1_map, 0, 8, dreamwld_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, AS_0, 8, dreamwld_state )
+static ADDRESS_MAP_START( oki2_map, 0, 8, dreamwld_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki2bank")
 ADDRESS_MAP_END
@@ -819,7 +819,7 @@ static MACHINE_CONFIG_START( baryon )
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 
 MACHINE_CONFIG_END
 
@@ -833,7 +833,7 @@ static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
 	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 
 MACHINE_CONFIG_END
 

@@ -132,7 +132,7 @@ ROM_START( bazooka )
 	ROM_LOAD( "bd2.e7",  0x0820, 0x0020, CRC(1bfb073f) SHA1(f6b26dcece71b2cf2ed4a537434edbe31cb10399) ) // 82123
 ROM_END
 
-ROM_START( bazookabr )
+ROM_START( bazookabr )  // 4 identical PROMs were found on a Model Racing "CS 18" PCB, labeled Cross Fir. Unfortunately PROMs at 1l and 6c were missing.
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0840, "roms", ROMREGION_ERASE00 )

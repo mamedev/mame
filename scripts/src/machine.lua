@@ -1576,6 +1576,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mc14411.h,MACHINES["MC14411"] = true
+---------------------------------------------------
+
+if (MACHINES["MC14411"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mc14411.cpp",
+		MAME_DIR .. "src/devices/machine/mc14411.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mc2661.h,MACHINES["MC2661"] = true
 ---------------------------------------------------
 
@@ -3201,5 +3213,17 @@ if (MACHINES["SMIOC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/smioc.cpp",
 		MAME_DIR .. "src/devices/machine/smioc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i82586.h,MACHINES["I82586"] = true
+---------------------------------------------------
+
+if (MACHINES["I82586"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i82586.cpp",
+		MAME_DIR .. "src/devices/machine/i82586.h",
 	}
 end

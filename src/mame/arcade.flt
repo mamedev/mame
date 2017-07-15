@@ -133,7 +133,6 @@ bishi.cpp
 bking.cpp
 blackt96.cpp
 bladestl.cpp
-blitz.cpp
 blitz68k.cpp
 blktiger.cpp
 blmbycar.cpp
@@ -1003,6 +1002,7 @@ scramble.cpp
 scregg.cpp
 scyclone.cpp
 sderby.cpp
+sderby2.cpp
 seabattl.cpp
 sealy.cpp
 seattle.cpp

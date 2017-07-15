@@ -492,9 +492,3 @@ READ_LINE_MEMBER( mc2661_device::txemt_r )
 {
 	return (m_sr & STATUS_TXEMT) ? ASSERT_LINE : CLEAR_LINE;
 }
-
-
-void mc2661_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}

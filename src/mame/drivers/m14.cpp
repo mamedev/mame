@@ -17,7 +17,7 @@ TODO:
 Notes:
 - Unlike most Arcade games, if you call a ron but you don't have a legit hand you'll automatically
   lose the match. This is commonly named chombo in rii'chi mahjong rules;
-- After getting a completed hand, press start 1 + ron + discard at the same time to go back 
+- After getting a completed hand, press start 1 + ron + discard at the same time to go back
   into attract mode (!);
 
 ==============================================================================================
@@ -98,11 +98,11 @@ public:
 	DECLARE_PALETTE_INIT(m14);
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
-	
+
 private:
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
-	
+
 	/* input-related */
 	//uint8_t m_hop_mux;
 	uint8_t m_ballx,m_bally;
@@ -259,14 +259,14 @@ static const char *const m14_sample_names[] =
 	"*ptrmj",
 	"wall_hit", // 1
 	"tile_hit", // 2
-	"tick",		// 0x40
+	"tick",     // 0x40
 	"ball_drop", // 8
 	"paddle_hit",
 	nullptr
 };
- 
+
 WRITE8_MEMBER(m14_state::sound_w)
-{	
+{
 	switch(data)
 	{
 		case 1: // wall hit
@@ -290,7 +290,7 @@ WRITE8_MEMBER(m14_state::sound_w)
 	}
 }
 
- 
+
 /*************************************
  *
  *  Memory Map
@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( m14 )
 
 
 	/* sound hardware */
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(5)

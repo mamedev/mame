@@ -56,7 +56,7 @@ void m4510_device::device_reset()
 	m65ce02_device::device_reset();
 }
 
-bool m4510_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool m4510_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (spacenum == AS_PROGRAM)
 	{

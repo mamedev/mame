@@ -32,7 +32,7 @@ class info_xml_creator
 {
 public:
 	// construction/destruction
-	info_xml_creator(emu_options const &options);
+	info_xml_creator(emu_options const &options, bool dtd = true);
 
 	// output
 	void output(FILE *out, std::vector<std::string> const &patterns);
@@ -74,6 +74,7 @@ private:
 	emu_options     m_lookup_options;
 
 	static const char s_dtd_string[];
+	bool m_dtd;
 };
 
 

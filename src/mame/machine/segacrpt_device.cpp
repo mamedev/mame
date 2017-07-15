@@ -270,7 +270,7 @@ DEFINE_DEVICE_TYPE(SEGA_315_5048, sega_315_5048_device, "sega_315_5048", "Sega 3
 DEFINE_DEVICE_TYPE(SEGA_315_5093, sega_315_5093_device, "sega_315_5093", "Sega 315-5093")
 DEFINE_DEVICE_TYPE(SEGA_315_5099, sega_315_5099_device, "sega_315_5099", "Sega 315-5099")
 DEFINE_DEVICE_TYPE(SEGA_315_5015, sega_315_5015_device, "sega_315_5015", "Sega 315-5015")
-DEFINE_DEVICE_TYPE(SEGA_315_5133, sega_315_5133_device, "sega_315_5133", "Sega 315-5133") // NOT DECRYPTED YET
+DEFINE_DEVICE_TYPE(SEGA_315_5133, sega_315_5133_device, "sega_315_5133", "Sega 315-5133") // exactly the same as Sega 315-5048?
 DEFINE_DEVICE_TYPE(SEGA_315_5061, sega_315_5061_device, "sega_315_5061", "Sega 315-5061")
 DEFINE_DEVICE_TYPE(SEGA_315_5028, sega_315_5028_device, "sega_315_5028", "Sega 315-5028")
 DEFINE_DEVICE_TYPE(SEGA_315_5084, sega_315_5084_device, "sega_315_5084", "Sega 315-5084")
@@ -700,6 +700,7 @@ void sega_315_5041_device::decrypt()
 
 
 sega_315_5048_device::sega_315_5048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_5048, tag, owner, clock) {}
+sega_315_5048_device::sega_315_5048_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, type, tag, owner, clock) {}
 void sega_315_5048_device::decrypt()
 {
 	static const uint8_t convtable[32][4] =
@@ -847,12 +848,8 @@ void sega_315_5015_device::decrypt()
 }
 
 
-sega_315_5133_device::sega_315_5133_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_5133, tag, owner, clock) {}
-void sega_315_5133_device::decrypt()
-{
-	// TODO
-}
-
+sega_315_5133_device::sega_315_5133_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_315_5048_device(mconfig, SEGA_315_5133, tag, owner, clock) {}
+// == sega_315_5048_device
 
 
 sega_315_5014_device::sega_315_5014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_5014, tag, owner, clock) {}

@@ -536,7 +536,7 @@ void a5105_state::video_start()
 	m_char_ram = memregion("pcg")->base();
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, a5105_state)
+static ADDRESS_MAP_START( upd7220_map, 0, 16, a5105_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -583,7 +583,7 @@ static MACHINE_CONFIG_START( a5105 )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_15MHz / 16) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
 

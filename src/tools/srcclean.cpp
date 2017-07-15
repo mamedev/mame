@@ -72,6 +72,7 @@
 
 
 namespace {
+
 /***************************************************************************
     SOURCE CLEANER BASE CLASS
 ***************************************************************************/
@@ -326,6 +327,7 @@ bool cleaner_base::affected() const
 			m_trailing_whitespace ||
 			m_tabs_expanded ||
 			m_tabs_created ||
+			m_spaces_combined ||
 			m_final_newline;
 }
 

@@ -785,11 +785,11 @@ GFXDECODE_END
 
 
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, apc_state)
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, apc_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, apc_state )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 16, apc_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -960,11 +960,11 @@ static MACHINE_CONFIG_START( apc )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
 
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
 
 	/* sound hardware */

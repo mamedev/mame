@@ -62,8 +62,10 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 #define MAIN_CLOCK 15974400
-#define LOG 0
 
 class fp1100_state : public driver_device
 {
@@ -191,7 +193,7 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 	machine().scheduler().synchronize(); // force resync
 	m_irq_mask = data;
 	m_subcpu->set_input_line(UPD7810_INTF2, BIT(data, 7) ? HOLD_LINE : CLEAR_LINE);
-	if (LOG) printf("%s: IRQmask=%X\n",machine().describe_context(),data);
+	LOG("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
 WRITE8_MEMBER( fp1100_state::main_to_sub_w )
@@ -199,14 +201,14 @@ WRITE8_MEMBER( fp1100_state::main_to_sub_w )
 //  machine().scheduler().synchronize(); // force resync
 //  m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
 	m_sub_latch = data;
-	if (LOG) printf("%s: From main:%X\n",machine().describe_context(),data);
+	LOG("%s: From main:%X\n",machine().describe_context(),data);
 }
 
 READ8_MEMBER( fp1100_state::sub_to_main_r )
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
-	if (LOG) printf("%s: To main:%X\n",machine().describe_context(),m_main_latch);
+	LOG("%s: To main:%X\n",machine().describe_context(),m_main_latch);
 	return m_main_latch;
 }
 
@@ -241,7 +243,7 @@ READ8_MEMBER( fp1100_state::main_to_sub_r )
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
-	if (LOG) printf("%s: To sub:%X\n",machine().describe_context(),m_sub_latch);
+	LOG("%s: To sub:%X\n",machine().describe_context(),m_sub_latch);
 	return m_sub_latch;
 }
 
@@ -250,7 +252,7 @@ WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 //  machine().scheduler().synchronize(); // force resync
 //  m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
 	m_main_latch = data;
-	if (LOG) printf("%s: From sub:%X\n",machine().describe_context(),data);
+	LOG("%s: From sub:%X\n",machine().describe_context(),data);
 }
 
 /*
@@ -296,7 +298,6 @@ static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8, fp1100_state )
 	//AM_RANGE(0xec00, 0xefff) "Acknowledge of INT0" doesn't seem to be used
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(colour_control_w)
 	AM_RANGE(0xf400, 0xff7f) AM_ROM AM_REGION("sub_ipl",0x2400)
-	AM_RANGE(0xff80, 0xffff) AM_RAM     /* upd7801 internal RAM */
 ADDRESS_MAP_END
 
 /*
@@ -344,7 +345,7 @@ WRITE8_MEMBER( fp1100_state::portc_w )
 {
 	if (BIT(m_irq_mask, 4))
 		m_maincpu->set_input_line_and_vector(0, BIT(data, 3) ? CLEAR_LINE : HOLD_LINE, 0xf0);
-	if (LOG) printf("%s: PortC:%X\n",machine().describe_context(),data);
+	LOG("%s: PortC:%X\n",machine().describe_context(),data);
 	m_upd7801.portc = data;
 	m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	m_centronics->write_strobe(BIT(data, 6));

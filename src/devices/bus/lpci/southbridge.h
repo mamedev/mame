@@ -121,8 +121,6 @@ private:
 	DECLARE_WRITE8_MEMBER(ide2_write_cs1_w);
 	DECLARE_READ8_MEMBER(at_dma8237_2_r);
 	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
-	DECLARE_READ8_MEMBER(at_keybc_r);
-	DECLARE_WRITE8_MEMBER(at_keybc_w);
 	DECLARE_WRITE8_MEMBER(write_rtc);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);

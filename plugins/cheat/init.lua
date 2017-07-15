@@ -113,7 +113,7 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "r")
+		local file = io.open(lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
 		if not file then
 			return
 		end
@@ -121,13 +121,7 @@ function cheat.startplugin()
 		for num, val in ipairs(hotkeys) do
 			for num, cheat in pairs(cheats) do
 				if val.desc == cheat.desc then
-					cheat.hotkeys = {}
-					local keymap = require("cheat/keycodemap")
-					cheat.hotkeys.keys = manager:machine():input():seq_from_tokens(val.keys)
-					local keysstr = {}
-					val.keys:gsub("([^ ]+)", function(s) keysstr[#keysstr + 1] = keymap[s] return s end)
-					cheat.hotkeys.keysstr = keysstr
-					cheat.hotkeys.pressed = false
+					cheat.hotkeys = {pressed = false, keys = manager:machine():input():seq_from_tokens(val.keys)}
 				end
 			end
 		end
@@ -137,22 +131,32 @@ function cheat.startplugin()
 		local hotkeys = {}
 		for num, cheat in ipairs(cheats) do
 			if cheat.hotkeys then
-				local keymap = require("cheat/keycodemap")
-				local hotkey = {}
-				hotkey.desc = cheat.desc
-				hotkey.keys = ""
-				for num2, key in ipairs(cheat.hotkeys.keysstr) do
-					if #hotkey.keys > 0 then
-						hotkey.keys = hotkey.keys .. " "
-					end
-					hotkey.keys = hotkey.keys .. keymap[key]
+				local hotkey = {desc = cheat.desc, keys = manager:machine():input():seq_to_tokens(cheat.hotkeys.keys)}
+				if hotkey.keys ~= "" then
+					hotkeys[#hotkeys + 1] = hotkey
 				end
-				hotkeys[#hotkeys + 1] = hotkey
 			end
 		end
 		if #hotkeys > 0 then
 			local json = require("json")
-			local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "w+")
+			local path = lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)"))
+			local attr = lfs.attributes(path)
+			if not attr then
+				lfs.mkdir(path)
+			elseif attr.mode ~= "directory" then -- uhhh?
+				return
+			end
+			if cheatname:find("/", 1, true) then
+				local softpath = path .. "/" .. cheatname:match("([^/]+)")
+				local attr = lfs.attributes(softpath)
+				if not attr then
+					lfs.mkdir(softpath)
+				elseif attr.mode ~= "directory" then -- uhhh?
+					return
+				end
+			end
+
+			local file = io.open(path .. "/" .. cheatname .. "_hotkeys.json", "w+")
 			if file then
 				file:write(json.stringify(hotkeys, {indent = true}))
 				file:close()
@@ -335,9 +339,6 @@ function cheat.startplugin()
 	end
 
 	local hotkeymenu = false
-	local hotkeysel = 0
-	local hotkey = 1
-	local hotmod = 1
 	local hotkeylist = {}
 	local function run_if(func) if func then func() end return func or false end
 	local function is_oneshot(cheat) return cheat.script and not cheat.script.run and not cheat.script.off end
@@ -345,86 +346,26 @@ function cheat.startplugin()
 	local function menu_populate()
 		local menu = {}
 		if hotkeymenu then
-			if hotkeysel > 0 then
-				return hotkeylist[hotkeysel].pop()
-			end
-			local keys = {"1","2","3","4","5","6","7","8","9","0"}
-			local mods = {"LSHFT","RSHFT","LALT","RALT","LCTRL","RCTRL","LWIN","RWIN","MENU"}
-
-			local function hkpopfunc(cheat)
-				local hkmenu = {}
-				hkmenu[1] = {"Set hotkey", "", "off"}
-				hkmenu[2] = {cheat.desc, "", "off"}
-				hkmenu[3] = {"Current Keys", cheat.hotkeys and table.concat(cheat.hotkeys.keysstr, " ") or "None", "off"}
-				hkmenu[4] = {"---", "", "off"}
-				hkmenu[5] = {"Key", keys[hotkey], "lr"}
-				if hotkey == 1 then
-					hkmenu[5][3] = "r"
-				elseif hotkey == #keys then
-					hkmenu[5][3] = "l"
-				end
-				hkmenu[6] = {"Modifier", mods[hotmod], "lr"}
-				if hotkey == 1 then
-					hkmenu[6][3] = "r"
-				elseif hotkey == #keys then
-					hkmenu[6][3] = "l"
-				end
-				hkmenu[7] = {"---", "", ""}
-				hkmenu[8] = {"Done", "", ""}
-				hkmenu[9] = {"Clear and Exit", "", ""}
-				hkmenu[10] = {"Cancel", "", ""}
-				return hkmenu
-			end
-
-			local function hkcbfunc(cheat, index, event)
-				if event == "right" then
-					if index == 5 then
-						hotkey = math.min(hotkey + 1, #keys)
-						return true
-					elseif index == 6 then
-						hotmod = math.min(hotmod + 1, #mods)
-						return true
-					end
-				elseif event == "left" then
-					if index == 5 then
-						hotkey = math.max(hotkey - 1, 1)
-						return true
-					elseif index == 6 then
-						hotmod = math.max(hotmod - 1, 1)
-						return true
-					end
-				elseif event == "select" then
-					if index == 8 then
-						local keymap = require("cheat/keycodemap")
-						cheat.hotkeys = {}
-						cheat.hotkeys.keys = manager:machine():input():seq_from_tokens(keymap[keys[hotkey]] .. " " .. keymap[mods[hotmod]])
-						cheat.hotkeys.keysstr = {keys[hotkey], mods[hotmod]}
-						cheat.hotkeys.pressed = false
-						hotkeysel = 0
-						hotkeymenu = false
-						return true
-					elseif index == 9 then
-						cheat.hotkeys = nil
-						hotkeysel = 0
-						hotkeymenu = false
-						return true
-					elseif index == 10 then
-						hotkeysel = 0
-						return true
-					end
-				end
-				return false
-			end
-
-
 			menu[1] = {"Select cheat to set hotkey", "", "off"}
 			menu[2] = {"---", "", "off"}
 			hotkeylist = {}
+
+			local function hkcbfunc(cheat)
+				local input = manager:machine():input()
+				manager:machine():popmessage("Press button for hotkey or wait to clear")
+				manager:machine():video():frame_update(true)
+				input:seq_poll_start("switch")
+				local time = os.clock()
+				while (not input:seq_poll()) and (os.clock() < time + 1) do end
+				cheat.hotkeys = {pressed = false, keys = input:seq_poll_final()}
+				manager:machine():popmessage()
+				manager:machine():video():frame_update(true)
+			end
+
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
-					menu[#menu + 1] = {cheat.desc, " ", ""}
-					hotkeylist[#hotkeylist + 1] = { pop = function() return hkpopfunc(cheat) end,
-													cb = function(index, event) return hkcbfunc(cheat, index, event) end }
+					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager:machine():input():seq_name(cheat.hotkeys.keys) or "None", ""}
+					hotkeylist[#hotkeylist + 1] = function() return hkcbfunc(cheat) end
 				end
 			end
 			menu[#menu + 1] = {"---", "", ""}
@@ -484,13 +425,10 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager:machine():popmessage()
 		if hotkeymenu then
-			if hotkeysel > 0 then
-				return hotkeylist[hotkeysel].cb(index, event)
-			end
 			if event == "select" then
 				index = index - 2
 				if index >= 1 and index <= #hotkeylist then
-					hotkeysel = index
+					hotkeylist[index]()
 					return true
 				elseif index == #hotkeylist + 2 then
 					hotkeymenu = false

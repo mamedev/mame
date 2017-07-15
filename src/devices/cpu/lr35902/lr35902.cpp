@@ -86,6 +86,12 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 {
 }
 
+device_memory_interface::space_config_vector lr35902_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 /****************************************************************************/
 /* Memory functions                                                         */

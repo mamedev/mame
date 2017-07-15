@@ -78,9 +78,11 @@ void namco_c139_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *namco_c139_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector namco_c139_device::memory_space_config() const
 {
-	return (spacenum == AS_DATA) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_DATA, &m_space_config)
+	};
 }
 
 //**************************************************************************

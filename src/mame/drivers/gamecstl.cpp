@@ -170,14 +170,14 @@ uint32_t gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_in
 static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("MTXC: read %d, %02X\n", function, reg);
+	state->logerror("MTXC: read %d, %02X\n", function, reg);
 	return state->m_mtxc_config_reg[reg];
 }
 
 static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("%s:MTXC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	state->logerror("%s:MTXC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -255,14 +255,14 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("PIIX4: read %d, %02X\n", function, reg);
+	state->logerror("PIIX4: read %d, %02X\n", function, reg);
 	return state->m_piix4_config_reg[function][reg];
 }
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	state->logerror("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
 	state->m_piix4_config_reg[function][reg] = data;
 }
 

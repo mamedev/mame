@@ -263,18 +263,6 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 	}
 }
 
-READ8_MEMBER(exprraid_state::sound_cpu_command_r)
-{
-	m_slave->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
-WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_slave->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 WRITE8_MEMBER(exprraid_state::exprraid_int_clear_w)
 {
 	m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
@@ -296,7 +284,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")    /* Coins */
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")   /* DSW 1 */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(exprraid_int_clear_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(sound_cpu_command_w)
+	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(exprraid_flipscreen_w)
 	AM_RANGE(0x2003, 0x2003) AM_WRITENOP // DMA SWAP - Allow writes to video and sprite RAM
 	AM_RANGE(0x2800, 0x2800) AM_READ(exprraid_prot_data_r)
@@ -316,7 +304,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_READ(sound_cpu_command_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -529,6 +517,7 @@ static MACHINE_CONFIG_START( exprraid )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("slave", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

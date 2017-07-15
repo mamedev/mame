@@ -75,6 +75,12 @@ ROM_START(macgalxy)
 	ROM_LOAD("galaxy2.bin", 0x2000, 0x2000, CRC(f0efb723) SHA1(697b3c9f3ebedca1087354eda5dfe9719d497045))
 ROM_END
 
+ROM_START(macjungl)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("jungle1.bin", 0x0000, 0x2000, CRC(461a3e1b) SHA1(96981b4d8db0412c474169eaf5e5386be5006ffe))
+	ROM_LOAD("jungle2.bin", 0x2000, 0x2000, CRC(26b53e6e) SHA1(e588787b2381c0e6a42590f0e7d18d2a74ebf5f0))
+ROM_END
+
 ROM_START(spctrain)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("mbm27128.25", 0x0000, 0x4000, CRC(d65c5c36) SHA1(6f350b48daaecd36b3086e682ec6ee174f297a34))
@@ -132,6 +138,7 @@ ROM_END
 
 // MAC S.A. pinballs
 GAME( 1986, macgalxy, 0, macp0,   macp, macp_state, 0, ROT0, "MAC S.A.", "MAC's Galaxy",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, macjungl, 0, macp0,   macp, macp_state, 0, ROT0, "MAC S.A.", "MAC Jungle",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, spctrain, 0, macp,    macp, macp_state, 0, ROT0, "MAC S.A.", "Space Train (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1988, spcpnthr, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "Space Panther",            MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 19??, mac_1808, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "Unknown Game (MAC #1808)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM                                                 // SCRATCH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, turbo_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -974,7 +974,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( buckrogu, buckrog )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
 

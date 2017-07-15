@@ -57,17 +57,21 @@ TODO:
 
     Chip                RAM     NVRAM   ROM     SCI     r15-f   ports
     -----------------------------------------------------------------
-    MC6800              -       -       -       no      no      4
-    MC6802              128     32      -       no      no      4
-    MC6802NS            128     -       -       no      no      4
-    MC6808              -       -       -       no      no      4
+    MC6800              -       -       -       no      no      -
+    MC6802              128     32      -       no      no      -
+    MC6802NS            128     -       -       no      no      -
+    MC6808              -       -       -       no      no      -
 
     MC6801              128     64      2K      yes     no      4
-    MC68701             128     64      -       yes     no      4
+    MC68701             128     64      2K      yes     no      4
     MC6803              128     64      -       yes     no      4
+    MC6803NR            -       -       -       yes     no      4
 
     MC6801U4            192     32      4K      yes     yes     4
     MC6803U4            192     32      -       yes     yes     4
+
+    MC68120             128(DP) -       2K      yes     IPC     3
+    MC68121             128(DP) -       -       yes     IPC     3
 
     HD6801              128     64      2K      yes     no      4
     HD6301V             128     -       4K      yes     no      4
@@ -165,7 +169,6 @@ TODO:
 #define CLR_HNZC    CC&=0xd2
 #define CLR_NZVC    CC&=0xf0
 #define CLR_Z       CC&=0xfb
-#define CLR_NZC     CC&=0xf2
 #define CLR_ZC      CC&=0xfa
 #define CLR_C       CC&=0xfe
 
@@ -270,6 +273,7 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 /* Macros for branch instructions */
 #define BRANCH(f) {IMMBYTE(t);if(f){PC+=SIGNED(t);}}
 #define NXORV  ((CC&0x08)^((CC&0x02)<<2))
+#define NXORC  ((CC&0x08)^((CC&0x01)<<3))
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
@@ -358,16 +362,18 @@ nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-const address_space_config *m6800_cpu_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector m6800_cpu_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config)
+		};
 }
-
 
 uint32_t m6800_cpu_device::RM16(uint32_t Addr )
 {
@@ -459,7 +465,7 @@ void m6800_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_decrypted_opcodes = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_program;
+	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
 	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
 
 	m_pc.d = 0;

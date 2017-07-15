@@ -43,7 +43,9 @@
     Sound FIFO empty   |          |   IOASIC Summary   |          |              |
     -------(0x0008)--->|          |----------(0x04)--->|          |              |
                        |__________|                    |__________|              |
-                                                                                 |
+                                      NSS/Hi-Link  (0x08)                        |
+                                      A2D IRQ      (0x02)                        |
+                                      SIO Watchdog (0x01)                        |
  +-------------------------------------------------------------------------------+
  |
  |                      __________                      __________
@@ -62,7 +64,6 @@
     UART Transmit      |          |----------(IRQ0)--->|          |
     -------(0x0010)--->|          |                    |__________|
                        |__________|
-
 
 ***************************************************************************
 
@@ -320,7 +321,8 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN.%u", 0)
+		m_io_analog(*this, "AN.%u", 0),
+		m_a2d_shift(0)
 	{ }
 
 	required_device<mips3_device> m_maincpu;
@@ -330,7 +332,7 @@ public:
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
-
+	int m_a2d_shift;
 	uint8_t m_vblank_state;
 	uint8_t m_cpuio_data[4];
 	uint8_t m_sio_irq_clear;
@@ -340,6 +342,7 @@ public:
 	uint8_t m_pending_analog_read;
 	uint8_t m_cmos_unlocked;
 	uint8_t m_dcs_idma_cs;
+	uint32_t m_i40_data;
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 	DECLARE_DRIVER_INIT(gauntleg);
@@ -358,7 +361,8 @@ public:
 
 	void update_sio_irqs();
 
-
+	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
 	DECLARE_WRITE32_MEMBER(timekeeper_w);
 	DECLARE_READ32_MEMBER(timekeeper_r);
 	void reset_sio(void);
@@ -381,8 +385,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 	DECLARE_READ32_MEMBER(unknown_r);
-};
+	DECLARE_WRITE32_MEMBER(i40_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 
+	std::string sioIRQString(uint8_t data);
+
+};
 
 /*************************************
  *
@@ -421,6 +429,7 @@ void vegas_state::machine_start()
 	save_item(NAME(m_sio_led_state));
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_cmos_unlocked));
+	save_item(NAME(m_i40_data));
 }
 
 
@@ -437,8 +446,37 @@ void vegas_state::machine_reset()
 	memset(m_cpuio_data, 0, ARRAY_LENGTH(m_cpuio_data));
 	// Clear SIO registers
 	reset_sio();
+	m_i40_data = 0;
 }
 
+/*************************************
+*  Watchdog interrupts
+*************************************/
+WRITE_LINE_MEMBER(vegas_state::watchdog_irq)
+{
+	if (state && !(m_sio_irq_state & 0x01)) {
+		logerror("%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
+		m_sio_irq_state |= 0x01;
+		update_sio_irqs();
+	}
+	else if (!state && (m_sio_irq_state & 0x01)) {
+		//logerror("%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
+		m_sio_irq_state &= ~0x01;
+		update_sio_irqs();
+	}
+}
+
+/*************************************
+*  Watchdog Reset
+*************************************/
+WRITE_LINE_MEMBER(vegas_state::watchdog_reset)
+{
+	if (state) {
+		//printf("vegas_state::watchdog_reset!!!\n");
+		logerror("vegas_state::watchdog_reset!!!\n");
+		machine().schedule_soft_reset();
+	}
+}
 
 /*************************************
  *
@@ -491,6 +529,15 @@ READ32_MEMBER( vegas_state::timekeeper_r )
  *  SIO interrupts
  *
  *************************************/
+std::string vegas_state::sioIRQString(uint8_t data)
+{
+	std::string sioBitDef[6] = { "SIO_WD", "A2D", "IOASIC", "NSS", "ETHER", "VSYNC" };
+	std::string sioBitSel = "";
+	for (int i = 0; i < 6; i++)
+		if (data & (1 << i)) sioBitSel += " " + sioBitDef[i];
+	return sioBitSel;
+
+}
 
 void vegas_state::update_sio_irqs()
 {
@@ -500,16 +547,25 @@ void vegas_state::update_sio_irqs()
 	else {
 		m_nile->pci_intr_c(CLEAR_LINE);
 	}
-	//logerror("update_sio_irqs: m_sio_irq_state: %02x\n", m_sio_irq_state);
+	if (LOG_SIO) {
+		std::string sioEnable = sioIRQString(m_sio_irq_enable);
+		std::string sioState = sioIRQString(m_sio_irq_state);
+		logerror("update_sio_irqs: irq_enable: %02x %s irq_state: %02x %s\n", m_sio_irq_enable, sioEnable, m_sio_irq_state, sioState);
+	}
 }
 
 
 WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 {
+	if (LOG_SIO)
+		logerror("vblank_assert: state: %d\n", state);
 	if (!m_vblank_state && state)
 	{
 		m_sio_irq_state |= 0x20;
 		update_sio_irqs();
+	}
+	else if (m_vblank_state && !state) {
+		m_sio_irq_state &= ~0x20;
 	}
 	m_vblank_state = state;
 }
@@ -556,14 +612,26 @@ READ8_MEMBER(vegas_state::sio_r)
 	case 1:
 		// Interrupt Enable
 		result = m_sio_irq_enable;
+		if (LOG_SIO) {
+			std::string sioBitSel = sioIRQString(result);
+			logerror("%08X: sio_r: INTR ENABLE 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
+		}
 		break;
 	case 2:
 		// Interrupt Cause
 		result = m_sio_irq_state & m_sio_irq_enable;
+		if (LOG_SIO) {
+			std::string sioBitSel = sioIRQString(result);
+			logerror("%08X: sio_r: INTR CAUSE 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
+		}
 		break;
 	case 3:
 		// Interrupt Status
 		result = m_sio_irq_state;
+		if (LOG_SIO) {
+			std::string sioBitSel = sioIRQString(result);
+			logerror("%08X: sio_r: INTR STATUS 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
+		}
 		break;
 	case 4:
 		// LED
@@ -600,7 +668,7 @@ READ8_MEMBER(vegas_state::sio_r)
 		break;
 	}
 	}
-	if (LOG_SIO)
+	if (LOG_SIO && (index < 0x1 || index > 0x4))
 		logerror("%08X: sio_r: offset: %08x index: %d result: %02X\n", machine().device("maincpu")->safe_pc(), offset, index, result);
 	return result;
 }
@@ -608,6 +676,7 @@ READ8_MEMBER(vegas_state::sio_r)
 
 WRITE8_MEMBER(vegas_state::sio_w)
 {
+	// Bit 0 of data is used to program the 6016 FPGA in programming mode (m_cpio_data[3](Bit 0)==0)
 	if (m_cpuio_data[3] & 0x1) {
 		int index = offset >> 12;
 		switch (index) {
@@ -615,21 +684,20 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			if (LOG_SIO)
 				logerror("sio_w: Reset Control offset: %08x index: %d data: %02X\n", offset, index, data);
 			// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
-			m_sio_irq_clear = data;
 
-			/* bit 0x01 seems to be used to reset the IOASIC */
+			/* bit 0x01 is used to reset the IOASIC */
 			if (!(data & 0x01))
 			{
 				m_ioasic->ioasic_reset();
 				m_dcs->reset_w(data & 0x01);
 			}
-
-			/* they toggle bit 0x08 low to reset the VBLANK */
+			/* toggle bit 0x08 low to reset the VBLANK */
 			if (!(data & 0x08))
 			{
 				m_sio_irq_state &= ~0x20;
 				update_sio_irqs();
 			}
+			m_sio_irq_clear = data;
 			break;
 		case 1:
 			// Interrupt Enable
@@ -639,13 +707,18 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			// Bit 3 => NSS / Hi-Link
 			// Bit 4 => Ethernet
 			// Bit 5 => Vsync
-			if (LOG_SIO)
-				logerror("sio_w: Interrupt Enable offset: %08x index: %d data: %02X\n", offset, index, data);
+			if (LOG_SIO) {
+				std::string sioBitSel = sioIRQString(data);
+				logerror("sio_w: Interrupt Enable 0x%02x %s\n", data, sioBitSel);
+				//logerror("sio_w: Interrupt Enable offset: %08x index: %d data: %02X\n", offset, index, data);
+			}
 			m_sio_irq_enable = data;
 			update_sio_irqs();
 			break;
 		case 4:
 			// LED
+			if (LOG_SIO)
+				logerror("sio_w: LED offset: %08x index: %d data: %02X\n", offset, index, data);
 			m_sio_led_state = data;
 			break;
 		case 6:
@@ -654,11 +727,12 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			break;
 		case 7:
 			// Watchdog
-			space.device().execute().eat_cycles(100);
+			m_timekeeper->watchdog_write(space, offset, data);
+			if (LOG_SIO)
+				logerror("sio_w: Watchdog: %08x index: %d data: %02X\n", offset, index, data);
+			//space.device().execute().eat_cycles(100);
 			break;
 		}
-		if (LOG_SIO && index != 6)
-			logerror("sio_w: offset: %08x index: %d data: %02X\n", offset, index, data);
 	}
 }
 
@@ -674,24 +748,64 @@ WRITE8_MEMBER(vegas_state::cpu_io_w)
 	// 1: PLD Config / Clock Gen
 	// 2: PLD Status / Jammma Serial Sense
 	// 3: System Reset Bit 0=>enable sio, Bit 1=>enable ide, Bit 2=>enable PCI
-	if (1 && offset != 0)
-		logerror("%08X:cpuio write to offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
-	if (offset < 4)
-		m_cpuio_data[offset] = data;
-	if (offset == 1)
+	m_cpuio_data[offset] = data;
+	switch (offset) {
+	case 0:
+	{
+		char digit = 'U';
+		switch (data & 0xff) {
+		case 0xc0: digit = '0'; break;
+		case 0xf9: digit = '1'; break;
+		case 0xa4: digit = '2'; break;
+		case 0xb0: digit = '3'; break;
+		case 0x99: digit = '4'; break;
+		case 0x92: digit = '5'; break;
+		case 0x82: digit = '6'; break;
+		case 0xf8: digit = '7'; break;
+		case 0x80: digit = '8'; break;
+		case 0x90: digit = '9'; break;
+		case 0x88: digit = 'A'; break;
+		case 0x83: digit = 'B'; break;
+		case 0xc6: digit = 'C'; break;
+		case 0xa7: digit = 'c'; break;
+		case 0xa1: digit = 'D'; break;
+		case 0x86: digit = 'E'; break;
+		case 0x87: digit = 'F'; break;
+		case 0x7f: digit = '.'; break;
+		case 0xf7: digit = '_'; break;
+		case 0xbf: digit = '|'; break;
+		case 0xfe: digit = '-'; break;
+		case 0xff: digit = 'Z'; break;
+		}
+		if (LOG_SIO) {
+			popmessage("System LED: %C", digit);
+			//logerror("%08X: cpu_io_w System LED offset %X = %02X '%c'\n", machine().device("maincpu")->safe_pc(), offset, data, digit);
+		}
+	}
+		break;
+	case 1:
 		m_cpuio_data[2] = (m_cpuio_data[2] & ~0x02) | ((m_cpuio_data[1] & 0x01) << 1) | (m_cpuio_data[1] & 0x01);
-	if (offset == 1) {
 		if (!(data & 0x1)) {
 			// Need to clear this register while programming SIO FPGA so that fpga config data doesn't register in sio_w
 			m_cpuio_data[3] &= ~0x1;
 			// Reset the SIO registers
 			reset_sio();
 		}
-	}
-	if (offset == 3) {
-		if (!(data & 0x2)) {
-			// Reset IDE
-		}
+		if (LOG_SIO)
+			logerror("%08X: cpu_io_w PLD Config offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+		break;
+	case 2:
+		if (LOG_SIO && (m_cpuio_data[3] & 0x1))
+			logerror("%08X: cpu_io_w PLD Status / Jamma Serial Sense offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+		break;
+	case 3:
+		// Bit 0: Enable SIO, Bit 1: Enable SIO_R0/IDE, Bit 2: Enable PCI
+		if (LOG_SIO)
+			logerror("%08X: cpu_io_w System Reset offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+		break;
+	default:
+		logerror("%08X: cpu_io_w unknown offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+		break;
 	}
 }
 
@@ -700,8 +814,8 @@ READ8_MEMBER( vegas_state::cpu_io_r )
 	uint32_t result = 0;
 	if (offset < 4)
 		result = m_cpuio_data[offset];
-	if (LOG_SIO && offset != 2)
-		logerror("%08X:cpuio read from offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, result);
+	if (LOG_SIO && !(offset == 2 && !(m_cpuio_data[3] & 0x1)))
+		logerror("%08X:cpu_io_r offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, result);
 	return result;
 }
 
@@ -715,15 +829,28 @@ READ8_MEMBER( vegas_state::cpu_io_r )
 
 READ32_MEMBER( vegas_state::analog_port_r )
 {
-	return m_pending_analog_read;
+	//logerror("%08X: analog_port_r = %08X & %08X\n", machine().device("maincpu")->safe_pc(), m_pending_analog_read, mem_mask);
+	// Clear interrupt
+	if (m_sio_irq_enable & 0x02) {
+		m_sio_irq_state &= ~0x02;
+		update_sio_irqs();
+	}
+	// TODO: Need to look at the proper shift value for sf2049
+	return m_pending_analog_read << (m_a2d_shift << 0);
 }
 
 
 WRITE32_MEMBER( vegas_state::analog_port_w )
 {
-	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", safe_pc(), data);
-	m_pending_analog_read = m_io_analog[data & 7].read_safe(0);
+	uint32_t shift_data = data >> m_a2d_shift;
+	int index = shift_data & 0x7;
+	m_pending_analog_read = (m_io_analog[index].read_safe(0));
+	//logerror("%08X: analog_port_w = %08X & %08X index = %d\n", machine().device("maincpu")->safe_pc(), data, mem_mask, index);
+	if (m_sio_irq_enable & 0x02) {
+		m_sio_irq_state |= 0x02;
+		update_sio_irqs();
+	}
+
 }
 
 
@@ -746,6 +873,7 @@ READ32_MEMBER( vegas_state::ethernet_r )
 		result |= m_ethernet->read(space, offset * 2 + 0, mem_mask);
 	if (ACCESSING_BITS_16_31)
 		result |= m_ethernet->read(space, offset * 2 + 1, mem_mask >> 16) << 16;
+	logerror("ethernet_r: offset %08x = %08x\n", offset, result);
 	return result;
 }
 
@@ -756,6 +884,7 @@ WRITE32_MEMBER( vegas_state::ethernet_w )
 		m_ethernet->write(space, offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
 		m_ethernet->write(space, offset * 2 + 1, data >> 16, mem_mask >> 16);
+	logerror("ethernet_w: offset %08x = %08x & %08x\n", offset, data, mem_mask);
 }
 
 
@@ -770,6 +899,61 @@ READ32_MEMBER(vegas_state::unknown_r)
 	if (1)
 		logerror("unknown_r: offset: %08X data: %08X mask: %08X\n", offset * 4, result, mem_mask);
 	return result;
+}
+
+/*************************************
+* Optical 49 Way Joystick I40 Board
+*************************************/
+WRITE32_MEMBER(vegas_state::i40_w)
+{
+	//printf("i40_w: data = %08x\n", data);
+	//logerror("i40_w: data = %08x\n", data);
+	m_i40_data = data;
+}
+
+CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
+{
+	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+	int index = m_i40_data & 0xf;
+	uint8_t data = 0;
+	switch (index) {
+	case 0:
+		data = translate49[ioport("49WAYX_P1")->read() >> 4];
+		break;
+	case 1:
+		data = translate49[ioport("49WAYY_P1")->read() >> 4];
+		break;
+	case 2:
+		data = translate49[ioport("49WAYX_P2")->read() >> 4];
+		break;
+	case 3:
+		data = translate49[ioport("49WAYY_P2")->read() >> 4];
+		break;
+	case 4:
+		data = translate49[ioport("49WAYX_P3")->read() >> 4];
+		break;
+	case 5:
+		data = translate49[ioport("49WAYY_P3")->read() >> 4];
+		break;
+	case 6:
+		data = translate49[ioport("49WAYX_P4")->read() >> 4];
+		break;
+	case 7:
+		data = translate49[ioport("49WAYY_P4")->read() >> 4];
+		break;
+	case 10:
+	case 11:
+	case 12:
+		// I40 Detection
+		data = ~index & 0xf;
+		break;
+	default:
+		break;
+	}
+	//if (m_i40_data & 0x1000)
+	//	printf("%08X: i40_r: select: %x index: %d data: %x\n", machine().device("maincpu")->safe_pc(), m_i40_data, index, data);
+	//m_i40_data &= ~0x1000;
+	return data;
 }
 
 /*************************************
@@ -881,6 +1065,16 @@ static INPUT_PORTS_START( vegas_common )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN.0") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_START("AN.1") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_START("AN.2") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_START("AN.3") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_START("AN.4") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_START("AN.5") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_START("AN.6") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_START("AN.7") PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+
 INPUT_PORTS_END
 
 
@@ -994,7 +1188,7 @@ static INPUT_PORTS_START( warfa )
 	PORT_DIPSETTING( 0x4000, "Medium Res 512x384" )
 	PORT_DIPSETTING( 0x0000, "VGA Res 640x480" )
 
-	   PORT_MODIFY("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_J) PORT_NAME("Trigger")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_K) PORT_NAME("Discard")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_L) PORT_NAME("Jump")
@@ -1004,29 +1198,12 @@ static INPUT_PORTS_START( warfa )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(KEYCODE_A) PORT_NAME("Dodge Left")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(KEYCODE_D) PORT_NAME("Dodge Right")
 
-	PORT_START("AN.0")
+	PORT_MODIFY("AN.0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN.1")
+	PORT_MODIFY("AN.1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN.2")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
 
@@ -1048,29 +1225,15 @@ static INPUT_PORTS_START( roadburn )
 	PORT_DIPSETTING(      0x0200, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" )
 
-	PORT_START("AN.0")   /* Accel */
+	PORT_MODIFY("AN.0")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("AN.1")   /* Steer */
+	PORT_MODIFY("AN.1")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("AN.2")   /* Brake */
+	PORT_MODIFY("AN.2")   /* Seat Tilt */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("AN.3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
 
@@ -1083,39 +1246,30 @@ static INPUT_PORTS_START( nbashowt )
 	PORT_DIPSETTING(      0x0000, "CMOS" )
 	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x000e, "Mode 1" )
-	PORT_DIPSETTING(      0x0008, "Mode 2" )
-	PORT_DIPSETTING(      0x0009, "Mode 3" )
-	PORT_DIPSETTING(      0x0002, "Mode 4" )
-	PORT_DIPSETTING(      0x000c, "Mode ECA" )
-//  PORT_DIPSETTING(      0x0004, "Not Used 1" )        /* Marked as Unused in the manual */
-//  PORT_DIPSETTING(      0x0008, "Not Used 2" )        /* Marked as Unused in the manual */
+	PORT_DIPSETTING(      0x000c, "Mode 2" )
+	PORT_DIPSETTING(      0x000a, "Mode 3" )
+	PORT_DIPSETTING(      0x0008, "Mode 4" )
+	PORT_DIPSETTING(      0x0006, "Mode 5")
+	PORT_DIPSETTING(      0x0004, "Mode 6")
+	PORT_DIPSETTING(      0x0002, "Mode 7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x0030, 0x0030, "Curency Type" )
 	PORT_DIPSETTING(      0x0030, DEF_STR( USA ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
-//  PORT_DIPSETTING(      0x0000, "Not Used" )      /* Marked as Unused in the manual */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )  /* Marked as Unused in the manual */
-	PORT_DIPSETTING(      0x0040, "0" )
-	PORT_DIPSETTING(      0x0000, "1" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Game" )
+	PORT_DIPUNUSED( 0x0040, 0x0000 )
+	PORT_DIPNAME( 0x0080, 0x0080, "Game Powerup" )
 	PORT_DIPSETTING(      0x0080, "NBA Showtime" )
-	PORT_DIPSETTING(      0x0000, "Blitz 99" )
-	PORT_DIPNAME( 0x0100, 0x0100, "Joysticks" )
+	PORT_DIPSETTING(      0x0000, "NFL Blitz" )
+	PORT_DIPNAME( 0x0100, 0x0000, "Joysticks" )
 	PORT_DIPSETTING(      0x0100, "8-Way" )
 	PORT_DIPSETTING(      0x0000, "49-Way" )
-	PORT_DIPNAME( 0x0600, 0x0200, "Graphics Mode" )
-	PORT_DIPSETTING(      0x0200, "512x385 @ 25KHz" )
-	PORT_DIPSETTING(      0x0400, "512x256 @ 15KHz" )
-//  PORT_DIPSETTING(      0x0600, "0" )         /* Marked as Unused in the manual */
-//  PORT_DIPSETTING(      0x0000, "3" )         /* Marked as Unused in the manual */
-	PORT_DIPNAME( 0x1800, 0x1800, "Graphics Speed" )
-	PORT_DIPSETTING(      0x0000, "45 MHz" )
-	PORT_DIPSETTING(      0x0800, "47 MHz" )
-	PORT_DIPSETTING(      0x1000, "49 MHz" )
-	PORT_DIPSETTING(      0x1800, "51 MHz" )
-	PORT_DIPNAME( 0x2000, 0x0000, "Number of Players" )
+	PORT_DIPNAME( 0x0200, 0x0200, "Graphics Mode" )
+	PORT_DIPSETTING(      0x0200, "Med Res" )
+	PORT_DIPSETTING(      0x0000, "Low Res" )
+	PORT_DIPUNUSED(       0x1c00, 0x1c00 )
+	PORT_DIPNAME( 0x2000, 0x2000, "Number of Players" )
 	PORT_DIPSETTING(      0x2000, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPNAME( 0x4000, 0x0000, "Power On Self Test" )
@@ -1124,6 +1278,55 @@ static INPUT_PORTS_START( nbashowt )
 	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED) // P1 Joystick
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED) // P2 Joystick
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED) // P3 Joystick
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegas_state, i40_r, nullptr)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("49WAYX_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYY_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYX_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("49WAYY_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("49WAYX_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYY_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYX_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
+
+	PORT_START("49WAYY_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
+
 INPUT_PORTS_END
 
 
@@ -1139,96 +1342,43 @@ static INPUT_PORTS_START( sf2049 )
 	PORT_DIPNAME( 0x0080, 0x0080, "PM Dump" )
 	PORT_DIPSETTING(      0x0080, "Watchdog resets only" )
 	PORT_DIPSETTING(      0x0000, "All resets" )
-	PORT_DIPNAME( 0x0100, 0x0200, "Resolution" )
-	PORT_DIPSETTING(      0x0000, "Standard Res 512x256" )
+	PORT_DIPNAME( 0x0300, 0x0200, "Resolution" )
+	PORT_DIPSETTING(      0x0300, "Standard Res 512x256" )
 	PORT_DIPSETTING(      0x0200, "Medium Res 512x384" )
-	PORT_DIPSETTING(      0x0300, "VGA Res 640x480" )
+	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" )
 
-	PORT_START("AN.0")   /* Steer */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 ) // Gear Reverse
 
-	PORT_START("AN.1")   /* Accel */
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) // Gear 1
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) // Gear 2
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) // Gear 3
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) // Gear 4
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN.2")   /* Brake */
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
+	PORT_MODIFY("AN.2")   /* Accel */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
-	PORT_START("AN.3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_MODIFY("AN.3")   /* Clutch */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN.4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_MODIFY("AN.6")   /* Brake */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN.5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( sf2049se )
-	PORT_INCLUDE(vegas_common)
-
-	PORT_MODIFY("DIPS")
-
-	PORT_START("AN.0")   /* Steer */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
-
-	PORT_START("AN.1")   /* Accel */
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
-
-	PORT_START("AN.2")   /* Brake */
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
-
-	PORT_START("AN.3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( sf2049te )
-	PORT_INCLUDE(vegas_common)
-
-	PORT_MODIFY("DIPS")
-
-	PORT_START("AN.0")   /* Steer */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
-
-	PORT_START("AN.1")   /* Accel */
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
-
-	PORT_START("AN.2")   /* Brake */
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
-
-	PORT_START("AN.3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_MODIFY("AN.7")   /* Steer */
+	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
 
@@ -1237,29 +1387,15 @@ static INPUT_PORTS_START( cartfury )
 
 	PORT_MODIFY("DIPS")
 
-	PORT_START("AN.0")   /* Steer */
+	PORT_MODIFY("AN.0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN.1")   /* Accel */
+	PORT_MODIFY("AN.1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN.2")   /* Brake */
+	PORT_MODIFY("AN.2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
-	PORT_START("AN.3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
-
-	PORT_START("AN.7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
 /*************************************
@@ -1337,6 +1473,8 @@ static MACHINE_CONFIG_START( vegascore )
 	MCFG_VOODOO_VBLANK_CB(DEVWRITELINE(":", vegas_state, vblank_assert))
 
 	MCFG_M48T37_ADD("timekeeper")
+	MCFG_M48T37_RESET_HANDLER(WRITELINE(vegas_state, watchdog_reset))
+	MCFG_M48T37_IRQ_HANDLER(WRITELINE(vegas_state, watchdog_irq))
 
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(vegas_state, ethernet_interrupt))
@@ -1414,7 +1552,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
@@ -1427,7 +1565,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -1440,7 +1578,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
@@ -1453,7 +1591,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb) -- Not in ram???
+    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -1466,7 +1604,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( roadburn, vegas32m )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0) /* no place to hook :-( */
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200a)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -1482,10 +1620,12 @@ static MACHINE_CONFIG_DERIVED( nbashowt, vegasban )
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
-	MCFG_MIDWAY_IOASIC_UPPER(528/* or 478 or 487 */)
+	// 528 494 478 development pic, 487 NBA
+	MCFG_MIDWAY_IOASIC_UPPER(487/* or 478 or 487 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
@@ -1497,7 +1637,8 @@ static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
 	MCFG_MIDWAY_IOASIC_UPPER(498/* or 478 or 487 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nbagold, vegasban)
@@ -1506,15 +1647,17 @@ static MACHINE_CONFIG_DERIVED( nbagold, vegasban)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
-	MCFG_MIDWAY_IOASIC_UPPER(494 /* ??? */)
+	MCFG_MIDWAY_IOASIC_UPPER( 494 /* 494 ??? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2049 , denver )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(16)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -1526,7 +1669,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2049se, denver )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(16)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
@@ -1538,7 +1681,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2049te, denver )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(16)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
@@ -1554,7 +1697,7 @@ static MACHINE_CONFIG_DERIVED( cartfury, vegasv3 )
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
-	MCFG_MIDWAY_IOASIC_UPPER(495/* others? */)
+	MCFG_MIDWAY_IOASIC_UPPER(433/* 495 others? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
@@ -1914,16 +2057,19 @@ DRIVER_INIT_MEMBER(vegas_state,nbanfl)
 
 DRIVER_INIT_MEMBER(vegas_state,sf2049)
 {
+	m_a2d_shift = 4;
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,sf2049se)
 {
+	m_a2d_shift = 4;
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,sf2049te)
 {
+	m_a2d_shift = 4;
 }
 
 
@@ -1965,8 +2111,8 @@ GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, nbanfl,   ROT
 
 /* Durango + Denver SIO + Voodoo 3 */
 GAME( 1998, sf2049,     0,        sf2049,   sf2049,   vegas_state, sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sf2049te,   sf2049,   sf2049te, sf2049te, vegas_state, sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, sf2049se,   sf2049,   sf2049se, sf2049,   vegas_state, sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sf2049te,   sf2049,   sf2049te, sf2049,   vegas_state, sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
 
 /* Durango + Vegas SIO + Voodoo 3 */
 GAME( 2000, cartfury,   0,        cartfury, cartfury, vegas_state, cartfury, ROT0, "Midway Games",  "Cart Fury", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

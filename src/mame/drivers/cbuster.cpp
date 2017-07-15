@@ -10,14 +10,14 @@
   The 'FX' board is filled with 'FU' roms except for the 4 program roms,
   both boards have 'export' stickers which usually indicates a World version.
   Maybe one is a UK or European version.  Some boards exist with 'FU-1' roms
-  which are binary identical to the FX roms.  
+  which are binary identical to the FX roms.
 
   The FX/FU-1 roms are largely translation corrections from the first revision:
-  
+
   THEIR SOLDIERS ARE ARMED WITH THE ADVANCED AND BIZARRE WEAPONS
   -> THEIR SOLDIERS ARE ARMED WITH THE MOST ADVANCED AND BIZARRE WEAPONS.
   etc
-  
+
   DE-0333-3 PCB
 
   Data East 59 - 64 pin (68k)

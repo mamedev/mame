@@ -37,6 +37,14 @@ mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char
 {
 }
 
+device_memory_interface::space_config_vector mb86233_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 
 offs_t mb86233_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

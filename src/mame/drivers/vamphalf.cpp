@@ -51,6 +51,7 @@
    Choice III: Joker's Dream (c) 2001 (likely SEMICOM-003 hardware)
  Undumped F2 System games on F-E1-16-002 hardware:
    New Cross Pang
+   Poosho Poosho (variation of Jumping Break?)
    World Adventure
 
 TODO:

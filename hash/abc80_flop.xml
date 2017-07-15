@@ -112,4 +112,18 @@
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=mJqlYFwMZWU -->
+	<software name="abcdata">
+		<description>ABCDatastorm</description>
+		<year>2017</year>
+		<publisher>Genesis Project</publisher>
+		<info name="usage" value="RUN&quot;ABCDATA&quot;" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="abcdatastorm.dsk" size="163840" crc="7aa13813" sha1="b0c13aa5928772485d8edb8d41e8e97b3028ac5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

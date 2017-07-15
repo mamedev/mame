@@ -940,9 +940,10 @@ WRITE32_MEMBER( powervr2_device::softreset_w )
 		logerror("%s: Core Pipeline soft reset\n", tag());
 #endif
 		if (start_render_received == 1) {
-			for (auto & elem : grab)
-				if (elem.busy == 1)
-					elem.busy = 0;
+			for (int a=0;a < NUM_BUFFERS;a++)
+				if (grab[a].busy == 1)
+					grab[a].busy = 0;
+
 			start_render_received = 0;
 		}
 	}
@@ -3620,7 +3621,8 @@ void powervr2_device::device_start()
 {
 	irq_cb.resolve_safe();
 
-	memset(grab, 0, sizeof(grab));
+	grab = make_unique_clear<receiveddata[]>(NUM_BUFFERS);
+
 	pvr_build_parameterconfig();
 
 	computedilated();

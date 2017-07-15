@@ -191,8 +191,8 @@ void image_manager::options_extract()
 		//  2.  When is_reset_on_load(), and this results in a device being unmounted (unmounting is_reset_and_load()
 		//      doesn't force an unmount).
 		//
-		//		Note that as a part of #2, we cannot extract the option when the image in question is a part of an
-		//		active reset_on_load; hence the check for is_reset_and_loading() (see issue #2414)
+		//      Note that as a part of #2, we cannot extract the option when the image in question is a part of an
+		//      active reset_on_load; hence the check for is_reset_and_loading() (see issue #2414)
 		if (!image.is_reset_on_load()
 			|| (!image.exists() && !image.is_reset_and_loading() && !machine().options().image_option(image.instance_name()).value().empty()))
 		{

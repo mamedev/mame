@@ -236,11 +236,12 @@ void h8_device::internal_update()
 	internal_update(total_cycles());
 }
 
-const address_space_config *h8_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector h8_device::memory_space_config() const
 {
-	return
-		spacenum == AS_PROGRAM ? &program_config :
-		spacenum == AS_IO ? &io_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &program_config),
+		std::make_pair(AS_IO,      &io_config)
+	};
 }
 
 

@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, sliver_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, sliver_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -494,7 +494,7 @@ static INPUT_PORTS_START( sliver )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x0000, "SW2:8" )    /* Listed as "UNUSED (MUST ON)" */
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sliver_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, sliver_state )
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( sliver )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 MACHINE_CONFIG_END

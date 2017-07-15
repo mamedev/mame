@@ -705,7 +705,6 @@ void funcube_touchscreen_device::device_start()
 	save_item(NAME(m_button_state));
 	save_item(NAME(m_serial_pos));
 	save_item(NAME(m_serial));
-	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 void funcube_touchscreen_device::device_reset()
@@ -717,20 +716,17 @@ void funcube_touchscreen_device::device_reset()
 
 void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(id) {
-		device_serial_interface::device_timer(timer, id, param, ptr);
-		return;
-	}
-
-	uint8_t button_state = m_btn->read();
-	if(m_button_state != button_state) {
-		m_button_state = button_state;
-		m_serial[0] = button_state ? 0xfe : 0xfd;
-		m_serial[1] = m_x->read();
-		m_serial[2] = m_y->read();
-		m_serial[3] = 0xff;
-		m_serial_pos = 0;
-		transmit_register_setup(m_serial[m_serial_pos++]);
+	if(!id) {
+		uint8_t button_state = m_btn->read();
+		if(m_button_state != button_state) {
+			m_button_state = button_state;
+			m_serial[0] = button_state ? 0xfe : 0xfd;
+			m_serial[1] = m_x->read();
+			m_serial[2] = m_y->read();
+			m_serial[3] = 0xff;
+			m_serial_pos = 0;
+			transmit_register_setup(m_serial[m_serial_pos++]);
+		}
 	}
 }
 

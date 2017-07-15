@@ -49,6 +49,15 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 }
 
 
+device_memory_interface::space_config_vector st0016_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_space_config),
+		std::make_pair(AS_IO,      &m_io_space_config)
+	};
+}
+
+
 
 
 //-------------------------------------------------

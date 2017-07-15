@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
@@ -108,7 +108,7 @@
     direction. Also, reading from the bus is the product of all active output
     buffers. With no active device, the bus lines are pulled high.
 
-    Every Hexbus device has an interface "device_ti_hexbus_interface" which
+    Every Hexbus device has an interface "device_hexbus_interface" which
     allows it to plug into a preceding Hexbus socket.
 
     Since the signal propagation is the same for all devices, there is a
@@ -119,11 +119,14 @@
     Reading is simpler, because we assume that changes can only be done by
     writing to the bus.
 
-    The "hexbus_chained_device" implements the "device_ti_hexbus_interface"
+    The "hexbus_chained_device" implements the "device_hexbus_interface"
     and holds references to up to two Hexbus instances, one for each direction.
     The computer console will not offer an inbound Hexbus connection, only
     an outbound one, and possibly there is some device that must be connected
     at the end, without further outbound connections.
+
+    By default, instances of "hexbus_chained_device" own an outbound
+    hexbus slot as a subdevice; this may be overwritten by subclasses.
 
     References
     ----------
@@ -143,12 +146,12 @@
 #include "hx5102.h"
 
 // Hexbus instance
-DEFINE_DEVICE_TYPE_NS(TI_HEXBUS, bus::ti99::hexbus, hexbus_device,  "ti_hexbus",  "Hexbus")
+DEFINE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device,  "hexbus",  "Hexbus")
 
-namespace bus { namespace ti99 { namespace hexbus {
+namespace bus { namespace hexbus {
 
 hexbus_device::hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TI_HEXBUS, tag, owner, clock),
+	device_t(mconfig, HEXBUS, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_next_dev(nullptr)
 {
@@ -156,7 +159,7 @@ hexbus_device::hexbus_device(const machine_config &mconfig, const char *tag, dev
 
 void hexbus_device::device_start()
 {
-	m_next_dev = dynamic_cast<device_ti_hexbus_interface *>(get_card_device());
+	m_next_dev = dynamic_cast<device_hexbus_interface *>(get_card_device());
 }
 
 /*
@@ -201,7 +204,7 @@ uint8_t hexbus_device::read(int dir)
 
 hexbus_chained_device::hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, type, tag, owner, clock),
-	device_ti_hexbus_interface(mconfig, *this)
+	device_hexbus_interface(mconfig, *this)
 {
 	m_hexbus_inbound = dynamic_cast<hexbus_device *>(owner);
 	m_myvalue = 0xff;
@@ -298,9 +301,9 @@ MACHINE_CONFIG_END
 
 // ------------------------------------------------------------------------
 
-}   }   }  // end namespace bus::ti99::hexbus
+}   }   // end namespace bus::hexbus
 
-SLOT_INTERFACE_START( ti_hexbus_conn )
-	SLOT_INTERFACE("hx5102", TI_HX5102)
+SLOT_INTERFACE_START( hexbus_conn )
+	SLOT_INTERFACE("hx5102", HX5102)
 SLOT_INTERFACE_END
 

@@ -276,15 +276,12 @@ protected:
 
 	virtual void device_start() override
 	{
-		device_buffered_serial_interface<FIFO_LENGTH>::register_save_state(machine().save(), this);
 	}
 
 	virtual void tra_callback() override
 	{
 		output_rxd(this->transmit_register_get_data_bit());
 	}
-
-	using device_buffered_serial_interface<FIFO_LENGTH>::device_timer;
 };
 
 DECLARE_DEVICE_TYPE(RS232_PORT, rs232_port_device)

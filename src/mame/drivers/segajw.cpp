@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( segajw_audiocpu_io_map, AS_IO, 8, segajw_state )
 	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segajw_hd63484_map, AS_0, 16, segajw_state )
+static ADDRESS_MAP_START( segajw_hd63484_map, 0, 16, segajw_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0x80000, 0xbffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
@@ -352,7 +352,7 @@ void segajw_state::machine_reset()
 	m_coin_counter = 0xff;
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, segajw_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, segajw_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

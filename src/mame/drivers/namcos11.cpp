@@ -35,7 +35,8 @@ souledgea  Soul Edge (SO2/VER.A)                   COH-100 / COH-110   "        
 souledgeja Soul Edge (SO1/VER.A)                   COH-100 / COH-110   "                        "                       "        "
 dunkmnia   Dunk Mania (DM2/VER.C)                  COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C410     5
 dunkmniajc Dunk Mania (DM1/VER.C)                  COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C410     5
-xevi3dg    Xevious 3D/G (XV31/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C430     5
+xevi3dg    Xevious 3D/G (XV32/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C430     5
+xevi3dgj   Xevious 3D/G (XV31/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C430     5
 primglex   Prime Goal EX (PG1/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C411     6
 danceyes   Dancing Eyes (DC3/VER.C)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
 danceyesj  Dancing Eyes (DC1/VER.A)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
@@ -1410,8 +1411,6 @@ ROM_START( tekkenac )
 	ROM_LOAD( "te1wave.8k",   0x0000000, 0x200000, CRC(fce6c57a) SHA1(7fb8c69452c92c59a940a2b69d0d73ef7aefcb82) )
 ROM_END
 
-
-
 ROM_START( tekkenb )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "te2verb.2l",   0x0000000, 0x100000, CRC(246cfbdd) SHA1(c1bffe3c463e9eff6dcaf9937da72bff8ff33e4e) )
@@ -1600,7 +1599,30 @@ ROM_START( tekken2jb )
 	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
 ROM_END
 
-ROM_START( xevi3dg )
+ROM_START( xevi3dg ) /* PCB was stickered as XV3 2 / VER.B */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "xv32vera.2l",  0x0000000, 0x100000, CRC(6ffcceac) SHA1(b26b1c38680a818335748554eee50f6290ae23d2) )
+	ROM_LOAD16_BYTE( "xv32vera.2j",  0x0000001, 0x100000, CRC(c096dd18) SHA1(195e080f833b8854d9011d5eb50b9e556954903f) )
+	ROM_LOAD16_BYTE( "xv31vera.2k",  0x0200000, 0x100000, CRC(3d58138e) SHA1(9203d6bdc2d968de818d5f465523cc030217dcf8) )
+	ROM_LOAD16_BYTE( "xv31vera.2f",  0x0200001, 0x100000, CRC(9e8780a2) SHA1(83148d55456b2b92969f7ac2bdb2d492bf969895) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "xv31rom0l.ic5", 0x0000000, 0x200000, CRC(24e1e262) SHA1(84df49b22a8a36284da771944a8390672a0c32bf) )
+	ROM_LOAD16_BYTE( "xv31rom0u.ic6", 0x0000001, 0x200000, CRC(cae38ef3) SHA1(2dfe0b31969091975e8d8c8188ce7dd007e4a0f3) )
+	ROM_LOAD16_BYTE( "xv31rom1l.ic3", 0x0400000, 0x200000, CRC(46b4cb72) SHA1(c3360c4fdb71ffcbccec3f4ad8d7963b08822e26) )
+	ROM_LOAD16_BYTE( "xv31rom1u.ic8", 0x0400001, 0x200000, CRC(be0eb5d1) SHA1(f1a0adcb7c65bbba723fe09b07280b0b924d6b19) )
+	ROM_LOAD16_BYTE( "xv31rom2l.ic4", 0x0800000, 0x200000, CRC(8403a277) SHA1(35193211351494a086d8422e3b0b71a8d3a262a6) )
+	ROM_LOAD16_BYTE( "xv31rom2u.ic7", 0x0800001, 0x200000, CRC(ecf70432) SHA1(bec128a215e0aef66e9a8707bb0d1eb7b098a356) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "xv31sprog.6d", 0x0000000, 0x040000, CRC(e50b856a) SHA1(631da4f60c9ce08387fca26a70481a2fdacf9765) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "xv31wave.8k",  0x000000, 0x400000, CRC(14f25ddd) SHA1(4981cf1017432ff85b768ec88c36f535df30b783) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
+ROM_START( xevi3dgj )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "xv31vera.2l",  0x0000000, 0x100000, CRC(419e0f13) SHA1(876ae81c9fde18cdec792f3dfee682761ac99730) )
 	ROM_LOAD16_BYTE( "xv31vera.2j",  0x0000001, 0x100000, CRC(df95373a) SHA1(65cf85ad4dcbc8f0376ac46ee0c1037d79099843) )
@@ -1648,7 +1670,8 @@ GAME( 1995, souledgeua, souledge, souledge,   souledge,   namcos11_state, 0, ROT
 GAME( 1995, souledgeja, souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge (Japan, SO1/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, dunkmnia,   0,        dunkmnia,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dunk Mania (World, DM2/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, dunkmniajc, dunkmnia, dunkmnia,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dunk Mania (Japan, DM1/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (Japan, XV31/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (World, XV32/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (Japan, XV31/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              MACHINE_IMPERFECT_GRAPHICS )
