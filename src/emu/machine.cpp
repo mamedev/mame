@@ -1381,4 +1381,20 @@ sound_manager * running_machine::emscripten_get_sound()
 	return &(emscripten_running_machine->sound());
 }
 
+void running_machine::emscripten_soft_reset() {
+	emscripten_running_machine->schedule_soft_reset();
+}
+void running_machine::emscripten_hard_reset() {
+	emscripten_running_machine->schedule_hard_reset();
+}
+void running_machine::emscripten_exit() {
+	emscripten_running_machine->schedule_exit();
+}
+void running_machine::emscripten_save(const char *name) {
+	emscripten_running_machine->schedule_save(name);
+}
+void running_machine::emscripten_load(const char *name) {
+	emscripten_running_machine->schedule_load(name);
+}
+
 #endif /* defined(EMSCRIPTEN) */

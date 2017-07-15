@@ -406,6 +406,12 @@ public:
 	static running_machine * emscripten_get_running_machine();
 	static ui_manager * emscripten_get_ui();
 	static sound_manager * emscripten_get_sound();
+
+	static void emscripten_exit();
+	static void emscripten_hard_reset();
+	static void emscripten_soft_reset();
+	static void emscripten_save(const char *name);
+	static void emscripten_load(const char *name);
 #endif
 };
 
