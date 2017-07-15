@@ -255,8 +255,6 @@ public:
 	cpu_device *            firstcpu;           // first CPU
 
 private:
-	void run_timeslice();
-
 	// video-related information
 	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless
 

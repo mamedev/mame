@@ -353,7 +353,20 @@ int running_machine::run(bool quiet)
 		// run the CPUs until a reset or exit
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
-			run_timeslice();
+			g_profiler.start(PROFILER_EXTRA);
+
+			// execute CPUs if not paused
+			if (!m_paused)
+				m_scheduler.timeslice();
+			// otherwise, just pump video updates through
+			else
+				m_video->frame_update();
+
+			// handle save/load
+			if (m_saveload_schedule != saveload_schedule::NONE)
+				handle_saveload();
+
+			g_profiler.stop();
 		}
 		m_manager.http()->clear();
 
@@ -409,28 +422,6 @@ int running_machine::run(bool quiet)
 	// close the logfile
 	m_logfile.reset();
 	return error;
-}
-
-//-------------------------------------------------
-//  run_timeslice - execute a single timeslice
-//-------------------------------------------------
-
-void running_machine::run_timeslice()
-{
-	g_profiler.start(PROFILER_EXTRA);
-
-	// execute CPUs if not paused
-	if (!m_paused)
-		m_scheduler.timeslice();
-	// otherwise, just pump video updates through
-	else
-		m_video->frame_update();
-
-	// handle save/load
-	if (m_saveload_schedule != saveload_schedule::NONE)
-		handle_saveload();
-
-	g_profiler.stop();
 }
 
 //-------------------------------------------------
@@ -1339,6 +1330,9 @@ void running_machine::emscripten_main_loop()
 	{
 		device_scheduler * scheduler;
 		scheduler = &(machine->scheduler());
+
+		// Emscripten will call this function at 60Hz, so step the simulation
+		// forward for the amount of time that has passed since the last frame
 		const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
 		const attotime stoptime(scheduler->time() + frametime);
 
@@ -1360,6 +1354,7 @@ void running_machine::emscripten_main_loop()
 	else
 		machine->m_video->frame_update();
 
+	// cancel the emscripten loop if the system has been told to exit
 	if (machine->m_exit_pending)
 	{
 		emscripten_cancel_main_loop();
