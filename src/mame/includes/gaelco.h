@@ -18,26 +18,12 @@ public:
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
+		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_screenram(*this, "screenram") { }
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<generic_latch_8_device> m_soundlatch;
-
-	/* memory pointers */
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_vregs;
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_screenram;
-
-	/* video-related */
-	tilemap_t      *m_tilemap[2];
+		m_screenram(*this, "screenram")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bigkarnk_sound_command_w);
 	DECLARE_WRITE8_MEMBER(bigkarnk_coin_w);
@@ -57,5 +43,29 @@ public:
 
 	uint32_t screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	required_device<screen_device> m_screen;
+
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_screenram;
+
+	/* video-related */
+	tilemap_t      *m_tilemap[2];
+
+	bitmap_ind16 m_temp_bitmap_bg0;
+	bitmap_ind16 m_temp_bitmap_bg1;
+	bitmap_ind16 m_temp_bitmap_sprites;
+
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
