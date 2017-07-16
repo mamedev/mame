@@ -95,19 +95,19 @@ int32_t multipcm_device::envelope_generator_update(slot_t *slot)
 {
 	switch(slot->m_envelope_gen.m_state)
 	{
-		case ATTACK:
+		case state_t::ATTACK:
 			slot->m_envelope_gen.m_volume += slot->m_envelope_gen.m_attack_rate;
 			if (slot->m_envelope_gen.m_volume >= (0x3ff << EG_SHIFT))
 			{
-				slot->m_envelope_gen.m_state = DECAY1;
+				slot->m_envelope_gen.m_state = state_t::DECAY1;
 				if (slot->m_envelope_gen.m_decay1_rate >= (0x400 << EG_SHIFT)) //Skip DECAY1, go directly to DECAY2
 				{
-					slot->m_envelope_gen.m_state = DECAY2;
+					slot->m_envelope_gen.m_state = state_t::DECAY2;
 				}
 				slot->m_envelope_gen.m_volume = 0x3ff << EG_SHIFT;
 			}
 			break;
-		case DECAY1:
+		case state_t::DECAY1:
 			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_decay1_rate;
 			if (slot->m_envelope_gen.m_volume <= 0)
 			{
@@ -115,17 +115,17 @@ int32_t multipcm_device::envelope_generator_update(slot_t *slot)
 			}
 			if (slot->m_envelope_gen.m_volume >> EG_SHIFT <= (slot->m_envelope_gen.m_decay_level << 6))
 			{
-				slot->m_envelope_gen.m_state = DECAY2;
+				slot->m_envelope_gen.m_state = state_t::DECAY2;
 			}
 			break;
-		case DECAY2:
+		case state_t::DECAY2:
 			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_decay2_rate;
 			if (slot->m_envelope_gen.m_volume <= 0)
 			{
 				slot->m_envelope_gen.m_volume = 0;
 			}
 			break;
-		case RELEASE:
+		case state_t::RELEASE:
 			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_release_rate;
 			if (slot->m_envelope_gen.m_volume <= 0)
 			{
@@ -367,7 +367,7 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 				slot->m_total_level = slot->m_dest_total_level << TL_SHIFT;
 
 				envelope_generator_calc(slot);
-				slot->m_envelope_gen.m_state = ATTACK;
+				slot->m_envelope_gen.m_state = state_t::ATTACK;
 				slot->m_envelope_gen.m_volume = 0;
 
 				if (slot->m_base >= 0x100000)
@@ -389,7 +389,7 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 				{
 					if (slot->m_sample.m_release_reg != 0xf)
 					{
-						slot->m_envelope_gen.m_state = RELEASE;
+						slot->m_envelope_gen.m_state = state_t::RELEASE;
 					}
 					else
 					{

@@ -27,7 +27,7 @@
 #define LOGOCW(...) LOGMASKED(LOG_OCW, __VA_ARGS__)
 
 
-ALLOW_SAVE_TYPE(pic8259_device::pic8259_state_t); // allow save_item on a non-fundamental type
+ALLOW_SAVE_TYPE(pic8259_device::state_t); // allow save_item on a non-fundamental type
 
 void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -44,7 +44,7 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 
 		/* is this IRQ pending and enabled? */
-		if ((m_state == STATE_READY) && (m_irr & mask) && !(m_imr & mask))
+		if ((m_state == state_t::READY) && (m_irr & mask) && !(m_imr & mask))
 		{
 			LOG("pic8259_timerproc(): PIC triggering IRQ #%d\n", irq);
 			m_out_int_func(1);
@@ -205,10 +205,10 @@ WRITE8_MEMBER( pic8259_device::write )
 				m_cascade            = (data & 0x02) ? 0 : 1;
 				m_icw4_needed        = (data & 0x01) ? 1 : 0;
 				m_vector_addr_low    = (data & 0xe0);
-				m_state          = STATE_ICW2;
+				m_state          = state_t::ICW2;
 				m_out_int_func(0);
 			}
-			else if (m_state == STATE_READY)
+			else if (m_state == state_t::READY)
 			{
 				if ((data & 0x98) == 0x08)
 				{
@@ -280,10 +280,10 @@ WRITE8_MEMBER( pic8259_device::write )
 		case 1:
 			switch(m_state)
 			{
-				case STATE_ICW1:
+				case state_t::ICW1:
 					break;
 
-				case STATE_ICW2:
+				case state_t::ICW2:
 					/* write ICW2 */
 					LOGICW("pic8259_device::write(): ICW2; data=0x%02X\n", data);
 
@@ -291,23 +291,23 @@ WRITE8_MEMBER( pic8259_device::write )
 					m_vector_addr_high = data ;
 					if (m_cascade)
 					{
-						m_state = STATE_ICW3;
+						m_state = state_t::ICW3;
 					}
 					else
 					{
-						m_state = m_icw4_needed ? STATE_ICW4 : STATE_READY;
+						m_state = m_icw4_needed ? state_t::ICW4 : state_t::READY;
 					}
 					break;
 
-				case STATE_ICW3:
+				case state_t::ICW3:
 					/* write ICW3 */
 					LOGICW("pic8259_device::write(): ICW3; data=0x%02X\n", data);
 
 					m_slave = data;
-					m_state = m_icw4_needed ? STATE_ICW4 : STATE_READY;
+					m_state = m_icw4_needed ? state_t::ICW4 : state_t::READY;
 					break;
 
-				case STATE_ICW4:
+				case state_t::ICW4:
 					/* write ICW4 */
 					LOGICW("pic8259_device::write(): ICW4; data=0x%02X\n", data);
 
@@ -315,10 +315,10 @@ WRITE8_MEMBER( pic8259_device::write )
 					m_mode = (data >> 2) & 3;
 					m_auto_eoi = (data & 0x02) ? 1 : 0;
 					m_is_x86 = (data & 0x01) ? 1 : 0;
-					m_state = STATE_READY;
+					m_state = state_t::READY;
 					break;
 
-				case STATE_READY:
+				case state_t::READY:
 					/* write OCW1 - set interrupt mask register */
 					LOGOCW("pic8259_device::write(): OCW1; data=0x%02X\n", data);
 
@@ -374,7 +374,7 @@ void pic8259_device::device_start()
 
 void pic8259_device::device_reset()
 {
-	m_state = STATE_READY;
+	m_state = state_t::READY;
 	m_isr = 0;
 	m_irr = 0;
 	m_irq_lines = 0;

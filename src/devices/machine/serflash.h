@@ -48,7 +48,7 @@ public:
 protected:
 	static constexpr unsigned FLASH_PAGE_SIZE = 2048+64;
 
-	enum flash_state_t { STATE_IDLE = 0, STATE_READ, STATE_READ_ID, STATE_READ_STATUS, STATE_BLOCK_ERASE, STATE_PAGE_PROGRAM };
+	enum class flash_state_t : u8 { IDLE = 0, READ, READ_ID, READ_STATUS, BLOCK_ERASE, PAGE_PROGRAM };
 
 	// device-level overrides
 	virtual void device_start() override;

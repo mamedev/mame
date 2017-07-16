@@ -80,7 +80,7 @@ protected:
 	void interrupt_start_vblank(void);
 
 private:
-	enum dma_mode_tt { dma_read, dma_write };
+	enum dma_mode_tt : u8 { dma_read, dma_write };
 
 	static constexpr uint8_t MODE_OFF    = 0;
 	static constexpr uint8_t MODE_TEXT   = 1;

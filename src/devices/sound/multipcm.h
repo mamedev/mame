@@ -43,7 +43,7 @@ private:
 		uint8_t m_lfo_amplitude_reg;
 	};
 
-	enum state_t
+	enum class state_t : u8
 	{
 		ATTACK,
 		DECAY1,

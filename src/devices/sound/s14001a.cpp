@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER(s14001a_device::start_w)
 {
 	m_stream->update();
 	m_bStart = (state != 0);
-	if (m_bStart) m_uStateP1 = WORDWAIT;
+	if (m_bStart) m_uStateP1 = states::WORDWAIT;
 }
 
 void s14001a_device::set_clock(uint32_t clock)
@@ -391,31 +391,31 @@ bool s14001a_device::Clock()
 	// logic done during phase 1
 	switch (m_uStateP1)
 	{
-	case IDLE:
+	case states::IDLE:
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = WORDWAIT;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
 
 		if (m_bBusyP1 && !m_bsy_handler.isnull())
 			m_bsy_handler(0);
 		m_bBusyP1 = false;
 		break;
 
-	case WORDWAIT:
+	case states::WORDWAIT:
 		// the delta address register latches the word number into bits 03 to 08
 		// all other bits forced to 0.  04 to 08 makes a multiply by two.
 		m_uDAR13To05P1 = (m_uWord&0x3C)>>2;
 		m_uDAR04To00P1 = (m_uWord&0x03)<<3;
 		m_RomAddrP1 = (m_uDAR13To05P1<<3)|(m_uDAR04To00P1>>2); // remove lower two bits
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = WORDWAIT;
-		else          m_uStateP1 = CWARMSB;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		else          m_uStateP1 = states::CWARMSB;
 
 		if (!m_bBusyP1 && !m_bsy_handler.isnull())
 			m_bsy_handler(1);
 		m_bBusyP1 = true;
 		break;
 
-	case CWARMSB:
+	case states::CWARMSB:
 		if (m_uPrintLevel >= 1)
 			printf("\n speaking word %02x",m_uWord);
 
@@ -427,20 +427,20 @@ bool s14001a_device::Clock()
 		m_RomAddrP1 = (m_uDAR13To05P1<<3)|(m_uDAR04To00P1>>2); // remove lower two bits
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = WORDWAIT;
-		else          m_uStateP1 = CWARLSB;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		else          m_uStateP1 = states::CWARLSB;
 		break;
 
-	case CWARLSB:
+	case states::CWARLSB:
 		m_uCWARP1   = m_uCWARP2|(readmem(m_uRomAddrP2,m_bPhase1)>>4); // setup in previous state
 		m_RomAddrP1 = m_uCWARP1;
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = WORDWAIT;
-		else          m_uStateP1 = DARMSB;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		else          m_uStateP1 = states::DARMSB;
 		break;
 
-	case DARMSB:
+	case states::DARMSB:
 		m_uDAR13To05P1 = readmem(m_uRomAddrP2,m_bPhase1)<<1; // 9 bit counter, 8 MSBs from ROM, lsb zeroed
 		m_uDAR04To00P1 = 0;
 		m_uCWARP1++;
@@ -448,11 +448,11 @@ bool s14001a_device::Clock()
 		m_uNControlWords++; // statistics
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = WORDWAIT;
-		else          m_uStateP1 = CTRLBITS;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		else          m_uStateP1 = states::CTRLBITS;
 		break;
 
-	case CTRLBITS:
+	case states::CTRLBITS:
 		m_bStopP1    = readmem(m_uRomAddrP2,m_bPhase1)&0x80? true: false;
 		m_bVoicedP1  = readmem(m_uRomAddrP2,m_bPhase1)&0x40? true: false;
 		m_bSilenceP1 = readmem(m_uRomAddrP2,m_bPhase1)&0x20? true: false;
@@ -463,15 +463,15 @@ bool s14001a_device::Clock()
 		m_RomAddrP1  = (m_uDAR13To05P1<<3)|(m_uDAR04To00P1>>2); // remove lower two bits
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = WORDWAIT;
-		else          m_uStateP1 = PLAY;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		else          m_uStateP1 = states::PLAY;
 
 		if (m_uPrintLevel >= 2)
 			printf("\n cw %d %d %d %d %d",m_bStopP1,m_bVoicedP1,m_bSilenceP1,m_uLengthP1>>4,m_uXRepeatP1);
 
 		break;
 
-	case PLAY:
+	case states::PLAY:
 	{
 		// statistics
 		if (m_bPPQCarryP2)
@@ -549,21 +549,21 @@ bool s14001a_device::Clock()
 		m_RomAddrP1 = (m_uDAR13To05P1<<3) | m_RomAddrP1>>2;
 
 		// next state
-		if (m_bStart) m_uStateP1 = WORDWAIT;
-		else if (m_bStopP2 && m_bLengthCarryP2) m_uStateP1 = DELAY;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		else if (m_bStopP2 && m_bLengthCarryP2) m_uStateP1 = states::DELAY;
 		else if (m_bLengthCarryP2)
 		{
-			m_uStateP1  = DARMSB;
+			m_uStateP1  = states::DARMSB;
 			m_RomAddrP1 = m_uCWARP1; // output correct address
 		}
-		else m_uStateP1 = PLAY;
+		else m_uStateP1 = states::PLAY;
 		break;
 	}
 
-	case DELAY:
+	case states::DELAY:
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = WORDWAIT;
-		else          m_uStateP1 = IDLE;
+		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		else          m_uStateP1 = states::IDLE;
 		break;
 	}
 

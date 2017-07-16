@@ -136,12 +136,12 @@ protected:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
-	enum e_mode {
-		MODE_NONE,  MODE_BIT8,  MODE_CC,
-		MODE_I8,    MODE_D8,    MODE_R8,
-		MODE_I16,   MODE_D16,   MODE_R16,
-		MODE_MI16,  MODE_MR16,  MODE_MR16D8,    MODE_MR16R8,
-		MODE_R16D8, MODE_R16R8
+	enum class e_mode : u8 {
+		NONE,   BIT8,   CC,
+		I8,     D8,     R8,
+		I16,    D16,    R16,
+		MI16,   MR16,   MR16D8, MR16R8,
+		R16D8,  R16R8
 	};
 
 	address_space_config m_program_config;
