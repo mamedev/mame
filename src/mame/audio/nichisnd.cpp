@@ -6,6 +6,11 @@
 	
 	Shared component between niyanpai.cpp and csplayh5.cpp
 	
+	Uses a TMPZ84C011 with YM3812 and two DACs
+	
+	TODO:
+	- DVD sound routing in here
+	
 ***************************************************************************/
 
 #include "emu.h"

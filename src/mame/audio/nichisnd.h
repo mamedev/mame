@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:<author_name>
+// copyright-holders:Angelo Salese,Takahiro Nogi
 /***************************************************************************
 
+	Nichibutsu sound HW
 
 ***************************************************************************/
 
