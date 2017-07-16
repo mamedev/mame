@@ -1346,6 +1346,36 @@ ROM_START( slrasslt ) /* USA version UAA */
 	ROM_LOAD16_WORD( "eeprom-slrasslt.bin", 0x0000, 0x0100, CRC(51eb4d93) SHA1(bc1359daccad80b0e16eb144a0bae715a4fb2e8d) )
 ROM_END
 
+ROM_START( slrassltj ) /* Japan version JAA */
+	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
+	ROM_LOAD32_BYTE( "672jaa_a01.21u", 0x000003, 0x080000, CRC(e2821f51) SHA1(20c6c2402ba2b564b8f77bcf452abe2d7e023417) )
+	ROM_LOAD32_BYTE( "672jaa_a02.19u", 0x000002, 0x080000, CRC(e3ac7031) SHA1(268588ac6e80463e51a399f53b2396b23faaddba) )
+	ROM_LOAD32_BYTE( "672jaa_a03.21r", 0x000001, 0x080000, CRC(52711d79) SHA1(8c89fbff9de21cc1e5f17c4ea08870faea648465) )
+	ROM_LOAD32_BYTE( "672jaa_a04.19r", 0x000000, 0x080000, CRC(f7419454) SHA1(44cef7f1181cb9c11b013ab0b7e26aa1e95d3746) )
+
+	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_LOAD32_WORD_SWAP( "672a05.14u", 0x000000, 0x200000, CRC(f6f296e4) SHA1(2ba4ede36f3392aa53a730614272fa80df65281c) )
+	ROM_LOAD32_WORD_SWAP( "672a06.12u", 0x000002, 0x200000, CRC(2126227f) SHA1(22615023025453772239b4b21e276fbcbb1cc2bf) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_LOAD16_WORD_SWAP( "672a07.10k", 0x000000, 0x080000, CRC(a757309d) SHA1(bc1c8b327815f70bc8bf94adafc8bb0c215e7d1f) )
+
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_LOAD( "672a09.9s", 0x000000, 0x200000, CRC(484355ef) SHA1(2af65565d10b058ab95888f36ff28bb7909181d5) )
+	ROM_LOAD( "672a10.7s", 0x200000, 0x200000, CRC(1ec1d5d1) SHA1(ebf5417a117f352fff36806a748305270adb70d8) )
+	ROM_LOAD( "672a11.5s", 0x400000, 0x200000, CRC(1126753e) SHA1(c7b91e2514329799944e1eb608b5b7e2eb87bea9) )
+	ROM_LOAD( "672a12.2s", 0x600000, 0x200000, CRC(432ec7fd) SHA1(a671625400f3837cbe8ddb06dbc37c574d75e281) )
+
+	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_LOAD64_WORD( "672a13.18d", 0x000000, 0x200000, CRC(ded2f06d) SHA1(851a896e156fb736bcb7cdfc7db2340bb819c092) )
+	ROM_LOAD64_WORD( "672a14.13d", 0x000002, 0x200000, CRC(cd311cfc) SHA1(ead708eaa4e3f1f2b9a17c41ddd0fbc016911527) )
+	ROM_LOAD64_WORD( "672a15.9d",  0x000004, 0x200000, CRC(7bb6c271) SHA1(9eb928a52e482b7718c723fa8a14b2c2faaf4425) )
+	ROM_LOAD64_WORD( "672a16.4d",  0x000006, 0x200000, CRC(6fa5c0ee) SHA1(ee40179a46f8529fab1c58c05f413a516e7d53ff) )
+
+	ROM_REGION16_BE(0x100, "eeprom", 0) /* default eeprom with magic number */
+	ROM_LOAD16_WORD( "eeprom-slrassltj.bin", 0x0000, 0x0100, CRC(407871d6) SHA1(17a311c412f450edb206750bf7d1055bd16a2135) )
+ROM_END
+
 ROM_START( hangplt ) /* Japan version JAB */
 	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
 	ROM_LOAD32_BYTE( "685jab01.21u", 0x000003, 0x080000, CRC(f98a3e82) SHA1(94ebaa172b0e98c5cd08efaea5f56e707e5032b4) )
@@ -1443,5 +1473,6 @@ GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT
 GAME( 1996, thunderh, 0,        thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, thunderhu,thunderh, thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrasslt, 0,        slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, slrassltj,slrasslt, slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAMEL(1997, hangplt,  0,        hangplt,  hangplt,  gticlub_state, hangplt,  ROT0, "Konami", "Hang Pilot (ver JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
 GAMEL(1997, hangpltu, hangplt,  hangplt,  hangplt,  gticlub_state, hangpltu, ROT0, "Konami", "Hang Pilot (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
