@@ -10506,9 +10506,11 @@ airraid                         // (c) 1987 Seibu Kaihatsu
 cshooter                        // (c) 1987 JKH (bootleg)
 
 @source:csplayh5.cpp
+aimode							// (c) 1999
 bikiniko                        // (c) 1999
 csplayh1                        // (c) 1995
 csplayh5                        // (c) 1998
+csplayh6						// (c) 1999
 csplayh7                        // (c) 1999
 fuudol                          // (c) 2000
 junai                           // (c) 1998
@@ -10518,8 +10520,10 @@ nichidvd						//
 nichisel						// (c) 2000
 mjgalpri						// (c) 1998
 mjmania                         // (c) 1999
+pokoachu						// (c) 1999
 renaimj							// (c) 1999
 thenanpa                        // (c) 1999
+tsuwaku							// (c) 2000
 
 @source:cswat.cpp
 cswat                           // (c) 1984
