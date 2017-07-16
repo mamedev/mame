@@ -468,9 +468,9 @@ uint8_t v99x8_device::status_r()
 	case 1:
 		ret = m_stat_reg[1];
 		m_stat_reg[1] &= 0xfe;
+		// mouse mode: add button state
 		if ((m_cont_reg[8] & 0xc0) == 0x80)
-			// mouse mode: add button state
-		ret |= m_button_state & 0xc0;
+			ret |= m_button_state & 0xc0;
 		break;
 	case 2:
 		/*update_command ();*/
