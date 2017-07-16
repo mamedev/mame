@@ -40,7 +40,7 @@ public:
 	void external_interrupt_0();
 	void external_interrupt_1();
 	void external_interrupt_2();
-
+	
 	DECLARE_READ16_MEMBER(imr_r);
 	DECLARE_WRITE16_MEMBER(imr_w);
 	DECLARE_READ16_MEMBER(iisr_r);
@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE16_MEMBER(pdr_w);
 	DECLARE_READ16_MEMBER(pdir_r);
 	DECLARE_WRITE16_MEMBER(pdir_w);
+	DECLARE_READ8_MEMBER(icr_r);
+	DECLARE_WRITE8_MEMBER(icr_w);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -63,8 +65,20 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER( timer_callback );
 	void update_timer( int i );
-	void update_irq_state();
-
+	void update_irq_state(uint16_t cause);
+	void update_irq_serial(uint16_t cause, uint8_t type);
+	
+	static constexpr uint16_t EXT_IRQ0 = 1 << 0;
+	static constexpr uint16_t EXT_IRQ1 = 1 << 1;
+	static constexpr uint16_t EXT_IRQ2 = 1 << 2;
+	static constexpr uint16_t SERIAL_IRQ_CH0 = 1 << 4;
+	static constexpr uint16_t SERIAL_IRQ_CH1 = 1 << 5;
+	static constexpr uint16_t SERIAL_IRQ_CH2 = 1 << 6;
+	static constexpr uint16_t PARALLEL_IRQ = 1 << 7;
+	static constexpr uint16_t TIMER0_IRQ = 1 << 8;
+	static constexpr uint16_t TIMER1_IRQ = 1 << 9;
+	static constexpr uint16_t TIMER2_IRQ = 1 << 10;
+	
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
 
@@ -74,7 +88,6 @@ private:
 	// internal state
 	uint16_t m_regs[0x400];
 
-	uint8_t m_IE[3];        // 3 External Interrupt Lines
 	emu_timer *m_tmp68301_timer[3];        // 3 Timers
 
 	uint16_t m_irq_vector[8];
@@ -84,7 +97,8 @@ private:
 	uint16_t m_scr;
 	uint16_t m_pdir;
 	uint16_t m_pdr;
-
+	uint8_t m_icr[10];
+	
 	const address_space_config      m_space_config;
 };
 
