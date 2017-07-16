@@ -32,17 +32,12 @@
 #include "emu.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/tmpz84c011.h"
-#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/tmp68301.h"
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
-#include "sound/dac.h"
-#include "sound/3812intf.h"
-#include "sound/volt_reg.h"
 #include "video/v9938.h"
-#include "speaker.h"
+#include "audio/nichisnd.h"
 
 #define USE_H8 0
 #define DVD_CLOCK XTAL_27MHz
@@ -55,34 +50,24 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
 		m_v9958(*this, "v9958"),
-		m_soundlatch(*this, "soundlatch"),
+		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_audiocpu(*this, "audiocpu"),
-		m_bank1(*this, "bank1")
+		m_region_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
 	required_device<v9958_device> m_v9958;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
-	required_memory_region m_region_audiocpu;
-	required_memory_bank m_bank1;
-
+	
 	uint16_t m_mux_data;
 
 	DECLARE_READ16_MEMBER(csplayh5_mux_r);
 	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
-	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
-	DECLARE_READ8_MEMBER(csplayh5_sound_r);
-	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
 	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
 
-	DECLARE_READ8_MEMBER(soundcpu_portd_r);
-	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
 	#if USE_H8
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
@@ -112,7 +97,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 
 	void general_init(int patchaddress, int patchvalue);
-	void soundbank_w(int data);
 };
 
 
@@ -137,16 +121,10 @@ WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 	m_mux_data = (~data & 0x1f);
 }
 
-WRITE16_MEMBER(csplayh5_state::csplayh5_sound_w)
-{
-	m_soundlatch->write(space, 0, ((data >> 8) & 0xff));
-}
-
-
 static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_WRITE(csplayh5_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
 	AM_RANGE(0x200200, 0x200201) AM_READWRITE(csplayh5_mux_r,csplayh5_mux_w)
 	AM_RANGE(0x200400, 0x200401) AM_READ_PORT("SYSTEM")
 
@@ -183,59 +161,6 @@ static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16, csplayh5_state )
 	AM_RANGE(0x0a, 0x0b) AM_READ(test_r)
 ADDRESS_MAP_END
 #endif
-
-
-/*
-sound HW is identical to Niyanpai
-*/
-
-/* TMPZ84C011 PIO emulation */
-
-void csplayh5_state::soundbank_w(int data)
-{
-	m_bank1->set_base(m_region_audiocpu->base() + 0x08000 + (0x8000 * (data & 0x03)));
-}
-
-READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
-{
-	return m_soundlatch->read(space, 0);
-}
-
-WRITE8_MEMBER(csplayh5_state::csplayh5_soundclr_w)
-{
-	m_soundlatch->clear_w(space, 0, 0);
-}
-
-
-READ8_MEMBER(csplayh5_state::soundcpu_portd_r)
-{
-	return csplayh5_sound_r(space, 0);
-}
-
-WRITE8_MEMBER(csplayh5_state::soundcpu_porta_w)
-{
-	soundbank_w(data & 0x03);
-}
-
-WRITE8_MEMBER(csplayh5_state::soundcpu_porte_w)
-{
-	if (!(data & 0x01)) csplayh5_soundclr_w(space, 0, 0);
-}
-
-
-
-
-
-
-static ADDRESS_MAP_START( csplayh5_sound_map, AS_PROGRAM, 8, csplayh5_state )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8, csplayh5_state )
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym3812_device, write)
-ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( csplayh5 )
@@ -402,12 +327,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 		m_tmp68301->external_interrupt_0();
 }
 
-static const z80_daisy_config daisy_chain_sound[] =
-{
-	TMPZ84C011_DAISY_INTERNAL,
-	{ nullptr }
-};
-
 WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
@@ -453,17 +372,6 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(csplayh5_state, ide_irq))
 #endif
 
-	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)  /* TMPZ84C011, unknown clock */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
-	MCFG_CPU_PROGRAM_MAP(csplayh5_sound_map)
-	MCFG_CPU_IO_MAP(csplayh5_sound_io_map)
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porta_w))
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac2", dac_byte_interface, write))
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac1", dac_byte_interface, write))
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(csplayh5_state, soundcpu_portd_r))
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porte_w))
-	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
-
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -472,18 +380,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
-
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_NICHISND_ADD("nichisnd")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -500,13 +397,13 @@ void csplayh5_state::general_init(int patchaddress, int patchvalue)
 	MAINROM[patchaddress] = patchvalue;
 	#endif
 
-	uint8_t *SNDROM = m_region_audiocpu->base();
+	//uint8_t *SNDROM = m_region_:nichisnd:audiorom->base();
 
 	/* initialize sound rom bank */
-	soundbank_w(0);
+	//soundbank_w(0);
 
 	/* patch sound program */
-	SNDROM[0x0213] = 0x00;          // DI -> NOP
+	//SNDROM[0x0213] = 0x00;          // DI -> NOP
 
 }
 
@@ -553,7 +450,7 @@ ROM_START( nichidvd )
 	
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", ROMREGION_ERASE00 ) // z80
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 
@@ -569,7 +466,7 @@ ROM_START( csplayh1 )
 	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, cd-rom player
 	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "1.bin", 0x000000, 0x020000, CRC(8296d67f) SHA1(20eb944a2bd27980e1aaf60ca544059e84129760) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -588,7 +485,7 @@ ROM_START( mjgalpri )
     ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(e8427076) SHA1(9b449599ffac2b67a29fac11d1e85218668d805d) )
 	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(653fcc14) SHA1(6231ec5f45a9f5e587dcd00ff85f9bbfae7364ab) )
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
     ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7b9b1887) SHA1(1393a1d79f3cc7ab68275791af4ec16e825056df) )
 
 	DVD_BIOS
@@ -611,7 +508,7 @@ ROM_START( junai )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a0472ea5) SHA1(0fd04941ff595cffe64357f3a1a9dc1170db8703) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -630,7 +527,7 @@ ROM_START( csplayh5 )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(0b920806) SHA1(95f50ebfb296ba29aaa8079a41f5362cb9e879cc) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -649,7 +546,7 @@ ROM_START( junai2 )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a4b07757) SHA1(5010f28d7a80af0cc3f4fd135f777950fb2cf679) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -672,7 +569,7 @@ ROM_START( mogitate )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
     ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7927c1d6) SHA1(15f0c0051124e7b7667eb721dd12938333b31899) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -693,7 +590,7 @@ ROM_START( mjmania )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f0c3bb11) SHA1(691a0ff53a9417e69051e9e2bdee7500bc6a746b) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -714,7 +611,7 @@ ROM_START( renaimj )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(614d17b9) SHA1(d6fb4441f55902c2b89b4bec53aae5311d81f07b) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -736,7 +633,7 @@ ROM_START( bikiniko )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(4a2142d6) SHA1(3a762f7b7cccdb6715b5f59524b04b12694fc130) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -755,7 +652,7 @@ ROM_START( csplayh6 )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(3ce03f2d) SHA1(5ccdcac8bad25b4f680ed7a2074575711c25af41) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -777,7 +674,7 @@ ROM_START( thenanpa )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f44c4095) SHA1(d43e464bd6d614c34791445f8fd4af2f62a4dfc2) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -798,7 +695,7 @@ ROM_START( pokoachu )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(9d344bad) SHA1(276c8066a2b5090edf6ba00843b7a9496c90f99f) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -819,7 +716,7 @@ ROM_START( csplayh7 )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(5905b199) SHA1(9155455bc21d23d439c4732549ff1143ee17b9d3) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -840,7 +737,7 @@ ROM_START( aimode )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(e6404950) SHA1(bb179c27ce65f7dc58d2aeed4710347e7953e11c) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -861,7 +758,7 @@ ROM_START( fuudol )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f6442026) SHA1(f49ddeeeaf6fffdccea9ba73bce3ca60c07a7647) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -882,7 +779,7 @@ ROM_START( tsuwaku )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(8451b9a9) SHA1(4e61c4b5ea7e91b53c97bd060b41466ba5005fd0) )
 	
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -903,7 +800,7 @@ ROM_START( nichisel )
 
 	DVD_BIOS
 	
-	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(f94981fd) SHA1(84dae027f10717a084016310cd245bb4c2ee6a56) )
 	
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
