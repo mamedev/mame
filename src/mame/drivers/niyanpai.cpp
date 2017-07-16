@@ -686,11 +686,6 @@ INTERRUPT_GEN_MEMBER(niyanpai_state::interrupt)
 	m_tmp68301->external_interrupt_0();
 }
 
-static const z80_daisy_config daisy_chain_sound[] =
-{
-	TMPZ84C011_DAISY_INTERNAL,
-	{ nullptr }
-};
 
 static MACHINE_CONFIG_START( niyanpai )
 
