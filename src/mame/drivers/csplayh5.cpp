@@ -78,6 +78,7 @@ public:
 	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
 	DECLARE_READ8_MEMBER(csplayh5_sound_r);
 	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
+	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
 
 	DECLARE_READ8_MEMBER(soundcpu_portd_r);
 	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
@@ -420,6 +421,16 @@ WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
 }
 #endif
 
+WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
+{
+	/*
+		bit 6 used during ROM check, h8 reset assert?
+	*/
+	
+	if(data & ~0x40)
+		printf("%04x\n",data);
+}
+
 
 static MACHINE_CONFIG_START( csplayh5 )
 
@@ -431,6 +442,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
 	MCFG_CPU_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
