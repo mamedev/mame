@@ -343,10 +343,11 @@ WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
 WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 {
 	/*
-		bit 6 used during ROM check, h8 reset assert?
+		-x-- ---- used during ROM check, h8 reset assert?
+		---- x--- enable DVD sound? Used by aimode at very least
 	*/
 	
-	if(data & ~0x40)
+	if(data & ~0x48)
 		printf("%04x\n",data);
 }
 
