@@ -12,7 +12,6 @@
 #include "video/tms34061.h"
 #include "screen.h"
 
-#define YBUFFER_COUNT   15
 
 class itech8_state : public driver_device
 {
@@ -30,6 +29,10 @@ public:
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY"),
 		m_visarea(0, 0, 0, 0) { }
+
+    static constexpr uint32_t YBUFFER_COUNT = 15;
+    static constexpr uint32_t VRAM_SIZE = 0x40000;
+    static constexpr uint32_t VRAM_MASK = VRAM_SIZE - 1;
 
 	enum
 	{
