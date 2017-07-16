@@ -96,7 +96,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc6847_base_device> m_mc6847;
+	required_device<mc6847_device> m_mc6847;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<vtech_ioexp_slot_device> m_ioexp;

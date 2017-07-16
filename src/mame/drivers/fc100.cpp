@@ -104,7 +104,7 @@ private:
 	bool m_banksw_unlocked;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc6847_base_device> m_vdg;
+	required_device<mc6847_device> m_vdg;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;

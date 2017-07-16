@@ -61,7 +61,7 @@ private:
 	void configure_sam(void);
 
 	required_device<sam6883_device> m_sam;
-	required_device<mc6847_base_device> m_vdg;
+	required_device<mc6847_device> m_vdg;
 };
 
 #endif // MAME_INCLUDES_COCO12_H

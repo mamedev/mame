@@ -132,7 +132,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
-	required_device<mc6847_base_device> m_crtc;
+	required_device<mc6847_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pia6821_device> m_pia0;
 	optional_device<pia6821_device> m_pia1;

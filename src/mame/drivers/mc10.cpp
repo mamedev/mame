@@ -62,7 +62,7 @@ private:
 	};
 
 	required_device<m6803_cpu_device> m_maincpu;
-	optional_device<mc6847_base_device> m_mc6847;
+	optional_device<mc6847_device> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
 	required_device<dac_bit_interface> m_dac;
 	required_device<ram_device> m_ram;

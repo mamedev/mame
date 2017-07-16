@@ -97,7 +97,7 @@
 #define LOG_INPUT               0
 
 
-const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
+const uint32_t mc6847_device::s_palette[mc6847_device::PALETTE_LENGTH] =
 {
 	rgb_t(0x07, 0xff, 0x00), /* GREEN */
 	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
@@ -544,7 +544,7 @@ std::string mc6847_friend_device::describe_context() const
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs) :
+mc6847_device::mc6847_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs) :
 	mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true),
 	m_input_cb(*this),
 	m_black_and_white(false),
@@ -565,7 +565,7 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 //  setup_fixed_mode - sets up fixed mode mask
 //-------------------------------------------------
 
-void mc6847_base_device::setup_fixed_mode()
+void mc6847_device::setup_fixed_mode()
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -579,7 +579,7 @@ void mc6847_base_device::setup_fixed_mode()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void mc6847_base_device::device_start()
+void mc6847_device::device_start()
 {
 	/* inherited function */
 	mc6847_friend_device::device_start();
@@ -611,7 +611,7 @@ void mc6847_base_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void mc6847_base_device::device_reset()
+void mc6847_device::device_reset()
 {
 	mc6847_friend_device::device_reset();
 	m_mode = m_fixed_mode;
@@ -623,7 +623,7 @@ void mc6847_base_device::device_reset()
 //  input
 //-------------------------------------------------
 
-uint8_t mc6847_base_device::input(uint16_t address)
+uint8_t mc6847_device::input(uint16_t address)
 {
 	uint8_t data = m_input_cb(address);
 	if (LOG_INPUT)
@@ -638,7 +638,7 @@ uint8_t mc6847_base_device::input(uint16_t address)
 //-------------------------------------------------
 
 template<int sample_count, int yres>
-void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, int32_t end_pos)
+void mc6847_device::record_scanline_res(int scanline, int32_t start_pos, int32_t end_pos)
 {
 	// determine the "sample_modulo" (e.g. - for 32 samples per row, query the video RAM every
 	// position, for 16 samples per row, query every other position)
@@ -682,7 +682,7 @@ void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, in
 //  record_body_scanline
 //-------------------------------------------------
 
-inline void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos)
+inline void mc6847_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos)
 {
 	// sanity checks
 	assert(scanline < 192);
@@ -734,7 +734,7 @@ inline void mc6847_base_device::record_body_scanline(uint16_t physical_scanline,
 //  record_body_scanline
 //-------------------------------------------------
 
-void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline)
+void mc6847_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline)
 {
 	record_body_scanline(physical_scanline, scanline, 0, 32);
 }
@@ -745,7 +745,7 @@ void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16
 //  record_partial_body_scanline
 //-------------------------------------------------
 
-void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_clock, int32_t end_clock)
+void mc6847_device::record_partial_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_clock, int32_t end_clock)
 {
 	int32_t start_pos = std::max(scanline_position_from_clock(start_clock), 0);
 	int32_t end_pos = std::min(scanline_position_from_clock(end_clock), 42);
@@ -760,7 +760,7 @@ void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline
 //  scanline_position_from_clock
 //-------------------------------------------------
 
-int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hsync)
+int32_t mc6847_device::scanline_position_from_clock(int32_t clocks_since_hsync)
 {
 	return (clocks_since_hsync - 20) / 4;
 }
@@ -771,7 +771,7 @@ int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hs
 //  field_sync_changed
 //-------------------------------------------------
 
-void mc6847_base_device::field_sync_changed(bool line)
+void mc6847_device::field_sync_changed(bool line)
 {
 	/* when field sync is on, the DA* enter the Hi-Z state */
 	if (line)
@@ -784,7 +784,7 @@ void mc6847_base_device::field_sync_changed(bool line)
 //  border_value
 //-------------------------------------------------
 
-inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode, const pixel_t *palette, bool is_mc6847t1)
+inline mc6847_device::pixel_t mc6847_device::border_value(uint8_t mode, const pixel_t *palette, bool is_mc6847t1)
 {
 	pixel_t result;
 	switch(mc6847_friend_device::border_value(mode, is_mc6847t1))
@@ -813,7 +813,7 @@ inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode
 //  update
 //-------------------------------------------------
 
-uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mc6847_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int base_x = 32;
 	int base_y = 25;
@@ -891,6 +891,44 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
+
+
+//
+// In the Bandai Super Vision 8000 there is a video setting
+// bit which causes black to be displayed as blue when css=1.
+//
+// This is probably done through circuitry outside the s68047,
+// but lacking schematics we don't know how it is hooked up
+// exactly.
+//
+// See https://www.youtube.com/watch?v=QCo24GLyff4
+//
+void mc6847_device::hack_black_becomes_blue(bool flag)
+{
+	static const uint32_t s_s68047_hack_palette[16] =
+	{
+		rgb_t(0x07, 0xff, 0x00), /* GREEN */
+		rgb_t(0xff, 0xff, 0x00), /* YELLOW */
+		rgb_t(0x3b, 0x08, 0xff), /* BLUE */
+		rgb_t(0xcc, 0x00, 0x3b), /* RED */
+		rgb_t(0xff, 0xff, 0xff), /* BUFF */
+		rgb_t(0x07, 0xe3, 0x99), /* CYAN */
+		rgb_t(0xff, 0x1c, 0xff), /* MAGENTA */
+		rgb_t(0xff, 0x81, 0x00), /* ORANGE */
+
+		rgb_t(0x00, 0x00, 0x00), /* BLACK */
+		rgb_t(0x07, 0xff, 0x00), /* GREEN */
+		rgb_t(0x3b, 0x08, 0xff), /* BLUE */
+		rgb_t(0xff, 0xff, 0xff), /* BUFF */
+
+		rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
+		rgb_t(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
+		rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
+		rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
+	};
+
+	set_custom_palette(flag ? s_s68047_hack_palette : nullptr);
+}
 
 
 //**************************************************************************
@@ -1625,7 +1663,7 @@ INPUT_PORTS_START(mc6847_artifacting)
 	PORT_CONFSETTING(    0x02, DEF_STR( Reverse ) )
 INPUT_PORTS_END
 
-ioport_constructor mc6847_base_device::device_input_ports() const
+ioport_constructor mc6847_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(mc6847_artifacting);
 }
@@ -1636,7 +1674,7 @@ ioport_constructor mc6847_base_device::device_input_ports() const
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::artifacter::artifacter()
+mc6847_device::artifacter::artifacter()
 {
 	m_config = nullptr;
 	m_artifacting = 0;
@@ -1652,7 +1690,7 @@ mc6847_base_device::artifacter::artifacter()
 //  artifacter::setup_config
 //-------------------------------------------------
 
-void mc6847_base_device::artifacter::setup_config(device_t *device)
+void mc6847_device::artifacter::setup_config(device_t *device)
 {
 	char port_name[32];
 	snprintf(port_name, ARRAY_LENGTH(port_name), "%s:%s", device->tag(), ARTIFACTING_TAG);
@@ -1665,7 +1703,7 @@ void mc6847_base_device::artifacter::setup_config(device_t *device)
 //  artifacter::update_colors
 //-------------------------------------------------
 
-void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
+void mc6847_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 {
 	/* Boy this code sucks; this code was adapted from the old M6847
 	 * artifacting implmentation.  The only reason that it didn't look as
@@ -1747,16 +1785,90 @@ void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 //  artifacter::update
 //-------------------------------------------------
 
-mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double factor, uint8_t c0, uint8_t c1)
+mc6847_device::pixel_t mc6847_device::artifacter::mix_color(double factor, uint8_t c0, uint8_t c1)
 {
 	return (uint32_t) (uint8_t) ((c0 * (1.0 - factor)) + (c1 * (0.0 + factor)) + 0.5);
 }
 
 
-
 //**************************************************************************
 //  VARIATIONS
 //**************************************************************************
+
+namespace
+{
+	class mc6847_ntsc_device : public mc6847_device
+	{
+	public:
+		mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, MC6847_NTSC, tag, owner, clock, ntsc_square_fontdata8x12, 262.0)
+		{
+		}
+	};
+
+	class mc6847_pal_device : public mc6847_device
+	{
+	public:
+		mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, MC6847_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
+		{
+		}
+	};
+
+	class mc6847y_ntsc_device : public mc6847_device
+	{
+	public:
+		mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, MC6847Y_NTSC, tag, owner, clock, ntsc_square_fontdata8x12, 262.5)
+		{
+		}
+	};
+
+	class mc6847y_pal_device : public mc6847_device
+	{
+	public:
+		mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, MC6847Y_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
+		{
+		}
+	};
+
+	class mc6847t1_ntsc_device : public mc6847_device
+	{
+	public:
+		mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, MC6847T1_NTSC, tag, owner, clock, ntsc_round_fontdata8x12, 262.0)
+		{
+		}
+	};
+
+	class mc6847t1_pal_device : public mc6847_device
+	{
+	public:
+		mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, MC6847T1_PAL, tag, owner, clock, pal_round_fontdata8x12, 313.0)
+		{
+		}
+	};
+
+	class s68047_device : public mc6847_device
+	{
+	public:
+		s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, S68047, tag, owner, clock, s68047_fontdata8x12, 262.0)
+		{
+		}
+	};
+
+	class m5c6847p1_device : public mc6847_device
+	{
+	public:
+		m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: mc6847_device(mconfig, M5C6847P1, tag, owner, clock, ntsc_square_fontdata8x12, 262.5)
+		{
+		}
+	};
+}
 
 DEFINE_DEVICE_TYPE(MC6847_NTSC,   mc6847_ntsc_device,   "mc6847_ntsc",   "Motorola MC6847 VDG (NTSC)")
 DEFINE_DEVICE_TYPE(MC6847_PAL,    mc6847_pal_device,    "mc6847_pal",    "Motorola MC6847 VDG (PAL)")
@@ -1766,129 +1878,3 @@ DEFINE_DEVICE_TYPE(MC6847T1_NTSC, mc6847t1_ntsc_device, "mc6847t1_ntsc", "Motoro
 DEFINE_DEVICE_TYPE(MC6847T1_PAL,  mc6847t1_pal_device,  "mc6847t1_pal",  "Motorola MC6847T1 VDG (PAL)")
 DEFINE_DEVICE_TYPE(S68047,        s68047_device,        "s68047",        "AMI S68047")
 DEFINE_DEVICE_TYPE(M5C6847P1,     m5c6847p1_device,     "m5c6847p1",     "Mitsubishi M5C6847P-1 VDG")
-
-
-
-//-------------------------------------------------
-//  mc6847_ntsc_device
-//-------------------------------------------------
-
-mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847_NTSC, tag, owner, clock, ntsc_square_fontdata8x12, 262.0)
-{
-}
-
-
-
-//-------------------------------------------------
-//  mc6847_pal_device
-//-------------------------------------------------
-
-mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
-{
-}
-
-
-
-//-------------------------------------------------
-//  mc6847y_ntsc_device
-//-------------------------------------------------
-
-mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847Y_NTSC, tag, owner, clock, ntsc_square_fontdata8x12, 262.5)
-{
-}
-
-
-
-//-------------------------------------------------
-//  mc6847y_pal_device
-//-------------------------------------------------
-
-mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847Y_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
-{
-}
-
-
-
-//-------------------------------------------------
-//  mc6847t1_ntsc_device
-//-------------------------------------------------
-
-mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847T1_NTSC, tag, owner, clock, ntsc_round_fontdata8x12, 262.0)
-{
-}
-
-
-
-//-------------------------------------------------
-//  mc6847t1_pal_device
-//-------------------------------------------------
-
-mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, pal_round_fontdata8x12, 313.0)
-{
-}
-
-
-
-//-------------------------------------------------
-//  s68047_device
-//-------------------------------------------------
-
-s68047_device::s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, S68047, tag, owner, clock, s68047_fontdata8x12, 262.0)
-{
-}
-
-
-//
-// In the Bandai Super Vision 8000 there is a video setting
-// bit which causes black to be displayed as blue when css=1.
-//
-// This is probably done through circuitry outside the s68047,
-// but lacking schematics we don't know how it is hooked up
-// exactly.
-//
-// See https://www.youtube.com/watch?v=QCo24GLyff4
-//
-void s68047_device::hack_black_becomes_blue(bool flag)
-{
-	set_custom_palette( flag ? s_s68047_hack_palette : nullptr );
-}
-
-const uint32_t s68047_device::s_s68047_hack_palette[16] =
-{
-	rgb_t(0x07, 0xff, 0x00), /* GREEN */
-	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
-	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
-	rgb_t(0xcc, 0x00, 0x3b), /* RED */
-	rgb_t(0xff, 0xff, 0xff), /* BUFF */
-	rgb_t(0x07, 0xe3, 0x99), /* CYAN */
-	rgb_t(0xff, 0x1c, 0xff), /* MAGENTA */
-	rgb_t(0xff, 0x81, 0x00), /* ORANGE */
-
-	rgb_t(0x00, 0x00, 0x00), /* BLACK */
-	rgb_t(0x07, 0xff, 0x00), /* GREEN */
-	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
-	rgb_t(0xff, 0xff, 0xff), /* BUFF */
-
-	rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
-	rgb_t(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
-	rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
-	rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
-};
-
-
-
-//-------------------------------------------------
-//  m5c6847p1_device
-//-------------------------------------------------
-
-m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, M5C6847P1, tag, owner, clock, ntsc_square_fontdata8x12, 262.5)
-{
-}

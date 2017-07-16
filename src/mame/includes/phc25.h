@@ -49,7 +49,7 @@ private:
 	uint8_t m_port40;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<cpu_device> m_maincpu;
-	required_device<mc6847_base_device> m_vdg;
+	required_device<mc6847_device> m_vdg;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cassette;
 	int m_centronics_busy;

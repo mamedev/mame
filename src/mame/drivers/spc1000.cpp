@@ -188,7 +188,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;
-	required_device<mc6847_base_device> m_vdg;
+	required_device<mc6847_device> m_vdg;
 	required_device<cassette_image_device> m_cass;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_p_videoram;

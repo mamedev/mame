@@ -21,7 +21,7 @@
 
 #define MCFG_SCREEN_MC6847_NTSC_ADD(_tag, _mctag) \
 	MCFG_SCREEN_ADD(_tag, RASTER)                               \
-	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
+	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_device, screen_update) \
 	MCFG_SCREEN_REFRESH_RATE(60)                                \
 	MCFG_SCREEN_SIZE(320, 243)                                  \
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
@@ -29,7 +29,7 @@
 
 #define MCFG_SCREEN_MC6847_PAL_ADD(_tag, _mctag) \
 	MCFG_SCREEN_ADD(_tag, RASTER)                               \
-	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
+	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_device, screen_update) \
 	MCFG_SCREEN_REFRESH_RATE(50)                                \
 	MCFG_SCREEN_SIZE(320, 243)                                  \
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
@@ -45,13 +45,13 @@
 	mc6847_friend_device::set_get_char_rom(*device, mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6847_INPUT_CALLBACK(_read) \
-	devcb = &mc6847_base_device::set_input_callback(*device, DEVCB_##_read);
+	devcb = &mc6847_device::set_input_callback(*device, DEVCB_##_read);
 
 #define MCFG_MC6847_FIXED_MODE(_mode) \
-	mc6847_base_device::set_get_fixed_mode(*device, _mode);
+	mc6847_device::set_get_fixed_mode(*device, _mode);
 
 #define MCFG_MC6847_BW(_bw) \
-	mc6847_base_device::set_black_and_white(*device, _bw);
+	mc6847_device::set_black_and_white(*device, _bw);
 
 
 #define MC6847_GET_CHARROM_MEMBER(_name)   uint8_t _name(uint8_t ch, int line)
@@ -265,7 +265,7 @@ protected:
 	devcb_write_line   m_write_fsync;
 
 	/* if specified, this reads the external char rom off of the driver state */
-	// moved here from mc6847_base_device so to be useable in GIME
+	// moved here from mc6847_device so to be useable in GIME
 	get_char_rom_delegate m_charrom_cb;
 
 	// incidentals
@@ -505,13 +505,13 @@ private:
 };
 
 // actual base class for MC6847 family of devices
-class mc6847_base_device : public mc6847_friend_device
+class mc6847_device : public mc6847_friend_device
 {
 public:
-	template <class Object> static devcb_base &set_input_callback(device_t &device, Object &&cb) { return downcast<mc6847_base_device &>(device).m_input_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_input_callback(device_t &device, Object &&cb) { return downcast<mc6847_device &>(device).m_input_cb.set_callback(std::forward<Object>(cb)); }
 
-	static void set_get_fixed_mode(device_t &device, uint8_t mode) { downcast<mc6847_base_device &>(device).m_fixed_mode = mode; }
-	static void set_black_and_white(device_t &device, bool bw) { downcast<mc6847_base_device &>(device).m_black_and_white = bw; }
+	static void set_get_fixed_mode(device_t &device, uint8_t mode) { downcast<mc6847_device &>(device).m_fixed_mode = mode; }
+	static void set_black_and_white(device_t &device, bool bw) { downcast<mc6847_device &>(device).m_black_and_white = bw; }
 
 	/* updates the screen -- this will call begin_update(),
 	   followed by update_row() repeatedly and after all row
@@ -528,8 +528,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( intext_w )   { change_mode(MODE_INTEXT, state); }
 	DECLARE_WRITE_LINE_MEMBER( inv_w )      { change_mode(MODE_INV, state); }
 
+	void hack_black_becomes_blue(bool flag);
+
 protected:
-	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs);
+	mc6847_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -629,67 +631,13 @@ private:
 //  VARIATIONS
 //**************************************************************************
 
-class mc6847_ntsc_device : public mc6847_base_device
-{
-public:
-	mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class mc6847_pal_device : public mc6847_base_device
-{
-public:
-	mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class mc6847y_ntsc_device : public mc6847_base_device
-{
-public:
-	mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class mc6847y_pal_device : public mc6847_base_device
-{
-public:
-	mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class mc6847t1_ntsc_device : public mc6847_base_device
-{
-public:
-	mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class mc6847t1_pal_device : public mc6847_base_device
-{
-public:
-	mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class s68047_device : public mc6847_base_device
-{
-public:
-	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void hack_black_becomes_blue(bool flag);
-
-private:
-	static const uint32_t s_s68047_hack_palette[16];
-};
-
-class m5c6847p1_device : public mc6847_base_device
-{
-public:
-	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-DECLARE_DEVICE_TYPE(MC6847_NTSC,   mc6847_ntsc_device)
-DECLARE_DEVICE_TYPE(MC6847_PAL,    mc6847_pal_device)
-DECLARE_DEVICE_TYPE(MC6847Y_NTSC,  mc6847t1_ntsc_device)
-DECLARE_DEVICE_TYPE(MC6847Y_PAL,   mc6847y_pal_device)
-DECLARE_DEVICE_TYPE(MC6847T1_NTSC, mc6847t1_ntsc_device)
-DECLARE_DEVICE_TYPE(MC6847T1_PAL,  mc6847t1_pal_device)
-DECLARE_DEVICE_TYPE(S68047,        s68047_device)
-DECLARE_DEVICE_TYPE(M5C6847P1,     m5c6847p1_device)
+extern const device_type MC6847_NTSC;
+extern const device_type MC6847_PAL;
+extern const device_type MC6847Y_NTSC;
+extern const device_type MC6847Y_PAL;
+extern const device_type MC6847T1_NTSC;
+extern const device_type MC6847T1_PAL;
+extern const device_type S68047;
+extern const device_type M5C6847P1;
 
 #endif // MAME_VIDEO_MC6847_H
