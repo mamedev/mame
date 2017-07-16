@@ -152,6 +152,9 @@ static const int ENVCNT[0x20]
 #define LEtoME16( x ) little_endianize_int16(x)
 #define MEtoLE16( x ) little_endianize_int16(x)
 
+ALLOW_SAVE_TYPE(snes_sound_device::env_state_t32);
+
+
 
 DEFINE_DEVICE_TYPE(SNES, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
 
@@ -348,7 +351,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			unable to find any pattern.  I doubt it will matter though, so
 			we'll go ahead and do the full time for now. */
 			vp->envcnt   = CNT_INIT;
-			vp->envstate = ATTACK;
+			vp->envstate = env_state_t32::ATTACK;
 		}
 
 		if (m_dsp_regs[0x4c] & m & ~m_dsp_regs[0x5c])
@@ -365,7 +368,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 		if (m_keys & m_dsp_regs[0x5c] & m)
 		{
 			/* Voice was keyed off */
-			vp->envstate = RELEASE;
+			vp->envstate = env_state_t32::RELEASE;
 			vp->on_cnt   = 0;
 
 #ifdef DBG_KEY
@@ -747,7 +750,7 @@ int snes_sound_device::advance_envelope( int v )
 
 	envx = m_voice_state[v].envx;
 
-	if (m_voice_state[v].envstate == RELEASE)
+	if (m_voice_state[v].envstate == env_state_t32::RELEASE)
 	{
 		/* Docs: "When in the state of "key off". the "click" sound is prevented
 		by the addition of the fixed value 1/256"  WTF???  Alright, I'm going
@@ -780,7 +783,7 @@ int snes_sound_device::advance_envelope( int v )
 	{
 		switch (m_voice_state[v].envstate)
 		{
-		case ATTACK:
+		case env_state_t32::ATTACK:
 			/* Docs are very confusing.  "AR is multiplied by the fixed value
 			1/64..."  I believe it means to add 1/64th to ENVX once every
 			time ATTACK is updated, and that's what I'm going to implement. */
@@ -808,7 +811,7 @@ int snes_sound_device::advance_envelope( int v )
 			if (envx > 0x7ff)
 			{
 				envx = 0x7ff;
-				m_voice_state[v].envstate = DECAY;
+				m_voice_state[v].envstate = env_state_t32::DECAY;
 			}
 
 #ifdef DBG_ENV
@@ -818,7 +821,7 @@ int snes_sound_device::advance_envelope( int v )
 			m_voice_state[v].envx = envx;
 			break;
 
-		case DECAY:
+		case env_state_t32::DECAY:
 			/* Docs: "DR... [is multiplied] by the fixed value 1-1/256."
 			Well, at least that makes some sense.  Multiplying ENVX by
 			255/256 every time DECAY is updated. */
@@ -832,7 +835,7 @@ int snes_sound_device::advance_envelope( int v )
 			}
 
 			if (envx <= 0x100 * (SL(v) + 1))
-				m_voice_state[v].envstate = SUSTAIN;
+				m_voice_state[v].envstate = env_state_t32::SUSTAIN;
 
 #ifdef DBG_ENV
 			logerror("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
@@ -840,7 +843,7 @@ int snes_sound_device::advance_envelope( int v )
 
 			break;
 
-		case SUSTAIN:
+		case env_state_t32::SUSTAIN:
 			/* Docs: "SR [is multiplied] by the fixed value 1-1/256."
 			Multiplying ENVX by 255/256 every time SUSTAIN is updated. */
 #ifdef DBG_ENV
@@ -864,7 +867,7 @@ int snes_sound_device::advance_envelope( int v )
 			/* Note: no way out of this state except by explicit KEY OFF (or switch to GAIN). */
 			break;
 
-		case RELEASE:   /* Handled earlier to prevent GAIN mode from stopping KEY OFF events */
+		case env_state_t32::RELEASE:   /* Handled earlier to prevent GAIN mode from stopping KEY OFF events */
 			break;
 		}
 	}
