@@ -54,7 +54,7 @@ protected:
 
 private:
 	//printer state
-	enum class printer_state
+	enum class printer_state : uint8_t
 	{
 		WAIT,
 		REC,
@@ -80,7 +80,7 @@ private:
 	// printer
 	uint8_t m_pr_buffer;
 	uint8_t m_pr_counter;
-	uint8_t m_pr_state;
+	printer_state m_pr_state;
 
 	uint8_t read_keyboard_strobe(bool single_line);
 };
@@ -179,12 +179,12 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 	// bit 0, cassette & printer output
 	m_cassette->output( BIT(data, 0) ? +1.0 : -1.0);
 
-	switch ((printer_state)m_pr_state)
+	switch (m_pr_state)
 	{
 		case printer_state::WAIT:
 			if (BIT(m_port2, 0) && !BIT(data, 0))
 			{
-				m_pr_state = (uint8_t)printer_state::REC;
+				m_pr_state = printer_state::REC;
 				m_pr_counter = 8;
 				m_pr_buffer = 0;
 			}
@@ -193,12 +193,12 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 			if (m_pr_counter--)
 				m_pr_buffer |= (BIT(data,0)<<(7-m_pr_counter));
 			else
-				m_pr_state = (uint8_t)printer_state::DONE;
+				m_pr_state = printer_state::DONE;
 			break;
 		case printer_state::DONE:
 			if (BIT(data,0))
 				m_printer->output(m_pr_buffer);
-			m_pr_state = (uint8_t)printer_state::WAIT;
+			m_pr_state = printer_state::WAIT;
 			break;
 	}
 
@@ -257,7 +257,7 @@ void mc10_state::driver_start()
 	/* initialize memory */
 	m_ram_base = m_ram->pointer();
 	m_ram_size = m_ram->size();
-	m_pr_state = (uint8_t)printer_state::WAIT;
+	m_pr_state = printer_state::WAIT;
 
 	m_bank1->set_base(m_ram_base);
 
@@ -279,14 +279,12 @@ void mc10_state::driver_start()
 		m_maincpu->m6801_io_w(prg, 0x05, 0xff);
 }
 
-}
-
 
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mc10_mem, AS_PROGRAM, 8 , mc10_state)
+ADDRESS_MAP_START( mc10_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0x0100, 0x3fff) AM_NOP /* unused */
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") /* 4k internal ram */
 	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
@@ -295,12 +293,12 @@ static ADDRESS_MAP_START( mc10_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mc10_io, AS_IO, 8 , mc10_state)
+ADDRESS_MAP_START( mc10_io, AS_IO, 8 , mc10_state)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(mc10_port1_r, mc10_port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(mc10_port2_r, mc10_port2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alice32_mem, AS_PROGRAM, 8 , mc10_state)
+ADDRESS_MAP_START( alice32_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
 	AM_RANGE(0x3000, 0x4fff) AM_RAMBANK("bank1") /* 8k internal ram */
 	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
@@ -310,7 +308,7 @@ static ADDRESS_MAP_START( alice32_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alice90_mem, AS_PROGRAM, 8 , mc10_state)
+ADDRESS_MAP_START( alice90_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
 	AM_RANGE(0x3000, 0xafff) AM_RAMBANK("bank1")    /* 32k internal ram */
 	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
@@ -335,7 +333,7 @@ ADDRESS_MAP_END
  */
 
 /*  Port                                        Key description                 Emulated key                  Natural key     Shift 1         Shift 2 (Ctrl) */
-static INPUT_PORTS_START( mc10 )
+INPUT_PORTS_START( mc10 )
 	PORT_START("pb0") /* KEY ROW 0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@     INPUT")        PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H     THEN")         PORT_CODE(KEYCODE_H)          PORT_CHAR('H')
@@ -414,7 +412,7 @@ INPUT_PORTS_END
 
 /* Alice uses an AZERTY keyboard */
 /*  Port                                        Key description                 Emulated key                  Natural key     Shift 1         Shift 2 (Ctrl) */
-static INPUT_PORTS_START( alice )
+INPUT_PORTS_START( alice )
 	PORT_START("pb0") /* KEY ROW 0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@     INPUT")        PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H     THEN")         PORT_CODE(KEYCODE_H)          PORT_CHAR('H')
@@ -495,7 +493,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mc10 )
+MACHINE_CONFIG_START( mc10 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
@@ -531,7 +529,7 @@ static MACHINE_CONFIG_START( mc10 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc10")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alice32 )
+MACHINE_CONFIG_START( alice32 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
@@ -574,7 +572,7 @@ static MACHINE_CONFIG_START( alice32 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mc10_cass", "mc10")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( alice90, alice32 )
+MACHINE_CONFIG_DERIVED( alice90, alice32 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alice90_mem)
 
@@ -586,6 +584,8 @@ static MACHINE_CONFIG_DERIVED( alice90, alice32 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("alice32_cass", "alice32")
 	MCFG_DEVICE_REMOVE("mc10_cass")
 MACHINE_CONFIG_END
+
+}
 
 
 /***************************************************************************
@@ -617,6 +617,8 @@ ROM_START( alice90 )
 	ROM_REGION( 0x2000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
+
+ALLOW_SAVE_TYPE(mc10_state::printer_state);
 
 /***************************************************************************
     GAME DRIVERS
