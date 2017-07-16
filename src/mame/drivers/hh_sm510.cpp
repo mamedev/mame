@@ -1533,7 +1533,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( tsjam )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz) // no external XTAL
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(tsjam_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
