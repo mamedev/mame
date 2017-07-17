@@ -10,6 +10,10 @@
 #include "emu.h"
 #include "screen.h"
 #include "cpu/capricorn/capricorn.h"
+#include "speaker.h"
+#include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 // Debugging
 #define VERBOSE 1
@@ -48,20 +52,24 @@ static constexpr unsigned MASTER_CLOCK  = 9808000;
 static constexpr unsigned VIDEO_MEM_SIZE= 8192;
 static constexpr unsigned ALPHA_MEM_SIZE= 4096;
 static constexpr unsigned GRAPH_MEM_SIZE= 16384;
-static constexpr unsigned CRT_STS_READY_BIT     = 0;
-static constexpr unsigned CRT_STS_DISPLAY_BIT   = 1;
-//static constexpr unsigned CRT_STS_BUSY_BIT      = 7;
-static constexpr unsigned CRT_CTL_RD_RQ_BIT     = 0;
-static constexpr unsigned CRT_CTL_WIPEOUT_BIT   = 1;
-static constexpr unsigned CRT_CTL_POWERDN_BIT   = 2;
-static constexpr unsigned CRT_CTL_GRAPHICS_BIT  = 7;
-static constexpr unsigned IRQ_KEYBOARD_BIT      = 0;
-static constexpr unsigned IRQ_TIMER0_BIT        = 1;
-static constexpr unsigned TIMER_COUNT           = 4;
-static constexpr unsigned IRQ_IOP0_BIT          = IRQ_TIMER0_BIT + TIMER_COUNT;
-static constexpr unsigned IOP_COUNT             = 0;
-static constexpr unsigned IRQ_BIT_COUNT         = IRQ_IOP0_BIT + IOP_COUNT;
-static constexpr unsigned NO_IRQ                = IRQ_BIT_COUNT;
+static constexpr unsigned CRT_STS_READY_BIT		= 0;
+static constexpr unsigned CRT_STS_DISPLAY_BIT	= 1;
+static constexpr unsigned CRT_STS_BUSY_BIT		= 7;
+static constexpr unsigned CRT_CTL_RD_RQ_BIT		= 0;
+static constexpr unsigned CRT_CTL_WIPEOUT_BIT	= 1;
+static constexpr unsigned CRT_CTL_POWERDN_BIT	= 2;
+static constexpr unsigned CRT_CTL_GRAPHICS_BIT	= 7;
+// Time to read/write a byte in video memory (in master clock cycles)
+static constexpr unsigned CRT_RW_TIME			= 96;
+// Time taken by hw timer updating (semi-made up) (in usec)
+static constexpr unsigned TIMER_BUSY_USEC	= 128;
+static constexpr unsigned IRQ_KEYBOARD_BIT	= 0;
+static constexpr unsigned IRQ_TIMER0_BIT	= 1;
+static constexpr unsigned TIMER_COUNT		= 4;
+static constexpr unsigned IRQ_IOP0_BIT		= IRQ_TIMER0_BIT + TIMER_COUNT;
+static constexpr unsigned IOP_COUNT			= 0;
+static constexpr unsigned IRQ_BIT_COUNT		= IRQ_IOP0_BIT + IOP_COUNT;
+static constexpr unsigned NO_IRQ			= IRQ_BIT_COUNT;
 
 // ************
 //  hp85_state
@@ -87,13 +95,24 @@ public:
 	DECLARE_WRITE8_MEMBER(keycod_w);
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
+	DECLARE_READ8_MEMBER(clksts_r);
+	DECLARE_WRITE8_MEMBER(clksts_w);
+	DECLARE_READ8_MEMBER(clkdat_r);
+	DECLARE_WRITE8_MEMBER(clkdat_w);
 	DECLARE_WRITE8_MEMBER(rselec_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
+	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_update);
+	TIMER_DEVICE_CALLBACK_MEMBER(clk_busy_timer);
 protected:
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<timer_device> m_vm_timer;
+	required_device<timer_device> m_clk_busy_timer;
+	required_device<beep_device> m_beep;
+	required_device<dac_1bit_device> m_dac;
 	required_region_ptr<uint8_t> m_rom00;
 	required_memory_bank m_rombank;
 	required_ioport m_io_key0;
@@ -111,6 +130,7 @@ protected:
 	uint8_t m_crt_sts;
 	uint8_t m_crt_ctl;
 	uint8_t m_crt_read_byte;
+	uint8_t m_crt_write_byte;
 	uint8_t m_empty_bank[ 0x2000 ];
 	bool m_global_int_en;
 	uint16_t m_int_req;
@@ -126,11 +146,24 @@ protected:
 	bool m_kb_flipped;
 	uint8_t m_kb_keycode;
 
+	// Timers
+	typedef struct {
+		uint8_t m_timer_cnt[ 4 ];
+		uint8_t m_timer_reg[ 4 ];
+		bool m_timer_en;
+		bool m_timer_clr;
+		uint8_t m_digit_to_match;
+	} hw_timer_t;
+	hw_timer_t m_hw_timer[ TIMER_COUNT ];
+	uint8_t m_timer_idx;
+	bool m_clk_busy;
+
+	attotime time_to_video_mem_availability() const;
 	static void get_video_addr(uint16_t addr , uint16_t& byte_addr , bool& lsb_nibble);
 	uint8_t video_mem_r(uint16_t addr , uint16_t addr_mask) const;
 	void video_mem_w(uint16_t addr , uint16_t addr_mask , uint8_t data);
 	void video_mem_read();
-	void video_mem_write(uint8_t data);
+	void video_mem_write();
 
 	bool kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& keycode);
 
@@ -145,6 +178,10 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 	  m_cpu(*this , "cpu"),
 	  m_screen(*this , "screen"),
 	  m_palette(*this , "palette"),
+	  m_vm_timer(*this , "vm_timer"),
+	  m_clk_busy_timer(*this , "clk_busy_timer"),
+	  m_beep(*this , "beeper"),
+	  m_dac(*this , "dac"),
 	  m_rom00(*this , "rom00"),
 	  m_rombank(*this , "rombank"),
 	  m_io_key0(*this , "KEY0"),
@@ -176,6 +213,7 @@ void hp85_state::machine_reset()
 	m_crt_sts = 0x7c;
 	m_crt_ctl = BIT_MASK(CRT_CTL_POWERDN_BIT) | BIT_MASK(CRT_CTL_WIPEOUT_BIT);
 	m_crt_read_byte = 0;
+	m_crt_write_byte = 0;
 	// Clear RSELEC
 	m_rombank->set_entry(0xff);
 
@@ -192,6 +230,17 @@ void hp85_state::machine_reset()
 	m_kb_enable = true;
 	m_kb_pressed = false;
 	m_kb_flipped = false;
+	for (auto& timer : m_hw_timer) {
+		for (unsigned i = 0; i < 4; i++) {
+			timer.m_timer_cnt[ i ] = 0;
+			timer.m_timer_reg[ i ] = 0;
+		}
+		timer.m_timer_en = false;
+		timer.m_timer_clr = false;
+		timer.m_digit_to_match = 0;
+	}
+	m_timer_idx = 0;
+	m_clk_busy = false;
 	update_irl();
 }
 
@@ -260,6 +309,7 @@ static const uint8_t vector_table[] = {
 
 IRQ_CALLBACK_MEMBER(hp85_state::irq_callback)
 {
+	logerror("IRQ ACK %u\n" , m_top_pending);
 	BIT_SET(m_int_acked , m_top_pending);
 	update_irl();
 	return vector_table[ m_top_pending ];
@@ -297,13 +347,13 @@ READ8_MEMBER(hp85_state::keysts_r)
 
 WRITE8_MEMBER(hp85_state::keysts_w)
 {
-	logerror("KEYSTS W=%02x\n" , data);
 	if (BIT(data , 0)) {
 		irq_en_w(IRQ_KEYBOARD_BIT , true);
 	} else if (BIT(data , 1)) {
 		irq_en_w(IRQ_KEYBOARD_BIT , false);
 	}
-	// TODO: beeper
+	m_dac->write(BIT(data , 5));
+	m_beep->set_state(BIT(data , 6));
 	if (BIT(data , 7)) {
 		m_kb_flipped = !m_kb_flipped;
 	}
@@ -316,7 +366,6 @@ READ8_MEMBER(hp85_state::keycod_r)
 
 WRITE8_MEMBER(hp85_state::keycod_w)
 {
-	logerror("KEYCOD W=%02x\n" , data);
 	if (data == 1) {
 		irq_w(IRQ_KEYBOARD_BIT , false);
 		m_kb_enable = true;
@@ -347,14 +396,12 @@ READ8_MEMBER(hp85_state::crtc_r)
 		res = m_crt_read_byte;
 		break;
 	}
-	logerror("RD @%u = %02x\n" , offset , res);
 	return res;
 }
 
 WRITE8_MEMBER(hp85_state::crtc_w)
 {
 	// Write to CRT controller (1MA5)
-	logerror("WR @%u = %02x\n" , offset , data);
 	uint8_t burst_idx = m_cpu->flatten_burst();
 	switch (offset) {
 	case 0:
@@ -364,7 +411,6 @@ WRITE8_MEMBER(hp85_state::crtc_w)
 		} else if (burst_idx == 0) {
 			m_crt_sad = (m_crt_sad & 0xff00) | data;
 		}
-		logerror("SAD=%04x m=%u\n" , m_crt_sad , burst_idx);
 		break;
 
 	case 1:
@@ -374,21 +420,114 @@ WRITE8_MEMBER(hp85_state::crtc_w)
 		} else if (burst_idx == 0) {
 			m_crt_bad = (m_crt_bad & 0xff00) | data;
 		}
-		logerror("BAD=%04x m=%u\n" , m_crt_bad , burst_idx);
 		break;
 
 	case 2:
 		// CRTCTL
 		m_crt_ctl = data;
 		if (BIT(m_crt_ctl , CRT_CTL_RD_RQ_BIT)) {
-			video_mem_read();
+			BIT_CLR(m_crt_sts , CRT_STS_READY_BIT);
+			BIT_SET(m_crt_sts , CRT_STS_BUSY_BIT);
+			attotime vm_av = time_to_video_mem_availability();
+			m_vm_timer->adjust(vm_av + attotime::from_ticks(CRT_RW_TIME , MASTER_CLOCK));
 		}
 		break;
 
 	case 3:
 		// CRTDAT
-		video_mem_write(data);
+		{
+			m_crt_write_byte = data;
+			BIT_CLR(m_crt_sts , CRT_STS_READY_BIT);
+			BIT_SET(m_crt_sts , CRT_STS_BUSY_BIT);
+			attotime vm_av = time_to_video_mem_availability();
+			m_vm_timer->adjust(vm_av + attotime::from_ticks(CRT_RW_TIME , MASTER_CLOCK));
+		}
 		break;
+	}
+}
+
+READ8_MEMBER(hp85_state::clksts_r)
+{
+	uint8_t res = 0;
+	for (unsigned i = 0; i < TIMER_COUNT; i++) {
+		if (BIT(m_int_en , IRQ_TIMER0_BIT + i)) {
+			BIT_SET(res , i);
+		}
+	}
+	if (!m_clk_busy) {
+		BIT_SET(res , 7);
+	}
+	//logerror("CLKSTS R=%02x\n" , res);
+	return res;
+}
+
+WRITE8_MEMBER(hp85_state::clksts_w)
+{
+	// logerror("CLKSTS W=%02x\n" , data);
+	if (data == 0x0c) {
+		// Set test mode (see timer_update)
+		auto& timer = m_hw_timer[ m_timer_idx ];
+		timer.m_digit_to_match = 1;
+		timer.m_timer_cnt[ 0 ] = timer.m_timer_reg[ 0 ];
+		timer.m_timer_cnt[ 1 ] = timer.m_timer_reg[ 1 ];
+		timer.m_timer_cnt[ 2 ] = timer.m_timer_reg[ 2 ];
+		timer.m_timer_cnt[ 3 ] = timer.m_timer_reg[ 3 ];
+		logerror("Test mode enabled for timer %u\n" , m_timer_idx);
+	} else {
+		m_timer_idx = (data >> 6) & 3;
+		auto& timer = m_hw_timer[ m_timer_idx ];
+		if (BIT(data , 0)) {
+			// Disable timer irq
+			irq_en_w(IRQ_TIMER0_BIT + m_timer_idx , false);
+		} else if (BIT(data , 1)) {
+			// Enable timer irq
+			irq_en_w(IRQ_TIMER0_BIT + m_timer_idx , true);
+		}
+		if (BIT(data , 2)) {
+			// Stop timer
+			timer.m_timer_en = false;
+		} else if (BIT(data , 3)) {
+			// Start timer
+			timer.m_timer_en = true;
+		}
+		if (BIT(data , 4) || (BIT(data , 3) && timer.m_digit_to_match)) {
+			// Clear timer
+			timer.m_timer_clr = true;
+			// Disable test mode
+			timer.m_digit_to_match = 0;
+		}
+		if (BIT(data , 5)) {
+			// Clear timer irq
+			irq_w(IRQ_TIMER0_BIT + m_timer_idx , false);
+		}
+		update_int_bits();
+	}
+}
+
+READ8_MEMBER(hp85_state::clkdat_r)
+{
+	uint8_t res;
+	unsigned burst_idx = m_cpu->flatten_burst();
+	if (burst_idx < 4) {
+		res = m_hw_timer[ m_timer_idx ].m_timer_cnt[ burst_idx ];
+	} else {
+		// What happens when loading more than 4 bytes from timers?
+		logerror("Reading more than 4 bytes from timer %u\n" , m_timer_idx);
+		res = 0;
+	}
+	//logerror("CLKDAT R %u=%02x\n" , burst_idx , res);
+	return res;
+}
+
+WRITE8_MEMBER(hp85_state::clkdat_w)
+{
+	unsigned burst_idx = m_cpu->flatten_burst();
+	//logerror("CLKDAT W %u=%02x\n" , burst_idx , data);
+	if (burst_idx < 4) {
+		m_hw_timer[ m_timer_idx ].m_timer_reg[ burst_idx ] = data;
+	} else {
+		// What happens when storing more than 4 bytes into timers?
+		logerror("Writing more than 4 bytes into timer %u\n" , m_timer_idx);
 	}
 }
 
@@ -525,7 +664,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp85_state::kb_scan)
 			kb_scan_ioport(input[ 2 ] & ~m_kb_state[ 2 ] , 64 , keycode);
 
 		if (got_key) {
-			logerror("key %02x\n" , keycode);
 			m_kb_keycode = keycode;
 			irq_w(IRQ_KEYBOARD_BIT , true);
 			m_kb_enable = false;
@@ -538,6 +676,129 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp85_state::kb_scan)
 	m_kb_state[ 0 ] = input[ 0 ];
 	m_kb_state[ 1 ] = input[ 1 ];
 	m_kb_state[ 2 ] = input[ 2 ];
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hp85_state::vm_timer)
+{
+	if (BIT(m_crt_ctl , CRT_CTL_RD_RQ_BIT)) {
+		video_mem_read();
+	} else {
+		video_mem_write();
+	}
+	BIT_CLR(m_crt_sts , CRT_STS_BUSY_BIT);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hp85_state::timer_update)
+{
+	for (unsigned i = 0; i < TIMER_COUNT; i++) {
+		auto& timer = m_hw_timer[ i ];
+		if (timer.m_timer_clr) {
+			timer.m_timer_clr = false;
+			timer.m_timer_cnt[ 0 ] = 0;
+			timer.m_timer_cnt[ 1 ] = 0;
+			timer.m_timer_cnt[ 2 ] = 0;
+			timer.m_timer_cnt[ 3 ] = 0;
+		} else if (timer.m_timer_en) {
+			if (timer.m_digit_to_match) {
+				// Timers have an undocumented mode (used by test "J" of service ROM)
+				// where the counter has to match in sequence all digits of register
+				// in order to raise an interrupt. In other words interrupt is generated
+				// after a number of updates that's equal to the sum of all digits in
+				// register + 1. My opinion is that people at HP designed this mode to
+				// allow all digits in a timer to be tested quickly. Without this special
+				// mode it takes more than 27 hours to check that all digits increment
+				// correctly and that there are no stuck bits.
+				// From an operative point of view, we copy register into counter when
+				// this special mode is activated (see clksts_w). Then, at each update,
+				// we decrement the digit of counter pointed to by m_digit_to_match (1 =
+				// least significant digit). Each time a digit "borrows" (i.e. it decrements
+				// from 0 to 9), we move on to digit at left. When m_digit_to_match reaches
+				// 9, interrupt is raised and the timer stops.
+				// At this point counter is always "99999999".
+				if (timer.m_digit_to_match < 9) {
+					while (true) {
+						bool borrow = false;
+						uint8_t b = timer.m_timer_cnt[ (timer.m_digit_to_match - 1) / 2 ];
+						if (BIT(timer.m_digit_to_match , 0)) {
+							// Least significant digit in b
+							if (b & 0x0f) {
+								b--;
+							} else {
+								b = (b & 0xf0) | 9;
+								borrow = true;
+							}
+						} else {
+							// Most significant digit in b
+							if (b & 0xf0) {
+								b -= 0x10;
+							} else {
+								b = 0x99;
+								borrow = true;
+							}
+						}
+						timer.m_timer_cnt[ (timer.m_digit_to_match - 1) / 2 ] = b;
+						if (borrow) {
+							timer.m_digit_to_match++;
+							if (timer.m_digit_to_match == 9) {
+								irq_w(IRQ_TIMER0_BIT + i , true);
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				}
+			} else {
+				// Standard timer mode
+				// Increment all active timers by 1
+				bool carry = true;
+				for (unsigned idx = 0; idx < 4 && carry; idx++) {
+					carry = false;
+					uint8_t b = timer.m_timer_cnt[ idx ];
+					b++;
+					if ((b & 0xf) > 9) {
+						b += 6;
+						if (b >= 0xa0) {
+							b += 0x60;
+							carry = true;
+						}
+					}
+					timer.m_timer_cnt[ idx ] = b;
+				}
+				if (timer.m_timer_cnt[ 0 ] == timer.m_timer_reg[ 0 ] &&
+					timer.m_timer_cnt[ 1 ] == timer.m_timer_reg[ 1 ] &&
+					timer.m_timer_cnt[ 2 ] == timer.m_timer_reg[ 2 ] &&
+					timer.m_timer_cnt[ 3 ] == timer.m_timer_reg[ 3 ]) {
+					timer.m_timer_cnt[ 0 ] = 0;
+					timer.m_timer_cnt[ 1 ] = 0;
+					timer.m_timer_cnt[ 2 ] = 0;
+					timer.m_timer_cnt[ 3 ] = 0;
+					irq_w(IRQ_TIMER0_BIT + i , true);
+				}
+			}
+		}
+	}
+	m_clk_busy = true;
+	m_clk_busy_timer->adjust(attotime::from_usec(TIMER_BUSY_USEC));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hp85_state::clk_busy_timer)
+{
+	m_clk_busy = false;
+}
+
+attotime hp85_state::time_to_video_mem_availability() const
+{
+	if (BIT(m_crt_ctl , CRT_CTL_WIPEOUT_BIT) || BIT(m_crt_ctl , CRT_CTL_POWERDN_BIT)) {
+		// Blank video, immediate access
+		return attotime::zero;
+	} else if (m_screen->vblank()) {
+		// Vertical blanking, immediate access
+		return attotime::zero;
+	} else {
+		// In the active part, wait until vertical blanking
+		return m_screen->time_until_vblank_start();
+	}
 }
 
 void hp85_state::get_video_addr(uint16_t addr , uint16_t& byte_addr , bool& lsb_nibble)
@@ -597,20 +858,20 @@ void hp85_state::video_mem_read()
 	}
 	m_crt_read_byte = video_mem_r(m_crt_bad , mask);
 	m_crt_bad += 2;
+	BIT_CLR(m_crt_ctl , CRT_CTL_RD_RQ_BIT);
 	BIT_SET(m_crt_sts , CRT_STS_READY_BIT);
 }
 
-void hp85_state::video_mem_write(uint8_t data)
+void hp85_state::video_mem_write()
 {
 	uint16_t mask;
 
-	logerror("VM @%04x=%02x\n" , m_crt_bad , data);
 	if (BIT(m_crt_ctl , CRT_CTL_GRAPHICS_BIT)) {
 		mask = GRAPH_MEM_SIZE / 2 - 1;
 	} else {
 		mask = ALPHA_MEM_SIZE / 2 - 1;
 	}
-	video_mem_w(m_crt_bad , mask , data);
+	video_mem_w(m_crt_bad , mask , m_crt_write_byte);
 	m_crt_bad += 2;
 }
 
@@ -756,6 +1017,8 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0xff02 , 0xff02) AM_READWRITE(keysts_r , keysts_w)
 	AM_RANGE(0xff03 , 0xff03) AM_READWRITE(keycod_r , keycod_w)
 	AM_RANGE(0xff04 , 0xff07) AM_READWRITE(crtc_r , crtc_w)
+	AM_RANGE(0xff0a , 0xff0a) AM_READWRITE(clksts_r , clksts_w)
+	AM_RANGE(0xff0b , 0xff0b) AM_READWRITE(clkdat_r , clkdat_w)
 	AM_RANGE(0xff18 , 0xff18) AM_WRITE(rselec_w)
 ADDRESS_MAP_END
 
@@ -769,9 +1032,25 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp85_state, vblank_w))
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_TIMER_DRIVER_ADD("vm_timer", hp85_state, vm_timer)
 
 	// No idea at all about the actual keyboard scan frequency
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp85_state , kb_scan , attotime::from_hz(100))
+
+	// Hw timers are updated at 1 kHz rate
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("hw_timer" , hp85_state , timer_update , attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD("clk_busy_timer", hp85_state, clk_busy_timer)
+
+	// Beeper
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac" , DAC_1BIT , 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
+	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
+
 MACHINE_CONFIG_END
 
 ROM_START(hp85)
@@ -787,4 +1066,4 @@ ROM_START(hp85)
 	ROM_LOAD("chrgen.bin" , 0 , 0x400 , CRC(9c402544) SHA1(32634fc73c1544aeeefda62ebb10349c5b40729f))
 ROM_END
 
-COMP(1980 , hp85 , 0 , 0 , hp85 , hp85 , hp85_state , 0 , "HP" , "HP 85" , MACHINE_NO_SOUND)
+COMP(1980 , hp85 , 0 , 0 , hp85 , hp85 , hp85_state , 0 , "HP" , "HP 85" , 0)
