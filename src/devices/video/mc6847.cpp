@@ -923,7 +923,7 @@ mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata,
 		uint16_t color_base_0;
 		uint16_t color_base_1;
 
-		if ((mode & (MODE_INTEXT | MODE_AS)) == MODE_AS)
+		if ((mode & ((is_mc6847t1 ? 0 : MODE_INTEXT) | MODE_AS)) == MODE_AS)
 		{
 			// semigraphics 4
 			fontdata = semigraphics4_fontdata8x12;
