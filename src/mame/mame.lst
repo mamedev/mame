@@ -36028,6 +36028,9 @@ tetrisp2                        // (c) 1997 Jaleco
 tetrisp2j                       // (c) 1997 Jaleco
 tetrisp2ja                      // (c) 1997 Jaleco
 
+@source:tg100.cpp
+tg100                           // (c) 1991
+
 @source:tgtpanic.cpp
 tgtpanic                        // GX601 (c) 1996
 
