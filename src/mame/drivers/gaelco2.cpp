@@ -1426,7 +1426,34 @@ ROM_START( wrally2 )
 	ROM_LOAD16_BYTE( "wr2.63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
-	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, BAD_DUMP CRC(e22328c5) SHA1(62bea9a28db88b5678e209c4e493e3cfdbf3c44e) ) /* one byte was bad, hand-fixed, marked as BAD_DUMP until a 2nd board is used to verify */
+	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0x00, the 2nd space was filled as 0xff.
+	   In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.  For reference the
+	   one that was not is "1938: 18 <-> 9B" (part of a data table)
+
+	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
+	   patched out
+
+		0200: mov   sp,#$70
+		0203: mov   a,pcon
+		0205: anl   a,#$20
+		0207: jnz   $0203
+		0209: nop
+		020A: nop
+		020B: nop
+		020C: mov   dptr,#$FC01
+
+	   while the newer dump has this
+
+		0200: mov   sp,#$70
+		0203: mov   mcon,#$68
+		0206: mov   i2cfg,#$00
+		0209: mov   crcr,#$80
+		020C: mov   dptr,#$FC01
+
+	   either way the 2nd dump is in much better state, so we're using that.
+	*/
+
+	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )	
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 )  /* GFX + Sound */
 	ROM_LOAD( "wr2.16d",    0x0000000, 0x0080000, CRC(ad26086b) SHA1(487ffaaca57c9d030fc486b8cae6735ee40a0ac3) )    /* GFX only */
