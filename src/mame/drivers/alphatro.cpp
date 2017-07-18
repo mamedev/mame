@@ -79,7 +79,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port20_w);
 	DECLARE_READ8_MEMBER(port30_r);
-	DECLARE_WRITE8_MEMBER(port30_w);	
+	DECLARE_WRITE8_MEMBER(port30_w);
+	DECLARE_WRITE8_MEMBER(portf0_w);		
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
@@ -95,7 +96,7 @@ private:
 	required_device<screen_device> m_screen;
 	u8 m_flashcnt;
 	u8 m_cass_data[4];
-	u8 m_port_10, m_port_20, m_port_30;
+	u8 m_port_10, m_port_20, m_port_30, m_port_f0;
 	bool m_cass_state;
 	bool m_cassold;
 	virtual void machine_start() override;
@@ -239,6 +240,25 @@ WRITE8_MEMBER( alphatro_state::port30_w )
 	m_port_30 = data;
 }
 
+WRITE8_MEMBER( alphatro_state::portf0_w)
+{
+	if ((data & 0x1) && !(m_port_f0))
+	{
+		m_fdc->reset();
+		
+		floppy_connector *con = machine().device<floppy_connector>("fdc:0");
+		floppy_image_device *floppy = con ? con->get_device() : nullptr;
+		if (floppy)
+		{
+			floppy->mon_w(0);
+			m_fdc->set_floppy(floppy);
+			m_fdc->set_rate(250000);
+		}
+	}
+	
+	m_port_f0 = data;
+}
+
 void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
@@ -368,10 +388,9 @@ static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE("dmac", i8257_device, read, write)
 	// 8259 PIT
 	//AM_RANGE(0x70, 0x72) AM_DEVREADWRITE("
-	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("fdc", upd765a_device, msr_r)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("fdc", upd765a_device, msr_r) AM_WRITE(portf0_w)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE("fdc", upd765a_device, fifo_r, fifo_w)
 	AM_RANGE(0xf9, 0xf9) AM_DEVREAD("fdc", upd765a_device, msr_r)
-
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( alphatro )
@@ -519,14 +538,6 @@ void alphatro_state::machine_reset()
 	m_cassold = 0;
 	m_usart->write_rxd(0);
 	m_beep->set_state(0);
-	
-	floppy_connector *con = machine().device<floppy_connector>("fdc:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
-	if (floppy)
-	{
-		m_fdc->set_floppy(floppy);
-		m_fdc->set_rate(500000);	// DS/DD?  250000 didn't work either...
-	}
 }
 
 PALETTE_INIT_MEMBER(alphatro_state, alphatro)
