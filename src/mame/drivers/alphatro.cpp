@@ -64,6 +64,7 @@ public:
 		, m_cartbank(*this, "cartbank")
 		, m_monbank(*this, "monbank")
 		, m_fdc(*this, "fdc")
+		, m_dmac(*this, "dmac")
 	{ }
 
 	DECLARE_READ8_MEMBER (ram0000_r);
@@ -84,6 +85,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_PALETTE_INIT(alphatro);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
@@ -112,6 +114,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_lowbank, m_cartbank, m_monbank;
 	required_device<upd765a_device> m_fdc;
+	required_device<i8257_device> m_dmac;
 };
 
 void alphatro_state::update_banking()
@@ -586,6 +589,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_p)
 	}
 }
 
+WRITE_LINE_MEMBER(alphatro_state::hrq_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dmac->hlda_w(state);
+}
+
 static SLOT_INTERFACE_START( alphatro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -623,6 +632,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(alphatro_state, ram0000_r))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(alphatro_state, dma0000_w))
 	MCFG_I8257_IN_IOR_2_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
