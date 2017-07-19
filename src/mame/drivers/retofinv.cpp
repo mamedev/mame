@@ -655,9 +655,45 @@ ROM_START( retofinvb2 ) // bootleg with mcu hacked out. Unclear what the 'correc
 	ROM_LOAD( "82s191n",   0x0000, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )
 ROM_END
 
+ROM_START( retofinvb3 ) // Italian bootleg PCB. Only maincpu ROMs differ from parent and the MCU isn't present.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.11", 0x0000, 0x2000, CRC(71c216ca) SHA1(34d04889dae6d6f586bce99413c1864dee52cf39) ) // unique
+	ROM_LOAD( "2.10", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) ) // same as retofinvb1 and retofinvb2
+	ROM_LOAD( "3.9",  0x4000, 0x2000, CRC(dd2f499a) SHA1(14c557c8be1852ad7bbd062629d5b8154bdf97da) ) // unique
 
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "4.15", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
 
-GAME( 1985, retofinv,  0,        retofinv,        retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb, retofinv, retofinvb,       retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb1,retofinv, retofinvb_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb2,retofinv, retofinvb_nomcu, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5.BIN", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
+
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "16.7", 0x0000, 0x2000, CRC(4e3f501c) SHA1(2d832f4038ae65bfdeedfab870f6f1176ec6b676) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "10.1",  0x0000, 0x2000, CRC(6afdeec8) SHA1(782fe0a8aea48c3c270318b7ba011fc6fce0db7a) )
+	ROM_LOAD( "11.2",  0x2000, 0x2000, CRC(d3dc9da3) SHA1(0d98d6e993b5a4845a23802751023b7a593dce29) )
+	ROM_LOAD( "12.3", 0x4000, 0x2000, CRC(d10b2eed) SHA1(3809a0adf935a119f9ee0d4c24f1456c35d2a6fa) )
+	ROM_LOAD( "13.4", 0x6000, 0x2000, CRC(00ca6b3d) SHA1(08ce5b13d5ebc79cc803949f4ba9e630e6cd92b8) )
+
+	ROM_REGION( 0x04000, "gfx3", 0 )
+	ROM_LOAD( "14.5", 0x0000, 0x2000, CRC(ef7f8651) SHA1(2d91057501e5e9c4255e0d55fff0d99c2a5be7e8) )
+	ROM_LOAD( "15.6", 0x2000, 0x2000, CRC(03b40905) SHA1(c10d87796e8a6e6a2a37c6fb713821cc87299cc8) )
+
+	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_LOAD( "74s287.b",  0x0000, 0x0100, CRC(e9643b8b) SHA1(7bbb92a42e7c3effb701fc7b2c24f2470f31b063) )   /* palette red bits  */
+	ROM_LOAD( "74s287.c",  0x0100, 0x0100, CRC(e8f34e11) SHA1(8f438561b8d46ffff00747ed8baf0ebb6a081615) )   /* palette green bits */
+	ROM_LOAD( "74s287.a",  0x0200, 0x0100, CRC(50030af0) SHA1(e748ae0b8702b7d20fb65c254dceee23246b3d13) )   /* palette blue bits   */
+
+	ROM_REGION( 0x0800, "clut", 0 )
+	ROM_LOAD_NIB_HIGH( "6353-1.a",  0x0000, 0x0400, CRC(c63cf10e) SHA1(bca8823aef31ab8f4c22201c4efd51f9a4124c8f) )
+	ROM_LOAD_NIB_LOW ( "6353-1.b",  0x0000, 0x0400, CRC(6db07bd1) SHA1(05b6728a96fecedae16cb3aa02de642a3a32d99d) )
+	ROM_LOAD_NIB_HIGH( "6353-1.d",  0x0400, 0x0400, CRC(a92aea27) SHA1(98e4726f40fdf0df2008ef03801ee35ede99e893) )
+	ROM_LOAD_NIB_LOW ( "6353-1.c",  0x0400, 0x0400, CRC(77a7aaf6) SHA1(61a474f1ad09b89ff8302f2d903b86a90823116c) )
+ROM_END
+
+GAME( 1985, retofinv,   0,        retofinv,        retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb,  retofinv, retofinvb,       retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb1, retofinv, retofinvb_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb2, retofinv, retofinvb_nomcu, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )

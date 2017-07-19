@@ -32187,6 +32187,7 @@ retofinv                        // A37 (c) 1985 Taito Corporation
 retofinvb                       // bootleg
 retofinvb1                      // bootleg
 retofinvb2                      // bootleg
+retofinvb3                      // bootleg
 
 @source:rex6000.cpp
 ds2                             //
