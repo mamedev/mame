@@ -467,13 +467,11 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 			if (part)
 			{
 				std::string const string_list(util::string_format("%s:%s:%s:%s", swinfo->listname, swinfo->shortname, *part, swinfo->instance));
-				printf("%s\n", string_list.c_str());
 				moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
 			}
 			else
 			{
 				std::string const string_list(util::string_format("%s:%s", swinfo->listname, swinfo->shortname));
-				printf("%s\n", string_list.c_str());
 				moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
 			}
 
