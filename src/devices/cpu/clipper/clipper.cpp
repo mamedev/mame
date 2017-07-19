@@ -452,7 +452,8 @@ int clipper_device::execute_instruction ()
 	case 0x16:
 		// popw: pop word
 		m_r[R2] = m_data->read_dword(m_r[R1]);
-		m_r[R1] += 4;
+		if (R1 != R2)
+			m_r[R1] += 4;
 		// TRAPS: C,U,A,P,R
 		break;
 
