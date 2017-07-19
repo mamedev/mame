@@ -1,23 +1,26 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald, Robbbert, R. Belmont
+// copyright-holders:Barry Rodewald, Robbbert, R. Belmont, Carl
 /***************************************************************************
 
     Triumph-Adler (or Royal) Alphatronic PC
 
-	Skeleton by Barry Rodewald and Robbbert, filled in by R. Belmont
+	Driver by Barry Rodewald, Robbbert, R. Belmont and Carl
 
     z80 + HD46505SP as a CRTC
 
     Other chips: 8251, 8257, 8259
     Crystals: 16MHz, 17.73447MHz
     Floppy format: 13cm, 2 sides, 40 tracks, 16 sectors, 256 bytes = 320kb.
-    FDC (uPD765) is in a plug-in module, with an undumped rom.
+    FDC (uPD765) is in a plug-in module, there is no ROM on the module.
+
+	A configuration switch determines if the FDC is present.
 
     Has a socket for monochrome (to the standard amber monitor),
     and another for RGB. We emulate this with a configuration switch.
 
     ToDo:
-    - Add fdc, then connect up software list
+    - Newer ROM set from Team Europe and try to work out the graphics expansion
+	- uPD765 oddness that prevents Disk BASIC from loading
 
 ***************************************************************************/
 
@@ -65,11 +68,11 @@ public:
 		, m_monbank(*this, "monbank")
 		, m_fdc(*this, "fdc")
 		, m_dmac(*this, "dmac")
+		, m_config(*this, "CONFIG")
 	{ }
 
 	DECLARE_READ8_MEMBER (ram0000_r);
 	DECLARE_WRITE8_MEMBER(ram0000_w);
-	DECLARE_WRITE8_MEMBER(dma0000_w);
 	DECLARE_READ8_MEMBER (ram6000_r);
 	DECLARE_WRITE8_MEMBER(ram6000_w);
 	DECLARE_READ8_MEMBER (rama000_r);
@@ -115,6 +118,7 @@ private:
 	required_device<address_map_bank_device> m_lowbank, m_cartbank, m_monbank;
 	required_device<upd765a_device> m_fdc;
 	required_device<i8257_device> m_dmac;
+	required_ioport m_config;
 };
 
 void alphatro_state::update_banking()
@@ -156,7 +160,6 @@ void alphatro_state::update_banking()
 
 READ8_MEMBER (alphatro_state::ram0000_r) { return m_ram_ptr[offset]; }
 WRITE8_MEMBER(alphatro_state::ram0000_w) { m_ram_ptr[offset] = data; }
-WRITE8_MEMBER(alphatro_state::dma0000_w) { printf("FDC DMA: [%04x] = %02x\n", offset, data); m_ram_ptr[offset] = data; }
 READ8_MEMBER (alphatro_state::ram6000_r) { return m_ram_ptr[offset+0x6000]; }
 WRITE8_MEMBER(alphatro_state::ram6000_w) { m_ram_ptr[offset+0x6000] = data; }
 READ8_MEMBER (alphatro_state::rama000_r) { return m_ram_ptr[offset+0xa000]; }
@@ -173,7 +176,10 @@ READ8_MEMBER( alphatro_state::port10_r )
 // Bit 6 -> 1 = NTSC, 0 = PAL
 // Bit 7 -> 1 = vblank or hblank, 0 = active display area
 
-	u8 retval = 0x40;	// 41 for FDC
+	u8 retval = 0x40;
+	
+	// we'll get "FDC present" and "graphics expansion present" from the config switches
+	retval |= (m_config->read() & 3);
 
 	if ((m_screen->vblank()) || (m_screen->hblank()))
 	{
@@ -284,7 +290,7 @@ WRITE_LINE_MEMBER( alphatro_state::write_usart_clock )
 MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	bool palette = BIT(ioport("CONFIG")->read(), 5);
+	bool palette = BIT(m_config->read(), 5);
 	if (y==0) m_flashcnt++;
 	bool inv;
 	u8 chr,gfx,attr,bg,fg;
@@ -508,6 +514,10 @@ static INPUT_PORTS_START( alphatro )
 	PORT_CONFNAME( 0x20, 0x00, "Monitor")
 	PORT_CONFSETTING(    0x00, "RGB")
 	PORT_CONFSETTING(    0x20, "Amber")
+	
+	PORT_CONFNAME(0x01, 0x00, "Floppy disk installed")
+	PORT_CONFSETTING(0x00, "Not present")
+	PORT_CONFSETTING(0x01, "Installed")
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -527,6 +537,11 @@ GFXDECODE_END
 
 void alphatro_state::machine_start()
 {
+	save_item(NAME(m_port_10));
+	save_item(NAME(m_port_20));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cass_state));
+	save_item(NAME(m_cassold));
 }
 
 void alphatro_state::machine_reset()
@@ -633,7 +648,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(alphatro_state, ram0000_r))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(alphatro_state, dma0000_w))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(alphatro_state, ram0000_w))
 	MCFG_I8257_IN_IOR_2_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
 	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
@@ -702,4 +717,4 @@ ROM_START( alphatro )
 	ROM_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) )
 ROM_END
 
-COMP( 1983, alphatro,   0,       0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_NOT_WORKING )
+COMP( 1983, alphatro,   0,       0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
