@@ -254,7 +254,6 @@ WRITE8_MEMBER( alphatro_state::portf0_w)
 		if (floppy)
 		{
 			floppy->mon_w(0);
-			m_fdc->set_floppy(floppy);
 			m_fdc->set_rate(250000);
 		}
 	}
@@ -624,7 +623,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_UPD765A_ADD("fdc", false, true)
+	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
