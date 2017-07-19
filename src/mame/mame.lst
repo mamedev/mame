@@ -37391,6 +37391,7 @@ vt240                           // 1983 Digital Equipment Corporation
 
 @source:vt320.cpp
 vt320                           // 1987 Digital Equipment Corporation
+vt330                           // 1987 Digital Equipment Corporation
 
 @source:vt520.cpp
 vt520                           // 1994 Digital Equipment Corporation
