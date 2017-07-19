@@ -188,7 +188,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;
-	required_device<mc6847_base_device> m_vdg;
+	required_device<mc6847_device> m_vdg;
 	required_device<cassette_image_device> m_cass;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( spc1000 )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(spc1000_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(spc1000_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2)
+	MCFG_MC6847_FIXED_MODE(mc6847_device::MODE_GM2)
 	// other lines not connected
 
 	/* sound hardware */

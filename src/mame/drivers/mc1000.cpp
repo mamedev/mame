@@ -69,7 +69,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc6847_base_device> m_vdg;
+	required_device<mc6847_device> m_vdg;
 	optional_device<mc6845_device> m_crtc;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cassette;

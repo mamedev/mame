@@ -107,7 +107,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	optional_device<mc6847_base_device> m_vdg;
+	optional_device<mc6847_device> m_vdg;
 	optional_shared_ptr<uint8_t> m_videoram;
 	required_device<ay31015_device> m_ay31015;
 	optional_device<kr2376_device> m_lx388_kr2376;

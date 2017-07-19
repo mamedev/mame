@@ -348,7 +348,7 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT)
 	// other lines not connected
 MACHINE_CONFIG_END
 
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT)
 	// other lines not connected
 MACHINE_CONFIG_END
 

@@ -132,7 +132,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
-	required_device<mc6847_base_device> m_crtc;
+	required_device<mc6847_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pia6821_device> m_pia0;
 	optional_device<pia6821_device> m_pia1;
@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( apfm1000 )
 	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(apf_state, videoram_r))
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1)
 	// INTEXT = GND
 	// other lines not connected
 
