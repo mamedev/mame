@@ -180,5 +180,5 @@ GAME( 2000, bhead2ka,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global V
 GAME( 2002, bhead2k2,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03",                   MACHINE_IS_SKELETON )
 GAME( 2003, bhead2k3,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_IS_SKELETON )
 GAME( 2003, nfs,       0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_IS_SKELETON )
-GAME( 2003, nfsgt,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_IS_SKELETON )
+GAME( 2004, nfsgt,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_IS_SKELETON )
 GAME( 2005, nfsug,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_IS_SKELETON )
