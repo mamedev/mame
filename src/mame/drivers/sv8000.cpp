@@ -72,7 +72,7 @@ private:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<s68047_device> m_s68047p;
+	required_device<mc6847_device> m_s68047p;
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_ioport m_io_row0;

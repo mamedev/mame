@@ -522,7 +522,7 @@ static MACHINE_CONFIG_START( fc100 )
 	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL_7_15909MHz/3)  // Clock not verified
 	MCFG_MC6847_INPUT_CALLBACK(READ8(fc100_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(m5c6847p1_device::MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(mc6847_device::MODE_INTEXT)
 	// other lines not connected
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")

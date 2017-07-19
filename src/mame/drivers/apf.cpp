@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( apfm1000 )
 	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(apf_state, videoram_r))
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1)
 	// INTEXT = GND
 	// other lines not connected
 
