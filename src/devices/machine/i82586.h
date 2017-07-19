@@ -252,10 +252,8 @@ protected:
 	loopback_mode cfg_loopback_mode()        { return (loopback_mode)(cfg_get(3) & LOOPBACK_BOTH); }
 	bool cfg_promiscuous_mode()  { return BIT(cfg_get(8), 0); }
 	bool cfg_broadcast_disable() { return BIT(cfg_get(8), 1); }
-#if I82586_FCS
 	bool cfg_no_crc_insertion()  { return BIT(cfg_get(8), 4); }
 	bool cfg_crc16()             { return BIT(cfg_get(8), 5); }
-#endif
 	u8 cfg_min_frame_length()    { return cfg_get(10); }
 
 private:
