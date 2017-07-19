@@ -836,7 +836,7 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 11 */ GAME( 1999, thenanpa,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
 /* 12 */ GAME( 1999, pokoachu,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  pokoachu,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
 /* 13 */ GAME( 1999, csplayh7,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", MACHINE_NOT_WORKING )
-/* 14 */ GAME( 1999, aimode,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  aimode,          ROT0, "Nichibutsu/eic", " Ai-mode - Pet Shiiku", MACHINE_NOT_WORKING )
+/* 14 */ GAME( 1999, aimode,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  aimode,          ROT0, "Nichibutsu/eic", "Ai-mode - Pet Shiiku", MACHINE_NOT_WORKING )
 
 // 2000
 /* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
