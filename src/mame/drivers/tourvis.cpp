@@ -44,7 +44,7 @@
   * Die Hard
     Dodge Ball (194)
     Doraemon Meikyuu Daisakusen (20)
-  * Doraemon II
+    Doreamon - Nobita's Dorabian Night (Doraemon II, 43)
     Down Load (43)
     Dragon Egg! (98)
     Dragon Saber (65)
@@ -68,7 +68,8 @@
     Kato & Ken (42)
     Kiki Kaikai (120)
     Legend Of Hero Tomna (56)
-    Makyo Densetsu - The Legenary Axe (40)
+    Makyo Densetsu - The Legendary Axe (40)
+    Mashin Eiyuden Wataru (27)
     Mesopotamia (197)
     Mizubaku Daibouken Liquid Kids (10) (marketed as "Parasol Stars II")
     Mr. Heli (23)

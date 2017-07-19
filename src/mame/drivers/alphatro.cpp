@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald, Robbbert
+// copyright-holders:Barry Rodewald, Robbbert, R. Belmont
 /***************************************************************************
 
     Triumph-Adler (or Royal) Alphatronic PC
 
-    skeleton driver
+	Skeleton by Barry Rodewald and Robbbert, filled in by R. Belmont
 
     z80 + HD46505SP as a CRTC
 
@@ -15,21 +15,6 @@
 
     Has a socket for monochrome (to the standard amber monitor),
     and another for RGB. We emulate this with a configuration switch.
-
-    This machine has 64k RAM, the ROMs being copied into RAM when
-    needed.
-
-    There are several mystery ports which might be connected to the floppy
-    disk system. These are Port 30 (in and out), Port 20 (out) and certain
-    bits of Port 10 (in). This unit communicates via a simple parallel
-    interface.
-
-    Port 10 bit 6 when high switches A000-DFFF over to roms that are in
-    a cart which is plugged into the RomPack socket. If C3 is found at
-    A000 or C000, then a jump is made to that address. It is however
-    possible that one of these addresses might be for the rom in the
-    floppy controller unit.
-
 
     ToDo:
     - Add fdc, then connect up software list
@@ -42,6 +27,9 @@
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/bankdev.h"
+#include "machine/upd765.h"
+#include "machine/i8257.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
@@ -62,62 +50,151 @@ public:
 
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_ram(*this, RAM_TAG)
 		, m_p_videoram(*this, "videoram")
+		, m_screen(*this, "screen")
 		, m_p_chargen(*this, "chargen")
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_usart(*this, "usart")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
-		, m_p_ram(*this, "main_ram")
 		, m_palette(*this, "palette")
+		, m_lowbank(*this, "lowbank")
+		, m_cartbank(*this, "cartbank")
+		, m_monbank(*this, "monbank")
+		, m_fdc(*this, "fdc")
+		, m_dmac(*this, "dmac")
 	{ }
 
+	DECLARE_READ8_MEMBER (ram0000_r);
+	DECLARE_WRITE8_MEMBER(ram0000_w);
+	DECLARE_WRITE8_MEMBER(dma0000_w);
+	DECLARE_READ8_MEMBER (ram6000_r);
+	DECLARE_WRITE8_MEMBER(ram6000_w);
+	DECLARE_READ8_MEMBER (rama000_r);
+	DECLARE_WRITE8_MEMBER(rama000_w);
+	DECLARE_READ8_MEMBER (rame000_r);
+	DECLARE_WRITE8_MEMBER(rame000_w);
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
+	DECLARE_WRITE8_MEMBER(port20_w);
+	DECLARE_READ8_MEMBER(port30_r);
+	DECLARE_WRITE8_MEMBER(port30_w);
+	DECLARE_WRITE8_MEMBER(portf0_w);		
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_PALETTE_INIT(alphatro);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
+	uint8_t *m_ram_ptr;
+	required_device<ram_device> m_ram;
 	required_shared_ptr<u8> m_p_videoram;
+	required_device<screen_device> m_screen;
 	u8 m_flashcnt;
-	u8 m_timer_bit;
 	u8 m_cass_data[4];
+	u8 m_port_10, m_port_20, m_port_30, m_port_f0;
 	bool m_cass_state;
 	bool m_cassold;
-	emu_timer* m_sys_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void update_banking();
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_usart;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
-	required_shared_ptr<u8> m_p_ram;
 	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_lowbank, m_cartbank, m_monbank;
+	required_device<upd765a_device> m_fdc;
+	required_device<i8257_device> m_dmac;
 };
 
-READ8_MEMBER( alphatro_state::port10_r )
+void alphatro_state::update_banking()
 {
-	//return (space.machine().device<screen_device>("screen")->vblank() ? 0x00 : 0x80);
-	return m_timer_bit;
+	if (m_port_10 & 0x80) 	// RAM at 0000?
+	{
+		m_lowbank->set_bank(1);
+	}
+	else
+	{
+		m_lowbank->set_bank(0);
+	}
+	
+	if (m_port_10 & 0x40)	// ROM cartridge at A000
+	{
+		m_cartbank->set_bank(0);
+	}
+	else
+	{
+		m_cartbank->set_bank(1);
+	}
+	
+	if (m_port_20 & 0x08)	 // VRAM at F000?
+	{
+		m_monbank->set_bank(0);
+	}
+	else
+	{
+		if (m_port_20 & 0x40)	// IPL or Monitor at F000?
+		{
+			m_monbank->set_bank(2);
+		}
+		else
+		{
+			m_monbank->set_bank(1);
+		}
+	}
+}
+
+READ8_MEMBER (alphatro_state::ram0000_r) { return m_ram_ptr[offset]; }
+WRITE8_MEMBER(alphatro_state::ram0000_w) { m_ram_ptr[offset] = data; }
+WRITE8_MEMBER(alphatro_state::dma0000_w) { printf("FDC DMA: [%04x] = %02x\n", offset, data); m_ram_ptr[offset] = data; }
+READ8_MEMBER (alphatro_state::ram6000_r) { return m_ram_ptr[offset+0x6000]; }
+WRITE8_MEMBER(alphatro_state::ram6000_w) { m_ram_ptr[offset+0x6000] = data; }
+READ8_MEMBER (alphatro_state::rama000_r) { return m_ram_ptr[offset+0xa000]; }
+WRITE8_MEMBER(alphatro_state::rama000_w) { m_ram_ptr[offset+0xa000] = data; }
+READ8_MEMBER (alphatro_state::rame000_r) { return m_ram_ptr[offset+0xe000]; }
+WRITE8_MEMBER(alphatro_state::rame000_w) { m_ram_ptr[offset+0xe000] = data; }
+	
+READ8_MEMBER( alphatro_state::port10_r )
+{	
+// Bit 0 -> 1 = FDC is installed, 0 = not
+// Bit 1 -> 1 = Graphic Board is installed, 0 = not
+// Bits 2-4 = Country select: 0 = Intl, 1 = German, 2 = US
+// Bit 5 -> 1 = BASIC LPRINT is RS-232, 0 = BASIC LPRINT is Centronics
+// Bit 6 -> 1 = NTSC, 0 = PAL
+// Bit 7 -> 1 = vblank or hblank, 0 = active display area
+
+	u8 retval = 0x40;	// 41 for FDC
+
+	if ((m_screen->vblank()) || (m_screen->hblank()))
+	{
+		retval |= 0x80;
+    }
+
+	return retval;
 }
 
 WRITE8_MEMBER( alphatro_state::port10_w )
 {
 // Bit 0 -> 0 = 40 cols; 1 = 80 cols
-// Bit 1 ? each keystroke, and a lot when it scrolls
-// Bit 2 ? after a cload
-// Bit 3 -> cassette relay
-// Bit 4 -> BEEP
-// Bit 6 -> 1 = select ROM pack
+// Bit 1 -> 0 = display enable, 1 = display inhibit
+// Bit 2 -> 0 = USART is connected to cassette, 1 = RS232 port
+// Bit 3 -> 0 = cassette motor off, 1 = cassette motor on
+// Bit 4 -> 0 = beeper off, 1 = beeper on
+// Bit 5 -> always 0
+// Bit 6 -> 1 = select ROM pack at A000, 0 = RAM at A000
+// Bit 7 -> 0 = ROM enabled at 0, 1 = RAM enabled
+
+	m_port_10 = data;
 
 	data &= 0xfe;
 
@@ -127,15 +204,67 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 
 	if (BIT(data,2))
 		m_cass_state = 1;
+		
+	update_banking();
+}
+
+WRITE8_MEMBER( alphatro_state::port20_w )
+{
+// Bit 0 -> 0 = CRTC reset release, 1 = CRTC reset enable
+// Bit 1 -> 0 = Centronics reset release, 1 = Centronics reset enable
+// Bit 2 -> 0 = no Centronics strobe, 1 = Centronics strobe active
+// Bit 3 -> 0 = Monitor ROM at F000, 1 = VRAM at F000
+// Bit 4 -> 0 = Graphic LED off, 1 = Graphic LED on
+// Bit 5 -> 0 = Shift Lock LED off, 1 = Shift Lock LED on
+// Bit 6 -> 0 = Lower 4K of Monitor at F000, 1 = Upper 4K of Monitor at F000
+// Bit 7 -> N/A
+
+	m_port_20 = data;
+	
+	update_banking();
+}
+
+READ8_MEMBER( alphatro_state::port30_r )
+{
+// Bit 0 -> SIOC
+// Bit 1 -> 1 = vsync, 0 = not
+// Bit 2 -> 1 = Centronics ACK, 0 = not
+// Bit 3 -> 1 = Centronics BUSY, 0 = not
+
+	u8 retval = 0;
+	
+	if (m_screen->vblank()) retval |= 0x02;
+	
+	return retval;
+}
+
+WRITE8_MEMBER( alphatro_state::port30_w )
+{
+	m_port_30 = data;
+}
+
+WRITE8_MEMBER( alphatro_state::portf0_w)
+{
+	if ((data & 0x1) && !(m_port_f0))
+	{
+		m_fdc->reset();
+		
+		floppy_connector *con = machine().device<floppy_connector>("fdc:0");
+		floppy_image_device *floppy = con ? con->get_device() : nullptr;
+		if (floppy)
+		{
+			floppy->mon_w(0);
+			m_fdc->set_rate(250000);
+		}
+	}
+	
+	m_port_f0 = data;
 }
 
 void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{
-	case TIMER_SYSTEM:
-		m_timer_bit ^= 0x80;
-		break;
 	default:
 		assert_always(false, "Unknown id in alphatro_state::device_timer");
 	}
@@ -210,15 +339,35 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x5fff) AM_DEVICE("lowbank", address_map_bank_device, amap8)
+	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(ram6000_r, ram6000_w)
+	AM_RANGE(0xa000, 0xdfff) AM_DEVICE("cartbank", address_map_bank_device, amap8)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(rame000_r, rame000_w)
+	AM_RANGE(0xf000, 0xffff) AM_DEVICE("monbank", address_map_bank_device, amap8)
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rombank_map, AS_PROGRAM, 8, alphatro_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("roms", 0x0000) AM_WRITE(ram0000_w)
+	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(ram0000_r, ram0000_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cartbank_map, AS_PROGRAM, 8, alphatro_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("cart", 0x0000)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(rama000_r, rama000_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( monbank_map, AS_PROGRAM, 8, alphatro_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0x8000)
+	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_REGION("roms", 0x9000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r,port10_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("X0")
+	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r, port10_w)
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("X0") AM_WRITE(port20_w)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("X1")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("X2")
 	AM_RANGE(0x23, 0x23) AM_READ_PORT("X3")
@@ -230,13 +379,20 @@ static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	AM_RANGE(0x29, 0x29) AM_READ_PORT("X9")
 	AM_RANGE(0x2a, 0x2a) AM_READ_PORT("XA")
 	AM_RANGE(0x2b, 0x2b) AM_READ_PORT("XB")
-	//AM_RANGE(0x30, 0x30) unknown
+	AM_RANGE(0x30, 0x30) AM_READWRITE(port30_r, port30_w)
 	// USART for cassette reading and writing
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
 	// CRTC - HD46505 / HD6845SP
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	// 8257 DMAC
+	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE("dmac", i8257_device, read, write)
+	// 8259 PIT
+	//AM_RANGE(0x70, 0x72) AM_DEVREADWRITE("
+	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("fdc", upd765a_device, msr_r) AM_WRITE(portf0_w)
+	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE("fdc", upd765a_device, fifo_r, fifo_w)
+	AM_RANGE(0xf9, 0xf9) AM_DEVREAD("fdc", upd765a_device, msr_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( alphatro )
@@ -371,22 +527,14 @@ GFXDECODE_END
 
 void alphatro_state::machine_start()
 {
-	m_sys_timer = timer_alloc(TIMER_SYSTEM);
 }
 
 void alphatro_state::machine_reset()
 {
-	// do what the IPL does
-	u8* ROM = memregion("roms")->base();
-	m_maincpu->set_pc(0xe000);
-	// If BASIC is missing then it boots into the Monitor
-	memcpy(m_p_ram, ROM, 0x6000); // Copy BASIC to RAM
-	// Top half of this rom has keyboard tables and appears to be unused
-	memcpy(m_p_ram+0xe000, ROM+0xe000, 0x1000); // copy BIOS + Monitor to RAM
+	m_ram_ptr = m_ram->pointer();
+	m_port_10 = m_port_20 = 0;
+	update_banking();
 
-	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
-	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
-	m_timer_bit = 0;
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
 	m_cass_state = 0;
 	m_cassold = 0;
@@ -440,8 +588,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_p)
 	}
 }
 
-static MACHINE_CONFIG_START( alphatro )
+WRITE_LINE_MEMBER(alphatro_state::hrq_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dmac->hlda_w(state);
+}
 
+static SLOT_INTERFACE_START( alphatro_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_START( alphatro )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(alphatro_map)
@@ -466,6 +623,21 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
+	MCFG_UPD765A_ADD("fdc", true, true)
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	
+	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(alphatro_state, ram0000_r))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(alphatro_state, dma0000_w))
+	MCFG_I8257_IN_IOR_2_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
+	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
+	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
+	
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
@@ -487,6 +659,27 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
+	/* 0000 banking */
+	MCFG_DEVICE_ADD("lowbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x6000)
+
+	/* A000 banking */
+	MCFG_DEVICE_ADD("cartbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(cartbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	
+	/* F000 banking */
+	MCFG_DEVICE_ADD("monbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(monbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 MACHINE_CONFIG_END
@@ -499,12 +692,11 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( alphatro )
-	ROM_REGION( 0x10000, "roms", ROMREGION_ERASE00)
+	ROM_REGION( 0xa000, "roms", ROMREGION_ERASE00)
 	ROM_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
-	ROM_LOAD( "2764.ic-1038",   0xe000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) )
+	ROM_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) )
 
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
-	ROM_LOAD( "ipl.bin",        0x8000, 0x2000, NO_DUMP  )
+	ROM_REGION( 0x4000, "cart", ROMREGION_ERASE00)
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) )

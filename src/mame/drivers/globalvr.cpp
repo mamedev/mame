@@ -134,11 +134,33 @@ ROM_START( bhead2k3 )
 	DISK_IMAGE_READONLY( "beachhead2003desertwar_5-27-2003", 0, SHA1(fed23a6496836050eb1d4f69b91da09adbd9d973) )
 ROM_END
 
-ROM_START( nfsug )
+ROM_START( nfs )
+	DISK_REGION( "drive_1" )
+	DISK_IMAGE_READONLY( "NEED FOR SPEED DISK 1 VERSION 1.0.1 Rev B", 0, SHA1(799017103c46712534e4bd9c04695fb8241a7ba4) )
+
+	DISK_REGION( "drive_2" )
+	DISK_IMAGE_READONLY( "NEED FOR SPEED DISK 2 VERSION 1.0.1 Rev B", 0, SHA1(800d1786bb9d2a2448c03c19ea6626af487aed90) )
+
+	DISK_REGION( "recovery" )
+	DISK_IMAGE_READONLY( "EMERGENCY RECOVERY DISK 11.11.2003 Rev A", 0, SHA1(38656b9da94150e5e8ed8a4183d2cc149e96aedd) )
+ROM_END
+
+ROM_START( nfsgt ) 
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE_READONLY( "nfsug1_1-disc1", 0, SHA1(25a9f0606ac3909bd7c4f3f3a59c6782e3c84712) )
+	DISK_IMAGE_READONLY( "NEED FOR SPEED GT", 0, SHA1(58bb2b47e30b65f2f09d2c2f2d7f300cf420b18a) )
 
 	DISK_REGION( "drive_1" )
+	DISK_IMAGE_READONLY( "NEED FOR SPEED GT DISK 1 1.1.0 REV C", 0, SHA1(49d967a808f415d3ceb59a5758ee5b3fc4cfb551) )
+
+	DISK_REGION( "drive_2" )
+	DISK_IMAGE_READONLY( "NEED FOR SPEED GT DISK 2 1.1.0 REV C", 0, SHA1(abbae9e61936079112c25c2b7bf2bbb608345ed2) )
+ROM_END
+
+ROM_START( nfsug )
+	DISK_REGION( "drive_1" )
+	DISK_IMAGE_READONLY( "nfsug1_1-disc1", 0, SHA1(25a9f0606ac3909bd7c4f3f3a59c6782e3c84712) )
+
+	DISK_REGION( "drive_2" )
 	DISK_IMAGE_READONLY( "nfsug1_1-disc2", 0, SHA1(5b0be45eb3fcd27ba513baca1da633f9e9a4c5ef) )
 
 	DISK_REGION( "recovery" )
@@ -157,4 +179,6 @@ GAME( 2000, bhead2k,   0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global V
 GAME( 2000, bhead2ka,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01",                   MACHINE_IS_SKELETON )
 GAME( 2002, bhead2k2,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03",                   MACHINE_IS_SKELETON )
 GAME( 2003, bhead2k3,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_IS_SKELETON )
+GAME( 2003, nfs,       0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_IS_SKELETON )
+GAME( 2004, nfsgt,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_IS_SKELETON )
 GAME( 2005, nfsug,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_IS_SKELETON )

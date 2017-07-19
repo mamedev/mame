@@ -203,7 +203,7 @@ SOUNDS["K051649"] = true
 --SOUNDS["K054539"] = true
 --SOUNDS["K056800"] = true
 --SOUNDS["SEGAPCM"] = true
---SOUNDS["MULTIPCM"] = true
+SOUNDS["MULTIPCM"] = true
 SOUNDS["SCSP"] = true
 SOUNDS["AICA"] = true
 SOUNDS["RF5C68"] = true
@@ -327,6 +327,7 @@ VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
 VIDEOS["S2636"] = true
 VIDEOS["SAA5050"] = true
+VIDEOS["SDA5708"] = true
 VIDEOS["SED1200"] = true
 VIDEOS["SED1330"] = true
 VIDEOS["SED1520"] = true
@@ -3322,6 +3323,7 @@ createMESSProjects(_target, _subtarget, "yamaha")
 files {
 	MAME_DIR .. "src/mame/drivers/ymmu100.cpp",
 	MAME_DIR .. "src/mame/drivers/fb01.cpp",
+	MAME_DIR .. "src/mame/drivers/tg100.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "zenith")

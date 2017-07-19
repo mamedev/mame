@@ -7,6 +7,8 @@
   TODO:
   - finish SM590/SM595 emulation (NES/SNES CIC)
 
+  http://bitsavers.informatik.uni-stuttgart.de/pdf/sharp/_dataBooks/1990_Sharp_Microcomputers_Data_Book.pdf
+  pdf page 35/doc page 26 thru pdf page 44/doc page 35
 */
 
 #include "emu.h"
@@ -88,9 +90,28 @@ void sm590_device::device_reset()
 	m_op = m_prev_op = 0;
 	reset_vector();
 	m_prev_pc = m_pc;
+	m_clk_div = 4; // 4 clock oscillations per cycle on SM59x, see datasheet page 30/pdf page 39
 
 	m_rports[0] = m_rports[1] = m_rports[2] = m_rports[3] = 0;
 	//m_write_r(0, 0, 0xff); // TODO: are the four ports zeroed on reset?
+}
+
+//-------------------------------------------------
+//  wake from suspend mode
+//-------------------------------------------------
+bool sm590_device::wake_me_up()
+{
+	// in halt mode, wake up after R2.2 goes high
+	if (m_rports[2]&0x4)
+	{
+		m_halt = false;
+		do_branch(0, 1, 0); // field 0, page 1, step 0
+
+		standard_irq_callback(0);
+		return true;
+	}
+	else
+		return false;
 }
 
 //-------------------------------------------------

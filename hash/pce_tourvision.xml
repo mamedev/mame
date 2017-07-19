@@ -363,6 +363,18 @@
 		</part>
 	</software>
 
+	<!--Doraemon - Nobita no Dorabian Night -->
+	<software name="dorandn">
+		<description>Doraemon - Nobita no Dorabian Night (Tourvision PCE bootleg)</description>
+		<year>1991</year>
+		<publisher>bootleg (Tourvision) / Fujiko-Shogakukan-TV Asahi / Hudson Soft</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x80000 matches PCE dorandn -->
+				<rom name="doreamon-nobitas_dorabian_night.tv" size="1048576" crc="716b1229" sha1="aaaf21cb511d07a0091ed560f3b426a3ba8950c5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--Down Load -->
 	<software name="download">

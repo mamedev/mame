@@ -70,7 +70,7 @@ private:
 	required_device<printer_image_device> m_printer;
 	required_ioport_array<8> m_pb;
 	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
+	optional_memory_bank m_bank2;
 
 	uint8_t *m_ram_base;
 	uint32_t m_ram_size;
@@ -262,12 +262,15 @@ void mc10_state::driver_start()
 	m_bank1->set_base(m_ram_base);
 
 	/* initialize memory expansion */
-	if (m_ram_size == 20*1024)
-		m_bank2->set_base(m_ram_base + 0x1000);
-	else if (m_ram_size == 24*1024)
-		m_bank2->set_base(m_ram_base + 0x2000);
-	else  if (m_ram_size != 32*1024)        //ensure that is not alice90
-		prg.nop_readwrite(0x5000, 0x8fff);
+	if (m_bank2)
+	{
+		if (m_ram_size == 20 * 1024)
+			m_bank2->set_base(m_ram_base + 0x1000);
+		else if (m_ram_size == 24 * 1024)
+			m_bank2->set_base(m_ram_base + 0x2000);
+		else if (m_ram_size != 32 * 1024)        //ensure that is not alice90
+			prg.nop_readwrite(0x5000, 0x8fff);
+	}
 
 	/* register for state saving */
 	save_item(NAME(m_keyboard_strobe));

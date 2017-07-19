@@ -213,7 +213,7 @@ protected:
 	u16 m_div;
 	bool m_1s;
 
-	bool wake_me_up();
+	virtual bool wake_me_up();
 	virtual void init_divider();
 	TIMER_CALLBACK_MEMBER(div_timer_cb);
 

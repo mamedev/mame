@@ -88,7 +88,9 @@
  * 0x00FFF700-0x00FFF721 Serial devices        offset to SIM40
  * 0x00FFF600-0x00FFF67F Timers                offset to SIM40
  * 0x00FFF000-0x00FFF07F SIM40                 programmed base adress (MCR)
- * 0x00700000-0x008fffff RAM
+ * 0x00700000-0x0077ffff RAM
+ * 0x00780000-0x007807ff I/O area
+ * 0x00800000-0x008fffff RAM
  * 0x00000000-0x0001ffff bootstrap
  * --------------------------------------------------------------------------
  *
@@ -106,14 +108,14 @@
  *  SIM40 + 0x0700: 0x00       Serial port
  *  SIM40 + 0x071F: 0xFF       Serial port
  *  SIM40 + 0x0004: 0x7F03     SYNCR
- *  SIM40 + 0x0040: 0x003FFFF5 CS0 mask 1
- *  SIM40 + 0x0044: 0x00000003 CS0 base 1
- *  SIM40 + 0x0048: 0x003FFFF5 CS1 mask 1
- *  SIM40 + 0x004C: 0x00800003 CS1 base 1
- *  SIM40 + 0x0050: 0x00007FFF CS2 mask 1
+ *  SIM40 + 0x0040: 0x003FFFF5 CS0 mask 1 - block size = 4194304 (4MB)
+ *  SIM40 + 0x0044: 0x00000003 CS0 base 1 - base addr = 0x000000
+ *  SIM40 + 0x0048: 0x003FFFF5 CS1 mask 1 - block size = 4194304 (4MB)
+ *  SIM40 + 0x004C: 0x00800003 CS1 base 1 - base addr = 0x
+ *  SIM40 + 0x0050: 0x00007FFF CS2 mask 1 - block size = 65536 (64KB)
  *  SIM40 + 0x0054: 0x00700003 CS2 base 1
- *  SIM40 + 0x0058: 0x000007F2 CS3 mask 1
- *  SIM40 + 0x005C: 0x00700003 CS3 base 1
+ *  SIM40 + 0x0058: 0x000007F2 CS3 mask 1 - block size = 2048 (2KB)
+ *  SIM40 + 0x005C: 0x00780003 CS3 base 1
  *  SIM40 + 0x001F: 0x40       PBARB Port B Pin Assignment
  *
  *  -------------------------------------------------------------
@@ -272,6 +274,38 @@
  *  SIM40 + 0x0640: 0x03     MCR Timer 2
  *  tbc...
  *
+ *  LED Dot Matrix Display hookup
+ *  -------------------------------------
+ *  "DISPLAY CONN ALT" connected to the SDA5708 
+ *  pin signal   connected to
+ *   1   VCC      +5v
+ *   2   LOAD1*   PA2 68340 pin 121 IP01
+ *   3   DATA      D8 68340 pin 134 IP01
+ *   4   SDCLK     Q6 74138 pin 9   IP12
+ *   5   RESET*    Q4 74259 pin 9   IP16
+ *   6   GND      GND
+ *
+ *  IP12 74138 hookup
+ *  pin signal   connected to
+ *   1   A0       A8 68340 pin 46  IP01
+ *   2   A1       A9 68340 pin 47  IP01
+ *   3   A2      A10 68340 pin 48  IP01
+ *   4   E1*     CS3 68340 pin  5  IP01
+ *   5   E2*     CS3 68340 pin  5  IP01
+ *   6   E3      +5v
+ *   9   Q6    SDCLK SDA5708 pin 4
+ *  14   Q1  Enable* 74259 pin 14  IP16
+ *
+ *  IP16 74259 hookup
+ *  pin signal   connected to
+ *   1   A0       A0 68340 pin 113 IP01
+ *   2   A1       A1 68340 pin  37 IP01
+ *   3   A2       A2 68340 pin  38 IP01
+ *   9   Q4   Reset* SDA5708 pin 5
+ *  13   D        D8 68340 pin 134 IP01
+ *  14   Enable*  Q1 74138 pin  14 IP12
+ *  15   Clear*   System reset         
+ *
  *  Identified low level drivers in firmware
  *  ----------------------------------------
  *  800420..80046C : Some PORT A serialisation routine for the
@@ -294,8 +328,6 @@
  * ----------------------------------------------------------
  *
  *  TODO:
- *  - Dump the ROMs
- *  - Dump/Find bootable software
  *  - Setup a working address map
  *  - Fix debug terminal
  *  - TBC
@@ -305,26 +337,83 @@
 #include "emu.h"
 #include "machine/68340.h"
 
+#include "video/sda5708.h"
+#include "machine/latch8.h" // IP16
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h 
+#define LOG_SETUP   (1U <<  1)
+#define LOG_DISPLAY (1U <<  2)
+
+//#define VERBOSE  (LOG_GENERAL|LOG_SETUP|LOG_DISPLAY)
+//#define LOG_OUTPUT_FUNC printf
+
+#include "logmacro.h"
+
+//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h 
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#define LLFORMAT "%I64d"
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#define LLFORMAT "%lld"
+#endif
+
 class dbox_state : public driver_device
 {
  public:
  dbox_state(const machine_config &mconfig, device_type type, const char *tag)
-	 : driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"){ }
+   : driver_device(mconfig, type, tag)
+   , m_maincpu(*this, "maincpu")
+   , m_display(*this, "display")
+   , m_ip16_74259(*this, "hct259.ip16")
+  { }
 	required_device<m68340_cpu_device> m_maincpu;
+	required_device<sda5708_device> m_display;
+	required_device<latch8_device> m_ip16_74259;
 
 	virtual void machine_reset() override;
 	DECLARE_DRIVER_INIT(dbox);
+	DECLARE_WRITE8_MEMBER (sda5708_reset);
+	DECLARE_WRITE8_MEMBER (sda5708_clk);
+	DECLARE_WRITE8_MEMBER(write_pa);
 };
 
 void dbox_state::machine_reset()
 {
+	LOG("%s\n", FUNCNAME);
 }
 
+// TODO: Hookup the reset latch correctly
+WRITE8_MEMBER (dbox_state::sda5708_reset){
+	LOGDISPLAY("%s - not implemented\n", FUNCNAME);
+}
+
+WRITE8_MEMBER (dbox_state::sda5708_clk){
+	LOGDISPLAY("%s\n", FUNCNAME);
+	m_display->sdclk_w(CLEAR_LINE);
+	m_display->data_w((0x80 & data) != 0 ? ASSERT_LINE : CLEAR_LINE); 
+	m_display->sdclk_w(ASSERT_LINE);
+}
+
+WRITE8_MEMBER (dbox_state::write_pa){
+	LOGDISPLAY("%s\n", FUNCNAME);
+	m_display->load_w((0x04 & data) == 0 ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static ADDRESS_MAP_START( dbox_map, AS_PROGRAM, 32, dbox_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x700000, 0x8fffff) AM_RAM
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x700000, 0x77ffff) AM_RAM // CS2
+//	AM_RANGE(0x780000, 0x7807ff) AM_RAM // CS3
+	AM_RANGE(0x780100, 0x7801ff) AM_WRITE8(sda5708_reset, 0xffffffff)
+	AM_RANGE(0x780600, 0x7806ff) AM_WRITE8(sda5708_clk, 0xffffffff)
+	AM_RANGE(0x800000, 0x8fffff) AM_RAM // CS1
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -334,16 +423,27 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( dbox )
 	MCFG_CPU_ADD("maincpu", M68340, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(dbox_map)
+	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(dbox_state, write_pa))
+
+	/* LED Matrix Display */
+	MCFG_SDA5708_ADD("display")
+
+	/* IP16 74256 8 bit latch */
+	MCFG_LATCH8_ADD("hct259.ip16")
+	MCFG_LATCH8_WRITE_4(DEVWRITELINE("display", sda5708_device, reset_w))
+  
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(dbox_state, dbox)
 {
 }
 
+// TODO: Figure out correct ROM address map
+// TODO: Figure out what DVB2000 is doing
 ROM_START( dbox )
 	ROM_REGION(0x1000000, "maincpu", 0)
-//  ROM_LOAD16_WORD( "dvb2000.bin", 0x000000, 0x8b742, CRC(5b21c455) SHA1(1e7654c37dfa65d1b8ac2469cdda82f91b47b3c7) )
-	ROM_LOAD16_WORD( "nokboot.bin", 0x000000, 0x20000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
+//	ROM_LOAD16_WORD( "dvb2000.bin", 0x000000, 0x08b742, CRC(5b21c455) SHA1(1e7654c37dfa65d1b8ac2469cdda82f91b47b3c7) )
+	ROM_LOAD16_WORD( "nokboot.bin", 0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
 ROM_END
 
 COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_IS_SKELETON )

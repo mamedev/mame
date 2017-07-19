@@ -10,17 +10,18 @@
     ======================================
     Game           | Year | Chip      | Ref      |Protected
     ---------------+------+-----------+----------+--------------------
-    Alligator Hunt | 1994 | GAE1 449  | 940411   | DS5002FP, but unprotected version available
+    Alligator Hunt | 1994 | GAE1 449  | 940411   | DS5002FP (unprotected version available)
     World Rally 2  | 1995 | GAE1 449  | 950510   | DS5002FP
     World Rally 2  | 1995 | GAE1 506  | 950510-1 | DS5002FP
-    Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP
+    Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP (unprotected version available)
     Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
-    Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP, but unprotected version available
+    Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
+	Gran Tesoro?   | 1999 | CG-1V-149 | ?        | DS5002FP (by Nova Desitec, might not fit here)
 
     Notes:
-    touchgok:
+    touchgo:
     sounds cut out sometimes, others are often missing (sound status reads as busy,
     so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
 
@@ -31,6 +32,7 @@
 
 #include "machine/eepromser.h"
 #include "sound/gaelco.h"
+#include "cpu/mcs51/mcs51.h"
 
 #include "rendlay.h"
 #include "screen.h"
@@ -61,6 +63,40 @@ GFXDECODEINFO(0x0200000, 128)
 TILELAYOUT16(0x0400000)
 GFXDECODEINFO(0x0400000, 128)
 
+/*============================================================================
+                            DS5002FP
+  ============================================================================*/
+
+READ8_MEMBER(gaelco2_state::dallas_share_r)
+{
+	uint8_t *shareram = (uint8_t *)m_shareram.target();
+	return shareram[BYTE_XOR_BE(offset)];
+}
+
+WRITE8_MEMBER(gaelco2_state::dallas_share_w)
+{
+	uint8_t *shareram = (uint8_t *)m_shareram.target();
+	shareram[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(gaelco2_state::dallas_ram_r)
+{
+	return m_mcu_ram[offset];
+}
+
+WRITE8_MEMBER(gaelco2_state::dallas_ram_w)
+{
+	m_mcu_ram[offset] = data;
+}
+
+static ADDRESS_MAP_START( dallas_rom, AS_PROGRAM, 8, gaelco2_state )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(dallas_ram_r, dallas_ram_w) /* Code in NVRAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, gaelco2_state )
+	AM_RANGE(0x08000, 0x0ffff) AM_READWRITE(dallas_share_r, dallas_share_w) /* confirmed that 0x8000 - 0xffff is a window into 68k shared RAM */
+	AM_RANGE(0x10000, 0x17fff) AM_READWRITE(dallas_ram_r, dallas_ram_w) /* yes, the games access it as data and use it for temporary storage!! */
+ADDRESS_MAP_END
 
 /*============================================================================
                             MANIAC SQUARE (FINAL)
@@ -77,7 +113,8 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP                                                                /* Sound muting? */
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")                                                       /* COINSW + SERVICESW */
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)                                                   /* Coin lockout + counters */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM */
+	AM_RANGE(0xfe0000, 0xfebfff) AM_RAM                                                                     /* Work RAM */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -655,7 +692,8 @@ static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")                                                            /* COINSW + Input 3P */
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")                                                            /* SERVICESW + Input 4P */
 	AM_RANGE(0x500000, 0x50001f) AM_WRITE(touchgo_coin_w)                                                       /* Coin counters */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                                         /* Work RAM */
+	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
+	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")											        /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
 
 
@@ -810,6 +848,15 @@ static MACHINE_CONFIG_START( touchgo )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( touchgo_d5002fp, touchgo )
+	MCFG_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2) /* ? */
+	MCFG_DS5002FP_CONFIG( 0x19, 0x00, 0x80 ) /* default config verified on chip */
+	MCFG_CPU_PROGRAM_MAP(dallas_rom)
+	MCFG_CPU_IO_MAP(dallas_ram)
+
+	MCFG_QUANTUM_PERFECT_CPU("mcu")
+MACHINE_CONFIG_END
+
 /*
 PCB Layout:
 
@@ -859,7 +906,7 @@ ROM_START( touchgo ) /* REF: 950906 */
 	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
@@ -878,7 +925,7 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
@@ -897,7 +944,7 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
@@ -1125,7 +1172,8 @@ static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, wrally2_state )
 	AM_RANGE(0x400000, 0x400011) AM_WRITE(wrally2_coin_w)                                                   /* Coin Counters */
 	AM_RANGE(0x400028, 0x400029) AM_WRITE(wrally2_adc_clk)                                                  /* ADCs clock-in line */
 	AM_RANGE(0x400030, 0x400031) AM_WRITE(wrally2_adc_cs)                                                   /* ADCs chip select line */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                                     /* Work RAM */
+	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
+	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
 
 
@@ -1223,6 +1271,13 @@ static MACHINE_CONFIG_START( wrally2 )
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)         /* 13 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
+
+	MCFG_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2) /* ? */
+	MCFG_DS5002FP_CONFIG( 0x69, 0x00, 0x80 ) /* default config verified on chip */
+	MCFG_CPU_PROGRAM_MAP(dallas_rom)
+	MCFG_CPU_IO_MAP(dallas_ram)
+
+	MCFG_QUANTUM_PERFECT_CPU("mcu")
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
@@ -1371,8 +1426,34 @@ ROM_START( wrally2 )
 	ROM_LOAD16_BYTE( "wr2.63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
-	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, NO_DUMP )
+	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0x00, the 2nd space was filled as 0xff.
+	   In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.  For reference the
+	   one that was not is "1938: 18 <-> 9B" (part of a data table)
 
+	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
+	   patched out
+
+		0200: mov   sp,#$70
+		0203: mov   a,pcon
+		0205: anl   a,#$20
+		0207: jnz   $0203
+		0209: nop
+		020A: nop
+		020B: nop
+		020C: mov   dptr,#$FC01
+
+	   while the newer dump has this
+
+		0200: mov   sp,#$70
+		0203: mov   mcon,#$68
+		0206: mov   i2cfg,#$00
+		0209: mov   crcr,#$80
+		020C: mov   dptr,#$FC01
+
+	   either way the 2nd dump is in much better state, so we're using that.
+	*/
+
+	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )	
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 )  /* GFX + Sound */
 	ROM_LOAD( "wr2.16d",    0x0000000, 0x0080000, CRC(ad26086b) SHA1(487ffaaca57c9d030fc486b8cae6735ee40a0ac3) )    /* GFX only */
@@ -1494,12 +1575,8 @@ READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
 	if (pc == 0xaad0) return 0x0a00; // if above ISN'T 0 this must be 0x0a00 (but code then dies, probably wants some data filled?)
 	// other code path just results in no more pieces dropping? maybe the MCU does the matching algorithm?
 
-
-
-
-
 	printf("read at PC %08x\n", pc);
-	return m_shareram[(0xfedaa2 - 0xfe0000) / 2];
+	return m_shareram[(0xfedaa2 - 0xfec000) / 2];
 
 }
 
@@ -1508,28 +1585,15 @@ DRIVER_INIT_MEMBER(gaelco2_state,maniacsqa)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfedaa2, 0xfedaa3, read16_delegate(FUNC(gaelco2_state::maniacsqa_prot_r), this) );
 }
 
-
-/* the game expects this value each frame to know that the DS5002FP is alive */
-READ16_MEMBER(gaelco2_state::dallas_kludge_r)
-{
-	return 0x0200;
-}
-
-DRIVER_INIT_MEMBER(gaelco2_state,touchgop)
-{
-	DRIVER_INIT_CALL(touchgo);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfefffa, 0xfefffb, read16_delegate(FUNC(gaelco2_state::dallas_kludge_r), this) );
-}
-
 GAME( 1994, aligator,  0,       alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1994, aligatorun,aligator,alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
 
-GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1995, touchgok, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
+GAME( 1995, touchgo,  0,        touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgok, touchgo,  touchgo,          touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,  wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, wrally2,  0,        wrally2, wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
 
 GAME( 1996, maniacsq, 0,        maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
 GAME( 1996, maniacsqa,maniacsq, maniacsq, maniacsq, gaelco2_state, maniacsqa,ROT0, "Gaelco", "Maniac Square (protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
