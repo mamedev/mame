@@ -102,6 +102,7 @@ protected:
 
 	virtual void device_reset() override;
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual bool wake_me_up() override;
 	virtual void init_divider() override { }
 	virtual void init_lcd_driver() override { }
 	virtual void init_melody() override { }
