@@ -13673,6 +13673,8 @@ gvrxpsup                        // Global VR XP OS Update/Install - 06/11/02
 gvrxpsys                        // Global VR XP OS Install - 09/30/01
 hyperv2                         // Hyper V2 (Global VR) Install - 06/12/02
 hyperv2a                        // Hyper V2 (Global VR) Install - 09/30/01
+nfs                             // Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)
+nfsgt                           // Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)
 nfsug                           // Need For Speed: Underground Install (2 Discs) (v1.1)
 
 @source:gluck2.cpp
