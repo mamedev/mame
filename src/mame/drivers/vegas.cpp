@@ -967,7 +967,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 *************************************/
 WRITE32_MEMBER(vegas_state::wheel_board_w)
 {
-	logerror("wheel_board_w: data = %08x\n", data);
+	//logerror("wheel_board_w: data = %08x\n", data);
 	/* two writes in pairs. bit 11 high, bit 10 flag, flag off first, on second. arg remains the same. */
 	bool valid = (data & (1 << 11));
 	bool flag = (data & (1 << 10));
@@ -2047,6 +2047,9 @@ ROM_END
 
 ROM_START( sf2049se )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
+	// Bad Dump
+	// POST Message: Boot EPROM checksum...FAILED. Computed: F7017455
+	// End of file including checksum area is filled with FF's.
 	ROM_LOAD( "sf2049se.u27", 0x000000, 0x80000, CRC(da4ecd9c) SHA1(2574ff3d608ebcc59a63cf6dea13ee7650ae8921) BAD_DUMP )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
