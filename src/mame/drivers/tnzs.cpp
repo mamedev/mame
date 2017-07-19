@@ -179,11 +179,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 5) 'kageki' and clones
 
-5a) 'kageki'
+5a) 'kagekiu'
 
   - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xe000 (shared RAM)
   - Sets :
-      * 'kageki'   : region = 0x02
+      * 'kagekiu'   : region = 0x02
   - Coinage relies on region (code at 0x0099 in CPU1) :
       * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
       * 0x03 and 0x04 : TAITO_COINAGE_WORLD
@@ -225,7 +225,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * 'kagekij'  : region = 0x01
   - This set really looks like a hack :
       * year has been changed from 1988 to 1992
-      * the game uses Japanese ROMS, but CPU0 ROM displays Engish text
+      * the game uses Japanese ROMS, but CPU0 ROM displays English text
         on bad guys screens when game starts
   - Coinage relies on region (code at 0x0099 in CPU1) :
       * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
@@ -1116,7 +1116,7 @@ static INPUT_PORTS_START( kageki )
 	/* special (see kageki_csport_* handlers) -> 0xe03b (shared RAM) */
 	PORT_START("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL_LOC(SWA)                           /* see notes */
-	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
+	TAITO_COINAGE_WORLD_LOC(SWA)
 
 	/* special (see kageki_csport_* handlers) -> 0xe03c (shared RAM) */
 	PORT_START("DSWB")
@@ -1147,8 +1147,15 @@ static INPUT_PORTS_START( kageki )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kagekij )
+static INPUT_PORTS_START( kagekiu )
 	PORT_INCLUDE( kageki )
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kagekij )
+	PORT_INCLUDE( kagekiu )
 
 	PORT_MODIFY("DSWA")
 	TAITO_MACHINE_COCKTAIL_LOC(SWA)                              /* see notes */
@@ -2156,9 +2163,37 @@ ROM_START( drtoppelj )
 	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
+ROM_START( kageki )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b35-13.bin", 0x00000, 0x10000, CRC(dc4b025f) SHA1(ed7e0d846693abe0a0ac198e23b272f84b30af46) )    /* World ver */
+	ROM_LOAD( "b35-10.9c",  0x10000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "b35-14.bin", 0x00000, 0x10000, CRC(8adef2d0) SHA1(0dc8206b35e898b8fed5cdccbdcc5ff1bad68da4) )    /* World ver */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "b35__01.13a",  0x00000, 0x20000, CRC(01d83a69) SHA1(92a84329306b58a45f7bb443a8642eeaeb04d553) )
+	ROM_LOAD( "b35__02.12a",  0x20000, 0x20000, CRC(d8af47ac) SHA1(2ef9ca991bf55ed6c12bf3a7dc4aa904d7749d5c) )
+	ROM_LOAD( "b35__03.10a",  0x40000, 0x20000, CRC(3cb68797) SHA1(e7669b1a9a26dede560cc87695004d29510bc1f5) )
+	ROM_LOAD( "b35__04.8a",   0x60000, 0x20000, CRC(71c03f91) SHA1(edce6e5a52b0c83c1c3c6bf9bc6b7957f7941521) )
+	ROM_LOAD( "b35__05.7a",   0x80000, 0x20000, CRC(a4e20c08) SHA1(5d1d23d1410fea8650b18c595b0170a17e5d89a6) )
+	ROM_LOAD( "b35__06.5a",   0xa0000, 0x20000, CRC(3f8ab658) SHA1(44de7ee2bdb89bc520ed9bc812c26789c3f31411) )
+	ROM_LOAD( "b35__07.4a",   0xc0000, 0x20000, CRC(1b4af049) SHA1(09783816d5076219d241538e2711402eb8c4cd03) )
+	ROM_LOAD( "b35__08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
+
+	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
+ROM_END
+
 /* M6100309A PCB
    P0-038A */
-ROM_START( kageki )
+ROM_START( kagekiu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b35-16.11c", 0x00000, 0x10000, CRC(a4e6fd58) SHA1(7cfe5b3fa6c88cdab45719f5b58541270825ad30) )    /* US ver */
 	ROM_LOAD( "b35-10.9c",  0x10000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
@@ -2177,7 +2212,7 @@ ROM_START( kageki )
 	ROM_LOAD( "b35__08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )   /* US ver */
+	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )   /* matches World ver */
 
 	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
 	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
@@ -2220,7 +2255,7 @@ ROM_END
 
 ROM_START( kagekih )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b35_16.11c", 0x00000, 0x10000, CRC(1cf67603) SHA1(0627285ac69e44312d7694c64b96a81489d8663c) )    /* hacked ver */
+	ROM_LOAD( "b35_16.11c", 0x00000, 0x10000, CRC(1cf67603) SHA1(0627285ac69e44312d7694c64b96a81489d8663c) )    /* hacked ver of the World set */
 	ROM_LOAD( "b35-10.9c",  0x10000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -2805,7 +2840,8 @@ GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, extrmatn_state, 0, ROT90,  
 GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, extrmatn_state, 0, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
 GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, extrmatn_state, 0, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   0, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   0, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kagekiu,   kageki,   kageki,   kagekiu,  kageki_state,   0, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  kageki_state,   0, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   0, ROT90,  "hack",                                                 "Kageki (hack)", MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
 
