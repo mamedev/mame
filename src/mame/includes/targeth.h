@@ -30,6 +30,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
 
 	virtual void video_start() override;
+	virtual void machine_start() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
