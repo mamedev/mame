@@ -99,43 +99,8 @@ private:
 	using s_parts = std::unordered_map<std::string, std::string>;
 	using s_bios = std::vector<std::pair<std::string, int>>;
 
-	class software_parts : public menu
-	{
-	public:
-		software_parts(mame_ui_manager &mui, render_container &container, s_parts &&parts, ui_software_info const &ui_info);
-		virtual ~software_parts() override;
-
-	protected:
-		virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
-	private:
-		virtual void populate(float &customtop, float &custombottom) override;
-		virtual void handle() override;
-
-		ui_software_info const &m_uiinfo;
-		s_parts const		   m_parts;
-	};
-
-	class bios_selection : public menu
-	{
-	public:
-		bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, game_driver const &driver, bool inlist);
-		bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, ui_software_info const &swinfo, bool inlist);
-		virtual ~bios_selection() override;
-
-	protected:
-		virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
-	private:
-		bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, void const *driver, bool software, bool inlist);
-
-		virtual void populate(float &customtop, float &custombottom) override;
-		virtual void handle() override;
-
-		void const  *m_driver;
-		bool        m_software, m_inlist;
-		s_bios      m_bios;
-	};
+	class software_parts;
+	class bios_selection;
 
 	class cache
 	{
