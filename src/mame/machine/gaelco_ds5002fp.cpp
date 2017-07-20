@@ -44,12 +44,7 @@ void gaelco_ds5002fp_device_base::device_reset()
 }
 
 gaelco_ds5002fp_device::gaelco_ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: gaelco_ds5002fp_device(mconfig, GAELCO_DS5002FP, tag, owner, clock)
-{
-}
-
-gaelco_ds5002fp_device::gaelco_ds5002fp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: gaelco_ds5002fp_device_base(mconfig, type, tag, owner, clock)
+	: gaelco_ds5002fp_device_base(mconfig, GAELCO_DS5002FP, tag, owner, clock)
 {
 }
 
@@ -73,9 +68,8 @@ MACHINE_CONFIG_MEMBER(gaelco_ds5002fp_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-
 gaelco_ds5002fp_wrally_device::gaelco_ds5002fp_wrally_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: gaelco_ds5002fp_device(mconfig, GAELCO_DS5002FP_WRALLY, tag, owner, clock)
+	: gaelco_ds5002fp_device_base(mconfig, GAELCO_DS5002FP_WRALLY, tag, owner, clock)
 {
 }
 

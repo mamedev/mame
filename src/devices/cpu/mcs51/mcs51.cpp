@@ -2476,11 +2476,11 @@ void ds5002fp_device::nvram_default()
 
 	if (!m_region.found())
 	{
-		logerror( "ds5002fp_device(%s) region not found\n", tag() );
+		logerror( "ds5002fp_device region not found\n" );
 	}
 	else if( m_region->bytes() != expected_bytes )
 	{
-		logerror( "ds5002fp_device(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), expected_bytes );
+		logerror( "ds5002fp_device region length 0x%x expected 0x%x\n", m_region->bytes(), expected_bytes );
 	}
 	else
 	{
