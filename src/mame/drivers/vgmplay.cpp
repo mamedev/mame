@@ -982,7 +982,7 @@ void vgmplay_state::machine_start()
 {
 	//m_nescpu->
 	uint32_t size = 0;
-	if(m_file->exists()) {
+	if(m_file->exists() && m_file->length() > 0) {
 		size = m_file->length();
 		m_file_data.resize(size);
 		m_file->input(&m_file_data[0], size);
@@ -1176,7 +1176,7 @@ void vgmplay_state::machine_start()
 			}
 			if(version >= 0x161 && r32(0xb0)) {
 				uint32_t clock = r32(0xb0);
-				m_pokeya->set_unscaled_clock(clock);
+				m_pokeya->set_unscaled_clock(clock & ~0x40000000);
 				if (clock & 0x40000000) {
 					clock &= ~0x40000000;
 					m_pokeyb->set_unscaled_clock(clock);
@@ -1334,6 +1334,7 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_CPU_IO16_MAP( soundchips16_map )
 
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
+	MCFG_BITBANGER_READONLY(true)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
