@@ -226,7 +226,7 @@ static int gb_get_pcb_id(const char *slot)
 			return elem.pcb_id;
 	}
 
-	return 0;
+	return GB_MBC_NONE;
 }
 
 static const char *gb_get_slot(int type)

@@ -12,7 +12,7 @@
   Improvements to match real hardware         Wilbert Pol        2006-2008
 
   Timing is not accurate enough:
-  - Mode 3 takes 172 cycles (measuered with logic analyzer by costis)
+  - Mode 3 takes 172 cycles (measured with logic analyzer by costis)
 
 The following timing of the first frame when the LCD is turned on, is with
 no sprites being displayed. If sprites are displayed then the timing of mode
@@ -3847,6 +3847,9 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 		case 0x10:  /* DATA_TRN */
 			/* Not Implemented */
 			break;
+		case 0x11:  /* MLT_REQ */
+			/* MLT_REQ currently handled inside gb.cpp logic */
+			break;
 		case 0x12:  /* JUMP */
 			/* Not Implemented */
 			break;
@@ -3895,11 +3898,10 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 			m_sgb_window_mask = data[1];
 			break;
 		case 0x18:  /* OBJ_TRN */
-			/* Not Implemnted */
+			/* Not Implemented */
 			break;
-		case 0x19:  /* ? */
-			/* Called by: dkl,dkl2,dkl3,zeldadx
-			 But I don't know what it is for. */
+		case 0x19:  /* PAL_PRI */
+			/* Called by: dkl,dkl2,dkl3,zeldadx */
 			/* Not Implemented */
 			break;
 		case 0x1E:  /* Used by bootrom to transfer the gb cart header */
