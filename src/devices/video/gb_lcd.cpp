@@ -322,7 +322,6 @@ dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_lr35902(*this, finder_base::DUMMY_TAG)
-	, m_sgb_border_hack(0)
 	, m_enable_experimental_engine(false)
 	, m_oam_size(0x100)
 	, m_vram_size(vram_size)
@@ -1395,19 +1394,8 @@ void sgb_ppu_device::refresh_border()
 				pal = 1;
 			pal <<= 4;
 
-			if (m_sgb_border_hack)
-			{ /* A few games do weird stuff */
-				uint8_t tileno = map[xidx];
-				if (tileno >= 128) tileno = ((64 + tileno) % 128) + 128;
-				else tileno = (64 + tileno) % 128;
-				data = tiles[tileno * 32] | (tiles[(tileno * 32) + 1] << 8);
-				data2 = tiles2[tileno * 32] | (tiles2[(tileno * 32) + 1] << 8);
-			}
-			else
-			{
-				data = tiles[map[xidx] * 32] | (tiles[(map[xidx] * 32) + 1] << 8);
-				data2 = tiles2[map[xidx] * 32] | (tiles2[(map[xidx] * 32) + 1] << 8);
-			}
+			data = tiles[map[xidx] * 32] | (tiles[(map[xidx] * 32) + 1] << 8);
+			data2 = tiles2[map[xidx] * 32] | (tiles2[(map[xidx] * 32) + 1] << 8);
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -3508,6 +3496,46 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
 
 // Super Game Boy
 
+/* Super Game Boys transfer VRAM data using the display signals.
+ * That means not DMG VRAM is copied from 0x8800 to SNES VRAM
+ * but displayed BG contents.
+ * Things to consider: LCDC (0xFF40) and SCY/SCX (0xFF42/3)
+ *  - LCD must be on
+ *  - TODO: Window might or might not influence result
+ *  - CHR and BG likely influence result
+ *  - BG must be on
+ *  - BG should not be scrolled, but likely does influence transfer
+ *  - TODO: are BG attributes (hflip, vflip) ignored?
+ */
+/**
+ * Copy DMG VRAM data to SGM VRAM
+ * @param dst       Destination Pointer
+ * @param start     Logical Start Tile index inside display area.
+ * @param num_tiles Number of DMG tiles (0x10u bytes) to copy.
+ */
+void sgb_ppu_device::sgb_vram_memcpy(uint8_t* dst, uint8_t start, size_t num_tiles) {
+	
+	size_t i;
+	uint16_t bg_ix = (start / 0x14u) * 0x20u + (start % 0x14u);
+	uint8_t tile_ix;
+	const uint8_t* map = m_layer[0].bg_map;
+	const uint8_t* tiles = m_layer[0].bg_tiles;
+	const uint8_t mod = m_gb_tile_no_mod;
+	
+	for (i = 0x00u; i < num_tiles && i < 0x100u; ++i) {
+		
+		tile_ix = map[bg_ix] ^ mod;
+		memcpy(dst, &tiles[tile_ix << 4], 0x10u);
+		dst += 0x10u;
+		
+		++bg_ix;
+		if ((bg_ix & 0x1Fu) == 0x14u) {
+			bg_ix += 0x20u - 0x14u; /* advance to next start of line */
+		}
+
+	}
+}
+
 void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 {
 	switch (offs)
@@ -3823,36 +3851,27 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 			/* Not Implemented */
 			break;
 		case 0x13:  /* CHR_TRN */
-			if (data[1] & 0x1)
-				memcpy(m_sgb_tile_data.get() + 4096, m_vram.get() + 0x0800, 4096);
+			if (data[1] & 0x01u)
+				sgb_vram_memcpy(m_sgb_tile_data.get() + 0x1000u, 0x00u, 0x100u);
 			else
-				memcpy(m_sgb_tile_data.get(), m_vram.get() + 0x0800, 4096);
+				sgb_vram_memcpy(m_sgb_tile_data.get(), 0x00u, 0x100u);
 			break;
 		case 0x14:  /* PCT_TRN */
 		{
 			uint16_t col;
-			if (m_sgb_border_hack)
+			uint8_t sgb_pal[0x80u];
+
+			sgb_vram_memcpy(m_sgb_tile_map, 0x00u, 0x80u);
+			sgb_vram_memcpy(sgb_pal, 0x80u, 0x08u);
+			for (int i = 0; i < 4 * 16 /* 4 pals at 16 colors each */; i++)
 			{
-				memcpy(m_sgb_tile_map, m_vram.get() + 0x1000, 2048);
-				for (int i = 0; i < 64; i++)
-				{
-					col = (m_vram[0x0800 + (i * 2) + 1 ] << 8) | m_vram[0x0800 + (i * 2)];
-					m_sgb_pal[SGB_BORDER_PAL_OFFSET + i] = col;
-				}
-			}
-			else /* Do things normally */
-			{
-				memcpy(m_sgb_tile_map, m_vram.get() + 0x0800, 2048);
-				for (int i = 0; i < 64; i++)
-				{
-					col = (m_vram[0x1000 + (i * 2) + 1] << 8) | m_vram[0x1000 + (i * 2)];
-					m_sgb_pal[SGB_BORDER_PAL_OFFSET + i] = col;
-				}
+				col = (sgb_pal[(i * 2) + 1] << 8) | sgb_pal[i * 2];
+				m_sgb_pal[SGB_BORDER_PAL_OFFSET + i] = col;
 			}
 		}
 			break;
 		case 0x15:  /* ATTR_TRN */
-			memcpy(m_sgb_atf_data, m_vram.get() + 0x0800, 4050);
+			sgb_vram_memcpy(m_sgb_atf_data, 0x00u, 0x100u);
 			break;
 		case 0x16:  /* ATTR_SET */
 		{
