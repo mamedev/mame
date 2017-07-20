@@ -17,6 +17,8 @@
 #include "debug/debugcpu.h"
 #include "debug/dvmemory.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEMemoryViewer
 
@@ -171,6 +173,19 @@
 - (IBAction)changeSubview:(id)sender {
 	[memoryView selectSubviewAtIndex:[[sender selectedItem] tag]];
 	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_MEMORY_VIEWER);
+	[memoryView saveConfigurationToNode:node];
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	[memoryView restoreConfigurationFromNode:node];
 }
 
 @end

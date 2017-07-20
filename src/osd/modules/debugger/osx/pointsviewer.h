@@ -25,4 +25,6 @@
 
 - (IBAction)changeSubview:(id)sender;
 
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+
 @end

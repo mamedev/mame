@@ -25,6 +25,8 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEDebugConsole
 
@@ -375,6 +377,55 @@
 
 - (void)auxiliaryWindowWillClose:(NSNotification *)notification {
 	[auxiliaryWindows removeObjectIdenticalTo:[notification object]];
+}
+
+
+- (void)loadConfiguration:(util::xml::data_node const *)parentnode {
+	util::xml::data_node const *node = nullptr;
+	for (node = parentnode->get_child("window"); node; node = node->get_next_sibling("window"))
+	{
+		MAMEDebugWindowHandler *win = nil;
+		switch (node->get_attribute_int("type", -1))
+		{
+		case MAME_DEBUGGER_WINDOW_TYPE_CONSOLE:
+			[self restoreConfigurationFromNode:node];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_MEMORY_VIEWER:
+			win = [[MAMEMemoryViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DISASSEMBLY_VIEWER:
+			win = [[MAMEDisassemblyViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_ERROR_LOG_VIEWER:
+			win = [[MAMEErrorLogViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER:
+			win = [[MAMEPointsViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DEVICES_VIEWER:
+			win = [[MAMEDevicesViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER:
+			// FIXME: needs device info on init, make another variant
+			//win = [[MAMEDeviceInfoViewer alloc] initWithMachine:*machine console:self];
+			break;
+		default:
+			break;
+		}
+		if (win)
+		{
+			[auxiliaryWindows addObject:win];
+			[win restoreConfigurationFromNode:node];
+			[win release];
+			[win activate];
+		}
+	}
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_CONSOLE);
 }
 
 

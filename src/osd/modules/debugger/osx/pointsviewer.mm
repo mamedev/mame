@@ -12,6 +12,8 @@
 #import "breakpointsview.h"
 #import "watchpointsview.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEPointsViewer
 
@@ -139,6 +141,12 @@
 - (IBAction)changeSubview:(id)sender {
 	[tabs selectTabViewItemAtIndex:[[sender selectedItem] tag]];
 	[window setTitle:[[sender selectedItem] title]];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER);
 }
 
 @end

@@ -9,6 +9,8 @@
 #include "emu.h"
 #import "deviceinfoviewer.h"
 
+#include "util/xmlfile.h"
+
 
 @interface MAMEDeviceInfoView : NSView
 {
@@ -230,6 +232,12 @@
 
 	// don't forget the result
 	return self;
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER);
 }
 
 @end
