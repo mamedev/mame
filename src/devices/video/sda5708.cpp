@@ -4,8 +4,12 @@
 
     Siemens SDA5708 8 character 7x5 dot matrix LED display
 
-**********************************************************************/
+**********************************************************************
 
+  Main source of information about the SDA5708 came from San Bergmans:
+  http://www.sbprojects.com/knowledge/footprints/sda5708/index.php
+
+**********************************************************************/
 #include "emu.h"
 #include "sda5708.h"
 
@@ -17,9 +21,10 @@
 #define LOG_SETUP   (1U <<  1)
 #define LOG_CMD     (1U <<  2)
 #define LOG_DATA    (1U <<  3)
+#define LOG_CNTR    (1U <<  4)
 
-//#define VERBOSE  (LOG_DATA|LOG_SETUP|LOG_CMD|LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC printf
+//#define VERBOSE  (LOG_DATA|LOG_SETUP|LOG_CMD|LOG_CNTR|LOG_GENERAL)
+#define LOG_OUTPUT_FUNC printf // must always be enabled as logerror is not available here
 
 #include "logmacro.h"
 
@@ -27,6 +32,7 @@
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGCMD(...)   LOGMASKED(LOG_CMD,     __VA_ARGS__)
 #define LOGDATA(...)  LOGMASKED(LOG_DATA,    __VA_ARGS__)
+#define LOGCNTR(...)  LOGMASKED(LOG_CNTR,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -56,6 +62,16 @@ DEFINE_DEVICE_TYPE(SDA5708,         sda5708_device,   "sda5708",         "SDA570
 
 sda5708_device::sda5708_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SDA5708, tag, owner, clock)
+    , m_serial(0)
+    , m_load(0)
+    , m_reset(0)
+    , m_data(0)
+    , m_sdclk(0)
+    , m_cdp(0)
+    , m_digit(0)
+    , m_bright(0)
+    , m_clear(0)
+	, m_ip(0)
 {
 }
 
@@ -68,6 +84,16 @@ void sda5708_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 	// register for state saving
+	save_item(NAME(m_serial));
+	save_item(NAME(m_load));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_data));
+	save_item(NAME(m_sdclk));
+	save_item(NAME(m_cdp));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_bright));
+	save_item(NAME(m_clear));
+	save_item(NAME(m_ip));
 }
 
 
@@ -78,6 +104,12 @@ void sda5708_device::device_start()
 void sda5708_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
+	m_ip = 0;
+	m_clear = 0;
+	m_bright = 0;
+	m_digit = 0;
+	memset(m_dispmem, 0x00, sizeof(m_dispmem));
+	update_display();
 }
 
 //-------------------------------------------------
@@ -90,6 +122,25 @@ void sda5708_device::device_reset()
 // on the same bus.
 //-------------------------------------------------
 
+void sda5708_device::update_display()
+{
+		LOG("%s\n", FUNCNAME);
+		for (int d = 1; d <= 8; d++)
+		{
+				for (int y = 1; y <= 7; y++)
+				{
+						LOGDATA("- SDA5708 data: ");
+						for (int x = 1; x <= 5; x++)
+						{
+								machine().output().set_indexed_value("Dot_", d * 100 + y * 10 + x, (m_dispmem[(d - 1) * 7 + y] & (1 << (4 - (x - 1)))) == 0 ? 7 : m_bright );
+								LOGDATA("%c", (m_dispmem[(d - 1) * 7 + (y - 1)] & (1 << (4 - (x - 1)))) == 0 ? '-' : 'x');
+						}
+						LOGDATA("\n");
+				}
+				LOGDATA("\n");
+		}
+}
+
 WRITE_LINE_MEMBER( sda5708_device::load_w )
 {
 	LOG("%s - line %s\n", FUNCNAME, state == ASSERT_LINE ? "asserted" : "cleared");
@@ -98,11 +149,20 @@ WRITE_LINE_MEMBER( sda5708_device::load_w )
 	  	switch (m_serial & SDA5708_REG_MASK)
 		{
 		case SDA5708_CNTR_COMMAND:
-			LOGCMD("- Control command: %0x02\n", m_serial & 0x1f);
+			LOGCMD("- Control command: %02x\n", m_serial);
+			m_bright = m_serial & 0x07;
+			m_clear  = m_serial & 0x20;
+			m_ip     = m_serial & 0x80;
+			LOGCNTR("- SDA5708 control command - Clear:%d IP:%d Bright:%d\n", m_clear, m_ip, m_bright);
 			break;
 		case SDA5708_CLEAR_COMMAND:
 			LOGCMD("- Display cleared\n");
 			memset(m_dispmem, 0x00, sizeof(m_dispmem));
+			update_display();
+			m_bright = m_serial & 0x07;
+			m_clear  = m_serial & 0x20;
+			m_ip     = m_serial & 0x80;
+			LOGCNTR("- SDA5708 clear command - Clear:%d IP:%d Bright:%d\n", m_clear, m_ip, m_bright);
 			break;
 		case SDA5708_ADDR_COMMAND:
 			LOGCMD("- Address command: %02x\n", m_serial & 0x1f);
@@ -112,12 +172,20 @@ WRITE_LINE_MEMBER( sda5708_device::load_w )
 		case SDA5708_DATA_COMMAND:
 			LOGCMD("- Data command: %02x\n", m_serial & 0x1f);
 			LOGDATA("- SDA5708 data: %c%c%c%c%c\n",
-				(m_serial & 0x10) ? 'x' : ' ',
-				(m_serial & 0x08) ? 'x' : ' ',
-				(m_serial & 0x04) ? 'x' : ' ',
-				(m_serial & 0x02) ? 'x' : ' ',
-				(m_serial & 0x01) ? 'x' : ' ' );
+					(m_serial & 0x10) ? (m_clear == 0 ? 'o' : 'x') : ' ',
+					(m_serial & 0x08) ? (m_clear == 0 ? 'o' : 'x')  : ' ',
+					(m_serial & 0x04) ? (m_clear == 0 ? 'o' : 'x')  : ' ',
+					(m_serial & 0x02) ? (m_clear == 0 ? 'o' : 'x')  : ' ',
+					(m_serial & 0x01) ? (m_clear == 0 ? 'o' : 'x')  : ' ' );
 			m_dispmem[m_digit * 7 + m_cdp] = m_serial;
+			if (m_clear != 0)
+			{
+					machine().output().set_indexed_value("Dot_", (m_digit + 1) * 100 + (m_cdp + 1) * 10 + 1, (m_serial & 0x10) ? m_bright : 7 );
+					machine().output().set_indexed_value("Dot_", (m_digit + 1) * 100 + (m_cdp + 1) * 10 + 2, (m_serial & 0x08) ? m_bright : 7 );
+					machine().output().set_indexed_value("Dot_", (m_digit + 1) * 100 + (m_cdp + 1) * 10 + 3, (m_serial & 0x04) ? m_bright : 7 );
+					machine().output().set_indexed_value("Dot_", (m_digit + 1) * 100 + (m_cdp + 1) * 10 + 4, (m_serial & 0x02) ? m_bright : 7 );
+					machine().output().set_indexed_value("Dot_", (m_digit + 1) * 100 + (m_cdp + 1) * 10 + 5, (m_serial & 0x01) ? m_bright : 7 );
+			}
 			m_cdp = (m_cdp + 1) % 7;
 			break;
 		default:
@@ -127,7 +195,6 @@ WRITE_LINE_MEMBER( sda5708_device::load_w )
 	}
        	m_load = state;
 }
-
 
 //-------------------------------------------------
 //  data_w - data line
@@ -177,4 +244,6 @@ WRITE_LINE_MEMBER( sda5708_device::reset_w )
 {
 	LOG("%s - line %s\n", FUNCNAME, state == ASSERT_LINE ? "asserted" : "cleared");
 	m_reset = state;
+	if (state == ASSERT_LINE)
+		device_reset();
 }
