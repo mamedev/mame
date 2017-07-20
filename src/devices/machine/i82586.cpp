@@ -39,7 +39,7 @@
 #define LOG_FILTER  (1U << 2)
 #define LOG_CONFIG  (1U << 3)
 
-#define VERBOSE (LOG_GENERAL | LOG_FRAMES | LOG_FILTER | LOG_CONFIG)
+//#define VERBOSE (LOG_GENERAL | LOG_FRAMES | LOG_FILTER | LOG_CONFIG)
 
 #include "logmacro.h"
 
