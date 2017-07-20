@@ -22,7 +22,6 @@
 *   https://www.intel.com/assets/pdf/general/82596ca.pdf
 *
 * TODO
-*   - save/restore state
 *   - testing for 82586 and 82596 big endian and non-linear modes
 *   - more complete statistics capturing
 *   - 82596 monitor mode
@@ -51,6 +50,9 @@ DEFINE_DEVICE_TYPE(I82596_LE16, i82596_le16_device, "i82596sx", "Intel 82596 SX 
 DEFINE_DEVICE_TYPE(I82596_BE16, i82596_be16_device, "i82596sx_be", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (big)")
 DEFINE_DEVICE_TYPE(I82596_LE32, i82596_le32_device, "i82596dx", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (little)")
 DEFINE_DEVICE_TYPE(I82596_BE32, i82596_be32_device, "i82596dx_be", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (big)")
+
+// Ethernet broadcast address
+static const u8 ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 // configure parameter default values
 static const u8 CFG_DEFAULTS[] = { 0x00, 0xc8, 0x40, 0x26, 0x00, 0x60, 0x00, 0xf2, 0x00, 0x00, 0x40, 0xff, 0x00, 0x3f };
@@ -98,7 +100,7 @@ CFG_PARAMS[] =
 	{ "promiscuous mode",           "address filter on",                   0,  8, 0x01, 0, false },
 	{ "padding",                    "no padding",                          0,  8, 0x80, 7, false },
 	{ "resume rd",                  "do not reread next cb on resume (82596B stepping only)",
-	                                                                       0,  2, 0x02, 1, false },
+																		   0,  2, 0x02, 1, false },
 	{ "slot time (lo)",             "bit times",                           0,  6, 0xff, 0, true },
 	{ "slot time (hi)",             "bit times",                           2,  7, 0x07, 0, true },
 	{ "save bad frame",             "discards bad frames",                 0,  2, 0x80, 7, false },
@@ -159,15 +161,34 @@ void i82586_base_device::device_start()
 	m_cu_timer->enable(false);
 	m_ru_timer = timer_alloc(RU_TIMER);
 	m_ru_timer->enable(false);
+
+	save_item(NAME(m_cx));
+	save_item(NAME(m_fr));
+	save_item(NAME(m_cna));
+	save_item(NAME(m_rnr));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_initialised));
+
+	save_item(NAME(m_cu_state));
+	save_item(NAME(m_ru_state));
+
+	save_item(NAME(m_scp_address));
+	save_item(NAME(m_scb_base));
+	save_item(NAME(m_scb_address));
+	save_item(NAME(m_scb_cs));
+	save_item(NAME(m_cba));
+	save_item(NAME(m_rfd));
+
+	save_item(NAME(m_mac_multi));
+
+	save_item(NAME(m_lb_length));
+	save_item(NAME(m_lb_buf));
 }
 
 void i82586_base_device::device_reset()
 {
 	m_cu_timer->enable(false);
 	m_ru_timer->enable(false);
-
-	m_cu_state = CU_IDLE;
-	m_ru_state = RU_IDLE;
 
 	m_cx = false;
 	m_fr = false;
@@ -176,6 +197,10 @@ void i82586_base_device::device_reset()
 	m_irq_state = false;
 	m_initialised = false;
 
+	m_cu_state = CU_IDLE;
+	m_ru_state = RU_IDLE;
+
+	m_scp_address = SCP_ADDRESS;
 	m_lb_length = 0;
 }
 
@@ -231,7 +256,7 @@ void i82586_base_device::recv_cb(u8 *buf, int length)
 		break;
 
 	case RU_READY:
-		if (accept_filter(buf))
+		if (address_filter(buf))
 		{
 			LOG("recv_cb receiving frame length %d\n", length);
 			dump_bytes(buf, length);
@@ -458,40 +483,45 @@ void i82586_base_device::cu_execute()
 	m_cx = (cb_cs & CB_I) && (cb_cs & CB_OK);
 }
 
-bool i82586_base_device::accept_filter(u8 *mac)
+bool i82586_base_device::address_filter(u8 *mac)
 {
-	u64 dst_mac = to_mac(mac);
+	if (cfg_address_length() != 6)
+	{
+		LOG("address_filter error: address length %d not supported\n", cfg_address_length());
 
-	LOGMASKED(LOG_FILTER, "accept_filter testing destination address %02x:%02x:%02x:%02x:%02x:%02x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+		return false;
+	}
+
+	LOGMASKED(LOG_FILTER, "address_filter testing destination address %02x:%02x:%02x:%02x:%02x:%02x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
 	if (cfg_promiscuous_mode())
 	{
-		LOG("accept_filter accepted: promiscuous mode enabled\n");
+		LOG("address_filter accepted: promiscuous mode enabled\n");
 
 		return true;
 	}
 
 	// ethernet broadcast
-	if (!cfg_broadcast_disable() && dst_mac == MAC_MASK)
+	if (!cfg_broadcast_disable() && !memcmp(mac, ETH_BROADCAST, cfg_address_length()))
 	{
-		LOGMASKED(LOG_FILTER, "accept_filter accepted: broadcast\n");
+		LOGMASKED(LOG_FILTER, "address_filter accepted: broadcast\n");
 
 		return true;
 	}
 
 	// individual address
-	if (dst_mac == m_mac)
+	if (!memcmp(mac, get_mac(), cfg_address_length()))
 	{
-		LOGMASKED(LOG_FILTER, "accept_filter accepted: individual address match\n");
+		LOGMASKED(LOG_FILTER, "address_filter accepted: individual address match\n");
 
 		return true;
 	}
 
 	// ethernet multicast
-	if ((mac[0] & 0x1) && m_mac_multi.size())
-		if (std::find(m_mac_multi.begin(), m_mac_multi.end(), dst_mac) != m_mac_multi.end())
+	if ((mac[0] & 0x1) && m_mac_multi)
+		if (m_mac_multi & address_hash(mac, cfg_address_length()))
 		{
-			LOGMASKED(LOG_FILTER, "accept_filter accepted: multicast filter match\n");
+			LOGMASKED(LOG_FILTER, "address_filter accepted: multicast filter match\n");
 
 			return true;
 		}
@@ -518,6 +548,14 @@ u32 i82586_base_device::compute_crc(u8 *buf, int length, bool crc16)
 {
 	// TODO: crc16 (not used by Ethernet)
 	return util::crc32_creator::simple(buf, length);
+}
+
+u64 i82586_base_device::address_hash(u8 *buf, int length)
+{
+	// address hash is computed using bits 2-7 from crc of address
+	u32 crc = compute_crc(buf, length, false);
+
+	return 1U << ((crc >> 2) & 0x3f);
 }
 
 int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
@@ -705,6 +743,13 @@ void i82586_base_device::dump_bytes(u8 *buf, int length)
 }
 
 // 82586 implementation
+void i82586_device::device_start()
+{
+	i82586_base_device::device_start();
+
+	save_item(NAME(m_cfg_bytes));
+}
+
 void i82586_device::device_reset()
 {
 	i82586_base_device::device_reset();
@@ -737,7 +782,7 @@ void i82586_device::initialise()
 bool i82586_device::cu_iasetup()
 {
 	int len = cfg_address_length();
-	char mac[8];
+	char mac[6];
 	u32 data;
 
 	if (len != 6)
@@ -757,11 +802,7 @@ bool i82586_device::cu_iasetup()
 	mac[4] = (data >> 16) & 0xff;
 	mac[5] = (data >> 24) & 0xff;
 
-	mac[6] = 0;
-	mac[7] = 0;
-
 	LOG("cu_iasetup individual address %02x:%02x:%02x:%02x:%02x:%02x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-	m_mac = *(u64 *)mac;
 	set_mac(mac);
 
 	return true;
@@ -814,7 +855,7 @@ bool i82586_device::cu_mcsetup()
 {
 	int addr_len = cfg_address_length();
 	u16 mc_count;
-	u8 data[8];
+	u8 data[6];
 
 	if (addr_len != 6)
 	{
@@ -827,6 +868,7 @@ bool i82586_device::cu_mcsetup()
 
 	// reset current list
 	LOG("mc_setup configuring %d addresses\n", mc_count);
+	m_mac_multi = 0;
 
 	// read and process the addresses
 	for (int i = 0; i < mc_count; i++)
@@ -834,10 +876,9 @@ bool i82586_device::cu_mcsetup()
 		*(u16 *)&data[0] = m_space->read_word(m_cba + 8 + i * 6 + 0);
 		*(u16 *)&data[1] = m_space->read_word(m_cba + 8 + i * 6 + 2);
 		*(u16 *)&data[2] = m_space->read_word(m_cba + 8 + i * 6 + 4);
-		*(u16 *)&data[3] = 0;
 
-		// extract the address
-		m_mac_multi.push_back(to_mac(data));
+		// add a hash of this address to the table
+		m_mac_multi |= address_hash(data, cfg_address_length());
 
 		LOG("mc_setup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
 			data[0], data[1], data[2], data[3], data[4], data[5]);
@@ -968,6 +1009,9 @@ bool i82586_device::cu_dump()
 	// individual address
 	memcpy(&buf[0x0c], get_mac(), 6);
 
+	// hash register
+	*(u64 *)&buf[0x24] = m_mac_multi;
+
 	// store dump buffer
 	dump_address = m_scb_base + m_space->read_word(m_cba + 6);
 
@@ -977,12 +1021,12 @@ bool i82586_device::cu_dump()
 	return true;
 }
 
-bool i82586_device::accept_filter(u8 *mac)
+bool i82586_device::address_filter(u8 *mac)
 {
-	if (i82586_base_device::accept_filter(mac))
+	if (i82586_base_device::address_filter(mac))
 		return true;
 
-	LOGMASKED(LOG_FILTER, "accept_filter rejected\n");
+	LOGMASKED(LOG_FILTER, "address_filter rejected\n");
 
 	return false;
 }
@@ -1136,6 +1180,18 @@ u32 i82586_device::address(u32 base, int offset, int address, u16 empty)
 }
 
 // 82596 implementation
+void i82596_device::device_start()
+{
+	i82586_base_device::device_start();
+
+	save_item(NAME(m_cfg_bytes));
+
+	save_item(NAME(m_sysbus));
+	save_item(NAME(m_iscp_address));
+
+	save_item(NAME(m_mac_multi_ia));
+}
+
 void i82596_device::device_reset()
 {
 	i82586_base_device::device_reset();
@@ -1226,7 +1282,7 @@ bool i82596_device::cu_iasetup()
 {
 	int len = cfg_address_length();
 	u32 data;
-	char mac[8];
+	char mac[6];
 
 	if (len != 6)
 	{
@@ -1263,11 +1319,7 @@ bool i82596_device::cu_iasetup()
 		break;
 	}
 
-	mac[6] = 0;
-	mac[7] = 0;
-
 	LOG("cu_iasetup individual address %02x:%02x:%02x:%02x:%02x:%02x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-	m_mac = *(u64 *)mac;
 	set_mac(mac);
 
 	return true;
@@ -1413,7 +1465,7 @@ bool i82596_device::cu_mcsetup()
 	if (mc_count == 0)
 	{
 		LOG("mc_setup multicast filter disabled\n");
-		m_mac_multi.clear();
+		m_mac_multi = 0;
 
 		return true;
 	}
@@ -1426,7 +1478,7 @@ bool i82596_device::cu_mcsetup()
 
 	// clear existing list
 	LOG("mc_setup configuring %d %s addresses\n", mc_count, multi_ia ? "multi-ia" : "multicast");
-	(multi_ia ? m_mac_multi_ia : m_mac_multi).clear();
+	(multi_ia ? m_mac_multi_ia : m_mac_multi) = 0;
 
 	for (int i = 0; i < mc_count; i++)
 	{
@@ -1440,8 +1492,8 @@ bool i82596_device::cu_mcsetup()
 		if (n == 12 && offset == 2)
 			*(u16 *)&data[18] = *(u16 *)&data[0];
 
-		// extract and store the address
-		(multi_ia ? m_mac_multi_ia : m_mac_multi).push_back(to_mac(&data[n + offset]));
+		// add a hash of this address to the table
+		(multi_ia ? m_mac_multi_ia : m_mac_multi) |= address_hash(&data[n + offset], cfg_address_length());
 
 		LOG("mc_setup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
 			data[n + offset + 0], data[n + offset + 1], data[n + offset + 2], data[n + offset + 3], data[n + offset + 4], data[n + offset + 5]);
@@ -1635,6 +1687,9 @@ bool i82596_device::cu_dump()
 
 		// individual address
 		memcpy(&buf[0x0c], get_mac(), 6);
+
+		// hash register
+		*(u64 *)&buf[0x24] = m_mac_multi;
 	}
 	else
 	{
@@ -1643,6 +1698,9 @@ bool i82596_device::cu_dump()
 
 		// individual address
 		memcpy(&buf[0x0e], get_mac(), 6);
+
+		// hash register
+		*(u64 *)&buf[0x26] = m_mac_multi;
 	}
 
 	// store dump buffer
@@ -1653,33 +1711,31 @@ bool i82596_device::cu_dump()
 	return true;
 }
 
-bool i82596_device::accept_filter(u8 *mac)
+bool i82596_device::address_filter(u8 *mac)
 {
-	if (i82586_base_device::accept_filter(mac))
+	if (i82586_base_device::address_filter(mac))
 		return true;
 
 	// check for accept all multicast
 	if ((mac[0] & 0x1) && !cfg_mc_all())
 	{
-		LOGMASKED(LOG_FILTER, "accept_filter accepted: multicast and configured to accept all multicast\n");
+		LOGMASKED(LOG_FILTER, "address_filter accepted: multicast and configured to accept all multicast\n");
 
 		return true;
 	}
 
 	// not ethernet multicast, check multi-ia
-	if (!(mac[0] & 0x1) && cfg_multi_ia() && m_mac_multi_ia.size())
+	if (!(mac[0] & 0x1) && cfg_multi_ia() && m_mac_multi_ia)
 	{
-		u64 dst_mac = to_mac(mac);
-
-		if (std::find(m_mac_multi_ia.begin(), m_mac_multi_ia.end(), dst_mac) != m_mac_multi_ia.end())
+		if (m_mac_multi_ia & address_hash(mac, cfg_address_length()))
 		{
-			LOGMASKED(LOG_FILTER, "accept_filter accepted: multi-ia filter match");
+			LOGMASKED(LOG_FILTER, "address_filter accepted: multi-ia filter match");
 
 			return true;
 		}
 	}
 
-	LOGMASKED(LOG_FILTER, "accept_filter rejected\n");
+	LOGMASKED(LOG_FILTER, "address_filter rejected\n");
 
 	return false;
 }
@@ -1747,7 +1803,7 @@ void i82596_device::ru_execute(u8 *buf, int length)
 	// TODO: increment alignment error counter
 
 	// set multicast status
-	if (mode() != MODE_82586 && to_mac(buf) != m_mac)
+	if (mode() != MODE_82586 && memcmp(buf, get_mac(), cfg_address_length()))
 		rfd_cs |= RFD_S_MULTICAST;
 
 	// fetch initial rbd address from rfd

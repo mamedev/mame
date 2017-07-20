@@ -43,7 +43,7 @@ public:
 		CUC_THROTTLE_D = 0x05000000, // load throttle timers after next terminal count
 		CUC_THROTTLE_I = 0x06000000  // load and restart throttle timers immediately
 	};
-	enum cu_state
+	enum cu_state : u32
 	{
 		CU_IDLE      = 0x0, // not executing, not associated with command, initial state
 		CU_SUSPENDED = 0x1, // not executing, associated with command
@@ -58,7 +58,7 @@ public:
 		RUC_SUSPEND = 0x00300000, // suspend frame reception
 		RUC_ABORT   = 0x00400000  // abort receiver operation immediately
 	};
-	enum ru_state
+	enum ru_state : u32
 	{
 		RU_IDLE      = 0x0, // no resources, discarding frames, initial state
 		RU_SUSPENDED = 0x1, // has resources, discarding frames
@@ -150,9 +150,6 @@ public:
 
 	static const u32 FCS_RESIDUE = 0xdebb20e3; // the residue after computing the fcs over a complete frame (including fcs)
 
-	// this constant is used to convet 6 byte addresses to u64 for easy handling
-	static const u64 MAC_MASK    = NATIVE_ENDIAN_VALUE_LE_BE(0x0000ffff'ffffffff, 0xffffffff'ffff0000);
-
 	template <class Object> static devcb_base &static_set_out_irq_callback(device_t &device, Object &&cb) { return downcast<i82586_base_device &>(device).m_out_irq.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(ca);
@@ -183,7 +180,7 @@ protected:
 	virtual bool cu_dump() = 0;
 
 	// receive unit
-	virtual bool accept_filter(u8 *mac);
+	virtual bool address_filter(u8 *mac);
 	virtual void ru_execute(u8 *buf, int length) = 0;
 
 	// helpers
@@ -191,10 +188,10 @@ protected:
 	virtual u32 address(u32 base, int offset, int address) = 0;
 	virtual u32 address(u32 base, int offset, int address, u16 empty) = 0;
 	static u32 compute_crc(u8 *buf, int length, bool crc32);
+	static u64 address_hash(u8 *buf, int length);
 	int fetch_bytes(u8 *buf, u32 src, int length);
 	int store_bytes(u32 dst, u8 *buf, int length);
 	void dump_bytes(u8 *buf, int length);
-	static u64 to_mac(u8 *buf) { return (*(u64 *)buf) & MAC_MASK; }
 
 	// device_* members
 	const address_space_config m_space_config;
@@ -224,10 +221,7 @@ protected:
 	u32 m_cba;           // current command block address
 	u32 m_rfd;           // current receive frame descriptor address
 
-	// addresses
-	u64 m_mac;                    // current individual address
-	std::vector<u64> m_mac_multi; // multicast address filter list
-
+	u64 m_mac_multi;   // multicast address hash table
 	u8 m_lb_buf[1528]; // storage for loopback frames
 	int m_lb_length;   // length of loopback frame
 
@@ -263,6 +257,7 @@ public:
 
 protected:
 	// standard device_* overrides
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// setup and scb
@@ -277,7 +272,7 @@ protected:
 	virtual bool cu_dump() override;
 
 	// receive unit
-	virtual bool accept_filter(u8 *mac) override;
+	virtual bool address_filter(u8 *mac) override;
 	virtual void ru_execute(u8 *buf, int length) override;
 
 	// helpers
@@ -319,6 +314,7 @@ protected:
 	i82596_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth);
 
 	// standard device_* overrides
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// setup and scb
@@ -333,7 +329,7 @@ protected:
 	virtual bool cu_dump() override;
 
 	// receive unit
-	virtual bool accept_filter(u8 *mac) override;
+	virtual bool address_filter(u8 *mac) override;
 	virtual void ru_execute(u8 *buf, int length) override;
 
 	// helpers
@@ -356,7 +352,7 @@ private:
 	u8 m_sysbus;
 	u32 m_iscp_address;
 
-	std::vector<u64> m_mac_multi_ia; // multi-ia address filter
+	u64 m_mac_multi_ia; // multi-ia address hash table
 };
 
 class i82596_le16_device : public i82596_device
@@ -382,6 +378,9 @@ class i82596_be32_device : public i82596_device
 public:
 	i82596_be32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
+
+ALLOW_SAVE_TYPE(i82586_base_device::cu_state);
+ALLOW_SAVE_TYPE(i82586_base_device::ru_state);
 
 DECLARE_DEVICE_TYPE(I82586, i82586_device)
 DECLARE_DEVICE_TYPE(I82596_LE16, i82596_le16_device)
