@@ -48,9 +48,9 @@
 
 DEFINE_DEVICE_TYPE(I82586, i82586_device, "i82586", "Intel 82586 IEEE 802.3 Ethernet LAN Coprocessor")
 DEFINE_DEVICE_TYPE(I82596_LE16, i82596_le16_device, "i82596sx", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (little)")
-DEFINE_DEVICE_TYPE(I82596_BE16, i82596_be16_device, "i82596sx_le", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (big)")
+DEFINE_DEVICE_TYPE(I82596_BE16, i82596_be16_device, "i82596sx_be", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (big)")
 DEFINE_DEVICE_TYPE(I82596_LE32, i82596_le32_device, "i82596dx", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (little)")
-DEFINE_DEVICE_TYPE(I82596_BE32, i82596_be32_device, "i82596dx_le", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (big)")
+DEFINE_DEVICE_TYPE(I82596_BE32, i82596_be32_device, "i82596dx_be", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (big)")
 
 // configure parameter default values
 static const u8 CFG_DEFAULTS[] = { 0x00, 0xc8, 0x40, 0x26, 0x00, 0x60, 0x00, 0xf2, 0x00, 0x00, 0x40, 0xff, 0x00, 0x3f };
