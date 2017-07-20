@@ -160,8 +160,28 @@ void alphatro_state::update_banking()
 	}
 }
 
-READ8_MEMBER (alphatro_state::ram0000_r) { return m_ram_ptr[offset]; }
-WRITE8_MEMBER(alphatro_state::ram0000_w) { m_ram_ptr[offset] = data; }
+READ8_MEMBER (alphatro_state::ram0000_r) 
+{ 
+	if (offset < 0xf000) 
+	{
+		return m_ram_ptr[offset]; 
+	}
+
+	return m_p_videoram[offset & 0xfff];
+}
+
+WRITE8_MEMBER(alphatro_state::ram0000_w) 
+{ 
+	if (offset < 0xf000) 
+	{
+		m_ram_ptr[offset] = data; 
+	}
+	else
+	{
+		m_p_videoram[offset & 0xfff] = data;
+	}
+}
+
 READ8_MEMBER (alphatro_state::ram6000_r) { return m_ram_ptr[offset+0x6000]; }
 WRITE8_MEMBER(alphatro_state::ram6000_w) { m_ram_ptr[offset+0x6000] = data; }
 READ8_MEMBER (alphatro_state::rama000_r) { return m_ram_ptr[offset+0xa000]; }
