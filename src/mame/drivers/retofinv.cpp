@@ -659,7 +659,7 @@ ROM_START( retofinvb3 ) // Italian bootleg PCB. Only maincpu ROMs differ from pa
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.11", 0x0000, 0x2000, CRC(71c216ca) SHA1(34d04889dae6d6f586bce99413c1864dee52cf39) ) // unique
 	ROM_LOAD( "2.10", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) ) // same as retofinvb1 and retofinvb2
-	ROM_LOAD( "3.9",  0x4000, 0x2000, CRC(dd2f499a) SHA1(14c557c8be1852ad7bbd062629d5b8154bdf97da) ) // unique
+	ROM_LOAD( "3.9",  0x4000, 0x2000, CRC(92d79fa8) SHA1(00610cd51ba73783d12bc97584ca0fd7fff044eb) ) // unique
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "4.15", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
