@@ -201,20 +201,22 @@
 
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
 	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
-	node->set_attribute_int("memoryregion", [self selectedSubviewIndex]);
 	node->set_attribute_int("reverse", memView->reverse() ? 1 : 0);
 	node->set_attribute_int("addressmode", memView->physical() ? 1 : 0);
 	node->set_attribute_int("dataformat", memView->get_data_format());
+	node->set_attribute_int("rowchunks", memView->chunks_per_row());
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
 	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
-	[self selectSubviewAtIndex:node->get_attribute_int("memoryregion", [self selectedSubviewIndex])];
 	memView->set_reverse(0 != node->get_attribute_int("reverse", memView->reverse() ? 1 : 0));
 	memView->set_physical(0 != node->get_attribute_int("addressmode", memView->physical() ? 1 : 0));
 	memView->set_data_format(node->get_attribute_int("dataformat", memView->get_data_format()));
+	memView->set_chunks_per_row(node->get_attribute_int("rowchunks", memView->chunks_per_row()));
 }
 
 

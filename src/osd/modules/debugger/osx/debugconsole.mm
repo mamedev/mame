@@ -426,7 +426,15 @@
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
 	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_CONSOLE);
+	[dasmView saveConfigurationToNode:node];
 }
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	[dasmView restoreConfigurationFromNode:node];
+}
+
 
 
 - (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor {

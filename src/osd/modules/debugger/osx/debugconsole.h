@@ -53,6 +53,7 @@
 - (void)loadConfiguration:(util::xml::data_node const *)parentnode;
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
 
 - (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor;
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command;
