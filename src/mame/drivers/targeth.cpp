@@ -234,6 +234,7 @@ static MACHINE_CONFIG_START( targeth )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", targeth_state, interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) 
+	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

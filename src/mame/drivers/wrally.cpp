@@ -261,6 +261,7 @@ static MACHINE_CONFIG_START( wrally )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP_WRALLY, XTAL_24MHz / 2) /* verified on pcb */
+	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

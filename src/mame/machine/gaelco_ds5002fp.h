@@ -11,13 +11,18 @@
 DECLARE_DEVICE_TYPE(GAELCO_DS5002FP,       gaelco_ds5002fp_device)
 DECLARE_DEVICE_TYPE(GAELCO_DS5002FP_WRALLY, gaelco_ds5002fp_wrally_device)
 
+#define GAELCO_DS5002FP_SET_SHARE_TAG(_tag) \
+	gaelco_ds5002fp_device_base::static_set_share_tag(*device, "^" _tag);
+
 class gaelco_ds5002fp_device_base : public device_t
 {
 public:
-	DECLARE_READ8_MEMBER(dallas_ram_r);
-	DECLARE_WRITE8_MEMBER(dallas_ram_w);
-	DECLARE_READ8_MEMBER(dallas_share_r);
-	DECLARE_WRITE8_MEMBER(dallas_share_w);
+	static void static_set_share_tag(device_t &device, const char *tag);
+
+	DECLARE_READ8_MEMBER(sram_r);
+	DECLARE_WRITE8_MEMBER(sram_w);
+	DECLARE_READ8_MEMBER(shareram_r);
+	DECLARE_WRITE8_MEMBER(shareram_w);
 
 protected:
 	gaelco_ds5002fp_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -27,7 +32,7 @@ protected:
 
 private:
 	required_shared_ptr<uint16_t> m_shareram;
-	required_region_ptr<uint8_t> m_mcu_ram;
+	required_region_ptr<uint8_t> m_sram;
 };
 
 

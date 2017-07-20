@@ -202,6 +202,7 @@ static MACHINE_CONFIG_START( thoop2 )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) 
+	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

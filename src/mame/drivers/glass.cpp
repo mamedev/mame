@@ -230,6 +230,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( glass_ds5002fp, glass )
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP_WRALLY, XTAL_24MHz / 2) /* verified on pcb */
+	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
 MACHINE_CONFIG_END
 
 ROM_START( glass ) /* Version 1.1 */
