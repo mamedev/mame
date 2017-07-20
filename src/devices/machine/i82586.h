@@ -43,7 +43,7 @@ public:
 		CUC_THROTTLE_D = 0x05000000, // load throttle timers after next terminal count
 		CUC_THROTTLE_I = 0x06000000  // load and restart throttle timers immediately
 	};
-	enum cu_state : u32
+	enum cu_state : u8
 	{
 		CU_IDLE      = 0x0, // not executing, not associated with command, initial state
 		CU_SUSPENDED = 0x1, // not executing, associated with command
@@ -58,7 +58,7 @@ public:
 		RUC_SUSPEND = 0x00300000, // suspend frame reception
 		RUC_ABORT   = 0x00400000  // abort receiver operation immediately
 	};
-	enum ru_state : u32
+	enum ru_state : u8
 	{
 		RU_IDLE      = 0x0, // no resources, discarding frames, initial state
 		RU_SUSPENDED = 0x1, // has resources, discarding frames
