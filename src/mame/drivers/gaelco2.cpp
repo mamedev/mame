@@ -18,7 +18,7 @@
     Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
-	Gran Tesoro?   | 1999 | CG-1V-149 | ?        | DS5002FP (by Nova Desitec, might not fit here)
+	Play 2000      | 1999 | CG-1V-149 | ?        | DS5002FP (by Nova Desitec)
 
     Notes:
     touchgo:
@@ -1588,6 +1588,6 @@ GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT
 GAME( 1998, bang,     0,        bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,    bang,     bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
-// are these ACTUALLY Gaelco hardware, or do they just use the same Dallas?
-GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+// 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
+GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
