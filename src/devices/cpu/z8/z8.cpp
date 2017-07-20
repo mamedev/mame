@@ -179,7 +179,6 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_rom_size(rom_size)
 {
-	(void)m_rom_size; // not used at the moment
 }
 
 
