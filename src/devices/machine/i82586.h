@@ -9,20 +9,6 @@
 #define MCFG_I82586_IRQ_CB(_out_irq) \
 	devcb = &i82586_base_device::static_set_out_irq_callback(*device, DEVCB_##_out_irq);
 
-#define I82586_SCP_ADDRESS 0xfffff4
-
-// FIXME: datasheet says this field should be "all 1's", but InterPro sets only lower 16 bits (in linear mode)
-#define I82586_TBD_EMPTY   0xffff
-#define I82586_RBD_EMPTY   0xffff
-
-#define I82586_CFG_SIZE 11
-#define I82596_CFG_SIZE 14
-
-#define I82586_DUMP_SIZE 170
-#define I82596_DUMP_SIZE 304
-
-#define FCS_RESIDUE 0xdebb20e3
-
 class i82586_base_device :
 	public device_t,
 	public device_memory_interface,
@@ -158,6 +144,15 @@ public:
 		RB_EL   = 0x8000  // end of rbd list
 	};
 
+	static const u32 SCP_ADDRESS = 0x00fffff4; // the default value of the system configuration pointer
+	static const u32 TBD_EMPTY   = 0x0000ffff; // FIXME: datasheet says this field should be "all 1's", but InterPro sets only lower 16 bits (in linear mode)
+	static const u32 RBD_EMPTY   = 0x0000ffff;
+
+	static const u32 FCS_RESIDUE = 0xdebb20e3; // the residue after computing the fcs over a complete frame (including fcs)
+
+	// this constant is used to convet 6 byte addresses to u64 for easy handling
+	static const u64 MAC_MASK    = NATIVE_ENDIAN_VALUE_LE_BE(0x0000ffff'ffffffff, 0xffffffff'ffff0000);
+
 	template <class Object> static devcb_base &static_set_out_irq_callback(device_t &device, Object &&cb) { return downcast<i82586_base_device &>(device).m_out_irq.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(ca);
@@ -199,6 +194,7 @@ protected:
 	int fetch_bytes(u8 *buf, u32 src, int length);
 	int store_bytes(u32 dst, u8 *buf, int length);
 	void dump_bytes(u8 *buf, int length);
+	static u64 to_mac(u8 *buf) { return (*(u64 *)buf) & MAC_MASK; }
 
 	// device_* members
 	const address_space_config m_space_config;
@@ -236,33 +232,34 @@ protected:
 	int m_lb_length;   // length of loopback frame
 
 	// configure parameters
-	enum loopback_mode
+	enum lb_mode
 	{
 		LOOPBACK_NONE     = 0x00,
-		LOOPBACK_INTERNAL = 0x40, // not sure which is which
+		LOOPBACK_INTERNAL = 0x40,
 		LOOPBACK_EXTERNAL = 0x80,
 		LOOPBACK_BOTH     = 0xc0  // internal loopback for 82586, external loopback for 82596
 	};
-	virtual u8 cfg_get(int offset) = 0;
+	virtual u8 cfg_get(int offset) const = 0;
 	virtual void cfg_set(int offset, u8 data) = 0;
 
-	bool cfg_save_bad_frames()   { return BIT(cfg_get(2), 7); }
-	u8 cfg_address_length()      { return (cfg_get(3) & 0x7) % 7; } // "NOTE: 7 is interpreted as 0"
-	bool cfg_no_src_add_ins()    { return BIT(cfg_get(3), 3); }
-	loopback_mode cfg_loopback_mode()        { return (loopback_mode)(cfg_get(3) & LOOPBACK_BOTH); }
-	bool cfg_promiscuous_mode()  { return BIT(cfg_get(8), 0); }
-	bool cfg_broadcast_disable() { return BIT(cfg_get(8), 1); }
-	bool cfg_no_crc_insertion()  { return BIT(cfg_get(8), 4); }
-	bool cfg_crc16()             { return BIT(cfg_get(8), 5); }
-	u8 cfg_min_frame_length()    { return cfg_get(10); }
-
-private:
+	bool cfg_save_bad_frames()   const { return BIT(cfg_get(2), 7); }
+	u8 cfg_address_length()      const { return (cfg_get(3) & 0x7) % 7; } // "NOTE: 7 is interpreted as 0"
+	bool cfg_no_src_add_ins()    const { return BIT(cfg_get(3), 3); }
+	lb_mode cfg_loopback_mode()  const { return (lb_mode)(cfg_get(3) & LOOPBACK_BOTH); }
+	bool cfg_promiscuous_mode()  const { return BIT(cfg_get(8), 0); }
+	bool cfg_broadcast_disable() const { return BIT(cfg_get(8), 1); }
+	bool cfg_no_crc_insertion()  const { return BIT(cfg_get(8), 4); }
+	bool cfg_crc16()             const { return BIT(cfg_get(8), 5); }
+	u8 cfg_min_frame_length()    const { return cfg_get(10); }
 };
 
 class i82586_device : public i82586_base_device
 {
 public:
 	i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static const int CFG_SIZE = 12;
+	static const int DUMP_SIZE = 170;
 
 protected:
 	// standard device_* overrides
@@ -289,10 +286,10 @@ protected:
 
 private:
 	// configure parameters
-	virtual u8 cfg_get(int offset) override { return m_cfg_bytes[offset]; }
+	virtual u8 cfg_get(int offset) const override { return m_cfg_bytes[offset]; }
 	virtual void cfg_set(int offset, u8 data) override { m_cfg_bytes[offset] = data; }
 
-	u8 m_cfg_bytes[I82586_CFG_SIZE];
+	u8 m_cfg_bytes[CFG_SIZE];
 };
 
 class i82596_device : public i82586_base_device
@@ -312,6 +309,9 @@ public:
 		MODE_32SEGMENTED = 0x2,
 		MODE_LINEAR      = 0x4
 	};
+
+	static const int CFG_SIZE = 14;
+	static const int DUMP_SIZE = 304;
 
 	void port(u32 data); // cpu access interface
 
@@ -342,17 +342,17 @@ protected:
 
 private:
 	// configure parameters
-	virtual u8 cfg_get(int offset) override { return m_cfg_bytes[offset]; }
+	virtual u8 cfg_get(int offset) const override { return m_cfg_bytes[offset]; }
 	virtual void cfg_set(int offset, u8 data) override { m_cfg_bytes[offset] = data; }
 
-	bool cfg_crc_in_memory() { return BIT(cfg_get(11), 2); }
-	bool cfg_mc_all()        { return BIT(cfg_get(11), 5); }
-	bool cfg_multi_ia()      { return BIT(cfg_get(13), 6); }
+	bool cfg_crc_in_memory() const { return BIT(cfg_get(11), 2); }
+	bool cfg_mc_all()        const { return BIT(cfg_get(11), 5); }
+	bool cfg_multi_ia()      const { return BIT(cfg_get(13), 6); }
 
 	// initialisation, configuration and sysbus
-	inline sysbus_mode mode() { return (sysbus_mode)(m_sysbus & SYSBUS_M); }
+	inline sysbus_mode mode() const { return (sysbus_mode)(m_sysbus & SYSBUS_M); }
 
-	u8 m_cfg_bytes[I82596_CFG_SIZE];
+	u8 m_cfg_bytes[CFG_SIZE];
 	u8 m_sysbus;
 	u32 m_iscp_address;
 

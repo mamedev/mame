@@ -30,9 +30,6 @@
 *   - special case handling for different 82596 steppings in big endian mode
 */
 
-// disable FCS insertion/checking because pcap doesn't expose them
-#define I82586_FCS 0
-
 #include "emu.h"
 #include "hashing.h"
 #include "i82586.h"
@@ -40,22 +37,74 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_FRAMES  (1U << 1)
 #define LOG_FILTER  (1U << 2)
+#define LOG_CONFIG  (1U << 3)
 
-#define VERBOSE 0
+#define VERBOSE (LOG_GENERAL | LOG_FRAMES | LOG_FILTER | LOG_CONFIG)
 
 #include "logmacro.h"
 
+// disable FCS insertion (on transmit) and checking (on receive) because pcap doesn't expose them
+#define I82586_FCS 0
+
 DEFINE_DEVICE_TYPE(I82586, i82586_device, "i82586", "Intel 82586 IEEE 802.3 Ethernet LAN Coprocessor")
-DEFINE_DEVICE_TYPE(I82596_LE16, i82596_le16_device, "i82596", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (little)")
-DEFINE_DEVICE_TYPE(I82596_BE16, i82596_be16_device, "i82596", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (big)")
-DEFINE_DEVICE_TYPE(I82596_LE32, i82596_le32_device, "i82596", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (little)")
-DEFINE_DEVICE_TYPE(I82596_BE32, i82596_be32_device, "i82596", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (big)")
+DEFINE_DEVICE_TYPE(I82596_LE16, i82596_le16_device, "i82596sx", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (little)")
+DEFINE_DEVICE_TYPE(I82596_BE16, i82596_be16_device, "i82596sx_le", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (big)")
+DEFINE_DEVICE_TYPE(I82596_LE32, i82596_le32_device, "i82596dx", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (little)")
+DEFINE_DEVICE_TYPE(I82596_BE32, i82596_be32_device, "i82596dx_le", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (big)")
 
 // configure parameter default values
-static const u8 cfg_defaults[] = { 0x00, 0xc8, 0x40, 0x26, 0x00, 0x60, 0x00, 0xf2, 0x00, 0x00, 0x40, 0xff, 0x00, 0x3f };
-
-// used to convert bytes to u64 for easy address testing
-static const u64 mac_mask = NATIVE_ENDIAN_VALUE_LE_BE(0x0000ffff'ffffffff, 0xffffffff'ffff0000);
+static const u8 CFG_DEFAULTS[] = { 0x00, 0xc8, 0x40, 0x26, 0x00, 0x60, 0x00, 0xf2, 0x00, 0x00, 0x40, 0xff, 0x00, 0x3f };
+#if VERBOSE & LOG_CONFIG
+static const struct
+{
+	const char *const name, *const unit;
+	const u8 dflt, byte, mask, shift;
+	const bool ieee8023;
+}
+CFG_PARAMS[] =
+{
+	{ "address length",             "bytes",                               6,  3, 0x07, 0, true },
+	{ "a/l field location",         "located in fd",                       0,  3, 0x08, 3, false },
+	{ "auto retransmit",            "auto retransmit enable",              1, 11, 0x08, 3, false },
+	{ "bitstuffing/eoc",            "eoc",                                 0,  8, 0x40, 6, false },
+	{ "broadcast disable",          "broadcast reception enabled",         0,  8, 0x02, 1, false },
+	{ "cdbsac",                     "disabled",                            1, 11, 0x10, 4, false },
+	{ "cdt filter",                 "bit times",                           0,  9, 0x70, 4, false },
+	{ "cdt src",                    "external collision detection",        0,  9, 0x80, 7, false },
+	{ "crc in memory",              "crc not transferred to memory",       1, 11, 0x04, 2, false },
+	{ "crc-16/crc-32",              "crc-32",                              0,  8, 0x20, 5, true },
+	{ "crs filter",                 "bit times",                           0,  9, 0x07, 0, false },
+	{ "crs src",                    "external crs",                        0,  9, 0x08, 3, false },
+	{ "disbof",                     "backoff enabled",                     0, 13, 0x80, 7, false },
+	{ "ext loopback",               "disabled",                            0,  3, 0x80, 7, false },
+	{ "exponential priority",       "802.3 algorithm",                     0,  4, 0x70, 4, true },
+	{ "exponential backoff method", "802.3 algorithm",                     0,  4, 0x80, 7, true },
+	{ "full duplex (fdx)",          "csma/cd protocol (no fdx)",           0, 12, 0x40, 6, false },
+	{ "fifo threshold",             "tx: 32 bytes, rx: 64 bytes",          8,  1, 0x0f, 0, false },
+	{ "int loopback",               "disabled",                            0,  3, 0x40, 6, false },
+	{ "interframe spacing",         "bit times",                          96,  5, 0xff, 0, true },
+	{ "linear priority",            "802.3 algorithm",                     0,  4, 0x07, 0, true },
+	{ "length field",               "padding disabled",                    1, 11, 0x02, 1, false },
+	{ "min frame length",           "bytes",                              64, 10, 0xff, 0, true },
+	{ "mc all",                     "disabled",                            1, 11, 0x20, 5, false },
+	{ "monitor",                    "disabled",                            3, 11, 0xc0, 6, false },
+	{ "manchester/nrz",             "nrz",                                 0,  8, 0x04, 2, false },
+	{ "multi ia",                   "disabled",                            0, 14, 0x40, 6, false },
+	{ "number of retries",          "maximum number of retries",          15,  7, 0xf0, 4, true },
+	{ "no crc insertion",           "crc appended to frame",               0,  8, 0x10, 4, false },
+	{ "prefetch bit in rbd",        "disabled (valid only in new modes)",  0,  0, 0x80, 7, false },
+	{ "preamble length",            "bytes",                               7,  3, 0x30, 4, true },
+	{ "preamble until crs",         "disabled",                            1, 11, 0x01, 0, false },
+	{ "promiscuous mode",           "address filter on",                   0,  8, 0x01, 0, false },
+	{ "padding",                    "no padding",                          0,  8, 0x80, 7, false },
+	{ "resume rd",                  "do not reread next cb on resume (82596B stepping only)",
+	                                                                       0,  2, 0x02, 1, false },
+	{ "slot time (lo)",             "bit times",                           0,  6, 0xff, 0, true },
+	{ "slot time (hi)",             "bit times",                           2,  7, 0x07, 0, true },
+	{ "save bad frame",             "discards bad frames",                 0,  2, 0x80, 7, false },
+	{ "transmit on no crs",         "disabled",                            0,  8, 0x08, 3, false },
+};
+#endif
 
 i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth)
 	: device_t(mconfig, type, tag, owner, clock),
@@ -63,16 +112,16 @@ i82586_base_device::i82586_base_device(const machine_config &mconfig, device_typ
 	device_network_interface(mconfig, *this, 10.0f),
 	m_space_config("shared", endian, datawidth, addrwidth),
 	m_out_irq(*this),
-	m_cu_state(CU_IDLE),
-	m_ru_state(RU_IDLE),
 	m_cx(false),
 	m_fr(false),
 	m_cna(false),
 	m_rnr(false),
 	m_irq_state(false),
 	m_initialised(false),
-	m_lb_length(0),
-	m_scp_address(I82586_SCP_ADDRESS)
+	m_cu_state(CU_IDLE),
+	m_ru_state(RU_IDLE),
+	m_scp_address(SCP_ADDRESS),
+	m_lb_length(0)
 {}
 
 i82586_device::i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -206,12 +255,12 @@ void i82586_base_device::process_scb()
 	m_scb_cs = m_space->read_dword(m_scb_address);
 
 #if VERBOSE & LOG_GENERAL
-	static const char *cuc[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "THROTTLE_D", "THROTTLE_I", "reserved" };
-	static const char *ruc[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "reserved", "reserved", "reserved" };
+	static const char *const CUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "THROTTLE_D", "THROTTLE_I", "reserved" };
+	static const char *const RUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "reserved", "reserved", "reserved" };
 
 	LOG("process_scb command/status 0x%08x (cuc %s, ruc %s%s)\n", m_scb_cs,
-		cuc[(m_scb_cs & CUC) >> 24],
-		ruc[(m_scb_cs & RUC) >> 20],
+		CUC_NAME[(m_scb_cs & CUC) >> 24],
+		RUC_NAME[(m_scb_cs & RUC) >> 20],
 		m_scb_cs & RESET ? ", reset" : "");
 #endif
 	// clear interrupt flags when acknowledged
@@ -317,8 +366,8 @@ void i82586_base_device::cu_execute()
 	m_space->write_dword(m_cba, cb_cs | CB_B);
 
 #if VERBOSE & LOG_GENERAL
-	static const char *cmd_name[] = { "NOP", "INDIVIDUAL ADDRESS SETUP", "CONFIGURE", "MULTICAST SETUP", "TRANSMIT", "TIME DOMAIN REFLECTOMETER", "DUMP", "DIAGNOSE" };
-	LOG("cu_execute command 0x%08x (%s)\n", cb_cs, cmd_name[(cb_cs & CB_CMD) >> 16]);
+	static const char *const CMD_NAME[] = { "NOP", "INDIVIDUAL ADDRESS SETUP", "CONFIGURE", "MULTICAST SETUP", "TRANSMIT", "TIME DOMAIN REFLECTOMETER", "DUMP", "DIAGNOSE" };
+	LOG("cu_execute command 0x%08x (%s)\n", cb_cs, CMD_NAME[(cb_cs & CB_CMD) >> 16]);
 #endif
 
 	if (m_cu_state != CU_IDLE)
@@ -401,8 +450,8 @@ void i82586_base_device::cu_execute()
 	}
 
 #if VERBOSE & LOG_GENERAL
-	static const char *cu_state_name[] = { "IDLE", "SUSPENDED", "ACTIVE" };
-	LOG("cu_execute complete state %s\n", cu_state_name[m_cu_state]);
+	static const char *const CU_STATE_NAME[] = { "IDLE", "SUSPENDED", "ACTIVE" };
+	LOG("cu_execute complete state %s\n", CU_STATE_NAME[m_cu_state]);
 #endif
 
 	// set command executed status
@@ -411,7 +460,7 @@ void i82586_base_device::cu_execute()
 
 bool i82586_base_device::accept_filter(u8 *mac)
 {
-	u64 dst_mac = (*(u64 *)mac) & mac_mask;
+	u64 dst_mac = to_mac(mac);
 
 	LOGMASKED(LOG_FILTER, "accept_filter testing destination address %02x:%02x:%02x:%02x:%02x:%02x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
@@ -423,7 +472,7 @@ bool i82586_base_device::accept_filter(u8 *mac)
 	}
 
 	// ethernet broadcast
-	if (!cfg_broadcast_disable() && dst_mac == mac_mask)
+	if (!cfg_broadcast_disable() && dst_mac == MAC_MASK)
 	{
 		LOGMASKED(LOG_FILTER, "accept_filter accepted: broadcast\n");
 
@@ -468,7 +517,7 @@ void i82586_base_device::set_irq(bool irq)
 u32 i82586_base_device::compute_crc(u8 *buf, int length, bool crc16)
 {
 	// TODO: crc16 (not used by Ethernet)
-	return crc16 ? 0 : util::crc32_creator::simple(buf, length);
+	return util::crc32_creator::simple(buf, length);
 }
 
 int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
@@ -661,7 +710,7 @@ void i82586_device::device_reset()
 	i82586_base_device::device_reset();
 
 	// configure parameter defaults
-	memcpy(m_cfg_bytes, cfg_defaults, I82596_CFG_SIZE);
+	memcpy(m_cfg_bytes, CFG_DEFAULTS, CFG_SIZE);
 }
 
 void i82586_device::initialise()
@@ -729,7 +778,7 @@ bool i82586_device::cu_configure()
 
 	// extract byte count (4 <= count <= 12)
 	count = cfg_get(0) & 0xf;
-	count = count < 4 ? 4 : (count > I82586_CFG_SIZE ? I82586_CFG_SIZE : count);
+	count = count < 4 ? 4 : (count > CFG_SIZE ? CFG_SIZE : count);
 
 	// read remaining bytes one word at a time
 	for (int i = 2; i < count; i++)
@@ -743,6 +792,21 @@ bool i82586_device::cu_configure()
 			cfg_set(i, (data >> 8) & 0xff);
 	}
 
+#if VERBOSE & LOG_CONFIG
+	LOGMASKED(LOG_CONFIG, "%-30s %3s %3s %3s %s\n", "parameter", "def", "cur", "chg", "default value interpretation");
+	for (auto param : CFG_PARAMS)
+	{
+		if (param.byte < (CFG_SIZE - 1))
+		{
+			u8 value = (m_cfg_bytes[param.byte] & param.mask) >> param.shift;
+
+			LOGMASKED(LOG_CONFIG, "%-30s %3d %3d  %c  %s%s\n",
+				param.name, param.dflt, value, value == param.dflt ? ' ' : '*', param.unit,
+				param.ieee8023 ? (value == param.dflt ? "" : " (current value not 802.3 compatible)") : "");
+		}
+	}
+#endif
+
 	return true;
 }
 
@@ -750,7 +814,7 @@ bool i82586_device::cu_mcsetup()
 {
 	int addr_len = cfg_address_length();
 	u16 mc_count;
-	u8 data[6];
+	u8 data[8];
 
 	if (addr_len != 6)
 	{
@@ -770,9 +834,10 @@ bool i82586_device::cu_mcsetup()
 		*(u16 *)&data[0] = m_space->read_word(m_cba + 8 + i * 6 + 0);
 		*(u16 *)&data[1] = m_space->read_word(m_cba + 8 + i * 6 + 2);
 		*(u16 *)&data[2] = m_space->read_word(m_cba + 8 + i * 6 + 4);
+		*(u16 *)&data[3] = 0;
 
 		// extract the address
-		m_mac_multi.push_back(*(u64 *)&data[0] & mac_mask);
+		m_mac_multi.push_back(to_mac(data));
 
 		LOG("mc_setup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
 			data[0], data[1], data[2], data[3], data[4], data[5]);
@@ -820,7 +885,7 @@ bool i82586_device::cu_transmit(u32 command)
 	}
 
 	// check if there is no tbd
-	tbd_count = (tbd_offset == I82586_TBD_EMPTY) ? TB_EOF : 0;
+	tbd_count = (tbd_offset == TBD_EMPTY) ? TB_EOF : 0;
 
 	// insert payload from tbd
 	while (!(tbd_count & TB_EOF))
@@ -889,16 +954,16 @@ bool i82586_device::cu_tdreflect()
 
 bool i82586_device::cu_dump()
 {
-	int length = I82586_DUMP_SIZE;
-	u8 buf[I82586_DUMP_SIZE];
+	int length = DUMP_SIZE;
+	u8 buf[DUMP_SIZE];
 	u32 dump_address;
 
 	// clear dump buffer
 	memset(buf, 0, length);
 
 	// populate dump buffer
-	// configure bytes 0-11
-	memcpy(&buf[0x00], &m_cfg_bytes[0], 12);
+	// configure bytes
+	memcpy(&buf[0x00], &m_cfg_bytes[0], CFG_SIZE);
 
 	// individual address
 	memcpy(&buf[0x0c], get_mac(), 6);
@@ -973,7 +1038,7 @@ void i82586_device::ru_execute(u8 *buf, int length)
 	}
 
 	// store remaining bytes in receive buffers
-	while (remaining && rbd_offset != I82586_RBD_EMPTY)
+	while (remaining && rbd_offset != RBD_EMPTY)
 	{
 		// fetch the count and address for this buffer
 		u32 rb_address = m_space->read_dword(m_scb_base + rbd_offset + 4);
@@ -995,7 +1060,7 @@ void i82586_device::ru_execute(u8 *buf, int length)
 		// check if buffers exhausted
 		if ((rbd_size & RB_EL))
 		{
-			rbd_offset = I82586_RBD_EMPTY;
+			rbd_offset = RBD_EMPTY;
 
 			if (remaining)
 			{
@@ -1037,7 +1102,7 @@ void i82586_device::ru_execute(u8 *buf, int length)
 			m_rfd = m_scb_base + m_space->read_word(m_rfd + 4);
 
 			// store next free rbd address into rfd
-			if (rbd_offset != I82586_RBD_EMPTY)
+			if (rbd_offset != RBD_EMPTY)
 				m_space->write_word(m_rfd + 6, rbd_offset);
 		}
 		else
@@ -1058,8 +1123,8 @@ void i82586_device::ru_execute(u8 *buf, int length)
 	}
 
 #if VERBOSE & LOG_GENERAL
-	static const char *ru_state_name[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY" };
-	LOG("ru_execute complete state %s\n", ru_state_name[m_ru_state]);
+	static const char *const RU_STATE_NAME[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY" };
+	LOG("ru_execute complete state %s\n", RU_STATE_NAME[m_ru_state]);
 #endif
 }
 
@@ -1076,7 +1141,7 @@ void i82596_device::device_reset()
 	i82586_base_device::device_reset();
 
 	// configure parameter defaults
-	memcpy(m_cfg_bytes, cfg_defaults, I82596_CFG_SIZE);
+	memcpy(m_cfg_bytes, CFG_DEFAULTS, CFG_SIZE);
 }
 
 void i82596_device::port(u32 data)
@@ -1225,7 +1290,7 @@ bool i82596_device::cu_configure()
 
 		// extract byte count (datasheet does not state minimum count)
 		count = cfg_get(0) & 0xf;
-		count = count < 4 ? 4 : (count > I82586_CFG_SIZE ? I82586_CFG_SIZE : count);
+		count = count < 4 ? 4 : (count > i82586_device::CFG_SIZE ? i82586_device::CFG_SIZE : count);
 
 		// read remaining bytes one dword at a time
 		for (int i = 2; i < count; i++)
@@ -1252,7 +1317,7 @@ bool i82596_device::cu_configure()
 
 		// extract byte count (datasheet does not state minimum count)
 		count = cfg_get(0) & 0xf;
-		count = count < 4 ? 4 : (count > I82596_CFG_SIZE ? I82596_CFG_SIZE : count);
+		count = count < 4 ? 4 : (count > CFG_SIZE ? CFG_SIZE : count);
 
 		// read remaining bytes one dword at a time
 		for (int i = 2; i < count; i++)
@@ -1281,7 +1346,7 @@ bool i82596_device::cu_configure()
 
 		// extract byte count (datasheet does not state minimum count)
 		count = cfg_get(0) & 0xf;
-		count = count < 4 ? 4 : (count > I82596_CFG_SIZE ? I82596_CFG_SIZE : count);
+		count = count < 4 ? 4 : (count > CFG_SIZE ? CFG_SIZE : count);
 
 		// read remaining bytes one dword at a time
 		for (int i = 4; i < count; i++)
@@ -1300,6 +1365,18 @@ bool i82596_device::cu_configure()
 		}
 		break;
 	}
+
+#if VERBOSE & LOG_CONFIG
+	LOGMASKED(LOG_CONFIG, "%-30s %3s %3s %3s %s\n", "parameter", "def", "cur", "chg", "default value interpretation");
+	for (auto param : CFG_PARAMS)
+	{
+		u8 value = (m_cfg_bytes[param.byte] & param.mask) >> param.shift;
+
+		LOGMASKED(LOG_CONFIG, "%-30s %3d %3d  %c  %s%s\n",
+			param.name, param.dflt, value, value == param.dflt ? ' ' : '*', param.unit,
+			param.ieee8023 ? (value == param.dflt ? "" : " (current value not 802.3 compatible)") : "");
+	}
+#endif
 
 	return true;
 }
@@ -1364,7 +1441,7 @@ bool i82596_device::cu_mcsetup()
 			*(u16 *)&data[18] = *(u16 *)&data[0];
 
 		// extract and store the address
-		(multi_ia ? m_mac_multi_ia : m_mac_multi).push_back(*(u64 *)&data[n + offset] & mac_mask);
+		(multi_ia ? m_mac_multi_ia : m_mac_multi).push_back(to_mac(&data[n + offset]));
 
 		LOG("mc_setup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
 			data[n + offset + 0], data[n + offset + 1], data[n + offset + 2], data[n + offset + 3], data[n + offset + 4], data[n + offset + 5]);
@@ -1390,7 +1467,7 @@ bool i82596_device::cu_transmit(u32 command)
 	{
 		u16 tbd_offset = m_space->read_word(m_cba + 6);
 
-		tbd_address = (tbd_offset == I82586_TBD_EMPTY) ? tbd_offset : m_scb_base + tbd_offset;
+		tbd_address = (tbd_offset == TBD_EMPTY) ? tbd_offset : m_scb_base + tbd_offset;
 	}
 	else
 		tbd_address = m_space->read_dword(m_cba + 8);
@@ -1399,7 +1476,7 @@ bool i82596_device::cu_transmit(u32 command)
 	tcb_count = (mode() == MODE_82586) ? 0 : m_space->read_word(m_cba + 8 + offset);
 
 	LOG("cu_transmit %s mode, crc insertion %s, tcb count %d, %s tbd\n",
-		command & CB_SF ? "flexible" : "simplified", command & CB_NC ? "disabled" : "enabled", tcb_count & TB_COUNT, (tbd_address == I82586_TBD_EMPTY) ? "no" : "valid");
+		command & CB_SF ? "flexible" : "simplified", command & CB_NC ? "disabled" : "enabled", tcb_count & TB_COUNT, (tbd_address == TBD_EMPTY) ? "no" : "valid");
 
 	if ((command & CB_SF) && !(tcb_count & TB_EOF))
 		LOG("cu_transmit error: tcb eof not set in simplified mode\n");
@@ -1449,7 +1526,7 @@ bool i82596_device::cu_transmit(u32 command)
 		LOG("cu_transmit error: don't know how to insert source address in flexible mode without tcb payload\n");
 
 	// check for no tbd
-	tbd_count = ((tcb_count & TB_EOF) || (tbd_address == I82586_TBD_EMPTY)) ? TB_EOF : 0;
+	tbd_count = ((tcb_count & TB_EOF) || (tbd_address == TBD_EMPTY)) ? TB_EOF : 0;
 
 	// insert payload from tbd
 	while (!(tbd_count & TB_EOF))
@@ -1543,8 +1620,8 @@ bool i82596_device::cu_tdreflect()
 
 bool i82596_device::cu_dump()
 {
-	int length = mode() == MODE_82586 ? I82586_DUMP_SIZE : I82596_DUMP_SIZE;
-	u8 buf[I82596_DUMP_SIZE];
+	int length = mode() == MODE_82586 ? i82586_device::DUMP_SIZE : DUMP_SIZE;
+	u8 buf[DUMP_SIZE];
 	u32 dump_address;
 
 	// clear dump buffer
@@ -1592,7 +1669,7 @@ bool i82596_device::accept_filter(u8 *mac)
 	// not ethernet multicast, check multi-ia
 	if (!(mac[0] & 0x1) && cfg_multi_ia() && m_mac_multi_ia.size())
 	{
-		u64 dst_mac = (*(u64 *)mac) & mac_mask;
+		u64 dst_mac = to_mac(mac);
 
 		if (std::find(m_mac_multi_ia.begin(), m_mac_multi_ia.end(), dst_mac) != m_mac_multi_ia.end())
 		{
@@ -1670,11 +1747,11 @@ void i82596_device::ru_execute(u8 *buf, int length)
 	// TODO: increment alignment error counter
 
 	// set multicast status
-	if (mode() != MODE_82586 && ((*(u64 *)buf) & mac_mask) != m_mac)
+	if (mode() != MODE_82586 && to_mac(buf) != m_mac)
 		rfd_cs |= RFD_S_MULTICAST;
 
 	// fetch initial rbd address from rfd
-	u32 rbd_address = address(m_rfd, 6, 8, I82586_RBD_EMPTY);
+	u32 rbd_address = address(m_rfd, 6, 8, RBD_EMPTY);
 
 	// check for simplified mode
 	if (mode() != MODE_82586 && !(rfd_cs & RFD_SF))
@@ -1743,7 +1820,7 @@ void i82596_device::ru_execute(u8 *buf, int length)
 		}
 
 		// store remaining bytes in receive buffers
-		while (remaining && rbd_address != I82586_RBD_EMPTY)
+		while (remaining && rbd_address != RBD_EMPTY)
 		{
 			// fetch the count and address for this buffer
 			u32 rb_address = m_space->read_dword(rbd_address + 4 + linear_offset);
@@ -1765,7 +1842,7 @@ void i82596_device::ru_execute(u8 *buf, int length)
 			// check if buffers exhausted
 			if ((rbd_size & RB_EL))
 			{
-				rbd_address = I82586_RBD_EMPTY;
+				rbd_address = RBD_EMPTY;
 
 				if (remaining)
 				{
@@ -1808,11 +1885,13 @@ void i82596_device::ru_execute(u8 *buf, int length)
 			m_rfd = address(m_rfd, 4, 4);
 
 			// store next free rbd address into rfd
-			if (rbd_address != I82586_RBD_EMPTY)
+			if (rbd_address != RBD_EMPTY)
+			{
 				if (mode() == MODE_LINEAR)
 					m_space->write_dword(m_rfd + 8, rbd_address);
 				else
 					m_space->write_word(m_rfd + 6, rbd_address - m_scb_base);
+			}
 		}
 		else
 		{
@@ -1832,10 +1911,9 @@ void i82596_device::ru_execute(u8 *buf, int length)
 	}
 
 #if VERBOSE & LOG_GENERAL
-	static const char *ru_state_name[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY", nullptr, nullptr, nullptr, nullptr, nullptr, "NO RESOURCES (RFD)", nullptr, "NO RESOURCES (RBD)" };
-	LOG("ru_execute complete state %s\n", ru_state_name[m_ru_state]);
+	static const char *const RU_STATE_NAME[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY", nullptr, nullptr, nullptr, nullptr, nullptr, "NO RESOURCES (RFD)", nullptr, "NO RESOURCES (RBD)" };
+	LOG("ru_execute complete state %s\n", RU_STATE_NAME[m_ru_state]);
 #endif
-
 }
 
 u32 i82596_device::address(u32 base, int offset, int address, u16 empty)
