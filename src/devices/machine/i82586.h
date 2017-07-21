@@ -379,9 +379,6 @@ public:
 	i82596_be32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-ALLOW_SAVE_TYPE(i82586_base_device::cu_state);
-ALLOW_SAVE_TYPE(i82586_base_device::ru_state);
-
 DECLARE_DEVICE_TYPE(I82586, i82586_device)
 DECLARE_DEVICE_TYPE(I82596_LE16, i82596_le16_device)
 DECLARE_DEVICE_TYPE(I82596_BE16, i82596_be16_device)

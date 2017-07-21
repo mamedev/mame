@@ -30,8 +30,8 @@
 */
 
 #include "emu.h"
-#include "hashing.h"
 #include "i82586.h"
+#include "hashing.h"
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_FRAMES  (1U << 1)
@@ -45,10 +45,13 @@
 // disable FCS insertion (on transmit) and checking (on receive) because pcap doesn't expose them
 #define I82586_FCS 0
 
+ALLOW_SAVE_TYPE(i82586_base_device::cu_state);
+ALLOW_SAVE_TYPE(i82586_base_device::ru_state);
+
 DEFINE_DEVICE_TYPE(I82586, i82586_device, "i82586", "Intel 82586 IEEE 802.3 Ethernet LAN Coprocessor")
-DEFINE_DEVICE_TYPE(I82596_LE16, i82596_le16_device, "i82596sx", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (little)")
+DEFINE_DEVICE_TYPE(I82596_LE16, i82596_le16_device, "i82596sx_le", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (little)")
 DEFINE_DEVICE_TYPE(I82596_BE16, i82596_be16_device, "i82596sx_be", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (big)")
-DEFINE_DEVICE_TYPE(I82596_LE32, i82596_le32_device, "i82596dx", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (little)")
+DEFINE_DEVICE_TYPE(I82596_LE32, i82596_le32_device, "i82596dx_le", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (little)")
 DEFINE_DEVICE_TYPE(I82596_BE32, i82596_be32_device, "i82596dx_be", "Intel 82596 DX/CA High-Performance 32-Bit Local Area Network Coprocessor (big)")
 
 // Ethernet broadcast address
@@ -56,7 +59,8 @@ static const u8 ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 // configure parameter default values
 static const u8 CFG_DEFAULTS[] = { 0x00, 0xc8, 0x40, 0x26, 0x00, 0x60, 0x00, 0xf2, 0x00, 0x00, 0x40, 0xff, 0x00, 0x3f };
-#if VERBOSE & LOG_CONFIG
+
+// describes parameters and default values for logging
 static const struct
 {
 	const char *const name, *const unit;
@@ -106,7 +110,6 @@ CFG_PARAMS[] =
 	{ "save bad frame",             "discards bad frames",                 0,  2, 0x80, 7, false },
 	{ "transmit on no crs",         "disabled",                            0,  8, 0x08, 3, false },
 };
-#endif
 
 i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth)
 	: device_t(mconfig, type, tag, owner, clock),
@@ -279,15 +282,13 @@ void i82586_base_device::process_scb()
 	// fetch current command and status
 	m_scb_cs = m_space->read_dword(m_scb_address);
 
-#if VERBOSE & LOG_GENERAL
 	static const char *const CUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "THROTTLE_D", "THROTTLE_I", "reserved" };
 	static const char *const RUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "reserved", "reserved", "reserved" };
-
 	LOG("process_scb command/status 0x%08x (cuc %s, ruc %s%s)\n", m_scb_cs,
 		CUC_NAME[(m_scb_cs & CUC) >> 24],
 		RUC_NAME[(m_scb_cs & RUC) >> 20],
 		m_scb_cs & RESET ? ", reset" : "");
-#endif
+
 	// clear interrupt flags when acknowledged
 	if (m_scb_cs & ACK_CX)
 		m_cx = false;
@@ -390,10 +391,8 @@ void i82586_base_device::cu_execute()
 	// set busy status
 	m_space->write_dword(m_cba, cb_cs | CB_B);
 
-#if VERBOSE & LOG_GENERAL
 	static const char *const CMD_NAME[] = { "NOP", "INDIVIDUAL ADDRESS SETUP", "CONFIGURE", "MULTICAST SETUP", "TRANSMIT", "TIME DOMAIN REFLECTOMETER", "DUMP", "DIAGNOSE" };
 	LOG("cu_execute command 0x%08x (%s)\n", cb_cs, CMD_NAME[(cb_cs & CB_CMD) >> 16]);
-#endif
 
 	if (m_cu_state != CU_IDLE)
 	{
@@ -474,10 +473,8 @@ void i82586_base_device::cu_execute()
 		m_cna = true;
 	}
 
-#if VERBOSE & LOG_GENERAL
 	static const char *const CU_STATE_NAME[] = { "IDLE", "SUSPENDED", "ACTIVE" };
 	LOG("cu_execute complete state %s\n", CU_STATE_NAME[m_cu_state]);
-#endif
 
 	// set command executed status
 	m_cx = (cb_cs & CB_I) && (cb_cs & CB_OK);
@@ -729,17 +726,18 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 
 void i82586_base_device::dump_bytes(u8 *buf, int length)
 {
-#if VERBOSE & LOG_FRAMES
-	// pad frame with zeros to 8-byte boundary
-	for (int i = 0; i < 8 - (length % 8); i++)
-		buf[length + i] = 0;
+	if (VERBOSE & LOG_FRAMES)
+	{
+		// pad frame with zeros to 8-byte boundary
+		for (int i = 0; i < 8 - (length % 8); i++)
+			buf[length + i] = 0;
 
-	// dump length / 8 (rounded up) groups of 8 bytes
-	for (int i = 0; i < (length + 7) / 8; i++)
-		LOGMASKED(LOG_FRAMES, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
-			buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
-			buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
-#endif
+		// dump length / 8 (rounded up) groups of 8 bytes
+		for (int i = 0; i < (length + 7) / 8; i++)
+			LOGMASKED(LOG_FRAMES, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
+				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
+				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
+	}
 }
 
 // 82586 implementation
@@ -833,20 +831,21 @@ bool i82586_device::cu_configure()
 			cfg_set(i, (data >> 8) & 0xff);
 	}
 
-#if VERBOSE & LOG_CONFIG
-	LOGMASKED(LOG_CONFIG, "%-30s %3s %3s %3s %s\n", "parameter", "def", "cur", "chg", "default value interpretation");
-	for (auto param : CFG_PARAMS)
+	if (VERBOSE & LOG_CONFIG)
 	{
-		if (param.byte < (CFG_SIZE - 1))
+		LOGMASKED(LOG_CONFIG, "%-30s %3s %3s %3s %s\n", "parameter", "def", "cur", "chg", "default value interpretation");
+		for (auto param : CFG_PARAMS)
 		{
-			u8 value = (m_cfg_bytes[param.byte] & param.mask) >> param.shift;
+			if (param.byte < (CFG_SIZE - 1))
+			{
+				u8 value = (m_cfg_bytes[param.byte] & param.mask) >> param.shift;
 
-			LOGMASKED(LOG_CONFIG, "%-30s %3d %3d  %c  %s%s\n",
-				param.name, param.dflt, value, value == param.dflt ? ' ' : '*', param.unit,
-				param.ieee8023 ? (value == param.dflt ? "" : " (current value not 802.3 compatible)") : "");
+				LOGMASKED(LOG_CONFIG, "%-30s %3d %3d  %c  %s%s\n",
+					param.name, param.dflt, value, value == param.dflt ? ' ' : '*', param.unit,
+					param.ieee8023 ? (value == param.dflt ? "" : " (current value not 802.3 compatible)") : "");
+			}
 		}
 	}
-#endif
 
 	return true;
 }
@@ -1166,10 +1165,8 @@ void i82586_device::ru_execute(u8 *buf, int length)
 		m_rnr = true;
 	}
 
-#if VERBOSE & LOG_GENERAL
 	static const char *const RU_STATE_NAME[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY" };
 	LOG("ru_execute complete state %s\n", RU_STATE_NAME[m_ru_state]);
-#endif
 }
 
 u32 i82586_device::address(u32 base, int offset, int address, u16 empty)
@@ -1418,17 +1415,18 @@ bool i82596_device::cu_configure()
 		break;
 	}
 
-#if VERBOSE & LOG_CONFIG
-	LOGMASKED(LOG_CONFIG, "%-30s %3s %3s %3s %s\n", "parameter", "def", "cur", "chg", "default value interpretation");
-	for (auto param : CFG_PARAMS)
+	if (VERBOSE & LOG_CONFIG)
 	{
-		u8 value = (m_cfg_bytes[param.byte] & param.mask) >> param.shift;
+		LOGMASKED(LOG_CONFIG, "%-30s %3s %3s %3s %s\n", "parameter", "def", "cur", "chg", "default value interpretation");
+		for (auto param : CFG_PARAMS)
+		{
+			u8 value = (m_cfg_bytes[param.byte] & param.mask) >> param.shift;
 
-		LOGMASKED(LOG_CONFIG, "%-30s %3d %3d  %c  %s%s\n",
-			param.name, param.dflt, value, value == param.dflt ? ' ' : '*', param.unit,
-			param.ieee8023 ? (value == param.dflt ? "" : " (current value not 802.3 compatible)") : "");
+			LOGMASKED(LOG_CONFIG, "%-30s %3d %3d  %c  %s%s\n",
+				param.name, param.dflt, value, value == param.dflt ? ' ' : '*', param.unit,
+				param.ieee8023 ? (value == param.dflt ? "" : " (current value not 802.3 compatible)") : "");
+		}
 	}
-#endif
 
 	return true;
 }
@@ -1966,10 +1964,8 @@ void i82596_device::ru_execute(u8 *buf, int length)
 		m_rnr = true;
 	}
 
-#if VERBOSE & LOG_GENERAL
 	static const char *const RU_STATE_NAME[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY", nullptr, nullptr, nullptr, nullptr, nullptr, "NO RESOURCES (RFD)", nullptr, "NO RESOURCES (RBD)" };
 	LOG("ru_execute complete state %s\n", RU_STATE_NAME[m_ru_state]);
-#endif
 }
 
 u32 i82596_device::address(u32 base, int offset, int address, u16 empty)
