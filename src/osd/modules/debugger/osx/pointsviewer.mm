@@ -21,7 +21,7 @@
 	MAMEDebugView   *breakView, *watchView;
 	NSScrollView    *breakScroll, *watchScroll;
 	NSTabViewItem   *breakTab, *watchTab;
-	NSPopUpButton   *actionButton, *subviewButton;
+	NSPopUpButton   *actionButton;
 	NSRect          subviewFrame;
 
 	if (!(self = [super initWithMachine:m title:@"(Break|Watch)points" console:c]))
@@ -147,6 +147,18 @@
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
 	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER);
+	node->set_attribute_int("bwtype", [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	int const tab = node->get_attribute_int("bwtype", [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
+	if ((0 <= tab) && ([tabs numberOfTabViewItems] > tab))
+	{
+		[subviewButton selectItemAtIndex:tab];
+		[self changeSubview:subviewButton];
+	}
 }
 
 @end

@@ -844,11 +844,14 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)keyUp:(NSEvent *)event {
-	debug_view_xy const pos = view->cursor_position();
-	[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
-										 pos.y * fontHeight,
-										 fontWidth,
-										 fontHeight)]; // FIXME: metrics
+	if (view->cursor_supported() && view->cursor_visible())
+	{
+		debug_view_xy const pos = view->cursor_position();
+		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
+											 pos.y * fontHeight,
+											 fontWidth,
+											 fontHeight)]; // FIXME: metrics
+	}
 }
 
 

@@ -226,8 +226,8 @@ bool debugger_cpu::comment_save()
 	bool comments_saved = false;
 
 	// if we don't have a root, bail
-	util::xml::data_node *const root = util::xml::data_node::file_create();
-	if (root == nullptr)
+	util::xml::file::ptr const root = util::xml::file::create();
+	if (!root)
 		return false;
 
 	// wrap in a try/catch to handle errors
@@ -269,19 +269,17 @@ bool debugger_cpu::comment_save()
 			osd_file::error filerr = file.open(m_machine.basename(), ".cmt");
 			if (filerr == osd_file::error::NONE)
 			{
-				root->file_write(file);
+				root->write(file);
 				comments_saved = true;
 			}
 		}
 	}
 	catch (emu_exception &)
 	{
-		root->file_free();
 		return false;
 	}
 
 	// free and get out of here
-	root->file_free();
 	return comments_saved;
 }
 
@@ -301,11 +299,11 @@ bool debugger_cpu::comment_load(bool is_inline)
 		return false;
 
 	// wrap in a try/catch to handle errors
-	util::xml::data_node *const root = util::xml::data_node::file_read(file, nullptr);
+	util::xml::file::ptr const root = util::xml::file::read(file, nullptr);
 	try
 	{
 		// read the file
-		if (root == nullptr)
+		if (!root)
 			throw emu_exception();
 
 		// find the config node
@@ -342,13 +340,10 @@ bool debugger_cpu::comment_load(bool is_inline)
 	catch (emu_exception &)
 	{
 		// clean up in case of error
-		if (root != nullptr)
-			root->file_free();
 		return false;
 	}
 
-	// free the parser
-	root->file_free();
+	// success!
 	return true;
 }
 
