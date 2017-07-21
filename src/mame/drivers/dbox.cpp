@@ -340,6 +340,8 @@
 #include "video/sda5708.h"
 #include "machine/latch8.h" // IP16
 
+#include "sda5708.lh"
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -427,7 +429,7 @@ static MACHINE_CONFIG_START( dbox )
 
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
-
+	MCFG_DEFAULT_LAYOUT(layout_sda5708)
 	/* IP16 74256 8 bit latch */
 	MCFG_LATCH8_ADD("hct259.ip16")
 	MCFG_LATCH8_WRITE_4(DEVWRITELINE("display", sda5708_device, reset_w))

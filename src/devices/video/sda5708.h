@@ -71,6 +71,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	void update_display();
+
 private:
 	enum {
 		SDA5708_REG_MASK       = 0xE0,
@@ -111,6 +113,9 @@ private:
 	uint8_t m_dispmem[7 * 8];
 	uint8_t m_cdp;
 	uint8_t m_digit;
+	uint8_t m_bright;
+	uint8_t m_clear;
+	uint8_t m_ip;
 };
 
 
