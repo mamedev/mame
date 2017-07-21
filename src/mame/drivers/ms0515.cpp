@@ -6,12 +6,13 @@
 
     To do:
     - softlist
-    - sound
+    . sound
     - 512K memory expansion
     - ?? refresh rate change
     - ?? parallel printer
     - ?? cassette (only with Version A firmware)
     - ?? port 177770
+    - ?? mc1702 (8086 co-processor)
 
     Docs:
     - http://www.tis.kz/docs/MC-0515/mc0515-ed.rar schematics etc.
@@ -37,6 +38,7 @@
 #include "sound/wave.h"
 
 #include "screen.h"
+#include "speaker.h"
 
 #include "formats/ms0515_dsk.h"
 
@@ -69,6 +71,8 @@ public:
 		, m_rs232(*this, "rs232")
 		, m_i8251kbd(*this, "i8251kbd")
 		, m_ms7004(*this, "ms7004")
+		, m_pit8253(*this, "pit8253")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	DECLARE_PALETTE_INIT(ms0515);
@@ -86,6 +90,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
+	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -109,6 +114,8 @@ protected:
 	required_device<rs232_port_device> m_rs232;
 	required_device<i8251_device> m_i8251kbd;
 	required_device<ms7004_device> m_ms7004;
+	required_device<pit8253_device> m_pit8253;
+	required_device<speaker_sound_device> m_speaker;
 
 private:
 	uint8_t *m_video_ram;
@@ -303,8 +310,8 @@ READ8_MEMBER(ms0515_state::ms0515_portb_r)
 
 
 /*
- * b7 -- sound out ??
- * b6 -- sound out gate
+ * b7 -- sound out gate
+ * b6 -- sound out route to speaker
  * b5 -- sound ??
  * b4 -- LED VD17
  * b3 -- video resolution, 0: 320x200, 1: 640x200
@@ -314,6 +321,7 @@ WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
 {
 	LOGSYSREG("Sysreg C <- %02x\n", data);
 
+	m_pit8253->write_gate2(BIT(data, 7));
 	output().set_value("led17", BIT(data, 4));
 
 	m_sysregc = data;
@@ -329,6 +337,11 @@ WRITE_LINE_MEMBER(ms0515_state::write_line_clock)
 {
 	m_i8251line->write_txc(state);
 	m_i8251line->write_rxc(state);
+}
+
+WRITE_LINE_MEMBER(ms0515_state::pit8253_out2_changed)
+{
+	m_speaker->level_w(state);
 }
 
 void ms0515_state::machine_reset()
@@ -502,7 +515,7 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 
 static MACHINE_CONFIG_START( ms0515 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", T11, XTAL_4MHz) // actual CPU is T11 clone, KR1807VM1
+	MCFG_CPU_ADD("maincpu", T11, XTAL_15MHz / 2) // actual CPU is T11 clone, KR1807VM1
 	MCFG_T11_INITIAL_MODE(0xf2ff)
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
 
@@ -561,7 +574,11 @@ static MACHINE_CONFIG_START( ms0515 )
 	MCFG_PIT8253_CLK1(XTAL_2MHz)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ms0515_state, write_line_clock))
 	MCFG_PIT8253_CLK2(XTAL_2MHz)
-//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE())
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ms0515_state, pit8253_out2_changed))
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -583,4 +600,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE         INIT  COMPANY        FULLNAME   FLAGS
-COMP( 1990, ms0515, 0,      0,       ms0515,    ms0515,  ms0515_state, 0,    "Elektronika", "MS 0515", MACHINE_NO_SOUND )
+COMP( 1990, ms0515, 0,      0,       ms0515,    ms0515,  ms0515_state, 0,    "Elektronika", "MS 0515", 0 )
