@@ -289,6 +289,12 @@ WRITE8_MEMBER( alphatro_state::portf0_w)
 			floppy->mon_w(0);
 			m_fdc->set_rate(250000);
 		}
+		con = machine().device<floppy_connector>("fdc:1");
+		floppy = con ? con->get_device() : nullptr;
+		if (floppy)
+		{
+			floppy->mon_w(0);
+		}
 	}
 	
 	m_port_f0 = data;
@@ -676,8 +682,6 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
