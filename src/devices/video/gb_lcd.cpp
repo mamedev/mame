@@ -3513,18 +3513,16 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
  * @param start     Logical Start Tile index inside display area.
  * @param num_tiles Number of DMG tiles (0x10u bytes) to copy.
  */
-void sgb_ppu_device::sgb_vram_memcpy(uint8_t* dst, uint8_t start, size_t num_tiles) {
+void sgb_ppu_device::sgb_vram_memcpy(uint8_t *dst, uint8_t start, size_t num_tiles) {
 	
-	size_t i;
 	uint16_t bg_ix = (start / 0x14u) * 0x20u + (start % 0x14u);
-	uint8_t tile_ix;
-	const uint8_t* map = m_layer[0].bg_map;
-	const uint8_t* tiles = m_layer[0].bg_tiles;
+	const uint8_t* const map = m_layer[0].bg_map;
+	const uint8_t* const tiles = m_layer[0].bg_tiles;
 	const uint8_t mod = m_gb_tile_no_mod;
 	
-	for (i = 0x00u; i < num_tiles && i < 0x100u; ++i) {
+	for (size_t i = 0x00u; i < num_tiles && i < 0x100u; ++i) {
 		
-		tile_ix = map[bg_ix] ^ mod;
+		const uint8_t tile_ix = map[bg_ix] ^ mod;
 		memcpy(dst, &tiles[tile_ix << 4], 0x10u);
 		dst += 0x10u;
 		
