@@ -31,7 +31,6 @@
 @implementation MAMEDebugConsole
 
 - (id)initWithMachine:(running_machine &)m {
-	NSSplitView     *regSplit, *dasmSplit;
 	NSScrollView    *regScroll, *dasmScroll, *consoleScroll;
 	NSView          *consoleContainer;
 	NSPopUpButton   *actionButton;
@@ -426,12 +425,32 @@
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
 	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_CONSOLE);
+	util::xml::data_node *const splits = node->add_child("splits", nullptr);
+	if (splits)
+	{
+		splits->set_attribute_float("state",
+									[regSplit isSubviewCollapsed:[[regSplit subviews] objectAtIndex:0]]
+								  ? 0.0
+								  : NSMaxX([[[regSplit subviews] objectAtIndex:0] frame]));
+		splits->set_attribute_float("disassembly",
+									[dasmSplit isSubviewCollapsed:[[dasmSplit subviews] objectAtIndex:0]]
+								  ? 0.0
+								  : NSMaxY([[[dasmSplit subviews] objectAtIndex:0] frame]));
+	}
 	[dasmView saveConfigurationToNode:node];
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
+	util::xml::data_node const *const splits = node->get_child("splits");
+	if (splits)
+	{
+		[regSplit setPosition:splits->get_attribute_float("state", NSMaxX([[[regSplit subviews] objectAtIndex:0] frame]))
+			 ofDividerAtIndex:0];
+		[dasmSplit setPosition:splits->get_attribute_float("disassembly", NSMaxY([[[dasmSplit subviews] objectAtIndex:0] frame]))
+			  ofDividerAtIndex:0];
+	}
 	[dasmView restoreConfigurationFromNode:node];
 }
 

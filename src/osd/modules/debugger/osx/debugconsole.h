@@ -21,6 +21,7 @@
 	MAMEDebugCommandHistory *history;
 	NSMutableArray          *auxiliaryWindows;
 
+	NSSplitView             *regSplit, *dasmSplit;
 	MAMERegistersView       *regView;
 	MAMEDisassemblyView     *dasmView;
 	MAMEDebugView           *consoleView;

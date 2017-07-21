@@ -203,7 +203,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)adjustSizeAndRecomputeVisible {
-	NSSize const clip = [[[self enclosingScrollView] contentView] bounds].size;
+	NSScrollView *const scroller = [self enclosingScrollView];
+	NSSize const clip = [[scroller contentView] bounds].size;
 	NSSize content = NSMakeSize((fontWidth * totalWidth) + (2 * [textContainer lineFragmentPadding]),
 								fontHeight * totalHeight);
 	if (wholeLineScroll)
@@ -211,6 +212,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
 								  ceil(std::max(clip.height, content.height)))];
 	[self recomputeVisible];
+	[scroller reflectScrolledClipView:[scroller contentView]];
 }
 
 
@@ -287,6 +289,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 				content.height += (fontHeight * 2) - 1;
 			[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
 										  ceil(std::max(clip.height, content.height)))];
+			[scroller reflectScrolledClipView:[scroller contentView]];
 		}
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
