@@ -464,19 +464,27 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 	{
 		if (!swinfo->startempty)
 		{
+			// set the software name
+			moptions.set_value(OPTION_SOFTWARENAME,
+				util::string_format("%s:%s", swinfo->listname, swinfo->shortname),
+				OPTION_PRIORITY_CMDLINE);
+
+			// If a part was selected, do so in addition.
+			//
+			// Prior to pre MAME 0.187, this was done with a "four part" software string, like
+			// "zorba:cpm:flop1:floppydisk1".  This was always an internal capability and never
+			// recognized at the command line directly.  That was bad, so we're performing this
+			// slight of hand here now
 			if (part)
 			{
-				std::string const string_list(util::string_format("%s:%s:%s:%s", swinfo->listname, swinfo->shortname, *part, swinfo->instance));
-				moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
-			}
-			else
-			{
-				std::string const string_list(util::string_format("%s:%s", swinfo->listname, swinfo->shortname));
-				moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
+				moptions.set_value(
+					swinfo->instance,
+					util::string_format("%s:%s:%s", swinfo->listname, swinfo->shortname, *part),
+					OPTION_PRIORITY_CMDLINE);
 			}
 
 			std::string const snap_list(util::string_format("%s%s%s", swinfo->listname, PATH_SEPARATOR, swinfo->shortname));
-			moptions.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
+			moptions.set_value(OPTION_SNAPNAME, std::move(snap_list), OPTION_PRIORITY_CMDLINE);
 		}
 		reselect_last::set_software(driver, *swinfo);
 	}
