@@ -1370,6 +1370,111 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tiger Gauntlet
+  * Sharp SM510 under epoxy (die label CMS54C, KMS583)
+  * lcd screen with custom segments, 1-bit sound
+
+  known releases:
+  - World: Gauntlet
+  - Japan: Gauntlet (published by Sega)
+
+***************************************************************************/
+
+class tgaunt_state : public hh_sm510_state
+{
+public:
+	tgaunt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	virtual DECLARE_READ8_MEMBER(input_r) override;
+};
+
+// handlers
+
+READ8_MEMBER(tgaunt_state::input_r)
+{
+	// K: multiplexed inputs (note: Vdd row is always on)
+	return m_inp_matrix[6]->read() | read_inputs(6);
+}
+
+
+// config
+
+static INPUT_PORTS_START( tgaunt )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pick")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Bomb")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Attack")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Key")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // Vdd!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( tgaunt )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(tgaunt_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1445, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1445-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Double Dragon
   * Sharp SM510 under epoxy (die label CMS54C, KMS570, KMS593)
   * lcd screen with custom segments, 1-bit sound
@@ -1868,6 +1973,15 @@ ROM_START( gnw_bx301 )
 ROM_END
 
 
+ROM_START( tgaunt )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "583", 0x0000, 0x1000, CRC(598d8156) SHA1(9f776e8b9b4321e8118481e6b1304f8a38f9932e) )
+
+	ROM_REGION( 704880, "svg", 0)
+	ROM_LOAD( "tgaunt.svg", 0, 704880, CRC(4d744da9) SHA1(487704f815ce2f7b091a35bd7222b48e1426c0f2) )
+ROM_END
+
+
 ROM_START( tddragon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "593", 0x0000, 0x1000, CRC(2642f778) SHA1(fee77acf93e057a8b4627389dfd481c6d9cbd02b) )
@@ -1891,7 +2005,7 @@ ROM_END
 
 ROM_START( tsjam )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "1023", 0x0000, 0x1000, CRC(6eaabfbd) SHA1(f0ecbd6f65fe72ce2d8a452685be2e77a63fc9f0) )
+	ROM_LOAD( "10_23", 0x0000, 0x1000, CRC(6eaabfbd) SHA1(f0ecbd6f65fe72ce2d8a452685be2e77a63fc9f0) )
 
 	ROM_REGION( 1044640, "svg", 0)
 	ROM_LOAD( "tsjam.svg", 0, 1044640, CRC(4e33adee) SHA1(220bab1e2921032e254f3f8bdf6916a84abb6de4) )
@@ -1922,6 +2036,7 @@ CONS( 1983, gnw_ml102, 0,        0, ml102,     ml102,     ml102_state,    0, "Ni
 
 CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1988, tgaunt,    0,        0, tgaunt,    tgaunt,    tgaunt_state,   0, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, tddragon,  0,        0, tddragon,  tddragon,  tddragon_state, 0, "Tiger Electronics (licensed from Tradewest/Technos)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, tsonic,    0,        0, tsonic,    tsonic,    tsonic_state,   0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tsjam,     0,        0, tsjam,     tsjam,     tsjam_state,    0, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
