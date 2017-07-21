@@ -161,9 +161,7 @@
   The switch placed below the program ROMs is connected to each PD /PGM line,
   so you can switch between 2 different programs.
 
-  Both programs seems to be encrypted.
-
-  - Data lines are clearly inverted (Q1-Q8 --> D7-D0).
+  - Data lines are inverted according to TI convention (Q1-Q8 --> D7-D0).
 
   - Address lines are scrambled:
 
@@ -328,9 +326,9 @@ void tmspoker_state::machine_reset()
 static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x2800, 0x2800) AM_READNOP AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(tmspoker_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(tmspoker_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3800, 0x3fff) AM_RAM //NVRAM?
 	AM_RANGE(0x2000, 0x20ff) AM_RAM //color RAM?
 ADDRESS_MAP_END
@@ -586,8 +584,10 @@ MACHINE_CONFIG_END
 ROM_START( tmspoker )
 	ROM_REGION( 0x4000, "maincpu", 0 ) /* TMS9980 selectable code */
 
-	ROM_LOAD( "0.bin",  0x0000, 0x1000, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  /* Program 1 */
-	ROM_LOAD( "8.bin",  0x1000, 0x1000, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  /* Program 2 */
+	ROM_LOAD( "0.bin",  0x0800, 0x0800, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  /* Program 1 */
+	ROM_CONTINUE(       0x0000, 0x0800 )
+	ROM_LOAD( "8.bin",  0x1800, 0x0800, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  /* Program 2 */
+	ROM_CONTINUE(       0x0800, 0x0800 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "3.bin",  0x0000, 0x0800, CRC(55458dae) SHA1(bf96d1b287292ff89bc2dbd9451a88a2ab941f3e) )
@@ -603,22 +603,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tmspoker_state,bus)
 {
-	/* decode the TMS9980 ROMs */
-
-	// MZ: Does not make sense to swap the bit order, so I commented it out.
-	// Only when unswapped do the commands make sense; otherwise there is a lot
-	// of invalid opcodes, and the RESET vector at 0000 is invalid either.
-
-/*  offs_t offs;
-    uint8_t *rom = memregion("maincpu")->base();
-    const size_t len = memregion("maincpu")->bytes();
-
-    for (offs = 0; offs < len; offs++)
-    {
-        rom[offs] = BITSWAP8(rom[offs],0,1,2,3,4,5,6,7);
-    }
-*/
-
 	/* still need to decode the addressing lines */
 	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
 	   that the lower address lines are good already:
