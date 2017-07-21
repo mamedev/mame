@@ -70,7 +70,7 @@ file::~file() { }
 
 file::ptr file::create()
 {
-	try { return ptr(new file()); }
+	try { return ptr(new file); }
 	catch (...) { return ptr(); }
 }
 
@@ -213,7 +213,12 @@ data_node::data_node(data_node *parent, const char *name, const char *value)
 
 data_node::~data_node()
 {
-	/* free the children */
+	free_children();
+}
+
+
+void data_node::free_children()
+{
 	for (data_node *nchild = nullptr; m_first_child; m_first_child = nchild)
 	{
 		/* note the next node and free this node */
@@ -382,6 +387,43 @@ data_node *data_node::get_or_add_child(const char *name, const char *value)
 }
 
 
+// recursively copy as child of another node
+data_node *data_node::copy_into(data_node &parent) const
+{
+	data_node *const result = parent.add_child(get_name(), get_value());
+	result->m_attributes = m_attributes;
+
+	data_node *dst = result;
+	data_node const *src = get_first_child();
+	while (src && (&parent != dst))
+	{
+		dst = dst->add_child(src->get_name(), src->get_value());
+		dst->m_attributes = src->m_attributes;
+		data_node const *next = src->get_first_child();
+		if (next)
+		{
+			src = next;
+		}
+		else
+		{
+			dst = dst->get_parent();
+			next = src->get_next_sibling();
+			if (next)
+			{
+				src = next;
+			}
+			else
+			{
+				dst = dst->get_parent();
+				src = src->get_parent()->get_next_sibling();
+			}
+		}
+	}
+
+	return result;
+}
+
+
 /*-------------------------------------------------
     delete_node - delete a node and its
     children
@@ -389,9 +431,10 @@ data_node *data_node::get_or_add_child(const char *name, const char *value)
 
 void data_node::delete_node()
 {
-	/* first unhook us from the list of children of our parent */
+	/* don't allow deletion of document root */
 	if (m_parent)
 	{
+		/* first unhook us from the list of children of our parent */
 		for (data_node **pnode = &m_parent->m_first_child; *pnode; pnode = &(*pnode)->m_next)
 		{
 			if (*pnode == this)
@@ -400,10 +443,15 @@ void data_node::delete_node()
 				break;
 			}
 		}
-	}
 
-	/* now free ourselves and our children */
-	delete this;
+		/* now free ourselves and our children */
+		delete this;
+	}
+	else
+	{
+		/* remove all children of document root */
+		free_children();
+	}
 }
 
 

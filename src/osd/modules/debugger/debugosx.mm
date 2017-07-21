@@ -30,6 +30,8 @@
 #import "osx/debugconsole.h"
 #import "osx/debugwindowhandler.h"
 
+#include "util/xmlfile.h"
+
 #include <atomic>
 
 
@@ -44,7 +46,8 @@ public:
 		osd_module(OSD_DEBUG_PROVIDER, "osx"),
 		debug_module(),
 		m_machine(nullptr),
-		m_console(nil)
+		m_console(nil),
+		m_config()
 	{
 	}
 
@@ -69,6 +72,7 @@ private:
 
 	running_machine *m_machine;
 	MAMEDebugConsole *m_console;
+	util::xml::file::ptr m_config;
 
 	static std::atomic_bool s_added_menus;
 };
@@ -141,6 +145,11 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 	// make sure the debug windows are visible
 	if (firststop)
 	{
+		if (m_config)
+		{
+			[m_console loadConfiguration:m_config->get_first_child()];
+			m_config.reset();
+		}
 		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:&device],
 																		@"MAMEDebugDevice",
 																		[NSValue valueWithPointer:m_machine],
@@ -296,10 +305,17 @@ void debugger_osx::config_load(config_type cfgtype, util::xml::data_node const *
 {
 	if ((config_type::GAME == cfgtype) && parentnode)
 	{
-		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		create_console();
-		[m_console loadConfiguration:parentnode];
-		[pool release];
+		if (m_console)
+		{
+			NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
+			[m_console loadConfiguration:parentnode];
+			[pool release];
+		}
+		else
+		{
+			m_config = util::xml::file::create();
+			parentnode->copy_into(*m_config);
+		}
 	}
 }
 

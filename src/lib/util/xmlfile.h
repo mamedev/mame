@@ -118,6 +118,9 @@ public:
 	// either return an existing child node or create one if it doesn't exist
 	data_node *get_or_add_child(const char *name, const char *value);
 
+	// recursively copy as child of another node
+	data_node *copy_into(data_node &parent) const;
+
 	// delete a node and its children
 	void delete_node();
 
@@ -189,6 +192,8 @@ private:
 	attribute_node *get_attribute(const char *attribute);
 	attribute_node const *get_attribute(const char *attribute) const;
 
+	void free_children();
+
 
 	data_node *                 m_next;
 	data_node *                 m_first_child;
@@ -208,7 +213,7 @@ public:
 
 	~file();
 
-	// create a new empty xml file object
+	// create a new, empty XML file
 	static ptr create();
 
 	// parse an XML file into its nodes
