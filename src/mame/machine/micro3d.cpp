@@ -7,11 +7,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/micro3d.h"
+#include "audio/micro3d.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/am29000/am29000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/micro3d.h"
 
 
 /*************************************
@@ -576,6 +578,74 @@ WRITE32_MEMBER(micro3d_state::drmath_int_w)
 WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
 {
 	m_drmath->set_input_line(AM29000_INTR2, CLEAR_LINE);
+}
+
+
+/***************************************************************************
+
+    8031 port mappings:
+
+    Port 1                          Port 2
+    =======                         ======
+    0: S/H sel A     (O)            0:
+    1: S/H sel B     (O)            1:
+    2: S/H sel C     (O)            2: uPD bank select (O)
+    3: S/H en        (O)            3: /uPD busy       (I)
+    4: DS1267 data   (O)            4: /uPD reset      (O)
+    5: DS1267 clock  (O)            5: Watchdog reset  (O)
+    6: /DS1267 reset (O)            6:
+    7: Test SW       (I)            7:
+
+***************************************************************************/
+
+
+WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_a)
+{
+	m_noise_1->dac_w(data);
+	m_noise_2->dac_w(data);
+}
+
+WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
+{
+	/* TODO: This controls upd7759 volume */
+}
+
+WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
+{
+	m_sound_port_latch[offset] = data;
+
+	switch (offset)
+	{
+		case 0x01:
+		{
+			micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
+			noise->noise_sh_w(data);
+			break;
+		}
+		case 0x03:
+		{
+			m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
+			m_upd7759->reset_w((data & 0x10) ? 0 : 1);
+			break;
+		}
+	}
+}
+
+READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
+{
+	switch (offset)
+	{
+		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | m_sound_sw->read();
+		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
+		default:    return 0;
+	}
+}
+
+WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
+{
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
 }
 
 

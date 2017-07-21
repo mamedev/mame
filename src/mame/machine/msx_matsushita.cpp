@@ -5,10 +5,10 @@
 
 const uint8_t manufacturer_id = 0x08;
 
-const device_type MSX_MATSUSHITA = &device_creator<msx_matsushita_device>;
+DEFINE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device, "msx_matsushita", "Matsushita switched device")
 
 msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_MATSUSHITA, "Matsushita switched device", tag, owner, clock, "msx_matsushita", __FILE__)
+	: device_t(mconfig, MSX_MATSUSHITA, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_io_config(*this, "CONFIG")
 	, m_turbo_out_cb(*this)
@@ -85,7 +85,7 @@ READ8_MEMBER(msx_matsushita_device::switched_read)
 		{
 			uint8_t result = (((m_pattern & 0x80) ? m_nibble1 : m_nibble2) << 4) | ((m_pattern & 0x40) ? m_nibble1 : m_nibble2);
 
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				m_pattern = (m_pattern << 2) | (m_pattern >> 6);
 
 			return result;

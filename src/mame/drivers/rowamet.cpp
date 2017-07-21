@@ -23,11 +23,15 @@ ToDO:
 *************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "machine/genpin.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "rowamet.lh"
+
 
 class rowamet_state : public driver_device
 {
@@ -163,7 +167,7 @@ READ8_MEMBER( rowamet_state::sound_r )
 
 WRITE8_MEMBER( rowamet_state::mute_w )
 {
-	machine().sound().system_enable(~data);
+	machine().sound().system_enable(data ? 0 : 1);
 }
 
 READ8_MEMBER( rowamet_state::io_r )
@@ -205,7 +209,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( rowamet_state::timer_a )
 	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
 
-static MACHINE_CONFIG_START( rowamet, rowamet_state )
+static MACHINE_CONFIG_START( rowamet )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1888888)
 	MCFG_CPU_PROGRAM_MAP(rowamet_map)
@@ -245,4 +249,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(198?, heavymtl, 0, rowamet, rowamet, driver_device, 0,  ROT0,  "Rowamet", "Heavy Metal", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, 0,  ROT0,  "Rowamet", "Heavy Metal", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -7,9 +7,10 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/firetrk.h"
+#include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #include "superbug.lh"
 
@@ -434,7 +435,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, "Smokey Joe (1 Player)" )
 	PORT_DIPSETTING(    0x40, "Fire Truck (2 Players)" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diag Hold") PORT_CODE(KEYCODE_F6)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Diag Hold")
 
 	PORT_START("BIT_7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -444,7 +445,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,crash_r, (void *)2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diag Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Diag Step")
 
 	PORT_START("HORN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Horn") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,firetrk_horn_changed, 0)
@@ -854,7 +855,7 @@ static GFXDECODE_START( montecar )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( firetrk, firetrk_state )
+static MACHINE_CONFIG_START( firetrk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
@@ -1011,6 +1012,6 @@ ROM_START( montecar )
 ROM_END
 
 
-GAMEL(1977, superbug, 0, superbug, superbug, driver_device, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
-GAME( 1978, firetrk,  0, firetrk,  firetrk, driver_device,  0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
-GAME( 1979, montecar, 0, montecar, montecar, driver_device, 0, ROT270, "Atari", "Monte Carlo", 0 )
+GAMEL(1977, superbug, 0, superbug, superbug, firetrk_state, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
+GAME( 1978, firetrk,  0, firetrk,  firetrk,  firetrk_state, 0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
+GAME( 1979, montecar, 0, montecar, montecar, firetrk_state, 0, ROT270, "Atari", "Monte Carlo", 0 )

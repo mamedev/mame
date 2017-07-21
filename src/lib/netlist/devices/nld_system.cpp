@@ -5,8 +5,8 @@
  *
  */
 
-#include <solver/nld_solver.h>
-#include <solver/nld_matrix_solver.h>
+#include "../solver/nld_solver.h"
+#include "../solver/nld_matrix_solver.h"
 #include "nlid_system.h"
 
 namespace netlist
@@ -46,8 +46,9 @@ namespace netlist
 	NETLIB_UPDATE(extclock)
 	{
 		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
-		m_cnt = (m_cnt + 1) % m_size;
 		m_off = netlist_time::zero();
+		if (++m_cnt >= m_size)
+			m_cnt = 0;
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -91,6 +92,11 @@ namespace netlist
 	// nld_res_sw
 	// -----------------------------------------------------------------------------
 
+	NETLIB_RESET(res_sw)
+	{
+		m_last_state = 0;
+		m_R.set_R(m_ROFF());
+	}
 
 	NETLIB_UPDATE(res_sw)
 	{
@@ -105,12 +111,12 @@ namespace netlist
 			{
 				m_R.update_dev();
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 			}
 			else
 			{
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 				//m_R->update_dev();
 			}
 		}
@@ -127,41 +133,11 @@ namespace netlist
 
 	NETLIB_UPDATE(function)
 	{
-		//nl_double val = INPANALOG(m_I[0]) * INPANALOG(m_I[1]) * 0.2;
-		//OUTANALOG(m_Q, val);
-		nl_double stack[20];
-		unsigned ptr = 0;
-		std::size_t e = m_precompiled.size();
-		for (std::size_t i = 0; i<e; i++)
+		for (std::size_t i=0; i < static_cast<unsigned>(m_N()); i++)
 		{
-			rpn_inst &rc = m_precompiled[i];
-			switch (rc.m_cmd)
-			{
-				case ADD:
-					ptr--;
-					stack[ptr-1] = stack[ptr] + stack[ptr-1];
-					break;
-				case MULT:
-					ptr--;
-					stack[ptr-1] = stack[ptr] * stack[ptr-1];
-					break;
-				case SUB:
-					ptr--;
-					stack[ptr-1] = stack[ptr-1] - stack[ptr];
-					break;
-				case DIV:
-					ptr--;
-					stack[ptr-1] = stack[ptr-1] / stack[ptr];
-					break;
-				case PUSH_INPUT:
-					stack[ptr++] = (*m_I[static_cast<unsigned>(rc.m_param)])();
-					break;
-				case PUSH_CONST:
-					stack[ptr++] = rc.m_param;
-					break;
-			}
+			m_vals[i] = (*m_I[i])();
 		}
-		m_Q.push(stack[ptr-1]);
+		m_Q.push(m_compiled.evaluate(m_vals));
 	}
 
 

@@ -11,11 +11,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/fastfred.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
+#include "speaker.h"
 
 
 void fastfred_state::machine_start()
@@ -645,7 +648,7 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( fastfred, fastfred_state )
+static MACHINE_CONFIG_START( fastfred )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12_432MHz/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
@@ -1057,13 +1060,13 @@ DRIVER_INIT_MEMBER(fastfred_state,imago)
 	m_hardware_type = 3;
 }
 
-GAME( 1982, flyboy,   0,        fastfred, flyboy, fastfred_state,   flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy, fastfred_state,   flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, flyboy,   0,        fastfred, flyboy,   fastfred_state, flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   fastfred_state, flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred_state, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84, fastfred_state,  boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84, fastfred_state,  boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  fastfred_state, boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84,  fastfred_state, boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, redrobin, 0,        fastfred, redrobin, fastfred_state, flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, imago,    0,        imago,    imago, fastfred_state,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,   imago,    imago,    imagoa, fastfred_state,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1984, imago,    0,        imago,    imago,    fastfred_state, imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,   imago,    imago,    imagoa,   fastfred_state, imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

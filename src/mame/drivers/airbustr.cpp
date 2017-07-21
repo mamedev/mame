@@ -220,10 +220,13 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 */
 
 #include "emu.h"
+#include "includes/airbustr.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/airbustr.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 READ8_MEMBER(airbustr_state::devram_r)
@@ -273,10 +276,12 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
 	membank("slavebank")->set_entry(data & 0x07);
 
-	flip_screen_set(data & 0x10);
+	m_bg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_fg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_pandora->flip_screen_set(BIT(data, 4));
 
 	// used at the end of levels, after defeating the boss, to leave trails
-	m_pandora->set_clear_bitmap(data & 0x20);
+	m_pandora->set_clear_bitmap(BIT(data, 5));
 }
 
 WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
@@ -566,7 +571,7 @@ void airbustr_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( airbustr, airbustr_state )
+static MACHINE_CONFIG_START( airbustr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, XTAL_12MHz/2)   /* verified on pcb */
@@ -597,7 +602,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(airbustr_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(airbustr_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airbustr)
@@ -622,7 +627,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/4, OKIM6295_PIN7_LOW)   /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/4, PIN7_LOW)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -737,6 +742,6 @@ DRIVER_INIT_MEMBER(airbustr_state,airbustr)
 
 /* Game Drivers */
 
-GAME( 1990, airbustr,   0,        airbustr, airbustr, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", MACHINE_SUPPORTS_SAVE ) // 891220
-GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj, airbustr_state,airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", MACHINE_SUPPORTS_SAVE)    // 891229
-GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, driver_device,0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE)    // based on Japan set (891229)
+GAME( 1990, airbustr,   0,        airbustr, airbustr,  airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
+GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
+GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, airbustr_state, 0,        ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)

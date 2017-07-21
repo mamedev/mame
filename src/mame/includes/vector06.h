@@ -6,23 +6,26 @@
  *
  ****************************************************************************/
 
-#ifndef VECTOR06_H_
-#define VECTOR06_H_
+#ifndef MAME_INCLUDES_VECTOR06_H
+#define MAME_INCLUDES_VECTOR06_H
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
-#include "sound/ay8910.h"
+#include "cpu/z80/z80.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
+#include "sound/ay8910.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 
 class vector06_state : public driver_device
@@ -87,7 +90,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
-	required_device<kr1818vg93_t> m_fdc;
+	required_device<kr1818vg93_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<i8255_device> m_ppi;
@@ -113,8 +116,9 @@ private:
 	uint8_t m_aylatch;
 	bool m_stack_state;
 	bool m_romen;
+	emu_timer *m_reset_check_timer;
 
 	void update_mem();
 };
 
-#endif /* VECTOR06_H_ */
+#endif // MAME_INCLUDES_VECTOR06_H

@@ -116,24 +116,26 @@
 */
 
 #include "emu.h"
-#include "machine/mc68901.h"
-#include "machine/upd765.h"
-#include "sound/okim6258.h"
-#include "machine/rp5c15.h"
-#include "machine/mb89352.h"
-#include "formats/xdf_dsk.h"
-#include "formats/dim_dsk.h"
+#include "includes/x68k.h"
 #include "machine/x68k_hdc.h"
 #include "machine/x68k_kbd.h"
-#include "includes/x68k.h"
-#include "machine/ram.h"
+
+#include "machine/mb89352.h"
 #include "machine/nvram.h"
-#include "bus/x68k/x68kexp.h"
+
 #include "bus/x68k/x68k_neptunex.h"
 #include "bus/x68k/x68k_scsiext.h"
+#include "bus/x68k/x68k_midi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+#include "bus/scsi/scsicd.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/dim_dsk.h"
+#include "formats/xdf_dsk.h"
+
 #include "x68000.lh"
 
 
@@ -726,7 +728,7 @@ WRITE8_MEMBER(x68k_state::x68k_ct_w)
 
 	m_adpcm.clock = data & 0x02;
 	x68k_set_adpcm();
-	m_okim6258->set_clock(data & 0x02 ? 4000000 : 8000000);
+	m_okim6258->set_unscaled_clock(data & 0x02 ? 4000000 : 8000000);
 }
 
 /*
@@ -977,7 +979,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
 	return 0xff;
 }
@@ -986,7 +988,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
 
@@ -994,7 +996,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
 		set_bus_error((offset << 1), 0, mem_mask);
 	return 0xff;
 }
@@ -1003,14 +1005,14 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
 READ16_MEMBER(x68k_state::x68k_exp_r)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 0, mem_mask);
 	return 0xff;
 }
@@ -1018,7 +1020,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 WRITE16_MEMBER(x68k_state::x68k_exp_w)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
@@ -1070,10 +1072,10 @@ WRITE8_MEMBER(x68k_state::x68030_adpcm_w)
 	switch(offset)
 	{
 		case 0x00:
-			m_okim6258->okim6258_ctrl_w(space,0,data);
+			m_okim6258->ctrl_w(space,0,data);
 			break;
 		case 0x01:
-			m_okim6258->okim6258_data_w(space,0,data);
+			m_okim6258->data_w(space,0,data);
 			break;
 	}
 }
@@ -1149,8 +1151,8 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
@@ -1187,8 +1189,8 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
@@ -1227,7 +1229,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
 	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff00ff)
-	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8("okim6258", okim6258_device, okim6258_status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
+	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8("okim6258", okim6258_device, status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w, 0xffffffff)
@@ -1472,9 +1474,17 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
 
 }
 
+WRITE_LINE_MEMBER(x68k_state::x68k_irq4_line)
+{
+	m_current_vector[4] = m_expansion->vector();
+	m_maincpu->set_input_line_and_vector(4,state,m_current_vector[4]);
+	logerror("EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
+}
+
 static SLOT_INTERFACE_START(x68000_exp_cards)
 	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX) // Neptune-X ethernet adapter (ISA NE2000 bridge)
 	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
+	SLOT_INTERFACE("x68k_midi",X68K_MIDI)  // X68000 MIDI interface
 SLOT_INTERFACE_END
 
 MACHINE_RESET_MEMBER(x68k_state,x68000)
@@ -1635,7 +1645,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("x68k", X68K_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x68000, x68k_state )
+static MACHINE_CONFIG_START( x68000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
@@ -1724,7 +1734,7 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_DEVICE_ADD("exp", X68K_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(x68000_exp_cards, nullptr, false)
 	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(x68k_state, x68k_irq2_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(INPUTLINE("maincpu", M68K_IRQ_4))
+	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(WRITELINE(x68k_state, x68k_irq4_line))
 	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* internal ram */
@@ -1750,7 +1760,7 @@ static MACHINE_CONFIG_DERIVED( x68ksupr, x68000 )
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "cdrom", SCSICD, SCSI_ID_6)
 
 	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
@@ -1860,8 +1870,8 @@ ROM_START( x68030 )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME        FLAGS */
-COMP( 1987, x68000, 0,      0,      x68000, x68000, x68k_state, x68000, "Sharp",    "X68000", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, x68ksupr,x68000, 0,     x68ksupr,x68000, x68k_state,x68000, "Sharp",    "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68k_state, x68kxvi,"Sharp",    "X68000 XVI", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68k_state, x68030, "Sharp",    "X68030", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   STATE       INIT    COMPANY     FULLNAME        FLAGS
+COMP( 1987, x68000,   0,      0,      x68000,   x68000, x68k_state, x68000, "Sharp",    "X68000",       MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, x68ksupr, x68000, 0,      x68ksupr, x68000, x68k_state, x68000, "Sharp",    "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1991, x68kxvi,  x68000, 0,      x68kxvi,  x68000, x68k_state, x68kxvi,"Sharp",    "X68000 XVI",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1993, x68030,   x68000, 0,      x68030,   x68000, x68k_state, x68030, "Sharp",    "X68030",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

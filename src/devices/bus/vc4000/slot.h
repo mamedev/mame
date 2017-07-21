@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __VC4000_SLOT_H
-#define __VC4000_SLOT_H
+#ifndef MAME_BUS_VC4000_SLOT_H
+#define MAME_BUS_VC4000_SLOT_H
 
 #include "softlist_dev.h"
 
@@ -27,7 +27,6 @@ class device_vc4000_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_vc4000_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vc4000_cart_interface();
 
 	// reading and writing
@@ -46,6 +45,8 @@ public:
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
 protected:
+	device_vc4000_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -64,13 +65,9 @@ public:
 	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vc4000_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual void call_unload() override {}
+	virtual void call_unload() override { }
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
@@ -87,7 +84,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -96,9 +93,18 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	vc4000_cart_slot_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock);
 
 	int m_type;
-	device_vc4000_cart_interface*       m_cart;
+	device_vc4000_cart_interface *m_cart;
 };
 
 class h21_cart_slot_device : public vc4000_cart_slot_device
@@ -112,8 +118,8 @@ public:
 };
 
 // device type definition
-extern const device_type VC4000_CART_SLOT;
-extern const device_type H21_CART_SLOT;
+DECLARE_DEVICE_TYPE(VC4000_CART_SLOT, vc4000_cart_slot_device)
+DECLARE_DEVICE_TYPE(H21_CART_SLOT,    h21_cart_slot_device)
 
 
 /***************************************************************************
@@ -130,4 +136,4 @@ extern const device_type H21_CART_SLOT;
 	MCFG_DEVICE_ADD(_tag, H21_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#endif
+#endif // MAME_BUS_VC4000_SLOT_H

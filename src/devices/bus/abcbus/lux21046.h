@@ -6,12 +6,11 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_ABCBUS_LUX21046_H
+#define MAME_BUS_ABCBUS_LUX21046_H
+
 #pragma once
 
-#ifndef __LUXOR_55_21046__
-#define __LUXOR_55_21046__
-
-#include "emu.h"
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -49,17 +48,11 @@
 // ======================> luxor_55_21046_device
 
 class luxor_55_21046_device :  public device_t,
-								public device_abcbus_card_interface
+						  public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
 	DECLARE_READ8_MEMBER( out_r );
@@ -69,21 +62,19 @@ public:
 	DECLARE_WRITE8_MEMBER( _8a_w );
 	DECLARE_READ8_MEMBER( _9a_r );
 
-	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
-
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -96,9 +87,18 @@ protected:
 	virtual void abcbus_c4(uint8_t data) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
+
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
@@ -125,8 +125,9 @@ public:
 	// construction/destruction
 	abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -139,8 +140,9 @@ public:
 	// construction/destruction
 	abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -153,8 +155,9 @@ public:
 	// construction/destruction
 	abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -167,8 +170,9 @@ public:
 	// construction/destruction
 	abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -181,20 +185,21 @@ public:
 	// construction/destruction
 	abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
 
 // device type definition
-extern const device_type LUXOR_55_21046;
-extern const device_type ABC830;
-extern const device_type ABC832;
-extern const device_type ABC834;
-extern const device_type ABC838;
-extern const device_type ABC850_FLOPPY;
+DECLARE_DEVICE_TYPE(LUXOR_55_21046, luxor_55_21046_device)
+DECLARE_DEVICE_TYPE(ABC830,         abc830_device)
+DECLARE_DEVICE_TYPE(ABC832,         abc832_device)
+DECLARE_DEVICE_TYPE(ABC834,         abc834_device)
+DECLARE_DEVICE_TYPE(ABC838,         abc838_device)
+DECLARE_DEVICE_TYPE(ABC850_FLOPPY,  abc850_floppy_device)
 
 
 
-#endif
+#endif // MAME_BUS_ABCBUS_LUX21046_H

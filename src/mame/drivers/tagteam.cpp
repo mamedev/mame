@@ -28,10 +28,14 @@ TODO:
 
 #include "emu.h"
 #include "includes/tagteam.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void tagteam_state::machine_start()
 {
@@ -209,7 +213,7 @@ INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 }
 
 
-static MACHINE_CONFIG_START( tagteam, tagteam_state )
+static MACHINE_CONFIG_START( tagteam )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -315,5 +319,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, driver_device, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam, driver_device,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, 0, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, 0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )

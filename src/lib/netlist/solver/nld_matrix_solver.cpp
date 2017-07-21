@@ -6,7 +6,9 @@
  */
 
 #include "nld_matrix_solver.h"
-#include "plib/putil.h"
+#include "../plib/putil.h"
+
+#include <cmath>  // <<= needed by windows build
 
 namespace netlist
 {
@@ -17,7 +19,7 @@ proxied_analog_output_t::~proxied_analog_output_t()
 {
 }
 
-terms_t::terms_t()
+terms_for_net_t::terms_for_net_t()
 	: m_railstart(0)
 	, m_last_V(0.0)
 	, m_DD_n_m_1(0.0)
@@ -25,46 +27,46 @@ terms_t::terms_t()
 {
 }
 
-void terms_t::clear()
+void terms_for_net_t::clear()
 {
-	m_term.clear();
-	m_net_other.clear();
+	m_terms.clear();
+	m_connected_net_idx.clear();
 	m_gt.clear();
 	m_go.clear();
 	m_Idr.clear();
-	m_other_curanalog.clear();
+	m_connected_net_V.clear();
 }
 
-void terms_t::add(terminal_t *term, int net_other, bool sorted)
+void terms_for_net_t::add(terminal_t *term, int net_other, bool sorted)
 {
 	if (sorted)
-		for (unsigned i=0; i < m_net_other.size(); i++)
+		for (unsigned i=0; i < m_connected_net_idx.size(); i++)
 		{
-			if (m_net_other[i] > net_other)
+			if (m_connected_net_idx[i] > net_other)
 			{
-				plib::container::insert_at(m_term, i, term);
-				plib::container::insert_at(m_net_other, i, net_other);
+				plib::container::insert_at(m_terms, i, term);
+				plib::container::insert_at(m_connected_net_idx, i, net_other);
 				plib::container::insert_at(m_gt, i, 0.0);
 				plib::container::insert_at(m_go, i, 0.0);
 				plib::container::insert_at(m_Idr, i, 0.0);
-				plib::container::insert_at(m_other_curanalog, i, nullptr);
+				plib::container::insert_at(m_connected_net_V, i, nullptr);
 				return;
 			}
 		}
-	m_term.push_back(term);
-	m_net_other.push_back(net_other);
+	m_terms.push_back(term);
+	m_connected_net_idx.push_back(net_other);
 	m_gt.push_back(0.0);
 	m_go.push_back(0.0);
 	m_Idr.push_back(0.0);
-	m_other_curanalog.push_back(nullptr);
+	m_connected_net_V.push_back(nullptr);
 }
 
-void terms_t::set_pointers()
+void terms_for_net_t::set_pointers()
 {
 	for (unsigned i = 0; i < count(); i++)
 	{
-		m_term[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
-		m_other_curanalog[i] = m_term[i]->m_otherterm->net().m_cur_Analog.ptr();
+		m_terms[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
+		m_connected_net_V[i] = m_terms[i]->m_otherterm->net().Q_Analog_state_ptr();
 	}
 }
 
@@ -84,6 +86,7 @@ matrix_solver_t::matrix_solver_t(netlist_t &anetlist, const pstring &name,
 	, m_last_step(*this, "m_last_step", netlist_time::zero())
 	, m_fb_sync(*this, "FB_sync")
 	, m_Q_sync(*this, "Q_sync")
+	, m_ops(0)
 	, m_sort(sort)
 {
 	connect_post_start(m_fb_sync, m_Q_sync);
@@ -91,15 +94,11 @@ matrix_solver_t::matrix_solver_t(netlist_t &anetlist, const pstring &name,
 
 matrix_solver_t::~matrix_solver_t()
 {
-	for (unsigned k = 0; k < m_terms.size(); k++)
-	{
-		plib::pfree(m_terms[k]);
-	}
-
 }
 
 void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 {
+
 	log().debug("New solver setup\n");
 
 	m_nets.clear();
@@ -108,8 +107,8 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	for (auto & net : nets)
 	{
 		m_nets.push_back(net);
-		m_terms.push_back(plib::palloc<terms_t>());
-		m_rails_temp.push_back(plib::palloc<terms_t>());
+		m_terms.push_back(plib::make_unique<terms_for_net_t>());
+		m_rails_temp.push_back(plib::palloc<terms_for_net_t>());
 	}
 
 	for (std::size_t k = 0; k < nets.size(); k++)
@@ -125,7 +124,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 			log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
 			switch (p->type())
 			{
-				case terminal_t::TERMINAL:
+				case detail::terminal_type::TERMINAL:
 					if (p->device().is_timestep())
 						if (!plib::container::contains(m_step_devices, &p->device()))
 							m_step_devices.push_back(&p->device());
@@ -138,7 +137,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					}
 					log().debug("Added terminal {1}\n", p->name());
 					break;
-				case terminal_t::INPUT:
+				case detail::terminal_type::INPUT:
 					{
 						proxied_analog_output_t *net_proxy_output = nullptr;
 						for (auto & input : m_inps)
@@ -150,21 +149,22 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 						if (net_proxy_output == nullptr)
 						{
-							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
+							pstring nname = this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size()));
+							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, nname);
 							net_proxy_output = net_proxy_output_u.get();
 							m_inps.push_back(std::move(net_proxy_output_u));
 							nl_assert(p->net().is_analog());
 							net_proxy_output->m_proxied_net = static_cast<analog_net_t *>(&p->net());
 						}
 						net_proxy_output->net().add_terminal(*p);
-						// FIXME: repeated
+						// FIXME: repeated calling - kind of brute force
 						net_proxy_output->net().rebuild_list();
 						log().debug("Added input\n");
 					}
 					break;
-				case terminal_t::OUTPUT:
-				case terminal_t::PARAM:
-					log().fatal("unhandled element found\n");
+				case detail::terminal_type::OUTPUT:
+					log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
+							p->name());
 					break;
 			}
 		}
@@ -183,14 +183,16 @@ void matrix_solver_t::setup_matrix()
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
 		for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
+			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->connected_net_idx()[i], false);
 
-		m_rails_temp[k]->clear(); // no longer needed
 		m_terms[k]->set_pointers();
 	}
 
-	for (unsigned k = 0; k < iN; k++)
-		plib::pfree(m_rails_temp[k]); // no longer needed
+	for (terms_for_net_t *rt : m_rails_temp)
+	{
+		rt->clear(); // no longer needed
+		plib::pfree(rt); // no longer needed
+	}
 
 	m_rails_temp.clear();
 
@@ -210,7 +212,7 @@ void matrix_solver_t::setup_matrix()
 	 * literature but I have found no articles about Gauss Seidel.
 	 *
 	 * For Gaussian Elimination however increasing order is better suited.
-	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
+	 * NOTE: Even better would be to sort on elements right of the matrix diagonal.
 	 *
 	 */
 
@@ -228,21 +230,21 @@ void matrix_solver_t::setup_matrix()
 				}
 			}
 
-		for (unsigned k = 0; k < iN; k++)
+		for (auto &term : m_terms)
 		{
-			int *other = m_terms[k]->net_other();
-			for (unsigned i = 0; i < m_terms[k]->count(); i++)
+			int *other = term->connected_net_idx();
+			for (unsigned i = 0; i < term->count(); i++)
 				if (other[i] != -1)
-					other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
+					other[i] = get_net_idx(&term->terms()[i]->m_otherterm->net());
 		}
 	}
 
 	/* create a list of non zero elements. */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k].get();
 		/* pretty brutal */
-		int *other = t->net_other();
+		int *other = t->connected_net_idx();
 
 		t->m_nz.clear();
 
@@ -262,9 +264,9 @@ void matrix_solver_t::setup_matrix()
 	 */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k].get();
 		/* pretty brutal */
-		int *other = t->net_other();
+		int *other = t->connected_net_idx();
 
 		if (k==0)
 			t->m_nzrd.clear();
@@ -292,9 +294,9 @@ void matrix_solver_t::setup_matrix()
 	 * This should reduce cache misses ...
 	 */
 
-	bool **touched = new bool*[iN];
+	bool **touched = plib::palloc_array<bool *>(iN);
 	for (unsigned k=0; k<iN; k++)
-		touched[k] = new bool[iN];
+		touched[k] = plib::palloc_array<bool>(iN);
 
 	for (unsigned k = 0; k < iN; k++)
 	{
@@ -304,34 +306,34 @@ void matrix_solver_t::setup_matrix()
 			touched[k][m_terms[k]->m_nz[j]] = true;
 	}
 
-	unsigned ops = 0;
+	m_ops = 0;
 	for (unsigned k = 0; k < iN; k++)
 	{
-		ops++; // 1/A(k,k)
+		m_ops++; // 1/A(k,k)
 		for (unsigned row = k + 1; row < iN; row++)
 		{
 			if (touched[row][k])
 			{
-				ops++;
+				m_ops++;
 				if (!plib::container::contains(m_terms[k]->m_nzbd, row))
 					m_terms[k]->m_nzbd.push_back(row);
 				for (unsigned col = k + 1; col < iN; col++)
 					if (touched[k][col])
 					{
 						touched[row][col] = true;
-						ops += 2;
+						m_ops += 2;
 					}
 			}
 		}
 	}
-	log().verbose("Number of mults/adds for {1}: {2}", name(), ops);
+	log().verbose("Number of mults/adds for {1}: {2}", name(), m_ops);
 
 	if ((0))
 		for (unsigned k = 0; k < iN; k++)
 		{
-			pstring line = plib::pfmt("{1}")(k, "3");
+			pstring line = plib::pfmt("{1:3}")(k);
 			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += plib::pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
+				line += plib::pfmt(" {1:3}")(m_terms[k]->m_nzrd[j]);
 			log().verbose("{1}", line);
 		}
 
@@ -352,8 +354,8 @@ void matrix_solver_t::setup_matrix()
 	}
 
 	for (unsigned k=0; k<iN; k++)
-		delete [] touched[k];
-	delete [] touched;
+		plib::pfree_array(touched[k]);
+	plib::pfree_array(touched);
 }
 
 void matrix_solver_t::update_inputs()
@@ -378,22 +380,22 @@ void matrix_solver_t::reset()
 void matrix_solver_t::update() NL_NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
+	update_inputs();
 
-	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero())
+	if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(new_timestep);
+		m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
 	}
 }
 
 void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
+	update_inputs();
 
-	if (m_params.m_dynamic && has_timestep_devices())
+	if (m_params.m_dynamic_ts && has_timestep_devices())
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
+		m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_min_timestep));
 	}
 }
 
@@ -406,7 +408,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 
 void matrix_solver_t::solve_base()
 {
-	m_stat_vsolver_calls++;
+	++m_stat_vsolver_calls;
 	if (has_dynamic_devices())
 	{
 		unsigned this_resched;
@@ -423,9 +425,8 @@ void matrix_solver_t::solve_base()
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
-			m_Q_sync.net().toggle_new_Q();
-			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
+			log().warning(MW_1_NEWTON_LOOPS_EXCEEDED_ON_NET_1, this->name());
+			m_Q_sync.net().toggle_and_push_to_queue(m_params.m_nr_recalc_delay);
 		}
 	}
 	else
@@ -449,8 +450,6 @@ const netlist_time matrix_solver_t::solve()
 	step(delta);
 	solve_base();
 	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
-
-	update_inputs();
 
 	return next_time_step;
 }
@@ -480,7 +479,7 @@ void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 		else // if (ot<0)
 		{
 			m_rails_temp[k]->add(term, ot, true);
-			log().fatal("found term with missing othernet {1}\n", term->name());
+			log().fatal(MF_1_FOUND_TERM_WITH_MISSING_OTHERNET, term->name());
 		}
 	}
 }
@@ -489,16 +488,12 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 	{
-		/*
-		 * FIXME: We should extend the logic to use either all nets or
-		 *        only output nets.
-		 */
 		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
-			terms_t *t = m_terms[k];
+			terms_for_net_t *t = m_terms[k].get();
 
 			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 			const nl_double hn = cur_ts;
@@ -510,7 +505,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
 			if (std::fabs(DD2) > NL_FCONST(1e-60)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_lte / std::fabs(NL_FCONST(0.5)*DD2));
+				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -547,12 +542,12 @@ void matrix_solver_t::log_stats()
 		log().verbose("       {1:6.3} average newton raphson loops",
 					static_cast<double>(this->m_stat_newton_raphson) / static_cast<double>(this->m_stat_vsolver_calls));
 		log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
-				this->m_stat_calculations(),
-				static_cast<double>(this->m_stat_calculations()) / this->netlist().time().as_double(),
-				this->m_iterative_fail(),
-				100.0 * static_cast<double>(this->m_iterative_fail())
-					/ static_cast<double>(this->m_stat_calculations()),
-				static_cast<double>(this->m_iterative_total()) / static_cast<double>(this->m_stat_calculations()));
+				this->m_stat_calculations,
+				static_cast<double>(this->m_stat_calculations) / this->netlist().time().as_double(),
+				this->m_iterative_fail,
+				100.0 * static_cast<double>(this->m_iterative_fail)
+					/ static_cast<double>(this->m_stat_calculations),
+				static_cast<double>(this->m_iterative_total) / static_cast<double>(this->m_stat_calculations));
 	}
 }
 

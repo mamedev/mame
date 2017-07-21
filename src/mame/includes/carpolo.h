@@ -95,7 +95,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(carpolo);
 	uint32_t screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_carpolo(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_carpolo);
 	INTERRUPT_GEN_MEMBER(carpolo_timer_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(coin1_interrupt_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_interrupt_clear_w);

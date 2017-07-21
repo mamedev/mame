@@ -33,6 +33,7 @@ Lower board (MGP_01):
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "video/resnet.h"
+#include "screen.h"
 
 #include "monzagp.lh"
 
@@ -402,8 +403,6 @@ WRITE8_MEMBER(monzagp_state::port2_w)
 
 static ADDRESS_MAP_START( monzagp_io, AS_IO, 8, monzagp_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(port_r, port_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( monzagp )
@@ -484,10 +483,13 @@ static GFXDECODE_START( monzagp )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,   0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( monzagp, monzagp_state )
+static MACHINE_CONFIG_START( monzagp )
 	MCFG_CPU_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_CPU_PROGRAM_MAP(monzagp_map)
 	MCFG_CPU_IO_MAP(monzagp_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(monzagp_state, port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(monzagp_state, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(monzagp_state, port2_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", monzagp_state, irq0_line_hold)
 
 	/* video hardware */
@@ -583,5 +585,5 @@ ROM_START( monzagpb )
 ROM_END
 
 
-GAMEL( 1981, monzagp,  0,       monzagp, monzagp, driver_device, 0, ROT270, "Olympia", "Monza GP", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
-GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, driver_device, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, 0, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )

@@ -76,18 +76,27 @@ a joystick.  This is not an emulation bug.
 
 #include "emu.h"
 #include "includes/snowbros.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/3812intf.h"
-#include "cpu/mcs51/mcs51.h" // for semicom mcu
-#include "machine/watchdog.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
-WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
+WRITE8_MEMBER(snowbros_state::snowbros_flipscreen_w)
 {
-	if (ACCESSING_BITS_8_15)
-		flip_screen_set(~data & 0x8000);
+	m_pandora->flip_screen_set(!BIT(data, 7));
+}
+
+
+WRITE8_MEMBER(snowbros_state::bootleg_flipscreen_w)
+{
+	flip_screen_set(~data & 0x80);
 }
 
 
@@ -100,7 +109,7 @@ uint32_t snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_in
 }
 
 
-void snowbros_state::screen_eof_snowbros(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(snowbros_state::screen_vblank_snowbros)
 {
 	// rising edge
 	if (state)
@@ -210,7 +219,7 @@ static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(snowbros_flipscreen_w, 0xff00)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -292,7 +301,7 @@ static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -349,7 +358,7 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,twinadv_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
@@ -526,7 +535,7 @@ static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE( 0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE( 0x300000, 0x300001) AM_READ(sb3_sound_r) // ?
 	AM_RANGE( 0x300000, 0x300001) AM_WRITE(sb3_sound_w)  // ?
-	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE( 0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 	AM_RANGE( 0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -1759,7 +1768,7 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 		m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
-static MACHINE_CONFIG_START( snowbros, snowbros_state )
+static MACHINE_CONFIG_START( snowbros )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* 8 Mhz - confirmed */
@@ -1778,7 +1787,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
@@ -1812,7 +1821,7 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
-	MCFG_SCREEN_VBLANK_NONE()
+	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
 MACHINE_CONFIG_END
 
 
@@ -1836,7 +1845,7 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1856,7 +1865,7 @@ static MACHINE_CONFIG_DERIVED( semiprot, semicom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( honeydol, snowbros_state )
+static MACHINE_CONFIG_START( honeydol )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P12 @ 12MHz */
@@ -1890,11 +1899,11 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( twinadv, snowbros_state )
+static MACHINE_CONFIG_START( twinadv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12MHz like Honey Dolls ? */
@@ -1926,7 +1935,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1965,7 +1974,7 @@ static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 
-	MCFG_OKIM6295_REPLACE("oki", 999900, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_REPLACE("oki", 999900, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -1976,7 +1985,7 @@ static MACHINE_CONFIG_DERIVED( _4in1, semicom )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snowbro3, snowbros_state ) /* PCB has 16MHz & 12MHz OSCs */
+static MACHINE_CONFIG_START( snowbro3 ) /* PCB has 16MHz & 12MHz OSCs */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
@@ -2000,13 +2009,13 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state ) /* PCB has 16MHz & 12MHz
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( yutnori, snowbros_state )
+static MACHINE_CONFIG_START( yutnori )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)
@@ -2022,7 +2031,7 @@ static MACHINE_CONFIG_START( yutnori, snowbros_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperpac)
@@ -2035,10 +2044,10 @@ static MACHINE_CONFIG_START( yutnori, snowbros_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/16, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/16, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2316,16 +2325,16 @@ ROM_END
 
 ROM_START( multi96 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e912ea4e) SHA1(cf0b37d6b6fbdd311ef7b404c4ba2c6a7e1f8486) )
-	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(ac99e837) SHA1(20bc1599f78a4eac65cae54350872fa292daa807) )
+	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e912ea4e) SHA1(cf0b37d6b6fbdd311ef7b404c4ba2c6a7e1f8486) ) // sldh
+	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(ac99e837) SHA1(20bc1599f78a4eac65cae54350872fa292daa807) ) // sldh
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* 64k for z80 sound code */
 	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) /* 4bpp gfx */
-	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(66cae586) SHA1(22af524b26241a6456b777a847db73ff8d3db11f) )
-	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(0bd9f6bb) SHA1(400ddff7a76860caacfe8bfd803f9ccd2dba3356) )
-	ROM_LOAD( "ua6", 0x100000, 0x80000, CRC(0e90b26c) SHA1(fd9b40988d03db8ed797abf859a8828bb65db8d5) )
+	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(66cae586) SHA1(22af524b26241a6456b777a847db73ff8d3db11f) ) // sldh
+	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(0bd9f6bb) SHA1(400ddff7a76860caacfe8bfd803f9ccd2dba3356) ) // sldh
+	ROM_LOAD( "ua6", 0x100000, 0x80000, CRC(0e90b26c) SHA1(fd9b40988d03db8ed797abf859a8828bb65db8d5) ) // sldh
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* Samples - both banks are almost the same */
 	/* todo, check bank ordering .. */
@@ -2905,48 +2914,48 @@ DRIVER_INIT_MEMBER(snowbros_state, yutnori)
 	m_pandora->set_bg_pen(0xf0);
 }
 
-GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan (Dooyong license)",      "Snow Bros. - Nick & Tom (Dooyong license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbroswb,snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg",                        "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", MACHINE_SUPPORTS_SAVE ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
+GAME( 1990, snowbros,   0,        snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosa,  snowbros, snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosb,  snowbros, snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosc,  snowbros, snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosj,  snowbros, snowbros,    snowbroj, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosd,  snowbros, snowbros,    snowbroj, snowbros_state, 0,    ROT0, "Toaplan (Dooyong license)",      "Snow Bros. - Nick & Tom (Dooyong license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wintbob,    snowbros, wintbob,     snowbros, snowbros_state, 0,    ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbroswb, snowbros, wintbob,     snowbros, snowbros_state, 0,    ROT0, "bootleg",                        "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", MACHINE_SUPPORTS_SAVE ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
 
-GAME( 1996, toto,      0,        snowbros, snowbros, snowbros_state, toto, ROT0, "SoftClub",                    "Come Back Toto", MACHINE_SUPPORTS_SAVE ) // modified from 'snowbros' code
+GAME( 1996, toto,       0,        snowbros,    snowbros, snowbros_state, toto, ROT0, "SoftClub",                       "Come Back Toto", MACHINE_SUPPORTS_SAVE ) // modified from 'snowbros' code
 
 // none of the games below are on genuine SnowBros hardware, but they clone the functionality of it.
 
 // SemiCom / Jeil titles are protected, a dumb MCU copies code into RAM at startup, some also check for a specific return value from an address on startup.
-GAME( 1993, finalttr, 0,        finalttr,     finalttr, driver_device,  0,        ROT0, "Jeil Computer System", "Final Tetris", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hyperpac, 0,        semicom_mcu,  hyperpac, snowbros_state, hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hyperpacb,hyperpac, semicom,      hyperpac, driver_device,  0,        ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2, 0,        semiprot,     cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, toppyrap, 0,        semiprot,     toppyrap, driver_device,  0,        ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, cookbib3, 0,        semiprot,     cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, pzlbreak, 0,        semiprot,     pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom / Tirano",     "Twinkle", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mcheonru, 0,        semiprot,     mcheonru, snowbros_state, 3in1semi, ROT0, "SemiCom / AceVer",     "Ma Cheon Ru", MACHINE_SUPPORTS_SAVE ) // a flyer exists for an English version called Arirang, AceVer team logo is displayed on it
-GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, finalttr,   0,        finalttr,    finalttr, snowbros_state, 0,        ROT0, "Jeil Computer System", "Final Tetris", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hyperpac,   0,        semicom_mcu, hyperpac, snowbros_state, hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hyperpacb,  hyperpac, semicom,     hyperpac, snowbros_state, 0,        ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2,   0,        semiprot,    cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, 0,        ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, suhosong,   0,        semiprot,    suhosong, snowbros_state, 0,        ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, 0,        ROT0, "SemiCom / Tirano",     "Twinkle", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mcheonru,   0,        semiprot,    mcheonru, snowbros_state, 3in1semi, ROT0, "SemiCom / AceVer",     "Ma Cheon Ru", MACHINE_SUPPORTS_SAVE ) // a flyer exists for an English version called Arirang, AceVer team logo is displayed on it
+GAME( 1999, moremore,   0,        semiprot,    moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, moremorp,   0,        semiprot,    moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", MACHINE_SUPPORTS_SAVE )
 // This is very similar to the SemiCom titles, but unprotected.
-GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , MACHINE_SUPPORTS_SAVE )
+GAME( 2002, 4in1boot,   0,        _4in1,       4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, honeydol, 0,        honeydol, honeydol, driver_device, 0, ROT0, "Barko Corp.", "Honey Dolls", MACHINE_SUPPORTS_SAVE ) // based on snowbros code..
+GAME( 1995, honeydol,   0,        honeydol,    honeydol, snowbros_state, 0,        ROT0, "Barko Corp.", "Honey Dolls", MACHINE_SUPPORTS_SAVE ) // based on snowbros code..
 
-GAME( 1995, twinadv,  0,        twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, multi96,  twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Multi Game '96 (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinadv,    0,        twinadv,     twinadv,  snowbros_state, 0,        ROT0, "Barko Corp.", "Twin Adventure (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinadvk,   twinadv,  twinadv,     twinadv,  snowbros_state, 0,        ROT0, "Barko Corp.", "Twin Adventure (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, multi96,    twinadv,  twinadv,     twinadv,  snowbros_state, 0,        ROT0, "Barko Corp.", "Multi Game '96 (Italy)", MACHINE_SUPPORTS_SAVE )
 
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg
 // it is possible this 'ball boy' is the original bootleg, with snwobro3 being a hack of that, and the ballboy set we have a further hack of that
 // there is also a later 2004 version with 3 player support
 // these use an MCU to drive the sound
-GAME( 2002, snowbro3, 0,        snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
-GAME( 2003, ballboy,  snowbro3, snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
+GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // protection appears to handle the sound, should check if it's just a block of code that is conditionally executed like some of the Semicom titles.
-GAME( 1999, yutnori,    0,        yutnori, yutnori, snowbros_state, yutnori, ROT0, "Nunal",                        "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer
+GAME( 1999, yutnori,    0,        yutnori,     yutnori,  snowbros_state, yutnori,  ROT0, "Nunal",   "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer

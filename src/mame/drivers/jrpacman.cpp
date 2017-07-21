@@ -101,8 +101,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/pacman.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jrpacman_state : public pacman_state
@@ -272,7 +275,7 @@ INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( jrpacman, jrpacman_state )
+static MACHINE_CONFIG_START( jrpacman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */

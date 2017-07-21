@@ -6,15 +6,15 @@
  *
  *  23/09/2015
  *
- * This device was drycoded based on OS9 boot strap code on a Mizar mz8105 board 
+ * This device was drycoded based on OS9 boot strap code on a Mizar mz8105 board
  * which expects to find a SIO on the VME bus + photos of a Mizar 8300 board on Ebay
  * I have found no formal documents for this board so far, so needs verification.
- *                                                                                   
- *         ||                                                                          
- *         ||                                                                          
- *         ||                                                                          
- *         ||                                                                          
- *         ||____________________________________________________________   ___ 
+ *
+ *         ||
+ *         ||
+ *         ||
+ *         ||
+ *         ||____________________________________________________________   ___
  * \+++====|| U2|AM26LS32|   |  NEC               | |74LS04N||74LS645   ||_|   |
  *  \=/-  o||   +--------+   |  D7201C            | ++-----+++----------+| |   |
  *   |  |  ||      +-------+ +--------------------+  |     | |SN74LS374N|| |   |
@@ -32,14 +32,14 @@
  *  /=\-  o||J1    K1 U4| xxx   |  xxx   | 74LS164|   K6     |AM25LS2521|| |   |
  * /+++====||  J2       +-------+--------+--------+--------+ +----------+|_|   |
  *         ||Rev G    U3| MC1488| MC1488 | 74LS161|  74F85 |      K8     | |___|
- *         ||-----------+-------+-----------------------------------------            
- *         ||                                                            
- *         ||                                                            
+ *         ||-----------+-------+-----------------------------------------
+ *         ||
+ *         ||
  *
  *
- * Misc links about this board: 
+ * Misc links about this board:
  * http://www.ebay.com/itm/MIZAR-INC-8300-0-01-REV-J-INTERFACE-CONTROL-BOARD-W-RIBBON-AND-PLATE-/231508658429?hash=item35e6fdc8fd
- * 
+ *
  * Description
  * ------------
  * The Mizar mz8300 is a Quad Serial board.
@@ -52,8 +52,8 @@
  * --------------------------------------------------------------------------
  * Local          VME                  Decscription
  * -------------------------------------------------------------------------
- *  n/a           0xff0000 0xff0003   mzr8105.c Bootstrap expects to find a 
- *                                    UPD7201 serial device here - configurable! 
+ *  n/a           0xff0000 0xff0003   mzr8105.c Bootstrap expects to find a
+ *                                    UPD7201 serial device here - configurable!
  * --------------------------------------------------------------------------
  *
  * Interrupt sources MVME
@@ -61,15 +61,15 @@
  * Description                  Device  Lvl  IRQ    VME board
  *                           /Board      Vector  Address
  * ----------------------------------------------------------
- * On board Sources                     
- *  
+ * On board Sources
+ *
  * Off board Sources (other VME boards)
  *
  * ----------------------------------------------------------
  *
  * DMAC Channel Assignments
  * ----------------------------------------------------------
- * Channel                               
+ * Channel
  * ----------------------------------------------------------
  *
  *  TODO:
@@ -83,6 +83,7 @@
 
 #include "emu.h"
 #include "vme_mzr8300.h"
+
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
@@ -110,17 +111,23 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MZR8300 = &device_creator<vme_mzr8300_card_device>;
+DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 SIO serial board")
 
 /* These values are borrowed just to get the terminal going and should be replaced
  * once a proper serial board hardware (ie MZ 8300) is found and emulated. */
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* fake */
 #define SIO_CLOCK (BAUDGEN_CLOCK / 128) /* This will give prompt */
 
-MACHINE_CONFIG_FRAGMENT( mzr8300 )
+MACHINE_CONFIG_MEMBER( vme_mzr8300_card_device::device_add_mconfig )
 	MCFG_UPD7201_ADD("sio0", XTAL_4MHz, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK )
 
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_txd))
@@ -128,40 +135,27 @@ MACHINE_CONFIG_FRAGMENT( mzr8300 )
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD ("rs232p1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201N_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("sio0", upd7201N_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, ctsb_w))
 
 	MCFG_Z80SIO_ADD("sio1", XTAL_4MHz, 0, 0, 0, 0 )
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//	machine_config_additions - device-specific
-//	machine configurations
-//-------------------------------------------------
-
-
-machine_config_constructor vme_mzr8300_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( mzr8300 );
-}
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_vme_card_interface(mconfig, *this)
+vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_MZR8300, "Mizar 8300 SIO serial board", tag, owner, clock, "mzr8300", __FILE__),
-	device_vme_card_interface(mconfig, *this)
+	vme_mzr8300_card_device(mconfig, VME_MZR8300, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 void vme_mzr8300_card_device::device_start()
@@ -171,14 +165,20 @@ void vme_mzr8300_card_device::device_start()
 
 	/* Setup r/w handlers for first SIO in A16 */
 	uint32_t base = 0xFF0000;
-	m_vme->install_device(base + 0, base + 1, // Channel B - Data
-							 read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("sio0")), 0x00ff);
-	m_vme->install_device(base + 2, base + 3, // Channel B - Control
-							 read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("sio0")), 0x00ff);
-	m_vme->install_device(base + 4, base + 5, // Channel A - Data
-							 read8_delegate(FUNC(z80sio_device::da_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::da_w), subdevice<z80sio_device>("sio0")), 0x00ff);
-	m_vme->install_device(base + 6, base + 7, // Channel A - Control
-							 read8_delegate(FUNC(z80sio_device::ca_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::ca_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	//  m_vme->static_set_custom_spaces(*this);
+
+	m_vme->install_device(vme_device::A16_SC, base + 0, base + 1, // Channel B - Data
+						  read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	m_vme->install_device(vme_device::A16_SC, base + 2, base + 3, // Channel B - Control
+						  read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	m_vme->install_device(vme_device::A16_SC, base + 4, base + 5, // Channel A - Data
+						  read8_delegate(FUNC(z80sio_device::da_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::da_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	m_vme->install_device(vme_device::A16_SC, base + 6, base + 7, // Channel A - Control
+						  read8_delegate(FUNC(z80sio_device::ca_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::ca_w), subdevice<z80sio_device>("sio0")), 0x00ff);
 }
 
 void vme_mzr8300_card_device::device_reset()

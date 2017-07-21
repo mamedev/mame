@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Karl Stenerud, hap
-#ifndef __M37710_H__
-#define __M37710_H__
+#ifndef MAME_CPU_M37710_M37710_H
+#define MAME_CPU_M37710_M37710_H
 
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
@@ -24,7 +24,11 @@ M37710 CPU Emulator v0.1
 enum
 {
 	// these interrupts are maskable
-	M37710_LINE_ADC = 0,
+	M37710_LINE_DMA3 = 0,
+	M37710_LINE_DMA2,
+	M37710_LINE_DMA1,
+	M37710_LINE_DMA0,
+	M37710_LINE_ADC,
 	M37710_LINE_UART1XMIT,
 	M37710_LINE_UART1RECV,
 	M37710_LINE_UART0XMIT,
@@ -93,13 +97,13 @@ enum
 class m37710_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_delegate map_delegate);
-
-	DECLARE_READ16_MEMBER( m37710_internal_word_r );
-	DECLARE_WRITE16_MEMBER( m37710_internal_word_w );
+	DECLARE_READ8_MEMBER( m37710_internal_r );
+	DECLARE_WRITE8_MEMBER( m37710_internal_w );
 
 protected:
+	// construction/destruction
+	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -112,7 +116,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -172,6 +176,10 @@ private:
 	uint8_t m_m37710_regs[128];
 	attotime m_reload[8];
 	emu_timer *m_timers[8];
+	uint32_t m_dma0_src, m_dma0_dst, m_dma0_cnt, m_dma0_mode;
+	uint32_t m_dma1_src, m_dma1_dst, m_dma1_cnt, m_dma1_mode;
+	uint32_t m_dma2_src, m_dma2_dst, m_dma2_cnt, m_dma2_mode;
+	uint32_t m_dma3_src, m_dma3_dst, m_dma3_cnt, m_dma3_mode;
 
 	// for debugger
 	uint32_t m_debugger_pc;
@@ -2024,8 +2032,8 @@ class m37702m2_device : public m37710_cpu_device
 public:
 	// construction/destruction
 	m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m37702m2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 protected:
+	m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_ADDRESS_MAP(map, 16);
 };
 
@@ -2038,14 +2046,23 @@ protected:
 	DECLARE_ADDRESS_MAP(map, 16);
 };
 
+class m37720s1_device : public m37710_cpu_device
+{
+public:
+	// construction/destruction
+	m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	DECLARE_ADDRESS_MAP(map, 16);
+};
 
-extern const device_type M37702M2;
-extern const device_type M37702S1;
-extern const device_type M37710S4;
+DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)
+DECLARE_DEVICE_TYPE(M37702S1, m37702s1_device)
+DECLARE_DEVICE_TYPE(M37710S4, m37710s4_device)
+DECLARE_DEVICE_TYPE(M37720S1, m37720s1_device)
 
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* __M37710_H__ */
+#endif // MAME_CPU_M37710_M37710_H

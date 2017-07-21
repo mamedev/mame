@@ -29,8 +29,9 @@ TODO:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/darkmist.h"
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 void darkmist_state::machine_start()
 {
@@ -67,7 +68,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, darkmist_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, darkmist_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -236,7 +237,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 
 
 
-static MACHINE_CONFIG_START( darkmist, darkmist_state )
+static MACHINE_CONFIG_START( darkmist )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)

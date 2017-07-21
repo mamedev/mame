@@ -38,7 +38,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, 2 digits means opcode is 2 bytes
-static const uint8_t s_bits[] =
+static const u8 s_bits[] =
 {
 	4, 0, 2, 80, 4, 0, 0, 0,
 	0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0,
@@ -54,7 +54,7 @@ static const uint8_t s_bits[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const uint32_t s_flags[] =
+static const u32 s_flags[] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -68,7 +68,7 @@ static const uint32_t s_flags[] =
 };
 
 
-static const uint8_t ucom4_mnemonic[0x100] =
+static const u8 ucom4_mnemonic[0x100] =
 {
 	/* 0x00 */
 	mNOP, mDI, mS, mTIT, mTC, mTTM, mDAA, mTAL,
@@ -116,8 +116,8 @@ static const uint8_t ucom4_mnemonic[0x100] =
 CPU_DISASSEMBLE(ucom4)
 {
 	int pos = 0;
-	uint8_t op = oprom[pos++];
-	uint8_t instr = ucom4_mnemonic[op];
+	u8 op = oprom[pos++];
+	u8 instr = ucom4_mnemonic[op];
 
 	util::stream_format(stream,"%-4s ", s_mnemonics[instr]);
 
@@ -125,10 +125,10 @@ CPU_DISASSEMBLE(ucom4)
 	int bits = s_bits[instr];
 	if (bits)
 	{
-		uint16_t param = op & ((1 << (bits % 10)) - 1);
+		u16 param = op & ((1 << (bits % 10)) - 1);
 		if (bits / 10)
 		{
-			uint8_t op2 = oprom[pos++];
+			u8 op2 = oprom[pos++];
 			param = (param << (bits / 10)) | (op2 & ((1 << (bits / 10)) - 1));
 			bits = (bits % 10) + (bits / 10);
 		}

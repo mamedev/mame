@@ -18,7 +18,6 @@ NETLIST_START(main)
     PARAM(Solver.SOR_FACTOR, 1.0)
     //PARAM(Solver.CONVERG, 1.0)
     PARAM(Solver.GS_LOOPS, 5)
-    PARAM(Solver.GS_THRESHOLD, 5)
 
     SUBMODEL(op1, opamp_fast)
     /* Wired as non - inverting amplifier like in LM3900 datasheet */

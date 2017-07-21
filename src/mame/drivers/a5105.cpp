@@ -20,18 +20,22 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/upd7220.h"
-#include "machine/ram.h"
-#include "machine/upd765.h"
-#include "formats/a5105_dsk.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "sound/wave.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "sound/wave.h"
+#include "video/upd7220.h"
 
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/a5105_dsk.h"
 
 
 class a5105_state : public driver_device
@@ -532,7 +536,7 @@ void a5105_state::video_start()
 	m_char_ram = memregion("pcg")->base();
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, a5105_state)
+static ADDRESS_MAP_START( upd7220_map, 0, 16, a5105_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -552,7 +556,7 @@ static const z80_daisy_config a5105_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( a5105, a5105_state )
+static MACHINE_CONFIG_START( a5105 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_15MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)
@@ -579,7 +583,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_15MHz / 16) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
 
@@ -619,5 +623,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME           FLAGS */
-COMP( 1989, a5105,  0,      0,       a5105,     a5105, driver_device,   0,      "VEB Robotron",   "BIC A5105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT    COMPANY           FULLNAME     FLAGS
+COMP( 1989, a5105,  0,      0,       a5105,     a5105, a5105_state, 0,      "VEB Robotron",   "BIC A5105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

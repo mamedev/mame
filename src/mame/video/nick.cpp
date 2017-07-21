@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "nick.h"
 
 
@@ -72,7 +73,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NICK = &device_creator<nick_device>;
+DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 
 DEVICE_ADDRESS_MAP_START( vram_map, 8, nick_device )
@@ -87,7 +88,7 @@ DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nick_map, AS_0, 8, nick_device )
+static ADDRESS_MAP_START( nick_map, 0, 8, nick_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -102,7 +103,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NICK, "NICK", tag, owner, clock, "nick", __FILE__),
+	: device_t(mconfig, NICK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
@@ -203,9 +204,11 @@ void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *nick_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector nick_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

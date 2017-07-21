@@ -33,12 +33,15 @@ ToDo:
 *********************************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/scmp/scmp.h"
 #include "imagedev/cassette.h"
 #include "machine/ins8154.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mk14.lh"
 
 
@@ -185,7 +188,7 @@ void mk14_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mk14, mk14_state )
+static MACHINE_CONFIG_START( mk14 )
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
 	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
@@ -222,5 +225,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY             FULLNAME  FLAGS */
-COMP( 1977, mk14,  0,       0,      mk14,      mk14, driver_device, 0, "Science of Cambridge", "MK-14", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT  COMPANY                 FULLNAME  FLAGS
+COMP( 1977, mk14,  0,      0,      mk14,      mk14,  mk14_state, 0,    "Science of Cambridge", "MK-14",  0 )

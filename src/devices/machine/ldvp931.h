@@ -8,10 +8,10 @@
 
 *************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_LDVP931_H
+#define MAME_MACHINE_LDVP931_H
 
-#ifndef __LDVP931_H__
-#define __LDVP931_H__
+#pragma once
 
 #include "laserdsc.h"
 #include "cpu/mcs48/mcs48.h"
@@ -30,7 +30,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type PHILLIPS_22VP931;
+DECLARE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device)
 
 
 
@@ -77,7 +77,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -94,14 +94,16 @@ public:
 	DECLARE_READ8_MEMBER( i8049_datic_r );
 	DECLARE_READ8_MEMBER( i8049_from_controller_r );
 	DECLARE_WRITE8_MEMBER( i8049_to_controller_w );
+
+private:
+	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8049_port1_r );
 	DECLARE_WRITE8_MEMBER( i8049_port1_w );
 	DECLARE_READ8_MEMBER( i8049_port2_r );
 	DECLARE_WRITE8_MEMBER( i8049_port2_w );
-	DECLARE_READ8_MEMBER( i8049_t0_r );
-	DECLARE_READ8_MEMBER( i8049_t1_r );
+	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
+	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
 
-protected:
 	// internal state
 	required_device<i8049_device> m_i8049_cpu;      // CPU index of the 8049
 	emu_timer *         m_tracktimer;               // timer device
@@ -118,7 +120,7 @@ protected:
 	uint8_t               m_datastrobe;               // DATA STROBE line from DATIC
 
 	// communication status
-	uint8_t               m_reset_state;              // state of the reset input
+	//uint8_t               m_reset_state;              // state of the reset input
 	uint8_t               m_fromcontroller;           // command byte from the controller
 	bool                m_fromcontroller_pending;   // true if data is pending
 	uint8_t               m_tocontroller;             // command byte to the controller
@@ -134,5 +136,4 @@ protected:
 	int16_t               m_advanced;                 // number of frames advanced
 };
 
-
-#endif
+#endif // MAME_MACHINE_LDVP931_H

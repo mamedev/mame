@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * symbfac2.c
+ * symbfac2.cpp
  *   SYMBiFACE II expansion device
  *    - IDE
  *    - RTC (Dallas DS1287A)
@@ -17,22 +17,16 @@
  *    - mouse controls still need some work
  */
 
+#include "emu.h"
 #include "symbfac2.h"
 
 
-const device_type CPC_SYMBIFACE2 = &device_creator<cpc_symbiface2_device>;
+DEFINE_DEVICE_TYPE(CPC_SYMBIFACE2, cpc_symbiface2_device, "cpc_symf2", "SYMBiFACE II")
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE
 //**************************************************************************
 
-// device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_symbiface2 )
-	MCFG_ATA_INTERFACE_ADD("ide",ata_devices,"hdd",nullptr,false)
-	MCFG_DS12885_ADD("rtc")
-	MCFG_NVRAM_ADD_1FILL("nvram")
-	// no pass-through
-MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(cpc_symbiface2)
 	PORT_START("sf2_mouse_x")
@@ -56,11 +50,13 @@ static INPUT_PORTS_START(cpc_symbiface2)
 //  PORT_PLAYER(1)
 INPUT_PORTS_END
 
-
-machine_config_constructor cpc_symbiface2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_symbiface2 );
-}
+// device machine config
+MACHINE_CONFIG_MEMBER( cpc_symbiface2_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
+	MCFG_DS12885_ADD("rtc")
+	MCFG_NVRAM_ADD_1FILL("nvram")
+	// no pass-through
+MACHINE_CONFIG_END
 
 ioport_constructor cpc_symbiface2_device::device_input_ports() const
 {
@@ -72,14 +68,16 @@ ioport_constructor cpc_symbiface2_device::device_input_ports() const
 //**************************************************************************
 
 cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_SYMBIFACE2, "SYMBiFACE II", tag, owner, clock, "cpc_symf2", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
+	device_t(mconfig, CPC_SYMBIFACE2, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr),
 	m_ide(*this,"ide"),
 	m_rtc(*this,"rtc"),
 	m_nvram(*this,"nvram"),
 	m_mouse_x(*this,"sf2_mouse_x"),
 	m_mouse_y(*this,"sf2_mouse_y"),
-	m_mouse_buttons(*this,"sf2_mouse_buttons"), m_iohigh(false), m_ide_data(0), m_mouse_state(0), m_input_x(0), m_input_y(0), m_4xxx_ptr_r(nullptr), m_4xxx_ptr_w(nullptr), m_6xxx_ptr_r(nullptr), m_6xxx_ptr_w(nullptr)
+	m_mouse_buttons(*this,"sf2_mouse_buttons"),
+	m_iohigh(false), m_ide_data(0), m_mouse_state(0), m_input_x(0), m_input_y(0), m_4xxx_ptr_r(nullptr), m_4xxx_ptr_w(nullptr), m_6xxx_ptr_r(nullptr), m_6xxx_ptr_w(nullptr)
 {
 }
 

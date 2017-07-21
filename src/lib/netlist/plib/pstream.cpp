@@ -5,13 +5,19 @@
  *
  */
 
+#include "pstream.h"
+#include "palloc.h"
+
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
 #include <algorithm>
 
-#include "pstream.h"
-#include "palloc.h"
+// VS2015 prefers _dup
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace plib {
 
@@ -25,28 +31,6 @@ pstream::~pstream()
 
 pistream::~pistream()
 {
-}
-
-bool pistream::readline(pstring &line)
-{
-	char c = 0;
-	m_linebuf.clear();
-	if (!this->readbyte(c))
-	{
-		line = "";
-		return false;
-	}
-	while (true)
-	{
-		if (c == 10)
-			break;
-		else if (c != 13) /* ignore CR */
-			m_linebuf += c;
-		if (!this->readbyte(c))
-			break;
-	}
-	line = m_linebuf;
-	return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -78,10 +62,11 @@ pifilestream::pifilestream(const pstring &fname)
 {
 	if (m_file == nullptr)
 		throw file_open_e(fname);
-	init();
+	else
+		init();
 }
 
-pifilestream::pifilestream(void *file, const pstring name, const bool do_close)
+pifilestream::pifilestream(void *file, const pstring &name, const bool do_close)
 : pistream(0), m_file(file), m_pos(0), m_actually_close(do_close), m_filename(name)
 {
 	if (m_file == nullptr)
@@ -171,7 +156,7 @@ pofilestream::pofilestream(const pstring &fname)
 	init();
 }
 
-pofilestream::pofilestream(void *file, const pstring name, const bool do_close)
+pofilestream::pofilestream(void *file, const pstring &name, const bool do_close)
 : postream(0), m_file(file), m_pos(0), m_actually_close(do_close), m_filename(name)
 {
 	if (m_file == nullptr)
@@ -189,7 +174,10 @@ void pofilestream::init()
 pofilestream::~pofilestream()
 {
 	if (m_actually_close)
+	{
+		fflush(static_cast<FILE *>(m_file));
 		fclose(static_cast<FILE *>(m_file));
+	}
 }
 
 void pofilestream::vwrite(const void *buf, const pos_type n)
@@ -197,6 +185,7 @@ void pofilestream::vwrite(const void *buf, const pos_type n)
 	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
 	{
+		//printf("%ld %ld %s\n", r, n, strerror(errno));
 		if (ferror(static_cast<FILE *>(m_file)))
 			throw file_write_e(m_filename);
 	}
@@ -236,7 +225,11 @@ postringstream::~postringstream()
 // -----------------------------------------------------------------------------
 
 pstderr::pstderr()
-: pofilestream(stderr, "<stderr>", false)
+#ifdef _WIN32
+: pofilestream(fdopen(_dup(fileno(stderr)), "wb"), "<stderr>", true)
+#else
+: pofilestream(fdopen(dup(fileno(stderr)), "wb"), "<stderr>", true)
+#endif
 {
 }
 
@@ -249,7 +242,11 @@ pstderr::~pstderr()
 // -----------------------------------------------------------------------------
 
 pstdout::pstdout()
-: pofilestream(stdout, "<stdout>", false)
+#ifdef _WIN32
+: pofilestream(fdopen(_dup(fileno(stdout)), "wb"), "<stdout>", true)
+#else
+: pofilestream(fdopen(dup(fileno(stdout)), "wb"), "<stdout>", true)
+#endif
 {
 }
 
@@ -281,7 +278,7 @@ pimemstream::pos_type pimemstream::vread(void *buf, const pos_type n)
 
 	if (ret > 0)
 	{
-		memcpy(buf, m_mem + m_pos, ret);
+		std::copy(m_mem + m_pos, m_mem + m_pos + ret, static_cast<char *>(buf));
 		m_pos += ret;
 	}
 
@@ -334,11 +331,11 @@ void pomemstream::vwrite(const void *buf, const pos_type n)
 		{
 			throw out_of_mem_e("pomemstream::vwrite");
 		}
-		memcpy(m_mem, o, m_pos);
+		std::copy(o, o + m_pos, m_mem);
 		pfree_array(o);
 	}
 
-	memcpy(m_mem + m_pos, buf, n);
+	std::copy(static_cast<const char *>(buf), static_cast<const char *>(buf) + n, m_mem + m_pos);
 	m_pos += n;
 	m_size = std::max(m_pos, m_size);
 }
@@ -357,7 +354,7 @@ void pomemstream::vseek(const pos_type n)
 		{
 			throw out_of_mem_e("pomemstream::vseek");
 		}
-		memcpy(m_mem, o, m_pos);
+		std::copy(o, o + m_pos, m_mem);
 		pfree_array(o);
 	}
 }
@@ -367,9 +364,43 @@ pstream::pos_type pomemstream::vtell()
 	return m_pos;
 }
 
-pstream_fmt_writer_t::~pstream_fmt_writer_t()
+bool putf8_reader::readline(pstring &line)
+{
+	pstring::code_t c = 0;
+	m_linebuf = "";
+	if (!this->readcode(c))
+	{
+		line = "";
+		return false;
+	}
+	while (true)
+	{
+		if (c == 10)
+			break;
+		else if (c != 13) /* ignore CR */
+			m_linebuf += pstring(c);
+		if (!this->readcode(c))
+			break;
+	}
+	line = m_linebuf;
+	return true;
+}
+
+putf8_fmt_writer::putf8_fmt_writer(postream &strm)
+: pfmt_writer_t()
+, putf8_writer(strm)
 {
 }
+
+putf8_fmt_writer::~putf8_fmt_writer()
+{
+}
+
+void putf8_fmt_writer::vdowrite(const pstring &ls) const
+{
+	write(ls);
+}
+
 
 
 }

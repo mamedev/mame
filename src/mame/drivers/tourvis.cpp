@@ -21,15 +21,17 @@
     Aero Blaster (32)
     After Burner II (46)
     Alice in Wonderland (61)
-  * Ankoku Densetu (Legendary Axe II)
+    Ankoku Densetsu (Legendary Axe II) (33)
     Armed-F (?)
     Ballistix (186)
     Barunba (39)
-  * Batman
+    Batman (30)
     Be Ball (93)
   * Blodia
     Bomberman (71)
     Bull Fight (185)
+    Burning Angels (49)
+    Cadash (203)
     Chozetsurinjin Beraboh Man (Super Foolish Man) (27)
     Chuka Taisen (37)
     Columns (90)
@@ -42,9 +44,9 @@
   * Die Hard
     Dodge Ball (194)
     Doraemon Meikyuu Daisakusen (20)
-  * Doraemon II
+    Doreamon - Nobita's Dorabian Night (Doraemon II, 43)
     Down Load (43)
-  * Dragon Egg!
+    Dragon Egg! (98)
     Dragon Saber (65)
     Dragon Spirit (?)
     Drop Rock Hora Hora (12)
@@ -56,6 +58,7 @@
     Final Match Tennis (62)
     Formation Soccer (1)
     Gomola Speed (27)
+    Gradius (187)
     Gunhed (148)
     Hana Taka Daka (Super Long Nose Goblin) (6)
   * Hatris
@@ -65,7 +68,8 @@
     Kato & Ken (42)
     Kiki Kaikai (120)
     Legend Of Hero Tomna (56)
-    Makyo Densetsu - The Legenary Axe (40)
+    Makyo Densetsu - The Legendary Axe (40)
+    Mashin Eiyuden Wataru (27)
     Mesopotamia (197)
     Mizubaku Daibouken Liquid Kids (10) (marketed as "Parasol Stars II")
     Mr. Heli (23)
@@ -92,7 +96,7 @@
     R-Type II (61)
   * Rabio Lepus Special
     Raiden (111)
-    Rastan Saga II (?)
+    Rastan Saga II (33, possibly incorrect riser)
     Saigo no Nindou (44)
     Salamander (184)
     Shinobi (5)
@@ -111,6 +115,7 @@
     Thunder Blade (34)
   * Tiger Road
   * Titan
+    Toilet Kids (196)
     Toy Shop Boys (51)
     Tricky (42)
   * TV Sports
@@ -120,6 +125,7 @@
     Volfied (68)
     W-Ring (21)
     Winning Shot (28)
+    World Jockey (202)
     Xevious (?)
 
     Rumored games:
@@ -283,25 +289,31 @@ http://blog.system11.org/?p=1943
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "machine/pcecommn.h"
+
+#include "cpu/h6280/h6280.h"
+#include "cpu/i8085/i8085.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "machine/i8155.h"
-#include "softlist.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 class tourvision_state : public pce_common_state
 {
 public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu"),
-		m_cart(*this, "cartslot")
-		{ }
+		: pce_common_state(mconfig, type, tag)
+		, m_subcpu(*this, "subcpu")
+		, m_cart(*this, "cartslot")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
@@ -363,15 +375,7 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
 /* note from system11 - this system actually supports 2 players */
 
 static INPUT_PORTS_START( tourvision )
-	PORT_START( "JOY" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button I */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button II */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PCE_STANDARD_INPUT_PORT_P1
 
 	PORT_START( "DSW1" )
 	PORT_DIPNAME( 0x07, 0x07, "Coins needed 1" )
@@ -400,8 +404,10 @@ static INPUT_PORTS_START( tourvision )
 	PORT_DIPSETTING(    0x10, "120" )
 	PORT_DIPSETTING(    0x08, "90" )
 	PORT_DIPSETTING(    0x00, "60" )
-		PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
-
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	
 	PORT_START( "DSW2" )
 	PORT_DIPNAME( 0x03, 0x03, "Coins needed 2" )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -492,7 +498,7 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 }
 
 
-static MACHINE_CONFIG_START( tourvision, tourvision_state )
+static MACHINE_CONFIG_START( tourvision )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -504,7 +510,7 @@ static MACHINE_CONFIG_START( tourvision, tourvision_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -562,4 +568,4 @@ ROM_START(tourvis)
 ROM_END
 
 
-GAME( 19??, tourvis,  0,       tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision)",                                      "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision_state, pce_common, ROT0, "bootleg (Tourvision)",                                      "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

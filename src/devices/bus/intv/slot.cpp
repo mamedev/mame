@@ -86,7 +86,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CART_SLOT = &device_creator<intv_cart_slot_device>;
+DEFINE_DEVICE_TYPE(INTV_CART_SLOT, intv_cart_slot_device, "intv_cart_slot", "Intellivision Cartridge Slot")
 
 //**************************************************************************
 //    Intellivision Cartridges Interface
@@ -145,10 +145,11 @@ void device_intv_cart_interface::ram_alloc(uint32_t size)
 //  intv_cart_slot_device - constructor
 //-------------------------------------------------
 intv_cart_slot_device::intv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, INTV_CART_SLOT, "Intellivision Cartridge Slot", tag, owner, clock, "intv_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(INTV_STD), m_cart(nullptr)
+	device_t(mconfig, INTV_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(INTV_STD),
+	m_cart(nullptr)
 {
 }
 
@@ -168,18 +169,6 @@ intv_cart_slot_device::~intv_cart_slot_device()
 void intv_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_intv_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void intv_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -391,7 +380,7 @@ image_init_result intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			return load_fullpath();
 		else
 		{
@@ -447,16 +436,16 @@ image_init_result intv_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string intv_cart_slot_device::get_default_card_software()
+std::string intv_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 		int type = INTV_STD;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if (rom[0] == 0xa8 && (rom[1] == (rom[2] ^ 0xff)))
 		{
@@ -469,7 +458,7 @@ std::string intv_cart_slot_device::get_default_card_software()
 			int mapper, rom[5], ram, extra;
 			std::string extrainfo;
 
-			if (hashfile_extrainfo(*this, extrainfo))
+			if (hook.hashfile_extrainfo(extrainfo))
 			{
 				sscanf(extrainfo.c_str() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 						&rom[3], &ram, &extra);
@@ -489,7 +478,6 @@ std::string intv_cart_slot_device::get_default_card_software()
 		slot_string = intv_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

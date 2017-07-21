@@ -76,13 +76,16 @@ CPU_DISASSEMBLE( arm7thumb );
 CPU_DISASSEMBLE( arm7thumb_be );
 CPU_DISASSEMBLE( asap );
 CPU_DISASSEMBLE( avr8 );
+CPU_DISASSEMBLE( capricorn );
 CPU_DISASSEMBLE( ccpu );
 CPU_DISASSEMBLE( cdp1801 );
 CPU_DISASSEMBLE( cdp1802 );
+CPU_DISASSEMBLE( clipper );
 CPU_DISASSEMBLE( coldfire );
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
 CPU_DISASSEMBLE( cop444 );
+CPU_DISASSEMBLE( cop424 );
 CPU_DISASSEMBLE( cp1610 );
 CPU_DISASSEMBLE( cquestlin );
 CPU_DISASSEMBLE( cquestrot );
@@ -108,6 +111,7 @@ CPU_DISASSEMBLE( hp_5061_3001 );
 CPU_DISASSEMBLE( hp_nanoprocessor );
 CPU_DISASSEMBLE( hyperstone_generic );
 CPU_DISASSEMBLE( i4004 );
+CPU_DISASSEMBLE( i4040 );
 CPU_DISASSEMBLE( i8008 );
 CPU_DISASSEMBLE( i8051 );
 CPU_DISASSEMBLE( i8052 );
@@ -120,7 +124,6 @@ CPU_DISASSEMBLE( i960 );
 CPU_DISASSEMBLE( ie15 );
 CPU_DISASSEMBLE( jaguardsp );
 CPU_DISASSEMBLE( jaguargpu );
-CPU_DISASSEMBLE( kb1013vk12 );
 CPU_DISASSEMBLE( konami );
 CPU_DISASSEMBLE( lh5801 );
 CPU_DISASSEMBLE( lr35902 );
@@ -137,6 +140,8 @@ CPU_DISASSEMBLE( m6803 );
 CPU_DISASSEMBLE( m68030 );
 CPU_DISASSEMBLE( m68040 );
 CPU_DISASSEMBLE( m6805 );
+CPU_DISASSEMBLE( m146805 );
+CPU_DISASSEMBLE( m68hc05 );
 CPU_DISASSEMBLE( m6808 );
 CPU_DISASSEMBLE( m6809 );
 CPU_DISASSEMBLE( m68340 );
@@ -173,6 +178,7 @@ CPU_DISASSEMBLE( sharc );
 CPU_DISASSEMBLE( sm500 );
 CPU_DISASSEMBLE( sm510 );
 CPU_DISASSEMBLE( sm511 );
+CPU_DISASSEMBLE( sm5a );
 CPU_DISASSEMBLE( sm8500 );
 CPU_DISASSEMBLE( spc700 );
 CPU_DISASSEMBLE( ssem );
@@ -244,13 +250,16 @@ static const dasm_table_entry dasm_table[] =
 	{ "arm7thumbb",  _16be,  0, CPU_DISASSEMBLE_NAME(arm7thumb_be) },
 	{ "asap",        _32le,  0, CPU_DISASSEMBLE_NAME(asap) },
 	{ "avr8",        _16le,  0, CPU_DISASSEMBLE_NAME(avr8) },
+	{ "capricorn",   _8bit,  0, CPU_DISASSEMBLE_NAME(capricorn) },
 	{ "ccpu",        _8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
 	{ "cdp1801",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1801) },
 	{ "cdp1802",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1802) },
+	{ "clipper",     _16le,  0, CPU_DISASSEMBLE_NAME(clipper) },
 	{ "coldfire",    _16be,  0, CPU_DISASSEMBLE_NAME(coldfire) },
 	{ "cop410",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
 	{ "cop420",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
 	{ "cop444",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
+	{ "cop424",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop424) },
 	{ "cp1610",      _16be, -1, CPU_DISASSEMBLE_NAME(cp1610) },
 	{ "cquestlin",   _64be, -3, CPU_DISASSEMBLE_NAME(cquestlin) },
 	{ "cquestrot",   _64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
@@ -267,8 +276,8 @@ static const dasm_table_entry dasm_table[] =
 //  { "h8",          _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
 //  { "h8_24",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
 //  { "h8_32",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
-	{ "hc11",        _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
-	{ "hcd62121",    _16be,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
+	{ "hc11",        _8bit,  0, CPU_DISASSEMBLE_NAME(hc11) },
+	{ "hcd62121",    _8bit,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
 	{ "hd61700",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
 	{ "hd6301",      _8bit,  0, CPU_DISASSEMBLE_NAME(hd6301) },
 	{ "hd6309",      _8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
@@ -278,6 +287,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hp_5061_3001",_16be, -1, CPU_DISASSEMBLE_NAME(hp_5061_3001) },
 	{ "hyperstone",  _16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
 	{ "i4004",       _8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
+	{ "i4040",       _8bit,  0, CPU_DISASSEMBLE_NAME(i4040) },
 	{ "i8008",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
 	{ "i8051",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8051) },
 	{ "i8052",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8052) },
@@ -290,7 +300,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "ie15",        _8bit,  0, CPU_DISASSEMBLE_NAME(ie15) },
 	{ "jaguardsp",   _16be,  0, CPU_DISASSEMBLE_NAME(jaguardsp) },
 	{ "jaguargpu",   _16be,  0, CPU_DISASSEMBLE_NAME(jaguargpu) },
-	{ "kb1013vk12",  _8bit,  0, CPU_DISASSEMBLE_NAME(kb1013vk12) },
 	{ "konami",      _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
 	{ "lh5801",      _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
 	{ "lr35902",     _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
@@ -307,6 +316,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "m68030",      _16be,  0, CPU_DISASSEMBLE_NAME(m68030) },
 	{ "m68040",      _16be,  0, CPU_DISASSEMBLE_NAME(m68040) },
 	{ "m6805",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6805) },
+	{ "m146805",     _8bit,  0, CPU_DISASSEMBLE_NAME(m146805) },
+	{ "m68hc05",     _8bit,  0, CPU_DISASSEMBLE_NAME(m68hc05) },
 	{ "m6808",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6808) },
 	{ "m6809",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6809) },
 	{ "m68340",      _16be,  0, CPU_DISASSEMBLE_NAME(m68340) },
@@ -343,6 +354,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm500",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm500) },
 	{ "sm510",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm510) },
 	{ "sm511",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm511) },
+	{ "sm5a",        _8bit,  0, CPU_DISASSEMBLE_NAME(sm5a) },
 	{ "sm8500",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm8500) },
 	{ "sparcv7",     _32be,  0, CPU_DISASSEMBLE_NAME(sparcv7) },
 	{ "sparcv8",     _32be,  0, CPU_DISASSEMBLE_NAME(sparcv8) },

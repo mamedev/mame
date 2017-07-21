@@ -43,7 +43,7 @@ static INPUT_PORTS_START( sawatte )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sawatte, sawatte_state )
+static MACHINE_CONFIG_START( sawatte )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "sawatte")
 MACHINE_CONFIG_END
 
@@ -51,4 +51,4 @@ ROM_START( sawatte )
 ROM_END
 
 
-CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, driver_device,  0, "Sega", "Sawatte", MACHINE_IS_SKELETON )
+CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, sawatte_state,  0, "Sega", "Sawatte", MACHINE_IS_SKELETON )

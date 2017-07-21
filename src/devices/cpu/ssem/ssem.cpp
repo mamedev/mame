@@ -76,20 +76,20 @@ inline void ssem_device::program_write32(uint32_t address, uint32_t data)
 
 /*****************************************************************************/
 
-const device_type SSEMCPU = &device_creator<ssem_device>;
+DEFINE_DEVICE_TYPE(SSEMCPU, ssem_device, "ssem_cpu", "SSEM CPU")
 
 //-------------------------------------------------
 //  ssem_device - constructor
 //-------------------------------------------------
 
 ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SSEMCPU, "SSEMCPU", tag, owner, clock, "ssem_cpu", __FILE__),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
-		m_pc(1),
-		m_shifted_pc(1<<2),
-		m_a(0),
-		m_halt(0),
-		m_icount(0)
+	: cpu_device(mconfig, SSEMCPU, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16)
+	, m_pc(1)
+	, m_shifted_pc(1<<2)
+	, m_a(0)
+	, m_halt(0)
+	, m_icount(0)
 {
 	// Allocate & setup
 }
@@ -135,13 +135,11 @@ void ssem_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *ssem_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector ssem_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 

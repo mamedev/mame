@@ -12,11 +12,11 @@
  *
  */
 
+#ifndef MAME_CPU_M68000_M68KCPU_H
+#define MAME_CPU_M68000_M68KCPU_H
 
 #pragma once
 
-#ifndef __M68KCPU_H__
-#define __M68KCPU_H__
 
 class m68000_base_device;
 
@@ -375,11 +375,11 @@ class m68000_base_device;
 #define MFLAG_CLEAR 0
 
 /* Turn flag values into 1 or 0 */
-#define XFLAG_AS_1(M) (((M)->x_flag>>8)&1)
-#define NFLAG_AS_1(M) (((M)->n_flag>>7)&1)
-#define VFLAG_AS_1(M) (((M)->v_flag>>7)&1)
-#define ZFLAG_AS_1(M) (!(M)->not_z_flag)
-#define CFLAG_AS_1(M) (((M)->c_flag>>8)&1)
+#define XFLAG_1(M) (((M)->x_flag>>8)&1)
+#define NFLAG_1(M) (((M)->n_flag>>7)&1)
+#define VFLAG_1(M) (((M)->v_flag>>7)&1)
+#define ZFLAG_1(M) (!(M)->not_z_flag)
+#define CFLAG_1(M) (((M)->c_flag>>8)&1)
 
 
 /* Conditions */
@@ -1701,4 +1701,4 @@ static inline void m68ki_check_interrupts(m68000_base_device *m68k)
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* __M68KCPU_H__ */
+#endif // MAME_CPU_M68000_M68KCPU_H

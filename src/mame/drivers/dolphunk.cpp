@@ -82,9 +82,11 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "dolphunk.lh"
 
 
@@ -98,7 +100,7 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -115,7 +117,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 };
 
-READ8_MEMBER( dauphin_state::cass_r )
+READ_LINE_MEMBER( dauphin_state::cass_r )
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
@@ -190,8 +192,6 @@ static ADDRESS_MAP_START( dauphin_io, AS_IO, 8, dauphin_state )
 	AM_RANGE(0x00, 0x03) AM_WRITE(port00_w) // 4-led display
 	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r) // pushbuttons
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
-	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -222,12 +222,13 @@ static INPUT_PORTS_START( dauphin )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( dauphin, dauphin_state )
+static MACHINE_CONFIG_START( dauphin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(dauphin_mem)
 	MCFG_CPU_IO_MAP(dauphin_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(dauphin_state, cass_w))
+	MCFG_S2650_SENSE_INPUT(READLINE(dauphin_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dauphin_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dolphunk)
@@ -262,5 +263,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     CLASS         INIT     COMPANY             FULLNAME   FLAGS */
-COMP( 1979, dauphin,   0,       0,       dauphin,  dauphin, driver_device, 0,     "LCD EPFL Stoppani", "Dauphin", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY              FULLNAME   FLAGS
+COMP( 1979, dauphin,  0,      0,      dauphin,  dauphin, dauphin_state, 0,    "LCD EPFL Stoppani", "Dauphin", 0 )

@@ -32,24 +32,28 @@
      - 4 internal expansion slots
     * Ports:
      - 1 composite video output for a color monitor
-     - 2 cassete interfaces
+     - 2 cassette interfaces
      - 1 RS-232C serial port
      - 1 parallel interface
     * Storage:
-     - Cassetes recorder
+     - Cassette recorder
      - Up to 4 external floppy drives: 8" (FD/DD, 1,1MB) or 5" 1/4
      - Up to 1 external 10 MB hard-drive
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
 #include "bus/generic/carts.h"
-#include "machine/pit8253.h"
+#include "bus/generic/slot.h"
+#include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
 #include "machine/i8279.h"
-#include "sound/speaker.h"
+#include "machine/pit8253.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class i7000_state : public driver_device
 {
@@ -328,7 +332,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
 }
 
 
-static MACHINE_CONFIG_START( i7000, i7000_state )
+static MACHINE_CONFIG_START( i7000 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
@@ -411,5 +415,5 @@ ROM_START( i7000 )
 	ROM_LOAD( "i7000_telex_ci09.rom", 0x0000, 0x1000, CRC(c1c8fcc8) SHA1(cbf5fb600e587b998f190a9e3fb398a51d8a5e87) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY    FULLNAME    FLAGS */
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE        INIT   COMPANY    FULLNAME    FLAGS
 COMP( 1982, i7000,  0,      0,       i7000,     i7000,   i7000_state, i7000, "Itautec", "I-7000",   MACHINE_NOT_WORKING)

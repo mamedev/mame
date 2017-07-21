@@ -37,27 +37,26 @@ image_manager::image_manager(running_machine &machine)
 		if (!image.user_loadable())
 			continue;
 
-		// is an image specified for this image
-		const char *image_name_ptr = machine.options().value(image.instance_name());
-		if ((image_name_ptr != nullptr) && (image_name_ptr[0] != '\0'))
-		{
-			image_init_result result = image_init_result::FAIL;
-			std::string image_name(image_name_ptr);
+		// find the image option in image_options()
+		const std::string &startup_image(machine.options().image_option(image.instance_name()).value());
 
-			// mark init state
-			image.set_init_phase();
+		// is an image specified for this image?
+		if (!startup_image.empty())
+		{
+			// we do have a startup image specified - load it
+			image_init_result result = image_init_result::FAIL;
 
 			// try as a softlist
-			if (software_name_parse(image_name))
-				result = image.load_software(image_name);
+			if (software_name_parse(startup_image))
+				result = image.load_software(startup_image);
 
 			// failing that, try as an image
 			if (result != image_init_result::PASS)
-				result = image.load(image_name);
+				result = image.load(startup_image);
 
 			// failing that, try creating it (if appropriate)
 			if (result != image_init_result::PASS && image.support_command_line_image_creation())
-				result = image.create(image_name);
+				result = image.create(startup_image);
 
 			// did the image load fail?
 			if (result != image_init_result::PASS)
@@ -65,12 +64,17 @@ image_manager::image_manager(running_machine &machine)
 				// retrieve image error message
 				std::string image_err = std::string(image.error());
 
-				// unload all images
-				unload_all();
+				// unload the bad image
+				image.unload();
+
+				// make sure it is removed from the ini file too
+				machine.options().image_option(image.instance_name()).specify("");
+				if (machine.options().write_config())
+					write_config(machine.options(), nullptr, &machine.system());
 
 				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (%s) failed: %s",
 					image.device().name(),
-					image_name.c_str(),
+					startup_image.c_str(),
 					image_err.c_str());
 			}
 		}
@@ -107,7 +111,7 @@ void image_manager::config_load(config_type cfg_type, util::xml::data_node const
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name()))
+					if (!strcmp(dev_instance, image.instance_name().c_str()))
 					{
 						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
@@ -131,7 +135,7 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	{
 		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 		{
-			const char *const dev_instance = image.instance_name();
+			const char *const dev_instance = image.instance_name().c_str();
 
 			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)
@@ -177,24 +181,38 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 
 void image_manager::options_extract()
 {
-	/* only extract the device options if we've added them
-	   no need to assert in case they are missing */
+	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		int index = 0;
-
-		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+		// There are two scenarios where we want to extract the option:
+		//
+		//  1.  When for the device, is_reset_on_load() is false (mounting devices for which is reset_and_load()
+		//      is true forces a reset, hence the name)
+		//
+		//  2.  When is_reset_on_load(), and this results in a device being unmounted (unmounting is_reset_and_load()
+		//      doesn't force an unmount).
+		//
+		//      Note that as a part of #2, we cannot extract the option when the image in question is a part of an
+		//      active reset_on_load; hence the check for is_reset_and_loading() (see issue #2414)
+		if (!image.is_reset_on_load()
+			|| (!image.exists() && !image.is_reset_and_loading() && !machine().options().image_option(image.instance_name()).value().empty()))
 		{
-			const char *filename = image.filename();
+			// we have to assemble the image option differently for software lists and for normal images
+			std::string image_opt;
+			if (image.exists())
+			{
+				if (image.loaded_through_softlist())
+					image_opt = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
+				else
+					image_opt = image.filename();
+			}
 
-			/* and set the option */
-			std::string error;
-			machine().options().set_value(image.instance_name(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
-
-			index++;
+			// and set the option (provided that it hasn't been removed out from under us)
+			if (machine().options().exists(image.instance_name()))
+				machine().options().image_option(image.instance_name()).specify(std::move(image_opt));
 		}
 	}
 
-	/* write the config, if appropriate */
+	// write the config, if appropriate
 	if (machine().options().write_config())
 		write_config(machine().options(), nullptr, &machine().system());
 }

@@ -10,7 +10,11 @@
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+
 // PV-1000 Sound device
 
 class pv1000_sound_device : public device_t,
@@ -23,7 +27,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	// sound stream update overrides
@@ -42,23 +45,11 @@ private:
 	sound_stream    *m_sh_channel;
 };
 
-extern const device_type PV1000;
-
-const device_type PV1000 = &device_creator<pv1000_sound_device>;
+DEFINE_DEVICE_TYPE(PV1000, pv1000_sound_device, "pv1000_sound", "NEC D65010G031")
 
 pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock, "pv1000_sound", __FILE__),
-					device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pv1000_sound_device::device_config_complete()
+	: device_t(mconfig, PV1000, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
@@ -147,7 +138,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
 		m_cart(*this, "cartslot"),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -187,7 +178,7 @@ public:
 
 static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
-	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(gfxram_w) AM_REGION("gfxram", 0)
 ADDRESS_MAP_END
 
@@ -441,7 +432,7 @@ static GFXDECODE_START( pv1000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pv1000, pv1000_state )
+static MACHINE_CONFIG_START( pv1000 )
 
 	MCFG_CPU_ADD( "maincpu", Z80, 17897725/5 )
 	MCFG_CPU_PROGRAM_MAP( pv1000 )
@@ -478,5 +469,5 @@ ROM_START( pv1000 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY   FULLNAME    FLAGS */
-CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, driver_device,   0,   "Casio",  "PV-1000",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY   FULLNAME    FLAGS */
+CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, pv1000_state,   0,    "Casio",  "PV-1000",  MACHINE_SUPPORTS_SAVE )

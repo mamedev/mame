@@ -519,15 +519,18 @@ Filter Board
 
 */
 #include "emu.h"
+#include "includes/namcos21.h"
+#include "machine/namcoic.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
-#include "includes/namcoic.h"
 #include "sound/ym2151.h"
-#include "sound/c140.h"
-#include "includes/namcos21.h"
 #include "machine/nvram.h"
+#include "sound/c140.h"
+#include "speaker.h"
+
 
 #define PTRAM_SIZE 0x20000
 // TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
@@ -1476,7 +1479,7 @@ static ADDRESS_MAP_START( winrun_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)	
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
@@ -1488,7 +1491,7 @@ static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)	
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
@@ -1568,10 +1571,10 @@ static ADDRESS_MAP_START( driveyes_common_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)	
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
-	
+
 static ADDRESS_MAP_START( driveyes_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
@@ -1716,7 +1719,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( winrungp )
 	PORT_INCLUDE(winrun)
-	
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
 	PORT_DIPSETTING(    0x20, "2M" )
@@ -1733,7 +1736,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_MODIFY("DIAL0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1850,8 +1853,8 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 {
 	int scanline = param;
-//	int cur_posirq = get_posirq_scanline()*2;
-	
+//  int cur_posirq = get_posirq_scanline()*2;
+
 	if(scanline == 240*2)
 	{
 		m_master_intc->vblank_irq_trigger();
@@ -1859,7 +1862,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 		if(m_gpu_intc)
 			m_gpu_intc->vblank_irq_trigger();
 	}
-	
+
 	if(m_gpu_intc != nullptr)
 	{
 		if(scanline == (0xff-m_gpu_intc->get_posirq_line())*2)
@@ -1867,7 +1870,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	}
 }
 
-static MACHINE_CONFIG_START( configure_c148_standard, namcos21_state )
+static MACHINE_CONFIG_START( configure_c148_standard )
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
 	namco_c148_device::link_c148_device(*device,"slave_intc");
 	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos21_state, sound_reset_w))
@@ -1878,7 +1881,7 @@ static MACHINE_CONFIG_START( configure_c148_standard, namcos21_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( namcos21, namcos21_state )
+static MACHINE_CONFIG_START( namcos21 )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -1935,7 +1938,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1945,7 +1948,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( driveyes, namcos21_state )
+static MACHINE_CONFIG_START( driveyes )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(driveyes_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -1996,7 +1999,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -2005,7 +2008,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( winrun, namcos21_state )
+static MACHINE_CONFIG_START( winrun )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(winrun_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -2059,7 +2062,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

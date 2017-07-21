@@ -15,14 +15,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type K033906 = &device_creator<k033906_device>;
+DEFINE_DEVICE_TYPE(K033906, k033906_device, "k033906", "K033906 PCI bridge")
 
 //-------------------------------------------------
 //  k033906_device - constructor
 //-------------------------------------------------
 
 k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K033906, "K033906 PCI bridge", tag, owner, clock, "k033906", __FILE__)
+	: device_t(mconfig, K033906, tag, owner, clock)
 	, m_reg_set(0)
 	, m_voodoo(*this, finder_base::DUMMY_TAG)
 {
@@ -57,7 +57,7 @@ uint32_t k033906_device::reg_r(int reg)
 		case 0x0f:      return m_reg[0x0f];         // interrupt_line, interrupt_pin, min_gnt, max_lat
 
 		default:
-			fatalerror("%s: k033906_reg_r: %08X\n", machine().describe_context(), reg);
+			fatalerror("%s: k033906_reg_r: %08X\n", machine().describe_context().c_str(), reg);
 	}
 	// never executed
 	//return 0;
@@ -106,7 +106,7 @@ void k033906_device::reg_w(int reg, uint32_t data)
 			break;
 
 		default:
-			fatalerror("%s:K033906_w: %08X, %08X\n", machine().describe_context(), data, reg);
+			fatalerror("%s:K033906_w: %08X, %08X\n", machine().describe_context().c_str(), data, reg);
 	}
 }
 

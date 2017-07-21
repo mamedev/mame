@@ -11,6 +11,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
+#include "screen.h"
 
 struct sprite_cave
 {
@@ -99,6 +100,7 @@ public:
 
 	int          m_spritetype[2];
 	int          m_kludge;
+	emu_timer *m_vblank_end_timer;
 
 
 	/* misc */

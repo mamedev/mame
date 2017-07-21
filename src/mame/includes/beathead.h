@@ -15,14 +15,15 @@ class beathead_state : public atarigen_state
 public:
 	beathead_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_jsa(*this, "jsa"),
-			m_nvram(*this, "nvram"),
-			m_videoram(*this, "videoram"),
-			m_vram_bulk_latch(*this, "vram_bulk_latch"),
-			m_palette_select(*this, "palette_select"),
-			m_ram_base(*this, "ram_base"),
-			m_rom_base(*this, "rom_base") { }
+		m_maincpu(*this, "maincpu"),
+		m_jsa(*this, "jsa"),
+		m_nvram(*this, "nvram"),
+		m_videoram(*this, "videoram"),
+		m_vram_bulk_latch(*this, "vram_bulk_latch"),
+		m_palette_select(*this, "palette_select"),
+		m_ram_base(*this, "ram_base"),
+		m_rom_base(*this, "rom_base")
+	{ }
 
 	virtual void machine_reset() override;
 
@@ -58,9 +59,6 @@ public:
 
 	uint8_t           m_eeprom_enabled;
 
-	uint32_t *        m_speedup_data;
-	uint32_t *        m_movie_speedup_data;
-
 	// in drivers/beathead.c
 	virtual void update_interrupts() override;
 	DECLARE_WRITE32_MEMBER( interrupt_control_w );
@@ -80,6 +78,5 @@ public:
 	DECLARE_WRITE32_MEMBER( finescroll_w );
 	DECLARE_READ32_MEMBER( hsync_ram_r );
 	DECLARE_WRITE32_MEMBER( hsync_ram_w );
-	DECLARE_DRIVER_INIT(beathead);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 };

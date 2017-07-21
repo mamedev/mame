@@ -37,7 +37,7 @@ namespace sol {
 
 	public:
 		function_result() = default;
-		function_result(lua_State* L, int index = -1, int returncount = 0) : L(L), index(index), returncount(returncount) {
+		function_result(lua_State* Ls, int idx = -1, int retnum = 0) : L(Ls), index(idx), returncount(retnum) {
 
 		}
 		function_result(const function_result&) = default;

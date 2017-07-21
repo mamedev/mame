@@ -1,6 +1,17 @@
 
                 ChangeLog file for zlib
 
+Changes in 1.2.11 (15 Jan 2017)
+- Fix deflate stored bug when pulling last block from window
+- Permit immediate deflateParams changes before any deflate input
+
+Changes in 1.2.10 (2 Jan 2017)
+- Avoid warnings on snprintf() return value
+- Fix bug in deflate_stored() for zero-length input
+- Fix bug in gzwrite.c that produced corrupt gzip files
+- Remove files to be installed before copying them in Makefile.in
+- Add warnings when compiling with assembler code
+
 Changes in 1.2.9 (31 Dec 2016)
 - Fix contrib/minizip to permit unzipping with desktop API [Zouzou]
 - Improve contrib/blast to return unused bytes

@@ -37,11 +37,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/nitedrvr.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
-#include "includes/nitedrvr.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Memory Map */
 
@@ -136,7 +139,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
+static MACHINE_CONFIG_START( nitedrvr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz
@@ -200,4 +203,4 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, driver_device, 0, ROT0, "Atari", "Night Driver", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, nitedrvr_state, 0, ROT0, "Atari", "Night Driver", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

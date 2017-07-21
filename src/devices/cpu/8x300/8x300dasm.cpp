@@ -122,7 +122,7 @@ CPU_DISASSEMBLE(n8x300)
 		}
 		break;
 	case 0x07:
-		util::stream_format(stream, "JMP  %04XH", opcode & 0x1fff);
+		util::stream_format(stream, "JMP  %04XH", (opcode & 0x1fff) << 1);
 		break;
 	}
 

@@ -261,16 +261,19 @@
 */
 
 #include "emu.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/sh4/sh4.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/aica.h"
-#include "machine/aicartc.h"
-#include "includes/dc.h"
 #include "includes/dccons.h"
+
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+#include "cpu/sh4/sh4.h"
 #include "imagedev/chd_cd.h"
+#include "machine/aicartc.h"
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define CPU_CLOCK (200000000)
 
@@ -347,16 +350,6 @@ WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
 	PDTRA = (data & 0xffff);
 }
 
-READ64_MEMBER(dc_cons_state::dc_arm_r )
-{
-	return *((uint64_t *)dc_sound_ram.target()+offset);
-}
-
-WRITE64_MEMBER(dc_cons_state::dc_arm_w )
-{
-	COMBINE_DATA((uint64_t *)dc_sound_ram.target() + offset);
-}
-
 #if 0
 READ8_MEMBER(dc_cons_state::dc_flash_r)
 {
@@ -383,7 +376,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
-	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
+	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
 //  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
@@ -564,9 +557,9 @@ static INPUT_PORTS_START( dc )
 	//A4 - A5, second analog stick, unused on DC
 
 	PORT_START("MAMEDEBUG")
-	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("SCREEN_TYPE")
 	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
@@ -575,34 +568,13 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
-{
-	dc_state::machine_reset();
-	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
-}
-
-WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
-{
-	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(dc_cons_state::sh4_aica_irq)
-{
-	if(state)
-		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;
-	else
-		dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_AICA;
-
-	dc_update_interrupt_status();
-}
-
-static MACHINE_CONFIG_FRAGMENT( gdrom_config )
+static MACHINE_CONFIG_START( gdrom_config )
 	MCFG_DEVICE_MODIFY("cdda")
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dc, dc_cons_state )
+static MACHINE_CONFIG_START( dc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -642,8 +614,8 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)
 	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(dc_cons_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_cons_state, sh4_aica_irq))
+	MCFG_AICA_IRQ_CB(WRITELINE(dc_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_state, sh4_aica_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
@@ -682,6 +654,9 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
 // ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
 
+// note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (VA0) or MBM29LV002TC (VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
+// sector SA5 (1A000 - 1BFFF) is read-only, contain factory information (region, broadcast, serial number, etc)
+
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
@@ -702,9 +677,17 @@ ROM_START( dcjp )
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(5f92bf76) SHA1(be78b834f512ab2cf3d67b96e377c9f3093ff82a) )         // hacked PAL flash
-	ROM_FILL( 0x1a004, 1, 0x30 ) // patch broadcast back to NTSC
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(f77c15a1) SHA1(66fd8ee40b207ce03a5fd6abbc00d27bbd5f92bd) ) // from VA0 with 1.004 BIOS
+ROM_END
+
+// unauthorised portable modification
+ROM_START( dctream )
+	ROM_REGION(0x200000, "maincpu", 0)
+	// multi-region hack of mpr-21931/1.01d BIOS, hardware checksum protection passes OK due to algorithm weakness
+	ROM_LOAD( "dc_bios.bin", 0x000000, 0x200000, CRC(cff88d0d) SHA1(e3f84705b183ffded0a349ac7f2ab00be2ab74ee) ) // dumped in software way, ROM label unknown
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(727ea7ec) SHA1(b027913a8c00d4edaef83c440dd6c59090b387f2) )
 ROM_END
 
 // normally, with DIP switch 4 off, HKT-100/110/120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
@@ -727,8 +710,9 @@ ROM_START( dcdev )
 	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
-CONS( 1999, dc,     dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1998, dcjp,   0,      0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1999, dceu,   dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1998, dcdev,  0,      0,      dc,     dc, dc_cons_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE            INIT    COMPANY FULLNAME */
+CONS( 1999, dc,     dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1998, dcjp,   0,      0,      dc,     dc,   dc_cons_state,   dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1999, dceu,   dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 200?, dctream,dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,"unknown", "Treamcast", MACHINE_NOT_WORKING )
+CONS( 1998, dcdev,  0,      0,      dc,     dc,   dc_cons_state,   dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

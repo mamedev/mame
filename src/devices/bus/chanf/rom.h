@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __CHANF_ROM_H
-#define __CHANF_ROM_H
+#ifndef MAME_BUS_CHANF_ROM_H
+#define MAME_BUS_CHANF_ROM_H
 
 #include "slot.h"
 
@@ -13,7 +13,6 @@ class chanf_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	chanf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	chanf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -28,8 +27,9 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
-
 protected:
+	chanf_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// used for RAM chip in Hangman & Maze
 	uint8_t m_latch[2];       // PORT A & PORT B
 	uint16_t m_addr_latch, m_addr;
@@ -133,12 +133,12 @@ private:
 
 
 // device type definition
-extern const device_type CHANF_ROM_STD;
-extern const device_type CHANF_ROM_MAZE;
-extern const device_type CHANF_ROM_HANGMAN;
-extern const device_type CHANF_ROM_CHESS;
-extern const device_type CHANF_ROM_MULTI_OLD;
-extern const device_type CHANF_ROM_MULTI_FINAL;
+DECLARE_DEVICE_TYPE(CHANF_ROM_STD,         chanf_rom_device)
+DECLARE_DEVICE_TYPE(CHANF_ROM_MAZE,        chanf_maze_device)
+DECLARE_DEVICE_TYPE(CHANF_ROM_HANGMAN,     chanf_hangman_device)
+DECLARE_DEVICE_TYPE(CHANF_ROM_CHESS,       chanf_chess_device)
+DECLARE_DEVICE_TYPE(CHANF_ROM_MULTI_OLD,   chanf_multi_old_device)
+DECLARE_DEVICE_TYPE(CHANF_ROM_MULTI_FINAL, chanf_multi_final_device)
 
 
-#endif
+#endif // MAME_BUS_CHANF_ROM_H

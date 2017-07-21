@@ -68,6 +68,7 @@ end
 #include "machine/s3c2410.h"
 #include "machine/smartmed.h"
 #include "rendlay.h"
+#include "screen.h"
 
 #define PALM_Z22_BATTERY_LEVEL  75
 
@@ -277,7 +278,7 @@ DRIVER_INIT_MEMBER(palmz22_state,palmz22)
 {
 }
 
-static MACHINE_CONFIG_START( palmz22, palmz22_state )
+static MACHINE_CONFIG_START( palmz22 )
 	MCFG_CPU_ADD("maincpu", ARM920T, 266000000)
 	MCFG_CPU_PROGRAM_MAP(palmz22_map)
 
@@ -304,7 +305,7 @@ static MACHINE_CONFIG_START( palmz22, palmz22_state )
 	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(palmz22_state, s3c2410_nand_data_w))
 
 	MCFG_DEVICE_ADD("nand", NAND, 0)
-	MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D_J)
+	MCFG_NAND_TYPE(K9F5608U0D_J)
 	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2410", s3c2410_device, frnb_w))
 MACHINE_CONFIG_END
 

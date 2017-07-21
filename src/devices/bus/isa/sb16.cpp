@@ -6,13 +6,17 @@
 // The mcu does host communication and control of the dma-dac unit
 // TODO: UART is connected to MIDI port, mixer, adc
 
+#include "emu.h"
 #include "sb16.h"
 
-const device_type ISA16_SB16 = &device_creator<sb16_lle_device>;
+#include "speaker.h"
+
+
+DEFINE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device, "sb16", "SoundBlaster 16 Audio Adapter LLE")
 
 READ8_MEMBER( sb16_lle_device::dsp_data_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		m_data_in = false;
 
 	return m_in_byte;
@@ -401,7 +405,12 @@ static ADDRESS_MAP_START(sb16_io, AS_IO, 8, sb16_lle_device)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( sb16 )
+const tiny_rom_entry *sb16_lle_device::device_rom_region() const
+{
+	return ROM_NAME( sb16 );
+}
+
+MACHINE_CONFIG_MEMBER( sb16_lle_device::device_add_mconfig )
 	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL_24MHz)
 	MCFG_CPU_IO_MAP(sb16_io)
 
@@ -417,16 +426,6 @@ static MACHINE_CONFIG_FRAGMENT( sb16 )
 
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
-
-const tiny_rom_entry *sb16_lle_device::device_rom_region() const
-{
-	return ROM_NAME( sb16 );
-}
-
-machine_config_constructor sb16_lle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sb16 );
-}
 
 READ8_MEMBER( sb16_lle_device::host_data_r )
 {
@@ -677,7 +676,7 @@ WRITE8_MEMBER( sb16_lle_device::mpu401_w )
 }
 
 sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_SB16, "SoundBlaster 16 Audio Adapter LLE", tag, owner, clock, "sb16", __FILE__),
+	device_t(mconfig, ISA16_SB16, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_ldac(*this, "ldac"),
 	m_rdac(*this, "rdac"),

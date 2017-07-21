@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include <chrono>
-
 #include "pchrono.h"
+
+#include <chrono>
 
 namespace plib {
 namespace chrono {

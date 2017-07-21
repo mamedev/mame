@@ -21,11 +21,12 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
-#include "machine/mos6551.h"
-#include "machine/kb3600.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/m6502/m6502.h"
+#include "machine/kb3600.h"
+#include "machine/mos6551.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 #define ACIA_TAG    "acia1"
 #define CRTC_TAG    "crtc"
@@ -489,7 +490,7 @@ MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( tv910, tv910_state )
+static MACHINE_CONFIG_START( tv910 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(tv910_mem)
@@ -548,5 +549,5 @@ ROM_START( tv910 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1981, tv910,  0,      0,       tv910,     tv910, driver_device,  0,  "TeleVideo", "TV910", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY      FULLNAME  FLAGS
+COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo", "TV910",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

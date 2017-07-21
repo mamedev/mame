@@ -23,12 +23,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_MOS6551_H
+#define MAME_MACHINE_MOS6551_H
+
 #pragma once
 
-#ifndef __MOS6551__
-#define __MOS6551__
-
-#include "emu.h"
 #include "machine/clock.h"
 
 #define MCFG_MOS6551_XTAL(_xtal) \
@@ -55,11 +54,11 @@ public:
 	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_xtal(device_t &device, uint32_t xtal) { downcast<mos6551_device &>(device).set_xtal(xtal); }
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_txd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rxc_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_rxc_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_rts_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dtr_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_dtr_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rxc_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_rxc_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dtr_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_dtr_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -71,14 +70,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
 	DECLARE_WRITE_LINE_MEMBER(write_dcd);
 
-	DECLARE_WRITE_LINE_MEMBER(internal_clock);
-
 	void set_xtal(uint32_t clock);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	enum
@@ -146,6 +143,7 @@ private:
 
 	int stoplength();
 
+	DECLARE_WRITE_LINE_MEMBER(internal_clock);
 	DECLARE_WRITE_LINE_MEMBER(receiver_clock);
 	DECLARE_WRITE_LINE_MEMBER(transmitter_clock);
 
@@ -207,6 +205,6 @@ private:
 	int m_tx_internal_clock;
 };
 
-extern const device_type MOS6551;
+DECLARE_DEVICE_TYPE(MOS6551, mos6551_device)
 
-#endif
+#endif // MAME_MACHINE_MOS6551_H

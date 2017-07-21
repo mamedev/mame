@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "segatap.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_SEGATAP = &device_creator<saturn_segatap_device>;
+DEFINE_DEVICE_TYPE(SATURN_SEGATAP, saturn_segatap_device, "saturn_segatap", "saturn_segatap_device")
 
 
 //**************************************************************************
@@ -26,7 +27,7 @@ const device_type SATURN_SEGATAP = &device_creator<saturn_segatap_device>;
 //-------------------------------------------------
 
 saturn_segatap_device::saturn_segatap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SATURN_SEGATAP, "Sega Saturn SegaTap", tag, owner, clock, "saturn_segatap", __FILE__),
+	device_t(mconfig, SATURN_SEGATAP, tag, owner, clock),
 	device_saturn_control_port_interface(mconfig, *this),
 	m_subctrl1_port(*this, "ctrl1"),
 	m_subctrl2_port(*this, "ctrl2"),
@@ -107,15 +108,9 @@ uint8_t saturn_segatap_device::read_id(int idx)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( segatap_slot )
+MACHINE_CONFIG_MEMBER( saturn_segatap_device::device_add_mconfig )
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl1", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl3", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl4", saturn_joys, "joypad")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor saturn_segatap_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( segatap_slot );
-}

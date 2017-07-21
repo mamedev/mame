@@ -18,11 +18,13 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
 #include "machine/i8251.h"
-#include "sound/speaker.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 class irisha_state : public driver_device
 {
@@ -55,6 +57,7 @@ private:
 	uint8_t m_keyboard_cnt;
 	uint8_t m_ppi_porta;
 	uint8_t m_ppi_portc;
+	emu_timer *m_key_timer;
 	void update_speaker();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -359,7 +362,8 @@ void irisha_state::machine_start()
 	for ( uint8_t i = 0; i < 10; i++ )
 		m_io_ports[i] = ioport( keynames[i] );
 
-	machine().scheduler().timer_pulse(attotime::from_msec(30), timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
+	m_key_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
+	m_key_timer->adjust(attotime::from_msec(30), 0, attotime::from_msec(30));
 }
 
 void irisha_state::machine_reset()
@@ -372,7 +376,7 @@ void irisha_state::machine_reset()
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( irisha, irisha_state )
+static MACHINE_CONFIG_START( irisha )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(irisha_mem)
@@ -425,5 +429,5 @@ ROM_START( irisha )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS           INIT    COMPANY  FULLNAME   FLAGS */
-COMP( 1983, irisha,      0,      0, irisha,     irisha, driver_device,  0,      "MGU",   "Irisha",  MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS          INIT    COMPANY  FULLNAME   FLAGS
+COMP( 1983, irisha,      0,      0, irisha,     irisha, irisha_state,  0,      "MGU",   "Irisha",  MACHINE_NOT_WORKING)

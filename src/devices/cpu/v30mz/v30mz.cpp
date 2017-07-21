@@ -43,8 +43,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "v30mz.h"
+#include "debugger.h"
 
 
 enum SREGS { ES=0, CS, SS, DS };
@@ -94,11 +94,11 @@ enum BREGS {
 
 /***************************************************************************/
 
-const device_type V30MZ = &device_creator<v30mz_cpu_device>;
+DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "V30MZ")
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, V30MZ, "V30MZ", tag, owner, clock, "v30mz", __FILE__)
+	: cpu_device(mconfig, V30MZ, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_ip(0)
@@ -132,6 +132,14 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 	}
 
 	memset(&m_regs, 0x00, sizeof(m_regs));
+}
+
+device_memory_interface::space_config_vector v30mz_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 

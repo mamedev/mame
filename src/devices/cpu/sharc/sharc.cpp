@@ -6,9 +6,10 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "sharc.h"
 #include "sharcfe.h"
+
+#include "debugger.h"
 
 
 #define DISABLE_FAST_REGISTERS      1
@@ -52,7 +53,7 @@ enum
 	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15
 };
 
-const device_type ADSP21062 = &device_creator<adsp21062_device>;
+DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "ADSP21062")
 
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
 	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)
@@ -74,7 +75,7 @@ static ADDRESS_MAP_START( internal_data, AS_DATA, 32, adsp21062_device )
 ADDRESS_MAP_END
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, ADSP21062, "ADSP21062", tag, owner, clock, "adsp21062", __FILE__)
+	: cpu_device(mconfig, ADSP21062, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, ADDRESS_MAP_NAME(internal_pgm))
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, ADDRESS_MAP_NAME(internal_data))
 	, m_boot_mode(BOOT_MODE_HOST)
@@ -87,6 +88,13 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 {
 }
 
+device_memory_interface::space_config_vector adsp21062_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 offs_t adsp21062_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

@@ -7,10 +7,10 @@
     TMS57002 "DASP" emulator.
 
 ***************************************************************************/
-#pragma once
+#ifndef MAME_CPU_TMS57002_TMS57002_H
+#define MAME_CPU_TMS57002_TMS57002_H
 
-#ifndef __TMS57002_H__
-#define __TMS57002_H__
+#pragma once
 
 class tms57002_device : public cpu_device, public device_sound_interface {
 public:
@@ -30,7 +30,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 	virtual uint32_t execute_min_cycles() const override;
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
@@ -212,6 +212,6 @@ enum {
 	TMS57002_XWR
 };
 
-extern const device_type TMS57002;
+DECLARE_DEVICE_TYPE(TMS57002, tms57002_device)
 
-#endif
+#endif // MAME_CPU_TMS57002_TMS57002_H

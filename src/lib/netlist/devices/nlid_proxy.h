@@ -11,12 +11,8 @@
 #ifndef NLID_PROXY_H_
 #define NLID_PROXY_H_
 
-#include <vector>
-
-#include "nl_setup.h"
-#include "nl_base.h"
-#include "nl_factory.h"
-#include "analog/nld_twoterm.h"
+#include "../nl_setup.h"
+#include "../analog/nlid_twoterm.h"
 
 namespace netlist
 {
@@ -39,12 +35,6 @@ namespace netlist
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 	protected:
-		const logic_family_desc_t *m_logic_family;
-
-		virtual const logic_family_desc_t &logic_family() const
-		{
-			return *m_logic_family;
-		}
 
 	private:
 		logic_t *m_term_proxied;
@@ -79,7 +69,7 @@ namespace netlist
 	public:
 		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied);
 
-		virtual ~nld_a_to_d_proxy();
+		virtual ~nld_a_to_d_proxy() override;
 
 		analog_input_t m_I;
 
@@ -115,7 +105,7 @@ namespace netlist
 	{
 	public:
 		nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied);
-		virtual ~nld_d_to_a_proxy() {}
+		virtual ~nld_d_to_a_proxy() override {}
 
 	protected:
 
@@ -124,10 +114,10 @@ namespace netlist
 
 	private:
 		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
-		NETLIB_SUB(twoterm) m_RV;
+		analog::NETLIB_SUB(twoterm) m_RV;
 		state_var<int> m_last_state;
 		bool m_is_timestep;
-	};
+};
 
 	} //namespace devices
 } // namespace netlist

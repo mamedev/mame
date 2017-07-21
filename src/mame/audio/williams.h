@@ -8,7 +8,6 @@
 
 ****************************************************************************/
 
-#include "emu.h"
 #include "machine/6821pia.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ym2151.h"
@@ -21,9 +20,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type WILLIAMS_NARC_SOUND;
-extern const device_type WILLIAMS_CVSD_SOUND;
-extern const device_type WILLIAMS_ADPCM_SOUND;
+DECLARE_DEVICE_TYPE(WILLIAMS_CVSD_SOUND, williams_cvsd_sound_device)
+DECLARE_DEVICE_TYPE(WILLIAMS_NARC_SOUND, williams_narc_sound_device)
+DECLARE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device)
 
 
 
@@ -46,16 +45,12 @@ public:
 
 	// internal communications
 	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(talkback_w);
 	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb);
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -68,6 +63,8 @@ private:
 
 	// internal state
 	uint8_t m_talkback;
+
+	DECLARE_WRITE8_MEMBER(talkback_w);
 };
 
 
@@ -97,11 +94,10 @@ public:
 	DECLARE_WRITE8_MEMBER(slave_sync_w);
 	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -148,7 +144,6 @@ public:
 	DECLARE_WRITE8_MEMBER(oki6295_bank_select_w);
 	DECLARE_READ8_MEMBER(command_r);
 	DECLARE_WRITE8_MEMBER(talkback_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 
 protected:
 	// timer IDs
@@ -159,7 +154,7 @@ protected:
 	};
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

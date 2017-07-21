@@ -10,7 +10,6 @@
 #define Z80PIO1_TAG     "z80pio1"
 #define Z80PIO2_TAG     "z80pio2"
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"

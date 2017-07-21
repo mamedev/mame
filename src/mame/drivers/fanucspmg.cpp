@@ -528,17 +528,22 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/ram.h"
+#include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
-#include "machine/upd765.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+
 #include "formats/imd_dsk.h"
+
 
 #define MAINCPU_TAG "maincpu"
 #define SUBCPU_TAG  "subcpu"
@@ -949,7 +954,7 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
+static MACHINE_CONFIG_START( fanucspmg )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
@@ -1037,6 +1042,6 @@ ROM_START( fanucspgm )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME       PARENT       COMPAT   MACHINE    INPUT      CLASS           INIT       COMPANY  FULLNAME            FLAGS */
-COMP( 1983, fanucspg,  0,             0,    fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, fanucspgm, fanucspg,      0,    fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT       COMPANY  FULLNAME                         FLAGS
+COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -43,10 +43,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/snk68.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "includes/snk68.h"
+#include "speaker.h"
+
 
 /******************************************************************************/
 
@@ -93,13 +96,10 @@ WRITE16_MEMBER(snk68_state::protection_w)
 	}
 }
 
-WRITE16_MEMBER(snk68_state::sound_w)
+WRITE8_MEMBER(snk68_state::sound_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(space, 0, data >> 8);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_soundlatch->write(space, 0, data);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // caused by 74123
 }
 
 /*******************************************************************************/
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE8(sound_w, 0xff00)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen_w)   // + char bank
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* Watchdog or IRQ ack */
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE8(sound_w, 0xff00)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(protection_w) /* top byte unknown, bottom is protection in ikari3 and streetsm */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(searchar_flipscreen_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(rotary_1_r) /* Player 1 rotary */
@@ -588,7 +588,7 @@ void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
 	region = 1;
 }
 
-static MACHINE_CONFIG_START( pow, snk68_state )
+static MACHINE_CONFIG_START( pow )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) /* verified on pcb */
@@ -1101,16 +1101,16 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, pow,       0,        pow,      pow,      driver_device, 0, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, powj,      pow,      pow,      powj,     driver_device, 0, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm,  0,        streetsm, streetsm, driver_device, 0, ROT0,  "SNK", "Street Smart (US version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm1, streetsm, searchar, streetsm, driver_device, 0, ROT0,  "SNK", "Street Smart (US version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmw, streetsm, searchar, streetsj, driver_device, 0, ROT0,  "SNK", "Street Smart (World version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmj, streetsm, searchar, streetsj, driver_device, 0, ROT0,  "SNK", "Street Smart (Japan version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3,    0,        searchar, ikari3,   driver_device, 0, ROT0,  "SNK", "Ikari III - The Rescue (World, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   driver_device, 0, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   driver_device, 0, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   driver_device, 0, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searchar,  0,        searchar, searchar, driver_device, 0, ROT90, "SNK", "SAR - Search And Rescue (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharu, searchar, searchar, searchar, driver_device, 0, ROT90, "SNK", "SAR - Search And Rescue (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharj, searchar, searchar, searchar, driver_device, 0, ROT90, "SNK", "SAR - Search And Rescue (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, pow,       0,        pow,      pow,      snk68_state, 0, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, powj,      pow,      pow,      powj,     snk68_state, 0, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm,  0,        streetsm, streetsm, snk68_state, 0, ROT0,  "SNK", "Street Smart (US version 2)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm1, streetsm, searchar, streetsm, snk68_state, 0, ROT0,  "SNK", "Street Smart (US version 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmw, streetsm, searchar, streetsj, snk68_state, 0, ROT0,  "SNK", "Street Smart (World version 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmj, streetsm, searchar, streetsj, snk68_state, 0, ROT0,  "SNK", "Street Smart (Japan version 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3,    0,        searchar, ikari3,   snk68_state, 0, ROT0,  "SNK", "Ikari III - The Rescue (World, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   snk68_state, 0, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   snk68_state, 0, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   snk68_state, 0, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searchar,  0,        searchar, searchar, snk68_state, 0, ROT90, "SNK", "SAR - Search And Rescue (World)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharu, searchar, searchar, searchar, snk68_state, 0, ROT90, "SNK", "SAR - Search And Rescue (US)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharj, searchar, searchar, searchar, snk68_state, 0, ROT90, "SNK", "SAR - Search And Rescue (Japan)",                MACHINE_SUPPORTS_SAVE )

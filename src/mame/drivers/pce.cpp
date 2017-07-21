@@ -57,15 +57,20 @@ Super System Card:
 **********************************************************************/
 
 #include "emu.h"
-#include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
+
 #include "bus/pce/pce_rom.h"
+#include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
-#include "video/huc6270.h"
 #include "video/huc6202.h"
+#include "video/huc6270.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )
@@ -300,7 +305,7 @@ static SLOT_INTERFACE_START(pce_cart)
 	SLOT_INTERFACE_INTERNAL("sf2", PCE_ROM_SF2)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pce_common, pce_state )
+static MACHINE_CONFIG_START( pce_common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -312,7 +317,7 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -350,7 +355,7 @@ static MACHINE_CONFIG_DERIVED( tg16, pce_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sgx, pce_state )
+static MACHINE_CONFIG_START( sgx )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)
@@ -362,7 +367,7 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -419,6 +424,6 @@ ROM_END
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
 
-CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", MACHINE_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "Nippon Electronic Company", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND)
-CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "Nippon Electronic Company", "SuperGrafx", MACHINE_IMPERFECT_SOUND)
+CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "NEC / Hudson Soft", "PC Engine",     MACHINE_IMPERFECT_SOUND )
+CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "NEC / Hudson Soft", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND )
+CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "NEC / Hudson Soft", "SuperGrafx",    MACHINE_IMPERFECT_SOUND )

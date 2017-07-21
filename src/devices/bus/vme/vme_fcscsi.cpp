@@ -72,10 +72,10 @@
  * - 68010 CPU for local control (10MHz)
  * - 68450 DMA Controller for local transfers (10MHz)
  * - Dual Ported l28Kbyte 0 wait state static RAM between the VMEbus and the local CPU
- * - SCSlbus interface built with the NCR 5386S SCSlbus controller. 
+ * - SCSlbus interface built with the NCR 5386S SCSlbus controller.
  *   o Programmable as an initiator or target
  *   o Transfer rate up to 1.5Mbyte/s
- * - SHUGART compatible floppy interface with the WD1772 FDC. Up to 4 floppy drives can be 
+ * - SHUGART compatible floppy interface with the WD1772 FDC. Up to 4 floppy drives can be
  *   controlled independent of the SCSlbus
  * - All I/O signals available on P2 connector 4 different interrupt request signals to the VMEbus. Each
  *   channel contains a software programmable IRQ level (1 to 7) and vector
@@ -102,7 +102,7 @@
  *
  * VME side A24 address map - Dual ported RAM
  * ----------------------------------------------------------
- * Default Range     Description 
+ * Default Range     Description
  * ----------------------------------------------------------
  * A00000 - A00000  Status word Bits 8:RESET 9:HALT 10:WD
  * A00001 - A0000F  BIM - See below
@@ -142,16 +142,15 @@
  *  - Let a controller CPU board (eg CPU-1 or CPU-30) boot from floppy or SCSI disk
  *
  ****************************************************************************/
-#define TODO "Driver for SCSI NCR5386s device needed\n"
-
 #include "emu.h"
+#include "vme_fcscsi.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/68230pit.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450
 #include "machine/clock.h"
 #include "formats/pc_dsk.h"
-#include "vme_fcscsi.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -175,11 +174,13 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+#define TODO "Driver for SCSI NCR5386s device needed\n"
+
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_FCSCSI1 = &device_creator<vme_fcscsi1_card_device>;
+DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board")
 
 #define CPU_CRYSTAL XTAL_20MHz /* Jauch */
 #define PIT_CRYSTAL XTAL_16MHz /* Jauch */
@@ -194,7 +195,7 @@ static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, vme_fcscsi1_card_device)
 //  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
 	AM_RANGE (0xc40000, 0xc4001f) AM_READWRITE8 (scsi_r, scsi_w, 0x00ff)
 	AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)  /* DMA Controller interface */
-	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_t, read, write, 0x00ff)      /* Floppy Controller interface */
+	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_device, read, write, 0x00ff)      /* Floppy Controller interface */
 	AM_RANGE (0xcc0008, 0xcc0009) AM_READWRITE8 (tcr_r, tcr_w, 0x00ff) /* The Control Register, SCSI ID and FD drive select bits */
 ADDRESS_MAP_END
 
@@ -207,10 +208,25 @@ static SLOT_INTERFACE_START( fcscsi_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-/*
- * Machine configuration
- */
-static MACHINE_CONFIG_FRAGMENT (fcscsi1)
+
+/* ROM definitions */
+ROM_START (fcscsi1)
+	ROM_REGION (0x1000000, "maincpu", 0)
+
+	/* Besta ROM:s - apparantly patched Force ROM:s */
+	ROM_SYSTEM_BIOS(0, "Besta 88", "Besta 88")
+	ROMX_LOAD ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
+
+	/* Force ROM:s  */
+	ROM_SYSTEM_BIOS(1, "ISCSI-1 v3.7", "Force Computer SYS68K/ISCSI-1 firmware v3.7")
+	ROMX_LOAD ("ISCSI-1_V3.7_L.BIN", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD ("ISCSI-1_V3.7_U.BIN", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
+
+ROM_END
+
+
+MACHINE_CONFIG_MEMBER(vme_fcscsi1_card_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
 	MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)
@@ -242,29 +258,6 @@ static MACHINE_CONFIG_FRAGMENT (fcscsi1)
 	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(vme_fcscsi1_card_device, fdc_write_byte))
 MACHINE_CONFIG_END
 
-/* ROM definitions */
-ROM_START (fcscsi1)
-	ROM_REGION (0x1000000, "maincpu", 0)
-
-	/* Besta ROM:s - apparantly patched Force ROM:s */
-	ROM_SYSTEM_BIOS(0, "Besta 88", "Besta 88")
-	ROMX_LOAD ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
-
-	/* Force ROM:s  */
-	ROM_SYSTEM_BIOS(1, "ISCSI-1 v3.7", "Force Computer SYS68K/ISCSI-1 firmware v3.7")
-	ROMX_LOAD ("ISCSI-1_V3.7_L.BIN", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD ("ISCSI-1_V3.7_U.BIN", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
-
-ROM_END
-
-
-machine_config_constructor vme_fcscsi1_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( fcscsi1 );
-}
-
 const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const
 {
 	LOG("%s\n", FUNCNAME);
@@ -274,28 +267,21 @@ const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
-vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu (*this, "maincpu")
-	,m_fdc (*this, "fdc")
-	,m_pit (*this, "pit")
-	,m_dmac(*this, "mc68450")
-	,m_tcr (0)
+vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_vme_card_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_fdc(*this, "fdc")
+	, m_pit(*this, "pit")
+	, m_dmac(*this, "mc68450")
+	, m_tcr(0)
 {
 	LOG("%s\n", FUNCNAME);
 }
 
-vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_FCSCSI1, "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board", tag, owner, clock, "fcscsi1", __FILE__)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu(*this, "maincpu")
-	,m_fdc(*this, "fdc")
-	,m_pit(*this, "pit")
-	,m_dmac(*this, "mc68450")
-	,m_tcr(0)
+vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vme_fcscsi1_card_device(mconfig, VME_FCSCSI1, tag, owner, clock)
 {
-	LOG("%s\n", FUNCNAME);
 }
 
 /* Start it up */

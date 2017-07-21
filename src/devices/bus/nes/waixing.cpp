@@ -33,141 +33,141 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_WAIXING_A = &device_creator<nes_waixing_a_device>;
-const device_type NES_WAIXING_A1 = &device_creator<nes_waixing_a1_device>;
-const device_type NES_WAIXING_B = &device_creator<nes_waixing_b_device>;
-const device_type NES_WAIXING_C = &device_creator<nes_waixing_c_device>;
-const device_type NES_WAIXING_D = &device_creator<nes_waixing_d_device>;
-const device_type NES_WAIXING_E = &device_creator<nes_waixing_e_device>;
-const device_type NES_WAIXING_F = &device_creator<nes_waixing_f_device>;
-const device_type NES_WAIXING_G = &device_creator<nes_waixing_g_device>;
-const device_type NES_WAIXING_H = &device_creator<nes_waixing_h_device>;
-const device_type NES_WAIXING_H1 = &device_creator<nes_waixing_h1_device>;
-const device_type NES_WAIXING_I = &device_creator<nes_waixing_i_device>;
-const device_type NES_WAIXING_J = &device_creator<nes_waixing_j_device>;
-const device_type NES_WAIXING_SH2 = &device_creator<nes_waixing_sh2_device>;
-const device_type NES_WAIXING_SEC = &device_creator<nes_waixing_sec_device>;
-const device_type NES_WAIXING_SGZ = &device_creator<nes_waixing_sgz_device>;
-const device_type NES_WAIXING_SGZLZ = &device_creator<nes_waixing_sgzlz_device>;
-const device_type NES_WAIXING_FFV = &device_creator<nes_waixing_ffv_device>;
-const device_type NES_WAIXING_WXZS = &device_creator<nes_waixing_wxzs_device>;
-const device_type NES_WAIXING_DQ8 = &device_creator<nes_waixing_dq8_device>;
-const device_type NES_WAIXING_WXZS2 = &device_creator<nes_waixing_wxzs2_device>;
-const device_type NES_WAIXING_FS304 = &device_creator<nes_waixing_fs304_device>;
+DEFINE_DEVICE_TYPE(NES_WAIXING_A,     nes_waixing_a_device,     "nes_waixing_a",     "NES Cart Waixing Type A PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_A1,    nes_waixing_a1_device,    "nes_waixing_a1",    "NES Cart Waixing Type A (Alt) PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_B,     nes_waixing_b_device,     "nes_waixing_b",     "NES Cart Waixing Type B PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_C,     nes_waixing_c_device,     "nes_waixing_c",     "NES Cart Waixing Type C PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_D,     nes_waixing_d_device,     "nes_waixing_d",     "NES Cart Waixing Type D PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_E,     nes_waixing_e_device,     "nes_waixing_e",     "NES Cart Waixing Type E PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_F,     nes_waixing_f_device,     "nes_waixing_f",     "NES Cart Waixing Type F PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_G,     nes_waixing_g_device,     "nes_waixing_g",     "NES Cart Waixing Type G PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_H,     nes_waixing_h_device,     "nes_waixing_h",     "NES Cart Waixing Type H PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_H1,    nes_waixing_h1_device,    "nes_waixing_h1",    "NES Cart Waixing Type H (Alt) PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_I,     nes_waixing_i_device,     "nes_waixing_i",     "NES Cart Waixing Type I PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_J,     nes_waixing_j_device,     "nes_waixing_j",     "NES Cart Waixing Type J PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_SH2,   nes_waixing_sh2_device,   "nes_waixing_sh2",   "NES Cart Waixing SH2 PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_SEC,   nes_waixing_sec_device,   "nes_waixing_sec",   "NES Cart Waixing Security Chip PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_SGZ,   nes_waixing_sgz_device,   "nes_waixing_sgz",   "NES Cart Waixing San Guo Zhi PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_SGZLZ, nes_waixing_sgzlz_device, "nes_waixing_sgzlz", "NES Cart Waixing San Guo Zhong Lie Zhuan PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_FFV,   nes_waixing_ffv_device,   "nes_waixing_ffv",   "NES Cart Waixing Final Fantasy V PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_WXZS,  nes_waixing_wxzs_device,  "nes_waixing_wxzs",  "NES Cart Waixing Wai Xing Zhan Shi PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_DQ8,   nes_waixing_dq8_device,   "nes_waixing_dq8",   "NES Cart Waixing Dragon Quest VIII PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_WXZS2, nes_waixing_wxzs2_device, "nes_waixing_wxzs2", "NES Cart Waixing Wai Xing Zhan Shi 2 PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_FS304, nes_waixing_fs304_device, "nes_waixing_fs304", "NES Cart Waixing FS-304 PCB")
 
 
-nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_txrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
 nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_WAIXING_A, "NES Cart Waixing Type A PCB", tag, owner, clock, "nes_waixing_a", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_A, tag, owner, clock)
 {
 }
 
 nes_waixing_a1_device::nes_waixing_a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_A1, "NES Cart Waixing Type A (Alt) PCB", tag, owner, clock, "nes_waixing_a1", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_A1, tag, owner, clock)
 {
 }
 
 nes_waixing_b_device::nes_waixing_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_B, "NES Cart Waixing Type B PCB", tag, owner, clock, "nes_waixing_b", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_B, tag, owner, clock)
 {
 }
 
 nes_waixing_c_device::nes_waixing_c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_C, "NES Cart Waixing Type C PCB", tag, owner, clock, "nes_waixing_c", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_C, tag, owner, clock)
 {
 }
 
 nes_waixing_d_device::nes_waixing_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_D, "NES Cart Waixing Type D PCB", tag, owner, clock, "nes_waixing_d", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_D, tag, owner, clock)
 {
 }
 
 nes_waixing_e_device::nes_waixing_e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_E, "NES Cart Waixing Type E PCB", tag, owner, clock, "nes_waixing_e", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_E, tag, owner, clock)
 {
 }
 
 nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_F, "NES Cart Waixing Type F PCB", tag, owner, clock, "nes_waixing_f", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_F, tag, owner, clock)
 {
 }
 
 nes_waixing_g_device::nes_waixing_g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_G, "NES Cart Waixing Type G PCB", tag, owner, clock, "nes_waixing_g", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_G, tag, owner, clock)
 {
 }
 
-nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_txrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
 nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_WAIXING_H, "NES Cart Waixing Type H PCB", tag, owner, clock, "nes_waixing_h", __FILE__)
+	: nes_waixing_h_device(mconfig, NES_WAIXING_H, tag, owner, clock)
 {
 }
 
 nes_waixing_h1_device::nes_waixing_h1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_h_device(mconfig, NES_WAIXING_H1, "NES Cart Waixing Type H (Alt) PCB", tag, owner, clock, "nes_waixing_h1", __FILE__)
+	: nes_waixing_h_device(mconfig, NES_WAIXING_H1, tag, owner, clock)
 {
 }
 
 nes_waixing_i_device::nes_waixing_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_I, "NES Cart Waixing Type I PCB", tag, owner, clock, "nes_waixing_i", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_I, tag, owner, clock)
 {
 }
 
 nes_waixing_j_device::nes_waixing_j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_waixing_a_device(mconfig, NES_WAIXING_J, "NES Cart Waixing Type J PCB", tag, owner, clock, "nes_waixing_j", __FILE__)
+	: nes_waixing_a_device(mconfig, NES_WAIXING_J, tag, owner, clock)
 {
 }
 
 nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_WAIXING_SH2, "NES Cart Waixing SH2 PCB", tag, owner, clock, "nes_waixing_sh2", __FILE__)
+	: nes_txrom_device(mconfig, NES_WAIXING_SH2, tag, owner, clock)
 {
 }
 
 nes_waixing_sec_device::nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_WAIXING_SEC, "NES Cart Waixing Security Chip PCB", tag, owner, clock, "nes_waixing_sec", __FILE__), m_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_WAIXING_SEC, tag, owner, clock), m_reg(0)
+{
 }
 
 nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_SGZ, "NES Cart Waixing San Guo Zhi PCB", tag, owner, clock, "nes_waixing_sgz", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_WAIXING_SGZ, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
+{
 }
 
 nes_waixing_sgzlz_device::nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_SGZLZ, "NES Cart Waixing San Guo Zhong Lie Zhuan PCB", tag, owner, clock, "nes_waixing_sgzlz", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_WAIXING_SGZLZ, tag, owner, clock), m_reg{ 0, 0, 0, 0 }
+{
 }
 
 nes_waixing_ffv_device::nes_waixing_ffv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_FFV, "NES Cart Waixing Final Fantasy V PCB", tag, owner, clock, "nes_waixing_ffv", __FILE__)
+	: nes_nrom_device(mconfig, NES_WAIXING_FFV, tag, owner, clock)
 {
 }
 
 nes_waixing_wxzs_device::nes_waixing_wxzs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_WXZS, "NES Cart Waixing Wai Xing Zhan Shi PCB", tag, owner, clock, "nes_waixing_wxzs", __FILE__)
+	: nes_nrom_device(mconfig, NES_WAIXING_WXZS, tag, owner, clock)
 {
 }
 
 nes_waixing_dq8_device::nes_waixing_dq8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_DQ8, "NES Cart Waixing Dragon Quest VIII PCB", tag, owner, clock, "nes_waixing_dq8", __FILE__)
+	: nes_nrom_device(mconfig, NES_WAIXING_DQ8, tag, owner, clock)
 {
 }
 
 nes_waixing_wxzs2_device::nes_waixing_wxzs2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_WXZS2, "NES Cart Waixing Wai Xing Zhan Shi 2 PCB", tag, owner, clock, "nes_waixing_wxzs2", __FILE__)
+	: nes_nrom_device(mconfig, NES_WAIXING_WXZS2, tag, owner, clock)
 {
 }
 
 nes_waixing_fs304_device::nes_waixing_fs304_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_FS304, "NES Cart Waixing FS-304 PCB", tag, owner, clock, "nes_waixing_fs304", __FILE__)
+	: nes_nrom_device(mconfig, NES_WAIXING_FS304, tag, owner, clock)
 {
 }
 
@@ -183,7 +183,7 @@ void nes_waixing_a_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
-	memset(mapper_ram, 0, sizeof(mapper_ram));
+	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
 }
 
 void nes_waixing_f_device::pcb_reset()
@@ -191,7 +191,7 @@ void nes_waixing_f_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
-	memset(mapper_ram, 0, sizeof(mapper_ram));
+	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
 	m_mmc_prg_bank[0] = 0x00;
 	m_mmc_prg_bank[1] = 0x01;
 	m_mmc_prg_bank[2] = 0x4e;
@@ -204,7 +204,7 @@ void nes_waixing_g_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
-	memset(mapper_ram, 0, sizeof(mapper_ram));
+	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
 	m_mmc_prg_bank[0] = 0x00;
 	m_mmc_prg_bank[1] = 0x01;
 	m_mmc_prg_bank[2] = 0x3e;
@@ -289,13 +289,13 @@ void nes_waixing_sgz_device::pcb_reset()
 	m_irq_count = 0;
 	m_irq_count_latch = 0;
 
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
+	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
 }
 
 void nes_waixing_sgzlz_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
 }
 
 void nes_waixing_sgzlz_device::pcb_reset()
@@ -304,7 +304,7 @@ void nes_waixing_sgzlz_device::pcb_reset()
 	prg32(0);
 	chr8(0, m_chr_source);
 
-	m_latch = 0;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 void nes_waixing_ffv_device::device_start()
@@ -372,7 +372,7 @@ void nes_waixing_fs304_device::pcb_reset()
 	prg32(0);
 	chr8(0, m_chr_source);
 
-	memset(m_reg, 0x00, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 
@@ -1035,30 +1035,69 @@ WRITE8_MEMBER(nes_waixing_sgz_device::write_h)
  Waixing San Guo Zhong Lie Zhuan Board
 
  Games: Fan Kong Jing Ying, San Guo Zhong Lie Zhuan, Xing
- Ji Zheng Ba
+ Ji Zheng Ba, Chong Wu Da Jia Zu Bu Luo Fen Zheng
 
  iNES: mapper 178
 
  In MESS: Supported.
+
+ Implementations wildly vary between emulators, but
+ Cah4e3's implementation boots up both the games and
+ the educational carts that assumedly use this board.
+
+ TODO: Is this even correct compared to real hardware?
 
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_waixing_sgzlz_device::write_l)
 {
 	LOG_MMC(("waixing_sgzlz write_l, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset)
+	if (offset >= 0x700 && offset <= 0xEFF)
 	{
-		case 0x700:
-			set_nt_mirroring(data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-		case 0x701:
-			m_latch = (m_latch & 0x0c) | ((data >> 1) & 0x03);
-			prg32(m_latch);
-			break;
-		case 0x702:
-			m_latch = (m_latch & 0x03) | ((data << 2) & 0x0c);
-			break;
+		m_reg[offset & 0x03] = data;
+		const uint8_t hbank = m_reg[1] & 0x7;
+		const uint8_t lbank = m_reg[2];
+		const uint8_t bank = (lbank << 3) | hbank;
+
+		// NESDev docs do it like this:
+		// case 0x700:
+		//  set_nt_mirroring(data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		// case 0x701:
+		//  reg1 = (value >> 1);
+		//  bank = reg1 + (reg2 << 2);
+		//  prg32(bank);
+		//  break;
+		// case 0x702:
+		//  reg2 = value;
+		//  break;
+
+		if (BIT(m_reg[0], 1))
+		{
+			// UNROM-ish mode
+			prg16_89ab(bank);
+			if (BIT(m_reg[0], 3))
+			{
+				prg16_cdef((lbank << 3) | 6 | BIT(m_reg[1], 0));
+			}
+			else
+			{
+				prg16_cdef((lbank << 3) | 7);
+			}
+		}
+		else
+		{   // NROM mode
+			if (BIT(m_reg[0], 3))
+			{
+				prg16_89ab(bank);
+				prg16_cdef(bank);
+			}
+			else
+			{
+				prg32(bank >> 1);
+			}
+		}
+
+		set_nt_mirroring(BIT(m_reg[0], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 }
 

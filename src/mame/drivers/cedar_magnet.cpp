@@ -115,6 +115,9 @@ I suspect the additional memory was an afterthought.
 #include "machine/cedar_magnet_sprite.h"
 #include "machine/cedar_magnet_flop.h"
 
+#include "screen.h"
+
+
 #define LOG_IC49_PIO_PB 0
 #define LOG_IC48_PIO_PB 0
 #define LOG_IC48_PIO_PA 0
@@ -203,7 +206,11 @@ public:
 
 	void handle_sub_board_cpu_lines(cedar_magnet_board_interface &dev, int old_data, int data);
 	INTERRUPT_GEN_MEMBER(irq);
-	void(*m_prothack)(cedar_magnet_state*);
+	typedef void (cedar_magnet_state::*prot_func)();
+	prot_func m_prothack;
+	void mag_time_protection_hack();
+	void mag_xain_protection_hack();
+	void mag_exzi_protection_hack();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -333,7 +340,7 @@ READ8_MEMBER(cedar_magnet_state::watchdog_r)
 
 READ8_MEMBER(cedar_magnet_state::port7c_r)
 {
-	//printf("%s: port7c_r\n", machine().describe_context());
+	//logerror("%s: port7c_r\n", machine().describe_context());
 	return 0x01;
 }
 
@@ -347,19 +354,19 @@ READ8_MEMBER(cedar_magnet_state::port7c_r)
 
 READ8_MEMBER(cedar_magnet_state::port18_r)
 {
-//  printf("%s: port18_r\n", machine().describe_context());
+//  logerror("%s: port18_r\n", machine().describe_context());
 	return 0x00;
 }
 
 WRITE8_MEMBER(cedar_magnet_state::port18_w)
 {
-//  printf("%s: port18_w %02x\n", machine().describe_context(), data);
+//  logerror("%s: port18_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(cedar_magnet_state::port19_r)
 {
 	uint8_t ret = 0x00;
-//  printf("%s: port19_r\n", machine().describe_context());
+//  logerror("%s: port19_r\n", machine().describe_context());
 
 // 9496 in a,($19)
 // 9498 bit 2,a
@@ -371,19 +378,19 @@ READ8_MEMBER(cedar_magnet_state::port19_r)
 
 READ8_MEMBER(cedar_magnet_state::port1a_r)
 {
-//  printf("%s: port1a_r\n", machine().describe_context());
+//  logerror("%s: port1a_r\n", machine().describe_context());
 	return 0x00;
 }
 
 
 WRITE8_MEMBER(cedar_magnet_state::port19_w)
 {
-//  printf("%s: port19_w %02x\n", machine().describe_context(), data);
+//  logerror("%s: port19_w %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(cedar_magnet_state::port1b_w)
 {
-//  printf("%s: port1b_w %02x\n", machine().describe_context(), data);
+//  logerror("%s: port1b_w %02x\n", machine().describe_context(), data);
 }
 
 /***********************
@@ -524,14 +531,14 @@ WRITE8_MEMBER(cedar_magnet_state::other_cpu_w)
 	{
 		cpus_accessed++;
 		m_cedsound->write_cpu_bus(offset2, data);
-	//  printf("%s: sound cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
+	//  logerror("%s: sound cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 	}
 
 	if (cpus_accessed != 1)
 		logerror("%s: writing multiple CPUS!!! %04x %02x - bank bits %d %d %d %d %d %d %d\n", machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 
 //  if ((offset==0) || (offset2 == 0xe) || (offset2 == 0xf) || (offset2 == 0x68))
-//      printf("%s: other cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
+//      logerror("%s: other cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 }
 
 
@@ -568,7 +575,7 @@ READ8_MEMBER( cedar_magnet_state::ic48_pio_pa_r ) // 0x20
 	// interrupt source stuff??
 	ret &= ~0x10;
 
-	if (LOG_IC48_PIO_PA) printf("%s: ic48_pio_pa_r (returning %02x)\n", machine().describe_context(), ret);
+	if (LOG_IC48_PIO_PA) logerror("%s: ic48_pio_pa_r (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -580,16 +587,16 @@ WRITE8_MEMBER( cedar_magnet_state::ic48_pio_pa_w ) // 0x20
 	m_ic48_pio_pa_val = data;
 
 	// address 0x20 - pio ic48 port a
-	if (LOG_IC48_PIO_PA) printf("%s: ic48_pio_pa_w %02x (memory banking etc.)\n", machine().describe_context(), data);
+	if (LOG_IC48_PIO_PA) logerror("%s: ic48_pio_pa_w %02x (memory banking etc.)\n", machine().describe_context(), data);
 
-	if (LOG_IC48_PIO_PA) printf("output bit 0x80 %d (unused)\n", (data >> 7)&1); // A7 -> 12 J4 unpopulated
-	if (LOG_IC48_PIO_PA) printf("output bit 0x40 %d (bank)\n", (data >> 6)&1); // A6 -> 2 74HC10 3NAND IC19
-	if (LOG_IC48_PIO_PA) printf("output bit 0x20 %d (bank)\n", (data >> 5)&1); // A5 -> 4 74HC10 3NAND IC19
-	if (LOG_IC48_PIO_PA) printf("input  bit 0x10 %d (interrupt source related?)\n", (data >> 4)&1); // 10 in // A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61
-	if (LOG_IC48_PIO_PA) printf("input  bit 0x08 %d (COIN1)\n", (data >> 3)&1); // 08 in // A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1
-	if (LOG_IC48_PIO_PA) printf("output bit 0x04 %d (plane0 CPU/bus related?)\n", (data >> 2)&1); // A2 -> 45 J6
-	if (LOG_IC48_PIO_PA) printf("output bit 0x02 %d (plane0 CPU/bus related?)\n", (data >> 1)&1); // A1 -> 47 J6
-	if (LOG_IC48_PIO_PA) printf("input  bit 0x01 %d (plane0 CPU/bus related?)\n", (data >> 0)&1); // A0 -> 49 J6
+	if (LOG_IC48_PIO_PA) logerror("output bit 0x80 %d (unused)\n", (data >> 7)&1); // A7 -> 12 J4 unpopulated
+	if (LOG_IC48_PIO_PA) logerror("output bit 0x40 %d (bank)\n", (data >> 6)&1); // A6 -> 2 74HC10 3NAND IC19
+	if (LOG_IC48_PIO_PA) logerror("output bit 0x20 %d (bank)\n", (data >> 5)&1); // A5 -> 4 74HC10 3NAND IC19
+	if (LOG_IC48_PIO_PA) logerror("input  bit 0x10 %d (interrupt source related?)\n", (data >> 4)&1); // 10 in // A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61
+	if (LOG_IC48_PIO_PA) logerror("input  bit 0x08 %d (COIN1)\n", (data >> 3)&1); // 08 in // A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1
+	if (LOG_IC48_PIO_PA) logerror("output bit 0x04 %d (plane0 CPU/bus related?)\n", (data >> 2)&1); // A2 -> 45 J6
+	if (LOG_IC48_PIO_PA) logerror("output bit 0x02 %d (plane0 CPU/bus related?)\n", (data >> 1)&1); // A1 -> 47 J6
+	if (LOG_IC48_PIO_PA) logerror("input  bit 0x01 %d (plane0 CPU/bus related?)\n", (data >> 0)&1); // A0 -> 49 J6
 
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
 	m_bank0->set_bank(bankbit0);
@@ -609,7 +616,7 @@ READ8_MEMBER( cedar_magnet_state::ic48_pio_pb_r ) // 0x22
 	if (!m_cedsprite->is_running()) ret &= ~0x10;
 	if (!m_cedplane1->is_running()) ret &= ~0x01;
 
-	if (LOG_IC48_PIO_PB) printf("%s: ic48_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
+	if (LOG_IC48_PIO_PB) logerror("%s: ic48_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -620,17 +627,17 @@ WRITE8_MEMBER(cedar_magnet_state::ic48_pio_pb_w) // 0x22
 
 	m_ic48_pio_pb_val = data;
 
-	if (LOG_IC48_PIO_PB)  printf("%s: ic48_pio_pb_w %02x\n", machine().describe_context(), data);
+	if (LOG_IC48_PIO_PB)  logerror("%s: ic48_pio_pb_w %02x\n", machine().describe_context(), data);
 
 	// address 0x22 - pio ic48 port b
-	if (LOG_IC48_PIO_PB) printf("input  bit 0x80 %d (COIN2)\n", (data >> 7)&1); // B7 <- 2 74HC14P (inverter) IC4 <- EDGE 22 COIN2
-	if (LOG_IC48_PIO_PB) printf("output bit 0x40 (J6) (sprite CPU/bus related?) %d\n", (data >> 6)&1); // B6 -> 41 J6
-	if (LOG_IC48_PIO_PB) printf("output bit 0x20 (J6) (sprite CPU/bus related?) %d\n", (data >> 5)&1); // B5 -> 43 J6
-	if (LOG_IC48_PIO_PB) printf("input  bit 0x10 (J6) (sprite CPU/bus related?) %d\n", (data >> 4)&1); // B4 -> 44 J6
-	if (LOG_IC48_PIO_PB) printf("output bit 0x08 (Q8) %d\n", (data >> 3)&1); // B3 -> Q8 transistor
-	if (LOG_IC48_PIO_PB) printf("output bit 0x04 (J6) (plane1 CPU/bus related?) %d\n", (data >> 2)&1); // B2 -> 46 J6
-	if (LOG_IC48_PIO_PB) printf("output bit 0x02 (J6) (plane1 CPU/bus related?) %d\n", (data >> 1)&1); // B1 -> 48 J6
-	if (LOG_IC48_PIO_PB) printf("input  bit 0x01 (J6) (plane1 CPU/bus related?) %d\n", (data >> 0)&1); // B0 -> 50 J6
+	if (LOG_IC48_PIO_PB) logerror("input  bit 0x80 %d (COIN2)\n", (data >> 7)&1); // B7 <- 2 74HC14P (inverter) IC4 <- EDGE 22 COIN2
+	if (LOG_IC48_PIO_PB) logerror("output bit 0x40 (J6) (sprite CPU/bus related?) %d\n", (data >> 6)&1); // B6 -> 41 J6
+	if (LOG_IC48_PIO_PB) logerror("output bit 0x20 (J6) (sprite CPU/bus related?) %d\n", (data >> 5)&1); // B5 -> 43 J6
+	if (LOG_IC48_PIO_PB) logerror("input  bit 0x10 (J6) (sprite CPU/bus related?) %d\n", (data >> 4)&1); // B4 -> 44 J6
+	if (LOG_IC48_PIO_PB) logerror("output bit 0x08 (Q8) %d\n", (data >> 3)&1); // B3 -> Q8 transistor
+	if (LOG_IC48_PIO_PB) logerror("output bit 0x04 (J6) (plane1 CPU/bus related?) %d\n", (data >> 2)&1); // B2 -> 46 J6
+	if (LOG_IC48_PIO_PB) logerror("output bit 0x02 (J6) (plane1 CPU/bus related?) %d\n", (data >> 1)&1); // B1 -> 48 J6
+	if (LOG_IC48_PIO_PB) logerror("input  bit 0x01 (J6) (plane1 CPU/bus related?) %d\n", (data >> 0)&1); // B0 -> 50 J6
 
 	int plane1select = (m_ic48_pio_pb_val & 0x07) >> 0;
 	int spriteselect = (m_ic48_pio_pb_val & 0x70) >> 4;
@@ -652,7 +659,7 @@ READ8_MEMBER( cedar_magnet_state::ic49_pio_pb_r ) // 0x42
 
 	if (!m_cedsound->is_running()) ret &= ~0x10;
 
-	if (LOG_IC49_PIO_PB) printf("%s: ic49_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
+	if (LOG_IC49_PIO_PB) logerror("%s: ic49_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -662,18 +669,18 @@ WRITE8_MEMBER( cedar_magnet_state::ic49_pio_pb_w ) // 0x42
 
 	m_ic49_pio_pb_val = data;
 
-	//printf("%s: ic49_pio_pb_w %02x\n", machine().describe_context(), data);
+	//logerror("%s: ic49_pio_pb_w %02x\n", machine().describe_context(), data);
 
 	// address 0x42 - pio ic49 port b
-	if (LOG_IC49_PIO_PB) printf("output bit 0x80 %d (Q9)\n", (data >> 7)&1); // B7 -> Q9 transistor
-	if (LOG_IC49_PIO_PB) printf("output bit 0x40 %d (sound CPU bus related) (J3)\n", (data >> 6)&1); // B6 -> 9 J3
-	if (LOG_IC49_PIO_PB) printf("output bit 0x20 %d (sound CPU bus related) (J3)\n", (data >> 5)&1); // B5 -> 8 J3
-	if (LOG_IC49_PIO_PB) printf("input  bit 0x10 %d (sound CPU bus related) (J3)\n", (data >> 4)&1); // B4 -> 7 J3       // input?
-	if (LOG_IC49_PIO_PB) printf("output bit 0x08 %d (J7)\n", (data >> 3)&1); // B3 -> 35 J7  bank bits
-	if (LOG_IC49_PIO_PB) printf("output bit 0x04 %d (J7)\n", (data >> 2)&1); // B2 -> 36 J7  bank bits
+	if (LOG_IC49_PIO_PB) logerror("output bit 0x80 %d (Q9)\n", (data >> 7)&1); // B7 -> Q9 transistor
+	if (LOG_IC49_PIO_PB) logerror("output bit 0x40 %d (sound CPU bus related) (J3)\n", (data >> 6)&1); // B6 -> 9 J3
+	if (LOG_IC49_PIO_PB) logerror("output bit 0x20 %d (sound CPU bus related) (J3)\n", (data >> 5)&1); // B5 -> 8 J3
+	if (LOG_IC49_PIO_PB) logerror("input  bit 0x10 %d (sound CPU bus related) (J3)\n", (data >> 4)&1); // B4 -> 7 J3       // input?
+	if (LOG_IC49_PIO_PB) logerror("output bit 0x08 %d (J7)\n", (data >> 3)&1); // B3 -> 35 J7  bank bits
+	if (LOG_IC49_PIO_PB) logerror("output bit 0x04 %d (J7)\n", (data >> 2)&1); // B2 -> 36 J7  bank bits
 	// there is code to mask out both bottom bits here before load operations?
-	if (LOG_IC49_PIO_PB) printf("output bit 0x02 %d (IC21)\n", (data >> 1)&1); // B1 -> 3 74HC04 IC21 (set before some SPRITE cpu operations, possibly halts the blitter?)
-	if (LOG_IC49_PIO_PB) printf("output bit 0x01 (LED) %d\n", (data >> 0)&1); // B0 -> LED LD1
+	if (LOG_IC49_PIO_PB) logerror("output bit 0x02 %d (IC21)\n", (data >> 1)&1); // B1 -> 3 74HC04 IC21 (set before some SPRITE cpu operations, possibly halts the blitter?)
+	if (LOG_IC49_PIO_PB) logerror("output bit 0x01 (LED) %d\n", (data >> 0)&1); // B0 -> LED LD1
 
 
 
@@ -739,7 +746,7 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 {
 	if (m_prothack)
-		m_prothack(this);
+		(this->*m_prothack)();
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_cedplane0->irq_hold();
@@ -747,7 +754,7 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 	m_cedsprite->irq_hold();
 }
 
-static MACHINE_CONFIG_START( cedar_magnet, cedar_magnet_state )
+static MACHINE_CONFIG_START( cedar_magnet )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
@@ -867,40 +874,39 @@ void protection_hack(uint8_t* ram, int address1, int address2)
 	if ((ram[address2] == 0x3e) && (ram[address2+1] == 0xff)) ram[address2] = 0xc9;
 }
 
-void mag_time_protection_hack(cedar_magnet_state* state)
+void cedar_magnet_state::mag_time_protection_hack()
 {
-	protection_hack(state->m_ram0, 0x8bc, 0x905);
+	protection_hack(m_ram0, 0x8bc, 0x905);
 }
 
-void mag_xain_protection_hack(cedar_magnet_state* state)
+void cedar_magnet_state::mag_xain_protection_hack()
 {
-	protection_hack(state->m_ram0, 0x796, 0x7df);
+	protection_hack(m_ram0, 0x796, 0x7df);
 }
 
-void mag_exzi_protection_hack(cedar_magnet_state* state)
+void cedar_magnet_state::mag_exzi_protection_hack()
 {
-	protection_hack(state->m_ram0, 0x8b6, 0x8ff);
+	protection_hack(m_ram0, 0x8b6, 0x8ff);
 }
-
 
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_time)
 {
-	m_prothack = mag_time_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_time_protection_hack;
 }
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_xain)
 {
-	m_prothack = mag_xain_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_xain_protection_hack;
 }
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
 {
-	m_prothack = mag_exzi_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_exzi_protection_hack;
 }
 
-GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, driver_device,       0,        ROT0,  "EFO SA / Cedar", "Magnet System", MACHINE_IS_BIOS_ROOT )
+GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, cedar_magnet_state,  0,        ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
 
-GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
-GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
+GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
+GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
 GAME( 1987, mag_xain,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_xain, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos

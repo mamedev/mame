@@ -152,16 +152,19 @@
 
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
+
 #include "rendlay.h"
+#include "screen.h"
+
 
 class pitagjr_state : public driver_device
 {
 public:
 	pitagjr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_rombank(*this, "rombank")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rombank(*this, "rombank")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
@@ -199,7 +202,7 @@ uint32_t pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pitajr, pitagjr_state )
+static MACHINE_CONFIG_START( pitajr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63705, XTAL_2MHz)   // probably a m6805-based MCU with internal boot ROM
 	MCFG_CPU_PROGRAM_MAP(pitajr_mem)
@@ -228,5 +231,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 199?, pitagjr,    0,       0,  pitajr,   pitajr, driver_device,     0,  "VTech",   "Pitagorin Junior", MACHINE_IS_SKELETON)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   STATE          INIT  COMPANY  FULLNAME            FLAGS
+COMP( 199?, pitagjr,  0,      0,      pitajr,  pitajr, pitagjr_state, 0,    "VTech", "Pitagorin Junior", MACHINE_IS_SKELETON )

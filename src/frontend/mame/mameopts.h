@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_FRONTEND_MAMEOPTS_H
+#define MAME_FRONTEND_MAMEOPTS_H
 
-#ifndef __MAMEOPTS_H__
-#define __MAMEOPTS_H__
+#pragma once
 
 #include "emuopts.h"
 
@@ -45,35 +45,20 @@ enum
 //**************************************************************************
 
 // forward references
-struct game_driver;
+class game_driver;
 class software_part;
 
 class mame_options
 {
-	static const uint32_t OPTION_FLAG_DEVICE = 0x80000000;
-
 public:
 	// parsing wrappers
-	static bool parse_command_line(emu_options &options, int argc, char *argv[], std::string &error_string);
-	static void parse_standard_inis(emu_options &options, std::string &error_string, const game_driver *driver = nullptr);
-	static bool parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
-	// FIXME: Couriersud: This should be in image_device_exit
-	static void remove_device_options(emu_options &options);
-
+	static void parse_standard_inis(emu_options &options, std::ostream &error_stream, const game_driver *driver = nullptr);
 	static const game_driver *system(const emu_options &options);
-	static void set_system_name(emu_options &options, const char *name);
-	static bool add_slot_options(emu_options &options, const software_part *swpart = nullptr);
+	static void populate_hashpath_from_args_and_inis(emu_options &options, const std::vector<std::string> &args);
+
 private:
-	// device-specific option handling
-	static void add_device_options(emu_options &options);
-	static void update_slot_options(emu_options &options, const software_part *swpart = nullptr);
-
 	// INI parsing helper
-	static bool parse_one_ini(emu_options &options, const char *basename, int priority, std::string *error_string = nullptr);
-
-	static int m_slot_options;
-	static int m_device_options;
-
+	static void parse_one_ini(emu_options &options, const char *basename, int priority, std::ostream *error_stream = nullptr);
 };
 
-#endif  /* __MAMEOPTS_H__ */
+#endif  // MAME_FRONTEND_MAMEOPTS_H

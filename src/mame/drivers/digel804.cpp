@@ -27,6 +27,20 @@
 *
 ******************************************************************************/
 
+/* Core includes */
+#include "emu.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "machine/mm74c922.h"
+#include "machine/mos6551.h"
+#include "machine/ram.h"
+#include "machine/roc10937.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+#include "digel804.lh"
+
+
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
@@ -53,18 +67,6 @@
 // port 47 write is tim0-tim7
 
 
-/* Core includes */
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "machine/roc10937.h"
-#include "machine/mos6551.h"
-#include "machine/mm74c922.h"
-#include "machine/ram.h"
-#include "bus/rs232/rs232.h"
-#include "digel804.lh"
-
-
 class digel804_state : public driver_device
 {
 public:
@@ -83,7 +85,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6551_device> m_acia;
-	required_device<roc10937_t> m_vfd;
+	required_device<roc10937_device> m_vfd;
 	required_device<mm74c922_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_rambank;
@@ -582,7 +584,7 @@ WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
 {
 }
 
-static MACHINE_CONFIG_START( digel804, digel804_state )
+static MACHINE_CONFIG_START( digel804 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
@@ -721,6 +723,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1985, digel804,   0,          0,      digel804,   digel804, digel804_state, digel804,      "Digelec, Inc",   "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
-COMP( 1982, ep804,   digel804,          0,      ep804,   digel804, digel804_state, digel804,      "Wavetek/Digelec, Inc",   "EP804 EPROM Programmer", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY                 FULLNAME                        FLAGS
+COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, digel804, "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, digel804_state, digel804, "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )

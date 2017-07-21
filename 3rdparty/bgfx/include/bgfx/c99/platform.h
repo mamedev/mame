@@ -19,6 +19,7 @@ typedef enum bgfx_render_frame
 {
     BGFX_RENDER_FRAME_NO_CONTEXT,
     BGFX_RENDER_FRAME_RENDER,
+    BGFX_RENDER_FRAME_TIMEOUT,
     BGFX_RENDER_FRAME_EXITING,
 
     BGFX_RENDER_FRAME_COUNT
@@ -80,8 +81,8 @@ typedef struct bgfx_interface_vtbl
     uint16_t (*weld_vertices)(uint16_t* _output, const bgfx_vertex_decl_t* _decl, const void* _data, uint16_t _num, float _epsilon);
     uint32_t (*topology_convert)(bgfx_topology_convert_t _conversion, void* _dst, uint32_t _dstSize, const void* _indices, uint32_t _numIndices, bool _index32);
     void (*topology_sort_tri_list)(bgfx_topology_sort_t _sort, void* _dst, uint32_t _dstSize, const float _dir[3], const float _pos[3], const void* _vertices, uint32_t _stride, const void* _indices, uint32_t _numIndices, bool _index32);
-    void (*image_swizzle_bgra8)(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst);
-    void (*image_rgba8_downsample_2x2)(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst);
+    void (*image_swizzle_bgra8)(void* _dst, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src);
+    void (*image_rgba8_downsample_2x2)(void* _dst, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src);
     uint8_t (*get_supported_renderers)(uint8_t _max, bgfx_renderer_type_t* _enum);
     const char* (*get_renderer_name)(bgfx_renderer_type_t _type);
     bool (*init)(bgfx_renderer_type_t _type, uint16_t _vendorId, uint16_t _deviceId, bgfx_callback_interface_t* _callback, bgfx_allocator_interface_t* _allocator);
@@ -150,7 +151,7 @@ typedef struct bgfx_interface_vtbl
     void (*get_uniform_info)(bgfx_uniform_handle_t _handle, bgfx_uniform_info_t* _info);
     void (*destroy_uniform)(bgfx_uniform_handle_t _handle);
     bgfx_occlusion_query_handle_t (*create_occlusion_query)();
-    bgfx_occlusion_query_result_t (*get_result)(bgfx_occlusion_query_handle_t _handle);
+    bgfx_occlusion_query_result_t (*get_result)(bgfx_occlusion_query_handle_t _handle, int32_t* _result);
     void (*destroy_occlusion_query)(bgfx_occlusion_query_handle_t _handle);
     void (*set_palette_color)(uint8_t _index, const float _rgba[4]);
     void (*set_view_name)(uint8_t _id, const char* _name);
@@ -197,7 +198,7 @@ typedef struct bgfx_interface_vtbl
     uint32_t (*dispatch_indirect)(uint8_t _id, bgfx_program_handle_t _handle, bgfx_indirect_buffer_handle_t _indirectHandle, uint16_t _start, uint16_t _num, uint8_t _flags);
     void (*discard)();
     void (*blit)(uint8_t _id, bgfx_texture_handle_t _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, bgfx_texture_handle_t _src, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth);
-    void (*save_screen_shot)(const char* _filePath);
+    void (*request_screen_shot)(bgfx_frame_buffer_handle_t _handle, const char* _filePath);
 
 } bgfx_interface_vtbl_t;
 

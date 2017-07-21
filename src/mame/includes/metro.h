@@ -12,6 +12,7 @@
 #include "video/k053936.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class metro_state : public driver_device
 {
@@ -97,6 +98,7 @@ public:
 	int         m_sprite_xoffs;
 	int         m_sprite_yoffs;
 	int         m_sprite_xoffs_dx;
+	emu_timer   *m_blit_done_timer;
 
 	std::unique_ptr<uint8_t[]>      m_expanded_gfx1;
 
@@ -104,14 +106,16 @@ public:
 	int         m_vblank_bit;
 	int         m_blitter_bit;
 	int         m_irq_line;
-	uint8_t       m_requested_int[8];
+	uint8_t     m_requested_int[8];
 	emu_timer   *m_mouja_irq_timer;
+	emu_timer   *m_karatour_irq_timer;
 
 	/* sound related */
 	uint16_t      m_soundstatus;
 	int         m_porta;
 	int         m_portb;
 	int         m_busy_sndcpu;
+	bool        m_essnd_gate;
 
 	/* misc */
 	int         m_gakusai_oki_bank_lo;
@@ -168,17 +172,20 @@ public:
 
 	// vmetal
 	DECLARE_WRITE8_MEMBER(vmetal_control_w);
-	DECLARE_WRITE8_MEMBER(vmetal_es8712_w);
+	DECLARE_WRITE8_MEMBER(es8712_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(vmetal_es8712_irq);
 
 	DECLARE_DRIVER_INIT(karatour);
 	DECLARE_DRIVER_INIT(daitorid);
 	DECLARE_DRIVER_INIT(blzntrnd);
+	DECLARE_DRIVER_INIT(vmetal);
 	DECLARE_DRIVER_INIT(mouja);
 	DECLARE_DRIVER_INIT(balcube);
 	DECLARE_DRIVER_INIT(gakusai);
 	DECLARE_DRIVER_INIT(dharmak);
 	DECLARE_DRIVER_INIT(puzzlet);
 	DECLARE_DRIVER_INIT(metro);
+	DECLARE_DRIVER_INIT(lastfortg);
 	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
 	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);

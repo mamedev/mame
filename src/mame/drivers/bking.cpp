@@ -19,12 +19,14 @@ DIP Locations verified for:
 
 #include "emu.h"
 #include "includes/bking.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
@@ -78,6 +80,15 @@ READ8_MEMBER(bking_state::bking3_ext_check_r)
 	return 0x31; //no "bad rom.", no "bad ext."
 }
 
+READ8_MEMBER(bking_state::bking3_mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
 static ADDRESS_MAP_START( bking_map, AS_PROGRAM, 8, bking_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -120,8 +131,8 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
-	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
-	AM_RANGE(0x4f, 0x4f) AM_DEVREAD("bmcu", taito68705_mcu_device, mcu_status_r) AM_WRITE(unk_w)
+	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0x4f, 0x4f) AM_READWRITE(bking3_mcu_status_r, unk_w)
 	AM_RANGE(0x60, 0x60) AM_READ(bking3_extrarom_r)
 	AM_RANGE(0x6f, 0x6f) AM_READWRITE(bking3_ext_check_r, bking3_addr_h_w)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
@@ -385,7 +396,7 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 	m_addr_l = 0;
 }
 
-static MACHINE_CONFIG_START( bking, bking_state )
+static MACHINE_CONFIG_START( bking )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4) /* 3 MHz */
@@ -410,7 +421,7 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
-	MCFG_SCREEN_VBLANK_DRIVER(bking_state, screen_eof_bking)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bking_state, screen_vblank_bking))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bking)
@@ -739,6 +750,6 @@ ROM_START( bking3 )
 ROM_END
 
 
-GAME( 1982, bking,  0, bking,  bking,  driver_device, 0, ROT270, "Taito Corporation", "Birdie King", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bking2, 0, bking,  bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bking3, 0, bking3, bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bking,  0, bking,  bking,  bking_state, 0, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )

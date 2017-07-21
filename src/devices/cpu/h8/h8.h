@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_H__
-#define __H8_H__
+#ifndef MAME_CPU_H8_H8_H
+#define MAME_CPU_H8_H8_H
+
+#pragma once
 
 class h8_dma_device;
 class h8_dtc_device;
@@ -60,8 +62,6 @@ public:
 		STATE_DTC_VECTOR         = 0x10005,
 		STATE_DTC_WRITEBACK      = 0x10006
 	};
-
-	h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate);
 
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
@@ -154,6 +154,8 @@ protected:
 		DASM_mach      /* internal register mach */
 	};
 
+	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_delegate map_delegate);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -165,7 +167,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -490,4 +492,4 @@ enum {
 	H8_EXR
 };
 
-#endif
+#endif // MAME_CPU_H8_H8_H

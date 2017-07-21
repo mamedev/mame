@@ -91,6 +91,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="actionfg">
 		<description>Action Fighter (Euro, USA, Bra, v2)</description>
 		<year>1986</year>
@@ -106,6 +107,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="actionfg1" cloneof="actionfg">
 		<description>Action Fighter (Euro, Jpn, v1)</description>
 		<year>1986</year>
@@ -120,6 +122,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="actionfg0" cloneof="actionfg">
 		<description>Action Fighter (v0, prototype)</description>
 		<year>1986</year>
@@ -132,6 +135,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="actionfgtw" cloneof="actionfg">
 		<description>Action Fighter / Mo zhan che (Taiwan)</description>
 		<year>1986</year>
@@ -287,7 +291,8 @@
 		</part>
 	</software>
 
-<!-- MPR-11047 according to SMS Power, but not clear which version these correspond to -->
+	<!-- Notes: optional SK-1100 keyboard support -->
+	<!-- MPR-11047 according to SMS Power, but not clear which version these correspond to -->
 	<software name="alexkidd">
 		<description>Alex Kidd in Miracle World (Euro, USA, v1)</description>
 		<year>1986</year>
@@ -300,6 +305,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="alexkidd1" cloneof="alexkidd">
 		<description>Alex Kidd in Miracle World (Euro, USA, v0)</description>
 		<year>1986</year>
@@ -311,6 +317,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="alexkiddb" cloneof="alexkidd">
 		<description>Alex Kidd in Miracle World (Bra, v1, Pirate)</description>
 		<year>1986</year>
@@ -322,6 +329,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="alexkiddj" cloneof="alexkidd">
 		<description>Alex Kidd no Miracle World (Jpn)</description>
 		<year>1986</year>
@@ -635,6 +643,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
 	<software name="astrofl1" cloneof="transbot">
 		<description>Astro Flash (Jpn, Pirate)</description>
@@ -647,6 +656,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="astropit">
 		<description>Astro Warrior &amp; Pit Pot (Euro)</description>
 		<year>1987</year>
@@ -662,6 +672,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="astrow">
 		<description>Astro Warrior (Jpn, USA, Bra)</description>
 		<year>1986</year>
@@ -902,6 +913,7 @@
     but boxes are typically mixed up and patched with stickers added to change game titles (on both boxes and cartridges)
     making the product number rather unreliable AND realistically we may never find out the correct numbers.
 -->
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Hang-On) -->
 	<software name="hicom3a">
 		<description>The Best Game Collection - Hang On + Pit Pot + Spy vs Spy (Kor)</description>
 		<year>1990</year>
@@ -914,6 +926,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3b">
 		<description>The Best Game Collection - Great Baseball + Great Soccer + Super Tennis (Kor)</description>
 		<year>1990</year>
@@ -926,6 +939,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3c">
 		<description>The Best Game Collection - Teddy Boy Blues + Pit-Pot + Astro Flash (Kor)</description>
 		<year>1990</year>
@@ -938,6 +952,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3d">
 		<description>The Best Game Collection - Teddy Boy Blues + Great Soccer + Comical Machine Gun Joe (Kor)</description>
 		<year>1990</year>
@@ -950,6 +965,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3e">
 		<description>The Best Game Collection - Ghost House + Teddy Boy Blues + Seishun Scandal (Kor)</description>
 		<year>1990</year>
@@ -962,6 +978,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3f">
 		<description>The Best Game Collection - Satellite-7 + Great Baseball + Seishun Scandal (Kor)</description>
 		<year>1990</year>
@@ -974,6 +991,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Hyper Sports 2, Monkey Academy) -->
 	<software name="hicom8a">
 		<description>The Best Game Collection (Kor, 8 in 1 Ver. A)</description>
 		<year>1990</year>
@@ -986,6 +1004,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection, King's Valley, Magical Tree, Hang-On) -->
 	<software name="hicom8b">
 		<description>The Best Game Collection (Kor, 8 in 1 Ver. B)</description>
 		<year>1990</year>
@@ -998,6 +1017,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Athletic Land, Bomb Jack, Circus Charlie, Yie Ar Kung-Fu) -->
 	<software name="hicom8c">
 		<description>The Best Game Collection (Kor, 8 in 1 Ver. C)</description>
 		<year>1990</year>
@@ -1010,6 +1030,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="blackblt">
 		<description>Black Belt (Euro, USA)</description>
 		<year>1986</year>
@@ -1405,6 +1426,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="chapolim" cloneof="ghosth">
 		<description>Chapolim x Dracula - Um Duelo Assustador (Bra)</description>
 		<year>1990</year>
@@ -1453,6 +1475,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="choplift">
 		<description>Choplifter (Euro, USA, Bra)</description>
 		<year>1986</year>
@@ -1468,6 +1491,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="chopliftj" cloneof="choplift">
 		<description>Choplifter (Jpn, Prototype)</description>
 		<year>1986</year>
@@ -1479,6 +1503,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="chopliftp" cloneof="choplift">
 		<description>Choplifter (USA, Prototype)</description>
 		<year>1986</year>
@@ -1526,6 +1551,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="circuit" cloneof="worldgp">
 		<description>The Circuit (Jpn)</description>
 		<year>1986</year>
@@ -1602,6 +1628,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="comicaltw" cloneof="comical">
 		<description>Comical Machine Gun Joe (Tw)</description>
 		<year>1986?</year>
@@ -1615,6 +1642,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="comicalk" cloneof="comical">
 		<description>Comical Machine Gun Joe (Kor)</description>
 		<year>198?</year>
@@ -1979,6 +2007,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="dumpmats" cloneof="prowres">
 		<description>Gokuaku Doumei Dump Matsumoto (Jpn)</description>
 		<year>1986</year>
@@ -2221,6 +2250,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="f16falc" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (USA)</description>
 		<year>1985</year>
@@ -2233,6 +2263,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- Alt. Title: F-16 -->
 	<software name="f16falctw" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (Tw)</description>
@@ -2246,6 +2277,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="f16fight">
 		<description>F-16 Fighter (Euro, USA)</description>
 		<year>1986</year>
@@ -2341,6 +2373,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="fantzone">
 		<description>Fantasy Zone (World, v2)</description>
 		<year>1986</year>
@@ -2358,6 +2391,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="fantzone1" cloneof="fantzone">
 		<description>Fantasy Zone (World, v1, Prototype)</description>
 		<year>1986</year>
@@ -2369,6 +2403,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="fantzonej" cloneof="fantzone">
 		<description>Fantasy Zone (Jpn, v0)</description>
 		<year>1986</year>
@@ -2384,6 +2419,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="fantzonetw" cloneof="fantzone">
 		<description>Fantasy Zone (Tw)</description>
 		<year>1986?</year>
@@ -2539,6 +2575,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="pitpot1" cloneof="pitpot">
 		<description>Fushigi no Oshiro Pit Pot (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -2744,6 +2781,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="gerald" cloneof="teddyboy">
 		<description>Geraldinho (Bra)</description>
 		<year>19??</year>
@@ -2756,6 +2794,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghostbst">
 		<description>Ghostbusters (Euro, USA, Kor)</description>
 		<year>1989</year>
@@ -2771,6 +2810,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosth">
 		<description>Ghost House (Euro, USA, Bra)</description>
 		<year>1986</year>
@@ -2786,6 +2826,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthj1" cloneof="ghosth">
 		<description>Ghost House (Jpn, Pirate?)</description>
 		<year>1986</year>
@@ -2797,6 +2838,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthk" cloneof="ghosth">
 		<description>Ghost House (Kor)</description>
 		<year>198?</year>
@@ -2938,7 +2980,7 @@
 
 	<software name="greatbas">
 		<description>Great Baseball (Euro, USA, Bra)</description>
-		<year>1985</year>
+		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5061"/>
 		<part name="cart" interface="sms_cart">
@@ -2951,6 +2993,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatbasj1" cloneof="greatbas">
 		<description>Great Baseball (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -3081,6 +3124,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscr">
 		<description>Great Soccer (Euro)</description>
 		<year>1985</year>
@@ -3093,6 +3137,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscrtw" cloneof="greatscr">
 		<description>Great Soccer (Tw)</description>
 		<year>1985?</year>
@@ -3174,6 +3219,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support (except for Hang-On) -->
 	<software name="hangonaw">
 		<description>Hang-On &amp; Astro Warrior (USA)</description>
 		<year>1986</year>
@@ -3253,7 +3299,8 @@
 		</part>
 	</software>
 
-	<!-- Notes: The Western version "Black Belt" is quite different -->
+	<!-- Notes: optional SK-1100 keyboard support -->
+	<!-- The Western version "Black Belt" is quite different -->
 	<software name="hokuto" cloneof="blackblt">
 		<description>Hokuto no Ken (Jpn)</description>
 		<year>1986</year>
@@ -3268,6 +3315,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="hokutotw" cloneof="blackblt">
 		<description>Hokuto no Ken (Tw)</description>
 		<year>1986?</year>
@@ -3816,7 +3864,8 @@
 		</part>
 	</software>
 
-	<!-- Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
+	<!-- Notes: optional SK-1100 keyboard support -->
+	<!-- This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
 	<software name="loretta">
 		<description>Loretta no Shouzou (Jpn)</description>
 		<year>1987</year>
@@ -4349,6 +4398,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="myhero">
 		<description>My Hero (Euro, USA, Bra)</description>
 		<year>1986</year>
@@ -4782,7 +4832,7 @@
 		</part>
 	</software>
 
-	<!-- Notes: FM support -->
+	<!-- Notes: FM support, optional SK-1100 keyboard support -->
 	<software name="pstrike">
 		<description>Power Strike (Euro, Bra, Kor)</description>
 		<year>1988</year>
@@ -4848,6 +4898,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="prowres">
 		<description>Pro Wrestling (Euro, USA, Bra)</description>
 		<year>1986</year>
@@ -5393,6 +5444,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="saposos" cloneof="astrow">
 		<description>S.O.S Lagoa Poluida (Bra)</description>
 		<year>1995</year>
@@ -5418,6 +5470,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="satell7a" cloneof="satell7">
 		<description>Satellite 7 (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -5554,6 +5607,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="seishun1" cloneof="myhero">
 		<description>Seishun Scandal (Jpn, Pirate?)</description>
 		<year>1986</year>
@@ -5663,6 +5717,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="sharrier">
 		<description>Space Harrier (Euro)</description>
 		<year>1986</year>
@@ -5709,6 +5764,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="sharrierju" cloneof="sharrier">
 		<description>Space Harrier (Jpn, USA)</description>
 		<year>1986</year>
@@ -6167,7 +6223,7 @@
 
 	<!-- Notes: -->
 	<!-- This Japanese version of Sports Pad Soccer has code to operate the
-	Sports Pad controller in two diffent modes. When it detects a Japanese SMS,
+	Sports Pad controller in two different modes. When it detects a Japanese SMS,
 	the operation is the same used by US Sports Pad games. Otherwise, it uses
 	a mode compatible with the Sega Mark III, that lacks the TH line used by
 	the US Sports Pad mode. This Mark III mode is also used on other non-SMSJ
@@ -6193,6 +6249,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspy">
 		<description>Spy vs. Spy (Euro, USA, Bra)</description>
 		<year>1986</year>
@@ -6205,7 +6262,8 @@
 		</part>
 	</software>
 
-<!-- same dump was released as a MyCard in Japan -->
+	<!-- Notes: optional SK-1100 keyboard support -->
+	<!-- same dump was released as a MyCard in Japan -->
 	<software name="spyvsspyk" cloneof="spyvsspy">
 		<description>Spy vs Spy (Kor)</description>
 		<year>1986</year>
@@ -6218,6 +6276,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspyj1" cloneof="spyvsspy">
 		<description>Spy vs. Spy (Jpn, Pirate?)</description>
 		<year>1986</year>
@@ -6229,6 +6288,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspytw" cloneof="spyvsspy">
 		<description>Spy vs Spy (Tw)</description>
 		<year>1986?</year>
@@ -6242,6 +6302,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspys" cloneof="spyvsspy">
 		<description>Spy vs. Spy (USA, Display Unit Sample)</description>
 		<year>1986</year>
@@ -6547,6 +6608,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="stennis">
 		<description>Super Tennis (Euro, USA)</description>
 		<year>1985</year>
@@ -6638,6 +6700,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboy">
 		<description>Teddy Boy (Euro, USA, Bra)</description>
 		<year>1985</year>
@@ -6653,6 +6716,24 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
+	<!-- This is a prototype cartridge in Japanese form to be supposedly used
+	in a machine of the cancelled EP-MyCard service, where users could bring
+	a rewritable card version and get new games written on for a certain fee.
+	The cartridge contains three 16kB EPROM chips, the last chip seems to have
+	only 48 bytes of metadata used by the machine and the rest is all $ff. -->
+	<software name="teddyboyjp" cloneof="teddyboy">
+		<description>Teddy Boy Blues (Jpn, Ep-MyCard, Prototype)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="teddy boy blues (japan) (proto) (ep-mycard).bin" size="49152" crc="d7508041" sha1="51014d89cd8770df8a3d837a0208cb69d5bf7903" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboyj1" cloneof="teddyboy">
 		<description>Teddy Boy Blues (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -6713,6 +6794,8 @@
 			<dataarea name="rom" size="262144">
 				<rom name="terminator, the (europe).bin" size="262144" crc="edc5c012" sha1="eaf733d385e61526b90c1b194bf605078d43e2d3" offset="000000" />
 			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
 		</part>
 	</software>
 
@@ -6724,6 +6807,8 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="terminator, the (brazil).bin" size="262144" crc="e3d5ce9a" sha1="bea0a1d0271faa2273e4cf1e968241d018c81da1" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6822,6 +6907,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="transbot">
 		<description>TransBot (Euro, USA, Bra)</description>
 		<year>1985</year>
@@ -6837,6 +6923,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="transbotp" cloneof="transbot">
 		<description>TransBot (USA, Prototype)</description>
 		<year>1985</year>
@@ -6861,6 +6948,7 @@
 	</software>
 
 	<!-- G-37 -->
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ttoriui" cloneof="myhero">
 		<description>Ttoriui Moheom (Kor)</description>
 		<year>19??</year>
@@ -7015,7 +7103,7 @@
 		</part>
 	</software>
 
-<!-- MPR-10744F on 171-5519 according to SMS Power, but not clear which version these correspond to -->
+	<!-- MPR-10744F on 171-5519 according to SMS Power, but not clear which version these correspond to -->
 	<software name="wboy">
 		<description>Wonder Boy (Euro, USA, Bra, v1)</description>
 		<year>1987</year>
@@ -7293,6 +7381,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="worldgp">
 		<description>World Grand Prix (Euro)</description>
 		<year>1986</year>
@@ -7308,6 +7397,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="worldgpu" cloneof="worldgp">
 		<description>World Grand Prix (USA, Bra, Kor)</description>
 		<year>1986</year>
@@ -7324,6 +7414,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="worldgpp" cloneof="worldgp">
 		<description>World Grand Prix (USA, Prototype)</description>
 		<year>1986</year>
@@ -7518,7 +7609,7 @@
 		</part>
 	</software>
 
-<!-- MPR-11068 according to SMS Power, but not clear which version these correspond to -->
+	<!-- MPR-11068 according to SMS Power, but not clear which version these correspond to -->
 	<software name="zillion">
 		<description>Zillion (Euro, v2)</description>
 		<year>1987</year>
@@ -7587,7 +7678,8 @@
 		</part>
 	</software>
 
-  <!-- This MASK rom was actually found on a larger arcade multi-game but appears to have been taken directly from a home cartridge.
+	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Super Wonderboy, Super Tetris, Super Boy I, Goonies, Road Fighter) -->
+	<!-- This MASK rom was actually found on a larger arcade multi-game but appears to have been taken directly from a home cartridge.
        The menu contained within it, and bank switching system used is ignored by the arcade board which just makes use of the game
        data from it -->
 	<software name="smssgame">
@@ -7630,8 +7722,9 @@
 	</software>
 
 
-<!-- Sega Cards & MyCard dumps -->
+<!-- Sega Card & MyCard dumps -->
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="astrofl" cloneof="transbot">
 		<description>Astro Flash (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7657,6 +7750,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="comical">
 		<description>Comical Machine Gun Joe (Jpn, MyCard)</description>
 		<year>1986</year>
@@ -7670,6 +7764,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="f16fightc" cloneof="f16fight">
 		<description>F-16 Fighter (Euro, USA, Sega Card)</description>
 		<year>1986</year>
@@ -7682,6 +7777,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="f16falcjc" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7695,6 +7791,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="f16falcc" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (USA, Sega Card for Display Unit)</description>
 		<year>1985</year>
@@ -7707,6 +7804,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="pitpot">
 		<description>Fushigi no Oshiro Pit Pot (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7720,6 +7818,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthc" cloneof="ghosth">
 		<description>Ghost House (Euro, USA, Bra, Sega Card)</description>
 		<year>1986</year>
@@ -7732,17 +7831,19 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthcp" cloneof="ghosth">
 		<description>Ghost House (Sega Card, Prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_cart">
+		<part name="cart" interface="sms_card">
 			<dataarea name="rom" size="32768">
 				<rom name="ghost house (usa, europe) (beta).bin" size="32768" crc="c3e7c1ed" sha1="f341e68bad5029bf475922c2c1b79eb109f467a1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthj" cloneof="ghosth">
 		<description>Ghost House (Jpn, MyCard)</description>
 		<year>1986</year>
@@ -7756,6 +7857,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatbasj" cloneof="greatbas">
 		<description>Great Baseball (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7769,6 +7871,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscrc" cloneof="greatscr">
 		<description>Great Soccer (Euro, Sega Card)</description>
 		<year>1985</year>
@@ -7781,6 +7884,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscrj" cloneof="greatscr">
 		<description>Great Soccer (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7794,6 +7898,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greattns" cloneof="stennis">
 		<description>Great Tennis (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7819,6 +7924,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="hangonj" cloneof="hangon">
 		<description>Hang-On (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7832,6 +7938,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="myheroc" cloneof="myhero">
 		<description>My Hero (Euro, USA, Bra, Sega Card)</description>
 		<year>1986</year>
@@ -7844,6 +7951,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="satell7">
 		<description>Satellite 7 (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7857,6 +7965,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="seishun" cloneof="myhero">
 		<description>Seishun Scandal (Jpn, MyCard)</description>
 		<year>1986</year>
@@ -7870,6 +7979,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspyc" cloneof="spyvsspy">
 		<description>Spy vs. Spy (Euro, USA, Bra, Sega Card)</description>
 		<year>1986</year>
@@ -7882,6 +7992,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspyj" cloneof="spyvsspy">
 		<description>Spy vs Spy (Jpn, MyCard)</description>
 		<year>1986</year>
@@ -7895,6 +8006,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="stennisc" cloneof="stennis">
 		<description>Super Tennis (Euro, USA, Sega Card)</description>
 		<year>1985</year>
@@ -7907,6 +8019,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboyc" cloneof="teddyboy">
 		<description>Teddy Boy (Euro, USA, Bra, Sega Card)</description>
 		<year>1985</year>
@@ -7919,17 +8032,7 @@
 		</part>
 	</software>
 
-	<software name="teddyboyjp" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, Ep-MyCard, Prototype)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_card">
-			<dataarea name="rom" size="49152">
-				<rom name="teddy boy blues (japan) (proto) (ep-mycard).bin" size="49152" crc="d7508041" sha1="51014d89cd8770df8a3d837a0208cb69d5bf7903" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboyj" cloneof="teddyboy">
 		<description>Teddy Boy Blues (Jpn, MyCard)</description>
 		<year>1985</year>
@@ -7943,6 +8046,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="transbotc" cloneof="transbot">
 		<description>TransBot (Euro, USA, Bra, Sega Card)</description>
 		<year>1985</year>

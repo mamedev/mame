@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
@@ -21,8 +22,10 @@
 #include "machine/msm58321.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class clcd_state : public driver_device
 {
@@ -134,7 +137,7 @@ public:
 			uint8_t *font = m_lcd_char_rom->base();
 			if (m_lcd_mode & LCD_MODE_ALT)
 			{
-				font += 2048;
+				font += 1024;
 			}
 
 			int chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
@@ -731,7 +734,7 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START(clcd, clcd_state)
+static MACHINE_CONFIG_START(clcd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
@@ -831,10 +834,11 @@ ROM_START( clcd )
 	ROM_LOAD( "sizapr.u103",        0x10000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
 	ROM_LOAD( "kizapr.u102",        0x18000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
 
-	ROM_REGION( 0x1000, "lcd_char_rom", 0 )
-	ROM_LOAD( "lcd-char-rom.u16",   0x00000, 0x1000, CRC(7b6d3867) SHA1(cb594801438849f933ddc3e64b03b56f42f59f09))
+	ROM_REGION( 0x800, "lcd_char_rom", 0 )
+	ROM_LOAD( "lcd-char-rom.u16",   0x00000, 0x800, CRC(7b6d3867) SHA1(cb594801438849f933ddc3e64b03b56f42f59f09))
+	ROM_IGNORE(0x800)
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                         FULLNAME       FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", 0 )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                        FULLNAME           FLAGS */
+COMP( 1985, clcd,   0,      0,       clcd,      clcd,  clcd_state,  0,     "Commodore Business Machines", "LCD (Prototype)", 0 )

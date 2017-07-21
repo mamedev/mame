@@ -13,12 +13,9 @@
 	<element name="text_4"><text string="4"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="text_5"><text string="5"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
+	<!-- actually a 8seg digit: default 7seg + bottom-right diagonal -->
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.2" green="1.0" blue="0.9" /></led7seg>
-	</element>
-	<element name="seg_h" defstate="0">
-		<text state="0" string="\"><color red="0.0235" green="0.1255" blue="0.1098" /></text>
-		<text state="1" string="\"><color red="0.2" green="1.0" blue="0.9" /></text>
+		<led14seg><color red="0.2" green="1.0" blue="0.9" /></led14seg>
 	</element>
 
 	<element name="sym_heart" defstate="0">
@@ -60,18 +57,6 @@
 		<bezel name="digit2" element="digit"><bounds x="82" y="12" width="10" height="15" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="92" y="12" width="10" height="15" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="102" y="12" width="10" height="15" /></bezel>
-
-		<bezel name="9.7" element="seg_h"><bounds x="3" y="20" width="8" height="5" /></bezel>
-		<bezel name="8.7" element="seg_h"><bounds x="13" y="20" width="8" height="5" /></bezel>
-		<bezel name="7.7" element="seg_h"><bounds x="23" y="20" width="8" height="5" /></bezel>
-		<bezel name="6.7" element="seg_h"><bounds x="33" y="20" width="8" height="5" /></bezel>
-		<bezel name="5.7" element="seg_h"><bounds x="43" y="20" width="8" height="5" /></bezel>
-		<bezel name="10.7" element="seg_h"><bounds x="53" y="20" width="8" height="5" /></bezel>
-		<bezel name="4.7" element="seg_h"><bounds x="63" y="20" width="8" height="5" /></bezel>
-		<bezel name="3.7" element="seg_h"><bounds x="73" y="20" width="8" height="5" /></bezel>
-		<bezel name="2.7" element="seg_h"><bounds x="83" y="20" width="8" height="5" /></bezel>
-		<bezel name="1.7" element="seg_h"><bounds x="93" y="20" width="8" height="5" /></bezel>
-		<bezel name="0.7" element="seg_h"><bounds x="103" y="20" width="8" height="5" /></bezel>
 
 	<!-- VFD card symbols -->
 

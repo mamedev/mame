@@ -11,11 +11,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "ccpu.h"
+#include "debugger.h"
 
 
-const device_type CCPU = &device_creator<ccpu_cpu_device>;
+DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
 
 
 /***************************************************************************
@@ -63,7 +63,7 @@ do { \
 ***************************************************************************/
 
 ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, CCPU, "Cinematronics CPU", tag, owner, clock, "ccpu", __FILE__)
+	: cpu_device(mconfig, CCPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 5, 0)
@@ -72,6 +72,14 @@ ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+device_memory_interface::space_config_vector ccpu_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 READ8_MEMBER( ccpu_cpu_device::read_jmi )
 {

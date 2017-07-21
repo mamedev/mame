@@ -128,9 +128,10 @@
  ****************************************************************************/
 
 #include "emu.h"
+#include "vme_mvme350.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/68230pit.h"
-#include "vme_mvme350.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -155,10 +156,10 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MVME350 = &device_creator<vme_mvme350_card_device>;
+DEFINE_DEVICE_TYPE(VME_MVME350, vme_mvme350_card_device, "mvme350", "Motorola MVME-350 Intelligent Tape Controller")
 
 #define MVME350_CPU_TAG "mvme350_cpu"
 #define MVME350_ROM "mvme350_rom"
@@ -177,30 +178,23 @@ static ADDRESS_MAP_START( mvme350_mem, AS_PROGRAM, 16, vme_mvme350_card_device )
 //AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 ADDRESS_MAP_END
 
-//-------------------------------------------------
-//	machine_config_additions - device-specific
-//	machine configurations
-//-------------------------------------------------
-
-MACHINE_CONFIG_FRAGMENT( mvme350 )
-	/* basic machine hardware */
-	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
-	MCFG_CPU_PROGRAM_MAP (mvme350_mem)
-	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
-	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
-MACHINE_CONFIG_END
-
 ROM_START( mvme350 )
 	ROM_REGION (0x20000, MVME350_ROM, 0)
 	ROM_LOAD16_BYTE ("mvme350U40v2.3.bin", 0x0001, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
 	ROM_LOAD16_BYTE ("mvme350U47v2.3.bin", 0x0000, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
 ROM_END
 
-machine_config_constructor vme_mvme350_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( mvme350 );
-}
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( vme_mvme350_card_device::device_add_mconfig )
+	/* basic machine hardware */
+	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP (mvme350_mem)
+	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const
 {
@@ -212,16 +206,15 @@ const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_vme_card_interface(mconfig, *this)
+vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_MVME350, "Motorola MVME-350 Intelligent Tape Controller", tag, owner, clock, "mvme350", __FILE__),
-	device_vme_card_interface(mconfig, *this)
+	vme_mvme350_card_device(mconfig, VME_MVME350, tag, owner, clock)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
@@ -236,10 +229,10 @@ void vme_mvme350_card_device::device_start()
 	/* From MVME166 Single Board Computer Installation Guide:
 
 	   Controller Type     First board    Second board
-                           CLUN Address   CLUN Address
+	                       CLUN Address   CLUN Address
 	  ---------------------------------------------------
 	   MVME350 - Streaming $04  $FFFF5000 $05  $FFFF5100
-	   Tape Controller 
+	   Tape Controller
 	  ---------------------------------------------------
 	*/
 	uint32_t base = 0xFFFF5000;

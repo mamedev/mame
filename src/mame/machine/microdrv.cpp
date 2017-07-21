@@ -37,14 +37,14 @@
 ***************************************************************************/
 
 // device type definition
-const device_type MICRODRIVE = &device_creator<microdrive_image_device>;
+DEFINE_DEVICE_TYPE(MICRODRIVE, microdrive_image_device, "microdrive_image", "Sinclair Microdrive")
 
 //-------------------------------------------------
 //  microdrive_image_device - constructor
 //-------------------------------------------------
 
 microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock, "microdrive_image", __FILE__),
+	device_t(mconfig, MICRODRIVE, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_write_comms_out(*this)
 {
@@ -56,18 +56,6 @@ microdrive_image_device::microdrive_image_device(const machine_config &mconfig, 
 
 microdrive_image_device::~microdrive_image_device()
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void microdrive_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 

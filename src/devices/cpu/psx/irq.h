@@ -7,12 +7,11 @@
  *
  */
 
+#ifndef MAME_CPU_PSX_IRQ_H
+#define MAME_CPU_PSX_IRQ_H
+
 #pragma once
 
-#ifndef __PSXIRQ_H__
-#define __PSXIRQ_H__
-
-#include "emu.h"
 
 extern const device_type PSX_IRQ;
 
@@ -25,7 +24,7 @@ public:
 	psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxirq_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<psxirq_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -57,4 +56,4 @@ private:
 	devcb_write_line m_irq_handler;
 };
 
-#endif
+#endif // MAME_CPU_PSX_IRQ_H

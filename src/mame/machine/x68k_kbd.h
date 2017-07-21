@@ -14,7 +14,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void key_make(uint8_t row, uint8_t column) override;
 	virtual void key_repeat(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;
@@ -27,6 +26,6 @@ private:
 	uint8_t m_enabled;  // keyboard enabled?
 };
 
-extern const device_type X68K_KEYBOARD;
+DECLARE_DEVICE_TYPE(X68K_KEYBOARD, x68k_keyboard_device)
 
 #endif // MAME_MACHINE_X68K_KBD_H

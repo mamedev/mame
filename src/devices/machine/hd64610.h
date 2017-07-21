@@ -21,12 +21,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_HD64610_H
+#define MAME_MACHINE_HD64610_H
+
 #pragma once
 
-#ifndef __HD64610__
-#define __HD64610__
-
-#include "emu.h"
 #include "dirtc.h"
 
 
@@ -56,8 +55,8 @@ public:
 	// construction/destruction
 	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_1hz_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_1hz_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -99,7 +98,6 @@ private:
 
 
 // device type definition
-extern const device_type HD64610;
+DECLARE_DEVICE_TYPE(HD64610, hd64610_device)
 
-
-#endif
+#endif // MAME_MACHINE_HD64610_H

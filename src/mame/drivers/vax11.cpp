@@ -88,7 +88,7 @@ public:
 	DECLARE_READ16_MEMBER( term_tx_status_r );
 	DECLARE_READ16_MEMBER( term_rx_status_r );
 	DECLARE_WRITE16_MEMBER( term_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
 };
@@ -131,13 +131,13 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vax11 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( vax11_state::kbd_put )
+void vax11_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	m_term_status = 0xffff;
 }
 
-static MACHINE_CONFIG_START( vax11, vax11_state )
+static MACHINE_CONFIG_START( vax11 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(0 << 13)
@@ -145,7 +145,7 @@ static MACHINE_CONFIG_START( vax11, vax11_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(vax11_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(vax11_state, kbd_put))
 
 	MCFG_RX01_ADD("rx01")
 MACHINE_CONFIG_END
@@ -170,5 +170,5 @@ ROM_START( vax785 )
 
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, vax785,  0,       0,    vax11,    vax11, driver_device,  0,   "Digital Equipment Corporation",   "VAX-11/785",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                          FULLNAME      FLAGS */
+COMP( 1984, vax785,  0,       0,      vax11,   vax11, vax11_state, 0,    "Digital Equipment Corporation", "VAX-11/785", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

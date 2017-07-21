@@ -75,16 +75,16 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define PCE_CD_CLOCK    9216000
 
 
-const device_type PCE_CD = &device_creator<pce_cd_device>;
+DEFINE_DEVICE_TYPE(PCE_CD, pce_cd_device, "pcecd", "PCE CD Add-on")
 
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, PCE_CD, "PCE CD Add-on", tag, owner, clock, "pcecd", __FILE__),
-						m_maincpu(*this, ":maincpu"),
-						m_msm(*this, "msm5205"),
-						m_cdda(*this, "cdda"),
-						m_nvram(*this, "bram"),
-						m_cdrom(*this, "cdrom")
+	: device_t(mconfig, PCE_CD, tag, owner, clock)
+	, m_maincpu(*this, ":maincpu")
+	, m_msm(*this, "msm5205")
+	, m_cdda(*this, "cdda")
+	, m_nvram(*this, "bram")
+	, m_cdrom(*this, "cdrom")
 {
 }
 
@@ -229,7 +229,7 @@ void pce_cd_device::late_setup()
 	}
 
 	// MSM5205 might be initialized after PCE CD as well...
-	m_msm->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
+	m_msm->set_unscaled_clock((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 }
 
 void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
@@ -241,7 +241,7 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
-static MACHINE_CONFIG_FRAGMENT( pce_cd )
+ MACHINE_CONFIG_MEMBER( pce_cd_device::device_add_mconfig )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("bram", pce_cd_device, nvram_init)
 
 	MCFG_CDROM_ADD("cdrom")
@@ -249,7 +249,7 @@ static MACHINE_CONFIG_FRAGMENT( pce_cd )
 
 	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(pce_cd_device, msm5205_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 1/48 prescaler, 4bit data */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 1/48 prescaler, 4bit data */
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:rspeaker", 0.50 )
 
@@ -257,12 +257,6 @@ static MACHINE_CONFIG_FRAGMENT( pce_cd )
 	MCFG_SOUND_ROUTE( 0, "^:lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "^:rspeaker", 1.00 )
 MACHINE_CONFIG_END
-
-
-machine_config_constructor pce_cd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pce_cd );
-}
 
 
 void pce_cd_device::adpcm_stop(uint8_t irq_flag)
@@ -1180,7 +1174,7 @@ WRITE8_MEMBER(pce_cd_device::intf_w)
 			break;
 		case 0x0E:  /* ADPCM playback rate */
 			m_adpcm_clock_divider = 0x10 - (data & 0x0f);
-			m_msm->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
+			m_msm->set_unscaled_clock((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 			break;
 		case 0x0F:  /* ADPCM and CD audio fade timer */
 			/* TODO: timers needs HW tests */

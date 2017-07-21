@@ -164,4 +164,4 @@ print("};")
 print("")
 
 # also output a global count
-print("int driver_list::s_driver_count = %d;\n" % len(drivlist))
+print("std::size_t const driver_list::s_driver_count = %d;\n" % len(drivlist))

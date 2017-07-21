@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_VW64_H
+#define MAME_BUS_C64_VW64_H
+
 #pragma once
 
-#ifndef __VW64__
-#define __VW64__
 
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -46,7 +45,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_VW64;
+DECLARE_DEVICE_TYPE(C64_VW64, c64_vizawrite_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_VW64_H

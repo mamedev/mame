@@ -53,6 +53,7 @@ Bugs:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "sound/sn76496.h"
 
 #include "includes/megadriv.h"
@@ -75,9 +76,7 @@ public:
 
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
-	DECLARE_READ8_MEMBER(bios_banksel_r);
 	DECLARE_WRITE8_MEMBER(bios_banksel_w);
-	DECLARE_READ8_MEMBER(bios_gamesel_r);
 	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
 	DECLARE_WRITE16_MEMBER(mp_io_write);
 	DECLARE_READ16_MEMBER(mp_io_read);
@@ -388,12 +387,23 @@ static INPUT_PORTS_START ( mp_shnb3 )
 	PORT_DIPSETTING( 0x0c, DEF_STR ( Normal ) )
 INPUT_PORTS_END
 
-/*MEGAPLAY specific*/
+static INPUT_PORTS_START ( mp_gunhe )
+	PORT_INCLUDE( megaplay )
 
-READ8_MEMBER(mplay_state::bios_banksel_r)
-{
-	return m_bios_bank;
-}
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_DIPNAME( 0x03, 0x01, "Initial Players" ) PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING( 0x00, "4" )
+	PORT_DIPSETTING( 0x01, "3" )
+	PORT_DIPSETTING( 0x02, "2" )
+	PORT_DIPSETTING( 0x03, "1" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR ( Difficulty ) ) PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPSETTING( 0x00, "Expert" )
+	PORT_DIPSETTING( 0x04, DEF_STR ( Hard ) )
+	PORT_DIPSETTING( 0x08, DEF_STR ( Easy ) )
+	PORT_DIPSETTING( 0x0c, DEF_STR ( Normal ) )
+INPUT_PORTS_END
+
+/*MEGAPLAY specific*/
 
 WRITE8_MEMBER(mplay_state::bios_banksel_w)
 {
@@ -405,11 +415,6 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
 	m_bios_bank = data;
 	m_bios_mode = MP_ROM;
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
-}
-
-READ8_MEMBER(mplay_state::bios_gamesel_r)
-{
-	return m_bios_6403;
 }
 
 WRITE8_MEMBER(mplay_state::bios_gamesel_w)
@@ -524,7 +529,7 @@ WRITE8_MEMBER(mplay_state::bios_width_w)
 READ8_MEMBER(mplay_state::bios_6404_r)
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
-	return (m_bios_6404 & 0xfe) | ((m_bios_6403 & 0x10) >> 4);
+	return ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
@@ -578,15 +583,8 @@ static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(game_w)
-	AM_RANGE(0x6200, 0x6200) AM_READ_PORT("DSW0")
-	AM_RANGE(0x6201, 0x6201) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6203, 0x6203) AM_READWRITE(bios_banksel_r, bios_banksel_w)
-	AM_RANGE(0x6204, 0x6204) AM_READWRITE(bios_6204_r, bios_width_w)
-	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("TEST")
-	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("COIN")
-	AM_RANGE(0x6402, 0x6402) AM_READWRITE(bios_6402_r, bios_6402_w)
-	AM_RANGE(0x6403, 0x6403) AM_READWRITE(bios_gamesel_r, bios_gamesel_w)
-	AM_RANGE(0x6404, 0x6404) AM_READWRITE(bios_6404_r, bios_6404_w)
+	AM_RANGE(0x6200, 0x6207) AM_DEVREADWRITE("io1", cxd1095_device, read, write)
+	AM_RANGE(0x6400, 0x6407) AM_DEVREADWRITE("io2", cxd1095_device, read, write)
 	AM_RANGE(0x6600, 0x6600) AM_READWRITE(bios_6600_r, bios_6600_w)
 	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
 	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
@@ -627,9 +625,9 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	for (int y = 0; y < 224; y++)
 	{
 		uint32_t* lineptr = &bitmap.pix32(y);
-		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
+		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
 
-		for (int x = 0; x < SEGA315_5124_WIDTH; x++)
+		for (int x = 0; x < sega315_5124_device::WIDTH; x++)
 		{
 			uint32_t src = srcptr[x] & 0xffffff;
 
@@ -653,7 +651,7 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-static MACHINE_CONFIG_START( megaplay, mplay_state )
+static MACHINE_CONFIG_START( megaplay )
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
@@ -665,6 +663,22 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("io1", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW0"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mplay_state, bios_banksel_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(mplay_state, bios_6204_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mplay_state, bios_width_w))
+
+	MCFG_DEVICE_ADD("io2", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("TEST"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("COIN"))
+	MCFG_CXD1095_IN_PORTC_CB(READ8(mplay_state, bios_6402_r))
+	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(mplay_state, bios_6402_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mplay_state, bios_gamesel_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(mplay_state, bios_6404_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mplay_state, bios_6404_w))
+
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
@@ -672,8 +686,8 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* New update functions to handle the extra layer */
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
-		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
-		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
+			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
 
 	// Megaplay has an additional SMS VDP as an overlay
@@ -851,6 +865,17 @@ ROM_START( mp_shnb3 ) /* Shinobi 3 */
 	MEGAPLAY_BIOS
 ROM_END
 
+ROM_START( mp_gunhe ) /* Gunstar Heroes */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "mpr-16390.ic1", 0x000000, 0x100000, CRC(d963a748) SHA1(adf231c5180a9307fd6675fe77fffd4c5bfa3d6a) )
+	/* Game Instruction rom copied to 0x300000 - 0x310000 (odd / even bytes equal) */
+
+	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
+	ROM_LOAD( "epr-15175-10.ic2", 0x000000, 0x08000, CRC(e4f08233) SHA1(b7e0ad3f6ae1c56df6ec76375842050f08afcbef) )
+
+	ROM_REGION( 0x20000, "mtbios", 0 ) /* Bios */
+	MEGAPLAY_BIOS
+ROM_END
 
 READ16_MEMBER(mplay_state::extra_ram_r )
 {
@@ -929,10 +954,12 @@ Streets Of Rage II   171-6215A   837-9165-05       610-0297-05          MPR-1542
 Bio-Hazard Battle    171-6215A   837-9165-06       610-0298-06          MPR-15699-F (838200)    EPR-15175-06 (27256)   n/a
 Sonic The Hedgehog 2 171-6215A   837-9165-07       610-0297-07          MPR-16011   (838200)    EPR-15175-07 (27256)   n/a
 Shinobi III          171-6215A   837-9165-09       610-0297-09          MPR-16197   (838200)    EPR-15175-09 (27256)   n/a
+Gunstar Heroes       171-6215A   837-9165-10       610-0297-09**        MPR-16390   (838200B)   EPR-15175-10 (27256)   n/a
 Mazin Wars           171-6215A   837-9165-11       610-0297-11          MPR-16460   (838200)    EPR-15175-11 (27256)   n/a
 
 * This is the code for Tecmo World Cup, as the ROMs in the Columns 3 cart
 didn't have original Sega part numbers it's probably a converted TWC cart
+** Probably reused cart case
 */
 
 /* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Mega Play BIOS", MACHINE_IS_BIOS_ROOT )
@@ -940,20 +967,19 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)" , 0 )
 /* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
 /* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",0  )
-/* 04 */ GAME( 1993, mp_twc,   megaplay, megaplay, mp_twc, mplay_state,   megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
-/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2, mplay_state,  megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
-/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio, mplay_state,   megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
+/* 04 */ GAME( 1993, mp_twc,   megaplay, megaplay, mp_twc,   mplay_state, megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
+/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
+/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
 /* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 )
 /* 08 */
 /* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, megaplay, ROT0, "Sega",                  "Shinobi III (Mega Play)" , 0 )
-/* 10 */
+/* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, megaplay, ROT0, "Sega",                  "Gunstar Heroes (Mega Play)" , 0 )
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)",0  )
 
 /* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 )
 
 
-/* Also confirmed to exist:
-Gunstar Heroes
+/* Not confirmed to exist:
 
 system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
 the numbering prior to 'Streets of Rage 2'

@@ -6,26 +6,29 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+
 /* mingw-gcc defines this */
 #ifdef i386
 #undef i386
 #endif /* i386 */
 
-
-#include "emu.h"
-#include "cpu/i86/i286.h"
-#include "cpu/i386/i386.h"
-#include "machine/at.h"
-#include "machine/wd7600.h"
-#include "machine/cs8221.h"
-#include "machine/nvram.h"
-#include "machine/vt82c496.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/lpci/pci.h"
 #include "bus/lpci/vt82c505.h"
-#include "machine/ds128x.h"
-#include "machine/ram.h"
-#include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "cpu/i386/i386.h"
+#include "cpu/i86/i286.h"
+#include "machine/at.h"
+#include "machine/cs8221.h"
+#include "machine/ds128x.h"
+#include "machine/idectrl.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/vt82c496.h"
+#include "machine/wd7600.h"
+#include "softlist_dev.h"
+#include "speaker.h"
 
 class at_state : public driver_device
 {
@@ -35,7 +38,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG)
-		{ }
+	{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
@@ -60,7 +63,7 @@ public:
 		m_wd7600(*this, "wd7600"),
 		m_isabus(*this, "isabus"),
 		m_speaker(*this, "speaker")
-		{ }
+	{ }
 
 public:
 	required_device<cpu_device> m_maincpu;
@@ -281,7 +284,7 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ibm5170, at_state )
+static MACHINE_CONFIG_START( ibm5170 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
@@ -365,7 +368,7 @@ static MACHINE_CONFIG_DERIVED( k286i, ibm5162 )
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa8", pc_isa16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at386, at_state )
+static MACHINE_CONFIG_START( at386 )
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -425,7 +428,7 @@ static MACHINE_CONFIG_DERIVED( ct386sx, at386sx )
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapc, megapc_state )
+static MACHINE_CONFIG_START( megapc )
 	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(megapc_map)
 	MCFG_CPU_IO_MAP(megapc_io)
@@ -510,7 +513,7 @@ static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapcpla, at_state )
+static MACHINE_CONFIG_START( megapcpla )
 	MCFG_CPU_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -544,7 +547,7 @@ static MACHINE_CONFIG_START( megapcpla, at_state )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ficpio2, at_state )
+static MACHINE_CONFIG_START( ficpio2 )
 	MCFG_CPU_ADD("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ficpio_map)
 	MCFG_CPU_IO_MAP(ficpio_io)
@@ -690,9 +693,9 @@ ROM_START( at )
 	ROMX_LOAD("at110387.0", 0x10000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")  /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",    0x10000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* bad dump, checksum off by 8 in the lsb*/
+	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(5644ed38) SHA1(963555ec77845defc3b42b433280908e1797076e),ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
 	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(5) )

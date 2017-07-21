@@ -6,12 +6,13 @@
 
 // TODO: multibus
 
+#include "emu.h"
 #include "isbc_215g.h"
 
-const device_type ISBC_215G = &device_creator<isbc_215g_device>;
+DEFINE_DEVICE_TYPE(ISBC_215G, isbc_215g_device, "isbc_215g", "ISBC 215G Winchester Disk Controller")
 
 isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISBC_215G, "ISBC 215G Winchester Disk Controller", tag, owner, clock, "isbc_215g", __FILE__),
+	device_t(mconfig, ISBC_215G, tag, owner, clock),
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),
 	m_hdd1(*this, "drive1"),
@@ -132,7 +133,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			break;
 		case 0x0c:
 			// reset channel 2
-			if(space.debugger_access()) // reading this is bad
+			if(machine().side_effect_disabled()) // reading this is bad
 				break;
 			m_dmac->sel_w(1);
 			m_dmac->ca_w(1);
@@ -294,7 +295,7 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 READ16_MEMBER(isbc_215g_device::mem_r)
 {
 	// XXX: hack to permit debugger to disassemble rom
-	if(space.debugger_access() && (offset < 0x1fff))
+	if(machine().side_effect_disabled() && (offset < 0x1fff))
 		return m_dmac->space(AS_IO).read_word_unaligned(offset*2);
 
 	switch(offset)
@@ -349,7 +350,7 @@ WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
 	m_isbx_irq[3] = state ? true : false;
 }
 
-static MACHINE_CONFIG_FRAGMENT( isbc_215g )
+MACHINE_CONFIG_MEMBER( isbc_215g_device::device_add_mconfig )
 	MCFG_CPU_ADD("u84", I8089, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(isbc_215g_mem)
 	MCFG_CPU_IO_MAP(isbc_215g_io)
@@ -366,10 +367,6 @@ static MACHINE_CONFIG_FRAGMENT( isbc_215g )
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_11_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor isbc_215g_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( isbc_215g );
-}
 
 ROM_START( isbc_215g )
 	ROM_REGION( 0x4000, "i8089", ROMREGION_ERASEFF )

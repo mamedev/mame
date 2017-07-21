@@ -7,11 +7,12 @@
     Natural keyboard input support.
 
 ***************************************************************************/
+#ifndef MAME_EMU_NATKEYBOARD_H
+#define MAME_EMU_NATKEYBOARD_H
 
 #pragma once
 
-#ifndef EMU_NATKEYBOARD_H
-#define EMU_NATKEYBOARD_H
+#include <iosfwd>
 
 
 //**************************************************************************
@@ -54,14 +55,21 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	// debugging
-	std::string dump();
+	void dump(std::ostream &str) const;
+	std::string dump() const;
 
 private:
+	enum
+	{
+		SHIFT_COUNT = UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1,
+		SHIFT_STATES = 1 << SHIFT_COUNT
+	};
+
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		char32_t    ch;
-		ioport_field *  field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
+		char32_t        ch;
+		ioport_field *  field[SHIFT_COUNT + 1];
 	};
 
 	// internal helpers
@@ -71,7 +79,7 @@ private:
 	attotime choose_delay(char32_t ch);
 	void internal_post(char32_t ch);
 	void timer(void *ptr, int param);
-	std::string unicode_to_string(char32_t ch);
+	std::string unicode_to_string(char32_t ch) const;
 	const keycode_map_entry *find_code(char32_t ch) const;
 
 	// internal state
@@ -80,6 +88,7 @@ private:
 	u32                             m_bufbegin;         // index of starting character
 	u32                             m_bufend;           // index of ending character
 	std::vector<char32_t>           m_buffer;           // actual buffer
+	unsigned                        m_fieldnum;         // current step in multi-key sequence
 	bool                            m_status_keydown;   // current keydown status
 	bool                            m_last_cr;          // was the last char a CR?
 	emu_timer *                     m_timer;            // timer for posting characters
@@ -90,4 +99,7 @@ private:
 	std::vector<keycode_map_entry>  m_keycode_map;      // keycode map
 };
 
-#endif
+
+inline std::ostream &operator<<(std::ostream &str, natural_keyboard const &kbd) { kbd.dump(str); return str; }
+
+#endif // MAME_EMU_NATKEYBOARD_H

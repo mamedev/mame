@@ -574,7 +574,7 @@ project "lualibs"
 	}
 if (_OPTIONS["osd"] ~= "uwp") then
 	includedirs {
-		MAME_DIR .. "3rdparty/linenoise-ng/include",
+		MAME_DIR .. "3rdparty/linenoise",
 	}
 end
 	includedirs {
@@ -730,6 +730,77 @@ links {
 }
 end
 end
+
+--------------------------------------------------
+-- BX library objects
+--------------------------------------------------
+
+project "bx"
+	uuid "238318fe-49f5-4eb4-88be-0618900f5eac"
+	kind "StaticLib"
+
+	defines {
+		"__STDC_LIMIT_MACROS",
+		"__STDC_FORMAT_MACROS",
+		"__STDC_CONSTANT_MACROS",
+	}
+
+	configuration { "vs*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
+		}
+	configuration { "mingw*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
+		}
+
+	configuration { "osx* or xcode4" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/osx",
+		}
+
+	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "netbsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { }
+
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
+		if version < 60000 then
+			buildoptions {
+				"-Wno-strict-overflow",
+			}
+		end
+	end
+
+	includedirs {
+		MAME_DIR .. "3rdparty/bx/include",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/bx/src/bx.cpp",
+		MAME_DIR .. "3rdparty/bx/src/commandline.cpp",
+		MAME_DIR .. "3rdparty/bx/src/crtnone.cpp",
+		MAME_DIR .. "3rdparty/bx/src/crtimpl.cpp",
+		MAME_DIR .. "3rdparty/bx/src/debug.cpp",
+		MAME_DIR .. "3rdparty/bx/src/dtoa.cpp",
+		MAME_DIR .. "3rdparty/bx/src/fpumath.cpp",
+		MAME_DIR .. "3rdparty/bx/src/mutex.cpp",
+		MAME_DIR .. "3rdparty/bx/src/os.cpp",
+		MAME_DIR .. "3rdparty/bx/src/semaphore.cpp",
+		MAME_DIR .. "3rdparty/bx/src/sort.cpp",
+		MAME_DIR .. "3rdparty/bx/src/string.cpp",
+		MAME_DIR .. "3rdparty/bx/src/timer.cpp",
+		MAME_DIR .. "3rdparty/bx/src/thread.cpp",
+	}
+
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
@@ -874,20 +945,10 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/camera.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/cube_atlas.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/font_manager.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_buffer_manager.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/ocornut_imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbuffercompression.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbufferdecompression.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_draw.cpp",
 	}
@@ -902,155 +963,166 @@ end
 --------------------------------------------------
 -- PortAudio library objects
 --------------------------------------------------
---
---if not _OPTIONS["with-system-portaudio"] then
---project "portaudio"
---  uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
---  kind "StaticLib"
---
---  configuration { "vs*" }
---      buildoptions {
---          "/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
---          "/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
---          "/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
---          "/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
---          "/wd4189", -- warning C4189: 'xxx' : local variable is initialized but not referenced
---          "/wd4127", -- warning C4127: conditional expression is constant
---      }
---if _OPTIONS["vs"]=="intel-15" then
---      buildoptions {
---          "/Qwd869",              -- remark #869: parameter "xxx" was never referenced
---          "/Qwd1478",             -- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
---          "/Qwd2544",             -- message #2544: empty dependent statement in if-statement
---          "/Qwd1879",             -- warning #1879: unimplemented pragma ignored
---      }
---end
---  configuration { "vs201*" }
---      buildoptions {
---          "/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
---      }
---
---  configuration { "gmake or ninja" }
---      buildoptions_c {
---          "-Wno-strict-prototypes",
---          "-Wno-bad-function-cast",
---          "-Wno-undef",
---          "-Wno-missing-braces",
---          "-Wno-unused-variable",
---          "-Wno-unused-value",
---          "-Wno-unused-function",
---          "-Wno-unknown-pragmas",
---      }
---
---  local version = str_to_version(_OPTIONS["gcc_version"])
---  if (_OPTIONS["gcc"]~=nil) then
---      if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
---          buildoptions_c {
---              "-Wno-unknown-warning-option",
---              "-Wno-absolute-value",
---              "-Wno-unused-but-set-variable",
---              "-Wno-maybe-uninitialized",
---              "-Wno-sometimes-uninitialized",
---          }
---      else
---          if (version >= 40600) then
---              buildoptions_c {
---                  "-Wno-unused-but-set-variable",
---                  "-Wno-maybe-uninitialized",
---                  "-Wno-sometimes-uninitialized",
---              }
---          end
---      end
---  end
---  configuration { "vs*" }
---      buildoptions {
---          "/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
---          "/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
---      }
---
---  configuration { }
---
---  includedirs {
---      MAME_DIR .. "3rdparty/portaudio/include",
---      MAME_DIR .. "3rdparty/portaudio/src/common",
---  }
---
---  files {
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_allocation.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_converters.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_cpuload.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_dither.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_debugprint.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_front.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_process.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_stream.c",
---      MAME_DIR .. "3rdparty/portaudio/src/common/pa_trace.c",
---      MAME_DIR .. "3rdparty/portaudio/src/hostapi/skeleton/pa_hostapi_skeleton.c",
---  }
---
---  if _OPTIONS["targetos"]=="windows" then
---      defines {
---          "PA_USE_DS=1",
---          "PA_USE_WDMKS=1",
---          "PA_USE_WMME=1",
---      }
---      includedirs {
---          MAME_DIR .. "3rdparty/portaudio/src/os/win",
---      }
---
---      configuration { }
---      files {
---          MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
---          MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
---          MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
---          MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_wdmks_utils.c",
---          MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_coinitialize.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/wdmks/pa_win_wdmks.c",
---          MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/wmme/pa_win_wmme.c",
---      }
---
---  end
---  if _OPTIONS["targetos"]=="linux" then
---      defines {
---          "PA_USE_ALSA=1",
---          "PA_USE_OSS=1",
---          "HAVE_LINUX_SOUNDCARD_H",
---      }
---      includedirs {
---          MAME_DIR .. "3rdparty/portaudio/src/os/unix",
---      }
---      files {
---          MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
---          MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/alsa/pa_linux_alsa.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/oss/pa_unix_oss.c",
---      }
---  end
---  if _OPTIONS["targetos"]=="macosx" then
---      defines {
---          "PA_USE_COREAUDIO=1",
---      }
---      includedirs {
---          MAME_DIR .. "3rdparty/portaudio/src/os/unix",
---      }
---      files {
---          MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
---          MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c",
---          MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c",
---          MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
---      }
---  end
---
---else
---links {
---  ext_lib("portaudio"),
---}
---end
+if _OPTIONS["NO_USE_PORTAUDIO"]~="1" then
+if not _OPTIONS["with-system-portaudio"] then
+project "portaudio"
+	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
+	kind "StaticLib"
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
+			"/wd4189", -- warning C4189: 'xxx' : local variable is initialized but not referenced
+			"/wd4127", -- warning C4127: conditional expression is constant
+		}
+	if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd1478",             -- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
+			"/Qwd2544",             -- message #2544: empty dependent statement in if-statement
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
+		}
+	end
+	configuration { "vs2015*" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+
+	configuration { "gmake or ninja" }
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+			"-Wno-bad-function-cast",
+			"-Wno-undef",
+			"-Wno-missing-braces",
+			"-Wno-unused-variable",
+			"-Wno-unused-value",
+			"-Wno-unused-function",
+			"-Wno-unknown-pragmas",
+		}
+
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if (_OPTIONS["gcc"]~=nil) then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
+			buildoptions_c {
+				"-Wno-unknown-warning-option",
+				"-Wno-absolute-value",
+				"-Wno-unused-but-set-variable",
+				"-Wno-maybe-uninitialized",
+				"-Wno-sometimes-uninitialized",
+			}
+		else
+			if (version >= 40600) then
+				buildoptions_c {
+					"-Wno-unused-but-set-variable",
+					"-Wno-maybe-uninitialized",
+					"-Wno-sometimes-uninitialized",
+					"-w",
+					"-Wno-incompatible-pointer-types-discards-qualifiers",
+				}
+			end
+		end
+	end
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+			"/wd4057", -- warning C4057: 'function': 'xxx' differs in indirection to slightly different base types from 'xxx'
+		}
+
+	configuration { }
+
+	includedirs {
+		MAME_DIR .. "3rdparty/portaudio/include",
+		MAME_DIR .. "3rdparty/portaudio/src/common",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_allocation.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_converters.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_cpuload.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_dither.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_debugprint.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_front.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_process.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_stream.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_trace.c",
+		MAME_DIR .. "3rdparty/portaudio/src/hostapi/skeleton/pa_hostapi_skeleton.c",
+	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		defines {
+			"PA_USE_DS=1",
+			"PA_USE_WASAPI=1",
+			"PA_USE_WDMKS=1",
+			"PA_USE_WMME=1",
+		}
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/win",
+		}
+
+		configuration { "mingw*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/mingw-include",
+		}
+
+		configuration { }
+		files {
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_coinitialize.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/pa_win_wasapi.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wdmks/pa_win_wdmks.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wmme/pa_win_wmme.c",
+			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
+		}
+
+	end
+	if _OPTIONS["targetos"]=="linux" then
+		defines {
+			"PA_USE_ALSA=1",
+			"PA_USE_OSS=1",
+			"HAVE_LINUX_SOUNDCARD_H",
+		}
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
+		}
+		files {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/alsa/pa_linux_alsa.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/oss/pa_unix_oss.c",
+		}
+	end
+	if _OPTIONS["targetos"]=="macosx" then
+		defines {
+			"PA_USE_COREAUDIO=1",
+		}
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
+		}
+		files {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c",
+			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
+		}
+	end
+
+else
+links {
+	ext_lib("portaudio"),
+}
+end
+end
 
 --------------------------------------------------
 -- SDL2 library
@@ -1559,10 +1631,10 @@ end
 end
 
 --------------------------------------------------
--- linenoise-ng library
+-- linenoise library
 --------------------------------------------------
 if (_OPTIONS["osd"] ~= "uwp") then
-project "linenoise-ng"
+project "linenoise"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)
 
@@ -1576,13 +1648,12 @@ project "linenoise-ng"
 	configuration { }
 
 	includedirs {
-		MAME_DIR .. "3rdparty/linenoise-ng/include",
+		MAME_DIR .. "3rdparty/linenoise",
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/linenoise-ng/src/ConvertUTF.cpp",
-		MAME_DIR .. "3rdparty/linenoise-ng/src/linenoise.cpp",
-		MAME_DIR .. "3rdparty/linenoise-ng/src/wcwidth.cpp",
+		MAME_DIR .. "3rdparty/linenoise/utf8.c",
+		MAME_DIR .. "3rdparty/linenoise/linenoise.c",
 	}
 end
 
@@ -1597,9 +1668,9 @@ project "utf8proc"
 	kind "StaticLib"
 
   defines {
-    "UTF8PROC_DLLEXPORT="
+	"UTF8PROC_DLLEXPORT="
   }
-  
+
 	configuration "Debug"
 		defines {
 			"verbose=-1",

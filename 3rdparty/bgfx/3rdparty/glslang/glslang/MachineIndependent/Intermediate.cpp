@@ -1,13 +1,13 @@
 //
-//Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
-//Copyright (C) 2012-2015 LunarG, Inc.
-//Copyright (C) 2015-2016 Google, Inc.
+// Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
+// Copyright (C) 2012-2015 LunarG, Inc.
+// Copyright (C) 2015-2016 Google, Inc.
 //
-//All rights reserved.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions
-//are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
 //
 //    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
@@ -21,18 +21,18 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 
 //
@@ -155,14 +155,10 @@ TIntermTyped* TIntermediate::addBinaryMath(TOperator op, TIntermTyped* left, TIn
             return folded;
     }
 
-    // If either is a specialization constant, while the other is 
-    // a constant (or specialization constant), the result is still
-    // a specialization constant, if the operation is an allowed
-    // specialization-constant operation.
-    if (( left->getType().getQualifier().isSpecConstant() && right->getType().getQualifier().isConstant()) ||
-        (right->getType().getQualifier().isSpecConstant() &&  left->getType().getQualifier().isConstant()))
-        if (isSpecializationOperation(*node))
-            node->getWritableType().getQualifier().makeSpecConstant();
+    // If can propagate spec-constantness and if the operation is an allowed
+    // specialization-constant operation, make a spec-constant.
+    if (specConstantPropagates(*left, *right) && isSpecializationOperation(*node))
+        node->getWritableType().getQualifier().makeSpecConstant();
 
     return node;
 }
@@ -192,7 +188,7 @@ TIntermBinary* TIntermediate::addBinaryNode(TOperator op, TIntermTyped* left, TI
     node->setType(type);
     return node;
 }
-    
+
 //
 // Low level: add unary node (no promotions or other argument modifications)
 //
@@ -286,7 +282,7 @@ TIntermTyped* TIntermediate::addUnaryMath(TOperator op, TIntermTyped* child, TSo
         if (source == EShSourceHlsl) {
             break; // HLSL can promote logical not
         }
- 
+
         if (child->getType().getBasicType() != EbtBool || child->getType().isMatrix() || child->getType().isArray() || child->getType().isVector()) {
             return nullptr;
         }
@@ -474,7 +470,7 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
 
         // samplers can get assigned via a sampler constructor
         // (well, not yet, but code in the rest of this function is ready for it)
-        if (node->getBasicType() == EbtSampler && op == EOpAssign && 
+        if (node->getBasicType() == EbtSampler && op == EOpAssign &&
             node->getAsOperator() != nullptr && node->getAsOperator()->getOp() == EOpConstructTextureSampler)
             break;
 
@@ -867,16 +863,16 @@ bool TIntermediate::canImplicitlyPromote(TBasicType from, TBasicType to, TOperat
         if (fromConvertable && toConvertable) {
             switch (op) {
             case EOpAndAssign:               // assignments can perform arbitrary conversions
-            case EOpInclusiveOrAssign:       // ... 
-            case EOpExclusiveOrAssign:       // ... 
-            case EOpAssign:                  // ... 
-            case EOpAddAssign:               // ... 
-            case EOpSubAssign:               // ... 
-            case EOpMulAssign:               // ... 
-            case EOpVectorTimesScalarAssign: // ... 
-            case EOpMatrixTimesScalarAssign: // ... 
-            case EOpDivAssign:               // ... 
-            case EOpModAssign:               // ... 
+            case EOpInclusiveOrAssign:       // ...
+            case EOpExclusiveOrAssign:       // ...
+            case EOpAssign:                  // ...
+            case EOpAddAssign:               // ...
+            case EOpSubAssign:               // ...
+            case EOpMulAssign:               // ...
+            case EOpVectorTimesScalarAssign: // ...
+            case EOpMatrixTimesScalarAssign: // ...
+            case EOpDivAssign:               // ...
+            case EOpModAssign:               // ...
             case EOpReturn:                  // function returns can also perform arbitrary conversions
             case EOpFunctionCall:            // conversion of a calling parameter
             case EOpLogicalNot:
@@ -1162,15 +1158,15 @@ TIntermAggregate* TIntermediate::growAggregate(TIntermNode* left, TIntermNode* r
         return nullptr;
 
     TIntermAggregate* aggNode = nullptr;
-    if (left)
+    if (left != nullptr)
         aggNode = left->getAsAggregate();
-    if (! aggNode || aggNode->getOp() != EOpNull) {
+    if (aggNode == nullptr || aggNode->getOp() != EOpNull) {
         aggNode = new TIntermAggregate;
-        if (left)
+        if (left != nullptr)
             aggNode->getSequence().push_back(left);
     }
 
-    if (right)
+    if (right != nullptr)
         aggNode->getSequence().push_back(right);
 
     return aggNode;
@@ -1232,7 +1228,7 @@ TIntermAggregate* TIntermediate::makeAggregate(const TSourceLoc& loc)
 //
 // Returns the selection node created.
 //
-TIntermNode* TIntermediate::addSelection(TIntermTyped* cond, TIntermNodePair nodePair, const TSourceLoc& loc)
+TIntermTyped* TIntermediate::addSelection(TIntermTyped* cond, TIntermNodePair nodePair, const TSourceLoc& loc)
 {
     //
     // Don't prune the false path for compile-time constants; it's needed
@@ -1245,13 +1241,12 @@ TIntermNode* TIntermediate::addSelection(TIntermTyped* cond, TIntermNodePair nod
     return node;
 }
 
-
 TIntermTyped* TIntermediate::addComma(TIntermTyped* left, TIntermTyped* right, const TSourceLoc& loc)
 {
     // However, the lowest precedence operators of the sequence operator ( , ) and the assignment operators
     // ... are not included in the operators that can create a constant expression.
     //
-    //if (left->getType().getQualifier().storage == EvqConst &&
+    // if (left->getType().getQualifier().storage == EvqConst &&
     //    right->getType().getQualifier().storage == EvqConst) {
 
     //    return right;
@@ -1278,10 +1273,19 @@ TIntermTyped* TIntermediate::addMethod(TIntermTyped* object, const TType& type, 
 // a true path, and a false path.  The two paths are specified
 // as separate parameters.
 //
+// Specialization constant operations include
+//     - The ternary operator ( ? : )
+//
 // Returns the selection node created, or nullptr if one could not be.
 //
 TIntermTyped* TIntermediate::addSelection(TIntermTyped* cond, TIntermTyped* trueBlock, TIntermTyped* falseBlock, const TSourceLoc& loc)
 {
+    // If it's void, go to the if-then-else selection()
+    if (trueBlock->getBasicType() == EbtVoid && falseBlock->getBasicType() == EbtVoid) {
+        TIntermNodePair pair = { trueBlock, falseBlock };
+        return addSelection(cond, pair, loc);
+    }
+
     //
     // Get compatible types.
     //
@@ -1315,9 +1319,15 @@ TIntermTyped* TIntermediate::addSelection(TIntermTyped* cond, TIntermTyped* true
     // Make a selection node.
     //
     TIntermSelection* node = new TIntermSelection(cond, trueBlock, falseBlock, trueBlock->getType());
-    node->getQualifier().makeTemporary();
     node->setLoc(loc);
     node->getQualifier().precision = std::max(trueBlock->getQualifier().precision, falseBlock->getQualifier().precision);
+
+    if ((cond->getQualifier().isConstant() && specConstantPropagates(*trueBlock, *falseBlock)) ||
+        (cond->getQualifier().isSpecConstant() && trueBlock->getQualifier().isConstant() &&
+                                                 falseBlock->getQualifier().isConstant()))
+        node->getQualifier().makeSpecConstant();
+    else
+        node->getQualifier().makeTemporary();
 
     return node;
 }
@@ -1393,18 +1403,43 @@ TIntermConstantUnion* TIntermediate::addConstantUnion(double d, TBasicType baseT
     return addConstantUnion(unionArray, TType(baseType, EvqConst), loc, literal);
 }
 
-TIntermTyped* TIntermediate::addSwizzle(TVectorFields& fields, const TSourceLoc& loc)
+TIntermConstantUnion* TIntermediate::addConstantUnion(const TString* s, const TSourceLoc& loc, bool literal) const
+{
+    TConstUnionArray unionArray(1);
+    unionArray[0].setSConst(s);
+
+    return addConstantUnion(unionArray, TType(EbtString, EvqConst), loc, literal);
+}
+
+// Put vector swizzle selectors onto the given sequence
+void TIntermediate::pushSelector(TIntermSequence& sequence, const TVectorSelector& selector, const TSourceLoc& loc)
+{
+    TIntermConstantUnion* constIntNode = addConstantUnion(selector, loc);
+    sequence.push_back(constIntNode);
+}
+
+// Put matrix swizzle selectors onto the given sequence
+void TIntermediate::pushSelector(TIntermSequence& sequence, const TMatrixSelector& selector, const TSourceLoc& loc)
+{
+    TIntermConstantUnion* constIntNode = addConstantUnion(selector.coord1, loc);
+    sequence.push_back(constIntNode);
+    constIntNode = addConstantUnion(selector.coord2, loc);
+    sequence.push_back(constIntNode);
+}
+
+// Make an aggregate node that has a sequence of all selectors.
+template TIntermTyped* TIntermediate::addSwizzle<TVectorSelector>(TSwizzleSelectors<TVectorSelector>& selector, const TSourceLoc& loc);
+template TIntermTyped* TIntermediate::addSwizzle<TMatrixSelector>(TSwizzleSelectors<TMatrixSelector>& selector, const TSourceLoc& loc);
+template<typename selectorType>
+TIntermTyped* TIntermediate::addSwizzle(TSwizzleSelectors<selectorType>& selector, const TSourceLoc& loc)
 {
     TIntermAggregate* node = new TIntermAggregate(EOpSequence);
 
     node->setLoc(loc);
-    TIntermConstantUnion* constIntNode;
     TIntermSequence &sequenceVector = node->getSequence();
 
-    for (int i = 0; i < fields.num; i++) {
-        constIntNode = addConstantUnion(fields.offsets[i], loc);
-        sequenceVector.push_back(constIntNode);
-    }
+    for (int i = 0; i < selector.size(); i++)
+        pushSelector(sequenceVector, selector[i], loc);
 
     return node;
 }
@@ -1426,10 +1461,10 @@ const TIntermTyped* TIntermediate::findLValueBase(const TIntermTyped* node, bool
         if (binary == nullptr)
             return node;
         TOperator op = binary->getOp();
-        if (op != EOpIndexDirect && op != EOpIndexIndirect && op != EOpIndexDirectStruct && op != EOpVectorSwizzle)
+        if (op != EOpIndexDirect && op != EOpIndexIndirect && op != EOpIndexDirectStruct && op != EOpVectorSwizzle && op != EOpMatrixSwizzle)
             return nullptr;
         if (! swizzleOkay) {
-            if (op == EOpVectorSwizzle)
+            if (op == EOpVectorSwizzle || op == EOpMatrixSwizzle)
                 return nullptr;
             if ((op == EOpIndexDirect || op == EOpIndexIndirect) &&
                 (binary->getLeft()->getType().isVector() || binary->getLeft()->getType().isScalar()) &&
@@ -1520,7 +1555,7 @@ void TIntermediate::addSymbolLinkageNodes(TIntermAggregate*& linkage, EShLanguag
     //  - ftransform() can make gl_Vertex and gl_ModelViewProjectionMatrix active.
     //
 
-    //if (ftransformUsed) {
+    // if (ftransformUsed) {
         // TODO: 1.1 lowering functionality: track ftransform() usage
     //    addSymbolLinkageNode(root, symbolTable, "gl_Vertex");
     //    addSymbolLinkageNode(root, symbolTable, "gl_ModelViewProjectionMatrix");
@@ -2256,8 +2291,8 @@ bool TIntermediate::promoteAggregate(TIntermAggregate& node)
     case EOpDot:
     case EOpDst:
     case EOpFaceForward:
-        // case EOpFindMSB: TODO: ?? 
-        // case EOpFindLSB: TODO: ??
+    // case EOpFindMSB: TODO:
+    // case EOpFindLSB: TODO:
     case EOpFma:
     case EOpMod:
     case EOpFrexp:
@@ -2267,11 +2302,11 @@ bool TIntermediate::promoteAggregate(TIntermAggregate& node)
     case EOpMax:
     case EOpMin:
     case EOpModf:
-        // case EOpGenMul: TODO: ??
+    // case EOpGenMul: TODO:
     case EOpPow:
     case EOpReflect:
     case EOpRefract:
-    // case EOpSinCos: TODO: ??
+    // case EOpSinCos: TODO:
     case EOpSmoothStep:
     case EOpStep:
         break;
@@ -2303,7 +2338,6 @@ bool TIntermediate::promoteAggregate(TIntermAggregate& node)
 
     return false;
 }
-
 
 void TIntermBinary::updatePrecision()
 {
@@ -2622,6 +2656,15 @@ void TIntermAggregate::addToPragmaTable(const TPragmaTable& pTable)
     assert(!pragmaTable);
     pragmaTable = new TPragmaTable();
     *pragmaTable = pTable;
+}
+
+// If either node is a specialization constant, while the other is
+// a constant (or specialization constant), the result is still
+// a specialization constant.
+bool TIntermediate::specConstantPropagates(const TIntermTyped& node1, const TIntermTyped& node2)
+{
+    return (node1.getType().getQualifier().isSpecConstant() && node2.getType().getQualifier().isConstant()) ||
+           (node2.getType().getQualifier().isSpecConstant() && node1.getType().getQualifier().isConstant());
 }
 
 } // end namespace glslang

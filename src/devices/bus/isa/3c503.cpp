@@ -5,30 +5,26 @@
 
 #define SADDR 0xcc000
 
-static MACHINE_CONFIG_FRAGMENT(el2_3c503_config)
+MACHINE_CONFIG_MEMBER(el2_3c503_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
 	MCFG_DP8390D_IRQ_CB(WRITELINE(el2_3c503_device, el2_3c503_irq_w))
 	MCFG_DP8390D_MEM_READ_CB(READ8(el2_3c503_device, el2_3c503_mem_read))
 	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(el2_3c503_device, el2_3c503_mem_write))
 MACHINE_CONFIG_END
 
-const device_type EL2_3C503 = &device_creator<el2_3c503_device>;
-
-machine_config_constructor el2_3c503_device::device_mconfig_additions() const {
-	return MACHINE_CONFIG_NAME(el2_3c503_config);
-}
+DEFINE_DEVICE_TYPE(EL2_3C503, el2_3c503_device, "el2_3c503", "3C503 Network Adapter")
 
 el2_3c503_device::el2_3c503_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: device_t(mconfig, EL2_3C503, "3C503 Network Adapter", tag, owner, clock, "el2_3c503", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_dp8390(*this, "dp8390d"),
-		m_irq_state(0)
+	: device_t(mconfig, EL2_3C503, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_dp8390(*this, "dp8390d")
+	, m_irq_state(0)
 {
 }
 
 void el2_3c503_device::device_start() {
 	char mac[7];
-	uint32_t num = rand();
+	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
 	sprintf(mac, "\x02\x60\x8c%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	memcpy(m_prom, mac, 6);

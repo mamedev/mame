@@ -18,17 +18,22 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_74157_H
+#define MAME_MACHINE_74157_H
+
 #pragma once
 
-#ifndef DEVICES_MACHINE_74157_H
-#define DEVICES_MACHINE_74157_H
-
-#include "emu.h"
 
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
+
+#define MCFG_74157_A_IN_CB(_devcb) \
+	devcb = &ls157_device::set_a_in_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_74157_B_IN_CB(_devcb) \
+	devcb = &ls157_device::set_b_in_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_74157_OUT_CB(_devcb) \
 	devcb = &ls157_device::set_out_callback(*device, DEVCB_##_devcb);
@@ -45,10 +50,11 @@ class ls157_device : public device_t
 public:
 	// construction/destruction
 	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	ls157_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
 	// static configuration
-	template<class _Object> static devcb_base &set_out_callback(device_t &device, _Object object) { return downcast<ls157_device &>(device).m_out_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_a_in_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_a_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_b_in_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_b_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	// data writes
 	DECLARE_WRITE8_MEMBER(a_w);
@@ -62,19 +68,38 @@ public:
 	DECLARE_WRITE8_MEMBER(interleave_w);
 	void interleave_w(u8 data);
 
-	// line writes
+	// data line writes
+	DECLARE_WRITE_LINE_MEMBER(a0_w);
+	DECLARE_WRITE_LINE_MEMBER(a1_w);
+	DECLARE_WRITE_LINE_MEMBER(a2_w);
+	DECLARE_WRITE_LINE_MEMBER(a3_w);
+	DECLARE_WRITE_LINE_MEMBER(b0_w);
+	DECLARE_WRITE_LINE_MEMBER(b1_w);
+	DECLARE_WRITE_LINE_MEMBER(b2_w);
+	DECLARE_WRITE_LINE_MEMBER(b3_w);
+
+	// control line writes
 	DECLARE_WRITE_LINE_MEMBER(select_w);
 	DECLARE_WRITE_LINE_MEMBER(strobe_w);
 
+	// output read
+	DECLARE_READ8_MEMBER(output_r);
+
 protected:
+	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
 	// internal helpers
+	void write_a_bit(int bit, bool state);
+	void write_b_bit(int bit, bool state);
 	void update_output();
 
 	// callbacks
+	devcb_read8     m_a_in_cb;
+	devcb_read8     m_b_in_cb;
 	devcb_write8    m_out_cb;
 
 	// internal state
@@ -82,6 +107,13 @@ private:
 	u8              m_b;
 	bool            m_select;
 	bool            m_strobe;
+};
+
+class hc157_device : public ls157_device
+{
+public:
+	// construction/destruction
+	hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class hct157_device : public ls157_device
@@ -97,8 +129,8 @@ public:
 //**************************************************************************
 
 // device type definition
-extern const device_type LS157;
-extern const device_type HCT157;
+DECLARE_DEVICE_TYPE(LS157,  ls157_device)
+DECLARE_DEVICE_TYPE(HC157,  hc157_device)
+DECLARE_DEVICE_TYPE(HCT157, hct157_device)
 
-
-#endif
+#endif // MAME_MACHINE_74157_H

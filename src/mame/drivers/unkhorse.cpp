@@ -22,7 +22,10 @@ TODO:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class horse_state : public driver_device
 {
@@ -188,7 +191,7 @@ INTERRUPT_GEN_MEMBER(horse_state::interrupt)
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( horse, horse_state )
+static MACHINE_CONFIG_START( horse )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
@@ -237,4 +240,4 @@ ROM_START( unkhorse )
 ROM_END
 
 
-GAME( 1981?, unkhorse, 0, horse, horse, driver_device, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
+GAME( 1981?, unkhorse, 0, horse, horse, horse_state, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981

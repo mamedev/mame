@@ -118,11 +118,6 @@
 
 *******************************************************************************/
 
-
-#define MAIN_CLOCK  XTAL_18MHz
-#define SEC_CLOCK   XTAL_8MHz
-#define AUX_CLOCK   XTAL_3_579545MHz
-
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
@@ -131,8 +126,15 @@
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "video/hd63484.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "sigmab52.lh"
+
+
+#define MAIN_CLOCK  XTAL_18MHz
+#define SEC_CLOCK   XTAL_8MHz
+#define AUX_CLOCK   XTAL_3_579545MHz
 
 class sigmab52_state : public driver_device
 {
@@ -371,7 +373,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( jwildb52_hd63484_map, AS_0, 16, sigmab52_state )
+static ADDRESS_MAP_START( jwildb52_hd63484_map, 0, 16, sigmab52_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
@@ -573,7 +575,7 @@ void sigmab52_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
+static MACHINE_CONFIG_START( jwildb52 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)    /* 2 MHz */

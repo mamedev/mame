@@ -70,12 +70,16 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/terminal.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "ravens.lh"
+
 
 #define TERMINAL_TAG "terminal"
 
@@ -96,9 +100,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port1c_w);
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_MACHINE_RESET(ravens2);
-	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 	uint8_t m_term_char;
@@ -113,7 +117,7 @@ WRITE_LINE_MEMBER( ravens_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( ravens_state::cass_r )
+READ_LINE_MEMBER( ravens_state::cass_r )
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
@@ -210,7 +214,6 @@ static ADDRESS_MAP_START( ravens_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE(leds_w) // LED output port
 	AM_RANGE(0x10, 0x15) AM_WRITE(display_w) // 6-led display
 	AM_RANGE(0x17, 0x17) AM_READ(port17_r) // pushbuttons
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
@@ -218,7 +221,6 @@ static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(port1c_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -254,7 +256,7 @@ static INPUT_PORTS_START( ravens )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("???") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ravens_state::kbd_put )
+void ravens_state::kbd_put(u8 data)
 {
 	if (data > 0x60) data -= 0x20; // fold to uppercase
 	m_term_data = data;
@@ -324,12 +326,13 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	return result;
 }
 
-static MACHINE_CONFIG_START( ravens, ravens_state )
+static MACHINE_CONFIG_START( ravens )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(ravens_state, cass_w))
+	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
@@ -344,18 +347,19 @@ static MACHINE_CONFIG_START( ravens, ravens_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ravens2, ravens_state )
+static MACHINE_CONFIG_START( ravens2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens2_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(ravens_state, cass_w))
+	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ravens_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ravens_state, kbd_put))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
@@ -383,6 +387,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS        INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1984, ravens,  0,       0,       ravens,  ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
-COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS         INIT  COMPANY                            FULLNAME                               FLAGS */
+COMP( 1984, ravens,  0,       0,       ravens,  ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
+COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )

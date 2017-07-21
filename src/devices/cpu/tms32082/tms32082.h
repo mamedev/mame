@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#pragma once
+#ifndef MAME_CPU_TMS32082_TMS32082_H
+#define MAME_CPU_TMS32082_TMS32082_H
 
-#ifndef __TMS32082_H__
-#define __TMS32082_H__
+#pragma once
 
 // Master Processor class
 class tms32082_mp_device : public cpu_device
@@ -87,14 +87,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -182,14 +175,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -211,8 +197,8 @@ protected:
 };
 
 
-extern const device_type TMS32082_MP;
-extern const device_type TMS32082_PP;
+DECLARE_DEVICE_TYPE(TMS32082_MP, tms32082_mp_device)
+DECLARE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device)
 
 
-#endif /* __TMS32082_H__ */
+#endif // MAME_CPU_TMS32082_TMS32082_H

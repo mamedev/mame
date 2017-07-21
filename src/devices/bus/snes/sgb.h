@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __SNS_SGB_H
-#define __SNS_SGB_H
+#ifndef MAME_BUS_SNES_SGB_H
+#define MAME_BUS_SNES_SGB_H
+
+#pragma once
 
 #include "snes_slot.h"
 #include "rom.h"
@@ -19,13 +21,6 @@
 class sns_rom_sgb_device : public sns_rom_device
 {
 public:
-	// construction/destruction
-	sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
@@ -45,6 +40,13 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
 protected:
+	// construction/destruction
+	sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	required_device<lr35902_cpu_device> m_sgb_cpu;
 	required_device<gameboy_sound_device> m_sgb_apu;
 	required_device<sgb_ppu_device> m_sgb_ppu;
@@ -81,8 +83,9 @@ public:
 	// construction/destruction
 	sns_rom_sgb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -93,13 +96,14 @@ public:
 	// construction/destruction
 	sns_rom_sgb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition
-extern const device_type SNS_LOROM_SUPERGB;
-extern const device_type SNS_LOROM_SUPERGB2;
+DECLARE_DEVICE_TYPE(SNS_LOROM_SUPERGB,  sns_rom_sgb1_device)
+DECLARE_DEVICE_TYPE(SNS_LOROM_SUPERGB2, sns_rom_sgb2_device)
 
-#endif
+#endif // MAME_BUS_SNES_SGB_H

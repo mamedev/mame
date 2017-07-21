@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class poker72_state : public driver_device
@@ -361,7 +363,7 @@ void poker72_state::machine_reset()
 	membank("bank1")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( poker72, poker72_state )
+static MACHINE_CONFIG_START( poker72 )
 
 
 	/* basic machine hardware */

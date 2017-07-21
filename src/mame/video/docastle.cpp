@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/docastle.h"
+#include "screen.h"
 
 /***************************************************************************
 
@@ -75,15 +76,22 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(docastle_state::flipscreen_r)
+READ8_MEMBER(docastle_state::inputs_flipscreen_r)
 {
-	flip_screen_set(offset);
-	return (offset ? 1 : 0); // is this really needed?
+	// inputs pass through LS244 non-inverting buffer
+	uint8_t buf = (m_inp[1]->read_h(space, 0) << 4) | m_inp[0]->read_h(space, 0);
+
+	// LS273 latches address bits on rising edge of address decode
+	flip_screen_set(BIT(offset, 7));
+	m_inp[0]->write_s(space, 0, offset & 7);
+	m_inp[1]->write_s(space, 0, offset & 7);
+
+	return buf;
 }
 
 WRITE8_MEMBER(docastle_state::flipscreen_w)
 {
-	flip_screen_set(offset);
+	flip_screen_set(BIT(offset, 7));
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)

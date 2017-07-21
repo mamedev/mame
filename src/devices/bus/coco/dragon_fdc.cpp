@@ -11,7 +11,7 @@
     which mostly uses the same command set with some subtle differences, most
     notably the 2797 handles disk side select internally. The Dragon Alpha also
     uses the WD2797, however as this is a built in interface and not an external
-    cartrige, it is dealt with in the main coco.cpp file.
+    cartridge, it is dealt with in the main coco.cpp file.
 
     The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
     on the Dragon.  In addition, there is another register
@@ -69,11 +69,11 @@
 #include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
-#include "includes/coco.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
+#include "formats/sdf_dsk.h"
 
 
 /***************************************************************************
@@ -92,26 +92,25 @@ namespace
 {
 	class dragon_fdc_device_base : public coco_family_fdc_device_base
 	{
-	public:
-		// construction/destruction
-		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	protected:
+		// construction/destruction
+		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 		// device-level overrides
-		virtual DECLARE_READ8_MEMBER(read) override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual DECLARE_READ8_MEMBER(scs_read) override;
+		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+		virtual void device_add_mconfig(machine_config &config) override;
 		virtual void update_lines() override;
 
 	private:
 		// device references
-		required_device<wd2797_t>                   m_wd2797;
+		required_device<wd2797_device>              m_wd2797;
 		required_device_array<floppy_connector, 4>  m_floppies;
 
 		// methods
 		void dskreg_w(uint8_t data);
 	};
-};
+}
 
 /***************************************************************************
     LOCAL VARIABLES
@@ -122,15 +121,19 @@ static SLOT_INTERFACE_START(dragon_fdc_device_base)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
+MACHINE_CONFIG_MEMBER(dragon_fdc_device_base::device_add_mconfig)
 	MCFG_WD2797_ADD(WD2797_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 
@@ -141,22 +144,11 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 //  dragon_fdc_device_base - constructor
 //-------------------------------------------------
-dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: coco_family_fdc_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
+dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd2797(*this, WD2797_TAG)
 	, m_floppies(*this, WD2797_TAG ":%u", 0)
 {
-}
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor dragon_fdc_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(dragon_fdc);
 }
 
 
@@ -168,10 +160,10 @@ machine_config_constructor dragon_fdc_device_base::device_mconfig_additions() co
 void dragon_fdc_device_base::update_lines()
 {
 	// set the NMI line
-	cart_set_line(cococart_slot_device::line::NMI, intrq() && (dskreg() & 0x20));
+	set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
 
 	// set the CART line
-	cart_set_line(cococart_slot_device::line::CART, drq());
+	set_line_value(line::CART, drq());
 }
 
 
@@ -201,7 +193,7 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w((data && 0x04) && (i == (data & 0x03)) ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w((data & 0x04) && (i == (data & 0x03)) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// manipulate the WD2797
@@ -213,10 +205,10 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_fdc_device_base::read)
+READ8_MEMBER(dragon_fdc_device_base::scs_read)
 {
 	uint8_t result = 0;
 	switch (offset & 0xEF)
@@ -240,10 +232,10 @@ READ8_MEMBER(dragon_fdc_device_base::read)
 
 
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(dragon_fdc_device_base::write)
+WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 {
 	switch (offset & 0xEF)
 	{
@@ -285,7 +277,7 @@ namespace
 	public:
 		// construction/destruction
 		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: dragon_fdc_device_base(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock, "dragon_fdc", __FILE__)
+			: dragon_fdc_device_base(mconfig, DRAGON_FDC, tag, owner, clock)
 		{
 		}
 
@@ -296,9 +288,9 @@ namespace
 			return ROM_NAME(dragon_fdc);
 		}
 	};
-};
+}
 
-const device_type DRAGON_FDC = &device_creator<dragon_fdc_device>;
+DEFINE_DEVICE_TYPE(DRAGON_FDC, dragon_fdc_device, "dragon_fdc", "Dragon FDC")
 
 
 //**************************************************************************
@@ -317,7 +309,7 @@ namespace
 	public:
 		// construction/destruction
 		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: dragon_fdc_device_base(mconfig, SDTANDY_FDC, "SDTANDY FDC", tag, owner, clock, "sdtandy_fdc", __FILE__)
+			: dragon_fdc_device_base(mconfig, SDTANDY_FDC, tag, owner, clock)
 		{
 		}
 
@@ -328,6 +320,6 @@ namespace
 			return ROM_NAME(sdtandy_fdc);
 		}
 	};
-};
+}
 
-const device_type SDTANDY_FDC = &device_creator<sdtandy_fdc_device>;
+DEFINE_DEVICE_TYPE(SDTANDY_FDC, sdtandy_fdc_device, "sdtandy_fdc", "SDTANDY FDC")

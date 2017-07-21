@@ -15,8 +15,10 @@
 
 #include "ui/selmenu.h"
 
+class media_auditor;
 
 namespace ui {
+
 class menu_select_game : public menu_select_launch
 {
 public:
@@ -27,7 +29,7 @@ public:
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
 protected:
-	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 private:
 	enum
@@ -75,6 +77,8 @@ private:
 	void init_sorted_list();
 	bool load_available_machines();
 	void load_custom_filters();
+
+	static std::string make_error_text(bool summary, media_auditor const &auditor);
 
 	void *get_selection_ptr() const
 	{

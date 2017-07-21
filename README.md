@@ -3,13 +3,16 @@
 
 [![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Build status for tiny build only, containing just core parts of project
+Build status for tiny build only, containing just core parts of project:
 
 | OS/Compiler        | Status           | 
 | ------------- |:-------------:| 
 |Linux GCC / OSX Clang| [![Build Status](https://travis-ci.org/mamedev/mame.svg?branch=master)](https://travis-ci.org/mamedev/mame) |
 |Windows MinGW | [![Build Status](https://tea-ci.org/api/badges/mamedev/mame/status.svg)](https://tea-ci.org/mamedev/mame) |
 
+Static analysis status for entire build (except for third-party parts of project):
+
+[![Coverity Scan Status](https://scan.coverity.com/projects/5727/badge.svg?flat=1)](https://scan.coverity.com/projects/mame-emulator)
 
 What is MAME?
 =============
@@ -89,7 +92,7 @@ Please note that MAME is a registered trademark of Nicola Salmoria, and permissi
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-    Copyright (C) 1997-2016  MAMEDev and contributors
+    Copyright (C) 1997-2017  MAMEDev and contributors
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

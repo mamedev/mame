@@ -90,7 +90,7 @@
     FC2   |       |C1 |C2 |C3 |C1 |C2 |C3 | W |
           |       |  color 3  |  color 4  |   |
           |                               |   |
-    FC3   |                       |frm|pos| W | scroe format and position
+    FC3   |                       |frm|pos| W | score format and position
           |                               |   |
     FC4   |                               | - |
     FC5   |                               | - |
@@ -120,6 +120,8 @@
 
 #include "emu.h"
 #include "machine/s2636.h"
+
+#include "screen.h"
 
 
 int const s2636_device::OFFS_OBJ[s2636_device::OBJ_COUNT] = { 0x000, 0x010, 0x020, 0x040 };
@@ -153,10 +155,10 @@ uint16_t const s2636_device::SCORE_FONT[16][5] =
  *
  *************************************/
 
-const device_type S2636 = &device_creator<s2636_device>;
+DEFINE_DEVICE_TYPE(S2636, s2636_device, "s2636", "Signetics 2636 PVI")
 
 s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__)
+	: device_t(mconfig, S2636, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_sound_interface(mconfig, *this)
 	, m_divider(1)
@@ -414,7 +416,7 @@ READ8_MEMBER( s2636_device::read_data )
 	{
 	case REG_COL_BG_CMPL:
 	case REG_VBL_COL_OBJ:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			m_registers[offset] = 0x00; // collision/completion/VRESET flags reset on read
 		break;
 	}

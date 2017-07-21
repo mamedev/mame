@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "magic_formel.h"
 
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MAGIC_FORMEL = &device_creator<c64_magic_formel_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MAGIC_FORMEL, c64_magic_formel_cartridge_device, "c64_magic_formel", "C64 Magic Formel cartridge")
 
 
 WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
@@ -92,26 +93,15 @@ WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_magic_formel )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_magic_formel )
+MACHINE_CONFIG_MEMBER( c64_magic_formel_cartridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pb_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(c64_magic_formel_cartridge_device, pia_cb2_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_magic_formel_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_magic_formel );
-}
 
 
 //-------------------------------------------------
@@ -163,7 +153,7 @@ ioport_constructor c64_magic_formel_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MAGIC_FORMEL, "C64 Magic Formel cartridge", tag, owner, clock, "c64_magic_formel", __FILE__),
+	device_t(mconfig, C64_MAGIC_FORMEL, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_pia(*this, MC6821_TAG),
 	m_ram(*this, "ram"),

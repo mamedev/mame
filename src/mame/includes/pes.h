@@ -40,12 +40,12 @@ public:
 	uint8_t m_infifo_head_ptr;        // " head
 
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(rsws_w);
+	DECLARE_WRITE8_MEMBER(rsq_wsq_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port3_w);
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port3_r);
-	DECLARE_WRITE8_MEMBER(pes_kbd_input);
+	void pes_kbd_input(u8 data);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 };

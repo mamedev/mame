@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef _GAMEPOCK_H_
-#define _GAMEPOCK_H_
-#include "sound/speaker.h"
+#ifndef MAME_INCLUDES_GAMEPOCK_H
+#define MAME_INCLUDES_GAMEPOCK_H
+
+#pragma once
+
 #include "bus/generic/slot.h"
+#include "sound/spkrdev.h"
 
 struct HD44102CH {
 	uint8_t   enabled;
@@ -21,7 +24,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_cart(*this, "cartslot")
-		{ }
+	{ }
 
 	virtual void machine_reset() override;
 
@@ -44,4 +47,4 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
 };
 
-#endif
+#endif // MAME_INCLUDES_GAMEPOCK_H

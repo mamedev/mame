@@ -29,7 +29,9 @@ public:
 		m_spr(*this, "vsystem_spr"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_spr_old2(*this, "vsystem_spr_ol2"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_soundbank(*this, "soundbank"),
+		m_okibank(*this, "okibank") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg1videoram;
@@ -53,7 +55,8 @@ public:
 	optional_device<vsystem_spr2_device> m_spr_old2; //  or a pair of them..
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-
+	optional_memory_bank m_soundbank;
+	optional_memory_bank m_okibank;
 
 	/* video-related */
 	tilemap_t   *m_bg1_tilemap;
@@ -64,6 +67,7 @@ public:
 	uint16_t    m_bg1scrolly;
 	uint16_t    m_bg2scrollx;
 	uint16_t    m_bg2scrolly;
+	bool        m_flip_screen;
 	uint16_t    m_wbbc97_bitmap_enable;
 	int       m_charpalettebank;
 	int       m_spritepalettebank;
@@ -74,15 +78,11 @@ public:
 	uint32_t aerofgt_old_tile_callback( uint32_t code );
 	uint32_t aerofgt_ol2_tile_callback( uint32_t code );
 
-	/* misc */
-	int       m_pending_command;
-
 	/* handlers */
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(aerfboot_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(karatblzbl_soundlatch_w);
 	DECLARE_READ8_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spinlbrk_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1videoram_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2videoram_w);
@@ -98,6 +98,8 @@ public:
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrollx_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrolly_w);
 	DECLARE_WRITE8_MEMBER(pspikes_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(spinlbrk_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(turbofrc_flip_screen_w);
 	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
 	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
 	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);
@@ -110,6 +112,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	DECLARE_MACHINE_START(aerofgt);
+	DECLARE_MACHINE_START(spinlbrk);
 	DECLARE_MACHINE_RESET(aerofgt);
 	DECLARE_VIDEO_START(pspikes);
 	DECLARE_MACHINE_START(common);

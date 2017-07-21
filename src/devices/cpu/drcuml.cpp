@@ -88,21 +88,27 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 		m_cache(cache),
 		m_device(device),
 		m_state(*(drcuml_machine_state *)cache.alloc_near(sizeof(m_state))),
-		m_accessors((data_accessors *)cache.alloc_near(sizeof(*m_accessors) * ADDRESS_SPACES))
+		m_accessors(nullptr)
 {
 	// reset the machine state
-	memset(m_accessors, 0, sizeof(*m_accessors) * ADDRESS_SPACES);
 	memset(&m_state, 0, sizeof(m_state));
 
 	// find the spaces and fetch memory accessors
 	device_memory_interface *memory;
 	if (device.interface(memory))
-		for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space); ++spacenum)
+	{
+		int count = memory->max_space_count();
+		m_accessors = ((data_accessors *)cache.alloc_near(sizeof(*m_accessors) * count));
+		memset(m_accessors, 0, sizeof(*m_accessors) * count);
+		m_space.resize(count, nullptr);
+
+		for (int spacenum = 0; spacenum < count; ++spacenum)
 			if (memory->has_space(spacenum))
 			{
 				m_space[spacenum] = &memory->space(spacenum);
 				m_space[spacenum]->accessors(m_accessors[spacenum]);
 			}
+	}
 }
 
 

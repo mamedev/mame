@@ -22,26 +22,29 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class homez80_state : public driver_device
 {
 public:
 	homez80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
-	required_shared_ptr<uint8_t> m_p_videoram;
-	uint8_t* m_p_chargen;
+	INTERRUPT_GEN_MEMBER(homez80_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	bool m_irq;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(homez80_interrupt);
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -55,7 +58,7 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_SHARE("videoram") // Video RAM
 	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
 ADDRESS_MAP_END
@@ -218,11 +221,6 @@ void homez80_state::machine_reset()
 	m_irq = 0;
 }
 
-void homez80_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
 uint32_t homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y,ra,chr,gfx;
@@ -280,7 +278,7 @@ INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
 	m_irq ^= 1;
 }
 
-static MACHINE_CONFIG_START( homez80, homez80_state )
+static MACHINE_CONFIG_START( homez80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(homez80_mem)
@@ -311,5 +309,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 2008, homez80,  0,     0,      homez80,   homez80, driver_device, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY             FULLNAME                 FLAGS */
+COMP( 2008, homez80,  0,     0,      homez80,   homez80, homez80_state, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)

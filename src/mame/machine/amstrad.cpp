@@ -38,6 +38,8 @@ This gives a total of 19968 NOPs per frame.
 
 
 #include "emu.h"
+#include "includes/amstrad.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
@@ -47,7 +49,6 @@ This gives a total of 19968 NOPs per frame.
 #include "bus/cpc/mface2.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "includes/amstrad.h"
 #include "sound/ay8910.h"
 #include "machine/ram.h"
 
@@ -1167,7 +1168,7 @@ void amstrad_state::amstrad_setLowerRom()
 		if ((m_gate_array.mrer & (1<<2)) == 0 && m_gate_array.romdis == 0)
 		{
 			if (m_exp)
-				m_exp->set_mapping(MAP_LOWER);
+				m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_LOWER);
 		}
 	}
 	else  // CPC+/GX4000
@@ -1234,7 +1235,7 @@ void amstrad_state::amstrad_setLowerRom()
 				m_bank1->set_base(m_region_cart->base());
 				m_bank2->set_base(m_region_cart->base() + 0x2000);
 				if (m_exp)
-					m_exp->set_mapping(MAP_LOWER);
+					m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_LOWER);
 			}
 		}
 	}
@@ -1269,7 +1270,7 @@ void amstrad_state::amstrad_setUpperRom()
 	if ( ! ( m_gate_array.mrer & 0x08 ) && m_gate_array.romdis == 0)
 	{
 		if (m_exp)
-			m_exp->set_mapping(MAP_UPPER);
+			m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_UPPER);
 	}
 
 }
@@ -2461,7 +2462,7 @@ void amstrad_state::amstrad_rethinkMemory()
 
 	/* mappings for other expansion devices */
 	if (m_exp)
-		m_exp->set_mapping(MAP_OTHER);
+		m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_OTHER);
 }
 
 
@@ -2475,7 +2476,7 @@ void amstrad_state::kccomp_reset_machine()
 }
 
 
-void amstrad_state::screen_eof_amstrad(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(amstrad_state::screen_vblank_amstrad)
 {
 	// rising edge
 	if (state)
@@ -3006,7 +3007,7 @@ void amstrad_state::enumerate_roms()
 		{
 			char str[20];
 			sprintf(str, "rom%i", i + 1);
-			rom_image_device* romimage = romexp->subdevice<rom_image_device>(str);
+			cpc_rom_image_device* romimage = romexp->subdevice<cpc_rom_image_device>(str);
 			if(romimage != nullptr && romimage->base() != nullptr)
 			{
 				m_Amstrad_ROM_Table[m_rom_count] = romimage->base();
@@ -3291,7 +3292,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	logerror("IMG: loading CPC+ cartridge file\n");
 
 	// check for .CPR header
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		image.fread(header, 12);
 		if (strncmp((char *)header, "RIFF", 4) != 0)
@@ -3310,7 +3311,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
 	// actually load the cart into ROM
-	if (image.software_entry() != nullptr)
+	if (image.loaded_through_softlist())
 	{
 		logerror("IMG: raw CPC+ cartridge from softlist\n");
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);

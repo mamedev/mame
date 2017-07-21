@@ -10,8 +10,7 @@ TODO:
 - sprite glitches (sometimes) .. missing vertical flip flag? <- (*)
 - sound cpu int freq (timer ? $a010 writes ?)
 
-(*) this looks a BTANB, when the player slide the relative sand drawing is made with the text tilemap and it's virtually impossible
-to fix it without breaking anything else. -AS
+(*) this was caused by flip Y being hooked up as bit 6 in text videoram attribute. -AS
 
 M6100097A
 
@@ -67,10 +66,14 @@ SRAM:
 
 #include "emu.h"
 #include "includes/ksayakyu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_18_432MHz
 
@@ -104,6 +107,12 @@ WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
 	m_soundlatch->write(space, 0, data);
 }
 
+READ8_MEMBER(ksayakyu_state::int_ack_r)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return 0xff; // value not used
+}
+
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -116,7 +125,7 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(ksayakyu_videoctrl_w)
 	AM_RANGE(0xa805, 0xa805) AM_WRITE(latch_w)
 	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
-	AM_RANGE(0xa807, 0xa807) AM_READNOP /* watchdog ? */
+	AM_RANGE(0xa807, 0xa807) AM_READ(int_ack_r)
 	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("spriteram")
@@ -247,12 +256,11 @@ void ksayakyu_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
+static MACHINE_CONFIG_START( ksayakyu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ksayakyu_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK/8) //divider is guessed, controls DAC tempo
 	MCFG_CPU_PROGRAM_MAP(soundcpu_map)
@@ -269,6 +277,7 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ksayakyu_state, screen_update_ksayakyu)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksayakyu)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -330,4 +339,4 @@ ROM_START( ksayakyu )
 	ROM_LOAD( "9f.bin", 0x0000, 0x0100, CRC(ff71b27f) SHA1(6aad2bd2be997595a05ddb81d24df8fe1435910b) )
 ROM_END
 
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, driver_device, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu_state, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )

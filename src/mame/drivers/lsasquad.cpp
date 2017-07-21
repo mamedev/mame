@@ -144,11 +144,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
-#include "sound/ay8910.h"
-#include "sound/2203intf.h"
 #include "includes/lsasquad.h"
+
+#include "cpu/m6805/m6805.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK    XTAL_24MHz
@@ -185,7 +188,7 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
@@ -382,7 +385,7 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
@@ -557,7 +560,7 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 }
 
 /* Note: lsasquad clock values are not verified */
-static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
+static MACHINE_CONFIG_START( lsasquad )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
@@ -587,12 +590,12 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
+	MCFG_SOUND_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
@@ -611,9 +614,12 @@ static MACHINE_CONFIG_DERIVED( storming, lsasquad )
 	MCFG_CPU_PROGRAM_MAP(storming_map)
 
 	MCFG_DEVICE_REMOVE("bmcu")
+
+	MCFG_SOUND_REPLACE("aysnd", AY8910, MASTER_CLOCK / 8) // AY-3-8910A
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
+static MACHINE_CONFIG_START( daikaiju )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
@@ -643,12 +649,12 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
+	MCFG_SOUND_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
@@ -783,6 +789,6 @@ ROM_START( daikaiju )
 ROM_END
 
 
-GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, driver_device, 0, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, storming, lsasquad, storming, storming, driver_device, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, driver_device, 0, ROT270, "Taito", "Daikaiju no Gyakushu", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad_state, 0, ROT270, "Taito",   "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, storming, lsasquad, storming, storming, lsasquad_state, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, lsasquad_state, 0, ROT270, "Taito",   "Daikaiju no Gyakushu",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

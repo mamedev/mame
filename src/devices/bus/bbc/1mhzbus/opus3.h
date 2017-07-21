@@ -7,10 +7,9 @@
 **********************************************************************/
 
 
-#ifndef __BBC_OPUS3__
-#define __BBC_OPUS3__
+#ifndef MAME_BUS_BBC_1MHZBUS_OPUS3_H
+#define MAME_BUS_BBC_1MHZBUS_OPUS3_H
 
-#include "emu.h"
 #include "1mhzbus.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -29,13 +28,6 @@ public:
 	// construction/destruction
 	bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(wd1770l_write);
 	DECLARE_WRITE8_MEMBER(page_w);
 	DECLARE_READ8_MEMBER(ramdisk_r);
@@ -46,10 +38,18 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 private:
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
 	required_memory_region m_dfs_rom;
 	required_device<ram_device> m_ramdisk;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -60,7 +60,7 @@ private:
 
 
 // device type definition
-extern const device_type BBC_OPUS3;
+DECLARE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device)
 
 
-#endif /* __BBC_OPUS3__ */
+#endif // MAME_BUS_BBC_1MHZBUS_OPUS3_H

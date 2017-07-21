@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_MAGIC_DESK_H
+#define MAME_BUS_C64_MAGIC_DESK_H
+
 #pragma once
 
-#ifndef __MAGIC_DESK__
-#define __MAGIC_DESK__
 
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -45,7 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MAGIC_DESK;
+DECLARE_DEVICE_TYPE(C64_MAGIC_DESK, c64_magic_desk_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MAGIC_DESK_H

@@ -222,6 +222,7 @@ collisions, one is for sprite/sprite collisions.
 */
 
 
+#include "emu.h"
 #include "includes/arcadia.h"
 
 static const uint8_t chars[0x40][8]={
@@ -664,9 +665,9 @@ INTERRUPT_GEN_MEMBER(arcadia_state::video_line)
 		draw_sprites();
 }
 
-READ8_MEMBER( arcadia_state::vsync_r )
+READ_LINE_MEMBER(arcadia_state::vsync_r)
 {
-	return m_line>=216 ? 0x80 : 0 ;
+	return m_line >= 216 ? ASSERT_LINE : CLEAR_LINE;
 }
 
 uint32_t arcadia_state::screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

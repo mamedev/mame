@@ -19,7 +19,7 @@
 
     This Can be converted to tilemaps very easily, but probably not worth it
 
-    Backup RAM enable / disable needs figuring out properly
+    EEPROM enable / disable needs figuring out properly
 */
 
 /*
@@ -37,6 +37,7 @@
     1x OKI5205 (sound)
     1x crystal resonator POE400B (close to sound)
     1x oscillator 24.000000MHz (close to main)
+    1x Exel XLS28C16AP (backup memory)
     ROMs
     1x M27C2001 (1)
     4x AM27C010 (2,5,6,7)
@@ -439,7 +440,9 @@
 #include "cpu/z180/z180.h"
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
-#include "machine/nvram.h"
+#include "machine/eeprompar.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class mastboy_state : public driver_device
@@ -451,7 +454,7 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_nvram(*this, "nvram") ,
+		m_earom(*this, "earom") ,
 		m_workram(*this, "workram"),
 		m_tileram(*this, "tileram"),
 		m_colram(*this, "colram") { }
@@ -460,8 +463,8 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<eeprom_parallel_28xx_device> m_earom;
 
-	required_shared_ptr<uint8_t> m_nvram;
 	required_shared_ptr<uint8_t> m_workram;
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_colram;
@@ -469,7 +472,7 @@ public:
 	uint8_t* m_vram;
 	uint8_t m_bank;
 	int m_irq0_ack;
-	int m_backupram_enabled;
+	int m_earom_enabled;
 	int m_m5205_next;
 	int m_m5205_part;
 	int m_m5205_sambit0;
@@ -478,9 +481,9 @@ public:
 	DECLARE_READ8_MEMBER(banked_ram_r);
 	DECLARE_WRITE8_MEMBER(banked_ram_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(backupram_r);
-	DECLARE_WRITE8_MEMBER(backupram_w);
-	DECLARE_WRITE8_MEMBER(backupram_enable_w);
+	DECLARE_READ8_MEMBER(earom_r);
+	DECLARE_WRITE8_MEMBER(earom_w);
+	DECLARE_WRITE8_MEMBER(earom_enable_w);
 	DECLARE_WRITE8_MEMBER(msm5205_sambit0_w);
 	DECLARE_WRITE8_MEMBER(msm5205_sambit1_w);
 	DECLARE_WRITE8_MEMBER(msm5205_data_w);
@@ -625,30 +628,30 @@ WRITE8_MEMBER(mastboy_state::bank_w)
 	m_bank = data;
 }
 
-/* Backup RAM access */
+// EAROM (28C16 parallel EEPROM) access
 
-READ8_MEMBER(mastboy_state::backupram_r)
+READ8_MEMBER(mastboy_state::earom_r)
 {
-	return m_nvram[offset];
+	return m_earom->read(space, offset);
 }
 
-WRITE8_MEMBER(mastboy_state::backupram_w)
+WRITE8_MEMBER(mastboy_state::earom_w)
 {
-//  if (m_backupram_enabled)
+//  if (m_earom_enabled)
 //  {
-		m_nvram[offset] = data;
+		m_earom->write(space, offset, data);
 //  }
 //  else
 //  {
-//      logerror("Write to BackupRAM when disabled! %04x, %02x\n", offset,data);
+//      logerror("Write to EAROM when disabled! %04x, %02x\n", offset,data);
 //  }
 }
 
-WRITE8_MEMBER(mastboy_state::backupram_enable_w)
+WRITE8_MEMBER(mastboy_state::earom_enable_w)
 {
-	/* This is some kind of enable / disable control for backup ram (see Charles's notes) but I'm not
+	/* This is some kind of enable / disable control for backup memory (see Charles's notes) but I'm not
 	   sure how it works in practice, if we use it then it writes a lot of data with it disabled */
-	m_backupram_enabled = data&1;
+	m_earom_enabled = data&1;
 }
 
 /* MSM5205 Related */
@@ -721,7 +724,7 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 
-	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(backupram_r,backupram_w) AM_SHARE("nvram")
+	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(earom_r, earom_w)
 
 	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
 	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
@@ -729,14 +732,13 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0xff820, 0xff827) AM_WRITE(bank_w)
-	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_device, data_w)
-	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_device, control_w)
+	AM_RANGE(0xff828, 0xff829) AM_DEVWRITE("saa", saa1099_device, write)
 	AM_RANGE(0xff830, 0xff830) AM_WRITE(msm5205_data_w)
 	AM_RANGE(0xff838, 0xff838) AM_WRITE(irq0_ack_w)
 	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_sambit0_w)
 	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_sambit1_w)
 	AM_RANGE(0xff83b, 0xff83b) AM_WRITE(msm5205_reset_w)
-	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(backupram_enable_w)
+	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(earom_enable_w)
 
 	AM_RANGE(0xffc00, 0xfffff) AM_RAM // Internal RAM
 ADDRESS_MAP_END
@@ -882,7 +884,7 @@ void mastboy_state::machine_start()
 
 	save_item(NAME(m_bank));
 	save_item(NAME(m_irq0_ack));
-	save_item(NAME(m_backupram_enabled));
+	save_item(NAME(m_earom_enabled));
 	save_item(NAME(m_m5205_next));
 	save_item(NAME(m_m5205_part));
 	save_item(NAME(m_m5205_sambit0));
@@ -904,13 +906,13 @@ void mastboy_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( mastboy, mastboy_state )
+static MACHINE_CONFIG_START( mastboy )
 	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  interrupt)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_EEPROM_2816_ADD("earom")
 
 
 	/* video hardware */
@@ -933,7 +935,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1054,6 +1056,6 @@ ROM_START( mastboyia )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )

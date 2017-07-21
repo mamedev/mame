@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __MIDIIN_H__
-#define __MIDIIN_H__
+#ifndef MAME_DEVICES_IMAGEDEV_MIDIIN_H
+#define MAME_DEVICES_IMAGEDEV_MIDIIN_H
+
+#pragma once
 
 
 #define MCFG_MIDIIN_INPUT_CB(_devcb) \
@@ -50,7 +52,6 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void device_config_complete() override;
 
 	// serial overrides
 	virtual void tra_complete() override;    // Tx completed sending byte
@@ -70,9 +71,9 @@ private:
 };
 
 // device type definition
-extern const device_type MIDIIN;
+DECLARE_DEVICE_TYPE(MIDIIN, midiin_device)
 
 // device iterator
-typedef device_type_iterator<&device_creator<midiin_device>, midiin_device> midiin_device_iterator;
+typedef device_type_iterator<midiin_device> midiin_device_iterator;
 
-#endif /* __MIDIIN_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_MIDIIN_H

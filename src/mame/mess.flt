@@ -13,10 +13,12 @@ abc1600.cpp
 abc80.cpp
 abc80x.cpp
 ac1.cpp
+accomm.cpp
 aceex.cpp
 acrnsys1.cpp
 adam.cpp
 advision.cpp
+agat.cpp
 aim65.cpp
 aim65_40.cpp
 akaiax80.cpp
@@ -84,6 +86,7 @@ bk.cpp
 bmjr.cpp
 bml3.cpp
 bob85.cpp
+bpmmicro.cpp
 br8641.cpp
 bullet.cpp
 busicom.cpp
@@ -120,6 +123,7 @@ coco12.cpp
 coco3.cpp
 codata.cpp
 coleco.cpp
+compc.cpp
 compis.cpp
 compucolor.cpp
 comquest.cpp
@@ -132,6 +136,7 @@ craft.cpp
 crvision.cpp
 ct486.cpp
 cvicny.cpp
+cxgz80.cpp
 cxhumax.cpp
 cybiko.cpp
 czk80.cpp
@@ -140,6 +145,7 @@ d6809.cpp
 dai.cpp
 daruma.cpp
 datum.cpp
+dbox.cpp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
@@ -178,7 +184,9 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurocom2.cpp
 europc.cpp
+eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
@@ -191,6 +199,7 @@ fccpu20.cpp
 fccpu30.cpp
 fidel6502.cpp
 fidel68k.cpp
+fidelmcs48.cpp
 fidelz80.cpp
 fk1.cpp
 fm7.cpp
@@ -219,6 +228,7 @@ goupil.cpp
 gp2x.cpp
 gp32.cpp
 grfd2301.cpp
+gridcomp.cpp
 h19.cpp
 h8.cpp
 h89.cpp
@@ -247,6 +257,7 @@ hp9k.cpp
 hp9k_3xx.cpp
 hprot1.cpp
 hpz80unk.cpp
+hp80.cpp
 ht68k.cpp
 huebler.cpp
 hunter2.cpp
@@ -267,7 +278,9 @@ indiana.cpp
 indigo.cpp
 indy_indigo2.cpp
 instruct.cpp
+intellec4.cpp
 interact.cpp
+interpro.cpp
 intv.cpp
 ipc.cpp
 ipds.cpp
@@ -299,6 +312,7 @@ kramermc.cpp
 kron.cpp
 kyocera.cpp
 laser3k.cpp
+lb186.cpp
 lc80.cpp
 lcmate2.cpp
 leapster.cpp
@@ -314,6 +328,7 @@ m20.cpp
 m24.cpp
 m5.cpp
 m6805evs.cpp
+m68705prg.cpp
 m79152pc.cpp
 mac.cpp
 mac128.cpp
@@ -345,6 +360,8 @@ mikromik.cpp
 mikrosha.cpp
 mini2440.cpp
 minicom.cpp
+miniforce.cpp
+minitel_2_rpic.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
@@ -389,6 +406,7 @@ nascom1.cpp
 nc.cpp
 neogeocd.cpp
 nes.cpp
+nes_vt.cpp
 newbrain.cpp
 next.cpp
 ngen.cpp
@@ -396,6 +414,8 @@ ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
 novag6502.cpp
+novag68k.cpp
+novagmcs48.cpp
 ob68k1a.cpp
 octopus.cpp
 odyssey2.cpp
@@ -452,7 +472,6 @@ pes.cpp
 pet.cpp
 pg685.cpp
 phc25.cpp
-phantom.cpp
 phunsy.cpp
 pimps.cpp
 pipbug.cpp
@@ -492,6 +511,7 @@ pv1000.cpp
 pv2000.cpp
 pv9234.cpp
 pve500.cpp
+pwrview.cpp
 px4.cpp
 px8.cpp
 pyl601.cpp
@@ -598,6 +618,8 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 test_t400.cpp
+testconsole.cpp
+tg100.cpp
 thomson.cpp
 ti630.cpp
 ti74.cpp

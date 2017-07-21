@@ -117,15 +117,21 @@
 
 */
 
+#include "emu.h"
+#include "includes/tiamc1.h"
+#include "audio/tiamc1.h"
+
+#include "cpu/i8085/i8085.h"
+#include "machine/i8255.h"
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MASTER_CLOCK    (15750000)
 #define CPU_CLOCK       (MASTER_CLOCK / 9)
 #define SND_CLOCK       (MASTER_CLOCK / 9)
 #define PIXEL_CLOCK     (MASTER_CLOCK / 3)
 
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "includes/tiamc1.h"
 
 void tiamc1_state::machine_reset()
 {
@@ -317,7 +323,7 @@ static GFXDECODE_START( kot )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
+static MACHINE_CONFIG_START( tiamc1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(tiamc1_map)
@@ -538,9 +544,9 @@ ROM_START( kot )
 ROM_END
 
 
-GAME( 1988, konek,    0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, sosterm,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, koroleva, 0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bilyard,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gorodki,  0, tiamc1, gorodki, driver_device, 0, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kot,      0, kot,    kot,     driver_device, 0, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1988, konek,    0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
+GAME( 1988, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gorodki,  0, tiamc1, gorodki, tiamc1_state, 0, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kot,      0, kot,    kot,     tiamc1_state, 0, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

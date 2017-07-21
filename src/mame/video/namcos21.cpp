@@ -25,8 +25,10 @@ Namco System 21 Video Hardware
     */
 
 #include "emu.h"
-#include "includes/namcoic.h"
 #include "includes/namcos21.h"
+
+#include "machine/namcoic.h"
+
 
 #define FRAMEBUFFER_SIZE_IN_BYTES (sizeof(uint16_t)*NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT)
 
@@ -417,9 +419,9 @@ uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_in
 
 	for( pri=pivot; pri<8; pri++ )
 		c355_obj_draw(screen, bitmap, cliprect, pri );
-	
+
 	c355_obj_draw(screen, bitmap, cliprect, 15 );   //driver's eyes
-	
+
 	return 0;
 
 }
@@ -444,7 +446,7 @@ void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &c
 			{
 			case 0xff:
 				break;
-			// TODO: additive blending? winrun car select uses register [0xc] for a xscroll value 
+			// TODO: additive blending? winrun car select uses register [0xc] for a xscroll value
 			case 0x00:
 				pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
 				break;
@@ -469,6 +471,6 @@ uint32_t namcos21_state::screen_update_winrun(screen_device &screen, bitmap_ind1
 	winrun_bitmap_draw(bitmap,cliprect);
 
 	//popmessage("%04x %04x %04x|%04x %04x",m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
-	
+
 	return 0;
 }

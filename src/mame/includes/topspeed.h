@@ -27,7 +27,7 @@ public:
 		m_msm2(*this, "msm2"),
 		m_pc080sn_1(*this, "pc080sn_1"),
 		m_pc080sn_2(*this, "pc080sn_2"),
-		m_tc0220ioc(*this, "tc0220ioc"),
+		m_tc0040ioc(*this, "tc0040ioc"),
 		m_filter1l(*this, "filter1l"),
 		m_filter1r(*this, "filter1r"),
 		m_filter2(*this, "filter2"),
@@ -47,7 +47,7 @@ public:
 	required_device<msm5205_device> m_msm2;
 	required_device<pc080sn_device> m_pc080sn_1;
 	required_device<pc080sn_device> m_pc080sn_2;
-	required_device<tc0220ioc_device> m_tc0220ioc;
+	required_device<tc0040ioc_device> m_tc0040ioc;
 	required_device<filter_volume_device> m_filter1l;
 	required_device<filter_volume_device> m_filter1r;
 	required_device<filter_volume_device> m_filter2;
@@ -82,6 +82,7 @@ public:
 	DECLARE_READ16_MEMBER(motor_r);
 	DECLARE_WRITE16_MEMBER(motor_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
+	DECLARE_WRITE8_MEMBER(coins_w);
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(msm5205_command_w);

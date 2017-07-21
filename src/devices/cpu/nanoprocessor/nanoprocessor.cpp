@@ -2,8 +2,8 @@
 // copyright-holders:F. Ulivi
 
 #include "emu.h"
-#include "debugger.h"
 #include "nanoprocessor.h"
+#include "debugger.h"
 
 // Index of state variables
 enum {
@@ -41,10 +41,10 @@ enum {
 #define NANO_E_BIT  (NANO_DC0_BIT + HP_NANO_DC_NO)  // Extend flag
 #define NANO_I_BIT  (NANO_E_BIT + 1)    // Interrupt flag
 
-const device_type HP_NANOPROCESSOR = &device_creator<hp_nanoprocessor_device>;
+DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "HP-Nanoprocessor")
 
 hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cpu_device(mconfig , HP_NANOPROCESSOR , "HP-Nanoprocessor" , tag , owner , clock , "nanoprocessor" , __FILE__),
+	cpu_device(mconfig , HP_NANOPROCESSOR , tag , owner , clock),
 	m_dc_changed_func(*this),
 	m_read_dc_func(*this),
 	m_program_config("program" , ENDIANNESS_BIG , 8 , 11),
@@ -108,6 +108,14 @@ void hp_nanoprocessor_device::device_reset()
 	dc_update();
 }
 
+device_memory_interface::space_config_vector hp_nanoprocessor_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
 void hp_nanoprocessor_device::execute_run()
 {
 	do {
@@ -117,9 +125,11 @@ void hp_nanoprocessor_device::execute_run()
 		if (BIT(m_flags , NANO_I_BIT)) {
 			m_reg_ISR = m_reg_PA;
 			m_reg_PA = (uint16_t)(standard_irq_callback(0) & 0xff);
-			dc_clr(HP_NANO_IE_DC);
 			// Vector fetching takes 1 cycle
 			m_icount -= 1;
+			dc_clr(HP_NANO_IE_DC);
+			// Need this to propagate the clearing of DC7 to the clearing of int. line
+			yield();
 		} else {
 			debugger_instruction_hook(this , m_reg_PA);
 

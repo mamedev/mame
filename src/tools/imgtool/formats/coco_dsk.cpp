@@ -723,7 +723,6 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	uint8_t *track_data;
 	void *track_data_v;
 	uint32_t max_track_size;
-	std::vector<int> sector_map;
 
 	sectors         = params->lookup_int(PARAM_SECTORS);
 	sector_length   = params->lookup_int(PARAM_SECTOR_LENGTH);
@@ -733,24 +732,18 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	max_track_size = get_dmk_tag(floppy)->track_size;
 
 	if (sectors > DMK_TOC_LEN)
-	{
-		err = FLOPPY_ERROR_INTERNAL;
-		goto done;
-	}
+		return FLOPPY_ERROR_INTERNAL;
 
 	if (max_track_size < coco_dmk_min_track_size(sectors, sector_length))
-	{
-		err = FLOPPY_ERROR_NOSPACE;
-		goto done;
-	}
+		return FLOPPY_ERROR_NOSPACE;
 
 	err = floppy_load_track(floppy, head, track, true, &track_data_v, NULL);
 	if (err)
-		goto done;
+		return err;
 	track_data = (uint8_t *) track_data_v;
 
-	/* set up sector map */
-	memset(&sector_map[0], 0xff, sectors*sizeof(int));
+	// set up sector map
+	std::vector<int> sector_map(sectors, -1);
 
 	physical_sector = 0;
 	for (logical_sector = 0; logical_sector < sectors; logical_sector++)
@@ -766,22 +759,22 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 		physical_sector %= sectors;
 	}
 
-	/* set up track table of contents */
+	// set up track table of contents
 	physical_sector = 0;
 	track_position = DMK_TOC_LEN * 2 + DMK_LEAD_IN;
 	while(physical_sector < DMK_TOC_LEN)
 	{
 		if (physical_sector >= sectors)
 		{
-			/* no more sectors */
+			// no more sectors
 			idam_offset = 0;
 		}
 		else
 		{
-			/* this is a sector */
+			// this is a sector
 			logical_sector = sector_map[physical_sector];
 
-			/* write the sector */
+			// write the sector
 			memset(&track_data[track_position], 0x00, 8);
 			track_position += 8;
 
@@ -807,7 +800,7 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 			memset(&track_data[track_position], 0xA1, 3);
 			track_position += 3;
 
-			/* write sector body */
+			// write sector body
 			track_data[track_position] = 0xFB;
 			memset(&track_data[track_position + 1], floppy_get_filler(floppy), sector_length);
 			crc = ccitt_crc16(0xcdb4, &track_data[track_position], sector_length + 1);
@@ -815,27 +808,26 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 			track_data[track_position + sector_length + 2] = (uint8_t) (crc >> 0);
 			track_position += sector_length + 3;
 
-			/* write sector footer */
+			// write sector footer
 			memset(&track_data[track_position], 0x4E, 24);
 			track_position += 24;
 		}
 
-		/* write the TOC entry */
+		// write the TOC entry
 		track_data[physical_sector * 2 + 0] = (uint8_t) (idam_offset >> 0);
 		track_data[physical_sector * 2 + 1] = (uint8_t) (idam_offset >> 8);
 
 		physical_sector++;
 	}
 
-	/* write track lead in */
+	// write track lead in
 	memset(&track_data[physical_sector * 2], 0x4e, DMK_LEAD_IN);
 
-	/* write track footer */
+	// write track footer
 	assert(max_track_size >= (uint32_t)track_position);
 	memset(&track_data[track_position], 0x4e, max_track_size - track_position);
 
-done:
-	return err;
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 

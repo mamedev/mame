@@ -38,7 +38,9 @@
     Raphael Nabet, 2000-2003
 */
 
+#include "emu.h"
 #include "includes/lisa.h"
+#include "screen.h"
 
 
 /*
@@ -943,7 +945,8 @@ void lisa_state::machine_start()
 	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::handle_mouse),this));
 
 	/* read command every ms (don't know the real value) */
-	machine().scheduler().timer_pulse(attotime::from_msec(1), timer_expired_delegate(FUNC(lisa_state::set_COPS_ready),this));
+	m_cops_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::set_COPS_ready), this));
+	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
 	m_nvram->set_base(m_fdc_ram, 1024);
 }

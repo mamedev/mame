@@ -139,6 +139,33 @@ namespace sol
 			}
 		};
 		template <>
+		struct checker<input_item_class>
+		{
+			template <typename Handler>
+			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
+			{
+				return stack::check<const std::string &>(L, index, handler);
+			}
+		};
+		template <>
+		struct getter<input_item_class>
+		{
+			static input_item_class get(lua_State* L, int index, record& tracking)
+			{
+				const std::string item_class =  stack::get<const std::string &>(L, index);
+				if(item_class == "switch")
+					return ITEM_CLASS_SWITCH;
+				else if(item_class == "absolute" || item_class == "abs")
+					return ITEM_CLASS_ABSOLUTE;
+				else if(item_class == "relative" || item_class == "rel")
+					return ITEM_CLASS_RELATIVE;
+				else if(item_class == "maximum" || item_class == "max")
+					return ITEM_CLASS_MAXIMUM;
+				else
+					return ITEM_CLASS_INVALID;
+			}
+		};
+		template <>
 		struct pusher<sol::buffer *>
 		{
 			static int push(lua_State* L, sol::buffer *buff)
@@ -515,7 +542,7 @@ lua_engine::lua_engine()
 {
 	m_machine = nullptr;
 	m_lua_state = luaL_newstate();  /* create state */
-	m_sol_state = new sol::state_view(m_lua_state); // create sol view
+	m_sol_state = std::make_unique<sol::state_view>(m_lua_state); // create sol view
 
 	luaL_checkversion(m_lua_state);
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
@@ -719,9 +746,9 @@ void lua_engine::initialize()
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
-	emu["gamename"] = [this](){ return machine().system().description; };
+	emu["gamename"] = [this](){ return machine().system().type.fullname(); };
 	emu["romname"] = [this](){ return machine().basename(); };
-	emu["softname"] = [this](){ return machine().options().software_name(); };
+	emu["softname"] = [this]() { return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
 	emu["time"] = [this](){ return machine().time().as_double(); };
 	emu["start"] = [this](const char *driver) {
@@ -769,17 +796,118 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), sol::nil);
 			return sol::make_object(sol(), driver_list::driver(i));
 		};
+	emu["wait"] = lua_CFunction([](lua_State *L) {
+			lua_engine *engine = mame_machine_manager::instance()->lua();
+			luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
+			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
+			return lua_yield(L, 0);
+		});
 
-	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
+/*
+ * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
+ *                                     support zipped files on the searchpath
+ * file:open(name) - open first file matching name in searchpath, supports read and write sockets as "socket.127.0.0.1:1234"
+ * file:open_next() - open next file matching name in searchpath
+ * file:read(len) - only reads len bytes, doen't do lua style formats
+ * file:write(data) - write data to file
+ * file:seek(offset, whence) - whence is as C "SEEK_*" int
+ * file:seek([opt] whence, [opt] offset) - lua style "set"|"cur"|"end", returns cur offset
+ * file:size() -
+ * file:filename() - name of current file, container name if file is in zip
+ * file:fullpath() -
+*/
+
+	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::initializers([](emu_file &file, u32 flags) { new (&file) emu_file(flags); },
+				[](emu_file &file, const char *path, u32 flags) { new (&file) emu_file(path, flags); },
+				[](emu_file &file, const char *mode) {
+					int flags = 0;
+					for(int i = 0; i < 2; i++) // limit to three chars
+					{
+						switch(mode[i])
+						{
+							case 'r':
+								flags |= OPEN_FLAG_READ;
+								break;
+							case 'w':
+								flags |= OPEN_FLAG_WRITE;
+								break;
+							case 'c':
+								flags |= OPEN_FLAG_CREATE;
+								break;
+						}
+					}
+					new (&file) emu_file(flags);
+				},
+				[](emu_file &file, const char *path, const char* mode) {
+					int flags = 0;
+					for(int i = 0; i < 2; i++) // limit to three chars
+					{
+						switch(mode[i])
+						{
+							case 'r':
+								flags |= OPEN_FLAG_READ;
+								break;
+							case 'w':
+								flags |= OPEN_FLAG_WRITE;
+								break;
+							case 'c':
+								flags |= OPEN_FLAG_CREATE;
+								break;
+						}
+					}
+					new (&file) emu_file(path, flags);
+				}),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
+			"write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); },
 			"open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open),
 			"open_next", &emu_file::open_next,
-			"seek", &emu_file::seek,
+			"seek", sol::overload([](emu_file &file) { return file.tell(); },
+				[this](emu_file &file, s64 offset, int whence) -> sol::object {
+					if(file.seek(offset, whence))
+						return sol::make_object(sol(), sol::nil);
+					else
+						return sol::make_object(sol(), file.tell());
+				},
+				[this](emu_file &file, const char* whence) -> sol::object {
+					int wval = -1;
+					const char *seekdirs[] = {"set", "cur", "end"};
+					for(int i = 0; i < 3; i++)
+					{
+						if(!strncmp(whence, seekdirs[i], 3))
+						{
+							wval = i;
+							break;
+						}
+					}
+					if(wval < 0 || wval >= 3)
+						return sol::make_object(sol(), sol::nil);
+					if(file.seek(0, wval))
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), file.tell());
+				},
+				[this](emu_file &file, const char* whence, s64 offset) -> sol::object {
+					int wval = -1;
+					const char *seekdirs[] = {"set", "cur", "end"};
+					for(int i = 0; i < 3; i++)
+					{
+						if(!strncmp(whence, seekdirs[i], 3))
+						{
+							wval = i;
+							break;
+						}
+					}
+					if(wval < 0 || wval >= 3)
+						return sol::make_object(sol(), sol::nil);
+					if(file.seek(offset, wval))
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), file.tell());
+				}),
 			"size", &emu_file::size,
 			"filename", &emu_file::filename,
 			"fullpath", &emu_file::fullpath);
 
 /*
+ * emu.thread()
  * thread.start(scr) - run scr (string not function) in a seperate thread in a new empty (other then modules) lua context
  * thread.continue(val) - resume thread and pass val to it
  * thread.result() - get thread result as string
@@ -915,9 +1043,11 @@ void lua_engine::initialize()
 			"entries", sol::property([this](core_options &options) {
 				sol::table table = sol().create_table();
 				int unadorned_index = 0;
-				for(core_options::entry &curentry : options)
+				for (auto &curentry : options.entries())
 				{
-					const char *name = curentry.name();
+					const char *name = curentry->names().size() > 0
+						? curentry->name().c_str()
+						: nullptr;
 					bool is_unadorned = false;
 					// check if it's unadorned
 					if (name && strlen(name) && !strcmp(name, options.unadorned(unadorned_index)))
@@ -925,8 +1055,8 @@ void lua_engine::initialize()
 						unadorned_index++;
 						is_unadorned = true;
 					}
-					if (!curentry.is_header() && !curentry.is_command() && !curentry.is_internal() && !is_unadorned)
-						table[name] = &curentry;
+					if (curentry->type() != core_options::option_type::HEADER && curentry->type() != core_options::option_type::COMMAND && !is_unadorned)
+						table[name] = &*curentry;
 				}
 				return table;
 			}));
@@ -967,18 +1097,19 @@ void lua_engine::initialize()
 						e.set_value(val, OPTION_PRIORITY_CMDLINE);
 				},
 				[this](core_options::entry &e) -> sol::object {
-					if(!e.type())
+					if (e.type() == core_options::option_type::INVALID)
 						return sol::make_object(sol(), sol::nil);
 					switch(e.type())
 					{
-						case OPTION_BOOLEAN:
+						case core_options::option_type::BOOLEAN:
 							return sol::make_object(sol(), atoi(e.value()) != 0);
-						case OPTION_INTEGER:
+						case core_options::option_type::INTEGER:
 							return sol::make_object(sol(), atoi(e.value()));
-						case OPTION_FLOAT:
+						case core_options::option_type::FLOAT:
 							return sol::make_object(sol(), atof(e.value()));
+						default:
+							return sol::make_object(sol(), e.value());
 					}
-					return sol::make_object(sol(), e.value());
 				}),
 			"description", &core_options::entry::description,
 			"default_value", &core_options::entry::default_value,
@@ -999,7 +1130,8 @@ void lua_engine::initialize()
  * machine:parameters() - get parameter_manager
  * machine:options() - get machine core_options
  * machine:output() - get output_manager
- * machine:input() - get ui_input_manager
+ * machine:input() - get input_manager
+ * machine:uiinput() - get ui_input_manager
  * machine.paused - get paused state
  * machine.devices - get device table
  * machine.screens - get screens table
@@ -1022,7 +1154,8 @@ void lua_engine::initialize()
 			"memory", &running_machine::memory,
 			"options", [](running_machine &m) { return static_cast<core_options *>(&m.options()); },
 			"outputs", &running_machine::output,
-			"input", &running_machine::ui_input,
+			"input", &running_machine::input,
+			"uiinput", &running_machine::ui_input,
 			"paused", sol::property(&running_machine::paused),
 			"devices", sol::property([this](running_machine &m) {
 					std::function<void(device_t &, sol::table)> tree;
@@ -1067,10 +1200,10 @@ void lua_engine::initialize()
  */
 
 	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
-			"source_file", sol::readonly(&game_driver::source_file),
+			"source_file", sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; }),
 			"parent", sol::readonly(&game_driver::parent),
-			"name", sol::readonly(&game_driver::name),
-			"description", sol::readonly(&game_driver::description),
+			"name", sol::property([] (game_driver const &driver) { return &driver.name[0]; }),
+			"description", sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; }),
 			"year", sol::readonly(&game_driver::year),
 			"manufacturer", sol::readonly(&game_driver::manufacturer),
 			"compatible_with", sol::readonly(&game_driver::compatible_with),
@@ -1096,7 +1229,7 @@ void lua_engine::initialize()
 					sol::table sp_table = sol().create_table();
 					if(!memdev)
 						return sp_table;
-					for(address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp)
+					for(int sp = 0; sp < memdev->max_space_count(); ++sp)
 					{
 						if(memdev->has_space(sp))
 							sp_table[memdev->space(sp).name()] = addr_space(memdev->space(sp), *memdev);
@@ -1312,16 +1445,46 @@ void lua_engine::initialize()
 			"skip_this_frame", &video_manager::skip_this_frame,
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
+			"frame_update", &video_manager::frame_update,
 			"frameskip", sol::property(&video_manager::frameskip, &video_manager::set_frameskip),
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
 
 /* machine:input()
- * input:find_mouse() - returns x, y, button state, ui render target
- * input:pressed(key) - get pressed state for key
+ * input:code_from_token(token) - get input_code for KEYCODE_* string token
+ * input:code_pressed(code) - get pressed state for input_code
+ * input:code_to_token(code) - get KEYCODE_* string token for code
+ * input:code_name(code) - get code friendly name
+ * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
+ * input:seq_pressed(seq) - get pressed state for input_seq
+ * input:seq_to_token(seq) - get KEYCODE_* string tokens for seq
+ * input:seq_to_name(seq) - get seq friendly name
  */
 
-	sol().registry().new_usertype<ui_input_manager>("input", "new", sol::no_constructor,
+	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
+			"code_from_token", [](input_manager &input, const char *token) { return sol::make_user(input.code_from_token(token)); },
+			"code_pressed", [](input_manager &input, sol::user<input_code> code) { return input.code_pressed(code); },
+			"code_to_token", [](input_manager &input, sol::user<input_code> code) { return input.code_to_token(code); },
+			"code_name", [](input_manager &input, sol::user<input_code> code) { return input.code_name(code); },
+			"seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return sol::make_user(seq); },
+			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); },
+			"seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); },
+			"seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); },
+			"seq_poll_start", [](input_manager &input, input_item_class cls, sol::object seq) {
+					input_seq *start = nullptr;
+					if(seq.is<sol::user<input_seq>>())
+						start = &seq.as<sol::user<input_seq>>();
+					input.seq_poll_start(cls, start);
+				},
+			"seq_poll", &input_manager::seq_poll,
+			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); });
+
+/* machine:uiinput()
+ * uiinput:find_mouse() - returns x, y, button state, ui render target
+ * uiinput:pressed(key) - get pressed state for ui key
+ */
+
+	sol().registry().new_usertype<ui_input_manager>("uiinput", "new", sol::no_constructor,
 			"find_mouse", [](ui_input_manager &ui) {
 					int32_t x, y;
 					bool button;
@@ -1705,8 +1868,24 @@ bool lua_engine::frame_hook()
 
 void lua_engine::close()
 {
-	lua_settop(m_lua_state, 0);  /* clear stack */
-	lua_close(m_lua_state);
+	m_sol_state.reset();
+	if (m_lua_state)
+	{
+		lua_settop(m_lua_state, 0);  /* clear stack */
+		lua_close(m_lua_state);
+		m_lua_state = nullptr;
+	}
+}
+
+void lua_engine::resume(void *ptr, int nparam)
+{
+	lua_State *L = static_cast<lua_State *>(ptr);
+	int stat = lua_resume(L, nullptr, 0);
+	if((stat != LUA_OK) && (stat != LUA_YIELD))
+	{
+		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
 }
 
 void lua_engine::run(sol::load_result res)

@@ -8,10 +8,10 @@
 *
 \**************************/
 
-#pragma once
+#ifndef MAME_CPU_UNSP_UNSP_H
+#define MAME_CPU_UNSP_UNSP_H
 
-#ifndef __UNSP_H__
-#define __UNSP_H__
+#pragma once
 
 enum
 {
@@ -68,7 +68,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -107,7 +107,6 @@ private:
 };
 
 
-extern const device_type UNSP;
+DECLARE_DEVICE_TYPE(UNSP, unsp_device)
 
-
-#endif /* __UNSP_H__ */
+#endif // MAME_CPU_UNSP_UNSP_H

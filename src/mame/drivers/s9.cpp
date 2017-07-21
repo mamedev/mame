@@ -35,9 +35,11 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/genpin.h"
-#include "sound/hc55516.h"
 #include "sound/dac.h"
+#include "sound/hc55516.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s9.lh"
 
 class s9_state : public genpin_class
@@ -308,7 +310,7 @@ DRIVER_INIT_MEMBER( s9_state, s9 )
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-static MACHINE_CONFIG_START( s9, s9_state )
+static MACHINE_CONFIG_START( s9 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s9_main_map)
@@ -359,7 +361,7 @@ static MACHINE_CONFIG_START( s9, s9_state )
 	MCFG_CPU_PROGRAM_MAP(s9_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -422,6 +424,7 @@ ROM_END
 / Space Shuttle (S9) 12/84 (#535)
 /----------------------------------*/
 ROM_START(sshtl_l7)
+	// Spanish licensed version by Stargame is identical to this set
 	ROM_REGION(0x4000, "roms", 0)
 	ROM_LOAD("cpu_u20.128", 0x0000, 0x4000, CRC(848ad54c) SHA1(4e4ce5fb970da37706472f94a27fd912e1ecb1a0))
 
@@ -507,13 +510,13 @@ ROM_START(alcat_l7)
 ROM_END
 
 
-GAME( 1983, ratrc_l1, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Rat Race (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, sorcr_l2, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1984, sshtl_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-7)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1984, sshtl_l3, sshtl_l7, s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, comet_l4, comet_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, comet_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-5)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1983, ratrc_l1, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Rat Race (L-1)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1985, sorcr_l2, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, sshtl_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-7)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, sshtl_l3, sshtl_l7, s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1985, comet_l4, comet_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-4)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1985, comet_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-5)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1984, szone_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1984, szone_l2, szone_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1985, alcat_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1985, alcat_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

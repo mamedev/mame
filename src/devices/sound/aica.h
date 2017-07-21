@@ -6,74 +6,25 @@
     Sega/Yamaha AICA emulation
 */
 
-#ifndef __AICA_H__
-#define __AICA_H__
+#ifndef MAME_SOUND_AICA_H
+#define MAME_SOUND_AICA_H
+
+#pragma once
 
 #include "aicadsp.h"
 
+
 #define MCFG_AICA_MASTER \
-	aica_device::set_master(*device);
+		aica_device::set_master(*device);
 
-#define MCFG_AICA_ROFFSET(_offs) \
-	aica_device::set_roffset(*device, _offs);
+#define MCFG_AICA_ROFFSET(offs) \
+		aica_device::set_roffset(*device, (offs));
 
-#define MCFG_AICA_IRQ_CB(_devcb) \
-	devcb = &aica_device::set_irq_callback(*device, DEVCB_##_devcb);
+#define MCFG_AICA_IRQ_CB(cb) \
+		devcb = &aica_device::set_irq_callback(*device, (DEVCB_##cb));
 
-#define MCFG_AICA_MAIN_IRQ_CB(_devcb) \
-	devcb = &aica_device::set_main_irq_callback(*device, DEVCB_##_devcb);
-
-enum AICA_STATE {AICA_ATTACK,AICA_DECAY1,AICA_DECAY2,AICA_RELEASE};
-
-struct AICA_LFO_t
-{
-	unsigned short phase;
-	uint32_t phase_step;
-	int *table;
-	int *scale;
-};
-
-
-struct AICA_EG_t
-{
-	int volume; //
-	AICA_STATE state;
-	int step;
-	//step vals
-	int AR;     //Attack
-	int D1R;    //Decay1
-	int D2R;    //Decay2
-	int RR;     //Release
-
-	int DL;     //Decay level
-	uint8_t LPLINK;
-};
-
-struct AICA_SLOT
-{
-	union
-	{
-		uint16_t data[0x40];  //only 0x1a bytes used
-		uint8_t datab[0x80];
-	} udata;
-	uint8_t active;   //this slot is currently playing
-	uint8_t *base;        //samples base address
-	uint32_t prv_addr;    // previous play address (for ADPCM)
-	uint32_t cur_addr;    //current play address (24.8)
-	uint32_t nxt_addr;    //next play address
-	uint32_t step;        //pitch step (24.8)
-	uint8_t Backwards;    //the wave is playing backwards
-	AICA_EG_t EG;            //Envelope
-	AICA_LFO_t PLFO;     //Phase LFO
-	AICA_LFO_t ALFO;     //Amplitude LFO
-	int slot;
-	int cur_sample;       //current ADPCM sample
-	int cur_quant;        //current ADPCM step
-	int curstep;
-	int cur_lpquant, cur_lpsample, cur_lpstep;
-	uint8_t *adbase, *adlpbase;
-	uint8_t lpend;
-};
+#define MCFG_AICA_MAIN_IRQ_CB(cb) \
+		devcb = &aica_device::set_main_irq_callback(*device, (DEVCB_##cb));
 
 class aica_device : public device_t,
 									public device_sound_interface
@@ -83,8 +34,8 @@ public:
 
 	static void set_master(device_t &device) { downcast<aica_device &>(device).m_master = true; }
 	static void set_roffset(device_t &device, int roffset) { downcast<aica_device &>(device).m_roffset = roffset; }
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_main_irq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<aica_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_main_irq_callback(device_t &device, Object &&cb) { return downcast<aica_device &>(device).m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// AICA register access
 	DECLARE_READ16_MEMBER( read );
@@ -102,7 +53,60 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
 private:
+	enum AICA_STATE {AICA_ATTACK,AICA_DECAY1,AICA_DECAY2,AICA_RELEASE};
+
+	struct AICA_LFO_t
+	{
+		unsigned short phase;
+		uint32_t phase_step;
+		int *table;
+		int *scale;
+	};
+
+	struct AICA_EG_t
+	{
+		int volume; //
+		AICA_STATE state;
+		int step;
+		//step vals
+		int AR;     //Attack
+		int D1R;    //Decay1
+		int D2R;    //Decay2
+		int RR;     //Release
+
+		int DL;     //Decay level
+		uint8_t LPLINK;
+	};
+
+	struct AICA_SLOT
+	{
+		union
+		{
+			uint16_t data[0x40];  //only 0x1a bytes used
+			uint8_t datab[0x80];
+		} udata;
+		uint8_t active;   //this slot is currently playing
+		uint8_t *base;        //samples base address
+		uint32_t prv_addr;    // previous play address (for ADPCM)
+		uint32_t cur_addr;    //current play address (24.8)
+		uint32_t nxt_addr;    //next play address
+		uint32_t step;        //pitch step (24.8)
+		uint8_t Backwards;    //the wave is playing backwards
+		AICA_EG_t EG;            //Envelope
+		AICA_LFO_t PLFO;     //Phase LFO
+		AICA_LFO_t ALFO;     //Amplitude LFO
+		int slot;
+		int cur_sample;       //current ADPCM sample
+		int cur_quant;        //current ADPCM step
+		int curstep;
+		int cur_lpquant, cur_lpsample, cur_lpstep;
+		uint8_t *adbase, *adlpbase;
+		uint8_t lpend;
+	};
+
+
 	unsigned char DecodeSCI(unsigned char irq);
 	void ResetInterrupts();
 
@@ -183,13 +187,13 @@ private:
 	emu_timer *m_timerA, *m_timerB, *m_timerC;
 
 	// DMA stuff
-	struct{
+	struct {
 		uint32_t dmea;
 		uint16_t drga;
 		uint16_t dlg;
 		uint8_t dgate;
 		uint8_t ddir;
-	}m_dma;
+	} m_dma;
 
 
 	int m_ARTABLE[64], m_DRTABLE[64];

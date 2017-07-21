@@ -12,11 +12,13 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
-
 #include "sound/okim6295.h"
-#include "includes/eolith.h"
+
+#include "speaker.h"
 
 
 class eolith16_state : public eolith_state
@@ -170,7 +172,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 
 
 
-static MACHINE_CONFIG_START( eolith16, eolith16_state )
+static MACHINE_CONFIG_START( eolith16 )
 	MCFG_CPU_ADD("maincpu", E116T, 60000000)        /* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
@@ -193,7 +195,7 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

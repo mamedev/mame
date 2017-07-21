@@ -36,6 +36,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "fd2.h"
 
 
@@ -54,7 +55,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_FD2 = &device_creator<abc_fd2_t>;
+DEFINE_DEVICE_TYPE(ABC_FD2, abc_fd2_device, "abc_fd2", "ABC FD2")
 
 
 //-------------------------------------------------
@@ -75,7 +76,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *abc_fd2_t::device_rom_region() const
+const tiny_rom_entry *abc_fd2_device::device_rom_region() const
 {
 	return ROM_NAME( abc_fd2 );
 }
@@ -85,7 +86,7 @@ const tiny_rom_entry *abc_fd2_t::device_rom_region() const
 //  status_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc_fd2_t::status_w )
+WRITE8_MEMBER( abc_fd2_device::status_w )
 {
 	/*
 
@@ -113,7 +114,7 @@ WRITE8_MEMBER( abc_fd2_t::status_w )
 //  ADDRESS_MAP( abc_fd2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc_fd2_mem, AS_PROGRAM, 8, abc_fd2_t )
+static ADDRESS_MAP_START( abc_fd2_mem, AS_PROGRAM, 8, abc_fd2_device )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM
 ADDRESS_MAP_END
@@ -123,10 +124,10 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc_fd2_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc_fd2_io, AS_IO, 8, abc_fd2_t )
+static ADDRESS_MAP_START( abc_fd2_io, AS_IO, 8, abc_fd2_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x73)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(FD1771_TAG, fd1771_t, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(FD1771_TAG, fd1771_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITE(status_w)
 ADDRESS_MAP_END
 
@@ -135,17 +136,17 @@ ADDRESS_MAP_END
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( abc_fd2_t::pio_pa_r )
+READ8_MEMBER( abc_fd2_device::pio_pa_r )
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( abc_fd2_t::pio_pa_w )
+WRITE8_MEMBER( abc_fd2_device::pio_pa_w )
 {
 	m_data = data;
 }
 
-READ8_MEMBER( abc_fd2_t::pio_pb_r )
+READ8_MEMBER( abc_fd2_device::pio_pb_r )
 {
 	/*
 
@@ -171,7 +172,7 @@ READ8_MEMBER( abc_fd2_t::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc_fd2_t::pio_pb_w )
+WRITE8_MEMBER( abc_fd2_device::pio_pb_w )
 {
 	/*
 
@@ -224,16 +225,16 @@ static SLOT_INTERFACE_START( abc_fd2_floppies )
 	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
 SLOT_INTERFACE_END
 
-FLOPPY_FORMATS_MEMBER( abc_fd2_t::floppy_formats )
+FLOPPY_FORMATS_MEMBER( abc_fd2_device::floppy_formats )
 	FLOPPY_ABC_FD2_FORMAT
 FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc_fd2 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
+MACHINE_CONFIG_MEMBER( abc_fd2_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(abc_fd2_mem)
 	MCFG_CPU_IO_MAP(abc_fd2_io)
@@ -241,31 +242,19 @@ static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_4MHz/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(abc_fd2_t, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(abc_fd2_t, pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(abc_fd2_t, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc_fd2_t, pio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(abc_fd2_device, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(abc_fd2_device, pio_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(abc_fd2_device, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc_fd2_device, pio_pb_w))
 
 	MCFG_FD1771_ADD(FD1771_TAG, XTAL_4MHz/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb7_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb5_w))
 	MCFG_WD_FDC_HLD_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb6_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_t::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc_fd2_t::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc_fd2 );
-}
-
 
 
 //**************************************************************************
@@ -273,11 +262,11 @@ machine_config_constructor abc_fd2_t::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  abc_fd2_t - constructor
+//  abc_fd2_device - constructor
 //-------------------------------------------------
 
-abc_fd2_t::abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ABC_FD2, "ABC FD2", tag, owner, clock, "abc_fd2", __FILE__),
+abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ABC_FD2, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_pio(*this, Z80PIO_TAG),
@@ -294,7 +283,7 @@ abc_fd2_t::abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *o
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void abc_fd2_t::device_start()
+void abc_fd2_device::device_start()
 {
 }
 
@@ -303,7 +292,7 @@ void abc_fd2_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void abc_fd2_t::device_reset()
+void abc_fd2_device::device_reset()
 {
 	m_cs = false;
 
@@ -324,7 +313,7 @@ void abc_fd2_t::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_cs(uint8_t data)
+void abc_fd2_device::abcbus_cs(uint8_t data)
 {
 	m_cs = (data == 0x2d);
 }
@@ -334,7 +323,7 @@ void abc_fd2_t::abcbus_cs(uint8_t data)
 //  abcbus_stat -
 //-------------------------------------------------
 
-uint8_t abc_fd2_t::abcbus_stat()
+uint8_t abc_fd2_device::abcbus_stat()
 {
 	uint8_t data = 0xff;
 
@@ -351,7 +340,7 @@ uint8_t abc_fd2_t::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-uint8_t abc_fd2_t::abcbus_inp()
+uint8_t abc_fd2_device::abcbus_inp()
 {
 	uint8_t data = 0xff;
 
@@ -374,7 +363,7 @@ uint8_t abc_fd2_t::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_out(uint8_t data)
+void abc_fd2_device::abcbus_out(uint8_t data)
 {
 	if (!m_cs) return;
 
@@ -392,7 +381,7 @@ void abc_fd2_t::abcbus_out(uint8_t data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_c1(uint8_t data)
+void abc_fd2_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -406,7 +395,7 @@ void abc_fd2_t::abcbus_c1(uint8_t data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_c3(uint8_t data)
+void abc_fd2_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -419,7 +408,7 @@ void abc_fd2_t::abcbus_c3(uint8_t data)
 //  abcbus_xmemfl -
 //-------------------------------------------------
 
-uint8_t abc_fd2_t::abcbus_xmemfl(offs_t offset)
+uint8_t abc_fd2_device::abcbus_xmemfl(offs_t offset)
 {
 	uint8_t data = 0xff;
 

@@ -36,7 +36,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "xl80.h"
+#include "screen.h"
 
 
 
@@ -55,7 +57,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_XL80 = &device_creator<c64_xl80_device>;
+DEFINE_DEVICE_TYPE(C64_XL80, c64_xl80_device, "c64_xl80", "C64 XL 80 cartridge")
 
 
 //-------------------------------------------------
@@ -118,10 +120,10 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_xl80 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
+MACHINE_CONFIG_MEMBER( c64_xl80_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505SP_TAG, h46505_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
@@ -138,17 +140,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_xl80_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_xl80 );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -159,7 +150,7 @@ machine_config_constructor c64_xl80_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_XL80, "XL 80", tag, owner, clock, "c64_xl80", __FILE__),
+	device_t(mconfig, C64_XL80, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, HD46505SP_TAG),
 	m_palette(*this, "palette"),

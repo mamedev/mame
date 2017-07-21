@@ -11,112 +11,23 @@
 
 #include "emu.h"
 #include "includes/arkanoid.h"
-#include "cpu/m6805/m6805.h"
 
 
 /* To log specific reads and writes of the bootlegs */
 #define ARKANOID_BOOTLEG_VERBOSE 1
 
 
-READ8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_r)
-{
-	/* return the last value the 68705 wrote, and mark that we've read it */
-	m_MCUHasWritten = 0;
-	return m_fromMCU;
-}
-
-WRITE8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_w)
-{
-	m_Z80HasWritten = 1;
-	m_fromZ80 = data;
-	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
-}
-
-READ8_MEMBER(arkanoid_state::mcu_porta_r)
-{
-	return m_portA_in;
-}
-
-WRITE8_MEMBER(arkanoid_state::mcu_porta_w)
-{
-	m_portA_out = data;
-}
-
-READ8_MEMBER(arkanoid_state::mcu_portc_r)
-{
-	int portC_in = 0;
-
-	/* bit 0 is latch 1 on ic26, is high if m_Z80HasWritten(latch 1) is set */
-	if (m_Z80HasWritten)
-		portC_in |= 0x01;
-
-	/* bit 1 is the negative output of latch 2 on ic26, is high if m_68705write is clear */
-	if (!m_MCUHasWritten)
-		portC_in |= 0x02;
-
-	/* bit 2 is an output, to clear latch 1, return whatever state it was set to in m_portC_out */
-	/* bit 3 is an output, to set latch 2, return whatever state it was set to in m_portC_out */
-
-	return portC_in;
-}
-
-READ8_MEMBER(arkanoid_state::mcu_portb_r)
-{
-	return ioport("MUX")->read();
-}
-
-
-WRITE8_MEMBER(arkanoid_state::mcu_portc_w)
-{
-	/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
-	/* bit 2 is an output, to clear latch 1(m_Z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
-	// if 0x04 rising edge, clear m_Z80HasWritten/latch 1 (and clear the irq line)
-	if ((~m_old_portC_out&0x04) && (data&0x04))
-	{
-		m_Z80HasWritten = 0;
-		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
-	}
-
-	// if 0x04 low, enable the m_portA_in latch, otherwise set the latch value to 0xFF
-	if (~data&0x04)
-		m_portA_in = m_fromZ80;
-	else
-		m_portA_in = 0xFF;
-
-	/* bit 3 is an output, to set latch 2(m_MCUHasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
-	// if 0x08 low, set m_MCUHasWritten/latch 2
-	if (~data&0x08)
-	{
-		/* a write from the 68705 to the Z80; remember its value */
-		m_MCUHasWritten = 1;
-		m_fromMCU = m_portA_out;
-	}
-
-	m_old_portC_out = data;
-}
-
-
-
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
 {
-	int res = 0;
-
-	/* bit 0x40 is latch 1 on ic26, is high if m_Z80HasWritten(latch 1) is clear */
-	if (!m_Z80HasWritten)
-		res |= 0x01;
-
-	/* bit 0x80 is the negative output of latch 2 on ic26, is high if m_MCUHasWritten is clear */
-	if (!m_MCUHasWritten)
-		res |= 0x02;
-
-	return res;
+	// bit 0 is host semaphore flag, bit 1 is MCU semaphore flag (both active low)
+	return
+			((CLEAR_LINE != m_mcuintf->host_semaphore_r()) ? 0x00 : 0x01) |
+			((CLEAR_LINE != m_mcuintf->mcu_semaphore_r()) ? 0x00 : 0x02);
 }
 
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
 {
-	const char *tag1 = (const char *)param;
-	const char *tag2 = tag1 + strlen(tag1) + 1; // the f***? is this right? are we intentionally pointer-mathing off the end of one array to hit another?
-	return ioport((m_paddle_select == 0) ? tag1 : tag2)->read();
+	return m_muxports[(0 == m_paddle_select) ? 0 : 1]->read();
 }
 
 /*

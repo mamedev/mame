@@ -63,6 +63,8 @@
     0x1c | ---- ---x | All channels enable (0 = off, 1 = on)
     0x1c | ---- --x- | Synch & Reset generators
 
+    Unspecified bits should be written as zero.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -71,14 +73,14 @@
 #define LEFT    0x00
 #define RIGHT   0x01
 
-static const int amplitude_lookup[16] = {
+static constexpr int amplitude_lookup[16] = {
 		0*32767/16,  1*32767/16,  2*32767/16,   3*32767/16,
 		4*32767/16,  5*32767/16,  6*32767/16,   7*32767/16,
 		8*32767/16,  9*32767/16, 10*32767/16, 11*32767/16,
 	12*32767/16, 13*32767/16, 14*32767/16, 15*32767/16
 };
 
-static const uint8_t envelope[8][64] = {
+static constexpr uint8_t envelope[8][64] = {
 	/* zero amplitude */
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -123,7 +125,7 @@ static const uint8_t envelope[8][64] = {
 
 
 // device type definition
-const device_type SAA1099 = &device_creator<saa1099_device>;
+DEFINE_DEVICE_TYPE(SAA1099, saa1099_device, "saa1099", "Philips SAA1099")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -134,21 +136,21 @@ const device_type SAA1099 = &device_creator<saa1099_device>;
 //-------------------------------------------------
 
 saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SAA1099, "SAA1099", tag, owner, clock, "saa1099", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_all_ch_enable(0),
-		m_sync_state(0),
-		m_selected_reg(0),
-		m_sample_rate(0.0)
+	: device_t(mconfig, SAA1099, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_noise_params{ 0, 0 }
+	, m_env_enable{ 0, 0 }
+	, m_env_reverse_right{ 0, 0 }
+	, m_env_mode{ 0, 0 }
+	, m_env_bits{ 0, 0 }
+	, m_env_clock{ 0, 0 }
+	, m_env_step{ 0, 0 }
+	, m_all_ch_enable(0)
+	, m_sync_state(0)
+	, m_selected_reg(0)
+	, m_sample_rate(0.0)
 {
-	memset(m_noise_params, 0, sizeof(int)*2);
-	memset(m_env_enable, 0, sizeof(int)*2);
-	memset(m_env_reverse_right, 0, sizeof(int)*2);
-	memset(m_env_mode, 0, sizeof(int)*2);
-	memset(m_env_bits, 0, sizeof(int)*2);
-	memset(m_env_clock, 0, sizeof(int)*2);
-	memset(m_env_step, 0, sizeof(int)*2);
 }
 
 
@@ -221,7 +223,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		case 0: m_noise[ch].freq = m_master_clock/256.0 * 2; break;
 		case 1: m_noise[ch].freq = m_master_clock/512.0 * 2; break;
 		case 2: m_noise[ch].freq = m_master_clock/1024.0 * 2; break;
-		case 3: m_noise[ch].freq = m_channels[ch * 3].freq;   break;
+		case 3: m_noise[ch].freq = m_channels[ch * 3].freq;   break; // todo: this case will be m_master_clock/[ch*3's octave divisor, 0 is = 256*2, higher numbers are higher] * 2 if the tone generator phase reset bit (0x1c bit 1) is set.
 		}
 	}
 
@@ -280,12 +282,14 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		for (ch = 0; ch < 2; ch++)
 		{
-			/* check the actual position in noise generator */
+			/* update the state of the noise generator
+			 * polynomial is x^18 + x^11 + x (i.e. 0x20400) and is a plain XOR, initial state is probably all 1s
+			 * see http://www.vogons.org/viewtopic.php?f=9&t=51695 */
 			m_noise[ch].counter -= m_noise[ch].freq;
 			while (m_noise[ch].counter < 0)
 			{
 				m_noise[ch].counter += m_sample_rate;
-				if( ((m_noise[ch].level & 0x4000) == 0) == ((m_noise[ch].level & 0x0040) == 0) )
+				if( ((m_noise[ch].level & 0x20000) == 0) != ((m_noise[ch].level & 0x0400) == 0) )
 					m_noise[ch].level = (m_noise[ch].level << 1) | 1;
 				else
 					m_noise[ch].level <<= 1;
@@ -440,6 +444,15 @@ WRITE8_MEMBER( saa1099_device::data_w )
 		}
 		break;
 	default:    /* Error! */
-		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag(), reg, data);
+		if (data != 0)
+			logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag(), reg, data);
 	}
+}
+
+WRITE8_MEMBER(saa1099_device::write)
+{
+	if (offset & 1)
+		control_w(space, 0, data);
+	else
+		data_w(space, 0, data);
 }

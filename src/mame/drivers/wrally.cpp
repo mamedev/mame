@@ -8,6 +8,27 @@ Driver by Manuel Abadia, Mike Coates, Nicola Salmoria and Miguel Angel Horna
 
 Thanks to GAELCO SA for the DS5002FP code and information about the encryption
 
+REF.930217  (also REF.930705)
++-------------------------------------------------+
+|       C1                                  6116  |
+|  VOL  C2                                  6116  |
+|          30MHz                            6116  |
+|    M6295                    +----------+  6116  |
+|     1MHz                    |TMS       |        |
+|      MS6264A                |TPC1020AFN|        |
+|J     MS6264A                |   -084C  |    H8  |
+|A     +------------+         +----------+        |
+|M     |DS5002FP Box|         +----------+        |
+|M     +------------+         |TMS       |    H12 |
+|A            MS6264A         |TPC1020AFN|        |
+|             MS6264A         |   -084C  |        |
+|                             +----------+        |
+|SW1                                  PAL  MS6264A|
+|     24MHz    MC68000P12                  MS6264A|
+|SW2           C22                    6116        |
+|      PAL     C23                    6116        |
++-------------------------------------------------+
+
 Main PCB components:
 ====================
 
@@ -16,7 +37,7 @@ CPUs related:
 * 1xDS5002FP @ D12 (Dallas security processor @ 12 MHz)
 * 1xHM62256ALFP-8T (32KB NVSRAM) @ C11 (encrypted DS5002FP program code)
 * 1xLithium cell
-* 2xMS6264A-20NC (16KB SRAM) @ D14 & D15 (shared memory between M68000 & DS5002FP)
+* 2xMS6264A-20NC (8KB SRAM) @ D14 & D15 (shared memory between M68000 & DS5002FP)
 * 4x74LS157 (Quad 2 input multiplexer) @ F14, F15, F16 & F17 (used to select M68000 or DS5002FP address bus)
 * 4x74LS245 (Octal bus transceiver) @ C14, C15, C16 & C17 (used to store shared RAM data)
 * 2x74LS373 (Octal tristate latch) @ D16 & D17 (used by DS5002FP to access data from shared RAM)
@@ -97,17 +118,20 @@ produces a high clock frequency, slow movements a low freq.
 
 PCB: REF.930217
 
-The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I 13 or larger
+The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or larger
  roms at H8 & H12 for graphics as well as the ability to use different size sound sample
  roms at C1 & C3
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/wrally.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
-#include "includes/wrally.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
@@ -153,7 +177,7 @@ static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, wrally_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)   AM_MASK(0x3fff)     /* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, wrally_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, wrally_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -250,7 +274,7 @@ static GFXDECODE_START( wrally )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wrally, wrally_state )
+static MACHINE_CONFIG_START( wrally )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wrally_map)
@@ -280,8 +304,8 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)                 /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)                 /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -387,7 +411,7 @@ ROM_START( wrallyat ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,   0,      wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya,  wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb,  wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyat, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )

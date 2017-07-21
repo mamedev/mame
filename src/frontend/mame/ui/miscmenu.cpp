@@ -127,14 +127,10 @@ void menu_bios_selection::handle()
 			if (val>cnt) val=1;
 			dev->set_system_bios(val);
 			if (strcmp(dev->tag(),":")==0) {
-				std::string error;
-				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
-				assert(error.empty());
+				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE);
 			} else {
-				std::string error;
-				std::string value = string_format("%s,bios=%d", machine().options().main_value(dev->owner()->tag()+1), val-1);
-				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
-				assert(error.empty());
+				const char *slot_option_name = dev->owner()->tag() + 1;
+				machine().options().slot_option(slot_option_name).set_bios(string_format("%d", val - 1));
 			}
 			reset(reset_options::REMEMBER_REF);
 		}
@@ -568,91 +564,87 @@ void menu_export::handle()
 	const event *menu_event = process(PROCESS_NOIMAGE);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((uintptr_t)menu_event->itemref)
+		switch (uintptr_t(menu_event->itemref))
 		{
-			case 1:
-			case 3:
+		case 1:
+		case 3:
+			if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					std::string filename("exported");
-					emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-					if (infile.open(filename.c_str(), ".xml") == osd_file::error::NONE)
-						for (int seq = 0; ; ++seq)
-						{
-							std::string seqtext = string_format("%s_%04d", filename, seq);
-							if (infile.open(seqtext.c_str(), ".xml") != osd_file::error::NONE)
-							{
-								filename = seqtext;
-								break;
-							}
-						}
-
-					// attempt to open the output file
-					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
+				std::string filename("exported");
+				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
+				if (infile.open(filename.c_str(), ".xml") == osd_file::error::NONE)
+					for (int seq = 0; ; ++seq)
 					{
-						FILE *pfile;
-						std::string fullpath(file.fullpath());
-						file.close();
-						pfile = fopen(fullpath.c_str(), "w");
-
-						// create the XML and save to file
-						driver_enumerator drvlist(machine().options());
-						drvlist.exclude_all();
-						for (auto & elem : m_list)
-							drvlist.include(driver_list::find(*elem));
-
-						info_xml_creator creator(drvlist);
-						creator.output(pfile, ((uintptr_t)menu_event->itemref == 1) ? false : true);
-						fclose(pfile);
-						machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
+						std::string seqtext = string_format("%s_%04d", filename, seq);
+						if (infile.open(seqtext.c_str(), ".xml") != osd_file::error::NONE)
+						{
+							filename = seqtext;
+							break;
+						}
 					}
+
+				// attempt to open the output file
+				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
+				{
+					FILE *pfile;
+					std::string fullpath(file.fullpath());
+					file.close();
+					pfile = fopen(fullpath.c_str(), "w");
+
+					// create the XML and save to file
+					driver_enumerator drvlist(machine().options());
+					drvlist.exclude_all();
+					for (auto & elem : m_list)
+						drvlist.include(driver_list::find(*elem));
+
+					info_xml_creator creator(machine().options());
+					creator.output(pfile, drvlist, (uintptr_t(menu_event->itemref) == 1) ? false : true);
+					fclose(pfile);
+					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 				}
-				break;
 			}
-			case 2:
+			break;
+		case 2:
+			if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					std::string filename("exported");
-					emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-					if (infile.open(filename.c_str(), ".txt") == osd_file::error::NONE)
-						for (int seq = 0; ; ++seq)
-						{
-							std::string seqtext = string_format("%s_%04d", filename, seq);
-							if (infile.open(seqtext.c_str(), ".txt") != osd_file::error::NONE)
-							{
-								filename = seqtext;
-								break;
-							}
-						}
-
-					// attempt to open the output file
-					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					if (file.open(filename.c_str(), ".txt") == osd_file::error::NONE)
+				std::string filename("exported");
+				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
+				if (infile.open(filename.c_str(), ".txt") == osd_file::error::NONE)
+					for (int seq = 0; ; ++seq)
 					{
-						// print the header
-						std::ostringstream buffer;
-						buffer << _("Name:             Description:\n");
-						driver_enumerator drvlist(machine().options());
-						drvlist.exclude_all();
-						for (auto & elem : m_list)
-							drvlist.include(driver_list::find(*elem));
-
-						// iterate through drivers and output the info
-						while (drvlist.next())
-							if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
-								util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
-						file.puts(buffer.str().c_str());
-						file.close();
-						machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
+						std::string seqtext = string_format("%s_%04d", filename, seq);
+						if (infile.open(seqtext.c_str(), ".txt") != osd_file::error::NONE)
+						{
+							filename = seqtext;
+							break;
+						}
 					}
+
+				// attempt to open the output file
+				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				if (file.open(filename.c_str(), ".txt") == osd_file::error::NONE)
+				{
+					// print the header
+					std::ostringstream buffer;
+					buffer << _("Name:             Description:\n");
+					driver_enumerator drvlist(machine().options());
+					drvlist.exclude_all();
+					for (auto & elem : m_list)
+						drvlist.include(driver_list::find(*elem));
+
+					// iterate through drivers and output the info
+					while (drvlist.next())
+						if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
+							util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
+					file.puts(buffer.str().c_str());
+					file.close();
+					machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
 				}
-				break;
 			}
-			default:
-				break;
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -677,15 +669,14 @@ void menu_export::populate(float &customtop, float &custombottom)
 menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container &container, const game_driver *prev, float _x0, float _y0)
 	: menu(mui, container)
 	, m_drv(prev)
-	, m_opts(mui.machine().options())
 	, x0(_x0)
 	, y0(_y0)
 	, m_curbios(0)
 	, m_fav_reset(false)
 {
 	// parse the INI file
-	std::string error;
-	mame_options::parse_standard_inis(m_opts,error, m_drv);
+	std::ostringstream error;
+	mame_options::parse_standard_inis(m_opts, error, m_drv);
 	setup_bios();
 }
 
@@ -756,9 +747,7 @@ void menu_machine_configure::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			(menu_event->iptkey == IPT_UI_LEFT) ? --m_curbios : ++m_curbios;
-			std::string error;
-			m_opts.set_value(OPTION_BIOS, m_bios[m_curbios].second, OPTION_PRIORITY_CMDLINE, error);
-			m_opts.mark_changed(OPTION_BIOS);
+			m_opts.set_value(OPTION_BIOS, m_bios[m_curbios].second, OPTION_PRIORITY_CMDLINE);
 			reset(reset_options::REMEMBER_POSITION);
 		}
 	}
@@ -808,7 +797,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	float maxwidth = origx2 - origx1;
 
 	text[0] = _("Configure machine:");
-	text[1] = m_drv->description;
+	text[1] = m_drv->type.fullname();
 
 	for (auto & elem : text)
 	{
@@ -920,8 +909,7 @@ void menu_plugins_configure::handle()
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
 			int oldval = plugins.int_value((const char*)menu_event->itemref);
-			std::string error_string;
-			plugins.set_value((const char*)menu_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE, error_string);
+			plugins.set_value((const char*)menu_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE);
 			changed = true;
 		}
 	}
@@ -937,13 +925,13 @@ void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
 	plugin_options& plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins)
+	for (auto &curentry : plugins.entries())
 	{
-		if (!curentry.is_header())
+		if (curentry->type() != OPTION_HEADER)
 		{
-			auto enabled = std::string(curentry.value()) == "1";
-			item_append(curentry.description(), enabled ? _("On") : _("Off"),
-				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry.name());
+			auto enabled = !strcmp(curentry->value(), "1");
+			item_append(curentry->description(), enabled ? _("On") : _("Off"),
+				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry->name().c_str());
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);

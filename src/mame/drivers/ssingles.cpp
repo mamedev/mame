@@ -150,6 +150,8 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define NUM_PENS (4*8)
 #define VMEM_SIZE 0x100
@@ -534,7 +536,7 @@ static GFXDECODE_START( atamanot )
 	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ssingles, ssingles_state )
+static MACHINE_CONFIG_START( ssingles )
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ssingles_map)

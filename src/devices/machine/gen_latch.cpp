@@ -9,12 +9,14 @@
 #include "emu.h"
 #include "gen_latch.h"
 
+
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type GENERIC_LATCH_8 = &device_creator<generic_latch_8_device>;
-const device_type GENERIC_LATCH_16 = &device_creator<generic_latch_16_device>;
+DEFINE_DEVICE_TYPE(GENERIC_LATCH_8, generic_latch_8_device, "generic_latch_8", "Generic 8-bit latch")
+DEFINE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device, "generic_latch_16", "Generic 16-bit latch")
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -24,8 +26,9 @@ const device_type GENERIC_LATCH_16 = &device_creator<generic_latch_16_device>;
 //  generic_latch_base_device - constructor
 //-------------------------------------------------
 
-generic_latch_base_device::generic_latch_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+generic_latch_base_device::generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_separate_acknowledge(false),
 	m_latch_written(false),
 	m_data_pending_cb(*this)
 {
@@ -79,14 +82,15 @@ void generic_latch_base_device::set_latch_written(bool latch_written)
 //-------------------------------------------------
 
 generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	generic_latch_base_device(mconfig, GENERIC_LATCH_8, "Generic 8-bit latch", tag, owner, clock, "generic_latch_8", __FILE__),
+	generic_latch_base_device(mconfig, GENERIC_LATCH_8, tag, owner, clock),
 	m_latched_value(0)
 {
 }
 
 READ8_MEMBER( generic_latch_8_device::read )
 {
-	set_latch_written(false);
+	if (!has_separate_acknowledge())
+		set_latch_written(false);
 	return m_latched_value;
 }
 
@@ -113,6 +117,17 @@ WRITE_LINE_MEMBER( generic_latch_8_device::preset_w )
 WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
 {
 	m_latched_value = 0x00;
+}
+
+READ8_MEMBER( generic_latch_8_device::acknowledge_r )
+{
+	set_latch_written(false);
+	return space.unmap();
+}
+
+WRITE8_MEMBER( generic_latch_8_device::acknowledge_w )
+{
+	set_latch_written(false);
 }
 
 //-------------------------------------------------
@@ -149,14 +164,15 @@ void generic_latch_8_device::device_start()
 //-------------------------------------------------
 
 generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	generic_latch_base_device(mconfig, GENERIC_LATCH_16, "Generic 16-bit latch", tag, owner, clock, "generic_latch_16", __FILE__),
+	generic_latch_base_device(mconfig, GENERIC_LATCH_16, tag, owner, clock),
 	m_latched_value(0)
 {
 }
 
 READ16_MEMBER( generic_latch_16_device::read )
 {
-	set_latch_written(false);
+	if (!has_separate_acknowledge())
+		set_latch_written(false);
 	return m_latched_value;
 }
 

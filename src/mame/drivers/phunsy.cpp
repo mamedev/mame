@@ -28,49 +28,50 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/keyboard.h"
-#include "sound/speaker.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "imagedev/snapquik.h"
+#include "machine/keyboard.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define LOG 1
-
-#define KEYBOARD_TAG "keyboard"
 
 class phunsy_state : public driver_device
 {
 public:
 	phunsy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_cass(*this, "cassette"),
-		m_p_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
 	DECLARE_DRIVER_INIT(phunsy);
-	DECLARE_READ8_MEMBER( phunsy_data_r );
-	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
-	DECLARE_WRITE8_MEMBER( phunsy_data_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_READ8_MEMBER(phunsy_data_r);
+	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
+	DECLARE_WRITE8_MEMBER(phunsy_data_w);
+	void kbd_put(u8 data);
+	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
 	DECLARE_PALETTE_INIT(phunsy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
-	const uint8_t *m_p_chargen;
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -79,7 +80,7 @@ WRITE_LINE_MEMBER( phunsy_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( phunsy_state::cass_r )
+READ_LINE_MEMBER(phunsy_state::cass_r)
 {
 	return (m_cass->input() > 0.03) ? 0 : 1;
 }
@@ -95,9 +96,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( S2650_CTRL_PORT, S2650_CTRL_PORT ) AM_WRITE( phunsy_ctrl_w )
-	AM_RANGE( S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE( phunsy_data_r, phunsy_data_w )
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( phunsy_data, AS_DATA, 8, phunsy_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(phunsy_ctrl_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(phunsy_data_r, phunsy_data_w)
 ADDRESS_MAP_END
 
 
@@ -179,7 +183,7 @@ static INPUT_PORTS_START( phunsy )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( phunsy_state::kbd_put )
+void phunsy_state::kbd_put(u8 data)
 {
 	if (data)
 		m_keyboard_input = data;
@@ -203,12 +207,6 @@ PALETTE_INIT_MEMBER(phunsy_state, phunsy)
 
 		palette.set_pen_color( i, j, j, j );
 	}
-}
-
-
-void phunsy_state::video_start()
-{
-	m_p_chargen = memregion( "chargen" )->base();
 }
 
 
@@ -332,12 +330,14 @@ DRIVER_INIT_MEMBER( phunsy_state, phunsy )
 	membank("bankq")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( phunsy, phunsy_state )
+static MACHINE_CONFIG_START( phunsy )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
 	MCFG_CPU_IO_MAP(phunsy_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(phunsy_state, cass_w))
+	MCFG_CPU_DATA_MAP(phunsy_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(phunsy_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(phunsy_state, cass_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -363,8 +363,8 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(phunsy_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(phunsy_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* quickload */
@@ -394,5 +394,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT         COMPANY        FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY            FULLNAME  FLAGS */
 COMP( 1980, phunsy, 0,      0,       phunsy,    phunsy, phunsy_state,  phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )

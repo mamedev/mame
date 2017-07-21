@@ -634,9 +634,8 @@ public:
 		return std::pair<iterator, bool>(inserted, true);
 	}
 	template <typename P>
-	std::pair<iterator, bool> insert(P &&value)
+	std::enable_if_t<std::is_constructible<value_type, P>::value, std::pair<iterator, bool> > insert(P &&value)
 	{
-		// FIXME: should only participate in overload resolution if std::is_constructible<value_type, P&&>::value
 		return emplace(std::forward<P>(value));
 	}
 	template <typename InputIt>

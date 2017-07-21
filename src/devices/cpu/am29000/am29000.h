@@ -8,10 +8,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_AM29000_AM29000_H
+#define MAME_CPU_AM29000_AM29000_H
+
 #pragma once
 
-#ifndef __AM29000_H__
-#define __AM29000_H__
 
 
 /***************************************************************************
@@ -431,7 +432,7 @@ enum
 #define AM29000_INTR3       3
 
 
-class am29000_cpu_device :  public cpu_device
+class am29000_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
@@ -450,16 +451,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			case AS_DATA:    return &m_data_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -655,7 +647,6 @@ protected:
 };
 
 
-extern const device_type AM29000;
+DECLARE_DEVICE_TYPE(AM29000, am29000_cpu_device)
 
-
-#endif /* __AM29000_H__ */
+#endif // MAME_CPU_AM29000_AM29000_H

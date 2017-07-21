@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>0.9.7: orthonormalize.hpp Source File</title>
+<title>0.9.8: projection.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">0.9.7
+   <div id="projectname">0.9.8
    </div>
   </td>
  </tr>
@@ -46,35 +46,30 @@
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">orthonormalize.hpp</div>  </div>
+<div class="title">projection.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
 <a href="a00086.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#pragma once</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">// Dependency:</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;../vec3.hpp&quot;</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &quot;../mat3x3.hpp&quot;</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &quot;../geometric.hpp&quot;</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#if(defined(GLM_MESSAGES) &amp;&amp; !defined(GLM_EXT_INCLUDED))</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#       pragma message(&quot;GLM: GLM_GTX_orthonormalize extension included&quot;)</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">namespace </span><a class="code" href="a00146.html">glm</a></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;{</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, precision P&gt; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        GLM_FUNC_DECL tmat3x3&lt;T, P&gt; <a class="code" href="a00220.html#gad7afff30d7323fdc7aed7f5a16a0c596">orthonormalize</a>(tmat3x3&lt;T, P&gt; <span class="keyword">const</span> &amp; m);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, precision P&gt; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        GLM_FUNC_DECL tvec3&lt;T, P&gt; <a class="code" href="a00220.html#gad7afff30d7323fdc7aed7f5a16a0c596">orthonormalize</a>(tvec3&lt;T, P&gt; <span class="keyword">const</span> &amp; x, tvec3&lt;T, P&gt; <span class="keyword">const</span> &amp; y);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}<span class="comment">//namespace glm</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#include &quot;orthonormalize.inl&quot;</span></div>
-<div class="ttc" id="a00220_html_gad7afff30d7323fdc7aed7f5a16a0c596"><div class="ttname"><a href="a00220.html#gad7afff30d7323fdc7aed7f5a16a0c596">glm::orthonormalize</a></div><div class="ttdeci">GLM_FUNC_DECL tvec3&lt; T, P &gt; orthonormalize(tvec3&lt; T, P &gt; const &amp;x, tvec3&lt; T, P &gt; const &amp;y)</div><div class="ttdoc">Orthonormalizes x according y. </div></div>
-<div class="ttc" id="a00146_html"><div class="ttname"><a href="a00146.html">glm</a></div><div class="ttdef"><b>Definition:</b> <a href="a00003_source.html#l00040">_noise.hpp:40</a></div></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">// Dependency:</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;../geometric.hpp&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#if GLM_MESSAGES == GLM_MESSAGES_ENABLED &amp;&amp; !defined(GLM_EXT_INCLUDED)</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#       pragma message(&quot;GLM: GLM_GTX_projection extension included&quot;)</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">namespace </span><a class="code" href="a00141.html">glm</a></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> vecType&gt;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        GLM_FUNC_DECL vecType <a class="code" href="a00219.html#gadf29123bcf748fc9d6fb0998192184cf">proj</a>(vecType <span class="keyword">const</span> &amp; x, vecType <span class="keyword">const</span> &amp; Normal);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;}<span class="comment">//namespace glm</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &quot;projection.inl&quot;</span></div>
+<div class="ttc" id="a00219_html_gadf29123bcf748fc9d6fb0998192184cf"><div class="ttname"><a href="a00219.html#gadf29123bcf748fc9d6fb0998192184cf">glm::proj</a></div><div class="ttdeci">GLM_FUNC_DECL vecType proj(vecType const &amp;x, vecType const &amp;Normal)</div><div class="ttdoc">Projects x on Normal. </div></div>
+<div class="ttc" id="a00141_html"><div class="ttname"><a href="a00141.html">glm</a></div><div class="ttdef"><b>Definition:</b> <a href="a00003_source.html#l00011">_noise.hpp:11</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

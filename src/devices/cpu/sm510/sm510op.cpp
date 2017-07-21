@@ -1,24 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// shared opcode handlers
+// SM510 shared opcode handlers
 
+#include "emu.h"
 #include "sm510.h"
 
 
 // internal helpers
 
-inline uint8_t sm510_base_device::ram_r()
+u8 sm510_base_device::ram_r()
 {
 	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	uint8_t address = (bmh | m_bm << 4 | m_bl) & m_datamask;
+	u8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
-inline void sm510_base_device::ram_w(uint8_t data)
+void sm510_base_device::ram_w(u8 data)
 {
 	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	uint8_t address = (bmh | m_bm << 4 | m_bl) & m_datamask;
+	u8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -36,13 +37,13 @@ void sm510_base_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
-void sm510_base_device::do_branch(uint8_t pu, uint8_t pm, uint8_t pl)
+void sm510_base_device::do_branch(u8 pu, u8 pm, u8 pl)
 {
 	// set new PC(Pu/Pm/Pl)
 	m_pc = ((pu << 10 & 0xc00) | (pm << 6 & 0x3c0) | (pl & 0x03f)) & m_prgmask;
 }
 
-inline uint8_t sm510_base_device::bitmask(uint16_t param)
+u8 sm510_base_device::bitmask(u16 param)
 {
 	// bitmask from immediate opcode param
 	return 1 << (param & 3);
@@ -57,22 +58,8 @@ inline uint8_t sm510_base_device::bitmask(uint16_t param)
 void sm510_base_device::op_lb()
 {
 	// LB x: load BM/BL with 4-bit immediate value (partial)
-
-	// SM510 WIP..
-	// bm and bl(low) are probably ok!
 	m_bm = (m_bm & 4) | (m_op & 3);
-	m_bl = (m_op >> 2 & 3);
-
-	// bl(high) is still unclear, official doc is confusing
-	uint8_t hi = 0;
-	switch (m_bl)
-	{
-		case 0: hi = 0; break;
-		case 1: hi = 3; break;
-		case 2: hi = 3; break;
-		case 3: hi = 3; break;
-	}
-	m_bl |= (hi << 2 & 0xc);
+	m_bl = (m_op >> 2 & 3) | ((m_op & 0xc) ? 0xc : 0);
 }
 
 void sm510_base_device::op_lbl()
@@ -90,7 +77,7 @@ void sm510_base_device::op_sbm()
 void sm510_base_device::op_exbla()
 {
 	// EXBLA: exchange BL with ACC
-	uint8_t a = m_acc;
+	u8 a = m_acc;
 	m_acc = m_bl;
 	m_bl = a;
 }
@@ -115,7 +102,7 @@ void sm510_base_device::op_decb()
 void sm510_base_device::op_atpl()
 {
 	// ATPL: load Pl(PC low bits) with ACC
-	m_pc = (m_pc & ~0xf) | m_acc;
+	m_pc = (m_prev_pc & ~0xf) | m_acc;
 }
 
 void sm510_base_device::op_rtn0()
@@ -155,7 +142,7 @@ void sm510_base_device::op_tm()
 	// TM x: indirect subroutine call, pointers(IDX) are in page 0
 	m_icount--;
 	push_stack();
-	uint8_t idx = m_program->read_byte(m_op & 0x3f);
+	u8 idx = m_program->read_byte(m_op & 0x3f);
 	do_branch(idx >> 6 & 3, 4, idx & 0x3f);
 }
 
@@ -166,7 +153,7 @@ void sm510_base_device::op_tm()
 void sm510_base_device::op_exc()
 {
 	// EXC x: exchange ACC with RAM, xor BM with x
-	uint8_t a = m_acc;
+	u8 a = m_acc;
 	m_acc = ram_r();
 	ram_w(a);
 	m_bm ^= (m_op & 3);
@@ -221,7 +208,7 @@ void sm510_base_device::op_wr()
 
 void sm510_base_device::op_ws()
 {
-	// WR: shift 1 into W
+	// WS: shift 1 into W
 	m_w = m_w << 1 | 1;
 	update_w_latch();
 }
@@ -262,11 +249,8 @@ void sm510_base_device::op_atfc()
 void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
-	if (m_r != (m_acc & 3))
-	{
-		m_r = m_acc & 3;
-		m_write_r(0, m_r, 0xff);
-	}
+	m_r = m_acc;
+	clock_melody();
 }
 
 
@@ -304,7 +288,7 @@ void sm510_base_device::op_coma()
 void sm510_base_device::op_rot()
 {
 	// ROT: rotate ACC right through carry
-	uint8_t c = m_acc & 1;
+	u8 c = m_acc & 1;
 	m_acc = m_acc >> 1 | m_c << 3;
 	m_c = c;
 }
@@ -459,6 +443,20 @@ void sm510_base_device::op_dta()
 {
 	// DTA: transfer divider low 4 bits to ACC
 	m_acc = m_div >> 11 & 0xf;
+}
+
+void sm510_base_device::op_clklo()
+{
+	// CLKLO*: select 8kHz instruction clock (*unknown mnemonic)
+	m_clk_div = 4;
+	notify_clock_changed();
+}
+
+void sm510_base_device::op_clkhi()
+{
+	// CLKHI*: select 16kHz instruction clock (*unknown mnemonic)
+	m_clk_div = 2;
+	notify_clock_changed();
 }
 
 void sm510_base_device::op_illegal()

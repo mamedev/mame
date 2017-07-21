@@ -10,21 +10,12 @@
 
 #include "emu.h"
 #include "nubus_48gc.h"
+#include "screen.h"
 
 #define VRAM_SIZE  (0x200000)  // 2 megs, maxed out
 
 #define GC48_SCREEN_NAME    "48gc_screen"
 #define GC48_ROM_REGION     "48gc_rom"
-
-MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
-	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-//  MCFG_SCREEN_SIZE(1152, 870)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
-//  MCFG_SCREEN_REFRESH_RATE(75)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-MACHINE_CONFIG_END
 
 ROM_START( gc48 )
 	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
@@ -33,26 +24,30 @@ ROM_END
 
 ROM_START( gc824 )
 	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
-	ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) )
+	ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) ) /* Label: "341-0868 // (C)APPLE COMPUTER // INC. 1986-1991 // ALL RIGHTS // RESERVED    W5" */
 ROM_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_48GC = &device_creator<nubus_48gc_device>;
-const device_type NUBUS_824GC = &device_creator<nubus_824gc_device>;
+DEFINE_DEVICE_TYPE(NUBUS_48GC,  nubus_48gc_device,  "nb_48gc",  "Apple 4*8 video card")
+DEFINE_DEVICE_TYPE(NUBUS_824GC, nubus_824gc_device, "nb_824gc", "Apple 8*24 video card")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor jmfb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( macvideo_48gc );
-}
+MACHINE_CONFIG_MEMBER( jmfb_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+//  MCFG_SCREEN_SIZE(1152, 870)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
+//  MCFG_SCREEN_REFRESH_RATE(75)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -76,25 +71,25 @@ const tiny_rom_entry *nubus_824gc_device::device_rom_region() const
 //  jmfb_device - constructor
 //-------------------------------------------------
 
-jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_screen(nullptr), m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0), m_count(0), m_clutoffs(0), m_xres(0), m_yres(0), m_is824(false)
+jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is824) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_screen(nullptr), m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0), m_count(0), m_clutoffs(0), m_xres(0), m_yres(0),
+	m_is824(is824),
+	m_assembled_tag(util::string_format("%s:%s", tag, GC48_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(GC48_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	jmfb_device(mconfig, NUBUS_48GC, "Apple 4*8 video card", tag, owner, clock, "nb_48gc", __FILE__)
+	jmfb_device(mconfig, NUBUS_48GC, tag, owner, clock, false)
 {
-	m_is824 = false;
 }
 
 nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	jmfb_device(mconfig, NUBUS_824GC, "Apple 8*24 video card", tag, owner, clock, "nb_824gc", __FILE__)
+	jmfb_device(mconfig, NUBUS_824GC, tag, owner, clock, true)
 {
-	m_is824 = true;
 }
 
 //-------------------------------------------------

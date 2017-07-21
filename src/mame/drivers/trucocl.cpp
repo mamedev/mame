@@ -36,9 +36,13 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 #include "emu.h"
 #include "includes/trucocl.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {
@@ -85,7 +89,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	m_dac->write(rom[dac_address+m_cur_dac_address_index]);
 
-	timer_set( attotime::from_hz( 16000 ), TIMER_DAC_IRQ);
+	m_dac_irq_timer->adjust(attotime::from_hz( 16000 ));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
@@ -138,7 +142,7 @@ INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 
 }
 
-static MACHINE_CONFIG_START( trucocl, trucocl_state )
+static MACHINE_CONFIG_START( trucocl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -196,11 +200,12 @@ DRIVER_INIT_MEMBER(trucocl_state,trucocl)
 {
 	m_cur_dac_address = -1;
 	m_cur_dac_address_index = 0;
+
+	m_dac_irq_timer = timer_alloc(TIMER_DAC_IRQ);
 }
 
 
 
 /******************************************************************************/
-/*    YEAR   NAME     PARENT  MACHINE  INPUT    INIT     MONITOR  */
-
+//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT     MONITOR
 GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

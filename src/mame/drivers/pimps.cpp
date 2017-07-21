@@ -40,7 +40,7 @@ public:
 
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 
@@ -86,12 +86,12 @@ void pimps_state::machine_reset()
 	m_term_data = 0;
 }
 
-WRITE8_MEMBER( pimps_state::kbd_put )
+void pimps_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( pimps, pimps_state )
+static MACHINE_CONFIG_START( pimps )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(pimps_mem)
@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( pimps, pimps_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pimps_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pimps_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -110,5 +110,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 197?, pimps,  0,      0,       pimps,     pimps, driver_device,   0, "Henry Colford", "P.I.M.P.S.", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY          FULLNAME      FLAGS */
+COMP( 197?, pimps,  0,      0,       pimps,     pimps, pimps_state,  0,    "Henry Colford", "P.I.M.P.S.", MACHINE_NO_SOUND_HW)

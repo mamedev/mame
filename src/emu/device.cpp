@@ -9,8 +9,66 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "string.h"
+#include "speaker.h"
 #include "debug/debugcpu.h"
+
+#include <string.h>
+
+
+//**************************************************************************
+//  DEVICE TYPE REGISTRATION
+//**************************************************************************
+
+namespace emu { namespace detail {
+
+namespace {
+
+struct device_registrations
+{
+	device_type_impl *first = nullptr;
+	device_type_impl *last = nullptr;
+	device_type_impl *unsorted = nullptr;
+};
+
+device_registrations &device_registration_data()
+{
+	// this is necessary to avoid issues with static initialisation order across units being indeterminate
+	// thread safety issues are avoided by always calling this function during static initialisation before the app can go threaded
+	static device_registrations instance;
+	return instance;
+}
+
+} // anonymous namespace
+
+
+device_registrar::const_iterator device_registrar::cbegin() const
+{
+	return const_iterator_helper(device_registration_data().first);
+}
+
+
+device_registrar::const_iterator device_registrar::cend() const
+{
+	return const_iterator_helper(nullptr);
+}
+
+
+device_type_impl *device_registrar::register_device(device_type_impl &type)
+{
+	device_registrations &data(device_registration_data());
+
+	if (!data.first) data.first = &type;
+	if (data.last) data.last->m_next = &type;
+	if (!data.unsorted) data.unsorted = &type;
+	data.last = &type;
+
+	return nullptr;
+}
+
+} } // namespace emu::detail
+
+emu::detail::device_registrar const registered_device_types;
+
 
 
 //**************************************************************************
@@ -23,31 +81,28 @@
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: m_type(type),
-		m_name(name),
-		m_shortname(shortname),
-		m_searchpath(shortname),
-		m_source(source),
-		m_owner(owner),
-		m_next(nullptr),
+device_t::device_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: m_type(type)
+	, m_searchpath(type.shortname())
+	, m_owner(owner)
+	, m_next(nullptr)
 
-		m_configured_clock(clock),
-		m_unscaled_clock(clock),
-		m_clock(clock),
-		m_clock_scale(1.0),
-		m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
+	, m_configured_clock(clock)
+	, m_unscaled_clock(clock)
+	, m_clock(clock)
+	, m_clock_scale(1.0)
+	, m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock))
 
-		m_machine_config(mconfig),
-		m_input_defaults(nullptr),
-		m_default_bios_tag(""),
+	, m_machine_config(mconfig)
+	, m_input_defaults(nullptr)
+	, m_default_bios_tag("")
 
-		m_machine(nullptr),
-		m_save(nullptr),
-		m_basetag(tag),
-		m_config_complete(false),
-		m_started(false),
-		m_auto_finder_list(nullptr)
+	, m_machine(nullptr)
+	, m_save(nullptr)
+	, m_basetag(tag)
+	, m_config_complete(false)
+	, m_started(false)
+	, m_auto_finder_list(nullptr)
 {
 	if (owner != nullptr)
 		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
@@ -159,15 +214,13 @@ std::string device_t::parameter(const char *tag) const
 
 void device_t::static_set_clock(device_t &device, u32 clock)
 {
+	device.m_configured_clock = clock;
+
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
-	{
-		assert(device.m_owner != nullptr);
-		clock = device.m_owner->m_configured_clock * ((clock >> 12) & 0xfff) / ((clock >> 0) & 0xfff);
-	}
-
-	device.m_clock = device.m_unscaled_clock = device.m_configured_clock = clock;
-	device.m_attoseconds_per_clock = (clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock);
+		device.calculate_derived_clock();
+	else
+		device.set_unscaled_clock(clock);
 }
 
 
@@ -239,10 +292,21 @@ void device_t::reset()
 
 void device_t::set_unscaled_clock(u32 clock)
 {
+	// do nothing if no actual change
+	if (clock == m_unscaled_clock)
+		return;
+
 	m_unscaled_clock = clock;
 	m_clock = m_unscaled_clock * m_clock_scale;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
-	notify_clock_changed();
+
+	// recalculate all derived clocks
+	for (device_t &child : subdevices())
+		child.calculate_derived_clock();
+
+	// if the device has already started, make sure it knows about the new clock
+	if (m_started)
+		notify_clock_changed();
 }
 
 
@@ -253,10 +317,36 @@ void device_t::set_unscaled_clock(u32 clock)
 
 void device_t::set_clock_scale(double clockscale)
 {
+	// do nothing if no actual change
+	if (clockscale == m_clock_scale)
+		return;
+
 	m_clock_scale = clockscale;
 	m_clock = m_unscaled_clock * m_clock_scale;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
-	notify_clock_changed();
+
+	// recalculate all derived clocks
+	for (device_t &child : subdevices())
+		child.calculate_derived_clock();
+
+	// if the device has already started, make sure it knows about the new clock
+	if (m_started)
+		notify_clock_changed();
+}
+
+
+//-------------------------------------------------
+//  calculate_derived_clock - derive the device's
+//  clock from its owner, if so configured
+//-------------------------------------------------
+
+void device_t::calculate_derived_clock()
+{
+	if ((m_configured_clock & 0xff000000) == 0xff000000)
+	{
+		assert(m_owner != nullptr);
+		set_unscaled_clock(m_owner->m_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff));
+	}
 }
 
 
@@ -267,7 +357,9 @@ void device_t::set_clock_scale(double clockscale)
 
 attotime device_t::clocks_to_attotime(u64 numclocks) const
 {
-	if (numclocks < m_clock)
+	if (m_clock == 0)
+		return attotime::never;
+	else if (numclocks < m_clock)
 		return attotime(0, numclocks * m_attoseconds_per_clock);
 	else
 	{
@@ -285,7 +377,10 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const
 
 u64 device_t::attotime_to_clocks(const attotime &duration) const
 {
-	return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
+	if (m_clock == 0)
+		return 0;
+	else
+		return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
 }
 
 
@@ -538,15 +633,13 @@ const tiny_rom_entry *device_t::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config - return a pointer to a machine
-//  config constructor describing sub-devices for
-//  this device
+//  device_add_mconfig - add device-specific
+//  machine configuration
 //-------------------------------------------------
 
-machine_config_constructor device_t::device_mconfig_additions() const
+void device_t::device_add_mconfig(machine_config &config)
 {
-	// none by default
-	return nullptr;
+	// do nothing by default
 }
 
 

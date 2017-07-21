@@ -26,7 +26,11 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "chsuper.lh"
+
 
 class chsuper_state : public driver_device
 {
@@ -338,7 +342,7 @@ static GFXDECODE_START( chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, chsuper_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, chsuper_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -347,7 +351,7 @@ ADDRESS_MAP_END
 *     Machine Drivers      *
 ***************************/
 
-static MACHINE_CONFIG_START( chsuper, chsuper_state )
+static MACHINE_CONFIG_START( chsuper )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 4)   /* HD64180RP8, 8 MHz? */

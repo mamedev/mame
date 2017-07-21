@@ -34,6 +34,7 @@
 
 	<element name="text_p1">
 		<rect><color red="0.06" green="0.3" blue="0.12" /></rect>
+		<text state="1" string=""></text>
 		<text string="PL SEL:">
 			<bounds x="0.0" y="0.17" width="1.0" height="0.6" />
 			<color red="0.7" green="0.7" blue="0.8" />
@@ -63,10 +64,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-9" right="393" top="-104" bottom="186" />
-		<bezel element="static_black">
-			<bounds left="-9" right="393" top="-104" bottom="186" />
-		</bezel>
+		<bounds left="-8.99" right="392.99" top="-104" bottom="186" />
 
 	<!-- bezel -->
 
@@ -83,10 +81,8 @@
 		<bezel element="text_time"><bounds x="122" y="133" width="140" height="19" /></bezel>
 		<bezel element="text_visitor"><bounds x="306" y="133" width="80" height="19" /></bezel>
 
-		<bezel element="text_p1"><bounds x="316" y="161" width="40" height="16" /></bezel>
-		<bezel element="text_p2" inputtag="IN.0" inputmask="0x04">
-			<bounds x="354" y="161" width="35" height="16" />
-		</bezel>
+		<bezel element="text_p1" inputtag="IN.0" inputmask="0x04"><bounds x="316" y="161" width="40" height="16" /></bezel>
+		<bezel element="text_p2" inputtag="IN.0" inputmask="0x04"><bounds x="354" y="161" width="35" height="16" /></bezel>
 
 		<bezel element="static_white"><bounds left="-9" right="393" top="-61" bottom="-51" /></bezel>
 		<bezel element="static_white"><bounds left="-9" right="393" top="110" bottom="120" /></bezel>
@@ -142,6 +138,9 @@
 		<bezel element="static_white"><bounds x="388" y="29" width="4" height="1" /></bezel>
 		<bezel element="static_white"><bounds x="388" y="56" width="4" height="1" /></bezel>
 
+		<bezel element="static_black"><bounds x="-29" y="-200" width="20" height="500" /></bezel>
+		<bezel element="static_black"><bounds x="393" y="-200" width="20" height="500" /></bezel>
+
 	<!-- leds -->
 
 		<bezel name="digit8" element="digit"><bounds x="3" y="-15.5" width="24" height="32" /></bezel>
@@ -179,7 +178,6 @@
 		<bezel name="digit0" element="digit"><bounds x="355" y="-15.5" width="24" height="32" /></bezel>
 		<bezel name="0.8" element="seg"><bounds x="359" y="42.5" width="15" height="3" /></bezel>
 		<bezel name="0.9" element="seg"><bounds x="359" y="71.5" width="15" height="3" /></bezel>
-
 
 	</view>
 </mamelayout>

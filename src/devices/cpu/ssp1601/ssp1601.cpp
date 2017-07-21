@@ -17,8 +17,9 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "ssp1601.h"
+
+#include "debugger.h"
 
 
 /* detect ops with unimplemented/invalid fields.
@@ -189,14 +190,22 @@
 #endif
 
 
-const device_type SSP1601 = &device_creator<ssp1601_device>;
+DEFINE_DEVICE_TYPE(SSP1601, ssp1601_device, "ssp1601", "SSP1601")
 
 
 ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SSP1601, "SSP1601", tag, owner, clock, "ssp1601", __FILE__)
+	: cpu_device(mconfig, SSP1601, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, 0)
 {
+}
+
+device_memory_interface::space_config_vector ssp1601_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 

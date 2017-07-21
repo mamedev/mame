@@ -20,12 +20,14 @@
 
 
 #include "emu.h"
+#include "includes/relief.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "machine/atarigen.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
-#include "includes/relief.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -105,7 +107,7 @@ WRITE16_MEMBER(relief_state::audio_volume_w)
 	}
 }
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, relief_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, relief_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
@@ -265,7 +267,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( relief, relief_state )
+static MACHINE_CONFIG_START( relief )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -300,9 +302,9 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

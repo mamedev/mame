@@ -57,7 +57,7 @@ namespace bgfx
 						}
 						else
 						{
-							memcpy(&m_view[0][ii].un.f4x4, &_frame->m_view[ii].un.f4x4, sizeof(Matrix4) );
+							bx::memCopy(&m_view[0][ii].un.f4x4, &_frame->m_view[ii].un.f4x4, sizeof(Matrix4) );
 						}
 					}
 				}
@@ -283,7 +283,7 @@ namespace bgfx
 	class StateCacheLru
 	{
 	public:
-		void add(uint64_t _key, Ty _value, uint16_t _parent)
+		Ty* add(uint64_t _key, const Ty& _value, uint16_t _parent)
 		{
 			uint16_t handle = m_alloc.alloc();
 			if (UINT16_MAX == handle)
@@ -300,6 +300,8 @@ namespace bgfx
 			data.m_value  = _value;
 			data.m_parent = _parent;
 			m_hashMap.insert(stl::make_pair(_key, handle) );
+
+			return &m_data[handle].m_value;
 		}
 
 		Ty* find(uint64_t _key)

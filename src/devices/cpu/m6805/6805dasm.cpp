@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /*
  *   A quick-hack 68(7)05 disassembler
  *
@@ -11,216 +11,271 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "m6805.h"
 
-enum addr_mode {
-	md_imp=0,     /* implicit */
-	md_btr,       /* bit test and relative */
-	md_bit,       /* bit set/clear */
-	md_rel,       /* relative */
-	md_imm,       /* immediate */
-	md_dir,       /* direct address */
-	md_ext,       /* extended address */
-	md_idx,       /* indexed */
-	md_ix1,       /* indexed + byte offset */
-	md_ix2        /* indexed + word offset */
+#include "debugger.h"
+
+namespace {
+
+enum class md {
+	INH,    // inherent
+	BTR,    // bit test and relative
+	BIT,    // bit set/clear
+	REL,    // relative
+	IMM,    // immediate
+	DIR,    // direct address
+	EXT,    // extended address
+	IDX,    // indexed
+	IX1,    // indexed + byte offset
+	IX2     // indexed + word offset
 };
 
-enum op_names {
-	adca=0, adda,   anda,   asl,    asla,   aslx,   asr,    asra,
+enum class lvl {
+	HMOS,
+	CMOS,
+	HC
+};
+
+enum class op_names {
+	adca,   adda,   anda,   asl,    asla,   aslx,   asr,    asra,
 	asrx,   bcc,    bclr,   bcs,    beq,    bhcc,   bhcs,   bhi,
-	bih,    bil,    bita,   bls,    bmc,    bmi,    bms,    bne,
+	bih,    bil,    bit,    bls,    bmc,    bmi,    bms,    bne,
 	bpl,    bra,    brclr,  brn,    brset,  bset,   bsr,    clc,
 	cli,    clr,    clra,   clrx,   cmpa,   com,    coma,   comx,
 	cpx,    dec,    deca,   decx,   eora,   ill,    inc,    inca,
 	incx,   jmp,    jsr,    lda,    ldx,    lsr,    lsra,   lsrx,
-	neg,    nega,   negx,   nop,    ora,    rol,    rola,   rolx,
-	ror,    rora,   rorx,   rsp,    rti,    rts,    sbca,   sec,
-	sei,    sta,    stx,    suba,   swi,    tax,    tst,    tsta,
-	tstx,   txa
+	mul,    neg,    nega,   negx,   nop,    ora,    rol,    rola,
+	rolx,   ror,    rora,   rorx,   rsp,    rti,    rts,    sbca,
+	sec,    sei,    sta,    stop,   stx,    suba,   swi,    tax,
+	tst,    tsta,   tstx,   txa,    wait
 };
 
-static const char *const op_name_str[] = {
-	"adca", "adda", "anda", "asl",  "asla", "aslx", "asr",  "asra",
-	"asrx", "bcc",  "bclr", "bcs",  "beq",  "bhcc", "bhcs", "bhi",
-	"bih",  "bil",  "bita", "bls",  "bmc",  "bmi",  "bms",  "bne",
-	"bpl",  "bra",  "brclr","brn",  "brset","bset", "bsr",  "clc",
-	"cli",  "clr",  "clra", "clrx", "cmpa", "com",  "coma", "comx",
-	"cpx",  "dec",  "deca", "decx", "eora", "*ill", "inc",  "inca",
-	"incx", "jmp",  "jsr",  "lda",  "ldx",  "lsr",  "lsra", "lsrx",
-	"neg",  "nega", "negx", "nop",  "ora",  "rol",  "rola", "rolx",
-	"ror",  "rora", "rorx", "rsp",  "rti",  "rts",  "sbca", "sec",
-	"sei",  "sta",  "stx",  "suba", "swi",  "tax",  "tst",  "tsta",
-	"tstx", "txa"
+#define OP(name, mode)   { op_names::name, #name,   md::mode, lvl::HMOS }
+#define OPC(name, mode)  { op_names::name, #name,   md::mode, lvl::CMOS }
+#define OPHC(name, mode) { op_names::name, #name,   md::mode, lvl::HC   }
+#define ILLEGAL          { op_names::ill,  nullptr, md::INH,  lvl::HMOS }
+struct { op_names op; char const *name; md mode; lvl level; } const disasm[0x100] = {
+	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR), // 00
+	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR),
+	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR),
+	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR),
+	OP  (bset, BIT), OP  (bclr, BIT), OP  (bset, BIT), OP  (bclr, BIT), // 10
+	OP  (bset, BIT), OP  (bclr, BIT), OP  (bset, BIT), OP  (bclr, BIT),
+	OP  (bset, BIT), OP  (bclr, BIT), OP  (bset, BIT), OP  (bclr, BIT),
+	OP  (bset, BIT), OP  (bclr, BIT), OP  (bset, BIT), OP  (bclr, BIT),
+	OP  (bra,  REL), OP  (brn,  REL), OP  (bhi,  REL), OP  (bls,  REL), // 20
+	OP  (bcc,  REL), OP  (bcs,  REL), OP  (bne,  REL), OP  (beq,  REL),
+	OP  (bhcc, REL), OP  (bhcs, REL), OP  (bpl,  REL), OP  (bmi,  REL),
+	OP  (bmc,  REL), OP  (bms,  REL), OP  (bil,  REL), OP  (bih,  REL),
+	OP  (neg,  DIR), ILLEGAL        , ILLEGAL        , OP  (com,  DIR), // 30
+	OP  (lsr,  DIR), ILLEGAL        , OP  (ror,  DIR), OP  (asr,  DIR),
+	OP  (asl,  DIR), OP  (rol,  DIR), OP  (dec,  DIR), ILLEGAL        ,
+	OP  (inc,  DIR), OP  (tst,  DIR), ILLEGAL        , OP  (clr,  DIR),
+	OP  (nega, INH), ILLEGAL        , OPHC(mul,  INH), OP  (coma, INH), // 40
+	OP  (lsra, INH), ILLEGAL        , OP  (rora, INH), OP  (asra, INH),
+	OP  (asla, INH), OP  (rola, INH), OP  (deca, INH), ILLEGAL        ,
+	OP  (inca, INH), OP  (tsta, INH), ILLEGAL        , OP  (clra, INH),
+	OP  (negx, INH), ILLEGAL        , ILLEGAL        , OP  (comx, INH), // 50
+	OP  (lsrx, INH), ILLEGAL        , OP  (rorx, INH), OP  (asrx, INH),
+	OP  (aslx, INH), OP  (rolx, INH), OP  (decx, INH), ILLEGAL        ,
+	OP  (incx, INH), OP  (tstx, INH), ILLEGAL        , OP  (clrx, INH),
+	OP  (neg,  IX1), ILLEGAL        , ILLEGAL        , OP  (com,  IX1), // 60
+	OP  (lsr,  IX1), ILLEGAL        , OP  (ror,  IX1), OP  (asr,  IX1),
+	OP  (asl,  IX1), OP  (rol,  IX1), OP  (dec,  IX1), ILLEGAL        ,
+	OP  (inc,  IX1), OP  (tst,  IX1), OP  (jmp,  IX1), OP  (clr,  IX1),
+	OP  (neg,  IDX), ILLEGAL        , ILLEGAL        , OP  (com,  IDX), // 70
+	OP  (lsr,  IDX), ILLEGAL        , OP  (ror,  IDX), OP  (asr,  IDX),
+	OP  (asl,  IDX), OP  (rol,  IDX), OP  (dec,  IDX), ILLEGAL        ,
+	OP  (inc,  IDX), OP  (tst,  IDX), OP  (jmp,  IDX), OP  (clr,  IDX),
+	OP  (rti,  INH), OP  (rts,  INH), ILLEGAL        , OP  (swi,  INH), // 80
+	ILLEGAL        , ILLEGAL        , ILLEGAL        , ILLEGAL        ,
+	ILLEGAL        , ILLEGAL        , ILLEGAL        , ILLEGAL        ,
+	ILLEGAL        , ILLEGAL        , OPC (stop, INH), OPC (wait, INH),
+	ILLEGAL        , ILLEGAL        , ILLEGAL        , ILLEGAL        , // 90
+	ILLEGAL        , ILLEGAL        , ILLEGAL        , OP  (tax,  INH),
+	OP  (clc,  INH), OP  (sec,  INH), OP  (cli,  INH), OP  (sei,  INH),
+	OP  (rsp,  INH), OP  (nop,  INH), ILLEGAL        , OP  (txa,  INH),
+	OP  (suba, IMM), OP  (cmpa, IMM), OP  (sbca, IMM), OP  (cpx,  IMM), // a0
+	OP  (anda, IMM), OP  (bit,  IMM), OP  (lda,  IMM), ILLEGAL        ,
+	OP  (eora, IMM), OP  (adca, IMM), OP  (ora,  IMM), OP  (adda, IMM),
+	ILLEGAL        , OP  (bsr,  REL), OP  (ldx,  IMM), ILLEGAL        ,
+	OP  (suba, DIR), OP  (cmpa, DIR), OP  (sbca, DIR), OP  (cpx,  DIR), // b0
+	OP  (anda, DIR), OP  (bit,  DIR), OP  (lda,  DIR), OP  (sta,  DIR),
+	OP  (eora, DIR), OP  (adca, DIR), OP  (ora,  DIR), OP  (adda, DIR),
+	OP  (jmp,  DIR), OP  (jsr,  DIR), OP  (ldx,  DIR), OP  (stx,  DIR),
+	OP  (suba, EXT), OP  (cmpa, EXT), OP  (sbca, EXT), OP  (cpx,  EXT), // c0
+	OP  (anda, EXT), OP  (bit,  EXT), OP  (lda,  EXT), OP  (sta,  EXT),
+	OP  (eora, EXT), OP  (adca, EXT), OP  (ora,  EXT), OP  (adda, EXT),
+	OP  (jmp,  EXT), OP  (jsr,  EXT), OP  (ldx,  EXT), OP  (stx,  EXT),
+	OP  (suba, IX2), OP  (cmpa, IX2), OP  (sbca, IX2), OP  (cpx,  IX2), // d0
+	OP  (anda, IX2), OP  (bit,  IX2), OP  (lda,  IX2), OP  (sta,  IX2),
+	OP  (eora, IX2), OP  (adca, IX2), OP  (ora,  IX2), OP  (adda, IX2),
+	OP  (jmp,  IX2), OP  (jsr,  IX2), OP  (ldx,  IX2), OP  (stx,  IX2),
+	OP  (suba, IX1), OP  (cmpa, IX1), OP  (sbca, IX1), OP  (cpx,  IX1), // e0
+	OP  (anda, IX1), OP  (bit,  IX1), OP  (lda,  IX1), OP  (sta,  IX1),
+	OP  (eora, IX1), OP  (adca, IX1), OP  (ora,  IX1), OP  (adda, IX1),
+	OP  (jmp,  IX1), OP  (jsr,  IX1), OP  (ldx,  IX1), OP  (stx,  IX1),
+	OP  (suba, IDX), OP  (cmpa, IDX), OP  (sbca, IDX), OP  (cpx,  IDX), // f0
+	OP  (anda, IDX), OP  (bit,  IDX), OP  (lda,  IDX), OP  (sta,  IDX),
+	OP  (eora, IDX), OP  (adca, IDX), OP  (ora,  IDX), OP  (adda, IDX),
+	OP  (jmp,  IDX), OP  (jsr,  IDX), OP  (ldx,  IDX), OP  (stx,  IDX)
 };
 
-static const unsigned char disasm[0x100][2] = {
-	{brset,md_btr},{brclr,md_btr},{brset,md_btr},{brclr,md_btr},/* 00 */
-	{brset,md_btr},{brclr,md_btr},{brset,md_btr},{brclr,md_btr},
-	{brset,md_btr},{brclr,md_btr},{brset,md_btr},{brclr,md_btr},
-	{brset,md_btr},{brclr,md_btr},{brset,md_btr},{brclr,md_btr},
-	{bset, md_bit},{bclr, md_bit},{bset, md_bit},{bclr, md_bit},/* 10 */
-	{bset, md_bit},{bclr, md_bit},{bset, md_bit},{bclr, md_bit},
-	{bset, md_bit},{bclr, md_bit},{bset, md_bit},{bclr, md_bit},
-	{bset, md_bit},{bclr, md_bit},{bset, md_bit},{bclr, md_bit},
-	{bra,  md_rel},{brn,  md_rel},{bhi,  md_rel},{bls,  md_rel},/* 20 */
-	{bcc,  md_rel},{bcs,  md_rel},{bne,  md_rel},{beq,  md_rel},
-	{bhcc, md_rel},{bhcs, md_rel},{bpl,  md_rel},{bmi,  md_rel},
-	{bmc,  md_rel},{bms,  md_rel},{bil,  md_rel},{bih,  md_rel},
-	{neg,  md_dir},{ill,  md_imp},{ill,  md_imp},{com,  md_dir},/* 30 */
-	{lsr,  md_dir},{ill,  md_imp},{ror,  md_dir},{asr,  md_dir},
-	{asl,  md_dir},{rol,  md_dir},{dec,  md_dir},{ill,  md_imp},
-	{inc,  md_dir},{tst,  md_dir},{ill,  md_imp},{clr,  md_dir},
-	{nega, md_imp},{ill,  md_imp},{ill,  md_imp},{coma, md_imp},/* 40 */
-	{lsra, md_imp},{ill,  md_imp},{rora, md_imp},{asra, md_imp},
-	{asla, md_imp},{rola, md_imp},{deca, md_imp},{ill,  md_imp},
-	{inca, md_imp},{tsta, md_imp},{ill,  md_imp},{clra, md_imp},
-	{negx, md_imp},{ill,  md_imp},{ill,  md_imp},{comx, md_imp},/* 50 */
-	{lsrx, md_imp},{ill,  md_imp},{rorx, md_imp},{asrx, md_imp},
-	{aslx, md_imp},{rolx, md_imp},{decx, md_imp},{ill,  md_imp},
-	{incx, md_imp},{tstx, md_imp},{ill,  md_imp},{clrx, md_imp},
-	{neg,  md_ix1},{ill,  md_imp},{ill,  md_imp},{com,  md_ix1},/* 60 */
-	{lsr,  md_ix1},{ill,  md_imp},{ror,  md_ix1},{asr,  md_ix1},
-	{asl,  md_ix1},{rol,  md_ix1},{dec,  md_ix1},{ill,  md_imp},
-	{inc,  md_ix1},{tst,  md_ix1},{jmp,  md_ix1},{clr,  md_ix1},
-	{neg,  md_idx},{ill,  md_imp},{ill,  md_imp},{com,  md_idx},/* 70 */
-	{lsr,  md_idx},{ill,  md_imp},{ror,  md_idx},{asr,  md_idx},
-	{asl,  md_idx},{rol,  md_idx},{dec,  md_idx},{ill,  md_imp},
-	{inc,  md_idx},{tst,  md_idx},{jmp,  md_idx},{clr,  md_idx},
-	{rti,  md_imp},{rts,  md_imp},{ill,  md_imp},{swi,  md_imp},/* 80 */
-	{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},
-	{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},
-	{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},
-	{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},/* 90 */
-	{ill,  md_imp},{ill,  md_imp},{ill,  md_imp},{tax,  md_imp},
-	{clc,  md_imp},{sec,  md_imp},{cli,  md_imp},{sei,  md_imp},
-	{rsp,  md_imp},{nop,  md_imp},{ill,  md_imp},{txa,  md_imp},
-	{suba, md_imm},{cmpa, md_imm},{sbca, md_imm},{cpx,  md_imm},/* a0 */
-	{anda, md_imm},{bita, md_imm},{lda,  md_imm},{ill,  md_imp},
-	{eora, md_imm},{adca, md_imm},{ora,  md_imm},{adda, md_imm},
-	{ill,  md_imp},{bsr,  md_rel},{ldx,  md_imm},{ill,  md_imp},
-	{suba, md_dir},{cmpa, md_dir},{sbca, md_dir},{cpx,  md_dir},/* b0 */
-	{anda, md_dir},{bita, md_dir},{lda,  md_dir},{sta,  md_dir},
-	{eora, md_dir},{adca, md_dir},{ora,  md_dir},{adda, md_dir},
-	{jmp,  md_dir},{jsr,  md_dir},{ldx,  md_dir},{stx,  md_dir},
-	{suba, md_ext},{cmpa, md_ext},{sbca, md_ext},{cpx,  md_ext},/* c0 */
-	{anda, md_ext},{bita, md_ext},{lda,  md_ext},{sta,  md_ext},
-	{eora, md_ext},{adca, md_ext},{ora,  md_ext},{adda, md_ext},
-	{jmp,  md_ext},{jsr,  md_ext},{ldx,  md_ext},{stx,  md_ext},
-	{suba, md_ix2},{cmpa, md_ix2},{sbca, md_ix2},{cpx,  md_ix2},/* d0 */
-	{anda, md_ix2},{bita, md_ix2},{lda,  md_ix2},{sta,  md_ix2},
-	{eora, md_ix2},{adca, md_ix2},{ora,  md_ix2},{adda, md_ix2},
-	{jmp,  md_ix2},{jsr,  md_ix2},{ldx,  md_ix2},{stx,  md_ix2},
-	{suba, md_ix1},{cmpa, md_ix1},{sbca, md_ix1},{cpx,  md_ix1},/* e0 */
-	{anda, md_ix1},{bita, md_ix1},{lda,  md_ix1},{sta,  md_ix1},
-	{eora, md_ix1},{adca, md_ix1},{ora,  md_ix1},{adda, md_ix1},
-	{jmp,  md_ix1},{jsr,  md_ix1},{ldx,  md_ix1},{stx,  md_ix1},
-	{suba, md_idx},{cmpa, md_idx},{sbca, md_idx},{cpx,  md_idx},/* f0 */
-	{anda, md_idx},{bita, md_idx},{lda,  md_idx},{sta,  md_idx},
-	{eora, md_idx},{adca, md_idx},{ora,  md_idx},{adda, md_idx},
-	{jmp,  md_idx},{jsr,  md_idx},{ldx,  md_idx},{stx,  md_idx}
-};
 
-#if 0
-static const char *const opcode_strings[0x0100] =
+template <typename T>
+void format_address(
+		std::ostream& stream,
+		T address,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count)
 {
-	"brset0",   "brclr0",   "brset1",   "brclr1",   "brset2",   "brclr2",   "brset3",   "brclr3",       /*00*/
-	"brset4",   "brclr4",   "brset5",   "brclr5",   "brset6",   "brclr6",   "brset7",   "brclr7",
-	"bset0",    "bclr0",    "bset1",    "bclr1",    "bset2",    "bclr2",    "bset3",    "bclr3",        /*10*/
-	"bset4",    "bclr4",    "bset5",    "bclr5",    "bset6",    "bclr6",    "bset7",    "bclr7",
-	"bra",      "brn",      "bhi",      "bls",      "bcc",      "bcs",      "bne",      "beq",          /*20*/
-	"bhcc",     "bhcs",     "bpl",      "bmi",      "bmc",      "bms",      "bil",      "bih",
-	"neg_di",   "illegal",  "illegal",  "com_di",   "lsr_di",   "illegal",  "ror_di",   "asr_di",       /*30*/
-	"asl_di",   "rol_di",   "dec_di",   "illegal",  "inc_di",   "tst_di",   "illegal",  "clr_di",
-	"nega",     "illegal",  "illegal",  "coma",     "lsra",     "illegal",  "rora",     "asra",         /*40*/
-	"asla",     "rola",     "deca",     "illegal",  "inca",     "tsta",     "illegal",  "clra",
-	"negx",     "illegal",  "illegal",  "comx",     "lsrx",     "illegal",  "rorx",     "asrx",         /*50*/
-	"aslx",     "rolx",     "decx",     "illegal",  "incx",     "tstx",     "illegal",  "clrx",
-	"neg_ix1",  "illegal",  "illegal",  "com_ix1",  "lsr_ix1",  "illegal",  "ror_ix1",  "asr_ix1",      /*60*/
-	"asl_ix1",  "rol_ix1",  "dec_ix1",  "illegal",  "inc_ix1",  "tst_ix1",  "jmp_ix1",  "clr_ix1",
-	"neg_ix",   "illegal",  "illegal",  "com_ix",   "lsr_ix",   "illegal",  "ror_ix",   "asr_ix",       /*70*/
-	"asl_ix",   "rol_ix",   "dec_ix",   "illegal",  "inc_ix",   "tst_ix",   "jmp_ix",   "clr_ix",
-	"rti",      "rts",      "illegal",  "swi",      "illegal",  "illegal",  "illegal",  "illegal",      /*80*/
-	"illegal",  "illegal",  "illegal",  "illegal",  "illegal",  "illegal",  "illegal",  "illegal",
-	"illegal",  "illegal",  "illegal",  "illegal",  "illegal",  "illegal",  "illegal",  "tax",          /*90*/
-	"clc",      "sec",      "cli",      "sei",      "rsp",      "nop",      "illegal",  "txa",
-	"suba_im",  "cmpa_im",  "sbca_im",  "cpx_im",   "anda_im",  "bita_im",  "lda_im",   "illegal",      /*A0*/
-	"eora_im",  "adca_im",  "ora_im",   "adda_im",  "illegal",  "bsr",      "ldx_im",   "illegal",
-	"suba_di",  "cmpa_di",  "sbca_di",  "cpx_di",   "anda_di",  "bita_di",  "lda_di",   "sta_di",       /*B0*/
-	"eora_di",  "adca_di",  "ora_di",   "adda_di",  "jmp_di",   "jsr_di",   "ldx_di",   "stx_di",
-	"suba_ex",  "cmpa_ex",  "sbca_ex",  "cpx_ex",   "anda_ex",  "bita_ex",  "lda_ex",   "sta_ex",       /*C0*/
-	"eora_ex",  "adca_ex",  "ora_ex",   "adda_ex",  "jmp_ex",   "jsr_ex",   "ldx_ex",   "stx_ex",
-	"suba_ix2", "cmpa_ix2", "sbca_ix2", "cpx_ix2",  "anda_ix2", "bita_ix2", "lda_ix2",  "sta_ix2",      /*D0*/
-	"eora_ix2", "adca_ix2", "ora_ix2",  "adda_ix2", "jmp_ix2",  "jsr_ix2",  "ldx_ix2",  "stx_ix2",
-	"suba_ix1", "cmpa_ix1", "sbca_ix1", "cpx_ix1",  "anda_ix1", "bita_ix1", "lda_ix1",  "sta_ix1",      /*E0*/
-	"eora_ix1", "adca_ix1", "ora_ix1",  "adda_ix1", "jmp_ix1",  "jsr_ix1",  "ldx_ix1",  "stx_ix1",
-	"suba_ix",  "cmpa_ix",  "sbca_ix",  "cpx_ix",   "anda_ix",  "bita_ix",  "lda_ix",   "sta_ix",       /*F0*/
-	"eora_ix",  "adca_ix",  "ora_ix",   "adda_ix",  "jmp_ix",   "jsr_ix",   "ldx_ix",   "stx_ix"
-};
-#endif
-
-CPU_DISASSEMBLE(m6805)
-{
-	int code, bit;
-	uint16_t ea;
-	uint32_t flags = 0;
-	offs_t result;
-
-	code = oprom[0];
-
-	if (disasm[code][0] == bsr || disasm[code][0] == jsr)
-		flags = DASMFLAG_STEP_OVER;
-	else if (disasm[code][0] == rts || disasm[code][0] == rti)
-		flags = DASMFLAG_STEP_OUT;
-
-	util::stream_format(stream, "%-6s", op_name_str[disasm[code][0]]);
-
-	switch( disasm[code][1] )
-	{
-	case md_btr:  /* bit test and relative branch */
-		bit = (code >> 1) & 7;
-		util::stream_format(stream, "%d,$%02X,$%03X", bit, opram[1], pc + 3 + (int8_t)opram[2]);
-		result = 3 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_bit:  /* bit test */
-		bit = (code >> 1) & 7;
-		util::stream_format(stream, "%d,$%03X", bit, opram[1]);
-		result = 2 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_rel:  /* relative */
-		util::stream_format(stream, "$%03X", pc + 2 + (int8_t)opram[1]);
-		result = 2 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_imm:  /* immediate */
-		util::stream_format(stream, "#$%02X", opram[1]);
-		result = 2 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_dir:  /* direct (zero page address) */
-		util::stream_format(stream, "$%02X", opram[1]);
-		result = 2 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_ext:  /* extended (16 bit address) */
-		ea = (opram[1] << 8) + opram[2];
-		util::stream_format(stream, "$%04X", ea);
-		result = 3 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_idx:  /* indexed */
-		util::stream_format(stream, "(x)");
-		result = 1 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_ix1:  /* indexed + byte (zero page) */
-		util::stream_format(stream, "(x+$%02X)", opram[1]);
-		result = 2 | flags | DASMFLAG_SUPPORTED;
-		break;
-	case md_ix2:  /* indexed + word (16 bit address) */
-		ea = (opram[1] << 8) + opram[2];
-		util::stream_format(stream, "(x+$%04X)", ea);
-		result = 3 | flags | DASMFLAG_SUPPORTED;
-		break;
-	default:    /* implicit */
-		result = 1 | flags | DASMFLAG_SUPPORTED;
-		break;
-	}
-	return result;
+	auto const symbol= std::lower_bound(
+			&symbols[0],
+			&symbols[symbol_count],
+			address,
+			[] (auto const &sym, u16 addr) { return sym.first < addr; });
+	if ((symbol_count != (symbol - symbols)) && (symbol->first == address))
+		stream << symbol->second;
+	else
+		util::stream_format(stream, "$%0*X", 2 * sizeof(T), address);
 }
+
+
+offs_t disassemble(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		lvl level,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count)
+{
+	u8 const code = oprom[0];
+
+	if (!disasm[code].name || (disasm[code].level > level))
+	{
+		util::stream_format(stream, "%-6s$%02X", "fcb", code);
+		return 1 | DASMFLAG_SUPPORTED;
+	}
+	else
+	{
+		u32 flags;
+		switch (disasm[code].op)
+		{
+		case op_names::bsr:
+		case op_names::jsr:
+			flags = DASMFLAG_STEP_OVER;
+			break;
+		case op_names::rts:
+		case op_names::rti:
+			flags = DASMFLAG_STEP_OUT;
+			break;
+		default:
+			flags = 0;
+		}
+
+		util::stream_format(stream, "%-6s", disasm[code].name);
+
+		int bit;
+		u16 ea;
+		switch (disasm[code].mode)
+		{
+		case md::INH:   // inherent
+			return 1 | flags | DASMFLAG_SUPPORTED;
+
+		case md::BTR:   // bit test and relative branch
+			bit = (code >> 1) & 7;
+			util::stream_format(stream, "%d,", bit);
+			format_address(stream, opram[1], symbols, symbol_count);
+			util::stream_format(stream, ",$%03X", pc + 3 + s8(opram[2]));
+			return 3 | flags | DASMFLAG_SUPPORTED;
+
+		case md::BIT:   // bit test
+			bit = (code >> 1) & 7;
+			util::stream_format(stream, "%d,", bit);
+			format_address(stream, opram[1], symbols, symbol_count);
+			return 2 | flags | DASMFLAG_SUPPORTED;
+
+		case md::REL:   // relative
+			util::stream_format(stream, "$%03X", pc + 2 + s8(opram[1]));
+			return 2 | flags | DASMFLAG_SUPPORTED;
+
+		case md::IMM:   // immediate
+			util::stream_format(stream, "#$%02X", opram[1]);
+			return 2 | flags | DASMFLAG_SUPPORTED;
+
+		case md::DIR:   // direct (zero page address)
+			format_address(stream, opram[1], symbols, symbol_count);
+			return 2 | flags | DASMFLAG_SUPPORTED;
+
+		case md::EXT:   // extended (16 bit address)
+			ea = (opram[1] << 8) + opram[2];
+			format_address(stream, ea, symbols, symbol_count);
+			return 3 | flags | DASMFLAG_SUPPORTED;
+
+		case md::IDX:   // indexed
+			util::stream_format(stream, "(x)");
+			return 1 | flags | DASMFLAG_SUPPORTED;
+
+		case md::IX1:   // indexed + byte (zero page)
+			util::stream_format(stream, "(x+$%02X)", opram[1]);
+			return 2 | flags | DASMFLAG_SUPPORTED;
+
+		case md::IX2:   // indexed + word (16 bit address)
+			ea = (opram[1] << 8) + opram[2];
+			util::stream_format(stream, "(x+$%04X)", ea);
+			return 3 | flags | DASMFLAG_SUPPORTED;
+		}
+
+		// if we fall off the switch statement something is very wrong
+		throw false;
+	}
+}
+
+} // anonymous namespace
+
+
+offs_t CPU_DISASSEMBLE_NAME(m6805)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count)
+{
+	return disassemble(device, stream, pc, oprom, opram, options, lvl::HMOS, symbols, symbol_count);
+}
+
+offs_t CPU_DISASSEMBLE_NAME(m146805)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count)
+{
+	return disassemble(device, stream, pc, oprom, opram, options, lvl::CMOS, symbols, symbol_count);
+}
+
+offs_t CPU_DISASSEMBLE_NAME(m68hc05)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count)
+{
+	return disassemble(device, stream, pc, oprom, opram, options, lvl::HC, symbols, symbol_count);
+}
+
+CPU_DISASSEMBLE(m6805)   { return CPU_DISASSEMBLE_NAME(m6805)  (device, stream, pc, oprom, opram, options, nullptr, 0); }
+CPU_DISASSEMBLE(m146805) { return CPU_DISASSEMBLE_NAME(m146805)(device, stream, pc, oprom, opram, options, nullptr, 0); }
+CPU_DISASSEMBLE(m68hc05) { return CPU_DISASSEMBLE_NAME(m68hc05)(device, stream, pc, oprom, opram, options, nullptr, 0); }

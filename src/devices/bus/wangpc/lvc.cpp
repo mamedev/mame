@@ -16,7 +16,10 @@
 
 */
 
+#include "emu.h"
 #include "lvc.h"
+
+#include "screen.h"
 
 
 
@@ -44,7 +47,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_LVC, wangpc_lvc_device, "wangpc_lvc", "Wang PC Low Resolution Video Card")
 
 
 //-------------------------------------------------
@@ -110,10 +113,10 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
+//  MACHINE_CONFIG_START( wangpc_lvc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
+MACHINE_CONFIG_MEMBER( wangpc_lvc_device::device_add_mconfig )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 25*9)
@@ -127,17 +130,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
 	MCFG_MC6845_UPDATE_ROW_CB(wangpc_lvc_device, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(wangpc_lvc_device, vsync_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_lvc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_lvc );
-}
 
 
 
@@ -167,7 +159,7 @@ inline void wangpc_lvc_device::set_irq(int state)
 //-------------------------------------------------
 
 wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_LVC, "Wang PC Low Resolution Video Card", tag, owner, clock, "wangpc_lvc", __FILE__),
+	device_t(mconfig, WANGPC_LVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
 	m_video_ram(*this, "video_ram"),

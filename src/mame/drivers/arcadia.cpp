@@ -119,16 +119,14 @@ anything in hardware. No cartridge has been found which uses them.
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/arcadia.h"
 #include "softlist.h"
+#include "speaker.h"
 
 static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8, arcadia_state )
 	AM_RANGE( 0x0000, 0x0fff) AM_DEVREAD("cartslot", arcadia_cart_slot_device, read_rom)
 	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE(video_r, video_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( arcadia_io, AS_IO, 8, arcadia_state )
-	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ(vsync_r)
 ADDRESS_MAP_END
 
 /* The Emerson Arcadia 2001 controllers have 2 fire buttons on the side,
@@ -471,11 +469,11 @@ static SLOT_INTERFACE_START(arcadia_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( arcadia, arcadia_state )
+static MACHINE_CONFIG_START( arcadia )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
-	MCFG_CPU_IO_MAP(arcadia_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(arcadia_state, vsync_r))
 	MCFG_CPU_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -808,7 +806,7 @@ DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 }
 
 
-/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT     INIT          COMPANY               FULLNAME */
+/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT    STATE           INIT          COMPANY               FULLNAME */
 CONS(1983, advsnha,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Advision",           "Advision Home Arcade", MACHINE_IMPERFECT_SOUND )    /* France */
 CONS(1982, bndarc,    arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Bandai",             "Arcadia", MACHINE_IMPERFECT_SOUND )                 /* Japan */
 CONS(1982, arcadia,   0,         0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Emerson",            "Arcadia 2001", MACHINE_IMPERFECT_SOUND )            /* U.S.A. */

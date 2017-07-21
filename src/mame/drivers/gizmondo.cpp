@@ -35,6 +35,8 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "machine/s3c2440.h"
 #include "video/gf4500.h"
 #include "rendlay.h"
+#include "screen.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -181,7 +183,7 @@ DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
+static MACHINE_CONFIG_START( gizmondo )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
 

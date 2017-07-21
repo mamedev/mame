@@ -6,10 +6,13 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "pointsviewer.h"
 
 #import "breakpointsview.h"
 #import "watchpointsview.h"
+
+#include "util/xmlfile.h"
 
 
 @implementation MAMEPointsViewer
@@ -72,6 +75,7 @@
 	[breakScroll setHasVerticalScroller:YES];
 	[breakScroll setAutohidesScrollers:YES];
 	[breakScroll setBorderType:NSNoBorder];
+	[breakScroll setDrawsBackground:NO];
 	[breakScroll setDocumentView:breakView];
 	[breakView release];
 	breakTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
@@ -87,6 +91,7 @@
 	[watchScroll setHasVerticalScroller:YES];
 	[watchScroll setAutohidesScrollers:YES];
 	[watchScroll setBorderType:NSNoBorder];
+	[watchScroll setDrawsBackground:NO];
 	[watchScroll setDocumentView:watchView];
 	[watchView release];
 	watchTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
@@ -136,6 +141,12 @@
 - (IBAction)changeSubview:(id)sender {
 	[tabs selectTabViewItemAtIndex:[[sender selectedItem] tag]];
 	[window setTitle:[[sender selectedItem] title]];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER);
 }
 
 @end

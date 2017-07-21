@@ -10,6 +10,8 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "screen.h"
+
 #include <ctype.h>
 
 
@@ -27,29 +29,43 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		m_gamedrv(gamedrv),
 		m_options(options)
 {
-	// construct the config
-	(*gamedrv.machine_config)(*this, nullptr, nullptr);
+	// add the root device
+	device_add(nullptr, "root", gamedrv.type, 0);
 
-	bool is_selected_driver = core_stricmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
-
 	for (device_slot_interface &slot : slot_interface_iterator(root_device()))
 	{
 		device_t &owner = slot.device();
-		std::string selval;
-		bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
-		if (is_selected_driver && options.exists(owner.tag()+1))
-			selval = options.main_value(owner.tag()+1);
-		else if (slot.default_option() != nullptr)
-			selval.assign(slot.default_option());
+		const char *slot_option_name = owner.tag() + 1;
 
-		if (!selval.empty())
+		// figure out which device goes into this slot
+		bool has_option = options.has_slot_option(slot_option_name);
+		const char *selval;
+		bool is_default;
+		if (!has_option)
 		{
-			const device_slot_option *option = slot.option(selval.c_str());
+			// The only time we should be getting here is when emuopts.cpp is invoking
+			// us to evaluate slot/image options, and the internal state of emuopts.cpp has
+			// not caught up yet
+			selval = slot.default_option();
+			is_default = true;
+		}
+		else
+		{
+			const slot_option &opt = options.slot_option(slot_option_name);
+			selval = opt.value().c_str();
+			is_default = !opt.specified();
+		}
 
-			if (option && (isdefault || option->selectable()))
+		if (selval && *selval)
+		{
+			const device_slot_option *option = slot.option(selval);
+
+			if (option && (is_default || option->selectable()))
 			{
+				// create the device
 				device_t *new_dev = device_add(&owner, option->name(), option->devtype(), option->clock());
+				slot.set_card_device(new_dev);
 
 				const char *default_bios = option->default_bios();
 				if (default_bios != nullptr)
@@ -57,19 +73,16 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 				machine_config_constructor additions = option->machine_config();
 				if (additions != nullptr)
-					(*additions)(const_cast<machine_config &>(*this), new_dev, new_dev);
+					(*additions)(*this, new_dev, new_dev);
 
 				const input_device_default *input_device_defaults = option->input_device_defaults();
 				if (input_device_defaults)
 					device_t::static_set_input_default(*new_dev, input_device_defaults);
 			}
 			else
-				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval.c_str(), owner.tag()+1);
+				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
 		}
 	}
-
-	// when finished, set the game driver
-	driver_device::static_set_game(*m_root_device, gamedrv);
 
 	// then notify all devices that their configuration is complete
 	for (device_t &device : device_iterator(root_device()))
@@ -122,25 +135,29 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 		std::string part(tag, next-tag);
 		owner = owner->subdevices().find(part);
 		if (owner == nullptr)
-			throw emu_fatalerror("Could not find %s when looking up path for device %s\n",
-									part.c_str(), orig_tag);
+			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part.c_str(), orig_tag);
 		tag = next+1;
 	}
 	assert(tag[0] != '\0');
 
 	if (owner != nullptr)
 	{
-		// allocate the new device
-		device_t *device = (*type)(*this, tag, owner, clock);
-
-		// append it to the owner's list
-		return &config_new_device(owner->subdevices().m_list.append(*device));
+		// allocate the new device and append it to the owner's list
+		device_t *const device = &owner->subdevices().m_list.append(*type(*this, tag, owner, clock).release());
+		device->add_machine_configuration(*this);
+		return device;
 	}
-
-	// allocate the root device directly
-	assert(m_root_device == nullptr);
-	m_root_device.reset((*type)(*this, tag, nullptr, clock));
-	return &config_new_device(*m_root_device);
+	else
+	{
+		// allocate the root device directly
+		assert(!m_root_device);
+		m_root_device = type(*this, tag, nullptr, clock);
+		driver_device *driver = dynamic_cast<driver_device *>(m_root_device.get());
+		if (driver)
+			driver->set_game_driver(m_gamedrv);
+		m_root_device->add_machine_configuration(*this);
+		return m_root_device.get();
+	}
 }
 
 
@@ -159,19 +176,20 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
 		return device_add(owner, tag, type, clock);
 	}
+	else
+	{
+		// make sure we have the old device's actual owner
+		owner = old_device->owner();
+		assert(owner != nullptr);
 
-	// make sure we have the old device's actual owner
-	owner = old_device->owner();
-	assert(owner != nullptr);
+		// remove references to the old device
+		remove_references(*old_device);
 
-	// remove references to the old device
-	remove_references(*old_device);
-
-	// allocate the new device
-	device_t *new_device = (*type)(*this, tag, owner, clock);
-
-	// substitute it for the old one in the owner's list
-	return &config_new_device(owner->subdevices().m_list.replace_and_remove(*new_device, *old_device));
+		// allocate the new device and substitute it for the old one in the owner's list
+		device_t *const new_device = &owner->subdevices().m_list.replace_and_remove(*type(*this, tag, owner, clock).release(), *old_device);
+		new_device->add_machine_configuration(*this);
+		return new_device;
+	}
 }
 
 
@@ -214,7 +232,6 @@ device_t *machine_config::device_find(device_t *owner, const char *tag)
 	// find the original device by relative tag (must exist)
 	assert(owner != nullptr);
 	device_t *device = owner->subdevice(tag);
-	assert(device != nullptr);
 	if (device == nullptr)
 		throw emu_fatalerror("Unable to find device '%s'\n", tag);
 
@@ -233,21 +250,4 @@ void machine_config::remove_references(ATTR_UNUSED device_t &device)
 	// iterate over all devices and remove any references
 	for (device_t &scan : device_iterator(root_device()))
 		scan.subdevices().m_tagmap.clear(); //remove(&device);
-}
-
-
-//-------------------------------------------------
-//  config_new_device - helper for recursive
-//  configuration of newly added devices
-//-------------------------------------------------
-
-device_t &machine_config::config_new_device(device_t &device)
-{
-	// apply any machine configuration owned by the device now
-	machine_config_constructor additions = device.machine_config_additions();
-	if (additions != nullptr)
-		(*additions)(*this, &device, nullptr);
-
-	// return the new device
-	return device;
 }

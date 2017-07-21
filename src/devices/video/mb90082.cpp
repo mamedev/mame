@@ -21,9 +21,9 @@
 //**************************************************************************
 
 // device type definition
-const device_type MB90082 = &device_creator<mb90082_device>;
+DEFINE_DEVICE_TYPE(MB90082, mb90082_device, "mb90082", "Fujitsu MB90082 OSD")
 
-static ADDRESS_MAP_START( mb90082_vram, AS_0, 16, mb90082_device )
+static ADDRESS_MAP_START( mb90082_vram, 0, 16, mb90082_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // main screen vram
 	AM_RANGE(0x0400, 0x063f) AM_RAM // main screen attr
 //  AM_RANGE(0x0800, 0x0a3f) AM_RAM // sub screen vram
@@ -50,9 +50,11 @@ const tiny_rom_entry *mb90082_device::device_rom_region() const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mb90082_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector mb90082_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //**************************************************************************
@@ -86,9 +88,9 @@ inline void mb90082_device::write_word(offs_t address, uint16_t data)
 //-------------------------------------------------
 
 mb90082_device::mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MB90082, "MB90082 OSD", tag, owner, clock, "mb90082", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(mb90082_vram))
+	: device_t(mconfig, MB90082, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(mb90082_vram))
 {
 }
 

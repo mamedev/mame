@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
@@ -69,7 +70,7 @@ void DeviceInformationWindow::fill_device_information()
 		f->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
 		QVBoxLayout *vb = new QVBoxLayout(f);
 		bool first = true;
-		for(address_spacenum i=AS_0; i<ADDRESS_SPACES; i++)
+		for(int i=0; i<d_memory->max_space_count(); i++)
 			if(d_memory->has_space(i)) {
 				QFrame *ff = new QFrame(f);
 				QHBoxLayout *hb = new QHBoxLayout(ff);

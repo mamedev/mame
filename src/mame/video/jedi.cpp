@@ -348,7 +348,7 @@ uint32_t jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bit
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( jedi_video )
+MACHINE_CONFIG_START( jedi_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 262) /* verify vert size */

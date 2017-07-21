@@ -19,29 +19,31 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class modellot_state : public driver_device
 {
 public:
 	modellot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<uint8_t> m_p_videoram;
+
 private:
 	uint8_t m_term_data;
-	const uint8_t *m_p_chargen;
 	virtual void machine_reset() override;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(modellot_mem, AS_PROGRAM, 8, modellot_state)
@@ -75,7 +77,7 @@ READ8_MEMBER( modellot_state::portff_r)
 	return data;
 }
 
-WRITE8_MEMBER( modellot_state::kbd_put )
+void modellot_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -83,7 +85,6 @@ WRITE8_MEMBER( modellot_state::kbd_put )
 void modellot_state::machine_reset()
 {
 	m_term_data = 1;
-	m_p_chargen = memregion("chargen")->base();
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
@@ -148,7 +149,7 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( modellot, modellot_state )
+static MACHINE_CONFIG_START( modellot )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(modellot_mem)
@@ -167,8 +168,8 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(modellot_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(modellot_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -186,4 +187,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, driver_device, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON)
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )

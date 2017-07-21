@@ -5,6 +5,7 @@
  *   Xerox AltoII memory refresh task
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 //! f1_mrt_block early: block the display word task

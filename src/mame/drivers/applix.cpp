@@ -35,18 +35,23 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
-#include "video/mc6845.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
 #include "sound/volt_reg.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/applix_dsk.h"
-#include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
 
 
 
@@ -161,7 +166,7 @@ private:
 	required_device<via6522_device> m_via;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<dac_byte_interface> m_ldac;
@@ -470,7 +475,7 @@ static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
 	AM_RANGE(0x10, 0x17) AM_READWRITE(port10_r,port10_w) //IRQ
 	AM_RANGE(0x18, 0x1f) AM_READWRITE(port18_r,port18_w) //data&command
 	AM_RANGE(0x20, 0x27) AM_MIRROR(0x18) AM_READWRITE(port20_r,port20_w) //SCSI NCR5380
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("fdc", wd1772_t, read, write) //FDC
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("fdc", wd1772_device, read, write) //FDC
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //anotherZ80SCC
 ADDRESS_MAP_END
 
@@ -827,7 +832,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( applix, applix_state )
+static MACHINE_CONFIG_START( applix )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7500000)
 	MCFG_CPU_PROGRAM_MAP(applix_mem)
@@ -935,7 +940,7 @@ DRIVER_INIT_MEMBER(applix_state, applix)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY           FULLNAME       FLAGS
 COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", 0 )
 
 

@@ -9,12 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "xmlfile.h"
-#include "modules/lib/osdobj_common.h"
+
 #include "ui/uimain.h"
 
+#include "emuopts.h"
 #include "drivenum.h"
+
+#include "xmlfile.h"
+
+#include "modules/lib/osdobj_common.h"
+
 
 GAME_EXTERN(zexall);
 
@@ -24,7 +28,7 @@ const game_driver * const driver_list::s_drivers_sorted[2] =
 	&GAME_NAME(zexall),
 };
 
-int driver_list::s_driver_count = 2;
+std::size_t const driver_list::s_driver_count = 2;
 
 // ======================> zexall_machine_manager
 
@@ -72,15 +76,23 @@ private:
 
 zexall_machine_manager* zexall_machine_manager::m_manager = nullptr;
 
-int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
+int emulator_info::start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args)
 {
 	std::string error_string;
 	options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
 	options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
 	//options.set_value(OPTION_DEBUG, true, OPTION_PRIORITY_MAXIMUM, error_string);
 	options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
+
+	zexall_machine_manager::instance(options,osd)->start_http_server();
 	zexall_machine_manager::instance(options,osd)->execute();
 	return 0;
+}
+
+int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
+{
+	std::vector<std::string> args(argv, argv + argc);
+	return start_frontend(options, osd, args);
 }
 
 const char * emulator_info::get_bare_build_version() { return nullptr; }
@@ -95,7 +107,7 @@ void emulator_info::periodic_check() { }
 
 bool emulator_info::frame_hook() { return false; }
 
-void emulator_info::layout_file_cb(xml_data_node &layout) { }
+void emulator_info::layout_file_cb(util::xml::data_node &layout) { }
 
 const char * emulator_info::get_appname() { return nullptr; }
 

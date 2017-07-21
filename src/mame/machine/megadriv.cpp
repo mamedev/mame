@@ -25,6 +25,7 @@ Known Non-Issues (confirmed on Real Genesis)
 
 #include "emu.h"
 #include "includes/megadriv.h"
+#include "speaker.h"
 
 
 MACHINE_CONFIG_EXTERN( megadriv );
@@ -473,16 +474,17 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-	/* these are fake - remove allocs in video_start to use these to view ram instead */
-//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_SHARE("megadrive_vdp_vram")
-//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_SHARE("megadrive_vdp_vsram")
-//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_SHARE("megadrive_vdp_cram")
-
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w) // the earth defend
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START( dcat16_megadriv_map, AS_PROGRAM, 16, md_base_state )
+	AM_RANGE(0x000000, 0x7fffff) AM_ROM
+	AM_IMPORT_FROM(megadriv_map)
 ADDRESS_MAP_END
 
 
@@ -885,12 +887,12 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-MACHINE_CONFIG_FRAGMENT( megadriv_timers )
+MACHINE_CONFIG_START( megadriv_timers )
 	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( md_ntsc )
+MACHINE_CONFIG_START( md_ntsc )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
@@ -920,7 +922,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -937,9 +939,17 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START( dcat16_megadriv_base )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dcat16_megadriv_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+MACHINE_CONFIG_END
+
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_CONFIG_FRAGMENT( md_pal )
+MACHINE_CONFIG_START( md_pal )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
@@ -968,7 +978,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -1064,7 +1074,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 	m_version_hi_nibble = 0xe0; // Export PAL no-SCD
 }
 
-void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(md_base_state::screen_vblank_megadriv)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);

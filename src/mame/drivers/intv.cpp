@@ -51,11 +51,15 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 
 
 #include "emu.h"
+#include "includes/intv.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
-#include "includes/intv.h"
 #include "sound/ay8910.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #ifndef VERBOSE
 #ifdef MAME_DEBUG
@@ -236,7 +240,7 @@ static INPUT_PORTS_START( intvkbd )
 
 	PORT_START("ROW7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)  PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)       PORT_CHAR('O') PORT_CHAR(')')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)       PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)       PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)       PORT_CHAR('6') PORT_CHAR('\xA2')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)       PORT_CHAR('4') PORT_CHAR('$')
@@ -409,8 +413,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( intvkbd2_mem , AS_PROGRAM, 8, intv_state )
 	ADDRESS_MAP_UNMAP_HIGH  /* Required because of probing */
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w)  /* Dual-port RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w)  /* Dual-port RAM */
-	AM_RANGE(0xb7f8, 0xb7ff) AM_RAM    /* ??? */
+	AM_RANGE(0x4000, 0x40bf) AM_READWRITE(intvkbd_io_r, intvkbd_io_w)
+	AM_RANGE(0x40c0, 0x40cf) AM_DEVREADWRITE("crtc", tms9927_device, read, write)
+	AM_RANGE(0x4200, 0x7fff) AM_READWRITE(intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w)  /* Dual-port RAM */
+	AM_RANGE(0xb7f8, 0xb7ff) AM_READWRITE(intvkbd_periph_r, intvkbd_periph_w)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("videoram") /* Text Display */
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_READ(intvkb_iocart_r)
@@ -449,7 +455,7 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
 }
 
-static MACHINE_CONFIG_START( intv, intv_state )
+static MACHINE_CONFIG_START( intv )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MCFG_CPU_PROGRAM_MAP(intv_mem)
@@ -463,8 +469,8 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_REFRESH_RATE(59.92)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intv)
-	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE)
-	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE-1)
+	MCFG_SCREEN_SIZE(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE)
+	MCFG_SCREEN_VISIBLE_AREA(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
@@ -538,9 +544,13 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
+	/* crt controller */
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_7_15909MHz)
+	MCFG_TMS9927_CHAR_WIDTH(8)
+	MCFG_TMS9927_OVERSCAN(stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE, stic_device::OVERSCAN_RIGHT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
+						  stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE, stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE)
+
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTVKBD_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTVKBD_Y_SCALE)
-	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTVKBD_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTVKBD_Y_SCALE-1)
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intvkbd)
 
 	/* I/O cartslots for BASIC */
@@ -642,10 +652,10 @@ DRIVER_INIT_MEMBER(intv_state,intvkbd)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY   FULLNAME */
 CONS( 1979, intv,       0,      0,      intv,       0,       intv_state,    intv,       "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, intvsrs,    intv,   0,      intv,       0,       intv_state,    intv,       "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd, intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 CONS( 1982, intv2,      intv,   0,      intv2,      0,       intv_state,    intv,       "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions

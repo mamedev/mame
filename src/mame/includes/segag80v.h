@@ -9,6 +9,7 @@
 #include "machine/segag80.h"
 #include "audio/segasnd.h"
 #include "video/vector.h"
+#include "screen.h"
 
 class segag80v_state : public driver_device
 {

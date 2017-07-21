@@ -32,7 +32,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, negative indicates complement
-static const int8_t s_bits[] =
+static const s8 s_bits[] =
 {
 	0, 0, 4, 2, 2, 2, 2, 0, 0, 0,
 	-2, -2, -2, -2, 2, 2,
@@ -45,7 +45,7 @@ static const int8_t s_bits[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const uint32_t s_flags[] =
+static const u32 s_flags[] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0,
@@ -56,7 +56,7 @@ static const uint32_t s_flags[] =
 };
 
 
-static const uint8_t s2000_mnemonic[0x100] =
+static const u8 s2000_mnemonic[0x100] =
 {
 	/* 0x00 */
 	mNOP, mHALT, mRT, mRTS, mPSH, mPSL, mAND, mSOS,
@@ -103,8 +103,8 @@ static const uint8_t s2000_mnemonic[0x100] =
 CPU_DISASSEMBLE(amis2000)
 {
 	int pos = 0;
-	uint8_t op = oprom[pos++];
-	uint8_t instr = s2000_mnemonic[op];
+	u8 op = oprom[pos++];
+	u8 instr = s2000_mnemonic[op];
 
 	util::stream_format(stream, "%-5s ", s_mnemonics[instr]);
 
@@ -117,7 +117,7 @@ CPU_DISASSEMBLE(amis2000)
 
 	if (mask != 0)
 	{
-		uint8_t param = op;
+		u8 param = op;
 		if (complement)
 			param = ~param;
 		param &= mask;

@@ -38,37 +38,38 @@ To Do:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/wd_fdc.h"
+#include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/com8116.h"
+#include "machine/wd_fdc.h"
 #include "sound/beep.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class sbrain_state : public driver_device
 {
 public:
-	sbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu"),
-		m_beep(*this, "beeper"),
-		m_brg(*this, "brg"),
-		m_u0(*this, "uart0"),
-		m_u1(*this, "uart1"),
-		m_ppi(*this, "ppi"),
-		m_fdc (*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
-		m_vs(*this, "VS"),
-		m_bankr0(*this, "bankr0"),
-		m_bankw0(*this, "bankw0"),
-		m_bank2(*this, "bank2") {}
+	sbrain_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_beep(*this, "beeper")
+		, m_brg(*this, "brg")
+		, m_u0(*this, "uart0")
+		, m_u1(*this, "uart1")
+		, m_ppi(*this, "ppi")
+		, m_fdc (*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_vs(*this, "VS")
+		, m_bankr0(*this, "bankr0")
+		, m_bankw0(*this, "bankw0")
+		, m_bank2(*this, "bank2")
+		{}
 
-public:
-	const uint8_t *m_p_chargen;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_DRIVER_INIT(sbrain);
 	DECLARE_MACHINE_RESET(sbrain);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
@@ -82,6 +83,8 @@ public:
 	DECLARE_WRITE8_MEMBER(baud_w);
 	DECLARE_WRITE_LINE_MEMBER(fr_w);
 	DECLARE_WRITE_LINE_MEMBER(ft_w);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
 	uint8_t m_porta;
 	uint8_t m_portb;
@@ -89,12 +92,14 @@ private:
 	uint8_t m_port08;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<com8116_device> m_brg;
 	required_device<i8251_device> m_u0;
 	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
-	required_device<fd1791_t> m_fdc;
+	required_device<fd1791_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_ioport m_vs;
@@ -131,7 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sbrain_subio, AS_IO, 8, sbrain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r,port08_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1791_device, read, write)
 ADDRESS_MAP_END
 
 // bit 0 is wrong, maybe the whole byte is wrong
@@ -270,7 +275,6 @@ SLOT_INTERFACE_END
 
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
-	m_p_chargen = memregion("chargen")->base();
 	m_bankr0->set_entry(1); // point at rom
 	m_bankw0->set_entry(0); // always write to ram
 	m_bank2->set_entry(1); // point at maincpu bank
@@ -313,7 +317,7 @@ uint32_t sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sbrain, sbrain_state )
+static MACHINE_CONFIG_START( sbrain )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(sbrain_mem)

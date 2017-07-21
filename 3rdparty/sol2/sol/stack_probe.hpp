@@ -36,7 +36,7 @@ namespace sol {
 					return probe(false, 0);
 				}
 				get_field<b, raw>(L, std::forward<Key>(key), tableindex);
-				return probe(!check<nil_t>(L), 1);
+				return probe(!check<lua_nil_t>(L), 1);
 			}
 		};
 
@@ -52,7 +52,7 @@ namespace sol {
 					return probe(false, 1);
 				}
 				get_field<false, raw>(L, std::get<1>(keys), tableindex);
-				return probe(!check<nil_t>(L), 2);
+				return probe(!check<lua_nil_t>(L), 2);
 			}
 		};
 
@@ -61,7 +61,7 @@ namespace sol {
 			template <std::size_t I, typename Keys>
 			probe apply(std::index_sequence<I>, int sofar, lua_State* L, Keys&& keys, int tableindex) {
 				get_field < I < 1 && b, raw>(L, std::get<I>(keys), tableindex);
-				return probe(!check<nil_t>(L), sofar);
+				return probe(!check<lua_nil_t>(L), sofar);
 			}
 
 			template <std::size_t I, std::size_t I1, std::size_t... In, typename Keys>

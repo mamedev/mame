@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __MD_EEPROM_H
-#define __MD_EEPROM_H
+#ifndef MAME_BUS_MEGADRIVE_EEPROM_H
+#define MAME_BUS_MEGADRIVE_EEPROM_H
+
+#pragma once
 
 #include "md_slot.h"
 #include "machine/i2cmem.h"
@@ -18,13 +20,15 @@ class md_std_eeprom_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -42,8 +46,9 @@ public:
 	// construction/destruction
 	md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -58,8 +63,9 @@ public:
 	// construction/destruction
 	md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -74,8 +80,9 @@ public:
 	// construction/destruction
 	md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -90,8 +97,9 @@ public:
 	// construction/destruction
 	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -106,8 +114,9 @@ public:
 	// construction/destruction
 	md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -122,8 +131,9 @@ public:
 	// construction/destruction
 	md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -132,13 +142,13 @@ public:
 
 
 // device type definition
-extern const device_type MD_STD_EEPROM;
-extern const device_type MD_EEPROM_NBAJAM;
-extern const device_type MD_EEPROM_NBAJAMTE;
-extern const device_type MD_EEPROM_CSLAM;
-extern const device_type MD_EEPROM_NFLQB;
-extern const device_type MD_EEPROM_NHLPA;
-extern const device_type MD_EEPROM_BLARA;
+DECLARE_DEVICE_TYPE(MD_STD_EEPROM,      md_std_eeprom_device)
+DECLARE_DEVICE_TYPE(MD_EEPROM_NBAJAM,   md_eeprom_nbajam_device)
+DECLARE_DEVICE_TYPE(MD_EEPROM_NBAJAMTE, md_eeprom_nbajamte_device)
+DECLARE_DEVICE_TYPE(MD_EEPROM_CSLAM,    md_eeprom_cslam_device)
+DECLARE_DEVICE_TYPE(MD_EEPROM_NFLQB,    md_eeprom_nflqb_device)
+DECLARE_DEVICE_TYPE(MD_EEPROM_NHLPA,    md_eeprom_nhlpa_device)
+DECLARE_DEVICE_TYPE(MD_EEPROM_BLARA,    md_eeprom_blara_device)
 
 
 
@@ -155,30 +165,30 @@ enum
 	STATE_I2C_READ_DATA
 };
 
-// ======================> md_eeprom_nbajam_device_alt
+// ======================> md_eeprom_nbajam_alt_device
 
-class md_eeprom_nbajam_device_alt : public md_std_eeprom_device
+class md_eeprom_nbajam_alt_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nbajam_device_alt(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-//  virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
+	md_eeprom_nbajam_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
 	virtual DECLARE_WRITE16_MEMBER(write) override;
 
-	std::vector<uint8_t> m_sram;
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
+private:
 	void eeprom_i2c_init();
 	void idle_devsel_check();
 	void eeprom_i2c_update();
 	uint8_t eeprom_i2c_out();
 
-private:
+	std::vector<uint8_t> m_sram;
+
 	// EEPROM runtime vars
 	uint8_t m_eeprom_sda;     // current SDA
 	uint8_t m_eeprom_prev_sda;    // previous SDA
@@ -197,8 +207,7 @@ private:
 
 };
 
-extern const device_type MD_EEPROM_NBAJAM_ALT;
+DECLARE_DEVICE_TYPE(MD_EEPROM_NBAJAM_ALT, md_eeprom_nbajam_alt_device)
 
 
-
-#endif
+#endif // MAME_BUS_MEGADRIVE_EEPROM_H

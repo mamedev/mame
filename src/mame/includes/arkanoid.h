@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Stephane Humbert
+#include "machine/taito68705interface.h"
+
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
 	ARKUNK = 0,  /* unknown bootlegs for inclusion of possible new sets */
@@ -18,14 +20,17 @@ public:
 
 
 	arkanoid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this,"videoram"),
-		m_spriteram(*this,"spriteram"),
-		m_protram(*this,"protram"),
-		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_protram(*this, "protram")
+		, m_muxports(*this, "P%u", 1)
+		, m_maincpu(*this, "maincpu")
+		, m_mcuintf(*this, "mcu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -44,35 +49,16 @@ public:
 	int      m_bootleg_id;
 	uint8_t    m_bootleg_cmd;
 
-	/* mcu interface related */
-	bool     m_Z80HasWritten;   // z80 has written to latch flag
-	uint8_t    m_fromZ80;         // byte latch for z80->68705 comms
-	bool     m_MCUHasWritten;   // 68705 has written to latch flag
-	uint8_t    m_fromMCU;         // byte latch for 68705->z80 comms
-
-	/* mcu internal related */
-	uint8_t    m_portA_in;
-	uint8_t    m_portA_out;
-	uint8_t    m_old_portC_out;
-
-	DECLARE_READ8_MEMBER( mcu_porta_r );
-	DECLARE_READ8_MEMBER( mcu_portb_r );
-	DECLARE_READ8_MEMBER( mcu_portc_r );
-	DECLARE_WRITE8_MEMBER( mcu_porta_w );
-	DECLARE_WRITE8_MEMBER( mcu_portc_w );
-
 	/* hexaa */
 	uint8_t m_hexaa_from_main;
 	uint8_t m_hexaa_from_sub;
 
 	/* devices */
+	optional_ioport_array<2> m_muxports;
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<arkanoid_mcu_device_base> m_mcuintf;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	DECLARE_READ8_MEMBER(arkanoid_Z80_mcu_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_Z80_mcu_w);
 
 
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_f000_r);

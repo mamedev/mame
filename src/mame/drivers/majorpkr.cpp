@@ -449,18 +449,24 @@
 
 **********************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "majorpkr.lh"
+
+
 #define MASTER_CLOCK    XTAL_12MHz
 #define CPU_CLOCK       (MASTER_CLOCK / 2)   // 6 MHz, measured.
 #define OKI_CLOCK       (MASTER_CLOCK / 8)   // 1.5 MHz, measured.
 #define CRTC_CLOCK      (MASTER_CLOCK / 16)  // 750 kHz, measured.
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/okim6295.h"
-#include "machine/bankdev.h"
-#include "machine/nvram.h"
-#include "majorpkr.lh"
 
 
 class majorpkr_state : public driver_device
@@ -979,7 +985,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
+static MACHINE_CONFIG_START( majorpkr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
 	MCFG_CPU_PROGRAM_MAP(map)
@@ -1020,7 +1026,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)  // clock frequency & pin 7 verified.
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)  // clock frequency & pin 7 verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

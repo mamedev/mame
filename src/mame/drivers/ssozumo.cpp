@@ -11,11 +11,14 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 
 #include "emu.h"
 #include "includes/ssozumo.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void ssozumo_state::machine_start()
@@ -194,7 +197,7 @@ INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
+static MACHINE_CONFIG_START( ssozumo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
@@ -293,4 +296,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, driver_device, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -10,13 +10,15 @@ The LCD is likely to be a SSD1828 LCD.
 ********************************************************************/
 
 #include "emu.h"
-#include "sound/speaker.h"
-#include "machine/i2cmem.h"
 #include "cpu/minx/minx.h"
+#include "machine/i2cmem.h"
+#include "sound/spkrdev.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 struct PRC
 {
@@ -1751,7 +1753,7 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( pokemini, pokemini_state )
+static MACHINE_CONFIG_START( pokemini )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MINX, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)
@@ -1795,4 +1797,4 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, driver_device, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

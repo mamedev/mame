@@ -6,16 +6,16 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "msm6255.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 #define MOR_GRAPHICS        0x01
 #define MOR_4_BIT_PARALLEL  0x02
@@ -51,7 +51,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MSM6255 = &device_creator<msm6255_device>;
+DEFINE_DEVICE_TYPE(MSM6255, msm6255_device, "msm6255", "Oki MSM6255 LCD Controller")
 
 // I/O map
 DEVICE_ADDRESS_MAP_START( map, 8, msm6255_device )
@@ -60,7 +60,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, msm6255_device )
 ADDRESS_MAP_END
 
 // default address map
-static ADDRESS_MAP_START( msm6255, AS_0, 8, msm6255_device )
+static ADDRESS_MAP_START( msm6255, 0, 8, msm6255_device )
 	AM_RANGE(0x00000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock, "msm6255", __FILE__),
+	device_t(mconfig, MSM6255, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, nullptr, *ADDRESS_MAP_NAME(msm6255)),
@@ -121,9 +121,11 @@ void msm6255_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *msm6255_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector msm6255_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

@@ -6,7 +6,6 @@
 #ifndef BX_ERROR_H_HEADER_GUARD
 #define BX_ERROR_H_HEADER_GUARD
 
-#include "bx.h"
 #include "string.h"
 
 #define BX_ERROR_SET(_ptr, _result, _msg) \
@@ -44,55 +43,29 @@ namespace bx
 			);
 
 	public:
-		Error()
-			: m_code(0)
-		{
-		}
+		///
+		Error();
 
-		void reset()
-		{
-			m_code = 0;
-			m_msg.clear();
-		}
+		///
+		void reset();
 
-		void setError(ErrorResult _errorResult, const StringView& _msg)
-		{
-			BX_CHECK(0 != _errorResult.code, "Invalid ErrorResult passed to setError!");
+		///
+		void setError(ErrorResult _errorResult, const StringView& _msg);
 
-			if (!isOk() )
-			{
-				return;
-			}
+		///
+		bool isOk() const;
 
-			m_code = _errorResult.code;
-			m_msg  = _msg;
-		}
+		///
+		ErrorResult get() const;
 
-		bool isOk() const
-		{
-			return 0 == m_code;
-		}
+		///
+		const StringView& getMessage() const;
 
-		ErrorResult get() const
-		{
-			ErrorResult result = { m_code };
-			return result;
-		}
+		///
+		bool operator==(const ErrorResult& _rhs) const;
 
-		const StringView& getMessage() const
-		{
-			return m_msg;
-		}
-
-		bool operator==(const ErrorResult& _rhs) const
-		{
-			return _rhs.code == m_code;
-		}
-
-		bool operator!=(const ErrorResult& _rhs) const
-		{
-			return _rhs.code != m_code;
-		}
+		///
+		bool operator!=(const ErrorResult& _rhs) const;
 
 	private:
 		StringView m_msg;
@@ -108,21 +81,18 @@ namespace bx
 			);
 
 	public:
-		ErrorScope(Error* _err)
-			: m_err(_err)
-		{
-			BX_CHECK(NULL != _err, "_err can't be NULL");
-		}
+		///
+		ErrorScope(Error* _err);
 
-		~ErrorScope()
-		{
-			BX_CHECK(m_err->isOk(), "Error: %d", m_err->get().code);
-		}
+		///
+		~ErrorScope();
 
 	private:
 		Error* m_err;
 	};
 
 } // namespace bx
+
+#include "inline/error.inl"
 
 #endif // BX_ERROR_H_HEADER_GUARD

@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "imi5000h.h"
 
 
@@ -28,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IMI5000H = &device_creator<imi5000h_device>;
+DEFINE_DEVICE_TYPE(IMI5000H, imi5000h_device, "imi5000h", "IMI 5000H")
 
 
 //-------------------------------------------------
@@ -336,10 +337,10 @@ WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( imi5000h )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( imi5000h )
+MACHINE_CONFIG_MEMBER( imi5000h_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(imi5000h_mem)
@@ -378,17 +379,6 @@ static MACHINE_CONFIG_FRAGMENT( imi5000h )
 
 	//MCFG_HARDDISK_ADD("harddisk1")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor imi5000h_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( imi5000h );
-}
 
 
 //-------------------------------------------------
@@ -446,7 +436,7 @@ ioport_constructor imi5000h_device::device_input_ports() const
 //-------------------------------------------------
 
 imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, IMI5000H, "IMI 5000H", tag, owner, clock, "imi5000h", __FILE__),
+	device_t(mconfig, IMI5000H, tag, owner, clock),
 	device_imi7000_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_ctc(*this, Z80CTC_TAG),

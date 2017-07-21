@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wdc.h"
 #include "bus/scsi/scsihd.h"
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_WDC = &device_creator<wangpc_wdc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_WDC, wangpc_wdc_device, "wangpc_wdc", "Wang PC-PM001 Winchester Disk Controller")
 
 
 //-------------------------------------------------
@@ -86,10 +87,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
+//  MACHINE_CONFIG_START( wangpc_wdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
+MACHINE_CONFIG_MEMBER( wangpc_wdc_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000) // XTAL_10MHz / ?
 	//MCFG_Z80_DAISY_CHAIN(wangpc_wdc_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)
@@ -100,17 +101,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
 
 	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_wdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_wdc );
-}
 
 
 
@@ -142,7 +132,7 @@ inline void wangpc_wdc_device::set_irq(int state)
 //-------------------------------------------------
 
 wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_WDC, "Wang PC-PM001", tag, owner, clock, "wangpc_wdc", __FILE__),
+	device_t(mconfig, WANGPC_WDC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_ctc(*this, MK3882_TAG), m_status(0), m_option(0), m_irq(0)

@@ -75,10 +75,14 @@ Coin B is not used
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/ashnojoe.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
-#include "includes/ashnojoe.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 {
@@ -297,7 +301,7 @@ void ashnojoe_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
+static MACHINE_CONFIG_START( ashnojoe )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -335,7 +339,7 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ashnojoe_state, ashnojoe_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -7,14 +7,16 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "m2105.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_M2105 = &device_creator<electron_m2105_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_M2105, electron_m2105_device, "electron_m2105", "Acorn M2105 Expansion")
 
 
 //-------------------------------------------------
@@ -49,10 +51,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( m2105 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( m2105 )
+MACHINE_CONFIG_MEMBER( electron_m2105_device::device_add_mconfig )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -96,17 +98,6 @@ static MACHINE_CONFIG_FRAGMENT( m2105 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor electron_m2105_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m2105 );
-}
-
 const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 {
 	return ROM_NAME( m2105 );
@@ -121,15 +112,15 @@ const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 //-------------------------------------------------
 
 electron_m2105_device::electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_M2105, "Acorn M2105 Expansion", tag, owner, clock, "electron_m2105", __FILE__),
-		device_electron_expansion_interface(mconfig, *this),
-		m_exp_rom(*this, "exp_rom"),
-		m_via6522_0(*this, "via6522_0"),
-		m_via6522_1(*this, "via6522_1"),
-		m_duart(*this, "sc2681"),
-		m_tms(*this, "tms5220"),
-		m_centronics(*this, "centronics"),
-		m_irqs(*this, "irqs")
+	: device_t(mconfig, ELECTRON_M2105, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp_rom(*this, "exp_rom")
+	, m_via6522_0(*this, "via6522_0")
+	, m_via6522_1(*this, "via6522_1")
+	, m_duart(*this, "sc2681")
+	, m_tms(*this, "tms5220")
+	, m_centronics(*this, "centronics")
+	, m_irqs(*this, "irqs")
 {
 }
 

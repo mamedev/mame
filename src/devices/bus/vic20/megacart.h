@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIC20_MEGACART_H
+#define MAME_BUS_VIC20_MEGACART_H
+
 #pragma once
 
-#ifndef __VIC20_MEGACART__
-#define __VIC20_MEGACART__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -30,13 +29,13 @@ public:
 	// construction/destruction
 	vic20_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
@@ -53,8 +52,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC20_MEGACART;
+DECLARE_DEVICE_TYPE(VIC20_MEGACART, vic20_megacart_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_MEGACART_H

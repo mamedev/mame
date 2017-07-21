@@ -121,6 +121,7 @@ How the architecture works:
 #include "machine/z80scc.h"
 #include "machine/bankdev.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
 
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
@@ -138,16 +139,16 @@ class sun2_state : public driver_device
 {
 public:
 	sun2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_rom(*this, "bootprom"),
-	m_idprom(*this, "idprom"),
-	m_ram(*this, RAM_TAG),
-	m_type0space(*this, "type0"),
-	m_type1space(*this, "type1"),
-	m_type2space(*this, "type2"),
-	m_type3space(*this, "type3"),
-	m_bw2_vram(*this, "bw2_vram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "bootprom")
+		, m_idprom(*this, "idprom")
+		, m_ram(*this, RAM_TAG)
+		, m_type0space(*this, "type0")
+		, m_type1space(*this, "type1")
+		, m_type2space(*this, "type2")
+		, m_type3space(*this, "type3")
+		, m_bw2_vram(*this, "bw2_vram")
 	{ }
 
 	required_device<m68010_device> m_maincpu;
@@ -194,7 +195,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !space.debugger_access())
+	if ((fc == 3) && !machine().side_effect_disabled())
 	{
 		if (offset & 0x4)   // set for CPU space
 		{
@@ -253,7 +254,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if ((space.debugger_access()) && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
+	if (machine().side_effect_disabled() && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -273,7 +274,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-	//  if (!space.debugger_access())
+	//  if (!machine().side_effect_disabled())
 	//      printf("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
@@ -316,10 +317,10 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 	else
 	{
-		if (!space.debugger_access()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	if (!space.debugger_access()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc, offset>>15);
+	if (!machine().side_effect_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc, offset>>15);
 
 	return 0xffff;
 }
@@ -419,7 +420,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-		//if (!space.debugger_access()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
+		//if (!machine().side_effect_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
@@ -443,7 +444,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 	}
 	else
 	{
-		if (!space.debugger_access()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
 	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
@@ -581,7 +582,7 @@ void sun2_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( sun2vme, sun2_state )
+static MACHINE_CONFIG_START( sun2vme )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
@@ -641,7 +642,7 @@ static MACHINE_CONFIG_START( sun2vme, sun2_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun2mbus, sun2_state )
+static MACHINE_CONFIG_START( sun2mbus )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
@@ -721,6 +722,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT                 INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1984, sun2_50,   0,       0,   sun2vme,   sun2, driver_device,     0,  "Sun Microsystems", "Sun 2/50", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1984, sun2_120,  0,       0,   sun2mbus,  sun2, driver_device,     0,  "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME     FLAGS
+COMP( 1984, sun2_50,  0,      0,      sun2vme,   sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/50",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, sun2_120, 0,      0,      sun2mbus,  sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

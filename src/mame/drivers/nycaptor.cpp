@@ -190,17 +190,20 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 
 ***************************************************************************/
 
-//#define USE_MCU
-
-
 #include "emu.h"
 #include "includes/nycaptor.h"
+#include "includes/taitoipt.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+//#define USE_MCU
 
 
 WRITE8_MEMBER(nycaptor_state::sub_cpu_halt_w)
@@ -242,6 +245,18 @@ READ8_MEMBER(nycaptor_state::nycaptor_bx_r)
 WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r1)
+{
+	/* bit 1 = when 1, mcu has sent data to the main cpu */
+	return (CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 2 : 0;
+}
+
+READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r2)
+{
+	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
+	return (CLEAR_LINE != m_bmcu->host_semaphore_r()) ? 0 : 1;
 }
 
 
@@ -311,7 +326,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, nycaptor_generic_control_w)   /* bit 3 - memory bank at 0x8000-0xbfff */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
@@ -395,6 +410,10 @@ WRITE8_MEMBER(nycaptor_state::cyclshtg_generic_control_w)
 {
 	m_generic_control_reg = data;
 	membank("bank1")->set_entry((data >> 2) & 3);
+
+	// shared palette data gets overwritten in colt without this
+	if (m_gametype == 2)
+		m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -763,7 +782,7 @@ void nycaptor_state::machine_reset()
 	memset(m_vol_ctrl, 0, sizeof(m_vol_ctrl));
 }
 
-static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
+static MACHINE_CONFIG_START( nycaptor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* ??? */
@@ -829,7 +848,7 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 	// Does the DAC also exist on this board? nycaptor writes 0x80 to 0xd600
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
+static MACHINE_CONFIG_START( cyclshtg )
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(cyclshtg_master_map)
@@ -896,7 +915,7 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bronx, nycaptor_state )
+static MACHINE_CONFIG_START( bronx )
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(bronx_master_map)
@@ -1320,8 +1339,8 @@ DRIVER_INIT_MEMBER(nycaptor_state,colt)
 	m_gametype = 2;
 }
 
-GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, nycaptor, ROT0,  "Taito",   "N.Y. Captor", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, nycaptor, ROT0,  "Taito",   "N.Y. Captor",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 /* bootlegs */
-GAME( 1986, bronx,    cyclshtg, bronx,    bronx, nycaptor_state,    bronx,    ROT90, "bootleg", "Bronx", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, colt,     nycaptor, bronx,    colt, nycaptor_state,     colt,     ROT0,  "bootleg", "Colt", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, colt,     ROT0,  "bootleg", "Colt",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

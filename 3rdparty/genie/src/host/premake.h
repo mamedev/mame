@@ -52,8 +52,17 @@ unsigned long do_hash(const char* str, int seed);
 int do_isfile(const char* filename);
 
 
+/* Path helper functions */
+#define PATH_BUFSIZE 0x4000
+int is_absolute_path(const char * path);
+char *get_relative_path(const char src[], const char dst[], char *buffer, int bufsize);
+char *get_absolute_path(const char path[], char *buffer, int bufsize);
+
+
 /* Built-in functions */
 int path_isabsolute(lua_State* L);
+int path_getabsolute(lua_State *L);
+int path_getrelative(lua_State *L);
 int os_chdir(lua_State* L);
 int os_copyfile(lua_State* L);
 int os_getcwd(lua_State* L);

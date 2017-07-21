@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIDBRAIN_STD_H
+#define MAME_BUS_VIDBRAIN_STD_H
+
 #pragma once
 
-#ifndef __VIDEOBRAIN_STANDARD_CARTRIDGE__
-#define __VIDEOBRAIN_STANDARD_CARTRIDGE__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -39,7 +38,6 @@ protected:
 
 
 // device type definition
-extern const device_type VB_STD;
+DECLARE_DEVICE_TYPE(VB_STD, videobrain_standard_cartridge_device)
 
-
-#endif
+#endif // MAME_BUS_VIDBRAIN_STD_H

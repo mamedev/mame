@@ -12,9 +12,10 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mb86235.h"
 #include "mb86235fe.h"
+
+#include "debugger.h"
 
 
 #define ENABLE_DRC      0
@@ -28,7 +29,7 @@
 
 
 
-const device_type MB86235 = &device_creator<mb86235_device>;
+DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "MB86235")
 
 
 static ADDRESS_MAP_START(internal_abus, AS_DATA, 32, mb86235_device)
@@ -204,7 +205,7 @@ void mb86235_cpu_device::execute_set_input(int irqline, int state)
 #endif
 
 mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MB86235, "MB86235", tag, owner, clock, "mb86235", __FILE__)
+	: cpu_device(mconfig, MB86235, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
 	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, ADDRESS_MAP_NAME(internal_abus))
 	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, ADDRESS_MAP_NAME(internal_bbus))
@@ -214,6 +215,14 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+device_memory_interface::space_config_vector mb86235_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_dataa_config),
+		std::make_pair(AS_IO,      &m_datab_config)
+	};
+}
 
 void mb86235_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

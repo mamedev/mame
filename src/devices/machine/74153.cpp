@@ -6,15 +6,17 @@
 
 ***************************************************************************/
 
-#include <algorithm>
+#include "emu.h"
 #include "74153.h"
+
+#include <algorithm>
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TTL153 = &device_creator<ttl153_device>;
+DEFINE_DEVICE_TYPE(TTL153, ttl153_device, "ttl153", "SN54/74153")
 
 
 //**************************************************************************
@@ -26,7 +28,7 @@ const device_type TTL153 = &device_creator<ttl153_device>;
 //-------------------------------------------------
 
 ttl153_device::ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TTL153, "SN54/74153", tag, owner, clock, "ttl153", __FILE__),
+	device_t(mconfig, TTL153, tag, owner, clock),
 	m_za_cb(*this),
 	m_zb_cb(*this),
 	m_s{ false, false },

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_PET_DIAG264_LB_TAPE_H
+#define MAME_BUS_PET_DIAG264_LB_TAPE_H
+
 #pragma once
 
-#ifndef __DIAG264_CASSETTE_LOOPBACK__
-#define __DIAG264_CASSETTE_LOOPBACK__
-
-#include "emu.h"
 #include "cass.h"
 
 
@@ -47,7 +46,6 @@ private:
 
 // device type definition
 extern const device_type DIAG264_CASSETTE_LOOPBACK;
+DECLARE_DEVICE_TYPE(DIAG264_CASSETTE_LOOPBACK, diag264_cassette_loopback_device)
 
-
-
-#endif
+#endif // MAME_BUS_PET_DIAG264_LB_TAPE_H

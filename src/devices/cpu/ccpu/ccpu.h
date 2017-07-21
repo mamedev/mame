@@ -10,32 +10,16 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_CCPU_CCPU_H
+#define MAME_CPU_CCPU_CCPU_H
 
-#ifndef __CCPU_H__
-#define __CCPU_H__
+#pragma once
 
 
 /***************************************************************************
     REGISTER ENUMERATION
 ***************************************************************************/
 
-enum
-{
-	CCPU_PC=1,
-	CCPU_FLAGS,
-	CCPU_A,
-	CCPU_B,
-	CCPU_I,
-	CCPU_J,
-	CCPU_P,
-	CCPU_X,
-	CCPU_Y,
-	CCPU_T
-};
-
-
-typedef device_delegate<void (int16_t, int16_t, int16_t, int16_t, uint8_t)> ccpu_vector_delegate;
 
 
 #define MCFG_CCPU_EXTERNAL_FUNC(_devcb) \
@@ -48,12 +32,30 @@ typedef device_delegate<void (int16_t, int16_t, int16_t, int16_t, uint8_t)> ccpu
 class ccpu_cpu_device : public cpu_device
 {
 public:
+	// register enumeration
+	// public because the cinemat driver accesses A/P/X/Y through state interace - should there be a proper public interface to read registers?
+	enum
+	{
+		CCPU_PC=1,
+		CCPU_FLAGS,
+		CCPU_A,
+		CCPU_B,
+		CCPU_I,
+		CCPU_J,
+		CCPU_P,
+		CCPU_X,
+		CCPU_Y,
+		CCPU_T
+	};
+
+	typedef device_delegate<void (int16_t, int16_t, int16_t, int16_t, uint8_t)> vector_delegate;
+
 	// construction/destruction
 	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_external_func(device_t &device, _Object object) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(object); }
-	static void set_vector_func(device_t &device, ccpu_vector_delegate callback) { downcast<ccpu_cpu_device &>(device).m_vector_callback = callback; }
+	template <class Object> static devcb_base &set_external_func(device_t &device, Object &&cb) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(std::forward<Object>(cb)); }
+	static void set_vector_func(device_t &device, vector_delegate callback) { downcast<ccpu_cpu_device &>(device).m_vector_callback = callback; }
 
 	DECLARE_READ8_MEMBER( read_jmi );
 	void wdt_timer_trigger();
@@ -70,16 +72,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			case AS_DATA:    return &m_data_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -109,7 +102,7 @@ protected:
 	uint16_t              m_drflag;
 
 	devcb_read8        m_external_input;
-	ccpu_vector_delegate m_vector_callback;
+	vector_delegate m_vector_callback;
 
 	uint8_t               m_waiting;
 	uint8_t               m_watchdog;
@@ -126,7 +119,6 @@ protected:
 };
 
 
-extern const device_type CCPU;
+DECLARE_DEVICE_TYPE(CCPU, ccpu_cpu_device)
 
-
-#endif /* __CCPU_H__ */
+#endif // MAME_CPU_CCPU_CCPU_H

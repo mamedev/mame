@@ -55,6 +55,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
+
 #include "beaminv.lh"
 
 
@@ -333,7 +335,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( beaminv, beaminv_state )
+static MACHINE_CONFIG_START( beaminv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */
@@ -387,5 +389,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  driver_device, 0, ROT270, "Teknon Kogyo", "Beam Invader", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
-GAMEL( 1979, pacominv, beaminv, beaminv, pacominv, driver_device, 0, ROT270, "Pacom Corporation", "Pacom Invader", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  beaminv_state, 0, ROT270, "Teknon Kogyo",      "Beam Invader",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, pacominv, beaminv, beaminv, pacominv, beaminv_state, 0, ROT270, "Pacom Corporation", "Pacom Invader", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )

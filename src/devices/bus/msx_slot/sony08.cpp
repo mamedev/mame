@@ -10,11 +10,11 @@
 #include "sony08.h"
 
 
-const device_type MSX_SLOT_SONY08 = &device_creator<msx_slot_sony08_device>;
+DEFINE_DEVICE_TYPE(MSX_SLOT_SONY08, msx_slot_sony08_device, "msx_slot_sony08", "MSX Internal SONY08")
 
 
 msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_SLOT_SONY08, "MSX Internal SONY08", tag, owner, clock, "msx_slot_sony08", __FILE__)
+	: device_t(mconfig, MSX_SLOT_SONY08, tag, owner, clock)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
@@ -30,15 +30,9 @@ msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, co
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( sony08 )
+MACHINE_CONFIG_MEMBER( msx_slot_sony08_device::device_add_mconfig )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_slot_sony08_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sony08 );
-}
 
 
 void msx_slot_sony08_device::set_rom_start(device_t &device, const char *region, uint32_t offset)

@@ -44,10 +44,12 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/realbrk.h"
+
+#include "cpu/m68000/m68000.h"
 #include "sound/ym2413.h"
 #include "sound/ymz280b.h"
+#include "speaker.h"
 
 
 /* Read 4 ten bit dip switches */
@@ -241,7 +243,7 @@ static INPUT_PORTS_START( realbrk )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -315,7 +317,7 @@ static INPUT_PORTS_START( pkgnsh )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -428,7 +430,7 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -613,7 +615,7 @@ static INPUT_PORTS_START( dai2kaku )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -752,7 +754,7 @@ INTERRUPT_GEN_MEMBER(realbrk_state::interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( realbrk, realbrk_state )
+static MACHINE_CONFIG_START( realbrk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)          /* !! TMP68301 !! */
@@ -1275,13 +1277,13 @@ ROM_START( dai2kaku_alt_rom_size )
 ROM_END
 #endif
 
-GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh, driver_device,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, driver_device, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, realbrk,  0,       realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrko, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkj, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkk, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrk,  0,       realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrko, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, driver_device, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, realbrk_state, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

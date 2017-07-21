@@ -5,8 +5,13 @@
     Turret Tower hardware
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_TURRETT_H
+#define MAME_INCLUDES_TURRETT_H
+
+#pragma once
 
 #include "machine/ataintf.h"
+#include "screen.h"
 
 
 class turrett_state : public driver_device
@@ -108,7 +113,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	const address_space_config  m_space_config;
 
@@ -127,4 +132,6 @@ private:
 };
 
 // device type definition
-const device_type TURRETT = &device_creator<turrett_device>;
+DECLARE_DEVICE_TYPE(TURRETT, turrett_device)
+
+#endif // MAME_INCLUDES_TURRETT_H

@@ -51,8 +51,10 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class wallc_state : public driver_device
@@ -186,8 +188,8 @@ static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP
 	AM_RANGE(0xb100, 0xb100) AM_WRITE(wallc_coin_counter_w)
 	AM_RANGE(0xb200, 0xb200) AM_WRITENOP
-	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8912_device, address_w)
+	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -306,7 +308,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallca)
 
 
 
-static MACHINE_CONFIG_START( wallc, wallc_state )
+static MACHINE_CONFIG_START( wallc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
@@ -327,7 +329,7 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 12288000 / 8)
+	MCFG_SOUND_ADD("aysnd", AY8912, 12288000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -490,8 +492,8 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 
 }
 
-GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast,wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+GAME( 1984, wallc,    0,     wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin",          "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,   wallc, wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin",          "Wall Crash (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast, wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sidampkr, 0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam",          "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

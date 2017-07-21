@@ -6,8 +6,10 @@ t10mmc.h
 
 ***************************************************************************/
 
-#ifndef _T10MMC_H_
-#define _T10MMC_H_
+#ifndef MAME_MACHINE_T10MMC_H
+#define MAME_MACHINE_T10MMC_H
+
+#pragma once
 
 #include "t10spc.h"
 #include "imagedev/chd_cd.h"
@@ -36,6 +38,7 @@ protected:
 		T10MMC_CMD_READ_SUB_CHANNEL = 0x42,
 		T10MMC_CMD_READ_TOC_PMA_ATIP = 0x43,
 		T10MMC_CMD_PLAY_AUDIO_10 = 0x45,
+		T10MMC_CMD_PLAY_AUDIO_MSF = 0x47,
 		T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX = 0x48,
 		T10MMC_CMD_PAUSE_RESUME = 0x4b,
 		T10MMC_CMD_STOP_PLAY_SCAN = 0x4e,
@@ -63,8 +66,9 @@ protected:
 	uint32_t m_num_subblocks;
 	uint32_t m_cur_subblock;
 	int m_audio_sense;
+	bool m_sotc;
 
 	device_t *m_device;
 };
 
-#endif
+#endif // MAME_MACHINE_T10MMC_H

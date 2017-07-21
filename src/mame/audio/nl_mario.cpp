@@ -96,12 +96,12 @@ static NETLIST_START(nl_mario_snd1)
 	NET_C(R7.2, 2J_B.FC)
 	NET_C(C4.2, GND)
 
-	SN74LS629(1J_B, CAP_N(39))		/* C5 */
+	SN74LS629(1J_B, CAP_N(39))      /* C5 */
 	NET_C(1J_B.RNG, V5)
 	NET_C(1J_B.ENQ, ttllow)
 	NET_C(GND, 1J_B.GND)
 
-	SN74LS629(2J_B, CAP_N(6.8))		/* C16 */
+	SN74LS629(2J_B, CAP_N(6.8))     /* C16 */
 	NET_C(2J_B.RNG, V5)
 	NET_C(2J_B.ENQ, ttllow)
 	NET_C(GND, 2J_B.GND)
@@ -220,7 +220,6 @@ NETLIST_START(mario)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-6)
 	PARAM(Solver.SOR_FACTOR, 1.0)
-	PARAM(Solver.GS_THRESHOLD, 5)
 	PARAM(Solver.GS_LOOPS, 1)
 	/* Dynamic timestepping avoids excessive newton loops on startup */
 	PARAM(Solver.DYNAMIC_LTE, 5e-2)

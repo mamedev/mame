@@ -140,9 +140,10 @@ Pin #11(+) | | R               |
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
 #include "includes/lethalj.h"
+
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK            XTAL_40MHz
@@ -628,7 +629,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gameroom, lethalj_state )
+static MACHINE_CONFIG_START( gameroom )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
@@ -651,13 +652,13 @@ static MACHINE_CONFIG_START( gameroom, lethalj_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_OKIM6295_ADD("oki3", SOUND_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki3", SOUND_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -1039,14 +1040,14 @@ DRIVER_INIT_MEMBER(lethalj_state,cclownz)
  *
  *************************************/
 
-GAME( 1996, lethalj,   0,        lethalj,  lethalj,   driver_device, 0,        ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
-GAME( 1996, franticf,  0,        gameroom, franticf,  driver_device, 0,        ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
-GAME( 1997, eggventr,  0,        gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
-GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
-GAME( 1997, eggventra, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
-GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, 0,        ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
+GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, 0,        ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
+GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
+GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
+GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
+GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
 GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
 GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
 GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )

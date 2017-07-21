@@ -7,6 +7,7 @@
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "screen.h"
 
 class buggychl_state : public driver_device
 {
@@ -64,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);
+	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(buggychl_chargen_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_bank_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);

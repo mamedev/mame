@@ -25,6 +25,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/starwars.h"
+#include "includes/slapstic.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
@@ -32,8 +35,8 @@
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "machine/x2212.h"
-#include "includes/starwars.h"
-#include "includes/slapstic.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
@@ -139,7 +142,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4340, 0x435f) AM_READ_PORT("DSW0")
 	AM_RANGE(0x4360, 0x437f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)            /* a-d control result */
-	AM_RANGE(0x4400, 0x4400) AM_READWRITE(starwars_main_read_r, starwars_main_wr_w)
+	AM_RANGE(0x4400, 0x4400) AM_DEVREAD("mainlatch", generic_latch_8_device, read)
+	AM_RANGE(0x4400, 0x4400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x4401, 0x4401) AM_READ(starwars_main_ready_flag_r)
 	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE("x2212", x2212_device, read, write)
 	AM_RANGE(0x4600, 0x461f) AM_DEVWRITE("avg", avg_starwars_device, go_w)
@@ -169,8 +173,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, starwars_state )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(starwars_sout_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(starwars_sin_r)        /* SIN Read */
+	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("mainlatch", generic_latch_8_device, write)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* SIN Read */
 	AM_RANGE(0x1000, 0x107f) AM_RAM                         /* 6532 ram */
 	AM_RANGE(0x1080, 0x109f) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x1800, 0x183f) AM_WRITE(quad_pokeyn_w)
@@ -204,7 +208,7 @@ static INPUT_PORTS_START( starwars )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Diagnostic Step")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -294,7 +298,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( starwars, starwars_state )
+static MACHINE_CONFIG_START( starwars )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 8)
@@ -312,7 +316,7 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_RIOT6532_OUT_PA_CB(WRITE8(starwars_state, r6532_porta_w))
 	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("tms", tms5220_device, status_r))
 	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("tms", tms5220_device, data_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(starwars_state, snd_interrupt))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
 	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
 
@@ -344,6 +348,12 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 
 	MCFG_SOUND_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa7_w))
+
+	MCFG_GENERIC_LATCH_8_ADD("mainlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa6_w))
 MACHINE_CONFIG_END
 
 

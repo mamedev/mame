@@ -37,6 +37,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/terminal.h"
@@ -70,10 +71,9 @@ static ADDRESS_MAP_START(pipbug_mem, AS_PROGRAM, 8, pipbug_state)
 	AM_RANGE( 0x0400, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pipbug_io, AS_IO, 8, pipbug_state)
+static ADDRESS_MAP_START(pipbug_data, AS_DATA, 8, pipbug_state)
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(pipbug_ctrl_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READNOP // this has to return zero or the parameter to write_sense is ignored
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -153,12 +153,12 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	return result;
 }
 
-static MACHINE_CONFIG_START( pipbug, pipbug_state )
+static MACHINE_CONFIG_START( pipbug )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
-	MCFG_CPU_IO_MAP(pipbug_io)
-	MCFG_S2650_FLAG_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_CPU_DATA_MAP(pipbug_data)
+	MCFG_S2650_FLAG_OUTPUT(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
@@ -178,5 +178,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, pipbug,  0,       0,     pipbug,    pipbug, driver_device,    0,  "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY      FULLNAME  FLAGS
+COMP( 1979, pipbug, 0,      0,      pipbug,   pipbug, pipbug_state, 0,    "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )

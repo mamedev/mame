@@ -8,14 +8,14 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "tms32082.h"
+#include "debugger.h"
 
 extern CPU_DISASSEMBLE(tms32082_mp);
 extern CPU_DISASSEMBLE(tms32082_pp);
 
-const device_type TMS32082_MP = &device_creator<tms32082_mp_device>;
-const device_type TMS32082_PP = &device_creator<tms32082_pp_device>;
+DEFINE_DEVICE_TYPE(TMS32082_MP, tms32082_mp_device, "tms32082_mp", "TMS32082 MP")
+DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "TMS32082 PP")
 
 
 
@@ -45,11 +45,24 @@ const uint32_t tms32082_mp_device::SHIFT_MASK[] =
 
 
 tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32082_MP, "TMS32082 MP", tag, owner, clock, "tms32082_mp", __FILE__)
+	: cpu_device(mconfig, TMS32082_MP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(mp_internal_map))
 {
 }
 
+device_memory_interface::space_config_vector tms32082_mp_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+device_memory_interface::space_config_vector tms32082_pp_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 offs_t tms32082_mp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
@@ -483,7 +496,7 @@ static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_pp_device)
 ADDRESS_MAP_END
 
 tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32082_PP, "TMS32082 PP", tag, owner, clock, "tms32082_pp", __FILE__)
+	: cpu_device(mconfig, TMS32082_PP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(pp_internal_map))
 {
 }

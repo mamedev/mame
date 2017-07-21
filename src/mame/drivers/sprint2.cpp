@@ -20,9 +20,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/sprint2.h"
+
+#include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #define MACHINE_IS_SPRINT1   (m_game == 1)
 #define MACHINE_IS_SPRINT2   (m_game == 2)
@@ -527,7 +529,7 @@ static GFXDECODE_START( sprint2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint2, sprint2_state )
+static MACHINE_CONFIG_START( sprint2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
@@ -543,7 +545,7 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint2_state, screen_update_sprint2)
-	MCFG_SCREEN_VBLANK_DRIVER(sprint2_state, screen_eof_sprint2)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sprint2_state, screen_vblank_sprint2))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint2)
@@ -637,7 +639,7 @@ ROM_START( sprint2a )
 	ROM_LOAD( "6290-01.b1", 0x2000, 0x0800, CRC(41fc985e) SHA1(7178846480cbf8d15955ccd987d0b0e902ab9f90) )
 	ROM_LOAD( "6291-01.c1", 0x2800, 0x0800, CRC(07f7a920) SHA1(845f65d2bd290eb295ca6bae2575f27aaa08c0dd) )
 	ROM_LOAD( "6404.d1",    0x3000, 0x0800, CRC(d2878ff6) SHA1(b742a8896c1bf1cfacf48d06908920d88a2c9ea8) )
-	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(e80fd249) SHA1(7bcf7dfd72ca83fdd80593eaf392570da1f71298) )
+	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(e80fd249) SHA1(7bcf7dfd72ca83fdd80593eaf392570da1f71298) ) // sldh
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )

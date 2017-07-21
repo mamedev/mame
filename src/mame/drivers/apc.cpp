@@ -54,15 +54,17 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "sound/upd1771.h"
+#include "machine/am9517a.h"
+#include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/am9517a.h"
-#include "machine/upd765.h"
 #include "machine/upd1990a.h"
-#include "machine/nvram.h"
+#include "machine/upd765.h"
+#include "sound/upd1771.h"
 #include "video/upd7220.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 //#include "sound/ay8910.h"
 
 #define MAIN_CLOCK XTAL_5MHz
@@ -783,11 +785,11 @@ GFXDECODE_END
 
 
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, apc_state)
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, apc_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, apc_state )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 16, apc_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -907,7 +909,7 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apc, apc_state )
+static MACHINE_CONFIG_START( apc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)
@@ -958,11 +960,11 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
 
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
 
 	/* sound hardware */

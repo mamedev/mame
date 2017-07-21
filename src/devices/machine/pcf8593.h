@@ -8,10 +8,11 @@
 
 *********************************************************************/
 
-#ifndef __PCF8593_H__
-#define __PCF8593_H__
+#ifndef MAME_MACHINE_PCF8593_H
+#define MAME_MACHINE_PCF8593_H
 
-#include "emu.h"
+#pragma once
+
 #include "dirtc.h"
 
 
@@ -75,6 +76,6 @@ private:
 };
 
 // device type definition
-extern const device_type PCF8593;
+DECLARE_DEVICE_TYPE(PCF8593, pcf8593_device)
 
-#endif /* __PCF8593_H__ */
+#endif // MAME_MACHINE_PCF8593_H

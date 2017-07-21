@@ -23,11 +23,14 @@
 
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
+#include "includes/midtunit.h"
+
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/midtunit.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define CPU_CLOCK       (50000000)
@@ -587,7 +590,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tunit_core, midtunit_state )
+static MACHINE_CONFIG_START( tunit_core )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)

@@ -174,10 +174,10 @@ Rowscroll style:
 #include "video/deco16ic.h"
 #include "render.h"
 
-const device_type DECO16IC = &device_creator<deco16ic_device>;
+DEFINE_DEVICE_TYPE(DECO16IC, deco16ic_device, "deco16ic", "DECO 55 / 56 / 74 / 141 IC")
 
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO16IC, "DECO 55 / 56 / 74 / 141 IC", tag, owner, clock, "deco16ic", __FILE__),
+	: device_t(mconfig, DECO16IC, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_pf1_data(nullptr),
 		m_pf2_data(nullptr),
@@ -724,21 +724,32 @@ static int deco16_pf_update(
 
 		if (tilemap_16x16)
 		{
+			int numrows = rows;
+
+			// cap at tilemap size
+			if (numrows > tilemap_16x16->height())
+				numrows = tilemap_16x16->height();
+
 			tilemap_16x16->set_scroll_cols(1);
-			tilemap_16x16->set_scroll_rows(rows);
+			tilemap_16x16->set_scroll_rows(numrows);
 			tilemap_16x16->set_scrolly(0, scrolly);
 
-			for (offs = 0; offs < rows; offs++)
+
+			for (offs = 0; offs < numrows; offs++)
 				tilemap_16x16->set_scrollx(offs, scrollx + rowscroll_ptr[offs]);
 		}
 
 		if (tilemap_8x8)
 		{
 			int numrows = rows;
-			
+
 			// wolffang uses a larger 8x8 tilemap for the Japanese intro text, everything else seems to need this logic tho?
 			if (!(tilemapsizes & 4))
 				numrows = rows >> 1;
+
+			// cap at tilemap size
+			if (numrows > tilemap_8x8->height())
+				numrows = tilemap_8x8->height();
 
 			tilemap_8x8->set_scroll_cols(1);
 			tilemap_8x8->set_scroll_rows(numrows);

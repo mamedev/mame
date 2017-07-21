@@ -6,21 +6,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_SH2_SH7604_SCI_H
+#define MAME_CPU_SH2_SH7604_SCI_H
+
 #pragma once
-
-#ifndef __SH7604_SCIDEV_H__
-#define __SH7604_SCIDEV_H__
-
-enum {
-	STATUS_MPBT = 1 << 0,
-	STATUS_MPB =  1 << 1,
-	STATUS_TEND = 1 << 2,
-	STATUS_PER =  1 << 3,
-	STATUS_FER =  1 << 4,
-	STATUS_ORER = 1 << 5,
-	STATUS_RDRF = 1 << 6,
-	STATUS_TDRE = 1 << 7
-};
 
 
 
@@ -37,14 +26,15 @@ enum {
 
 // ======================> sh7604_sci_device
 
-class sh7604_sci_device : public device_t,
-						  public device_memory_interface
+class sh7604_sci_device : public device_t
 {
 public:
 	// construction/destruction
 	sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
+	DECLARE_ADDRESS_MAP( sci_regs, 8 );
+
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
@@ -61,12 +51,23 @@ public:
 	DECLARE_WRITE8_MEMBER( serial_ack_w );
 	DECLARE_READ8_MEMBER( receive_data_r );
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 protected:
+	enum {
+		STATUS_MPBT = 1 << 0,
+		STATUS_MPB =  1 << 1,
+		STATUS_TEND = 1 << 2,
+		STATUS_PER =  1 << 3,
+		STATUS_FER =  1 << 4,
+		STATUS_ORER = 1 << 5,
+		STATUS_RDRF = 1 << 6,
+		STATUS_TDRE = 1 << 7
+	};
+
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	const address_space_config      m_space_config;
 	uint8_t m_smr;
@@ -77,14 +78,6 @@ private:
 
 
 // device type definition
-extern const device_type SH7604_SCI;
+DECLARE_DEVICE_TYPE(SH7604_SCI, sh7604_sci_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-
-#endif
+#endif // MAME_CPU_SH2_SH7604_SCI_H

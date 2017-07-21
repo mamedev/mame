@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
-#include "emu.h"
 
 #include "machine/ds2401.h"
 #include "machine/ticket.h"
@@ -177,6 +176,7 @@ public:
 	DECLARE_PALETTE_INIT(magodds);
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(masked_irq);
 

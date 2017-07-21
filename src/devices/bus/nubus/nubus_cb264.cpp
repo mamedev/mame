@@ -15,19 +15,13 @@
 
 #include "emu.h"
 #include "nubus_cb264.h"
+#include "screen.h"
 
 #define CB264_SCREEN_NAME   "cb264_screen"
 #define CB264_ROM_REGION    "cb264_rom"
 
 #define VRAM_SIZE   (0x200000)  // 2 megs, maxed out
 
-MACHINE_CONFIG_FRAGMENT( cb264 )
-	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
 
 ROM_START( cb264 )
 	ROM_REGION(0x4000, CB264_ROM_REGION, 0)
@@ -39,18 +33,20 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_CB264 = &device_creator<nubus_cb264_device>;
+DEFINE_DEVICE_TYPE(NUBUS_CB264, nubus_cb264_device, "nb_c264", "RasterOps ColorBoard 264 video card")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_cb264_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cb264 );
-}
+MACHINE_CONFIG_MEMBER( nubus_cb264_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -70,14 +66,14 @@ const tiny_rom_entry *nubus_cb264_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS_CB264, "RasterOps ColorBoard 264 video card", tag, owner, clock, "nb_cb264", __FILE__),
-		device_nubus_card_interface(mconfig, *this), m_cb264_mode(0), m_cb264_vbl_disable(0), m_cb264_toggle(0), m_count(0), m_clutoffs(0)
+	nubus_cb264_device(mconfig, NUBUS_CB264, tag, owner, clock)
 {
 }
 
-nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_nubus_card_interface(mconfig, *this), m_cb264_mode(0), m_cb264_vbl_disable(0), m_cb264_toggle(0), m_count(0), m_clutoffs(0)
+nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_nubus_card_interface(mconfig, *this),
+	m_cb264_mode(0), m_cb264_vbl_disable(0), m_cb264_toggle(0), m_count(0), m_clutoffs(0)
 {
 }
 

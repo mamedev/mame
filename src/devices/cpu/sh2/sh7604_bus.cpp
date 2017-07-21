@@ -23,7 +23,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SH7604_BUS = &device_creator<sh7604_bus_device>;
+DEFINE_DEVICE_TYPE(SH7604_BUS, sh7604_bus_device, "sh7604bus", "SH7604 BUS Controller")
 
 
 //**************************************************************************
@@ -93,7 +93,7 @@ WRITE16_MEMBER(sh7604_bus_device::refresh_timer_constant_w)
 	COMBINE_DATA(&m_rtcor);
 }
 
-static ADDRESS_MAP_START( bus_regs, AS_0, 16, sh7604_bus_device )
+DEVICE_ADDRESS_MAP_START( bus_regs, 16, sh7604_bus_device )
 	AM_RANGE(0x00, 0x01) AM_READWRITE(bus_control_1_r, bus_control_1_w)
 	AM_RANGE(0x02, 0x03) AM_READWRITE(bus_control_2_r, bus_control_2_w)
 	AM_RANGE(0x04, 0x05) AM_READWRITE(wait_control_r, wait_control_w)
@@ -109,16 +109,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 sh7604_bus_device::sh7604_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SH7604_BUS, "sh7604_bus_longname", tag, owner, clock, "sh7604_bus", __FILE__),
-	device_memory_interface(mconfig, *this),
-	m_space_config("regs", ENDIANNESS_BIG, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(bus_regs))
+	: device_t(mconfig, SH7604_BUS, tag, owner, clock)
 {
-}
-
-
-const address_space_config *sh7604_bus_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //-------------------------------------------------

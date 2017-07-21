@@ -34,8 +34,8 @@ extensions = [
 	'edit_on_github',
 ]
 
-edit_on_github_project = 'mamedev/docs'
-edit_on_github_branch = 'master/source'
+edit_on_github_project = 'mamedev/mame'
+edit_on_github_branch = 'master/docs/source'
 
 # Math
 mathjax_path = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MAME Documentation'
-copyright = u'2016, MAMEdev Team'
+copyright = u'2017, MAMEdev Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

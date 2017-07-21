@@ -66,6 +66,8 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "machine/gen_latch.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class meijinsn_state : public driver_device
 {
@@ -348,7 +350,7 @@ void meijinsn_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
+static MACHINE_CONFIG_START( meijinsn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000 )
@@ -412,4 +414,4 @@ ROM_START( meijinsn )
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-GAME( 1986, meijinsn, 0, meijinsn, meijinsn, driver_device, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsn, 0, meijinsn, meijinsn, meijinsn_state, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )

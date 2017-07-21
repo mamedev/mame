@@ -30,9 +30,12 @@ YM2151:
 
 ***************************************************************************/
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/mustache.h"
 #include "audio/t5182.h"
+
+#include "cpu/z80/z80.h"
+#include "speaker.h"
+
 
 #define XTAL1  14318180
 #define XTAL2  18432000
@@ -62,7 +65,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mustache_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mustache_state )
 	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
@@ -174,7 +177,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
 
 
 
-static MACHINE_CONFIG_START( mustache, mustache_state )
+static MACHINE_CONFIG_START( mustache )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -197,8 +200,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
-	MCFG_PALETTE_ADD("palette", 8*16+16*8)
-	MCFG_PALETTE_INIT_OWNER(mustache_state, mustache)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

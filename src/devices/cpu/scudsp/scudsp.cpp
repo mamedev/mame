@@ -91,11 +91,12 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "scudsp.h"
 
+#include "debugger.h"
 
-const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
+
+DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 /* FLAGS */
 #define PRF m_flags & 0x04000000
@@ -896,6 +897,14 @@ void scudsp_cpu_device::execute_run()
 	} while( m_icount > 0 );
 }
 
+device_memory_interface::space_config_vector scudsp_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 void scudsp_cpu_device::device_start()
 {
 	m_pc = 0;
@@ -1001,7 +1010,7 @@ void scudsp_cpu_device::execute_set_input(int irqline, int state)
 }
 
 scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SCUDSP, "SCUDSP", tag, owner, clock, "scudsp", __FILE__)
+	: cpu_device(mconfig, SCUDSP, tag, owner, clock)
 	, m_out_irq_cb(*this)
 	, m_in_dma_cb(*this)
 	, m_out_dma_cb(*this)

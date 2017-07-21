@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_SLOT = &device_creator<nubus_slot_device>;
+DEFINE_DEVICE_TYPE(NUBUS_SLOT, nubus_slot_device, "nubus_slot", "NuBus slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -26,16 +26,15 @@ const device_type NUBUS_SLOT = &device_creator<nubus_slot_device>;
 //  nubus_slot_device - constructor
 //-------------------------------------------------
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock, "nubus_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-	m_nubus_tag(nullptr),
-	m_nubus_slottag(nullptr)
+	nubus_slot_device(mconfig, NUBUS_SLOT, tag, owner, clock)
 {
 }
 
-nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_nubus_tag(nullptr), m_nubus_slottag(nullptr)
+nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_nubus_tag(nullptr),
+	m_nubus_slottag(nullptr)
 {
 }
 
@@ -61,7 +60,7 @@ void nubus_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS = &device_creator<nubus_device>;
+DEFINE_DEVICE_TYPE(NUBUS, nubus_device, "nubus", "NuBus")
 
 void nubus_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -78,24 +77,20 @@ void nubus_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock, "nubus", __FILE__), m_maincpu(nullptr),
-		m_out_irq9_cb(*this),
-		m_out_irqa_cb(*this),
-		m_out_irqb_cb(*this),
-		m_out_irqc_cb(*this),
-		m_out_irqd_cb(*this),
-		m_out_irqe_cb(*this), m_cputag(nullptr)
+	nubus_device(mconfig, NUBUS, tag, owner, clock)
 {
 }
 
-nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
-		m_out_irq9_cb(*this),
-		m_out_irqa_cb(*this),
-		m_out_irqb_cb(*this),
-		m_out_irqc_cb(*this),
-		m_out_irqd_cb(*this),
-		m_out_irqe_cb(*this), m_cputag(nullptr)
+nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(nullptr),
+	m_out_irq9_cb(*this),
+	m_out_irqa_cb(*this),
+	m_out_irqb_cb(*this),
+	m_out_irqc_cb(*this),
+	m_out_irqd_cb(*this),
+	m_out_irqe_cb(*this),
+	m_cputag(nullptr)
 {
 }
 //-------------------------------------------------
@@ -414,7 +409,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 		case 0xc3:  // lanes 0, 1
 			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			memset(&m_declaration_rom[0], 0, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -425,7 +420,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 		case 0xa5:  // lanes 0, 2
 			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			memset(&m_declaration_rom[0], 0, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -436,7 +431,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 		case 0x3c:  // lanes 2,3
 			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			memset(&m_declaration_rom[0], 0, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];

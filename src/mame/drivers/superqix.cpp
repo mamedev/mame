@@ -167,35 +167,31 @@ code at z80:0093:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
-#include "cpu/mcs51/mcs51.h"
-#include "sound/ay8910.h"
-#include "sound/samples.h"
 #include "includes/superqix.h"
 
-SAMPLES_START_CB_MEMBER(superqix_state::pbillian_sh_start)
-{
-	uint8_t *src = memregion("samples")->base();
-	int i, len = memregion("samples")->bytes();
+#include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
-	/* convert 8-bit unsigned samples to 8-bit signed */
-	m_samplebuf = std::make_unique<int16_t[]>(len);
-	for (i = 0;i < len;i++)
-		m_samplebuf[i] = (int8_t)(src[i] ^ 0x80) * 256;
+
+SAMPLES_START_CB_MEMBER(hotsmash_state::pbillian_sh_start)
+{
+	// convert 8-bit unsigned samples to 8-bit signed
+	m_samplebuf = std::make_unique<int16_t[]>(m_samples_region.length());
+	for (unsigned i = 0; i < m_samples_region.length(); i++)
+		m_samplebuf[i] = s8(m_samples_region[i] ^ 0x80) * 256;
 }
 
-WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
+WRITE8_MEMBER(hotsmash_state::pbillian_sample_trigger_w)
 {
 	//logerror("sample trigger write of %02x\n", data);
-	uint8_t *src = memregion("samples")->base();
-	int len = memregion("samples")->bytes();
-	int start,end;
 
-	start = data << 7;
-	/* look for end of sample marker */
-	end = start;
-	while (end < len && src[end] != 0xff)
+	// look for end of sample marker
+	unsigned start = data << 7;
+	unsigned end = start;
+	while ((end < m_samples_region.length()) && (m_samples_region[end] != 0xff))
 		end++;
 
 	m_samples->start_raw(0, m_samplebuf.get() + start, end - start, XTAL_12MHz/3072); // needs verification, could be 2048 and 4096 alternating every sample
@@ -203,32 +199,9 @@ WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 
 /**************************************************************************
 
-  Timers
-
-**************************************************************************/
-
-void superqix_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case MCU_ACKNOWLEDGE:
-		mcu_acknowledge_callback(ptr, param);
-		break;
-	case HLE_68705_WRITE:
-		hle_68705_w_cb(ptr, param);
-		break;
-	default:
-		assert_always(false, "Unknown id in superqix_state::device_timer");
-	}
-}
-
-/**************************************************************************
-
 Super Qix Z80 <-> 8751 communication
 
 This is quite hackish, because the communication protocol is not very clear.
-Add to that that we are not sure the 8751 is behaving 100% correctly because
-the ROM was bad...
 
 The Z80 acts this way:
 - wait for 8910 #0 port B, bit 6 to be 0
@@ -252,7 +225,7 @@ The MCU acts this way:
 
 **************************************************************************/
 
-CUSTOM_INPUT_MEMBER(superqix_state::superqix_semaphore_input_r) // similar to pbillian_semaphore_input_r below, but reverse order and polarity
+CUSTOM_INPUT_MEMBER(superqix_state_base::superqix_semaphore_input_r) // similar to pbillian_semaphore_input_r below, but reverse order and polarity
 {
 	int res = 0;
 
@@ -265,7 +238,7 @@ CUSTOM_INPUT_MEMBER(superqix_state::superqix_semaphore_input_r) // similar to pb
 	return res;
 }
 
-READ8_MEMBER(superqix_state::in4_mcu_r)
+READ8_MEMBER(superqix_state_base::in4_mcu_r)
 {
 //  logerror("%04x: in4_mcu_r\n",space.device().safe_pc());
 	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
@@ -274,7 +247,7 @@ READ8_MEMBER(superqix_state::in4_mcu_r)
 	return temp;
 }
 
-READ8_MEMBER(superqix_state::sqix_from_mcu_r)
+READ8_MEMBER(superqix_state_base::sqix_from_mcu_r)
 {
 //  logerror("%04x: read mcu answer (%02x)\n",space.device().safe_pc(),m_fromMCU);
 	return m_fromMCU;
@@ -297,17 +270,20 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_acknowledge_callback)
 
 READ8_MEMBER(superqix_state::mcu_acknowledge_r)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::mcu_acknowledge_callback),this));
+	if(!machine().side_effect_disabled())
+	{
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::mcu_acknowledge_callback), this));
+	}
 	return 0;
 }
 
-WRITE8_MEMBER(superqix_state::sqix_z80_mcu_w)
+WRITE8_MEMBER(superqix_state_base::sqix_z80_mcu_w)
 {
 //  logerror("%04x: sqix_z80_mcu_w %02x\n",space.device().safe_pc(),data);
 	m_fromZ80pending = data;
 }
 
-WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
+WRITE8_MEMBER(superqix_state_base::bootleg_mcu_p1_w)
 {
 	switch ((data & 0x0e) >> 1)
 	{
@@ -348,12 +324,12 @@ WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state::mcu_p3_w)
+WRITE8_MEMBER(superqix_state_base::mcu_p3_w)
 {
 	m_port3 = data;
 }
 
-READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
+READ8_MEMBER(superqix_state_base::bootleg_mcu_p3_r)
 {
 	if ((m_port1 & 0x10) == 0)
 	{
@@ -365,19 +341,22 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 	}
 	else if ((m_port1 & 0x40) == 0)
 	{
-//      logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
-		m_Z80HasWritten = 0;
+		if(!machine().side_effect_disabled())
+		{
+			//logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
+			m_Z80HasWritten = 0;
+		}
 		return m_fromZ80;
 	}
 	return 0;
 }
 
-READ8_MEMBER(superqix_state::sqix_system_status_r)
+READ8_MEMBER(superqix_state_base::sqix_system_status_r)
 {
 	return ioport("SYSTEM")->read();
 }
 
-WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
+WRITE8_MEMBER(superqix_state_base::sqixu_mcu_p2_w)
 {
 	// bit 0 = enable latch for bits 1-6 below on high level or falling edge (doesn't particularly matter which, either one works)
 
@@ -411,10 +390,10 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 	m_port2 = data;
 }
 
-READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
+READ8_MEMBER(superqix_state_base::sqixu_mcu_p3_r)
 {
 //  logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_Z80HasWritten = 0;
 	}
@@ -422,21 +401,21 @@ READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 }
 
 
-READ8_MEMBER(superqix_state::nmi_ack_r)
+READ8_MEMBER(superqix_state_base::nmi_ack_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	return sqix_system_status_r(space, 0);
 }
 
-READ8_MEMBER(superqix_state::bootleg_in0_r)
+READ8_MEMBER(superqix_state_base::bootleg_in0_r)
 {
 	return BITSWAP8(ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
+WRITE8_MEMBER(superqix_state_base::bootleg_flipscreen_w)
 {
 	flip_screen_set(~data & 1);
 }
@@ -747,171 +726,11 @@ PortC[4] -> activates m_porta_in latch (active low)
 
  ***************************************************************************/
 
-/*
- * This wrapper routine is necessary because the dial is not connected to an
- * hardware counter as usual, but the DIR and CLOCK inputs are directly
- * connected to the 68705 which acts as a counter.
- */
-
-int superqix_state::read_dial(int player)
-{
-	int newpos;
-
-	/* get the new position and adjust the result */
-	newpos = ioport(player ? "DIAL2" : "DIAL1")->read();
-	if (newpos != m_oldpos[player])
-	{
-		m_sign[player] = ((newpos - m_oldpos[player]) & 0x80) >> 7;
-		m_oldpos[player] = newpos;
-	}
-
-	if (player == 0)
-		return ((m_oldpos[player] & 1) << 2) | (m_sign[player] << 3);
-	else    // player == 1
-		return ((m_oldpos[player] & 1) << 3) | (m_sign[player] << 2);
-}
-
-WRITE8_MEMBER(superqix_state::hotsmash_68705_ddr_a_w)
-{
-	m_ddrA = data;
-}
-
-WRITE8_MEMBER(superqix_state::hotsmash_68705_ddr_b_w)
-{
-	m_ddrB = data;
-}
-
-WRITE8_MEMBER(superqix_state::hotsmash_68705_ddr_c_w)
-{
-	m_ddrC = data;
-}
-
-READ8_MEMBER(superqix_state::hotsmash_68705_portA_r)
-{
-//  logerror("%04x: 68705 reads port A = %02x\n",space.device().safe_pc(),m_portA_in);
-	return (/*m_portA_internal*/0 & m_ddrA) | (m_portA_in & ~m_ddrA);
-}
-
-WRITE8_MEMBER(superqix_state::hotsmash_68705_portB_w)
-{
-	m_portB_internal = data;
-	m_portB_out = (m_portB_internal|(~m_ddrB));
-}
-
-READ8_MEMBER(superqix_state::hotsmash_68705_portC_r)
-{
-	return (m_portC_internal & m_ddrC) | (/*m_portC_in*/0 & ~m_ddrA);
-}
-
-WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
-{
-	m_portC_internal = data|0xF0;
-	uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
-	m_portC_out = (m_portC_internal|(~m_ddrC));
-
-	if ((changed_m_portC_out&0x08) && !(m_portC_out&0x08)) // on the falling edge of the latch bit, update m_portA_in and (if applicable) m_portB_out latches
-	{
-		//logerror("%04x: MCU setting MUX port to %d\n", space.device().safe_pc(), m_portC_out & 0x07);
-		switch (m_portC_out & 0x07)
-		{
-			case 0x0:   // dsw A
-				m_portA_in = ioport("DSW1")->read();
-				break;
-
-			case 0x1:   // dsw B
-				m_portA_in = ioport("DSW2")->read();
-				break;
-
-			case 0x3:   // command from Z80
-				//logerror("%04x: command %02x read by MCU\n",space.device().safe_pc(),m_fromZ80);
-				m_Z80HasWritten = 0; // TODO: does this actually SET the flag, rather than clear it?
-				//m_MCUHasWritten = 1; // does this get SET here? command 00 just reads this port and resets the MCU, doesn't write any response...
-				m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
-				m_portA_in = m_fromZ80;
-				break;
-
-			case 0x5:   // answer to Z80; the mcu->z80 semaphore is set
-				m_fromMCU = m_portB_out;
-				//logerror("%04x: response %02x written by MCU\n",space.device().safe_pc(),m_fromMCU);
-				m_MCUHasWritten = 1;
-				break;
-
-			case 0x6:
-				m_portA_in = read_dial(0);
-				break;
-
-			case 0x7:
-				m_portA_in = read_dial(1);
-				break;
-
-			default: // cases 2 and 4 presumably latch open bus/0xFF; implication from the superqix bootleg is that reading port 4 may clear the m_MCUHasWritten flag, but the hotsmash MCU never touches it. Needs hardware tests/tracing to prove.
-				logerror("%04x: MCU attempted to read mux port %d which is invalid!\n", space.device().safe_pc(), m_portC_out & 0x07);
-				//m_portA_in = 0xFF;
-				break;
-		}
-		//if ((m_portC_out & 0x07) < 6) logerror("%04x: MCU latched %02x from mux input %d m_portA_in\n", space.device().safe_pc(), m_portA_in, m_portC_out & 0x07);
-	}
-}
-
-WRITE8_MEMBER(superqix_state::hotsmash_Z80_mcu_w)
-{
-	m_fromZ80 = data;
-	m_MCUHasWritten = 0; // this is cleared here, strangely enough. Doesn't make a lot of sense, but doesn't work otherwise.
-	m_Z80HasWritten = 1; // set the semaphore, and assert interrupt on the mcu
-	if (m_mcu.found()) // hotsmash
-	{
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250)); //boost the interleave temporarily, or the game will crash.
-		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
-	}
-	else // prebillian hle
-	{
-		// set a timer here for hle of mcu to processes the command;
-		timer_set(attotime::from_hz(10000), HLE_68705_WRITE); // 10000hz is a guess.
-	}
-}
-
-READ8_MEMBER(superqix_state::hotsmash_Z80_mcu_r)
-{
-//  logerror("%04x: z80 reads answer %02x\n",space.device().safe_pc(),m_fromMCU);
-	/* return the last value the 68705 wrote, but do not mark that we've read it */
-	return m_fromMCU;
-}
-
-CUSTOM_INPUT_MEMBER(superqix_state::pbillian_semaphore_input_r)
-{
-	int res = 0;
-	/* bit 0x40 is PROBABLY latch 1 on 74ls74.7c, is high if m_Z80HasWritten is clear */
-	if (!m_Z80HasWritten)
-		res |= 0x01;
-
-	/* bit 0x80 is PROBABLY latch 2 on 74ls74.7c, is high if m_MCUHasWritten is clear */
-	if (!m_MCUHasWritten)
-		res |= 0x02;
-
-	return res;
-}
-
-READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
-{
-	//logerror("%04x: ay_port_a_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_state_interface &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
-	uint8_t temp = ioport("BUTTONS")->read();
-	//logerror("returning %02X\n", temp);
-	return temp;
-}
-
-READ8_MEMBER(superqix_state::pbillian_ay_port_b_r)
-{
-	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
-	uint8_t temp = ioport("SYSTEM")->read();
-	//logerror("returning %02X\n", temp);
-	return temp;
-}
-
 /**************************************************************************
 
- Prebillian MCU HLE simulation
+ Prebillian MCU info
 
-Seems to act like an older version of hotsmash mcu code
+Seems to act like an older version of hotsmash mcu code, the quadrature code is much messier here than in hotsmash
 
  MCU Commands Legend (prebillian)
  0x00 - Reset MCU
@@ -919,41 +738,155 @@ Seems to act like an older version of hotsmash mcu code
  0x02 - Read Spinner Position Counter for Player 1 or 2 (p1 spinner, bits UNKNOWN (3 and 2?) quadrature) OR (p2 spinner, bits UNKNOWN (0 and 1?) quadrature); counter range is 00-FF and wraps
  0x04 - Read dipswitch array sw1 and send to z80
  0x08 - Read dipswitch array sw2 and send to z80
- 0x80 - Set commands 00 and 01 to return player 1 controls (returns 0x00 or bad stuff happens?)
- 0x81 - Set commands 00 and 01 to return player 2 controls (returns 0x00 or bad stuff happens?)
- other - probably Echo (writes whatever the command number was back to the z80 immediately)? (guess)
+ 0x80 - Set commands 00 and 01 to return player 1 controls, return nothing
+ 0x81 - Set commands 00 and 01 to return player 2 controls, return nothing
+ other - do nothing, return nothing
+ Disabled/dead code MCU commands (can be enabled by patching MCU rom 0x1BA to 0x9D)
+  0x03 - return mcu timer, and latch the current command (0x03) (or another byte if you write one VERY fast) to add to an accumulator
+  0x0A - return the accumulator from command 0x03
+  0x13 - return currently selected player number (bit0=0 for player 1, bit0=1 for player 2; upper 7 bits are a counter of how many times more or less command 80 or 81 was run; 80 increments, 81 decrements)
+  0x10 - protection scramble; immediately latch the current command (0x10) (or another byte if you write one VERY fast) and do some rotates and scrambling of the value an XORing it against the prior value, and return it. This is affected by the carry flag if something else set it.
 
 **************************************************************************/
 
-TIMER_CALLBACK_MEMBER(superqix_state::hle_68705_w_cb)
+/*
+ * This wrapper routine is necessary because the dial is not connected to an
+ * hardware counter as usual, but the DIR and CLOCK inputs are directly
+ * connected to the 68705 which acts as a counter.
+ * both hotsmash and prebillian have two dials connected this way.
+ * on hotsmash only, the second player dial has the DIR and CLOCK inputs swapped
+ * prebillian also has two plungers, which are connected via a standard quadrature hookup.
+ * though the plungers are spring-loaded and return to one extreme when released.
+ * prebillian also has a launch button which will instantly launch the ball;
+ * Whether this is a secondary trigger at the innermost position of the plunger
+ * (in case the quadrature is fouled and/or the plunger is slammed inward), a separate
+ * panel button, or a debug button left over from development is up to debate.
+ */
+
+int hotsmash_state::read_inputs(int player) // if called with player=1, we're mux port 7, otherwise mux port 6
 {
-	m_Z80HasWritten = 0; // unset the z80->mcu semaphore
-	switch (m_fromZ80)
+	// get the new position and adjust the result
+	// dials use DIR and CLOCK?
+	int const newpos_dial = m_dials[player]->read();
+	// get the launch button state
+	int const launchbtn_state = m_launchbtns[player]->read()&1;
+	if (newpos_dial != m_dial_oldpos[player])
 	{
-		case 0x00: m_curr_player = 0; break; // this command should fully reset the mcu and quadrature counters by jumping to its reset vector, as in hotsmash. it does not return a response value.
-		case 0x01:
-		{
-			uint8_t p = ioport(m_curr_player ? "PLUNGER2" : "PLUNGER1")->read() & 0xbf;
-			if ((p & 0x3f) == 0) p |= 0x40;
-			m_fromMCU = p;
-			break;
-		}
-
-		case 0x02: m_fromMCU = ioport(m_curr_player ? "DIAL2" : "DIAL1")->read(); break;
-
-		case 0x04: m_fromMCU = ioport("DSW1")->read(); break;
-		case 0x08: m_fromMCU = ioport("DSW2")->read(); break;
-
-		case 0x80: m_fromMCU = m_curr_player = 0; break;
-		case 0x81: m_fromMCU = m_curr_player = 1; break;
-		default: logerror("unknown prebillian MCU command %02X, HLE is returning the command value as result!\n", m_fromZ80); m_fromMCU = m_fromZ80; break;
+		m_dial_sign[player] = ((newpos_dial - m_dial_oldpos[player]) & 0x80) >> 7;
+		m_dial_oldpos[player] = newpos_dial;
 	}
+	// plungers use a plain old quadrature
+	// quad1 = plunger bit 1
+	// quad2 = plunger bit 0 XOR plunger bit 1
+	int const newpos_plunger = m_plungers[player]->read();
 
-//  logerror("408[%x] r at %x\n",m_fromZ80,space.device().safe_pc());
-	if (m_fromZ80 != 0) m_MCUHasWritten = 1; // set the mcu->z80 semaphore, except for command 0 (mcu reset)
+	if ((player == 0) || (m_invert_p2_spinner == false))
+		return (launchbtn_state<<4 | ((m_dial_oldpos[player] & 1) << 2) | (m_dial_sign[player] << 3) | (newpos_plunger&2) | ((newpos_plunger^(newpos_plunger>>1))&1) );
+	else    // (player == 1) && (m_invert_p2_spinner == true)
+		return (launchbtn_state<<4 | ((m_dial_oldpos[player] & 1) << 3) | (m_dial_sign[player] << 2) | (newpos_plunger&2) | ((newpos_plunger^(newpos_plunger>>1))&1) );
 }
 
-void superqix_state::machine_init_common()
+WRITE8_MEMBER(hotsmash_state::hotsmash_68705_portB_w)
+{
+	m_portB_out = data;
+}
+
+WRITE8_MEMBER(hotsmash_state::hotsmash_68705_portC_w)
+{
+	u8 const changed_m_portC_out = m_portC_out ^ data;
+	m_portC_out = data;
+	//logerror("%04x: MCU setting MUX port to %d\n", space.device().safe_pc(), m_portC_out & 0x07);
+	// maybe on the RISING edge of the latch bit, the semaphores are updated, like TaitoSJ?
+	/*if (BIT(changed_m_portC_out, 3) && BIT(m_portC_out, 3))
+	{
+	    switch (m_portC_out & 0x07)
+	    {
+	    case 0x03:
+	        m_Z80HasWritten = 0;
+	        break;
+	    case 0x05:
+	        m_MCUHasWritten = 1;
+	        break;
+	    default:
+	        break;
+	    }
+	}*/
+	// on the falling edge of the latch bit, update port A and (if applicable) m_portB_out latches
+	if (BIT(changed_m_portC_out, 3) && !BIT(m_portC_out, 3))
+	{
+		switch (m_portC_out & 0x07)
+		{
+		case 0x0:   // dsw A
+		case 0x1:   // dsw B
+			m_mcu->pa_w(space, 0, m_dsw[m_portC_out & 0x01]->read());
+			break;
+
+		case 0x3:   // Read command from Z80 to MCU, the z80->mcu semaphore is cleared on the rising edge
+			//logerror("%04x: command %02x read by MCU; Z80HasWritten: %d (and will be 0 after this); MCUHasWritten: %d\n",space.device().safe_pc(),m_fromZ80,m_Z80HasWritten, m_MCUHasWritten);
+			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+			m_mcu->pa_w(space, 0, m_fromZ80);
+			m_Z80HasWritten = 0;
+			break;
+
+		case 0x5:   // latch response from MCU to Z80; the mcu->z80 semaphore is set on the rising edge
+			m_fromMCU = m_portB_out;
+			//logerror("%04x: response %02x written by MCU; Z80HasWritten: %d; MCUHasWritten: %d (and will be 1 after this)\n",space.device().safe_pc(),m_fromMCU,m_Z80HasWritten, m_MCUHasWritten);
+			m_MCUHasWritten = 1;
+			break;
+
+		case 0x6:
+		case 0x7:
+			m_mcu->pa_w(space, 0, read_inputs(m_portC_out & 0x01));
+			break;
+
+		default: // cases 2 and 4 presumably latch open bus/0xFF; implication from the superqix bootleg is that reading port 4 may clear the m_MCUHasWritten flag, but the hotsmash MCU never touches it. Needs hardware tests/tracing to prove.
+			logerror("%04x: MCU attempted to read mux port %d which is invalid!\n", space.device().safe_pc(), m_portC_out & 0x07);
+			m_mcu->pa_w(space, 0, 0xff);
+			break;
+		}
+		//if ((m_portC_out & 0x07) < 6) logerror("%04x: MCU latched %02x from mux input %d m_portA_in\n", space.device().safe_pc(), m_portA_in, m_portC_out & 0x07);
+	}
+}
+
+WRITE8_MEMBER(hotsmash_state::hotsmash_Z80_mcu_w)
+{
+	m_fromZ80 = data;
+	//if ((m_fromZ80 != 0x04) && (m_fromZ80 != 0x08))
+	//  logerror("%04x: z80 write to MCU %02x; Z80HasWritten: %d (and will be 1 after this); MCUHasWritten: %d\n",space.device().safe_pc(),m_fromZ80, m_Z80HasWritten, m_MCUHasWritten);
+	m_Z80HasWritten = 1; // set the semaphore, and assert interrupt on the mcu
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250)); //boost the interleave temporarily, or the game will crash.
+	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+}
+
+READ8_MEMBER(hotsmash_state::hotsmash_Z80_mcu_r)
+{
+	if(!machine().side_effect_disabled())
+	{
+		//if ((m_fromZ80 != 0x04) && (m_fromZ80 != 0x08))
+		//  logerror("%04x: z80 read from MCU %02x; Z80HasWritten: %d; MCUHasWritten: %d (and will be 0 after this)\n",space.device().safe_pc(),m_fromMCU, m_Z80HasWritten, m_MCUHasWritten);
+		m_MCUHasWritten = 0;
+	}
+	// return the last value the 68705 wrote, but do not mark that we've read it
+	return m_fromMCU;
+}
+
+CUSTOM_INPUT_MEMBER(hotsmash_state::pbillian_semaphore_input_r)
+{
+	ioport_value res = 0;
+	// bit 0x40 is PROBABLY latch 1 on 74ls74.7c, is high if m_Z80HasWritten is clear
+	if (!m_Z80HasWritten)
+		res |= 0x01;
+
+	// bit 0x80 is PROBABLY latch 2 on 74ls74.7c, is high if m_MCUHasWritten is clear
+	// prebillian code at 0x6771 will wait in a loop reading ay port E forever and waiting
+	// for bit 7 to be clear before it will read from the mcu
+	if (!m_MCUHasWritten)
+		res |= 0x02;
+	return res;
+}
+
+
+void superqix_state_base::machine_init_common()
 {
 	// MCU HLE and/or 8751 related
 	save_item(NAME(m_port1));
@@ -961,7 +894,6 @@ void superqix_state::machine_init_common()
 	save_item(NAME(m_port3));
 	save_item(NAME(m_port3_latch));
 	save_item(NAME(m_fromZ80pending));
-	save_item(NAME(m_curr_player));
 
 	// commmon 68705/8751/HLE
 	save_item(NAME(m_MCUHasWritten));
@@ -969,22 +901,9 @@ void superqix_state::machine_init_common()
 	save_item(NAME(m_fromMCU));
 	save_item(NAME(m_fromZ80));
 
-	// 68705 related
-	save_item(NAME(m_portA_in));
-	//save_item(NAME(m_portB_in));
-	//save_item(NAME(m_portC_in));
-	//save_item(NAME(m_portA_out));
-	save_item(NAME(m_portB_out));
-	save_item(NAME(m_portC_out));
-	//save_item(NAME(m_portA_internal));
-	save_item(NAME(m_portB_internal));
-	save_item(NAME(m_portC_internal));
-	save_item(NAME(m_ddrA));
-	save_item(NAME(m_ddrB));
-	save_item(NAME(m_ddrC));
-
 	//general machine stuff
 	save_item(NAME(m_invert_coin_lockout));
+	save_item(NAME(m_invert_p2_spinner));
 	save_item(NAME(m_nmi_mask));
 
 	// superqix specific stuff
@@ -993,13 +912,22 @@ void superqix_state::machine_init_common()
 	// the following are saved in VIDEO_START_MEMBER(superqix_state,superqix):
 	//save_item(NAME(*m_fg_bitmap[0]));
 	//save_item(NAME(*m_fg_bitmap[1]));
-
-	// spinner quadrature stuff
-	save_item(NAME(m_oldpos));
-	save_item(NAME(m_sign));
 }
 
-MACHINE_START_MEMBER(superqix_state,superqix)
+void hotsmash_state::machine_init_common()
+{
+	superqix_state_base::machine_init_common();
+
+	// 68705 related
+	save_item(NAME(m_portB_out));
+	save_item(NAME(m_portC_out));
+
+	// spinner quadrature stuff
+	save_item(NAME(m_dial_oldpos));
+	save_item(NAME(m_dial_sign));
+}
+
+MACHINE_START_MEMBER(superqix_state_base, superqix)
 {
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -1007,7 +935,7 @@ MACHINE_START_MEMBER(superqix_state,superqix)
 	machine_init_common();
 }
 
-MACHINE_START_MEMBER(superqix_state,pbillian)
+MACHINE_START_MEMBER(hotsmash_state, pbillian)
 {
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -1016,7 +944,7 @@ MACHINE_START_MEMBER(superqix_state,pbillian)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state_base )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	// the following four ranges are part of a single 6264 64Kibit SRAM chip, called 'VRAM' in POST
@@ -1026,7 +954,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state ) // used by both pbillian and hotsmash
+static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, hotsmash_state ) // used by both pbillian and hotsmash
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
@@ -1052,20 +980,6 @@ static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE(superqix_bitmapram_w) AM_SHARE("bitmapram")
 	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_SHARE("bitmapram2")
 	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, superqix_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_READ(hotsmash_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(hotsmash_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(hotsmash_68705_portC_r, hotsmash_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(hotsmash_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(hotsmash_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(hotsmash_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1135,37 +1049,45 @@ static INPUT_PORTS_START( pbillian )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")
+	PORT_START("SYSTEM") // ay port B (register F)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hblank?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("BUTTONS")
+	PORT_START("BUTTONS") // ay port A (register E)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     // N/C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    // P1 fire (M powerup) + high score initials
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     // N/C
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // P2 fire (M powerup) + high score initials
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
-	PORT_START("PLUNGER1")  // plunger mechanism for shot (BUTTON1 and PEDAL mapped to the same key in MAME)
-	PORT_BIT( 0x3f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_START("PLUNGER1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
 	PORT_START("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8)
 
+	PORT_START("LAUNCH1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("PLUNGER2")
-	PORT_BIT( 0x3f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_COCKTAIL
 
 	PORT_START("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_COCKTAIL
+
+	PORT_START("LAUNCH2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotsmash )
@@ -1217,29 +1139,42 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")
+	PORT_START("SYSTEM") // ay port B (register F)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )//$49c
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )//$42d
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hblank?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("BUTTONS")
+	PORT_START("BUTTONS") // ay port A (register E)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // p1 button 2, unused on this game?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // p2 button 2, unused on this game?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+
+	PORT_START("PLUNGER1")  // plunger isn't present on hotsmash though the pins exist for it
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
 
 	PORT_START("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(30) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
+	PORT_START("LAUNCH1")  // launch button isn't present on hotsmash
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PLUNGER2")  // plunger isn't present on hotsmash though the pins exist for it
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+
 	PORT_START("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(30) PORT_CENTERDELTA(0) PORT_PLAYER(2)
+
+	PORT_START("LAUNCH2")  // launch button isn't present on hotsmash
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -1376,13 +1311,13 @@ static GFXDECODE_START( sqix )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(superqix_state::vblank_irq)
+INTERRUPT_GEN_MEMBER(hotsmash_state::vblank_irq)
 {
-	if(m_nmi_mask)
+	if (m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
+INTERRUPT_GEN_MEMBER(superqix_state_base::sqix_timer_irq)
 {
 	if (m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -1390,13 +1325,18 @@ INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
 
 
 
-static MACHINE_CONFIG_START( pbillian, superqix_state )
+static MACHINE_CONFIG_START( pbillian )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)      /* 6 MHz, ROHM Z80B */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(pbillian_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superqix_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hotsmash_state, vblank_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(superqix_state,pbillian)
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL_12MHz/4) /* 3mhz???? */
+	MCFG_M68705_PORTB_W_CB(WRITE8(hotsmash_state, hotsmash_68705_portB_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(hotsmash_state, hotsmash_68705_portC_w))
+
+	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_MACHINE_START_OVERRIDE(hotsmash_state, pbillian)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1404,35 +1344,29 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_pbillian)
+	MCFG_SCREEN_UPDATE_DRIVER(hotsmash_state, screen_update_pbillian)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
-	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
+	MCFG_VIDEO_START_OVERRIDE(hotsmash_state, pbillian)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(superqix_state, pbillian_ay_port_a_r))   /* port Aread */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, pbillian_ay_port_b_r))   /* port Bread */
-	//MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/8) // AY-3-8910A
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(superqix_state, pbillian_sh_start)
+	MCFG_SAMPLES_START_CB(hotsmash_state, pbillian_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hotsmash, pbillian )
-	MCFG_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* 3mhz???? */
-	MCFG_CPU_PROGRAM_MAP(m68705_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( sqix, superqix_state )
+static MACHINE_CONFIG_START( sqix )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)    /* 6 MHz */
@@ -1486,7 +1420,7 @@ static MACHINE_CONFIG_DERIVED( sqix_8031, sqix )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sqix_nomcu, superqix_state )
+static MACHINE_CONFIG_START( sqix_nomcu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
@@ -1545,8 +1479,8 @@ ROM_START( pbillian )
 	ROM_LOAD( "mitsubishi__electric__1.m5l27256k.6bc",  0x00000, 0x08000, CRC(d379fe23) SHA1(e147a9151b1cdeacb126d9713687bd0aa92980ac) )
 	ROM_LOAD( "mitsubishi__electric__2.m5l27128k.6d",  0x14000, 0x04000, CRC(1af522bc) SHA1(83e002dc831bfcedbd7096b350c9b34418b79674) )
 
-	ROM_REGION( 0x0800, "cpu1", 0 )
-	ROM_LOAD( "mitsubishi__electric__7.mc68705p5s.7k", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "mitsubishi__electric__7.mc68705p5s.7k", 0x0000, 0x0800, CRC(03de0c74) SHA1(ee2bc8be9bab9557c6776b996b85ed6f32300b47) )
 
 	ROM_REGION( 0x8000, "samples", 0 )
 	ROM_LOAD( "mitsubishi__electric__3.m5l27256k.7h",  0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
@@ -1716,17 +1650,17 @@ ROM_START( perestro )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(superqix_state,sqix)
+DRIVER_INIT_MEMBER(superqix_state_base, sqix)
 {
-	m_invert_coin_lockout = 1;
+	m_invert_coin_lockout = true;
 }
 
-DRIVER_INIT_MEMBER(superqix_state,sqixr0)
+DRIVER_INIT_MEMBER(superqix_state_base, sqixr0)
 {
-	m_invert_coin_lockout = 0;
+	m_invert_coin_lockout = false;
 }
 
-DRIVER_INIT_MEMBER(superqix_state,perestro)
+DRIVER_INIT_MEMBER(superqix_state_base, perestro)
 {
 	uint8_t *src;
 	int len;
@@ -1788,10 +1722,19 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 	}
 }
 
+DRIVER_INIT_MEMBER(superqix_state_base, pbillian)
+{
+	m_invert_p2_spinner = false;
+}
+
+DRIVER_INIT_MEMBER(superqix_state_base, hotsmash)
+{
+	m_invert_p2_spinner = true;
+}
 
 
-GAME( 1986, pbillian, 0,        pbillian,   pbillian, driver_device,  0,        ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        hotsmash,   hotsmash, driver_device,  0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, pbillian, 0,        pbillian,   pbillian, hotsmash_state, pbillian, ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        pbillian,   hotsmash, hotsmash_state, hotsmash, ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )

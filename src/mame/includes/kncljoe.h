@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
 
 class kncljoe_state : public driver_device
 {

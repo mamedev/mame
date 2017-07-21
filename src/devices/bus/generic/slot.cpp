@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GENERIC_SOCKET = &device_creator<generic_slot_device>;
+DEFINE_DEVICE_TYPE(GENERIC_SOCKET, generic_slot_device, "generic_socket", "Generic ROM Socket / RAM Socket / Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -85,15 +85,16 @@ void device_generic_cart_interface::ram_alloc(uint32_t size)
 //  generic_slot_device - constructor
 //-------------------------------------------------
 generic_slot_device::generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, GENERIC_SOCKET, "Generic ROM Socket / RAM Socket / Cartridge Slot", tag, owner, clock, "generic_socket", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_interface(nullptr),
-						m_default_card("rom"),
-						m_extensions("bin"),
-						m_must_be_loaded(false),
-						m_width(GENERIC_ROM8_WIDTH),
-						m_endianness(ENDIANNESS_LITTLE), m_cart(nullptr)
+	device_t(mconfig, GENERIC_SOCKET, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_interface(nullptr),
+	m_default_card("rom"),
+	m_extensions("bin"),
+	m_must_be_loaded(false),
+	m_width(GENERIC_ROM8_WIDTH),
+	m_endianness(ENDIANNESS_LITTLE),
+	m_cart(nullptr)
 {
 }
 
@@ -113,18 +114,6 @@ generic_slot_device::~generic_slot_device()
 void generic_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_generic_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void generic_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -168,7 +157,7 @@ void generic_slot_device::call_unload()
  get default card software
  -------------------------------------------------*/
 
-std::string generic_slot_device::get_default_card_software()
+std::string generic_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot(m_default_card);
 }
@@ -189,9 +178,9 @@ std::string generic_slot_device::get_default_card_software()
 uint32_t generic_slot_device::common_get_size(const char *region)
 {
 	// if we are loading from softlist, you have to specify a region
-	assert((software_entry() == nullptr) || (region != nullptr));
+	assert(!loaded_through_softlist() || (region != nullptr));
 
-	return (software_entry() == nullptr) ? length() : get_software_region_length(region);
+	return !loaded_through_softlist() ? length() : get_software_region_length(region);
 }
 
 /*-------------------------------------------------
@@ -205,9 +194,9 @@ void generic_slot_device::common_load_rom(uint8_t *ROM, uint32_t len, const char
 	assert((ROM != nullptr) && (len > 0));
 
 	// if we are loading from softlist, you have to specify a region
-	assert((software_entry() == nullptr) || (region != nullptr));
+	assert(!loaded_through_softlist() || (region != nullptr));
 
-	if (software_entry() == nullptr)
+	if (!loaded_through_softlist())
 		fread(ROM, len);
 	else
 		memcpy(ROM, get_software_region(region), len);

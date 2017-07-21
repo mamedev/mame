@@ -9,6 +9,7 @@
  *  Written by Barry Rodewald
  */
 
+#include "emu.h"
 #include "8x300.h"
 #include "debugger.h"
 
@@ -36,14 +37,22 @@
 #define DST_LATCH  do { if(DST_IS_RIGHT_BANK) m_right_IV = READPORT(m_IVR+0x100); else m_left_IV = READPORT(m_IVL); } while (0)
 #define SET_OVF    do { if(result & 0xff00) m_OVF = 1; else m_OVF = 0; } while (0)
 
-const device_type N8X300 = &device_creator<n8x300_cpu_device>;
+DEFINE_DEVICE_TYPE(N8X300, n8x300_cpu_device, "8x300", "Signetics 8X300")
 
 
 n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, N8X300, "Signetics 8X300", tag, owner, clock, "8x300", __FILE__)
+	: cpu_device(mconfig, N8X300, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 {
+}
+
+device_memory_interface::space_config_vector n8x300_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 void n8x300_cpu_device::set_reg(uint8_t reg, uint8_t val)

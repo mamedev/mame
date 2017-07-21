@@ -4,6 +4,7 @@
  *   Xerox AltoII disassembler
  *
  **********************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 #define loc_DASTART     0000420 // display list header

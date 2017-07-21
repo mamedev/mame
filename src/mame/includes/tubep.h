@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "sound/msm5205.h"
+#include "screen.h"
 
 class tubep_state : public driver_device
 {
@@ -29,6 +30,7 @@ public:
 	uint8_t m_ls74;
 	uint8_t m_ls377;
 	emu_timer *m_interrupt_timer;
+	emu_timer *m_sprite_timer;
 	int m_curr_scanline;
 	required_shared_ptr<uint8_t> m_textram;
 	optional_shared_ptr<uint8_t> m_backgroundram;
@@ -87,8 +89,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_portB_2_w);
 	DECLARE_MACHINE_START(tubep);
 	DECLARE_MACHINE_RESET(tubep);
-	DECLARE_VIDEO_START(tubep);
-	DECLARE_VIDEO_RESET(tubep);
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(tubep);
 	DECLARE_MACHINE_START(rjammer);
 	DECLARE_MACHINE_RESET(rjammer);

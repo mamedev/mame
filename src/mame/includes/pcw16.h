@@ -9,7 +9,6 @@
 #ifndef PCW16_H_
 #define PCW16_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"     /* FDC superio */
 #include "machine/pc_lpt.h"     /* PC-Parallel Port */

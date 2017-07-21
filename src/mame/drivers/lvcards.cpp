@@ -74,10 +74,13 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
 #include "includes/lvcards.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 MACHINE_START_MEMBER(lvcards_state,lvpoker)
@@ -448,7 +451,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static MACHINE_CONFIG_START( lvcards, lvcards_state )
+static MACHINE_CONFIG_START( lvcards )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_CPU_PROGRAM_MAP(lvcards_map)
@@ -496,8 +499,8 @@ static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(lvcards_state,ponttehk)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 MACHINE_CONFIG_END
 
 ROM_START( lvpoker )
@@ -561,6 +564,6 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,        0, lvcards,  lvcards, driver_device,  0, ROT0, "Tehkan", "Lovely Cards", 0 )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker, driver_device,  0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
-GAME( 1985, ponttehk,       0, ponttehk, ponttehk, driver_device, 0, ROT0, "Tehkan", "Pontoon (Tehkan)", 0 )
+GAME( 1985, lvcards,        0, lvcards,  lvcards,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Cards",       0 )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
+GAME( 1985, ponttehk,       0, ponttehk, ponttehk, lvcards_state, 0, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )

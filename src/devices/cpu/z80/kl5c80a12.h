@@ -13,12 +13,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_Z80_KL5C80A12_H
+#define MAME_CPU_Z80_KL5C80A12_H
+
 #pragma once
 
-#ifndef __KL5C80A12__
-#define __KL5C80A12__
-
-#include "emu.h"
 #include "z80.h"
 #include "machine/z80ctc.h"
 
@@ -41,14 +40,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
 
 // device type definition
-extern const device_type KL5C80A12;
+DECLARE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device)
 
-
-#endif /// __KL5C80A12__
+#endif // MAME_CPU_Z80_KL5C80A12_H

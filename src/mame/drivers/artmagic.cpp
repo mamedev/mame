@@ -25,13 +25,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/mcs51/mcs51.h"
-#include "video/tlc34076.h"
 #include "includes/artmagic.h"
-#include "sound/okim6295.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/tms34010/tms34010.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK_40MHz      (XTAL_40MHz)
@@ -67,6 +69,8 @@ WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
 
 void artmagic_state::machine_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_hack_irq));
 	save_item(NAME(m_prot_input_index));
@@ -135,7 +139,7 @@ READ16_MEMBER(artmagic_state::ultennis_hack_r)
 	{
 		m_hack_irq = 1;
 		update_irq_state();
-		timer_set(attotime::from_usec(1), TIMER_IRQ_OFF);
+		m_irq_off_timer->adjust(attotime::from_usec(1));
 	}
 	return ioport("300000")->read();
 }
@@ -809,7 +813,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( artmagic, artmagic_state )
+static MACHINE_CONFIG_START( artmagic )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
@@ -839,7 +843,7 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_CONFIG_END
 

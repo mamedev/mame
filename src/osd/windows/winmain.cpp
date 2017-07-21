@@ -230,7 +230,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_YIQ_IVALUE";yiqi",                              "1.2",               OPTION_FLOAT,      "I filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_QVALUE";yiqq",                              "0.6",               OPTION_FLOAT,      "Q filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",              OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
-	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
+	{ WINOPTION_YIQ_PHASE_COUNT";yiqpc",                        "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
 	/* Vector simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
 	{ WINOPTION_VECTOR_BEAM_SMOOTH";vecsmooth",                 "0.0",               OPTION_FLOAT,      "The vector beam smoothness" },
@@ -260,7 +260,7 @@ const options_entry windows_options::s_option_entries[] =
 
 	// input options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enables global inputs" },
+	{ WINOPTION_GLOBAL_INPUTS,                        "0",        OPTION_BOOLEAN,    "enables global inputs" },
 	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enables dual lightgun input" },
 
 	{ nullptr }
@@ -276,7 +276,7 @@ const options_entry windows_options::s_option_entries[] =
 //  utf8_main
 //============================================================
 
-int main(int argc, char *argv[])
+int main(std::vector<std::string> &args)
 {
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
 		// Initialize this after the osd interface so that we are first in the
 		// output order
 		winui_output_error winerror;
-		if (win_is_gui_application() || is_double_click_start(argc))
+		if (win_is_gui_application() || is_double_click_start(args.size()))
 		{
 			// if we are a GUI app, output errors to message boxes
 			osd_output::push(&winerror);
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 			FreeConsole();
 		}
 		osd.register_options();
-		result = emulator_info::start_frontend(options, osd, argc, argv);
+		result = emulator_info::start_frontend(options, osd, args);
 		osd_output::pop(&winerror);
 	}
 
@@ -515,23 +515,20 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options.bench();
-	std::string error_string;
 	if (bench > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// determine if we are profiling, and adjust options appropriately
 	int profile = options.profile();
 	if (profile > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// thread priority

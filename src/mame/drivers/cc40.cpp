@@ -80,7 +80,10 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "cc40.lh"
 
@@ -108,21 +111,21 @@ public:
 
 	memory_region *m_cart_rom;
 
-	uint8_t m_bus_control;
-	uint8_t m_power;
-	uint8_t m_banks;
-	uint8_t m_clock_control;
-	uint8_t m_clock_divider;
-	uint8_t m_key_select;
+	u8 m_bus_control;
+	u8 m_power;
+	u8 m_banks;
+	u8 m_clock_control;
+	u8 m_clock_divider;
+	u8 m_key_select;
 
-	std::unique_ptr<uint8_t[]> m_sysram[2];
-	uint16_t m_sysram_size[2];
-	uint16_t m_sysram_end[2];
-	uint16_t m_sysram_mask[2];
+	std::unique_ptr<u8[]> m_sysram[2];
+	u16 m_sysram_size[2];
+	u16 m_sysram_end[2];
+	u16 m_sysram_mask[2];
 
 	void postload();
-	void init_sysram(int chip, uint16_t size);
-	void update_lcd_indicator(uint8_t y, uint8_t x, int state);
+	void init_sysram(int chip, u16 size);
+	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_clock_divider();
 
 	DECLARE_READ8_MEMBER(sysram_r);
@@ -156,7 +159,7 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
 	if (size > 0x20000)
@@ -165,7 +168,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 		return image_init_result::FAIL;
 	}
 
-	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);  // allocate a larger ROM region to have 4x32K banks
+	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return image_init_result::PASS;
@@ -186,7 +189,7 @@ PALETTE_INIT_MEMBER(cc40_state, cc40)
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
-void cc40_state::update_lcd_indicator(uint8_t y, uint8_t x, int state)
+void cc40_state::update_lcd_indicator(u8 y, u8 x, int state)
 {
 	// reference _________________...
 	// output#  |10  11     12     13     14      0      1      2      3   4
@@ -300,6 +303,8 @@ READ8_MEMBER(cc40_state::bankswitch_r)
 
 WRITE8_MEMBER(cc40_state::bankswitch_w)
 {
+	data &= 0x0f;
+
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);
 
@@ -307,7 +312,7 @@ WRITE8_MEMBER(cc40_state::bankswitch_w)
 	if (m_cart_rom)
 		membank("cartbank")->set_entry(data >> 2 & 3);
 
-	m_banks = data & 0x0f;
+	m_banks = data;
 }
 
 READ8_MEMBER(cc40_state::clock_control_r)
@@ -324,10 +329,12 @@ void cc40_state::update_clock_divider()
 
 WRITE8_MEMBER(cc40_state::clock_control_w)
 {
+	data &= 0x0f;
+
 	// d0-d2: clock divider
 	// d3: enable clock divider always
 	// other bits: unused?
-	if (m_clock_control != (data & 0x0f))
+	if (m_clock_control != data)
 	{
 		m_clock_control = data;
 		update_clock_divider();
@@ -336,7 +343,7 @@ WRITE8_MEMBER(cc40_state::clock_control_w)
 
 READ8_MEMBER(cc40_state::keyboard_r)
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
@@ -510,12 +517,12 @@ void cc40_state::machine_reset()
 	bankswitch_w(space, 0, 0);
 }
 
-void cc40_state::init_sysram(int chip, uint16_t size)
+void cc40_state::init_sysram(int chip, u16 size)
 {
 	if (m_sysram[chip] == nullptr)
 	{
 		// init to largest possible
-		m_sysram[chip] = std::make_unique<uint8_t[]>(0x2000);
+		m_sysram[chip] = std::make_unique<u8[]>(0x2000);
 		save_pointer(NAME(m_sysram[chip].get()), 0x2000, chip);
 
 		save_item(NAME(m_sysram_size[chip]), chip);
@@ -572,7 +579,7 @@ void cc40_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( cc40, cc40_state )
+static MACHINE_CONFIG_START( cc40 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)
@@ -623,12 +630,13 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( cc40 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tms70c20.bin", 0xf800, 0x0800, CRC(a21bf6ab) SHA1(3da8435ecbee143e7fa149ee8e1c92949bade1d8) ) // internal cpu rom
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "tms70c20.bin", 0x000, 0x800, CRC(a21bf6ab) SHA1(3da8435ecbee143e7fa149ee8e1c92949bade1d8) ) // internal cpu rom
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "hn61256pc09.bin", 0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
 ROM_END
 
 
-COMP( 1983, cc40, 0, 0, cc40, cc40, driver_device, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE    INIT  COMPANY, FULLNAME, FLAGS
+COMP( 1983, cc40, 0,      0, cc40,   cc40, cc40_state, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )

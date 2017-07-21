@@ -116,18 +116,18 @@
 *****************************************************************************/
 
 #include "emu.h"
+#include "bus/ti99/ti99defs.h"
+#include "bus/ti99/joyport/joyport.h"
+#include "bus/ti99/peb/peribox.h"
 #include "cpu/tms9900/tms9900.h"
-#include "sound/wave.h"
-
-#include "machine/tms9901.h"
 #include "imagedev/cassette.h"
-#include "bus/ti99x/joyport.h"
-#include "bus/ti99_peb/peribox.h"
 #include "machine/ram.h"
+#include "machine/tms9901.h"
+#include "sound/wave.h"
+#include "speaker.h"
 
-#define TMS9901_TAG "tms9901"
-#define SGCPU_TAG "sgcpu"
-#define AMSRAM_TAG "amsram1meg"
+#define TI99_SGCPU_TAG "sgcpu"
+#define TI99_AMSRAM_TAG "amsram1meg"
 
 #define TRACE_ILLWRITE 0
 #define TRACE_READY 0
@@ -142,13 +142,13 @@ public:
 	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TMS9901_TAG),
+		m_tms9901(*this, TI_TMS9901_TAG),
 		m_cassette(*this, "cassette"),
-		m_peribox(*this, PERIBOX_TAG),
-		m_joyport(*this, JOYPORT_TAG),
-		m_scratchpad(*this, PADRAM_TAG),
-		m_amsram(*this, AMSRAM_TAG)
-		{ }
+		m_peribox(*this, TI_PERIBOX_TAG),
+		m_joyport(*this, TI_JOYPORT_TAG),
+		m_scratchpad(*this, TI99_PADRAM_TAG),
+		m_amsram(*this, TI99_AMSRAM_TAG)
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
@@ -191,8 +191,8 @@ private:
 	required_device<tms9900_device>        m_cpu;
 	required_device<tms9901_device>        m_tms9901;
 	required_device<cassette_image_device> m_cassette;
-	required_device<peribox_device>        m_peribox;
-	required_device<joyport_device>        m_joyport;
+	required_device<bus::ti99::peb::peribox_device>        m_peribox;
+	required_device<bus::ti99::joyport::joyport_device>   m_joyport;
 	required_device<ram_device> m_scratchpad;
 	required_device<ram_device> m_amsram;
 
@@ -286,10 +286,10 @@ static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
 ADDRESS_MAP_END
 
@@ -455,7 +455,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 	int addr_off8k = m_addr_buf & 0x1fff;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -498,7 +498,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 		break;
 
 	case SGCPU_PEB:
-		if (space.debugger_access()) return debugger_read(space, offset);
+		if (machine().side_effect_disabled()) return debugger_read(space, offset);
 		// The byte from the odd address has already been read into the latch
 		// Reading the even address now
 		m_peribox->readz(space, m_addr_buf, &hbyte);
@@ -516,7 +516,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	int address = 0;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -560,7 +560,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		break;
 
 	case SGCPU_PEB:
-		if (space.debugger_access()) { debugger_write(space, offset, data); return; }
+		if (machine().side_effect_disabled()) { debugger_write(space, offset, data); return; }
 
 		// Writing the even address now (addr)
 		// The databus multiplexer puts the even value into the latch and outputs the odd value now.
@@ -728,7 +728,7 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 
 	switch (offset & 0x03)
 	{
-	case TMS9901_CB_INT7:
+	case tms9901_device::CB_INT7:
 		// Read pins INT3*-INT7* of TI99's 9901.
 		// bit 1: INT1 status
 		// bit 2: INT2 status
@@ -751,7 +751,7 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 		answer = (answer << 3) | m_9901_int;
 		break;
 
-	case TMS9901_INT8_INT15:
+	case tms9901_device::INT8_INT15:
 		// Read pins int8_t*-INT15* of TI99's 9901.
 		// bit 0-2: keyboard status bits 5 to 7
 		// bit 3: tape input mirror
@@ -763,10 +763,10 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 		answer |= 0xf0;
 		break;
 
-	case TMS9901_P0_P7:
+	case tms9901_device::P0_P7:
 		break;
 
-	case TMS9901_P8_P15:
+	case tms9901_device::P8_P15:
 		// Read pins P8-P15 of TI99's 9901.
 		// bit 26: high
 		// bit 27: tape input
@@ -989,7 +989,7 @@ MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
 /*
     Machine description.
 */
-static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
+static MACHINE_CONFIG_START( ti99_4p_60hz )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
@@ -999,7 +999,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4p_state, dbin_line) )
 
 	// tms9901
-	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
+	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4p_state, read_by_9901) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4p_state, keyC0) )
 	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_4p_state, keyC1) )
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4p_state, tms9901_interrupt) )
 
 	// Peripheral expansion box (SGCPU composition)
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_SG, 0)
+	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_SG, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4p_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4p_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, ready_line) )
@@ -1020,12 +1020,12 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_PERIBOX_LCP_HANDLER( WRITELINE(ti99_4p_state, video_interrupt_in) )
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
-	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_ADD(TI99_PADRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1k")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// AMS RAM 1 MiB
-	MCFG_RAM_ADD(AMSRAM_TAG)
+	MCFG_RAM_ADD(TI99_AMSRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
@@ -1037,7 +1037,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
+	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
 
 MACHINE_CONFIG_END
 
@@ -1049,5 +1049,5 @@ ROM_START(ti99_4p)
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */
-COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System-99 User Group",       "SGCPU (aka TI-99/4P)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT   MACHINE       INPUT    STATE          INIT  COMPANY                 FULLNAME                 FLAGS
+COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, ti99_4p_state, 0,    "System-99 User Group", "SGCPU (aka TI-99/4P)" , MACHINE_SUPPORTS_SAVE )

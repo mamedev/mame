@@ -27,11 +27,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/thedeep.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/thedeep.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -407,7 +411,7 @@ INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedeep, thedeep_state )
+static MACHINE_CONFIG_START( thedeep )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* verified on pcb */
@@ -544,5 +548,5 @@ ROM_START( rundeep )
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 
-GAME( 1987, thedeep, 0,      thedeep, thedeep, driver_device, 0, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rundeep, thedeep,thedeep, thedeep, driver_device, 0, ROT270, "bootleg (Cream)", "Run Deep", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, 0, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, 0, ROT270, "bootleg (Cream)", "Run Deep",         MACHINE_SUPPORTS_SAVE )

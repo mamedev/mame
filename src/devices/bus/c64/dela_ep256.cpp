@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "dela_ep256.h"
 
 
@@ -14,14 +15,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DELA_EP256 = &device_creator<c64_dela_ep256_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_DELA_EP256, c64_dela_ep256_cartridge_device, "delep256", "C64 Dela 256KB EPROM cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_dela_ep256 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_dela_ep256 )
+MACHINE_CONFIG_MEMBER( c64_dela_ep256_cartridge_device::device_add_mconfig )
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
@@ -41,17 +42,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_dela_ep256 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_dela_ep256_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_dela_ep256 );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -62,7 +52,7 @@ machine_config_constructor c64_dela_ep256_cartridge_device::device_mconfig_addit
 //-------------------------------------------------
 
 c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_DELA_EP256, "C64 Dela 256KB EPROM cartridge", tag, owner, clock, "delep256", __FILE__),
+	device_t(mconfig, C64_DELA_EP256, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 	for (int i = 0; i < 8; i++)

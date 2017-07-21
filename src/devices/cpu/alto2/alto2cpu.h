@@ -5,15 +5,17 @@
  *   Xerox AltoII CPU core interface
  *
  *****************************************************************************/
-#ifndef _CPU_ALTO2_H_
-#define _CPU_ALTO2_H_
+#ifndef MAME_DEVICES_CPU_ALTO2_H
+#define MAME_DEVICES_CPU_ALTO2_H
+
+#pragma once
+
+#include "machine/diablo_hd.h"
+#include "sound/spkrdev.h"
+
+#include "debugger.h"
 
 #define ALTO2_TAG "alto2"
-
-#include "emu.h"
-#include "debugger.h"
-#include "sound/speaker.h"
-#include "machine/diablo_hd.h"
 
 /**
  * \brief AltoII register names
@@ -228,7 +230,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	//! device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	//! device (P)ROMs
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -937,7 +939,6 @@ private:
 #include "a2kwd.h"
 };
 
-extern const device_type ALTO2;
+DECLARE_DEVICE_TYPE(ALTO2, alto2_cpu_device)
 
-
-#endif /* _CPU_ALTO2_H_ */
+#endif // MAME_DEVICES_CPU_ALTO2_H

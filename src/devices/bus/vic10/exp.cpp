@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC10_EXPANSION_SLOT = &device_creator<vic10_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(VIC10_EXPANSION_SLOT, vic10_expansion_slot_device, "vic10_expansion_slot", "VIC-10 expansion port")
 
 
 
@@ -57,13 +57,14 @@ device_vic10_expansion_card_interface::~device_vic10_expansion_card_interface()
 //-------------------------------------------------
 
 vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, VIC10_EXPANSION_SLOT, "VIC-10 expansion port", tag, owner, clock, "vic10_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this),
-		m_write_irq(*this),
-		m_write_res(*this),
-		m_write_cnt(*this),
-		m_write_sp(*this), m_card(nullptr)
+	device_t(mconfig, VIC10_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_write_irq(*this),
+	m_write_res(*this),
+	m_write_cnt(*this),
+	m_write_sp(*this),
+	m_card(nullptr)
 {
 }
 
@@ -115,7 +116,7 @@ image_init_result vic10_expansion_slot_device::call_load()
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 
@@ -139,7 +140,7 @@ image_init_result vic10_expansion_slot_device::call_load()
 				int exrom = 1;
 				int game = 1;
 
-				if (cbm_crt_read_header(*m_file, &roml_size, &romh_size, &exrom, &game))
+				if (cbm_crt_read_header(image_core_file(), &roml_size, &romh_size, &exrom, &game))
 				{
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
@@ -150,7 +151,7 @@ image_init_result vic10_expansion_slot_device::call_load()
 					if (roml_size) roml = m_card->m_lorom;
 					if (romh_size) romh = m_card->m_lorom;
 
-					cbm_crt_read_data(*m_file, roml, romh);
+					cbm_crt_read_data(image_core_file(), roml, romh);
 				}
 			}
 		}
@@ -170,14 +171,12 @@ image_init_result vic10_expansion_slot_device::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string vic10_expansion_slot_device::get_default_card_software()
+std::string vic10_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
-		if (is_filetype("crt"))
-			return cbm_crt_get_card(*m_file);
-
-		clear();
+		if (hook.is_filetype("crt"))
+			return cbm_crt_get_card(*hook.image_file());
 	}
 
 	return software_get_default_slot("standard");

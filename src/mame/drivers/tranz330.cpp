@@ -20,8 +20,13 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/tranz330.h"
+
+#include "speaker.h"
+
 #include "tranz330.lh"
+
 
 static void construct_address_map_tranz330_mem(address_map &map)
 {
@@ -145,7 +150,7 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 
 // * - check clocks
 // ? - check purported RS232 hookup, inconsistent information found at the relevant webpage vs. user-submitted errata
-static MACHINE_CONFIG_START( tranz330, tranz330_state )
+static MACHINE_CONFIG_START( tranz330 )
 	MCFG_CPU_ADD(CPU_TAG, Z80, XTAL_7_15909MHz/2) //*
 	MCFG_CPU_PROGRAM_MAP(tranz330_mem)
 	MCFG_CPU_IO_MAP(tranz330_io)
@@ -195,5 +200,5 @@ ROM_START( tranz330 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS             INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, driver_device,    0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT   COMPANY      FULLNAME        FLAGS
+COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state,  0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )

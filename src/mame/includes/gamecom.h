@@ -13,7 +13,6 @@
 #ifndef GAMECOM_H_
 #define GAMECOM_H_
 
-#include "emu.h"
 #include "cpu/sm8500/sm8500.h"
 #include "sound/dac.h"
 #include "bus/generic/slot.h"

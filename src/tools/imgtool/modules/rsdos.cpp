@@ -247,7 +247,7 @@ static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image 
 
 //-------------------------------------------------
 //  prepare_dirent - create a new directory entry
-//	with a specified name
+//  with a specified name
 //-------------------------------------------------
 
 static imgtoolerr_t prepare_dirent(rsdos_dirent &ent, const char *fname)

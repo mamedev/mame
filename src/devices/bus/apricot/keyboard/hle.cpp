@@ -49,6 +49,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "hle.h"
 #include "machine/keyboard.ipp"
 
@@ -57,7 +58,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_KEYBOARD_HLE = &device_creator<apricot_keyboard_hle_device>;
+DEFINE_DEVICE_TYPE(APRICOT_KEYBOARD_HLE, apricot_keyboard_hle_device, "apricotkb_hle", "Apricot Keyboard (HLE)")
 
 
 //-------------------------------------------------
@@ -194,14 +195,9 @@ ioport_constructor apricot_keyboard_hle_device::device_input_ports() const
 	return INPUT_PORTS_NAME( keyboard );
 }
 
-static MACHINE_CONFIG_FRAGMENT( keyboard_components )
+MACHINE_CONFIG_MEMBER( apricot_keyboard_hle_device::device_add_mconfig )
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 MACHINE_CONFIG_END
-
-machine_config_constructor apricot_keyboard_hle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( keyboard_components );
-}
 
 
 //**************************************************************************
@@ -213,7 +209,7 @@ machine_config_constructor apricot_keyboard_hle_device::device_mconfig_additions
 //-------------------------------------------------
 
 apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APRICOT_KEYBOARD_HLE, "Apricot Keyboard (HLE)", tag, owner, clock, "apricotkb_hle", __FILE__),
+	device_t(mconfig, APRICOT_KEYBOARD_HLE, tag, owner, clock),
 	device_apricot_keyboard_interface(mconfig, *this),
 	device_buffered_serial_interface(mconfig, *this),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6", "row_7", "row_8", "row_9", "row_a", "row_b", "row_c"),
@@ -228,7 +224,6 @@ apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &m
 
 void apricot_keyboard_hle_device::device_start()
 {
-	device_buffered_serial_interface::register_save_state(machine().save(), this);
 }
 
 //-------------------------------------------------
@@ -351,14 +346,4 @@ void apricot_keyboard_hle_device::key_break(uint8_t row, uint8_t column)
 void apricot_keyboard_hle_device::out_w(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
-}
-
-//-------------------------------------------------
-//  device_timer - device-specific timer
-//-------------------------------------------------
-
-void apricot_keyboard_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-	device_buffered_serial_interface::device_timer(timer, id, param, ptr);
 }

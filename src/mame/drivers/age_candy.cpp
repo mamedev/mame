@@ -13,6 +13,7 @@ Device is a 27c256   location U3
 */
 
 #include "emu.h"
+#include "speaker.h"
 
 
 class age_candy_state : public driver_device
@@ -43,10 +44,16 @@ void age_candy_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( age_candy, age_candy_state )
+#ifdef UNUSED_DEFINITION
+static ADDRESS_MAP_START(age_candy_map, AS_PROGRAM, 8, age_candy_state)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x4000)
+ADDRESS_MAP_END
+#endif
+
+static MACHINE_CONFIG_START( age_candy )
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown (vectors at end? 6xxx ?)
+//  MCFG_CPU_ADD("maincpu", HPC46104, 8000000) // unknown clock; HPC emulation needed
 //  MCFG_CPU_PROGRAM_MAP(age_candy_map)
 //  MCFG_CPU_IO_MAP(age_candy_io)
 
@@ -57,8 +64,8 @@ MACHINE_CONFIG_END
 
 
 ROM_START( age_cand )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "AGEcandy.u3", 0x0000, 0x8000, CRC(c8cfc666) SHA1(a1c475ae105746e984741af0723a712f09d7b847) )
 ROM_END
 
-GAME( 19??, age_cand,  0,    age_candy, age_candy, driver_device,  0, ROT0, "Advanced Game Engineering", "Candy Crane (AGE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, age_cand,  0,    age_candy, age_candy, age_candy_state,  0, ROT0, "Advanced Game Engineering", "Candy Crane (AGE)", MACHINE_IS_SKELETON_MECHANICAL )

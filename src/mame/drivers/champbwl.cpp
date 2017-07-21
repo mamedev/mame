@@ -154,10 +154,12 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/x1_010.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/x1_010.h"
 #include "video/seta001.h"
+#include "screen.h"
+#include "speaker.h"
 
 class champbwl_state : public driver_device
 {
@@ -185,8 +187,8 @@ public:
 	DECLARE_PALETTE_INIT(champbwl);
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_champbwl(screen_device &screen, bool state);
-	void screen_eof_doraemon(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
@@ -481,7 +483,7 @@ uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(champbwl_state::screen_vblank_champbwl)
 {
 	// rising edge
 	if (state)
@@ -489,7 +491,7 @@ void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
 }
 
 
-static MACHINE_CONFIG_START( champbwl, champbwl_state )
+static MACHINE_CONFIG_START( champbwl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
@@ -511,7 +513,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
-	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_champbwl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_champbwl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
@@ -541,7 +543,7 @@ uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(champbwl_state::screen_vblank_doraemon)
 {
 	// rising edge
 	if (state)
@@ -554,7 +556,7 @@ MACHINE_START_MEMBER(champbwl_state,doraemon)
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( doraemon, champbwl_state )
+static MACHINE_CONFIG_START( doraemon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
@@ -575,7 +577,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
-	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_doraemon)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_doraemon))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
@@ -711,5 +713,5 @@ ROM_START( doraemon )
 	ROM_LOAD( "u27-01.bin", 0x00200, 0x200, CRC(66245fc7) SHA1(c94d9dce7b557c21a3dc1f3f8a1b29594715c994) )
 ROM_END
 
-GAME( 1993?,doraemon, 0, doraemon, doraemon, driver_device, 0, ROT0,   "Sunsoft / Epoch", "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
-GAME( 1989, champbwl, 0, champbwl, champbwl, driver_device, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", MACHINE_SUPPORTS_SAVE )
+GAME( 1993?,doraemon, 0, doraemon, doraemon, champbwl_state, 0, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+GAME( 1989, champbwl, 0, champbwl, champbwl, champbwl_state, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )

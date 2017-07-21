@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
+#include "screen.h"
 
 class bigevglf_state : public driver_device
 {
@@ -67,18 +68,6 @@ public:
 	DECLARE_READ8_MEMBER(beg_trackball_y_r);
 	DECLARE_WRITE8_MEMBER(beg_port08_w);
 	DECLARE_READ8_MEMBER(sub_cpu_mcu_coin_port_r);
-	DECLARE_READ8_MEMBER(bigevglf_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(bigevglf_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(bigevglf_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_ddr_c_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_mcu_w);
-	DECLARE_READ8_MEMBER(bigevglf_mcu_r);
-	DECLARE_READ8_MEMBER(bigevglf_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(bigevglf_palette_w);
 	DECLARE_WRITE8_MEMBER(bigevglf_gfxcontrol_w);
 	DECLARE_WRITE8_MEMBER(bigevglf_vidram_addr_w);

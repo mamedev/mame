@@ -9,6 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
 #include "machine/taito68705interface.h"
+#include "screen.h"
 
 class slapfght_state : public driver_device
 {
@@ -46,8 +47,8 @@ public:
 	enum getstar_id
 	{
 		GETSTUNK = 0, /* unknown for inclusion of possible new sets */
-		GETSTAR,
-		GETSTARJ,
+		//GETSTAR,
+		//GETSTARJ,
 		GETSTARB1,    /* "good" bootleg with same behaviour as 'getstarj' */
 		GETSTARB2     /* "lame" bootleg with lots of ingame bugs */
 	} m_getstar_id;
@@ -97,11 +98,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(getstar);
 
 	void init_banks();
-	DECLARE_DRIVER_INIT(getstarj);
-	DECLARE_DRIVER_INIT(getstar);
 	DECLARE_DRIVER_INIT(getstarb1);
 	DECLARE_DRIVER_INIT(slapfigh);
 	DECLARE_DRIVER_INIT(getstarb2);

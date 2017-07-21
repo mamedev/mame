@@ -101,11 +101,13 @@
  *********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/mcs51.h"
-
 #include "machine/eepromser.h"
-#include "includes/eolith.h"
+
+#include "speaker.h"
 
 
 /*************************************
@@ -542,7 +544,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( eolith45, eolith_state )
+static MACHINE_CONFIG_START( eolith45 )
 	MCFG_CPU_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
 	MCFG_CPU_PROGRAM_MAP(eolith_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)

@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Ron Fries,Dan Boris
-#pragma once
+#ifndef MAME_SOUND_TIAINTF_H
+#define MAME_SOUND_TIAINTF_H
 
-#ifndef __TIAINTF_H__
-#define __TIAINTF_H__
+#pragma once
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -21,12 +21,12 @@
 
 // ======================> tia_device
 
-class tia_device : public device_t,
-					public device_sound_interface
+class tia_device : public device_t, public device_sound_interface
 {
 public:
 	tia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tia_device() { }
+
+	DECLARE_WRITE8_MEMBER( tia_sound_w );
 
 protected:
 	// device-level overrides
@@ -36,15 +36,11 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-public:
-	DECLARE_WRITE8_MEMBER( tia_sound_w );
-
 private:
 	sound_stream *m_channel;
 	void *m_chip;
 };
 
-extern const device_type TIA;
+DECLARE_DEVICE_TYPE(TIA, tia_device)
 
-
-#endif /* __TIAINTF_H__ */
+#endif // MAME_SOUND_TIAINTF_H

@@ -2,8 +2,7 @@
 // copyright-holders:Pierpaolo Prazzoli
 /*
 
-Jolly Jogger
-Taito, 1982
+Guru-Readme for Jolly Jogger (Taito, 1982)
 
 PCB Layout
 ----------
@@ -35,6 +34,14 @@ KDK00502
 |                                                         |-|
 |    VOL         AY3-8910     3.579545MHz                  |
 |----------------------------------------------------------|
+Notes:
+      AY3-8910 - Clock 1.7897725MHz [3.579545/2]
+      KD13.1F  - 82S123 Bipolar PROM
+      TMM416   - Toshiba TMM416 16k x1-bit Page Mode DRAM
+      MB14241  - Fujitsu MB14241 Video Shifter
+      VSync    - 59.1864Hz
+      HSync    - 15.0835kHz
+
 
 FGO70008
 KDN00007
@@ -56,12 +63,19 @@ KDN00007
 |                                                         | |
 |                                            KD15.8B      | |
 |                                                         | |
-|                                            KD14.8A      | |
+|                                8216  8216  KD14.8A      | |
 |                                                         | |
 |                                                         | |
 |                                                         |-|
 |                                                          |
 |----------------------------------------------------------|
+Notes:
+      Z80   - Clock 3.000MHz [18/6]
+      D2125 - Intel D2125 1k x1-bit SRAM
+      8216  - 4 Bit Parallel Bi-directional Bus Driver
+      6116  - 2k x8-bit SRAM
+      KD*   - 2732 EPROM
+
 
 FGO70009
 KDN00006
@@ -70,25 +84,29 @@ KDN00006
 |                                                         |-|
 |                                                         | |
 |                                                         | |
-|                                                         | |
+|                                                      [E]| |
 |                                                         | |
 |                                                         | |
 |                         KD11.5H   KD12.7H               | |
 |                                                         |-|
 |1                                                         |
 |8                                                         |
-|W                                                         |
+|W [T]                                                     |
 |A                                                         |
 |Y                                                        |-|
 |                                                         | |
 |                                                         | |
 |                                                         | |
-|   KD09.1C  KD10.2C                                      | |
+|   KD09.1C  KD10.2C  8216 8216 8216 8216 8216 8216    [F]| |
 |                                                         | |
 |                                                         | |
 |               2114  2114     2114  2114  2114  2114     |-|
 |                                                          |
 |----------------------------------------------------------|
+Notes:
+      KD*  - 2716 EPROM
+      2114 - 1k x4-bit SRAM
+      8216 - 4 Bit Parallel Bi-directional Bus Driver
 
 
   driver by Pierpaolo Prazzoli
@@ -102,6 +120,8 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jollyjgr_state : public driver_device
@@ -117,7 +137,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_bm_palette(*this, "bm_palette") { }
+		m_bm_palette(*this, "bm_palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -649,15 +670,15 @@ void jollyjgr_state::machine_reset()
 	m_tilemap_bank = 0;
 }
 
-static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
+static MACHINE_CONFIG_START( jollyjgr )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3579545)        /* 3,579545 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)  /* 3MHz verified */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jollyjgr_state,  jollyjgr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.18)     /* 59.1864Hz measured */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -671,7 +692,7 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/2) /* 1.7897725MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -758,5 +779,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider,  fspider, driver_device,  0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
-GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, driver_device, 0, ROT90, "Taito Corporation", "Jolly Jogger", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fspiderb, 0, fspider,  fspider,  jollyjgr_state, 0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
+GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, jollyjgr_state, 0, ROT90, "Taito Corporation", "Jolly Jogger",              MACHINE_SUPPORTS_SAVE )

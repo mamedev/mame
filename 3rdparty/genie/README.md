@@ -21,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 737 (commit 35301d9b1fb086eba05c8f5fc99cc52652a0fa83)
+	version 807 (commit 83efdca3c3c63cb47bd1b4daa8b73d526841f900)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -113,6 +113,8 @@ intention to keep it compatible with it.
  - Added Swift language support for make and ninja build generators.
  - Removed CodeBlocks and CodeLite support.
  - Added vs2017 support.
+ - Removed vs2008 support.
+ - Added `removeplatforms` that removes VS build target platforms.
 
 Debugging GENie scripts
 -----------------------
@@ -179,7 +181,7 @@ PS3.
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
 	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
 	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
-	Nikolay Aleksiev.
+	Nikolay Aleksiev, Jon Olson.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie

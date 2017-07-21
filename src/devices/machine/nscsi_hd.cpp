@@ -1,17 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "machine/nscsi_hd.h"
 #include "imagedev/harddriv.h"
 
-const device_type NSCSI_HARDDISK = &device_creator<nscsi_harddisk_device>;
+DEFINE_DEVICE_TYPE(NSCSI_HARDDISK, nscsi_harddisk_device, "scsi_harddisk", "SCSI Hard Disk")
 
 nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_full_device(mconfig, NSCSI_HARDDISK, "SCSI HARDDISK", tag, owner, clock, "scsi_harddisk", __FILE__), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
+	nscsi_harddisk_device(mconfig, NSCSI_HARDDISK, tag, owner, clock)
 {
 }
 
-nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	nscsi_full_device(mconfig, type, name, tag, owner, clock, shortname, source), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
+nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_full_device(mconfig, type, tag, owner, clock), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
 
@@ -40,15 +41,11 @@ void nscsi_harddisk_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_harddisk)
+MACHINE_CONFIG_MEMBER(nscsi_harddisk_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD("image")
 	MCFG_HARDDISK_INTERFACE("scsi_hdd")
 MACHINE_CONFIG_END
 
-machine_config_constructor nscsi_harddisk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_harddisk);
-}
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 {
@@ -132,17 +129,20 @@ void nscsi_harddisk_device::scsi_command()
 		logerror("%s: command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
 					tag(),
 					lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
-		if(lun) {
-			bad_lun();
-			return;
-		}
 
 		int page = scsi_cmdbuf[2];
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
 			memset(scsi_cmdbuf, 0, 148);
-			scsi_cmdbuf[0] = 0x00; // device is direct-access (e.g. hard disk)
+			// From Seagate SCSI Commands Reference Manual (http://www.seagate.com/staticfiles/support/disc/manuals/scsi/100293068a.pdf), page 73:
+			// If the SCSI target device is not capable of supporting a peripheral device connected to this logical unit, the
+			// device server shall set these fields to 7Fh (i.e., PERIPHERAL QUALIFIER field set to 011b and PERIPHERAL DEVICE
+			// TYPE set to 1Fh).
+			if (lun != 0)
+				scsi_cmdbuf[0] = 0x7f;
+			else
+				scsi_cmdbuf[0] = 0x00; // device is direct-access (e.g. hard disk)
 			scsi_cmdbuf[1] = 0x00; // media is not removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x01; // response data format = CCS

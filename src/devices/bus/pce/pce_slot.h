@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __PCE_SLOT_H
-#define __PCE_SLOT_H
+#ifndef MAME_BUS_PCE_PCE_SLOT_H
+#define MAME_BUS_PCE_PCE_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -28,7 +30,6 @@ class device_pce_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_pce_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_pce_cart_interface();
 
 	// reading and writing
@@ -42,12 +43,15 @@ public:
 	uint32_t get_rom_size() { return m_rom_size; }
 	uint32_t get_ram_size() { return m_ram.size(); }
 
+	void rom_map_setup(uint32_t size);
+
+protected:
+	device_pce_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
 	std::vector<uint8_t> m_ram;
-
-	void rom_map_setup(uint32_t size);
 
 	uint8_t rom_bank_map[8];    // 128K chunks of rom
 };
@@ -66,7 +70,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -74,7 +77,7 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
-	int get_cart_type(uint8_t *ROM, uint32_t len);
+	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	void internal_header_logging(uint8_t *ROM, uint32_t len);
 
@@ -90,24 +93,22 @@ public:
 	virtual const char *file_extensions() const override { return "pce,bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
 
-
 protected:
-
 	const char *m_interface;
 	int m_type;
-	device_pce_cart_interface*       m_cart;
+	device_pce_cart_interface *m_cart;
 };
 
 
 
 // device type definition
-extern const device_type PCE_CART_SLOT;
+DECLARE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device)
 
 
 /***************************************************************************
@@ -127,4 +128,4 @@ extern const device_type PCE_CART_SLOT;
 	static_cast<pce_cart_slot_device *>(device)->set_intf("tg16_cart");
 
 
-#endif
+#endif // MAME_BUS_PCE_PCE_SLOT_H

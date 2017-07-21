@@ -25,18 +25,21 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "rendlay.h"
 #include "machine/nvram.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class cesclassic_state : public driver_device
 {
 public:
 	cesclassic_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_oki(*this, "oki"),
-	m_vram(*this, "vram"),
-	m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_vram(*this, "vram")
+		, m_palette(*this, "palette")
+	{ }
 
 	DECLARE_WRITE16_MEMBER(irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(irq3_ack_w);
@@ -244,7 +247,7 @@ PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
 		palette.set_pen_color(i, pal2bit(i), 0, 0);
 }
 
-static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
+static MACHINE_CONFIG_START( cesclassic )
 
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
 	MCFG_CPU_PROGRAM_MAP(cesclassic_map)
@@ -266,7 +269,7 @@ static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
 	MCFG_PALETTE_INIT_OWNER(cesclassic_state, cesclassic)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 24000000/16, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 24000000/16, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -298,6 +301,6 @@ ROM_START(tsclass)
 ROM_END
 
 
-GAME(1997, hrclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1997, ccclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1997, tsclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, 0, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, 0, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, 0, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

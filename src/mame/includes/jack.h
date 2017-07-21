@@ -49,7 +49,7 @@ public:
 	int m_question_rom;
 	int m_remap_address[16];
 
-	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
+	IRQ_CALLBACK_MEMBER(jack_sh_irq_ack);
 	DECLARE_WRITE8_MEMBER(joinem_control_w);
 	DECLARE_WRITE8_MEMBER(joinem_scroll_w);
 	DECLARE_READ8_MEMBER(striv_question_r);

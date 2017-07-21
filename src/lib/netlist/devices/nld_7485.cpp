@@ -6,6 +6,7 @@
  */
 
 #include "nld_7485.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -73,7 +74,7 @@ namespace netlist
 	// FIXME: Timing
 	NETLIB_UPDATE(7485)
 	{
-		for (std::size_t i = 3; i-- > 0; )
+		for (std::size_t i = 4; i-- > 0; )
 		{
 			if (m_A[i]() > m_B[i]())
 			{

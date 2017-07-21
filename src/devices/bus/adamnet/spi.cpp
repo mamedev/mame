@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "spi.h"
 
 
@@ -25,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_SPI = &device_creator<adam_spi_device>;
+DEFINE_DEVICE_TYPE(ADAM_SPI, adam_spi_device, "adam_spi", "Adam SPI")
 
 
 //-------------------------------------------------
@@ -69,10 +70,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( adam_spi )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( adam_spi )
+MACHINE_CONFIG_MEMBER( adam_spi_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_spi_mem)
 	MCFG_CPU_IO_MAP(adam_spi_io)
@@ -89,17 +90,6 @@ static MACHINE_CONFIG_FRAGMENT( adam_spi )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor adam_spi_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( adam_spi );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -110,7 +100,7 @@ machine_config_constructor adam_spi_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 adam_spi_device::adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_SPI, "Adam SPI", tag, owner, clock, "adam_spi", __FILE__),
+	: device_t(mconfig, ADAM_SPI, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)
 {

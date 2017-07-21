@@ -468,8 +468,9 @@ const hdc92x4_device::cmddef hdc92x4_device::s_command[] =
 /*
     Standard constructor for the base class and the two variants
 */
-hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_hdc9234)
+	: device_t(mconfig, type, tag, owner, clock),
+	m_is_hdc9234(is_hdc9234),
 	m_out_intrq(*this),
 	m_out_dmarq(*this),
 	m_out_dip(*this),
@@ -481,15 +482,13 @@ hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, 
 }
 
 hdc9224_device::hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hdc92x4_device(mconfig, HDC9224, "SMC HDC9224 Universal Disk Controller", tag, owner, clock, "hdc9224", __FILE__)
+	: hdc92x4_device(mconfig, HDC9224, tag, owner, clock, false)
 {
-	m_is_hdc9234 = false;
 }
 
 hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hdc92x4_device(mconfig, HDC9234, "SMC HDC9234 Universal Disk Controller", tag, owner, clock, "hdc9234", __FILE__)
+	: hdc92x4_device(mconfig, HDC9234, tag, owner, clock, true)
 {
-	m_is_hdc9234 = true;
 }
 
 
@@ -515,7 +514,7 @@ bool hdc92x4_device::fm_mode()
 */
 bool hdc92x4_device::on_track00()
 {
-	return (m_register_r[DRIVE_STATUS] & HDC_DS_TRK00)!=0;
+	return (m_register_r[DRIVE_STATUS] & DS_TRK00)!=0;
 }
 
 /*
@@ -523,7 +522,7 @@ bool hdc92x4_device::on_track00()
 */
 bool hdc92x4_device::seek_complete()
 {
-	return (m_register_r[DRIVE_STATUS] & HDC_DS_SKCOM)!=0;
+	return (m_register_r[DRIVE_STATUS] & DS_SKCOM)!=0;
 }
 
 /*
@@ -531,7 +530,7 @@ bool hdc92x4_device::seek_complete()
 */
 bool hdc92x4_device::index_hole()
 {
-	return (m_register_r[DRIVE_STATUS] & HDC_DS_INDEX)!=0;
+	return (m_register_r[DRIVE_STATUS] & DS_INDEX)!=0;
 }
 
 /*
@@ -539,7 +538,7 @@ bool hdc92x4_device::index_hole()
 */
 bool hdc92x4_device::drive_ready()
 {
-	return (m_register_r[DRIVE_STATUS] & HDC_DS_READY)!=0;
+	return (m_register_r[DRIVE_STATUS] & DS_READY)!=0;
 }
 
 /*
@@ -868,11 +867,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			// First step: Search the next IDAM, and if found, read the
 			// ID values into the registers
 
-			// Depending on the implied seek flag, continue with read_id,
-			// else switch to verify.
-			// The 9224 always assumes implied seek
-			m_substate = (implied_seek || !m_is_hdc9234)? READ_ID1 : VERIFY;
-
+			m_substate = READ_ID1;
 			m_live_state.bit_count_total = 0;
 			live_start(SEARCH_IDAM);
 			cont = WAIT;
@@ -903,12 +898,19 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 				break;
 			}
 
+			// Depending on the implied seek flag, continue with read_id,
+			// else switch to verify.
+			// The 9224 always assumes implied seek
+			m_substate = (implied_seek || !m_is_hdc9234)? READ_ID_STEPON : VERIFY;
+
 			// Calculate the direction and number of step pulses
 			// positive -> towards inner cylinders
 			// negative -> towards outer cylinders
 			// zero -> we're already there
-			m_track_delta = desired_cylinder() - current_cylinder();
-			m_substate = READ_ID_STEPON;
+
+			if (m_substate == VERIFY) cont = NEXT;
+			else m_track_delta = desired_cylinder() - current_cylinder();
+
 			break;
 
 		case READ_ID_STEPON:
@@ -1746,9 +1748,9 @@ void hdc92x4_device::seek_read_id()
 	}
 
 	int cont = NEXT;
-	bool step_enable = (current_command() & 0x04)==1;
-	bool wait_seek_comp = (current_command() & 0x02)==1;
-	bool do_verify = (current_command() & 0x01)==1;
+	bool step_enable = BIT(current_command(), 2);
+	bool wait_seek_comp = BIT(current_command(), 1);
+	bool do_verify = BIT(current_command(), 0);
 	m_logical = true;
 
 	while (cont == NEXT)
@@ -2066,7 +2068,7 @@ void hdc92x4_device::format_track()
 			cont = WAIT;
 			break;
 		case TRACKDONE:
-			if (FORMAT_TRACK && TRACE_SUBSTATES) logerror("Track writing done\n");
+			if (TRACE_FORMAT && TRACE_SUBSTATES) logerror("Track writing done\n");
 			cont = SUCCESS;
 			break;
 		}
@@ -2341,6 +2343,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// [1,2]: The ID field sync mark must be found within 33,792 byte times
 			if (m_live_state.bit_count_total > 33792*16)
 			{
+				if (TRACE_LIVE) logerror("[%s live] Sector not found within 33,792 byte times\n", tts(m_live_state.time).c_str());
 				// Desired sector not found within time
 				if (m_substate == VERIFY3)
 					wait_for_realtime(VERIFY_FAILED);
@@ -2367,7 +2370,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				// FM case
 				if (m_live_state.shift_reg == 0xf57e)
 				{
-					if (TRACE_LIVE) logerror("SEARCH_IDAM: IDAM found\n");
+					if (TRACE_LIVE) logerror("[%s live] SEARCH_IDAM: IDAM found [byte count %d]\n", tts(m_live_state.time).c_str(), m_live_state.bit_count_total/16);
 					preset_crc(m_live_state, 0xfe);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
@@ -4499,10 +4502,10 @@ void hdc92x4_device::auxbus_in(uint8_t data)
 
 	if (TRACE_AUXBUS) logerror("Got value %02x via auxbus: ecc=%d index=%d seek_comp=%d tr00=%d user=%d writeprot=%d ready=%d fault=%d\n",
 				tag(), data,
-				(data&HDC_DS_ECCERR)? 1:0, (data&HDC_DS_INDEX)? 1:0,
-				(data&HDC_DS_SKCOM)? 1:0, (data&HDC_DS_TRK00)? 1:0,
-				(data&HDC_DS_UDEF)? 1:0, (data&HDC_DS_WRPROT)? 1:0,
-				(data&HDC_DS_READY)? 1:0, (data&HDC_DS_WRFAULT)? 1:0);
+				(data&DS_ECCERR)? 1:0, (data&DS_INDEX)? 1:0,
+				(data&DS_SKCOM)? 1:0, (data&DS_TRK00)? 1:0,
+				(data&DS_UDEF)? 1:0, (data&DS_WRPROT)? 1:0,
+				(data&DS_READY)? 1:0, (data&DS_WRFAULT)? 1:0);
 
 	bool previndex = index_hole();
 	bool prevready = drive_ready();
@@ -4646,8 +4649,8 @@ void hdc92x4_device::auxbus_out()
 	if (m_output1 != m_output1_old || m_output2 != m_output2_old)
 	{
 		// Only propagate changes
-		m_out_auxbus((offs_t)HDC_OUTPUT_1, m_output1);
-		m_out_auxbus((offs_t)HDC_OUTPUT_2, m_output2);
+		m_out_auxbus((offs_t)OUTPUT_1, m_output1);
+		m_out_auxbus((offs_t)OUTPUT_2, m_output2);
 		m_output1_old = m_output1;
 		m_output2_old = m_output2;
 	}
@@ -4656,9 +4659,9 @@ void hdc92x4_device::auxbus_out()
 void hdc92x4_device::dma_address_out(uint8_t addrub, uint8_t addrhb, uint8_t addrlb)
 {
 	if (TRACE_DMA) logerror("Setting DMA address %06x\n", (addrub<<16 | addrhb<<8 | addrlb)&0xffffff);
-	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrub);
-	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrhb);
-	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrlb);
+	m_out_auxbus((offs_t)OUTPUT_DMA_ADDR, addrub);
+	m_out_auxbus((offs_t)OUTPUT_DMA_ADDR, addrhb);
+	m_out_auxbus((offs_t)OUTPUT_DMA_ADDR, addrlb);
 }
 
 /*
@@ -4823,5 +4826,5 @@ void hdc92x4_device::device_reset()
 	m_out_dmarq(CLEAR_LINE);
 }
 
-const device_type HDC9224 = &device_creator<hdc9224_device>;
-const device_type HDC9234 = &device_creator<hdc9234_device>;
+DEFINE_DEVICE_TYPE(HDC9224, hdc9224_device, "hdc9224", "SMC HDC9224 Universal Disk Controller")
+DEFINE_DEVICE_TYPE(HDC9234, hdc9234_device, "hdc9234", "SMC HDC9234 Universal Disk Controller")

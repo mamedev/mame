@@ -30,22 +30,27 @@ ToDo:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8251.h"
-#include "bus/rs232/rs232.h"
-//#include "machine/clock.h"
-#include "machine/pit8253.h"
-#include "machine/i8255.h"
+
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
-#include "machine/z80dma.h"
-#include "machine/rescap.h"
 #include "machine/74123.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
+#include "machine/rescap.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80dma.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/excali64_dsk.h"
+
 
 class excali64_state : public driver_device
 {
@@ -54,6 +59,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 		, m_cass(*this, "cassette")
 		, m_crtc(*this, "crtc")
 		, m_io_keyboard(*this, "KEY.%u", 0)
@@ -90,7 +96,6 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
-	const uint8_t *m_p_chargen;
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_hiresram;
 	uint8_t m_sys_status;
@@ -100,13 +105,14 @@ private:
 	bool m_motor;
 	bool m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
 	required_device<z80dma_device> m_dma;
 	required_device<ttl74123_device> m_u12;
 	required_device<centronics_device> m_centronics;
-	required_device<wd2793_t> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 };
@@ -134,7 +140,7 @@ static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
 	AM_RANGE(0xe4, 0xe7) AM_WRITE(porte4_w)
 	AM_RANGE(0xe8, 0xeb) AM_READ(porte8_r)
 	AM_RANGE(0xec, 0xef) AM_WRITE(portec_w)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -447,7 +453,6 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 {
 	// do this here because driver_init hasn't run yet
 	m_p_videoram = memregion("videoram")->base();
-	m_p_chargen = memregion("chargen")->base();
 	m_p_hiresram = m_p_videoram + 0x2000;
 	uint8_t *main = memregion("roms")->base();
 	uint8_t *ram = memregion("rambank")->base();
@@ -539,7 +544,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( excali64, excali64_state )
+static MACHINE_CONFIG_START( excali64 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(excali64_mem)
@@ -642,5 +647,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", 0 )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS           INIT  COMPANY          FULLNAME        FLAGS
+COMP( 1984, excali64, 0,      0,       excali64,  excali64, excali64_state, 0,    "BGR Computers", "Excalibur 64", 0 )

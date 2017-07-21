@@ -45,6 +45,7 @@ public:
 
 protected:
 	uint64_t file_header_skip_bytes;
+	uint64_t file_footer_skip_bytes;
 
 	floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);

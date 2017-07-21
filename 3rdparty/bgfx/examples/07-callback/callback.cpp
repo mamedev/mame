@@ -126,7 +126,7 @@ struct BgfxCallback : public bgfx::CallbackI
 	virtual void fatal(bgfx::Fatal::Enum _code, const char* _str) BX_OVERRIDE
 	{
 		// Something unexpected happened, inform user and bail out.
-		dbgPrintf("Fatal error: 0x%08x: %s", _code, _str);
+		bx::debugPrintf("Fatal error: 0x%08x: %s", _code, _str);
 
 		// Must terminate, continuing will cause crash anyway.
 		abort();
@@ -134,8 +134,8 @@ struct BgfxCallback : public bgfx::CallbackI
 
 	virtual void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) BX_OVERRIDE
 	{
-		dbgPrintf("%s (%d): ", _filePath, _line);
-		dbgPrintfVargs(_format, _argList);
+		bx::debugPrintf("%s (%d): ", _filePath, _line);
+		bx::debugPrintfVargs(_format, _argList);
 	}
 
 	virtual uint32_t cacheReadSize(uint64_t _id) BX_OVERRIDE
@@ -257,7 +257,7 @@ public:
 			{
 				if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
 				{
-					dbgPrintf("%s(%d): FREE %p\n", _file, _line, _ptr);
+					bx::debugPrintf("%s(%d): FREE %p\n", _file, _line, _ptr);
 					::free(_ptr);
 					--m_numBlocks;
 				}
@@ -274,7 +274,7 @@ public:
 			if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
 			{
 				void* ptr = ::malloc(_size);
-				dbgPrintf("%s(%d): ALLOC %p of %d byte(s)\n", _file, _line, ptr, _size);
+				bx::debugPrintf("%s(%d): ALLOC %p of %d byte(s)\n", _file, _line, ptr, _size);
 				++m_numBlocks;
 				m_maxBlocks = bx::uint32_max(m_maxBlocks, m_numBlocks);
 				return ptr;
@@ -286,7 +286,7 @@ public:
 		if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
 		{
 			void* ptr = ::realloc(_ptr, _size);
-			dbgPrintf("%s(%d): REALLOC %p (old %p) of %d byte(s)\n", _file, _line, ptr, _ptr, _size);
+			bx::debugPrintf("%s(%d): REALLOC %p (old %p) of %d byte(s)\n", _file, _line, ptr, _ptr, _size);
 
 			if (NULL == _ptr)
 			{
@@ -302,7 +302,7 @@ public:
 
 	void dumpStats() const
 	{
-		dbgPrintf("Allocator stats: num blocks %d (peak: %d)\n", m_numBlocks, m_maxBlocks);
+		bx::debugPrintf("Allocator stats: num blocks %d (peak: %d)\n", m_numBlocks, m_maxBlocks);
 	}
 
 private:
@@ -403,7 +403,7 @@ int _main_(int _argc, char** _argv)
 		float view[16];
 		float proj[16];
 		bx::mtxLookAt(view, eye, at);
-		bx::mtxProj(proj, 60.0f, float(width)/float(height), 0.1f, 100.0f);
+		bx::mtxProj(proj, 60.0f, float(width)/float(height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 		// Set view and projection matrix for view 0.
 		bgfx::setViewTransform(0, view, proj);
@@ -439,7 +439,8 @@ int _main_(int _argc, char** _argv)
 		// Take screen shot at frame 150.
 		if (150 == frame)
 		{
-			bgfx::saveScreenShot("temp/frame150");
+			bgfx::FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
+			bgfx::requestScreenShot(fbh, "temp/frame150");
 		}
 
 		// Advance to next frame. Rendering thread will be kicked to

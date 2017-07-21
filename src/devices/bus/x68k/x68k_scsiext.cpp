@@ -9,16 +9,18 @@
  */
 
 #include "emu.h"
+#include "x68k_scsiext.h"
+
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "machine/mb89352.h"
-#include "x68k_scsiext.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type X68K_SCSIEXT = &device_creator<x68k_scsiext_device>;
+DEFINE_DEVICE_TYPE(X68K_SCSIEXT, x68k_scsiext_device, "x68k_cz6bs1", "Sharp CZ-6BS1 SCSI-1")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -35,7 +37,7 @@ const tiny_rom_entry *x68k_scsiext_device::device_rom_region() const
 }
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( x68k_scsiext )
+MACHINE_CONFIG_MEMBER( x68k_scsiext_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)
@@ -51,15 +53,11 @@ static MACHINE_CONFIG_FRAGMENT( x68k_scsiext )
 	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_scsiext_device, drq_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor x68k_scsiext_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( x68k_scsiext );
-}
-
 x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, X68K_SCSIEXT, "Sharp CZ-6BS1 SCSI-1", tag, owner, clock, "x68k_cz6bs1", __FILE__),
-		device_x68k_expansion_card_interface(mconfig, *this), m_slot(nullptr),
-		m_spc(*this, "mb89352")
+	: device_t(mconfig, X68K_SCSIEXT, tag, owner, clock)
+	, device_x68k_expansion_card_interface(mconfig, *this)
+	, m_slot(nullptr),
+	m_spc(*this, "mb89352")
 {
 }
 

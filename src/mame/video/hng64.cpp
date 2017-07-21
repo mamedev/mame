@@ -1110,7 +1110,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
 {
 	// rising edge
 	if (state)

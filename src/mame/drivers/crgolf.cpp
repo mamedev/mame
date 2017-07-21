@@ -90,10 +90,13 @@ protected or a snippet should do the aforementioned string copy.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/crgolf.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -489,7 +492,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( crgolf, crgolf_state )
+static MACHINE_CONFIG_START( crgolf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
@@ -532,7 +535,7 @@ static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -793,11 +796,11 @@ DRIVER_INIT_MEMBER(crgolf_state,crgolfhi)
  *
  *************************************/
 
-GAME( 1984, crgolf,   0,      crgolf,   crgolf, driver_device,  0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, "Nasco Japan", "Crowns Golf (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, "Nasco Japan", "Champion Golf", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, "bootleg", "Champion Golf (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state,  crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii" , MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, mastrglf,  0,    mastrglf, crgolf, driver_device,  0, ROT0, "Nasco", "Master's Golf", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 198?, mastrglf, 0,      mastrglf, crgolf, crgolf_state, 0,        ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

@@ -23,9 +23,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/redclash.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/redclash.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Sound comm between CPU's */
@@ -623,7 +626,7 @@ MACHINE_RESET_MEMBER(redclash_state,redclash)
 	m_stars_count = 0;
 }
 
-static MACHINE_CONFIG_START( zerohour, redclash_state )
+static MACHINE_CONFIG_START( zerohour )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
@@ -639,7 +642,7 @@ static MACHINE_CONFIG_START( zerohour, redclash_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
-	MCFG_SCREEN_VBLANK_DRIVER(redclash_state, screen_eof_redclash)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
@@ -652,7 +655,7 @@ static MACHINE_CONFIG_START( zerohour, redclash_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( redclash, redclash_state )
+static MACHINE_CONFIG_START( redclash )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
@@ -668,7 +671,7 @@ static MACHINE_CONFIG_START( redclash, redclash_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
-	MCFG_SCREEN_VBLANK_DRIVER(redclash_state, screen_eof_redclash)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
@@ -680,7 +683,7 @@ static MACHINE_CONFIG_START( redclash, redclash_state )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sraider, redclash_state )
+static MACHINE_CONFIG_START( sraider )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
@@ -702,7 +705,7 @@ static MACHINE_CONFIG_START( sraider, redclash_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_sraider)
-	MCFG_SCREEN_VBLANK_DRIVER(redclash_state, screen_eof_sraider)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(redclash_state, screen_vblank_sraider))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sraider)
@@ -942,10 +945,10 @@ DRIVER_INIT_MEMBER(redclash_state,redclash)
 }
 
 
-GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, redclash, ROT270, "Universal", "Zero Hour (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, redclash, ROT270, "Universal", "Zero Hour (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, redclash, ROT270, "bootleg (Inder SA)", "Zero Hour (Inder)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclash,  0,        redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",    "Red Clash (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasha, redclash, redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",    "Red Clash (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, redclash, ROT270, "Universal",               "Zero Hour (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, redclash, ROT270, "Universal",               "Zero Hour (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, redclash, ROT270, "bootleg (Inder SA)",      "Zero Hour (Inder)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclash,  0,        redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",                  "Red Clash (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasha, redclash, redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",                  "Red Clash (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclashk, redclash, redclash, redclash, redclash_state, redclash, ROT270, "Tehkan (Kaneko license)", "Red Clash (Kaneko)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sraider,  0,       sraider, sraider, driver_device,  0,       ROT270, "Universal", "Space Raider", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sraider,  0,         sraider,  sraider,  redclash_state, 0,        ROT270, "Universal",               "Space Raider",       MACHINE_SUPPORTS_SAVE )

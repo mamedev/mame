@@ -9,6 +9,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "input_merger.h"
 
 #include <algorithm>
@@ -19,8 +20,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type INPUT_MERGER_ACTIVE_HIGH = &device_creator<input_merger_active_high_device>;
-const device_type INPUT_MERGER_ACTIVE_LOW = &device_creator<input_merger_active_low_device>;
+DEFINE_DEVICE_TYPE(INPUT_MERGER_ACTIVE_HIGH, input_merger_active_high_device, "ipt_merger_hi", "Input Merger (active high)")
+DEFINE_DEVICE_TYPE(INPUT_MERGER_ACTIVE_LOW,  input_merger_active_low_device,  "ipt_merger_lo", "Input Merger (active low)")
 
 
 //**************************************************************************
@@ -31,9 +32,8 @@ const device_type INPUT_MERGER_ACTIVE_LOW = &device_creator<input_merger_active_
 //  input_merger_device - constructor
 //-------------------------------------------------
 
-input_merger_device::input_merger_device(machine_config const &mconfig, device_type type,
-	char const *name, char const *tag, device_t *owner, uint32_t clock, char const *shortname, char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+input_merger_device::input_merger_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	m_output_handler(*this)
 {
 }
@@ -65,7 +65,7 @@ void input_merger_device::device_start()
 //-------------------------------------------------
 
 input_merger_active_high_device::input_merger_active_high_device(machine_config const &mconfig, char const *tag, device_t *owner,   uint32_t clock)
-	: input_merger_device(mconfig,  INPUT_MERGER_ACTIVE_HIGH, "Input Merger (Active High)", tag, owner, clock, "input_merger_hi", __FILE__)
+	: input_merger_device(mconfig, INPUT_MERGER_ACTIVE_HIGH, tag, owner, clock)
 {
 }
 
@@ -98,7 +98,7 @@ void input_merger_active_high_device::update_state()
 //-------------------------------------------------
 
 input_merger_active_low_device::input_merger_active_low_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: input_merger_device(mconfig,  INPUT_MERGER_ACTIVE_LOW, "Input Merger (Active Low)", tag, owner, clock, "input_merger_lo", __FILE__)
+	: input_merger_device(mconfig, INPUT_MERGER_ACTIVE_LOW, tag, owner, clock)
 {
 }
 

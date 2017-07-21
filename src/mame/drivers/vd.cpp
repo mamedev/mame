@@ -3,7 +3,7 @@
 /**************************************************************************************
 
     PINBALL
-    Videodens
+    Video Dens S.A., Madrid
 
     PinMAME used as reference. The Break '86 manual scan available on the net includes
     a mostly illegible schematic.
@@ -15,17 +15,21 @@
 ***************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "vd.lh"
 
 class vd_state : public driver_device
 {
 public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_READ8_MEMBER(ack_r);
@@ -176,7 +180,7 @@ void vd_state::machine_reset()
 	m_t_c = 0;
 }
 
-static MACHINE_CONFIG_START( vd, vd_state )
+static MACHINE_CONFIG_START( vd )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vd_map)
@@ -223,5 +227,5 @@ ROM_START(papillon)
 ROM_END
 
 
-GAME(1986, break86,  0,    vd,  break86,  driver_device, 0,  ROT0,  "Videodens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, papillon, 0,    vd,  papillon, driver_device, 0,  ROT0,  "Videodens", "Papillon", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, break86,  0,    vd,  break86,  vd_state, 0,  ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, 0,  ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)

@@ -3,10 +3,12 @@
 /* */
 
 /* todo: remove code from header, linker starts throwing silly messages when I try due to the templates.. make sense of them */
+#ifndef MAME_INCLUDES_K053246_K053247_K055673_H
+#define MAME_INCLUDES_K053246_K053247_K055673_H
 
 #pragma once
-#ifndef __K05324x_H__
-#define __K05324x_H__
+
+#include "screen.h"
 
 #define NORMAL_PLANE_ORDER 4
 
@@ -32,7 +34,7 @@ typedef device_delegate<void (int *code, int *color, int *priority_mask)> k05324
 #define K055673_LAYOUT_RNG 4
 #define K055673_LAYOUT_LE2 8
 #define K055673_LAYOUT_GX6 6
-
+#define K055673_LAYOUT_PS  7
 
 /*
 Callback procedures for non-standard shadows:
@@ -63,9 +65,6 @@ class k053247_device : public device_t,
 {
 public:
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	~k053247_device() { }
 
 	// static configuration
 	static void set_k053247_callback(device_t &device, k053247_cb_delegate callback) { downcast<k053247_device &>(device).m_k053247_cb = callback; }
@@ -81,6 +80,7 @@ public:
 	void clear_all();
 
 	DECLARE_READ16_MEMBER( k055673_rom_word_r );
+	DECLARE_READ16_MEMBER( k055673_ps_rom_word_r );
 	DECLARE_READ16_MEMBER( k055673_5bpp_rom_word_r );
 
 	DECLARE_READ8_MEMBER( k053247_r );
@@ -460,23 +460,18 @@ public:
 	}
 
 
-
-
-
-	template<class _BitmapClass>
-	void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
-
-
 protected:
+	k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-private:
 
-
+	template <class _BitmapClass> void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
 };
 
-extern const device_type K053246;
+DECLARE_DEVICE_TYPE(K053247, k053247_device)
+extern device_type const K053246;
 
 class k055673_device : public k053247_device
 {
@@ -492,7 +487,7 @@ private:
 
 };
 
-extern const device_type K055673;
+DECLARE_DEVICE_TYPE(K055673, k055673_device)
 
 
 #define MCFG_K053246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
@@ -505,4 +500,4 @@ extern const device_type K055673;
 #define MCFG_K055673_PALETTE MCFG_GFX_PALETTE
 
 
-#endif
+#endif // MAME_INCLUDES_K053246_K053247_K055673_H

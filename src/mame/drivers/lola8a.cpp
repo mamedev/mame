@@ -21,10 +21,13 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
 #include "imagedev/cassette.h"
+#include "sound/ay8910.h"
 #include "sound/wave.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define AY8910_TAG "g12"
 #define HD46505SP_TAG "h45"
@@ -245,7 +248,7 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( lola8a, lola8a_state )
+static MACHINE_CONFIG_START( lola8a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(lola8a_mem)
@@ -291,5 +294,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, lola8a,  0,       0,    lola8a,     lola8a,  driver_device,  0,      "Institut Ivo Lola Ribar",   "Lola 8A",        MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT    COMPANY                      FULLNAME       FLAGS
+COMP( 1986, lola8a, 0,      0,      lola8a,   lola8a,  lola8a_state,  0,      "Institut Ivo Lola Ribar",   "Lola 8A",     MACHINE_NOT_WORKING )

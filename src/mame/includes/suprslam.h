@@ -5,7 +5,10 @@
     Super Slams
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SUPRSLAM_H
+#define MAME_INCLUDES_SUPRSLAM_H
 
+#include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
 #include "video/k053936.h"
 
@@ -18,7 +21,6 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_spr_ctrl(*this, "spr_ctrl"),
 		m_screen_vregs(*this, "screen_vregs"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -33,7 +35,6 @@ public:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_sp_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_spr_ctrl;
 	required_shared_ptr<uint16_t> m_screen_vregs;
 
 	/* video-related */
@@ -42,9 +43,7 @@ public:
 	uint16_t      m_screen_bank;
 	uint16_t      m_bg_bank;
 	uint32_t  suprslam_tile_callback( uint32_t code );
-
-	/* misc */
-	int         m_pending_command;
+	uint8_t       m_spr_ctrl;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -55,12 +54,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(suprslam_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(suprslam_screen_videoram_w);
 	DECLARE_WRITE16_MEMBER(suprslam_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(suprslam_bank_w);
+	DECLARE_WRITE8_MEMBER(spr_ctrl_w);
 	TILE_GET_INFO_MEMBER(get_suprslam_tile_info);
 	TILE_GET_INFO_MEMBER(get_suprslam_bg_tile_info);
 	virtual void machine_start() override;
@@ -68,3 +66,5 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+#endif // MAME_INCLUDES_SUPRSLAM_H

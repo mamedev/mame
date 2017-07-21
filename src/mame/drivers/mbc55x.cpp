@@ -16,8 +16,11 @@ ToDo:
 */
 
 
+#include "emu.h"
 #include "includes/mbc55x.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 {
@@ -235,7 +238,7 @@ static SLOT_INTERFACE_START( mbc55x_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
+static MACHINE_CONFIG_START( mbc55x )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8088, 3600000)
 	MCFG_CPU_PROGRAM_MAP(mbc55x_mem)
@@ -246,7 +249,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,896,0,300,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE(VID_MC6845_NAME, mc6845_device, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(mbc55x_state, screen_eof_mbc55x)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mbc55x_state, screen_vblank_mbc55x))
 
 	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS * 3)
 	MCFG_PALETTE_INIT_OWNER(mbc55x_state, mbc55x)
@@ -312,5 +315,5 @@ ROM_START( mbc55x )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 1983, mbc55x,     0,      0,      mbc55x, mbc55x, driver_device, 0,   "Sanyo",  "MBC-55x",  0 /*MACHINE_NO_SOUND*/)
+//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME    FLAGS
+COMP( 1983, mbc55x,     0,      0,      mbc55x,  mbc55x, mbc55x_state, 0,    "Sanyo",  "MBC-55x",  0 /*MACHINE_NO_SOUND*/)

@@ -73,6 +73,10 @@
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
 
+#define OSDOPTION_PA_API                "pa_api"
+#define OSDOPTION_PA_DEVICE             "pa_device"
+#define OSDOPTION_PA_LATENCY            "pa_latency"
+
 #define OSDOPTION_AUDIO_OUTPUT          "audio_output"
 #define OSDOPTION_AUDIO_EFFECT          "audio_effect"
 
@@ -159,6 +163,11 @@ public:
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
+
+	// PortAudio options
+	const char *pa_api() const { return value(OSDOPTION_PA_API); }
+	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
+	const float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
 
 private:
 	static const options_entry s_option_entries[];
@@ -261,7 +270,7 @@ private:
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
 	{
-		std::string opt_val = opts.value(opt_name.c_str());
+		std::string opt_val = opts.exists(opt_name) ? opts.value(opt_name.c_str()) : "";
 		if (opt_val.compare("auto")==0)
 			opt_val = "";
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))

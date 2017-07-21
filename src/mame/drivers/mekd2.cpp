@@ -74,12 +74,14 @@ TODO
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mekd2.lh"
 
 #define XTAL_MEKD2 1228800
@@ -362,7 +364,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 
 ************************************************************/
 
-static MACHINE_CONFIG_START( mekd2, mekd2_state )
+static MACHINE_CONFIG_START( mekd2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_CPU_PROGRAM_MAP(mekd2_mem)
@@ -422,5 +424,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT    COMPANY     FULLNAME   FLAGS */
-COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, driver_device, 0,  "Motorola", "MEK6800D2" , 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY     FULLNAME      FLAGS
+COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, 0,    "Motorola", "MEK6800D2" , 0 )

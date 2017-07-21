@@ -39,7 +39,8 @@ public:
 	DECLARE_READ16_MEMBER(port1e_r);
 	DECLARE_READ16_MEMBER(key_r);
 	DECLARE_READ16_MEMBER(stat_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
+
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -83,7 +84,7 @@ READ16_MEMBER( c900_state::stat_r )
 	return (m_term_data) ? 6 : 4;
 }
 
-WRITE8_MEMBER( c900_state::kbd_put )
+void c900_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -106,7 +107,7 @@ static GFXDECODE_START( c900 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c900_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( c900, c900_state )
+static MACHINE_CONFIG_START( c900 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(c900_mem)
@@ -114,7 +115,7 @@ static MACHINE_CONFIG_START( c900, c900_state )
 	MCFG_CPU_IO_MAP(c900_io)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(c900_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(c900_state, kbd_put))
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c900)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
@@ -131,5 +132,5 @@ ROM_START( c900 )
 	ROM_LOAD( "380217-01.u2", 0x0000, 0x1000, CRC(64cb4171) SHA1(e60d796170addfd27e2c33090f9c512c7e3f99f5) )
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
-COMP( 1985, c900,   0,      0,      c900,    c900, driver_device,    0, "Commodore", "Commodore 900", MACHINE_IS_SKELETON )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   STATE       INIT  COMPANY      FULLNAME         FLAGS */
+COMP( 1985, c900,  0,      0,      c900,    c900,   c900_state, 0,    "Commodore", "Commodore 900", MACHINE_IS_SKELETON )

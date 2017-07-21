@@ -39,6 +39,8 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "screen.h"
+
 
 class ibm3153_state : public driver_device
 {
@@ -46,14 +48,16 @@ public:
 	ibm3153_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-	{ }
+		, m_p_chargen(*this, "chargen")
+		{ }
 
-	const uint8_t *m_p_chargen;
 	DECLARE_PALETTE_INIT(ibm3153);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -87,10 +91,9 @@ PALETTE_INIT_MEMBER( ibm3153_state, ibm3153 )
 
 void ibm3153_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
-static MACHINE_CONFIG_START( ibm3153, ibm3153_state )
+static MACHINE_CONFIG_START( ibm3153 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_16MHz) // no idea of clock
 	MCFG_CPU_PROGRAM_MAP(ibm3153_mem)
@@ -120,5 +123,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY            FULLNAME       FLAGS */
-COMP( 1999?, ibm3153, 0,      0,       ibm3153,  ibm3153, driver_device,  0,  "IBM", "IBM 3153 Terminal", MACHINE_IS_SKELETON)
+//    YEAR   NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY  FULLNAME             FLAGS
+COMP( 1999?, ibm3153, 0,      0,       ibm3153,  ibm3153, ibm3153_state, 0,    "IBM",   "IBM 3153 Terminal", MACHINE_IS_SKELETON)

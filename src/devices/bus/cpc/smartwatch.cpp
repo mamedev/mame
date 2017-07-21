@@ -11,25 +11,19 @@
 
 #include "emu.h"
 #include "smartwatch.h"
-#include "includes/amstrad.h"
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_SMARTWATCH = &device_creator<cpc_smartwatch_device>;
+DEFINE_DEVICE_TYPE(CPC_SMARTWATCH, cpc_smartwatch_device, "cpc_smartwatch", "Dobbertin Smartwatch")
 
 
-static MACHINE_CONFIG_FRAGMENT( cpc_smartwatch )
+MACHINE_CONFIG_MEMBER( cpc_smartwatch_device::device_add_mconfig )
 	MCFG_DS1315_ADD("rtc")
 	// no pass-through (?)
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_smartwatch_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_smartwatch );
-}
 
 ROM_START( cpc_smartwatch )
 	ROM_REGION( 0x4000, "exp_rom", 0 )
@@ -46,7 +40,7 @@ const tiny_rom_entry *cpc_smartwatch_device::device_rom_region() const
 //**************************************************************************
 
 cpc_smartwatch_device::cpc_smartwatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_SMARTWATCH, "Dobbertin Smartwatch", tag, owner, clock, "cpc_smartwatch", __FILE__),
+	device_t(mconfig, CPC_SMARTWATCH, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_rtc(*this,"rtc"), m_bank(nullptr)
 {

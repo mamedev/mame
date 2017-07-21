@@ -3,6 +3,14 @@
 /*
  * geforce 3d (NV2A) vertex program disassembler
  */
+#ifndef MAME_INCLUDES_XBOX_NV2A_H
+#define MAME_INCLUDES_XBOX_NV2A_H
+
+#pragma once
+
+#include "machine/pic8259.h"
+#include "video/poly.h"
+
 #include <mutex>
 
 class vertex_program_disassembler {
@@ -108,7 +116,7 @@ public:
 		{
 			union
 			{
-				uint32_t i; 
+				uint32_t i;
 				float f;
 			} cnv;
 
@@ -447,10 +455,10 @@ public:
 	}
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);
-	void vblank_callback(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
-	void set_interrupt_device(pic8259_device *device);
+	void set_irq_callbaclk(std::function<void(int state)> callback) { irq_callback = callback; }
 
 	void render_texture_simple(int32_t scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
 	void render_color(int32_t scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
@@ -501,8 +509,7 @@ public:
 	void compute_size_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void extract_packed_float(uint32_t data, float &first, float &second, float &third);
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
-	int read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit);
-	int read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit);
+	int read_vertices_0x180x(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
@@ -533,7 +540,7 @@ public:
 	uint32_t dma_size[2];
 	uint8_t *basemempointer;
 	uint8_t *topmempointer;
-	pic8259_device *interruptdevice;
+	std::function<void(int state)> irq_callback;
 	rectangle clippingwindows[8];
 	rectangle limits_rendertarget;
 	uint32_t pitch_rendertarget;
@@ -589,7 +596,7 @@ public:
 	uint32_t primitives_total_count;
 	int indexesleft_count;
 	int indexesleft_first;
-	uint32_t indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
+	uint32_t vertex_indexes[1024]; // vertex indices sent by the software to the 3d accelerator
 	int vertex_count;
 	unsigned int vertex_first;
 	int vertex_accumulated;
@@ -758,3 +765,5 @@ public:
 	bool enable_waitvblank;
 	bool enable_clipping_w;
 };
+
+#endif // MAME_INCLUDES_XBOX_NV2A_H

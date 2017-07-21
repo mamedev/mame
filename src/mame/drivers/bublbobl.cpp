@@ -261,7 +261,6 @@ TODO:
     internal timers (similar to the HD63701). I've just mapped the I/O ports since
     that's the only thing required for normal operation, but the program does
     use some of the additional features in its special "test" mode.
-- tokio: doesn't work due to missing MC68705 MCU protection emulation.
 - tokio: sound support is probably incomplete. There are a couple of unknown
   accesses done by the CPU, including to the YM2203 I/O ports. At the
   very least, there should be some filters.
@@ -274,13 +273,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bublbobl.h"
+
+#include "cpu/m6800/m6801.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "cpu/m6805/m6805.h"
-#include "includes/bublbobl.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_XTAL   XTAL_24MHz
@@ -335,19 +336,6 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-// The 68705 is from a bootleg, the original MCU is a 6801U4
-static ADDRESS_MAP_START( bootlegmcu_map, AS_PROGRAM, 8, bublbobl_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x000, 0x000) AM_READWRITE(bublbobl_68705_port_a_r, bublbobl_68705_port_a_w)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(bublbobl_68705_port_b_r, bublbobl_68705_port_b_w)
-	AM_RANGE(0x002, 0x002) AM_READ_PORT("IN0")  // COIN
-	AM_RANGE(0x004, 0x004) AM_WRITE(bublbobl_68705_ddr_a_w)
-	AM_RANGE(0x005, 0x005) AM_WRITE(bublbobl_68705_ddr_b_w)
-	AM_RANGE(0x006, 0x006) AM_WRITENOP // ???
-	AM_RANGE(0x010, 0x07f) AM_RAM
-	AM_RANGE(0x080, 0x7ff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -393,7 +381,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map_mcu, AS_PROGRAM, 8, bublbobl_state )
 	AM_IMPORT_FROM(tokio_map)
-	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map_bootleg, AS_PROGRAM, 8, bublbobl_state )
@@ -486,22 +474,22 @@ static INPUT_PORTS_START( bublbobl )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy down, present on connector and readable
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy up, present on connector and readable
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tied to +5v
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy 2 down, present on connector and readable
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // joy 2 up, present on connector and readable
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tied to +5v
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( boblbobl )
@@ -709,8 +697,58 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, main_sent_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_sent_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r, nullptr)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bublboblp )
+	PORT_INCLUDE( tokio_base )
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW A:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW A:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW A:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW A:5,6")
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW A:7,8")
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW-B:1,2") // code is present to read this and look up a table per level, but unclear if it actually works
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW-B:3,4")
+	PORT_DIPSETTING(    0x08, "20K 80K 300K" )
+	PORT_DIPSETTING(    0x0c, "30K 100K 400K" )
+	PORT_DIPSETTING(    0x04, "40K 200K 500K" )
+	PORT_DIPSETTING(    0x00, "50K 250K 500K" )
+	// then more bonus lives at 1M 2M 3M 4M 5M - for all dip switch settings
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW-B:5,6")
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0x40, 0x40, "Edit Mode" )                 PORT_DIPLOCATION("DSW-B:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW-B:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*************************************
@@ -770,7 +808,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 
 
 
-static MACHINE_CONFIG_START( tokio, bublbobl_state )
+static MACHINE_CONFIG_START( tokio )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
@@ -818,7 +856,7 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tokiob, tokio )
-	
+
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_DEVICE_REMOVE("bmcu")
 
@@ -865,7 +903,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 	m_port4_out = 0;
 }
 
-static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
+static MACHINE_CONFIG_START( bublbobl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
@@ -945,30 +983,23 @@ static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(bublbobl_state,bub68705)
+MACHINE_START_MEMBER(bub68705_state, bub68705)
 {
 	MACHINE_START_CALL_MEMBER(common);
 
-	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
 	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
 	save_item(NAME(m_address));
 	save_item(NAME(m_latch));
+
+	m_port_a_out = 0xff;
+	m_port_b_out = 0xff;
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,bub68705)
+MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
 	m_address = 0;
 	m_latch = 0;
 }
@@ -978,12 +1009,14 @@ static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("mcu")
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
-	MCFG_CPU_PROGRAM_MAP(bootlegmcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
+	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
+	MCFG_M68705_PORTA_W_CB(WRITE8(bub68705_state, port_a_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(bub68705_state, port_b_w))
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,bub68705)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,bub68705)
+	MCFG_MACHINE_START_OVERRIDE(bub68705_state, bub68705)
+	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)
 MACHINE_CONFIG_END
 
 
@@ -1159,6 +1192,51 @@ ROM_START( tokiob )
 	ROM_LOAD( "a71-25.ic41",  0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing, on gfx board */
 ROM_END
 
+/*
+   Bubble Bobble prototype on Tokio hardware
+   14.MAY,1986VER 0.0
+ */
+ROM_START( bublboblp )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* main CPU */
+	ROM_LOAD( "maincpu.ic4",   0x00000, 0x8000, CRC(874ddd6c) SHA1(30efef29558c7b2336ec8ab44686e32382d2045a) ) // blank label, under epoxy
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "maincpu.ic5",   0x10000, 0x8000, CRC(588cc602) SHA1(83c83ddace2fddbe16e4fbf8cbdbbb3140ac8192) ) // blank label, under epoxy
+	// ic6 socket is empty, under epoxy
+	// ic7 socket is empty, under epoxy
+	// ic8 socket is empty, under epoxy
+
+	ROM_REGION( 0x10000, "slave", 0 )   /* video CPU */
+	ROM_LOAD( "slave.ic1",   0x00000, 0x8000, CRC(e8187e8f) SHA1(74b0442c61fe7f745ce0014bd5b7948783a323bd) ) // blank label, under epoxy
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* audio CPU */
+	ROM_LOAD( "audiocpu.ic10",  0x0000, 0x08000, CRC(c516c26e) SHA1(8cdeff2b8bb21d8c118f48e43b567a4e5b5e7184) ) // blank label, under epoxy
+
+	// mcu socket is empty
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
+	ROM_LOAD( "c1.ic12",  0x00000, 0x8000, CRC(183d378b) SHA1(e07599212af5d822ed1cb9eba8ca3fc01f13cbe0) )    /* 1st plane */
+	ROM_LOAD( "c3.ic13",  0x08000, 0x8000, CRC(55408ff9) SHA1(1337eaa9f7189ac3192ef7c631a1460b5e02a820) )
+	ROM_LOAD( "c5.ic14",  0x10000, 0x8000, CRC(12cc5949) SHA1(840042304e32125448507b0396ebd8734ea78016) )
+	ROM_LOAD( "c7.ic15",  0x18000, 0x8000, CRC(10e24f35) SHA1(fce643c8aa1838309d82929717fea39d4d6fbd11) )
+	ROM_LOAD( "c9.ic16",  0x20000, 0x8000, CRC(dec95961) SHA1(9f8b84035a85fc3325926c87d7908dedfbe4e80d) )
+	ROM_LOAD( "c11.ic17", 0x28000, 0x8000, CRC(1c49d228) SHA1(3ea40bf82bc42d0ddb8b613e3012fa334a755272) )
+	// ic18 socket is empty
+	// ic19 socket is empty
+	ROM_LOAD( "c0.ic30",  0x40000, 0x8000, CRC(39d0ce8f) SHA1(05d77d2c8ea083851fc5652fe6e4da9645c533e6) )    /* 2nd plane */
+	ROM_LOAD( "c2.ic31",  0x48000, 0x8000, CRC(f705a512) SHA1(b598899b80ab28b1e487325f088fca0ba7994b19) )
+	ROM_LOAD( "c4.ic32",  0x50000, 0x8000, CRC(151df0eb) SHA1(51071fbca7af66cfabd0ab963c385682fd402213) )
+	ROM_LOAD( "c6.ic33",  0x58000, 0x8000, CRC(7b737c1e) SHA1(ae1bf563e1772d4ab50ee52aaacb1a7236f1e4e1) )
+	ROM_LOAD( "c8.ic34",  0x60000, 0x8000, CRC(1320e15d) SHA1(b5da80bc27c053353c701f523f89f704c11c24e9) )
+	ROM_LOAD( "c10.ic35", 0x68000, 0x8000, CRC(29c41387) SHA1(6f7b433a82e34b9daf5ce3f9a28061c64db061f6) )
+	// ic36 socket is empty
+	// ic37 socket is empty
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.ic41",  0x0000, 0x0100, BAD_DUMP CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing, on gfx board */ // NEEDS DUMPING, temporarily copied from tokio for now
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "bublboblp.pal16l8.ic19",  0x0000, 0x0117, CRC(4e1f119c) SHA1(0ac8eb2fdb202951e5f7145f92dfd10fe96b294b) ) // under epoxy; unlabeled, but equations are identical to tokio a71-26.ic19. fusemap was not dumped.
+ROM_END
 
 /*
 
@@ -1903,31 +1981,31 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
  *
  *************************************/
 
-GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, tokio,    ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, tokio,    ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)", MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
-GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, tokiob,   bublboblp,  bublbobl_state, tokio,    ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
+GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, bublbobl, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bubble Bobble (bootleg)", MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
-GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, bublbobl, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
+GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bub68705_state, bublbobl, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, dland,      bublbobl, boblbobl, dland,      bublbobl_state, dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2013, bbredux,    bublbobl, boblbobl, boblbobl, bublbobl_state, bublbobl, ROT0, "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
-GAME( 2013, bublboblb,  bublbobl, boblbobl, boblcave, bublbobl_state, bublbobl, ROT0, "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
+GAME( 2013, bbredux,    bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
+GAME( 2013, bublboblb,  bublbobl, boblbobl, boblcave,   bublbobl_state, bublbobl, ROT0,  "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)",                      MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
 
-GAME( 2013, bublcave,   bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2", MACHINE_SUPPORTS_SAVE )
-GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
-
-GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0", MACHINE_SUPPORTS_SAVE )
+GAME( 2013, bublcave,   bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0",                         MACHINE_SUPPORTS_SAVE )

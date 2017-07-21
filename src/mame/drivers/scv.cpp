@@ -11,7 +11,9 @@
 #include "sound/upd1771.h"
 #include "bus/scv/slot.h"
 #include "bus/scv/rom.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 class scv_state : public driver_device
@@ -73,13 +75,6 @@ static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
 
 	AM_RANGE( 0x8000, 0xff7f ) AM_DEVREADWRITE("cartslot", scv_cart_slot_device, read_cart, write_cart) // cartridge
 	AM_RANGE( 0xff80, 0xffff ) AM_RAM   // upd7801 internal RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( scv_io, AS_IO, 8, scv_state )
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(porta_w)
-	AM_RANGE( 0x01, 0x01 ) AM_READ(portb_r)
-	AM_RANGE( 0x02, 0x02 ) AM_READWRITE(portc_r, portc_w)
 ADDRESS_MAP_END
 
 
@@ -656,11 +651,14 @@ static SLOT_INTERFACE_START(scv_cart)
 	SLOT_INTERFACE_INTERNAL("rom128k_ram", SCV_ROM128K_RAM4K)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( scv, scv_state )
+static MACHINE_CONFIG_START( scv )
 
 	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP( scv_mem )
-	MCFG_CPU_IO_MAP( scv_io )
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(scv_state, porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(scv_state, portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(scv_state, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(scv_state, portc_w))
 
 	/* Video chip is EPOCH TV-1 */
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -714,6 +712,6 @@ ROM_START( scv_pal )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY  FULLNAME                 FLAGS */
-CONS( 1984, scv,     0,      0,      scv,     scv, driver_device,   0,      "Epoch", "Super Cassette Vision", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, scv_pal, scv,    0,      scv_pal, scv, driver_device,   0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                       FLAGS */
+CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, 0,      "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, 0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

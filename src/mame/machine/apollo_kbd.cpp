@@ -10,10 +10,12 @@
  *
  */
 
+#include "emu.h"
+
 #define VERBOSE 0
 
 #include "machine/apollo_kbd.h"
-#include "sound/beep.h"
+
 
 #define LOG(x)  { m_device->logerror ("%s apollo_kbd: ", m_device->cpu_context()); m_device->logerror x; m_device->logerror ("\n"); }
 #define LOG1(x) { if (VERBOSE > 0) LOG(x)}
@@ -24,8 +26,6 @@
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
-
-//const device_type APOLLO_KBD = apollo_kbd_device_config::static_alloc_device_config;
 
 //**************************************************************************
 //  CONSTANTS
@@ -55,14 +55,14 @@
 ***************************************************************************/
 
 // device type definition
-const device_type APOLLO_KBD = &device_creator<apollo_kbd_device>;
+DEFINE_DEVICE_TYPE(APOLLO_KBD, apollo_kbd_device, "apollo_kbd", "Apollo Keyboard")
 
 //-------------------------------------------------
 // apollo_kbd_device - constructor
 //-------------------------------------------------
 
 apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock, "apollo_kbd", __FILE__),
+	: device_t(mconfig, APOLLO_KBD, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_tx_w(*this),
 	m_german_r(*this)
@@ -125,11 +125,6 @@ void apollo_kbd_device::device_reset()
 
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
-}
-
-void apollo_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 /***************************************************************************

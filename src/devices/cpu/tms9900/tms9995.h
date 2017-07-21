@@ -7,16 +7,17 @@
   Also see tms9900.h for types of TMS99xx processors.
 */
 
-#ifndef __TMS9995_H__
-#define __TMS9995_H__
+#ifndef MAME_CPU_TMS9995_TMS9995_H
+#define MAME_CPU_TMS9995_TMS9995_H
 
-#include "emu.h"
+#pragma once
+
 #include "debugger.h"
 #include "tms99com.h"
 
 // device type definition
-extern const device_type TMS9995;
-extern const device_type TMS9995_MP9537;
+DECLARE_DEVICE_TYPE(TMS9995, tms9995_device)
+DECLARE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device)
 
 enum
 {
@@ -49,7 +50,6 @@ class tms9995_device : public cpu_device
 {
 public:
 	tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms9995_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	// We chose to use a direct method instead of a delegate to keep performance
@@ -79,6 +79,8 @@ public:
 	void set_overflow_interrupt( int enable ) { m_check_overflow = (enable!=0); }
 
 protected:
+	tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void        device_start() override;
 	virtual void        device_stop() override;
@@ -96,7 +98,7 @@ protected:
 	virtual uint32_t      disasm_max_opcode_bytes() const override;
 	virtual offs_t      disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return clocks / 4.0; }
 	uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * 4.0; }
@@ -439,10 +441,10 @@ class tms9995_mp9537_device : public tms9995_device
 {
 public:
 	tms9995_mp9537_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9995_device(mconfig, TMS9995_MP9537, "TMS9995-MP9537", tag, owner, clock, "tms9995_mp9537", __FILE__)
+		: tms9995_device(mconfig, TMS9995_MP9537, tag, owner, clock)
 	{
 		m_mp9537 = true;
 	}
 };
 
-#endif /* __TMS9995_H__ */
+#endif // MAME_CPU_TMS9995_TMS9995_H

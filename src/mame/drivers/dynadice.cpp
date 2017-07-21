@@ -34,11 +34,13 @@ dy_6.bin (near Z80)
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/ay8910.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class dynadice_state : public driver_device
@@ -236,7 +238,7 @@ void dynadice_state::machine_reset()
 	m_ay_data = 0;
 }
 
-static MACHINE_CONFIG_START( dynadice, dynadice_state )
+static MACHINE_CONFIG_START( dynadice )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080,18432000/8)

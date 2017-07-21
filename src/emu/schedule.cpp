@@ -299,7 +299,10 @@ void emu_timer::dump() const
 {
 	machine().logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_ptr);
 	if (m_device == nullptr)
-		machine().logerror(" cb=%s\n", m_callback.name());
+		if (m_callback.name() == nullptr)
+			machine().logerror(" cb=NULL\n");
+		else
+			machine().logerror(" cb=%s\n", m_callback.name());
 	else
 		machine().logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
 }
@@ -495,7 +498,15 @@ void device_scheduler::timeslice()
 					exec->m_totalcycles += ran;
 
 					// update the local time for this CPU
-					attotime deltatime(0, exec->m_attoseconds_per_cycle * ran);
+					attotime deltatime;
+					if (ran < exec->m_cycles_per_second)
+						deltatime = attotime(0, exec->m_attoseconds_per_cycle * ran);
+					else
+					{
+						u32 remainder;
+						s32 secs = divu_64x32_rem(ran, exec->m_cycles_per_second, &remainder);
+						deltatime = attotime(secs, u64(remainder) * exec->m_attoseconds_per_cycle);
+					}
 					assert(deltatime >= attotime::zero);
 					exec->m_localtime += deltatime;
 					LOG(("         %d ran, %d total, time = %s\n", ran, s32(exec->m_totalcycles), exec->m_localtime.as_string(PRECISION)));
@@ -503,7 +514,7 @@ void device_scheduler::timeslice()
 					// if the new local CPU time is less than our target, move the target up, but not before the base
 					if (exec->m_localtime < target)
 					{
-						target = max(exec->m_localtime, m_basetime);
+						target = std::max(exec->m_localtime, m_basetime);
 						LOG(("         (new target)\n"));
 					}
 				}
@@ -587,18 +598,6 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback, void *
 void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param, void *ptr)
 {
 	m_timer_allocator.alloc()->init(machine(), callback, ptr, true).adjust(duration, param);
-}
-
-
-//-------------------------------------------------
-//  timer_pulse - allocate an anonymous non-device
-//  timer and set it to go off at the given
-//  frequency
-//-------------------------------------------------
-
-void device_scheduler::timer_pulse(const attotime &period, timer_expired_delegate callback, int param, void *ptr)
-{
-	m_timer_allocator.alloc()->init(machine(), callback, ptr, false).adjust(period, param, period);
 }
 
 
@@ -767,11 +766,11 @@ void device_scheduler::rebuild_execute_list()
 			if (!device->interface(exec))
 				fatalerror("Device '%s' specified for perfect interleave is not an executing device!\n", machine().config().m_perfect_cpu_quantum.c_str());
 
-			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
+			min_quantum = std::min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}
 
 		// make sure it's no higher than 60Hz
-		min_quantum = min(min_quantum, attotime::from_hz(60));
+		min_quantum = std::min(min_quantum, attotime::from_hz(60));
 
 		// inform the timer system of our decision
 		add_scheduling_quantum(min_quantum, attotime::never);
@@ -960,7 +959,7 @@ void device_scheduler::add_scheduling_quantum(const attotime &quantum, const att
 
 	// if we found an exact match, just take the maximum expiry time
 	if (insert_after != nullptr && insert_after->m_requested == quantum_attos)
-		insert_after->m_expire = max(insert_after->m_expire, expire);
+		insert_after->m_expire = std::max(insert_after->m_expire, expire);
 
 	// otherwise, allocate a new quantum and insert it after the one we picked
 	else

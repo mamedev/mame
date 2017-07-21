@@ -81,9 +81,10 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
-#include "video/tms9928a.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
@@ -338,7 +339,7 @@ void pachifev_state::machine_start()
 	save_item(NAME(m_cnt));
 }
 
-static MACHINE_CONFIG_START( pachifev, pachifev_state )
+static MACHINE_CONFIG_START( pachifev )
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, pachifev_map, pachifev_cru)
@@ -379,4 +380,4 @@ ROM_START( pachifev )
 
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev, driver_device,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

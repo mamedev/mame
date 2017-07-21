@@ -11,9 +11,9 @@
 #define NL_CONVERT_H_
 
 #include <memory>
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#include "plib/pparser.h"
+#include "../plib/pstring.h"
+#include "../plib/plists.h"
+#include "../plib/pparser.h"
 
 /*-------------------------------------------------
     convert - convert a spice netlist
@@ -23,14 +23,14 @@ class nl_convert_base_t
 {
 public:
 
-	nl_convert_base_t();
 	virtual ~nl_convert_base_t();
 
-	const pstringbuffer &result() { return m_buf.str(); }
+	const pstring &result() { return m_buf.str(); }
 
 	virtual void convert(const pstring &contents) = 0;
 
 protected:
+	nl_convert_base_t();
 
 	void add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias);
 
@@ -49,24 +49,24 @@ protected:
 
 	double get_sp_val(const pstring &sin);
 
-	plib::pstream_fmt_writer_t out;
+	plib::putf8_fmt_writer out;
 private:
 
 	struct net_t
 	{
 	public:
-		net_t(const pstring &aname)
+		explicit net_t(const pstring &aname)
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
-		plib::pstring_vector_t &terminals() { return m_terminals; }
+		std::vector<pstring> &terminals() { return m_terminals; }
 		void set_no_export() { m_no_export = true; }
 		bool is_no_export() { return m_no_export; }
 
 	private:
 		pstring m_name;
 		bool m_no_export;
-		plib::pstring_vector_t m_terminals;
+		std::vector<pstring> m_terminals;
 	};
 
 	struct dev_t
@@ -101,8 +101,8 @@ private:
 	};
 
 	struct unit_t {
-		pstring m_unit;
-		pstring m_func;
+		const char *m_unit;
+		const char *m_func;
 		double m_mult;
 	};
 
@@ -140,7 +140,7 @@ class nl_convert_spice_t : public nl_convert_base_t
 public:
 
 	nl_convert_spice_t() : nl_convert_base_t() {}
-	~nl_convert_spice_t()
+	virtual ~nl_convert_spice_t() override
 	{
 	}
 
@@ -159,14 +159,14 @@ class nl_convert_eagle_t : public nl_convert_base_t
 public:
 
 	nl_convert_eagle_t() : nl_convert_base_t() {}
-	~nl_convert_eagle_t()
+	virtual ~nl_convert_eagle_t() override
 	{
 	}
 
 	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		tokenizer(nl_convert_eagle_t &convert, plib::pistream &strm);
+		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &strm);
 
 		token_id_t m_tok_ADD;
 		token_id_t m_tok_VALUE;
@@ -195,14 +195,14 @@ class nl_convert_rinf_t : public nl_convert_base_t
 public:
 
 	nl_convert_rinf_t() : nl_convert_base_t() {}
-	~nl_convert_rinf_t()
+	virtual ~nl_convert_rinf_t() override
 	{
 	}
 
 	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		tokenizer(nl_convert_rinf_t &convert, plib::pistream &strm);
+		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &strm);
 
 		token_id_t m_tok_HEA;
 		token_id_t m_tok_APP;

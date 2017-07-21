@@ -30,10 +30,14 @@ EEPROM chip: 93C46
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eepromser.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/saa1099.h"
 #include "includes/xorworld.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
+#include "sound/saa1099.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /****************************************************************
@@ -79,8 +83,7 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
 	AM_RANGE(0xa0000a, 0xa0000b) AM_WRITE(eeprom_serial_clock_w)
 	AM_RANGE(0xa0000c, 0xa0000d) AM_WRITE(eeprom_data_w)
@@ -167,7 +170,7 @@ static GFXDECODE_START( xorworld )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( xorworld, xorworld_state )
+static MACHINE_CONFIG_START( xorworld )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   // 10 MHz
 	MCFG_CPU_PROGRAM_MAP(xorworld_map)

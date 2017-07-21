@@ -1,19 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * ddi1.c  --  Amstrad DDI-1 Floppy Disk Drive interface
+ * ddi1.cpp  --  Amstrad DDI-1 Floppy Disk Drive interface
  */
 
 #include "emu.h"
 #include "ddi1.h"
-#include "includes/amstrad.h"
 #include "softlist.h"
+
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_DDI1 = &device_creator<cpc_ddi1_device>;
+DEFINE_DEVICE_TYPE(CPC_DDI1, cpc_ddi1_device, "cpc_ddi1", "Amstrad DDI-1")
 
 static SLOT_INTERFACE_START( ddi1_floppies )
 	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
@@ -38,7 +39,7 @@ const tiny_rom_entry *cpc_ddi1_device::device_rom_region() const
 }
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_ddi1 )
+MACHINE_CONFIG_MEMBER( cpc_ddi1_device::device_add_mconfig )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
@@ -52,17 +53,13 @@ static MACHINE_CONFIG_FRAGMENT( cpc_ddi1 )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_ddi1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_ddi1 );
-}
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_DDI1, "DDI-1", tag, owner, clock, "cpc_ddi1", __FILE__),
+	device_t(mconfig, CPC_DDI1, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_fdc(*this,"upd765"),
 	m_connector(*this,"upd765:0"), m_rom_active(false), m_romen(false)

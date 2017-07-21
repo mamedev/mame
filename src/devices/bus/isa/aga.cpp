@@ -5,6 +5,7 @@
  * aga.c
  *
  ****************************************************************************/
+#include "emu.h"
 #include "aga.h"
 #include "video/cgapal.h"
 
@@ -50,49 +51,36 @@ INPUT_PORTS_END
 #define CGA_MONITOR     (m_cga_config->read()&0x1C)
 #define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
 
-const device_type ISA8_AGA = &device_creator<isa8_aga_device>;
+DEFINE_DEVICE_TYPE(ISA8_AGA, isa8_aga_device, "aga", "AGA")
 
 //-------------------------------------------------
 //  isa8_aga_device - constructor
 //-------------------------------------------------
 
 isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t( mconfig, ISA8_AGA, "AGA", tag, owner, clock, "aga", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_palette(*this, "palette"),
-		m_mc6845(*this, AGA_MC6845_NAME),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1),
-		m_mode(),
-		m_mda_mode_control(0),
-		m_mda_status(0),
-		m_mda_chr_gen(nullptr),
-		m_cga_mode_control(0),
-		m_cga_color_select(0),
-		m_cga_status(0),
-		m_cga_chr_gen(nullptr),
-		m_framecnt(0),
-		m_vsync(0),
-		m_hsync(0),
-		m_videoram(nullptr)
+	isa8_aga_device(mconfig, ISA8_AGA, tag, owner, clock)
 {
 }
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this),
-		m_palette(*this, "palette"),
-		m_mc6845(*this, AGA_MC6845_NAME),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1), m_mode(),
-		m_mda_mode_control(0),
-		m_mda_status(0), m_mda_chr_gen(nullptr),
-		m_cga_mode_control(0),
-		m_cga_color_select(0),
-		m_cga_status(0), m_cga_chr_gen(nullptr),
-		m_framecnt(0),
-		m_vsync(0),
-		m_hsync(0), m_videoram(nullptr)
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_palette(*this, "palette"),
+	m_mc6845(*this, AGA_MC6845_NAME),
+	m_cga_config(*this, "cga_config"),
+	m_update_row_type(-1),
+	m_mode(),
+	m_mda_mode_control(0),
+	m_mda_status(0),
+	m_mda_chr_gen(nullptr),
+	m_cga_mode_control(0),
+	m_cga_color_select(0),
+	m_cga_status(0),
+	m_cga_chr_gen(nullptr),
+	m_framecnt(0),
+	m_vsync(0),
+	m_hsync(0),
+	m_videoram(nullptr)
 {
 }
 //-------------------------------------------------
@@ -158,17 +146,17 @@ ioport_constructor isa8_aga_device::device_input_ports() const
 
 
 
-const device_type ISA8_AGA_PC200 = &device_creator<isa8_aga_pc200_device>;
+DEFINE_DEVICE_TYPE(ISA8_AGA_PC200, isa8_aga_pc200_device, "aga_pc200", "AGA PC200")
 
 //-------------------------------------------------
 //  isa8_aga_pc200_device - constructor
 //-------------------------------------------------
 
 isa8_aga_pc200_device::isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_aga_device( mconfig, ISA8_AGA_PC200, "AGA PC200", tag, owner, clock, "aga_pc200", __FILE__),
-		m_port8(0),
-		m_portd(0),
-		m_porte(0)
+	isa8_aga_device(mconfig, ISA8_AGA_PC200, tag, owner, clock),
+	m_port8(0),
+	m_portd(0),
+	m_porte(0)
 {
 }
 
@@ -285,7 +273,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::aga_update_row )
 }
 
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
+MACHINE_CONFIG_MEMBER( isa8_aga_device::device_add_mconfig )
 	MCFG_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz,912,0,640,262,0,200 )
 	MCFG_SCREEN_UPDATE_DEVICE( AGA_MC6845_NAME, mc6845_device, screen_update )
@@ -300,10 +288,6 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_aga_device, vsync_changed))
 MACHINE_CONFIG_END
 
-machine_config_constructor isa8_aga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_aga );
-}
 
 /*************************************
  *

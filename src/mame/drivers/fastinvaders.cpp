@@ -11,12 +11,13 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 
+#include "cpu/i8085/i8085.h"
+#include "machine/i8257.h"
+#include "machine/pic8259.h"
 #include "video/i8275.h"
 #include "video/mc6845.h"
-#include "machine/pic8259.h"
-#include "machine/i8257.h"
+#include "screen.h"
 
 
 class fastinvaders_state : public driver_device
@@ -629,7 +630,7 @@ static GFXDECODE_START( fastinvaders )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( fastinvaders, fastinvaders_state )
+static MACHINE_CONFIG_START( fastinvaders )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
@@ -776,6 +777,6 @@ ROM_START( fi6845 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
 ROM_END
 
-/*   YEAR  NAME    PARENT   MACHINE             INPUT       STATE          INIT    ROT     COMPANY              FULLNAME                                    FLAGS*/
+//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT    ROT     COMPANY       FULLNAME                        FLAGS
 GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state,fi6845,     ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

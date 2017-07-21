@@ -56,9 +56,12 @@ To load and play a game:
 */
 
 #include "emu.h"
-#include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
+
+#include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
+#include "screen.h"
+
 
 /*
  *
@@ -683,15 +686,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_READTAPE = &device_creator<pdp1_readtape_image_device>;
+DEFINE_DEVICE_TYPE(PDP1_READTAPE, pdp1_readtape_image_device, "pdp1_readtape_image", "PDP1 Tape Reader")
 
 pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_READTAPE, "PDP1 Tape Reader", tag, owner, clock, "pdp1_readtape_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, PDP1_READTAPE, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -716,15 +718,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_PUNCHTAPE = &device_creator<pdp1_punchtape_image_device>;
+DEFINE_DEVICE_TYPE(PDP1_PUNCHTAPE, pdp1_punchtape_image_device, "pdp1_punchtape_image_device", "PDP1 Tape Puncher")
 
 pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_PUNCHTAPE, "PDP1 Tape Puncher", tag, owner, clock, "pdp1_punchtape_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, PDP1_PUNCHTAPE, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -750,15 +751,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_PRINTER = &device_creator<pdp1_printer_image_device>;
+DEFINE_DEVICE_TYPE(PDP1_PRINTER, pdp1_printer_image_device, "pdp1_printer_image", "PDP1 Typewriter")
 
 pdp1_printer_image_device::pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_PRINTER, "PDP1 Typewriter", tag, owner, clock, "pdp1_printer_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, PDP1_PRINTER, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -783,15 +783,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_CYLINDER = &device_creator<pdp1_cylinder_image_device>;
+DEFINE_DEVICE_TYPE(PDP1_CYLINDER, pdp1_cylinder_image_device, "pdp1_cylinder_image", "PDP1 Cylinder")
 
 pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_CYLINDER, "PDP1 Cylinder", tag, owner, clock, "pdp1_cylinder_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, PDP1_CYLINDER, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -1833,7 +1832,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));
-			m_maincpu->set_state_int(PDP1_IR, LAC); /* this instruction is actually executed */
+			m_maincpu->set_state_int(PDP1_IR, pdp1_device::LAC); /* this instruction is actually executed */
 
 			m_maincpu->set_state_int(PDP1_MB, (signed)m_maincpu->space(AS_PROGRAM).read_dword(PDP1_MA<<2));
 			m_maincpu->set_state_int(PDP1_AC, m_maincpu->state_int(PDP1_MB));
@@ -1844,7 +1843,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));
 			m_maincpu->set_state_int(PDP1_AC, m_maincpu->state_int(PDP1_TW));
-			m_maincpu->set_state_int(PDP1_IR, DAC); /* this instruction is actually executed */
+			m_maincpu->set_state_int(PDP1_IR, pdp1_device::DAC); /* this instruction is actually executed */
 
 			m_maincpu->set_state_int(PDP1_MB, m_maincpu->state_int(PDP1_AC));
 			m_maincpu->space(AS_PROGRAM).write_dword(m_maincpu->state_int(PDP1_MA)<<2, m_maincpu->state_int(PDP1_MB));
@@ -1918,7 +1917,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( pdp1, pdp1_state )
+static MACHINE_CONFIG_START( pdp1 )
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
@@ -1934,7 +1933,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pdp1_state, screen_update_pdp1)
-	MCFG_SCREEN_VBLANK_DRIVER(pdp1_state, screen_eof_pdp1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pdp1_state, screen_vblank_pdp1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crt", CRT, 0)
@@ -1967,5 +1966,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT    COMPANY                        FULLNAME */
-COMP( 1961, pdp1,     0,        0,      pdp1,     pdp1, driver_device,  0,  "Digital Equipment Corporation",  "PDP-1" , MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS        INIT  COMPANY                           FULLNAME  FLAGS
+COMP( 1961, pdp1,     0,        0,      pdp1,     pdp1, pdp1_state,  0,    "Digital Equipment Corporation",  "PDP-1",  MACHINE_NO_SOUND_HW )

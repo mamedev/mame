@@ -10,7 +10,9 @@
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/pet/cass.h"
 #include "bus/vic10/exp.h"
 #include "bus/vcs_ctrl/ctrl.h"
@@ -248,7 +250,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, vic10_state )
+static ADDRESS_MAP_START( vic_videoram_map, 0, 8, vic10_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -257,7 +259,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, vic10_state )
+static ADDRESS_MAP_START( vic_colorram_map, 1, 8, vic10_state )
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -686,7 +688,7 @@ void vic10_state::machine_reset()
 //  MACHINE_CONFIG( vic10 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic10, vic10_state )
+static MACHINE_CONFIG_START( vic10 )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_8MHz/8)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
@@ -700,8 +702,8 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_MOS6566_CPU(M6510_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(vic10_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, vic_colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
@@ -759,4 +761,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1982, vic10,      0,    0,    vic10, vic10, driver_device,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, vic10,      0,    0,    vic10, vic10, vic10_state,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )

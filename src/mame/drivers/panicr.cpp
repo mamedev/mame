@@ -61,9 +61,12 @@ D.9B         [f99cac4b] /
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/nec/nec.h"
 #include "audio/t5182.h"
+
+#include "cpu/nec/nec.h"
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class panicr_state : public driver_device
@@ -602,7 +605,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
-static MACHINE_CONFIG_START( panicr, panicr_state )
+static MACHINE_CONFIG_START( panicr )
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_CPU_PROGRAM_MAP(panicr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)

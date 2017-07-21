@@ -9,7 +9,7 @@
 
 void aabbToObb(Obb& _obb, const Aabb& _aabb)
 {
-	memset(_obb.m_mtx, 0, sizeof(_obb.m_mtx) );
+	bx::memSet(_obb.m_mtx, 0, sizeof(_obb.m_mtx) );
 	_obb.m_mtx[ 0] = (_aabb.m_max[0] - _aabb.m_min[0]) * 0.5f;
 	_obb.m_mtx[ 5] = (_aabb.m_max[1] - _aabb.m_min[1]) * 0.5f;
 	_obb.m_mtx[10] = (_aabb.m_max[2] - _aabb.m_min[2]) * 0.5f;
@@ -91,7 +91,7 @@ void aabbTransformToObb(Obb& _obb, const Aabb& _aabb, const float* _mtx)
 	aabbToObb(_obb, _aabb);
 	float result[16];
 	bx::mtxMul(result, _obb.m_mtx, _mtx);
-	memcpy(_obb.m_mtx, result, sizeof(result) );
+	bx::memCopy(_obb.m_mtx, result, sizeof(result) );
 }
 
 void toAabb(Aabb& _aabb, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
@@ -182,6 +182,12 @@ void aabbExpand(Aabb& _aabb, float _factor)
 	_aabb.m_max[2] += _factor;
 }
 
+void aabbExpand(Aabb& _aabb, const float* _pos)
+{
+	bx::vec3Min(_aabb.m_min, _aabb.m_min, _pos);
+	bx::vec3Max(_aabb.m_max, _aabb.m_max, _pos);
+}
+
 uint32_t aabbOverlapTest(const Aabb& _aabb0, const Aabb& _aabb1)
 {
 	const uint32_t ltMinX = _aabb0.m_max[0] < _aabb1.m_min[0];
@@ -246,7 +252,7 @@ void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _
 		ax += angleStep;
 	}
 
-	memcpy(&_obb, &best, sizeof(Obb) );
+	bx::memCopy(&_obb, &best, sizeof(Obb) );
 }
 
 void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
@@ -276,7 +282,7 @@ void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	}
 
 	bx::vec3Move(_sphere.m_center, center);
-	_sphere.m_radius = sqrtf(maxDistSq);
+	_sphere.m_radius = bx::fsqrt(maxDistSq);
 }
 
 void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride, float _step)

@@ -39,11 +39,11 @@ enum
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
 
-const device_type MC68HC11 = &device_creator<mc68hc11_cpu_device>;
+DEFINE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device, "mc68hc11", "MC68HC11")
 
 
 mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MC68HC11, "MC68HC11", tag, owner, clock, "mc68hc11", __FILE__)
+	: cpu_device(mconfig, MC68HC11, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0 )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
@@ -53,6 +53,13 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const ch
 {
 }
 
+device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 offs_t mc68hc11_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

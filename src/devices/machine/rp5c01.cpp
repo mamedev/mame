@@ -16,11 +16,13 @@
 
 */
 
+#include "emu.h"
 #include "rp5c01.h"
 
 
-// device type definition
-const device_type RP5C01 = &device_creator<rp5c01_device>;
+// device type definitions
+DEFINE_DEVICE_TYPE(RP5C01, rp5c01_device, "rp5c01", "Ricoh RP5C01 RTC")
+DEFINE_DEVICE_TYPE(TC8521, tc8521_device, "tc8521", "Toshiba TC8521 RTC")
 
 
 //**************************************************************************
@@ -168,7 +170,12 @@ inline void rp5c01_device::check_alarm()
 //-------------------------------------------------
 
 rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock, "rp5c01", __FILE__),
+	: rp5c01_device(mconfig, RP5C01, tag, owner, clock)
+{
+}
+
+rp5c01_device::rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_out_alarm_cb(*this),
@@ -414,4 +421,13 @@ WRITE8_MEMBER( rp5c01_device::write )
 		if (LOG) logerror("RP5C01 '%s' Register %u Write %02x\n", tag(), offset, data);
 		break;
 	}
+}
+
+//-------------------------------------------------
+//  tc8521_device - constructor
+//-------------------------------------------------
+
+tc8521_device::tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rp5c01_device(mconfig, TC8521, tag, owner, clock)
+{
 }

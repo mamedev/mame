@@ -25,9 +25,10 @@ clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 
 */
 
+#include "emu.h"
+
 #define ENABLE_VGA 0
 
-#include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pcshare.h"
@@ -35,6 +36,7 @@ clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 #if ENABLE_VGA
 #include "video/pc_vga.h"
 #endif
+#include "screen.h"
 
 class taitowlf_state : public pcat_base_state
 {
@@ -363,7 +365,7 @@ PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
 }
 #endif
 
-static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
+static MACHINE_CONFIG_START( taitowlf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)

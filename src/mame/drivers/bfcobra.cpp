@@ -75,15 +75,17 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/clock.h"
-#include "machine/6850acia.h"
-#include "machine/meters.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/upd7759.h"
-#include "sound/ay8910.h"
+#include "cpu/z80/z80.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/meters.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "sound/upd7759.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*
@@ -1274,7 +1276,7 @@ ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bfcobra_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, bfcobra_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -1629,7 +1631,7 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 	update_irqs();
 }
 
-static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
+static MACHINE_CONFIG_START( bfcobra )
 	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
 	MCFG_CPU_IO_MAP(z80_io_map)

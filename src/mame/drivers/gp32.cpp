@@ -18,11 +18,16 @@
 
 #include "emu.h"
 #include "includes/gp32.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/volt_reg.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -1677,7 +1682,7 @@ void gp32_state::machine_reset()
 	s3c240x_machine_reset();
 }
 
-static MACHINE_CONFIG_START( gp32, gp32_state )
+static MACHINE_CONFIG_START( gp32 )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gp32_map)
 
@@ -1725,4 +1730,4 @@ ROM_START( gp32 )
 #endif
 ROM_END
 
-CONS(2001, gp32, 0, 0, gp32, gp32, driver_device, 0, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, 0, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

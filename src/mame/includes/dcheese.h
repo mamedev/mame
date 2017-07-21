@@ -9,6 +9,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/bsmt2000.h"
+#include "screen.h"
 
 class dcheese_state : public driver_device
 {
@@ -35,6 +36,7 @@ public:
 
 	std::unique_ptr<bitmap_ind16> m_dstbitmap;
 	emu_timer *m_blitter_timer;
+	emu_timer *m_signal_irq_timer;
 
 	/* misc */
 	uint8_t    m_irq_state[5];

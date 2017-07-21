@@ -8,18 +8,17 @@
  *
  ****************************************************************************/
 
-#ifndef LISA_H_
-#define LISA_H_
+#ifndef MAME_INCLUDES_LISA_H
+#define MAME_INCLUDES_LISA_H
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
-#include "machine/8530scc.h"
 #include "machine/6522via.h"
-#include "machine/nvram.h"
+#include "machine/8530scc.h"
 #include "machine/applefdc.h"
+#include "machine/nvram.h"
 #include "machine/sonydriv.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 #define COP421_TAG      "u9f"
 #define KB_COP421_TAG   "kbcop"
@@ -182,6 +181,7 @@ public:
 	int m_mouse_data_offset;
 	int m_COPS_force_unplug;
 	emu_timer *m_mouse_timer;
+	emu_timer *m_cops_ready_timer;
 	int m_hold_COPS_data;
 	int m_NMIcode;
 	clock_regs_t m_clock_regs;
@@ -229,4 +229,4 @@ public:
 	void plug_keyboard();
 };
 
-#endif /* LISA_H_ */
+#endif // MAME_INCLUDES_LISA_H

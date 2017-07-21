@@ -149,23 +149,26 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "audio/seibu.h"
 #include "video/airraid_dev.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 class airraid_state : public driver_device
 {
 public:
 	airraid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound"),
-		m_mainram(*this, "mainram"),
-		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_airraid_video(*this,"airraid_vid")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_seibu_sound(*this, "seibu_sound")
+		, m_mainram(*this, "mainram")
+		, m_palette(*this, "palette")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_airraid_video(*this,"airraid_vid")
+	{ }
 
 
 	required_device<cpu_device> m_maincpu;
@@ -274,7 +277,7 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, airraid_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -295,7 +298,7 @@ static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( airraid_sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, airraid_state )
+static ADDRESS_MAP_START( airraid_sound_decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
@@ -384,7 +387,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( airraid, airraid_state )
+static MACHINE_CONFIG_START( airraid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
@@ -625,6 +628,6 @@ DRIVER_INIT_MEMBER(airraid_state,cshootere)
 }
 
 // There's also an undumped International Games version
-GAME( 1987, cshooter,  airraid,      airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)",           "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, airraid,   0,         airraid_crypt,  airraid,  airraid_state, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1987, cshooter,  airraid,   airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, airraid,   0,         airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 

@@ -209,7 +209,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomi)
 	create_pic_from_retdat();
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomi2)
+DRIVER_INIT_MEMBER(naomi2_state,naomi2)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
 

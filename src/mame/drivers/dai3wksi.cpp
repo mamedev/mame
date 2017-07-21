@@ -38,10 +38,14 @@ Driver Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/samples.h"
 #include "machine/rescap.h"
+#include "sound/samples.h"
 #include "sound/sn76477.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define USE_SAMPLES     (1)
 
@@ -396,7 +400,7 @@ void dai3wksi_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
+static MACHINE_CONFIG_START( dai3wksi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
@@ -547,4 +551,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, driver_device, 0, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, dai3wksi_state, 0, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

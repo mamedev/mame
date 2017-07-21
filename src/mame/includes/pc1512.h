@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_PC1512_H
+#define MAME_INCLUDES_PC1512_H
+
 #pragma once
 
-#ifndef __PC1512__
-#define __PC1512__
-
-#include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
@@ -13,7 +12,6 @@
 #include "bus/pc1512/mouse.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
-#include "formats/pc_dsk.h"
 #include "machine/am9517a.h"
 #include "machine/buffer.h"
 #include "machine/ins8250.h"
@@ -23,8 +21,10 @@
 #include "machine/pc1512kb.h"
 #include "machine/pc_fdc.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
+
+#include "formats/pc_dsk.h"
 
 #define I8086_TAG       "ic120"
 #define I8087_TAG       "ic119"
@@ -97,7 +97,7 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<pc1512_keyboard_t> m_kb;
+	required_device<pc1512_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
@@ -252,4 +252,4 @@ public:
 
 MACHINE_CONFIG_EXTERN( pc1512_video );
 
-#endif
+#endif // MAME_INCLUDES_PC1512_H

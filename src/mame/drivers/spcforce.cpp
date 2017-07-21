@@ -36,10 +36,14 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/spcforce.h"
+
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
-#include "includes/spcforce.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void spcforce_state::machine_start()
 {
@@ -89,7 +93,7 @@ WRITE8_MEMBER(spcforce_state::SN76496_select_w)
 	if (~data & 0x10) m_sn3->write(space, 0, m_sn76496_latch);
 }
 
-READ8_MEMBER(spcforce_state::t0_r)
+READ_LINE_MEMBER(spcforce_state::t0_r)
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
 	return machine().rand() & 1;
@@ -129,13 +133,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spcforce_sound_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spcforce_sound_io_map, AS_IO, 8, spcforce_state )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(SN76496_latch_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(SN76496_select_r, SN76496_select_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
 ADDRESS_MAP_END
 
 
@@ -277,7 +274,7 @@ INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
 		device.execute().set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( spcforce, spcforce_state )
+static MACHINE_CONFIG_START( spcforce )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
@@ -287,7 +284,11 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 
 	MCFG_CPU_ADD("audiocpu", I8035, 6144000)        /* divisor ??? */
 	MCFG_CPU_PROGRAM_MAP(spcforce_sound_map)
-	MCFG_CPU_IO_MAP(spcforce_sound_io_map)
+	MCFG_MCS48_PORT_BUS_IN_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(spcforce_state, SN76496_latch_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(spcforce_state, SN76496_select_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(spcforce_state, SN76496_select_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(spcforce_state, t0_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -424,7 +425,7 @@ ROM_START( meteors )
 ROM_END
 
 
-GAME( 1980, spcforce, 0,        spcforce, spcforce, driver_device, 0, ROT270, "Venture Line", "Space Force (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, driver_device, 0, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, meteor,   spcforce, spcforce, spcforc2, driver_device, 0, ROT270, "Venture Line", "Meteoroids", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, meteors,  spcforce, meteors,  spcforc2, driver_device, 0, ROT0,   "Amusement World", "Meteors", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spcforce, 0,        spcforce, spcforce, spcforce_state, 0, ROT270, "Venture Line",     "Space Force (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, spcforce_state, 0, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, meteor,   spcforce, spcforce, spcforc2, spcforce_state, 0, ROT270, "Venture Line",     "Meteoroids",          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, meteors,  spcforce, meteors,  spcforc2, spcforce_state, 0, ROT0,   "Amusement World",  "Meteors",             MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

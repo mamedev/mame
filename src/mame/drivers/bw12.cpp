@@ -25,11 +25,14 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/bw12.h"
 #include "bus/rs232/rs232.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /*
 
@@ -540,7 +543,7 @@ GFXDECODE_END
 
 
 /* Machine Driver */
-static MACHINE_CONFIG_START( common, bw12_state )
+static MACHINE_CONFIG_START( common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bw12_mem)
@@ -671,6 +674,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984, bw12,   0,      0,      bw12,   bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY               FULLNAME        FLAGS */
+COMP( 1984, bw12,   0,      0,      bw12,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 12",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 14",  MACHINE_SUPPORTS_SAVE )

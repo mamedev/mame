@@ -1,12 +1,12 @@
 //
-//Copyright (C) 2016 Google, Inc.
-//Copyright (C) 2016 LunarG, Inc.
+// Copyright (C) 2016 Google, Inc.
+// Copyright (C) 2016 LunarG, Inc.
 //
-//All rights reserved.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions
-//are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
 //
 //    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
@@ -20,18 +20,18 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 
 //
@@ -47,12 +47,11 @@
 #include "../glslang/MachineIndependent/ParseHelper.h"
 #include "hlslScanContext.h"
 #include "hlslTokens.h"
-//#include "Scan.h"
 
 // preprocessor includes
 #include "../glslang/MachineIndependent/preprocessor/PpContext.h"
 #include "../glslang/MachineIndependent/preprocessor/PpTokens.h"
-    
+
 namespace {
 
 struct str_eq
@@ -82,6 +81,7 @@ struct str_hash
 // After a single process-level initialization, this is read only and thread safe
 std::unordered_map<const char*, glslang::EHlslTokenClass, str_hash, str_eq>* KeywordMap = nullptr;
 std::unordered_set<const char*, str_hash, str_eq>* ReservedSet = nullptr;
+std::unordered_map<const char*, glslang::TBuiltInVariable, str_hash, str_eq>* SemanticMap = nullptr;
 
 };
 
@@ -118,6 +118,8 @@ void HlslScanContext::fillInKeywordMap()
     (*KeywordMap)["out"] =                     EHTokOut;
     (*KeywordMap)["inout"] =                   EHTokInOut;
     (*KeywordMap)["layout"] =                  EHTokLayout;
+    (*KeywordMap)["globallycoherent"] =        EHTokGloballyCoherent;
+    (*KeywordMap)["inline"] =                  EHTokInline;
 
     (*KeywordMap)["point"] =                   EHTokPoint;
     (*KeywordMap)["line"] =                    EHTokLine;
@@ -128,6 +130,9 @@ void HlslScanContext::fillInKeywordMap()
     (*KeywordMap)["PointStream"] =             EHTokPointStream;
     (*KeywordMap)["LineStream"] =              EHTokLineStream;
     (*KeywordMap)["TriangleStream"] =          EHTokTriangleStream;
+
+    (*KeywordMap)["InputPatch"] =              EHTokInputPatch;
+    (*KeywordMap)["OutputPatch"] =             EHTokOutputPatch;
 
     (*KeywordMap)["Buffer"] =                  EHTokBuffer;
     (*KeywordMap)["vector"] =                  EHTokVector;
@@ -142,7 +147,7 @@ void HlslScanContext::fillInKeywordMap()
     (*KeywordMap)["half"] =                    EHTokHalf;
     (*KeywordMap)["float"] =                   EHTokFloat;
     (*KeywordMap)["double"] =                  EHTokDouble;
-    (*KeywordMap)["min16float"] =              EHTokMin16float; 
+    (*KeywordMap)["min16float"] =              EHTokMin16float;
     (*KeywordMap)["min10float"] =              EHTokMin10float;
     (*KeywordMap)["min16int"] =                EHTokMin16int;
     (*KeywordMap)["min12int"] =                EHTokMin12int;
@@ -169,6 +174,10 @@ void HlslScanContext::fillInKeywordMap()
     (*KeywordMap)["uint3"] =                   EHTokUint3;
     (*KeywordMap)["uint4"] =                   EHTokUint4;
 
+    (*KeywordMap)["half1"] =                   EHTokHalf1;
+    (*KeywordMap)["half2"] =                   EHTokHalf2;
+    (*KeywordMap)["half3"] =                   EHTokHalf3;
+    (*KeywordMap)["half4"] =                   EHTokHalf4;
     (*KeywordMap)["min16float1"] =             EHTokMin16float1;
     (*KeywordMap)["min16float2"] =             EHTokMin16float2;
     (*KeywordMap)["min16float3"] =             EHTokMin16float3;
@@ -312,11 +321,19 @@ void HlslScanContext::fillInKeywordMap()
     (*KeywordMap)["RWTexture3D"] =             EHTokRWTexture3d;
     (*KeywordMap)["RWBuffer"] =                EHTokRWBuffer;
 
+    (*KeywordMap)["AppendStructuredBuffer"] =  EHTokAppendStructuredBuffer;
+    (*KeywordMap)["ByteAddressBuffer"] =       EHTokByteAddressBuffer;
+    (*KeywordMap)["ConsumeStructuredBuffer"] = EHTokConsumeStructuredBuffer;
+    (*KeywordMap)["RWByteAddressBuffer"] =     EHTokRWByteAddressBuffer;
+    (*KeywordMap)["RWStructuredBuffer"] =      EHTokRWStructuredBuffer;
+    (*KeywordMap)["StructuredBuffer"] =        EHTokStructuredBuffer;
 
+    (*KeywordMap)["class"] =                   EHTokClass;
     (*KeywordMap)["struct"] =                  EHTokStruct;
     (*KeywordMap)["cbuffer"] =                 EHTokCBuffer;
     (*KeywordMap)["tbuffer"] =                 EHTokTBuffer;
     (*KeywordMap)["typedef"] =                 EHTokTypedef;
+    (*KeywordMap)["this"] =                    EHTokThis;
 
     (*KeywordMap)["true"] =                    EHTokBoolConstant;
     (*KeywordMap)["false"] =                   EHTokBoolConstant;
@@ -336,11 +353,10 @@ void HlslScanContext::fillInKeywordMap()
 
     // TODO: get correct set here
     ReservedSet = new std::unordered_set<const char*, str_hash, str_eq>;
-    
+
     ReservedSet->insert("auto");
     ReservedSet->insert("catch");
     ReservedSet->insert("char");
-    ReservedSet->insert("class");
     ReservedSet->insert("const_cast");
     ReservedSet->insert("enum");
     ReservedSet->insert("explicit");
@@ -359,7 +375,6 @@ void HlslScanContext::fillInKeywordMap()
     ReservedSet->insert("sizeof");
     ReservedSet->insert("static_cast");
     ReservedSet->insert("template");
-    ReservedSet->insert("this");
     ReservedSet->insert("throw");
     ReservedSet->insert("try");
     ReservedSet->insert("typename");
@@ -367,6 +382,73 @@ void HlslScanContext::fillInKeywordMap()
     ReservedSet->insert("unsigned");
     ReservedSet->insert("using");
     ReservedSet->insert("virtual");
+
+    SemanticMap = new std::unordered_map<const char*, glslang::TBuiltInVariable, str_hash, str_eq>;
+
+    // in DX9, all outputs had to have a semantic associated with them, that was either consumed
+    // by the system or was a specific register assignment
+    // in DX10+, only semantics with the SV_ prefix have any meaning beyond decoration
+    // Fxc will only accept DX9 style semantics in compat mode
+    // Also, in DX10 if a SV value is present as the input of a stage, but isn't appropriate for that
+    // stage, it would just be ignored as it is likely there as part of an output struct from one stage
+    // to the next
+    bool bParseDX9 = false;
+    if (bParseDX9) {
+        (*SemanticMap)["PSIZE"] = EbvPointSize;
+        (*SemanticMap)["FOG"] =   EbvFogFragCoord;
+        (*SemanticMap)["DEPTH"] = EbvFragDepth;
+        (*SemanticMap)["VFACE"] = EbvFace;
+        (*SemanticMap)["VPOS"] =  EbvFragCoord;
+    }
+
+    (*SemanticMap)["SV_POSITION"] =               EbvPosition;
+    (*SemanticMap)["SV_CLIPDISTANCE"] =           EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE0"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE1"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE2"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE3"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE4"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE5"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE6"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE7"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE8"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE9"] =          EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE10"] =         EbvClipDistance;
+    (*SemanticMap)["SV_CLIPDISTANCE11"] =         EbvClipDistance;
+    (*SemanticMap)["SV_CULLDISTANCE"] =           EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE0"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE1"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE2"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE3"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE4"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE5"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE6"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE7"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE8"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE9"] =          EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE10"] =         EbvCullDistance;
+    (*SemanticMap)["SV_CULLDISTANCE11"] =         EbvCullDistance;
+    (*SemanticMap)["SV_VERTEXID"] =               EbvVertexIndex;
+    (*SemanticMap)["SV_VIEWPORTARRAYINDEX"] =     EbvViewportIndex;
+    (*SemanticMap)["SV_TESSFACTOR"] =             EbvTessLevelOuter;
+    (*SemanticMap)["SV_SAMPLEINDEX"] =            EbvSampleId;
+    (*SemanticMap)["SV_RENDERTARGETARRAYINDEX"] = EbvLayer;
+    (*SemanticMap)["SV_PRIMITIVEID"] =            EbvPrimitiveId;
+    (*SemanticMap)["SV_OUTPUTCONTROLPOINTID"] =   EbvInvocationId;
+    (*SemanticMap)["SV_ISFRONTFACE"] =            EbvFace;
+    (*SemanticMap)["SV_INSTANCEID"] =             EbvInstanceIndex;
+    (*SemanticMap)["SV_INSIDETESSFACTOR"] =       EbvTessLevelInner;
+    (*SemanticMap)["SV_GSINSTANCEID"] =           EbvInvocationId;
+    (*SemanticMap)["SV_DISPATCHTHREADID"] =       EbvGlobalInvocationId;
+    (*SemanticMap)["SV_GROUPTHREADID"] =          EbvLocalInvocationId;
+    (*SemanticMap)["SV_GROUPINDEX"] =             EbvLocalInvocationIndex;
+    (*SemanticMap)["SV_GROUPID"] =                EbvWorkGroupId;
+    (*SemanticMap)["SV_DOMAINLOCATION"] =         EbvTessCoord;
+    (*SemanticMap)["SV_DEPTH"] =                  EbvFragDepth;
+    (*SemanticMap)["SV_COVERAGE"] =               EbvSampleMask;
+    (*SemanticMap)["SV_DEPTHGREATEREQUAL"] =      EbvFragDepthGreater;
+    (*SemanticMap)["SV_DEPTHLESSEQUAL"] =         EbvFragDepthLesser;
+    (*SemanticMap)["SV_STENCILREF"] =             EbvStencilRef;
 }
 
 void HlslScanContext::deleteKeywordMap()
@@ -375,13 +457,24 @@ void HlslScanContext::deleteKeywordMap()
     KeywordMap = nullptr;
     delete ReservedSet;
     ReservedSet = nullptr;
+    delete SemanticMap;
+    SemanticMap = nullptr;
 }
 
-// Wrapper for tokenizeClass()"] =  to get everything inside the token.
+// Wrapper for tokenizeClass() to get everything inside the token.
 void HlslScanContext::tokenize(HlslToken& token)
 {
     EHlslTokenClass tokenClass = tokenizeClass(token);
     token.tokenClass = tokenClass;
+}
+
+glslang::TBuiltInVariable HlslScanContext::mapSemantic(const char* upperCase)
+{
+    auto it = SemanticMap->find(upperCase);
+    if (it != SemanticMap->end())
+        return it->second;
+    else
+        return glslang::EbvNone;
 }
 
 //
@@ -457,6 +550,8 @@ EHlslTokenClass HlslScanContext::tokenizeClass(HlslToken& token)
         case PpAtomDecrement:          return EHTokDecOp;
         case PpAtomIncrement:          return EHTokIncOp;
 
+        case PpAtomColonColon:         return EHTokColonColon;
+
         case PpAtomConstInt:           parserToken->i = ppToken.ival;       return EHTokIntConstant;
         case PpAtomConstUint:          parserToken->i = ppToken.ival;       return EHTokUintConstant;
         case PpAtomConstFloat:         parserToken->d = ppToken.dval;       return EHTokFloatConstant;
@@ -521,6 +616,8 @@ EHlslTokenClass HlslScanContext::tokenizeIdentifier()
     case EHTokInOut:
     case EHTokPrecise:
     case EHTokLayout:
+    case EHTokGloballyCoherent:
+    case EHTokInline:
         return keyword;
 
     // primitive types
@@ -535,6 +632,11 @@ EHlslTokenClass HlslScanContext::tokenizeIdentifier()
     case EHTokPointStream:
     case EHTokLineStream:
     case EHTokTriangleStream:
+        return keyword;
+
+    // Tessellation patches
+    case EHTokInputPatch:
+    case EHTokOutputPatch:
         return keyword;
 
     case EHTokBuffer:
@@ -579,6 +681,10 @@ EHlslTokenClass HlslScanContext::tokenizeIdentifier()
     case EHTokUint2:
     case EHTokUint3:
     case EHTokUint4:
+    case EHTokHalf1:
+    case EHTokHalf2:
+    case EHTokHalf3:
+    case EHTokHalf4:
     case EHTokMin16float1:
     case EHTokMin16float2:
     case EHTokMin16float3:
@@ -707,13 +813,21 @@ EHlslTokenClass HlslScanContext::tokenizeIdentifier()
     case EHTokRWTexture2darray:
     case EHTokRWTexture3d:
     case EHTokRWBuffer:
+    case EHTokAppendStructuredBuffer:
+    case EHTokByteAddressBuffer:
+    case EHTokConsumeStructuredBuffer:
+    case EHTokRWByteAddressBuffer:
+    case EHTokRWStructuredBuffer:
+    case EHTokStructuredBuffer:
         return keyword;
 
     // variable, user type, ...
+    case EHTokClass:
     case EHTokStruct:
     case EHTokTypedef:
     case EHTokCBuffer:
     case EHTokTBuffer:
+    case EHTokThis:
         return keyword;
 
     case EHTokBoolConstant:

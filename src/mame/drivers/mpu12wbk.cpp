@@ -205,14 +205,16 @@
 
 *****************************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_8MHz
-
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
 //#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_8MHz
 
 
 class mpu12wbk_state : public driver_device
@@ -481,7 +483,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
+static MACHINE_CONFIG_START( mpu12wbk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
@@ -558,5 +560,5 @@ DRIVER_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY             FULLNAME                         FLAGS */
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY             FULLNAME                          FLAGS
 GAME( 1997, fruitstb, 0,      mpu12wbk, mpu12wbk, mpu12wbk_state, mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

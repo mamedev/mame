@@ -10,12 +10,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "rspcp2d.h"
+
 #include "rsp.h"
 #include "rspcp2.h"
-#include "rspcp2d.h"
+
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
+
+#include "rspdefs.h"
+
 
 using namespace uml;
 
@@ -301,7 +306,7 @@ void rsp_cop2_drc::lsv()
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xe;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -338,7 +343,7 @@ void rsp_cop2_drc::llv()
 	uint32_t ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xc;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -377,7 +382,7 @@ void rsp_cop2_drc::ldv()
 	uint32_t ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0x8;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -906,7 +911,7 @@ void rsp_cop2_drc::sdv()
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0x8;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{

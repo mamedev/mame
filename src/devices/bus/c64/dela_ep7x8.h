@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_DELA_EP7X8_H
+#define MAME_BUS_C64_DELA_EP7X8_H
+
 #pragma once
 
-#ifndef __DELA_EP7X8__
-#define __DELA_EP7X8__
 
-
-#include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "exp.h"
@@ -32,13 +31,13 @@ public:
 	// construction/destruction
 	c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
@@ -58,8 +57,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_DELA_EP7X8;
+DECLARE_DEVICE_TYPE(C64_DELA_EP7X8, c64_dela_ep7x8_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_DELA_EP7X8_H

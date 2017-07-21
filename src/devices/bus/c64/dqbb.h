@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_DQBB_H
+#define MAME_BUS_C64_DQBB_H
+
 #pragma once
 
-#ifndef __DQBB__
-#define __DQBB__
 
-
-#include "emu.h"
 #include "exp.h"
 #include "machine/nvram.h"
 
@@ -53,7 +52,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_DQBB;
+DECLARE_DEVICE_TYPE(C64_DQBB, c64_dqbb_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_DQBB_H

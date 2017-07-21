@@ -11,6 +11,11 @@
 #include "emu.h"
 #include "d002.h"
 
+#include "ram.h"
+#include "rom.h"
+#include "d004.h"
+
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -59,7 +64,51 @@ WRITE_LINE_MEMBER(kc_d002_device::out_halt_w)
 	m_slot->m_out_halt_cb(state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( kc_d002 )
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(KC_D002, kc_d002_device, "kc_d002", "D002 Bus Driver")
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  kc_d002_device - constructor
+//-------------------------------------------------
+
+kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, KC_D002, tag, owner, clock)
+	, device_kcexp_interface(mconfig, *this)
+	, m_slot(nullptr)
+	, m_expansions(*this, { "m0", "m4", "m8", "mc", "exp" })
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void kc_d002_device::device_start()
+{
+	m_slot = dynamic_cast<kcexp_slot_device *>(owner());
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void kc_d002_device::device_reset()
+{
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( kc_d002_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("m0", KCCART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
 	MCFG_KCCART_SLOT_NEXT_SLOT("m4")
@@ -93,58 +142,6 @@ static MACHINE_CONFIG_FRAGMENT( kc_d002 )
 	MCFG_KCEXP_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
 	MCFG_KCEXP_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
 MACHINE_CONFIG_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type KC_D002 = &device_creator<kc_d002_device>;
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  kc_d002_device - constructor
-//-------------------------------------------------
-
-kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock, "kc_d002", __FILE__),
-		device_kcexp_interface( mconfig, *this ), m_slot(nullptr)
-	{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void kc_d002_device::device_start()
-{
-	m_slot = dynamic_cast<kcexp_slot_device *>(owner());
-
-	m_expansions[0] = downcast<kcexp_slot_device *>(subdevice("m0"));
-	m_expansions[1] = downcast<kcexp_slot_device *>(subdevice("m4"));
-	m_expansions[2] = downcast<kcexp_slot_device *>(subdevice("m8"));
-	m_expansions[3] = downcast<kcexp_slot_device *>(subdevice("mc"));
-	m_expansions[4] = downcast<kcexp_slot_device *>(subdevice("exp"));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void kc_d002_device::device_reset()
-{
-}
-
-//-------------------------------------------------
-//  device_mconfig_additions
-//-------------------------------------------------
-
-machine_config_constructor kc_d002_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kc_d002 );
-}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

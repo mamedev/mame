@@ -14,6 +14,7 @@
  *
  */
 
+#include "emu.h"
 #include "sc499.h"
 #include "formats/ioprocs.h"
 
@@ -27,7 +28,7 @@ static int verbose = VERBOSE;
 #define LOG3(x) { if (verbose > 2) LOG(x)}
 
 #define SC499_CTAPE_TAG "sc499_ctape"
-extern const device_type SC499_CTAPE;
+DECLARE_DEVICE_TYPE(SC499_CTAPE, sc499_ctape_image_device)
 
 static INPUT_PORTS_START( sc499_port )
 	PORT_START("IO_BASE")
@@ -176,20 +177,16 @@ static INPUT_PORTS_START( sc499_port )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_FRAGMENT( sc499_ctape )
+MACHINE_CONFIG_MEMBER( sc499_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
 MACHINE_CONFIG_END
 
-machine_config_constructor sc499_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sc499_ctape );
-}
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_SC499 = &device_creator<sc499_device>;
+DEFINE_DEVICE_TYPE(ISA8_SC499, sc499_device, "sc499", "Archive SC-499")
 
 //**************************************************************************
 //  CONSTANTS
@@ -307,15 +304,12 @@ const device_type ISA8_SC499 = &device_creator<sc499_device>;
     IMPLEMENTATION
 ***************************************************************************/
 
-// device type definition
-const device_type SC499 = &device_creator<sc499_device>;
-
 //-------------------------------------------------
 // sc499_device - constructor
 //-------------------------------------------------
 
 sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__),
+	: device_t(mconfig, ISA8_SC499, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
 	m_irqdrq(*this, "IRQ_DRQ"), m_data(0), m_command(0), m_status(0), m_control(0), m_has_cartridge(0), m_is_writable(0), m_current_command(0), m_first_block_hack(0), m_nasty_readahead(0), m_read_block_pending(0),
@@ -1300,17 +1294,12 @@ void sc499_device::block_set_filemark()
 
 //##########################################################################
 
-const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
+DEFINE_DEVICE_TYPE(SC499_CTAPE, sc499_ctape_image_device, "sc499_ctape", "SC-499 Cartridge Tape")
 
 sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock, "sc499_ctape", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, SC499_CTAPE, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
-}
-
-void sc499_ctape_image_device::device_config_complete()
-{
-	update_names(SC499_CTAPE, "ctape", "ct");
 }
 
 
@@ -1351,7 +1340,7 @@ void sc499_ctape_image_device::call_unload()
 {
 	m_ctape_data.resize(0);
 	// TODO: add save tape on exit?
-	//if (software_entry() == nullptr)
+	//if (!loaded_through_softlist())
 	//{
 	//    fseek(0, SEEK_SET);
 	//    fwrite(m_ctape_data, m_ctape_data.size);

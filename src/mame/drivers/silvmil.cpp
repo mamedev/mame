@@ -28,8 +28,10 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "video/decospr.h"
 #include "sound/ym2151.h"
+#include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class silvmil_state : public driver_device
@@ -393,7 +395,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( silvmil, silvmil_state )
+static MACHINE_CONFIG_START( silvmil )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* Verified */
@@ -432,7 +434,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -445,7 +447,7 @@ static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

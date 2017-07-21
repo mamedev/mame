@@ -9,6 +9,7 @@
 #include "machine/eeprompar.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
+#include "screen.h"
 
 enum
 {

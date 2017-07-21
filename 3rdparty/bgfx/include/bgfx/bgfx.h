@@ -879,7 +879,7 @@ namespace bgfx
 	/// Convert index buffer for use with different primitive topologies.
 	///
 	/// @param[in] _conversion Conversion type, see `TopologyConvert::Enum`.
-	/// @param[in] _dst Destination index buffer. If this argument it NULL
+	/// @param[in] _dst Destination index buffer. If this argument is NULL
 	///    function will return number of indices after conversion.
 	/// @param[in] _dstSize Destination index buffer in bytes. It must be
 	///    large enough to contain output indices. If destination size is
@@ -935,40 +935,40 @@ namespace bgfx
 
 	/// Swizzle RGBA8 image to BGRA8.
 	///
+	/// @param[in] _dst Destination image. Must be the same size as input image.
+	///   _dst might be pointer to the same memory as _src.
 	/// @param[in] _width Width of input image (pixels).
 	/// @param[in] _height Height of input image (pixels).
 	/// @param[in] _pitch Pitch of input image (bytes).
 	/// @param[in] _src Source image.
-	/// @param[in] _dst Destination image. Must be the same size as input image.
-	///   _dst might be pointer to the same memory as _src.
 	///
 	/// @attention C99 equivalent is `bgfx_image_swizzle_bgra8`.
 	///
 	void imageSwizzleBgra8(
-		  uint32_t _width
+		  void* _dst
+		, uint32_t _width
 		, uint32_t _height
 		, uint32_t _pitch
 		, const void* _src
-		, void* _dst
 		);
 
 	/// Downsample RGBA8 image with 2x2 pixel average filter.
 	///
+	/// @param[in] _dst Destination image. Must be at least quarter size of
+	///   input image. _dst might be pointer to the same memory as _src.
 	/// @param[in] _width Width of input image (pixels).
 	/// @param[in] _height Height of input image (pixels).
 	/// @param[in] _pitch Pitch of input image (bytes).
 	/// @param[in] _src Source image.
-	/// @param[in] _dst Destination image. Must be at least quarter size of
-	///   input image. _dst might be pointer to the same memory as _src.
 	///
 	/// @attention C99 equivalent is `bgfx_image_rgba8_downsample_2x2`.
 	///
 	void imageRgba8Downsample2x2(
-		  uint32_t _width
+		  void* _dst
+		, uint32_t _width
 		, uint32_t _height
 		, uint32_t _pitch
 		, const void* _src
-		, void* _dst
 		);
 
 	/// Returns supported backend API renderers.
@@ -1215,6 +1215,8 @@ namespace bgfx
 
 	/// Destroy static index buffer.
 	///
+	/// @param[in] _handle Static index buffer handle.
+	///
 	/// @attention C99 equivalent is `bgfx_destroy_index_buffer`.
 	///
 	void destroyIndexBuffer(IndexBufferHandle _handle);
@@ -1268,6 +1270,7 @@ namespace bgfx
 	///       buffers.
 	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
 	///       index buffers.
+	/// @returns Dynamic index buffer handle.
 	///
 	/// @attention C99 equivalent is `bgfx_create_dynamic_index_buffer`.
 	///
@@ -1291,6 +1294,7 @@ namespace bgfx
 	///       buffers.
 	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
 	///       index buffers.
+	/// @returns Dynamic index buffer handle.
 	///
 	/// @attention C99 equivalent is `bgfx_create_dynamic_index_buffer_mem`.
 	///
@@ -1337,6 +1341,7 @@ namespace bgfx
 	///       buffers.
 	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
 	///       index buffers.
+	/// @returns Dynamic vertex buffer handle.
 	///
 	/// @attention C99 equivalent is `bgfx_create_dynamic_vertex_buffer`.
 	///
@@ -1362,6 +1367,7 @@ namespace bgfx
 	///       buffers.
 	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
 	///       index buffers.
+	/// @returns Dynamic vertex buffer handle.
 	///
 	/// @attention C99 equivalent is `bgfx_create_dynamic_vertex_buffer_mem`.
 	///
@@ -1386,6 +1392,8 @@ namespace bgfx
 		);
 
 	/// Destroy dynamic vertex buffer.
+	///
+	/// @param[in] _handle Dynamic vertex buffer handle.
 	///
 	/// @attention C99 equivalent is `bgfx_destroy_dynamic_vertex_buffer`.
 	///
@@ -1480,11 +1488,16 @@ namespace bgfx
 
 	/// Create draw indirect buffer.
 	///
+	/// @param[in] _num Number of indirect calls.
+	/// @returns Indirect buffer handle.
+	///
 	/// @attention C99 equivalent is `bgfx_create_indirect_buffer`.
 	///
 	IndirectBufferHandle createIndirectBuffer(uint32_t _num);
 
 	/// Destroy draw indirect buffer.
+	///
+	/// @param[in] _handle Indirect buffer handle.
 	///
 	/// @attention C99 equivalent is `bgfx_destroy_indirect_buffer`.
 	///
@@ -1639,9 +1652,9 @@ namespace bgfx
 	///   - `BGFX_TEXTURE_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
 	///     sampling.
 	///
-	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable.
-	///   When `_numLayers` is more than 1, expected memory layout is texture and all mips together
-	///   for each array element.
+	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+	///   `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+	///   1, expected memory layout is texture and all mips together for each array element.
 	///
 	/// @attention C99 equivalent is `bgfx_create_texture_2d`.
 	///
@@ -1695,7 +1708,8 @@ namespace bgfx
 	///   - `BGFX_TEXTURE_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
 	///     sampling.
 	///
-	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable.
+	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+	///   `_mem` is NULL content of the texture is uninitialized.
 	///
 	/// @attention C99 equivalent is `bgfx_create_texture_3d`.
 	///
@@ -1723,9 +1737,9 @@ namespace bgfx
 	///   - `BGFX_TEXTURE_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
 	///     sampling.
 	///
-	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable.
-	///   When `_numLayers` is more than 1, expected memory layout is cubemap texture and all mips
-	///   together for each array element.
+	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+	///   `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+	///   1, expected memory layout is texture and all mips together for each array element.
 	///
 	/// @attention C99 equivalent is `bgfx_create_texture_cube`.
 	///
@@ -1907,7 +1921,7 @@ namespace bgfx
 		, uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP
 		);
 
-	/// Create frame buffer.
+	/// Create MRT frame buffer from texture handles (simple).
 	///
 	/// @param[in] _num Number of texture attachments.
 	/// @param[in] _handles Texture attachments.
@@ -1924,7 +1938,8 @@ namespace bgfx
 		, bool _destroyTextures = false
 		);
 
-	/// Create frame buffer.
+	/// Create MRT frame buffer from texture handles with specific layer and
+	/// mip level.
 	///
 	/// @param[in] _num Number of texture attachments.
 	/// @param[in] _attachment Attachment texture info. See: `Attachment`.
@@ -2042,11 +2057,13 @@ namespace bgfx
 	/// Retrieve occlusion query result from previous frame.
 	///
 	/// @param[in] _handle Handle to occlusion query object.
+	/// @param[out] _result Number of pixels that passed test. This argument
+	///   can be `NULL` if result of occlusion query is not needed.
 	/// @returns Occlusion query result.
 	///
 	/// @attention C99 equivalent is `bgfx_get_result`.
 	///
-	OcclusionQueryResult::Enum getResult(OcclusionQueryHandle _handle);
+	OcclusionQueryResult::Enum getResult(OcclusionQueryHandle _handle, int32_t* _result = NULL);
 
 	/// Destroy occlusion query.
 	///
@@ -2808,16 +2825,19 @@ namespace bgfx
 		, uint16_t _depth = UINT16_MAX
 		);
 
-	/// Request screen shot.
+	/// Request screen shot of window back buffer.
 	///
+	/// @param[in] _handle Frame buffer handle. If handle is `BGFX_INVALID_HANDLE` request will be
+	///   made for main window back buffer.
 	/// @param[in] _filePath Will be passed to `bgfx::CallbackI::screenShot` callback.
 	///
 	/// @remarks
 	///   `bgfx::CallbackI::screenShot` must be implemented.
 	///
-	/// @attention C99 equivalent is `bgfx_save_screen_shot`.
+	/// @attention Frame buffer handle must be created with OS' target native window handle.
+	/// @attention C99 equivalent is `bgfx_request_screen_shot`.
 	///
-	void saveScreenShot(const char* _filePath);
+	void requestScreenShot(FrameBufferHandle _handle, const char* _filePath);
 
 } // namespace bgfx
 

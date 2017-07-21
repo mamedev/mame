@@ -29,6 +29,8 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tugboat_state : public driver_device
@@ -356,7 +358,7 @@ static GFXDECODE_START( tugboat )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tugboat, tugboat_state )
+static MACHINE_CONFIG_START( tugboat )
 	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
@@ -470,6 +472,6 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat, driver_device,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

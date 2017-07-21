@@ -54,10 +54,13 @@ Press one of the start buttons to exit.
 */
 
 #include "emu.h"
+#include "includes/wc90.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2608intf.h"
-#include "includes/wc90.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(wc90_state::bankswitch_w)
@@ -68,12 +71,6 @@ WRITE8_MEMBER(wc90_state::bankswitch_w)
 WRITE8_MEMBER(wc90_state::bankswitch1_w)
 {
 	membank("subbank")->set_entry(data >> 3);
-}
-
-WRITE8_MEMBER(wc90_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -105,7 +102,7 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc43, 0xfc43) AM_WRITEONLY AM_SHARE("scroll2yhi")
 	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_SHARE("scroll2xlo")
 	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_SHARE("scroll2xhi")
-	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfcc0, 0xfcc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xfcd0, 0xfcd0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
@@ -126,7 +123,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_READNOP /* ??? adpcm ??? */
+	AM_RANGE(0xfc00, 0xfc00) AM_NOP // IRQ acknowledge? (data read and immediately written back)
 	AM_RANGE(0xfc10, 0xfc10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -346,7 +343,7 @@ void wc90_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( wc90, wc90_state )
+static MACHINE_CONFIG_START( wc90 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)     /* verified on pcb */
@@ -383,6 +380,7 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -565,9 +563,9 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, wc90,  0,    wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (World)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90a, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90b, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90t, wc90, wc90t,wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90,  0,       wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90a, wc90,    wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b, wc90,    wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90t, wc90,    wc90t, wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, pac90, puckman, pac90,pac90,driver_device, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.
+GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

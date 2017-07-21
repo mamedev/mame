@@ -57,9 +57,9 @@
    netlist system per-game:
 
  TM-057 (Stunt Cycle)
- 	566    Voltage-Controlled Oscillator
- 	1N751A Zener Diode
- 	1N752A Zener Diode
+    566    Voltage-Controlled Oscillator
+    1N751A Zener Diode
+    1N752A Zener Diode
 
  TM-055 (Indy 4)
     7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
@@ -78,6 +78,7 @@
 #include "machine/nl_stuntcyc.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
+#include "screen.h"
 
 
 // copied by Pong, not accurate for this driver!
@@ -94,13 +95,13 @@
 #define HRES_MULT                   (1)
 // end
 
-#define SC_VIDCLOCK		(14318181/2)
-#define SC_HTOTAL		(0x1C8+1)		// 456
-#define SC_VTOTAL		(0x103+1)		// 259
-#define SC_HBSTART		(SC_HTOTAL)
-#define SC_HBEND		(32)
-#define SC_VBSTART		(SC_VTOTAL)
-#define SC_VBEND		(8)
+#define SC_VIDCLOCK     (14318181/2)
+#define SC_HTOTAL       (0x1C8+1)       // 456
+#define SC_VTOTAL       (0x103+1)       // 259
+#define SC_HBSTART      (SC_HTOTAL)
+#define SC_HBEND        (32)
+#define SC_VBSTART      (SC_VTOTAL)
+#define SC_VBEND        (8)
 
 class atarikee_state : public driver_device
 {
@@ -113,7 +114,7 @@ public:
 	}
 
 	// devices
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
 protected:
@@ -136,8 +137,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		//, m_video(*this, "fixfreq")
 		, m_probe_screen(*this, "screen")
-		, m_hf1(*this, "maincpu:hf1")
-		, m_d7(*this, "maincpu:d7")
 		, m_probe_bit0(0.0)
 		, m_probe_bit1(0.0)
 		, m_probe_bit2(0.0)
@@ -171,11 +170,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	//required_device<fixedfreq_device> m_video;
 	required_device<screen_device> m_probe_screen;
-	required_device<netlist_mame_rom_t> m_hf1;
-	required_device<netlist_mame_rom_t> m_d7;
 
 	int m_probe_bit0;
 	int m_probe_bit1;
@@ -184,7 +181,7 @@ private:
 	int m_probe_bit4;
 	int m_probe_bit5;
 	int m_probe_bit6;
-	
+
 	std::unique_ptr<int[]> m_probe_data;
 
 	int m_last_beam;
@@ -309,7 +306,7 @@ uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-static MACHINE_CONFIG_START( atarikee, atarikee_state )
+static MACHINE_CONFIG_START( atarikee )
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(atarikee)
@@ -326,13 +323,10 @@ MACHINE_CONFIG_END
 //#define STUNTCYC_NL_CLOCK (14318181*69)
 #define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
-static MACHINE_CONFIG_START( stuntcyc, stuntcyc_state )
+static MACHINE_CONFIG_START( stuntcyc )
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
 	MCFG_NETLIST_SETUP(stuntcyc)
-
-	MCFG_NETLIST_ROM_REGION("maincpu", "hf1", "hf1", "004275.f1", 0x0000, 0x0200)
-	MCFG_NETLIST_ROM_REGION("maincpu", "d7",  "d7",  "004811.d7", 0x0000, 0x0020)
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
 	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
@@ -495,10 +489,10 @@ ROM_END
 ROM_START( stuntcyc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0200, "hf1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "maincpu:004275.f1", ROMREGION_ERASE00 )
 	ROM_LOAD( "004275.f1",  0x0000, 0x0200, CRC(4ed5a99d) SHA1(1e5f439bce72e78dfff76fd8f61187c6ef484a64) ) // Motorcycle & Bus
 
-	ROM_REGION( 0x0020, "d7", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0020, "maincpu:004811.d7", ROMREGION_ERASE00 )
 	ROM_LOAD( "004811.d7",  0x0000, 0x0020, CRC(31a09efb) SHA1(fd5d538c9ec1234acf7c74ca0704113d220abbf6) ) // Score Translator
 ROM_END
 
@@ -533,14 +527,14 @@ ROM_START( gtrak10 )  // Unknown size, assumed 2K Bytes
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
     ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-    ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
+    ROM_LOAD( "74186.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack, not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
 ROM_END
 
 ROM_START( gtrak20 )  // Unknown size, assumed 2K Bytes
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
     ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-    ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
+    ROM_LOAD( "74186.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack, not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
 ROM_END
 
 ROM_START( lemans )
@@ -636,39 +630,39 @@ ROM_END
 
 */
 
-GAME(1975,  antiairc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
-GAME(1975,  crashnsc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
-GAME(1976,  indy4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
-GAME(1975,  indy800,   0,         atarikee,   0,  driver_device, 0,  ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
-GAME(1975,  jetfight,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
-GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,         stuntcyc,   0,  driver_device, 0,  ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
-GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  tankii,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
+GAME(1975,  antiairc,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
+GAME(1975,  crashnsc,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
+GAME(1976,  indy4,     0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
+GAME(1975,  indy800,   0,         atarikee,   0,  atarikee_state, 0,  ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
+GAME(1975,  jetfight,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  jetfighta, jetfight,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  outlaw,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
+GAME(1975,  sharkjaw,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  steeplec,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
+GAME(1976,  stuntcyc,  0,         stuntcyc,   0,  stuntcyc_state, 0,  ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
+GAME(1974,  tank,      0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  tankii,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
 
 // MISSING ROM DUMPS
-//GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Astroturf [TTL]",        MACHINE_IS_SKELETON)
-//GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON) //?
-//GAME(1974,  gtrak20,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON) //?
-//GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
-//GAME(1974,  qwak,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
+//GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Astroturf [TTL]",        MACHINE_IS_SKELETON)
+//GAME(1974,  gtrak10,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON) //?
+//GAME(1974,  gtrak20,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON) //?
+//GAME(1976,  lemans,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
+//GAME(1974,  qwak,      0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
 
 // 100% TTL
-//GAME(1974,  coupfran,  worldcup,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari Europe", "Coup Franc [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1974,  coupdmnd,  worldcup,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari France", "Coup du Monde [TTL]",    MACHINE_IS_SKELETON)
-//GAME(1975,  crossfir,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Crossfire [TTL]",        MACHINE_IS_SKELETON)
-//GAME(1973,  eliminat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Elimination! [TTL]",     MACHINE_IS_SKELETON)
-//GAME(1975,  goaliv,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Goal IV [TTL]",          MACHINE_IS_SKELETON)
-//GAME(1973,  gotchaat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Gotcha [TTL]",           MACHINE_IS_SKELETON) //?
-//GAME(1973,  gotchaatc, 0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Gotcha Color [TTL]",     MACHINE_IS_SKELETON) //?
-//GAME(1975,  hiway,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Hi-Way/Highway [TTL]",   MACHINE_IS_SKELETON)
-//GAME(1974,  pinpong,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Pin Pong [TTL]",         MACHINE_IS_SKELETON)
-//GAME(1975,  pursuit,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Pursuit [TTL]",          MACHINE_IS_SKELETON)
-//GAME(1974,  quadpong,  eliminat,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Quadrapong [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1974,  rebound,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Rebound/Spike/Volleyball [TTL]",   MACHINE_IS_SKELETON)
-//GAME(1973,  spacrace,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Space Race [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1974,  touchme,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Touch-Me [TTL]",         MACHINE_IS_SKELETON) //?
-//GAME(1974,  worldcup,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "World Cup/World Cup Football [TTL]",   MACHINE_IS_SKELETON)
+//GAME(1974,  coupfran,  worldcup,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari Europe", "Coup Franc [TTL]",       MACHINE_IS_SKELETON)
+//GAME(1974,  coupdmnd,  worldcup,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari France", "Coup du Monde [TTL]",    MACHINE_IS_SKELETON)
+//GAME(1975,  crossfir,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Crossfire [TTL]",        MACHINE_IS_SKELETON)
+//GAME(1973,  eliminat,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Elimination! [TTL]",     MACHINE_IS_SKELETON)
+//GAME(1975,  goaliv,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Goal IV [TTL]",          MACHINE_IS_SKELETON)
+//GAME(1973,  gotchaat,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Gotcha [TTL]",           MACHINE_IS_SKELETON) //?
+//GAME(1973,  gotchaatc, 0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Gotcha Color [TTL]",     MACHINE_IS_SKELETON) //?
+//GAME(1975,  hiway,     0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Hi-Way/Highway [TTL]",   MACHINE_IS_SKELETON)
+//GAME(1974,  pinpong,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Pin Pong [TTL]",         MACHINE_IS_SKELETON)
+//GAME(1975,  pursuit,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Pursuit [TTL]",          MACHINE_IS_SKELETON)
+//GAME(1974,  quadpong,  eliminat,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Quadrapong [TTL]",       MACHINE_IS_SKELETON)
+//GAME(1974,  rebound,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Rebound/Spike/Volleyball [TTL]",   MACHINE_IS_SKELETON)
+//GAME(1973,  spacrace,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Space Race [TTL]",       MACHINE_IS_SKELETON)
+//GAME(1974,  touchme,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Touch-Me [TTL]",         MACHINE_IS_SKELETON) //?
+//GAME(1974,  worldcup,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "World Cup/World Cup Football [TTL]",   MACHINE_IS_SKELETON)

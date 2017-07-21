@@ -10,15 +10,15 @@
  *
  ****************************************************************************/
 
-#ifndef SAMCOUPE_H_
-#define SAMCOUPE_H_
+#ifndef MAME_INCLUDES_SAMCOUPE_H
+#define MAME_INCLUDES_SAMCOUPE_H
 
-#include "machine/wd_fdc.h"
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/ram.h"
+#include "imagedev/cassette.h"
 #include "machine/msm6242.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
 
 /* screen dimensions */
 #define SAM_BLOCK           8
@@ -162,7 +162,7 @@ public:
 	required_device<centronics_device> m_lpt2;
 	required_device<ram_device> m_ram;
 	required_device<msm6242_device> m_rtc;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_wd1772_0;
 	required_device<floppy_connector> m_wd1772_1;
 	required_memory_region m_region_maincpu;
@@ -200,4 +200,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* SAMCOUPE_H_ */
+#endif // MAME_INCLUDES_SAMCOUPE_H

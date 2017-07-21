@@ -19,8 +19,8 @@
 
 
 // device type definitions
-const device_type I8155 = &device_creator<i8155_device>;
-const device_type I8156 = &device_creator<i8155_device>;
+DEFINE_DEVICE_TYPE(I8155, i8155_device, "i8155", "Intel 8155 RIOT")
+const device_type I8156 = I8155;
 
 
 //**************************************************************************
@@ -98,7 +98,7 @@ enum
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( i8155, AS_0, 8, i8155_device )
+static ADDRESS_MAP_START( i8155, 0, 8, i8155_device )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -203,7 +203,7 @@ inline void i8155_device::write_port(int port, uint8_t data)
 //-------------------------------------------------
 
 i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8155, "8155 RIOT", tag, owner, clock, "i8155", __FILE__),
+	: device_t(mconfig, I8155, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_in_pa_cb(*this),
 		m_in_pb_cb(*this),
@@ -344,9 +344,11 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *i8155_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector i8155_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

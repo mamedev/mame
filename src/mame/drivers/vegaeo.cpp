@@ -14,11 +14,13 @@
  *********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "machine/at28c16.h"
 #include "machine/gen_latch.h"
 #include "sound/qs1000.h"
-#include "includes/eolith.h"
+#include "speaker.h"
 
 
 class vegaeo_state : public eolith_state
@@ -215,7 +217,7 @@ uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( vega, vegaeo_state )
+static MACHINE_CONFIG_START( vega )
 	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_55MHz)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)

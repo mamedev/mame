@@ -27,6 +27,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define LOG_PROT    (0)
 
@@ -587,7 +589,7 @@ static INPUT_PORTS_START( enigma2a )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( enigma2, enigma2_state )
+static MACHINE_CONFIG_START( enigma2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -615,7 +617,7 @@ static MACHINE_CONFIG_START( enigma2, enigma2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( enigma2a, enigma2_state )
+static MACHINE_CONFIG_START( enigma2a )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
@@ -704,6 +706,6 @@ DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 
 
 
-GAME( 1981, enigma2,  0,       enigma2,  enigma2, enigma2_state,  enigma2, ROT270, "Game Plan (Zilec Electronics license)", "Enigma II", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics", "Enigma II (Space Invaders hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, enigma2b, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics", "Phantoms II (Space Invaders hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, enigma2,  0,       enigma2,  enigma2,  enigma2_state, enigma2, ROT270, "Game Plan (Zilec Electronics license)", "Enigma II",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics",                     "Enigma II (Space Invaders hardware)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, enigma2b, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics",                     "Phantoms II (Space Invaders hardware)", MACHINE_SUPPORTS_SAVE )

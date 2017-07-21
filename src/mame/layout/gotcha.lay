@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Vas Crabb
+Got-cha / Pasha Pasha Champ Mini Game Festival layout
+-->
+<mamelayout version="2">
+
+	<element name="red_surround" defstate="0">
+		<disk state="0"><color red="0.25" green="0" blue="0" /></disk>
+		<disk state="1"><color red="0.25" green="0" blue="0" /></disk>
+	</element>
+	<element name="green_surround" defstate="0">
+		<disk state="0"><color red="0" green="0.25" blue="0" /></disk>
+		<disk state="1"><color red="0" green="0.25" blue="0" /></disk>
+	</element>
+	<element name="blue_surround" defstate="0">
+		<disk state="0"><color red="0" green="0" blue="0.25" /></disk>
+		<disk state="1"><color red="0" green="0" blue="0.25" /></disk>
+	</element>
+
+	<element name="red_lamp" defstate="0">
+		<disk state="0"><color red="0.15" green="0" blue="0" /></disk>
+		<disk state="1"><color red="0.85" green="0" blue="0" /></disk>
+	</element>
+	<element name="green_lamp" defstate="0">
+		<disk state="0"><color red="0" green="0.15" blue="0" /></disk>
+		<disk state="1"><color red="0" green="0.85" blue="0" /></disk>
+	</element>
+	<element name="blue_lamp" defstate="0">
+		<disk state="0"><color red="0" green="0" blue="0.15" /></disk>
+		<disk state="1"><color red="0" green="0" blue="0.85" /></disk>
+	</element>
+
+	<element name="start_surround" defstate="0">
+		<rect state="0"><color red="0.25" green="0.25" blue="0" /></rect>
+		<rect state="1"><color red="0.25" green="0.25" blue="0" /></rect>
+	</element>
+	<element name="start_lamp" defstate="0">
+		<rect state="0"><color red="0.15" green="0.15" blue="0" /></rect>
+		<rect state="1"><color red="0.85" green="0.85" blue="0" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.3" width="0.8" height="0.4" />
+		</text>
+	</element>
+
+	<element name="backdrop">
+		<rect><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="1000" bottom="750" />
+		</screen>
+
+		<bezel name="backdrop" element="backdrop">
+			<bounds left="0" top="750" right="1000" bottom="940" />
+		</bezel>
+
+		<bezel name="lamp_p1_r" element="red_surround" inputtag="INPUTS" inputmask="0x0001">
+			<bounds left="30" top="820" right="100" bottom="890" />
+		</bezel>
+		<bezel name="lamp_p1_r" element="red_lamp" inputtag="INPUTS" inputmask="0x0001">
+			<bounds left="35" top="825" right="95" bottom="885" />
+		</bezel>
+		<bezel name="lamp_p1_g" element="green_surround" inputtag="INPUTS" inputmask="0x0002">
+			<bounds left="120" top="850" right="190" bottom="920" />
+		</bezel>
+		<bezel name="lamp_p1_g" element="green_lamp" inputtag="INPUTS" inputmask="0x0002">
+			<bounds left="125" top="855" right="185" bottom="915" />
+		</bezel>
+		<bezel name="lamp_p1_b" element="blue_surround" inputtag="INPUTS" inputmask="0x0004">
+			<bounds left="210" top="820" right="280" bottom="890" />
+		</bezel>
+		<bezel name="lamp_p1_b" element="blue_lamp" inputtag="INPUTS" inputmask="0x0004">
+			<bounds left="215" top="825" right="275" bottom="885" />
+		</bezel>
+		<bezel name="lamp_p1_s" element="start_surround" inputtag="INPUTS" inputmask="0x0008">
+			<bounds left="125" top="780" right="185" bottom="810" />
+		</bezel>
+		<bezel name="lamp_p1_s" element="start_lamp" inputtag="INPUTS" inputmask="0x0008">
+			<bounds left="127" top="782" right="183" bottom="808" />
+		</bezel>
+
+		<bezel name="lamp_p2_r" element="red_surround" inputtag="INPUTS" inputmask="0x0010">
+			<bounds left="375" top="820" right="445" bottom="890" />
+		</bezel>
+		<bezel name="lamp_p2_r" element="red_lamp" inputtag="INPUTS" inputmask="0x0010">
+			<bounds left="380" top="825" right="440" bottom="885" />
+		</bezel>
+		<bezel name="lamp_p2_g" element="green_surround" inputtag="INPUTS" inputmask="0x0020">
+			<bounds left="465" top="850" right="535" bottom="920" />
+		</bezel>
+		<bezel name="lamp_p2_g" element="green_lamp" inputtag="INPUTS" inputmask="0x0020">
+			<bounds left="470" top="855" right="530" bottom="915" />
+		</bezel>
+		<bezel name="lamp_p2_b" element="blue_surround" inputtag="INPUTS" inputmask="0x0040">
+			<bounds left="555" top="820" right="625" bottom="890" />
+		</bezel>
+		<bezel name="lamp_p2_b" element="blue_lamp" inputtag="INPUTS" inputmask="0x0040">
+			<bounds left="560" top="825" right="620" bottom="885" />
+		</bezel>
+		<bezel name="lamp_p2_s" element="start_surround" inputtag="INPUTS" inputmask="0x0080">
+			<bounds left="470" top="780" right="530" bottom="810" />
+		</bezel>
+		<bezel name="lamp_p2_s" element="start_lamp" inputtag="INPUTS" inputmask="0x0080">
+			<bounds left="472" top="782" right="528" bottom="808" />
+		</bezel>
+
+		<bezel name="lamp_p3_r" element="red_surround" inputtag="INPUTS" inputmask="0x0100">
+			<bounds left="720" top="820" right="790" bottom="890" />
+		</bezel>
+		<bezel name="lamp_p3_r" element="red_lamp" inputtag="INPUTS" inputmask="0x0100">
+			<bounds left="725" top="825" right="785" bottom="885" />
+		</bezel>
+		<bezel name="lamp_p3_g" element="green_surround" inputtag="INPUTS" inputmask="0x0200">
+			<bounds left="810" top="850" right="880" bottom="920" />
+		</bezel>
+		<bezel name="lamp_p3_g" element="green_lamp" inputtag="INPUTS" inputmask="0x0200">
+			<bounds left="815" top="855" right="875" bottom="915" />
+		</bezel>
+		<bezel name="lamp_p3_b" element="blue_surround" inputtag="INPUTS" inputmask="0x0400">
+			<bounds left="900" top="820" right="970" bottom="890" />
+		</bezel>
+		<bezel name="lamp_p3_b" element="blue_lamp" inputtag="INPUTS" inputmask="0x0400">
+			<bounds left="905" top="825" right="965" bottom="885" />
+		</bezel>
+		<bezel name="lamp_p3_s" element="start_surround" inputtag="INPUTS" inputmask="0x0800">
+			<bounds left="815" top="780" right="875" bottom="810" />
+		</bezel>
+		<bezel name="lamp_p3_s" element="start_lamp" inputtag="INPUTS" inputmask="0x0800">
+			<bounds left="817" top="782" right="873" bottom="808" />
+		</bezel>
+	</view>
+</mamelayout>

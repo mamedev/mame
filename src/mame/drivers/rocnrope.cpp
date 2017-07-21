@@ -9,13 +9,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/rocnrope.h"
+#include "includes/konamipt.h"
+#include "audio/timeplt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/konami1.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "audio/timeplt.h"
-#include "includes/konamipt.h"
-#include "includes/rocnrope.h"
+#include "screen.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 
@@ -198,7 +200,7 @@ INTERRUPT_GEN_MEMBER(rocnrope_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
+static MACHINE_CONFIG_START( rocnrope )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
@@ -375,5 +377,5 @@ DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
  *************************************/
 
 GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, driver_device,  0,        ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, 0,        ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )

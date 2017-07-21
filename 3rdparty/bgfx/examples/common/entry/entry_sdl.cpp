@@ -26,6 +26,7 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #endif // defined(None)
 
 #include <stdio.h>
+#include <bx/mutex.h>
 #include <bx/thread.h>
 #include <bx/handlealloc.h>
 #include <bx/readerwriter.h>
@@ -158,7 +159,7 @@ namespace entry
 			: m_controller(NULL)
 			, m_jid(INT32_MAX)
 		{
-			memset(m_value, 0, sizeof(m_value) );
+			bx::memSet(m_value, 0, sizeof(m_value) );
 
 			// Deadzone values from xinput.h
 			m_deadzone[GamepadAxis::LeftX ] =
@@ -341,7 +342,7 @@ namespace entry
 			, m_mouseLock(false)
 			, m_fullscreen(false)
 		{
-			memset(s_translateKey, 0, sizeof(s_translateKey) );
+			bx::memSet(s_translateKey, 0, sizeof(s_translateKey) );
 			initTranslateKey(SDL_SCANCODE_ESCAPE,       Key::Esc);
 			initTranslateKey(SDL_SCANCODE_RETURN,       Key::Return);
 			initTranslateKey(SDL_SCANCODE_TAB,          Key::Tab);
@@ -425,7 +426,7 @@ namespace entry
 			initTranslateKey(SDL_SCANCODE_Y,            Key::KeyY);
 			initTranslateKey(SDL_SCANCODE_Z,            Key::KeyZ);
 
-			memset(s_translateGamepad, uint8_t(Key::Count), sizeof(s_translateGamepad) );
+			bx::memSet(s_translateGamepad, uint8_t(Key::Count), sizeof(s_translateGamepad) );
 			initTranslateGamepad(SDL_CONTROLLER_BUTTON_A,             Key::GamepadA);
 			initTranslateGamepad(SDL_CONTROLLER_BUTTON_B,             Key::GamepadB);
 			initTranslateGamepad(SDL_CONTROLLER_BUTTON_X,             Key::GamepadX);
@@ -442,7 +443,7 @@ namespace entry
 			initTranslateGamepad(SDL_CONTROLLER_BUTTON_START,         Key::GamepadStart);
 			initTranslateGamepad(SDL_CONTROLLER_BUTTON_GUIDE,         Key::GamepadGuide);
 
-			memset(s_translateGamepadAxis, uint8_t(GamepadAxis::Count), sizeof(s_translateGamepadAxis) );
+			bx::memSet(s_translateGamepadAxis, uint8_t(GamepadAxis::Count), sizeof(s_translateGamepadAxis) );
 			initTranslateGamepadAxis(SDL_CONTROLLER_AXIS_LEFTX,        GamepadAxis::LeftX);
 			initTranslateGamepadAxis(SDL_CONTROLLER_AXIS_LEFTY,        GamepadAxis::LeftY);
 			initTranslateGamepadAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT,  GamepadAxis::LeftZ);
@@ -487,13 +488,13 @@ namespace entry
 			setWindowSize(defaultWindow, m_width, m_height, true);
 
 			bx::FileReaderI* reader = getFileReader();
-			if (bx::open(&reader, "gamecontrollerdb.txt") )
+			if (bx::open(reader, "gamecontrollerdb.txt") )
 			{
 				bx::AllocatorI* allocator = getAllocator();
-				uint32_t size = (uint32_t)bx::getSize(&reader);
+				uint32_t size = (uint32_t)bx::getSize(reader);
 				void* data = BX_ALLOC(allocator, size);
-				bx::read(&reader, data, size);
-				bx::close(&reader);
+				bx::read(reader, data, size);
+				bx::close(reader);
 
 				SDL_GameControllerAddMapping( (char*)data);
 
@@ -923,7 +924,7 @@ namespace entry
 
 		WindowHandle findHandle(SDL_Window* _window)
 		{
-			bx::LwMutexScope scope(m_lock);
+			bx::MutexScope scope(m_lock);
 			for (uint32_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
 			{
 				uint16_t idx = m_windowAlloc.getHandleAt(ii);
@@ -972,7 +973,7 @@ namespace entry
 		bx::Thread m_thread;
 
 		EventQueue m_eventQueue;
-		bx::LwMutex m_lock;
+		bx::Mutex m_lock;
 
 		bx::HandleAllocT<ENTRY_CONFIG_MAX_WINDOWS> m_windowAlloc;
 		SDL_Window* m_window[ENTRY_CONFIG_MAX_WINDOWS];
@@ -1011,7 +1012,7 @@ namespace entry
 
 	WindowHandle createWindow(int32_t _x, int32_t _y, uint32_t _width, uint32_t _height, uint32_t _flags, const char* _title)
 	{
-		bx::LwMutexScope scope(s_ctx.m_lock);
+		bx::MutexScope scope(s_ctx.m_lock);
 		WindowHandle handle = { s_ctx.m_windowAlloc.alloc() };
 
 		if (UINT16_MAX != handle.idx)
@@ -1036,7 +1037,7 @@ namespace entry
 		{
 			sdlPostEvent(SDL_USER_WINDOW_DESTROY, _handle);
 
-			bx::LwMutexScope scope(s_ctx.m_lock);
+			bx::MutexScope scope(s_ctx.m_lock);
 			s_ctx.m_windowAlloc.free(_handle.idx);
 		}
 	}

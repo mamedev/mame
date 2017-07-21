@@ -14,11 +14,11 @@
 
 // DPC device
 
-const device_type ATARI_DPC = &device_creator<dpc_device>;
+DEFINE_DEVICE_TYPE(ATARI_DPC, dpc_device, "atari_dpc", "Atari DPC")
 
 
 dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	device_t(mconfig, ATARI_DPC, "Atari DCP", tag, owner, clock, "atari_dcp", __FILE__),
+	device_t(mconfig, ATARI_DPC, tag, owner, clock),
 	m_movamt(0),
 	m_latch_62(0),
 	m_latch_64(0),
@@ -127,6 +127,7 @@ READ8_MEMBER(dpc_device::read)
 		{
 			case 0x00:      // Random number generator
 			case 0x02:
+				m_shift_reg = (m_shift_reg << 1) | (~(((m_shift_reg >> 7) ^ (m_shift_reg >> 5)) ^ ((m_shift_reg >> 4) ^ (m_shift_reg >> 3))) & 1);
 				return m_shift_reg;
 			case 0x04:      // Sound value, MOVAMT value AND'd with Draw Line Carry; with Draw Line Add
 				m_latch_62 = m_latch_64;
@@ -237,12 +238,11 @@ WRITE8_MEMBER(dpc_device::write)
 
 // cart device
 
-const device_type A26_ROM_DPC = &device_creator<a26_rom_dpc_device>;
+DEFINE_DEVICE_TYPE(A26_ROM_DPC, a26_rom_dpc_device, "a2600_dpc", "Atari 2600 ROM Cart Pitfall II")
 
 
 a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: a26_rom_f8_device(mconfig, A26_ROM_DPC, "Atari 2600 ROM Cart Pitfall II", tag, owner, clock, "a2600_dcp", __FILE__),
-						m_dpc(*this, "dpc")
+	: a26_rom_f8_device(mconfig, A26_ROM_DPC, tag, owner, clock), m_dpc(*this, "dpc")
 {
 }
 
@@ -266,15 +266,9 @@ void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( a26_dpc )
+MACHINE_CONFIG_MEMBER( a26_rom_dpc_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("dpc", ATARI_DPC, 0)
 MACHINE_CONFIG_END
-
-machine_config_constructor a26_rom_dpc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a26_dpc );
-}
-
 
 READ8_MEMBER(a26_rom_dpc_device::read_rom)
 {
@@ -290,17 +284,4 @@ WRITE8_MEMBER(a26_rom_dpc_device::write_bank)
 		m_dpc->write(space, offset, data);
 	else
 		a26_rom_f8_device::write_bank(space, offset, data);
-}
-
-DIRECT_UPDATE_MEMBER(a26_rom_dpc_device::cart_opbase)
-{
-	if (!direct.space().debugger_access())
-	{
-		uint8_t new_bit;
-		new_bit = (m_dpc->m_shift_reg & 0x80) ^ ((m_dpc->m_shift_reg & 0x20) << 2);
-		new_bit = new_bit ^ (((m_dpc->m_shift_reg & 0x10) << 3) ^ ((m_dpc->m_shift_reg & 0x08) << 4));
-		new_bit = new_bit ^ 0x80;
-		m_dpc->m_shift_reg = new_bit | (m_dpc->m_shift_reg >> 1);
-	}
-	return address;
 }

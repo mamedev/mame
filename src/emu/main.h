@@ -40,7 +40,6 @@ enum
 //**************************************************************************
 //    TYPE DEFINITIONS
 //**************************************************************************
-class osd_interface;
 
 class emulator_info
 {
@@ -56,6 +55,7 @@ public:
 	static const char * get_bare_build_version();
 	static const char * get_build_version();
 	static void display_ui_chooser(running_machine& machine);
+	static int start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args);
 	static int start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[]);
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
@@ -64,17 +64,6 @@ public:
 	static bool standalone();
 };
 
-// ======================> machine_manager
-class ui_manager;
-namespace asio
-{
-	class io_context;
-}
-namespace webpp
-{
-	class http_server;
-	class ws_server;
-}
 
 class machine_manager
 {
@@ -83,7 +72,7 @@ protected:
 	// construction/destruction
 	machine_manager(emu_options& options, osd_interface& osd);
 public:
-	virtual ~machine_manager();
+	virtual ~machine_manager() { }
 
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
@@ -94,22 +83,19 @@ public:
 
 	virtual ui_manager* create_ui(running_machine& machine) { return nullptr;  }
 	virtual void create_custom(running_machine& machine) { }
+	virtual void load_cheatfiles(running_machine& machine) { }
 	virtual void ui_initialize(running_machine& machine) { }
 
 	virtual void update_machine() { }
 
+	http_manager *http() { return m_http.get(); }
 	void start_http_server();
-	void start_context();
-	webpp::http_server* http_server() const { return m_server.get(); }
+
 protected:
-	osd_interface &         m_osd;                  // reference to OSD system
-	emu_options &           m_options;              // reference to options
-	running_machine *       m_machine;
-	std::shared_ptr<asio::io_context>   m_io_context;
-	std::unique_ptr<webpp::http_server> m_server;
-	std::unique_ptr<webpp::ws_server>   m_wsserver;
-	std::thread						    m_server_thread;
+	osd_interface &               m_osd;                  // reference to OSD system
+	emu_options &                 m_options;              // reference to options
+	running_machine *             m_machine;
+	std::unique_ptr<http_manager> m_http;
 };
 
-
-#endif  /* MAME_EMU_MAIN_H */
+#endif // MAME_EMU_MAIN_H

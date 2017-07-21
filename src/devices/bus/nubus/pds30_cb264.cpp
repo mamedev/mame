@@ -8,19 +8,13 @@
 
 #include "emu.h"
 #include "pds30_cb264.h"
+#include "screen.h"
 
 #define CB264SE30_SCREEN_NAME "cb264_screen"
 #define CB264SE30_ROM_REGION  "cb264_rom"
 
 #define VRAM_SIZE   (0x200000)
 
-MACHINE_CONFIG_FRAGMENT( cb264se30 )
-	MCFG_SCREEN_ADD( CB264SE30_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264se30_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
 
 ROM_START( cb264se30 )
 	ROM_REGION(0x8000, CB264SE30_ROM_REGION, 0)
@@ -31,18 +25,20 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_CB264SE30 = &device_creator<nubus_cb264se30_device>;
+DEFINE_DEVICE_TYPE(PDS030_CB264SE30, nubus_cb264se30_device, "pd3_c264", "RasterOps Colorboard 264/SE30")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_cb264se30_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cb264se30 );
-}
+MACHINE_CONFIG_MEMBER( nubus_cb264se30_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( CB264SE30_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264se30_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -62,20 +58,18 @@ const tiny_rom_entry *nubus_cb264se30_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PDS030_CB264SE30, "RasterOps Colorboard 264/SE30", tag, owner, clock, "pd3_c264", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	nubus_cb264se30_device(mconfig, PDS030_CB264SE30, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(CB264SE30_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
+	(void)m_toggle;
 }
 
-nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, CB264SE30_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(CB264SE30_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

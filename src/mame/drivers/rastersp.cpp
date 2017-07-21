@@ -24,6 +24,8 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 /*************************************
  *
@@ -826,7 +828,7 @@ WRITE32_MEMBER(rastersp_state::ncr53c700_write)
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
 
-static MACHINE_CONFIG_FRAGMENT( ncr53c700 )
+static MACHINE_CONFIG_START( ncr53c700 )
 	MCFG_DEVICE_CLOCK(66000000)
 	MCFG_NCR53C7XX_IRQ_HANDLER(DEVWRITELINE(":", rastersp_state, scsi_irq))
 	MCFG_NCR53C7XX_HOST_READ(DEVREAD32(":", rastersp_state, ncr53c700_read))
@@ -845,7 +847,7 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rastersp, rastersp_state )
+static MACHINE_CONFIG_START( rastersp )
 	MCFG_CPU_ADD("maincpu", I486, 33330000)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -952,5 +954,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, rotr, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
-GAME( 1997, fbcrazy, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM", "Football Crazy (Video Quiz)", MACHINE_NOT_WORKING )
+GAME( 1994, rotr,    0, rastersp, rotr, rastersp_state, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
+GAME( 1997, fbcrazy, 0, rastersp, rotr, rastersp_state, 0, ROT0, "BFM",        "Football Crazy (Video Quiz)",    MACHINE_NOT_WORKING )

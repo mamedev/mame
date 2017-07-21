@@ -50,6 +50,8 @@ VIDEO_START_MEMBER(exidy440_state,exidy440)
 	/* allocate a buffer for palette RAM */
 	m_local_paletteram = std::make_unique<uint8_t[]>(512 * 2);
 	memset(m_local_paletteram.get(), 0, 512 * 2);
+
+	m_collide_firq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exidy440_state::collide_firq_callback), this));
 }
 
 
@@ -349,7 +351,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							screen.machine().scheduler().timer_set(screen.time_until_pos(yoffs, currx), timer_expired_delegate(FUNC(exidy440_state::collide_firq_callback), this), currx);
+							m_collide_firq_timer->adjust(screen.time_until_pos(yoffs, currx), currx);
 					}
 					currx++;
 
@@ -362,7 +364,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							screen.machine().scheduler().timer_set(screen.time_until_pos(yoffs, currx), timer_expired_delegate(FUNC(exidy440_state::collide_firq_callback), this), currx);
+							m_collide_firq_timer->adjust(screen.time_until_pos(yoffs, currx), currx);
 					}
 					currx++;
 				}
@@ -455,7 +457,7 @@ uint32_t exidy440_state::screen_update_topsecex(screen_device &screen, bitmap_in
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( exidy440_video )
+MACHINE_CONFIG_START( exidy440_video )
 	MCFG_VIDEO_START_OVERRIDE(exidy440_state,exidy440)
 	MCFG_PALETTE_ADD("palette", 256)
 
@@ -467,7 +469,7 @@ MACHINE_CONFIG_FRAGMENT( exidy440_video )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( topsecex_video )
+MACHINE_CONFIG_START( topsecex_video )
 	MCFG_VIDEO_START_OVERRIDE(exidy440_state,topsecex)
 
 	MCFG_SCREEN_MODIFY("screen")

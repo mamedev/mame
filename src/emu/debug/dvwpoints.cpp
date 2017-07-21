@@ -103,7 +103,7 @@ static int cActionAscending(const void* a, const void* b)
 {
 	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
 	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return strcmp(left->action(), right->action());
+	return left->action().compare(right->action());
 }
 
 static int cActionDescending(const void* a, const void* b)
@@ -227,7 +227,7 @@ void debug_view_watchpoints::gather_watchpoints()
 	{
 		// Collect
 		device_debug &debugInterface = *source.device()->debug();
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
+		for (int spacenum = 0; spacenum < debugInterface.watchpoint_space_count(); ++spacenum)
 		{
 			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				m_buffer.push_back(wp);

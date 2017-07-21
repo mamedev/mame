@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "mcc.h"
 
 
@@ -47,28 +48,17 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_MCC = &device_creator<wangpc_mcc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device, "wangpc_mcc", "Wang PC-PM043 Multiport Communications Controller")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_mcc )
+//  MACHINE_CONFIG_START( wangpc_mcc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_mcc )
+MACHINE_CONFIG_MEMBER( wangpc_mcc_device::device_add_mconfig )
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 4000000, 0, 0, 0, 0)
 	MCFG_Z80DART_ADD(Z80DART_TAG, 4000000, 0, 0, 0, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_mcc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_mcc );
-}
 
 
 
@@ -103,7 +93,7 @@ inline void wangpc_mcc_device::set_irq(int state)
 //-------------------------------------------------
 
 wangpc_mcc_device::wangpc_mcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_MCC, "Wang PC-PM043", tag, owner, clock, "wangpc_mcc", __FILE__),
+	device_t(mconfig, WANGPC_MCC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_sio(*this, Z80SIO2_TAG),
 	m_dart(*this, Z80DART_TAG), m_option(0), m_irq(0)

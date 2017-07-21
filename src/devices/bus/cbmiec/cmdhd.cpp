@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cmdhd.h"
 #include "machine/msm6242.h"
 
@@ -28,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CMD_HD = &device_creator<cmd_hd_device>;
+DEFINE_DEVICE_TYPE(CMD_HD, cmd_hd_device, "cmdhd", "CMD HD")
 
 
 //-------------------------------------------------
@@ -72,10 +73,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( cmd_hd )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cmd_hd )
+MACHINE_CONFIG_MEMBER( cmd_hd_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(cmd_hd_mem)
 
@@ -89,17 +90,6 @@ static MACHINE_CONFIG_FRAGMENT( cmd_hd )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor cmd_hd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cmd_hd );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -110,7 +100,7 @@ machine_config_constructor cmd_hd_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CMD_HD, "HD", tag, owner, clock, "cmdhd", __FILE__),
+	: device_t(mconfig, CMD_HD, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
 		m_scsibus(*this, SCSIBUS_TAG)

@@ -30,6 +30,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "sio.h"
 
 
@@ -47,7 +48,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_SIO = &device_creator<abc_sio_device>;
+DEFINE_DEVICE_TYPE(ABC_SIO, abc_sio_device, "abcsio", "ABC SIO")
 
 
 //-------------------------------------------------
@@ -72,24 +73,13 @@ const tiny_rom_entry *abc_sio_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc_sio )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc_sio )
+MACHINE_CONFIG_MEMBER( abc_sio_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_4_9152MHz)
 	MCFG_Z80DART_ADD(Z80SIO_TAG, 0, 0, 0, 0, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc_sio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc_sio );
-}
 
 
 
@@ -102,7 +92,7 @@ machine_config_constructor abc_sio_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ABC_SIO, "ABC SIO", tag, owner, clock, "abcsio", __FILE__),
+	: device_t(mconfig, ABC_SIO, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_ctc(*this, Z80CTC_TAG),
 		m_sio(*this, Z80SIO_TAG),

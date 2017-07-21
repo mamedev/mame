@@ -67,7 +67,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const& N, tvec4<float, P> const& I, tvec4<float, P> const& Nref)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_faceforward(N.data. I.data, Nref.data);
+			result.data = glm_vec4_faceforward(N.data, I.data, Nref.data);
 			return result;
 		}
 	};

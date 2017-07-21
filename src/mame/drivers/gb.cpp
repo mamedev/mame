@@ -25,65 +25,53 @@ MBC1 Mapper
 ===========
 
 The MBC1 mapper has two modes: 2MB ROM/8KB RAM or 512KB ROM/32KB RAM.
-This mode is selected by writing into the 6000-7FFF memory area:
-0bXXXXXXXB - B=0 - 2MB ROM/8KB RAM mode
-             B=1 - 512KB ROM/32KB RAM mode
-The default behaviour is to be in 2MB ROM/8KB RAM mode.
+Initially, the mapper operates in 2MB ROM/8KB RAM mode.
 
-Writing a value ( 0bXXXBBBBB ) into the 2000-3FFF memory area selects the
-lower 5 bits of the ROM bank to select for the 4000-7FFF memory area. If a
-value of 0bXXX00000 is written then this will autmatically be changed to
-0bXXX00001 by the mbc chip.
+0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
+            SRAM.
+2000-3FFF - Writing a value 0bXXXBBBBB into the 2000-3FFF memory area selects the
+            lower 5 bits of the ROM bank to select for the 4000-7FFF memory area.
+            If a value of 0bXXX00000 is written then this will autmatically be
+            changed to 0bXXX00001 by the mbc chip. Initial value 00.
+4000-5FFF - Writing a value 0bXXXXXXBB into the 4000-5FFF memory area either selects
+            the RAM bank to use or bits 6 and 7 for the ROM bank to use for the 4000-7FFF
+            memory area. This behaviour depends on the memory moddel chosen.
+            These address lines are fixed in mode 1 and switch depending on A14 in mode 0.
+            In mode 0 these will drive 0 when RB 00 is accessed (A14 low) or the value set
+            in 4000-5FFF when RB <> 00 is accessed (A14 high).
+            Switching between modes does not clear this register. Initial value 00.
+6000-7FFF - Writing a value 0bXXXXXXXB into the 6000-7FFF memory area switches the mode.
+            B=0 - 2MB ROM/8KB RAM mode
+            B=1 - 512KB ROM/32KB RAM mode
 
-Writing a value (0bXXXXXXBB ) into the 4000-5FFF memory area either selects
-the RAM bank to use or bits 6 and 7 for the ROM bank to use for the 4000-7FFF
-memory area. This behaviour depends on the memory moddel chosen.
-
-The RAM sections are enabled by writing the value 0bXXX1010 into the 0000-1FFF
-memory area. Writing any other value disables the RAM section.
-
-Some unanswered cases:
-#1 - Set mode 0
-   - Set lower bank bits to 1F
-   - Set high bank bits to 01  => bank #3F
-   - Set mode 1
-   - What ROM bank is now at 4000-7FFF, bank #1F or bank #3F?
-
-#2 - Set mode 1
-   - Set ram area #1
-   - Set mode 0
-   - What ram area is now at A000-BFFF, ram bank 00 or ram bank 01?
-
+Regular ROM aliasing rules apply.
 
 MBC2 Mapper
 ===========
 
 The MBC2 mapper includes 512x4bits of builtin RAM.
 
-0000-1FFF - Writing to this area enables (value 0bXXXX1010) or disables (any
+0000-3FFF - Writing to this area enables (value 0bXXXX1010) or disables (any
             other value than 0bXXXX1010) the RAM. In order to perform this
-            function bit 12 of the address must be reset, so usable areas are
-            0000-00FF, 0200-02FF, 0400-04FF, 0600-06FF, ..., 1E00-1EFF.
-2000-3FFF - Writing to this area selects the rom bank to appear at 4000-7FFF.
+            function bit 8 of the address must be reset, so usable areas are
+            0000-00FF, 0200-02FF, 0400-04FF, 0600-06FF, ..., 3E00-3EFF,
+0000-3FFF - Writing to this area selects the rom bank to appear at 4000-7FFF.
             Only bits 3-0 are used to select the bank number. If a value of
             0bXXXX0000 is written then this is automatically changed into
             0bXXXX0001 by the mapper.
-            In order to perform the rom banking bit 12 of the address must be
-            set, so usable areas are 2100-21FF, 2300-23FF, 2500-25FF, 2700-
-            27FF, ..., 3F00-3FFF.
+            In order to perform the rom banking bit 8 of the address must be
+            set, so usable areas are 0100-01FF, 0300-03FF, 0500-05FF, 0700-
+            07FF,..., 3F00-3FFF,
 
-Some unanswered cases:
-#1 - Set rom bank to 8 for a 4 bank rom image.
-   - What rom bank appears at 4000-7FFF, bank #0 or bank #1 ?
-
+Regular ROM aliasing rules apply.
 
 MBC3 Mapper
 ===========
 
 The MBC3 mapper cartridges can include a RTC chip.
 
-0000-1FFF - Writing to this area enables (value 0x0A) or disables (0x00) the
-            RAM and RTC registers.
+0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
+            SRAM and RTC registers.
 2000-3FFF - Writing to this area selects the rom bank to appear at 4000-7FFF.
             Bits 6-0 are used  to select the bank number. If a value of
             0bX0000000 is written then this is autmatically changed into
@@ -102,21 +90,12 @@ The MBC3 mapper cartridges can include a RTC chip.
 6000-7FFF - Writing 0x00 followed by 0x01 latches the RTC data. This latching
             method is used for reading the RTC registers.
 
-Some unanswered cases:
-#1 - Set rom bank to 8(/16/32/64) for a 4(/8/16/32) bank image.
-   - What rom bank appears at 4000-7FFF, bank #0 or bank #1 ?
-
-
-MBC4 Mapper
-===========
-
-Stauts: not supported yet.
-
+Regular ROM aliasing rules apply.
 
 MBC5 Mapper
 ===========
 
-0000-1FFF - Writing to this area enables (0x0A) or disables (0x00) the RAM area.
+0000-1FFF - Writing to this area enables (0x0A) or disables (not 0x0A) the SRAM area.
 2000-2FFF - Writing to this area updates bits 7-0 of the rom bank number to
             appear at 4000-7FFF.
 3000-3FFF - Writing to this area updates bit 8 of the rom bank number to appear
@@ -299,7 +278,9 @@ space. This mapper uses 32KB sized banks.
 #include "includes/gb.h"
 #include "bus/gameboy/rom.h"
 #include "bus/gameboy/mbc.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 #define DMG_FRAMES_PER_SECOND   59.732155
@@ -623,7 +604,7 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 }
 
 
-static MACHINE_CONFIG_START( gameboy, gb_state )
+static MACHINE_CONFIG_START( gameboy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz)
@@ -663,7 +644,7 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( supergb, gb_state )
+static MACHINE_CONFIG_START( supergb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
@@ -738,7 +719,7 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_MGB_PPU_ADD("ppu", "maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gbcolor, gb_state )
+static MACHINE_CONFIG_START( gbcolor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) // todo XTAL_8_388MHz
@@ -784,7 +765,7 @@ static MACHINE_CONFIG_START( gbcolor, gb_state )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megaduck, megaduck_state )
+static MACHINE_CONFIG_START( megaduck )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) /* 4.194304 MHz */
@@ -864,12 +845,12 @@ ROM_START(megaduck)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 ROM_END
 
-/*   YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  COMPANY     FULLNAME */
-CONS(1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, supergb2, gameboy, 0,       supergb2, gameboy, driver_device, 0,    "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+/*   YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT    STATE           INIT  COMPANY     FULLNAME */
+CONS(1990, gameboy,   0,       0,       gameboy,  gameboy, gb_state,       0,    "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1994, supergb,   gameboy, 0,       supergb,  gameboy, gb_state,       0,    "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, supergb2,  gameboy, 0,       supergb2, gameboy, gb_state,       0,    "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1996, gbpocket,  gameboy, 0,       gbpocket, gameboy, gb_state,       0,    "Nintendo", "Game Boy Pocket", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, gbcolor,   0,       0,       gbcolor,  gameboy, gb_state,       0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, megaduck_state, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

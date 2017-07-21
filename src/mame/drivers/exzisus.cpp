@@ -36,11 +36,14 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/exzisus.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
-#include "includes/exzisus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -222,7 +225,7 @@ GFXDECODE_END
 
 
 /* All clocks are unconfirmed */
-static MACHINE_CONFIG_START( exzisus, exzisus_state )
+static MACHINE_CONFIG_START( exzisus )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpua", Z80, 6000000)
@@ -252,7 +255,7 @@ static MACHINE_CONFIG_START( exzisus, exzisus_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exzisus)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 1024)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -387,6 +390,6 @@ ROM_START( exzisust )
 	ROM_LOAD( "b23-05.16l", 0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )
 ROM_END
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )

@@ -8,11 +8,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "ser_mouse.h"
 
 
-serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_rs232_port_interface(mconfig, *this),
 	device_serial_interface(mconfig, *this),
 	m_dtr(1),
@@ -28,17 +29,17 @@ serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_t
 {
 }
 
-const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
+DEFINE_DEVICE_TYPE(MSFT_SERIAL_MOUSE, microsoft_mouse_device, "microsoft_mouse", "Microsoft Serial Mouse")
 
 microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, "Microsoft Serial Mouse", tag, owner, clock, "microsoft_mouse", __FILE__)
+	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, tag, owner, clock)
 {
 }
 
-const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_device>;
+DEFINE_DEVICE_TYPE(MSYSTEM_SERIAL_MOUSE, mouse_systems_mouse_device, "mouse_systems_mouse", "Mouse Systems Serial Mouse")
 
 mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: serial_mouse_device(mconfig, MSYSTEM_SERIAL_MOUSE, "Mouse Systems Serial Mouse", tag, owner, clock, "mouse_systems_mouse", __FILE__)
+	: serial_mouse_device(mconfig, MSYSTEM_SERIAL_MOUSE, tag, owner, clock)
 {
 }
 
@@ -85,46 +86,42 @@ void serial_mouse_device::tra_callback()
  **************************************************************************/
 void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (id)
+	if (!id)
 	{
-		device_serial_interface::device_timer(timer, id, param, ptr);
-		return;
+		static int ox = 0, oy = 0;
+		int nx,ny;
+		int dx, dy, nb;
+		int mbc;
+
+		/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
+		if (m_head==m_tail)
+		{
+			nx = m_x->read();
+
+			dx = nx - ox;
+			if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
+			if (dx>=0x800) dx = nx - 0x1000 - ox;
+			ox = nx;
+
+			ny = m_y->read();
+
+			dy = ny - oy;
+			if (dy<=-0x800) dy = ny + 0x1000 - oy;
+			if (dy>=0x800) dy = ny - 0x1000 - oy;
+			oy = ny;
+
+			nb = m_btn->read();
+			mbc = nb^m_mb;
+			m_mb = nb;
+
+			/* check if there is any delta or mouse buttons changed */
+			if ( (dx!=0) || (dy!=0) || (mbc!=0) )
+				mouse_trans(dx, dy, nb, mbc);
+		}
+
+		if(m_tail != m_head && is_transmit_register_empty())
+			transmit_register_setup(unqueue_data());
 	}
-
-	static int ox = 0, oy = 0;
-	int nx,ny;
-	int dx, dy, nb;
-	int mbc;
-
-	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
-	if (m_head==m_tail)
-	{
-		nx = m_x->read();
-
-		dx = nx - ox;
-		if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
-		if (dx>=0x800) dx = nx - 0x1000 - ox;
-		ox = nx;
-
-		ny = m_y->read();
-
-		dy = ny - oy;
-		if (dy<=-0x800) dy = ny + 0x1000 - oy;
-		if (dy>=0x800) dy = ny - 0x1000 - oy;
-		oy = ny;
-
-		nb = m_btn->read();
-		mbc = nb^m_mb;
-		m_mb = nb;
-
-		/* check if there is any delta or mouse buttons changed */
-		if ( (dx!=0) || (dy!=0) || (mbc!=0) )
-			mouse_trans(dx, dy, nb, mbc);
-	}
-
-
-	if(m_tail != m_head && is_transmit_register_empty())
-		transmit_register_setup(unqueue_data());
 }
 
 void microsoft_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)

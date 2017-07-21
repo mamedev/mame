@@ -111,7 +111,7 @@ static const char *const frogs_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( frogs_audio )
+MACHINE_CONFIG_START( frogs_audio )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(frogs_sample_names)
@@ -445,7 +445,7 @@ static DISCRETE_SOUND_START(headon)
 
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_FRAGMENT( headon_audio )
+MACHINE_CONFIG_START( headon_audio )
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(headon)

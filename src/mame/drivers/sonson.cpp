@@ -51,10 +51,13 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sonson.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/sonson.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)
@@ -238,7 +241,7 @@ void sonson_state::machine_reset()
 	m_last_irq = 0;
 }
 
-static MACHINE_CONFIG_START( sonson, sonson_state )
+static MACHINE_CONFIG_START( sonson )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)   /* 1.5 MHz */
@@ -346,5 +349,5 @@ ROM_START( sonsonj )
 ROM_END
 
 
-GAME( 1984, sonson,  0,      sonson, sonson, driver_device, 0, ROT0, "Capcom", "Son Son", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sonsonj, sonson, sonson, sonson, driver_device, 0, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonson,  0,      sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonsonj, sonson, sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )

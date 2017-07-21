@@ -12,12 +12,15 @@
 
 #include "emu.h"
 #include "includes/gba.h"
+
 #include "bus/gba/rom.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
 #include "sound/volt_reg.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Sound Registers */
 #define SOUNDCNT_L  HWLO(0x080)  /* 0x4000080  2  R/W   Control Stereo/Volume/Enable */
@@ -1141,8 +1144,11 @@ READ32_MEMBER(gba_state::gba_bios_r)
 			return 0;
 	}
 
-	if (m_bios_protected != 0)
-		offset = (m_bios_last_address + 8) / 4;
+	if (m_maincpu->pc() >= 0x4000)
+	{
+		//printf("GBA protection: blocking PC=%x\n", m_maincpu->pc());
+		return 0;
+	}
 
 	return rom[offset & 0x3fff];
 }
@@ -1251,8 +1257,6 @@ void gba_state::machine_reset()
 	KEYCNT_SET(0x03ff);
 	RCNT_SET(0x8000);
 	JOYSTAT_SET(0x0002);
-
-	m_bios_protected = 0;
 
 	m_dma_timer[0]->adjust(attotime::never);
 	m_dma_timer[1]->adjust(attotime::never, 1);
@@ -1371,8 +1375,6 @@ void gba_state::machine_start()
 	save_item(NAME(m_fifo_b_in));
 	save_item(NAME(m_fifo_a));
 	save_item(NAME(m_fifo_b));
-	save_item(NAME(m_bios_last_address));
-	save_item(NAME(m_bios_protected));
 }
 
 
@@ -1395,7 +1397,7 @@ static SLOT_INTERFACE_START(gba_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( gbadv, gba_state )
+static MACHINE_CONFIG_START( gbadv )
 
 	MCFG_CPU_ADD("maincpu", ARM7, XTAL_16_777216MHz)
 	MCFG_CPU_PROGRAM_MAP(gba_map)
@@ -1433,28 +1435,5 @@ ROM_START( gba )
 ROM_END
 
 
-// this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,
-// and some games verify that as a protection check (notably Metroid Fusion)
-DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
-{
-	if (address > 0x4000)
-	{
-		m_bios_protected = 1;
-	}
-	else
-	{
-		m_bios_protected = 0;
-		m_bios_last_address = address;
-	}
-	return address;
-}
-
-
-DRIVER_INIT_MEMBER(gba_state,gbadv)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&gba_state::gba_direct, this));
-}
-
-
-/*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */
-CONS(2001, gba, 0,     0,     gbadv,  gbadv, gba_state,  gbadv, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+//   YEAR  NAME PARENT COMPAT MACHINE INPUT  STATE      INIT  COMPANY     FULLNAME            FLAGS
+CONS(2001, gba, 0,     0,     gbadv,  gbadv, gba_state, 0,    "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

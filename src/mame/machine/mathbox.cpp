@@ -37,20 +37,10 @@
 //  mathbox_device - constructor
 //-------------------------------------------------
 
-const device_type MATHBOX = &device_creator<mathbox_device>;
+DEFINE_DEVICE_TYPE(MATHBOX, mathbox_device, "mathbox", "Atari MATHBOX")
 
 mathbox_device::mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MATHBOX, "Atari MATHBOX", tag, owner, clock, "mathbox", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mathbox_device::device_config_complete()
+	: device_t(mconfig, MATHBOX, tag, owner, clock)
 {
 }
 

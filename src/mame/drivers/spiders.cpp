@@ -190,14 +190,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/rescap.h"
+#include "includes/spiders.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"
-#include "includes/spiders.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK   (11200000)
@@ -539,7 +541,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spiders, spiders_state )
+static MACHINE_CONFIG_START( spiders )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2800000)
@@ -702,7 +704,7 @@ ROM_END
  *************************************/
 
 /* this is a newer version with just one bug fix */
-GAME( 1981, spiders,  0,       spiders, spiders, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spiders2, spiders, spiders, spiders, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spiders3, spiders, spiders, spiders, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spinner,  spiders, spiders, spiders, driver_device, 0, ROT270, "bootleg",                 "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders,  0,       spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders2, spiders, spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders3, spiders, spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spinner,  spiders, spiders, spiders, spiders_state, 0, ROT270, "bootleg",                 "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

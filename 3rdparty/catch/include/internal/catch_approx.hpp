@@ -13,6 +13,10 @@
 #include <cmath>
 #include <limits>
 
+#if defined(CATCH_CONFIG_CPP11_TYPE_TRAITS)
+#include <type_traits>
+#endif
+
 namespace Catch {
 namespace Detail {
 
@@ -41,6 +45,53 @@ namespace Detail {
             return approx;
         }
 
+#if defined(CATCH_CONFIG_CPP11_TYPE_TRAITS)
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator == ( const T& lhs, Approx const& rhs ) {
+            // Thanks to Richard Harris for his help refining this formula
+            auto lhs_v = double(lhs);
+            return fabs( lhs_v - rhs.m_value ) < rhs.m_epsilon * (rhs.m_scale + (std::max)( fabs(lhs_v), fabs(rhs.m_value) ) );
+        }
+
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator == ( Approx const& lhs, const T& rhs ) {
+            return operator==( rhs, lhs );
+        }
+
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator != ( T lhs, Approx const& rhs ) {
+            return !operator==( lhs, rhs );
+        }
+
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator != ( Approx const& lhs, T rhs ) {
+            return !operator==( rhs, lhs );
+        }
+
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator <= ( T lhs, Approx const& rhs )
+        {
+          return double(lhs) < rhs.m_value || lhs == rhs;
+        }
+
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator <= ( Approx const& lhs, T rhs )
+        {
+          return lhs.m_value < double(rhs) || lhs == rhs;
+        }
+
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator >= ( T lhs, Approx const& rhs )
+        {
+          return double(lhs) > rhs.m_value || lhs == rhs;
+        }
+
+        template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+        friend bool operator >= ( Approx const& lhs, T rhs )
+        {
+          return lhs.m_value > double(rhs) || lhs == rhs;
+        }
+#else
         friend bool operator == ( double lhs, Approx const& rhs ) {
             // Thanks to Richard Harris for his help refining this formula
             return fabs( lhs - rhs.m_value ) < rhs.m_epsilon * (rhs.m_scale + (std::max)( fabs(lhs), fabs(rhs.m_value) ) );
@@ -57,6 +108,27 @@ namespace Detail {
         friend bool operator != ( Approx const& lhs, double rhs ) {
             return !operator==( rhs, lhs );
         }
+
+        friend bool operator <= ( double lhs, Approx const& rhs )
+        {
+          return lhs < rhs.m_value || lhs == rhs;
+        }
+
+        friend bool operator <= ( Approx const& lhs, double rhs )
+        {
+          return lhs.m_value < rhs || lhs == rhs;
+        }
+
+        friend bool operator >= ( double lhs, Approx const& rhs )
+        {
+          return lhs > rhs.m_value || lhs == rhs;
+        }
+
+        friend bool operator >= ( Approx const& lhs, double rhs )
+        {
+          return lhs.m_value > rhs || lhs == rhs;
+        }
+#endif
 
         Approx& epsilon( double newEpsilon ) {
             m_epsilon = newEpsilon;

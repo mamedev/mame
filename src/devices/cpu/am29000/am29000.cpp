@@ -19,7 +19,7 @@
 #include "am29000.h"
 
 
-const device_type AM29000 = &device_creator<am29000_cpu_device>;
+DEFINE_DEVICE_TYPE(AM29000, am29000_cpu_device, "am29000", "AMC Am29000")
 
 
 /***************************************************************************
@@ -79,7 +79,7 @@ const device_type AM29000 = &device_creator<am29000_cpu_device>;
 ***************************************************************************/
 
 am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, AM29000, "AMD Am29000", tag, owner, clock, "am29000", __FILE__)
+	: cpu_device(mconfig, AM29000, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
@@ -118,6 +118,14 @@ am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char
 	m_next_pc = 0;
 }
 
+device_memory_interface::space_config_vector am29000_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 void am29000_cpu_device::device_start()
 {

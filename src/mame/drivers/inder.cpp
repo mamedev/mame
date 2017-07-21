@@ -28,15 +28,20 @@
 
 ********************************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/74157.h"
+#include "machine/7474.h"
 #include "machine/i8255.h"
-#include "sound/sn76496.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "machine/7474.h"
-#include "machine/74157.h"
+#include "sound/sn76496.h"
+#include "speaker.h"
+
 #include "inder.lh"
+
 
 class inder_state : public genpin_class
 {
@@ -72,7 +77,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sndcmd_lapbylap_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE_LINE_MEMBER(vck_w);
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
@@ -1247,16 +1251,6 @@ void inder_state::update_mus()
 		m_13->ba_w(0);
 }
 
-WRITE_LINE_MEMBER( inder_state::vck_w )
-{
-	// The order of these writes is sensitive, though the schematic (not to scale)
-	// makes it seem that both 74HCT74 clock inputs should be raised simultaneously
-	m_9b->clock_w(0);
-	m_9a->clock_w(0);
-	m_9b->clock_w(1);
-	m_9a->clock_w(1);
-}
-
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
 {
 	m_msm->reset_w(state);
@@ -1297,7 +1291,7 @@ WRITE8_MEMBER( inder_state::ppic_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc, 5))
-		m_msm->set_prescaler_selector(*m_msm, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm->set_prescaler_selector(*m_msm, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
 	m_7a->clock_w(BIT(data, 6));
 	m_7a->preset_w(!BIT(data, 7));
 	m_9a->preset_w(!BIT(data, 7));
@@ -1341,7 +1335,7 @@ DRIVER_INIT_MEMBER( inder_state, inder1 )
 	m_game = 1;
 }
 
-static MACHINE_CONFIG_START( brvteam, inder_state )
+static MACHINE_CONFIG_START( brvteam )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(brvteam_map)
@@ -1359,7 +1353,7 @@ static MACHINE_CONFIG_START( brvteam, inder_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( canasta, inder_state )
+static MACHINE_CONFIG_START( canasta )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(canasta_map)
@@ -1377,7 +1371,7 @@ static MACHINE_CONFIG_START( canasta, inder_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lapbylap, inder_state )
+static MACHINE_CONFIG_START( lapbylap )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lapbylap_map)
@@ -1401,7 +1395,7 @@ static MACHINE_CONFIG_START( lapbylap, inder_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( inder, inder_state )
+static MACHINE_CONFIG_START( inder )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(inder_map)
@@ -1419,8 +1413,10 @@ static MACHINE_CONFIG_START( inder, inder_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(inder_state, vck_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("9a", ttl7474_device, clock_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
+
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
 	/* Devices */
@@ -1467,10 +1463,10 @@ static MACHINE_CONFIG_START( inder, inder_state )
 	MCFG_DEVICE_ADD("7a", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc7a_w))
 
-	MCFG_DEVICE_ADD("9a", TTL7474, 0)
+	MCFG_DEVICE_ADD("9a", TTL7474, 0) // HCT74
 	MCFG_7474_OUTPUT_CB(WRITELINE(inder_state, q9a_w))
 
-	MCFG_DEVICE_ADD("9b", TTL7474, 0)
+	MCFG_DEVICE_ADD("9b", TTL7474, 0) // HCT74
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc9b_w))
 
 	MCFG_DEVICE_ADD("13", HCT157, 0)
@@ -1630,18 +1626,18 @@ ROM_START(metalman)
 
 	ROM_REGION(0x80000, "user2", 0)
 	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
-	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(4d9f5ed2) SHA1(bc6b7c70369c25eddddac5304497f30cee7675d4))
+	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,    0,    brvteam,  brvteam,  driver_device, 0,    ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  brvteam,    0,    brvteam,  brvteam,  inder_state, 0,      ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,    0,    canasta,  canasta,  driver_device, 0,    ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, 0,      ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, driver_device, 0,    ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, inder_state, 0,      ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, sound board with msm5205
 GAME(1987,  pinmoonl,   0,    inder,    pinmoonl, inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

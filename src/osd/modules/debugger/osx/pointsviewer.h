@@ -10,7 +10,6 @@
 
 #import "debugwindowhandler.h"
 
-#include "emu.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -25,5 +24,7 @@
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 - (IBAction)changeSubview:(id)sender;
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
 
 @end

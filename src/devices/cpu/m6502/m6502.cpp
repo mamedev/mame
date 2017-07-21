@@ -12,20 +12,15 @@
 #include "debugger.h"
 #include "m6502.h"
 
-const device_type M6502 = &device_creator<m6502_device>;
+DEFINE_DEVICE_TYPE(M6502, m6502_device, "m6502", "M6502")
 
 m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cpu_device(mconfig, M6502, "M6502", tag, owner, clock, "m6502", __FILE__),
-	sync_w(*this),
-	program_config("program", ENDIANNESS_LITTLE, 8, 16),
-	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
-	inst_state(0), inst_substate(0), icount(0), nmi_state(false), irq_state(false), apu_irq_state(false), v_state(false), irq_taken(false), sync(false), inhibit_interrupts(false)
+	m6502_device(mconfig, M6502, tag, owner, clock)
 {
-	direct_disabled = false;
 }
 
-m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	cpu_device(mconfig, type, tag, owner, clock),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
 	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
@@ -47,7 +42,7 @@ void m6502_device::device_start()
 void m6502_device::init()
 {
 	mintf->program  = &space(AS_PROGRAM);
-	mintf->sprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : mintf->program;
+	mintf->sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : mintf->program;
 
 	mintf->direct  = &mintf->program->direct();
 	mintf->sdirect = &mintf->sprogram->direct();
@@ -407,14 +402,17 @@ void m6502_device::execute_set_input(int inputnum, int state)
 }
 
 
-const address_space_config *m6502_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector m6502_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_OPCODES, &sprogram_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &program_config)
+		};
 }
 
 

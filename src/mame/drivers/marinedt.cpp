@@ -112,7 +112,7 @@ static INPUT_PORTS_START( marinedt )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( marinedt, marinedt_state )
+static MACHINE_CONFIG_START( marinedt )
 MACHINE_CONFIG_END
 
 ROM_START( marinedt )
@@ -143,4 +143,4 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) )
 ROM_END
 
-GAME( 1981, marinedt, 0, marinedt, marinedt, driver_device, 0, ROT270, "Taito", "Marine Date", MACHINE_IS_SKELETON )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, 0, ROT270, "Taito", "Marine Date", MACHINE_IS_SKELETON )

@@ -26,13 +26,16 @@ public:
 	{
 	}
 
+	void kbd_put(u8 data);
+	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
+
+protected:
+	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
 	//uint8_t m_term_data;
 	required_shared_ptr<uint16_t> m_p_ram;
-	virtual void machine_reset() override;
 };
 
 
@@ -74,12 +77,12 @@ void dual68_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( dual68_state::kbd_put )
+void dual68_state::kbd_put(u8 data)
 {
 	//m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dual68, dual68_state )
+static MACHINE_CONFIG_START( dual68 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dual68_mem)
@@ -91,7 +94,7 @@ static MACHINE_CONFIG_START( dual68, dual68_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dual68_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -111,5 +114,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                        FULLNAME       FLAGS */
-COMP( 1981, dual68,  0,     0,       dual68,    dual68, driver_device,   0,  "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                     FULLNAME              FLAGS
+COMP( 1981, dual68,  0,     0,       dual68,    dual68, dual68_state, 0,    "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

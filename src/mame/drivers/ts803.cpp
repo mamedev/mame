@@ -56,6 +56,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
+#include "screen.h"
 
 
 class ts803_state : public driver_device
@@ -71,6 +72,7 @@ public:
 		//, m_sti(*this, "sti")
 		, m_dart(*this, "dart")
 		, m_crtc(*this,"crtc")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_READ8_MEMBER( ts803_port_r );
@@ -90,7 +92,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dart_tick);
 
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<palette_device> m_palette;
 
 private:
 
@@ -100,18 +101,19 @@ private:
 	uint8_t m_sioarr[256];
 	bool m_graphics_mode;
 	bool m_tick;
-	uint8_t *m_p_chargen;
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	//required_device<z80sti_device> m_sti;
 	required_device<z80dart_device> m_dart;
 	required_device<sy6545_1_device> m_crtc;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(ts803_mem, AS_PROGRAM, 8, ts803_state)
@@ -149,7 +151,7 @@ static ADDRESS_MAP_START(ts803_io, AS_IO, 8, ts803_state)
 	//AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("sti", z80sti_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
 
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x90, 0x90) AM_READWRITE(disk_0_control_r,disk_0_control_w)
 
 	//AM_RANGE(0x91, 0xff) AM_READWRITE(ts803_porthi_r, ts803_porthi_w)
@@ -213,10 +215,11 @@ d7 Drive select 3 (active low)
 
 	m_fdc->set_floppy(floppy);
 
-	floppy->mon_w(BIT(data, 1));
-
-	floppy->ss_w(BIT(data, 2) ? 0: 1);
-
+	if (floppy)
+	{
+		floppy->mon_w(BIT(data, 1));
+		floppy->ss_w(BIT(data, 2) ? 0: 1);
+	}
 	m_fdc->dden_w(BIT(data, 3));
 }
 
@@ -462,7 +465,6 @@ DRIVER_INIT_MEMBER( ts803_state, ts803 )
 	m_videoram = std::make_unique<uint8_t[]>(0x8000);
 	m_56kram = std::make_unique<uint8_t[]>(0xc000);
 
-	m_p_chargen = memregion("chargen")->base();
 	uint8_t *rom = memregion("roms")->base();
 	membank("bankr0")->configure_entry(0, &rom[0]); // rom
 	membank("bankr0")->configure_entry(1, m_56kram.get()); // ram
@@ -489,7 +491,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( ts803, ts803_state )
+static MACHINE_CONFIG_START( ts803 )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(ts803_mem)
 	MCFG_CPU_IO_MAP(ts803_io)
@@ -551,5 +553,5 @@ ROM_END
 
 
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY     FULLNAME       FLAGS */
+//   YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY     FULLNAME  FLAGS
 COMP(1983, ts803h,  0,      0,      ts803,     ts803, ts803_state, ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )

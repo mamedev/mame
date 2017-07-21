@@ -244,14 +244,14 @@ DC00      - Selection buttons #2, 9-16 (R)
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/ym2413.h"
-#include "video/315_5124.h"
 #include "includes/sms.h"
+
+#include "cpu/z80/z80.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "sms1.lh"
+
 
 #define MASTER_CLOCK_GG     32215905
 #define MASTER_CLOCK_PALN   10746168
@@ -486,7 +486,7 @@ static INPUT_PORTS_START( gg )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sms_base, sms_state )
+static MACHINE_CONFIG_START( sms_base )
 	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
 	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
@@ -537,33 +537,33 @@ MACHINE_CONFIG_END
 
 #define MCFG_SCREEN_SMS_PAL_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		SEGA315_5124_WIDTH, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
-		SEGA315_5124_HEIGHT_PAL, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT + 240) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_PAL))
+		sega315_5124_device::WIDTH, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+		sega315_5124_device::HEIGHT_PAL, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240) \
+	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
 
 #define MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		SEGA315_5124_WIDTH, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
-		SEGA315_5124_HEIGHT_NTSC, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_NTSC))
+		sega315_5124_device::WIDTH, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+		sega315_5124_device::HEIGHT_NTSC, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224) \
+	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 #define MCFG_SCREEN_GG_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		SEGA315_5124_WIDTH, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 6*8, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 26*8, \
-		SEGA315_5124_HEIGHT_NTSC, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 3*8, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 21*8 ) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_NTSC))
+		sega315_5124_device::WIDTH, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 6*8, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 26*8, \
+		sega315_5124_device::HEIGHT_NTSC, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 ) \
+	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 
 static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( sms_sdisp, sms1_ntsc, smssdisp_state )
+static MACHINE_CONFIG_DERIVED( sms_sdisp, sms1_ntsc )
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
 	MCFG_SEGA315_5124_INT_CB(WRITELINE(smssdisp_state, sms_store_int_callback))
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_DERIVED( sms1_paln, sms_paln_base )
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_DERIVED( sms1_br, sms_br_base )
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms1_ntsc )
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gamegear, sms_state )
+static MACHINE_CONFIG_START( gamegear )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_GG/9)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)

@@ -6,9 +6,12 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "devicesviewer.h"
 
 #import "debugconsole.h"
+
+#include "util/xmlfile.h"
 
 
 @interface MAMEDeviceWrapper : NSObject
@@ -145,6 +148,7 @@
 	[devicesScroll setHasVerticalScroller:YES];
 	[devicesScroll setAutohidesScrollers:YES];
 	[devicesScroll setBorderType:NSNoBorder];
+	[devicesScroll setDrawsBackground:NO];
 	[devicesScroll setDocumentView:devicesView];
 	[devicesView release];
 	[[window contentView] addSubview:devicesScroll];
@@ -176,6 +180,12 @@
 
 - (IBAction)showDeviceDetail:(id)sender {
 	[console debugNewInfoWindowForDevice:[(MAMEDeviceWrapper *)[sender itemAtRow:[sender clickedRow]] device]];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DEVICES_VIEWER);
 }
 
 

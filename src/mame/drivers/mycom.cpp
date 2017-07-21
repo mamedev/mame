@@ -50,13 +50,15 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8255.h"
-#include "sound/sn76496.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
+#include "machine/i8255.h"
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class mycom_state : public driver_device
@@ -69,14 +71,15 @@ public:
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
 		, m_cass(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_audio(*this, "sn1")
-		, m_rtc(*this, "rtc"),
-		m_palette(*this, "palette")
+		, m_rtc(*this, "rtc")
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "vram")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_READ8_MEMBER(mycom_upper_r);
@@ -94,10 +97,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	uint8_t *m_p_videoram;
-	uint8_t *m_p_chargen;
-	uint8_t m_0a;
+
 private:
+	uint8_t m_0a;
 	uint16_t m_i_videoram;
 	uint8_t m_keyb_press;
 	uint8_t m_keyb_press_flag;
@@ -106,30 +108,23 @@ private:
 	uint8_t *m_p_ram;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
 	required_device<cassette_image_device> m_cass;
-	required_device<wave_device> m_wave;
 	required_device<mc6845_device> m_crtc;
-	required_device<fd1771_t> m_fdc;
+	required_device<fd1771_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
-
-void mycom_state::video_start()
-{
-	m_p_videoram = memregion("vram")->base();
-	m_p_chargen = memregion("chargen")->base();
-}
 
 MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 {
@@ -233,7 +228,7 @@ static ADDRESS_MAP_START(mycom_io, AS_IO, 8, mycom_state)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1771_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -501,7 +496,7 @@ DRIVER_INIT_MEMBER(mycom_state,mycom)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-static MACHINE_CONFIG_START( mycom, mycom_state )
+static MACHINE_CONFIG_START( mycom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mycom_map)
@@ -581,5 +576,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY                   FULLNAME       FLAGS */
-COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state,   mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                      FULLNAME      FLAGS
+COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state, mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

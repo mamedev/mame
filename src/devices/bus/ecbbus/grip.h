@@ -6,20 +6,20 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ECBBUS_GRIP_H
+#define MAME_BUS_ECBBUS_GRIP_H
+
 #pragma once
 
-#ifndef __GRIP__
-#define __GRIP__
-
-#include "emu.h"
 #include "ecbbus.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/z80sti.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
 
@@ -28,19 +28,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> grip_device
+// ======================> ecb_grip21_device
 
-class grip_device : public device_t,
-					public device_ecbbus_card_interface
+class ecb_grip21_device : public device_t, public device_ecbbus_card_interface
 {
 public:
 	// construction/destruction
-	grip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	ecb_grip21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// not really public
 	DECLARE_WRITE8_MEMBER( vol0_w );
@@ -52,29 +46,36 @@ public:
 	DECLARE_WRITE8_MEMBER( lrs_w );
 	DECLARE_READ8_MEMBER( cxstb_r );
 	DECLARE_WRITE8_MEMBER( cxstb_w );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_READ8_MEMBER( sti_gpio_r );
-	DECLARE_WRITE_LINE_MEMBER( speaker_w );
-	DECLARE_WRITE8_MEMBER( kb_w );
-
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-
-	MC6845_UPDATE_ROW( crtc_update_row );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	// device_ecbbus_card_interface overrides
 	virtual uint8_t ecbbus_io_r(offs_t offset) override;
 	virtual void ecbbus_io_w(offs_t offset, uint8_t data) override;
 
 private:
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi_pa_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_READ8_MEMBER( sti_gpio_r );
+	DECLARE_WRITE_LINE_MEMBER( speaker_w );
+
+	void kb_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+
+	MC6845_UPDATE_ROW( crtc_update_row );
+
 	required_device<i8255_device> m_ppi;
 	required_device<z80sti_device> m_sti;
 	required_device<mc6845_device> m_crtc;
@@ -111,7 +112,6 @@ private:
 
 	// timers
 	emu_timer *m_kb_timer;
-};
 
 
 	/*
@@ -123,9 +123,10 @@ private:
 	int m_dpage;            // displayed video page
 	*/
 
+};
 
 
 // device type definition
-extern const device_type ECB_GRIP21;
+DECLARE_DEVICE_TYPE(ECB_GRIP21, ecb_grip21_device)
 
-#endif
+#endif // MAME_BUS_ECBBUS_GRIP_H

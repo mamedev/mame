@@ -142,8 +142,8 @@
 //**************************************************************************
 
 // device type definition
-const device_type FD1089A = &device_creator<fd1089a_device>;
-const device_type FD1089B = &device_creator<fd1089b_device>;
+DEFINE_DEVICE_TYPE(FD1089A, fd1089a_device, "fd1089a", "Hitachi FD1089A Encrypted CPU")
+DEFINE_DEVICE_TYPE(FD1089B, fd1089b_device, "fd1089b", "Hitachi FD1089B Encrypted CPU")
 
 // common base lookup table, shared between A and B variants
 const uint8_t fd1089_base_device::s_basetable_fd1089[0x100] =
@@ -208,7 +208,7 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 	{ 0xac, 1,6,3,5,0,7,4,2 },
 };
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, fd1094_device )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, fd1094_device )
 	AM_RANGE(0x00000, 0xfffff) AM_ROM AM_SHARE(":fd1089_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -221,26 +221,23 @@ ADDRESS_MAP_END
 //  fd1089_base_device - constructor
 //-------------------------------------------------
 
-fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: m68000_device(mconfig, tag, owner, clock, shortname, source),
+fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: m68000_device(mconfig, type, tag, owner, clock),
 		m_region(*this, DEVICE_SELF),
 		m_key(*this, "key"),
 		m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
 {
-	// override the name after the m68000 initializes
-	m_name.assign(name);
-
 	// add the decrypted opcodes map
-	m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
+	set_addrmap(AS_OPCODES, ADDRESS_MAP_NAME(decrypted_opcodes_map));
 }
 
 fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fd1089_base_device(mconfig, FD1089A, "FD1089A", tag, owner, clock, "fd1089a", __FILE__)
+	: fd1089_base_device(mconfig, FD1089A, tag, owner, clock)
 {
 }
 
 fd1089b_device::fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fd1089_base_device(mconfig, FD1089B, "FD1089B", tag, owner, clock, "fd1089b", __FILE__)
+	: fd1089_base_device(mconfig, FD1089B, tag, owner, clock)
 {
 }
 

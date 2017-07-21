@@ -7,9 +7,11 @@
 */
 
 #include "emu.h"
-#include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
+
+#include "cpu/pdp1/tx0.h"
 #include "video/crt.h"
+#include "screen.h"
 
 
 /*
@@ -373,15 +375,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type TX0_READTAPE = &device_creator<tx0_readtape_image_device>;
+DEFINE_DEVICE_TYPE(TX0_READTAPE, tx0_readtape_image_device, "tx0_readtape_image", "TX0 Tape Reader")
 
 tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX0_READTAPE, "TX0 Tape Reader", tag, owner, clock, "tx0_readtape_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, TX0_READTAPE, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -406,15 +407,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type TX0_PUNCHTAPE = &device_creator<tx0_punchtape_image_device>;
+DEFINE_DEVICE_TYPE(TX0_PUNCHTAPE, tx0_punchtape_image_device, "tx0_punchtape_image", "TX0 Tape Puncher")
 
 tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX0_PUNCHTAPE, "TX0 Tape Puncher", tag, owner, clock, "tx0_punchtape_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, TX0_PUNCHTAPE, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -440,15 +440,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type TX0_PRINTER = &device_creator<tx0_printer_image_device>;
+DEFINE_DEVICE_TYPE(TX0_PRINTER, tx0_printer_image_device, "tx0_printer_image", "TX0 Typewriter")
 
 tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX0_PRINTER, "TX0 Typewriter", tag, owner, clock, "tx0_printer_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, TX0_PRINTER, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -473,15 +472,14 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 };
 
-const device_type TX0_MAGTAPE = &device_creator<tx0_magtape_image_device>;
+DEFINE_DEVICE_TYPE(TX0_MAGTAPE, tx0_magtape_image_device, "tx0_magtape_image", "TX0 Magnetic Tape")
 
 tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX0_MAGTAPE, "TX0 Magnetic Tape", tag, owner, clock, "tx0_magtape_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, TX0_MAGTAPE, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -1532,7 +1530,7 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 	}
 }
 
-static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
+static MACHINE_CONFIG_START( tx0_64kw )
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
 	MCFG_CPU_ADD("maincpu", TX0_64KW, 166667)
@@ -1559,7 +1557,7 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tx0_state, screen_update_tx0)
-	MCFG_SCREEN_VBLANK_DRIVER(tx0_state, screen_eof_tx0)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx0_state, screen_vblank_tx0))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crt", CRT, 0)
@@ -1612,6 +1610,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT INIT     COMPANY                   FULLNAME */
-COMP( 1956, tx0_64kw, 0,    0,  tx0_64kw, tx0, tx0_state,   tx0,            "MIT", "TX-0 original demonstrator (64 kWords of RAM)" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-COMP( 1962, tx0_8kw,  tx0_64kw, 0,  tx0_8kw,  tx0, tx0_state,   tx0,        "MIT", "TX-0 upgraded system (8 kWords of RAM)" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE        INIT   COMPANY  FULLNAME                                          FLAGS
+COMP( 1956, tx0_64kw, 0,        0,      tx0_64kw, tx0,   tx0_state,   tx0,   "MIT",   "TX-0 original demonstrator (64 kWords of RAM)" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1962, tx0_8kw,  tx0_64kw, 0,      tx0_8kw,  tx0,   tx0_state,   tx0,   "MIT",   "TX-0 upgraded system (8 kWords of RAM)" ,        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)

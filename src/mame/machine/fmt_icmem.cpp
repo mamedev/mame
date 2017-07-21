@@ -14,14 +14,14 @@
 #include "fmt_icmem.h"
 
 // device type definition
-const device_type FMT_ICMEM = &device_creator<fmt_icmem_device>;
+DEFINE_DEVICE_TYPE(FMT_ICMEM, fmt_icmem_device, "fmt_icmem", "FM Towns IC Memory Card")
 
 //-------------------------------------------------
 //  fmt_icmem_device - constructor
 //-------------------------------------------------
 
 fmt_icmem_device::fmt_icmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FMT_ICMEM, "FM Towns IC Memory Card", tag, owner, clock, "fmt_icmem", __FILE__),
+	: device_t(mconfig, FMT_ICMEM, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_writeprotect(*this,"icmem"),
 		m_change(false),
@@ -38,19 +38,6 @@ static INPUT_PORTS_START( fmt_icmem )
 	PORT_CONFSETTING(0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(0x01, DEF_STR( On ))
 INPUT_PORTS_END
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void fmt_icmem_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
 
 
 //-------------------------------------------------

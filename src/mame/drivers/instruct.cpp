@@ -43,11 +43,15 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "instruct.lh"
+
 
 class instruct_state : public driver_device
 {
@@ -65,7 +69,7 @@ public:
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
 	DECLARE_READ8_MEMBER(portfe_r);
-	DECLARE_READ8_MEMBER(sense_r);
+	DECLARE_READ_LINE_MEMBER(sense_r);
 	DECLARE_WRITE_LINE_MEMBER(flag_w);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
@@ -166,7 +170,7 @@ READ8_MEMBER( instruct_state::portfe_r )
 
 
 // Read cassette and SENS key
-READ8_MEMBER( instruct_state::sense_r )
+READ_LINE_MEMBER( instruct_state::sense_r )
 {
 	if (m_cassin)
 		return (m_cass->input() > 0.03) ? 1 : 0;
@@ -228,8 +232,11 @@ static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
 	AM_RANGE(0xfd, 0xfd) AM_READ(portfd_r)
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( instruct_data, AS_DATA, 8, instruct_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(sense_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -401,13 +408,15 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 	return result;
 }
 
-static MACHINE_CONFIG_START( instruct, instruct_state )
+static MACHINE_CONFIG_START( instruct )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(instruct_mem)
 	MCFG_CPU_IO_MAP(instruct_io)
+	MCFG_CPU_DATA_MAP(instruct_data)
 	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(instruct_state, flag_w))
+	MCFG_S2650_SENSE_INPUT(READLINE(instruct_state, sense_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(instruct_state, flag_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
@@ -434,5 +443,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME                    FLAGS */
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, driver_device, 0,    "Signetics", "Signetics Instructor 50", 0 )
+//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY      FULLNAME                   FLAGS
+COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )

@@ -30,9 +30,13 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/speedbal.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "includes/speedbal.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "speedbal.lh"
 
 
@@ -254,7 +258,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( speedbal, speedbal_state )
+static MACHINE_CONFIG_START( speedbal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // 4 MHz

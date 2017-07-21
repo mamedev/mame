@@ -26,19 +26,25 @@ TODO:
 
 *******************************************************************************/
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_19_6608MHz
-
 #include "emu.h"
+#include "includes/cdi.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
-#include "includes/cdi.h"
+#include "imagedev/chd_cd.h"
 #include "machine/timekpr.h"
 #include "sound/cdda.h"
-#include "cdrom.h"
-#include "cdi.lh"
-#include "imagedev/chd_cd.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "cdrom.h"
+
+#include "cdi.lh"
+
+#define CLOCK_A XTAL_30MHz
+#define CLOCK_B XTAL_19_6608MHz
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -364,7 +370,7 @@ MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 
 READ8_MEMBER( cdi_state::servo_io_r )
 {
-	if (space.debugger_access())
+	if (space.machine().side_effect_disabled())
 	{
 		return 0;
 	}
@@ -564,7 +570,7 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 
 READ8_MEMBER( cdi_state::slave_io_r )
 {
-	if (space.debugger_access())
+	if (space.machine().side_effect_disabled())
 	{
 		return 0;
 	}
@@ -764,7 +770,7 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 *************************/
 
 // CD-i Mono-I system base
-static MACHINE_CONFIG_START( cdimono1_base, cdi_state )
+static MACHINE_CONFIG_START( cdimono1_base )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 
@@ -810,7 +816,7 @@ static MACHINE_CONFIG_START( cdimono1_base, cdi_state )
 MACHINE_CONFIG_END
 
 // CD-i model 220 (Mono-II, NTSC)
-static MACHINE_CONFIG_START( cdimono2, cdi_state )
+static MACHINE_CONFIG_START( cdimono2 )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdimono2_mem)
 
@@ -864,7 +870,7 @@ static MACHINE_CONFIG_START( cdimono2, cdi_state )
 	MCFG_MK48T08_ADD( "mk48t08" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cdi910, cdi_state )
+static MACHINE_CONFIG_START( cdi910 )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdi910_mem)
 
@@ -937,7 +943,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 {
-	return rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, cdi_state )
@@ -950,7 +956,7 @@ static MACHINE_CONFIG_DERIVED( quizard1, quizard )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-//	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
 
@@ -967,7 +973,7 @@ static MACHINE_CONFIG_DERIVED( quizard4, quizard )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-//	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
 
@@ -1058,12 +1064,12 @@ ROM_END
 
 /*  Quizard notes
 
-	The MCU controls the protection sequence, which in turn controls the game display language.
-	Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
-	just the CD, but not between games as a new MCU is required.
+    The MCU controls the protection sequence, which in turn controls the game display language.
+    Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
+    just the CD, but not between games as a new MCU is required.
 
-	The only dumped MCUs are German region ones for Quizard 1 and 4.
-	A Czech Quizard 4 MCU was located but it was an 89c51 type instead
+    The only dumped MCUs are German region ones for Quizard 1 and 4.
+    A Czech Quizard 4 MCU was located but it was an 89c51 type instead
 
 */
 
@@ -1084,7 +1090,7 @@ ROM_START( quizard ) /* CD-ROM printed ??/?? */
 	DISK_IMAGE_READONLY( "quizard18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
 ROM_END
 
 
@@ -1102,7 +1108,7 @@ ROM_START( quizard_17 )
 	DISK_IMAGE_READONLY( "quizard17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
 ROM_END
 
 ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
@@ -1119,7 +1125,7 @@ ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
 	DISK_IMAGE_READONLY( "quizard12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
 ROM_END
 
 ROM_START( quizard_10 )
@@ -1139,7 +1145,7 @@ ROM_START( quizard_10 )
 	DISK_IMAGE_READONLY( "quizard10", 0, SHA1(5715db50f0d5ffe06f47c0943f4bf0481ab6048e) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
 ROM_END
 
 
@@ -1230,7 +1236,7 @@ ROM_START( quizard4 ) /* CD-ROM printed 09/98 */
 	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
+	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
 ROM_END
 
 ROM_START( quizard4_41 )
@@ -1247,7 +1253,7 @@ ROM_START( quizard4_41 )
 	DISK_IMAGE_READONLY( "quizard4r41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
+	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
 ROM_END
 
 ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
@@ -1264,7 +1270,7 @@ ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
 	DISK_IMAGE_READONLY( "quizard4r40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
+	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
 ROM_END
 
 
@@ -1272,31 +1278,31 @@ ROM_END
 *      Game driver(s)    *
 *************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     DEVICE         INIT      COMPANY     FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     DEVICE     INIT      COMPANY     FULLNAME */
 
 // BIOS / System
-CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
-CONS( 1991, cdimono2, 0,        0,        cdimono2, cdimono2, driver_device, 0,        "Philips",  "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
-CONS( 1991, cdi910,   0,        0,        cdi910,   cdimono2, driver_device, 0,        "Philips",  "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING  )
-CONS( 1991, cdi490a,  0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i 490",   MACHINE_NOT_WORKING  )
+CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      cdi_state, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
+CONS( 1991, cdimono2, 0,        0,        cdimono2, cdimono2, cdi_state, 0,        "Philips",  "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi910,   0,        0,        cdi910,   cdimono2, cdi_state, 0,        "Philips",  "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING  )
+CONS( 1991, cdi490a,  0,        0,        cdimono1, cdi,      cdi_state, 0,        "Philips",  "CD-i 490",   MACHINE_NOT_WORKING  )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
-GAME( 1995, cdibios,  0,               cdimono1_base,  quizard, driver_device,      0, ROT0,     "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
+GAME( 1995, cdibios,  0,               cdimono1_base,  quizard, cdi_state,      0, ROT0,     "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, quizard,     cdibios,      quizard1,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_17,  quizard,      quizard1,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.7)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_12,  quizard,      quizard1,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_10,  quizard,      quizard1,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard,     cdibios,      quizard1,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard (v1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_17,  quizard,      quizard1,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard (v1.7)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_12,  quizard,      quizard1,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard (v1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_10,  quizard,      quizard1,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard (v1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizard2,    cdibios,      quizard2,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard2_22, quizard2,     quizard2,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2,    cdibios,      quizard2,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2_22, quizard2,     quizard2,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 // Quizard 3 and 4 will hang after inserting a coin (incomplete protection sims?)
 
-GAME( 1995, quizard3,    cdibios,      quizard3,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, quizard3_32, quizard3,     quizard3,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard3,    cdibios,      quizard3,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, quizard3_32, quizard3,     quizard3,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1998, quizard4,    cdibios,      quizard4,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, quizard4_41, quizard4,     quizard4,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997, quizard4_40, quizard4,     quizard4,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4,    cdibios,      quizard4,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4_41, quizard4,     quizard4,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1997, quizard4_40, quizard4,     quizard4,       quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

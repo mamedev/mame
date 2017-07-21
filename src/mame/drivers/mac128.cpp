@@ -96,7 +96,9 @@ c0   8 data bits, Rx disabled
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
@@ -200,6 +202,8 @@ public:
 	/* keycode buffer (used for keypad/arrow key transition) */
 	int m_keycode_buf[2];
 	int m_keycode_buf_index;
+
+	int m_cb2_in;
 #endif
 
 	/* keyboard matrix to detect transition - macadb needs to stop relying on this */
@@ -378,6 +382,24 @@ void mac128_state::set_via_interrupt(int value)
 
 void mac128_state::vblank_irq()
 {
+#ifndef MAC_USE_EMULATED_KBD
+	/* handle keyboard */
+	if (m_kbd_comm == true && m_kbd_receive == false)
+	{
+		int keycode = scan_keyboard();
+
+		if (keycode != 0x7B)
+		{
+			/* if key pressed, send the code */
+
+			logerror("keyboard enquiry successful, keycode %X\n", keycode);
+
+			m_inquiry_timeout->reset();
+			kbd_shift_out(keycode);
+		}
+	}
+#endif
+
 	m_ca1_data ^= 1;
 	m_via->write_ca1(m_ca1_data);
 
@@ -938,19 +960,35 @@ TIMER_CALLBACK_MEMBER(mac128_state::kbd_clock)
 
 	if (m_kbd_comm == TRUE)
 	{
-		for (i=0; i<8; i++)
+		for (i=0; i<9; i++)
 		{
 			/* Put data on CB2 if we are sending*/
 			if (m_kbd_receive == FALSE)
+			{
 				m_via->write_cb2(m_kbd_shift_reg&0x80?1:0);
-			m_kbd_shift_reg <<= 1;
+				if (i > 0)
+				{
+					m_kbd_shift_reg <<= 1;
+				}
+			}
+
 			m_via->write_cb1(0);
 			m_via->write_cb1(1);
+
+			if (m_kbd_receive == TRUE)
+			{
+				if (i < 8)
+				{
+					m_kbd_shift_reg <<= 1;
+					m_kbd_shift_reg |= (m_cb2_in & 1);
+				}
+			}
 		}
 		if (m_kbd_receive == TRUE)
 		{
 			m_kbd_receive = FALSE;
 			/* Process the command received from mac */
+			//printf("Mac sent %02x\n", m_kbd_shift_reg & 0xff);
 			keyboard_receive(m_kbd_shift_reg & 0xff);
 		}
 		else
@@ -965,6 +1003,7 @@ void mac128_state::kbd_shift_out(int data)
 {
 	if (m_kbd_comm == TRUE)
 	{
+		//printf("%02x to Mac\n", data);
 		m_kbd_shift_reg = data;
 		machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(mac128_state::kbd_clock),this));
 	}
@@ -972,6 +1011,7 @@ void mac128_state::kbd_shift_out(int data)
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_out_cb2)
 {
+	//printf("CB2 = %d, kbd_comm = %d\n", state, m_kbd_comm);
 	if (m_kbd_comm == FALSE && state == 0)
 	{
 		/* Mac pulls CB2 down to initiate communication */
@@ -982,7 +1022,7 @@ WRITE_LINE_MEMBER(mac128_state::mac_via_out_cb2)
 	if (m_kbd_comm == TRUE && m_kbd_receive == TRUE)
 	{
 		/* Shift in what mac is sending */
-		m_kbd_shift_reg = (m_kbd_shift_reg & ~1) | state;
+		m_cb2_in = state;
 	}
 }
 
@@ -1001,6 +1041,7 @@ TIMER_CALLBACK_MEMBER(mac128_state::inquiry_timeout_func)
 */
 void mac128_state::keyboard_receive(int val)
 {
+	//printf("Mac sent %02x\n", val);
 	switch (val)
 	{
 	case 0x10:
@@ -1286,7 +1327,7 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-static MACHINE_CONFIG_START( mac512ke, mac128_state )
+static MACHINE_CONFIG_START( mac512ke )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(mac512ke_map)

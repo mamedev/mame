@@ -43,10 +43,13 @@
 */
 
 #include "emu.h"
+#include "includes/shootout.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
-#include "includes/shootout.h"
 #include "machine/deco222.h"
+#include "screen.h"
+#include "speaker.h"
 
 /*******************************************************************************/
 
@@ -270,7 +273,7 @@ void shootout_state::machine_reset ()
 	m_ccnt_old_val = 0x40;
 }
 
-static MACHINE_CONFIG_START( shootout, shootout_state )
+static MACHINE_CONFIG_START( shootout )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, XTAL_12MHz / 6) // 2 MHz?
@@ -303,7 +306,7 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shootouj, shootout_state )
+static MACHINE_CONFIG_START( shootouj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)

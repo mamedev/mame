@@ -1,33 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Mathis Rosenhauer
 // thanks-to:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
-#ifndef __AVGDVG__
-#define __AVGDVG__
+#ifndef MAME_VIDEO_AVGDVG_H
+#define MAME_VIDEO_AVGDVG_H
 
-#define MAXVECT      (10000)
+#pragma once
 
 #include "video/vector.h"
 
 #define MCFG_AVGDVG_VECTOR(_tag) \
 	avgdvg_device::static_set_vector_tag(*device, "^" _tag);
 
-struct vgvector
-{
-	int x; int y;
-	rgb_t color;
-	int intensity;
-	int arg1; int arg2;
-	int status;
-};
-
 // ======================> avgdvg_device
 
 class avgdvg_device : public device_t
 {
 public:
-	// construction/destruction
-	avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	static void static_set_vector_tag(device_t &device, const char *tag);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
@@ -44,6 +32,20 @@ public:
 	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
 	TIMER_CALLBACK_MEMBER(run_state_machine);
 protected:
+	static constexpr unsigned MAXVECT = 10000;
+
+	struct vgvector
+	{
+		int x; int y;
+		rgb_t color;
+		int intensity;
+		int arg1; int arg2;
+		int status;
+	};
+
+	// construction/destruction
+	avgdvg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	void apply_flipping(int *x, int *y);
 	void vg_set_halt(int dummy);
 
@@ -132,6 +134,7 @@ public:
 
 	void dvg_draw_to(int x, int y, int intensity);
 
+protected:
 	virtual int handler_0() override;
 	virtual int handler_1() override;
 	virtual int handler_2() override;
@@ -149,18 +152,20 @@ public:
 };
 
 // device type definition
-extern const device_type DVG;
+DECLARE_DEVICE_TYPE(DVG, dvg_device)
 
 class avg_device : public avgdvg_device
 {
 public:
 	// construction/destruction
 	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	int avg_common_strobe1();
 	int avg_common_strobe2();
 	int avg_common_strobe3();
+
+protected:
+	avg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual int handler_0() override;
 	virtual int handler_1() override;
@@ -179,7 +184,7 @@ public:
 };
 
 // device type definition
-extern const device_type AVG;
+DECLARE_DEVICE_TYPE(AVG, avg_device)
 
 class avg_tempest_device : public avg_device
 {
@@ -187,13 +192,14 @@ public:
 	// construction/destruction
 	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual int handler_6() override;
 	virtual int handler_7() override;
 	//virtual void vggo();
 };
 
 // device type definition
-extern const device_type AVG_TEMPEST;
+DECLARE_DEVICE_TYPE(AVG_TEMPEST, avg_tempest_device)
 
 class avg_mhavoc_device : public avg_device
 {
@@ -201,6 +207,7 @@ public:
 	// construction/destruction
 	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual int handler_1() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
@@ -209,26 +216,30 @@ public:
 };
 
 // device type definition
-extern const device_type AVG_MHAVOC;
+DECLARE_DEVICE_TYPE(AVG_MHAVOC, avg_mhavoc_device)
 
 class avg_starwars_device : public avg_device
 {
 public:
 	// construction/destruction
 	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual int handler_6() override;
 	virtual int handler_7() override;
 	virtual void update_databus() override;
 };
 
 // device type definition
-extern const device_type AVG_STARWARS;
+DECLARE_DEVICE_TYPE(AVG_STARWARS, avg_starwars_device)
 
 class avg_quantum_device : public avg_device
 {
 public:
 	// construction/destruction
 	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual int handler_0() override;
 	virtual int handler_1() override;
 	virtual int handler_2() override;
@@ -242,20 +253,22 @@ public:
 };
 
 // device type definition
-extern const device_type AVG_QUANTUM;
+DECLARE_DEVICE_TYPE(AVG_QUANTUM, avg_quantum_device)
 
 class avg_bzone_device : public avg_device
 {
 public:
 	// construction/destruction
 	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual int handler_1() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
 };
 
 // device type definition
-extern const device_type AVG_BZONE;
+DECLARE_DEVICE_TYPE(AVG_BZONE, avg_bzone_device)
 
 class avg_tomcat_device : public avg_device
 {
@@ -263,12 +276,13 @@ public:
 	// construction/destruction
 	avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual int handler_6() override;
 	virtual int handler_7() override;
 };
 
 // device type definition
-extern const device_type AVG_TOMCAT;
+DECLARE_DEVICE_TYPE(AVG_TOMCAT, avg_tomcat_device)
 
 
-#endif
+#endif // MAME_VIDEO_AVGDVG_H

@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-#include "emu.h"
+#ifndef MAME_INCLUDES_KAYPRO_H
+#define MAME_INCLUDES_KAYPRO_H
+
+#pragma once
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
@@ -26,6 +30,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 		, m_pio_g(*this, "z80pio_g")
 		, m_pio_s(*this, "z80pio_s")
 		, m_sio(*this, "z80sio")
@@ -70,7 +75,9 @@ public:
 	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
 	MC6845_UPDATE_ROW(kaypro2x_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
-	const uint8_t *m_p_chargen;
+	TIMER_CALLBACK_MEMBER( kay_kbd_beepoff );
+
+private:
 	uint8_t m_mc6845_cursor[16];
 	uint8_t m_mc6845_reg[32];
 	uint8_t m_mc6845_ind;
@@ -78,14 +85,10 @@ public:
 	uint8_t *m_p_videoram;
 	kay_kbd_t *m_kbd;
 	int m_centronics_busy;
-	required_device<palette_device> m_palette;
 	void kay_kbd_in(uint8_t data );
 	uint8_t kay_kbd_c_r();
 	uint8_t kay_kbd_d_r();
-	TIMER_CALLBACK_MEMBER( kay_kbd_beepoff );
 	void kay_kbd_d_w( uint8_t data );
-
-private:
 	bool m_is_motor_off;
 	uint8_t m_fdc_rq;
 	uint8_t m_system_port;
@@ -94,15 +97,19 @@ private:
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
 	required_device<z80sio0_device> m_sio;
 	optional_device<z80sio0_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
 };
+
+#endif // MAME_INCLUDES_KAYPRO_H

@@ -59,16 +59,13 @@ map:
 
 
 
-
-
 // cart device
 
-const device_type A26_ROM_HARMONY = &device_creator<a26_rom_harmony_device>;
+DEFINE_DEVICE_TYPE(A26_ROM_HARMONY, a26_rom_harmony_device, "a2600_harmony", "Atari 2600 ROM Cart HARMONY/MELODY")
 
 
 a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, "Atari 2600 ROM Cart HARMONY/MELODY", tag, owner, clock, "a2600_harmony", __FILE__),
-						m_cpu(*this, "arm")
+	: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, tag, owner, clock), m_cpu(*this, "arm")
 {
 }
 
@@ -84,15 +81,10 @@ void a26_rom_harmony_device::device_start()
 static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_device )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( a26_harmony )
+MACHINE_CONFIG_MEMBER( a26_rom_harmony_device::device_add_mconfig )
 	MCFG_CPU_ADD("arm", LPC2103, 70000000)
 	MCFG_CPU_PROGRAM_MAP(harmony_arm7_map)
 MACHINE_CONFIG_END
-
-machine_config_constructor a26_rom_harmony_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a26_harmony );
-}
 
 // actually if the ARM code is doing this and providing every opcode to the main CPU based
 // on bus activity then we shouldn't be doing and of this here (if the ROM is actually

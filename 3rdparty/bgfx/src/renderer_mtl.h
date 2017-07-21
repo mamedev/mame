@@ -843,7 +843,7 @@ namespace bgfx { namespace mtl
 		CommandQueueMtl() : m_releaseWriteIndex(0), m_releaseReadIndex(0)
 		{
 		}
-		
+
 		void init(Device _device);
 		void shutdown();
 		CommandBuffer alloc();
@@ -856,13 +856,13 @@ namespace bgfx { namespace mtl
 
 		CommandQueue  m_commandQueue;
 		CommandBuffer m_activeCommandBuffer;
-		
+
 		int m_releaseWriteIndex;
 		int m_releaseReadIndex;
 		typedef stl::vector<NSObject*> ResourceArray;
 		ResourceArray m_release[MTL_MAX_FRAMES_IN_FLIGHT];
 	};
-	
+
 	struct TimerQueryMtl
 	{
 		TimerQueryMtl()
@@ -896,6 +896,7 @@ namespace bgfx { namespace mtl
 		void begin(RenderCommandEncoder& _rce, Frame* _render, OcclusionQueryHandle _handle);
 		void end(RenderCommandEncoder& _rce);
 		void resolve(Frame* _render, bool _wait = false);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		struct Query
 		{
@@ -903,7 +904,7 @@ namespace bgfx { namespace mtl
 		};
 
 		Buffer m_buffer;
-		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

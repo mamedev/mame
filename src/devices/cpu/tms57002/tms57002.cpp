@@ -8,12 +8,12 @@
 
 ***************************************************************************/
 
-
 #include "emu.h"
-#include "debugger.h"
 #include "tms57002.h"
+#include "debugger.h"
 
-const device_type TMS57002 = &device_creator<tms57002_device>;
+
+DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "TMS57002")
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
 static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)
@@ -21,11 +21,11 @@ static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)
 ADDRESS_MAP_END
 
 tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS57002, "TMS57002", tag, owner, clock, "tms57002", __FILE__),
-		device_sound_interface(mconfig, *this), macc(0), st0(0), st1(0), sti(0),
-		txrd(0),
-		program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, ADDRESS_MAP_NAME(internal_pgm)),
-		data_config("data", ENDIANNESS_LITTLE, 8, 20)
+	: cpu_device(mconfig, TMS57002, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, macc(0), st0(0), st1(0), sti(0), txrd(0)
+	, program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, ADDRESS_MAP_NAME(internal_pgm))
+	, data_config("data", ENDIANNESS_LITTLE, 8, 20)
 {
 }
 
@@ -908,11 +908,10 @@ offs_t tms57002_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	return CPU_DISASSEMBLE_NAME(tms57002)(this, stream, pc, oprom, opram, options);
 }
 
-const address_space_config *tms57002_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector tms57002_device::memory_space_config() const
 {
-	switch(spacenum) {
-	case AS_PROGRAM: return &program_config;
-	case AS_DATA: return &data_config;
-	default: return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &program_config),
+		std::make_pair(AS_DATA, &data_config)
+	};
 }

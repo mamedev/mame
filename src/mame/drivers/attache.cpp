@@ -52,19 +52,24 @@
  */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/ay8910.h"
+#include "machine/am9517a.h"
 #include "machine/msm5832.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
-#include "machine/z80ctc.h"
-#include "machine/am9517a.h"
-#include "machine/upd765.h"
+#include "sound/ay8910.h"
 #include "video/tms9927.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class attache_state : public driver_device
 {
@@ -131,7 +136,6 @@ public:
 
 	// overrides
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_int(screen_device &screen, bool state);
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -261,7 +265,7 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 	else
 		bitmap.fill(0);
-	
+
 	// Text output
 	for(y=0;y<(bitmap.height()-1)/10;y++)  // lines
 	{
@@ -337,11 +341,6 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 	}
 	return 0;
-}
-
-void attache_state::vblank_int(screen_device &screen, bool state)
-{
-	m_ctc->trg2(state);
 }
 
 READ8_MEMBER(attache_state::rom_r)
@@ -913,7 +912,7 @@ void attache_state::machine_reset()
 	m_kb_bitpos = 0;
 }
 
-static MACHINE_CONFIG_START( attache, attache_state )
+static MACHINE_CONFIG_START( attache )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
 	MCFG_CPU_IO_MAP(attache_io)
@@ -927,7 +926,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(attache_state, vblank_int)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
@@ -997,5 +996,5 @@ ROM_START( attache )
 	ROM_LOAD("u630.bin",  0x0000, 0x0100, CRC(f7a5c821) SHA1(fea07d9ac7e4e5f4f72aa7b2159deaedbd662ead) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS)
+//    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY     FULLNAME             FLAGS
+COMP( 1982, attache, 0,      0,         attache,    attache, attache_state,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS )

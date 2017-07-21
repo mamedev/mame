@@ -18,7 +18,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_tms1k.h"
+
+#include "speaker.h"
 
 // internal artwork
 #include "cmulti8.lh"
@@ -26,6 +29,7 @@
 #include "mathmarv.lh"
 #include "ti1250.lh"
 #include "ti1270.lh"
+#include "ti25503.lh"
 #include "ti30.lh"
 #include "tisr16.lh"
 #include "wizatron.lh"
@@ -76,11 +80,11 @@ void cmulti8_state::prepare_display()
 	set_display_segmask(0xfffff, 0xff);
 
 	// M-digit is on in memory mode, upper row is off in single mode
-	uint32_t m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
-	uint32_t mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
+	u32 m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
+	u32 mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
 
 	// R10 selects display row
-	uint32_t sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
+	u32 sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
 	display_matrix(8, 21, m_o, (sel & mask) | m);
 }
 
@@ -180,7 +184,7 @@ static INPUT_PORTS_START( cmulti8 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmulti8, cmulti8_state )
+static MACHINE_CONFIG_START( cmulti8 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1070, 250000) // approximation - RC osc. R=56K, C=68pf
@@ -396,7 +400,7 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tisr16, tisr16_state )
+static MACHINE_CONFIG_START( tisr16 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
@@ -510,7 +514,7 @@ static INPUT_PORTS_START( ti1250 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
 	PORT_START("IN.5") // O7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("MC")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("MC")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+")
@@ -534,7 +538,7 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti1250, ti1250_state )
+static MACHINE_CONFIG_START( ti1250 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // approximation - RC osc. R=68K, C=68pf
@@ -557,6 +561,121 @@ static MACHINE_CONFIG_DERIVED( ti1270, ti1250 )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1250_state, write_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-2550 III/TI-1265 (both have same chip)
+  * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
+  * 9-digit cyan VFD display
+
+***************************************************************************/
+
+class ti25503_state : public ticalc1x_state
+{
+public:
+	ti25503_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void ti25503_state::prepare_display()
+{
+	set_display_segmask(0x1ff, 0xff);
+	display_matrix(8, 9, m_o, m_r);
+}
+
+WRITE16_MEMBER(ti25503_state::write_r)
+{
+	// R0-R6: input mux
+	// R0-R8: select digit
+	m_r = m_inp_mux = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(ti25503_state::write_o)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(ti25503_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(7);
+}
+
+
+// config
+
+static INPUT_PORTS_START( ti25503 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( ti25503 )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(ti25503_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti25503_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti25503_state, write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ti25503)
+
+	/* no sound! */
 MACHINE_CONFIG_END
 
 
@@ -645,7 +764,7 @@ static INPUT_PORTS_START( ti1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti1000, ti1000_state )
+static MACHINE_CONFIG_START( ti1000 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
@@ -745,7 +864,7 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wizatron, wizatron_state )
+static MACHINE_CONFIG_START( wizatron )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
@@ -819,7 +938,7 @@ static INPUT_PORTS_START( lilprof )
 	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilprof, lilprof_state )
+static MACHINE_CONFIG_START( lilprof )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
@@ -865,8 +984,8 @@ public:
 WRITE16_MEMBER(lilprof78_state::write_r)
 {
 	// update leds state
-	uint8_t seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
-	uint16_t r = (data & 7) | (data << 1 & 0x1f0);
+	u8 seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	u16 r = (data & 7) | (data << 1 & 0x1f0);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(7, 9, seg, r, false);
 
@@ -929,7 +1048,7 @@ static INPUT_PORTS_START( lilprof78 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilprof78, lilprof78_state )
+static MACHINE_CONFIG_START( lilprof78 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
@@ -1041,7 +1160,7 @@ static INPUT_PORTS_START( dataman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( dataman, dataman_state )
+static MACHINE_CONFIG_START( dataman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // patent says 300kHz
@@ -1108,7 +1227,7 @@ static INPUT_PORTS_START( mathmarv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mathmarv, mathmarv_state )
+static MACHINE_CONFIG_START( mathmarv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // assume same as dataman
@@ -1368,7 +1487,7 @@ static INPUT_PORTS_START( tibusan )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti30, ti30_state )
+static MACHINE_CONFIG_START( ti30 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed
@@ -1465,6 +1584,17 @@ ROM_START( ti1270 )
 	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+ROM_START( ti25503 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1043nl_za0352", 0x0000, 0x0400, CRC(434c2684) SHA1(ff566f1991f63cfe057879674e6bc7ccd580a919) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti25503_micro.pla", 0, 867, CRC(65d274ae) SHA1(33d77efe38f8b067096c643d71263bb5adde0ca9) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ti25503_output.pla", 0, 365, CRC(ac43b768) SHA1(5eb19b493328c73edab73e44591afda0fbe4965f) )
 ROM_END
 
 
@@ -1599,24 +1729,27 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1977, cmulti8,   0,        0, cmulti8,   cmulti8,   driver_device, 0, "Canon", "Multi 8 (Canon)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      STATE         INIT  COMPANY, FULLNAME, FLAGS
+COMP( 1977, cmulti8,   0,       0, cmulti8,   cmulti8,   cmulti8_state,   0, "Canon", "Multi 8 (Canon)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1975, tisr16ii,  0,        0, tisr16,    tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1974, tisr16,    0,       0, tisr16,    tisr16,    tisr16_state,    0, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, tisr16ii,  0,       0, tisr16,    tisr16ii,  tisr16_state,    0, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1975, ti1250,    0,        0, ti1250,    ti1250,    driver_device, 0, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti125076,  ti1250,   0, ti1270,    ti1250,    driver_device, 0, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, ti1250,    0,       0, ti1250,    ti1250,    ti1250_state,    0, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti125076,  ti1250,  0, ti1270,    ti1250,    ti1250_state,    0, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti1270,    0,       0, ti1270,    ti1270,    ti1250_state,    0, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1977, wizatron,  0,        0, wizatron,  wizatron,  driver_device, 0, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti25503,   0,       0, ti25503,   ti25503,   ti25503_state,   0, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1977, dataman,   0,        0, dataman,   dataman,   driver_device, 0, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, mathmarv,  0,        0, mathmarv,  mathmarv,  driver_device, 0, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
+COMP( 1977, ti1000,    0,       0, ti1000,    ti1000,    ti1000_state,    0, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1976, ti30,      0,        0, ti30,      ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, tibusan,   0,        0, ti30,      tibusan,   driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, tiprog,    0,        0, ti30,      tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, wizatron,  0,       0, wizatron,  wizatron,  wizatron_state,  0, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, lilprof,   0,       0, lilprof,   lilprof,   lilprof_state,   0, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1978, lilprof78, lilprof, 0, lilprof78, lilprof78, lilprof78_state, 0, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+COMP( 1977, dataman,   0,       0, dataman,   dataman,   dataman_state,   0, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, mathmarv,  0,       0, mathmarv,  mathmarv,  mathmarv_state,  0, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
+
+COMP( 1976, ti30,      0,       0, ti30,      ti30,      ti30_state,      0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, tibusan,   0,       0, ti30,      tibusan,   ti30_state,      0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,       0, ti30,      tiprog,    ti30_state,      0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

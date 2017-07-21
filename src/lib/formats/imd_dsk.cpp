@@ -492,10 +492,13 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			}
 		}
 
-		if(fm)
-			build_pc_track_fm(track, head, image, cell_count, sector_count, sects, gap_3);
-		else
-			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, gap_3);
+		if(sector_count) {
+			if(fm) {
+				build_pc_track_fm(track, head, image, cell_count, sector_count, sects, gap_3);
+			} else {
+				build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, gap_3);
+			}
+		}
 
 		for(int i=0; i<sector_count; i++)
 			if(sects[i].data && (sects[i].data < &img[0] || sects[i].data >= (&img[0] + size)))

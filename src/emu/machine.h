@@ -21,21 +21,18 @@
 
 #include <time.h>
 
-// forward declaration instead of osdepend.h
-class osd_interface;
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
 // machine phases
-enum machine_phase
+enum class machine_phase
 {
-	MACHINE_PHASE_PREINIT,
-	MACHINE_PHASE_INIT,
-	MACHINE_PHASE_RESET,
-	MACHINE_PHASE_RUNNING,
-	MACHINE_PHASE_EXIT
+	PREINIT,
+	INIT,
+	RESET,
+	RUNNING,
+	EXIT
 };
 
 
@@ -52,15 +49,15 @@ enum machine_notification
 
 
 // debug flags
-const int DEBUG_FLAG_ENABLED        = 0x00000001;       // debugging is enabled
-const int DEBUG_FLAG_CALL_HOOK      = 0x00000002;       // CPU cores must call instruction hook
-const int DEBUG_FLAG_WPR_PROGRAM    = 0x00000010;       // watchpoints are enabled for PROGRAM memory reads
-const int DEBUG_FLAG_WPR_DATA       = 0x00000020;       // watchpoints are enabled for DATA memory reads
-const int DEBUG_FLAG_WPR_IO         = 0x00000040;       // watchpoints are enabled for IO memory reads
-const int DEBUG_FLAG_WPW_PROGRAM    = 0x00000100;       // watchpoints are enabled for PROGRAM memory writes
-const int DEBUG_FLAG_WPW_DATA       = 0x00000200;       // watchpoints are enabled for DATA memory writes
-const int DEBUG_FLAG_WPW_IO         = 0x00000400;       // watchpoints are enabled for IO memory writes
-const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is enabled
+constexpr int DEBUG_FLAG_ENABLED        = 0x00000001;       // debugging is enabled
+constexpr int DEBUG_FLAG_CALL_HOOK      = 0x00000002;       // CPU cores must call instruction hook
+constexpr int DEBUG_FLAG_WPR_PROGRAM    = 0x00000010;       // watchpoints are enabled for PROGRAM memory reads
+constexpr int DEBUG_FLAG_WPR_DATA       = 0x00000020;       // watchpoints are enabled for DATA memory reads
+constexpr int DEBUG_FLAG_WPR_IO         = 0x00000040;       // watchpoints are enabled for IO memory reads
+constexpr int DEBUG_FLAG_WPW_PROGRAM    = 0x00000100;       // watchpoints are enabled for PROGRAM memory writes
+constexpr int DEBUG_FLAG_WPW_DATA       = 0x00000200;       // watchpoints are enabled for DATA memory writes
+constexpr int DEBUG_FLAG_WPW_IO         = 0x00000400;       // watchpoints are enabled for IO memory writes
+constexpr int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is enabled
 
 
 
@@ -79,26 +76,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declarations
-class render_manager;
-class sound_manager;
-class video_manager;
-class ui_manager;
-class tilemap_manager;
-class debug_view_manager;
-class network_manager;
-class bookkeeping_manager;
-class configuration_manager;
-class output_manager;
-class ui_input_manager;
-class crosshair_manager;
-class image_manager;
-class rom_load_manager;
-class debugger_manager;
-class osd_interface;
-enum class config_type;
-
 
 // ======================> system_time
 
@@ -150,7 +127,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	const address_space_config  m_space_config;
@@ -166,6 +143,8 @@ typedef delegate<void ()> machine_notify_delegate;
 class running_machine
 {
 	DISABLE_COPYING(running_machine);
+
+	class side_effect_disabler;
 
 	friend class sound_manager;
 	friend class memory_manager;
@@ -211,13 +190,18 @@ public:
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
 	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
-	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
+	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
 	bool ui_active() const { return m_ui_active; }
 	const char *basename() const { return m_basename.c_str(); }
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
 	screen_device *first_screen() const { return primary_screen; }
+
+	// RAII-based side effect disable
+	// NOP-ed when passed false, to make it more easily conditional
+	side_effect_disabler disable_side_effect(bool disable_se = true) { return side_effect_disabler(this, disable_se); }
+	bool side_effect_disabled() const { return m_side_effect_disabled != 0; }
 
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
@@ -249,8 +233,8 @@ public:
 	void schedule_exit();
 	void schedule_hard_reset();
 	void schedule_soft_reset();
-	void schedule_save(const char *filename);
-	void schedule_load(const char *filename);
+	void schedule_save(std::string &&filename);
+	void schedule_load(std::string &&filename);
 
 	// date & time
 	void base_datetime(system_time &systime);
@@ -264,8 +248,8 @@ public:
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	void strlog(const char *str) const;
 	u32 rand();
-	const char *describe_context();
-	std::string compose_saveload_filename(const char *base_filename, const char **searchpath = nullptr);
+	std::string describe_context() const;
+	std::string compose_saveload_filename(std::string &&base_filename, const char **searchpath = nullptr);
 
 	// CPU information
 	cpu_device *            firstcpu;           // first CPU
@@ -274,16 +258,41 @@ private:
 	// video-related information
 	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless
 
+	// side effect disable counter
+	u32                     m_side_effect_disabled;
+
 public:
 	// debugger-related information
 	u32                     debug_flags;        // the current debug flags
 
 private:
+	class side_effect_disabler {
+		running_machine *m_machine;
+		bool m_disable_se;
+
+	public:
+		side_effect_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
+			if(m_disable_se)
+				m_machine->disable_side_effect_count();
+		}
+
+		~side_effect_disabler() {
+			if(m_disable_se)
+				m_machine->enable_side_effect_count();
+		}
+
+		side_effect_disabler(const side_effect_disabler &) = delete;
+		side_effect_disabler(side_effect_disabler &&) = default;
+	};
+
+	void disable_side_effect_count() { m_side_effect_disabled++; }
+	void enable_side_effect_count()  { m_side_effect_disabled--; }
+
 	// internal helpers
 	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
 	template <typename T> struct is_null<T *> { template <typename U> static bool value(U &&x) { return !x; } };
 	void start();
-	void set_saveload_filename(const char *filename);
+	void set_saveload_filename(std::string &&filename);
 	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, s32 param = 0);
@@ -337,16 +346,15 @@ private:
 	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
-	std::string             m_context;              // context string buffer
 	int                     m_sample_rate;          // the digital audio sample rate
 	std::unique_ptr<emu_file>  m_logfile;              // pointer to the active log file
 
 	// load/save management
-	enum saveload_schedule
+	enum class saveload_schedule
 	{
-		SLS_NONE,
-		SLS_SAVE,
-		SLS_LOAD
+		NONE,
+		SAVE,
+		LOAD
 	};
 	saveload_schedule       m_saveload_schedule;
 	attotime                m_saveload_schedule_time;
@@ -388,6 +396,23 @@ private:
 
 	// configuration state
 	dummy_space_device m_dummy_space;
+
+#if defined(EMSCRIPTEN)
+private:
+	static running_machine *emscripten_running_machine;
+	static void emscripten_main_loop();
+public:
+	static void emscripten_set_running_machine(running_machine *machine);
+	static running_machine * emscripten_get_running_machine();
+	static ui_manager * emscripten_get_ui();
+	static sound_manager * emscripten_get_sound();
+
+	static void emscripten_exit();
+	static void emscripten_hard_reset();
+	static void emscripten_soft_reset();
+	static void emscripten_save(const char *name);
+	static void emscripten_load(const char *name);
+#endif
 };
 
 

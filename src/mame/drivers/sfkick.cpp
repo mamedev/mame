@@ -158,6 +158,8 @@ DIPSW-2
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sfkick_state : public driver_device
@@ -577,7 +579,7 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
-static MACHINE_CONFIG_START( sfkick, sfkick_state )
+static MACHINE_CONFIG_START( sfkick )
 
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_map)

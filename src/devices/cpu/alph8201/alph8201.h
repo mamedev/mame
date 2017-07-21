@@ -20,8 +20,8 @@ cpu/alph8201/ will be removed when the alpha 8304 has been dumped.
 	*                                                                          *
 	\**************************************************************************/
 
-#ifndef __ALPH8201_H__
-#define __ALPH8201_H__
+#ifndef MAME_CPU_ALPH8201_ALPH8201_H
+#define MAME_CPU_ALPH8201_ALPH8201_H
 
 #pragma once
 
@@ -51,9 +51,18 @@ class alpha8201_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
 protected:
+	typedef void ( alpha8201_cpu_device::*opcode_fun ) ();
+
+	/* The opcode table now is a combination of cycle counts and function pointers */
+	struct s_opcode {
+		unsigned cycles;
+		opcode_fun opcode_func;
+	};
+
+	alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const s_opcode *opmap);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -66,7 +75,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -352,14 +361,6 @@ protected:
 	void save_zc() { m_savez = m_zf; m_savec = m_cf; };
 	void rest_zc() { m_zf = m_savez; m_cf = m_savec; };
 
-	typedef void ( alpha8201_cpu_device::*opcode_fun ) ();
-
-	/* The opcode table now is a combination of cycle counts and function pointers */
-	struct s_opcode {
-		unsigned cycles;
-		opcode_fun opcode_func;
-	};
-
 	static const s_opcode opcode_8201[256];
 	static const s_opcode opcode_8301[256];
 
@@ -393,7 +394,7 @@ protected:
 	int m_icount;
 	int m_inst_cycles;
 
-	const s_opcode *m_opmap;
+	const s_opcode *const m_opmap;
 
 	// Used for import/export only
 	u8 m_sp;
@@ -410,8 +411,7 @@ public:
 };
 
 
-extern const device_type ALPHA8201L;
-extern const device_type ALPHA8301L;
+DECLARE_DEVICE_TYPE(ALPHA8201L, alpha8201_cpu_device)
+DECLARE_DEVICE_TYPE(ALPHA8301L, alpha8301_cpu_device)
 
-
-#endif  /* __ALPH8201_H__ */
+#endif  // MAME_CPU_ALPH8201_ALPH8201_H

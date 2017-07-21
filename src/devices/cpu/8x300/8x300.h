@@ -7,10 +7,10 @@
  *  Created on: 18/12/2013
  */
 
-#ifndef _8X300_H_
-#define _8X300_H_
+#ifndef MAME_CPU_8X300_8X300_H
+#define MAME_CPU_8X300_8X300_H
 
-#include "emu.h"
+#pragma once
 
 // Register enumeration
 enum
@@ -60,15 +60,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
@@ -134,6 +126,6 @@ private:
 	uint8_t get_reg(uint8_t reg);
 };
 
-extern const device_type N8X300;
+DECLARE_DEVICE_TYPE(N8X300, n8x300_cpu_device)
 
-#endif /* 8X300_H_ */
+#endif // MAME_CPU_8X300_8X300_H

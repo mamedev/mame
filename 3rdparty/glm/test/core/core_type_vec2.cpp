@@ -6,6 +6,10 @@
 #	include <type_traits>
 #endif
 
+static glm::vec2 v1;
+static glm::vec2 v2(1);
+static glm::vec2 v3(1, 1);
+
 int test_vec2_operators()
 {
 	int Error = 0;
@@ -265,6 +269,8 @@ int test_vec2_size()
 	Error += 16 == sizeof(glm::highp_dvec2) ? 0 : 1;
 	Error += glm::vec2().length() == 2 ? 0 : 1;
 	Error += glm::dvec2().length() == 2 ? 0 : 1;
+	Error += glm::vec2::length() == 2 ? 0 : 1;
+	Error += glm::dvec2::length() == 2 ? 0 : 1;
 
 	return Error;
 }

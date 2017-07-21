@@ -12,6 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
+#include "screen.h"
 
 class cyberbal_state : public atarigen_state
 {
@@ -78,7 +79,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_68k_dac_w);
 	DECLARE_DRIVER_INIT(cyberbalt);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	DECLARE_MACHINE_START(cyberbal);
 	DECLARE_MACHINE_START(cyberbal2p);
 	DECLARE_MACHINE_RESET(cyberbal);

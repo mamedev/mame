@@ -8,10 +8,9 @@
 #ifndef PEXCEPTION_H_
 #define PEXCEPTION_H_
 
-#include <exception>
-
-#include "pconfig.h"
 #include "pstring.h"
+
+#include <exception>
 
 namespace plib {
 //============================================================
@@ -21,12 +20,13 @@ namespace plib {
 class pexception : public std::exception
 {
 public:
-	explicit pexception(const pstring text);
-	pexception(const pexception &e) : std::exception(e) { m_text = e.m_text; }
+	explicit pexception(const pstring &text);
+	pexception(const pexception &e) : std::exception(e), m_text(e.m_text) { }
 
 	virtual ~pexception() noexcept;
 
 	const pstring &text() { return m_text; }
+	const char* what() const noexcept override { return m_text.c_str(); }
 
 private:
 	pstring m_text;
@@ -35,7 +35,7 @@ private:
 class file_e : public plib::pexception
 {
 public:
-	explicit file_e(const pstring fmt, const pstring &filename);
+	file_e(const pstring &fmt, const pstring &filename);
 	file_e(const file_e &e) : pexception(e) { }
 	virtual ~file_e() noexcept;
 };
@@ -87,17 +87,17 @@ public:
 class fpexception_e : public pexception
 {
 public:
-	fpexception_e(const pstring &text);
+	explicit fpexception_e(const pstring &text);
 	fpexception_e(const fpexception_e &e) : pexception(e) { }
 	virtual ~fpexception_e() noexcept;
 };
 
-static const unsigned FP_INEXACT = 0x0001;
-static const unsigned FP_DIVBYZERO = 0x0002;
-static const unsigned FP_UNDERFLOW = 0x0004;
-static const unsigned FP_OVERFLOW = 0x0008;
-static const unsigned FP_INVALID = 0x00010;
-static const unsigned FP_ALL = 0x0001f;
+static constexpr unsigned FP_INEXACT = 0x0001;
+static constexpr unsigned FP_DIVBYZERO = 0x0002;
+static constexpr unsigned FP_UNDERFLOW = 0x0004;
+static constexpr unsigned FP_OVERFLOW = 0x0008;
+static constexpr unsigned FP_INVALID = 0x00010;
+static constexpr unsigned FP_ALL = 0x0001f;
 
 /*
  * Catch SIGFPE on linux for debugging purposes.
@@ -106,7 +106,7 @@ static const unsigned FP_ALL = 0x0001f;
 class fpsignalenabler
 {
 public:
-	fpsignalenabler(unsigned fpexceptions);
+	explicit fpsignalenabler(unsigned fpexceptions);
 	~fpsignalenabler();
 
 	/* is the functionality supported ? */

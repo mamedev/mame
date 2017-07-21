@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port1f_w);
 	DECLARE_READ8_MEMBER(port90_r);
 	DECLARE_READ8_MEMBER(port91_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -72,7 +72,10 @@ static ADDRESS_MAP_START( chaos_io, AS_IO, 8, chaos_state )
 	AM_RANGE(0x90, 0x90) AM_READ(port90_r)
 	AM_RANGE(0x91, 0x91) AM_READ(port91_r)
 	AM_RANGE(0x92, 0x92) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0x101, 0x103) AM_NOP // stops error log filling up while using debug
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( chaos_data, AS_DATA, 8, chaos_state )
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -125,7 +128,7 @@ READ8_MEMBER( chaos_state::port91_r )
 	return ret;
 }
 
-WRITE8_MEMBER( chaos_state::kbd_put )
+void chaos_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -138,15 +141,16 @@ void chaos_state::machine_reset()
 	memcpy(m_p_ram+0x7000, ROM+0x3000, 0x1000);
 }
 
-static MACHINE_CONFIG_START( chaos, chaos_state )
+static MACHINE_CONFIG_START( chaos )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(chaos_mem)
 	MCFG_CPU_IO_MAP(chaos_io)
+	MCFG_CPU_DATA_MAP(chaos_data)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(chaos_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(chaos_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -160,5 +164,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY        FULLNAME       FLAGS */
-COMP( 1983, chaos,  0,      0,       chaos,     chaos, driver_device,   0,   "David Greaves",  "Chaos 2", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY          FULLNAME   FLAGS
+COMP( 1983, chaos,  0,      0,      chaos,   chaos, chaos_state, 0,    "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )

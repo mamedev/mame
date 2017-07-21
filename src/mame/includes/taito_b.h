@@ -4,6 +4,7 @@
 #include "machine/taitoio.h"
 #include "video/hd63484.h"
 #include "video/tc0180vcu.h"
+#include "screen.h"
 
 class taitob_state : public driver_device
 {
@@ -86,9 +87,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gain_control_w);
 	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
 	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
 	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
-	DECLARE_READ16_MEMBER(pbobble_input_bypass_r);
 	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
 	DECLARE_WRITE16_MEMBER(realpunc_output_w);
 	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
@@ -110,7 +111,7 @@ public:
 	DECLARE_VIDEO_START(taitob_core);
 	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_taitob(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitob);
 	INTERRUPT_GEN_MEMBER(rastansaga2_interrupt);
 	INTERRUPT_GEN_MEMBER(crimec_interrupt);
 	INTERRUPT_GEN_MEMBER(hitice_interrupt);

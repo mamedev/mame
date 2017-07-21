@@ -273,25 +273,31 @@
 **************************************************************************/
 
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
-#define CPU_CLOCK_ALT   (XTAL_8MHz)         /* alternative main cpu clock for newer games */
-#define SOUND_CLOCK     (XTAL_8MHz)         /* sound cpu clock */
-#define VIDEO_CLOCK     (XTAL_7.8643MHz)
-
-
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "videopkr.lh"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "babydad.lh"
+#include "babypkr.lh"
 #include "blckjack.lh"
 #include "videocba.lh"
 #include "videodad.lh"
-#include "babypkr.lh"
-#include "babydad.lh"
+#include "videopkr.lh"
+
+
+#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
+#define CPU_CLOCK_ALT   (XTAL_8MHz)         /* alternative main cpu clock for newer games */
+#define SOUND_CLOCK     (XTAL_8MHz)         /* sound cpu clock */
+#define VIDEO_CLOCK     (XTAL_7.8643MHz)
 
 
 class videopkr_state : public driver_device
@@ -344,8 +350,8 @@ public:
 	DECLARE_READ8_MEMBER(videopkr_p2_data_r);
 	DECLARE_WRITE8_MEMBER(videopkr_p1_data_w);
 	DECLARE_WRITE8_MEMBER(videopkr_p2_data_w);
-	DECLARE_READ8_MEMBER(videopkr_t0_latch);
-	DECLARE_WRITE8_MEMBER(prog_w);
+	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
+	DECLARE_WRITE_LINE_MEMBER(prog_w);
 	DECLARE_READ8_MEMBER(sound_io_r);
 	DECLARE_WRITE8_MEMBER(sound_io_w);
 	DECLARE_READ8_MEMBER(sound_p2_r);
@@ -746,14 +752,14 @@ WRITE8_MEMBER(videopkr_state::videopkr_p2_data_w)
 	m_p2 = data;
 }
 
-READ8_MEMBER(videopkr_state::videopkr_t0_latch)
+READ_LINE_MEMBER(videopkr_state::videopkr_t0_latch)
 {
 	return m_t0_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::prog_w)
+WRITE_LINE_MEMBER(videopkr_state::prog_w)
 {
-	if (!data)
+	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
 }
 
@@ -958,11 +964,22 @@ static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8, videopkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_port, AS_IO, 8, videopkr_state )
-	AM_RANGE(0x00,            0xff           ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1  ) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2  ) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITE(prog_w)
-	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0  ) AM_READ(videopkr_t0_latch)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(videopkr_io_r, videopkr_io_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( i8751_map, AS_PROGRAM, 8, videopkr_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( i8751_io_port, AS_IO, 8, videopkr_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM // NVRAM?
+	AM_RANGE(0x8000, 0x8000) AM_NOP // ???
+	AM_RANGE(0x9000, 0x9000) AM_WRITEONLY // ???
+	AM_RANGE(0xa000, 0xbfff) AM_RAM // video RAM?
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY // ???
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READONLY // ???
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP // ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
@@ -970,9 +987,7 @@ static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_port, AS_IO, 8, videopkr_state )
-	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(sound_io_r, sound_io_w)
 ADDRESS_MAP_END
 
 
@@ -1224,18 +1239,28 @@ void videopkr_state::machine_start()
 *    Machine Drivers    *
 ************************/
 
-static MACHINE_CONFIG_START( videopkr, videopkr_state )
+static MACHINE_CONFIG_START( videopkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_io_port)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(videopkr_state, videopkr_p1_data_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(videopkr_state, videopkr_p1_data_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(videopkr_state, videopkr_p2_data_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(videopkr_state, videopkr_p2_data_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(videopkr_state, prog_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(videopkr_state, videopkr_t0_latch))
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", videopkr_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("soundcpu", I8039, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i8039_sound_mem)
 	MCFG_CPU_IO_MAP(i8039_sound_port)
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(videopkr_state, sound_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(videopkr_state, sound_p2_w))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
@@ -1257,7 +1282,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -1322,6 +1347,18 @@ static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bpoker, babypkr )
+	MCFG_CPU_REPLACE("maincpu", I8751, XTAL_6MHz)
+	MCFG_CPU_PROGRAM_MAP(i8751_map)
+	MCFG_CPU_IO_MAP(i8751_io_port)
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	//MCFG_I8255_OUT_PORTA_CB()
+	//MCFG_I8255_IN_PORTB_CB()
+	//MCFG_I8255_OUT_PORTC_CB()
+	//MCFG_I8255_IN_PORTC_CB()
 MACHINE_CONFIG_END
 
 
@@ -1544,12 +1581,12 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY                                 FULLNAME                              FLAGS             LAYOUT      */
-GAMEL( 1984, videopkr, 0,        videopkr, videopkr, driver_device, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,                layout_videopkr )
-GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, driver_device, 0,    ROT0, "IGT - International Game Technology",   "Fortune I (PK485-S) Draw Poker",     0,                layout_videopkr )
-GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, driver_device, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,                layout_blckjack )
-GAMEL( 1987, videodad, videopkr, videodad, videodad, driver_device, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,                layout_videodad )
-GAMEL( 1987, videocba, videopkr, videodad, videocba, driver_device, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                layout_videocba )
-GAMEL( 1987, babypkr , videopkr, babypkr,  babypkr, driver_device,  0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                layout_babypkr  )
-GAMEL( 1987, babydad , videopkr, babypkr,  babydad, driver_device,  0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                layout_babydad  )
-GAMEL( 198?, bpoker ,  videopkr, babypkr,  babypkr, driver_device,  0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT  ROT   COMPANY                                  FULLNAME                              FLAGS                LAYOUT
+GAMEL( 1984, videopkr, 0,        videopkr, videopkr, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,                   layout_videopkr )
+GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, videopkr_state, 0,    ROT0, "IGT - International Game Technology",   "Fortune I (PK485-S) Draw Poker",     0,                   layout_videopkr )
+GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,                   layout_blckjack )
+GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,                   layout_videodad )
+GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                   layout_videocba )
+GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                   layout_babypkr  )
+GAMEL( 1987, babydad,  videopkr, babypkr,  babydad,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                   layout_babydad  )
+GAMEL( 198?, bpoker,   videopkr, bpoker,   babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )

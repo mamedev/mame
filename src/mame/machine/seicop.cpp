@@ -18,7 +18,7 @@
 #include "includes/legionna.h"
 
 
-const device_type SEIBU_COP_BOOTLEG = &device_creator<seibu_cop_bootleg_device>;
+DEFINE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device, "seibu_cop_boot", "Seibu COP (bootleg)")
 
 READ16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_r)
 {
@@ -233,7 +233,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
 }
 
 // anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
-static ADDRESS_MAP_START( seibucopbl_map, AS_0, 16, seibu_cop_bootleg_device )
+static ADDRESS_MAP_START( seibucopbl_map, 0, 16, seibu_cop_bootleg_device )
 	AM_RANGE(0x01e, 0x01f) AM_RAM // angle step, PC=0xc0186
 	AM_RANGE(0x046, 0x049) AM_READWRITE(d104_move_r,d104_move_w)
 	AM_RANGE(0x070, 0x07f) AM_RAM // DMA registers, PC=0xc0034
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( seibucopbl_map, AS_0, 16, seibu_cop_bootleg_device )
 ADDRESS_MAP_END
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEIBU_COP_BOOTLEG, "Seibu COP (Bootleg)", tag, owner, clock, "seibu_cop_boot", __FILE__),
+	: device_t(mconfig, SEIBU_COP_BOOTLEG, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_space_config("regs", ENDIANNESS_LITTLE, 16, 9, 0, nullptr, *ADDRESS_MAP_NAME(seibucopbl_map))
 {
@@ -254,19 +254,11 @@ seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig
 
 
 
-const address_space_config *seibu_cop_bootleg_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector seibu_cop_bootleg_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void seibu_cop_bootleg_device::device_config_complete()
-{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //-------------------------------------------------

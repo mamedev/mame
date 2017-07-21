@@ -93,7 +93,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
+DEFINE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device, "nes_cart_slot", "NES Cartridge Slot")
 
 
 //**************************************************************************
@@ -105,31 +105,32 @@ const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
 //-------------------------------------------------
 
 device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconfig, device_t &device)
-						: device_slot_card_interface(mconfig, device),
-						m_prg(nullptr),
-						m_vrom(nullptr),
-						m_ciram(nullptr),
-						m_prg_size(0),
-						m_vrom_size(0), m_maincpu(nullptr),
-						m_mapper_sram(nullptr),
-						m_mapper_sram_size(0),
-						m_ce_mask(0),
-						m_ce_state(0),
-						m_vrc_ls_prg_a(0),
-						m_vrc_ls_prg_b(0),
-						m_vrc_ls_chr(0),
-						m_mirroring(PPU_MIRROR_NONE),
-						m_pcb_ctrl_mirror(false),
-						m_four_screen_vram(false),
-						m_has_trainer(false),
-						m_x1_005_alt_mirroring(false),
-						m_bus_conflict(true),
-						m_open_bus(0),
-						m_prg_chunks(0),
-						m_prg_mask(0xffff),
-						m_chr_source(CHRRAM),
-						m_vrom_chunks(0),
-						m_vram_chunks(0)
+	: device_slot_card_interface(mconfig, device)
+	, m_prg(nullptr)
+	, m_vrom(nullptr)
+	, m_ciram(nullptr)
+	, m_prg_size(0)
+	, m_vrom_size(0)
+	, m_maincpu(nullptr)
+	, m_mapper_sram(nullptr)
+	, m_mapper_sram_size(0)
+	, m_ce_mask(0)
+	, m_ce_state(0)
+	, m_vrc_ls_prg_a(0)
+	, m_vrc_ls_prg_b(0)
+	, m_vrc_ls_chr(0)
+	, m_mirroring(PPU_MIRROR_NONE)
+	, m_pcb_ctrl_mirror(false)
+	, m_four_screen_vram(false)
+	, m_has_trainer(false)
+	, m_x1_005_alt_mirroring(false)
+	, m_bus_conflict(true)
+	, m_open_bus(0)
+	, m_prg_chunks(0)
+	, m_prg_mask(0xffff)
+	, m_chr_source(CHRRAM)
+	, m_vrom_chunks(0)
+	, m_vram_chunks(0)
 {
 }
 
@@ -742,13 +743,14 @@ void device_nes_cart_interface::nes_banks_restore()
 //-------------------------------------------------
 //  nes_cart_slot_device - constructor
 //-------------------------------------------------
-nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock, "nes_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_crc_hack(0), m_cart(nullptr),
-						m_pcb_id(NO_BOARD),
-						m_must_be_loaded(1)
+nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NES_CART_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_crc_hack(0)
+	, m_cart(nullptr)
+	, m_pcb_id(NO_BOARD)
+	, m_must_be_loaded(1)
 {
 }
 
@@ -767,18 +769,6 @@ nes_cart_slot_device::~nes_cart_slot_device()
 void nes_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_nes_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void nes_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -833,7 +823,7 @@ image_init_result nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			char magic[4];
 
@@ -902,23 +892,21 @@ void nes_cart_slot_device::call_unload()
  get default card software
  -------------------------------------------------*/
 
-std::string nes_cart_slot_device::get_default_card_software()
+std::string nes_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string = "nrom";
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
-			slot_string = get_default_card_ines(&rom[0], len);
+			slot_string = get_default_card_ines(hook, &rom[0], len);
 
 		if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
 			slot_string = get_default_card_unif(&rom[0], len);
-
-		clear();
 
 		return std::string(slot_string);
 	}
@@ -1026,18 +1014,4 @@ WRITE8_MEMBER(nes_cart_slot_device::write_ex)
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
 	}
-}
-
-
-//-------------------------------------------------
-//  partial hash function to be used by
-//  device_image_partialhash_func
-//-------------------------------------------------
-
-void nes_partialhash(util::hash_collection &dest, const unsigned char *data,
-						unsigned long length, const char *functions)
-{
-	if (length <= 16)
-		return;
-	dest.compute(&data[16], length - 16, functions);
 }

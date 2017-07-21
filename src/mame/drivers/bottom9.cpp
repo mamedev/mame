@@ -15,12 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bottom9.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "includes/konamipt.h"
-#include "includes/bottom9.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_interrupt)
 {
@@ -295,7 +298,7 @@ void bottom9_state::machine_reset()
 	m_nmienable = 0;
 }
 
-static MACHINE_CONFIG_START( bottom9, bottom9_state )
+static MACHINE_CONFIG_START( bottom9 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* ? */
@@ -530,6 +533,6 @@ ROM_END
 
 
 
-GAME( 1989, bottom9,  0,       bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bottom9n, bottom9, bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mstadium, bottom9, bottom9, mstadium, driver_device, 0, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9,  0,       bottom9, bottom9,  bottom9_state, 0, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  bottom9_state, 0, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9_state, 0, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )

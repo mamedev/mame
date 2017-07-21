@@ -46,6 +46,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "expbox.h"
 
 
@@ -65,7 +66,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EB = &device_creator<comx_eb_device>;
+DEFINE_DEVICE_TYPE(COMX_EB, comx_eb_device, "comx_eb", "COMX-35E Expansion Box")
 
 
 //-------------------------------------------------
@@ -94,10 +95,10 @@ const tiny_rom_entry *comx_eb_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_eb )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_eb )
+MACHINE_CONFIG_MEMBER( comx_eb_device::device_add_mconfig )
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
 	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot1_irq_w))
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")
@@ -107,17 +108,6 @@ static MACHINE_CONFIG_FRAGMENT( comx_eb )
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, comx_expansion_cards, "ram")
 	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot4_irq_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor comx_eb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( comx_eb );
-}
 
 
 
@@ -130,7 +120,7 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock, "comx_eb", __FILE__),
+	device_t(mconfig, COMX_EB, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "e000"),
 	m_select(0)

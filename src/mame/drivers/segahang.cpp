@@ -17,12 +17,14 @@
 
 #include "emu.h"
 #include "includes/segahang.h"
+#include "includes/segaipt.h"
+
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 
 
@@ -408,7 +410,7 @@ static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(hangon_io_r, hangon_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segahang_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segahang_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
@@ -441,7 +443,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0x07c000, 0x07ffff) AM_RAM AM_SHARE("subram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fd1094_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segahang_state )
+static ADDRESS_MAP_START( fd1094_decrypted_opcodes_map, AS_OPCODES, 16, segahang_state )
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -744,7 +746,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( shared_base, segahang_state )
+static MACHINE_CONFIG_START( shared_base )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/4)
@@ -819,7 +821,7 @@ static MACHINE_CONFIG_DERIVED( endurord_base, sharrier_base )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
+static MACHINE_CONFIG_START( sound_board_2203 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -847,7 +849,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
+static MACHINE_CONFIG_START( sound_board_2203x2 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -885,7 +887,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2151 )
+static MACHINE_CONFIG_START( sound_board_2151 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)

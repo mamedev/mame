@@ -22,9 +22,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/namco52.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mb88xx/mb88xx.h"
-#include "audio/namco52.h"
+#include "screen.h"
 
 
 class cswat_state : public driver_device
@@ -130,7 +132,7 @@ READ8_MEMBER(cswat_state::dipswitch_r)
 READ8_MEMBER(cswat_state::sensors_r)
 {
 	// ?
-	return rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( cswat_map, AS_PROGRAM, 8, cswat_state )
@@ -251,7 +253,7 @@ void cswat_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-static MACHINE_CONFIG_START( cswat, cswat_state )
+static MACHINE_CONFIG_START( cswat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_18_432MHz/3/4) // HD68A09EP, 1.5MHz?
@@ -302,4 +304,4 @@ ROM_START( cswat )
 ROM_END
 
 
-GAME( 1984, cswat, 0, cswat, cswat, driver_device, 0, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, cswat, 0, cswat, cswat, cswat_state, 0, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )

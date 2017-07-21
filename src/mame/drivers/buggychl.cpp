@@ -78,11 +78,13 @@ Dip locations and factory settings verified from dip listing
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/buggychl.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/buggychl.h"
+#include "speaker.h"
 
 #include "buggychl.lh"
 
@@ -126,6 +128,14 @@ WRITE8_MEMBER(buggychl_state::sound_enable_w)
 	machine().sound().system_enable(data & 1);
 }
 
+READ8_MEMBER(buggychl_state::mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
 
 
 static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
@@ -140,8 +150,8 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
-	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
-	AM_RANGE(0xd401, 0xd401) AM_DEVREAD("bmcu", taito68705_mcu_device, mcu_status_r)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(mcu_status_r)
 	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
@@ -356,7 +366,7 @@ void buggychl_state::machine_reset()
 	m_bg_scrollx = 0;
 }
 
-static MACHINE_CONFIG_START( buggychl, buggychl_state )
+static MACHINE_CONFIG_START( buggychl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
@@ -485,5 +495,5 @@ ROM_START( buggychlt )
 ROM_END
 
 
-GAMEL( 1984, buggychl, 0,        buggychl, buggychl, driver_device, 0, ROT270, "Taito Corporation", "Buggy Challenge", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_buggychl )
-GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, driver_device, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS| MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychl, 0,        buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_buggychl )

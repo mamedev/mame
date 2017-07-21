@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 
 
 const char device_video_interface::s_unconfigured_screen_tag[] = "!!UNCONFIGURED!!";
@@ -125,6 +126,20 @@ void device_video_interface::interface_pre_start()
 		throw emu_fatalerror("Device '%s' requires a screen", device().tag());
 
 	// if we have a screen and it's not started, wait for it
+	device_palette_interface *palintf;
 	if (m_screen != nullptr && !m_screen->started())
-		throw device_missing_dependencies();
+	{
+		// avoid circular dependency if we are also a palette device
+		if (!device().interface(palintf))
+			throw device_missing_dependencies();
+		else
+		{
+			// resolve the palette for the sake of register_screen_bitmap
+			m_screen->resolve_palette();
+
+			// no other palette may be specified (FIXME: breaks meritm.cpp)
+			if (0 && m_screen->has_palette() && palintf != &m_screen->palette())
+				throw emu_fatalerror("Device '%s' cannot control screen '%s' with palette '%s'", device().tag(), m_screen_tag, m_screen->palette().device().tag());
+		}
+	}
 }

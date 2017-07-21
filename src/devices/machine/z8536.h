@@ -29,12 +29,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_Z8536_H
+#define MAME_MACHINE_Z8536_H
+
 #pragma once
 
-#ifndef __Z8536__
-#define __Z8536__
-
-#include "emu.h"
 #include "cpu/z80/z80daisy.h"
 
 
@@ -79,13 +78,13 @@ public:
 	// construction/destruction
 	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pa.set_callback(object); }
-	template<class _Object> static devcb_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pa.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pc_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pc.set_callback(object); }
-	template<class _Object> static devcb_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pc.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_rd_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_read_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_rd_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_read_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_rd_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_read_pc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_pc.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -346,8 +345,6 @@ private:
 
 
 // device type definition
-extern const device_type Z8536;
+DECLARE_DEVICE_TYPE(Z8536, z8536_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_Z8536_H

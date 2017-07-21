@@ -33,13 +33,11 @@ Unable to proceed due to no info available (& in English).
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
 #include "machine/keyboard.h"
+#include "machine/ram.h"
 #include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
-#define KEYBOARD_TAG "keyboard"
+#include "video/mc6845.h"
+#include "screen.h"
 
 class sapi1_state : public driver_device
 {
@@ -67,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sapi3_00_w);
 	DECLARE_READ8_MEMBER(sapi3_25_r);
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_DRIVER_INIT(sapizps3);
 	DECLARE_DRIVER_INIT(sapizps3a);
 	DECLARE_DRIVER_INIT(sapizps3b);
@@ -226,7 +224,7 @@ static ADDRESS_MAP_START( sapi3a_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
@@ -469,7 +467,7 @@ READ8_MEMBER( sapi1_state::sapi2_keyboard_data_r)
 	return ret;
 }
 
-WRITE8_MEMBER( sapi1_state::kbd_put )
+void sapi1_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -534,7 +532,7 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( sapi1, sapi1_state )
+static MACHINE_CONFIG_START( sapi1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
@@ -560,8 +558,8 @@ static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(sapi1_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sapi3, sapi2 )
@@ -592,7 +590,7 @@ static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
 	MCFG_SCREEN_NO_PALETTE
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sapi3a, sapi1_state )
+static MACHINE_CONFIG_START( sapi3a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)
@@ -600,8 +598,8 @@ static MACHINE_CONFIG_START( sapi3a, sapi1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sapi1_state, kbd_put))
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -663,9 +661,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT  CLASS           INIT      COMPANY    FULLNAME       FLAGS */
-COMP( 1985, sapi1,    0,       0,      sapi1,      sapi1, driver_device,  0,         "Tesla", "SAPI-1 ZPS 1", MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps2, sapi1,   0,      sapi2,      sapi1, driver_device,  0,         "Tesla", "SAPI-1 ZPS 2", MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps3, sapi1,   0,      sapi3,      sapi1, sapi1_state,    sapizps3,  "Tesla", "SAPI-1 ZPS 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps3a,sapi1,   0,      sapi3a,     sapi1, sapi1_state,    sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps3b,sapi1,   0,      sapi3b,     sapi1, sapi1_state,    sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  CLASS        INIT       COMPANY  FULLNAME                   FLAGS
+COMP( 1985, sapi1,     0,       0,      sapi1,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps2,  sapi1,   0,      sapi2,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3,  sapi1,   0,      sapi3,      sapi1, sapi1_state, sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3a, sapi1,   0,      sapi3a,     sapi1, sapi1_state, sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3b, sapi1,   0,      sapi3b,     sapi1, sapi1_state, sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

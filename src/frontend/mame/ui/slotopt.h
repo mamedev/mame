@@ -15,6 +15,7 @@
 
 #include "ui/menu.h"
 
+#include <unordered_map>
 
 namespace ui {
 class menu_slot_devices : public menu
@@ -27,13 +28,17 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	device_slot_option *slot_get_current_option(device_slot_interface &slot);
-	int slot_get_current_index(device_slot_interface &slot);
-	int slot_get_length(device_slot_interface &slot);
-	const char *slot_get_next(device_slot_interface &slot);
-	const char *slot_get_prev(device_slot_interface &slot);
-	const char *slot_get_option(device_slot_interface &slot, int index);
+	device_slot_option *get_current_option(device_slot_interface &slot) const;
+	int get_current_index(device_slot_interface &slot) const;
+	const char *get_next_slot(device_slot_interface &slot) const;
+	const char *get_previous_slot(device_slot_interface &slot) const;
 	void set_slot_device(device_slot_interface &slot, const char *val);
+	void record_current_options();
+	bool try_refresh_current_options();
+
+	// variables
+	std::unique_ptr<machine_config>                 m_config;
+	std::unordered_map<std::string, std::string>    m_slot_options;
 };
 
 } // namespace ui

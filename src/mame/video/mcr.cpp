@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/mcr.h"
+#include "screen.h"
 
 
 int8_t mcr12_sprite_xoffs;

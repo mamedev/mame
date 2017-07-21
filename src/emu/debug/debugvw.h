@@ -79,10 +79,6 @@ constexpr int DCK_MIDDLE_CLICK  = 3;        // middle instantaneous click
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-class debug_view;
-
-
 // OSD callback function for a view
 typedef void (*debug_view_osd_update_func)(debug_view &view, void *osdprivate);
 
@@ -266,7 +262,7 @@ public:
 
 	// setters
 	void mark_dirty() { m_dirty = true; }
-	void set_string(const char *string) { m_string.assign(string); m_dirty = true; }
+	template <typename... Params> void set_string(Params &&... args) { m_string.assign(std::forward<Params>(args)...); m_dirty = true; }
 	void set_context(symbol_table *context);
 
 private:

@@ -377,16 +377,22 @@
 #define PREVIOUS_PC     ((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 
 
-const device_type PDP1 = &device_creator<pdp1_device>;
+DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "PDP1")
 
 
 pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, PDP1, "PDP1", tag, owner, clock, "pdp1_cpu", __FILE__)
+	: cpu_device(mconfig, PDP1, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, 0)
 {
 	m_program_config.m_is_octal = true;
 }
 
+device_memory_interface::space_config_vector pdp1_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 void pdp1_device::device_config_complete()
 {

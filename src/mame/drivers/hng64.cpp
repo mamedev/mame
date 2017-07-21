@@ -202,7 +202,7 @@ No.  PCB Label  IC Markings               IC Package
 Notes:
        1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
        2. If the game cart is not plugged in, the hardware shows nothing on screen.
-
+       3. The IOCTR I/O MCU runs at 8 MHz.
 
 
 Hyper Neo Geo game cartridges
@@ -435,13 +435,14 @@ or Fatal Fury for example).
 */
 
 
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mips/mips3.h"
-#include "machine/nvram.h"
 #include "includes/hng64.h"
+
+#include "cpu/mips/mips3.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "machine/hng64_net.h"
+
 
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
@@ -1515,6 +1516,8 @@ void hng64_state::machine_start()
 	{
 		m_videoregs[i] = 0xdeadbeef;
 	}
+
+	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 }
 
 void hng64_state::machine_reset()
@@ -1529,7 +1532,7 @@ void hng64_state::machine_reset()
 
 MACHINE_CONFIG_EXTERN(hng64_audio);
 
-static MACHINE_CONFIG_START(hng64, hng64_state)
+static MACHINE_CONFIG_START(hng64)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)
@@ -1546,13 +1549,17 @@ static MACHINE_CONFIG_START(hng64, hng64_state)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-	MCFG_SCREEN_VBLANK_DRIVER(hng64_state, screen_eof_hng64)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hng64_state, screen_vblank_hng64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_FRAGMENT_ADD( hng64_audio )
 	MCFG_FRAGMENT_ADD( hng64_network )
+
+	MCFG_CPU_ADD("iomcu", TMP87PH40AN, 8000000)
+	MCFG_DEVICE_DISABLE() // work in progress
+
 MACHINE_CONFIG_END
 
 
@@ -1573,7 +1580,11 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
+	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
+	/* this was dumped from a TMP87PH40AN type chip.  Some boards use a TMP87CH40N, in all cases they're stickered SNK-IOJ1.00A so likely the same content */ \
+	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
+
 
 ROM_START( hng64 )
 	/* BIOS */

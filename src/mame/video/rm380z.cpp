@@ -8,6 +8,7 @@ RM 380Z video code
 */
 
 
+#include "emu.h"
 #include "includes/rm380z.h"
 
 

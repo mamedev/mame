@@ -9,7 +9,9 @@
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/c64/exp.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/cbmiec/c1571.h"
@@ -682,7 +684,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, c128_state )
+static ADDRESS_MAP_START( vic_videoram_map, 0, 8, c128_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -691,7 +693,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, c128_state )
+static ADDRESS_MAP_START( vic_colorram_map, 1, 8, c128_state )
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -700,7 +702,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vdc_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vdc_videoram_map, AS_0, 8, c128_state )
+static ADDRESS_MAP_START( vdc_videoram_map, 0, 8, c128_state )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1670,7 +1672,7 @@ void c128_state::machine_reset()
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc, c128_state )
+static MACHINE_CONFIG_START( ntsc )
 	// basic hardware
 	MCFG_CPU_ADD(Z80A_TAG, Z80, XTAL_14_31818MHz*2/3.5/2)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -1699,8 +1701,8 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(c128_state, vic_irq_w))
 	MCFG_MOS8564_K_CALLBACK(WRITE8(c128_state, vic_k_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, vic_colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
 	MCFG_SCREEN_ADD(SCREEN_VIC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
@@ -1841,7 +1843,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal, c128_state )
+static MACHINE_CONFIG_START( pal )
 	// basic hardware
 	MCFG_CPU_ADD(Z80A_TAG, Z80, XTAL_17_734472MHz*2/4.5/2)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -1870,8 +1872,8 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(c128_state, vic_irq_w))
 	MCFG_MOS8564_K_CALLBACK(WRITE8(c128_state, vic_k_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, vic_colorram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
 	MCFG_SCREEN_ADD(SCREEN_VIC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
@@ -2175,22 +2177,22 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT                COMPANY                        FULLNAME                                 FLAGS
-COMP( 1985, c128,       0,      0,      c128,       c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128 (NTSC)",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128p,      0,      0,      c128pal,    c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128 (PAL)",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128_de,    c128,   0,      c128pal,    c128_de,    driver_device,  0,  "Commodore Business Machines", "Commodore 128 (Germany)",               MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_fr,   c128,  0,   c128pal,  c128_fr, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_no,   c128,  0,   c128pal,  c128_it, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128_se,    c128,   0,      c128pal,    c128_se,    driver_device,  0,  "Commodore Business Machines", "Commodore 128 (Sweden/Finland)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c128d,      c128,   0,      c128,       c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128D (NTSC, prototype)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c128dp,     c128,   0,      c128pal,    c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128D (PAL)",                  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            COMPANY                        FULLNAME                                 FLAGS
+COMP( 1985, c128,       0,      0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128 (NTSC)",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128p,      0,      0,      c128pal,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128 (PAL)",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_de,    c128,   0,      c128pal,    c128_de,    c128_state,  0,  "Commodore Business Machines", "Commodore 128 (Germany)",               MACHINE_SUPPORTS_SAVE )
+//COMP( 1985, c128_fr,   c128,  0,   c128pal,  c128_fr, c128_state, 0,  "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
+//COMP( 1985, c128_no,   c128,  0,   c128pal,  c128_it, c128_state, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_se,    c128,   0,      c128pal,    c128_se,    c128_state,  0,  "Commodore Business Machines", "Commodore 128 (Sweden/Finland)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128d,      c128,   0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D (NTSC, prototype)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128dp,     c128,   0,      c128pal,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D (PAL)",                  MACHINE_SUPPORTS_SAVE )
 
-COMP( 1986, c128cr,     c128,   0,      c128,       c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128cr,     c128,   0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",     MACHINE_SUPPORTS_SAVE )
 
-COMP( 1987, c128dcr,    c128,   0,      c128dcr,    c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128DCR (NTSC)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcrp,   c128,   0,      c128dcrp,   c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128DCR (PAL)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_de, c128,   0,      c128dcrp,   c128_de,    driver_device,  0,  "Commodore Business Machines", "Commodore 128DCR (Germany)",            MACHINE_SUPPORTS_SAVE )
-//COMP( 1986, c128dcr_it,  c128,  0,   c128dcrp, c128_it, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_se, c128,   0,      c128dcrp,   c128_se,    driver_device,  0,  "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr,    c128,   0,      c128dcr,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (NTSC)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcrp,   c128,   0,      c128dcrp,   c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (PAL)",                MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_de, c128,   0,      c128dcrp,   c128_de,    c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (Germany)",            MACHINE_SUPPORTS_SAVE )
+//COMP( 1986, c128dcr_it,  c128,  0,   c128dcrp, c128_it, c128_state, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_se, c128,   0,      c128dcrp,   c128_se,    c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",     MACHINE_SUPPORTS_SAVE )
 
-COMP( 1986, c128d81,    c128,   0,      c128d81,    c128,       driver_device,  0,  "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128d81,    c128,   0,      c128d81,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)",   MACHINE_SUPPORTS_SAVE )

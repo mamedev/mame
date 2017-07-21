@@ -206,9 +206,15 @@
 
 ************************************************************************************************/
 
+#include "emu.h"
 #include "includes/x1.h"
-#include "formats/2d_dsk.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/2d_dsk.h"
+
 
 #define MAIN_CLOCK XTAL_16MHz
 #define VDP_CLOCK  XTAL_42_9545MHz
@@ -644,7 +650,7 @@ uint16_t x1_state::check_keyboard_press()
 						if (scancode >= 0x2c && scancode <= 0x5f)
 							scancode = kanatable[scancode - 0x2c][1];
 					}
-					
+
 					if (scancode >= 0x41 && scancode < 0x5a)
 						scancode += 0x20;  // lowercase
 				}
@@ -658,7 +664,7 @@ uint16_t x1_state::check_keyboard_press()
 								scancode = kanatable[scancode - 0x2c][2];
 						}
 					}
-					
+
 					if(scancode >= 0x31 && scancode < 0x3a)
 						scancode -= 0x10;
 					if(scancode == 0x30)
@@ -2501,7 +2507,7 @@ MACHINE_START_MEMBER(x1_state,x1)
 	save_pointer(NAME(m_emm_ram.get()), 0x1000000);
 	save_pointer(NAME(m_pcg_ram.get()), 0x1800);
 
-	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(*m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
+	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
 PALETTE_INIT_MEMBER(x1_state,x1)
@@ -2520,7 +2526,7 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1, x1_state )
+static MACHINE_CONFIG_START( x1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
@@ -2724,9 +2730,9 @@ DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 }
 
 
-/*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT       INIT      COMPANY    FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1, driver_device,         0,        "Sharp", "X1 (CZ-800C)", 0 )
+//    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT    STATE        INIT      COMPANY  FULLNAME              FLAGS
+COMP( 1982, x1,        0,      0,       x1,      x1,      x1_state,    0,        "Sharp", "X1 (CZ-800C)",       0 )
 // x1twin in x1twin.c
 COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
 COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
-//COMP( 1986, x1turboz, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )
+//COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )

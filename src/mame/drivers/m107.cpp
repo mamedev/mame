@@ -26,13 +26,16 @@ confirmed for m107 games as well.
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
-#include "cpu/nec/v25.h"
 #include "includes/m107.h"
 #include "includes/iremipt.h"
+
+#include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
+#include "speaker.h"
+
 
 // this is the hacky code from m92.c, but better than per-game irq vector hacks.
 #define USE_HACKED_IRQS
@@ -343,6 +346,7 @@ static INPUT_PORTS_START( dsoccr94 )
 	PORT_DIPSETTING(      0x0300, "1000" )
 	PORT_DIPSETTING(      0x0100, "1500" )
 	PORT_DIPSETTING(      0x0200, "2000" )
+	/* Manual says not to use these SW3:3-8 */
 
 	PORT_MODIFY("DSW")
 	/* Dip switch bank 1 */
@@ -369,27 +373,6 @@ static INPUT_PORTS_START( dsoccr94 )
 	PORT_DIPNAME( 0x0020, 0x0020, "Starting Button" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, "Button 1" )
 	PORT_DIPSETTING(      0x0020, "Start Button" )
-
-	/* Manual says not to use these SW3:3-8 */
-	PORT_START("DSW3")  /* Dip switch bank 3 */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wpksoc )
@@ -789,7 +772,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( firebarr, m107_state )
+static MACHINE_CONFIG_START( firebarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 28000000/2)    /* NEC V33, 28MHz clock */
@@ -1077,11 +1060,11 @@ DRIVER_INIT_MEMBER(m107_state,wpksoc)
 
 /***************************************************************************/
 
-GAME( 1993, airass,        0,             airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
-GAME( 1993, firebarr,      airass,        firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, airass,    0,        airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
+GAME( 1993, firebarr,  airass,   firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, dsoccr94,      0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dsoccr94k,     dsoccr94, dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
+GAME( 1994, dsoccr94,  0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dsoccr94k, dsoccr94, dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
 
-GAME( 1995, wpksoc,        0,        wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, kftgoal,       wpksoc,   wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wpksoc,    0,        wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "World PK Soccer",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kftgoal,   wpksoc,   wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

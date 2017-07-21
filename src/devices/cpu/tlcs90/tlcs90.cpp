@@ -21,72 +21,93 @@ static const char *const op_names[] =   {   "??",       "nop",  "ex",   "exx",  
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
-const device_type TMP90840 = &device_creator<tmp90840_device>;
-const device_type TMP90841 = &device_creator<tmp90841_device>;
-const device_type TMP90845 = &device_creator<tmp90845_device>;
-const device_type TMP91640 = &device_creator<tmp91640_device>;
-const device_type TMP91641 = &device_creator<tmp91641_device>;
+DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "TMP90840")
+DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "TMP90841")
+DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "TMP90845")
+DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "TMP91640")
+DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "TMP91641")
+DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "TMP90PH44")
 
 
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
 	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
-	AM_RANGE(   0xfec0,     0xffc0          )   AM_RAM  // 256b RAM (internal)
+	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp90841_mem, AS_PROGRAM, 8, tlcs90_device)
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
-	AM_RANGE(   0xfec0,     0xffc0          )   AM_RAM  // 256b RAM (internal)
+	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp91640_mem, AS_PROGRAM, 8, tlcs90_device )
 	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
-	AM_RANGE(   0xfdc0,     0xffc0          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, tlcs90_device )
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
-	AM_RANGE(   0xfdc0,     0xffc0          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(tmp90ph44_mem, AS_PROGRAM, 8, tlcs90_device )
+	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB PROM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
+ADDRESS_MAP_END
 
-tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+
+tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_port_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
 
 tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90840, "TMP90840", tag, owner, clock, "tmp90840", __FILE__, ADDRESS_MAP_NAME(tmp90840_mem))
+	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, ADDRESS_MAP_NAME(tmp90840_mem))
 {
 }
 
 tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, "TMP90841", tag, owner, clock, "tmp90841", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 
 tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 
 
 
 tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91640, "TMP91640", tag, owner, clock, "tmp91640", __FILE__, ADDRESS_MAP_NAME(tmp91640_mem))
+	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, ADDRESS_MAP_NAME(tmp91640_mem))
 {
 }
 
 
 tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91641, "TMP91641", tag, owner, clock, "tmp91641", __FILE__, ADDRESS_MAP_NAME(tmp91641_mem))
+	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, ADDRESS_MAP_NAME(tmp91641_mem))
 {
+}
+
+
+tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, ADDRESS_MAP_NAME(tmp90ph44_mem))
+{
+}
+
+device_memory_interface::space_config_vector tlcs90_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -180,22 +201,22 @@ static const char *const cc_names[] =   {   "f",    "lt",   "le",   "ule",  "ov"
 #define OPCC(   X,CF,CT )   OP( X, CT ) m_cyc_f = (CF*2);
 #define OPCC16( X,CF,CT )   OPCC( (X)|OP_16,CF,CT )
 
-#define BIT8( N,I )         m_mode##N = MODE_BIT8;  m_r##N = I;
-#define I8( N,I )           m_mode##N = MODE_I8;        m_r##N = I;
-#define D8( N,I )           m_mode##N = MODE_D8;        m_r##N = I;
-#define I16( N,I )          m_mode##N = MODE_I16;       m_r##N = I;
-#define D16( N,I )          m_mode##N = MODE_D16;       m_r##N = I;
-#define R8( N,R )           m_mode##N = MODE_R8;        m_r##N = R;
-#define R16( N,R )          m_mode##N = MODE_R16;       m_r##N = R;
-#define Q16( N,R )          m_mode##N = MODE_R16;       m_r##N = R; if (m_r##N == SP) m_r##N = AF;
-#define MI16( N,I )         m_mode##N = MODE_MI16;  m_r##N = I;
-#define MR16( N,R )         m_mode##N = MODE_MR16;  m_r##N = R;
-#define MR16D8( N,R,I )     m_mode##N = MODE_MR16D8;    m_r##N = R; m_r##N##b = I;
-#define MR16R8( N,R,g )     m_mode##N = MODE_MR16R8;    m_r##N = R; m_r##N##b = g;
-#define NONE( N )           m_mode##N = MODE_NONE;
-#define CC( N,cc )          m_mode##N = MODE_CC;        m_r##N = cc;
-#define R16D8( N,R,I )      m_mode##N = MODE_R16D8; m_r##N = R; m_r##N##b = I;
-#define R16R8( N,R,g )      m_mode##N = MODE_R16R8; m_r##N = R; m_r##N##b = g;
+#define BIT8( N,I )         m_mode##N = e_mode::BIT8;  m_r##N = I;
+#define I8( N,I )           m_mode##N = e_mode::I8;        m_r##N = I;
+#define D8( N,I )           m_mode##N = e_mode::D8;        m_r##N = I;
+#define I16( N,I )          m_mode##N = e_mode::I16;       m_r##N = I;
+#define D16( N,I )          m_mode##N = e_mode::D16;       m_r##N = I;
+#define R8( N,R )           m_mode##N = e_mode::R8;        m_r##N = R;
+#define R16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R;
+#define Q16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R; if (m_r##N == SP) m_r##N = AF;
+#define MI16( N,I )         m_mode##N = e_mode::MI16;  m_r##N = I;
+#define MR16( N,R )         m_mode##N = e_mode::MR16;  m_r##N = R;
+#define MR16D8( N,R,I )     m_mode##N = e_mode::MR16D8;    m_r##N = R; m_r##N##b = I;
+#define MR16R8( N,R,g )     m_mode##N = e_mode::MR16R8;    m_r##N = R; m_r##N##b = g;
+#define NONE( N )           m_mode##N = e_mode::NONE;
+#define CC( N,cc )          m_mode##N = e_mode::CC;        m_r##N = cc;
+#define R16D8( N,R,I )      m_mode##N = e_mode::R16D8; m_r##N = R; m_r##N##b = I;
+#define R16R8( N,R,g )      m_mode##N = e_mode::R16R8; m_r##N = R; m_r##N##b = g;
 
 uint8_t  tlcs90_device::RM8 (uint32_t a)    { return m_program->read_byte( a ); }
 uint16_t tlcs90_device::RM16(uint32_t a)    { return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
@@ -996,34 +1017,34 @@ bool tlcs90_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pr
 	const char *reg_name;
 	switch ( mode )
 	{
-		case MODE_NONE:     return false;
+	case e_mode::NONE:   return false;
 
-		case MODE_BIT8:     util::stream_format(stream, "%s%d",            pre,    r                                   );   return true;
-		case MODE_I8:       util::stream_format(stream, "%s$%02X",         pre,    r                                   );   return true;
-		case MODE_D8:       util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );   return true;
-		case MODE_I16:      util::stream_format(stream, "%s$%04X",         pre,    r                                   );   return true;
-		case MODE_D16:      util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );   return true;
-		case MODE_MI16:
-			reg_name = internal_registers_names(r);
-			if (reg_name)
-				util::stream_format(stream, "%s(%s)", pre, reg_name);
-			else
-				util::stream_format(stream, "%s($%04X)",       pre,    r                                   );
-			return true;
-		case MODE_R8:       util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );   return true;
-		case MODE_R16:      util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );   return true;
-		case MODE_MR16:     util::stream_format(stream, "%s(%s)",          pre,    r16_names[r]                        );   return true;
+	case e_mode::BIT8:   util::stream_format(stream, "%s%d",            pre,    r                                   );   return true;
+	case e_mode::I8:     util::stream_format(stream, "%s$%02X",         pre,    r                                   );   return true;
+	case e_mode::D8:     util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );   return true;
+	case e_mode::I16:    util::stream_format(stream, "%s$%04X",         pre,    r                                   );   return true;
+	case e_mode::D16:    util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );   return true;
+	case e_mode::MI16:
+		reg_name = internal_registers_names(r);
+		if (reg_name)
+			util::stream_format(stream, "%s(%s)", pre, reg_name);
+		else
+			util::stream_format(stream, "%s($%04X)",       pre,    r                                   );
+		return true;
+	case e_mode::R8:     util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );   return true;
+	case e_mode::R16:    util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );   return true;
+	case e_mode::MR16:   util::stream_format(stream, "%s(%s)",          pre,    r16_names[r]                        );   return true;
 
-		case MODE_MR16R8:   util::stream_format(stream, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );   return true;
-		case MODE_MR16D8:   util::stream_format(stream, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
+	case e_mode::MR16R8: util::stream_format(stream, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );   return true;
+	case e_mode::MR16D8: util::stream_format(stream, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
 
-		case MODE_CC:       util::stream_format(stream, "%s%s",            pre,    cc_names[r]                         );   return true;
+	case e_mode::CC:     util::stream_format(stream, "%s%s",            pre,    cc_names[r]                         );   return true;
 
-		case MODE_R16R8:    util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );   return true;
-		case MODE_R16D8:    util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
+	case e_mode::R16R8:  util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );   return true;
+	case e_mode::R16D8:  util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
 
-		default:
-			fatalerror("%04x: unimplemented addr mode = %d\n",pc,mode);
+	default:
+		fatalerror("%04x: unimplemented addr mode = %d\n",pc,std::underlying_type_t<e_mode>(mode));
 	}
 
 	// never executed
@@ -1123,53 +1144,53 @@ void tlcs90_device::w16( const uint16_t r, uint16_t value )
 #define READ_FN( N ) \
 uint8_t tlcs90_device::Read##N##_8()    { \
 	switch ( m_mode##N )    { \
-		case MODE_CC: \
-		case MODE_BIT8: \
-		case MODE_I8:       return (uint8_t)m_r##N; \
-		case MODE_D8:       return (uint8_t)m_r##N; \
-		case MODE_R8:       return (uint8_t)r8(m_r##N); \
-		case MODE_MI16:     return RM8(m_r##N); \
-		case MODE_MR16R8:   return RM8((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b))); \
-		case MODE_MR16: \
+		case e_mode::CC: \
+		case e_mode::BIT8: \
+		case e_mode::I8:       return (uint8_t)m_r##N; \
+		case e_mode::D8:       return (uint8_t)m_r##N; \
+		case e_mode::R8:       return (uint8_t)r8(m_r##N); \
+		case e_mode::MI16:     return RM8(m_r##N); \
+		case e_mode::MR16R8:   return RM8((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b))); \
+		case e_mode::MR16: \
 			switch( m_r##N ) { \
 				case IX:    return RX8(m_ix.w.l,m_ixbase); \
 				case IY:    return RX8(m_iy.w.l,m_iybase); \
 			} \
 			return RM8(r16(m_r##N)); \
-		case MODE_MR16D8: \
+		case e_mode::MR16D8: \
 			switch( m_r##N ) { \
 				case IX:    return RX8((uint16_t)(m_ix.w.l + (int8_t)m_r##N##b),m_ixbase); \
 				case IY:    return RX8((uint16_t)(m_iy.w.l + (int8_t)m_r##N##b),m_iybase); \
 			} \
 			return RM8((uint16_t)(r16(m_r##N) + (int8_t)m_r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",m_pc.w.l,N,m_mode##N); \
+			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",m_pc.w.l,N,std::underlying_type_t<e_mode>(m_mode##N)); \
 	} \
 	return 0; \
 } \
 uint16_t tlcs90_device::Read##N##_16()  { \
 	switch ( m_mode##N )    { \
-		case MODE_I16:      return m_r##N; \
-		case MODE_D16:      return m_r##N - 1; \
-		case MODE_R16:      return r16(m_r##N); \
-		case MODE_R16D8:    return r16(m_r##N) + (int8_t)m_r##N##b; \
-		case MODE_R16R8:    return r16(m_r##N) + (int8_t)r8(m_r##N##b); \
-		case MODE_MI16:     return RM16(m_r##N); \
-		case MODE_MR16R8:   return RM16((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b))); \
-		case MODE_MR16: \
+		case e_mode::I16:      return m_r##N; \
+		case e_mode::D16:      return m_r##N - 1; \
+		case e_mode::R16:      return r16(m_r##N); \
+		case e_mode::R16D8:    return r16(m_r##N) + (int8_t)m_r##N##b; \
+		case e_mode::R16R8:    return r16(m_r##N) + (int8_t)r8(m_r##N##b); \
+		case e_mode::MI16:     return RM16(m_r##N); \
+		case e_mode::MR16R8:   return RM16((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b))); \
+		case e_mode::MR16: \
 			switch( m_r##N ) { \
 				case IX:    return RX16(m_ix.w.l,m_ixbase); \
 				case IY:    return RX16(m_iy.w.l,m_iybase); \
 			} \
 			return RM16(r16(m_r##N)); \
-		case MODE_MR16D8: \
+		case e_mode::MR16D8: \
 			switch( m_r##N ) { \
 				case IX:    return RX16((uint16_t)(m_ix.w.l + (int8_t)m_r##N##b),m_ixbase); \
 				case IY:    return RX16((uint16_t)(m_iy.w.l + (int8_t)m_r##N##b),m_iybase); \
 			} \
 			return RM16((uint16_t)(r16(m_r##N) + (int8_t)m_r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",m_pc.w.l,N,m_mode##N); \
+			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",m_pc.w.l,N,std::underlying_type_t<e_mode>(m_mode##N)); \
 	} \
 	return 0; \
 }
@@ -1179,45 +1200,45 @@ uint16_t tlcs90_device::Read##N##_16()  { \
 #define WRITE_FN( N ) \
 void tlcs90_device::Write##N##_8( uint8_t value ) { \
 	switch ( m_mode##N )    { \
-		case MODE_R8:       w8(m_r##N,value);     return; \
-		case MODE_MI16:     WM8(m_r##N, value);   return; \
-		case MODE_MR16R8:   WM8((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b)), value);  return; \
-		case MODE_MR16: \
+		case e_mode::R8:       w8(m_r##N,value);     return; \
+		case e_mode::MI16:     WM8(m_r##N, value);   return; \
+		case e_mode::MR16R8:   WM8((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b)), value);  return; \
+		case e_mode::MR16: \
 			switch( m_r##N ) { \
 				case IX:    WX8(m_ix.w.l,value,m_ixbase); return; \
 				case IY:    WX8(m_iy.w.l,value,m_iybase); return; \
 			} \
 			WM8(r16(m_r##N), value);    return; \
-		case MODE_MR16D8: \
+		case e_mode::MR16D8: \
 			switch( m_r##N ) { \
 				case IX:    WX8((uint16_t)(m_ix.w.l + (int8_t)m_r##N##b),value,m_ixbase); return; \
 				case IY:    WX8((uint16_t)(m_iy.w.l + (int8_t)m_r##N##b),value,m_iybase); return; \
 			} \
 			WM8((uint16_t)(r16(m_r##N) + (int8_t)m_r##N##b), value);    return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",m_pc.w.l,N,m_mode##N); \
+			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",m_pc.w.l,N,std::underlying_type_t<e_mode>(m_mode##N)); \
 	} \
 } \
 void tlcs90_device::Write##N##_16( uint16_t value ) \
 { \
 	switch ( m_mode##N )    { \
-		case MODE_R16:      w16(m_r##N,value);    return; \
-		case MODE_MI16:     WM16(m_r##N, value);  return; \
-		case MODE_MR16R8:   WM16((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b)), value); return; \
-		case MODE_MR16: \
+		case e_mode::R16:      w16(m_r##N,value);    return; \
+		case e_mode::MI16:     WM16(m_r##N, value);  return; \
+		case e_mode::MR16R8:   WM16((uint16_t)(r16(m_r##N) + (int8_t)r8(m_r##N##b)), value); return; \
+		case e_mode::MR16: \
 			switch( m_r##N ) { \
 				case IX:    WX16(m_ix.w.l,value,m_ixbase);    return; \
 				case IY:    WX16(m_iy.w.l,value,m_iybase);    return; \
 			} \
 			WM16(r16(m_r##N), value);   return; \
-		case MODE_MR16D8: \
+		case e_mode::MR16D8: \
 			switch( m_r##N ) { \
 				case IX:    WX16((uint16_t)(m_ix.w.l + (int8_t)m_r##N##b),value,m_ixbase);    return; \
 				case IY:    WX16((uint16_t)(m_iy.w.l + (int8_t)m_r##N##b),value,m_iybase);    return; \
 			} \
 			WM16((uint16_t)(r16(m_r##N) + (int8_t)m_r##N##b), value);   return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",m_pc.w.l,N,m_mode##N); \
+			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",m_pc.w.l,N,std::underlying_type_t<e_mode>(m_mode##N)); \
 	} \
 }
 
@@ -1781,7 +1802,7 @@ void tlcs90_device::execute_run()
 				a32 = a16 + b16;
 				if ( (m_op == (ADC | OP_16)) && (F & CF) )  a32 += 1;
 				Write1_16( a32 );
-				if ( (m_op == (ADD | OP_16)) && m_mode2 == MODE_R16 )
+				if ( (m_op == (ADD | OP_16)) && m_mode2 == e_mode::R16 )
 				{
 					F &= SF | ZF | IF | VF;
 				}
@@ -1877,7 +1898,7 @@ void tlcs90_device::execute_run()
 				a8 = Read1_8();
 				a8 = (a8 << 1) | (a8 >> 7);
 				Write1_8( a8 );
-				if ( m_mode1 == MODE_R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
+				if ( m_mode1 == e_mode::R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
 				else                                F = (F & IF) | SZP[a8];
 				if (a8 & 0x01)                      F |= CF | XCF;  // X?
 				Cyc();
@@ -1886,7 +1907,7 @@ void tlcs90_device::execute_run()
 				a8 = Read1_8();
 				a8 = (a8 >> 1) | (a8 << 7);
 				Write1_8( a8 );
-				if ( m_mode1 == MODE_R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
+				if ( m_mode1 == e_mode::R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
 				else                                F = (F & IF) | SZP[a8];
 				if (a8 & 0x80)                      F |= CF | XCF;  // X?
 				Cyc();
@@ -1897,7 +1918,7 @@ void tlcs90_device::execute_run()
 				a8 <<= 1;
 				if (F & CF) a8 |= 0x01;
 				Write1_8( a8 );
-				if ( m_mode1 == MODE_R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
+				if ( m_mode1 == e_mode::R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
 				else                                F = (F & IF) | SZP[a8];
 				if (b8)                             F |= CF | XCF;  // X?
 				Cyc();
@@ -1908,7 +1929,7 @@ void tlcs90_device::execute_run()
 				a8 >>= 1;
 				if (F & CF) a8 |= 0x80;
 				Write1_8( a8 );
-				if ( m_mode1 == MODE_R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
+				if ( m_mode1 == e_mode::R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
 				else                                F = (F & IF) | SZP[a8];
 				if (b8)                             F |= CF | XCF;  // X?
 				Cyc();
@@ -1920,7 +1941,7 @@ void tlcs90_device::execute_run()
 				b8 = a8 & 0x80;
 				a8 <<= 1;
 				Write1_8( a8 );
-				if ( m_mode1 == MODE_R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
+				if ( m_mode1 == e_mode::R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
 				else                                F = (F & IF) | SZP[a8];
 				if (b8)                             F |= CF | XCF;  // X?
 				Cyc();
@@ -1930,7 +1951,7 @@ void tlcs90_device::execute_run()
 				b8 = a8 & 0x01;
 				a8 = (a8 & 0x80) | (a8 >> 1);
 				Write1_8( a8 );
-				if ( m_mode1 == MODE_R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
+				if ( m_mode1 == e_mode::R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
 				else                                F = (F & IF) | SZP[a8];
 				if (b8)                             F |= CF | XCF;  // X?
 				Cyc();
@@ -1940,7 +1961,7 @@ void tlcs90_device::execute_run()
 				b8 = a8 & 0x01;
 				a8 >>= 1;
 				Write1_8( a8 );
-				if ( m_mode1 == MODE_R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
+				if ( m_mode1 == e_mode::R8 && m_r1 == A )  F &= SF | ZF | IF | PF;
 				else                                F = (F & IF) | SZP[a8];
 				if (b8)                             F |= CF | XCF;  // X?
 				Cyc();
@@ -2316,26 +2337,26 @@ FFED    BX      R/W     Reset   Description
 
 READ8_MEMBER( tlcs90_device::t90_internal_registers_r )
 {
-	#define RIO     m_io->read_byte( T90_IOBASE+offset )
-
 	uint8_t data = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
 	{
 		case T90_P3:    // 7,4,1,0
-			return (data & 0x6c) | (RIO & 0x93);
+			return (data & 0x6c) | (m_port_read_cb[3]() & 0x93);
 
 		case T90_P4:    // only output
 			return data & 0x0f;
 
 		case T90_P5:
-			return (RIO & 0x3f);
+			return (m_port_read_cb[5]() & 0x3f);
 
 		case T90_P6:
+			return (data & 0xf0) | (m_port_read_cb[6]() & 0x0f);
+
 		case T90_P7:
-			return (data & 0xf0) | (RIO & 0x0f);
+			return (data & 0xf0) | (m_port_read_cb[7]() & 0x0f);
 
 		case T90_P8:    // 2,1,0
-			return (data & 0x08) | (RIO & 0x07);
+			return (data & 0x08) | (m_port_read_cb[8]() & 0x07);
 
 		case T90_BX:
 		case T90_BY:
@@ -2510,8 +2531,6 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 {
-	#define WIO     m_io->write_byte( T90_IOBASE+offset, data )
-
 	uint8_t out_mask;
 	uint8_t old = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
@@ -2573,7 +2592,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 		case T90_P3:
 			data &= 0x6c;
-			WIO;
+			m_port_write_cb[3](data);
 			break;
 
 		case T90_P4:
@@ -2582,7 +2601,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[4](data);
 			}
 			break;
 
@@ -2604,7 +2623,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[6](data);
 			}
 			break;
 
@@ -2626,7 +2645,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[7](data);
 			}
 			break;
 
@@ -2636,7 +2655,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[8](data);
 			}
 			break;
 
@@ -2653,7 +2672,10 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 void tlcs90_device::device_start()
 {
-	int i, p;
+	for (auto &cb : m_port_read_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_write_cb)
+		cb.resolve_safe();
 
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -2694,9 +2716,9 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_cyc_f));
 	save_item(NAME(m_addr));
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		p = 0;
+		int p = 0;
 		if( i&0x01 ) ++p;
 		if( i&0x02 ) ++p;
 		if( i&0x04 ) ++p;
@@ -2728,21 +2750,20 @@ void tlcs90_device::device_start()
 	m_timer_value[0] = m_timer_value[1] = m_timer_value[2] = m_timer_value[3] = 0;
 	m_timer4_value = 0;
 	m_op = 0;
-	m_mode1 = MODE_NONE;
+	m_mode1 = e_mode::NONE;
 	m_r1 = m_r1b = 0;
-	m_mode2 = MODE_NONE;
+	m_mode2 = e_mode::NONE;
 	m_r2 = m_r2b = 0;
 	m_cyc_t = m_cyc_f = 0;
 	m_addr = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_io = &space(AS_IO);
 
 	m_timer_period = attotime::from_hz(unscaled_clock()) * 8;
 
 	// Timers
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer_callback),this));
 
 	m_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer4_callback),this));

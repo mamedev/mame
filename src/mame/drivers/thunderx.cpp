@@ -33,13 +33,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/thunderx.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/thunderx.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(thunderx_state::vblank_interrupt)
@@ -311,7 +313,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 		calculate_collisions();
 
 		/* 100 cycle delay is arbitrary */
-		timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100), TIMER_THUNDERX_FIRQ);
+		m_thunderx_firq_timer->adjust(m_maincpu->cycles_to_attotime(100));
 	}
 
 	m_1f98_latch = data;
@@ -628,7 +630,7 @@ void thunderx_state::machine_reset()
 	m_priority = 0;
 }
 
-static MACHINE_CONFIG_START( scontra, thunderx_state )
+static MACHINE_CONFIG_START( scontra )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
@@ -1032,15 +1034,19 @@ ROM_START( crazycop )
 ROM_END
 
 
+DRIVER_INIT_MEMBER(thunderx_state, thunderx)
+{
+	m_thunderx_firq_timer = timer_alloc(TIMER_THUNDERX_FIRQ);
+}
 
 /***************************************************************************/
 
-GAME( 1988, scontra,   0,        scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderx,  0,        thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxa, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxb, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, driver_device, 0, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gbusters,  0,        gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 1)", MACHINE_SUPPORTS_SAVE ) /* N02 & J03 program roms */
-GAME( 1988, gbustersa, gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 2)", MACHINE_SUPPORTS_SAVE ) /* unknown region program roms */
-GAME( 1988, crazycop,  gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Crazy Cop (Japan)", MACHINE_SUPPORTS_SAVE )    /* M02 & J03 program roms */
+GAME( 1988, scontra,   0,        scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gbusters,  0,        gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
+GAME( 1988, gbustersa, gbusters, gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
+GAME( 1988, crazycop,  gbusters, gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs

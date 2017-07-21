@@ -58,8 +58,8 @@
 
 
 #include "emu.h"
-#include "debugger.h"
 #include "tms32010.h"
+#include "debugger.h"
 
 
 
@@ -73,9 +73,9 @@
 #define P_OUT(A,V)      TMS32010_Out(A,V)
 
 
-const device_type TMS32010 = &device_creator<tms32010_device>;
-const device_type TMS32015 = &device_creator<tms32015_device>;
-const device_type TMS32016 = &device_creator<tms32016_device>;
+DEFINE_DEVICE_TYPE(TMS32010, tms32010_device, "tms32010", "TMS32010")
+DEFINE_DEVICE_TYPE(TMS32015, tms32015_device, "tms32015", "TMS32015")
+DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "TMS32016")
 
 
 /****************************************************************************
@@ -98,20 +98,15 @@ ADDRESS_MAP_END
 
 
 tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32010, "TMS32010", tag, owner, clock, "tms32010", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32010_ram))
-	, m_io_config("io", ENDIANNESS_BIG, 16, 4, -1)
-	, m_bio_in(*this)
-	, m_addr_mask(0x0fff)
+	: tms32010_device(mconfig, TMS32010, tag, owner, clock, ADDRESS_MAP_NAME(tms32010_ram), 0x0fff)
 {
 }
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int addr_mask)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32015_ram))
+	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, data_map)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, -1)
 	, m_bio_in(*this)
 	, m_addr_mask(addr_mask)
@@ -120,16 +115,24 @@ tms32010_device::tms32010_device(const machine_config &mconfig, device_type type
 
 
 tms32015_device::tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32015, "TMS32015", tag, owner, clock, "tms32015", __FILE__, 0x0fff)
+	: tms32010_device(mconfig, TMS32015, tag, owner, clock, ADDRESS_MAP_NAME(tms32015_ram), 0x0fff)
 {
 }
 
 
 tms32016_device::tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32016, "TMS32016", tag, owner, clock, "tms32016", __FILE__, 0xffff)
+	: tms32010_device(mconfig, TMS32016, tag, owner, clock, ADDRESS_MAP_NAME(tms32015_ram), 0xffff)
 {
 }
 
+device_memory_interface::space_config_vector tms32010_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

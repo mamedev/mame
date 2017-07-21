@@ -332,7 +332,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (hk68v10, hk68v10_state)
+static MACHINE_CONFIG_START (hk68v10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START (hk68v10, hk68v10_state)
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", hk68_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 1, hk68_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -389,5 +389,5 @@ ROM_LOAD16_BYTE ("hk68kv10U12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e6869
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1985, hk68v10,      0,      0,       hk68v10,        hk68v10, driver_device, 0,   "Heurikon Corporation",   "HK68/V10", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+/*    YEAR  NAME          PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY                  FULLNAME    FLAGS */
+COMP (1985, hk68v10,      0,      0,       hk68v10, hk68v10, hk68v10_state, 0,    "Heurikon Corporation",  "HK68/V10", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

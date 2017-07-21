@@ -39,7 +39,10 @@ so levels 0,1,2,5 are unmasked, vectors get set during the sound CPU init code.
 */
 
 
+#include "emu.h"
 #include "includes/hng64.h"
+#include "speaker.h"
+
 
 // save the sound program?
 #define DUMP_SOUNDPRG  0
@@ -383,7 +386,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 
-MACHINE_CONFIG_FRAGMENT( hng64_audio )
+MACHINE_CONFIG_START( hng64_audio )
 	MCFG_CPU_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
 	MCFG_CPU_IO_MAP(hng_sound_io)

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device, "c64_expansion_slot", "C64 expansion port")
 
 
 
@@ -57,7 +58,7 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 //-------------------------------------------------
 
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock, "c64_expansion_slot", __FILE__),
+		device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
 		m_read_dma_cd(*this),
@@ -119,7 +120,7 @@ image_init_result c64_expansion_slot_device::call_load()
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 
@@ -153,7 +154,7 @@ image_init_result c64_expansion_slot_device::call_load()
 				int exrom = 1;
 				int game = 1;
 
-				if (cbm_crt_read_header(*m_file, &roml_size, &romh_size, &exrom, &game))
+				if (cbm_crt_read_header(image_core_file(), &roml_size, &romh_size, &exrom, &game))
 				{
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
@@ -164,7 +165,7 @@ image_init_result c64_expansion_slot_device::call_load()
 					if (roml_size) roml = m_card->m_roml;
 					if (romh_size) romh = m_card->m_roml;
 
-					cbm_crt_read_data(*m_file, roml, romh);
+					cbm_crt_read_data(image_core_file(), roml, romh);
 				}
 
 				m_card->m_exrom = exrom;
@@ -205,14 +206,12 @@ image_init_result c64_expansion_slot_device::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string c64_expansion_slot_device::get_default_card_software()
+std::string c64_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
-		if (is_filetype("crt"))
-			return cbm_crt_get_card(*m_file);
-
-		clear();
+		if (hook.is_filetype("crt"))
+			return cbm_crt_get_card(*hook.image_file());
 	}
 
 	return software_get_default_slot("standard");
@@ -339,6 +338,7 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 #include "sfx_sound_expander.h"
 #include "silverrock.h"
 #include "simons_basic.h"
+#include "speakeasy.h"
 #include "stardos.h"
 #include "std.h"
 #include "structured_basic.h"
@@ -375,6 +375,7 @@ SLOT_INTERFACE_START( c64_expansion_cards )
 	SLOT_INTERFACE("reu1750", C64_REU1750)
 	SLOT_INTERFACE("reu1764", C64_REU1764)
 	SLOT_INTERFACE("sfxse", C64_SFX_SOUND_EXPANDER)
+	SLOT_INTERFACE("speakez", C64_SPEAKEASY)
 	SLOT_INTERFACE("supercpu", C64_SUPERCPU)
 	SLOT_INTERFACE("swiftlink", C64_SWIFTLINK)
 	SLOT_INTERFACE("turbo232", C64_TURBO232)

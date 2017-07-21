@@ -17,18 +17,16 @@
 //
 //
 
-static inline int clamp(int v)
+static constexpr int clamp(int v)
 {
-	if (v<-32768) return -32768;
-	if (v>32767) return 32767;
-	return v;
+	return (v<-32768) ? -32768 : (v>32767) ? 32767 : v;
 }
 
 //
 //
 //
 
-reverb::reverb(const int hz, const int maxdelay)
+spu_device::reverb::reverb(const int hz, const int maxdelay)
 	:  yp(0),
 		max_delay(maxdelay),
 		sound_hz(hz)
@@ -54,7 +52,7 @@ reverb::reverb(const int hz, const int maxdelay)
 //
 //
 
-reverb::~reverb()
+spu_device::reverb::~reverb()
 {
 	for (int c=0; c<2; c++)
 	{
@@ -70,7 +68,7 @@ reverb::~reverb()
 //
 //
 
-void reverb::bandpass(signed short *sp,
+void spu_device::reverb::bandpass(signed short *sp,
 											const reverb_params *rp,
 											const unsigned int sz)
 {
@@ -98,7 +96,7 @@ void reverb::bandpass(signed short *sp,
 	}
 }
 
-void reverb::comb_allpass1(signed short *sp,
+void spu_device::reverb::comb_allpass1(signed short *sp,
 														signed short *dp,
 														const comb_param &comb_delay,
 														const int comb_gain,
@@ -148,7 +146,7 @@ void reverb::comb_allpass1(signed short *sp,
 //
 //
 
-void reverb::comb_allpass4(signed short *sp,
+void spu_device::reverb::comb_allpass4(signed short *sp,
 														signed short *dp,
 														const comb_param &comb_delay,
 														const int comb_gain,
@@ -235,7 +233,7 @@ void reverb::comb_allpass4(signed short *sp,
 //
 //
 
-void reverb::comb_allpass(signed short *sp,
+void spu_device::reverb::comb_allpass(signed short *sp,
 													signed short *dp,
 													const reverb_params *rp,
 													const int wetvol_l,
@@ -312,7 +310,7 @@ void reverb::comb_allpass(signed short *sp,
 //
 //
 
-void reverb::process(signed short *output,
+void spu_device::reverb::process(signed short *output,
 										signed short *reverb_input,
 										const reverb_params *rp,
 										const int wetvol_l,

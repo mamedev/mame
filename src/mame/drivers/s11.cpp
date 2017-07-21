@@ -17,11 +17,16 @@ ToDo:
 
 *****************************************************************************************/
 
+#include "emu.h"
 #include "includes/s11.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s11.lh"
+
 
 static ADDRESS_MAP_START( s11_main_map, AS_PROGRAM, 8, s11_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
@@ -374,7 +379,7 @@ DRIVER_INIT_MEMBER( s11_state, s11 )
 	m_irq_active = false;
 }
 
-static MACHINE_CONFIG_START( s11, s11_state )
+static MACHINE_CONFIG_START( s11 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11_main_map)
@@ -439,7 +444,7 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_CPU_PROGRAM_MAP(s11_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
@@ -466,7 +471,7 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11_state, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac1", dac_byte_interface, write))
@@ -679,15 +684,15 @@ ROM_END
 
 GAME( 1986, grand_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1986, grand_l3, grand_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 GAME( 1986, tts_l2,   0,        s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, tdawg_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, shfin_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, tdawg_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, shfin_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

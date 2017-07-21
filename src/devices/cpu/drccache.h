@@ -72,7 +72,7 @@ private:
 	static const size_t CODEGEN_MAX_BYTES = 65536;
 
 	// minimum alignment, in bytes (must be power of 2)
-	static const size_t CACHE_ALIGNMENT = 8;
+	static const size_t CACHE_ALIGNMENT = alignof(std::max_align_t);
 
 	// largest permanent allocation we allow
 	static const size_t MAX_PERMANENT_ALLOC = 1024;

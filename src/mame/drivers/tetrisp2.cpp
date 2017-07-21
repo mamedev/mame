@@ -49,14 +49,19 @@ stepstag:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "sound/ymz280b.h"
-#include "rocknms.lh"
-#include "stepstag.lh"
 #include "includes/tetrisp2.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/okim6295.h"
+#include "sound/ymz280b.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "rocknms.lh"
+#include "stepstag.lh"
 
 
 /***************************************************************************
@@ -1266,8 +1271,10 @@ TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_sub_level1_callback)
 
 void tetrisp2_state::init_rockn_timer()
 {
-	machine().scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),this));
+	m_rockn_timer_l1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),this));
 	m_rockn_timer_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level4_callback),this));
+
+	m_rockn_timer_l1->adjust(attotime::from_msec(32), 0, attotime::from_msec(32));
 
 	save_item(NAME(m_systemregs));
 	save_item(NAME(m_rocknms_sub_systemregs));
@@ -1300,8 +1307,10 @@ DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 {
 	init_rockn_timer();
 
-	machine().scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level1_callback),this));
+	m_rockn_timer_sub_l1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level1_callback),this));
 	m_rockn_timer_sub_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level4_callback),this));
+
+	m_rockn_timer_sub_l1->adjust(attotime::from_msec(32), 0, attotime::from_msec(32));
 
 	m_rockn_protectdata = 3;
 
@@ -1320,7 +1329,7 @@ DRIVER_INIT_MEMBER(stepstag_state,stepstag)
 }
 
 
-static MACHINE_CONFIG_START( tetrisp2, tetrisp2_state )
+static MACHINE_CONFIG_START( tetrisp2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1355,7 +1364,7 @@ static MACHINE_CONFIG_START( tetrisp2, tetrisp2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nndmseal, tetrisp2_state )
+static MACHINE_CONFIG_START( nndmseal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -1383,12 +1392,12 @@ static MACHINE_CONFIG_START( nndmseal, tetrisp2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_2MHz, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_2MHz, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rockn, tetrisp2_state )
+static MACHINE_CONFIG_START( rockn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1422,7 +1431,7 @@ static MACHINE_CONFIG_START( rockn, tetrisp2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rockn2, tetrisp2_state )
+static MACHINE_CONFIG_START( rockn2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1456,7 +1465,7 @@ static MACHINE_CONFIG_START( rockn2, tetrisp2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
+static MACHINE_CONFIG_START( rocknms )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1506,7 +1515,7 @@ static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( stepstag, stepstag_state )
+static MACHINE_CONFIG_START( stepstag )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 ) //??
 	MCFG_CPU_PROGRAM_MAP(stepstag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
@@ -2282,19 +2291,19 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2, driver_device, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, driver_device,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, driver_device,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1997, nndmseal, 0,        nndmseal, nndmseal, tetrisp2_state, rockn, ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1997, nndmseala,nndmseal, nndmseal, nndmseal, tetrisp2_state, rockn, ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1999, rockn,    0,        rockn,    rockn, tetrisp2_state,   rockn,    ROT270, "Jaleco",                      "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockna,   rockn,    rockn,    rockn, tetrisp2_state,   rockn1,   ROT270, "Jaleco",                      "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockn2,   0,        rockn2,   rockn, tetrisp2_state,   rockn2,   ROT270, "Jaleco",                      "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn,    0,        rockn,    rockn,   tetrisp2_state, rockn,    ROT270, "Jaleco",                      "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockna,   rockn,    rockn,    rockn,   tetrisp2_state, rockn1,   ROT270, "Jaleco",                      "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn2,   0,        rockn2,   rockn,   tetrisp2_state, rockn2,   ROT270, "Jaleco",                      "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rocknms,  0,        rocknms,  rocknms, tetrisp2_state, rocknms,  ROT0,   "Jaleco",                      "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, rockn3,   0,        rockn2,   rockn, tetrisp2_state,   rockn3,   ROT270, "Jaleco",                      "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 2000, rockn4,   0,        rockn2,   rockn, tetrisp2_state,   rockn3,   ROT270, "Jaleco / PCCWJ",              "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn3,   0,        rockn2,   rockn,   tetrisp2_state, rockn3,   ROT270, "Jaleco",                      "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rockn4,   0,        rockn2,   rockn,   tetrisp2_state, rockn3,   ROT270, "Jaleco / PCCWJ",              "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
 
 // Undumped:
 // - Stepping Stage <- the original Game

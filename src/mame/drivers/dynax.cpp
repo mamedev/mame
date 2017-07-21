@@ -55,11 +55,10 @@ Notes:
 - sprtmtch and drgpunch are "clones", but the gfx are very different; sprtmtch
   is a trimmed down version, without all animations between levels.
 
-- according to the readme, mjfriday should have a M5205. However there don't seem to be
-  accesses to it, and looking at the ROMs I don't see ADPCM data. Note that apart from a
-  minor difference in the memory map mjfriday and mjdialq2 are identical, and mjdialq2
-  doesn't have a 5205 either. Therefore, I think it's either a mistake in the readme or
-  the chip is on the board but unused.
+- according to the readme, mjfriday should have a M5205. However the program ROMs don't
+  seem to make accesses to it or contain ADPCM data for it, and photos of the game's
+  PCB don't even show an unpopulated location for one. Note that gekisha and mjdialq2,
+  which run on similar hardware, also lack 5205s. Likely it's a mistake in the readme.
 
 TODO:
 
@@ -78,14 +77,18 @@ TODO:
 *********************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/dynax.h"
+
 #include "cpu/tlcs90/tlcs90.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "machine/nvram.h"
+
 #include "rendlay.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -542,7 +545,7 @@ static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x76, 0x76 ) AM_WRITE(dynax_blit_palbank_w)       // Layers Palettes (High Bit)
 	AM_RANGE( 0x77, 0x77 ) AM_WRITE(hanamai_layer_half_w)       // half of the interleaved layer to write to
 	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE("ym2203", ym2203_device, read, write) // 2 x DSW
-	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)   // AY8910
+	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE("aysnd", ay8912_device, address_data_w)   // AY8912
 //  AM_RANGE( 0x7c, 0x7c ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x7d, 0x7d ) AM_WRITENOP   //
 	AM_RANGE( 0x7e, 0x7e ) AM_WRITE(dynax_blit_romregion_w) // Blitter ROM bank
@@ -564,9 +567,9 @@ static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW0
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8912_device, data_r)     // AY8912, DSW0
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
@@ -649,9 +652,9 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
 
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW0
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8912_device, data_r)     // AY8912, DSW0
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
 
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
@@ -788,8 +791,8 @@ static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x22, 0x22 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x24, 0x25 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
-	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
+	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
 	AM_RANGE( 0x49, 0x49 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
 	AM_RANGE( 0x4a, 0x4a ) AM_WRITE(yarunara_rombank_w)     // BANK ROM Select
@@ -827,8 +830,8 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
@@ -910,8 +913,8 @@ static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("COINS")            // Coins
 	AM_RANGE( 0x12, 0x12 ) AM_READ(hanamai_keyboard_1_r)        // P2
@@ -1029,8 +1032,8 @@ static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(jantouki_sound_rombank_w)       // BANK ROM Select
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(jantouki_sound_vblank_ack_w)    // VBlank IRQ Ack
-	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD("aysnd", ay8910_device, data_r)         // AY8910
-	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)   //
+	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD("aysnd", ay8912_device, data_r)         // AY8912
+	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE("aysnd", ay8912_device, data_address_w)   //
 	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE("ym2203", ym2203_device, read, write) //
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)      // MSM5205 reset
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(adpcm_data_w)               // MSM5205 data
@@ -1068,8 +1071,8 @@ static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
 	AM_RANGE( 0x11, 0x12 ) AM_WRITE(mjelctrn_blitter_ack_w) //?
 //  AM_RANGE( 0x20, 0x20 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x21, 0x21 ) AM_WRITENOP   // CRT Controller
@@ -1104,9 +1107,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjembase_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE("ym2413", ym2413_device, write)       //
-	AM_RANGE( 0x06, 0x06 ) AM_DEVREAD("aysnd", ay8910_device, data_r)        // AY8910, dsw0
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)       //
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x06, 0x06 ) AM_DEVREAD("aysnd", ay8912_device, data_r)        // AY8912, dsw0
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)       //
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
 	AM_RANGE( 0x11, 0x12 ) AM_WRITE(mjelctrn_blitter_ack_w) //?
 	AM_RANGE( 0x1c, 0x1c ) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x1e, 0x1e ) AM_READ_PORT("DSW2")
@@ -1399,15 +1402,6 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)    // Blitter (inverted scroll values)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenkai_io_map, AS_IO, 8, dynax_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(tenkai_p3_r, tenkai_p3_w)
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(tenkai_p4_w)
-	AM_RANGE( T90_P5, T90_P5 ) AM_READ(tenkai_p5_r)
-	AM_RANGE( T90_P6, T90_P6 ) AM_WRITE(tenkai_p6_w)
-	AM_RANGE( T90_P7, T90_P7 ) AM_WRITE(tenkai_p7_w)
-	AM_RANGE( T90_P8, T90_P8 ) AM_READWRITE(tenkai_p8_r, tenkai_p8_w)
-ADDRESS_MAP_END
-
 /***************************************************************************
                                 Mahjong Gekisha
 ***************************************************************************/
@@ -1539,10 +1533,6 @@ static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(gekisha_8000_r, gekisha_8000_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gekisha_io_map, AS_IO, 8, dynax_state )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(gekisha_p4_w)
 ADDRESS_MAP_END
 
 
@@ -4184,7 +4174,7 @@ static INPUT_PORTS_START( gekisha )
 	PORT_DIPNAME( 0x03, 0x03, "Odds Rate" )
 	PORT_DIPSETTING(    0x03, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x01, "1 2 3 5 10 25 50 100 " )
+	PORT_DIPSETTING(    0x01, "1 2 3 5 10 25 50 100" )
 	PORT_DIPSETTING(    0x02, "1 2 3 5 10 50 100 200" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
@@ -4378,7 +4368,7 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
                                 Castle Of Dracula
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( cdracula, dynax_state )
+static MACHINE_CONFIG_START( cdracula )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/4) /* 5.3693175MHz measured */
@@ -4408,7 +4398,7 @@ static MACHINE_CONFIG_START( cdracula, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH) /* 1MHz measured */
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, PIN7_HIGH) /* 1MHz measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -4417,7 +4407,7 @@ MACHINE_CONFIG_END
                                 Hana no Mai
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hanamai, dynax_state )
+static MACHINE_CONFIG_START( hanamai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
@@ -4447,7 +4437,7 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
+	MCFG_SOUND_ADD("aysnd", AY8912, 22000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
@@ -4461,7 +4451,7 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4471,7 +4461,7 @@ MACHINE_CONFIG_END
                                 Hana Oriduru
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hnoridur, dynax_state )
+static MACHINE_CONFIG_START( hnoridur )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_22MHz / 4)    /* 5.5MHz */
@@ -4500,7 +4490,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_22MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -4509,7 +4499,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4518,7 +4508,7 @@ MACHINE_CONFIG_END
                                 Hana Jingi
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hjingi, dynax_state )
+static MACHINE_CONFIG_START( hjingi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_22MHz / 4)
@@ -4547,7 +4537,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_22MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -4556,7 +4546,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4565,7 +4555,7 @@ MACHINE_CONFIG_END
                                 Sports Match
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sprtmtch, dynax_state )
+static MACHINE_CONFIG_START( sprtmtch )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,22000000 / 4)   /* 5.5MHz */
@@ -4610,7 +4600,7 @@ MACHINE_CONFIG_END
                             Mahjong Friday
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mjfriday, dynax_state )
+static MACHINE_CONFIG_START( mjfriday )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,24000000/4)  /* 6 MHz? */
@@ -4744,7 +4734,7 @@ MACHINE_START_MEMBER(dynax_state,jantouki)
 }
 
 
-static MACHINE_CONFIG_START( jantouki, dynax_state )
+static MACHINE_CONFIG_START( jantouki )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
@@ -4788,7 +4778,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
+	MCFG_SOUND_ADD("aysnd", AY8912, 22000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
@@ -4800,7 +4790,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int_cpu1))         /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
@@ -4944,12 +4934,19 @@ WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
 }
 
 
-static MACHINE_CONFIG_START( tenkai, dynax_state )
+static MACHINE_CONFIG_START( tenkai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
 	MCFG_CPU_PROGRAM_MAP(tenkai_map)
-	MCFG_CPU_IO_MAP(tenkai_io_map)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(dynax_state, tenkai_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(dynax_state, tenkai_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, tenkai_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(dynax_state, tenkai_p5_r))
+	MCFG_TLCS90_PORT_P6_WRITE_CB(WRITE8(dynax_state, tenkai_p6_w))
+	MCFG_TLCS90_PORT_P7_WRITE_CB(WRITE8(dynax_state, tenkai_p7_w))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(dynax_state, tenkai_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(dynax_state, tenkai_p8_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dynax_state, tenkai_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,tenkai)
@@ -5015,12 +5012,12 @@ MACHINE_RESET_MEMBER(dynax_state,gekisha)
 	gekisha_set_rombank(0);
 }
 
-static MACHINE_CONFIG_START( gekisha, dynax_state )
+static MACHINE_CONFIG_START( gekisha )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",TMP90841, XTAL_10MHz )   // ?
 	MCFG_CPU_PROGRAM_MAP(gekisha_map)
-	MCFG_CPU_IO_MAP(gekisha_io_map)
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, gekisha_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,gekisha)
@@ -5287,7 +5284,7 @@ Mahjong Friday
 D2607198L1
 
 CPU  : Zilog Z0840006PSC (Z80)
-Sound: YM2413 M5205
+Sound: YM2413
 OSC  : 24MHz (X1)
 
 CRT Controller: HD46505SP (6845)
@@ -7472,51 +7469,51 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, janyuki,  0,        janyuki,  janyuki,  driver_device, 0,        ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, driver_device, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  driver_device, 0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hjingi,   0,        hjingi,   hjingi,   driver_device, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   driver_device, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet, alt.)",                                 MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, driver_device, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, driver_device, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, janyuki,  0,        janyuki,  janyuki,  dynax_state, 0,        ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, dynax_state, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  dynax_state, 0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hjingi,   0,        hjingi,   hjingi,   dynax_state, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   dynax_state, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet, alt.)",                                 MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, dynax_state, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, dynax_state, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
 /* these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
-GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state,   mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
-GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state,   blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state, mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
+GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gekisha,  0,        gekisha,  gekisha,  driver_device, 0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                               MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 7jigen,   0,        nanajign, nanajign, driver_device, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, jantouki, 0,        jantouki, jantouki, driver_device, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, yarunara, 0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjangels, 0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, driver_device, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state,   mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state,   mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanayara, 0,        yarunara, hanayara, driver_device, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjcomv1,  0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkai,   0,        tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonpai, 0,        tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Pai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Pai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state,   mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cdracula, 0,        cdracula, cdracula, driver_device, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
-GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
-GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
-GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gekisha,  0,        gekisha,  gekisha,  dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 7jigen,   0,        nanajign, nanajign, dynax_state, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, jantouki, 0,        jantouki, jantouki, dynax_state, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yarunara, 0,        yarunara, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjangels, 0,        yarunara, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, dynax_state, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanayara, 0,        yarunara, hanayara, dynax_state, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjcomv1,  0,        yarunara, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkai,   0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonpai, 0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Pai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Pai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state, mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
+GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
+GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
+GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

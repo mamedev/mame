@@ -22,6 +22,7 @@ Todo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "speaker.h"
 
 #define SCHEMATIC_CLOCK (20000000)
 
@@ -366,7 +367,7 @@ void segald_state::machine_start()
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( astron, segald_state )
+static MACHINE_CONFIG_START( astron )
 
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
@@ -604,10 +605,10 @@ DRIVER_INIT_MEMBER(segald_state,astron)
 }
 
 
-//    YEAR, NAME,     PARENT,  MACHINE,INPUT,  INIT,   MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, astron,   0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, astronp,  astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR, NAME,     PARENT,  MACHINE,INPUT,  STATE,        INIT,   MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1983, astron,   0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt",                             MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, astronp,  astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME( 1983, cobraseg, astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyr,  0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyr,  0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger",                           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

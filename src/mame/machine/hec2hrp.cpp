@@ -40,16 +40,20 @@
 */
 
 #include "emu.h"
+#include "includes/hec2hrp.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h" /* for floppy disc controller */
+
+#include "speaker.h"
 
 #include "formats/hect_tap.h"
-#include "includes/hec2hrp.h"
 #include "formats/hect_dsk.h"
-#include "cpu/z80/z80.h"
+
 
 #ifndef DEBUG_TRACE_COM_HECTOR
 //#define DEBUG_TRACE_COM_HECTOR  1
@@ -799,7 +803,7 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_FRAGMENT( hector_audio )
+MACHINE_CONFIG_START( hector_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/

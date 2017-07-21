@@ -16,22 +16,34 @@ Sound Chips :   Custom (NAMCO)
 
 XTAL        :   18.432 MHz
 
-Notes:
-
-- firebatl video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
-  text layer is not correctly emulated.
+TODO:
+- few unused video registers (2 and 3);
+- clshroad: erratic gameplay speed;
+- firebatl: video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
+  text layer is not correctly emulated, fixed by initializing VRAM to 0xf0? (that layer seems unused by this game);
+- firebatl: bad sprite colors;
+- firebatl: remove ROM patch;
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "audio/wiping.h"
 #include "includes/clshroad.h"
+#include "audio/wiping.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
+
+/* unknown divider, assume /5 */
+#define MAIN_CLOCK XTAL_18_432MHz/5
 
 void clshroad_state::machine_reset()
 {
 	flip_screen_set(0);
 	m_main_irq_mask = m_sound_irq_mask = 0;
+	// not initialized by HW, matches grey background on first title screen
+	for(int i = 0;i<0x800;i++)
+		m_vram_0[i] = 0xf0;
 }
 
 
@@ -264,14 +276,14 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( firebatl, clshroad_state )
+static MACHINE_CONFIG_START( firebatl )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)   /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
@@ -298,17 +310,17 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( clshroad, clshroad_state )
+static MACHINE_CONFIG_START( clshroad )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)  /* ? real speed unknown. 3MHz is too low and causes problems */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
 	MCFG_CPU_PROGRAM_MAP(clshroad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
-
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -559,6 +571,6 @@ die once, it would be nice to avoid the hack however
 }
 
 GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Wood Place Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, driver_device, 0,         ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, driver_device, 0,         ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroadd,clshroad, clshroad, clshroad, driver_device, 0,         ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroad, 0,        clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroads,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroadd,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )

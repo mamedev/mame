@@ -1,12 +1,12 @@
 //
-//Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
-//Copyright (C) 2012-2013 LunarG, Inc.
+// Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
+// Copyright (C) 2012-2013 LunarG, Inc.
 //
-//All rights reserved.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions
-//are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
 //
 //    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
@@ -20,18 +20,18 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 
 //
@@ -79,9 +79,7 @@ public:
             symbolTable(symbolTable),
             parsingBuiltins(parsingBuiltins), scanContext(nullptr), ppContext(nullptr),
             globalUniformBlock(nullptr)
-    {
-        linkage = new TIntermAggregate;
-    }
+    { }
     virtual ~TParseContextBase() { }
 
     virtual void C_DECL   error(const TSourceLoc&, const char* szReason, const char* szToken,
@@ -138,14 +136,12 @@ public:
     TSymbolTable& symbolTable;   // symbol table that goes with the current language, version, and profile
 
     // Manage the global uniform block (default uniforms in GLSL, $Global in HLSL)
-    // TODO: This could perhaps get its own object, but the current design doesn't work
-    // yet when new uniform variables are declared between function definitions, so
-    // this is pending getting a fully functional design.
-    virtual void growGlobalUniformBlock(TSourceLoc&, TType&, TString& memberName);
-    virtual bool insertGlobalUniformBlock();
+    virtual void growGlobalUniformBlock(TSourceLoc&, TType&, TString& memberName, TTypeList* typeList = nullptr);
 
     virtual bool lValueErrorCheck(const TSourceLoc&, const char* op, TIntermTyped*);
     virtual void rValueErrorCheck(const TSourceLoc&, const char* op, TIntermTyped*);
+
+    const char* const scopeMangler = "::";
 
 protected:
     TParseContextBase(TParseContextBase&);
@@ -170,23 +166,23 @@ protected:
         std::function<bool(const TType&, const TType&, const TType&)>,
         /* output */ bool& tie);
 
+    virtual void parseSwizzleSelector(const TSourceLoc&, const TString&, int size,
+                                      TSwizzleSelectors<TVectorSelector>&);
+
     // Manage the global uniform block (default uniforms in GLSL, $Global in HLSL)
     TVariable* globalUniformBlock;   // the actual block, inserted into the symbol table
     int firstNewMember;              // the index of the first member not yet inserted into the symbol table
     // override this to set the language-specific name
-    virtual const char* getGlobalUniformBlockName() { return ""; }
+    virtual const char* getGlobalUniformBlockName() const { return ""; }
+    virtual void setUniformBlockDefaults(TType& block) const { }
     virtual void finalizeGlobalUniformBlockLayout(TVariable&) { }
     virtual void outputMessage(const TSourceLoc&, const char* szReason, const char* szToken,
                                const char* szExtraInfoFormat, TPrefixType prefix,
                                va_list args);
     virtual void trackLinkage(TSymbol& symbol);
-    virtual void trackLinkageDeferred(TSymbol& symbol);
     virtual void makeEditable(TSymbol*&);
     virtual TVariable* getEditableVariable(const char* name);
     virtual void finish();
-
-private:
-    TIntermAggregate* linkage;
 };
 
 //
@@ -284,7 +280,6 @@ public:
     void handlePrecisionQualifier(const TSourceLoc&, TQualifier&, TPrecisionQualifier);
     void checkPrecisionQualifier(const TSourceLoc&, TPrecisionQualifier);
 
-    bool parseVectorFields(const TSourceLoc&, const TString&, int vecSize, TVectorFields&);
     void assignError(const TSourceLoc&, const char* op, TString left, TString right);
     void unaryOpError(const TSourceLoc&, const char* op, TString operand);
     void binaryOpError(const TSourceLoc&, const char* op, TString left, TString right);
@@ -448,7 +443,7 @@ protected:
     //     * note, that appropriately gives an error if redeclaring a block that
     //       was already used and hence already copied-up
     //
-    //  - on seeing a layout declaration that sizes the array, fix everything in the 
+    //  - on seeing a layout declaration that sizes the array, fix everything in the
     //    resize-list, giving errors for mismatch
     //
     //  - on seeing an array size declaration, give errors on mismatch between it and previous

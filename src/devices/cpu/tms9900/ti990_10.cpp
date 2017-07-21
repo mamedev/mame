@@ -23,6 +23,7 @@
     **** This is WORK IN PROGRESS ****
 */
 
+#include "emu.h"
 #include "ti990_10.h"
 
 /*
@@ -42,7 +43,7 @@
 ****************************************************************************/
 
 ti990_10_device::ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TI990_10, "TI990/10 CPU", tag, owner, clock, "ti990_10_cpu",  __FILE__),
+	: cpu_device(mconfig, TI990_10, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 16, 21),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 12),
 		m_prgspace(nullptr),
@@ -82,19 +83,12 @@ void ti990_10_device::device_reset()
 	if (TRACE_EMU) logerror("ti990_10: Device reset by emulator\n");
 }
 
-const address_space_config *ti990_10_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector ti990_10_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_PROGRAM:
-		return &m_program_config;
-
-	case AS_IO:
-		return &m_io_config;
-
-	default:
-		return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 void ti990_10_device::execute_run()
@@ -146,4 +140,4 @@ offs_t ti990_10_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	return CPU_DISASSEMBLE_NAME(tms9900)(this, stream, pc, oprom, opram, options);
 }
 
-const device_type TI990_10 = &device_creator<ti990_10_device>;
+DEFINE_DEVICE_TYPE(TI990_10, ti990_10_device, "ti990_10_cpu", "TI990/10 CPU")

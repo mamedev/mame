@@ -46,9 +46,13 @@
 
 #include "emu.h"
 #include "pc_vga.h"
+
 #include "bus/isa/trident.h"
 #include "machine/eepromser.h"
+
 #include "debugger.h"
+#include "screen.h"
+
 
 /***************************************************************************
 
@@ -117,80 +121,78 @@ enum
 
 ***************************************************************************/
 // device type definition
-const device_type VGA = &device_creator<vga_device>;
-const device_type TSENG_VGA = &device_creator<tseng_vga_device>;
-const device_type S3_VGA = &device_creator<s3_vga_device>;
-const device_type GAMTOR_VGA = &device_creator<gamtor_vga_device>;
-const device_type ATI_VGA = &device_creator<ati_vga_device>;
-const device_type IBM8514A = &device_creator<ibm8514a_device>;
-const device_type MACH8 = &device_creator<mach8_device>;
+DEFINE_DEVICE_TYPE(VGA,        vga_device,        "vga",        "VGA")
+DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,  "tseng_vga",  "Tseng Labs VGA")
+DEFINE_DEVICE_TYPE(S3_VGA,     s3_vga_device,     "s3_vga",     "S3 Graphics VGA")
+DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "GAMTOR VGA")
+DEFINE_DEVICE_TYPE(ATI_VGA,    ati_vga_device,    "ati_vga",    "ATi VGA")
+DEFINE_DEVICE_TYPE(IBM8514A,   ibm8514a_device,   "ibm8514a",   "IBM 8514/A Video")
+DEFINE_DEVICE_TYPE(MACH8,      mach8_device,      "mach8",      "Mach8")
 
-vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_palette(*this, "^palette"),
-		m_screen(*this,"^screen")
+vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_palette(*this, "^palette")
+	, m_screen(*this,"^screen")
 {
 }
 
 vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VGA, "VGA", tag, owner, clock, "vga", __FILE__),
-		m_palette(*this, "^palette"),
-		m_screen(*this,"^screen")
+	: vga_device(mconfig, VGA, tag, owner, clock)
 {
 }
 
-svga_device::svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, TSENG_VGA, "TSENG LABS VGA", tag, owner, clock, "tseng_vga", __FILE__)
+	: svga_device(mconfig, TSENG_VGA, tag, owner, clock)
 {
 }
 
 s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ati_vga_device(mconfig, S3_VGA, "S3 Graphics VGA", tag, owner, clock, "s3_vga", __FILE__)
+	: s3_vga_device(mconfig, S3_VGA, tag, owner, clock)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ati_vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, GAMTOR_VGA, "GAMTOR VGA", tag, owner, clock, "gamtor_vga", __FILE__)
+	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
 {
 }
 
 ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, ATI_VGA, "ATI VGA", tag, owner, clock, "ati_vga", __FILE__)
+	: ati_vga_device(mconfig, ATI_VGA, tag, owner, clock)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IBM8514A, "IBM8514A Video", tag, owner, clock, "ibm8514a", __FILE__)
+	: ibm8514a_device(mconfig, IBM8514A, tag, owner, clock)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ibm8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
+mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ibm8514a_device(mconfig, type, tag, owner, clock)
 {
 }
 
 mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ibm8514a_device(mconfig, MACH8, "MACH8", tag, owner, clock, "mach8", __FILE__)
+	: mach8_device(mconfig, MACH8, tag, owner, clock)
 {
 }
 
@@ -256,9 +258,94 @@ void vga_device::device_start()
 	vga.memory.resize(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
-	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
-	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
-	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
+	save_item(NAME(vga.pens));
+
+	save_item(NAME(vga.miscellaneous_output));
+	save_item(NAME(vga.feature_control));
+
+	save_item(NAME(vga.sequencer.index));
+	save_item(NAME(vga.sequencer.data));
+	save_item(NAME(vga.sequencer.map_mask));
+	save_item(NAME(vga.sequencer.char_sel.A));
+	save_item(NAME(vga.sequencer.char_sel.B));
+
+	save_item(NAME(vga.crtc.index));
+	save_item(NAME(vga.crtc.data));
+	save_item(NAME(vga.crtc.horz_total));
+	save_item(NAME(vga.crtc.horz_disp_end));
+	save_item(NAME(vga.crtc.horz_blank_start));
+	save_item(NAME(vga.crtc.horz_retrace_start));
+	save_item(NAME(vga.crtc.horz_retrace_skew));
+	save_item(NAME(vga.crtc.horz_retrace_end));
+	save_item(NAME(vga.crtc.disp_enable_skew));
+	save_item(NAME(vga.crtc.evra));
+	save_item(NAME(vga.crtc.vert_total));
+	save_item(NAME(vga.crtc.vert_disp_end));
+	save_item(NAME(vga.crtc.vert_retrace_start));
+	save_item(NAME(vga.crtc.vert_retrace_end));
+	save_item(NAME(vga.crtc.vert_blank_start));
+	save_item(NAME(vga.crtc.line_compare));
+	save_item(NAME(vga.crtc.cursor_addr));
+	save_item(NAME(vga.crtc.byte_panning));
+	save_item(NAME(vga.crtc.preset_row_scan));
+	save_item(NAME(vga.crtc.scan_doubling));
+	save_item(NAME(vga.crtc.maximum_scan_line));
+	save_item(NAME(vga.crtc.cursor_enable));
+	save_item(NAME(vga.crtc.cursor_scan_start));
+	save_item(NAME(vga.crtc.cursor_skew));
+	save_item(NAME(vga.crtc.cursor_scan_end));
+	save_item(NAME(vga.crtc.start_addr));
+	save_item(NAME(vga.crtc.start_addr_latch));
+	save_item(NAME(vga.crtc.protect_enable));
+	save_item(NAME(vga.crtc.bandwidth));
+	save_item(NAME(vga.crtc.offset));
+	save_item(NAME(vga.crtc.word_mode));
+	save_item(NAME(vga.crtc.dw));
+	save_item(NAME(vga.crtc.div4));
+	save_item(NAME(vga.crtc.underline_loc));
+	save_item(NAME(vga.crtc.vert_blank_end));
+	save_item(NAME(vga.crtc.sync_en));
+	save_item(NAME(vga.crtc.aw));
+	save_item(NAME(vga.crtc.div2));
+	save_item(NAME(vga.crtc.sldiv));
+	save_item(NAME(vga.crtc.map14));
+	save_item(NAME(vga.crtc.map13));
+	save_item(NAME(vga.crtc.irq_clear));
+	save_item(NAME(vga.crtc.irq_disable));
+
+	save_item(NAME(vga.gc.index));
+	save_item(NAME(vga.gc.latch));
+	save_item(NAME(vga.gc.set_reset));
+	save_item(NAME(vga.gc.enable_set_reset));
+	save_item(NAME(vga.gc.color_compare));
+	save_item(NAME(vga.gc.logical_op));
+	save_item(NAME(vga.gc.rotate_count));
+	save_item(NAME(vga.gc.shift256));
+	save_item(NAME(vga.gc.shift_reg));
+	save_item(NAME(vga.gc.read_map_sel));
+	save_item(NAME(vga.gc.read_mode));
+	save_item(NAME(vga.gc.write_mode));
+	save_item(NAME(vga.gc.color_dont_care));
+	save_item(NAME(vga.gc.bit_mask));
+	save_item(NAME(vga.gc.alpha_dis));
+	save_item(NAME(vga.gc.memory_map_sel));
+	save_item(NAME(vga.gc.host_oe));
+	save_item(NAME(vga.gc.chain_oe));
+
+	save_item(NAME(vga.attribute.index));
+	save_item(NAME(vga.attribute.data));
+	save_item(NAME(vga.attribute.state));
+	save_item(NAME(vga.attribute.prot_bit));
+	save_item(NAME(vga.attribute.pel_shift));
+	save_item(NAME(vga.attribute.pel_shift_latch));
+
+	save_item(NAME(vga.dac.read_index));
+	save_item(NAME(vga.dac.write_index));
+	save_item(NAME(vga.dac.mask));
+	save_item(NAME(vga.dac.read));
+	save_item(NAME(vga.dac.state));
+	save_item(NAME(vga.dac.color));
+	save_item(NAME(vga.dac.dirty));
 
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 }
@@ -267,6 +354,14 @@ void svga_device::device_start()
 {
 	vga_device::device_start();
 	memset(&svga, 0, sizeof(svga));
+
+	save_item(NAME(svga.bank_r));
+	save_item(NAME(svga.bank_w));
+	save_item(NAME(svga.rgb15_en));
+	save_item(NAME(svga.rgb16_en));
+	save_item(NAME(svga.rgb24_en));
+	save_item(NAME(svga.rgb32_en));
+	save_item(NAME(svga.id));
 }
 
 void ati_vga_device::device_start()
@@ -301,6 +396,15 @@ void tseng_vga_device::device_start()
 {
 	svga_device::device_start();
 	memset(&et4k, 0, sizeof(et4k));
+
+	save_item(NAME(et4k.reg_3d8));
+	save_item(NAME(et4k.dac_ctrl));
+	save_item(NAME(et4k.dac_state));
+	save_item(NAME(et4k.horz_overflow));
+	save_item(NAME(et4k.aux_ctrl));
+	save_item(NAME(et4k.ext_reg_ena));
+	save_item(NAME(et4k.misc1));
+	save_item(NAME(et4k.misc2));
 }
 
 void ibm8514a_device::device_start()
@@ -832,9 +936,9 @@ uint8_t vga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				m_palette->set_pen_color(i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].green & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].blue & 0x3f) << 2);
+				m_palette->set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
 			}
 			vga.dac.dirty = 0;
 		}
@@ -893,9 +997,9 @@ uint8_t svga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				m_palette->set_pen_color(i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].green & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].blue & 0x3f) << 2);
+				m_palette->set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
 			}
 			vga.dac.dirty = 0;
 		}
@@ -1710,13 +1814,13 @@ READ8_MEMBER(vga_device::port_03c0_r)
 				switch (vga.dac.state++)
 				{
 					case 0:
-						data = vga.dac.color[vga.dac.read_index].red;
+						data = vga.dac.color[3*vga.dac.read_index];
 						break;
 					case 1:
-						data = vga.dac.color[vga.dac.read_index].green;
+						data = vga.dac.color[3*vga.dac.read_index + 1];
 						break;
 					case 2:
-						data = vga.dac.color[vga.dac.read_index].blue;
+						data = vga.dac.color[3*vga.dac.read_index + 2];
 						break;
 				}
 
@@ -1898,13 +2002,13 @@ WRITE8_MEMBER(vga_device::port_03c0_w)
 		{
 			switch (vga.dac.state++) {
 			case 0:
-				vga.dac.color[vga.dac.write_index].red=data;
+				vga.dac.color[3*vga.dac.write_index]=data;
 				break;
 			case 1:
-				vga.dac.color[vga.dac.write_index].green=data;
+				vga.dac.color[3*vga.dac.write_index + 1]=data;
 				break;
 			case 2:
-				vga.dac.color[vga.dac.write_index].blue=data;
+				vga.dac.color[3*vga.dac.write_index + 2]=data;
 				break;
 			}
 			vga.dac.dirty=1;
@@ -1986,7 +2090,7 @@ READ8_MEMBER(vga_device::mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			vga.gc.latch[0]=vga.memory[(offset)];
 			vga.gc.latch[1]=vga.memory[(offset)+0x10000];
@@ -2087,7 +2191,7 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 	vga.memory[offset] = data;
 }
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
+MACHINE_CONFIG_START( pcvideo_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
@@ -2096,7 +2200,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_DEVICE_ADD("vga", VGA, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_trident_vga )
+MACHINE_CONFIG_START( pcvideo_trident_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
@@ -2105,7 +2209,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_trident_vga )
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_gamtor_vga )
+MACHINE_CONFIG_START( pcvideo_gamtor_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", gamtor_vga_device, screen_update)
@@ -2114,7 +2218,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_gamtor_vga )
 	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_s3_vga )
+MACHINE_CONFIG_START( pcvideo_s3_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
@@ -2124,29 +2228,18 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_s3_vga )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( ati_vga )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( ati_vga_device::device_add_mconfig )
 	MCFG_MACH8_ADD_OWNER("8514a")
 	MCFG_EEPROM_SERIAL_93C46_ADD("ati_eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( s3_764 )
+MACHINE_CONFIG_MEMBER( s3_vga_device::device_add_mconfig )
 	MCFG_8514A_ADD_OWNER("8514a")
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ati_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ati_vga );
-}
-
-machine_config_constructor s3_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s3_764 );
-}
 
 /******************************************
 

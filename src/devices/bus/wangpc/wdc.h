@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_WANGPC_WDC_H
+#define MAME_BUS_WANGPC_WDC_H
+
 #pragma once
 
-#ifndef __WANGPC_WDC__
-#define __WANGPC_WDC__
-
-#include "emu.h"
 #include "wangpc.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
@@ -32,10 +31,6 @@ public:
 	// construction/destruction
 	wangpc_wdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// not really public
 	DECLARE_READ8_MEMBER( port_r );
 	DECLARE_WRITE8_MEMBER( status_w );
@@ -52,6 +47,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_wangpcbus_card_interface overrides
 	virtual uint16_t wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask) override;
@@ -75,7 +72,6 @@ private:
 
 
 // device type definition
-extern const device_type WANGPC_WDC;
+DECLARE_DEVICE_TYPE(WANGPC_WDC, wangpc_wdc_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_WDC_H

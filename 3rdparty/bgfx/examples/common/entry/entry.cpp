@@ -254,7 +254,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 	bool setOrToggle(uint32_t& _flags, const char* _name, uint32_t _bit, int _first, int _argc, char const* const* _argv)
 	{
-		if (0 == strcmp(_argv[_first], _name) )
+		if (0 == bx::strncmp(_argv[_first], _name) )
 		{
 			int arg = _first+1;
 			if (_argc > arg)
@@ -310,11 +310,13 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				bgfx::setDebug(s_debug);
 				return 0;
 			}
-			else if (0 == strcmp(_argv[1], "screenshot") )
+			else if (0 == bx::strncmp(_argv[1], "screenshot") )
 			{
+				bgfx::FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
+
 				if (_argc > 2)
 				{
-					bgfx::saveScreenShot(_argv[2]);
+					bgfx::requestScreenShot(fbh, _argv[2]);
 				}
 				else
 				{
@@ -323,12 +325,12 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 					char filePath[256];
 					bx::snprintf(filePath, sizeof(filePath), "temp/screenshot-%d", tt);
-					bgfx::saveScreenShot(filePath);
+					bgfx::requestScreenShot(fbh, filePath);
 				}
 
 				return 0;
 			}
-			else if (0 == strcmp(_argv[1], "fullscreen") )
+			else if (0 == bx::strncmp(_argv[1], "fullscreen") )
 			{
 				WindowHandle window = { 0 };
 				toggleFullscreen(window);
@@ -353,6 +355,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{ entry::Key::KeyF,         entry::Modifier::RightCtrl, 1, NULL, "graphics fullscreen"               },
 		{ entry::Key::Return,       entry::Modifier::RightAlt,  1, NULL, "graphics fullscreen"               },
 		{ entry::Key::F1,           entry::Modifier::None,      1, NULL, "graphics stats"                    },
+		{ entry::Key::F1,           entry::Modifier::LeftCtrl,  1, NULL, "graphics ifh"                      },
 		{ entry::Key::GamepadStart, entry::Modifier::None,      1, NULL, "graphics stats"                    },
 		{ entry::Key::F1,           entry::Modifier::LeftShift, 1, NULL, "graphics stats 0\ngraphics text 0" },
 		{ entry::Key::F3,           entry::Modifier::None,      1, NULL, "graphics wireframe"                },
@@ -364,6 +367,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{ entry::Key::F9,           entry::Modifier::None,      1, NULL, "graphics flush"                    },
 		{ entry::Key::F10,          entry::Modifier::None,      1, NULL, "graphics hidpi"                    },
 		{ entry::Key::Print,        entry::Modifier::None,      1, NULL, "graphics screenshot"               },
+		{ entry::Key::KeyP,         entry::Modifier::LeftCtrl,  1, NULL, "graphics screenshot"               },
 
 		INPUT_BINDING_END
 	};

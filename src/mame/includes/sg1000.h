@@ -3,7 +3,6 @@
 #ifndef __SG1000__
 #define __SG1000__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "formats/sf7000_dsk.h"
 #include "imagedev/printer.h"

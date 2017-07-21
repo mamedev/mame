@@ -20,8 +20,9 @@ ToDo:
 *********************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 //#include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 //#include "audio/midway.h"
@@ -368,7 +369,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 	m_pia0->cb1_w(m_pia0_timer);
 }
 
-static MACHINE_CONFIG_START( by6803, by6803_state )
+static MACHINE_CONFIG_START( by6803 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(by6803_map)
@@ -401,7 +402,7 @@ static MACHINE_CONFIG_START( by6803, by6803_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia1_cb2_w))
 
 	//MCFG_SPEAKER_STANDARD_MONO("speaker")
-	//MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0) // Cheap Squeak Turbo
+	//MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0) // Cheap Squeak Turbo
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -429,6 +430,16 @@ ROM_END
 ROM_START(beatclck)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "btc_u3.cpu", 0xc000, 0x4000, CRC(9ba822ab) SHA1(f28d38411df3978bcaf24177fa1b47037a586cbb))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("btc_u2.snd", 0xc000, 0x1000, CRC(fd22fd2a) SHA1(efad3b94e91d07930ada5366d389f35377dfbd99))
+	ROM_LOAD("btc_u3.snd", 0xd000, 0x1000, CRC(22311a4a) SHA1(2c22ba9228e44e68b9308b3bf8803edcd70fa5b9))
+	ROM_LOAD("btc_u4.snd", 0xe000, 0x1000, CRC(af1cf23b) SHA1(ebfa3afafd7850dfa2664d3c640fbfa631012455))
+	ROM_LOAD("btc_u5.snd", 0xf000, 0x1000, CRC(230cf329) SHA1(45b17a785b81cd5b1d7fdfb720cf1990994b52b7))
+ROM_END
+
+ROM_START(beatclck2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "btc_lights_pro_111385_C70-803-05_u3.cpu", 0xc000, 0x4000, CRC(dff5bad6) SHA1(915495d60be7ca12f00364b6e4b99c822ecfc7aa))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("btc_u2.snd", 0xc000, 0x1000, CRC(fd22fd2a) SHA1(efad3b94e91d07930ada5366d389f35377dfbd99))
 	ROM_LOAD("btc_u3.snd", 0xd000, 0x1000, CRC(22311a4a) SHA1(2c22ba9228e44e68b9308b3bf8803edcd70fa5b9))
@@ -615,6 +626,14 @@ ROM_START(motrdome)
 	ROM_LOAD("modm_u7.snd", 0x8000, 0x8000, CRC(29ce4679) SHA1(f17998198b542dd99a34abd678db7e031bde074b))
 ROM_END
 
+ROM_START(motrdomeg) // German version claims to be game #E69
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "u2_11_de.bin", 0x8000, 0x4000, CRC(8a4bafd3) SHA1(d764d2e38be2df27ab982cfbedddb79f89ca2359))
+	ROM_LOAD( "u3_11_de.bin", 0xc000, 0x4000, CRC(9cb10037) SHA1(7847a71a0295e8de51a8f2f8d406350eca4555bf))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("modm_u7.snd", 0x8000, 0x8000, CRC(29ce4679) SHA1(f17998198b542dd99a34abd678db7e031bde074b))
+ROM_END
+
 /*--------------------------------
 / Party Animal #OH01
 /-------------------------------*/
@@ -705,26 +724,28 @@ ROM_START(trucksp2)
 ROM_END
 
 
-GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Eight Ball Champ", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Beat the Clock", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","MotorDome", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Lady Luck", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngscg,  strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science (German)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Special Force", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt (Squawk and Talk)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","City Slicker", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Hardbody", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Hardbody (German)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal (German)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Heavy Metal Meltdown", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Escape from the Lost World", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Escape from the Lost World (German)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Dungeons & Dragons", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100s, black100, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100 (Single Ball Play)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp3,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp2,  trucksp3, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, atlantip,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Atlantis", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, beatclck2, beatclck, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "MotorDome",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "MotorDome (German)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngscg,  strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science (German)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Hardbody",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Hardbody (German)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, black100,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Blackwater 100",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, black100s, black100, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Blackwater 100 (Single Ball Play)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, trucksp3,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Truck Stop (P-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, trucksp2,  trucksp3, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Truck Stop (P-2)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, atlantip,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Atlantis",                              MACHINE_IS_SKELETON_MECHANICAL)

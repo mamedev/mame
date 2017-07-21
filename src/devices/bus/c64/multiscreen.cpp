@@ -56,6 +56,7 @@
 
 */
 
+#include "emu.h"
 #include "multiscreen.h"
 
 
@@ -77,7 +78,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MULTISCREEN = &device_creator<c64_multiscreen_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MULTISCREEN, c64_multiscreen_cartridge_device, "c64_mscr", "C64 Multiscreen cartridge")
 
 
 //-------------------------------------------------
@@ -107,28 +108,16 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
+MACHINE_CONFIG_MEMBER( c64_multiscreen_cartridge_device::device_add_mconfig )
 	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
 
 	MCFG_DEVICE_ADD(MC6821P_0_TAG, PIA6821, 0)
 	MCFG_DEVICE_ADD(MC6821P_1_TAG, PIA6821, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_multiscreen_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_multiscreen );
-}
-
 
 
 //**************************************************************************
@@ -140,7 +129,7 @@ machine_config_constructor c64_multiscreen_cartridge_device::device_mconfig_addi
 //-------------------------------------------------
 
 c64_multiscreen_cartridge_device::c64_multiscreen_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MULTISCREEN, "C64 Multiscreen cartridge", tag, owner, clock, "c64_mscr", __FILE__),
+	device_t(mconfig, C64_MULTISCREEN, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this), m_bank(0)
 {
 }

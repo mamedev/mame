@@ -33,15 +33,17 @@ RAM = 4116 (x11)
 ********************************************************************/
 
 #include "emu.h"
-#include "machine/rescap.h"
-#include "machine/6821pia.h"
-#include "machine/74123.h"
-#include "video/mc6845.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/ay8910.h"
+#include "machine/6821pia.h"
+#include "machine/74123.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define LOG_AUDIO_COMM  (0)
@@ -439,7 +441,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
+static MACHINE_CONFIG_START( r2dtank )
 	MCFG_CPU_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
 
@@ -530,4 +532,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, r2dtank, 0, r2dtank, r2dtank, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE)
+GAME( 1980, r2dtank, 0, r2dtank, r2dtank, r2dtank_state, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE)

@@ -6,17 +6,17 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_ABCKB_ABC77_H
+#define MAME_BUS_ABCKB_ABC77_H
+
 #pragma once
 
-#ifndef __ABC77__
-#define __ABC77__
+#include "abckb.h"
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/watchdog.h"
-#include "abckb.h"
 #include "sound/discrete.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 
 
@@ -26,35 +26,31 @@
 
 // ======================> abc77_device
 
-class abc77_device :  public device_t,
-						public abc_keyboard_interface
+class abc77_device :  public device_t, public abc_keyboard_interface
 {
 public:
 	// construction/destruction
-	abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
 
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t1_r );
-	DECLARE_WRITE8_MEMBER( prog_w );
 	DECLARE_WRITE8_MEMBER( j3_w );
 
 protected:
+	abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	enum
 	{
@@ -84,6 +80,12 @@ protected:
 	// timers
 	emu_timer *m_serial_timer;
 	emu_timer *m_reset_timer;
+
+private:
+	DECLARE_READ8_MEMBER( p1_r );
+	DECLARE_WRITE8_MEMBER( p2_w );
+	DECLARE_READ_LINE_MEMBER( t1_r );
+	DECLARE_WRITE_LINE_MEMBER( prog_w );
 };
 
 
@@ -99,9 +101,8 @@ public:
 
 
 // device type definition
-extern const device_type ABC77;
-extern const device_type ABC55;
+DECLARE_DEVICE_TYPE(ABC77, abc77_device)
+DECLARE_DEVICE_TYPE(ABC55, abc55_device)
 
 
-
-#endif
+#endif // MAME_BUS_ABCKB_ABC77_H

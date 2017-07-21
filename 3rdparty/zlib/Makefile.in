@@ -1,5 +1,5 @@
 # Makefile for zlib
-# Copyright (C) 1995-2016 Jean-loup Gailly, Mark Adler
+# Copyright (C) 1995-2017 Jean-loup Gailly, Mark Adler
 # For conditions of distribution and use, see copyright notice in zlib.h
 
 # To compile and test, type:
@@ -32,7 +32,7 @@ CPP=$(CC) -E
 
 STATICLIB=libz.a
 SHAREDLIB=libz.so
-SHAREDLIBV=libz.so.1.2.9
+SHAREDLIBV=libz.so.1.2.11
 SHAREDLIBM=libz.so.1
 LIBS=$(STATICLIB) $(SHAREDLIBV)
 
@@ -309,10 +309,12 @@ install-libs: $(LIBS)
 	-@if [ ! -d $(DESTDIR)$(sharedlibdir) ]; then mkdir -p $(DESTDIR)$(sharedlibdir); fi
 	-@if [ ! -d $(DESTDIR)$(man3dir)      ]; then mkdir -p $(DESTDIR)$(man3dir); fi
 	-@if [ ! -d $(DESTDIR)$(pkgconfigdir) ]; then mkdir -p $(DESTDIR)$(pkgconfigdir); fi
+	rm -f $(DESTDIR)$(libdir)/$(STATICLIB)
 	cp $(STATICLIB) $(DESTDIR)$(libdir)
 	chmod 644 $(DESTDIR)$(libdir)/$(STATICLIB)
 	-@($(RANLIB) $(DESTDIR)$(libdir)/libz.a || true) >/dev/null 2>&1
 	-@if test -n "$(SHAREDLIBV)"; then \
+	  rm -f $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBV); \
 	  cp $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir); \
 	  echo "cp $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir)"; \
 	  chmod 755 $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBV); \
@@ -322,8 +324,10 @@ install-libs: $(LIBS)
 	  ln -s $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBM); \
 	  ($(LDCONFIG) || true)  >/dev/null 2>&1; \
 	fi
+	rm -f $(DESTDIR)$(man3dir)/zlib.3
 	cp $(SRCDIR)zlib.3 $(DESTDIR)$(man3dir)
 	chmod 644 $(DESTDIR)$(man3dir)/zlib.3
+	rm -f $(DESTDIR)$(pkgconfigdir)/zlib.pc
 	cp zlib.pc $(DESTDIR)$(pkgconfigdir)
 	chmod 644 $(DESTDIR)$(pkgconfigdir)/zlib.pc
 # The ranlib in install is needed on NeXTSTEP which checks file times
@@ -331,6 +335,7 @@ install-libs: $(LIBS)
 
 install: install-libs
 	-@if [ ! -d $(DESTDIR)$(includedir)   ]; then mkdir -p $(DESTDIR)$(includedir); fi
+	rm -f $(DESTDIR)$(includedir)/zlib.h $(DESTDIR)$(includedir)/zconf.h
 	cp $(SRCDIR)zlib.h zconf.h $(DESTDIR)$(includedir)
 	chmod 644 $(DESTDIR)$(includedir)/zlib.h $(DESTDIR)$(includedir)/zconf.h
 

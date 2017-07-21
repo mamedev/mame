@@ -30,13 +30,19 @@ ToDo:
 
 ****************************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs51/mcs51.h"
+#include "cpu/z80/z80.h"
+#include "machine/74157.h"
+#include "machine/7474.h"
 #include "machine/i8255.h"
 #include "sound/msm5205.h"
-#include "machine/7474.h"
-#include "machine/74157.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class spinb_state : public genpin_class
 {
@@ -83,8 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	DECLARE_WRITE_LINE_MEMBER(vck_a_w);
-	DECLARE_WRITE_LINE_MEMBER(vck_m_w);
 	DECLARE_DRIVER_INIT(game0);
 	DECLARE_DRIVER_INIT(game1);
 	DECLARE_DRIVER_INIT(game2);
@@ -123,8 +127,8 @@ private:
 	required_device<msm5205_device> m_msm_m;
 	required_device<ttl7474_device> m_ic5a;
 	required_device<ttl7474_device> m_ic5m;
-	required_device<hct157_device> m_ic14a;
-	required_device<hct157_device> m_ic14m;
+	required_device<hc157_device> m_ic14a;
+	required_device<hc157_device> m_ic14m;
 	required_ioport_array<11> m_switches;
 };
 
@@ -433,32 +437,20 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 	update_sound_m();
 }
 
-WRITE_LINE_MEMBER( spinb_state::vck_a_w )
-{
-	m_ic5a->clock_w(0);
-	m_ic5a->clock_w(1);
-}
-
 void spinb_state::update_sound_a()
 {
 	if (m_sndbank_a != 0xff)
-		m_ic14a->ab_w(m_p_audio[m_sound_addr_a]);
+		m_ic14a->ba_w(m_p_audio[m_sound_addr_a]);
 	else
-		m_ic14a->ab_w(0);
-}
-
-WRITE_LINE_MEMBER( spinb_state::vck_m_w )
-{
-	m_ic5m->clock_w(0);
-	m_ic5m->clock_w(1);
+		m_ic14a->ba_w(0);
 }
 
 void spinb_state::update_sound_m()
 {
 	if (m_sndbank_m != 0xff)
-		m_ic14m->ab_w(m_p_music[m_sound_addr_m]);
+		m_ic14m->ba_w(m_p_music[m_sound_addr_m]);
 	else
-		m_ic14m->ab_w(0);
+		m_ic14m->ba_w(0);
 }
 
 WRITE_LINE_MEMBER( spinb_state::ic5a_w )
@@ -513,7 +505,7 @@ WRITE8_MEMBER( spinb_state::ppia_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_a, 5))
-		m_msm_a->set_prescaler_selector(*m_msm_a, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_a->set_prescaler_selector(*m_msm_a, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
 	m_msm_a->reset_w(BIT(data, 6));
 	m_ic5a->clear_w(!BIT(data, 6));
 	m_portc_a = data & 0xfe;
@@ -523,7 +515,7 @@ WRITE8_MEMBER( spinb_state::ppim_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_m, 5))
-		m_msm_m->set_prescaler_selector(*m_msm_m, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_m->set_prescaler_selector(*m_msm_m, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
 	m_msm_m->reset_w(BIT(data, 6));
 	m_ic5m->clear_w(!BIT(data, 6));
 	m_portc_m = data & 0xfe;
@@ -631,7 +623,7 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-static MACHINE_CONFIG_START( spinb, spinb_state )
+static MACHINE_CONFIG_START( spinb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(spinb_map)
@@ -661,13 +653,13 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("msmavol")
 	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL_384kHz)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(spinb_state, vck_a_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
 	MCFG_SPEAKER_STANDARD_MONO("msmmvol")
 	MCFG_SOUND_ADD("msm_m", MSM5205, XTAL_384kHz)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(spinb_state, vck_m_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5m", ttl7474_device, clock_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 
 	/* Devices */
@@ -718,13 +710,13 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5a_w))
 
-	MCFG_DEVICE_ADD("ic14a", HCT157, 0)
+	MCFG_DEVICE_ADD("ic14a", HC157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_a", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5m_w))
 
-	MCFG_DEVICE_ADD("ic14m", HCT157, 0)
+	MCFG_DEVICE_ADD("ic14m", HC157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 

@@ -35,7 +35,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "render.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ldv1000.h"
@@ -44,7 +44,10 @@
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "render.h"
+#include "speaker.h"
+
 #include "dlair.lh"
 
 
@@ -704,7 +707,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dlair_base, dlair_state )
+static MACHINE_CONFIG_START( dlair_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
@@ -740,7 +743,7 @@ static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleuro, dlair_state )
+static MACHINE_CONFIG_START( dleuro )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)

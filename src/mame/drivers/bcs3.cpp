@@ -53,6 +53,8 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bcs3_state : public driver_device
@@ -77,27 +79,27 @@ public:
 	DECLARE_DRIVER_INIT(bcs3b);
 	DECLARE_DRIVER_INIT(bcs3c);
 	DECLARE_DRIVER_INIT(bcs3d);
-	uint32_t screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	bool m_cass_bit;
-	uint8_t s_curs;
-	uint8_t s_init;
-	uint8_t s_rows;
-	uint8_t s_cols;
+	u8 s_curs;
+	u8 s_init;
+	u8 s_rows;
+	u8 s_cols;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
-	required_memory_region m_p_chargen;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
+	required_shared_ptr<u8> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<10> m_io_keyboard;
 };
 
 READ8_MEMBER( bcs3_state::keyboard_r )
 {
-	uint8_t i, data = 0;
+	u8 i, data = 0;
 
 	if (offset == 0)
 		data = (m_cass->input() > +0.01) ? 0x80 : 0;
@@ -114,7 +116,7 @@ READ8_MEMBER( bcs3_state::keyboard_r )
 // 00-7F = NUL, 0xE0 = end of line.
 READ8_MEMBER( bcs3_state::video_r )
 {
-	uint8_t data = m_p_videoram[offset];
+	u8 data = m_p_videoram[offset];
 	return BIT(data, 7) ? data : 0;
 }
 
@@ -215,10 +217,10 @@ static INPUT_PORTS_START( bcs3 )
 INPUT_PORTS_END
 
 // Official version
-uint32_t bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,rat;
-	uint16_t sy=0,ma=0x50,x;
+	u8 y,ra,chr,gfx,rat;
+	u16 sy=0,ma=0x50,x;
 
 	for (y = 0; y < 12; y++)
 	{
@@ -234,7 +236,7 @@ uint32_t bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bit
 					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen->base()[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -257,11 +259,11 @@ uint32_t bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bit
 
 /* Hacks: When it starts, it has 4 lines of data. Pressing enter causes it to allocate 100 lines.
    I'm assuming that it only shows a portion of this, with the cursor always in sight. */
-uint32_t bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,rat;
-	uint16_t sy = 0, ma = s_init, x;
-	uint16_t cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
+	u8 y,ra,chr,gfx,rat;
+	u16 sy = 0, ma = s_init, x;
+	u16 cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
 	rat = cursor / (s_cols+1);
 	if (rat > (s_rows-1)) ma += (rat-(s_rows-1)) * (s_cols+1);
 
@@ -279,7 +281,7 @@ uint32_t bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bi
 					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen->base()[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -372,7 +374,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3d )
 	s_cols = 29;
 }
 
-static MACHINE_CONFIG_START( bcs3, bcs3_state )
+static MACHINE_CONFIG_START( bcs3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz /2)
@@ -399,7 +401,7 @@ static MACHINE_CONFIG_START( bcs3, bcs3_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bcs3a, bcs3_state )
+static MACHINE_CONFIG_START( bcs3a )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7MHz /2)
@@ -484,9 +486,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT        COMPANY             FULLNAME       FLAGS */
-COMP( 1984, bcs3,   0,       0,      bcs3,      bcs3,  driver_device,   0,     "Eckhard Schiller", "BCS 3 rev 2.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT       COMPANY             FULLNAME                   FLAGS */
+COMP( 1984, bcs3,   0,       0,      bcs3,      bcs3,  bcs3_state,  0,         "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1986, bcs3a,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3a,     "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1986, bcs3b,  bcs3,    0,      bcs3b,     bcs3,  bcs3_state,  bcs3b,     "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3c,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3c,     "Eckhard Schiller", "BCS 3 rev 3.2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3d,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3d,     "Eckhard Schiller", "BCS 3 rev 3.3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3c,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3c,     "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3d,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3d,     "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

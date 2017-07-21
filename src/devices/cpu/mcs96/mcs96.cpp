@@ -12,9 +12,10 @@
 #include "debugger.h"
 #include "mcs96.h"
 
-mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int data_width, const char *shortname, const char *source) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	program_config("program", ENDIANNESS_LITTLE, data_width, 16), program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
+mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	program_config("program", ENDIANNESS_LITTLE, data_width, 16),
+	program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
 	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
 {
 }
@@ -115,9 +116,11 @@ void mcs96_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-const address_space_config *mcs96_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector mcs96_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &program_config)
+	};
 }
 
 void mcs96_device::state_import(const device_state_entry &entry)

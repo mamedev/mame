@@ -37,7 +37,7 @@ namespace sol {
 				const auto& metakey = usertype_traits<T>::metatable();
 				luaL_getmetatable(L, &metakey[0]);
 				const type expectedmetatabletype = static_cast<type>(lua_type(L, -1));
-				if (expectedmetatabletype != type::nil) {
+				if (expectedmetatabletype != type::lua_nil) {
 					if (lua_rawequal(L, -1, index) == 1) {
 						lua_pop(L, 1 + static_cast<int>(poptable));
 						return true;
@@ -106,7 +106,7 @@ namespace sol {
 		};
 
 		template <type expected, typename C>
-		struct checker<nil_t, expected, C> {
+		struct checker<lua_nil_t, expected, C> {
 			template <typename Handler>
 			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
 				bool success = lua_isnil(L, index);
@@ -125,7 +125,7 @@ namespace sol {
 		};
 
 		template <type expected, typename C>
-		struct checker<nullopt_t, expected, C> : checker<nil_t> {};
+		struct checker<nullopt_t, expected, C> : checker<lua_nil_t> {};
 
 		template <typename C>
 		struct checker<this_state, type::poly, C> {
@@ -217,8 +217,8 @@ namespace sol {
 			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
 				tracking.use(1);
 				type t = type_of(L, index);
-				if (t == type::nil || t == type::none || t == type::function) {
-					// allow for nil to be returned
+				if (t == type::lua_nil || t == type::none || t == type::function) {
+					// allow for lua_nil to be returned
 					return true;
 				}
 				if (t != type::userdata && t != type::table) {
@@ -292,7 +292,7 @@ namespace sol {
 					auto pn = stack::pop_n(L, 1);
 					lua_pushstring(L, &detail::base_class_check_key()[0]);
 					lua_rawget(L, metatableindex);
-					if (type_of(L, -1) != type::nil) {
+					if (type_of(L, -1) != type::lua_nil) {
 						void* basecastdata = lua_touserdata(L, -1);
 						detail::inheritance_check_function ic = (detail::inheritance_check_function)basecastdata;
 						success = ic(detail::id_for<T>::value);
@@ -322,8 +322,8 @@ namespace sol {
 			template <typename Handler>
 			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
 				const type indextype = type_of(L, index);
-				// Allow nil to be transformed to nullptr
-				if (indextype == type::nil) {
+				// Allow lua_nil to be transformed to nullptr
+				if (indextype == type::lua_nil) {
 					tracking.use(1);
 					return true;
 				}
@@ -372,7 +372,7 @@ namespace sol {
 					tracking.use(0);
 					return true;
 				}
-				if (t == type::nil) {
+				if (t == type::lua_nil) {
 					tracking.use(1);
 					return true;
 				}

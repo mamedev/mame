@@ -18,19 +18,25 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
-#include "machine/i8255.h"
-#include "machine/wd_fdc.h"
-#include "machine/pit8253.h"
-#include "sound/beep.h"
-#include "sound/wave.h"
-#include "machine/rp5c15.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
+#include "machine/rp5c15.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80pio.h"
+#include "sound/beep.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include "formats/2d_dsk.h"
 #include "formats/mz_cas.h"
-#include "softlist.h"
+
 
 #define MASTER_CLOCK XTAL_17_73447MHz/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 
@@ -123,7 +129,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<mb8877_t> m_mb8877a;
+	required_device<mb8877_device> m_mb8877a;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -855,7 +861,7 @@ static SLOT_INTERFACE_START( mz2000_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mz2000, mz2000_state )
+static MACHINE_CONFIG_START( mz2000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mz2000_map)
@@ -988,7 +994,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1981, mz80b,    0,        0,   mz80b,    mz80be, driver_device,  0, "Sharp",   "MZ-80B", MACHINE_NOT_WORKING )
-COMP( 1982, mz2000,   0,        0,   mz2000,   mz80bj, driver_device,  0, "Sharp",   "MZ-2000", MACHINE_NOT_WORKING )
-COMP( 1982, mz2200,   mz2000,   0,   mz2000,   mz80bj, driver_device,  0, "Sharp",   "MZ-2200", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT   STATE         INIT  COMPANY    FULLNAME   FLAGS
+COMP( 1981, mz80b,    0,        0,       mz80b,    mz80be, mz2000_state, 0,    "Sharp",   "MZ-80B",  MACHINE_NOT_WORKING )
+COMP( 1982, mz2000,   0,        0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2000", MACHINE_NOT_WORKING )
+COMP( 1982, mz2200,   mz2000,   0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2200", MACHINE_NOT_WORKING )

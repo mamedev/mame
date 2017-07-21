@@ -241,6 +241,7 @@ public:
             int baseTextureBinding,
             int baseImageBinding,
             int baseUboBinding,
+            int baseSsboBinding,
             bool autoMapBindings,
             bool flattenUniformArrays)
     {
@@ -251,6 +252,7 @@ public:
         shader.setShiftTextureBinding(baseTextureBinding);
         shader.setShiftImageBinding(baseImageBinding);
         shader.setShiftUboBinding(baseUboBinding);
+        shader.setShiftSsboBinding(baseSsboBinding);
         shader.setAutoMapBindings(autoMapBindings);
         shader.setFlattenUniformArrays(flattenUniformArrays);
 
@@ -430,6 +432,7 @@ public:
                                       int baseTextureBinding,
                                       int baseImageBinding,
                                       int baseUboBinding,
+                                      int baseSsboBinding,
                                       bool autoMapBindings,
                                       bool flattenUniformArrays)
     {
@@ -443,7 +446,8 @@ public:
 
         const EShMessages controls = DeriveOptions(source, semantics, target);
         GlslangResult result = compileLinkIoMap(testName, input, entryPointName, controls,
-                                                baseSamplerBinding, baseTextureBinding, baseImageBinding, baseUboBinding,
+                                                baseSamplerBinding, baseTextureBinding, baseImageBinding,
+                                                baseUboBinding, baseSsboBinding,
                                                 autoMapBindings,
                                                 flattenUniformArrays);
 
@@ -521,7 +525,7 @@ public:
         glslang::TShader shader(EShLangVertex);
         shader.setStringsWithLengths(&shaderStrings, &shaderLengths, 1);
         std::string ppShader;
-        glslang::TShader::ForbidInclude includer;
+        glslang::TShader::ForbidIncluder includer;
         const bool success = shader.preprocess(
             &glslang::DefaultTBuiltInResource, defaultVersion, defaultProfile,
             forceVersionProfile, isForwardCompatible, (EShMessages)(EShMsgOnlyPreprocessor | EShMsgCascadingErrors),

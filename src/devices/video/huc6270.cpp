@@ -54,7 +54,9 @@ TODO
 #include "emu.h"
 #include "huc6270.h"
 
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 enum {
 	MAWR = 0x00,
@@ -77,8 +79,8 @@ enum {
 	DVSSR = 0x13
 };
 
-ALLOW_SAVE_TYPE(huc6270_device::huc6270_v_state);
-ALLOW_SAVE_TYPE(huc6270_device::huc6270_h_state);
+ALLOW_SAVE_TYPE(huc6270_device::v_state);
+ALLOW_SAVE_TYPE(huc6270_device::h_state);
 
 
 /* Bits in the VDC status register */
@@ -91,15 +93,15 @@ ALLOW_SAVE_TYPE(huc6270_device::huc6270_h_state);
 #define HUC6270_CR          0x01    /* Set when sprite #0 overlaps with another sprite */
 
 
-const device_type HUC6270 = &device_creator<huc6270_device>;
+DEFINE_DEVICE_TYPE(HUC6270, huc6270_device, "huc6270", "Hudson HuC6270 VDC")
 
 
-const uint8_t huc6270_device::vram_increments[4] = { 1, 32, 64, 128 };
+constexpr uint8_t huc6270_device::vram_increments[4];
 
 huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HUC6270, "HuC6270 VDC", tag, owner, clock, "huc6270", __FILE__),
-	m_vram_size(0),
-	m_irq_changed_cb(*this)
+	: device_t(mconfig, HUC6270, tag, owner, clock)
+	, m_vram_size(0)
+	, m_irq_changed_cb(*this)
 {
 }
 
@@ -109,18 +111,15 @@ huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, d
 */
 inline void huc6270_device::fetch_bat_tile_row()
 {
-	uint16_t bat_data, data1, data2, data3, data4, tile_palette;
-	int i;
-
-	bat_data = m_vram[ m_bat_address & m_vram_mask ];
-	tile_palette = ( bat_data >> 8 ) & 0xF0;
-	data1 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 0 ) & m_vram_mask ];
-	data2 = ( data1 >> 7 ) & 0x1FE;
-	data3 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 8 ) & m_vram_mask ];
-	data4 = ( data3 >> 5 ) & 0x7F8;
+	const uint16_t bat_data = m_vram[ m_bat_address & m_vram_mask ];
+	const uint16_t tile_palette = ( bat_data >> 8 ) & 0xF0;
+	uint16_t data1 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 0 ) & m_vram_mask ];
+	uint16_t data2 = ( data1 >> 7 ) & 0x1FE;
+	uint16_t data3 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 8 ) & m_vram_mask ];
+	uint16_t data4 = ( data3 >> 5 ) & 0x7F8;
 	data3 <<= 2;
 
-	for ( i = 7; i >= 0; i-- )
+	for ( int i = 7; i >= 0; i-- )
 	{
 		uint16_t c = ( data1 & 0x01 ) | ( data2 & 0x02 ) | ( data3 & 0x04 ) | ( data4 & 0x08 );
 
@@ -304,7 +303,7 @@ inline void huc6270_device::handle_vblank()
 		{
 			int i;
 
-			if (LOG) logerror("SATB transfer from %05x\n", m_dvssr << 1 );
+			LOG("SATB transfer from %05x\n", m_dvssr << 1 );
 			for ( i = 0; i < 4 * 64; i += 4 )
 			{
 				m_sat[i + 0] = m_vram[ ( m_dvssr + i + 0 ) & m_vram_mask ] & 0x03FF;
@@ -332,26 +331,26 @@ inline void huc6270_device::next_vert_state()
 {
 	switch ( m_vert_state )
 	{
-	case HUC6270_VSW:
-		m_vert_state = HUC6270_VDS;
+	case v_state::VSW:
+		m_vert_state = v_state::VDS;
 		m_vert_to_go = ( ( m_vpr >> 8 ) & 0xFF ) + 2;
 		break;
 
-	case HUC6270_VDS:
-		m_vert_state = HUC6270_VDW;
+	case v_state::VDS:
+		m_vert_state = v_state::VDW;
 		m_vert_to_go = ( m_vdw & 0x1FF ) + 1;
 		m_byr_latched = m_byr;
 		m_vd_triggered = 0;
 		break;
 
-	case HUC6270_VDW:
-		m_vert_state = HUC6270_VCR;
+	case v_state::VDW:
+		m_vert_state = v_state::VCR;
 		m_vert_to_go = ( m_vcr & 0xFF );
 		handle_vblank();
 		break;
 
-	case HUC6270_VCR:
-		m_vert_state = HUC6270_VSW;
+	case v_state::VCR:
+		m_vert_state = v_state::VSW;
 		m_vert_to_go = ( m_vpr & 0x1F ) + 1;
 		break;
 	}
@@ -362,10 +361,10 @@ inline void huc6270_device::next_horz_state()
 {
 	switch ( m_horz_state )
 	{
-	case HUC6270_HDS:
+	case h_state::HDS:
 		m_bxr_latched = m_bxr;
-//if (LOG) printf("latched bxr vpos=%d, hpos=%d\n", video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()));
-		m_horz_state = HUC6270_HDW;
+		//LOG("latched bxr vpos=%d, hpos=%d\n", video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()));
+		m_horz_state = h_state::HDW;
 		m_horz_to_go = ( m_hdr & 0x7F ) + 1;
 		{
 			static const int width_shift[4] = { 5, 6, 7, 7 };
@@ -381,18 +380,18 @@ inline void huc6270_device::next_horz_state()
 		}
 		break;
 
-	case HUC6270_HDW:
-		m_horz_state = HUC6270_HDE;
+	case h_state::HDW:
+		m_horz_state = h_state::HDE;
 		m_horz_to_go = ( ( m_hdr >> 8 ) & 0x7F ) + 1;
 		break;
 
-	case HUC6270_HDE:
-		m_horz_state = HUC6270_HSW;
+	case h_state::HDE:
+		m_horz_state = h_state::HSW;
 		m_horz_to_go = ( m_hsr & 0x1F ) + 1;
 		break;
 
-	case HUC6270_HSW:
-		m_horz_state = HUC6270_HDS;
+	case h_state::HSW:
+		m_horz_state = h_state::HDS;
 		m_horz_to_go = std::max( ( ( m_hsr >> 8 ) & 0x7F ), 2 ) + 1;
 
 		/* If section has ended, advance to next vertical state */
@@ -412,10 +411,10 @@ READ16_MEMBER( huc6270_device::next_pixel )
 	uint16_t data = HUC6270_SPRITE;
 
 	/* Check if we're on an active display line */
-	if ( m_vert_state == HUC6270_VDW )
+	if ( m_vert_state == v_state::VDW )
 	{
 		/* Check if we're in active display area */
-		if ( m_horz_state == HUC6270_HDW )
+		if ( m_horz_state == h_state::HDW )
 		{
 			uint8_t sprite_data = m_sprite_row[ m_sprite_row_index ] & 0x00FF;
 			int collission = ( m_sprite_row[ m_sprite_row_index ] & 0x8000 ) ? 1 : 0;
@@ -490,7 +489,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 		/* Check for low->high VSYNC transition */
 		if ( state )
 		{
-			m_vert_state = HUC6270_VCR;
+			m_vert_state = v_state::VCR;
 			m_vert_to_go = 0;
 
 			while ( m_vert_to_go == 0 )
@@ -509,7 +508,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 				int desr_inc = ( m_dcr & 0x0008 ) ? -1 : +1;
 				int sour_inc = ( m_dcr & 0x0004 ) ? -1 : +1;
 
-				if (LOG) logerror("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
+				LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
 				do {
 					uint16_t data = m_vram[ m_sour & m_vram_mask ];
 					m_vram[ m_desr & m_vram_mask ] = data;
@@ -551,12 +550,12 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			}
 		}
 
-		m_horz_state = HUC6270_HSW;
+		m_horz_state = h_state::HSW;
 		m_horz_to_go = 0;
 		m_horz_steps = 0;
 		m_byr_latched += 1;
 		m_raster_count += 1;
-		if ( m_vert_to_go == 1 && m_vert_state == HUC6270_VDS )
+		if ( m_vert_to_go == 1 && m_vert_state == v_state::VDS )
 		{
 			m_raster_count = 0x40;
 		}
@@ -608,7 +607,7 @@ READ8_MEMBER( huc6270_device::read )
 
 WRITE8_MEMBER( huc6270_device::write )
 {
-	if (LOG) logerror("%s: huc6270 write %02x <- %02x ", machine().describe_context(), offset, data);
+	LOG("%s: huc6270 write %02x <- %02x ", machine().describe_context(), offset, data);
 
 	switch ( offset & 3 )
 	{
@@ -644,18 +643,18 @@ WRITE8_MEMBER( huc6270_device::write )
 //                      m_status |= HUC6270_RR;
 //                      m_irq_changed_cb( ASSERT_LINE );
 //                  }
-//if (LOG) printf("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
+//LOG("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case BXR:       /* background x-scroll register LSB */
 					m_bxr = ( m_bxr & 0x0300 ) | data;
-//if (LOG) printf("*********************** BXR written %d at %d,%d\n", m_bxr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
+//LOG("*********************** BXR written %d at %d,%d\n", m_bxr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case BYR:       /* background y-scroll register LSB */
 					m_byr = ( m_byr & 0x0100 ) | data;
 					m_byr_latched = m_byr;
-//if (LOG) printf("******************** BYR written %d at %d,%d\n", huc6270->m_byr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
+//LOG("******************** BYR written %d at %d,%d\n", huc6270->m_byr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case MWR:       /* memory width register LSB */
@@ -795,7 +794,7 @@ WRITE8_MEMBER( huc6270_device::write )
 			}
 			break;
 	}
-	if (LOG) logerror("\n");
+	LOG("\n");
 }
 
 
@@ -882,10 +881,10 @@ void huc6270_device::device_reset()
 	m_satb_countdown = 0;
 	m_raster_count = 0x4000;
 	m_vert_to_go = 0;
-	m_vert_state = HUC6270_VSW;
+	m_vert_state = v_state::VSW;
 	m_horz_steps = 0;
 	m_horz_to_go = 0;
-	m_horz_state = HUC6270_HDS;
+	m_horz_state = h_state::HDS;
 	m_hsync = 0;
 	m_vsync = 0;
 	m_dma_enabled = 0;

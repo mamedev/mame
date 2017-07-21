@@ -6,10 +6,10 @@ Acorn Archimedes KART interface
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_AAKART_H
+#define MAME_MACHINE_AAKART_H
 
-#ifndef __AAKARTDEV_H__
-#define __AAKARTDEV_H__
+#pragma once
 
 
 
@@ -24,15 +24,6 @@ Acorn Archimedes KART interface
 	devcb = &aakart_device::set_out_rx_callback(*device, DEVCB_##_devcb);
 
 
-enum{
-	STATUS_NORMAL = 0,
-	STATUS_KEYUP,
-	STATUS_KEYDOWN,
-	STATUS_MOUSE,
-	STATUS_HRST,
-	STATUS_UNDEFINED
-};
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -45,8 +36,8 @@ public:
 	// construction/destruction
 	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_tx_callback(device_t &device, Object &&cb) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rx_callback(device_t &device, Object &&cb) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(std::forward<Object>(cb)); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -63,6 +54,15 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	enum {
+		STATUS_NORMAL = 0,
+		STATUS_KEYUP,
+		STATUS_KEYDOWN,
+		STATUS_MOUSE,
+		STATUS_HRST,
+		STATUS_UNDEFINED
+	};
+
 	static const device_timer_id RX_TIMER = 1;
 	static const device_timer_id TX_TIMER = 2;
 	static const device_timer_id MOUSE_TIMER = 3;
@@ -87,14 +87,6 @@ private:
 
 
 // device type definition
-extern const device_type AAKART;
+DECLARE_DEVICE_TYPE(AAKART, aakart_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-
-#endif
+#endif // MAME_MACHINE_AAKART_H

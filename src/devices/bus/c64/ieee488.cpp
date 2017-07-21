@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ieee488.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_IEEE488 = &device_creator<c64_ieee488_device>;
+DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488_device", "C64 IEEE-488 cartridge")
 
 
 //-------------------------------------------------
@@ -135,11 +136,12 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
 	m_roml_sel = BIT(data, 4);
 }
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
+MACHINE_CONFIG_MEMBER( c64_ieee488_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
 	MCFG_TPI6525_IN_PA_CB(READ8(c64_ieee488_device, tpi_pa_r))
 	MCFG_TPI6525_OUT_PA_CB(WRITE8(c64_ieee488_device, tpi_pa_w))
@@ -153,17 +155,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_ieee488_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_ieee488 );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -174,7 +165,7 @@ machine_config_constructor c64_ieee488_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_IEEE488, "IEEE-488", tag, owner, clock, "c64_ieee488", __FILE__),
+	device_t(mconfig, C64_IEEE488, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_tpi(*this, MOS6525_TAG),
 	m_bus(*this, IEEE488_TAG),

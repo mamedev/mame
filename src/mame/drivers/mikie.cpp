@@ -39,13 +39,17 @@ Stephh's notes (based on the games M6809 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mikie.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/konamipt.h"
-#include "includes/mikie.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MIKIE_TIMER_RATE 512
@@ -250,7 +254,7 @@ INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( mikie, mikie_state )
+static MACHINE_CONFIG_START( mikie )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, OSC/12)
@@ -378,6 +382,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mikie,   0,     mikie, mikie, driver_device, 0, ROT270, "Konami", "Mikie", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiej,  mikie, mikie, mikie, driver_device, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiehs, mikie, mikie, mikie, driver_device, 0, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )

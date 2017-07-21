@@ -43,6 +43,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "wdxt_gen.h"
 
 
@@ -61,7 +62,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_WDXT_GEN = &device_creator<wdxt_gen_device>;
+DEFINE_DEVICE_TYPE(ISA8_WDXT_GEN, wdxt_gen_device, "wdxt_gen", "Western Digital WDXT-GEN (Amstrad PC1512/1640)")
 
 
 //-------------------------------------------------
@@ -93,10 +94,6 @@ const tiny_rom_entry *wdxt_gen_device::device_rom_region() const
 
 static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
 	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE(WD11C00_17_TAG, wd11c00_17_device, read, write)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(wd1015_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(wd1015_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(wd1015_p1_r, wd1015_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(wd1015_p2_r, wd1015_p2_w)
 ADDRESS_MAP_END
 
 
@@ -138,12 +135,18 @@ WRITE8_MEMBER( wdxt_gen_device::ram_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( wdxt_gen )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
+MACHINE_CONFIG_MEMBER( wdxt_gen_device::device_add_mconfig )
 	MCFG_CPU_ADD(WD1015_TAG, I8049, 5000000)
 	MCFG_CPU_IO_MAP(wd1015_io)
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE(WD11C00_17_TAG, wd11c00_17_device, busy_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(wdxt_gen_device, wd1015_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(wdxt_gen_device, wd1015_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(wdxt_gen_device, wd1015_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(wdxt_gen_device, wd1015_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(wdxt_gen_device, wd1015_p2_w))
 
 	MCFG_DEVICE_ADD(WD11C00_17_TAG, WD11C00_17, 5000000)
 	MCFG_WD11C00_17_OUT_IRQ5_CB(WRITELINE(wdxt_gen_device, irq5_w))
@@ -170,17 +173,6 @@ static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wdxt_gen_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wdxt_gen );
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -190,11 +182,11 @@ machine_config_constructor wdxt_gen_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ISA8_WDXT_GEN, "Western Digital WDXT-GEN (Amstrad PC1512/1640)", tag, owner, clock, "wdxt_gen", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_maincpu(*this, WD1015_TAG),
-		m_host(*this, WD11C00_17_TAG),
-		m_hdc(*this, WD2010A_TAG)
+	: device_t(mconfig, ISA8_WDXT_GEN, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_maincpu(*this, WD1015_TAG)
+	, m_host(*this, WD11C00_17_TAG)
+	, m_hdc(*this, WD2010A_TAG)
 {
 }
 
@@ -242,21 +234,12 @@ void wdxt_gen_device::dack_w(int line, uint8_t data)
 	m_host->dack_w(data);
 }
 
-//-------------------------------------------------
-//  wd1015_t0_r -
-//-------------------------------------------------
-
-READ8_MEMBER( wdxt_gen_device::wd1015_t0_r )
-{
-	return m_host->busy_r();
-}
-
 
 //-------------------------------------------------
 //  wd1015_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_t1_r )
+READ_LINE_MEMBER( wdxt_gen_device::wd1015_t1_r )
 {
 	return 0; // TODO
 }

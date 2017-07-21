@@ -1,5 +1,12 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
+#ifndef MAME_INCLUDES_DCCONS_H
+#define MAME_INCLUDES_DCCONS_H
+
+#pragma once
+
+#include "dc.h"
+
 #include "imagedev/chd_cd.h"
 #include "machine/gdrom.h"
 #include "machine/ataintf.h"
@@ -9,10 +16,10 @@ class dc_cons_state : public dc_state
 {
 public:
 	dc_cons_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dc_state(mconfig, type, tag),
-		m_ata(*this, "ata")
-//        m_dcflash(*this, "dcflash")
-		{ }
+		: dc_state(mconfig, type, tag)
+		, m_ata(*this, "ata")
+//      , m_dcflash(*this, "dcflash")
+	{ }
 
 	required_device<ata_interface_device> m_ata;
 //  required_device<macronix_29lv160tmc_device> m_dcflash;
@@ -24,7 +31,6 @@ public:
 	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
 	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);
 
-	DECLARE_MACHINE_RESET(dc_console);
 	DECLARE_READ64_MEMBER(dc_pdtra_r);
 	DECLARE_WRITE64_MEMBER(dc_pdtra_w);
 	DECLARE_READ64_MEMBER(dc_arm_r);
@@ -46,3 +52,5 @@ private:
 	emu_timer *atapi_timer;
 	int atapi_xferlen, atapi_xferbase;
 };
+
+#endif // MAME_INCLUDES_DCCONS_H

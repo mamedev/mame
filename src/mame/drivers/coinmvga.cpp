@@ -216,17 +216,19 @@
 
 *******************************************************************************/
 
-
-#define CPU_CLOCK   XTAL_14_7456MHz
-#define MACH_CLOCK  XTAL_50MHz      // 50.35
-#define COM_CLOCK   XTAL_20MHz
-#define SND_CLOCK   XTAL_16_9344MHz
-
 #include "emu.h"
 #include "cpu/h8/h83006.h"
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define CPU_CLOCK   XTAL_14_7456MHz
+#define MACH_CLOCK  XTAL_50MHz      // 50.35
+#define COM_CLOCK   XTAL_20MHz
+#define SND_CLOCK   XTAL_16_9344MHz
 
 
 class coinmvga_state : public driver_device
@@ -615,16 +617,16 @@ INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 *    Machine Drivers     *
 *************************/
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, coinmvga_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, coinmvga_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac2_map, AS_0, 8, coinmvga_state )
+static ADDRESS_MAP_START( ramdac2_map, 0, 8, coinmvga_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
+static MACHINE_CONFIG_START( coinmvga )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
@@ -880,9 +882,9 @@ DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT     COMPANY                    FULLNAME                                      FLAGS */
-GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                    FULLNAME                                       FLAGS
+GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, driver_device,  0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, driver_device,  0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

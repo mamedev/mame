@@ -30,6 +30,8 @@ NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/bankdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pengadvb_state : public driver_device
@@ -194,7 +196,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
+static MACHINE_CONFIG_START( pengadvb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
@@ -279,7 +281,7 @@ void pengadvb_state::machine_reset()
 void pengadvb_state::pengadvb_decrypt(const char* region)
 {
 	uint8_t *mem = memregion(region)->base();
-	int memsize = memregion(region)->bytes();
+	uint32_t memsize = memregion(region)->bytes();
 
 	// data lines swap
 	for (int i = 0; i < memsize; i++)

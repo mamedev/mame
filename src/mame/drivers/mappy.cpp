@@ -14,9 +14,8 @@ They can be divided in three "families":
    The hardware consists of two 6809, and several Namco custom ICs that provide
    a static tilemap and 2bpp sprites.
    Grobda is the only Namco game of this era that has speech (just a short
-   sample). At this time, it is still unknown whether the DAC used to play
-   the speech is part of the standard Namco sound hardware, or a quick addition
-   to the base board.
+   sample). At this time, it is still unknown how speech samples are transmitted
+   to the DAC (almost certainly the same resistor network used by the 15XX).
 2) Phozon. This game runs on an unique board: the large number of sprites on
    screen at the same time required a 3rd 6809 to help with the calculations.
    The sprite hardware is also different from Super Pacman, featuring 8x8 sprites.
@@ -44,7 +43,8 @@ CPU board:
 15XX     sound control
 16XX     I/O control
 5xXX(x2) I/O
-99XX     sound volume (only Mappy, Super Pacman uses a standard LS273)
+99XX     DAC with volume control (only Mappy, Super Pacman uses LS273, CD4066
+         and binary-weighted resistors R34-37 and R22-25)
 
 Video board:
 00XX     tilemap address generator with scrolling capability (only Super Pacman)
@@ -550,9 +550,13 @@ TODO:
 
 #include "emu.h"
 #include "includes/mappy.h"
+
 #include "cpu/m6809/m6809.h"
+#include "machine/74157.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 /*************************************
  *
@@ -1279,37 +1283,37 @@ static INPUT_PORTS_START( phozon )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
+	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed and interleaved */
+	PORT_DIPNAME( 0x11, 0x11, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPSETTING(    0x01, "1" ) // 1 on, 2 off
+	PORT_DIPSETTING(    0x11, "3" )
+	PORT_DIPSETTING(    0x10, "4" ) // 2 on, 1 off
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4,5")
-	PORT_DIPSETTING(    0x08, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "20k, 80k & Every 80k" )  PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x04, "30k Only" )          PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k & 60k Only" )        PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x1c, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-//  PORT_DIPSETTING(    0x14, "30k 100k" )  // repeated         PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x0c, "30k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x0c, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "30k" )           PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x1c, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-//  PORT_DIPSETTING(    0x14, "30k 100k" )  // repeated     PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "40k & 80k Only" )        PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x04, "100k Only" )         PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_DIPNAME( 0x62, 0x62, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,3,5")
+	PORT_DIPSETTING(    0x02, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x40, "20k, 80k & Every 80k" )  PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k Only" )          PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x42, "30k & 60k Only" )        PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x62, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+//  PORT_DIPSETTING(    0x60, "30k 100k" )  // repeated         PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x22, "30k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x22, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "30k" )           PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x40, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x62, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+//  PORT_DIPSETTING(    0x60, "30k 100k" )  // repeated     PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x42, "40k & 80k Only" )        PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "100k Only" )         PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPNAME( 0x8c, 0x8c, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:6,8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x8c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x88, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x84, DEF_STR( 1C_7C ) )
 INPUT_PORTS_END
 
 
@@ -1604,25 +1608,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-READ8_MEMBER(mappy_state::dipA_l){ return ioport("DSW1")->read(); }     // dips A
-READ8_MEMBER(mappy_state::dipA_h){ return ioport("DSW1")->read() >> 4; }    // dips A
-
-READ8_MEMBER(mappy_state::dipB_mux)// dips B
-{
-	return ioport("DSW2")->read() >> (4 * m_mux);
-}
-
-READ8_MEMBER(mappy_state::dipB_muxi)// dips B
-{
-	// bits are interleaved in Phozon
-	return BITSWAP8(ioport("DSW2")->read(),6,4,2,0,7,5,3,1) >> (4 * m_mux);
-}
-
-WRITE8_MEMBER(mappy_state::out_mux)
-{
-	m_mux = data & 1;
-}
-
 WRITE8_MEMBER(mappy_state::out_lamps)
 {
 	output().set_led_value(0, data & 1);
@@ -1663,7 +1648,7 @@ MACHINE_START_MEMBER(mappy_state,mappy)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( superpac_common )
+static MACHINE_CONFIG_START( superpac_common )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
@@ -1704,75 +1689,87 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( superpac, mappy_state )
+static MACHINE_CONFIG_START( superpac )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pacnpal, mappy_state )
+static MACHINE_CONFIG_START( pacnpal )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  pacnpal_main_vblank_irq) // also update the custom I/O chips
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO59XX, 0)
-	MCFG_NAMCO59XX_IN_0_CB(READ8(mappy_state, dipB_mux))
-	MCFG_NAMCO59XX_IN_1_CB(READ8(mappy_state, dipA_l))
-	MCFG_NAMCO59XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_59XX, 0)
+	MCFG_NAMCO59XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO59XX_IN_1_CB(IOPORT("DSW1"))
+	MCFG_NAMCO59XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO59XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO59XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	MCFG_NAMCO59XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( grobda, mappy_state )
+static MACHINE_CONFIG_START( grobda )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  grobda_main_vblank_irq)  // also update the custom I/O chips
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // unknown DAC
+	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // alternate route to 15XX-related DAC?
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( phozon, mappy_state )
+static MACHINE_CONFIG_START( phozon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,  PIXEL_CLOCK/4)  /* MAIN CPU */
@@ -1794,18 +1791,22 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,phozon)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_muxi))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phozon)
@@ -1829,7 +1830,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( mappy_common )
+static MACHINE_CONFIG_START( mappy_common )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
@@ -1868,25 +1869,29 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mappy, mappy_state )
+static MACHINE_CONFIG_START( mappy )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(READ8(mappy_state, dipB_mux))
-	MCFG_NAMCO58XX_IN_1_CB(READ8(mappy_state, dipA_l))
-	MCFG_NAMCO58XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_58XX, 0)
+	MCFG_NAMCO58XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO58XX_IN_1_CB(IOPORT("DSW1"))
+	MCFG_NAMCO58XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO58XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	MCFG_NAMCO58XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( digdug2, mappy_state )
+static MACHINE_CONFIG_START( digdug2 )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
@@ -1896,18 +1901,22 @@ static MACHINE_CONFIG_START( digdug2, mappy_state )
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
@@ -1918,26 +1927,30 @@ static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( motos, mappy_state )
+static MACHINE_CONFIG_START( motos )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  motos_main_vblank_irq)    // also update the custom I/O chips
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 
@@ -2412,13 +2425,13 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 {
 	m_type = GAME_GROBDA;
 
-	/* I think the speech in Grobda is not a standard Namco sound feature, but rather a hack.
+	/* The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
 	   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
 	   probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
 	   to locations not used by the sound hardware).
 	   The program writes the same value to 0x02, 0x12, 0x22 and 0x32.
 	   However, removing the 15XX from the board causes sound to disappear completely, so
-	   the DAC might be built-in after all.
+	   the 15XX may still play some part in conveying speech to the DAC.
 	  */
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
 }
@@ -2454,25 +2467,25 @@ DRIVER_INIT_MEMBER(mappy_state,motos)
 
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
-GAME( 1982, superpac, 0,        superpac, superpac, mappy_state,   superpac,        ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, superpacm,superpac, superpac, superpac, mappy_state,   superpac,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal, mappy_state,   pacnpal,        ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal, mappy_state,   pacnpal,        ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal, mappy_state,   pacnpal,        ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda,   0,        grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda2,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda3,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpac, 0,        superpac, superpac,  mappy_state, superpac, ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpacm,superpac, superpac, superpac,  mappy_state, superpac, ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda,   0,        grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda2,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda3,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
-GAME( 1983, phozon,   0,        phozon,   phozon, mappy_state,   phozon,        ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, phozons,  phozon,   phozon,   phozon, mappy_state,   phozon,        ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozon,   0,        phozon,    phozon,   mappy_state, phozon,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozons,  phozon,   phozon,    phozon,   mappy_state, phozon,   ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
-GAME( 1983, mappy,    0,        mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mappyj,   mappy,    mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state,   druaga,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2,  0,        digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, motos,    0,        motos,    motos, mappy_state,   motos,        ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappy,    0,        mappy,     mappy,    mappy_state, mappy,    ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappyj,   mappy,    mappy,     mappy,    mappy_state, mappy,    ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state, druaga,   ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state, druaga,   ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state, druaga,   ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2,  0,        digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2o, digdug2,  digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, motos,    0,        motos,     motos,    mappy_state, motos,    ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )

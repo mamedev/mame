@@ -16,8 +16,8 @@ public:
 		m_rowscrollram(*this, "rowscrollram"),
 		m_vidregs2(*this, "vidregs2"),
 		m_spriteram(*this, "spriteram"),
-			m_oki_1(*this, "oki1"),
-			m_oki_2(*this, "oki2") ,
+		m_oki_1(*this, "oki1"),
+		m_oki_2(*this, "oki2") ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -58,7 +58,6 @@ public:
 	DECLARE_WRITE8_MEMBER(drgnmst_pcm_banksel_w);
 	DECLARE_WRITE8_MEMBER(drgnmst_oki_w);
 	DECLARE_WRITE8_MEMBER(drgnmst_snd_control_w);
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_WRITE16_MEMBER(drgnmst_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_md_videoram_w);

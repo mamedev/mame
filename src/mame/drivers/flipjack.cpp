@@ -81,6 +81,9 @@ ________________________|___________________________
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_16MHz
 #define VIDEO_CLOCK     XTAL_6MHz
@@ -432,7 +435,7 @@ void flipjack_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( flipjack, flipjack_state )
+static MACHINE_CONFIG_START( flipjack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -500,4 +503,4 @@ ROM_START( flipjack )
 ROM_END
 
 
-GAME( 1983?, flipjack,   0,      flipjack, flipjack, driver_device, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983
+GAME( 1983?, flipjack,   0,      flipjack, flipjack, flipjack_state, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983

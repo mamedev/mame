@@ -35,7 +35,9 @@
 
 */
 
+#include "emu.h"
 #include "includes/cgc7900.h"
+#include "speaker.h"
 
 
 
@@ -291,17 +293,6 @@ static ADDRESS_MAP_START( keyboard_mem, AS_PROGRAM, 8, cgc7900_state )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    ADDRESS_MAP( keyboard_io )
--------------------------------------------------*/
-
-static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, cgc7900_state )
-/*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-    AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
-    AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
-    AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)*/
-ADDRESS_MAP_END
-
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -364,14 +355,20 @@ void cgc7900_state::machine_reset()
     MACHINE_DRIVER( cgc7900 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
+static MACHINE_CONFIG_START( cgc7900 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
 	MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
 
 	MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
 	MCFG_CPU_PROGRAM_MAP(keyboard_mem)
-	MCFG_CPU_IO_MAP(keyboard_io)
+	//MCFG_MCS48_PORT_P1_IN_CB(READ8())
+	//MCFG_MCS48_PORT_P1_OUT_CB(WRITE8())
+	//MCFG_MCS48_PORT_P2_IN_CB(READ8())
+	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8())
+	//MCFG_MCS48_PORT_T1_IN_CB(READLINE())
+	//MCFG_MCS48_PORT_BUS_IN_CB(READ8())
+	//MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8())
 	MCFG_DEVICE_DISABLE()
 
 /*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
@@ -444,5 +441,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, driver_device, 0,      "Chromatics",   "CGC 7900", MACHINE_NOT_WORKING)
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY         FULLNAME    FLAGS */
+COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, cgc7900_state, 0,      "Chromatics",   "CGC 7900", MACHINE_NOT_WORKING)

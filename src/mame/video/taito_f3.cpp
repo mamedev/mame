@@ -323,7 +323,7 @@ pri_alp_bitmap
 */
 
 
-void taito_f3_state::device_post_load() 
+void taito_f3_state::device_post_load()
 {
 	/* force a reread of the dynamic tiles in the pixel layer */
 	m_gfxdecode->gfx(3)->mark_all_dirty();
@@ -506,7 +506,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 
 /******************************************************************************/
 
-void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taito_f3_state::screen_vblank_f3)
 {
 	// rising edge
 	if (state)

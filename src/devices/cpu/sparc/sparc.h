@@ -4,8 +4,8 @@
     SPARC v7 emulator
 */
 
-#ifndef __SPARC_H__
-#define __SPARC_H__
+#ifndef MAME_CPU_SPARC_SPARC_H
+#define MAME_CPU_SPARC_SPARC_H
 
 #pragma once
 
@@ -40,7 +40,7 @@ public:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override;
@@ -233,7 +233,7 @@ protected:
 };
 
 // device type definition
-extern const device_type MB86901;
+DECLARE_DEVICE_TYPE(MB86901, mb86901_device)
 
 enum
 {
@@ -290,4 +290,4 @@ enum
 	SPARC_RESET
 };
 
-#endif /* __SPARC_H__ */
+#endif // MAME_CPU_SPARC_SPARC_H

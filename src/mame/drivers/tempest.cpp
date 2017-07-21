@@ -283,6 +283,8 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "video/vector.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
@@ -477,7 +479,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_tempest_device, done_r, nullptr)
@@ -587,7 +589,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tempest, tempest_state )
+static MACHINE_CONFIG_START( tempest )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
@@ -861,9 +863,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, tempest,   0,       tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 3, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest3,  tempest, tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest2,  tempest, tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest1,  tempest, tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest1r, tempest, tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 1, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, temptube,  tempest, tempest, tempest, driver_device, 0, ROT270, "hack (Duncan Brown)", "Tempest Tubes", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest,   0,       tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 3, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest3,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest2,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest1,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest1r, tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 1, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, temptube,  tempest, tempest, tempest, tempest_state, 0, ROT270, "hack (Duncan Brown)", "Tempest Tubes", MACHINE_SUPPORTS_SAVE )

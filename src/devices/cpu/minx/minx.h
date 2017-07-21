@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#pragma once
+#ifndef MAME_CPU_MINX_MINX_H
+#define MAME_CPU_MINX_MINX_H
 
-#ifndef __MINX_H__
-#define __MINX_H__
+#pragma once
 
 
 enum
@@ -33,7 +33,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -115,7 +115,6 @@ private:
 };
 
 
-extern const device_type MINX;
+DECLARE_DEVICE_TYPE(MINX, minx_cpu_device)
 
-
-#endif /* __MINX_H__ */
+#endif // MAME_CPU_MINX_MINX_H

@@ -5,11 +5,15 @@
  also sometimes implemented as basic logic outside the CPU on early revs and bootlegs */
 
 
+#include "emu.h"
 #include "deco222.h"
+
+DEFINE_DEVICE_TYPE(DECO_222,    deco_222_device,    "deco222",    "DECO 222")
+DEFINE_DEVICE_TYPE(DECO_C10707, deco_c10707_device, "decoc10707", "DECO C10707")
 
 
 deco_222_device::deco_222_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, DECO_222, "DECO 222", tag, owner, clock, "deco222", __FILE__)
+	m6502_device(mconfig, DECO_222, tag, owner, clock)
 {
 }
 
@@ -33,7 +37,7 @@ uint8_t deco_222_device::mi_decrypt::read_sync(uint16_t adr)
 
 
 deco_c10707_device::deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, DECO_C10707, "DECO C10707", tag, owner, clock, "decoc10707", __FILE__)
+	m6502_device(mconfig, DECO_C10707, tag, owner, clock)
 {
 }
 

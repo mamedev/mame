@@ -11,11 +11,15 @@ game details unknown
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/i8255.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "video/hd44780.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "piggypas.lh"
+
 
 class piggypas_state : public driver_device
 {
@@ -46,7 +50,7 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 	if ((m_ctrl ^ data) & m_ctrl & 0x04)
 		m_digit_idx = 0;
 
-	m_ticket->write(space, 0, (data & 0x40) ? 0x80 : 0);
+	m_ticket->motor_w(BIT(data, 6));
 
 	m_ctrl = data;
 }
@@ -62,13 +66,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( piggypas_io, AS_IO, 8, piggypas_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN1")
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(ctrl_w)
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("IN0")
-
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("hd44780", hd44780_device, write)
 	AM_RANGE(0x1802, 0x1803) AM_DEVREAD("hd44780", hd44780_device, read)
 
@@ -123,7 +122,7 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-static MACHINE_CONFIG_START( piggypas, piggypas_state )
+static MACHINE_CONFIG_START( piggypas )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8031, 8000000) // unknown variant
@@ -149,8 +148,13 @@ static MACHINE_CONFIG_START( piggypas, piggypas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(piggypas_state, ctrl_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
@@ -224,16 +228,16 @@ ROM_END
 
 
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40
-GAME( 1992, piggypas,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 05.22
-GAME( 1992, hoopshot,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
 // Quick $ilver   Development Co.    10/08/96      ROUND  REV 6
-GAME( 1996, rndrndqs,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, rndrndqs,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
 //  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
-GAME( 1995, fidlstix,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, fidlstix,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, jackbean,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, dumpump,   0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )

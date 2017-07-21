@@ -24,11 +24,13 @@ Notes:
 #include "emu.h"
 #include "includes/nbmj9195.h"
 #include "includes/nb1413m3.h"      // needed for mahjong input controller
+
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 void nbmj9195_state::machine_start()
@@ -600,7 +602,7 @@ static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
 	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
 	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
@@ -913,75 +915,6 @@ static INPUT_PORTS_START( janbari )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 2-8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
-
-	PORT_INCLUDE( nbmjcontrols )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( mjanbari )
-
-	// I don't have manual for this game.
-
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 1-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 1-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
@@ -1358,9 +1291,9 @@ static INPUT_PORTS_START( mjlaman )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pachiten )
+static INPUT_PORTS_START( pachiten ) // mjanbari has the same dips, see MT05577
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x07, 0x07, "Game Out" )
+	PORT_DIPNAME( 0x07, 0x07, "Game Out" ) PORT_DIPLOCATION("DSWA:1,2,3")
 	PORT_DIPSETTING(    0x07, "90% (Easy)" )
 	PORT_DIPSETTING(    0x06, "85%" )
 	PORT_DIPSETTING(    0x05, "80%" )
@@ -1369,43 +1302,43 @@ static INPUT_PORTS_START( pachiten )
 	PORT_DIPSETTING(    0x02, "65%" )
 	PORT_DIPSETTING(    0x01, "60%" )
 	PORT_DIPSETTING(    0x00, "55% (Hard)" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x00, "Last Chance" )
+	PORT_DIPNAME( 0x10, 0x00, "Last Chance" ) PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Last chance needs 1credit" )
+	PORT_DIPNAME( 0x20, 0x20, "Last chance needs 1credit" ) PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
+	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" ) PORT_DIPLOCATION("DSWA:7") // Marked as not used on the dip sheet
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" ) PORT_DIPLOCATION("DSWA:8") // Marked as not used on the dip sheet
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" ) PORT_DIPLOCATION("DSWB:2") // Marked as test mode / game mode on the dip sheet, doesn't seem to work.
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bet1 Only" )
+	PORT_DIPNAME( 0x04, 0x04, "Bet1 Only" ) PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Bet Min" )
+	PORT_DIPNAME( 0x18, 0x18, "Bet Min" ) PORT_DIPLOCATION("DSWB:4,5")
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x60, 0x00, "Bet Max" )
+	PORT_DIPNAME( 0x60, 0x00, "Bet Max" ) PORT_DIPLOCATION("DSWB:6,7")
 	PORT_DIPSETTING(    0x60, "8" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x20, "12" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x80, 0x80, "Score Pool" )
+	PORT_DIPNAME( 0x80, 0x80, "Score Pool" ) PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1952,33 +1885,32 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jituroku )
 
-	// I don't have manual for this game.
+	// DSWA sheet available at MameTesters (MT05559)
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSWA:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 1-4" )
+	PORT_DIPNAME( 0x08, 0x00, "Game Sounds" ) PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 1-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSWA:5")  // On / Off don't match dip sheet?
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0xe0, 0x80, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSWA:6,7,8")
+	PORT_DIPSETTING(    0xe0, "1 (Easiest)" )
+	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0xa0, "3" )
+	PORT_DIPSETTING(    0x80, "4 (Normal)" )
+	PORT_DIPSETTING(    0x60, "5" )
+	PORT_DIPSETTING(    0x40, "6" )
+	PORT_DIPSETTING(    0x20, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
@@ -2571,7 +2503,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, clutsel_w)) \
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, outcoin_flag_w))
 
-static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
+static MACHINE_CONFIG_START( NBMJDRV1_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMPZ84C011, 12000000/2) /* TMPZ84C011, 6.00 MHz */
@@ -2993,7 +2925,7 @@ ROM_START( janbari )
 	ROM_LOAD( "9.10h", 0x300000, 0x80000, CRC(a8ef5bf5) SHA1(13f3431270d5b8970a7795efa9ea710652d0c502) )
 ROM_END
 
-ROM_START( mjanbari )
+ROM_START( mjanbari ) // Medal Series No. 136N, according to dip sheet
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "11.7ca", 0x00000,  0x10000, CRC(1edde2ef) SHA1(fe0c23971cc25c8e2898ac697ce5111fda482f41) )
 
@@ -3500,39 +3432,39 @@ ROM_START( shabdama )
 		DISK_IMAGE_READONLY( "shabdama", 0, NO_DUMP )
 ROM_END
 
-//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY, FULLNAME, FLAGS
-GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, koinomp,  0,        koinomp,  koinomp, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, janbari,  0,        janbari,  janbari, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mjanbari, janbari,  janbari,  mjanbari, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, nbmj9195, ROT0,   "Apple", "Ultra Maru-hi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Gal 10-renpatsu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Ren-ai Club (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mkeibaou, 0,        mkeibaou, patimono, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, nbmj9195, ROT0,   "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR, COMPANY, FULLNAME, FLAGS
+GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, koinomp,  0,        koinomp,  koinomp,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, janbari,  0,        janbari,  janbari,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjanbari, janbari,  janbari,  pachiten, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, nbmj9195, ROT0,    "Apple", "Ultra Maru-hi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, nbmj9195, ROT0,    "Fujic", "Mahjong Gal 10-renpatsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, nbmj9195, ROT0,    "Fujic", "Mahjong Ren-ai Club (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mkeibaou, 0,        mkeibaou, patimono, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, nbmj9195, ROT0,    "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, nbmj9195, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, nbmj9195, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, nbmj9195, ROT0,    "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal, nbmj9195_state,   nbmj9195, ROT0,   "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal,   nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm, nbmj9195_state,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, imekura,  0,        imekura,  imekura, nbmj9195_state,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Imekura Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf, nbmj9195_state,  nbmj9195, ROT0,   "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195_state, nbmj9195, ROT0,    "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195_state, nbmj9195, ROT0,    "Sphinx / AV Japan", "Imekura Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, nbmj9195, ROT0,    "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, shabdama, 0,        shabdama, mjuraden,nbmj9195_state,  nbmj9195,       ROT0, "Nichibutsu",      "LD Mahjong #4 Shabon-Dama", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, shabdama, 0,        shabdama, mjuraden, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "LD Mahjong #4 Shabon-Dama", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

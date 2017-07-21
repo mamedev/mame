@@ -252,13 +252,13 @@ void tceptor_state::decode_bg(const char * region)
 	memcpy(src, &buffer[0], len);
 
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(*m_palette, bg_layout, memregion(region)->base(), 0, 64, 0x0a00));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, bg_layout, memregion(region)->base(), 0, 64, 0x0a00));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(*m_palette, *layout, (const uint8_t *)data, 0, 64, 1024));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, *layout, (const uint8_t *)data, 0, 64, 1024));
 }
 
 // fix sprite order
@@ -544,7 +544,7 @@ uint32_t tceptor_state::screen_update_tceptor_3d_right(screen_device &screen, bi
 }
 
 
-void tceptor_state::screen_eof_tceptor(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 {
 	// rising edge
 	if (state)

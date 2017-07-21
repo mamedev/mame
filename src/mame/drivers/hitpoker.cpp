@@ -46,9 +46,11 @@ Some debug tricks (let's test this CPU as more as possible):
 
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class hitpoker_state : public driver_device
@@ -467,7 +469,7 @@ INTERRUPT_GEN_MEMBER(hitpoker_state::hitpoker_irq)
 	device.execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
+static MACHINE_CONFIG_START( hitpoker )
 	MCFG_CPU_ADD("maincpu", MC68HC11,1000000)
 	MCFG_CPU_PROGRAM_MAP(hitpoker_map)
 	MCFG_CPU_IO_MAP(hitpoker_io)

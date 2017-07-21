@@ -17,7 +17,7 @@ NETLIST_START(lr)
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-6)
     CLOCK(clk, 50)
-	PARAM(Solver.ITERATIVE, "MAT_CR")
+	PARAM(Solver.METHOD, "MAT_CR")
 
     IND(L1, 10)
     RES(R1, 10000)

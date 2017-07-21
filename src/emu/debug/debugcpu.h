@@ -8,17 +8,14 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_DEBUG_DEBUGCPU_H
 #define MAME_EMU_DEBUG_DEBUGCPU_H
+
+#pragma once
 
 #include "express.h"
 
 #include <set>
-
-
-namespace util { namespace xml { class data_node; } }
 
 
 //**************************************************************************
@@ -113,7 +110,7 @@ public:
 		offs_t address() const { return m_address; }
 		offs_t length() const { return m_length; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action.c_str(); }
+		const std::string &action() const { return m_action; }
 
 		// setters
 		void setEnabled(bool value) { m_enabled = value; }
@@ -171,6 +168,7 @@ public:
 
 	// commonly-used pass-throughs
 	int logaddrchars() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).logaddrchars() : 8; }
+	bool is_octal() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).is_octal() : false; }
 	device_t& device() const { return m_device; }
 
 	// hooks used by the rest of the system
@@ -217,7 +215,8 @@ public:
 	void breakpoint_enable_all(bool enable = true);
 
 	// watchpoints
-	watchpoint *watchpoint_first(address_spacenum spacenum) const { return m_wplist[spacenum]; }
+	int watchpoint_space_count() const { return m_wplist.size(); }
+	watchpoint *watchpoint_first(int spacenum) const { return m_wplist[spacenum]; }
 	int watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action);
 	bool watchpoint_clear(int wpnum);
 	void watchpoint_clear_all();
@@ -257,13 +256,13 @@ public:
 
 	// memory tracking
 	void set_track_mem(bool value) { m_track_mem = value; }
-	offs_t track_mem_pc_from_space_address_data(const address_spacenum& space,
+	offs_t track_mem_pc_from_space_address_data(const int& space,
 												const offs_t& address,
 												const u64& data) const;
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
 
 	// tracing
-	void trace(FILE *file, bool trace_over, bool detect_loops, const char *action);
+	void trace(FILE *file, bool trace_over, bool detect_loops, bool logerror, const char *action);
 	void trace_printf(const char *fmt, ...) ATTR_PRINTF(2,3);
 	void trace_flush() { if (m_trace != nullptr) m_trace->flush(); }
 
@@ -280,6 +279,7 @@ private:
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
 	u32 dasm_wrapped(std::string &buffer, offs_t pc);
+	void errorlog_write_line(const char *line);
 
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
@@ -329,19 +329,20 @@ private:
 
 	// breakpoints and watchpoints
 	breakpoint *            m_bplist;                   // list of breakpoints
-	watchpoint *            m_wplist[ADDRESS_SPACES];   // watchpoint lists for each address space
+	std::vector<watchpoint *> m_wplist;                 // watchpoint lists for each address space
 	registerpoint *         m_rplist;                   // list of registerpoints
 
 	// tracing
 	class tracer
 	{
 	public:
-		tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, const char *action);
+		tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, bool logerror, const char *action);
 		~tracer();
 
 		void update(offs_t pc);
 		void vprintf(const char *format, va_list va);
 		void flush();
+		bool logerror() const { return m_logerror; }
 
 	private:
 		static const int TRACE_LOOPS = 64;
@@ -351,6 +352,7 @@ private:
 		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
 		bool                m_detect_loops;             // whether or not we should detect loops
+		bool                m_logerror;                 // whether or not we should collect logerror output
 		int                 m_loops;                    // number of instructions in a loop
 		int                 m_nextdex;                  // next index
 		bool                m_trace_over;               // true if we're tracing over
@@ -407,7 +409,7 @@ private:
 	class dasm_memory_access
 	{
 	public:
-		dasm_memory_access(const address_spacenum& address_space,
+		dasm_memory_access(const int& address_space,
 							const offs_t& address,
 							const u64& data,
 							const offs_t& pc);
@@ -424,7 +426,7 @@ private:
 		}
 
 		// Stores the PC for a given address, memory region, and data value
-		address_spacenum m_address_space;
+		int m_address_space;
 		offs_t           m_address;
 		u64              m_data;
 		mutable offs_t   m_pc;
@@ -568,16 +570,16 @@ public:
 	void ensure_comments_loaded();
 	void reset_transient_flags();
 	void process_source_file();
-	void watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, device_debug::watchpoint** wplist);
+	void watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist);
 
 private:
 	static const size_t NUM_TEMP_VARIABLES;
 
 	/* expression handlers */
-	u64 expression_read_memory(void *param, const char *name, expression_space space, u32 address, int size);
+	u64 expression_read_memory(void *param, const char *name, expression_space space, u32 address, int size, bool disable_se);
 	u64 expression_read_program_direct(address_space &space, int opcode, offs_t address, int size);
 	u64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
-	void expression_write_memory(void *param, const char *name, expression_space space, u32 address, int size, u64 data);
+	void expression_write_memory(void *param, const char *name, expression_space space, u32 address, int size, u64 data, bool disable_se);
 	void expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void expression_write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
 	expression_error::error_code expression_validate(void *param, const char *name, expression_space space);
@@ -598,14 +600,13 @@ private:
 	device_t *  m_visiblecpu;
 	device_t *  m_breakcpu;
 
-	FILE *      m_source_file;          // script source file
+	std::unique_ptr<std::istream> m_source_file;        // script source file
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 
 	bool        m_within_instruction_hook;
 	bool        m_vblank_occurred;
 	bool        m_memory_modified;
-	bool        m_debugger_access;
 
 	int         m_execution_state;
 	device_t *  m_stop_when_not_device; // stop execution when the device ceases to be this

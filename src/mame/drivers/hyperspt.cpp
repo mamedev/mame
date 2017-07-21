@@ -9,10 +9,11 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/konamipt.h"
 #include "includes/hyperspt.h"
-#include "audio/trackfld.h"
+#include "includes/konamipt.h"
 #include "audio/hyprolyb.h"
+#include "audio/trackfld.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
@@ -22,6 +23,9 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 void hyperspt_state::machine_start()
@@ -279,7 +283,7 @@ INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
+static MACHINE_CONFIG_START( hyperspt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/12)   /* verified on pcb */
@@ -565,9 +569,9 @@ ROM_START( roadf3 ) // This hack was found on an original GX330 (Hyper Sports) P
 	ROM_LOAD( "82s129.a9",  0x0120, 0x0100, CRC(5b3b5f2a) SHA1(e83556fba6d50ad20dff6e19bd300ba0c30cc6e2) ) // identical to a09_c29.bin
 ROM_END
 
-GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, driver_device, 0, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, driver_device, 0, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
-GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, driver_device, 0, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf,     0,        roadf,     roadf, driver_device, 0, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf2,    roadf,    roadf,     roadf, driver_device, 0, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf3,    roadf,    roadf,     roadf, driver_device, 0, ROT90, "hack",  "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, 0, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, 0, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
+GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, 0, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf,     0,        roadf,     roadf,    hyperspt_state, 0, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf2,    roadf,    roadf,     roadf,    hyperspt_state, 0, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf3,    roadf,    roadf,     roadf,    hyperspt_state, 0, ROT90, "hack",    "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )

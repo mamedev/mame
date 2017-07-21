@@ -8,8 +8,10 @@
 
 ****************************************************************************/
 
-#ifndef __PCE220_SER_H__
-#define __PCE220_SER_H__
+#ifndef MAME_MACHINE_PCE220_SER_H
+#define MAME_MACHINE_PCE220_SER_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -57,7 +59,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -81,7 +82,7 @@ private:
 };
 
 // device type definition
-extern const device_type PCE220SERIAL;
+DECLARE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device)
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -90,4 +91,5 @@ extern const device_type PCE220SERIAL;
 
 #define MCFG_PCE220_SERIAL_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PCE220SERIAL, 0)
-#endif /* __PCE220_SER_H__ */
+
+#endif // MAME_MACHINE_PCE220_SER_H

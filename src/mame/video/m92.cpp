@@ -52,8 +52,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	{
 	case TIMER_SPRITEBUFFER:
 		m_sprite_buffer_busy = 1;
-		if (m_game_kludge!=2) /* Major Title 2 doesn't like this interrupt!? */
-			m92_sprite_interrupt();
+		m_upd71059c->ir1_w(1);
 		break;
 	default:
 		assert_always(false, "Unknown id in m92_state::device_timer");
@@ -88,10 +87,11 @@ WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
 		/* this implementation is not accurate: still some delayed sprites in gunforc2 (might be another issue?) */
 		m_spriteram->copy();
 		m_sprite_buffer_busy = 0;
+		m_upd71059c->ir1_w(0);
 
 		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
 		spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
-		timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, TIMER_SPRITEBUFFER);
+		m_spritebuffer_timer->adjust(attotime::from_hz(XTAL_26_66666MHz) * 0x400);
 	}
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",space.device().safe_pc(),offset,data);
 }
@@ -239,6 +239,7 @@ WRITE16_MEMBER(m92_state::m92_master_control_w)
 
 		case 3:
 			m_raster_irq_position = m_pf_master_control[3] - 128;
+			m_upd71059c->ir2_w(0);
 			break;
 	}
 }
@@ -247,10 +248,10 @@ WRITE16_MEMBER(m92_state::m92_master_control_w)
 
 VIDEO_START_MEMBER(m92_state,m92)
 {
-	int laynum;
+	m_spritebuffer_timer = timer_alloc(TIMER_SPRITEBUFFER);
 
 	memset(&m_pf_layer, 0, sizeof(m_pf_layer));
-	for (laynum = 0; laynum < 3; laynum++)
+	for (int laynum = 0; laynum < 3; laynum++)
 	{
 		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 
@@ -301,11 +302,9 @@ VIDEO_START_MEMBER(m92_state,m92)
 
 VIDEO_START_MEMBER(m92_state,ppan)
 {
-	int laynum;
-
 	VIDEO_START_CALL_MEMBER(m92);
 
-	for (laynum = 0; laynum < 3; laynum++)
+	for (int laynum = 0; laynum < 3; laynum++)
 	{
 		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 

@@ -217,9 +217,14 @@ ToDo:
 ***********************************************************************************************************/
 
 #include "emu.h"
-#include "super80.lh"
 #include "includes/super80.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "super80.lh"
+
 
 #define MASTER_CLOCK    (XTAL_12MHz)
 #define PIXEL_CLOCK (MASTER_CLOCK/2)
@@ -292,7 +297,7 @@ static ADDRESS_MAP_START( super80r_io, AS_IO, 8, super80_state )
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_device, register_r)
 	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
 	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
 	AM_RANGE(0x3e, 0x3e) AM_READ(port3e_r)
 	AM_RANGE(0x3f, 0x3f) AM_WRITE(port3f_w)
 	AM_RANGE(0xdc, 0xdc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
@@ -687,7 +692,7 @@ static const char *const relay_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( super80, super80_state )
+static MACHINE_CONFIG_START( super80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80_map)
@@ -770,10 +775,10 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80m)
-	MCFG_SCREEN_VBLANK_DRIVER(super80_state, screen_eof_super80m)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(super80_state, screen_vblank_super80m))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( super80v, super80_state )
+static MACHINE_CONFIG_START( super80v )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80v_map)
@@ -791,7 +796,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SCREEN_SIZE(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80v)
-	MCFG_SCREEN_VBLANK_DRIVER(super80_state, screen_eof_super80m)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(super80_state, screen_vblank_super80m))
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
@@ -803,7 +808,6 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
-	MCFG_VIDEO_START_OVERRIDE(super80_state,super80v)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

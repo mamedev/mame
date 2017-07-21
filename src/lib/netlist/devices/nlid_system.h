@@ -11,12 +11,10 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include <vector>
-
-#include "nl_setup.h"
-#include "nl_base.h"
-#include "nl_factory.h"
-#include "analog/nld_twoterm.h"
+#include "../nl_base.h"
+#include "../nl_setup.h"
+#include "../analog/nlid_twoterm.h"
+#include "../plib/putil.h"
 
 namespace netlist
 {
@@ -92,7 +90,7 @@ namespace netlist
 		{
 			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 		}
 		NETLIB_UPDATEI();
 		//NETLIB_RESETI();
@@ -121,16 +119,16 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc[0] = netlist_time::from_double(1.0 / (m_freq() * 2.0));
 
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 			{
 				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
-				plib::pstring_vector_t pat(m_pattern(),",");
+				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
-				unsigned long pati[256];
-				m_size = pat.size();
+				unsigned long pati[32];
+				m_size = static_cast<std::uint8_t>(pat.size());
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
@@ -157,10 +155,10 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		netlist_time m_inc[32];
-		state_var<unsigned> m_cnt;
+		state_var_u8 m_cnt;
+		std::uint8_t m_size;
 		state_var<netlist_time> m_off;
-		std::size_t m_size;
+		netlist_time m_inc[32];
 	};
 
 	// -----------------------------------------------------------------------------
@@ -175,7 +173,7 @@ namespace netlist
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
-			set_logic_family(netlist().setup().family_from_model(m_FAMILY()));
+			set_logic_family(setup().family_from_model(m_FAMILY()));
 		}
 
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
@@ -267,11 +265,11 @@ namespace netlist
 		{
 			register_subalias("I", m_RIN.m_P);
 			register_subalias("G", m_RIN.m_N);
-			connect_late(m_I, m_RIN.m_P);
+			connect(m_I, m_RIN.m_P);
 
 			register_subalias("_OP", m_ROUT.m_P);
 			register_subalias("Q", m_ROUT.m_N);
-			connect_late(m_Q, m_ROUT.m_P);
+			connect(m_Q, m_ROUT.m_P);
 		}
 
 		NETLIB_RESETI()
@@ -286,9 +284,9 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_NAME(twoterm) m_RIN;
+		analog::NETLIB_NAME(twoterm) m_RIN;
 		/* Fixme: only works if the device is time-stepped - need to rework */
-		NETLIB_NAME(twoterm) m_ROUT;
+		analog::NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
 
@@ -305,45 +303,20 @@ namespace netlist
 	NETLIB_OBJECT(function)
 	{
 		NETLIB_CONSTRUCTOR(function)
-		, m_N(*this, "N", 2)
-		, m_func(*this, "FUNC", "")
+		, m_N(*this, "N", 1)
+		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
+		, m_compiled(this->name() + ".FUNCC", this, this->netlist().state())
 		{
+			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
-				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
-
-			plib::pstring_vector_t cmds(m_func(), " ");
-			m_precompiled.clear();
-
-			for (std::size_t i=0; i < cmds.size(); i++)
 			{
-				pstring cmd = cmds[i];
-				rpn_inst rc;
-				if (cmd == "+")
-					rc.m_cmd = ADD;
-				else if (cmd == "-")
-					rc.m_cmd = SUB;
-				else if (cmd == "*")
-					rc.m_cmd = MULT;
-				else if (cmd == "/")
-					rc.m_cmd = DIV;
-				else if (cmd.startsWith("A"))
-				{
-					rc.m_cmd = PUSH_INPUT;
-					rc.m_param = cmd.substr(1).as_long();
-				}
-				else
-				{
-					bool err = false;
-					rc.m_cmd = PUSH_CONST;
-					rc.m_param = cmd.as_double(&err);
-					if (err)
-						netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func());
-				}
-				m_precompiled.push_back(rc);
+				pstring n = plib::pfmt("A{1}")(i);
+				m_I.push_back(plib::make_unique<analog_input_t>(*this, n));
+				inps.push_back(n);
+				m_vals.push_back(0.0);
 			}
-
-
+			m_compiled.compile(inps, m_func());
 		}
 
 	protected:
@@ -353,29 +326,13 @@ namespace netlist
 
 	private:
 
-		enum rpn_cmd
-		{
-			ADD,
-			MULT,
-			SUB,
-			DIV,
-			PUSH_CONST,
-			PUSH_INPUT
-		};
-
-		struct rpn_inst
-		{
-			rpn_inst() : m_cmd(ADD), m_param(0.0) { }
-			rpn_cmd m_cmd;
-			nl_double m_param;
-		};
-
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
 		std::vector<std::unique_ptr<analog_input_t>> m_I;
 
-		std::vector<rpn_inst> m_precompiled;
+		std::vector<double> m_vals;
+		plib::pfunction m_compiled;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -386,7 +343,7 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR(res_sw)
-		, m_R(*this, "R")
+		, m_R(*this, "_R")
 		, m_I(*this, "I")
 		, m_RON(*this, "RON", 1.0)
 		, m_ROFF(*this, "ROFF", 1.0E20)
@@ -396,16 +353,12 @@ namespace netlist
 			register_subalias("2", m_R.m_N);
 		}
 
-		NETLIB_SUB(R) m_R;
+		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_double_t m_RON;
 		param_double_t m_ROFF;
 
-		NETLIB_RESETI()
-		{
-			m_last_state = 0;
-			m_R.set_R(m_ROFF());
-		}
+		NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATEI();
 

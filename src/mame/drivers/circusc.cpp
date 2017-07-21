@@ -53,6 +53,7 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 
 #include "emu.h"
 #include "includes/circusc.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
@@ -60,6 +61,9 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/volt_reg.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 void circusc_state::machine_start()
@@ -333,7 +337,7 @@ INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( circusc, circusc_state )
+static MACHINE_CONFIG_START( circusc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */

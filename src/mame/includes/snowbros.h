@@ -36,7 +36,8 @@ public:
 	int m_sb3_music;
 	uint8_t m_semicom_prot_offset;
 
-	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(snowbros_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);
@@ -71,7 +72,7 @@ public:
 	uint32_t screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_snowbros(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_snowbros);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros3_irq);

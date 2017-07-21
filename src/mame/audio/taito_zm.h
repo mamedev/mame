@@ -5,6 +5,10 @@
     Taito Zoom ZSG-2 sound board
 
 ***************************************************************************/
+#ifndef MAME_AUDIO_TAITO_ZM_H
+#define MAME_AUDIO_TAITO_ZM_H
+
+#pragma once
 
 #include "cpu/mn10200/mn10200.h"
 #include "cpu/tms57002/tms57002.h"
@@ -17,7 +21,6 @@ class taito_zoom_device : public device_t
 {
 public:
 	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~taito_zoom_device() {}
 
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(sound_irq_r);
@@ -45,9 +48,11 @@ private:
 	std::unique_ptr<uint8_t[]> m_snd_shared_ram;
 };
 
-extern const device_type TAITO_ZOOM;
+DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)
 
 MACHINE_CONFIG_EXTERN( taito_zoom_sound );
 
 #define MCFG_TAITO_ZOOM_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TAITO_ZOOM, 0)
+
+#endif // MAME_AUDIO_TAITO_ZM_H

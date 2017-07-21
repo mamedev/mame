@@ -43,13 +43,14 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "m72.h"
 
 
-const device_type M72 = &device_creator<m72_audio_device>;
+DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audio")
 
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, M72, "Irem M72 Audio Custom", tag, owner, clock, "m72_audio", __FILE__)
+	: device_t(mconfig, IREM_M72_AUDIO, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_irqvector(0)
 	, m_sample_addr(0)
@@ -57,16 +58,6 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 	, m_samples_size(0)
 	, m_dac(*this, "^dac")
 	, m_soundlatch(*this, "^soundlatch")
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void m72_audio_device::device_config_complete()
 {
 }
 

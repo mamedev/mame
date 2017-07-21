@@ -9,14 +9,21 @@
 #
 ###########################################################################
 
-OBJ = obj
 SRC = ..
+VSBUILD = $(SRC)/buildVS
+DOC = $(SRC)/documentation
+
+ifeq ($(subst Windows_NT,windows,$(OS)),windows)
+OBJ = obj/mingw
+else
+OBJ = obj/nix
+endif
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I../.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
@@ -50,6 +57,7 @@ POBJS := \
 	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pexception.o \
+	$(POBJ)/pfunction.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \
@@ -57,15 +65,17 @@ POBJS := \
 	$(POBJ)/pstream.o \
 	$(POBJ)/putil.o \
 
+PMAIN := $(POBJ)/pmain.o
+
 NLOBJS := \
 	$(NLOBJ)/nl_base.o \
 	$(NLOBJ)/nl_parser.o \
 	$(NLOBJ)/nl_setup.o \
 	$(NLOBJ)/nl_factory.o \
 	$(NLOBJ)/analog/nld_bjt.o \
-	$(NLOBJ)/analog/nld_fourterm.o \
+	$(NLOBJ)/analog/nlid_fourterm.o \
 	$(NLOBJ)/analog/nld_switches.o \
-	$(NLOBJ)/analog/nld_twoterm.o \
+	$(NLOBJ)/analog/nlid_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_2716.o \
@@ -85,6 +95,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74153.o \
 	$(NLOBJ)/devices/nld_74161.o \
+	$(NLOBJ)/devices/nld_74164.o \
 	$(NLOBJ)/devices/nld_74165.o \
 	$(NLOBJ)/devices/nld_74166.o \
 	$(NLOBJ)/devices/nld_74174.o \
@@ -92,7 +103,6 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74192.o \
 	$(NLOBJ)/devices/nld_74193.o \
 	$(NLOBJ)/devices/nld_74194.o \
-	$(NLOBJ)/devices/nld_74279.o \
 	$(NLOBJ)/devices/nld_74365.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
@@ -100,7 +110,6 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_82S123.o \
 	$(NLOBJ)/devices/nld_82S126.o \
 	$(NLOBJ)/devices/nld_9310.o \
-	$(NLOBJ)/devices/nld_9312.o \
 	$(NLOBJ)/devices/nld_9316.o \
 	$(NLOBJ)/devices/nld_9322.o \
 	$(NLOBJ)/devices/nld_am2847.o \
@@ -114,17 +123,41 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_log.o \
 	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
-	$(NLOBJ)/devices/nld_truthtable.o \
+	$(NLOBJ)/devices/nlid_truthtable.o \
+	$(NLOBJ)/macro/nlm_base.o \
 	$(NLOBJ)/macro/nlm_cd4xxx.o \
 	$(NLOBJ)/macro/nlm_opamp.o \
 	$(NLOBJ)/macro/nlm_other.o \
 	$(NLOBJ)/macro/nlm_ttl74xx.o \
 	$(NLOBJ)/solver/nld_solver.o \
+	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
+	
+VSBUILDS = \
+	$(VSBUILD/netlistlib.vcxproj) \
+	$(VSBUILD/netlistlib.vcxproj.user \
+	$(VSBUILD/nltool.vcxproj \
+	$(VSBUILD/netlistlib.vcxproj.filters  \
+	$(VSBUILD/nltool.vcxproj.filters \
+	$(VSBUILD/netlist.sln \
 
-ALL_OBJS = $(OBJS) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
+DOCS = \
+	doxygen.conf \
+	$(DOC)/doc.css \
+	$(DOC)/mainpage.dox.h \
+	$(DOC)/primer_1.dox.h \
+	$(DOC)/structure.dox.h \
+	$(DOC)/test1-50r.svg \
+
+ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
+ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
+
 MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw
+
+
+# git archive HEAD --prefix=project-name-version/ \
+#     --format=zip -o project-name-version.zip
 
 #-------------------------------------------------
 # all
@@ -143,11 +176,11 @@ clean:
 # nltool
 #-------------------------------------------------
 
-nltool: $(OBJ)/prg/nltool.o $(OBJS)
+nltool: $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
-nlwav: $(OBJ)/prg/nlwav.o $(OBJS)
+nlwav: $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
@@ -164,17 +197,23 @@ maketree: $(sort $(OBJDIRS))
 # Special targets
 #-------------------------------------------------
 
-.PHONY: clang mingw doc
+.PHONY: clang clang-5 mingw doc
 
 clang:
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
-#-Wno-weak-vtables
-# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
+clang-5:
+	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
+
 #
+# Mostly done: -Wno-weak-vtables -Wno-cast-align
+# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
+# FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
+# FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
 
 mingw:
-	$(MAKE) LDEXTRAFLAGS="-Wl,--subsystem,console" LIBS= MD=@mkdir.exe SHELL=sh.exe
+	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN" \
+		LDEXTRAFLAGS="-Wl,--subsystem,console -municode" LIBS= MD=@mkdir.exe SHELL=sh.exe
 
 #
 # FIXME: Unicode
@@ -183,7 +222,8 @@ mingw:
 #
 
 
-doc:
+doc: nltool
+	./nltool -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
 #-------------------------------------------------
@@ -194,7 +234,7 @@ doc:
 	@echo creating .depend
 	@rm -f ./.depend
 	@for i in $(SOURCES); do \
-		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's/$(SRC)/$(OBJ)/' -e 's/.cpp/.o/' ` >>./.depend; \
+		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >>./.depend; \
 	done
 
 depend: .depend
@@ -224,3 +264,4 @@ $(OBJ)/%.a:
 	@echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $^
+

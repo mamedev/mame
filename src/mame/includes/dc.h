@@ -5,9 +5,10 @@
     dc.h - Sega Dreamcast includes
 
 */
+#ifndef MAME_INCLUDES_DC_H
+#define MAME_INCLUDES_DC_H
 
-#ifndef __DC_H__
-#define __DC_H__
+#pragma once
 
 #include "video/powervr2.h"
 #include "machine/naomig1.h"
@@ -77,6 +78,11 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( dc_modem_w );
 	DECLARE_WRITE8_MEMBER( g1_irq );
 	DECLARE_WRITE8_MEMBER( pvr_irq );
+	DECLARE_READ64_MEMBER( sh4_soundram_r );
+	DECLARE_WRITE64_MEMBER( sh4_soundram_w );
+	DECLARE_WRITE_LINE_MEMBER(aica_irq);
+	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
+
 
 	required_device<sh4_base_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -87,6 +93,9 @@ class dc_state : public driver_device
 
 	void generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram);
 	TIMER_DEVICE_CALLBACK_MEMBER(dc_scanline);
+	DECLARE_MACHINE_RESET(dc_console);
+
+	DECLARE_INPUT_CHANGED_MEMBER(mastercpu_cheat_r);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/
@@ -278,4 +287,4 @@ class dc_state : public driver_device
 
 void dc_maple_irq(running_machine &machine);
 
-#endif
+#endif // MAME_INCLUDES_DC_H

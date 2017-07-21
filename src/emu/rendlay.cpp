@@ -2561,7 +2561,20 @@ layout_file::layout_file(running_machine &machine, util::xml::data_node const &r
 
 	// parse all the views
 	for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
-		m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
+	{
+		// the trouble with allowing emu_fatalerror to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
+		// e.g. intlc44 and intlc440 have a terminal on the tty port by default and have a view with the front panel above the terminal screen
+		// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
+		// if the emu_fatalerror is allowed to propagate, the entire layout is dropped so you can't select the useful view
+		try
+		{
+			m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
+		}
+		catch (emu_fatalerror const &)
+		{
+			// the exception will print its own message before we get here
+		}
+	}
 }
 
 

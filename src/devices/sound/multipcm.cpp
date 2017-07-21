@@ -71,8 +71,8 @@ const int32_t multipcm_device::VALUE_TO_CHANNEL[32] =
 	21,22,23,24,25,26,27, -1,
 };
 
-const uint32_t multipcm_device::TL_SHIFT = 12;
-const uint32_t multipcm_device::EG_SHIFT = 16;
+constexpr uint32_t multipcm_device::TL_SHIFT;
+constexpr uint32_t multipcm_device::EG_SHIFT;
 
 void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 {
@@ -95,19 +95,19 @@ int32_t multipcm_device::envelope_generator_update(slot_t *slot)
 {
 	switch(slot->m_envelope_gen.m_state)
 	{
-		case ATTACK:
+		case state_t::ATTACK:
 			slot->m_envelope_gen.m_volume += slot->m_envelope_gen.m_attack_rate;
 			if (slot->m_envelope_gen.m_volume >= (0x3ff << EG_SHIFT))
 			{
-				slot->m_envelope_gen.m_state = DECAY1;
+				slot->m_envelope_gen.m_state = state_t::DECAY1;
 				if (slot->m_envelope_gen.m_decay1_rate >= (0x400 << EG_SHIFT)) //Skip DECAY1, go directly to DECAY2
 				{
-					slot->m_envelope_gen.m_state = DECAY2;
+					slot->m_envelope_gen.m_state = state_t::DECAY2;
 				}
 				slot->m_envelope_gen.m_volume = 0x3ff << EG_SHIFT;
 			}
 			break;
-		case DECAY1:
+		case state_t::DECAY1:
 			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_decay1_rate;
 			if (slot->m_envelope_gen.m_volume <= 0)
 			{
@@ -115,17 +115,17 @@ int32_t multipcm_device::envelope_generator_update(slot_t *slot)
 			}
 			if (slot->m_envelope_gen.m_volume >> EG_SHIFT <= (slot->m_envelope_gen.m_decay_level << 6))
 			{
-				slot->m_envelope_gen.m_state = DECAY2;
+				slot->m_envelope_gen.m_state = state_t::DECAY2;
 			}
 			break;
-		case DECAY2:
+		case state_t::DECAY2:
 			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_decay2_rate;
 			if (slot->m_envelope_gen.m_volume <= 0)
 			{
 				slot->m_envelope_gen.m_volume = 0;
 			}
 			break;
-		case RELEASE:
+		case state_t::RELEASE:
 			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_release_rate;
 			if (slot->m_envelope_gen.m_volume <= 0)
 			{
@@ -187,7 +187,7 @@ void multipcm_device::envelope_generator_calc(slot_t *slot)
         LFO  SECTION
 *****************************/
 
-const uint32_t multipcm_device::LFO_SHIFT = 8;
+constexpr uint32_t multipcm_device::LFO_SHIFT;
 
 const float multipcm_device::LFO_FREQ[8] = // In Hertz
 {
@@ -284,8 +284,8 @@ void multipcm_device::lfo_init()
 
 uint32_t multipcm_device::value_to_fixed(const uint32_t bits, const float value)
 {
-	const float float_shift = (float)(1 << bits);
-	return (uint32_t)(float_shift * value);
+	const float float_shift = float(1 << bits);
+	return uint32_t(float_shift * value);
 }
 
 int32_t multipcm_device::pitch_lfo_step(lfo_t *lfo)
@@ -307,7 +307,7 @@ int32_t multipcm_device::amplitude_lfo_step(lfo_t *lfo)
 void multipcm_device::lfo_compute_step(lfo_t *lfo, uint32_t lfo_frequency, uint32_t lfo_scale, int32_t amplitude_lfo)
 {
 	float step = (float)LFO_FREQ[lfo_frequency] * 256.0f / (float)m_rate;
-	lfo->m_phase_step = (uint32_t)((float)(1 << LFO_SHIFT) * step);
+	lfo->m_phase_step = uint32_t(float(1 << LFO_SHIFT) * step);
 	if (amplitude_lfo)
 	{
 		lfo->m_table = m_amplitude_table;
@@ -367,7 +367,7 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 				slot->m_total_level = slot->m_dest_total_level << TL_SHIFT;
 
 				envelope_generator_calc(slot);
-				slot->m_envelope_gen.m_state = ATTACK;
+				slot->m_envelope_gen.m_state = state_t::ATTACK;
 				slot->m_envelope_gen.m_volume = 0;
 
 				if (slot->m_base >= 0x100000)
@@ -389,7 +389,7 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 				{
 					if (slot->m_sample.m_release_reg != 0xf)
 					{
-						slot->m_envelope_gen.m_state = RELEASE;
+						slot->m_envelope_gen.m_state = state_t::RELEASE;
 					}
 					else
 					{
@@ -464,10 +464,10 @@ void multipcm_device::set_bank(uint32_t leftoffs, uint32_t rightoffs)
 	printf("%08x, %08x\n", leftoffs, rightoffs);
 }
 
-const device_type MULTIPCM = &device_creator<multipcm_device>;
+DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "multipcm", "Sega/Yamaha 315-5560 MultiPCM")
 
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
+	: device_t(mconfig, MULTIPCM, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
 		m_stream(nullptr),
@@ -489,16 +489,6 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void multipcm_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

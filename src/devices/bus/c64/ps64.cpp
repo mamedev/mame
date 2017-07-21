@@ -40,6 +40,7 @@
 
 */
 
+#include "emu.h"
 #include "ps64.h"
 
 
@@ -56,7 +57,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_PS64 = &device_creator<c64_ps64_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_PS64, c64_ps64_cartridge_device, "c64_ps64", "C64 PS-64")
 
 
 //-------------------------------------------------
@@ -69,26 +70,16 @@ static struct votrax_sc02_interface votrax_intf =
 };
 */
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_ps64 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_ps64 )
+MACHINE_CONFIG_MEMBER( c64_ps64_cartridge_device::device_add_mconfig )
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
 	//MCFG_VOTRAX_SC02_ADD(SSI263_TAG, 2000000, votrax_intf)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_ps64_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_ps64 );
-}
 
 
 
@@ -101,7 +92,7 @@ machine_config_constructor c64_ps64_cartridge_device::device_mconfig_additions()
 //-------------------------------------------------
 
 c64_ps64_cartridge_device::c64_ps64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_PS64, "C64 PS-64", tag, owner, clock, "c64_ps64", __FILE__),
+	device_t(mconfig, C64_PS64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

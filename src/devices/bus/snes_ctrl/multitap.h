@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SNES_CTRL_MULTITAP_H
+#define MAME_BUS_SNES_CTRL_MULTITAP_H
+
 #pragma once
 
-#ifndef __SNES_MULTITAP__
-#define __SNES_MULTITAP__
 
-
-#include "emu.h"
 #include "ctrl.h"
 
 //**************************************************************************
@@ -28,14 +27,14 @@ public:
 	// construction/destruction
 	snes_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_snes_control_port_interface overrides
 	virtual uint8_t read_pin4() override;
@@ -55,7 +54,6 @@ private:
 
 
 // device type definition
-extern const device_type SNES_MULTITAP;
+DECLARE_DEVICE_TYPE(SNES_MULTITAP, snes_multitap_device)
 
-
-#endif
+#endif // MAME_BUS_SNES_CTRL_MULTITAP_H

@@ -9,19 +9,24 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
-#include "machine/pic8259.h"
-#include "machine/mc2661.h"
-#include "machine/wd_fdc.h"
-#include "machine/mc146818.h"
 #include "machine/pcd_kbd.h"
 #include "video/pcd.h"
-#include "sound/speaker.h"
-#include "formats/pc_dsk.h"
-#include "bus/scsi/omti5100.h"
+
 #include "bus/rs232/rs232.h"
+#include "bus/scsi/omti5100.h"
+#include "cpu/i86/i186.h"
+#include "machine/mc146818.h"
+#include "machine/mc2661.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+
+#include "speaker.h"
+
+#include "formats/pc_dsk.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -30,19 +35,19 @@
 class pcd_state : public driver_device
 {
 public:
-	pcd_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pic1(*this, "pic1"),
-	m_pic2(*this, "pic2"),
-	m_speaker(*this, "speaker"),
-	m_fdc(*this, "fdc"),
-	m_rtc(*this, "rtc"),
-	m_scsi(*this, "scsi"),
-	m_scsi_data_out(*this, "scsi_data_out"),
-	m_scsi_data_in(*this, "scsi_data_in"),
-	m_ram(*this, "ram"),
-	m_req_hack(nullptr)
+	pcd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pic1(*this, "pic1")
+		, m_pic2(*this, "pic2")
+		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "fdc")
+		, m_rtc(*this, "rtc")
+		, m_scsi(*this, "scsi")
+		, m_scsi_data_out(*this, "scsi_data_out")
+		, m_scsi_data_in(*this, "scsi_data_in")
+		, m_ram(*this, "ram")
+		, m_req_hack(nullptr)
 	{ }
 
 	DECLARE_READ8_MEMBER( irq_callback );
@@ -85,9 +90,9 @@ private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<wd2793_t> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<mc146818_device> m_rtc;
-	required_device<SCSI_PORT_DEVICE> m_scsi;
+	required_device<scsi_port_device> m_scsi;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<ram_device> m_ram;
@@ -157,7 +162,7 @@ WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 
 READ8_MEMBER( pcd_state::nmi_io_r )
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 		return 0;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -167,7 +172,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 
 WRITE8_MEMBER( pcd_state::nmi_io_w )
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 		return;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -389,7 +394,7 @@ WRITE16_MEMBER(pcd_state::mem_w)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !space.debugger_access())
+		if(!reg && !machine().side_effect_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -411,7 +416,7 @@ READ16_MEMBER(pcd_state::mem_r)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !space.debugger_access())
+		if(!reg && !machine().side_effect_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -441,7 +446,7 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xf840, 0xf841) AM_READWRITE8(stat_r, stat_w, 0x00ff)
 	AM_RANGE(0xf840, 0xf841) AM_READWRITE8(led_r, led_w, 0xff00)
 	AM_RANGE(0xf880, 0xf8bf) AM_READWRITE8(rtc_r, rtc_w, 0xffff)
-	AM_RANGE(0xf900, 0xf903) AM_DEVREADWRITE8("fdc", wd2793_t, read, write, 0xffff)
+	AM_RANGE(0xf900, 0xf903) AM_DEVREADWRITE8("fdc", wd2793_device, read, write, 0xffff)
 	AM_RANGE(0xf904, 0xf905) AM_READWRITE(dskctl_r, dskctl_w)
 	AM_RANGE(0xf940, 0xf943) AM_READWRITE8(scsi_r, scsi_w, 0xffff)
 	AM_RANGE(0xf980, 0xf9bf) AM_DEVICE("video", pcdx_video_device, map)
@@ -481,7 +486,7 @@ static INPUT_PORTS_START(pcx)
 	PORT_CONFSETTING(0x02, "SINIX 1.2")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pcd, pcd_state )
+static MACHINE_CONFIG_START( pcd )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pcd_map)
 	MCFG_CPU_IO_MAP(pcd_io)
@@ -601,5 +606,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1984, pcd, 0, 0, pcd, 0, driver_device, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
-COMP( 1984, pcx, pcd, 0, pcx, pcx, driver_device, 0, "Siemens", "PC-X", MACHINE_NOT_WORKING )
+COMP( 1984, pcd, 0,   0, pcd, 0,   pcd_state, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
+COMP( 1984, pcx, pcd, 0, pcx, pcx, pcd_state, 0, "Siemens", "PC-X", MACHINE_NOT_WORKING )

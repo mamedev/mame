@@ -49,7 +49,7 @@ debugger_console::debugger_console(running_machine &machine)
 
 	/* print the opening lines */
 	printf("%s debugger version %s\n", emulator_info::get_appname(), emulator_info::get_build_version());
-	printf("Currently targeting %s (%s)\n", m_machine.system().name, m_machine.system().description);
+	printf("Currently targeting %s (%s)\n", m_machine.system().name, m_machine.system().type.fullname());
 
 	/* request callback upon exiting */
 	m_machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&debugger_console::exit, this));
@@ -218,7 +218,10 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 
 	/* execute the handler */
 	if (execute)
-		found->handler(found->ref, params, (const char **)param);
+	{
+		std::vector<std::string> params_vec(param, param + params);
+		found->handler(found->ref, params_vec);
+	}
 	return CMDERR_NONE;
 }
 
@@ -228,7 +231,7 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
     and either executes or just validates it
 -------------------------------------------------*/
 
-CMDERR debugger_console::internal_parse_command(const char *original_command, bool execute)
+CMDERR debugger_console::internal_parse_command(const std::string &original_command, bool execute)
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
 	char *params[MAX_COMMAND_PARAMS] = { nullptr };
@@ -237,7 +240,7 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 	char *p, c = 0;
 
 	/* make a copy of the command */
-	strcpy(command, original_command);
+	strcpy(command, original_command.c_str());
 
 	/* loop over all semicolon-separated stuff */
 	for (p = command; *p != 0; )
@@ -324,13 +327,13 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
     execute_command - execute a command string
 -------------------------------------------------*/
 
-CMDERR debugger_console::execute_command(const char *command, bool echo)
+CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 {
 	CMDERR result;
 
 	/* echo if requested */
 	if (echo)
-		printf(">%s\n", command);
+		printf(">%s\n", command.c_str());
 
 	/* parse and execute */
 	result = internal_parse_command(command, true);
@@ -339,7 +342,7 @@ CMDERR debugger_console::execute_command(const char *command, bool echo)
 	if (result != CMDERR_NONE)
 	{
 		if (!echo)
-			printf(">%s\n", command);
+			printf(">%s\n", command.c_str());
 		printf(" %*s^\n", CMDERR_ERROR_OFFSET(result), "");
 		printf("%s\n", cmderr_to_string(result));
 	}
@@ -368,9 +371,9 @@ CMDERR debugger_console::validate_command(const char *command)
     register_command - register a command handler
 -------------------------------------------------*/
 
-void debugger_console::register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler)
+void debugger_console::register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler)
 {
-	assert_always(m_machine.phase() == MACHINE_PHASE_INIT, "Can only call register_command() at init time!");
+	assert_always(m_machine.phase() == machine_phase::INIT, "Can only call register_command() at init time!");
 	assert_always((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call register_command() when debugger is not running");
 
 	debug_command *cmd = auto_alloc_clear(m_machine, <debug_command>());

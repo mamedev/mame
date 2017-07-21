@@ -1562,6 +1562,7 @@ void arm7_cpu_device::tg0e_1(uint32_t pc, uint32_t op)
 	addr &= 0xfffffffc;
 	SetRegister(14, (R15 + 4) | 1);
 	R15 = addr;
+	set_cpsr(GET_CPSR & ~T_MASK);
 }
 
 	/* BL */

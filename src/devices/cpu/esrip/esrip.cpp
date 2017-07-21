@@ -10,8 +10,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "esrip.h"
+
+#include "debugger.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -336,13 +338,11 @@ void esrip_device::device_stop()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *esrip_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector esrip_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+	};
 }
 
 
@@ -1685,14 +1685,14 @@ void esrip_device::nop(uint16_t inst)
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type ESRIP = &device_creator<esrip_device>;
+DEFINE_DEVICE_TYPE(ESRIP, esrip_device, "esrip", "Entertainment Sciences RIP")
 
 //-------------------------------------------------
 //  esrip_device - constructor
 //-------------------------------------------------
 
 esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, ESRIP, "ESRIP", tag, owner, clock, "esrip", __FILE__),
+	: cpu_device(mconfig, ESRIP, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 64, 9, -3),
 		m_fdt_r(*this),
 		m_fdt_w(*this),

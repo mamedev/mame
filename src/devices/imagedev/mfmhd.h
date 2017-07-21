@@ -11,10 +11,11 @@
 
 *****************************************************************************/
 
-#ifndef __MFMHD__
-#define __MFMHD__
+#ifndef MAME_DEVICES_IMAGEDEV_MFMHD_H
+#define MAME_DEVICES_IMAGEDEV_MFMHD_H
 
-#include "emu.h"
+#pragma once
+
 #include "imagedev/harddriv.h"
 #include "formats/mfm_hd.h"
 
@@ -51,7 +52,6 @@ class mfm_harddisk_device : public harddisk_image_device,
 							public device_slot_card_interface
 {
 public:
-	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~mfm_harddisk_device();
 
 	typedef delegate<void (mfm_harddisk_device*, int)> index_pulse_cb;
@@ -102,6 +102,8 @@ public:
 	int             get_actual_heads();
 
 protected:
+	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	void                device_start() override;
 	void                device_stop() override;
 	void                device_reset() override;
@@ -177,7 +179,7 @@ public:
 	mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type MFMHD_GENERIC;
+DECLARE_DEVICE_TYPE(MFMHD_GENERIC, mfm_hd_generic_device)
 
 class mfm_hd_st213_device : public mfm_harddisk_device
 {
@@ -185,7 +187,7 @@ public:
 	mfm_hd_st213_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type MFMHD_ST213;
+DECLARE_DEVICE_TYPE(MFMHD_ST213, mfm_hd_st213_device)
 
 class mfm_hd_st225_device : public mfm_harddisk_device
 {
@@ -193,7 +195,7 @@ public:
 	mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type MFMHD_ST225;
+DECLARE_DEVICE_TYPE(MFMHD_ST225, mfm_hd_st225_device)
 
 class mfm_hd_st251_device : public mfm_harddisk_device
 {
@@ -201,7 +203,7 @@ public:
 	mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type MFMHD_ST251;
+DECLARE_DEVICE_TYPE(MFMHD_ST251, mfm_hd_st251_device)
 
 
 /* Connector for a MFM hard disk. See also floppy.c */
@@ -227,7 +229,7 @@ private:
 	mfmhd_image_format_t* m_format;
 };
 
-extern const device_type MFM_HD_CONNECTOR;
+DECLARE_DEVICE_TYPE(MFM_HD_CONNECTOR, mfm_harddisk_connector)
 
 /*
     Add a harddisk connector.
@@ -247,4 +249,4 @@ extern const device_type MFM_HD_CONNECTOR;
 	static_cast<mfm_harddisk_connector *>(device)->configure(_enc, _spinupms, _cache, _format);
 
 
-#endif
+#endif // MAME_DEVICES_IMAGEDEV_MFMHD_H

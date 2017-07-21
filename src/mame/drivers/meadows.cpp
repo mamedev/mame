@@ -118,8 +118,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/meadows.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "deadeye.lh"
 #include "gypsyjug.lh"
 #include "minferno.lh"
@@ -358,7 +362,7 @@ static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8, meadows_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( minferno_io_map, AS_IO, 8, meadows_state )
+static ADDRESS_MAP_START( minferno_data_map, AS_DATA, 8, meadows_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
@@ -606,7 +610,7 @@ static const char *const bowl3d_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( meadows, meadows_state )
+static MACHINE_CONFIG_START( meadows )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
@@ -643,12 +647,12 @@ static MACHINE_CONFIG_START( meadows, meadows_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( minferno, meadows_state )
+static MACHINE_CONFIG_START( minferno )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
 	MCFG_CPU_PROGRAM_MAP(minferno_main_map)
-	MCFG_CPU_IO_MAP(minferno_io_map)
+	MCFG_CPU_DATA_MAP(minferno_data_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  minferno_interrupt)
 
 	/* video hardware */
@@ -667,7 +671,7 @@ static MACHINE_CONFIG_START( minferno, meadows_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bowl3d, meadows_state )
+static MACHINE_CONFIG_START( bowl3d )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
@@ -877,7 +881,7 @@ DRIVER_INIT_MEMBER(meadows_state,minferno)
  *
  *************************************/
 
-GAMEL( 1978, deadeye,  0, meadows,  meadows, driver_device,  0,        ROT0,  "Meadows Games, Inc.", "Dead Eye", 0, layout_deadeye )
-GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d, driver_device,   0,        ROT90, "Meadows Games, Inc.", "3-D Bowling", MACHINE_NO_SOUND )
-GAMEL( 1978, gypsyjug, 0, meadows,  meadows, meadows_state,  gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler", MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
+GAMEL( 1978, deadeye,  0, meadows,  meadows,  meadows_state, 0,        ROT0,  "Meadows Games, Inc.", "Dead Eye",          0, layout_deadeye )
+GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d,   meadows_state, 0,        ROT90, "Meadows Games, Inc.", "3-D Bowling",       MACHINE_NO_SOUND )
+GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  meadows_state, gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler",     MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
 GAMEL( 1978, minferno, 0, minferno, minferno, meadows_state, minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", MACHINE_NO_SOUND, layout_minferno )

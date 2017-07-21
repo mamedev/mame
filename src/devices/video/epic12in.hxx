@@ -86,23 +86,23 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 // wrong/unsafe slowdown sim
 	if (dimy > starty && dimx > startx)
 	{
-		epic12_device_blit_delay += (dimy - starty)*(dimx - startx);
+		blit_delay += (dimy - starty)*(dimx - startx);
 
-		//printf("delay is now %d\n", epic12_device_blit_delay);
+		//printf("delay is now %d\n", blit_delay);
 	}
 
 #if BLENDED == 1
 #if _SMODE == 0
 #if _DMODE == 0
-	const uint8_t* salpha_table = epic12_device_colrtable[s_alpha];
-	const uint8_t* dalpha_table = epic12_device_colrtable[d_alpha];
+	const uint8_t* salpha_table = colrtable[s_alpha];
+	const uint8_t* dalpha_table = colrtable[d_alpha];
 #endif
 
 #if _DMODE == 5
-	const uint8_t* salpha_table = epic12_device_colrtable[s_alpha];
+	const uint8_t* salpha_table = colrtable[s_alpha];
 #endif
 #if _DMODE == 1
-	const uint8_t* salpha_table = epic12_device_colrtable[s_alpha];
+	const uint8_t* salpha_table = colrtable[s_alpha];
 #endif
 
 #endif
@@ -110,7 +110,7 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 #if _SMODE == 2
 #if _DMODE == 0
 
-	const uint8_t* dalpha_table = epic12_device_colrtable[d_alpha];
+	const uint8_t* dalpha_table = colrtable[d_alpha];
 #endif
 #endif
 #endif

@@ -2,8 +2,10 @@
 // copyright-holders:Olivier Galibert
 // Lindbergh Sega baseboard
 
-#ifndef SEGABB_H
-#define SEGABB_H
+#ifndef MAME_MACHINE_SEGABB_H
+#define MAME_MACHINE_SEGABB_H
+
+#pragma once
 
 #include "machine/pci.h"
 
@@ -24,6 +26,6 @@ private:
 	DECLARE_ADDRESS_MAP(map3, 32);
 };
 
-extern const device_type SEGA_LINDBERGH_BASEBOARD;
+DECLARE_DEVICE_TYPE(SEGA_LINDBERGH_BASEBOARD, sega_lindbergh_baseboard_device)
 
-#endif
+#endif // MAME_MACHINE_SEGABB_H

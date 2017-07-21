@@ -2,10 +2,6 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /* Sega Saturn VDP2 */
 
-#define DEBUG_MODE 0
-#define TEST_FUNCTIONS 0
-#define POPMESSAGE_DEBUG 0
-
 /*
 
 the dirty marking stuff and tile decoding will probably be removed in the end anyway as we'll need custom
@@ -105,7 +101,15 @@ In other words,the first three types uses the offset and not the color allocated
 */
 
 #include "emu.h"
-#include "includes/saturn.h"
+#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+
+#include "screen.h"
+
+
+#define DEBUG_MODE 0
+#define TEST_FUNCTIONS 0
+#define POPMESSAGE_DEBUG 0
+
 
 enum
 {
@@ -195,7 +199,7 @@ enum
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    | EXLTFG   | EXSYFG   |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    | VBLANK   | HBLANK   | ODD      | EVEN     |
+       |    --    |    --    |    --    |    --    | VBLANK   | HBLANK   | ODD      | PAL      |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 /* 180006 - r/w - VRSIZE - VRAM Size
@@ -5717,7 +5721,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 			/* latch h/v signals through HV latch*/
 			if(!STV_VDP2_EXLTEN)
 			{
-				if(!space.debugger_access())
+				if(!machine().side_effect_disabled())
 				{
 					m_vdp2.h_count = get_hcounter();
 					m_vdp2.v_count = get_vcounter();
@@ -5744,7 +5748,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 				m_vdp2_regs[offset] |= 1 << 3;
 
 			/* HV latches clears if this register is read */
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 			{
 				m_vdp2.exltfg &= ~1;
 				m_vdp2.exsyfg &= ~1;
@@ -5758,7 +5762,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 
 			/* Games basically r/w the entire VDP2 register area when this is tripped. (example: Silhouette Mirage)
 			   Disable log for the time being. */
-			//if(!space.debugger_access())
+			//if(!machine().side_effect_disabled())
 			//  printf("Warning: VDP2 version read\n");
 			break;
 		}
@@ -5778,7 +5782,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 		}
 
 		default:
-			//if(!space.debugger_access())
+			//if(!machine().side_effect_disabled())
 			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
@@ -5996,13 +6000,20 @@ uint8_t saturn_state::get_vblank( void )
 	return 0;
 }
 
+// TODO: seabass explicitly wants this bit to be 0 when screen is disabled from bios to game transition, assume following disp bit.
+//       this is actually wrong for finlarch/sasissu/magzun so it needs to be tested on real HW.
 uint8_t saturn_state::get_odd_bit( void )
 {
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
 		return 1;
 
 	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
+	{
+		if((STV_VDP2_HRES & 1) == 0)
+			return STV_VDP2_DISP;
+
 		return 1;
+	}
 
 	return machine().first_screen()->frame_number() & 1;
 }

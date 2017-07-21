@@ -40,11 +40,13 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/beep.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/wave.h"
 #include "machine/6821pia.h"
+#include "sound/beep.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class d6800_state : public driver_device
@@ -377,7 +379,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( d6800, d6800_state )
+static MACHINE_CONFIG_START( d6800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)
@@ -431,5 +433,5 @@ ROM_START( d6800 )
 	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(2) )
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS,          INIT      COMPANY        FULLNAME      FLAGS */
-COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,   0,   "Michael Bauer", "Dream 6800", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY          FULLNAME      FLAGS
+COMP( 1979, d6800, 0,      0,      d6800,    d6800, d6800_state, 0,    "Michael Bauer", "Dream 6800", 0 )

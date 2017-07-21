@@ -125,6 +125,20 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
 Not sure exactly what this tests, likely tries firing the vector generator
 state machine and sees if the GO bit ever finishes and goes back to 0
 */
+#include "emu.h"
+
+#include "bus/rs232/rs232.h"
+#include "cpu/i8085/i8085.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
+#include "machine/com8116.h"
+#include "machine/i8251.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "vk100.lh"
+
 
 // named timer IDs
 #define TID_I8251_RX 1
@@ -147,14 +161,6 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 
 // debug state dump for the vector generator
 #undef DEBUG_VG_STATE
-
-#include "bus/rs232/rs232.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/beep.h"
-#include "video/mc6845.h"
-#include "machine/com8116.h"
-#include "machine/i8251.h"
-#include "vk100.lh"
 
 #define RS232_TAG       "rs232"
 #define COM5016T_TAG    "com5016t"
@@ -1026,7 +1032,7 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 }
 
 
-static MACHINE_CONFIG_START( vk100, vk100_state )
+static MACHINE_CONFIG_START( vk100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
 	MCFG_CPU_PROGRAM_MAP(vk100_mem)
@@ -1260,5 +1266,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                       FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY                          FULLNAME        FLAGS */
 COMP( 1980, vk100,  0,      0,       vk100,     vk100, vk100_state,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

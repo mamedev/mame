@@ -1,5 +1,5 @@
 /*
-** Copyright (c) 2014-2016 The Khronos Group Inc.
+** Copyright (c) 2014-2017 The Khronos Group Inc.
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and/or associated documentation files (the "Materials"),
@@ -30,20 +30,25 @@
 enum BuiltIn;
 enum Decoration;
 enum Op;
+enum Capability;
 
 static const int GLSLextNVVersion = 100;
-static const int GLSLextNVRevision = 2;
+static const int GLSLextNVRevision = 5;
 
 //SPV_NV_sample_mask_override_coverage
 const char* const E_SPV_NV_sample_mask_override_coverage = "SPV_NV_sample_mask_override_coverage";
 
-static const Decoration OverrideCoverageNV = static_cast<Decoration>(5248);
-
-
 //SPV_NV_geometry_shader_passthrough
 const char* const E_SPV_NV_geometry_shader_passthrough = "SPV_NV_geometry_shader_passthrough";
 
-static const Decoration PassthroughNV = static_cast<Decoration>(5250);
+//SPV_NV_viewport_array2
+const char* const E_SPV_NV_viewport_array2 = "SPV_NV_viewport_array2";
+const char* const E_ARB_shader_viewport_layer_array = "SPV_ARB_shader_viewport_layer_array";
 
-static const Capability GeometryShaderPassthroughNV = static_cast<Capability>(5251);
+//SPV_NV_stereo_view_rendering
+const char* const E_SPV_NV_stereo_view_rendering = "SPV_NV_stereo_view_rendering";
+
+//SPV_NVX_multiview_per_view_attributes
+const char* const E_SPV_NVX_multiview_per_view_attributes = "SPV_NVX_multiview_per_view_attributes";
+
 #endif  // #ifndef GLSLextNV_H

@@ -11,54 +11,54 @@
  *       ||
  * ||    ||
  * ||||--||
- * ||||--||
- * ||    ||__________________________________________________________    ___
- *       ||                                                          |_|   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |VME|
- *       ||                                                          | |   |
- *       ||                                                          | |P1 |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          |_|   |
- *       ||                                                            |___|
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |___
- *       ||                                                           _|   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |VME|
- *       ||                                                          | |   |
- *       ||                                                          | |P2 |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          |_|   |
- *       ||                                                            |___|
- * ||    ||------------------------------------------------------------+-+
- * ||||--||
+ * ||||--|| ISIO-1 Rev U (Newer revs has two EPROMs)
+ * ||    ||__________________________________________________________   ___
+ *       || +---+---+---+---+---+---+---+---+ +---+ +---+ +---------+|_|   |
+ * RUN   C| |16x    |   |   |   |   |   |   | |   | |   | |         || |   |
+ *       || |64 or  |   |   |   |   |   |   | |   | |   | +---------+| |   |
+ * R/L o-[| |256 Kb |   |   |   |   |   |   | |   | |   | |         || |   |
+ *       || |SRAM   |   |   |   |   |   |   | |   | |   | +=========+| |   |
+ * LOCAL C| +---+---+---+---+---+---+---+---+ |   | |   | |         || |   |
+ * HALT  C| +---+---+---+---+---+---+---+---+ +---+ +---+ +---------+| |VME|
+ *       || |   |   |   |   |   |   |   |   | |   | |   | |         || |   |
+ *       || |   |   |   |   |   |   |   |   | |   | |   | +---------+| |P1 |
+ * SEL   C| |   |   |   |   |   |   |   |   | |   | |   | |         || |   |
+ * FAIL  C| |   |   |   |   |   |   |   |   | |   | |   | +---------+| |   |
+ *       || +---+---+---+---+---+---+---+---+ |   | +---+ |         || |   |
+ *       || +------+  +----++---+---+---+     +---+ |   | +---------+| |   |
+ *       || |      |..|    ||   |   |   |   [[ [[[  |   | |         || |   |
+ *  S1   C| |EPROM |..|    ||   |   |   |    +------+   | +=========+| |   |
+ *  S2   C| |      |..|    ||   |   |   |    |      |   | |         ||_|   |
+ *  S3   C| |      |..+----++   |   |   |    |BIM   |   | |---------+  |___|
+ *  S4   C| |      | .|XTL  |   |   |   |    |68153 +---+ |         |  |
+ *       || |      |..|16.0 +---+---+---+---+|      |   | +---------+  |
+ *       || +------+..|MHz  |   +---+---+---+|      |   | |         |  |
+ *       ||+----------+-----+---+   |   |   ||      |   | +---------+  |
+ *       |||          +-----+   |   |   |   ||      |   | |         |  |
+ *       ||| CPU      |XTL  |   |   |   |   ||      |   | +=========+  |
+ *       ||| 68010    |14.74|   |   |   |   |+------+---+  [[[[        |
+ *       |||          |MHz  +---+---+---+---+              =========   |
+ *       ||+---+======+==---+===========+                  =========   |___
+ *       |+---+|                        |..        +------++------+   _|   |
+ *       ||   || PIT 68230              |..        |1488  ||1489  |  | |   |
+ *       ||   ||                        |..        +------++------+  | |   |
+ *       ||   |+------------------------+..        |1488  ||1489  |  | |   |
+ *       ||   ||                        |..        +------++------+  | |   |
+ *       |+---+| DUSCC 68562            |..        |75188 ||1489  |  | |VME|
+ *       |+---+|                        |..        +------++------+  | |   |
+ *       ||   |+------------------------+..        |75188 ||1489  |  | |P2 |
+ *       ||   ||                        |..        +------++------+  | |   |
+ *       ||   || DUSCC 68562            |..        |75188 ||1489  |  | |   |
+ *       |+---+|                        |..        +------++------+  | |   |
+ *       |+---++------------------------+..        |75188 ||1489  |  | |   |
+ *       ||   ||                        |..        +------++------+  | |   |
+ *       ||   || DUSCC 68562            |..        |1488  ||1489  |  | |   |
+ *       ||   ||                        |..        +------++------+  | |   |
+ *       ||   |+------------------------+..        |1488  ||1489  |  | |   |
+ *       |+---+|                        |..        +------++------+  |_|   |
+ *       ||    | DUSCC 68562            |..                =========   |___|
+ * ||    ||    |                        |..                =========   |
+ * ||||--||----+------------------------+------------------------------+
  * ||||--||
  * ||
  *
@@ -94,7 +94,7 @@
  *
  * VME side A24 address map - Dual ported RAM
  * ----------------------------------------------------------
- * Offset Range     Description 
+ * Offset Range     Description
  * ----------------------------------------------------------
  * 000000 - 0007FF  BIM
  * 000800 - 000FFF  Status registers
@@ -124,31 +124,25 @@
  *          PIT and DUSCCs are hooked up to the BIM to get further.
  *
  ****************************************************************************/
-#define TODO "Driver for 68153 BIM device needed\n"
-
 #include "emu.h"
+#include "vme_fcisio.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
+#include "machine/68153bim.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
-#include "vme_fcisio.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
 
-#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,  __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -156,11 +150,13 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+#define TODO "VME side hookup of 68153 BIM device needed\n"
+
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_FCISIO1 = &device_creator<vme_fcisio1_card_device>;
+DEFINE_DEVICE_TYPE(VME_FCISIO1, vme_fcisio1_card_device, "fcisio1", "Force Computer SYS68K/ISIO-1/2 Intelligent Serial I/O Board")
 
 #define CPU_CLOCK XTAL_20MHz /* HCJ */
 #define DUSCC_CLOCK XTAL_14_7456MHz /* HCJ */
@@ -177,32 +173,6 @@ static ADDRESS_MAP_START (fcisio1_mem, AS_PROGRAM, 16, vme_fcisio1_card_device)
 	AM_RANGE (0xf00000, 0xf7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
 //  AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
 ADDRESS_MAP_END
-
-/*
- * Machine configuration
- */
-static MACHINE_CONFIG_FRAGMENT (fcisio1)
-	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68010, CPU_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP (fcisio1_mem)
-
-	MCFG_DUSCC68562_ADD("duscc0", DUSCC_CLOCK, 0, 0, 0, 0 )
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
-
-	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsa_w))
-//	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", fcisio_terminal)
-
-	MCFG_DUSCC68562_ADD("duscc1", DUSCC_CLOCK, 0, 0, 0, 0 )
-	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
-	MCFG_DUSCC68562_ADD("duscc3", DUSCC_CLOCK, 0, 0, 0, 0 )
-
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_20MHz / 2)
-	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fcisio1_card_device, config_rd))
-MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (fcisio1)
@@ -304,11 +274,98 @@ ROM_START (fcisio1)
 	ROM_LOAD16_BYTE ("ISIO-1_V2.1_U.BIN", 0xf00000, 0x4000, CRC (67986768) SHA1 (215f7ff90d9dbe2bea54510e3722fb33d4e54193))
 ROM_END
 
-machine_config_constructor vme_fcisio1_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( fcisio1 );
-}
+MACHINE_CONFIG_MEMBER (vme_fcisio1_card_device::device_add_mconfig)
+	/* basic machine hardware */
+	MCFG_CPU_ADD ("maincpu", M68010, CPU_CLOCK / 2)
+	MCFG_CPU_PROGRAM_MAP (fcisio1_mem)
+
+	/* DUSCC channels */
+#define RS232P1_TAG      "rs232p1"
+#define RS232P2_TAG      "rs232p2"
+#define RS232P3_TAG      "rs232p3"
+#define RS232P4_TAG      "rs232p4"
+#define RS232P5_TAG      "rs232p5"
+#define RS232P6_TAG      "rs232p6"
+#define RS232P7_TAG      "rs232p7"
+#define RS232P8_TAG      "rs232p8"
+
+	MCFG_DUSCC68562_ADD("duscc0", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 1 on DUSCC 0 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	/* Port 2 on DUSCC 0 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 0 */
+	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsb_w))
+
+	MCFG_DUSCC68562_ADD("duscc1", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 3 on DUSCC 1 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	/* Port 4 on DUSCC 1 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 1 */
+	MCFG_RS232_PORT_ADD (RS232P3_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, ctsb_w))
+
+	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 5 on DUSCC 2 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_rts))
+	/* Port 6 on DUSCC 2 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 2 */
+	MCFG_RS232_PORT_ADD (RS232P5_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P6_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsb_w))
+
+	MCFG_DUSCC68562_ADD("duscc3", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 7 on DUSCC 3 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_rts))
+	/* Port 8 on DUSCC 3 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 4 */
+	MCFG_RS232_PORT_ADD (RS232P7_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P8_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, ctsb_w))
+
+	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_20MHz / 2)
+	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fcisio1_card_device, config_rd))
+
+	MCFG_MC68153_ADD("bim", XTAL_20MHz / 2)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const
 {
@@ -319,30 +376,23 @@ const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
-vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu (*this, "maincpu")
-	,m_duscc0(*this, "duscc0")
-	,m_duscc1(*this, "duscc1")
-	,m_duscc2(*this, "duscc2")
-	,m_duscc3(*this, "duscc3")
-	,m_pit (*this, "pit")
+vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_vme_card_interface(mconfig, *this)
+	, m_maincpu (*this, "maincpu")
+	, m_duscc0(*this, "duscc0")
+	, m_duscc1(*this, "duscc1")
+	, m_duscc2(*this, "duscc2")
+	, m_duscc3(*this, "duscc3")
+	, m_pit (*this, "pit")
+	, m_bim (*this, "bim")
 {
 	LOG("%s\n", FUNCNAME);
 }
 
-vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_FCISIO1, "Force Computer SYS68K/ISIO-1/2 Intelligent Serial I/O Board", tag, owner, clock, "fcisio1", __FILE__)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu(*this, "maincpu")
-	,m_duscc0(*this, "duscc0")
-	,m_duscc1(*this, "duscc1")
-	,m_duscc2(*this, "duscc2")
-	,m_duscc3(*this, "duscc3")
-	,m_pit (*this, "pit")
+vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vme_fcisio1_card_device(mconfig, VME_FCISIO1, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 /* Start it up */

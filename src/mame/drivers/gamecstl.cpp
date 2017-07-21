@@ -66,10 +66,11 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "machine/lpci.h"
+#include "machine/pckeybrd.h"
+#include "machine/pcshare.h"
+#include "screen.h"
 
 
 class gamecstl_state : public pcat_base_state
@@ -169,14 +170,14 @@ uint32_t gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_in
 static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("MTXC: read %d, %02X\n", function, reg);
+	state->logerror("MTXC: read %d, %02X\n", function, reg);
 	return state->m_mtxc_config_reg[reg];
 }
 
 static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("%s:MTXC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	state->logerror("%s:MTXC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -254,14 +255,14 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("PIIX4: read %d, %02X\n", function, reg);
+	state->logerror("PIIX4: read %d, %02X\n", function, reg);
 	return state->m_piix4_config_reg[function][reg];
 }
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	state->logerror("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
 	state->m_piix4_config_reg[function][reg] = data;
 }
 
@@ -427,7 +428,7 @@ void gamecstl_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
+static MACHINE_CONFIG_START( gamecstl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000)
 	MCFG_CPU_PROGRAM_MAP(gamecstl_map)
@@ -492,5 +493,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

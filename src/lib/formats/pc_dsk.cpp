@@ -168,6 +168,11 @@ int pc_format::identify(io_generic *io, uint32_t form_factor)
 		file_header_skip_bytes = 0x200;
 	}
 
+	/* some 1.44MB images have a 1024-byte footer */
+	if (size == 1474560 + 0x400) {
+		file_footer_skip_bytes = 0x400;
+	}
+
 	return upd765_format::identify(io, form_factor);
 }
 
@@ -188,9 +193,13 @@ const pc_format::format pc_format::formats[] = {
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000,  9, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
+	{   /*  360K 5 1/4 inch double density, 42 tracks */
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000,  9, 42, 2, 512, {}, 1, {}, 80, 50, 22, 80
+	},
 	{   /*  400K 5 1/4 inch double density - gaps unverified */
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 10, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
+		2000, 10, 40, 2, 512, {}, 1, {}, 80, 50, 22, 36
 	},
 	{   /*  720K 5 1/4 inch quad density - gaps unverified */
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,

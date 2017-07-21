@@ -19,18 +19,20 @@
 
 */
 
-#define I8080_TAG   "ua2"
-#define TMS5501_TAG "ud2"
-#define CRT5027_TAG "uf9"
-#define RS232_TAG   "rs232"
-
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "bus/compucolor/floppy.h"
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "screen.h"
 #include "softlist.h"
+
+#define I8080_TAG   "ua2"
+#define TMS5501_TAG "ud2"
+#define CRT5027_TAG "uf9"
+#define RS232_TAG   "rs232"
 
 class compucolor2_state : public driver_device
 {
@@ -385,7 +387,7 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
+static MACHINE_CONFIG_START( compucolor2 )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
@@ -455,4 +457,4 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
 
-COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, driver_device, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, compucolor2_state, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

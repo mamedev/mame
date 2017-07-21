@@ -37,6 +37,7 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "opus3.h"
 
 
@@ -44,14 +45,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_OPUS3 = &device_creator<bbc_opus3_device>;
+DEFINE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device, "bbc_opus3", "Opus Challenger 3-in-1")
 
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( opus3 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(floppy_formats)
+FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_CPM_FORMAT,
@@ -64,7 +65,22 @@ SLOT_INTERFACE_START(bbc_floppies)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_FRAGMENT( opus3 )
+ROM_START( opus3 )
+	ROM_REGION(0x4000, "dfs_rom", 0)
+	ROM_DEFAULT_BIOS("ch103")
+	ROM_SYSTEM_BIOS(0, "ch100", "Challenger 1.00")
+	ROMX_LOAD("ch100.rom", 0x0000, 0x4000, CRC(740a8335) SHA1(f3c75c21bcd7d4a4dfff922fd287230dcdb91d0e), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "ch101", "Challenger 1.01")
+	ROMX_LOAD("ch101.rom", 0x0000, 0x4000, CRC(2f64503d) SHA1(37ee3f20bed50555720703b279f62aab0ed28922), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "ch103", "Challenger 1.03")
+	ROMX_LOAD("ch103.rom", 0x0000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33), ROM_BIOS(3))
+ROM_END
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( bbc_opus3_device::device_add_mconfig )
 	/* fdc */
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opus3_device, fdc_drq_w))
@@ -80,28 +96,6 @@ MACHINE_CONFIG_FRAGMENT( opus3 )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-
-ROM_START( opus3 )
-	ROM_REGION(0x4000, "dfs_rom", 0)
-	ROM_DEFAULT_BIOS("ch103")
-	ROM_SYSTEM_BIOS(0, "ch100", "Challenger 1.00")
-	ROMX_LOAD("ch100.rom", 0x0000, 0x4000, CRC(740a8335) SHA1(f3c75c21bcd7d4a4dfff922fd287230dcdb91d0e), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "ch101", "Challenger 1.01")
-	ROMX_LOAD("ch101.rom", 0x0000, 0x4000, CRC(2f64503d) SHA1(37ee3f20bed50555720703b279f62aab0ed28922), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "ch103", "Challenger 1.03")
-	ROMX_LOAD("ch103.rom", 0x0000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33), ROM_BIOS(3))
-ROM_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor bbc_opus3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( opus3 );
-}
-
 const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 {
 	return ROM_NAME( opus3 );
@@ -116,7 +110,7 @@ const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 //-------------------------------------------------
 
 bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_OPUS3, "Opus Challenger 3-in-1", tag, owner, clock, "bbc_opus3", __FILE__),
+	: device_t(mconfig, BBC_OPUS3, tag, owner, clock),
 		device_bbc_1mhzbus_interface(mconfig, *this),
 		m_dfs_rom(*this, "dfs_rom"),
 		m_ramdisk(*this, "ramdisk"),
@@ -135,7 +129,7 @@ void bbc_opus3_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfcf8, 0xfcfb, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
+	space.install_readwrite_handler(0xfcf8, 0xfcfb, READ8_DEVICE_DELEGATE(m_fdc, wd1770_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_device, write));
 	space.install_write_handler(0xfcfc, 0xfcfc, WRITE8_DELEGATE(bbc_opus3_device, wd1770l_write));
 	space.install_write_handler(0xfcfe, 0xfcff, WRITE8_DELEGATE(bbc_opus3_device, page_w));
 	space.install_readwrite_handler(0xfd00, 0xfdff, READ8_DELEGATE(bbc_opus3_device, ramdisk_r), WRITE8_DELEGATE(bbc_opus3_device, ramdisk_w));

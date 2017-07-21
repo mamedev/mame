@@ -38,8 +38,10 @@ Port 82 in - upper byte = 0 thru 7
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
 #include "machine/z80pio.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "sc1.lh"
 
 
@@ -47,9 +49,9 @@ class sc1_state : public driver_device
 {
 public:
 	sc1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, "speaker")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -168,7 +170,7 @@ static INPUT_PORTS_START( sc1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sc1, sc1_state )
+static MACHINE_CONFIG_START( sc1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc1_mem)
@@ -196,5 +198,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                           FULLNAME       FLAGS */
-COMP( 1989, sc1,    0,      0,       sc1,       sc1, driver_device,     0,  "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE       INIT  COMPANY                       FULLNAME              FLAGS
+COMP( 1989, sc1,  0,      0,       sc1,     sc1,   sc1_state,  0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

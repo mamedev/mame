@@ -137,7 +137,7 @@ static void sn_divide(running_machine &machine)
 
 	if (SN74S516.X == 0)
 	{
-		osd_printf_debug("%s:SN74S516 tried to divide by zero\n", machine.describe_context());
+		machine.logerror("%s:SN74S516 tried to divide by zero\n", machine.describe_context());
 		SN74S516.ZW.as16bit.Z = (int16_t)0xffff;
 		SN74S516.ZW.as16bit.W = 0xffff;
 		SN74S516.ZWfl = 0;
@@ -284,7 +284,7 @@ static void kick_sn74s516(running_machine &machine, uint16_t *data, const int in
 			if (SN74S516.code == 0x6666)
 			{
 				CLEAR_SEQUENCE;
-				osd_printf_debug("%s:Code 6666: PROMADDR:%x\n", machine.describe_context(), math.promaddr);
+				machine.logerror("%s:Code 6666: PROMADDR:%x\n", machine.describe_context(), math.promaddr);
 			}
 
 			UPDATE_SEQUENCE;

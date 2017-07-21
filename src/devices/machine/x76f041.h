@@ -7,12 +7,11 @@
  *
  */
 
+#ifndef MAME_MACHINE_X76F041_H
+#define MAME_MACHINE_X76F041_H
+
 #pragma once
 
-#ifndef __X76F041_H__
-#define __X76F041_H__
-
-#include "emu.h"
 
 #define MCFG_X76F041_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, X76F041, 0 )
@@ -124,6 +123,6 @@ private:
 
 
 // device type definition
-extern const device_type X76F041;
+DECLARE_DEVICE_TYPE(X76F041, x76f041_device)
 
-#endif
+#endif // MAME_MACHINE_X76F041_H

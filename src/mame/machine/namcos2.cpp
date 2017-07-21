@@ -86,7 +86,7 @@ WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
 		/* Suspend execution */
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-	
+
 	if (namcos2_kickstart != nullptr)
 	{
 		//printf( "dspkick=0x%x\n", data );
@@ -97,11 +97,11 @@ WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
 	}
 }
 
-// TODO: 
+// TODO:
 WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
-{	
+{
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	
+
 	if (data & 0x01)
 	{
 		address_space &masterspace = m_maincpu->space(AS_PROGRAM);
