@@ -12,9 +12,9 @@
 
  Custom programmed Mitsubishi M60016 Gate Array, 3608 gates, 148 Max I/O ports
 
-    The X1-010 is 16 Voices sound generator, each channel gets it's
-    waveform from RAM (128 bytes per waveform, 8 bit unsigned data)
-    or sampling PCM(8bit unsigned data).
+    The X1-010 is a 16-Voice sound generator, each channel gets its
+    waveform from RAM (128 bytes per waveform, 8 bit signed data)
+    or sampling PCM (8 bit signed data).
 
 Registers:
     8 registers per channel (mapped to the lower bytes of 16 words on the 68K)
@@ -23,7 +23,7 @@ Registers:
 
     0       7--- ----   Frequency divider flag (only downtown seems to set this)
             -654 3---
-            ---- -2--   PCM/Waveform repeat flag (0:Ones 1:Repeat) (*1)
+            ---- -2--   PCM/Waveform repeat flag (0:Once 1:Repeat) (*1)
             ---- --1-   Sound out select (0:PCM 1:Waveform)
             ---- ---0   Key on / off
 
@@ -47,7 +47,7 @@ Registers:
     offset 0x0000 - 0x0fff  Wave form data
     offset 0x1000 - 0x1fff  Envelope data
 
-    *1 : when 0 is specified, hardware interrupt is caused(allways return soon)
+    *1 : when 0 is specified, hardware interrupt is caused (always return soon)
 
 ***************************************************************************/
 
@@ -68,7 +68,7 @@ namespace {
 
 #define FREQ_BASE_BITS        8                 // Frequency fixed decimal shift bits
 #define ENV_BASE_BITS        16                 // wave form envelope fixed decimal shift bits
-#define VOL_BASE    (2*32*256/30)                   // Volume base
+#define VOL_BASE    (2*32*256/30)               // Volume base
 
 /* this structure defines the parameters for a channel */
 struct X1_010_CHANNEL {
@@ -82,10 +82,6 @@ struct X1_010_CHANNEL {
 };
 
 } // anonymous namespace
-
-
-/* mixer tables and internal buffers */
-//static short  *mixer_buffer = nullptr;
 
 
 DEFINE_DEVICE_TYPE(X1_010, x1_010_device, "x1_010", "Seta X1-010")

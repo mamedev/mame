@@ -31,7 +31,7 @@ enum script_state
 	SCRIPT_STATE_CHANGE,
 	SCRIPT_STATE_COUNT
 };
-DECLARE_ENUM_OPERATORS(script_state)
+DECLARE_ENUM_INCDEC_OPERATORS(script_state)
 
 
 

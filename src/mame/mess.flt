@@ -204,6 +204,7 @@ fidelz80.cpp
 fk1.cpp
 fm7.cpp
 fmtowns.cpp
+fontwriter.cpp
 force68k.cpp
 fp1100.cpp
 fp200.cpp

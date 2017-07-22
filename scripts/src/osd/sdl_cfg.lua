@@ -86,7 +86,7 @@ if BASE_TARGETOS=="unix" then
 					"MACOSX_USE_LIBSDL",
 				}
 				buildoptions {
-					backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"),
+					backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
 				}
 			end
 			end

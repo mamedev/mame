@@ -1356,6 +1356,20 @@ Notes:
 	</software>
 
 
+	<!--Majin Eiyuu Den Wataru -->
+	<software name="wataru">
+		<description>Majin Eiyuu Den Wataru (Tourvision PCE bootleg)</description>
+		<year>1988</year>
+		<publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x40000 matches PCE wataru -->
+				<rom name="mashin_eiyuden_wataru.tv" size="1048576" crc="13a96308" sha1="03b8bc737c9cc27ec8153ad997515fe211a17b7d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!--Winning Shot -->
 	<software name="winshot">
 		<description>Winning Shot (Tourvision PCE bootleg)</description>

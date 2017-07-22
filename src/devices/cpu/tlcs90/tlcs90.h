@@ -76,7 +76,7 @@ enum e_ir
 };
 
 enum tlcs90_e_irq {    INTSWI = 0, INTNMI, INTWD,  INT0,   INTT0,  INTT1,  INTT2,  INTT3,  INTT4,  INT1,   INTT5,  INT2,   INTRX,  INTTX,  INTMAX  };
-DECLARE_ENUM_OPERATORS(tlcs90_e_irq)
+DECLARE_ENUM_INCDEC_OPERATORS(tlcs90_e_irq)
 
 class tlcs90_device : public cpu_device
 {

@@ -2727,9 +2727,13 @@ static MACHINE_CONFIG_START( naomi_base )
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
-	// clock was measured using GPIO (13.499Mhz) and UART (13.260MHz) access
-	// IO ports access may have latency so actual CPU core clock can be higher, possible OSC3 14.7456MHz
-	MCFG_MIE_ADD("mie", 13500000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
+	// high probable this MCU uses one of "fast Z80" cores, like ASCII R800, Kawasaki KC80 or similar, where clocks per instructions is much different from regular Z80. 
+	// was made few attempts to measure CPU core clock using different methods (in term of "regular Z80" clock and cycles):
+	// - GPIO toggle in a loop - 13.499Mhz,
+	// - using UART as timer - 13.260MHz,
+	// - unrolled NOPs then GPIO toggle - 12.76MHz (or 3.19M NOP instructions per second)
+	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
+	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")
 
