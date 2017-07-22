@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, David Haywood
 
+#include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
@@ -17,6 +18,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_eeprom(*this, "eeprom"),
 		m_pixelram(*this, "pixelram"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
@@ -37,6 +39,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	required_shared_ptr<uint16_t> m_pixelram;
 	required_shared_ptr<uint16_t> m_videoram;
@@ -100,6 +103,7 @@ public:
 	DECLARE_WRITE16_MEMBER(funystrp_protection_w);
 	DECLARE_READ16_MEMBER(funystrp_protection_r);
 	DECLARE_WRITE16_MEMBER(funystrp_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(funystrp_eeprom_w);
 
 	//roldfrog and funystrp specific
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
