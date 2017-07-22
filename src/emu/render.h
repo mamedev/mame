@@ -614,7 +614,7 @@ enum item_layer
 	ITEM_LAYER_MARQUEE,
 	ITEM_LAYER_MAX
 };
-DECLARE_ENUM_OPERATORS(item_layer)
+DECLARE_ENUM_INCDEC_OPERATORS(item_layer)
 
 
 
