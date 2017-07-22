@@ -15,9 +15,8 @@ maybe bad dump of DS5002FP rom, maybe CPU bugs
 
 #include "emu.h"
 #include "includes/thoop2.h"
-
+#include "machine/gaelco_ds5002fp.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -55,40 +54,6 @@ WRITE16_MEMBER(thoop2_state::coin_w)
 	/* 05b unknown */
 }
 
-/*============================================================================
-                            DS5002FP
-  ============================================================================*/
-
-READ8_MEMBER(thoop2_state::dallas_share_r)
-{
-	uint8_t *shareram = (uint8_t *)m_shareram.target();
-	return shareram[BYTE_XOR_BE(offset)];
-}
-
-WRITE8_MEMBER(thoop2_state::dallas_share_w)
-{
-	uint8_t *shareram = (uint8_t *)m_shareram.target();
-	shareram[BYTE_XOR_BE(offset)] = data;
-}
-
-READ8_MEMBER(thoop2_state::dallas_ram_r)
-{
-	return m_mcu_ram[offset];
-}
-
-WRITE8_MEMBER(thoop2_state::dallas_ram_w)
-{
-	m_mcu_ram[offset] = data;
-}
-
-static ADDRESS_MAP_START( dallas_rom, AS_PROGRAM, 8, thoop2_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(dallas_ram_r, dallas_ram_w) /* Code in NVRAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, thoop2_state )
-	AM_RANGE(0x08000, 0x0ffff) AM_READWRITE(dallas_share_r, dallas_share_w) /* confirmed that 0x8000 - 0xffff is a window into 68k shared RAM */
-	AM_RANGE(0x10000, 0x17fff) AM_READWRITE(dallas_ram_r, dallas_ram_w) /* yes, the games access it as data and use it for temporary storage!! */
-ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
@@ -232,16 +197,12 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( thoop2 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)          /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(thoop2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2) /* ? */
-	MCFG_DS5002FP_CONFIG( 0x79, 0x00, 0x80 ) /* default config verified on chip */
-	MCFG_CPU_PROGRAM_MAP(dallas_rom)
-	MCFG_CPU_IO_MAP(dallas_ram)
-
-	MCFG_QUANTUM_PERFECT_CPU("mcu")
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) 
+	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -267,13 +228,20 @@ static MACHINE_CONFIG_START( thoop2 )
 MACHINE_CONFIG_END
 
 
+
 ROM_START( thoop2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE(    "th2c23.040",   0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
 	ROM_LOAD16_BYTE(    "th2c22.040",   0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(67cbf579) SHA1(40a543b9d0f57d374ceccb720be20b9e42ecc91a) ) /* marked as BAD_DUMP until a 2nd board is used to verify, also because game currently crashes */
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "th2-h8.32m",     0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )

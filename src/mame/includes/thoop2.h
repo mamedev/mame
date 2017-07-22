@@ -10,19 +10,12 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
-		m_spriteram(*this, "spriteram"),
-		m_shareram(*this, "shareram"),
-		m_mcu_ram(*this, "mcu")	
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(coin_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
-
-	DECLARE_READ8_MEMBER(dallas_ram_r);
-	DECLARE_WRITE8_MEMBER(dallas_ram_w);
-	DECLARE_READ8_MEMBER(dallas_share_r);
-	DECLARE_WRITE8_MEMBER(dallas_share_w);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -45,6 +38,4 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_shareram;
-	required_region_ptr<uint8_t> m_mcu_ram;
 };

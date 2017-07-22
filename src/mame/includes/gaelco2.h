@@ -17,17 +17,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_16(*this, "paletteram"),
-		m_shareram(*this, "shareram"),
-		m_mcu_ram(*this, "mcu")
+		m_shareram(*this, "shareram")
 	{ }
-
-
-	DECLARE_READ16_MEMBER(maniacsqa_prot_r);
-
-	DECLARE_READ8_MEMBER(dallas_ram_r);
-	DECLARE_WRITE8_MEMBER(dallas_ram_w);
-	DECLARE_READ8_MEMBER(dallas_share_r);
-	DECLARE_WRITE8_MEMBER(dallas_share_w);
 
 	DECLARE_WRITE16_MEMBER(gaelco2_coin_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_coin2_w);
@@ -39,7 +30,6 @@ public:
 	DECLARE_DRIVER_INIT(touchgo);
 	DECLARE_DRIVER_INIT(snowboar);
 	DECLARE_DRIVER_INIT(alighunt);
-	DECLARE_DRIVER_INIT(maniacsqa);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
@@ -74,8 +64,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_shared_ptr<uint16_t> m_shareram;
-	optional_region_ptr<uint8_t> m_mcu_ram;
-
 };
 
 

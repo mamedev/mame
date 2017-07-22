@@ -250,14 +250,15 @@ static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8, mcs51_cpu_device)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mcs51_cpu_device)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
+	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("scratchpad")
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("scratchpad")
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
+
 
 
 mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
@@ -271,6 +272,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_features(features)
 	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
 	, m_num_interrupts(5)
+	, m_sfr_ram(*this, "sfr_ram")
+	, m_scratchpad(*this, "scratchpad")
 	, m_serial_tx_cb(*this)
 	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
@@ -369,8 +372,11 @@ at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *ta
 {
 }
 
+/* program width field is set to 0 because technically the SRAM isn't internal */
 ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs51_cpu_device(mconfig, DS5002FP, tag, owner, clock, 12, 7, FEATURE_DS5002FP | FEATURE_CMOS)
+	: mcs51_cpu_device(mconfig, DS5002FP, tag, owner, clock, 0, 7, FEATURE_DS5002FP | FEATURE_CMOS)
+	, device_nvram_interface(mconfig, *this)
+	, m_region(*this, "internal")
 {
 }
 
@@ -463,7 +469,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define B           SFR_A(ADDR_B)
 #define SBUF        SFR_A(ADDR_SBUF)
 
-#define R_REG(r)    m_internal_ram[(r) | (PSW & 0x18)]
+#define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 #define DPTR        ((DPH<<8) | DPL)
 
 /* 8052 Only registers */
@@ -522,7 +528,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define SET_SBUF(v) SET_SFR_A(ADDR_SBUF, v)
 
 /* No actions triggered on write */
-#define SET_REG(r, v)   do { m_internal_ram[(r) | (PSW & 0x18)] = (v); } while (0)
+#define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
 
 #define SET_DPTR(n)     do { DPH = ((n) >> 8) & 0xff; DPL = (n) & 0xff; } while (0)
 
@@ -739,12 +745,6 @@ void mcs51_cpu_device::clear_current_irq()
 uint8_t mcs51_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
 
 uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
-
-void mcs51_cpu_device::update_ptrs()
-{
-	m_internal_ram = (uint8_t *)m_data->get_write_ptr(0x00);
-	m_sfr_ram = (uint8_t *)m_data->get_write_ptr(0x100);
-}
 
 
 /* Generate an external ram address for read/writing using indirect addressing mode */
@@ -1958,8 +1958,6 @@ void mcs51_cpu_device::execute_run()
 {
 	uint8_t op;
 
-	update_ptrs();
-
 	/* external interrupts may have been set since we last checked */
 	m_inst_cycles = 0;
 	check_irqs();
@@ -2107,9 +2105,6 @@ void mcs51_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
-	/* ensure these pointers are set before get_info is called */
-	update_ptrs();
-
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
 
@@ -2232,8 +2227,6 @@ void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std:
 /* Reset registers to the initial values */
 void mcs51_cpu_device::device_reset()
 {
-	update_ptrs();
-
 	m_last_line_state = 0;
 	m_t0_cnt = 0;
 	m_t1_cnt = 0;
@@ -2292,11 +2285,11 @@ void mcs51_cpu_device::device_reset()
 	{
 		// set initial values (some of them are set using the bootstrap loader)
 		PCON = 0;
-		MCON = m_ds5002fp.mcon & 0xfb;
-		RPCTL = m_ds5002fp.rpctl & 0x01;
+		MCON = m_sfr_ram[ADDR_MCON-0x80];
+		RPCTL = m_sfr_ram[ADDR_RPCTL-0x80];
 		RPS = 0;
 		RNR = 0;
-		CRCR = m_ds5002fp.crc & 0xf0;
+		CRCR = m_sfr_ram[ADDR_CRCR-0x80];
 		CRCL = 0;
 		CRCH = 0;
 		TA = 0;
@@ -2468,6 +2461,51 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 	}
 	return m_data->read_byte((size_t) offset | 0x100);
 }
+
+/*
+Documentation states that having the battery connected "maintains the internal scratchpad RAM" and "certain SFRs"
+(although it isn't clear exactly which SFRs except for those explicitly mentioned)
+*/
+
+void ds5002fp_device::nvram_default()
+{
+	memset( m_scratchpad, 0, 0x80 );
+	memset( m_sfr_ram, 0, 0x80 );
+
+	int expected_bytes = 0x80 + 0x80;
+
+	if (!m_region.found())
+	{
+		logerror( "ds5002fp_device region not found\n" );
+	}
+	else if( m_region->bytes() != expected_bytes )
+	{
+		logerror( "ds5002fp_device region length 0x%x expected 0x%x\n", m_region->bytes(), expected_bytes );
+	}
+	else
+	{
+		uint8_t *region = m_region->base();
+
+		memcpy( m_scratchpad, region, 0x80 ); region += 0x80;
+		memcpy( m_sfr_ram, region, 0x80 ); region += 0x80;
+		/* does anything else need storing? any registers that aren't in sfr ram?
+		   It isn't clear if the various initial MCON registers etc. are just stored in sfr ram
+		   or if the DS5002FP stores them elsewhere and the bootstrap copies them */
+	}
+}
+
+void ds5002fp_device::nvram_read( emu_file &file )
+{
+	file.read( m_scratchpad, 0x80 );
+	file.read( m_sfr_ram, 0x80 );
+}
+
+void ds5002fp_device::nvram_write( emu_file &file )
+{
+	file.write( m_scratchpad, 0x80 );
+	file.write( m_sfr_ram, 0x80 );
+}
+
 
 
 offs_t mcs51_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
