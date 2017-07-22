@@ -261,8 +261,7 @@ void imgtool_warn(const char *format, ...)
 //  determine what module can best handle a file
 //-------------------------------------------------
 
-static imgtoolerr_t evaluate_module(const char *fname,
-	const imgtool_module *module, float *result)
+static imgtoolerr_t evaluate_module(const char *fname, const imgtool_module *module, float &result)
 {
 	imgtoolerr_t err;
 	imgtool::image::ptr image;
@@ -271,7 +270,7 @@ static imgtoolerr_t evaluate_module(const char *fname,
 	imgtool_dirent ent;
 	float current_result;
 
-	*result = 0.0;
+	result = 0.0;
 
 	err = imgtool::image::open(module, fname, OSD_FOPEN_READ, image);
 	if (err)
@@ -285,7 +284,7 @@ static imgtoolerr_t evaluate_module(const char *fname,
 		if (err)
 			goto done;
 
-		err = imgtool::directory::open(*partition, nullptr, imageenum);
+		err = imgtool::directory::open(*partition, "", imageenum);
 		if (err)
 			goto done;
 
@@ -303,7 +302,7 @@ static imgtoolerr_t evaluate_module(const char *fname,
 		}
 		while(!ent.eof);
 
-		*result = current_result;
+		result = current_result;
 	}
 
 done:
@@ -352,7 +351,7 @@ imgtoolerr_t imgtool::image::identify_file(const char *fname, imgtool_module **m
 	{
 		if (!extension || image_find_extension(module->extensions, extension))
 		{
-			err = evaluate_module(fname, module.get(), &val);
+			err = evaluate_module(fname, module.get(), val);
 			if (err)
 				return err;
 
