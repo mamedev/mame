@@ -932,52 +932,6 @@ void midway_ioasic_device::fifo_full_w(uint16_t data)
 }
 
 
-/* need to check if device callback is required instead of hardcode here */
-void midway_ioasic_device::output_w(uint32_t data)
-{
-	if (!m_aux_output_cb.isnull()) {
-		// This is P15 on vegas boards
-		m_aux_output_cb(data);
-	}
-	else {
-		/* two writes in pairs. flag off first, on second. arg remains the same. */
-		uint8_t flag = (data >> 8) & 0x8;
-		uint8_t op = (data >> 8) & 0x7;
-		uint8_t arg = data & 0xFF;
-
-		switch (op)
-		{
-		default:
-			logerror("Unknown output (%02X) = %02X\n", flag | op, arg);
-			break;
-
-		case 0x0:
-			if (flag)
-			{
-				machine().output().set_value("wheel", arg); // wheel motor delta. signed byte.
-			}
-			break;
-
-		case 0x4:
-			if (flag)
-			{
-				for (uint8_t bit = 0; bit < 8; bit++)
-					machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
-			}
-			break;
-
-		case 0x5:
-			if (flag)
-			{
-				for (uint8_t bit = 0; bit < 8; bit++)
-					machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
-			}
-			break;
-		}
-	}
-}
-
-
 
 /*************************************
  *
@@ -1216,7 +1170,9 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			break;
 
 		case IOASIC_PICIN:
-			output_w(data);
+			/* This is P15 on vegas boards */
+			if (!m_aux_output_cb.isnull())
+				m_aux_output_cb(data);
 			break;
 
 		case IOASIC_INTCTL:
