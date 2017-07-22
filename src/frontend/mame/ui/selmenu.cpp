@@ -22,6 +22,7 @@
 
 #include "cheat.h"
 #include "mame.h"
+#include "mameopts.h"
 
 #include "drivenum.h"
 #include "emuopts.h"
@@ -179,8 +180,13 @@ menu_select_launch::software_parts::~software_parts()
 
 void menu_select_launch::software_parts::populate(float &customtop, float &custombottom)
 {
-	for (auto & elem : m_parts)
-		item_append(elem.first, elem.second, 0, (void *)&elem);
+	std::vector<s_parts::const_iterator> parts;
+	parts.reserve(m_parts.size());
+	for (s_parts::const_iterator it = m_parts.begin(); m_parts.end() != it; ++it)
+		parts.push_back(it);
+	std::sort(parts.begin(), parts.end(), [] (auto const &left, auto const &right) { return 0 > core_stricmp(left->first.c_str(), right->first.c_str()); });
+	for (auto const &elem : parts)
+		item_append(elem->first, elem->second, 0, (void *)&*elem);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
@@ -502,19 +508,11 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 	{
 		if (!swinfo->startempty)
 		{
+			moptions.set_value(OPTION_SOFTWARENAME, util::string_format("%s:%s", swinfo->listname, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
 			if (part)
-			{
-				std::string const string_list(util::string_format("%s:%s:%s:%s", swinfo->listname, swinfo->shortname, *part, swinfo->instance));
-				moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
-			}
-			else
-			{
-				std::string const string_list(util::string_format("%s:%s", swinfo->listname, swinfo->shortname));
-				moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
-			}
+				moptions.set_value(swinfo->instance, *part, OPTION_PRIORITY_SUBCMD);
 
-			std::string const snap_list(util::string_format("%s%s%s", swinfo->listname, PATH_SEPARATOR, swinfo->shortname));
-			moptions.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
+			moptions.set_value(OPTION_SNAPNAME, util::string_format("%s%s%s", swinfo->listname, PATH_SEPARATOR, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
 		}
 		reselect_last::set_software(driver, *swinfo);
 	}
