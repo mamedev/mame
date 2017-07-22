@@ -332,6 +332,7 @@ public:
 	DECLARE_WRITE32_MEMBER(output_w);
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
+	DECLARE_WRITE32_MEMBER(wheel_board_w);
 
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
@@ -449,6 +450,35 @@ WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
 WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
 {
 	m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
+}
+
+WRITE32_MEMBER(seattle_state::wheel_board_w)
+{
+	//logerror("wheel_board_w: data = %08x\n", data);
+	/* two writes in pairs. flag off first, on second. arg remains the same. */
+	bool flag = (data & (1 << 11));
+	uint8_t op = (data >> 8) & 0x7;
+	uint8_t arg = data & 0xff;
+
+	if (flag)
+	{
+		switch (op)
+		{
+		case 0x0:
+			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			break;
+
+		case 0x4:
+			for (uint8_t bit = 0; bit < 8; bit++)
+				machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
+			break;
+
+		case 0x5:
+			for (uint8_t bit = 0; bit < 8; bit++)
+				machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
+			break;
+		}
+	}
 }
 
 /*************************************
@@ -1870,6 +1900,7 @@ static MACHINE_CONFIG_DERIVED( sfrush, flagstaff )
 	MCFG_MIDWAY_IOASIC_UPPER(315/* no alternates */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sfrushrk, flagstaff )
@@ -1882,6 +1913,7 @@ static MACHINE_CONFIG_DERIVED( sfrushrk, flagstaff )
 	MCFG_MIDWAY_IOASIC_UPPER(331/* unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sfrushrkw, sfrushrk )
