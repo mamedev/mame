@@ -96,14 +96,14 @@ WRITE8_MEMBER(wolfpack_state::torpedo_v_w)
 
 void wolfpack_state::video_start()
 {
+	uint16_t val = 0;
+
 	m_LFSR = std::make_unique<uint8_t[]>(0x8000);
 
 	m_screen->register_screen_bitmap(m_helper);
 
 	for (int i = 0; i < 0x8000; i++)
 	{
-		uint16_t val = 0;
-
 		int bit = (val >> 0x0) ^ (val >> 0xe) ^ 1;
 
 		val = (val << 1) | (bit & 1);
