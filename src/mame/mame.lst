@@ -12039,6 +12039,10 @@ btm2105                         // 1985 BT Merlin M2105
 @source:elekscmp.cpp
 elekscmp                        //
 
+@source:elektronmono.cpp
+monomach						// MK2 (c) 2004 Elektron
+machdrum						// MK2 (c) 2007 Elektron
+
 @source:elf.cpp
 elf2                            //
 

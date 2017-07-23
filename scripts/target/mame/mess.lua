@@ -1881,6 +1881,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/junior.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "elektron")
+files {
+	MAME_DIR .. "src/mame/drivers/elektronmono.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "ensoniq")
 files {
 	MAME_DIR .. "src/mame/drivers/esq1.cpp",
