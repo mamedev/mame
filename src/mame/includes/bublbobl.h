@@ -2,8 +2,14 @@
 // copyright-holders:Chris Moore, Nicola Salmoria
 
 #include "cpu/m6805/m68705.h"
+#include "cpu/m6800/m6801.h"
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
+#include "sound/2203intf.h"
+#include "sound/3526intf.h"
+#include "screen.h"
+#include "speaker.h"
 
-#include "machine/gen_latch.h"
 #include "machine/taito68705interface.h"
 
 class bublbobl_state : public driver_device
@@ -11,22 +17,23 @@ class bublbobl_state : public driver_device
 public:
 	enum
 	{
-		TIMER_NMI,
 		TIMER_M68705_IRQ_ACK
 	};
 
 	bublbobl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_objectram(*this, "objectram"),
-		m_mcu_sharedram(*this, "mcu_sharedram"),
-		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_slave(*this, "slave"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_objectram(*this, "objectram")
+		, m_mcu_sharedram(*this, "mcu_sharedram")
+		, m_maincpu(*this, "maincpu")
+		, m_mcu(*this, "mcu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_subcpu(*this, "subcpu")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_ym2203(*this, "ym2203")
+		, m_ym3526(*this, "ym3526")
 	{ }
 
 	/* memory pointers */
@@ -34,13 +41,21 @@ public:
 	required_shared_ptr<uint8_t> m_objectram;
 	optional_shared_ptr<uint8_t> m_mcu_sharedram;
 
+	/* general */
+	bool     m_is_tokio_hw;
+
 	/* video-related */
-	int      m_video_enable;
+	bool     m_video_enable;
 
 	/* sound-related */
-	int      m_sound_nmi_enable;
-	int      m_pending_nmi;
-	int      m_sound_status;
+	bool     m_sound_nmi_enable;
+	uint8_t  m_fromMain;
+	uint8_t  m_fromSound;
+	bool     m_MainHasWritten;
+	bool     m_SoundHasWritten;
+	bool     m_ym2203_irq;
+	bool     m_ym3526_irq;
+	int      m_sreset_old;
 
 	/* mcu-related */
 
@@ -65,23 +80,29 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_slave;
+	required_device<cpu_device> m_subcpu;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<ym2203_device> m_ym2203;
+	optional_device<ym3526_device> m_ym3526;
 
+	void common_sreset(int state);
 	DECLARE_WRITE8_MEMBER(bublbobl_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
-
+	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(ym3526_irqhandler);
 	DECLARE_READ8_MEMBER(tokiob_mcu_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_sound_command_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_sh_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_sh_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_soundcpu_reset_w);
-	DECLARE_READ8_MEMBER(bublbobl_sound_status_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_sound_status_w);
+	DECLARE_READ8_MEMBER(common_fromMain_latch_r);
+	DECLARE_WRITE8_MEMBER(common_fromMain_latch_w);
+	DECLARE_READ8_MEMBER(common_fromSound_latch_r);
+	DECLARE_WRITE8_MEMBER(common_fromSound_latch_w);
+	DECLARE_READ8_MEMBER(common_sound_semaphores_r);
 	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr1_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr1_w);
 	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr2_r);
