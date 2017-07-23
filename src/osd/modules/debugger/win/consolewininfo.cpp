@@ -23,6 +23,7 @@
 
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	disasmbasewin_info(debugger, true, "Debug", nullptr),
+	m_current_cpu(nullptr),
 	m_devices_menu(nullptr)
 {
 	if ((window() == nullptr) || (m_views[0] == nullptr))
@@ -94,9 +95,13 @@ consolewin_info::~consolewin_info()
 {
 }
 
-
 void consolewin_info::set_cpu(device_t &device)
 {
+	// exit if this cpu is already selected
+	if (m_current_cpu == &device)
+		return;
+	m_current_cpu = &device;
+
 	// first set all the views to the new cpu number
 	m_views[0]->set_source_for_device(device);
 	m_views[1]->set_source_for_device(device);
