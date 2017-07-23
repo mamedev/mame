@@ -3,10 +3,10 @@
 /*
  Yamaha TG100 AWM Tone Generator
  Skeleton written by superctr
- 
+
  Roms dumped by vampirefrog
  Service manual scanned by bmos
- 
+
  CPU: Hitachi HD6435208A00P (H8/520)
   - 20MHz clock
   - Mode bits 0,1 high, 2 low
@@ -23,7 +23,7 @@
 
  Other ICs:
   HG62E11R54FS (XK462A00) Gate array (LCD control, glue logic)
- 
+
 */
 
 #include "emu.h"
@@ -69,14 +69,14 @@ static MACHINE_CONFIG_START( tg100 )
 	MCFG_CPU_ADD("maincpu",  H83002, XTAL_20MHz) /* TODO: correct CPU type (H8/520) */
 	MCFG_CPU_PROGRAM_MAP( tg100_map )
 	MCFG_CPU_IO_MAP( tg100_io_map )
-	
+
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_SOUND_ADD("ymw258", MULTIPCM, 9400000)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymw258_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 MACHINE_CONFIG_END
 
 ROM_START( tg100 )
@@ -86,7 +86,7 @@ ROM_START( tg100 )
 
 	ROM_REGION(0x200000, "ymw258", 0)
 	ROM_LOAD( "xk992a0.ic6", 0x000000, 0x200000, CRC(01dc6954) SHA1(32ec77a46f4d005538c735f56ad48fa7243c63be) )
-	
+
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS

@@ -30,9 +30,9 @@ public:
 		m_fakey(*this, "FAKEY"),
 		m_visarea(0, 0, 0, 0) { }
 
-    static constexpr uint32_t YBUFFER_COUNT = 15;
-    static constexpr uint32_t VRAM_SIZE = 0x40000;
-    static constexpr uint32_t VRAM_MASK = VRAM_SIZE - 1;
+	static constexpr uint32_t YBUFFER_COUNT = 15;
+	static constexpr uint32_t VRAM_SIZE = 0x40000;
+	static constexpr uint32_t VRAM_MASK = VRAM_SIZE - 1;
 
 	enum
 	{

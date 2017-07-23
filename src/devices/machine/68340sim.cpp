@@ -9,7 +9,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h 
+//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
 #define LOG_SETUP   (1U <<  1)
 #define LOG_READ    (1U <<  2)
 #define LOG_PORTS   (1U <<  3)
@@ -19,7 +19,7 @@
 
 #include "logmacro.h"
 
-//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h 
+//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGR(...)     LOGMASKED(LOG_READ,  __VA_ARGS__)
 #define LOGPORTS(...) LOGMASKED(LOG_PORTS, __VA_ARGS__)
@@ -301,7 +301,7 @@ WRITE8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_w )
 
 	LOGSETUP(" * Reg %02x <- %02x - %s\n", offset, data, std::array<char const *, 16>
 		 {{"", "PORTA", "", "DDRA", "", "PPRA1", "", "PPRA2", "", "PORTB","", "PORTB1", "", "DDRB", "", "PPARB"}}[offset - 0x10]);
- 
+
 	switch (offset)
 	{
 		case m68340SIM_PORTA:

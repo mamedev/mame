@@ -6,8 +6,8 @@
 
 	<element name="Pixel">
 	<!-- The data sheet says 575nm wave length which is yellow but occular comparison
-		 suggests ~515nm which is green and also stated as the color in the data sheet
-		 The colors below are green based on the occular comparison with the real hardware -->
+	     suggests ~515nm which is green and also stated as the color in the data sheet
+	     The colors below are green based on the occular comparison with the real hardware -->
 		<disk state="0">
 			<color red="0.12" green="1.0" blue="0.0" />
 			<bounds x="0" y="0" width="1" height="1" />
@@ -60,24 +60,24 @@
 
 int main()
 {
-	int digits = 8; // 8 digits
-	int cols   = 5; // 5 rows in each digit
-	int rows   = 7; // 7 columns in each digit
-	int size   = 100; // size of each led
-	int dsx    = 380; // distance between each digit
-	int psx    = 111 - size; // horizontal distance between leds
-	int psy    = 114 - size; // vertical distance between leds
+    int digits = 8; // 8 digits
+    int cols   = 5; // 5 rows in each digit
+    int rows   = 7; // 7 columns in each digit
+    int size   = 100; // size of each led
+    int dsx    = 380; // distance between each digit
+    int psx    = 111 - size; // horizontal distance between leds
+    int psy    = 114 - size; // vertical distance between leds
 
-	for (int d = 1; d <= digits; d++ ){
-		for (int y = 1; y <= rows; y++){
-			for (int x = 1; x <= cols; x++)	{
-					printf( "<bezel name=\"Dot_%d\" element=\"Pixel\" state=\"0\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"/></bezel>\n",
-							d * 100 + y * 10 +  x,
-							(d - 1) * (cols *(size + psx) + dsx) + (x - 1) * (size + psx),
-							(y - 1) * (psy + size), size, size);
-			}
-		}
-	}
+    for (int d = 1; d <= digits; d++ ){
+        for (int y = 1; y <= rows; y++){
+            for (int x = 1; x <= cols; x++) {
+                    printf( "<bezel name=\"Dot_%d\" element=\"Pixel\" state=\"0\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"/></bezel>\n",
+                            d * 100 + y * 10 +  x,
+                            (d - 1) * (cols *(size + psx) + dsx) + (x - 1) * (size + psx),
+                            (y - 1) * (psy + size), size, size);
+            }
+        }
+    }
 }
 -->
 <bezel name="Dot_111" element="Pixel" state="0"><bounds x="0" y="0" width="100" height="100"/></bezel>

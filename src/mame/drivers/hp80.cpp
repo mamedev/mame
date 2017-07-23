@@ -52,24 +52,24 @@ static constexpr unsigned MASTER_CLOCK  = 9808000;
 static constexpr unsigned VIDEO_MEM_SIZE= 8192;
 static constexpr unsigned ALPHA_MEM_SIZE= 4096;
 static constexpr unsigned GRAPH_MEM_SIZE= 16384;
-static constexpr unsigned CRT_STS_READY_BIT		= 0;
-static constexpr unsigned CRT_STS_DISPLAY_BIT	= 1;
-static constexpr unsigned CRT_STS_BUSY_BIT		= 7;
-static constexpr unsigned CRT_CTL_RD_RQ_BIT		= 0;
-static constexpr unsigned CRT_CTL_WIPEOUT_BIT	= 1;
-static constexpr unsigned CRT_CTL_POWERDN_BIT	= 2;
-static constexpr unsigned CRT_CTL_GRAPHICS_BIT	= 7;
+static constexpr unsigned CRT_STS_READY_BIT     = 0;
+static constexpr unsigned CRT_STS_DISPLAY_BIT   = 1;
+static constexpr unsigned CRT_STS_BUSY_BIT      = 7;
+static constexpr unsigned CRT_CTL_RD_RQ_BIT     = 0;
+static constexpr unsigned CRT_CTL_WIPEOUT_BIT   = 1;
+static constexpr unsigned CRT_CTL_POWERDN_BIT   = 2;
+static constexpr unsigned CRT_CTL_GRAPHICS_BIT  = 7;
 // Time to read/write a byte in video memory (in master clock cycles)
-static constexpr unsigned CRT_RW_TIME			= 96;
+static constexpr unsigned CRT_RW_TIME           = 96;
 // Time taken by hw timer updating (semi-made up) (in usec)
-static constexpr unsigned TIMER_BUSY_USEC	= 128;
-static constexpr unsigned IRQ_KEYBOARD_BIT	= 0;
-static constexpr unsigned IRQ_TIMER0_BIT	= 1;
-static constexpr unsigned TIMER_COUNT		= 4;
-static constexpr unsigned IRQ_IOP0_BIT		= IRQ_TIMER0_BIT + TIMER_COUNT;
-static constexpr unsigned IOP_COUNT			= 0;
-static constexpr unsigned IRQ_BIT_COUNT		= IRQ_IOP0_BIT + IOP_COUNT;
-static constexpr unsigned NO_IRQ			= IRQ_BIT_COUNT;
+static constexpr unsigned TIMER_BUSY_USEC   = 128;
+static constexpr unsigned IRQ_KEYBOARD_BIT  = 0;
+static constexpr unsigned IRQ_TIMER0_BIT    = 1;
+static constexpr unsigned TIMER_COUNT       = 4;
+static constexpr unsigned IRQ_IOP0_BIT      = IRQ_TIMER0_BIT + TIMER_COUNT;
+static constexpr unsigned IOP_COUNT         = 0;
+static constexpr unsigned IRQ_BIT_COUNT     = IRQ_IOP0_BIT + IOP_COUNT;
+static constexpr unsigned NO_IRQ            = IRQ_BIT_COUNT;
 
 // ************
 //  hp85_state

@@ -2727,7 +2727,7 @@ static MACHINE_CONFIG_START( naomi_base )
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
-	// high probable this MCU uses one of "fast Z80" cores, like ASCII R800, Kawasaki KC80 or similar, where clocks per instructions is much different from regular Z80. 
+	// high probable this MCU uses one of "fast Z80" cores, like ASCII R800, Kawasaki KC80 or similar, where clocks per instructions is much different from regular Z80.
 	// was made few attempts to measure CPU core clock using different methods (in term of "regular Z80" clock and cycles):
 	// - GPIO toggle in a loop - 13.499Mhz,
 	// - using UART as timer - 13.260MHz,

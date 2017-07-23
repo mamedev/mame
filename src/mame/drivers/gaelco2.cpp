@@ -18,7 +18,7 @@
     Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
-	Play 2000      | 1999 | CG-1V-149 | ?        | DS5002FP (by Nova Desitec)
+    Play 2000      | 1999 | CG-1V-149 | ?        | DS5002FP (by Nova Desitec)
 
     Notes:
     touchgo:
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)                                                       /* Coin lockout + counters */
 	AM_RANGE(0x500006, 0x500007) AM_WRITENOP                                                                    /* ??? */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")											        /* Work RAM (shared with D5002FP) */
+	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                    /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
 
 
@@ -691,7 +691,7 @@ static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")                                                            /* SERVICESW + Input 4P */
 	AM_RANGE(0x500000, 0x50001f) AM_WRITE(touchgo_coin_w)                                                       /* Coin counters */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")											        /* Work RAM (shared with D5002FP) */
+	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                    /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
 
 
@@ -1290,7 +1290,7 @@ static MACHINE_CONFIG_START( wrally2 )
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) 
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
@@ -1447,26 +1447,26 @@ ROM_START( wrally2 )
 	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
 	   patched out
 
-		0200: mov   sp,#$70
-		0203: mov   a,pcon
-		0205: anl   a,#$20
-		0207: jnz   $0203
-		0209: nop
-		020A: nop
-		020B: nop
-		020C: mov   dptr,#$FC01
+	    0200: mov   sp,#$70
+	    0203: mov   a,pcon
+	    0205: anl   a,#$20
+	    0207: jnz   $0203
+	    0209: nop
+	    020A: nop
+	    020B: nop
+	    020C: mov   dptr,#$FC01
 
 	   while the newer dump has this
 
-		0200: mov   sp,#$70
-		0203: mov   mcon,#$68
-		0206: mov   i2cfg,#$00
-		0209: mov   crcr,#$80
-		020C: mov   dptr,#$FC01
+	    0200: mov   sp,#$70
+	    0203: mov   mcon,#$68
+	    0206: mov   i2cfg,#$00
+	    0209: mov   crcr,#$80
+	    020C: mov   dptr,#$FC01
 
 	   either way the 2nd dump is in much better state, so we're using that.
 	*/
-	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )	
+	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */

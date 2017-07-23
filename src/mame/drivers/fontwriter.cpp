@@ -11,7 +11,7 @@
     512k RAM
     Custom gate array
     640x400 dot-matrix LCD
-    
+
     Things to check
     - Hook up 37720 DMAC, it's used before this dies
     - Check if "stack in bank FF" bit is used
@@ -101,7 +101,7 @@ MACHINE_CONFIG_END
 
 ROM_START(fw700ger)
 	ROM_REGION(0x200000, "maincpu", 0)       /* M37720 program ROM */
-	ROM_LOAD( "lh5370pd.ic7", 0x000000, 0x200000, CRC(29083e13) SHA1(7e1605f91b53580e75f638f9e6b0917305c35f84) ) 
+	ROM_LOAD( "lh5370pd.ic7", 0x000000, 0x200000, CRC(29083e13) SHA1(7e1605f91b53580e75f638f9e6b0917305c35f84) )
 ROM_END
 
 SYST( 1994, fw700ger, 0, 0, fontwriter, fontwriter, fontwriter_state, 0, "Sharp", "FontWriter FW-700 (German)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

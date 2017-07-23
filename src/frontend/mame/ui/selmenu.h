@@ -217,7 +217,7 @@ private:
 	// cleanup function
 	static void exit(running_machine &machine);
 
-	bool	    m_ui_error;
+	bool        m_ui_error;
 	std::string m_error_text;
 
 	game_driver const           *m_info_driver;

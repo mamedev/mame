@@ -37,18 +37,18 @@ const char *itt3030_format::extensions() const
 const itt3030_format::format itt3030_format::formats[] = {
 	{   /*  5,25" DS DD 70 tracks 16 SPT 256 bytes/sector */
 		floppy_image::FF_525,  floppy_image::DSQD, floppy_image::MFM,
-		2000, 
-		16, 70, 2, 
-		256, {}, 
-		1, {}, 
+		2000,
+		16, 70, 2,
+		256, {},
+		1, {},
 		32, 22, 31
 	},
 	{/*  5,25" DS DD 35 tracks 16 SPT 256 bytes/sector */
 		floppy_image::FF_525,  floppy_image::DSDD, floppy_image::MFM,
-		2000, 
-		16, 35, 2, 
-		256, {}, 
-		1, {}, 
+		2000,
+		16, 35, 2,
+		256, {},
+		1, {},
 		32, 22, 31
 	}
 };

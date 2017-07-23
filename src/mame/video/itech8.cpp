@@ -372,7 +372,7 @@ void itech8_state::perform_blit(address_space &space)
 
 			/* advance to the next byte */
 			addr += xdir;
-            addr &= VRAM_MASK;
+			addr &= VRAM_MASK;
 		}
 
 		/* skip right */

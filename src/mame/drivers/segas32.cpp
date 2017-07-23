@@ -4078,7 +4078,7 @@ ROM_START( kokoroj2 )
 	ROM_REGION( 0x500000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-16185.ic36", 0x100000, 0x020000, CRC(afb97c4d) SHA1(f6e77d932824f93d89559a9cb3b2d678d5fc6940) )
 	ROM_LOAD( "mpr-16184.ic35",    0x200000, 0x100000, CRC(d7a19751) SHA1(8ae9f13689c8f9851e1eea995c51285972bed4a2) )
-    // IC24 & IC34 are not populated
+	// IC24 & IC34 are not populated
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16188.ic14", 0x000000, 0x200000, CRC(83a450ab) SHA1(1d0b45512d784ed1d82135b84c7c540f92d789f7) )

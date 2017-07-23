@@ -2527,7 +2527,7 @@ static ADDRESS_MAP_START( setaroul_map, AS_PROGRAM, 16, setaroul_state )
 	AM_RANGE(0xf40000, 0xf40bff) AM_WRITE(spriteylow_w)
 	AM_RANGE(0xf40c00, 0xf40c11) AM_WRITE(spritectrl_w)
 
-//	AM_RANGE(0xf80000, 0xf80001) AM_WRITE // $40 at boot
+//  AM_RANGE(0xf80000, 0xf80001) AM_WRITE // $40 at boot
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -8297,7 +8297,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 	int scanline = param;
 
 	if ((scanline % 32) == 0) // every 2ms?
-		m_maincpu->set_input_line(2, HOLD_LINE); // read 1 board column (out of 26) every other call 
+		m_maincpu->set_input_line(2, HOLD_LINE); // read 1 board column (out of 26) every other call
 
 	if (scanline == 248)
 		m_maincpu->set_input_line(4, HOLD_LINE); // vblank

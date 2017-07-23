@@ -17,12 +17,12 @@ Implements WD2010 / WD1010 controller basics for a single hard disk.
 
 UNIMPLEMENTED FEATURES :
         - more than 1 drive (untested)
-	- multi sector transfers (M = 1)
+    - multi sector transfers (M = 1)
         - seek and index timers / ID not found.
         - implied seeks / implied writes / retries
         - edge or level triggered seek complete (SC)
-        - set_parameter / compute_correction 
-	  (the DWC flag is not usable in this context).
+        - set_parameter / compute_correction
+      (the DWC flag is not usable in this context).
 
  Pseudo code (from datasheet) left in to illustrate
  the intended instruction flow. Some loops were omitted!
@@ -529,7 +529,7 @@ void wd2010_device::seek(uint8_t data)
 	// ...update CYLINDER registers with cylinder found -
 	m_task_file[TASK_FILE_CYLINDER_HIGH] = (m_present_cylinder >> 8) & 0xff;
 	m_task_file[TASK_FILE_CYLINDER_LOW] = (m_present_cylinder - ((m_task_file[TASK_FILE_CYLINDER_HIGH] << 8) )) & 0xff;
-	
+
 	logerror("SEEK (END) - m_present_cylinder = %u SDH CYL L/H %02x / %02x\n", m_present_cylinder,m_task_file[TASK_FILE_CYLINDER_LOW],m_task_file[TASK_FILE_CYLINDER_HIGH]);
 
 	cmd_timer->adjust(attotime::from_msec(35), newstatus);  // 35 msecs makes "SEEK_TIMING" test happy.

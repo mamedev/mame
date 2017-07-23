@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese,Takahiro Nogi
 /***************************************************************************
 
-	Nichibutsu sound HW
+    Nichibutsu sound HW
 
 ***************************************************************************/
 
@@ -51,7 +51,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_region_ptr<uint8_t> m_sound_rom;

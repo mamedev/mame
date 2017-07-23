@@ -4,7 +4,7 @@
 
     Triumph-Adler (or Royal) Alphatronic PC
 
-	Driver by Barry Rodewald, Robbbert, R. Belmont and Carl
+    Driver by Barry Rodewald, Robbbert, R. Belmont and Carl
 
     z80 + HD46505SP as a CRTC
 
@@ -13,14 +13,14 @@
     Floppy format: 13cm, 2 sides, 40 tracks, 16 sectors, 256 bytes = 320kb.
     FDC (uPD765) is in a plug-in module, there is no ROM on the module.
 
-	A configuration switch determines if the FDC is present.
+    A configuration switch determines if the FDC is present.
 
     Has a socket for monochrome (to the standard amber monitor),
     and another for RGB. We emulate this with a configuration switch.
 
     ToDo:
     - Newer ROM set from Team Europe and try to work out the graphics expansion
-	- uPD765 oddness that prevents Disk BASIC from loading
+    - uPD765 oddness that prevents Disk BASIC from loading
 
 ***************************************************************************/
 
@@ -85,7 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(port30_r);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_READ8_MEMBER(portf0_r);
-	DECLARE_WRITE8_MEMBER(portf0_w);		
+	DECLARE_WRITE8_MEMBER(portf0_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
@@ -125,7 +125,7 @@ private:
 
 void alphatro_state::update_banking()
 {
-	if (m_port_10 & 0x80) 	// RAM at 0000?
+	if (m_port_10 & 0x80)   // RAM at 0000?
 	{
 		m_lowbank->set_bank(1);
 	}
@@ -133,8 +133,8 @@ void alphatro_state::update_banking()
 	{
 		m_lowbank->set_bank(0);
 	}
-	
-	if (m_port_10 & 0x40)	// ROM cartridge at A000
+
+	if (m_port_10 & 0x40)   // ROM cartridge at A000
 	{
 		m_cartbank->set_bank(0);
 	}
@@ -142,14 +142,14 @@ void alphatro_state::update_banking()
 	{
 		m_cartbank->set_bank(1);
 	}
-	
-	if (m_port_20 & 0x08)	 // VRAM at F000?
+
+	if (m_port_20 & 0x08)    // VRAM at F000?
 	{
 		m_monbank->set_bank(0);
 	}
 	else
 	{
-		if (m_port_20 & 0x40)	// IPL or Monitor at F000?
+		if (m_port_20 & 0x40)   // IPL or Monitor at F000?
 		{
 			m_monbank->set_bank(2);
 		}
@@ -160,21 +160,21 @@ void alphatro_state::update_banking()
 	}
 }
 
-READ8_MEMBER (alphatro_state::ram0000_r) 
-{ 
-	if (offset < 0xf000) 
+READ8_MEMBER (alphatro_state::ram0000_r)
+{
+	if (offset < 0xf000)
 	{
-		return m_ram_ptr[offset]; 
+		return m_ram_ptr[offset];
 	}
 
 	return m_p_videoram[offset & 0xfff];
 }
 
-WRITE8_MEMBER(alphatro_state::ram0000_w) 
-{ 
-	if (offset < 0xf000) 
+WRITE8_MEMBER(alphatro_state::ram0000_w)
+{
+	if (offset < 0xf000)
 	{
-		m_ram_ptr[offset] = data; 
+		m_ram_ptr[offset] = data;
 	}
 	else
 	{
@@ -188,9 +188,9 @@ READ8_MEMBER (alphatro_state::rama000_r) { return m_ram_ptr[offset+0xa000]; }
 WRITE8_MEMBER(alphatro_state::rama000_w) { m_ram_ptr[offset+0xa000] = data; }
 READ8_MEMBER (alphatro_state::rame000_r) { return m_ram_ptr[offset+0xe000]; }
 WRITE8_MEMBER(alphatro_state::rame000_w) { m_ram_ptr[offset+0xe000] = data; }
-	
+
 READ8_MEMBER( alphatro_state::port10_r )
-{	
+{
 // Bit 0 -> 1 = FDC is installed, 0 = not
 // Bit 1 -> 1 = Graphic Board is installed, 0 = not
 // Bits 2-4 = Country select: 0 = Intl, 1 = German, 2 = US
@@ -199,14 +199,14 @@ READ8_MEMBER( alphatro_state::port10_r )
 // Bit 7 -> 1 = vblank or hblank, 0 = active display area
 
 	u8 retval = 0x40;
-	
+
 	// we'll get "FDC present" and "graphics expansion present" from the config switches
 	retval |= (m_config->read() & 3);
 
 	if ((m_screen->vblank()) || (m_screen->hblank()))
 	{
 		retval |= 0x80;
-    }
+	}
 
 	return retval;
 }
@@ -232,7 +232,7 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 
 	if (BIT(data,2))
 		m_cass_state = 1;
-		
+
 	update_banking();
 }
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER( alphatro_state::port20_w )
 // Bit 7 -> N/A
 
 	m_port_20 = data;
-	
+
 	update_banking();
 }
 
@@ -260,9 +260,9 @@ READ8_MEMBER( alphatro_state::port30_r )
 // Bit 3 -> 1 = Centronics BUSY, 0 = not
 
 	u8 retval = 0;
-	
+
 	if (m_screen->vblank()) retval |= 0x02;
-	
+
 	return retval;
 }
 
@@ -281,7 +281,7 @@ WRITE8_MEMBER( alphatro_state::portf0_w)
 	if ((data & 0x1) && !(m_port_f0))
 	{
 		m_fdc->reset();
-		
+
 		floppy_connector *con = machine().device<floppy_connector>("fdc:0");
 		floppy_image_device *floppy = con ? con->get_device() : nullptr;
 		if (floppy)
@@ -296,7 +296,7 @@ WRITE8_MEMBER( alphatro_state::portf0_w)
 			floppy->mon_w(0);
 		}
 	}
-	
+
 	m_port_f0 = data;
 }
 
@@ -547,7 +547,7 @@ static INPUT_PORTS_START( alphatro )
 	PORT_CONFNAME( 0x20, 0x00, "Monitor")
 	PORT_CONFSETTING(    0x00, "RGB")
 	PORT_CONFSETTING(    0x20, "Amber")
-	
+
 	PORT_CONFNAME(0x01, 0x00, "Floppy disk installed")
 	PORT_CONFSETTING(0x00, "Not present")
 	PORT_CONFSETTING(0x01, "Installed")
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	
+
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(alphatro_state, ram0000_r))
@@ -690,7 +690,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_I8257_IN_IOR_2_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
 	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
-	
+
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
@@ -725,14 +725,14 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-	
+
 	/* F000 banking */
 	MCFG_DEVICE_ADD("monbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(monbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-	
+
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 MACHINE_CONFIG_END

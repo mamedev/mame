@@ -40,7 +40,7 @@ public:
 	void external_interrupt_0();
 	void external_interrupt_1();
 	void external_interrupt_2();
-	
+
 	DECLARE_READ16_MEMBER(imr_r);
 	DECLARE_WRITE16_MEMBER(imr_w);
 	DECLARE_READ16_MEMBER(iisr_r);
@@ -67,7 +67,7 @@ private:
 	void update_timer( int i );
 	void update_irq_state(uint16_t cause);
 	void update_irq_serial(uint16_t cause, uint8_t type);
-	
+
 	static constexpr uint16_t EXT_IRQ0 = 1 << 0;
 	static constexpr uint16_t EXT_IRQ1 = 1 << 1;
 	static constexpr uint16_t EXT_IRQ2 = 1 << 2;
@@ -78,7 +78,7 @@ private:
 	static constexpr uint16_t TIMER0_IRQ = 1 << 8;
 	static constexpr uint16_t TIMER1_IRQ = 1 << 9;
 	static constexpr uint16_t TIMER2_IRQ = 1 << 10;
-	
+
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
 
@@ -98,7 +98,7 @@ private:
 	uint16_t m_pdir;
 	uint16_t m_pdr;
 	uint8_t m_icr[10];
-	
+
 	const address_space_config      m_space_config;
 };
 

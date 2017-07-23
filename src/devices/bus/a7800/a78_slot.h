@@ -22,7 +22,7 @@ enum
 	A78_TYPE3,          // as TYPE1 + POKEY chip on the PCB
 	A78_TYPE6,          // as TYPE1 + RAM IC on the PCB
 	A78_TYPEA,          // Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
- 	A78_TYPE8,          // Rescue on Fractalus, as TYPE0 + 2K Mirror RAM IC on the PCB
+	A78_TYPE8,          // Rescue on Fractalus, as TYPE0 + 2K Mirror RAM IC on the PCB
 	A78_ABSOLUTE,       // F18 Hornet
 	A78_ACTIVISION,     // Double Dragon, Rampage
 	A78_HSC,            // Atari HighScore cart

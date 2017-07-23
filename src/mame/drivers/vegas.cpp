@@ -958,7 +958,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 		break;
 	}
 	//if (m_i40_data & 0x1000)
-	//	printf("%08X: i40_r: select: %x index: %d data: %x\n", machine().device("maincpu")->safe_pc(), m_i40_data, index, data);
+	//  printf("%08X: i40_r: select: %x index: %d data: %x\n", machine().device("maincpu")->safe_pc(), m_i40_data, index, data);
 	//m_i40_data &= ~0x1000;
 	return data;
 }
@@ -986,11 +986,11 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 		case 0x1:
 			for (uint8_t bit = 0; bit < 8; bit++)
 				machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
-			
+
 			/* leader lamp bit is included in every write, for some reason. */
 			machine().output().set_lamp_value(8, (data >> 12) & 0x1);
 			break;
-			
+
 		case 0x2:
 			m_keypad_select = arg;
 			break;
@@ -1641,7 +1641,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
@@ -1654,7 +1654,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -1667,7 +1667,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
@@ -1680,7 +1680,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-    MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)

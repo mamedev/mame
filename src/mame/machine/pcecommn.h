@@ -40,7 +40,7 @@ private:
 	int m_joystick_data_select; /* which nibble of joystick data we want */
 };
 
-// used by the Arcade bootlegs. 
+// used by the Arcade bootlegs.
 // Button II is actually on the left of a standard PCE joypad so we need to invert our button layout here.
 #define PCE_STANDARD_INPUT_PORT_P1 \
 	PORT_START( "JOY" ) \

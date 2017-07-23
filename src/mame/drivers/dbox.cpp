@@ -276,7 +276,7 @@
  *
  *  LED Dot Matrix Display hookup
  *  -------------------------------------
- *  "DISPLAY CONN ALT" connected to the SDA5708 
+ *  "DISPLAY CONN ALT" connected to the SDA5708
  *  pin signal   connected to
  *   1   VCC      +5v
  *   2   LOAD1*   PA2 68340 pin 121 IP01
@@ -304,7 +304,7 @@
  *   9   Q4   Reset* SDA5708 pin 5
  *  13   D        D8 68340 pin 134 IP01
  *  14   Enable*  Q1 74138 pin  14 IP12
- *  15   Clear*   System reset         
+ *  15   Clear*   System reset
  *
  *  Identified low level drivers in firmware
  *  ----------------------------------------
@@ -346,7 +346,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h 
+//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
 #define LOG_SETUP   (1U <<  1)
 #define LOG_DISPLAY (1U <<  2)
 
@@ -355,7 +355,7 @@
 
 #include "logmacro.h"
 
-//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h 
+//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY, __VA_ARGS__)
 
@@ -400,7 +400,7 @@ WRITE8_MEMBER (dbox_state::sda5708_reset){
 WRITE8_MEMBER (dbox_state::sda5708_clk){
 	LOGDISPLAY("%s\n", FUNCNAME);
 	m_display->sdclk_w(CLEAR_LINE);
-	m_display->data_w((0x80 & data) != 0 ? ASSERT_LINE : CLEAR_LINE); 
+	m_display->data_w((0x80 & data) != 0 ? ASSERT_LINE : CLEAR_LINE);
 	m_display->sdclk_w(ASSERT_LINE);
 }
 
@@ -412,7 +412,7 @@ WRITE8_MEMBER (dbox_state::write_pa){
 static ADDRESS_MAP_START( dbox_map, AS_PROGRAM, 32, dbox_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x700000, 0x77ffff) AM_RAM // CS2
-//	AM_RANGE(0x780000, 0x7807ff) AM_RAM // CS3
+//  AM_RANGE(0x780000, 0x7807ff) AM_RAM // CS3
 	AM_RANGE(0x780100, 0x7801ff) AM_WRITE8(sda5708_reset, 0xffffffff)
 	AM_RANGE(0x780600, 0x7806ff) AM_WRITE8(sda5708_clk, 0xffffffff)
 	AM_RANGE(0x800000, 0x8fffff) AM_RAM // CS1
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( dbox )
 	/* IP16 74256 8 bit latch */
 	MCFG_LATCH8_ADD("hct259.ip16")
 	MCFG_LATCH8_WRITE_4(DEVWRITELINE("display", sda5708_device, reset_w))
-  
+
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(dbox_state, dbox)
@@ -444,7 +444,7 @@ DRIVER_INIT_MEMBER(dbox_state, dbox)
 // TODO: Figure out what DVB2000 is doing
 ROM_START( dbox )
 	ROM_REGION(0x1000000, "maincpu", 0)
-//	ROM_LOAD16_WORD( "dvb2000.bin", 0x000000, 0x08b742, CRC(5b21c455) SHA1(1e7654c37dfa65d1b8ac2469cdda82f91b47b3c7) )
+//  ROM_LOAD16_WORD( "dvb2000.bin", 0x000000, 0x08b742, CRC(5b21c455) SHA1(1e7654c37dfa65d1b8ac2469cdda82f91b47b3c7) )
 	ROM_LOAD16_WORD( "nokboot.bin", 0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
 ROM_END
 

@@ -153,10 +153,10 @@ MACHINE_CONFIG_END
 ROM_START( pippin )
 	ROM_REGION( 0x400000, "bootrom",  ROMREGION_64BIT | ROMREGION_BE )
 	ROM_SYSTEM_BIOS(0, "v13", "Kinka v 1.3")
-	ROMX_LOAD( "bandai pippin (19960920 - kinka 1.3) - 3e6b3ee4-a52528e9ce8c.rom", 0x000000, 0x400000, CRC(87a1337d) SHA1(8e512af6e34dd823f3defec77d43ecbff1ecad54), ROM_BIOS(1) ) 
+	ROMX_LOAD( "bandai pippin (19960920 - kinka 1.3) - 3e6b3ee4-a52528e9ce8c.rom", 0x000000, 0x400000, CRC(87a1337d) SHA1(8e512af6e34dd823f3defec77d43ecbff1ecad54), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(1, "v12", "Kinka v 1.2")
-	ROMX_LOAD( "bandai pippin (19960628 - kinka 1.2) - 3e10e14c-72c40c1af23a.rom", 0x000000, 0x400000, CRC(4fead4b3) SHA1(3fa02e9b0fa702ac6e02edc08911eac8b50e2d1f), ROM_BIOS(2) ) 
+	ROMX_LOAD( "bandai pippin (19960628 - kinka 1.2) - 3e10e14c-72c40c1af23a.rom", 0x000000, 0x400000, CRC(4fead4b3) SHA1(3fa02e9b0fa702ac6e02edc08911eac8b50e2d1f), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS(2, "v1", "Kinka v 1.0")
 	ROMX_LOAD( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
@@ -165,7 +165,7 @@ ROM_START( pippin )
 	ROMX_LOAD( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(3, "vgm", "Kinka GM version")
-	ROMX_LOAD( "bandai pippin (19960128 - kinka gm flash) - 2bf65931-318e40f6a1f4.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb), ROM_BIOS(4) ) 
+	ROMX_LOAD( "bandai pippin (19960128 - kinka gm flash) - 2bf65931-318e40f6a1f4.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS(4, "pre", "Kinka pre-release")
 	ROMX_LOAD( "kinka-pre.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb),ROM_BIOS(5) )

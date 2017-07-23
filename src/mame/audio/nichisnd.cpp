@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese,Takahiro Nogi
 /***************************************************************************
 
-	Nichibutsu sound HW
-	
-	Shared component between niyanpai.cpp and csplayh5.cpp
-	
-	Uses a TMPZ84C011 with YM3812 and two DACs
-	
-	TODO:
-	- DVD sound routing in here
-	
+    Nichibutsu sound HW
+
+    Shared component between niyanpai.cpp and csplayh5.cpp
+
+    Uses a TMPZ84C011 with YM3812 and two DACs
+
+    TODO:
+    - DVD sound routing in here
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -100,7 +100,7 @@ MACHINE_CONFIG_MEMBER(nichisnd_device::device_add_mconfig)
 	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.37) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)	
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -109,7 +109,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 void nichisnd_device::device_start()
-{	
+{
 	uint8_t *SNDROM = m_sound_rom;
 
 	// sound program patch

@@ -17,7 +17,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h 
+//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
 #define LOG_SETUP   (1U <<  1)
 #define LOG_CMD     (1U <<  2)
 #define LOG_DATA    (1U <<  3)
@@ -28,7 +28,7 @@
 
 #include "logmacro.h"
 
-//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h 
+//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGCMD(...)   LOGMASKED(LOG_CMD,     __VA_ARGS__)
 #define LOGDATA(...)  LOGMASKED(LOG_DATA,    __VA_ARGS__)
@@ -62,15 +62,15 @@ DEFINE_DEVICE_TYPE(SDA5708,         sda5708_device,   "sda5708",         "SDA570
 
 sda5708_device::sda5708_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SDA5708, tag, owner, clock)
-    , m_serial(0)
-    , m_load(0)
-    , m_reset(0)
-    , m_data(0)
-    , m_sdclk(0)
-    , m_cdp(0)
-    , m_digit(0)
-    , m_bright(0)
-    , m_clear(0)
+	, m_serial(0)
+	, m_load(0)
+	, m_reset(0)
+	, m_data(0)
+	, m_sdclk(0)
+	, m_cdp(0)
+	, m_digit(0)
+	, m_bright(0)
+	, m_clear(0)
 	, m_ip(0)
 {
 }
@@ -117,7 +117,7 @@ void sda5708_device::device_reset()
 //
 // The Load pin is an active low input used to enable data transfer into the display.
 // When Load is low, data is clocked into the 8 bit serial data register. When Load goes
-// high, the contents of the 8 bit serial data register are evaluated by the display controller. 
+// high, the contents of the 8 bit serial data register are evaluated by the display controller.
 // While Load remains high the Data and SDCLK pins may be used to control other serial devices
 // on the same bus.
 //-------------------------------------------------
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER( sda5708_device::load_w )
 	LOG("%s - line %s\n", FUNCNAME, state == ASSERT_LINE ? "asserted" : "cleared");
 	if (m_load != state && m_reset == CLEAR_LINE && state == CLEAR_LINE)
 	{
-	  	switch (m_serial & SDA5708_REG_MASK)
+		switch (m_serial & SDA5708_REG_MASK)
 		{
 		case SDA5708_CNTR_COMMAND:
 			LOGCMD("- Control command: %02x\n", m_serial);
@@ -193,7 +193,7 @@ WRITE_LINE_MEMBER( sda5708_device::load_w )
 			break;
 		}
 	}
-       	m_load = state;
+		m_load = state;
 }
 
 //-------------------------------------------------
@@ -235,7 +235,7 @@ WRITE_LINE_MEMBER( sda5708_device::sdclk_w )
 //
 // When the Reset pin is held low, the display will be reset. The multiplex counter, the address register,
 // the control word and the display bit patterns are all cleared. This means that the display will be
-// blank and the display is set to 100% brightness and maximum peak current. 
+// blank and the display is set to 100% brightness and maximum peak current.
 // During normal operation the Reset pin is only made low for a short period when power is applied to
 // the circuit and is left at high level from then on.
 //-------------------------------------------------

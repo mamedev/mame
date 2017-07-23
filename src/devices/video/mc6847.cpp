@@ -949,8 +949,8 @@ mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata,
 			// an external ROM nor are we on an MC6847T1
 			fontdata            = m_stripes;
 			character_mask      = 0x7F;
-			color_base_0		= (mode & MODE_CSS ? 14 : 12);
-			color_base_1		= (mode & MODE_CSS ? 15 : 13);
+			color_base_0        = (mode & MODE_CSS ? 14 : 12);
+			color_base_1        = (mode & MODE_CSS ? 15 : 13);
 		}
 		else
 		{

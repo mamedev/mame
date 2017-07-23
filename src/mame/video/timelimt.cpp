@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(timelimt_state, timelimt)
 			3,  resistances_rg, weights_g,  0,  0,
 			2,  resistances_b,  weights_b,  0,  0);
 
-	
+
 	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;

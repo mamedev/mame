@@ -9,8 +9,8 @@
     TODO:
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
-    - csplayh1: inputs doesn't work at all, slower than the others too. 
-	  Probably not a DVD but CD rom game? 
+    - csplayh1: inputs doesn't work at all, slower than the others too.
+      Probably not a DVD but CD rom game?
 
     DVD Notes:
     - TMP68301 communicates with h8 via their respective internal serial comms
@@ -61,7 +61,7 @@ public:
 	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
-	
+
 	uint16_t m_mux_data;
 
 	DECLARE_READ16_MEMBER(csplayh5_mux_r);
@@ -91,7 +91,7 @@ public:
 	DECLARE_DRIVER_INIT(renaimj);
 	DECLARE_DRIVER_INIT(thenanpa);
 	DECLARE_DRIVER_INIT(tsuwaku);
-	
+
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
@@ -343,10 +343,10 @@ WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
 WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 {
 	/*
-		-x-- ---- used during ROM check, h8 reset assert?
-		---- x--- enable DVD sound? Used by aimode at very least
+	    -x-- ---- used during ROM check, h8 reset assert?
+	    ---- x--- enable DVD sound? Used by aimode at very least
 	*/
-	
+
 	if(data & ~0x48)
 		printf("%04x\n",data);
 }
@@ -434,7 +434,7 @@ DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
- 
+
 #define DVD_BIOS \
 	ROM_REGION( 0x20000, "subcpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0,  "vb102",    "va1b102" ) \
@@ -448,7 +448,7 @@ DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
 // dummy ROM definition
 ROM_START( nichidvd )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // tmp68301 prg
-	
+
 	DVD_BIOS
 
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", ROMREGION_ERASE00 ) // z80
@@ -483,21 +483,21 @@ ROM_END
 
 ROM_START( mjgalpri )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(e8427076) SHA1(9b449599ffac2b67a29fac11d1e85218668d805d) )
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(e8427076) SHA1(9b449599ffac2b67a29fac11d1e85218668d805d) )
 	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(653fcc14) SHA1(6231ec5f45a9f5e587dcd00ff85f9bbfae7364ab) )
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
-    ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7b9b1887) SHA1(1393a1d79f3cc7ab68275791af4ec16e825056df) )
+	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7b9b1887) SHA1(1393a1d79f3cc7ab68275791af4ec16e825056df) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
-    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(6497bc8f) SHA1(ce0ecfab8df87f7356aa42648e47ffda53840188) )
-    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(3ac982e8) SHA1(d889d45888cf7bcb5af808f63e9ad41204bd5992) )
-     
- 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(6497bc8f) SHA1(ce0ecfab8df87f7356aa42648e47ffda53840188) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(3ac982e8) SHA1(d889d45888cf7bcb5af808f63e9ad41204bd5992) )
+
+	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(4c92a523) SHA1(51da73fdfdfccdc070fa8a13163e031438b50876) )
-	
+
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8001", 0, SHA1(30f356af4e08567273a88758bb0ddd3544eea228) )
 ROM_END
@@ -527,7 +527,7 @@ ROM_START( csplayh5 )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(81ca49a4) SHA1(601b6802ab85be61f45a64f5b4c7e1f1ae5ee887) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(0b920806) SHA1(95f50ebfb296ba29aaa8079a41f5362cb9e879cc) )
 
@@ -565,21 +565,21 @@ ROM_END
 
 ROM_START( mogitate )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-    ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(42ec6c2e) SHA1(a0279502e1f7e62f072ec6612caf198aa0ae3af7) )
-    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(f71546c6) SHA1(546b0d12e7b1627c96d5a17c015bdbbca1e93232) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(42ec6c2e) SHA1(a0279502e1f7e62f072ec6612caf198aa0ae3af7) )
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(f71546c6) SHA1(546b0d12e7b1627c96d5a17c015bdbbca1e93232) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
-    ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7927c1d6) SHA1(15f0c0051124e7b7667eb721dd12938333b31899) )
+	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7927c1d6) SHA1(15f0c0051124e7b7667eb721dd12938333b31899) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
-    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(ea655990) SHA1(7f59cfab21e8858625e82a9501acc943b07f799c) )
-    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(4c910b86) SHA1(48007f03f4e445b9de15531afe821c1b18fccae1) )
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(ea655990) SHA1(7f59cfab21e8858625e82a9501acc943b07f799c) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(4c910b86) SHA1(48007f03f4e445b9de15531afe821c1b18fccae1) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8006", 0, SHA1(aa911e46e791d89ce4fed4a32b4b0637ba3a9920) )
-	
+
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
 ROM_END
@@ -611,7 +611,7 @@ ROM_START( renaimj )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(285a5651) SHA1(c572a7c82759600e29e31518c69b17ae173c2263) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(614d17b9) SHA1(d6fb4441f55902c2b89b4bec53aae5311d81f07b) )
 
@@ -622,9 +622,9 @@ ROM_START( renaimj )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8008", 0, SHA1(49c92cb9b08ee7773f3d93fce0bbecc3c0ae654d) )
-	
+
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal18v8b.020", 0x000000, 0x040000, CRC(0a32a144) SHA1(f3b4a1174adbb2f7b7500adeafa20142f6a16d08) ) 
+	ROM_LOAD( "gal18v8b.020", 0x000000, 0x040000, CRC(0a32a144) SHA1(f3b4a1174adbb2f7b7500adeafa20142f6a16d08) )
 ROM_END
 
 ROM_START( bikiniko )
@@ -633,7 +633,7 @@ ROM_START( bikiniko )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(13a885af) SHA1(ba8221fab1a37f1937e4399eabe3eaa9093884d3) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(4a2142d6) SHA1(3a762f7b7cccdb6715b5f59524b04b12694fc130) )
 
@@ -652,7 +652,7 @@ ROM_START( csplayh6 )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(1e4679ca) SHA1(f5df03c07f749906bbcef26a4a5d433564d4aeb8) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(3ce03f2d) SHA1(5ccdcac8bad25b4f680ed7a2074575711c25af41) )
 
@@ -663,9 +663,9 @@ ROM_START( csplayh6 )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8010", 0, SHA1(01e247fe1b86bbfe743e09a625432874f881a9a0) )
-	
+
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "palce16v8h.020_bad", 0x000000, 0x040000, BAD_DUMP CRC(2aec4e37) SHA1(79d64394c0f6f2c5e17ae9fc62eaa279da466ccd) ) 
+	ROM_LOAD( "palce16v8h.020_bad", 0x000000, 0x040000, BAD_DUMP CRC(2aec4e37) SHA1(79d64394c0f6f2c5e17ae9fc62eaa279da466ccd) )
 ROM_END
 
 ROM_START( thenanpa )
@@ -695,7 +695,7 @@ ROM_START( pokoachu )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(789ffbc8) SHA1(44f3846414682e19465b485ffb89c7b78920cb0a)  )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(9d344bad) SHA1(276c8066a2b5090edf6ba00843b7a9496c90f99f) )
 
@@ -707,7 +707,7 @@ ROM_START( pokoachu )
 	DISK_IMAGE_READONLY( "nb8012", 0, SHA1(06c611f110377f5d02bbde1ab1d43d3623772b7b) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) ) 
+	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
 ROM_END
 
 ROM_START( csplayh7 )
@@ -716,7 +716,7 @@ ROM_START( csplayh7 )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(162f8cff) SHA1(8aa185fd1daa943d0b21fdf6e692f7782bc6dac4) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(5905b199) SHA1(9155455bc21d23d439c4732549ff1143ee17b9d3) )
 
@@ -737,7 +737,7 @@ ROM_START( aimode )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(c86765a8) SHA1(924831c07191e046beec79dd1da30c1944cfe57c) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(e6404950) SHA1(bb179c27ce65f7dc58d2aeed4710347e7953e11c) )
 
@@ -749,7 +749,7 @@ ROM_START( aimode )
 	DISK_IMAGE_READONLY( "nb8014", 0, SHA1(c5ad9bd66f0930e1c477126301286e38f077c164) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(0a32a144) SHA1(f3b4a1174adbb2f7b7500adeafa20142f6a16d08) ) 
+	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(0a32a144) SHA1(f3b4a1174adbb2f7b7500adeafa20142f6a16d08) )
 ROM_END
 
 ROM_START( fuudol )
@@ -758,7 +758,7 @@ ROM_START( fuudol )
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(b1fa335e) SHA1(8a881c9c511fb63b00a3a7e433bae12aa9c2c262) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f6442026) SHA1(f49ddeeeaf6fffdccea9ba73bce3ca60c07a7647) )
 
@@ -775,44 +775,44 @@ ROM_END
 
 ROM_START( tsuwaku )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-    ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(a9890007) SHA1(3cd36c653d387842289f74c3cf35435f9d2a3aca) )
-    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(4577bf7b) SHA1(fed88157ded8ac72cc28cdd3b2ee36c293a6ee93) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(a9890007) SHA1(3cd36c653d387842289f74c3cf35435f9d2a3aca) )
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(4577bf7b) SHA1(fed88157ded8ac72cc28cdd3b2ee36c293a6ee93) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(8451b9a9) SHA1(4e61c4b5ea7e91b53c97bd060b41466ba5005fd0) )
-	
+
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
-    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(00657ca3) SHA1(a02bb8a177f3915ddf0bf97fd69426a3a28061a5) )
-    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(edf56c94) SHA1(76d95a45aced3ad8bfe8a561f355731f4f99603e) )
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(00657ca3) SHA1(a02bb8a177f3915ddf0bf97fd69426a3a28061a5) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(edf56c94) SHA1(76d95a45aced3ad8bfe8a561f355731f4f99603e) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8017", 0, SHA1(6c86985574d53f990c4eec573d7fa84782cb9c4c) )
-	
+
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal16v8h.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) ) 
+	ROM_LOAD( "gal16v8h.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
 ROM_END
 
 ROM_START( nichisel )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-    ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(95fb8e74) SHA1(79aa45ed1c3bd3e1a83b02afb64268efb386100e) )
-    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(fb84fc3e) SHA1(6b87c3516ceec59ec96012ea6a3d2fa9670a1cb3) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(95fb8e74) SHA1(79aa45ed1c3bd3e1a83b02afb64268efb386100e) )
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(fb84fc3e) SHA1(6b87c3516ceec59ec96012ea6a3d2fa9670a1cb3) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(f94981fd) SHA1(84dae027f10717a084016310cd245bb4c2ee6a56) )
-	
+
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
-    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(5ab63481) SHA1(fc81fbdd1df496813fc0d80bcab6d0434b75d311) )
-    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(50085861) SHA1(b8f99a66a743c9bf66ef307fe4b581586e293fe5) )
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(5ab63481) SHA1(fc81fbdd1df496813fc0d80bcab6d0434b75d311) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(50085861) SHA1(b8f99a66a743c9bf66ef307fe4b581586e293fe5) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb80sp", 0, SHA1(48eb9f8adba0ea5f59cfcbdee61c29b4af84ac97) )
-	
+
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
-    ROM_LOAD( "palce16v8h.020", 0x000000, 0x040000, CRC(228b98fb) SHA1(53b57a09610425a5bb9d0ffe0f68dce2d9ab3bf6) )
+	ROM_LOAD( "palce16v8h.020", 0x000000, 0x040000, CRC(228b98fb) SHA1(53b57a09610425a5bb9d0ffe0f68dce2d9ab3bf6) )
 ROM_END
 
 // 1995
@@ -821,7 +821,7 @@ GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,    
 GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,                       ROT0, "Nichibutsu",                            "Nichbutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
-/* 01 */ GAME( 1998, mjgalpri,  nichidvd,   csplayh5, csplayh5,  csplayh5_state,  mjgalpri, 		ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
+/* 01 */ GAME( 1998, mjgalpri,  nichidvd,   csplayh5, csplayh5,  csplayh5_state,  mjgalpri,         ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
 /* 03 */ GAME( 1998, junai,     nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai,           ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
 /* 04 */ GAME( 1998, csplayh5,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,        ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )

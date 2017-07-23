@@ -10508,24 +10508,24 @@ airraid                         // (c) 1987 Seibu Kaihatsu
 cshooter                        // (c) 1987 JKH (bootleg)
 
 @source:csplayh5.cpp
-aimode							// (c) 1999
+aimode                          // (c) 1999
 bikiniko                        // (c) 1999
 csplayh1                        // (c) 1995
 csplayh5                        // (c) 1998
-csplayh6						// (c) 1999
+csplayh6                        // (c) 1999
 csplayh7                        // (c) 1999
 fuudol                          // (c) 2000
 junai                           // (c) 1998
 junai2                          // (c) 1998
-mogitate						// (c) 1998
-nichidvd						//
-nichisel						// (c) 2000
-mjgalpri						// (c) 1998
+mogitate                        // (c) 1998
+nichidvd                        //
+nichisel                        // (c) 2000
+mjgalpri                        // (c) 1998
 mjmania                         // (c) 1999
-pokoachu						// (c) 1999
-renaimj							// (c) 1999
+pokoachu                        // (c) 1999
+renaimj                         // (c) 1999
 thenanpa                        // (c) 1999
-tsuwaku							// (c) 2000
+tsuwaku                         // (c) 2000
 
 @source:cswat.cpp
 cswat                           // (c) 1984
@@ -12628,7 +12628,7 @@ fmtownssj                       // FM-Towns II SJ
 fmtownsux                       // 1991.11 FM-Towns II UX
 
 @source:fontwriter.cpp
-fw700ger						// (c) Sharp
+fw700ger                        // (c) Sharp
 
 @source:foodf.cpp
 foodf                           // 136020           (c) 1982        // made by Gencomp

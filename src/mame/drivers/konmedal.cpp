@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( ddboy_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
 	AM_RANGE(0xcc00, 0xcc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP	// ???  writes 00 and 3f every frame
+	AM_RANGE(0xd000, 0xd000) AM_WRITENOP    // ???  writes 00 and 3f every frame
 	AM_RANGE(0xd800, 0xd87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
 	AM_RANGE(0xd880, 0xd889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
 	AM_RANGE(0xd88a, 0xd88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
@@ -273,31 +273,31 @@ static INPUT_PORTS_START( konmedal )
 	PORT_DIPSETTING(    0x0d, "25%" )
 	PORT_DIPSETTING(    0x0e, "20%" )
 	PORT_DIPSETTING(    0x0f, "15%" )
-    PORT_DIPNAME( 0x30, 0x00, "Play Timer" )         PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Play Timer" )         PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "30 sec" )
 	PORT_DIPSETTING(    0x10, "24 sec" )
 	PORT_DIPSETTING(    0x20, "18 sec" )
 	PORT_DIPSETTING(    0x30, "12 sec" )
-    PORT_DIPNAME( 0x40, 0x40, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "Keep" )
 	PORT_DIPSETTING(    0x00, "Clear" )
-    PORT_DIPNAME( 0x80, 0x00, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	// medal
-	PORT_BIT( 0xd0, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // medal
+	PORT_BIT( 0xd0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// medal ack
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // medal ack
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
 INPUT_PORTS_END
 
 void konmedal_state::machine_start()

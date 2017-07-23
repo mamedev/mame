@@ -86,7 +86,7 @@ private:
 	virtual void handle() override;
 
 	ui_software_info const &m_uiinfo;
-	s_parts const		   m_parts;
+	s_parts const          m_parts;
 };
 
 class menu_select_launch::bios_selection : public menu

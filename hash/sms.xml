@@ -7680,8 +7680,8 @@
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Super Wonderboy, Super Tetris, Super Boy I, Goonies, Road Fighter) -->
 	<!-- This MASK rom was actually found on a larger arcade multi-game but appears to have been taken directly from a home cartridge.
-       The menu contained within it, and bank switching system used is ignored by the arcade board which just makes use of the game
-       data from it -->
+	   The menu contained within it, and bank switching system used is ignored by the arcade board which just makes use of the game
+	   data from it -->
 	<software name="smssgame">
 		<description>Super Game 11-in-1 (Kor)</description>
 		<year>1990</year>

@@ -20,11 +20,11 @@
         * CPU - Intel N80C188 L0450591 @ ??MHz - U23
         * MCU - Signetics SC87C451CCA68 220CP079109KA 97D8641 - U70
         * DMA - KS82C37A - U46, U47, U48, U49, U50
-	* SCC - Signetics SCC2698BC1A84 - U67
+    * SCC - Signetics SCC2698BC1A84 - U67
         * Memory - NEC D43256AGU-10LL 8948A9038 SRAM 32KB - U51
         * Memory - Mitsubishi M5M187AJ 046101-35 SRAM 64K X 1?? - U37
-	* Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U53
-	* Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U54
+    * Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U53
+    * Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U54
 
     Logic:
         * U8 - 22V10-25JC
@@ -42,23 +42,23 @@
     Program Memory:
         * 0x00000 - 0x07FFF : SRAM D43256AGU-10LL 32KB
         * 0xF8000 - 0xFFFFF : ROM 27C256 PLCC32 32KB
-	* 0xC0080 - 0xC008F : KS82C37A - Probably RAM DMA
-	* 0xC0090 - 0xC009F : KS82C37A - Serial DMA (Port 1 and 2?)
-	* 0xC00A0 - 0xC00AF : KS82C37A - Serial DMA (Port 3 and 4?)
-	* 0xC00B0 - 0xC00BF : KS82C37A - Serial DMA (Port 5 and 6?)
-	* 0xC00C0 - 0xC00CF : KS82C37A - Serial DMA (Port 7 and 8?)
+    * 0xC0080 - 0xC008F : KS82C37A - Probably RAM DMA
+    * 0xC0090 - 0xC009F : KS82C37A - Serial DMA (Port 1 and 2?)
+    * 0xC00A0 - 0xC00AF : KS82C37A - Serial DMA (Port 3 and 4?)
+    * 0xC00B0 - 0xC00BF : KS82C37A - Serial DMA (Port 5 and 6?)
+    * 0xC00C0 - 0xC00CF : KS82C37A - Serial DMA (Port 7 and 8?)
 
     IO Memory:
         * Unknown
 
     TODO:
-	* Emulate SCC and hook up RS232 ports
-	* Hook up console to RS232 port 1
-	* Hook up System Monitor II to RS232 port 2
-	* Dump 87C451 rom data and emulate MCU
-	* Dump 87C51 on SMIOC interconnect box
-	* Dump all PAL chips
-	* Hook up status LEDs
+    * Emulate SCC and hook up RS232 ports
+    * Hook up console to RS232 port 1
+    * Hook up System Monitor II to RS232 port 2
+    * Dump 87C451 rom data and emulate MCU
+    * Dump 87C51 on SMIOC interconnect box
+    * Dump all PAL chips
+    * Hook up status LEDs
 */
 
 #include "emu.h"

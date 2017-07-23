@@ -765,7 +765,7 @@ DRIVER_INIT_MEMBER(cps_state,cps2crypt)
 
 		key[0] = (decoded[0] << 16) | decoded[1];
 		key[1] = (decoded[2] << 16) | decoded[3];
- 		// decoded[4] == watchdog instruction third word
+		// decoded[4] == watchdog instruction third word
 		// decoded[5] == watchdog instruction second word
 		// decoded[6] == watchdog instruction first word
 		// decoded[7] == 0x4000 (bits 8 to 23 of CPS2 object output address)

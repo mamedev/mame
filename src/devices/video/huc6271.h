@@ -27,7 +27,7 @@
 // ======================> huc6271_device
 
 class huc6271_device : public device_t,
-   					   public device_memory_interface
+					   public device_memory_interface
 {
 public:
 	// construction/destruction

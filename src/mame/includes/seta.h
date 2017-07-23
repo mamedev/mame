@@ -315,7 +315,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 private:
-	required_device<upd4992_device> m_rtc;	// ! Actually D4911C !
+	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<26> m_bet;
 
