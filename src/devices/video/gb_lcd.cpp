@@ -3511,26 +3511,24 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
  * Copy DMG VRAM data to SGM VRAM
  * @param dst       Destination Pointer
  * @param start     Logical Start Tile index inside display area.
- * @param num_tiles Number of DMG tiles (0x10u bytes) to copy.
+ * @param num_tiles Number of DMG tiles (0x10U bytes) to copy.
  */
-void sgb_ppu_device::sgb_vram_memcpy(uint8_t *dst, uint8_t start, size_t num_tiles) {
-	
-	uint16_t bg_ix = (start / 0x14u) * 0x20u + (start % 0x14u);
-	const uint8_t* const map = m_layer[0].bg_map;
-	const uint8_t* const tiles = m_layer[0].bg_tiles;
+void sgb_ppu_device::sgb_vram_memcpy(uint8_t *dst, uint8_t start, size_t num_tiles)
+{
+	uint16_t bg_ix = (start / 0x14U) * 0x20U + (start % 0x14U);
+	const uint8_t *const map = m_layer[0].bg_map;
+	const uint8_t *const tiles = m_layer[0].bg_tiles;
 	const uint8_t mod = m_gb_tile_no_mod;
-	
-	for (size_t i = 0x00u; i < num_tiles && i < 0x100u; ++i) {
-		
-		const uint8_t tile_ix = map[bg_ix] ^ mod;
-		memcpy(dst, &tiles[tile_ix << 4], 0x10u);
-		dst += 0x10u;
-		
-		++bg_ix;
-		if ((bg_ix & 0x1Fu) == 0x14u) {
-			bg_ix += 0x20u - 0x14u; /* advance to next start of line */
-		}
 
+	for (size_t i = 0x00U; i < num_tiles && i < 0x100U; ++i)
+	{
+		const uint8_t tile_ix = map[bg_ix] ^ mod;
+		std::copy_n(&tiles[tile_ix << 4], 0x10U, dst);
+		dst += 0x10U;
+
+		++bg_ix;
+		if ((bg_ix & 0x1fU) == 0x14U)
+			bg_ix += 0x20U - 0x14U; /* advance to next start of line */
 	}
 }
 
@@ -3852,18 +3850,18 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 			/* Not Implemented */
 			break;
 		case 0x13:  /* CHR_TRN */
-			if (data[1] & 0x01u)
-				sgb_vram_memcpy(m_sgb_tile_data.get() + 0x1000u, 0x00u, 0x100u);
+			if (data[1] & 0x01U)
+				sgb_vram_memcpy(m_sgb_tile_data.get() + 0x1000U, 0x00U, 0x100U);
 			else
-				sgb_vram_memcpy(m_sgb_tile_data.get(), 0x00u, 0x100u);
+				sgb_vram_memcpy(m_sgb_tile_data.get(), 0x00U, 0x100U);
 			break;
 		case 0x14:  /* PCT_TRN */
 		{
 			uint16_t col;
-			uint8_t sgb_pal[0x80u];
+			uint8_t sgb_pal[0x80U];
 
-			sgb_vram_memcpy(m_sgb_tile_map, 0x00u, 0x80u);
-			sgb_vram_memcpy(sgb_pal, 0x80u, 0x08u);
+			sgb_vram_memcpy(m_sgb_tile_map, 0x00U, 0x80U);
+			sgb_vram_memcpy(sgb_pal, 0x80U, 0x08U);
 			for (int i = 0; i < 4 * 16 /* 4 pals at 16 colors each */; i++)
 			{
 				col = (sgb_pal[(i * 2) + 1] << 8) | sgb_pal[i * 2];
@@ -3872,7 +3870,7 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 		}
 			break;
 		case 0x15:  /* ATTR_TRN */
-			sgb_vram_memcpy(m_sgb_atf_data, 0x00u, 0x100u);
+			sgb_vram_memcpy(m_sgb_atf_data, 0x00U, 0x100U);
 			break;
 		case 0x16:  /* ATTR_SET */
 		{

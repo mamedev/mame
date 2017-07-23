@@ -256,7 +256,7 @@ protected:
 	virtual void update_sprites() override;
 	virtual void update_scanline(uint32_t cycles_to_go) override;
 	void refresh_border();
-	
+
 	void sgb_vram_memcpy(uint8_t *dst, uint8_t start, size_t num_tiles);
 };
 
