@@ -201,7 +201,12 @@ void image_manager::options_extract()
 			if (image.exists())
 			{
 				if (image.loaded_through_softlist())
+				{
 					image_opt = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
+					const software_part *tmp = image.part_entry();
+					if (!tmp->name().empty())
+						image_opt.append(":").append(tmp->name());
+				}
 				else
 					image_opt = image.filename();
 			}
