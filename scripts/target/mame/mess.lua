@@ -952,6 +952,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"einis",
 		"elektor",
 		"elektrka",
+		"elektron",
 		"ensoniq",
 		"enterprise",
 		"entex",
