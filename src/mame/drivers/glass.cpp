@@ -21,6 +21,19 @@ except for the Promat licensed Korean version which is unprotected.
 #include "speaker.h"
 
 
+WRITE8_MEMBER(glass_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(glass_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
+
 WRITE16_MEMBER(glass_state::clr_int_w)
 {
 	m_cause_interrupt = 1;
@@ -81,23 +94,29 @@ WRITE16_MEMBER(glass_state::coin_w)
 	}
 }
 
+
+static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, glass_state )
+	AM_RANGE(0x0000, 0xffff) AM_MASK(0x3fff) AM_READWRITE(shareram_r, shareram_w) // shared RAM with the main CPU
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")                            /* Video RAM */
-	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                     /* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                             /* Video Registers */
-	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)                                                        /* CLR INT Video */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                                               /* Sprite RAM */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                   // ROM
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")                                // Video RAM
+	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                   // Extra Video RAM
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                           // Video Registers
+	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)                                                      // CLR INT Video
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                                             // Sprite RAM
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x700008, 0x700009) AM_WRITE(blitter_w)                                                  /* serial blitter */
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                            /* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)              /* OKI6295 status register */
-	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(coin_w)                                                     /* Coin Counters/Lockout */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                               /* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0x700008, 0x700009) AM_WRITE(blitter_w)                                                      // serial blitter
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                          // OKI6295 bankswitch
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)            // OKI6295 status register
+	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(coin_w)                                                         // Coin Counters/Lockout
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                              // Work RAM (partially shared with DS5002FP)
 ADDRESS_MAP_END
 
 
@@ -229,8 +248,8 @@ static MACHINE_CONFIG_START( glass )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( glass_ds5002fp, glass )
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP_WRALLY, XTAL_24MHz / 2) /* verified on pcb */
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
 ROM_START( glass ) /* Version 1.1 */

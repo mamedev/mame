@@ -20,6 +20,8 @@ public:
 		m_shareram(*this, "shareram")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(shareram_w);
+	DECLARE_READ8_MEMBER(shareram_r);
 	DECLARE_WRITE16_MEMBER(gaelco2_coin_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_coin2_w);
 	DECLARE_WRITE16_MEMBER(touchgo_coin_w);

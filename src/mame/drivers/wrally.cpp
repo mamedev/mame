@@ -127,11 +127,19 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 #include "emu.h"
 #include "includes/wrally.h"
 
-#include "cpu/m68000/m68000.h"
 #include "machine/gaelco_ds5002fp.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+
 #include "screen.h"
 #include "speaker.h"
+
+
+static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, wrally_state )
+	AM_RANGE(0x0000, 0xffff) AM_MASK(0x3fff) AM_READWRITE(shareram_r, shareram_w) // shared RAM with the main CPU
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
@@ -260,8 +268,8 @@ static MACHINE_CONFIG_START( wrally )
 	MCFG_CPU_PROGRAM_MAP(wrally_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP_WRALLY, XTAL_24MHz / 2) /* verified on pcb */
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

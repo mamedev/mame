@@ -106,6 +106,23 @@ WRITE16_MEMBER(targeth_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 }
 
+WRITE8_MEMBER(targeth_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(targeth_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
+
+static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, targeth_state )
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")  /* Video RAM */
@@ -234,7 +251,7 @@ static MACHINE_CONFIG_START( targeth )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", targeth_state, interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) 
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

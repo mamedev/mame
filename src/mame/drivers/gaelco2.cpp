@@ -30,9 +30,11 @@
 #include "emu.h"
 #include "includes/gaelco2.h"
 
+#include "machine/gaelco_ds5002fp.h"
+
+#include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
 #include "sound/gaelco.h"
-#include "machine/gaelco_ds5002fp.h"
 
 #include "rendlay.h"
 #include "screen.h"
@@ -62,6 +64,17 @@ TILELAYOUT16(0x0200000)
 GFXDECODEINFO(0x0200000, 128)
 TILELAYOUT16(0x0400000)
 GFXDECODEINFO(0x0400000, 128)
+
+
+
+/*============================================================================
+                            COMMON
+  ============================================================================*/
+
+static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, gaelco2_state )
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+ADDRESS_MAP_END
+
 
 /*============================================================================
                             MANIAC SQUARE (FINAL)
@@ -196,7 +209,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maniacsq_d5002fp, maniacsq )
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* ? */
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
 ROM_START( maniacsq )
@@ -578,7 +591,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( alighunt_d5002fp, alighunt )
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* ? */
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
 /*
@@ -835,7 +848,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( touchgo_d5002fp, touchgo )
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* ? */
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
 /*
@@ -1278,7 +1291,7 @@ static MACHINE_CONFIG_START( wrally2 )
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) 
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 

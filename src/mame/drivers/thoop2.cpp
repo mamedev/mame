@@ -15,10 +15,14 @@ maybe bad dump of DS5002FP rom, maybe CPU bugs
 
 #include "emu.h"
 #include "includes/thoop2.h"
+
 #include "machine/gaelco_ds5002fp.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,6 +58,22 @@ WRITE16_MEMBER(thoop2_state::coin_w)
 	/* 05b unknown */
 }
 
+WRITE8_MEMBER(thoop2_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(thoop2_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
+
+static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, thoop2_state )
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
@@ -202,7 +222,7 @@ static MACHINE_CONFIG_START( thoop2 )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) 
-	GAELCO_DS5002FP_SET_SHARE_TAG("shareram")
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

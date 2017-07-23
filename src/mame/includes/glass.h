@@ -9,15 +9,17 @@
 class glass_state : public driver_device
 {
 public:
-	glass_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	glass_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_shareram(*this, "shareram") { }
+		m_shareram(*this, "shareram"),
+		m_pant{ nullptr, nullptr }
+	{ }
 
 
 	/* devices */
@@ -41,6 +43,8 @@ public:
 	int         m_cause_interrupt;
 	int         m_blitter_serial_buffer[5];
 
+	DECLARE_WRITE8_MEMBER(shareram_w);
+	DECLARE_READ8_MEMBER(shareram_r);
 	DECLARE_WRITE16_MEMBER(clr_int_w);
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(coin_w);

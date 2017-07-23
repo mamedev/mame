@@ -26,6 +26,18 @@ void wrally_state::machine_start()
 
 ***************************************************************************/
 
+WRITE8_MEMBER(wrally_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(wrally_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
 WRITE16_MEMBER(wrally_state::vram_w)
 {
 	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
