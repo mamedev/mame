@@ -832,7 +832,7 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 07 */ GAME( 1999, mjmania,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjmania,         ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
 /* 08 */ GAME( 1999, renaimj,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
 /* 09 */ GAME( 1999, bikiniko,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,        ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
-/* 10 */ GAME( 1999, csplayh6,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh6,        ROT0, "Nichibutsu/eic", "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen(Japan)", MACHINE_NOT_WORKING )
+/* 10 */ GAME( 1999, csplayh6,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh6,        ROT0, "Nichibutsu/eic", "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
 /* 11 */ GAME( 1999, thenanpa,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
 /* 12 */ GAME( 1999, pokoachu,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  pokoachu,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
 /* 13 */ GAME( 1999, csplayh7,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", MACHINE_NOT_WORKING )
