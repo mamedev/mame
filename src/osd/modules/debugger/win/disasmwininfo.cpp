@@ -126,7 +126,7 @@ void disasmwin_info::draw_contents(HDC dc)
 }
 
 
-void disasmwin_info::process_string(const std::string &string)
+void disasmwin_info::process_string(std::string &&string)
 {
 	// set the string to the disasm view
 	downcast<disasmview_info *>(m_views[0].get())->set_expression(string);
@@ -135,11 +135,11 @@ void disasmwin_info::process_string(const std::string &string)
 	editwnd_select_all();
 
 	// update the default string to match
-	set_edit_defstr(string);
+	set_edit_defstr(std::move(string));
 }
 
 
 void disasmwin_info::update_caption()
 {
-	win_set_window_text_utf8(window(), std::string("Disassembly: ").append(m_views[0]->source_name()).c_str());
+	win_set_window_text_utf8(window(), std::string("Disassembly: ").append(m_views[0]->source_name()));
 }

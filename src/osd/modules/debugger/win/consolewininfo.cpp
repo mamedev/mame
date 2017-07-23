@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  consolewininfo.c - Win32 debug window handling
+//  consolewininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -20,10 +20,187 @@
 #include "strconv.h"
 #include "winutf8.h"
 
+#include <string>
 
-consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
-	disasmbasewin_info(debugger, true, "Debug", nullptr),
-	m_devices_menu(nullptr)
+
+//**************************************************************************
+//  ANONYMOUS NAMESPACE
+//**************************************************************************
+
+namespace
+{
+
+//-------------------------------------------------
+//  copy_extension_list
+//-------------------------------------------------
+
+void copy_extension_list(std::ostream &dest, const char *extensions)
+{
+	// our extension lists are comma delimited; Win32 expects to see lists
+	// delimited by semicolons
+	char const *s = extensions;
+	while (*s)
+	{
+		// append a semicolon if not at the beginning
+		if (s != extensions)
+			dest << ';';
+
+		// append ".*"
+		dest << "*.";
+
+		// append the file extension
+		while (*s && (*s != ','))
+			dest << *s++;
+
+		// if we found a comma, advance
+		while (*s == ',')
+			s++;
+	}
+}
+
+
+//-------------------------------------------------
+//  add_filter_entry
+//-------------------------------------------------
+
+void add_filter_entry(std::ostream &dest, const char *description, const char *extensions)
+{
+	using namespace std::literals;
+
+	// add the description
+	dest << description;
+	dest << " (";
+
+	// add the extensions to the description
+	copy_extension_list(dest, extensions);
+
+	// add the trailing rparen and '\0' character
+	dest << ")\0"s;
+
+	// now add the extension list itself
+	copy_extension_list(dest, extensions);
+
+	// append a '\0'
+	dest << '\0';
+}
+
+
+//-------------------------------------------------
+//  build_generic_filter
+//-------------------------------------------------
+
+std::string build_generic_filter(device_image_interface *img, bool is_save)
+{
+	using namespace std::literals;
+
+	std::ostringstream filter;
+	std::string file_extension;
+
+	if (img)
+		file_extension = img->file_extensions();
+
+	if (!is_save)
+		file_extension.append(",zip,7z");
+
+	add_filter_entry(filter, "Common image types", file_extension.c_str());
+
+	filter << "All files (*.*)\0*.*\0"s;
+
+	if (!is_save)
+		filter << "Compressed Images (*.zip;*.7z)\0*.zip;*.7z\0"s;
+
+	return filter.str();
+}
+
+
+//-------------------------------------------------
+//  win_get_file_name
+//-------------------------------------------------
+
+enum class win_get_file_name_type
+{
+	OPEN,
+	SAVE
+};
+
+std::string win_get_file_name(win_get_file_name_type type, const std::string &filter, const std::string &dir)
+{
+	// convert to TCHAR
+	osd::text::tstring t_filter = osd::text::to_tstring(filter);
+	osd::text::tstring t_dir = osd::text::to_tstring(dir);
+
+	// this is where the selected filename is stored
+	TCHAR selected_filename[MAX_PATH];
+	selected_filename[0] = '\0';
+
+	// record the current working directory
+	DWORD working_directory_length = GetCurrentDirectory(0, nullptr);
+	TCHAR *working_directory = (TCHAR *) alloca(working_directory_length * sizeof(TCHAR));
+	GetCurrentDirectory(working_directory_length, working_directory);
+
+	// determine the flags
+	DWORD flags;
+	switch (type)
+	{
+	case win_get_file_name_type::OPEN:
+		flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+		break;
+	case win_get_file_name_type::SAVE:
+		flags = OFN_PATHMUSTEXIST;
+		break;
+	default:
+		throw false;
+	}
+
+	// create the gnarly OPENFILENAME struct
+	OPENFILENAME ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = nullptr;
+	ofn.lpstrFile = selected_filename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrFilter = t_filter.c_str();
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = nullptr;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = t_dir.c_str();
+	ofn.Flags = flags;
+
+	// get the filename
+	BOOL result;
+	switch (type)
+	{
+	case win_get_file_name_type::OPEN:
+		result = GetOpenFileName(&ofn);
+		break;
+	case win_get_file_name_type::SAVE:
+		result = GetSaveFileName(&ofn);
+		break;
+	default:
+		throw false;
+	}
+
+	// restore the current working directory
+	SetCurrentDirectory(working_directory);
+
+	return result
+		? osd::text::from_tstring(selected_filename)
+		: "";
+}
+
+}
+
+//**************************************************************************
+//  CONSOLE WIN INFO
+//**************************************************************************
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+consolewin_info::consolewin_info(debugger_windows_interface &debugger)
+	: disasmbasewin_info(debugger, true, "Debug", nullptr)
+	, m_devices_menu(nullptr)
 {
 	if ((window() == nullptr) || (m_views[0] == nullptr))
 		goto cleanup;
@@ -90,10 +267,9 @@ cleanup:
 }
 
 
-consolewin_info::~consolewin_info()
-{
-}
-
+//-------------------------------------------------
+//  set_cpu - sets the CPU device for the console
+//-------------------------------------------------
 
 void consolewin_info::set_cpu(device_t &device)
 {
@@ -105,12 +281,17 @@ void consolewin_info::set_cpu(device_t &device)
 	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
 	std::string curtitle = win_get_window_text_utf8(window());
 	if (title != curtitle)
-		win_set_window_text_utf8(window(), title.c_str());
+		win_set_window_text_utf8(window(), title);
 
 	// and recompute the children
 	recompute_children();
 }
 
+
+//-------------------------------------------------
+//  recompute_children - recompute the size of
+//	the child views
+//-------------------------------------------------
 
 void consolewin_info::recompute_children()
 {
@@ -152,6 +333,11 @@ void consolewin_info::recompute_children()
 	set_editwnd_bounds(editrect);
 }
 
+
+//-------------------------------------------------
+//  update_menu - updates the contents of each menu
+//	based on device info
+//-------------------------------------------------
 
 void consolewin_info::update_menu()
 {
@@ -236,6 +422,10 @@ void consolewin_info::update_menu()
 }
 
 
+//-------------------------------------------------
+//  handle_command - handles a Win32 message
+//-------------------------------------------------
+
 bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
 	if ((HIWORD(wparam) == 0) && (LOWORD(wparam) >= ID_DEVICE_OPTIONS))
@@ -249,18 +439,8 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			{
 			case DEVOPTION_ITEM :
 				{
-					std::string filter;
-					build_generic_filter(nullptr, false, filter);
+					std::string filter = build_generic_filter(nullptr, false);
 					{
-						osd::text::tstring t_filter = osd::text::to_tstring(filter);
-
-						// convert a pipe-char delimited string into a NUL delimited string
-						for (int i = 0; t_filter[i] != '\0'; i++)
-						{
-							if (t_filter[i] == '|')
-								t_filter[i] = '\0';
-						}
-
 						std::string opt_name = img->instance_name();
 						std::string as = slmap.find(opt_name)->second;
 
@@ -270,28 +450,10 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
 						}
-						osd::text::tstring t_dir = osd::text::to_tstring(as);
 
-						// display the dialog
-						TCHAR selectedFilename[MAX_PATH];
-						selectedFilename[0] = '\0';
-						OPENFILENAME ofn;
-						memset(&ofn, 0, sizeof(ofn));
-						ofn.lStructSize = sizeof(ofn);
-						ofn.hwndOwner = nullptr;
-						ofn.lpstrFile = selectedFilename;
-						ofn.lpstrFile[0] = '\0';
-						ofn.nMaxFile = MAX_PATH;
-						ofn.lpstrFilter = t_filter.c_str();
-						ofn.nFilterIndex = 1;
-						ofn.lpstrFileTitle = nullptr;
-						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = t_dir.c_str();
-						ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-						if (GetOpenFileName(&ofn))
+						std::string buf = win_get_file_name(win_get_file_name_type::OPEN, filter, as);
+						if (!buf.empty())
 						{
-							std::string buf = std::string(osd::text::from_tstring(selectedFilename));
 							// Get the Item name out of the full path
 							size_t t1 = buf.find(".zip"); // get rid of zip name and anything after
 							if (t1 != std::string::npos)
@@ -305,25 +467,15 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							buf.erase(0, t1+1);
 
 							// load software
-							img->load_software( buf.c_str());
+							img->load_software(buf.c_str());
 						}
 					}
 				}
 				return true;
 			case DEVOPTION_OPEN :
 				{
-					std::string filter;
-					build_generic_filter(img, false, filter);
+					std::string filter = build_generic_filter(img, false);
 					{
-						osd::text::tstring t_filter = osd::text::to_tstring(filter);
-
-						// convert a pipe-char delimited string into a NUL delimited string
-						for (int i = 0; t_filter[i] != '\0'; i++)
-						{
-							if (t_filter[i] == '|')
-								t_filter[i] = '\0';
-						}
-
 						char buf[400];
 						std::string as;
 						strcpy(buf, machine().options().emu_options::sw_path());
@@ -340,45 +492,17 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
 						}
-						osd::text::tstring t_dir = osd::text::to_tstring(as);
 
-						TCHAR selectedFilename[MAX_PATH];
-						selectedFilename[0] = '\0';
-						OPENFILENAME ofn;
-						memset(&ofn, 0, sizeof(ofn));
-						ofn.lStructSize = sizeof(ofn);
-						ofn.hwndOwner = nullptr;
-						ofn.lpstrFile = selectedFilename;
-						ofn.lpstrFile[0] = '\0';
-						ofn.nMaxFile = MAX_PATH;
-						ofn.lpstrFilter = t_filter.c_str();
-						ofn.nFilterIndex = 1;
-						ofn.lpstrFileTitle = nullptr;
-						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = t_dir.c_str();
-						ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-						if (GetOpenFileName(&ofn))
-						{
-							auto utf8_buf = osd::text::from_tstring(selectedFilename);
-							img->load(utf8_buf.c_str());
-						}
+						std::string result = win_get_file_name(win_get_file_name_type::OPEN, filter, as);
+						if (!result.empty())
+							img->load(result);
 					}
 				}
 				return true;
 			case DEVOPTION_CREATE:
 				{
-					std::string filter;
-					build_generic_filter(img, true, filter);
+					std::string filter = build_generic_filter(img, true);
 					{
-						osd::text::tstring t_filter = osd::text::to_tstring(filter);
-						// convert a pipe-char delimited string into a NUL delimited string
-						for (int i = 0; t_filter[i] != '\0'; i++)
-						{
-							if (t_filter[i] == '|')
-								t_filter[i] = '\0';
-						}
-
 						char buf[400];
 						std::string as;
 						strcpy(buf, machine().options().emu_options::sw_path());
@@ -395,29 +519,10 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
 						}
-						osd::text::tstring t_dir = osd::text::to_tstring(as);
 
-						TCHAR selectedFilename[MAX_PATH];
-						selectedFilename[0] = '\0';
-						OPENFILENAME ofn;
-						memset(&ofn, 0, sizeof(ofn));
-						ofn.lStructSize = sizeof(ofn);
-						ofn.hwndOwner = nullptr;
-						ofn.lpstrFile = selectedFilename;
-						ofn.lpstrFile[0] = '\0';
-						ofn.nMaxFile = MAX_PATH;
-						ofn.lpstrFilter = t_filter.c_str();
-						ofn.nFilterIndex = 1;
-						ofn.lpstrFileTitle = nullptr;
-						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = t_dir.c_str();
-						ofn.Flags = OFN_PATHMUSTEXIST;
-
-						if (GetSaveFileName(&ofn))
-						{
-							auto utf8_buf = osd::text::from_tstring(selectedFilename);
-							img->create(utf8_buf.c_str(), img->device_get_indexed_creatable_format(0), nullptr);
-						}
+						std::string result = win_get_file_name(win_get_file_name_type::SAVE, filter, as);
+						if (!result.empty())
+							img->create(result, img->device_get_indexed_creatable_format(0), nullptr);
 					}
 				}
 				return true;
@@ -453,7 +558,11 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 }
 
 
-void consolewin_info::process_string(std::string const &string)
+//-------------------------------------------------
+//  process_string - inputs a string from the user
+//-------------------------------------------------
+
+void consolewin_info::process_string(std::string &&string)
 {
 	if (string.empty()) // an empty string is a single step
 		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
@@ -465,72 +574,11 @@ void consolewin_info::process_string(std::string const &string)
 }
 
 
-void consolewin_info::build_generic_filter(device_image_interface *img, bool is_save, std::string &filter)
-{
-	std::string file_extension;
+//-------------------------------------------------
+//  get_softlist_info - gets info about a softlist
+//	for a particular device
+//-------------------------------------------------
 
-	if (img)
-		file_extension = img->file_extensions();
-
-	if (!is_save)
-		file_extension.append(",zip,7z");
-
-	add_filter_entry(filter, "Common image types", file_extension.c_str());
-
-	filter.append("All files (*.*)|*.*|");
-
-	if (!is_save)
-		filter.append("Compressed Images (*.zip;*.7z)|*.zip;*.7z|");
-}
-
-
-void consolewin_info::add_filter_entry(std::string &dest, const char *description, const char *extensions)
-{
-	// add the description
-	dest.append(description);
-	dest.append(" (");
-
-	// add the extensions to the description
-	copy_extension_list(dest, extensions);
-
-	// add the trailing rparen and '|' character
-	dest.append(")|");
-
-	// now add the extension list itself
-	copy_extension_list(dest, extensions);
-
-	// append a '|'
-	dest.append("|");
-}
-
-
-void consolewin_info::copy_extension_list(std::string &dest, const char *extensions)
-{
-	// our extension lists are comma delimited; Win32 expects to see lists
-	// delimited by semicolons
-	char const *s = extensions;
-	while (*s)
-	{
-		// append a semicolon if not at the beginning
-		if (s != extensions)
-			dest.push_back(';');
-
-		// append ".*"
-		dest.append("*.");
-
-		// append the file extension
-		while (*s && (*s != ','))
-			dest.push_back(*s++);
-
-		// if we found a comma, advance
-		while(*s == ',')
-			s++;
-	}
-}
-
-//============================================================
-//  get_softlist_info
-//============================================================
 bool consolewin_info::get_softlist_info(device_image_interface *img)
 {
 	bool has_software = false;

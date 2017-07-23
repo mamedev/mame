@@ -18,7 +18,6 @@ class consolewin_info : public disasmbasewin_info
 {
 public:
 	consolewin_info(debugger_windows_interface &debugger);
-	virtual ~consolewin_info();
 
 	void set_cpu(device_t &device);
 
@@ -42,11 +41,8 @@ private:
 		DEVOPTION_MAX
 	};
 
-	virtual void process_string(std::string const &string) override;
+	virtual void process_string(std::string &&string) override;
 
-	static void build_generic_filter(device_image_interface *img, bool is_save, std::string &filter);
-	static void add_filter_entry(std::string &dest, char const *description, char const *extensions);
-	static void copy_extension_list(std::string &dest, char const *extensions);
 	bool get_softlist_info(device_image_interface *img);
 
 	HMENU   m_devices_menu;
