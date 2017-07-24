@@ -12,6 +12,7 @@
 
     TODO:
     - verify cpu speed and rom labels where unknown
+    - SC12 CPU divider isn't working right, seems too slow and the beeper sound should be clean
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
@@ -232,7 +233,10 @@ RE information from netlist by Berger
 8*(8+1) buttons, 8+8+2 red LEDs
 DIN 41524C printer port
 36-pin edge connector
-CPU is a R65C02P4, running at 4MHz
+CPU is a R65C02P4, running at 4MHz*
+
+*By default, the CPU frequency is lowered on A13/A14 access, with a factory-set jumper:
+/2 on model SC12(1.5MHz), /4 on model 6086(1MHz)
 
 NE556 dual-timer IC:
 - timer#1, one-shot at power-on, to CPU _RESET
@@ -789,10 +793,13 @@ MACHINE_RESET_MEMBER(fidel6502_state, sc9c)
 
 void fidel6502_state::sc12_set_cpu_freq(offs_t offset)
 {
-	// when a13/a14 is high, XTAL goes through divider(s)
-	// (depending on factory-set jumper, either one or two 7474)
-	float div = (m_inp_matrix[9]->read() & 1) ? 0.25 : 0.5;
-	m_maincpu->set_clock_scale((offset & 0x6000) ? div : 1.0);
+	if (m_inp_matrix[9]->read() & 2)
+	{
+		// when a13/a14 is high, XTAL goes through divider(s)
+		// (depending on factory-set jumper, either one or two 7474)
+		float div = (m_inp_matrix[9]->read() & 1) ? 0.25 : 0.5;
+		m_maincpu->set_clock_scale((offset & 0x6000) ? div : 1.0);
+	}
 }
 
 WRITE8_MEMBER(fidel6502_state::sc12_trampoline_w)
@@ -1396,19 +1403,11 @@ static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( fidel_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
 
-	PORT_START("IN.9") // factory-set
-	PORT_CONFNAME( 0x01, 0x00, "CPU Divider" )
-	PORT_CONFSETTING(    0x00, "2" )
-	PORT_CONFSETTING(    0x01, "4" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sc12b )
-	PORT_INCLUDE( sc12 )
-
-	PORT_MODIFY("IN.9")
-	PORT_CONFNAME( 0x01, 0x01, "CPU Divider" )
-	PORT_CONFSETTING(    0x00, "2" )
-	PORT_CONFSETTING(    0x01, "4" )
+	PORT_START("IN.9") // hardwired
+	PORT_CONFNAME( 0x03, 0x00, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "Disabled" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "4" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( playmatic )
@@ -2352,7 +2351,7 @@ CONS( 1982, fscc9c,     fscc9,    0, sc9c,      sc9c,      fidel6502_state, 0,  
 CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, 0,        "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Fidelity West Germany
 
 CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12b,     fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, 0,        "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
