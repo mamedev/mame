@@ -1238,7 +1238,7 @@ void lua_engine::initialize()
 					int execstate = debug.cpu().execution_state();
 					if(execstate == 0)
 						return "stop";
-					return "running";
+					return "run";
 				},
 				[](debugger_manager &debug, const std::string &state) {
 					int execstate = 1;
