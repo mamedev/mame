@@ -868,6 +868,14 @@ actfancrj                       // (c) 1989 Data East Corporation (Japan)
 triothep                        // (c) 1989 Data East Corporation (World)
 triothepj                       // (c) 1989 Data East Corporation (Japan)
 
+@source:acvirus.cpp
+virusa							// (c) 1997 Access Gmbh
+virusb							// (c) 1999 Access Gmbh
+virusc							// (c) 2002 Access Gmbh
+virusrck						// (c) 2001 Access Gmbh
+virusrckxl						// (c) 2002 Access Gmbh
+viruscl							// (c) 2004 Access Gmbh
+
 @source:adam.cpp
 adam                            // Coleco Adam
 
