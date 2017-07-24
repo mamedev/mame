@@ -192,12 +192,10 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 #include "machine/74259.h"
 #include "machine/atari_vg.h"
 #include "machine/watchdog.h"
-#include "sound/discrete.h"
 #include "sound/pokey.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
 #include "screen.h"
-#include "speaker.h"
 
 #include "astdelux.lh"
 
@@ -652,20 +650,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( asteroid )
+static MACHINE_CONFIG_START( asteroid_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(asteroid_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
-
-	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SND_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SEL>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SHIP_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_LIFE_EN>))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -679,13 +669,12 @@ static MACHINE_CONFIG_START( asteroid )
 
 	MCFG_DEVICE_ADD("dvg", DVG, 0)
 	MCFG_AVGDVG_VECTOR("vector")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( asteroid, asteroid_base )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(asteroid)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
+	MCFG_FRAGMENT_ADD(asteroid_sound)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( asterock, asteroid )
@@ -696,45 +685,39 @@ static MACHINE_CONFIG_DERIVED( asterock, asteroid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
+static MACHINE_CONFIG_DERIVED( astdelux, asteroid_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(astdelux_map)
 
-	MCFG_DEVICE_MODIFY("audiolatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(asteroid_state, start1_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(asteroid_state, start2_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP)
-	// Q3 still activates the thrusters
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("ram1"))
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(asteroid_state, coin_counter_left_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(asteroid_state, coin_counter_center_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(asteroid_state, coin_counter_right_w))
-
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(astdelux)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FRAGMENT_ADD(astdelux_sound)
 
 	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_MODIFY("audiolatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(asteroid_state, start1_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(asteroid_state, start2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("ram1"))
+	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(asteroid_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(asteroid_state, coin_counter_center_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(asteroid_state, coin_counter_right_w))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( llander, asteroid )
+static MACHINE_CONFIG_DERIVED( llander, asteroid_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(llander_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  (double)MASTER_CLOCK/4096/12)
-
-	MCFG_DEVICE_REMOVE("audiolatch")
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)
@@ -742,9 +725,7 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(llander)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FRAGMENT_ADD(llander_sound)
 MACHINE_CONFIG_END
 
 

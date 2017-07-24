@@ -8,12 +8,6 @@
 
 #include "sound/discrete.h"
 
-/* Avalanche Discrete Sound Input Nodes */
-#define AVALNCHE_AUD0_EN            NODE_01
-#define AVALNCHE_AUD1_EN            NODE_02
-#define AVALNCHE_AUD2_EN            NODE_03
-#define AVALNCHE_SOUNDLVL_DATA      NODE_04
-#define AVALNCHE_ATTRACT_EN         NODE_05
 
 
 class avalnche_state : public driver_device
@@ -36,7 +30,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(credit_2_lamp_w);
 	DECLARE_WRITE_LINE_MEMBER(start_lamp_w);
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(avalnche_noise_amplitude_w);
 	DECLARE_WRITE_LINE_MEMBER(catch_aud0_w);
@@ -46,6 +39,7 @@ public:
 };
 
 
-/*----------- defined in audio/avalnche.c -----------*/
+/*----------- defined in audio/avalnche.cpp -----------*/
 
-DISCRETE_SOUND_EXTERN( avalnche );
+MACHINE_CONFIG_EXTERN(avalnche_sound);
+MACHINE_CONFIG_EXTERN(catch_sound);

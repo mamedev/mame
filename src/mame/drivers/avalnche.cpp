@@ -35,9 +35,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
-#include "sound/discrete.h"
 #include "screen.h"
-#include "speaker.h"
 
 #include "avalnche.lh"
 
@@ -232,16 +230,19 @@ void avalnche_state::machine_start()
 	save_item(NAME(m_avalance_video_inverted));
 }
 
-void avalnche_state::machine_reset()
-{
-}
-
-static MACHINE_CONFIG_START( avalnche )
+static MACHINE_CONFIG_START( avalnche_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
+
+	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(avalnche_state, credit_1_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(avalnche_state, video_invert_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(avalnche_state, credit_2_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(avalnche_state, start_lamp_w))
+	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -252,40 +253,21 @@ static MACHINE_CONFIG_START( avalnche )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(avalnche)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(avalnche_state, credit_1_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_ATTRACT_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(avalnche_state, video_invert_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(avalnche_state, credit_2_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD0_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(avalnche_state, start_lamp_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( catch, avalnche )
+static MACHINE_CONFIG_DERIVED( avalnche, avalnche_base)
+	/* sound hardware */
+	MCFG_FRAGMENT_ADD(avalnche_sound)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( catch, avalnche_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(catch_map)
 
 	/* sound hardware... */
-	MCFG_DEVICE_REMOVE("discrete")
-	MCFG_DEVICE_REMOVE("mono")
-
-	MCFG_DEVICE_MODIFY("latch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // It is attract_enable just like avalnche, but not hooked up yet.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(avalnche_state, catch_aud0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(avalnche_state, catch_aud1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(avalnche_state, catch_aud2_w))
+	MCFG_FRAGMENT_ADD(catch_sound)
 MACHINE_CONFIG_END
 
 
