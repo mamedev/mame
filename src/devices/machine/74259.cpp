@@ -102,10 +102,11 @@ DEFINE_DEVICE_TYPE(CD4099, cd4099_device, "cd4099", "CD4099B Addressable Latch")
 //  ADDRESSABLE LATCH DEVICE
 //**************************************************************************
 
-addressable_latch_device::addressable_latch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+addressable_latch_device::addressable_latch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool clear_active)
 	: device_t(mconfig, type, tag, owner, clock),
 		m_q_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-		m_parallel_out_cb(*this)
+		m_parallel_out_cb(*this),
+		m_clear_active(clear_active)
 {
 }
 
@@ -300,25 +301,12 @@ WRITE8_MEMBER(addressable_latch_device::clear)
 }
 
 //-------------------------------------------------
-//  q[0-7]_r - read individual output lines
-//-------------------------------------------------
-
-READ_LINE_MEMBER(addressable_latch_device::q0_r) { return BIT(m_q, 0); }
-READ_LINE_MEMBER(addressable_latch_device::q1_r) { return BIT(m_q, 1); }
-READ_LINE_MEMBER(addressable_latch_device::q2_r) { return BIT(m_q, 2); }
-READ_LINE_MEMBER(addressable_latch_device::q3_r) { return BIT(m_q, 3); }
-READ_LINE_MEMBER(addressable_latch_device::q4_r) { return BIT(m_q, 4); }
-READ_LINE_MEMBER(addressable_latch_device::q5_r) { return BIT(m_q, 5); }
-READ_LINE_MEMBER(addressable_latch_device::q6_r) { return BIT(m_q, 6); }
-READ_LINE_MEMBER(addressable_latch_device::q7_r) { return BIT(m_q, 7); }
-
-//-------------------------------------------------
 //  clear_w - handle clear/reset input
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER(addressable_latch_device::clear_w)
 {
-	m_clear = is_cmos() ? bool(state) : !state;
+	m_clear = bool(state) == m_clear_active;
 	if (m_clear)
 		clear_outputs(m_enable ? u8(m_data) << m_address : 0);
 }
@@ -350,7 +338,7 @@ void addressable_latch_device::clear_outputs(u8 new_q)
 //**************************************************************************
 
 ls259_device::ls259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: addressable_latch_device(mconfig, LS259, tag, owner, clock)
+	: addressable_latch_device(mconfig, LS259, tag, owner, clock, false)
 {
 }
 
@@ -359,7 +347,7 @@ ls259_device::ls259_device(const machine_config &mconfig, const char *tag, devic
 //**************************************************************************
 
 hc259_device::hc259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: addressable_latch_device(mconfig, HC259, tag, owner, clock)
+	: addressable_latch_device(mconfig, HC259, tag, owner, clock, false)
 {
 }
 
@@ -368,7 +356,7 @@ hc259_device::hc259_device(const machine_config &mconfig, const char *tag, devic
 //**************************************************************************
 
 hct259_device::hct259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: addressable_latch_device(mconfig, HCT259, tag, owner, clock)
+	: addressable_latch_device(mconfig, HCT259, tag, owner, clock, false)
 {
 }
 
@@ -377,7 +365,7 @@ hct259_device::hct259_device(const machine_config &mconfig, const char *tag, dev
 //**************************************************************************
 
 f9334_device::f9334_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: addressable_latch_device(mconfig, F9334, tag, owner, clock)
+	: addressable_latch_device(mconfig, F9334, tag, owner, clock, false)
 {
 }
 
@@ -386,6 +374,6 @@ f9334_device::f9334_device(const machine_config &mconfig, const char *tag, devic
 //**************************************************************************
 
 cd4099_device::cd4099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: addressable_latch_device(mconfig, CD4099, tag, owner, clock)
+	: addressable_latch_device(mconfig, CD4099, tag, owner, clock, true)
 {
 }

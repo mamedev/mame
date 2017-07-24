@@ -27,31 +27,31 @@
 
 **********************************************************************/
 
-#pragma once
-
 #ifndef DEVICES_MACHINE_74259_H
 #define DEVICES_MACHINE_74259_H
+
+#pragma once
 
 //**************************************************************************
 //  CONFIGURATION MACROS
 //**************************************************************************
 
 #define MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<0>(*device, DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<1>(*device, DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<2>(*device, DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<3>(*device, DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<4>(*device, DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 5, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<5>(*device, DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 6, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<6>(*device, DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb(*device, 7, DEVCB_##_devcb);
+	devcb = &addressable_latch_device::set_q_out_cb<7>(*device, DEVCB_##_devcb);
 
 #define MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(_devcb) \
 	devcb = &addressable_latch_device::set_parallel_out_cb(*device, DEVCB_##_devcb);
@@ -65,12 +65,9 @@
 class addressable_latch_device : public device_t
 {
 public:
-	// construction/destruction
-	addressable_latch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
 	// static configuration
-	template<class Object> static devcb_base &set_q_out_cb(device_t &device, int bit, Object object) { return downcast<addressable_latch_device &>(device).m_q_out_cb[bit].set_callback(object); }
-	template<class Object> static devcb_base &set_parallel_out_cb(device_t &device, Object object) { return downcast<addressable_latch_device &>(device).m_parallel_out_cb.set_callback(object); }
+	template<unsigned Bit, class Object> static devcb_base &set_q_out_cb(device_t &device, Object &&object) { return downcast<addressable_latch_device &>(device).m_q_out_cb[Bit].set_callback(std::forward<Object>(object)); }
+	template<class Object> static devcb_base &set_parallel_out_cb(device_t &device, Object &&object) { return downcast<addressable_latch_device &>(device).m_parallel_out_cb.set_callback(std::forward<Object>(object)); }
 
 	// data write handlers
 	void write_bit(offs_t offset, bool d);
@@ -81,15 +78,15 @@ public:
 	DECLARE_WRITE8_MEMBER(write_nibble);
 	DECLARE_WRITE8_MEMBER(clear);
 
-	// read handlers
-	DECLARE_READ_LINE_MEMBER(q0_r);
-	DECLARE_READ_LINE_MEMBER(q1_r);
-	DECLARE_READ_LINE_MEMBER(q2_r);
-	DECLARE_READ_LINE_MEMBER(q3_r);
-	DECLARE_READ_LINE_MEMBER(q4_r);
-	DECLARE_READ_LINE_MEMBER(q5_r);
-	DECLARE_READ_LINE_MEMBER(q6_r);
-	DECLARE_READ_LINE_MEMBER(q7_r);
+	// read handlers (inlined for the sake of optimization)
+	DECLARE_READ_LINE_MEMBER(q0_r) { return BIT(m_q, 0); }
+	DECLARE_READ_LINE_MEMBER(q1_r) { return BIT(m_q, 1); }
+	DECLARE_READ_LINE_MEMBER(q2_r) { return BIT(m_q, 2); }
+	DECLARE_READ_LINE_MEMBER(q3_r) { return BIT(m_q, 3); }
+	DECLARE_READ_LINE_MEMBER(q4_r) { return BIT(m_q, 4); }
+	DECLARE_READ_LINE_MEMBER(q5_r) { return BIT(m_q, 5); }
+	DECLARE_READ_LINE_MEMBER(q6_r) { return BIT(m_q, 6); }
+	DECLARE_READ_LINE_MEMBER(q7_r) { return BIT(m_q, 7); }
 	u8 output_state() const { return m_q; }
 
 	// control inputs
@@ -97,11 +94,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(clear_w);
 
 protected:
+	// construction/destruction
+	addressable_latch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool clear_active);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	virtual bool is_cmos() const { return false; }
 
 private:
 	// internal helpers
@@ -111,6 +109,9 @@ private:
 	// device callbacks
 	devcb_write_line    m_q_out_cb[8];  // output line callback array
 	devcb_write8        m_parallel_out_cb; // parallel output option
+
+	// miscellaneous configuration
+	bool    m_clear_active;             // active state of clear line
 
 	// internal state
 	u8      m_address;                  // address input
@@ -158,9 +159,6 @@ class cd4099_device : public addressable_latch_device
 {
 public:
 	cd4099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual bool is_cmos() const override { return true; }
 };
 
 // device type definition
