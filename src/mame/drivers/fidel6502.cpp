@@ -407,6 +407,7 @@ I/O is via TTL, very similar to Designer Display
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
+#include "machine/bankdev.h"
 #include "machine/6821pia.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -435,11 +436,13 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
+		m_sc12_map(*this, "sc12_map"),
 		m_cart(*this, "cartslot")
 	{ }
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
+	optional_device<address_map_bank_device> m_sc12_map;
 	optional_device<generic_slot_device> m_cart;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
@@ -479,9 +482,12 @@ public:
 	void sc9c_set_cpu_freq();
 
 	// SC12
+	DECLARE_WRITE8_MEMBER(sc12_trampoline_w);
+	DECLARE_READ8_MEMBER(sc12_trampoline_r);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	DECLARE_READ8_MEMBER(sc12_cart_r);
+	void sc12_set_cpu_freq(offs_t offset);
 
 	// Excellence
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
@@ -781,6 +787,26 @@ MACHINE_RESET_MEMBER(fidel6502_state, sc9c)
 
 // TTL/generic
 
+void fidel6502_state::sc12_set_cpu_freq(offs_t offset)
+{
+	// when a13/a14 is high, XTAL goes through divider(s)
+	// (depending on factory-set jumper, either one or two 7474)
+	float div = (m_inp_matrix[9]->read() & 1) ? 0.25 : 0.5;
+	m_maincpu->set_clock_scale((offset & 0x6000) ? div : 1.0);
+}
+
+WRITE8_MEMBER(fidel6502_state::sc12_trampoline_w)
+{
+	sc12_set_cpu_freq(offset);
+	m_sc12_map->write8(space, offset, data);
+}
+
+READ8_MEMBER(fidel6502_state::sc12_trampoline_r)
+{
+	sc12_set_cpu_freq(offset);
+	return m_sc12_map->read8(space, offset);
+}
+
 WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 {
 	// d0-d3: 7442 a0-a3
@@ -792,6 +818,7 @@ WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 	m_dac->write(BIT(sel, 9));
 
 	// d6,d7: led select (active low)
+	m_display_wait = 60;
 	display_matrix(9, 2, sel & 0x1ff, ~data >> 6 & 3);
 
 	// d4,d5: printer
@@ -1111,6 +1138,10 @@ ADDRESS_MAP_END
 
 // SC12
 
+static ADDRESS_MAP_START( sc12_trampoline, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(sc12_trampoline_r, sc12_trampoline_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
@@ -1349,7 +1380,7 @@ static INPUT_PORTS_START( eagg )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( sc12_base )
+static INPUT_PORTS_START( sc12_sidepanel )
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("DM / Knight")
@@ -1363,16 +1394,35 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( fidel_cb_buttons )
-	PORT_INCLUDE( sc12_base )
+	PORT_INCLUDE( sc12_sidepanel )
+
+	PORT_START("IN.9") // factory-set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFSETTING(    0x01, "4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sc12b )
+	PORT_INCLUDE( sc12 )
+
+	PORT_MODIFY("IN.9")
+	PORT_CONFNAME( 0x01, 0x01, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFSETTING(    0x01, "4" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( playmatic )
 	PORT_INCLUDE( fidel_cb_magnets )
-	PORT_INCLUDE( sc12_base )
+	PORT_INCLUDE( sc12_sidepanel )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sc9 )
+	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( sc12_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc9c )
-	PORT_INCLUDE( sc12 )
+	PORT_INCLUDE( sc9 )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, sc9c_cpu_freq, nullptr) // factory set
@@ -1634,11 +1684,17 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sc12 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(sc12_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(596)) // from 556 timer (22nF, 82K+26K, 1K)
-	MCFG_TIMER_START_DELAY(attotime::from_hz(596) - attotime::from_nsec(15250)) // active for 15.25us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(596))
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz) // R65C02P3
+	MCFG_CPU_PROGRAM_MAP(sc12_trampoline)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
+
+	MCFG_DEVICE_ADD("sc12_map", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(sc12_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
@@ -1654,6 +1710,20 @@ static MACHINE_CONFIG_START( sc12 )
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
 	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sc12b, sc12 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL_4MHz) // R65C02P4
+
+	// change irq timer frequency
+	MCFG_DEVICE_REMOVE("irq_on")
+	MCFG_DEVICE_REMOVE("irq_off")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(596)) // from 556 timer (22nF, 82K+26K, 1K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(596) - attotime::from_nsec(15250)) // active for 15.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(596))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fexcel )
@@ -2119,11 +2189,18 @@ ROM_START( fscc9ps )
 ROM_END
 
 
-ROM_START( fscc12 ) // model 6086, PCB label 510-1084B01
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1068a01",   0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
-	ROM_LOAD("tms2732ajl-45", 0xc000, 0x1000, CRC(45070a71) SHA1(8aeecff828f26fb7081902c757559903be272649) ) // TI TMS2732AJL-45
-	ROM_LOAD("tmm2764d-2",    0xe000, 0x2000, CRC(183d3edc) SHA1(3296a4c3bce5209587d4a1694fce153558544e63) ) // Toshiba TMM2764D-2
+ROM_START( fscc12 ) // model SC12, PCB label 510-1084B01
+	ROM_REGION( 0x10000, "sc12_map", 0 )
+	ROM_LOAD("101-1068a01.ic15", 0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
+	ROM_LOAD("orange.ic13",      0xc000, 0x1000, CRC(ed5289b2) SHA1(9b0c7f9ae4102d4a66eb8c91d4e84b9eec2ffb3d) ) // TI TMS2732AJL-45, no label, orange sticker
+	ROM_LOAD("red.ic14",         0xe000, 0x2000, CRC(0c4968c4) SHA1(965a66870b0f8ce9549418cbda09d2ff262a1504) ) // TI TMS2764JL-25, no label, red sticker
+ROM_END
+
+ROM_START( fscc12b ) // model 6086, PCB label 510-1084B01
+	ROM_REGION( 0x10000, "sc12_map", 0 )
+	ROM_LOAD("101-1068a01.ic15", 0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
+	ROM_LOAD("orange.ic13",      0xc000, 0x1000, CRC(45070a71) SHA1(8aeecff828f26fb7081902c757559903be272649) ) // TI TMS2732AJL-45, no label, orange sticker
+	ROM_LOAD("red.ic14",         0xe000, 0x2000, CRC(183d3edc) SHA1(3296a4c3bce5209587d4a1694fce153558544e63) ) // Toshiba TMM2764D-2, no label, red sticker
 ROM_END
 
 
@@ -2269,12 +2346,13 @@ CONS( 1986, feag2100sp, feag2100, 0, eag,       eagg,      fidel6502_state, 0,  
 CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, feag2100fr, feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1982, fscc9,      0,        0, sc9d,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
-CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9,      0,        0, sc9d,      sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
+CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, fscc9c,     fscc9,    0, sc9c,      sc9c,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, 0,        "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Fidelity West Germany
 
-CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12b,     fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, 0,        "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
