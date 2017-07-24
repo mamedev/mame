@@ -37,7 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(display_a_w);
 	DECLARE_WRITE8_MEMBER(drivers_l_w);
 	DECLARE_WRITE8_MEMBER(drivers_b_w);
-	DECLARE_WRITE8_MEMBER(drivers_a_w);
 
 	DECLARE_READ8_MEMBER(inputs_r);
 	DECLARE_READ8_MEMBER(ports_r);
@@ -65,7 +64,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_oki;
 	optional_device<ls157_device> m_adpcm_select;
-	optional_device_array<hc259_device, 6> m_driver_latch;
+	optional_device_array<addressable_latch_device, 6> m_driver_latch;
 	optional_memory_bank m_soundbank;
 	u8 m_soundlatch;
 	bool m_adpcm_toggle;
@@ -117,11 +116,6 @@ WRITE8_MEMBER(joctronic_state::drivers_b_w)
 	logerror("drivers_b[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::drivers_a_w)
-{
-	logerror("drivers_a[%d] = $%02X\n", offset, data);
-}
-
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, joctronic_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
@@ -133,9 +127,9 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, joctronic_state )
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0fc7) AM_WRITE(display_3_w) // CSD3
 	AM_RANGE(0xc018, 0xc018) AM_MIRROR(0x0fc7) AM_WRITE(display_4_w) // CSD4
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0fc7) AM_WRITE(display_a_w) // CSDA
-	AM_RANGE(0xc028, 0xc02f) AM_MIRROR(0x0fc0) AM_WRITE(drivers_l_w) // OL
-	AM_RANGE(0xc030, 0xc037) AM_MIRROR(0x0fc0) AM_WRITE(drivers_b_w) // OB
-	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x0fc0) AM_WRITE(drivers_a_w) // OA
+	AM_RANGE(0xc028, 0xc028) AM_MIRROR(0x0fc7) AM_WRITE(drivers_l_w) // OL
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0fc7) AM_WRITE(drivers_b_w) // OB
+	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x0fc0) AM_WRITE(drivers_w) // OA
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x0fff) AM_WRITE(soundlatch_nmi_w) // PSON
 ADDRESS_MAP_END
 
@@ -163,7 +157,8 @@ WRITE8_MEMBER(joctronic_state::display_strobe_w)
 WRITE8_MEMBER(joctronic_state::drivers_w)
 {
 	for (int i = 0; i < 6; ++i)
-		m_driver_latch[i]->write_bit(offset, BIT(data, i));
+		if (m_driver_latch[i].found())
+			m_driver_latch[i]->write_bit(offset, BIT(data, i));
 }
 
 WRITE8_MEMBER(joctronic_state::display_ck_w)
@@ -339,6 +334,11 @@ static MACHINE_CONFIG_START( joctronic )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
 
+	MCFG_DEVICE_ADD("drivers1", LS259, 0) // IC4
+	MCFG_DEVICE_ADD("drivers2", LS259, 0) // IC3
+	MCFG_DEVICE_ADD("drivers3", LS259, 0) // IC2
+	MCFG_DEVICE_ADD("drivers4", LS259, 0) // IC1
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -380,12 +380,12 @@ static MACHINE_CONFIG_START( slalom03 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
 
-	MCFG_DEVICE_ADD("drivers1", HC259, 0)
-	MCFG_DEVICE_ADD("drivers2", HC259, 0)
-	MCFG_DEVICE_ADD("drivers3", HC259, 0)
-	MCFG_DEVICE_ADD("drivers4", HC259, 0)
-	MCFG_DEVICE_ADD("drivers5", HC259, 0)
-	MCFG_DEVICE_ADD("drivers6", HC259, 0)
+	MCFG_DEVICE_ADD("drivers1", HC259, 0) // IC1
+	MCFG_DEVICE_ADD("drivers2", HC259, 0) // IC2
+	MCFG_DEVICE_ADD("drivers3", HC259, 0) // IC3
+	MCFG_DEVICE_ADD("drivers4", HC259, 0) // IC4
+	MCFG_DEVICE_ADD("drivers5", HC259, 0) // IC5
+	MCFG_DEVICE_ADD("drivers6", HC259, 0) // IC6
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

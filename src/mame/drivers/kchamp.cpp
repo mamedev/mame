@@ -469,7 +469,7 @@ static MACHINE_CONFIG_START( kchamp )
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC71
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kchamp_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kchamp_state, nmi_enable_w))
 
