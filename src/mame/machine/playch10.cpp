@@ -82,7 +82,7 @@ CUSTOM_INPUT_MEMBER(playch10_state::pc10_int_detect_r)
 	return ~m_pc10_int_detect & 1;
 }
 
-WRITE_LINE_MEMBER(playch10_state::SDCS_w)
+WRITE_LINE_MEMBER(playch10_state::sdcs_w)
 {
 	/*
 	    Hooked to CLR on LS194A - Sheet 2, bottom left.
@@ -93,32 +93,32 @@ WRITE_LINE_MEMBER(playch10_state::SDCS_w)
 	m_pc10_sdcs = !state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::CNTRLMASK_w)
+WRITE_LINE_MEMBER(playch10_state::cntrl_mask_w)
 {
 	m_cntrl_mask = !state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::DISPMASK_w)
+WRITE_LINE_MEMBER(playch10_state::disp_mask_w)
 {
 	m_pc10_dispmask = !state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::SOUNDMASK_w)
+WRITE_LINE_MEMBER(playch10_state::sound_mask_w)
 {
 	/* should mute the APU - unimplemented yet */
 }
 
-WRITE_LINE_MEMBER(playch10_state::NMIENABLE_w)
+WRITE_LINE_MEMBER(playch10_state::nmi_enable_w)
 {
 	m_pc10_nmi_enable = state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::DOGDI_w)
+WRITE_LINE_MEMBER(playch10_state::dog_di_w)
 {
 	m_pc10_dog_di = state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::PPURES_w)
+WRITE_LINE_MEMBER(playch10_state::ppu_reset_w)
 {
 	if (state)
 		machine().device("ppu")->reset();
@@ -131,7 +131,7 @@ READ8_MEMBER(playch10_state::pc10_detectclr_r)
 	return 0;
 }
 
-WRITE8_MEMBER(playch10_state::CARTSEL_w)
+WRITE8_MEMBER(playch10_state::cart_sel_w)
 {
 	m_cart_sel = data;
 }

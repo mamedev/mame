@@ -5,8 +5,20 @@
     audio\avalnche.c
 
 *************************************************************************/
+
 #include "emu.h"
 #include "includes/avalnche.h"
+#include "machine/74259.h"
+#include "sound/discrete.h"
+#include "speaker.h"
+
+
+/* Avalanche Discrete Sound Input Nodes */
+#define AVALNCHE_AUD0_EN            NODE_01
+#define AVALNCHE_AUD1_EN            NODE_02
+#define AVALNCHE_AUD2_EN            NODE_03
+#define AVALNCHE_SOUNDLVL_DATA      NODE_04
+#define AVALNCHE_ATTRACT_EN         NODE_05
 
 
 /***************************************************************************
@@ -43,7 +55,7 @@ static const discrete_lfsr_desc avalnche_lfsr={
 #define AVALNCHE_AUD2_SND           NODE_12
 #define AVALNCHE_SOUNDLVL_AUD0_SND  NODE_13
 
-DISCRETE_SOUND_START(avalnche)
+static DISCRETE_SOUND_START(avalnche)
 	/************************************************/
 	/* avalnche  Effects Relataive Gain Table       */
 	/*                                              */
@@ -89,6 +101,30 @@ DISCRETE_SOUND_START(avalnche)
 
 	DISCRETE_OUTPUT(NODE_90, 65534.0/(725.6+750.2+750.2+1000.0))
 DISCRETE_SOUND_END
+
+
+MACHINE_CONFIG_START( avalnche_sound )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(avalnche)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_MODIFY("latch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_ATTRACT_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD0_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD2_EN>))
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START( catch_sound ) // just a stub here...
+	MCFG_DEVICE_MODIFY("latch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // It is attract_enable just like avalnche, but not hooked up yet.
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(avalnche_state, catch_aud0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(avalnche_state, catch_aud1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(avalnche_state, catch_aud2_w))
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

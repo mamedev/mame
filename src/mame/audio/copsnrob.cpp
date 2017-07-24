@@ -5,9 +5,9 @@
  * Nov 2010, Derrick Renaud
  ************************************************************************/
 #include "emu.h"
-#include "speaker.h"
 #include "includes/copsnrob.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 
 /* Discrete Sound Input Nodes */
