@@ -571,8 +571,8 @@ static MACHINE_CONFIG_START( roldfrog )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(splash_state, coin2_lockout_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(splash_state, coin1_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splash_state, coin2_counter_w))
 
