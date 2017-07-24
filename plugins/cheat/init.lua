@@ -81,6 +81,7 @@ function cheat.startplugin()
 	local stop = true
 	local cheatname = ""
 	local consolelog = nil
+	local consolelast = 0
 	local watches = {}
 	local breaks = {}
 
@@ -255,7 +256,7 @@ function cheat.startplugin()
 
 	local function periodiccb()
 		local msg = consolelog[#consolelog]
-		if msg:find("Stopped at", 1, true) then
+		if #consolelog > consolelast and msg:find("Stopped at", 1, true) then
 			local point = msg:match("Stopped at breakpoint ([0-9]+)")
 			if not point then
 				point = msg:match("Stopped at watchpoint ([0-9]+")
@@ -277,6 +278,7 @@ function cheat.startplugin()
 				manager:machine():debugger().execution_state = "run"
 			end
 		end
+		consolelast = #consolelog
 	end
 
 	local function bpset(cheat, dev, addr, func)
@@ -693,6 +695,7 @@ function cheat.startplugin()
 		load_hotkeys()
 		if manager:machine():debugger() then
 			consolelog = manager:machine():debugger().consolelog
+			consolelast = 0
 		end
 	end)
 
