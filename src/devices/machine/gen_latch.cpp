@@ -89,7 +89,7 @@ generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, co
 
 READ8_MEMBER( generic_latch_8_device::read )
 {
-	if (!has_separate_acknowledge())
+	if (!has_separate_acknowledge() && !machine().side_effect_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
@@ -121,7 +121,8 @@ WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
 
 READ8_MEMBER( generic_latch_8_device::acknowledge_r )
 {
-	set_latch_written(false);
+	if (!machine().side_effect_disabled())
+		set_latch_written(false);
 	return space.unmap();
 }
 
@@ -171,7 +172,7 @@ generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, 
 
 READ16_MEMBER( generic_latch_16_device::read )
 {
-	if (!has_separate_acknowledge())
+	if (!has_separate_acknowledge() && !machine().side_effect_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
