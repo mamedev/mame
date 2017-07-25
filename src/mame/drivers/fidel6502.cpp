@@ -361,7 +361,7 @@ Ricoh RP65C02G CPU, 3MHz XTAL
 PCB label 510.1129A01
 basically same as (Par) Excellence hardware, reskinned board
 
-Designer 2100 (model 6103): exactly same, but running at 5MHz
+Designer 2100 (model 6103): exactly same, but running at 6MHz
 
 Designer 2100 Display (model 6106)
 ----------------
@@ -1790,10 +1790,10 @@ static MACHINE_CONFIG_DERIVED( granits, fexcelp )
 	MCFG_DEVICE_CLOCK(XTAL_8MHz) // overclocked
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
+static MACHINE_CONFIG_DERIVED( fdes2100, fexcel )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // RP65C02G
+	MCFG_CPU_REPLACE("maincpu", M65C02, XTAL_6MHz) // WDC 65C02
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 
 	// change irq timer frequency
@@ -1806,11 +1806,11 @@ static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_des)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fdes2100, fdes2000 )
+static MACHINE_CONFIG_DERIVED( fdes2000, fdes2100 )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_5MHz)
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // RP65C02G
+	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
