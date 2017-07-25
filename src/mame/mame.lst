@@ -35146,6 +35146,7 @@ super80v                        //
 superchs                        // D46 (c) 1992 Taito Corporation Japan (World)
 superchsj                       // D46 (c) 1992 Taito Corporation (Japan)
 superchsp                       // prototype
+superchsp2                      // prototype
 superchsu                       // D46 (c) 1992 Taito America Corporation (US)
 
 @source:supercrd.cpp
