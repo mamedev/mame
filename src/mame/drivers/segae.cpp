@@ -855,14 +855,16 @@ ROM_START( ridleofp )
 	ROM_LOAD( "epr10422.bin",   0x28000, 0x08000, CRC(14781e56) SHA1(f15d9d89e1ebff36c3867cfc8f0bdf7f6b3c96bc) )
 ROM_END
 
+// Game ID# 833-5927-01
+// ROM BD # 834-5929-01
 ROM_START( transfrm )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "ic7.top",    0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) /* Fixed Code */
+	ROM_LOAD( "epr-7605.ic7",   0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
 	ROM_LOAD( "epr-7347.ic5",   0x10000, 0x08000, CRC(df0f639f) SHA1(a09a9841b66de246a585be63d911b9a42a323503) )
 	ROM_LOAD( "epr-7348.ic4",   0x18000, 0x08000, CRC(0f38ea96) SHA1(d4d421c5d93832e2bc1f22f39dffb6b80f2750bd) )
-	ROM_LOAD( "ic3.top",        0x20000, 0x08000, CRC(9d485df6) SHA1(b25f04803c8f7188021f3039aa13aac80d480823) )
+	ROM_LOAD( "epr-7606.ic3",   0x20000, 0x08000, CRC(9d485df6) SHA1(b25f04803c8f7188021f3039aa13aac80d480823) )
 	ROM_LOAD( "epr-7350.ic2",   0x28000, 0x08000, CRC(0052165d) SHA1(cf4b5dffa54238e513515b3fc90faa7ce0b65d34) )
 ROM_END
 
