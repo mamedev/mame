@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/ym2151.h"
 #include "machine/atarigen.h"
 #include "includes/cyberbal.h"
 
@@ -54,7 +53,7 @@ WRITE8_MEMBER(cyberbal_state::sound_bank_select_w)
 	machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
 	m_daccpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	if (!(data & 0x01)) machine().device("ymsnd")->reset();
+	m_ymsnd->reset_w(BIT(data, 0));
 }
 
 

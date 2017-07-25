@@ -198,6 +198,7 @@ RoadBlasters (aka Future Vette):005*
 #include "machine/6522via.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
+#include "sound/ym2151.h"
 #include "video/atarimo.h"
 #include "speaker.h"
 
@@ -236,14 +237,6 @@ MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
 	m_joystick_value = 0;
 	m_joystick_int = 0;
 	m_joystick_int_enable = 0;
-}
-
-
-WRITE_LINE_MEMBER(atarisy1_state::music_reset_w)
-{
-	// reset the YM2151 and YM3012
-	if (!state)
-		m_ymsnd->reset();
 }
 
 
@@ -748,7 +741,7 @@ static MACHINE_CONFIG_START( atarisy1 )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(atarisy1_state, music_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(atarisy1_state, led_1_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(atarisy1_state, led_2_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(atarisy1_state, coin_counter_right_w))
