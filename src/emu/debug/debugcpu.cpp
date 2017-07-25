@@ -2715,14 +2715,15 @@ void device_debug::watchpoint_update_flags(address_space &space)
 
 	// see if there are any enabled breakpoints
 	bool enablewrite = false;
-	for (watchpoint *wp = m_wplist[space.spacenum()]; wp != nullptr; wp = wp->m_next)
-		if (wp->m_enabled)
-		{
-			if (wp->m_type & WATCHPOINT_READ)
-				enableread = true;
-			if (wp->m_type & WATCHPOINT_WRITE)
-				enablewrite = true;
-		}
+	if (space.spacenum() < int(m_wplist.size()))
+		for (watchpoint *wp = m_wplist[space.spacenum()]; wp != nullptr; wp = wp->m_next)
+			if (wp->m_enabled)
+			{
+				if (wp->m_type & WATCHPOINT_READ)
+					enableread = true;
+				if (wp->m_type & WATCHPOINT_WRITE)
+					enablewrite = true;
+			}
 
 	// push the flags out globally
 	space.enable_read_watchpoints(enableread);
