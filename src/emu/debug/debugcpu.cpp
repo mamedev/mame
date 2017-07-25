@@ -2794,41 +2794,42 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 		m_wpdata = value_to_write;
 
 	// see if we match
-	for (device_debug::watchpoint *wp = wplist[space.spacenum()]; wp != nullptr; wp = wp->next())
-		if (wp->hit(type, address, size))
-		{
-			// halt in the debugger by default
-			m_execution_state = EXECUTION_STATE_STOPPED;
-
-			// if we hit, evaluate the action
-			if (!wp->action().empty())
-				m_machine.debugger().console().execute_command(wp->action(), false);
-
-			// print a notification, unless the action made us go again
-			if (m_execution_state == EXECUTION_STATE_STOPPED)
+	if (space.spacenum() < int(wplist.size()))
+		for (device_debug::watchpoint *wp = wplist[space.spacenum()]; wp != nullptr; wp = wp->next())
+			if (wp->hit(type, address, size))
 			{
-				static const char *const sizes[] =
-				{
-					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
-				};
-				offs_t pc = space.device().safe_pcbase();
-				std::string buffer;
+				// halt in the debugger by default
+				m_execution_state = EXECUTION_STATE_STOPPED;
 
-				if (type & WATCHPOINT_WRITE)
+				// if we hit, evaluate the action
+				if (!wp->action().empty())
+					m_machine.debugger().console().execute_command(wp->action(), false);
+
+				// print a notification, unless the action made us go again
+				if (m_execution_state == EXECUTION_STATE_STOPPED)
 				{
-					buffer = string_format("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
-					if (value_to_write >> 32)
-						buffer.append(string_format(" (data=%X%08X)", u32(value_to_write >> 32), u32(value_to_write)));
+					static const char *const sizes[] =
+					{
+						"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
+					};
+					offs_t pc = space.device().safe_pcbase();
+					std::string buffer;
+
+					if (type & WATCHPOINT_WRITE)
+					{
+						buffer = string_format("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
+						if (value_to_write >> 32)
+							buffer.append(string_format(" (data=%X%08X)", u32(value_to_write >> 32), u32(value_to_write)));
+						else
+							buffer.append(string_format(" (data=%X)", u32(value_to_write)));
+					}
 					else
-						buffer.append(string_format(" (data=%X)", u32(value_to_write)));
+						buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
+					m_machine.debugger().console().printf("%s\n", buffer.c_str());
+					space.device().debug()->compute_debug_flags();
 				}
-				else
-					buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
-				m_machine.debugger().console().printf("%s\n", buffer.c_str());
-				space.device().debug()->compute_debug_flags();
+				break;
 			}
-			break;
-		}
 
 	m_within_instruction_hook = false;
 }
