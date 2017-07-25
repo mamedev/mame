@@ -176,7 +176,8 @@ void namcoio_device::device_reset()
 	for (auto & elem : m_ram)
 		elem = 0;
 
-	set_reset_line(PULSE_LINE);
+	if (m_reset != ASSERT_LINE)
+		set_reset_line(PULSE_LINE);
 }
 
 /*****************************************************************************
