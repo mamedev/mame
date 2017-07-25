@@ -13,7 +13,9 @@
     TODO:
     - verify cpu speed and rom labels where unknown
     - improve SC12 CPU divider? it seems a little bit slower than the real machine.
-      Currently, a dummy timer workaround is needed, or it's much worse
+      Currently, a dummy timer workaround is needed, or it's much worse.
+      Is the problem here is due to timing of CPU addressbus changes? We can only 'sense'
+      the addressbus at read or write accesses.
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
