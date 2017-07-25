@@ -189,6 +189,7 @@ MAIN BOARD:
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -203,9 +204,14 @@ MAIN BOARD:
 #define VLM_CLOCK             XTAL_3_579545MHz
 
 
-WRITE8_MEMBER(trackfld_state::coin_w)
+WRITE_LINE_MEMBER(trackfld_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(trackfld_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 WRITE8_MEMBER(trackfld_state::questions_bank_w)
@@ -222,20 +228,16 @@ WRITE8_MEMBER(trackfld_state::questions_bank_w)
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::irq_mask_w)
+WRITE_LINE_MEMBER(trackfld_state::irq_mask_w)
 {
-	m_irq_mask = data & 1;
+	m_irq_mask = state;
+	if (!m_irq_mask)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* AFE */
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)  /* FLIP */
-	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* 26 */ /* cause interrupt on audio CPU */
-	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITENOP                      /* 25 */
-	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)                 /* 24, 23 */
-	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.2 */
-	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.4 */
-	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(irq_mask_w)             /* INT */
+	AM_RANGE(0x1080, 0x1087) AM_MIRROR(0x0078) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  /* 32 */
 	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
@@ -255,9 +257,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(trackfld_state::yieartf_nmi_mask_w)
+WRITE_LINE_MEMBER(trackfld_state::nmi_mask_w)
 {
-	m_yieartf_nmi_mask = data & 1;
+	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_MEMBER(trackfld_state::trackfld_speech_r)
@@ -282,13 +286,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(trackfld_VLM5030_control_w)
 	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* AFE */
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)  /* FLIP */
-	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* 26 */ /* cause interrupt on audio CPU */
-	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITE(yieartf_nmi_mask_w)     /* 25 */
-	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)                 /* 24, 23 */
-	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.2 */
-	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.4 */
-	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(irq_mask_w)             /* INT */
+	AM_RANGE(0x1080, 0x1087) AM_MIRROR(0x0078) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 //  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)     /* 32 */
 	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
@@ -312,10 +310,7 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	/* all usual addresses +0x8000 */
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x9080) AM_WRITE(trackfld_flipscreen_w)
-	AM_RANGE(0x9081, 0x9081) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x9083, 0x9084) AM_WRITE(coin_w)
-	AM_RANGE(0x9087, 0x9087) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x9080, 0x9087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x9100, 0x9100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x9280, 0x9280) AM_READ_PORT("SYSTEM")
@@ -345,10 +340,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(trackfld_flipscreen_w)
-	AM_RANGE(0x10b1, 0x10b1) AM_READNOP AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)
-	AM_RANGE(0x10b3, 0x10b4) AM_WRITE(coin_w) // actually not used
-	AM_RANGE(0x10b7, 0x10b7) AM_READNOP AM_WRITE(irq_mask_w)
+	AM_RANGE(0x10b0, 0x10b7) AM_READNOP AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x1100, 0x1100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
@@ -372,10 +364,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
-	AM_RANGE(0x1080, 0x1080) AM_WRITE(trackfld_flipscreen_w)
-	AM_RANGE(0x1081, 0x1081) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
-	AM_RANGE(0x1087, 0x1087) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x1080, 0x1087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x1100, 0x1100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
@@ -873,6 +862,9 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(trackfld_state,trackfld)
 {
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_nmi_mask));
+
 	/* video */
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_sprite_bank1));
@@ -890,14 +882,14 @@ MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 
 INTERRUPT_GEN_MEMBER(trackfld_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (m_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( trackfld )
@@ -912,6 +904,17 @@ static MACHINE_CONFIG_START( trackfld )
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1D
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(trackfld_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // 26 = SOUND ON
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // 25 = MUT?
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(trackfld_state, coin_counter_1_w)) // 24 = OUT1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(trackfld_state, coin_counter_2_w)) // 23 = OUT2
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // CN3.2
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // CN3.4
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, irq_mask_w)) // INT
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -953,8 +956,8 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 {
-	if (m_yieartf_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( yieartf )
@@ -971,6 +974,17 @@ static MACHINE_CONFIG_START( yieartf )
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(trackfld_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(trackfld_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(trackfld_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, irq_mask_w))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1033,11 +1047,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mastkin, trackfld )
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("maincpu")
-
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_CPU_REPLACE("maincpu", M6809, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(mastkin_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // actually not used
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // actually not used
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
@@ -1047,6 +1063,9 @@ static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
 	MCFG_CPU_REPLACE("maincpu",M6800,2048000)       /* 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(wizzquiz_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state,  vblank_nmi)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( reaktor, trackfld )

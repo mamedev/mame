@@ -106,13 +106,15 @@ WRITE8_MEMBER(sbasketb_state::sbasketb_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_flipscreen_w)
+WRITE_LINE_MEMBER(sbasketb_state::flipscreen_w)
 {
-	if (flip_screen() != data)
-	{
-		flip_screen_set(data);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
+}
+
+WRITE_LINE_MEMBER(sbasketb_state::spriteram_select_w)
+{
+	m_spriteram_select = state;
 }
 
 TILE_GET_INFO_MEMBER(sbasketb_state::get_bg_tile_info)
@@ -128,12 +130,14 @@ void sbasketb_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbasketb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
+
+	save_item(NAME(m_spriteram_select));
 }
 
 void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	uint8_t *spriteram = m_spriteram;
-	int offs = (*m_spriteram_select & 0x01) * 0x100;
+	int offs = m_spriteram_select ? 0x100 : 0;
 	int i;
 
 	for (i = 0; i < 64; i++, offs += 4)
