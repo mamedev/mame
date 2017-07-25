@@ -47,7 +47,6 @@ public:
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_squeak_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);

@@ -229,12 +229,6 @@ READ8_MEMBER(gauntlet_state::switch_6502_r)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gauntlet_state::ym2151_reset_w)
-{
-	if (state == 0)
-		m_ym2151->reset();
-}
-
 WRITE_LINE_MEMBER(gauntlet_state::speech_squeak_w)
 {
 	uint8_t data = 5 | (state ? 2 : 0);
@@ -546,7 +540,7 @@ static MACHINE_CONFIG_START( gauntlet_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
 	MCFG_DEVICE_ADD("soundctl", LS259, 0) // 16T/U
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gauntlet_state, ym2151_reset_w)) // music reset, low reset
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz

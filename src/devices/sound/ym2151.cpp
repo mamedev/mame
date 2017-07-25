@@ -1773,6 +1773,19 @@ void ym2151_device::device_reset()
 
 
 //-------------------------------------------------
+//  reset_w - handle writes to the reset lines of
+//  the YM2151 and its associated DAC
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(ym2151_device::reset_w)
+{
+	// FIXME: not accurate behavior
+	if (!state)
+		reset();
+}
+
+
+//-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 

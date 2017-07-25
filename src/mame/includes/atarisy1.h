@@ -28,7 +28,6 @@ public:
 			m_scanline_timer(*this, "scan_timer"),
 			m_int3off_timer(*this, "int3off_timer"),
 			m_tms(*this, "tms"),
-			m_ymsnd(*this, "ymsnd"),
 			m_outlatch(*this, "outlatch") { }
 
 	required_device<cpu_device> m_audiocpu;
@@ -61,7 +60,6 @@ public:
 	/* speech */
 	required_device<tms5220_device> m_tms;
 
-	required_device<ym2151_device> m_ymsnd;
 	required_device<ls259_device> m_outlatch;
 
 	/* graphics bank tracking */
@@ -74,7 +72,6 @@ public:
 	DECLARE_WRITE16_MEMBER(joystick_w);
 	DECLARE_READ16_MEMBER(trakball_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE_LINE_MEMBER(music_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(led_1_w);
 	DECLARE_WRITE_LINE_MEMBER(led_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
