@@ -160,6 +160,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* rest of main_rom */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( esb_main_map, AS_PROGRAM, 8, starwars_state )
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(esb_slapstic_r, esb_slapstic_w)
+	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank2")
+	AM_IMPORT_FROM(main_map)
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -364,6 +369,9 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( esb, starwars )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(esb_main_map)
+
 	MCFG_SLAPSTIC_ADD("slapstic", 101)
 
 	MCFG_DEVICE_MODIFY("outlatch")
@@ -554,12 +562,6 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 	m_slapstic_device->slapstic_init();
 	m_slapstic_source = &rom[0x14000];
 	m_slapstic_base = &rom[0x08000];
-
-	/* install read/write handlers for it */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),this), write8_delegate(FUNC(starwars_state::esb_slapstic_w),this));
-
-	/* install additional banking */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xa000, 0xffff, "bank2");
 
 	/* prepare the matrix processor */
 	starwars_mproc_init();
