@@ -27,8 +27,8 @@
 
 **********************************************************************/
 
-#ifndef DEVICES_MACHINE_74259_H
-#define DEVICES_MACHINE_74259_H
+#ifndef MAME_MACHINE_74259_H
+#define MAME_MACHINE_74259_H
 
 #pragma once
 
@@ -66,8 +66,8 @@ class addressable_latch_device : public device_t
 {
 public:
 	// static configuration
-	template<unsigned Bit, class Object> static devcb_base &set_q_out_cb(device_t &device, Object &&object) { return downcast<addressable_latch_device &>(device).m_q_out_cb[Bit].set_callback(std::forward<Object>(object)); }
-	template<class Object> static devcb_base &set_parallel_out_cb(device_t &device, Object &&object) { return downcast<addressable_latch_device &>(device).m_parallel_out_cb.set_callback(std::forward<Object>(object)); }
+	template<unsigned Bit, class Object> static devcb_base &set_q_out_cb(device_t &device, Object &&cb) { return downcast<addressable_latch_device &>(device).m_q_out_cb[Bit].set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_parallel_out_cb(device_t &device, Object &&cb) { return downcast<addressable_latch_device &>(device).m_parallel_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	// data write handlers
 	void write_bit(offs_t offset, bool d);
@@ -107,11 +107,11 @@ private:
 	void clear_outputs(u8 new_q);
 
 	// device callbacks
-	devcb_write_line    m_q_out_cb[8];  // output line callback array
-	devcb_write8        m_parallel_out_cb; // parallel output option
+	devcb_write_line    m_q_out_cb[8];      // output line callback array
+	devcb_write8        m_parallel_out_cb;  // parallel output option
 
 	// miscellaneous configuration
-	bool    m_clear_active;             // active state of clear line
+	bool const          m_clear_active;     // active state of clear line
 
 	// internal state
 	u8      m_address;                  // address input
@@ -168,4 +168,4 @@ DECLARE_DEVICE_TYPE(HCT259, hct259_device)
 DECLARE_DEVICE_TYPE(F9334, f9334_device)
 DECLARE_DEVICE_TYPE(CD4099, cd4099_device)
 
-#endif
+#endif // MAME_MACHINE_74259_H
