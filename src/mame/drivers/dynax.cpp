@@ -106,7 +106,7 @@ TODO:
 /* It runs in IM 0, thus needs an opcode on the data bus */
 void dynax_state::sprtmtch_update_irq()
 {
-	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x10 : 0) | ((m_blitter_irq) ? 0x20 : 0) ;
+	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x10 : 0) | ((m_blitter_irq && m_blitter_irq_mask) ? 0x20 : 0) ;
 	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
@@ -118,8 +118,12 @@ WRITE8_MEMBER(dynax_state::dynax_vblank_ack_w)
 
 WRITE_LINE_MEMBER(dynax_state::blitter_ack_w)
 {
-	// probably not exactly how this works
-	m_blitter_irq = 0;
+	m_blitter_irq_mask = state;
+
+	// this must be acknowledged somewhere else
+	if (!m_blitter_irq_mask)
+		m_blitter_irq = 0;
+
 	sprtmtch_update_irq();
 }
 
@@ -143,7 +147,7 @@ WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
 /* It runs in IM 0, thus needs an opcode on the data bus */
 void dynax_state::jantouki_update_irq()
 {
-	int irq = ((m_blitter_irq) ? 0x08 : 0) | ((m_blitter2_irq) ? 0x10 : 0) | ((m_vblank_irq) ? 0x20 : 0) ;
+	int irq = ((m_blitter_irq && m_blitter_irq_mask) ? 0x08 : 0) | ((m_blitter2_irq && m_blitter2_irq_mask) ? 0x10 : 0) | ((m_vblank_irq) ? 0x20 : 0) ;
 	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
@@ -155,13 +159,23 @@ WRITE8_MEMBER(dynax_state::jantouki_vblank_ack_w)
 
 WRITE_LINE_MEMBER(dynax_state::jantouki_blitter_ack_w)
 {
-	m_blitter_irq = state;
+	m_blitter_irq_mask = state;
+
+	// this must be acknowledged somewhere else
+	if (!m_blitter_irq_mask)
+		m_blitter_irq = 0;
+
 	jantouki_update_irq();
 }
 
 WRITE_LINE_MEMBER(dynax_state::jantouki_blitter2_ack_w)
 {
-	m_blitter2_irq = state;
+	m_blitter2_irq_mask = state;
+
+	// this must be acknowledged somewhere else
+	if (!m_blitter2_irq_mask)
+		m_blitter2_irq = 0;
+
 	jantouki_update_irq();
 }
 
@@ -4198,9 +4212,13 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(dynax_state,dynax)
 {
+	m_blitter_irq_mask = 1;
+	m_blitter2_irq_mask = 1;
+
 	save_item(NAME(m_sound_irq));
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_blitter_irq));
+	save_item(NAME(m_blitter_irq_mask));
 	save_item(NAME(m_blitter2_irq));
 	save_item(NAME(m_soundlatch_irq));
 	save_item(NAME(m_sound_vblank_irq));

@@ -66,12 +66,14 @@ public:
 	/* irq */
 	typedef void (dynax_state::*irq_func)();    // some games trigger IRQ at blitter end, some don't
 	irq_func m_update_irq_func;
-	uint8_t m_sound_irq;
-	uint8_t m_vblank_irq;
-	uint8_t m_blitter_irq;
-	uint8_t m_blitter2_irq;
-	uint8_t m_soundlatch_irq;
-	uint8_t m_sound_vblank_irq;
+	bool m_sound_irq;
+	bool m_vblank_irq;
+	bool m_blitter_irq;
+	bool m_blitter_irq_mask;
+	bool m_blitter2_irq;
+	bool m_blitter2_irq_mask;
+	bool m_soundlatch_irq;
+	bool m_sound_vblank_irq;
 
 	/* blitters */
 	int m_blit_scroll_x;
