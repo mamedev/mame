@@ -4043,6 +4043,9 @@ ROM_START( ordyne )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD( "or_voi2.voice2",  0x080000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* ORDYNE */
@@ -4099,6 +4102,9 @@ ROM_START( ordyneje )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD( "or_voi2.voice2",  0x080000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* ORDYNE */
@@ -4155,6 +4161,9 @@ ROM_START( ordynej )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD( "or_voi2.voice2",  0x080000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* PHELIOS */
