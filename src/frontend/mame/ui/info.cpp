@@ -129,7 +129,7 @@ std::string machine_info::warnings_string() const
 	if (m_unemulated_features)
 	{
 		buf << _("Completely unemulated features: ");
-		bool first = false;
+		bool first = true;
 		for (auto const &feature : FEATURE_NAMES)
 		{
 			if (m_unemulated_features & feature.first)
@@ -145,7 +145,7 @@ std::string machine_info::warnings_string() const
 	if (m_imperfect_features)
 	{
 		buf << _("Imperfectly emulated features: ");
-		bool first = false;
+		bool first = true;
 		for (auto const &feature : FEATURE_NAMES)
 		{
 			if (m_imperfect_features & feature.first)
