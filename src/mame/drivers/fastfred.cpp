@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW")
-	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x03f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
 	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
