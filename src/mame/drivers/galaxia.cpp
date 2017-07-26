@@ -61,6 +61,8 @@ HW has many similarities with quasar.c / cvs.c / zac2650.c
 ---
 
 TODO:
+- speed is wrong for all games. needs investigation, interrupt related?
+  real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
 - correct color/star generation using info from Galaxia technical manual and schematics
 - add sound board emulation
 - improve bullets
@@ -296,7 +298,7 @@ static MACHINE_CONFIG_START( galaxia )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
@@ -340,7 +342,7 @@ static MACHINE_CONFIG_START( astrowar )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
