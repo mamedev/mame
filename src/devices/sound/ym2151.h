@@ -260,6 +260,7 @@ private:
 	uint8_t                  m_lastreg;
 	devcb_write_line       m_irqhandler;
 	devcb_write8           m_portwritehandler;
+	bool                   m_reset_active;
 
 	void init_tables();
 	void calculate_timers();
