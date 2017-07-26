@@ -32,6 +32,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin4_counter_w);
 	DECLARE_READ16_MEMBER(snowboar_protection_r);
 	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
+	DECLARE_READ16_MEMBER(play2000_shareram_68k_r);
+	DECLARE_WRITE16_MEMBER(play2000_shareram_68k_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
 	DECLARE_DRIVER_INIT(touchgo);
