@@ -65,10 +65,10 @@ static bool draw_this_frame;
 
 //FIXME: re-add way to handle 16/32 bit 
 #ifdef M16B
-uint16_t videoBuffer[1600*1200];
+uint16_t videoBuffer[4096*3072];
 #define LOG_PIXEL_BYTES 1
 #else
-unsigned int videoBuffer[1600*1200];
+unsigned int videoBuffer[4096*3072];
 #define LOG_PIXEL_BYTES 2*1
 #endif
 
@@ -167,7 +167,8 @@ void retro_set_environment(retro_environment_t cb)
 
     { option_osd, "Boot to OSD; disabled|enabled" },
     { option_cli, "Boot from CLI; disabled|enabled" },
-    { option_res, "Resolution; 640x480|640x360|800x600|800x450|960x720|960x540" },
+    { option_res, "Resolution; 640x480|640x360|800x600|800x450|960x720|960x540|1024x768|1024x576|1280x960|1280x720|1600x1200|1600x900|1440x1080|1920x1080|1920x1440|2560x1440|2880x2160|3840x2160" },
+
     { NULL, NULL },
    };
 
@@ -579,9 +580,9 @@ bool retro_load_game(const struct retro_game_info *info)
 
 //FIXME: re-add way to handle 16/32 bit
 #ifdef M16B
-    memset(videoBuffer, 0, 1600*1200*2);
+    memset(videoBuffer, 0, 4096*3072*2);
 #else
-    memset(videoBuffer, 0, 1600*1200*2*2);
+    memset(videoBuffer, 0, 4096*3072*2*2);
 #endif
 
 //FIXME: re-add way to handle OGL
