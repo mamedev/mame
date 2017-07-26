@@ -45,14 +45,14 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 	if (clonex)
 	{
 		cx = driver_list::find(x->parent);
-		if (cx == -1 || (driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0)
+		if ((0 > cx) || (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
 			clonex = false;
 	}
 
 	if (cloney)
 	{
 		cy = driver_list::find(y->parent);
-		if (cy == -1 || (driver_list::driver(cy).flags & MACHINE_IS_BIOS_ROOT) != 0)
+		if ((0 > cy) || (driver_list::driver(cy).flags & machine_flags::IS_BIOS_ROOT))
 			cloney = false;
 	}
 

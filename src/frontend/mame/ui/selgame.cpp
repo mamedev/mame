@@ -540,7 +540,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 				if (cloneof)
 				{
 					int cx = driver_list::find(elem->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
@@ -568,7 +568,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 				if (cloneof)
 				{
 					int cx = driver_list::find(favmap.second.driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
@@ -802,7 +802,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((driver->flags & MACHINE_TYPE_ARCADE) == 0)
+			if ((machine().system().flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE)
 			{
 				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
 					if (!swlistdev.get_info().empty())
@@ -861,7 +861,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((ui_swinfo->driver->flags & MACHINE_TYPE_ARCADE) == 0)
+			if ((machine().system().flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE)
 			{
 				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
 					if (!swlistdev.get_info().empty())
@@ -950,7 +950,7 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 
 	for (auto & s_driver : s_drivers)
 	{
-		if (!bioscheck && filter != FILTER_BIOS && (s_driver->flags & MACHINE_IS_BIOS_ROOT) != 0)
+		if (!bioscheck && filter != FILTER_BIOS && (s_driver->flags & machine_flags::IS_BIOS_ROOT) != 0)
 			continue;
 
 		switch (filter)
@@ -962,17 +962,17 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 			break;
 
 		case FILTER_WORKING:
-			if (!(s_driver->flags & MACHINE_NOT_WORKING))
+			if (!(s_driver->flags & machine_flags::NOT_WORKING))
 				m_displaylist.push_back(s_driver);
 			break;
 
 		case FILTER_NOT_MECHANICAL:
-			if (!(s_driver->flags & MACHINE_MECHANICAL))
+			if (!(s_driver->flags & machine_flags::MECHANICAL))
 				m_displaylist.push_back(s_driver);
 			break;
 
 		case FILTER_BIOS:
-			if (s_driver->flags & MACHINE_IS_BIOS_ROOT)
+			if (s_driver->flags & machine_flags::IS_BIOS_ROOT)
 				m_displaylist.push_back(s_driver);
 			break;
 
@@ -983,7 +983,7 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 				if (cloneof)
 				{
 					auto cx = driver_list::find(s_driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
@@ -994,22 +994,22 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 			}
 			break;
 		case FILTER_NOT_WORKING:
-			if (s_driver->flags & MACHINE_NOT_WORKING)
+			if (s_driver->flags & machine_flags::NOT_WORKING)
 				m_displaylist.push_back(s_driver);
 			break;
 
 		case FILTER_MECHANICAL:
-			if (s_driver->flags & MACHINE_MECHANICAL)
+			if (s_driver->flags & machine_flags::MECHANICAL)
 				m_displaylist.push_back(s_driver);
 			break;
 
 		case FILTER_SAVE:
-			if (s_driver->flags & MACHINE_SUPPORTS_SAVE)
+			if (s_driver->flags & machine_flags::SUPPORTS_SAVE)
 				m_displaylist.push_back(s_driver);
 			break;
 
 		case FILTER_NOSAVE:
-			if (!(s_driver->flags & MACHINE_SUPPORTS_SAVE))
+			if (!(s_driver->flags & machine_flags::SUPPORTS_SAVE))
 				m_displaylist.push_back(s_driver);
 			break;
 
@@ -1172,7 +1172,7 @@ void menu_select_game::populate_search()
 		if (cloneof)
 		{
 			int cx = driver_list::find(m_searchlist[curitem]->parent);
-			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+			if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
 		item_append(m_searchlist[curitem]->type.fullname(), "", (!cloneof) ? flags_ui : (FLAG_INVERT | flags_ui),
@@ -1198,36 +1198,39 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else
 		str << _("Driver is Parent:\n");
 
-	if (driver->flags & MACHINE_NOT_WORKING)
+	if (driver->flags & machine_flags::NOT_WORKING)
 		str << _("Overall: NOT WORKING\n");
-	else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
+	else if ((driver->type.unemulated_features() | driver->type.imperfect_features()) & device_t::feature::PROTECTION)
 		str << _("Overall: Unemulated Protection\n");
 	else
 		str << _("Overall: Working\n");
 
-	if (driver->flags & MACHINE_IMPERFECT_COLORS)
-		str << _("Graphics: Imperfect Colors\n");
-	else if (driver->flags & MACHINE_WRONG_COLORS)
+	if (driver->type.unemulated_features() & device_t::feature::GRAPHICS)
+		str << _("Graphics: Unimplemented\n");
+	else if (driver->type.unemulated_features() & device_t::feature::PALETTE)
 		str << ("Graphics: Wrong Colors\n");
-	else if (driver->flags & MACHINE_IMPERFECT_GRAPHICS)
+	else if (driver->type.imperfect_features() & device_t::feature::PALETTE)
+		str << _("Graphics: Imperfect Colors\n");
+	else if (driver->type.imperfect_features() & device_t::feature::GRAPHICS)
 		str << _("Graphics: Imperfect\n");
 	else
 		str << _("Graphics: OK\n");
 
-	if (driver->flags & MACHINE_NO_SOUND)
+	if (driver->flags & machine_flags::NO_SOUND_HW)
+		str << _("Sound: None\n");
+	else if (driver->type.unemulated_features() & device_t::feature::SOUND)
 		str << _("Sound: Unimplemented\n");
-	else if (driver->flags & MACHINE_IMPERFECT_SOUND)
+	else if (driver->type.imperfect_features() & device_t::feature::SOUND)
 		str << _("Sound: Imperfect\n");
 	else
 		str << _("Sound: OK\n");
 
-	util::stream_format(str, _("Driver is Skeleton: %1$s\n"), ((driver->flags & MACHINE_IS_SKELETON) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Game is Mechanical: %1$s\n"), ((driver->flags & MACHINE_MECHANICAL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Artwork: %1$s\n"), ((driver->flags & MACHINE_REQUIRES_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Clickable Artwork: %1$s\n"), ((driver->flags & MACHINE_CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Cocktail: %1$s\n"), ((driver->flags & MACHINE_NO_COCKTAIL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Driver is Bios: %1$s\n"), ((driver->flags & MACHINE_IS_BIOS_ROOT) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Save: %1$s\n"), ((driver->flags & MACHINE_SUPPORTS_SAVE) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Game is Mechanical: %1$s\n"), ((driver->flags & machine_flags::MECHANICAL) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Requires Artwork: %1$s\n"), ((driver->flags & machine_flags::REQUIRES_ARTWORK) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Requires Clickable Artwork: %1$s\n"), ((driver->flags & machine_flags::CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Support Cocktail: %1$s\n"), ((driver->flags & machine_flags::NO_COCKTAIL) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Driver is Bios: %1$s\n"), ((driver->flags & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Support Save: %1$s\n"), ((driver->flags & machine_flags::SUPPORTS_SAVE) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Screen Orientation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
 	auto entries = rom_build_entries(driver->rom);
@@ -1330,7 +1333,7 @@ void menu_select_game::init_sorted_list()
 		const game_driver *driver = &driver_list::driver(x);
 		if (driver == &GAME_NAME(___empty))
 			continue;
-		if (driver->flags & MACHINE_IS_BIOS_ROOT)
+		if (driver->flags & machine_flags::IS_BIOS_ROOT)
 			m_isabios++;
 
 		m_sortedlist.push_back(driver);

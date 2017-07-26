@@ -220,7 +220,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	int curitem;
 
 	for (curitem = matchcount = 0; m_driverlist[curitem] != nullptr && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
-		if (!(m_driverlist[curitem]->flags & MACHINE_NO_STANDALONE))
+		if (!(m_driverlist[curitem]->flags & machine_flags::NO_STANDALONE))
 			matchcount++;
 
 	// if nothing there, add a single multiline item and return
@@ -326,22 +326,26 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->type.source()));
 
 		// next line is overall driver status
-		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3].assign(_("Overall: NOT WORKING"));
-		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3].assign(_("Overall: Unemulated Protection"));
+		if (driver->flags & machine_flags::NOT_WORKING)
+			tempbuf[3] = _("Overall: NOT WORKING");
+		else if ((driver->type.unemulated_features() | driver->type.imperfect_features()) & device_t::feature::PROTECTION)
+			tempbuf[3] = _("Overall: Unemulated Protection");
 		else
-			tempbuf[3].assign(_("Overall: Working"));
+			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
-		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
+		if (driver->type.unemulated_features() & device_t::feature::GRAPHICS)
+			gfxstat = _("Unimplemented");
+		else if ((driver->type.unemulated_features() | driver->type.imperfect_features()) & (device_t::feature::GRAPHICS | device_t::feature::PALETTE))
 			gfxstat = _("Imperfect");
 		else
 			gfxstat = _("OK");
 
-		if (driver->flags & MACHINE_NO_SOUND)
+		if (driver->flags & machine_flags::NO_SOUND_HW)
+			soundstat = _("None");
+		else if (driver->type.unemulated_features() & device_t::feature::SOUND)
 			soundstat = _("Unimplemented");
-		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
+		else if (driver->type.imperfect_features() & device_t::feature::SOUND)
 			soundstat = _("Imperfect");
 		else
 			soundstat = _("OK");
@@ -390,13 +394,14 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	y2 = origy2 + bottom;
 
 	// draw a box
-	color = UI_BACKGROUND_COLOR;
-	if (driver != nullptr)
-		color = UI_GREEN_COLOR;
-	if (driver != nullptr && (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
-		color = UI_YELLOW_COLOR;
-	if (driver != nullptr && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
+	if (!driver)
+		color = UI_BACKGROUND_COLOR;
+	else if ((driver->flags & machine_flags::NOT_WORKING) || ((driver->type.unemulated_features() | driver->type.imperfect_features()) & device_t::feature::PROTECTION))
 		color = UI_RED_COLOR;
+	else if (driver->type.unemulated_features() || driver->type.imperfect_features())
+		color = UI_YELLOW_COLOR;
+	else
+		color = UI_GREEN_COLOR;
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
 
 	// take off the borders

@@ -202,7 +202,7 @@ void mame_ui_manager::init()
 	using namespace std::placeholders;
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_messagebox, this, _1));
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
-	m_mouse_show = machine().system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
+	m_mouse_show = machine().system().flags & machine_flags::CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mame_ui_manager::exit, this));
@@ -289,22 +289,21 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
 	bool show_warnings = true, show_mandatory_fileman = true;
-	int state;
 
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
-	#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
 	show_gameinfo = show_warnings = false;
-	#endif
+#endif
 
 	// loop over states
 	using namespace std::placeholders;
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
-	for (state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
+	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
 	{
 		// default to standard colors
 		messagebox_backcolor = UI_BACKGROUND_COLOR;
@@ -313,36 +312,32 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		// pick the next state
 		switch (state)
 		{
-			case 0:
-				if (show_warnings)
-					messagebox_text = machine_info().warnings_string();
-				if (!messagebox_text.empty())
-				{
-					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
-					// TODO: don't think BTANB should be marked yellow? Also move this snippet to specific getter
-					if (machine().system().flags & (MACHINE_WARNING_FLAGS|MACHINE_BTANB_FLAGS))
-						messagebox_backcolor = UI_YELLOW_COLOR;
-					if (machine().system().flags & (MACHINE_FATAL_FLAGS))
-						messagebox_backcolor = UI_RED_COLOR;
-				}
-				break;
+		case 0:
+			if (show_warnings)
+				messagebox_text = machine_info().warnings_string();
+			if (!messagebox_text.empty())
+			{
+				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
+				messagebox_backcolor = machine_info().warnings_color();
+			}
+			break;
 
-			case 1:
-				if (show_gameinfo)
-					messagebox_text = machine_info().game_info_string();
-				if (!messagebox_text.empty())
-					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
-				break;
+		case 1:
+			if (show_gameinfo)
+				messagebox_text = machine_info().game_info_string();
+			if (!messagebox_text.empty())
+				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
+			break;
 
-			case 2:
-				if (show_mandatory_fileman)
-					messagebox_text = machine_info().mandatory_images();
-				if (!messagebox_text.empty())
-				{
-					std::string warning = std::string(_("This driver requires images to be loaded in the following device(s): ")) + messagebox_text;
-					ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.c_str());
-				}
-				break;
+		case 2:
+			if (show_mandatory_fileman)
+				messagebox_text = machine_info().mandatory_images();
+			if (!messagebox_text.empty())
+			{
+				std::string warning = std::string(_("This driver requires images to be loaded in the following device(s): ")) + messagebox_text;
+				ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.c_str());
+			}
+			break;
 		}
 
 		// clear the input memory

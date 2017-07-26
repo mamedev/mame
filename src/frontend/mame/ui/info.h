@@ -32,14 +32,22 @@ public:
 	bool has_test_switch() const { return m_has_test_switch; }
 
 	// text generators
-	std::string warnings_string();
-	std::string game_info_string();
-	std::string mandatory_images();
-	std::string get_screen_desc(screen_device &screen);
+	std::string warnings_string() const;
+	std::string game_info_string() const;
+	std::string mandatory_images() const;
+	std::string get_screen_desc(screen_device &screen) const;
+
+	// message colour
+	rgb_t warnings_color() const;
 
 private:
 	// reference to machine
 	running_machine &       m_machine;
+
+	// overall feature status
+	machine_flags::type     m_flags;
+	device_t::feature_type  m_unemulated_features;
+	device_t::feature_type  m_imperfect_features;
 
 	// has...
 	bool                    m_has_configs;

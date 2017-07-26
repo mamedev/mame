@@ -645,34 +645,36 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 			tempbuf[2] = _("Driver is parent");
 
 		// next line is overall driver status
-		if (driver->flags & MACHINE_NOT_WORKING)
+		if (driver->flags & machine_flags::NOT_WORKING)
 			tempbuf[3] = _("Overall: NOT WORKING");
-		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
+		else if ((driver->type.unemulated_features() | driver->type.imperfect_features()) & device_t::feature::PROTECTION)
 			tempbuf[3] = _("Overall: Unemulated Protection");
 		else
 			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
-		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
+		if (driver->type.unemulated_features() & device_t::feature::GRAPHICS)
+			tempbuf[4] = _("Graphics: Unimplemented, ");
+		else if ((driver->type.unemulated_features() | driver->type.imperfect_features()) & (device_t::feature::GRAPHICS | device_t::feature::PALETTE))
 			tempbuf[4] = _("Graphics: Imperfect, ");
 		else
 			tempbuf[4] = _("Graphics: OK, ");
 
-		if (driver->flags & MACHINE_NO_SOUND)
+		if (driver->flags & machine_flags::NO_SOUND_HW)
+			tempbuf[4].append(_("Sound: None"));
+		else if (driver->type.unemulated_features() & device_t::feature::SOUND)
 			tempbuf[4].append(_("Sound: Unimplemented"));
-		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
+		else if (driver->type.imperfect_features() & device_t::feature::SOUND)
 			tempbuf[4].append(_("Sound: Imperfect"));
 		else
 			tempbuf[4].append(_("Sound: OK"));
 
-		color = UI_GREEN_COLOR;
-
-		if ((driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS
-			| MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
-			color = UI_YELLOW_COLOR;
-
-		if ((driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
+		if ((driver->flags & machine_flags::NOT_WORKING) || ((driver->type.unemulated_features() | driver->type.imperfect_features()) & device_t::feature::PROTECTION))
 			color = UI_RED_COLOR;
+		else if (driver->type.unemulated_features() || driver->type.imperfect_features())
+			color = UI_YELLOW_COLOR;
+		else
+			color = UI_GREEN_COLOR;
 	}
 	else
 	{
@@ -1020,7 +1022,7 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 		if (cloneof)
 		{
 			auto cx = driver_list::find(driver->parent);
-			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+			if ((cx >= 0) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
 				cloneof = false;
 		}
 
@@ -2021,7 +2023,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		m_cache->set_snapx_software(nullptr);
 
 		if (ui_globals::default_image)
-			ui_globals::curimage_view = ((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? CABINETS_VIEW : SNAPSHOT_VIEW;
+			ui_globals::curimage_view = ((driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
 
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
@@ -2061,7 +2063,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				if (cloneof)
 				{
 					int cx = driver_list::find(driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+					if ((cx >= 0) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
 						cloneof = false;
 				}
 

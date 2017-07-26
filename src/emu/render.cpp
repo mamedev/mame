@@ -575,7 +575,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 	if (m_screen != nullptr)
 	{
 		// set the initial orientation and brightness/contrast/gamma
-		m_user.m_orientation = manager.machine().system().flags & ORIENTATION_MASK;
+		m_user.m_orientation = manager.machine().system().flags & machine_flags::MASK_ORIENTATION;
 		m_user.m_brightness = manager.machine().options().brightness();
 		m_user.m_contrast = manager.machine().options().contrast();
 		m_user.m_gamma = manager.machine().options().gamma();
@@ -948,7 +948,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
-		m_base_orientation = orientation_reverse(manager.machine().system().flags & ORIENTATION_MASK);
+		m_base_orientation = orientation_reverse(manager.machine().system().flags & machine_flags::MASK_ORIENTATION);
 
 	// rotate left/right
 	if (manager.machine().options().ror() || (manager.machine().options().auto_ror() && (manager.machine().system().flags & ORIENTATION_SWAP_XY)))

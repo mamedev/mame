@@ -179,7 +179,7 @@ void favorite_manager::add_favorite_game(ui_software_info &swinfo)
 
 void favorite_manager::add_favorite_game()
 {
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
+	if ((machine().system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
 	{
 		add_favorite_game(&machine().system());
 		return;
@@ -270,7 +270,7 @@ void favorite_manager::remove_favorite_game()
 
 bool favorite_manager::isgame_favorite()
 {
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
+	if ((machine().system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
 		return isgame_favorite(&machine().system());
 
 	auto image_loaded = false;
