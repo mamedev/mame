@@ -601,9 +601,10 @@ static int execute_game_cmd(char* path)
    int gameRot=0;
    bool CreateConf = (!strcmp(ARGUV[0],"-cc") || !strcmp(ARGUV[0],"-createconfig")) ? 1 : 0;
    bool Only1Arg   = (ARGUC == 1) ? 1 : 0;
+   bool Mamecmdopt = strcmp(ARGUV[0],core) == 0 ? 1: 0;
 
 if(!Only1Arg)CreateConf = (!strcmp(ARGUV[1],"-cc") || !strcmp(ARGUV[1],"-createconfig")) ? 1 : 0;
-printf("ARGUV[0]=%s\n",ARGUV[0]);
+if (log_cb)log_cb(RETRO_LOG_INFO,"ARGUV[0]=%s\n",ARGUV[0]);
 
    FirstTimeUpdate = 1;
 
@@ -652,11 +653,11 @@ printf("ARGUV[0]=%s\n",ARGUV[0]);
             {
                if (log_cb)
                   log_cb(RETRO_LOG_ERROR, "Driver not found: %s\n", MsystemName);
-               return -2;
+                if(!Mamecmdopt)return -2;
             }
          }
          else
-            return -2;
+             if(!Mamecmdopt)return -2;
       }
    }
 
@@ -699,6 +700,10 @@ printf("ARGUV[0]=%s\n",ARGUV[0]);
             Add_Option(MsystemName);
          Add_Option(MgameName);
       }
+   }
+   else if (Mamecmdopt){
+         for(i = 1;i < ARGUC; i++)
+            Add_Option(ARGUV[i]);
    }
    else
    {
@@ -793,11 +798,11 @@ int mmain2(int argc, const char *argv)
 
 
    //launch mmain from retromain
-   mmain(PARAMCOUNT, ( char **)xargv_cmd);
+   result=mmain(PARAMCOUNT, ( char **)xargv_cmd);
 
    xargv_cmd[PARAMCOUNT - 2] = NULL;
-
-   return 1;
+   
+   return result/*==0?0:1*/;
 }
 
 

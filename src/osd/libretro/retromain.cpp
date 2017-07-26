@@ -171,7 +171,7 @@ int mmain(int argc, char *argv[])
 		retro_global_osd= global_alloc(retro_osd_interface(retro_global_options));
 		retro_global_osd->register_options();
 		res =  emulator_info::start_frontend(retro_global_options, *retro_global_osd,argc, argv);
-		return 1;
+		return res;
 	}
 
 #ifdef RETROMAME_UNIX
