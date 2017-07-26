@@ -457,8 +457,6 @@ MACHINE_START_MEMBER(centiped_state,centiped)
 MACHINE_RESET_MEMBER(centiped_state,centiped)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-	m_dsw_select = 0;
-	m_control_select = 0;
 	m_prg_bank = 0;
 }
 
