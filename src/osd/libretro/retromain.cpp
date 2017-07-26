@@ -145,6 +145,8 @@ int mmain(int argc, char *argv[])
 {
 	int res = 0;
 
+	std::vector<std::string> args(argv, argv+argc);
+
 	static retro_options retro_global_options;
 	// disable I/O buffering
 	setvbuf(stdout, (char *) nullptr, _IONBF, 0);
@@ -170,7 +172,7 @@ int mmain(int argc, char *argv[])
 	{
 		retro_global_osd= global_alloc(retro_osd_interface(retro_global_options));
 		retro_global_osd->register_options();
-		res =  emulator_info::start_frontend(retro_global_options, *retro_global_osd,argc, argv);
+		res =  emulator_info::start_frontend(retro_global_options, *retro_global_osd,args);
 		return res;
 	}
 

@@ -289,13 +289,13 @@ void mame_machine_manager::mmchange()
    if (m_new_driver_pending)
    {
       // set up new system name and adjust device options accordingly
-      mame_options::set_system_name(m_options,m_new_driver_pending->name);
+      m_options.set_system_name(m_new_driver_pending->name);
       m_firstrun = true;
       mfirst=1;
    }
    else
    {
-      if (retro_global_machine->exit_pending()) mame_options::set_system_name(m_options,"");
+      if (retro_global_machine->exit_pending())m_options.set_system_name("");
    }
 
    //FIXME RETRO
