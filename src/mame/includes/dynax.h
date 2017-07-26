@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/74259.h"
+#include "machine/bankdev.h"
 #include "machine/msm6242.h"
 #include "sound/ym2413.h"
 #include "sound/msm5205.h"
@@ -27,6 +28,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_rtc(*this, "rtc")
 		, m_mainlatch(*this, "mainlatch")
+		, m_bankdev(*this, "bankdev")
 		, m_gfx_region1(*this, "gfx1")
 		, m_gfx_region2(*this, "gfx2")
 		, m_gfx_region3(*this, "gfx3")
@@ -49,6 +51,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<msm6242_device> m_rtc;
 	optional_device<ls259_device> m_mainlatch;
+	optional_device<address_map_bank_device> m_bankdev;
 	optional_region_ptr<uint8_t> m_gfx_region1;
 	optional_region_ptr<uint8_t> m_gfx_region2;
 	optional_region_ptr<uint8_t> m_gfx_region3;
@@ -137,8 +140,6 @@ public:
 	int m_tenkai_6c;
 	int m_tenkai_70;
 	uint8_t m_gekisha_val[2];
-	uint8_t m_gekisha_rom_enable;
-	uint8_t *m_romptr;
 	uint8_t *m_hnoridur_ptr;
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
@@ -196,8 +197,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tenkai_p7_w);
 	DECLARE_WRITE8_MEMBER(tenkai_p8_w);
 	DECLARE_READ8_MEMBER(tenkai_p8_r);
-	DECLARE_READ8_MEMBER(tenkai_8000_r);
-	DECLARE_WRITE8_MEMBER(tenkai_8000_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_6c_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_70_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_romregion_w);
@@ -206,8 +205,6 @@ public:
 	DECLARE_READ8_MEMBER(gekisha_keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(gekisha_hopper_w);
 	DECLARE_WRITE8_MEMBER(gekisha_p4_w);
-	DECLARE_READ8_MEMBER(gekisha_8000_r);
-	DECLARE_WRITE8_MEMBER(gekisha_8000_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_pen_w);
@@ -276,7 +273,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
 
 	void tenkai_update_rombank();
-	void gekisha_bank_postload();
 
 	DECLARE_WRITE_LINE_MEMBER(sprtmtch_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
@@ -286,9 +282,6 @@ public:
 	DECLARE_MACHINE_RESET(adpcm);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_reset_kludge_w);
-	DECLARE_MACHINE_START(gekisha);
-	DECLARE_MACHINE_RESET(gekisha);
-	DECLARE_MACHINE_START(tenkai);
 	DECLARE_WRITE8_MEMBER(tenkai_dswsel_w);
 	DECLARE_READ8_MEMBER(tenkai_dsw_r);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_rtc_irq);

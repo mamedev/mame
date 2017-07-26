@@ -1212,7 +1212,7 @@ WRITE8_MEMBER(dynax_state::tenkai_palette_w)
 
 void dynax_state::tenkai_update_rombank()
 {
-	m_romptr = memregion("maincpu")->base() + 0x10000 + 0x8000 * m_rombank;
+	m_bankdev->set_bank(m_rombank);
 //  logerror("rombank = %02x\n", m_rombank);
 }
 
@@ -1264,37 +1264,6 @@ READ8_MEMBER(dynax_state::tenkai_p8_r)
 	return 0x00;
 }
 
-READ8_MEMBER(dynax_state::tenkai_8000_r)
-{
-	if (m_rombank < 0x10)
-		return m_romptr[offset];
-	else if ((m_rombank == 0x10) && (offset < 0x10))
-	{
-		return m_rtc->read(space, offset);
-	}
-	else if (m_rombank == 0x12)
-		return tenkai_palette_r(space, offset);
-
-	logerror("%04x: unmapped offset %04X read with rombank=%02X\n", space.device().safe_pc(), offset, m_rombank);
-	return 0x00;
-}
-
-WRITE8_MEMBER(dynax_state::tenkai_8000_w)
-{
-	if ((m_rombank == 0x10) && (offset < 0x10))
-	{
-		m_rtc->write(space, offset, data);
-		return;
-	}
-	else if (m_rombank == 0x12)
-	{
-		tenkai_palette_w(space, offset, data);
-		return;
-	}
-
-	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", space.device().safe_pc(), offset, data, m_rombank);
-}
-
 void dynax_state::tenkai_show_6c()
 {
 //    popmessage("%02x %02x", m_tenkai_6c, m_tenkai_70);
@@ -1332,7 +1301,7 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(tenkai_8000_r, tenkai_8000_w)
+	AM_RANGE(  0x8000,  0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD("aysnd", ay8910_device, data_r)       // AY8910
 	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE("aysnd", ay8910_device, data_w) //
 	AM_RANGE( 0x10010, 0x10010 ) AM_DEVWRITE("aysnd", ay8910_device, address_w)  //
@@ -1349,6 +1318,12 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x100c1, 0x100c1 ) AM_WRITE(tenkai_ip_w)
 	AM_RANGE( 0x100c2, 0x100c3 ) AM_READ(tenkai_ip_r)
 	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)    // Blitter (inverted scroll values)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tenkai_banked_map, AS_PROGRAM, 8, dynax_state )
+	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_REGION("maincpu", 0x10000) 
+	AM_RANGE( 0x80000, 0x8000f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE( 0x90000, 0x97fff ) AM_READWRITE(tenkai_palette_r, tenkai_palette_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1391,88 +1366,38 @@ WRITE8_MEMBER(dynax_state::gekisha_hopper_w)
 //  popmessage("%02x %02x", gekisha_val[0], gekisha_val[1]);
 }
 
-void dynax_state::gekisha_set_rombank( uint8_t data )
-{
-	m_rombank = data;
-	m_romptr = memregion("maincpu")->base() + 0x8000 + m_rombank * 0x8000;
-}
-
 WRITE8_MEMBER(dynax_state::gekisha_p4_w)
 {
-	m_gekisha_rom_enable = !BIT(data, 3);
-	gekisha_set_rombank(BIT(data, 2));
-}
-
-READ8_MEMBER(dynax_state::gekisha_8000_r)
-{
-	if (m_gekisha_rom_enable)
-		return m_romptr[offset];
-
-	switch (offset + 0x8000)
-	{
-		case 0x8061:    return ioport("COINS")->read();
-		case 0x8062:    return gekisha_keyboard_1_r(space, 0);
-		case 0x8063:    return gekisha_keyboard_0_r(space, 0);
-		case 0x8064:    return ioport("DSW1")->read();
-		case 0x8065:    return ioport("DSW3")->read();
-		case 0x8066:    return ioport("DSW4")->read();
-		case 0x8067:    return ioport("DSW2")->read();
-	}
-
-	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",space.device().safe_pc(), offset, m_rombank);
-	return 0x00;
-}
-
-WRITE8_MEMBER(dynax_state::gekisha_8000_w)
-{
-	if (!m_gekisha_rom_enable)
-	{
-		switch (offset + 0x8000)
-		{
-			// same offsets as mjfriday
-
-			case 0x8001:    dynax_blit_palette01_w(space, offset - 0x01, data);     return;
-
-//          case 0x8002:    // ? 1
-
-			case 0x8003:    dynax_blit_backpen_w(space, offset - 0x03, data);       return;
-
-			case 0x8010: case 0x8011: case 0x8012: case 0x8013:
-			case 0x8014: case 0x8015: case 0x8016: case 0x8017:
-                                        m_mainlatch->write_bit(offset & 7, BIT(data, 0));       return;
-
-			case 0x8020:
-			case 0x8021:    gekisha_hopper_w(space, offset - 0x20, data);   return;
-
-			case 0x8041:
-			case 0x8042:
-			case 0x8043:
-			case 0x8044:
-			case 0x8045:
-			case 0x8046:
-			case 0x8047:    dynax_blitter_rev2_w(space, offset - 0x41, data);   return;
-
-			case 0x8050:    // CRT controller
-			case 0x8051:    return;
-
-			case 0x8070:    m_ym2413->register_port_w(space, 0, data);    return;
-			case 0x8071:    m_ym2413->data_port_w(space, 0, data);    return;
-
-			case 0x8060:    m_keyb = data;  return;
-
-//          case 0x8080:    // ? 0,1,6 (bit 0 = screen disable?)
-//              popmessage("80 = %02x", data);
-//              break;
-		}
-	}
-	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", space.device().safe_pc(), offset, data, m_rombank);
+	m_bankdev->set_bank((data >> 2) & 3);
 }
 
 
 static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(gekisha_8000_r, gekisha_8000_w)
+	AM_RANGE(  0x8000,  0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gekisha_banked_map, AS_PROGRAM, 8, dynax_state )
+	AM_RANGE( 0x00000, 0x0ffff ) AM_ROM AM_REGION("maincpu", 0x8000)
+	AM_RANGE( 0x10001, 0x10001 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
+//  AM_RANGE( 0x10002, 0x10002 )    // ? 1
+	AM_RANGE( 0x10003, 0x10003 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
+	AM_RANGE( 0x10010, 0x10017 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	AM_RANGE( 0x10020, 0x10021 ) AM_WRITE(gekisha_hopper_w)
+	AM_RANGE( 0x10041, 0x10047 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+//  AM_RANGE( 0x10050, 0x10050 ) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x10051, 0x10051 ) AM_WRITENOP   // CRT Controller
+	AM_RANGE( 0x10060, 0x10060 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
+	AM_RANGE( 0x10061, 0x10061 ) AM_READ_PORT("COINS")            // Coins
+	AM_RANGE( 0x10062, 0x10062 ) AM_READ(gekisha_keyboard_1_r)        // P2
+	AM_RANGE( 0x10063, 0x10063 ) AM_READ(gekisha_keyboard_0_r)        // P1
+	AM_RANGE( 0x10064, 0x10064 ) AM_READ_PORT("DSW1")         // DSW
+	AM_RANGE( 0x10065, 0x10065 ) AM_READ_PORT("DSW3")         // DSW
+	AM_RANGE( 0x10066, 0x10066 ) AM_READ_PORT("DSW4")         // DSW
+	AM_RANGE( 0x10067, 0x10067 ) AM_READ_PORT("DSW2")         // DSW
+	AM_RANGE( 0x10070, 0x10071 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
+//  AM_RANGE( 0x10080, 0x10080 )     // ? 0,1,6 (bit 0 = screen disable?)
 ADDRESS_MAP_END
 
 
@@ -4244,7 +4169,6 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	save_item(NAME(m_tenkai_70));
 	save_item(NAME(m_gekisha_val));
 	save_item(NAME(m_palette_ram));
-	save_item(NAME(m_gekisha_rom_enable));
 }
 
 MACHINE_RESET_MEMBER(dynax_state,dynax)
@@ -4280,7 +4204,6 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	m_tenkai_70 = 0;
 	m_gekisha_val[0] = 0;
 	m_gekisha_val[1] = 0;
-	m_gekisha_rom_enable = 0;
 
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 }
@@ -4939,13 +4862,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::tenkai_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(dynax_state,tenkai)
-{
-	MACHINE_START_CALL_MEMBER(dynax);
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(dynax_state::tenkai_update_rombank), this));
-}
-
 WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
@@ -4967,7 +4883,13 @@ static MACHINE_CONFIG_START( tenkai )
 	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(dynax_state, tenkai_p8_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dynax_state, tenkai_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START_OVERRIDE(dynax_state,tenkai)
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(tenkai_banked_map)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -5024,25 +4946,6 @@ MACHINE_CONFIG_END
                                 Mahjong Gekisha
 ***************************************************************************/
 
-void dynax_state::gekisha_bank_postload()
-{
-	gekisha_set_rombank(m_rombank);
-}
-
-MACHINE_START_MEMBER(dynax_state,gekisha)
-{
-	MACHINE_START_CALL_MEMBER(dynax);
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(dynax_state::gekisha_bank_postload), this));
-}
-
-MACHINE_RESET_MEMBER(dynax_state,gekisha)
-{
-	MACHINE_RESET_CALL_MEMBER(dynax);
-
-	gekisha_set_rombank(0);
-}
-
 static MACHINE_CONFIG_START( gekisha )
 
 	/* basic machine hardware */
@@ -5051,8 +4954,14 @@ static MACHINE_CONFIG_START( gekisha )
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, gekisha_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  irq0_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(dynax_state,gekisha)
-	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,gekisha)
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(gekisha_banked_map)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
