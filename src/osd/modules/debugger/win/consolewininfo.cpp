@@ -98,22 +98,23 @@ consolewin_info::~consolewin_info()
 void consolewin_info::set_cpu(device_t &device)
 {
 	// exit if this cpu is already selected
-	if (m_current_cpu == &device)
-		return;
-	m_current_cpu = &device;
+	if (&device != m_current_cpu)
+	{
+		m_current_cpu = &device;
 
-	// first set all the views to the new cpu number
-	m_views[0]->set_source_for_device(device);
-	m_views[1]->set_source_for_device(device);
+		// first set all the views to the new cpu number
+		m_views[0]->set_source_for_device(device);
+		m_views[1]->set_source_for_device(device);
 
-	// then update the caption
-	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
-	std::string curtitle = win_get_window_text_utf8(window());
-	if (title != curtitle)
-		win_set_window_text_utf8(window(), title.c_str());
+		// then update the caption
+		std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
+		std::string curtitle = win_get_window_text_utf8(window());
+		if (title != curtitle)
+			win_set_window_text_utf8(window(), title.c_str());
 
-	// and recompute the children
-	recompute_children();
+		// and recompute the children
+		recompute_children();
+	}
 }
 
 

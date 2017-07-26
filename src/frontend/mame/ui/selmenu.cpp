@@ -508,9 +508,10 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 	{
 		if (!swinfo->startempty)
 		{
-			moptions.set_value(OPTION_SOFTWARENAME, util::string_format("%s:%s", swinfo->listname, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
 			if (part)
-				moptions.set_value(swinfo->instance, *part, OPTION_PRIORITY_SUBCMD);
+				moptions.set_value(swinfo->instance, util::string_format("%s:%s:%s", swinfo->listname, swinfo->shortname, *part), OPTION_PRIORITY_CMDLINE);
+			else
+				moptions.set_value(OPTION_SOFTWARENAME, util::string_format("%s:%s", swinfo->listname, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
 
 			moptions.set_value(OPTION_SNAPNAME, util::string_format("%s%s%s", swinfo->listname, PATH_SEPARATOR, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
 		}
