@@ -1,0 +1,399 @@
+<?xml version="1.0" ?>
+<mamelayout version="2">
+
+  <!-- Straight up bets -->
+  <element name="Bet 0">   <disk>              <color red="1.00" green="0.91" blue="0.52"/>  </disk>
+						   <text string="0">   <color red="0.06" green="0.39" blue="0.00"/>  </text>  </element>
+
+  <element name="Bet 1">   <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="1">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 2">   <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="2">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 3">   <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="3">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 4">   <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="4">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 5">   <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="5">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 6">   <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="6">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 7">   <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="7">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 8">   <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="8">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 9">   <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="9">   <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 10">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="10">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <!-- 11 is black like 10 -->
+  <element name="Bet 11">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="11">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 12">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="12">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 13">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="13">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 14">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="14">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 15">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="15">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 16">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="16">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 17">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="17">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 18">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="18">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <!-- 19 is red like 18 -->
+  <element name="Bet 19">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="19">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 20">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="20">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 21">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="21">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 22">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="22">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 23">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="23">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 24">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="24">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 25">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="25">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 26">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="26">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 27">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="27">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 28">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="28">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <!-- 29 is black like 28 -->
+  <element name="Bet 29">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="29">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 30">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="30">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 31">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="31">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 32">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="32">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 33">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="33">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <element name="Bet 34">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="34">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 35">  <disk>              <color red="0.06" green="0.06" blue="0.06"/>  </disk>
+						   <text string="35">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+  <element name="Bet 36">  <disk>              <color red="0.71" green="0.00" blue="0.00"/>  </disk>
+						   <text string="36">  <color red="1.00" green="0.91" blue="0.52"/>  </text>  </element>
+
+  <!-- Corner/Split bets -->
+  <element name="Bet">
+	<disk>                   <color red="0.00" green="0.16" blue="0.00"/>  </disk>
+  </element>
+
+  <!-- Outside bets -->
+  <element name="Bet 19-36">
+	<text string="19-36">    <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.00" green="0.00" blue="0.00"/>  </text>
+  </element>
+  <element name="Bet 1-12">
+	<text string="1-12">     <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.00" green="0.00" blue="0.00"/>  </text>
+  </element>
+  <element name="Bet 1-18">
+	<text string="1-18">     <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.00" green="0.00" blue="0.00"/>  </text>
+  </element>
+
+  <element name="Bet Odd">
+	<text string="ODD">      <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.00" green="0.00" blue="0.00"/>  </text>
+  </element>
+  <element name="Bet 13-24">
+	<text string="13-24">    <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.00" green="0.00" blue="0.00"/>  </text>
+  </element>
+  <element name="Bet Even">
+	<text string="EVEN">     <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.00" green="0.00" blue="0.00"/>  </text>
+  </element>
+
+  <element name="Bet Red">
+	<rect>                   <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.71" green="0.00" blue="0.00"/>  </rect>
+	<text string="RED">      <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="1.00" green="0.91" blue="0.52"/>  </text>
+  </element>
+  <element name="Bet 25-36">
+	<text string="25-36">    <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.00" green="0.00" blue="0.00"/>  </text>
+  </element>
+  <element name="Bet Black">
+	<rect>                   <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.06" green="0.06" blue="0.06"/>  </rect>
+	<text string="BLACK">    <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="1.00" green="0.91" blue="0.52"/>  </text>
+  </element>
+
+  <!-- Special Keys -->
+  <element name="Pay">
+	<text string="PAY">    <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="1.00" green="0.91" blue="0.52"/>  </text>
+  </element>
+  <element name="Bet All">
+	<text string="ALL">    <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="1.00" green="0.91" blue="0.52"/>  </text>
+  </element>
+  <element name="Bet Cancel">
+	<text string="CANCEL"> <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="1.00" green="0.91" blue="0.52"/>  </text>
+  </element>
+  <element name="Bet Repeat">
+	<text string="REPEAT"> <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="1.00" green="0.91" blue="0.52"/>  </text>
+  </element>
+
+  <!-- Debug Keys -->
+  <element name="Unknown">
+	<text string="UNK"> <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.80" green="0.80" blue="0.80"/>  </text>
+  </element>
+  <element name="Debug">
+	<text string="DBG"> <bounds x="0.00" y="0.00" width="2.25" height="0.65"/>  <color red="0.80" green="0.80" blue="0.80"/>  </text>
+  </element>
+
+  <!-- Board background -->
+  <element name="Board">
+	<rect>                   <bounds x="0.00" y="0.00" width="240"  height="112"/>   <color red="0.06" green="0.39" blue="0.00"/>  </rect>
+  </element>
+
+
+  <view name="Standard Screen (3:4) and Board">
+
+
+	<!-- Screen (Top) -->
+	<screen index="0">
+	  <bounds x="0" y="0" width="240" height="320"/>
+	</screen>
+
+
+	<!-- Board (Bottom) -->
+	<bezel element="Board">                                          <bounds x="0.0"   y="330.0" width="240.0" height="112.0"/> </bezel>
+
+	<!-- Top Row -->
+	<bezel element="Pay"        inputtag="BET.00"  inputmask="0x01"> <bounds x="-2.0"  y="340.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet 19-36"  inputtag="BET.04"  inputmask="0x01"> <bounds x="38.0"  y="340.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet Odd"    inputtag="BET.0C"  inputmask="0x01"> <bounds x="102.0" y="340.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet Red"    inputtag="BET.14"  inputmask="0x01"> <bounds x="166.0" y="340.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet All"    inputtag="BET.19"  inputmask="0x01"> <bounds x="206.0" y="340.0" width="36.0" height="11.0"/> </bezel>
+
+	<!-- Bottom Row 1 -->
+	<bezel element="Unknown"    inputtag="BET.00"  inputmask="0x80"> <bounds x="7.0"   y="402.3" width="18.0" height="10.5"/> </bezel>
+	<bezel element="Bet 1-12"   inputtag="BET.04"  inputmask="0x80"> <bounds x="38.0"  y="404.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet 13-24"  inputtag="BET.0C"  inputmask="0x80"> <bounds x="102.0" y="404.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet 25-36"  inputtag="BET.14"  inputmask="0x80"> <bounds x="166.0" y="404.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet Cancel" inputtag="BET.18"  inputmask="0x80"> <bounds x="206.0" y="404.0" width="36.0" height="11.0"/> </bezel>
+
+	<!-- Bottom Row 2 -->
+	<bezel element="Debug"      inputtag="BET.01"  inputmask="0x80"> <bounds x="7.0"   y="420.3" width="18.0" height="10.5"/> </bezel>
+	<bezel element="Bet 1-18"   inputtag="BET.05"  inputmask="0x80"> <bounds x="38.0"  y="420.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet Even"   inputtag="BET.0D"  inputmask="0x80"> <bounds x="102.0" y="420.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet Black"  inputtag="BET.15"  inputmask="0x80"> <bounds x="166.0" y="420.0" width="36.0" height="11.0"/> </bezel>
+	<bezel element="Bet Repeat" inputtag="BET.19"  inputmask="0x80"> <bounds x="206.0" y="420.0" width="36.0" height="11.0"/> </bezel>
+
+	<!-- Column 0 -->
+	<bezel element="Bet 0"      inputtag="BET.00"  inputmask="0x08"> <bounds x="11.0"  y="372.0" width="10.0" height="10.0"/> </bezel>
+
+	<!-- Column between 0 and 1-3 -->
+	<bezel element="Bet"        inputtag="BET.01"  inputmask="0x02"> <bounds x="22.0"  y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.01"  inputmask="0x04"> <bounds x="22.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.01"  inputmask="0x08"> <bounds x="22.0"  y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.01"  inputmask="0x10"> <bounds x="22.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.01"  inputmask="0x20"> <bounds x="22.0"  y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.01"  inputmask="0x40"> <bounds x="22.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 1-3 -->
+	<bezel element="Bet 3"      inputtag="BET.02"  inputmask="0x02"> <bounds x="27.0"  y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.02"  inputmask="0x04"> <bounds x="30.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 2"      inputtag="BET.02"  inputmask="0x08"> <bounds x="27.0"  y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.02"  inputmask="0x10"> <bounds x="30.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 1"      inputtag="BET.02"  inputmask="0x20"> <bounds x="27.0"  y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.02"  inputmask="0x40"> <bounds x="30.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 1-3 and 4-6 -->
+	<bezel element="Bet"        inputtag="BET.03"  inputmask="0x02"> <bounds x="38.0"  y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.03"  inputmask="0x04"> <bounds x="38.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.03"  inputmask="0x08"> <bounds x="38.0"  y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.03"  inputmask="0x10"> <bounds x="38.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.03"  inputmask="0x20"> <bounds x="38.0"  y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.03"  inputmask="0x40"> <bounds x="38.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 4-6 -->
+	<bezel element="Bet 6"      inputtag="BET.04"  inputmask="0x02"> <bounds x="43.0"  y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.04"  inputmask="0x04"> <bounds x="46.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 5"      inputtag="BET.04"  inputmask="0x08"> <bounds x="43.0"  y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.04"  inputmask="0x10"> <bounds x="46.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 4"      inputtag="BET.04"  inputmask="0x20"> <bounds x="43.0"  y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.04"  inputmask="0x40"> <bounds x="46.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 4-6 and 7-9 -->
+	<bezel element="Bet"        inputtag="BET.05"  inputmask="0x02"> <bounds x="54.0"  y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.05"  inputmask="0x04"> <bounds x="54.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.05"  inputmask="0x08"> <bounds x="54.0"  y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.05"  inputmask="0x10"> <bounds x="54.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.05"  inputmask="0x20"> <bounds x="54.0"  y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.05"  inputmask="0x40"> <bounds x="54.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 7-9 -->
+	<bezel element="Bet 9"      inputtag="BET.06"  inputmask="0x02"> <bounds x="59.0"  y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.06"  inputmask="0x04"> <bounds x="62.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 8"      inputtag="BET.06"  inputmask="0x08"> <bounds x="59.0"  y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.06"  inputmask="0x10"> <bounds x="62.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 7"      inputtag="BET.06"  inputmask="0x20"> <bounds x="59.0"  y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.06"  inputmask="0x40"> <bounds x="62.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 7-9 and 10-12 -->
+	<bezel element="Bet"        inputtag="BET.07"  inputmask="0x02"> <bounds x="70.0"  y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.07"  inputmask="0x04"> <bounds x="70.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.07"  inputmask="0x08"> <bounds x="70.0"  y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.07"  inputmask="0x10"> <bounds x="70.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.07"  inputmask="0x20"> <bounds x="70.0"  y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.07"  inputmask="0x40"> <bounds x="70.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 10-12 -->
+	<bezel element="Bet 12"     inputtag="BET.08"  inputmask="0x02"> <bounds x="75.0"  y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.08"  inputmask="0x04"> <bounds x="78.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 11"     inputtag="BET.08"  inputmask="0x08"> <bounds x="75.0"  y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.08"  inputmask="0x10"> <bounds x="78.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 10"     inputtag="BET.08"  inputmask="0x20"> <bounds x="75.0"  y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.08"  inputmask="0x40"> <bounds x="78.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 10-12 and 13-15 -->
+	<bezel element="Bet"        inputtag="BET.09"  inputmask="0x02"> <bounds x="86.0"  y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.09"  inputmask="0x04"> <bounds x="86.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.09"  inputmask="0x08"> <bounds x="86.0"  y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.09"  inputmask="0x10"> <bounds x="86.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.09"  inputmask="0x20"> <bounds x="86.0"  y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.09"  inputmask="0x40"> <bounds x="86.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 13-15 -->
+	<bezel element="Bet 15"     inputtag="BET.0A"  inputmask="0x02"> <bounds x="91.0"  y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0A"  inputmask="0x04"> <bounds x="94.0"  y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 14"     inputtag="BET.0A"  inputmask="0x08"> <bounds x="91.0"  y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0A"  inputmask="0x10"> <bounds x="94.0"  y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 13"     inputtag="BET.0A"  inputmask="0x20"> <bounds x="91.0"  y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0A"  inputmask="0x40"> <bounds x="94.0"  y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 13-15 and 16-18 -->
+	<bezel element="Bet"        inputtag="BET.0B"  inputmask="0x02"> <bounds x="102.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0B"  inputmask="0x04"> <bounds x="102.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0B"  inputmask="0x08"> <bounds x="102.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0B"  inputmask="0x10"> <bounds x="102.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0B"  inputmask="0x20"> <bounds x="102.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0B"  inputmask="0x40"> <bounds x="102.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 16-18 -->
+	<bezel element="Bet 18"     inputtag="BET.0C"  inputmask="0x02"> <bounds x="107.0" y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0C"  inputmask="0x04"> <bounds x="110.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 17"     inputtag="BET.0C"  inputmask="0x08"> <bounds x="107.0" y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0C"  inputmask="0x10"> <bounds x="110.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 16"     inputtag="BET.0C"  inputmask="0x20"> <bounds x="107.0" y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0C"  inputmask="0x40"> <bounds x="110.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 16-18 and 19-21 -->
+	<bezel element="Bet"        inputtag="BET.0D"  inputmask="0x02"> <bounds x="118.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0D"  inputmask="0x04"> <bounds x="118.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0D"  inputmask="0x08"> <bounds x="118.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0D"  inputmask="0x10"> <bounds x="118.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0D"  inputmask="0x20"> <bounds x="118.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0D"  inputmask="0x40"> <bounds x="118.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 19-21 -->
+	<bezel element="Bet 21"     inputtag="BET.0E"  inputmask="0x02"> <bounds x="123.0" y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0E"  inputmask="0x04"> <bounds x="126.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 20"     inputtag="BET.0E"  inputmask="0x08"> <bounds x="123.0" y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0E"  inputmask="0x10"> <bounds x="126.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 19"     inputtag="BET.0E"  inputmask="0x20"> <bounds x="123.0" y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.0E"  inputmask="0x40"> <bounds x="126.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 19-21 and 22-24 -->
+	<bezel element="Bet"        inputtag="BET.0F"  inputmask="0x02"> <bounds x="134.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0F"  inputmask="0x04"> <bounds x="134.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0F"  inputmask="0x08"> <bounds x="134.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0F"  inputmask="0x10"> <bounds x="134.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0F"  inputmask="0x20"> <bounds x="134.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.0F"  inputmask="0x40"> <bounds x="134.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 22-24 -->
+	<bezel element="Bet 24"     inputtag="BET.10"  inputmask="0x02"> <bounds x="139.0" y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.10"  inputmask="0x04"> <bounds x="142.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 23"     inputtag="BET.10"  inputmask="0x08"> <bounds x="139.0" y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.10"  inputmask="0x10"> <bounds x="142.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 22"     inputtag="BET.10"  inputmask="0x20"> <bounds x="139.0" y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.10"  inputmask="0x40"> <bounds x="142.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 22-24 and 25-27 -->
+	<bezel element="Bet"        inputtag="BET.11"  inputmask="0x02"> <bounds x="150.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.11"  inputmask="0x04"> <bounds x="150.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.11"  inputmask="0x08"> <bounds x="150.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.11"  inputmask="0x10"> <bounds x="150.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.11"  inputmask="0x20"> <bounds x="150.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.11"  inputmask="0x40"> <bounds x="150.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 25-27 -->
+	<bezel element="Bet 27"     inputtag="BET.12"  inputmask="0x02"> <bounds x="155.0" y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.12"  inputmask="0x04"> <bounds x="158.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 26"     inputtag="BET.12"  inputmask="0x08"> <bounds x="155.0" y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.12"  inputmask="0x10"> <bounds x="158.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 25"     inputtag="BET.12"  inputmask="0x20"> <bounds x="155.0" y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.12"  inputmask="0x40"> <bounds x="158.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 25-27 and 28-30 -->
+	<bezel element="Bet"        inputtag="BET.13"  inputmask="0x02"> <bounds x="166.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.13"  inputmask="0x04"> <bounds x="166.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.13"  inputmask="0x08"> <bounds x="166.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.13"  inputmask="0x10"> <bounds x="166.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.13"  inputmask="0x20"> <bounds x="166.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.13"  inputmask="0x40"> <bounds x="166.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 28-30 -->
+	<bezel element="Bet 30"     inputtag="BET.14"  inputmask="0x02"> <bounds x="171.0" y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.14"  inputmask="0x04"> <bounds x="174.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 29"     inputtag="BET.14"  inputmask="0x08"> <bounds x="171.0" y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.14"  inputmask="0x10"> <bounds x="174.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 28"     inputtag="BET.14"  inputmask="0x20"> <bounds x="171.0" y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.14"  inputmask="0x40"> <bounds x="174.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 28-30 and 31-33 -->
+	<bezel element="Bet"        inputtag="BET.15"  inputmask="0x02"> <bounds x="182.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.15"  inputmask="0x04"> <bounds x="182.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.15"  inputmask="0x08"> <bounds x="182.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.15"  inputmask="0x10"> <bounds x="182.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.15"  inputmask="0x20"> <bounds x="182.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.15"  inputmask="0x40"> <bounds x="182.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 31-33 -->
+	<bezel element="Bet 33"     inputtag="BET.16"  inputmask="0x02"> <bounds x="187.0" y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.16"  inputmask="0x04"> <bounds x="190.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 32"     inputtag="BET.16"  inputmask="0x08"> <bounds x="187.0" y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.16"  inputmask="0x10"> <bounds x="190.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 31"     inputtag="BET.16"  inputmask="0x20"> <bounds x="187.0" y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.16"  inputmask="0x40"> <bounds x="190.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column between 31-33 and 34-36 -->
+	<bezel element="Bet"        inputtag="BET.17"  inputmask="0x02"> <bounds x="198.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.17"  inputmask="0x04"> <bounds x="198.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.17"  inputmask="0x08"> <bounds x="198.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.17"  inputmask="0x10"> <bounds x="198.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.17"  inputmask="0x20"> <bounds x="198.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.17"  inputmask="0x40"> <bounds x="198.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Column 34-36 -->
+	<bezel element="Bet 36"     inputtag="BET.18"  inputmask="0x02"> <bounds x="203.0" y="356.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.18"  inputmask="0x04"> <bounds x="206.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 35"     inputtag="BET.18"  inputmask="0x08"> <bounds x="203.0" y="372.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.18"  inputmask="0x10"> <bounds x="206.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet 34"     inputtag="BET.18"  inputmask="0x20"> <bounds x="203.0" y="388.0" width="10.0" height="10.0"/> </bezel>
+	<bezel element="Bet"        inputtag="BET.18"  inputmask="0x40"> <bounds x="206.0" y="399.0" width="4.0"  height="4.0"/>  </bezel>
+
+	<!-- Rightmost column -->
+	<bezel element="Bet"        inputtag="BET.19"  inputmask="0x02"> <bounds x="222.0" y="359.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.19"  inputmask="0x04"> <bounds x="222.0" y="367.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.19"  inputmask="0x08"> <bounds x="222.0" y="375.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.19"  inputmask="0x10"> <bounds x="222.0" y="383.0" width="4.0"  height="4.0"/>  </bezel>
+	<bezel element="Bet"        inputtag="BET.19"  inputmask="0x20"> <bounds x="222.0" y="391.0" width="4.0"  height="4.0"/>  </bezel>
+
+  </view>
+
+
+</mamelayout>

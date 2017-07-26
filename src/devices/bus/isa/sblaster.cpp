@@ -1568,13 +1568,10 @@ void sb_device::dack_w(int line, uint8_t data)
 
 void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-//    printf("DMA timer expire\n");
 	if (tid)
-	{
-		device_serial_interface::device_timer(timer, tid, param, ptr);
 		return;
-	}
 
+//    printf("DMA timer expire\n");
 	uint16_t lsample, rsample;
 	switch (m_dsp.flags) {
 		case 0: // 8-bit unsigned mono

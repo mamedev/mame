@@ -89,11 +89,37 @@ protected:
 	virtual void view_click(const int button, const debug_view_xy& pos) override;
 
 private:
+	// The information of one disassembly line. May become the actual
+	// external interface at one point
+	struct dasm_line {
+		offs_t m_byteaddress;                   // address of the first byte of the instruction
+		std::string m_adr;                      // instruction address as a string
+		std::string m_dasm;                     // disassembly
+		std::string m_rawdata;                  // textual representation of the instruction values
+		std::string m_encdata;                  // textual representation of encrypted instruction values
+		std::string m_comment;                  // comment, when present
+
+		bool operator == (const dasm_line &right) const {
+			return
+				m_byteaddress == right.m_byteaddress &&
+				m_adr == right.m_adr &&
+				m_dasm == right.m_dasm &&
+				m_rawdata == right.m_rawdata &&
+				m_encdata == right.m_encdata &&
+				m_comment == right.m_comment;
+		}
+
+		bool operator != (const dasm_line &right) const {
+			return !(*this == right);
+		}
+	};
+
 	// internal helpers
 	void enumerate_sources();
 	offs_t find_pc_backwards(offs_t targetpc, int numinstrs);
-	void generate_bytes(offs_t pcbyte, int numbytes, int minbytes, int maxchars, bool encrypted);
+	std::string generate_bytes(offs_t pcbyte, int numbytes, int granularity, bool encrypted);
 	bool recompute(offs_t pc, int startline, int lines);
+	void print(int row, std::string text, int start, int end, u8 attrib);
 
 	// internal state
 	disasm_right_column m_right_column;         // right column contents
@@ -106,8 +132,7 @@ private:
 	int                 m_divider1, m_divider2; // left and right divider columns
 	int                 m_divider3;             // comment divider column
 	debug_view_expression m_expression;         // expression-related information
-	std::vector<offs_t> m_byteaddress;               // addresses of the instructions
-	util::ovectorstream m_dasm;                 // disassembled instructions
+	std::vector<dasm_line> m_dasm;              // disassembled instructions
 
 	// constants
 	static constexpr int DEFAULT_DASM_LINES = 1000;

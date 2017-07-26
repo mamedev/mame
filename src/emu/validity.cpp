@@ -16,7 +16,6 @@
 
 #include <ctype.h>
 #include <type_traits>
-#include <typeindex>
 #include <typeinfo>
 
 
@@ -1903,91 +1902,83 @@ void validity_checker::validate_device_types()
 	m_verbose_text.clear();
 
 	std::unordered_map<std::string, std::add_pointer_t<device_type> > device_name_map, device_shortname_map;
-	std::unordered_set<std::type_index> device_types;
 	machine_config config(GAME_NAME(___empty), m_drivlist.options());
 	for (device_type type : registered_device_types)
 	{
-		if (!device_types.emplace(type.type()).second)
+		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+
+		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
+		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
+
+		// ensure shortname exists
+		if (!dev->shortname() || !*dev->shortname())
 		{
-			osd_printf_error("Device class '%s' registered multiple times\n", type.type().name());
+			osd_printf_error("Device %s does not have short name defined\n", description.c_str());
 		}
 		else
 		{
-			device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+			// make sure the device name is not too long
+			if (strlen(dev->shortname()) > 32)
+				osd_printf_error("Device short name must be 32 characters or less\n");
 
-			char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
-			std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
-
-			// ensure shortname exists
-			if (!dev->shortname() || !*dev->shortname())
+			// check for invalid characters in shortname
+			for (char const *s = dev->shortname(); *s; ++s)
 			{
-				osd_printf_error("Device %s does not have short name defined\n", description.c_str());
-			}
-			else
-			{
-				// make sure the device name is not too long
-				if (strlen(dev->shortname()) > 32)
-					osd_printf_error("Device short name must be 32 characters or less\n");
-
-				// check for invalid characters in shortname
-				for (char const *s = dev->shortname(); *s; ++s)
+				if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '_'))
 				{
-					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '_'))
-					{
-						osd_printf_error("Device %s short name contains invalid characters\n", description.c_str());
-						break;
-					}
-				}
-
-				// check for name conflicts
-				auto const drvname(m_names_map.find(dev->shortname()));
-				auto const devname(device_shortname_map.emplace(dev->shortname(), &type));
-				if (m_names_map.end() != drvname)
-				{
-					game_driver const &dup(*drvname->second);
-					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
-				}
-				else if (!devname.second)
-				{
-					device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
-					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-					config.device_remove(&config.root_device(), "_dup");
+					osd_printf_error("Device %s short name contains invalid characters\n", description.c_str());
+					break;
 				}
 			}
 
-			// ensure name exists
-			if (!dev->name() || !*dev->name())
+			// check for name conflicts
+			auto const drvname(m_names_map.find(dev->shortname()));
+			auto const devname(device_shortname_map.emplace(dev->shortname(), &type));
+			if (m_names_map.end() != drvname)
 			{
-				osd_printf_error("Device %s does not have name defined\n", description.c_str());
+				game_driver const &dup(*drvname->second);
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
 			}
-			else
+			else if (!devname.second)
 			{
-				// check for description conflicts
-				auto const drvdesc(m_descriptions_map.find(dev->name()));
-				auto const devdesc(device_name_map.emplace(dev->name(), &type));
-				if (m_names_map.end() != drvdesc)
-				{
-					game_driver const &dup(*drvdesc->second);
-					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
-				}
-				else if (!devdesc.second)
-				{
-					device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
-					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-					config.device_remove(&config.root_device(), "_dup");
-				}
+				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				config.device_remove(&config.root_device(), "_dup");
 			}
-
-			// ensure source exists
-			if (!dev->source() || !*dev->source())
-				osd_printf_error("Device %s does not have source defined\n", description.c_str());
-
-			// check that reported type matches supplied type
-			if (dev->type().type() != type.type())
-				osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
-
-			config.device_remove(&config.root_device(), "_tmp");
 		}
+
+		// ensure name exists
+		if (!dev->name() || !*dev->name())
+		{
+			osd_printf_error("Device %s does not have name defined\n", description.c_str());
+		}
+		else
+		{
+			// check for description conflicts
+			auto const drvdesc(m_descriptions_map.find(dev->name()));
+			auto const devdesc(device_name_map.emplace(dev->name(), &type));
+			if (m_names_map.end() != drvdesc)
+			{
+				game_driver const &dup(*drvdesc->second);
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+			}
+			else if (!devdesc.second)
+			{
+				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				config.device_remove(&config.root_device(), "_dup");
+			}
+		}
+
+		// ensure source exists
+		if (!dev->source() || !*dev->source())
+			osd_printf_error("Device %s does not have source defined\n", description.c_str());
+
+		// check that reported type matches supplied type
+		if (dev->type().type() != type.type())
+			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
+
+		config.device_remove(&config.root_device(), "_tmp");
 	}
 
 	// if we had warnings or errors, output

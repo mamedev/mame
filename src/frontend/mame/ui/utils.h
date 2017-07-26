@@ -128,15 +128,35 @@ enum
 // GLOBAL STRUCTURES
 struct ui_software_info
 {
-	ui_software_info() {}
-	ui_software_info(std::string sname, std::string lname, std::string pname, std::string y, std::string pub,
-		uint8_t s, std::string pa, const game_driver *d, std::string li, std::string i, std::string is, uint8_t em,
-		std::string plong, std::string u, std::string de, bool av)
+	ui_software_info() { }
+
+	// info for software list item
+	ui_software_info(
+			software_info const &info,
+			software_part const &p,
+			game_driver const &d,
+			std::string const &li,
+			std::string const &is,
+			std::string const &de);
+
+	// info for starting empty
+	ui_software_info(game_driver const &d);
+
+	// copyable/movable
+	ui_software_info(ui_software_info const &) = default;
+	ui_software_info(ui_software_info &&) = default;
+	ui_software_info &operator=(ui_software_info const &) = default;
+	ui_software_info &operator=(ui_software_info &&) = default;
+
+	bool operator==(ui_software_info const &r)
 	{
-		shortname = sname; longname = lname; parentname = pname; year = y; publisher = pub;
-		supported = s; part = pa; driver = d; listname = li; interface = i; instance = is; startempty = em;
-		parentlongname = plong; usage = u; devicetype = de; available = av;
+		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
+			   && year == r.year && publisher == r.publisher && supported == r.supported
+			   && part == r.part && driver == r.driver && listname == r.listname
+			   && interface == r.interface && instance == r.instance && startempty == r.startempty
+			   && parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype;
 	}
+
 	std::string shortname;
 	std::string longname;
 	std::string parentname;
@@ -153,15 +173,6 @@ struct ui_software_info
 	std::string usage;
 	std::string devicetype;
 	bool available = false;
-
-	bool operator==(const ui_software_info& r)
-	{
-		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
-			   && year == r.year && publisher == r.publisher && supported == r.supported
-			   && part == r.part && driver == r.driver && listname == r.listname
-			   && interface == r.interface && instance == r.instance && startempty == r.startempty
-			   && parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype;
-	}
 };
 
 // Manufacturers

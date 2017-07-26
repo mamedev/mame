@@ -139,7 +139,7 @@ void serflash_device::flash_hard_reset()
 {
 //  logerror("%08x FLASH: RESET\n", cpuexec_describe_context(machine));
 
-	m_flash_state = STATE_READ;
+	m_flash_state = flash_state_t::READ;
 
 	m_flash_cmd_prev = -1;
 	m_flash_cmd_seq = 0;
@@ -196,7 +196,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				break;
 
 			case 0x70:  // READ STATUS
-				flash_change_state( STATE_READ_STATUS );
+				flash_change_state( flash_state_t::READ_STATUS );
 				break;
 
 			case 0x80:  // PAGE / CACHE PROGRAM
@@ -206,11 +206,11 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				break;
 
 			case 0x90:  // READ ID
-				flash_change_state( STATE_READ_ID );
+				flash_change_state( flash_state_t::READ_ID );
 				break;
 
 			case 0xff:  // RESET
-				flash_change_state( STATE_IDLE );
+				flash_change_state( flash_state_t::IDLE );
 				break;
 
 			default:
@@ -230,7 +230,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 					m_flash_page_addr = m_flash_col;
 					m_flash_page_index = m_flash_row;
 
-					flash_change_state( STATE_READ );
+					flash_change_state( flash_state_t::READ );
 
 					//logerror("%08x FLASH: caching page = %04X\n", m_maincpu->pc(), m_flash_row);
 				}
@@ -239,7 +239,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 			case 0x60: // BLOCK ERASE
 				if (data==0xd0)
 				{
-					flash_change_state( STATE_BLOCK_ERASE );
+					flash_change_state( flash_state_t::BLOCK_ERASE );
 					m_flashwritemap[m_flash_col] |= 1;
 					memset(m_region + m_flash_col * FLASH_PAGE_SIZE, 0xff, FLASH_PAGE_SIZE);
 					//logerror("erased block %04x (%08x - %08x)\n", m_flash_col, m_flash_col * FLASH_PAGE_SIZE,  ((m_flash_col+1) * FLASH_PAGE_SIZE)-1);
@@ -252,7 +252,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 			case 0x80:
 				if (data==0x10)
 				{
-					flash_change_state( STATE_PAGE_PROGRAM );
+					flash_change_state( flash_state_t::PAGE_PROGRAM );
 					m_flashwritemap[m_flash_row] |= (memcmp(m_region + m_flash_row * FLASH_PAGE_SIZE, m_flash_page_data, FLASH_PAGE_SIZE) != 0);
 					memcpy(m_region + m_flash_row * FLASH_PAGE_SIZE, m_flash_page_data, FLASH_PAGE_SIZE);
 					//logerror("re-written block %04x (%08x - %08x)\n", m_flash_row, m_flash_row * FLASH_PAGE_SIZE,  ((m_flash_row+1) * FLASH_PAGE_SIZE)-1);
@@ -318,7 +318,7 @@ READ8_MEMBER( serflash_device::flash_io_r )
 
 	switch (m_flash_state)
 	{
-		case STATE_READ_ID:
+		case flash_state_t::READ_ID:
 			//old = m_flash_read_seq;
 
 			switch( m_flash_read_seq++ )
@@ -341,7 +341,7 @@ READ8_MEMBER( serflash_device::flash_io_r )
 			//logerror("%08x FLASH: read %02X from id(%02X)\n", m_maincpu->pc(), data, old);
 			break;
 
-		case STATE_READ:
+		case flash_state_t::READ:
 			if (m_flash_page_addr > FLASH_PAGE_SIZE-1)
 				m_flash_page_addr = FLASH_PAGE_SIZE-1;
 
@@ -352,7 +352,7 @@ READ8_MEMBER( serflash_device::flash_io_r )
 			//logerror("%08x FLASH: read data %02X from addr %03X (page %04X)\n", m_maincpu->pc(), data, old, m_flash_page_index);
 			break;
 
-		case STATE_READ_STATUS:
+		case flash_state_t::READ_STATUS:
 			// bit 7 = writeable, bit 6 = ready, bit 5 = ready/true ready, bit 1 = fail(N-1), bit 0 = fail
 			data = 0xe0;
 			//logerror("%08x FLASH: read status %02X\n", m_maincpu->pc(), data);

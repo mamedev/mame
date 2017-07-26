@@ -1147,7 +1147,7 @@ void ay8910_device::build_mixer_table()
 	 */
 	else
 	{
-		build_3D_table(m_res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table);
+		build_3D_table(m_res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table.get());
 	}
 }
 
@@ -1199,6 +1199,8 @@ void ay8910_device::device_start()
 		logerror("%s device using single output!\n", name());
 		m_streams = 1;
 	}
+
+	m_vol3d_table = make_unique_clear<int32_t[]>(8*32*32*32);
 
 	build_mixer_table();
 
@@ -1512,7 +1514,6 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 	memset(&m_vol_enabled,0,sizeof(m_vol_enabled));
 	memset(&m_vol_table,0,sizeof(m_vol_table));
 	memset(&m_env_table,0,sizeof(m_env_table));
-	memset(&m_vol3d_table,0,sizeof(m_vol3d_table));
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 
 	set_type(psg_type);

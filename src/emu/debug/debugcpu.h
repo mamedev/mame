@@ -215,7 +215,8 @@ public:
 	void breakpoint_enable_all(bool enable = true);
 
 	// watchpoints
-	watchpoint *watchpoint_first(address_spacenum spacenum) const { return m_wplist[spacenum]; }
+	int watchpoint_space_count() const { return m_wplist.size(); }
+	watchpoint *watchpoint_first(int spacenum) const { return m_wplist[spacenum]; }
 	int watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action);
 	bool watchpoint_clear(int wpnum);
 	void watchpoint_clear_all();
@@ -255,7 +256,7 @@ public:
 
 	// memory tracking
 	void set_track_mem(bool value) { m_track_mem = value; }
-	offs_t track_mem_pc_from_space_address_data(const address_spacenum& space,
+	offs_t track_mem_pc_from_space_address_data(const int& space,
 												const offs_t& address,
 												const u64& data) const;
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
@@ -328,7 +329,7 @@ private:
 
 	// breakpoints and watchpoints
 	breakpoint *            m_bplist;                   // list of breakpoints
-	watchpoint *            m_wplist[ADDRESS_SPACES];   // watchpoint lists for each address space
+	std::vector<watchpoint *> m_wplist;                 // watchpoint lists for each address space
 	registerpoint *         m_rplist;                   // list of registerpoints
 
 	// tracing
@@ -408,7 +409,7 @@ private:
 	class dasm_memory_access
 	{
 	public:
-		dasm_memory_access(const address_spacenum& address_space,
+		dasm_memory_access(const int& address_space,
 							const offs_t& address,
 							const u64& data,
 							const offs_t& pc);
@@ -425,7 +426,7 @@ private:
 		}
 
 		// Stores the PC for a given address, memory region, and data value
-		address_spacenum m_address_space;
+		int m_address_space;
 		offs_t           m_address;
 		u64              m_data;
 		mutable offs_t   m_pc;
@@ -569,7 +570,7 @@ public:
 	void ensure_comments_loaded();
 	void reset_transient_flags();
 	void process_source_file();
-	void watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, device_debug::watchpoint** wplist);
+	void watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist);
 
 private:
 	static const size_t NUM_TEMP_VARIABLES;

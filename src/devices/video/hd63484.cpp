@@ -344,9 +344,11 @@ ROM_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *hd63484_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector hd63484_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

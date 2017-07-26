@@ -398,7 +398,7 @@ WRITE8_MEMBER(atarisy1_state::via_pb_w)
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);
-	m_tms->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
+	m_tms->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / (16 - data));
 }
 
 

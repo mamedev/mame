@@ -9,15 +9,17 @@
 class glass_state : public driver_device
 {
 public:
-	glass_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	glass_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_mainram(*this, "mainram") { }
+		m_shareram(*this, "shareram"),
+		m_pant{ nullptr, nullptr }
+	{ }
 
 
 	/* devices */
@@ -29,7 +31,7 @@ public:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_mainram;
+	required_shared_ptr<uint16_t> m_shareram;
 
 	/* video-related */
 	tilemap_t     *m_pant[2];
@@ -41,16 +43,15 @@ public:
 	int         m_cause_interrupt;
 	int         m_blitter_serial_buffer[5];
 
+	DECLARE_WRITE8_MEMBER(shareram_w);
+	DECLARE_READ8_MEMBER(shareram_r);
 	DECLARE_WRITE16_MEMBER(clr_int_w);
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(coin_w);
 	DECLARE_WRITE16_MEMBER(blitter_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(mainram_r);
-	DECLARE_WRITE16_MEMBER(mainram_w);
 
 	DECLARE_DRIVER_INIT(glass);
-	DECLARE_DRIVER_INIT(glassp);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

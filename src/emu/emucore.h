@@ -188,12 +188,20 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 	TYPE(const TYPE &) = delete; \
 	TYPE &operator=(const TYPE &) = delete
 
-// macro for declaring enumerator operators that increment/decrement like plain old C
-#define DECLARE_ENUM_OPERATORS(TYPE) \
+// macro for declaring enumeration operators that increment/decrement like plain old C
+#define DECLARE_ENUM_INCDEC_OPERATORS(TYPE) \
 inline TYPE &operator++(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) + 1); } \
-inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
 inline TYPE &operator--(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) - 1); } \
+inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
 inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; return old; }
+
+// macro for declaring bitwise operators for an enumerated type
+#define DECLARE_ENUM_BITWISE_OPERATORS(TYPE) \
+constexpr TYPE operator~(TYPE value) { return TYPE(~std::underlying_type_t<TYPE>(value)); } \
+constexpr TYPE operator&(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) & std::underlying_type_t<TYPE>(b)); } \
+constexpr TYPE operator|(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) | std::underlying_type_t<TYPE>(b)); } \
+inline TYPE &operator&=(TYPE &a, TYPE b) { return a = a & b; } \
+inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 
 
 // this macro passes an item followed by a string version of itself as two consecutive parameters

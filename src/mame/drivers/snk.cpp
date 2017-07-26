@@ -5126,6 +5126,12 @@ ROM_START( victroad )
 	ROM_REGION( 0x20000, "ym2", 0 )
 	ROM_LOAD( "p4.ef5", 0x00000, 0x10000, CRC(e10fb8cc) SHA1(591aa1f947216795252dc4d9ec2600ef63dada7d) )
 	ROM_LOAD( "p5.g5",  0x10000, 0x10000, CRC(93e5f110) SHA1(065a78805e50ce6a48cb7930f264bada236feb13) )
+
+	ROM_REGION( 0x800, "pals", 0 ) // not used by the emulation
+	ROM_LOAD( "a5004-1.d6", 0x000, 0x104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
+	ROM_LOAD( "a5004-4.s8", 0x200, 0x104, CRC(fad4c493) SHA1(0aacc2d25434173366ba95eaac848812ea9f40c5) )
+	ROM_LOAD( "a6002-3.p2", 0x400, 0x104, CRC(036b1a16) SHA1(c688071c452066e5d4addf09212eb76d3078ec45) )
+	ROM_LOAD( "pal20l8",    0x600, 0x144, NO_DUMP ) // protected
 ROM_END
 
 ROM_START( dogosoke )
@@ -6459,9 +6465,9 @@ GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, 0,        ROT2
 GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.N.K III (US)", 0 )
 GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
 GAME( 1986, athena,    0,        athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena", 0 )
-GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Fighting Golf (US)", 0 )
-GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Fighting Golf (US, Ver 2)", 0 )
+GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
+GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
+GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
 GAME( 1988, countryc,  0,        fitegolf,  countryc,  snk_state, countryc, ROT0,   "SNK",     "Country Club", 0 )
 
 GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)

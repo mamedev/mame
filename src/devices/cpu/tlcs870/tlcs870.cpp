@@ -247,6 +247,14 @@ tmp87ph40an_device::tmp87ph40an_device(const machine_config &mconfig, const char
 {
 }
 
+device_memory_interface::space_config_vector tlcs870_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
 uint8_t  tlcs870_device::RM8 (uint32_t a)    { return m_program->read_byte( a ); }
 uint16_t tlcs870_device::RM16(uint32_t a)    { return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
 

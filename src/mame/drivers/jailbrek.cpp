@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vlm_map, AS_0, 8, jailbrek_state )
+static ADDRESS_MAP_START( vlm_map, 0, 8, jailbrek_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( jailbrek )
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 MACHINE_CONFIG_END
 
 

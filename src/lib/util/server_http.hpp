@@ -199,6 +199,7 @@ namespace webpp {
 		}
 		void clear()
 		{
+			std::lock_guard<std::mutex> lock(m_resource_mutex);
 			m_resource.clear();
 		}
 
@@ -206,12 +207,12 @@ namespace webpp {
 
 		std::function<void(std::shared_ptr<socket_type> socket, std::shared_ptr<typename ServerBase<socket_type>::Request>)> on_upgrade;
 	private:
-		/// Warning: do not add or remove resources after start() is called
+		/// Warning: do not access (red or write) m_resources without holding m_resource_mutex
 		std::map<regex_orderable, std::map<std::string, std::tuple<path2regex::Keys, http_handler>>>  m_resource;
+		std::mutex m_resource_mutex;
 
 		std::map<std::string, http_handler> m_default_resource;
 
-		std::mutex m_resource_mutex;
 	public:
 		virtual void start() {
 			if(!m_io_context)

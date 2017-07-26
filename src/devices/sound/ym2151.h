@@ -81,6 +81,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -259,6 +260,7 @@ private:
 	devcb_write8           m_portwritehandler;
 
 	void init_tables();
+	void calculate_timers();
 	void envelope_KONKOFF(YM2151Operator * op, int v);
 	void set_connect(YM2151Operator *om1, int cha, int v);
 	void advance();

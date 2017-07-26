@@ -51,7 +51,7 @@ public:
 	required_ioport_array<7> m_inp_matrix;
 
 	// display common
-	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
 	int m_display_maxy;             // display matrix number of rows
 	int m_display_maxx;             // display matrix number of columns (max 31 for now)
 

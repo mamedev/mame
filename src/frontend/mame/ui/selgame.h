@@ -15,8 +15,10 @@
 
 #include "ui/selmenu.h"
 
+class media_auditor;
 
 namespace ui {
+
 class menu_select_game : public menu_select_launch
 {
 public:
@@ -75,6 +77,8 @@ private:
 	void init_sorted_list();
 	bool load_available_machines();
 	void load_custom_filters();
+
+	static std::string make_error_text(bool summary, media_auditor const &auditor);
 
 	void *get_selection_ptr() const
 	{

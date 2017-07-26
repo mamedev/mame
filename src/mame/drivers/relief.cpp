@@ -107,7 +107,7 @@ WRITE16_MEMBER(relief_state::audio_volume_w)
 	}
 }
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, relief_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, relief_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( relief )
 
 	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

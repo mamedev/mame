@@ -288,7 +288,7 @@ READ8_MEMBER(pwrview_state::pitclock_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(bios_bank, AS_0, 16, pwrview_state)
+static ADDRESS_MAP_START(bios_bank, 0, 16, pwrview_state)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0x07fff) AM_WRITE(nmimem_w)
 
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START(pwrview_map, AS_PROGRAM, 16, pwrview_state)
 	AM_RANGE(0xf8000, 0xfffff) AM_DEVICE("bios_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_fetch_map, AS_DECRYPTED_OPCODES, 16, pwrview_state)
+static ADDRESS_MAP_START(pwrview_fetch_map, AS_OPCODES, 16, pwrview_state)
 	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xf8000, 0xfffff) AM_READ(fbios_r)

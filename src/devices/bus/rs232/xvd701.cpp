@@ -65,7 +65,7 @@ void jvc_xvd701_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		break;
 
 	default:
-		device_serial_interface::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 

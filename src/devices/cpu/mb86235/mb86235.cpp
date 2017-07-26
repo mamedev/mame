@@ -215,6 +215,14 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+device_memory_interface::space_config_vector mb86235_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_dataa_config),
+		std::make_pair(AS_IO,      &m_datab_config)
+	};
+}
 
 void mb86235_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

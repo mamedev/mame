@@ -20,11 +20,21 @@ public:
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
 
+	DECLARE_WRITE8_MEMBER(boot_state_w);
 };
+
+WRITE8_MEMBER(at586_state::boot_state_w)
+{
+	logerror("Boot state %02x\n", data);
+}
 
 static MACHINE_CONFIG_START( tx_config )
 	MCFG_I82439TX_CPU( "maincpu" )
 	MCFG_I82439TX_REGION( "isa" )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START(sb_config)
+	MCFG_I82371SB_BOOT_STATE_HOOK(DEVWRITE8(":", at586_state, boot_state_w))
 MACHINE_CONFIG_END
 
 static SLOT_INTERFACE_START( pci_devices )
@@ -85,6 +95,7 @@ static MACHINE_CONFIG_START( at586x3 )
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
 
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82371sb", sb_config)
 
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa2", pc_isa16_cards, nullptr, false)
@@ -112,7 +123,11 @@ ROM_END
 
 ROM_START( at586x3 )
 	ROM_REGION32_LE(0x40000, "isa", 0)
-	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
+	ROM_SYSTEM_BIOS(0, "5hx29", "5HX29")
+	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "n7ns04", "Version 21/01/98, without integrated sound") // SMSC FDC37C93X I/O
+	ROMX_LOAD("m7ns04.rom", 0x00000, 0x40000, CRC(9c1f656b) SHA1(f4a0a522d8c47b6ddb6c01fe9a34ddf5b1977f8d), ROM_BIOS(2) )
 ROM_END
 
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */

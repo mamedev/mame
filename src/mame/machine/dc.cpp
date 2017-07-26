@@ -244,7 +244,7 @@ int dc_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shif
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
 	{
-		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
+		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context().c_str());
 		//machine().debug_break();
 	}
 
@@ -268,7 +268,7 @@ int dc_state::decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *sh
 	if ((mem_mask != 0x0000ffff00000000U) && (mem_mask != 0x000000000000ffffU) &&
 		(mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
 	{
-		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
+		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context().c_str());
 		//machine().debug_break();
 	}
 

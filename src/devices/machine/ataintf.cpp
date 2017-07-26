@@ -19,21 +19,21 @@
 
 void ata_interface_device::set_irq(int state)
 {
-//  printf( "%s: irq %d\n", machine().describe_context(), state );
+//  logerror( "%s: irq %d\n", machine().describe_context(), state );
 
 	m_irq_handler(state);
 }
 
 void ata_interface_device::set_dmarq(int state)
 {
-//  printf( "%s: dmarq %d\n", machine().describe_context(), state );
+//  logerror( "%s: dmarq %d\n", machine().describe_context(), state );
 
 	m_dmarq_handler(state);
 }
 
 void ata_interface_device::set_dasp(int state)
 {
-//  printf( "%s: dasp %d\n", machine().describe_context(), state );
+//  logerror( "%s: dasp %d\n", machine().describe_context(), state );
 
 	m_dasp_handler(state);
 }
@@ -132,7 +132,7 @@ uint16_t ata_interface_device::read_dma()
 		if (elem->dev() != nullptr)
 			result &= elem->dev()->read_dma();
 
-//  printf( "%s: read_dma %04x\n", machine().describe_context(), result );
+//  logerror( "%s: read_dma %04x\n", machine().describe_context(), result );
 	return result;
 }
 
@@ -145,7 +145,7 @@ READ16_MEMBER( ata_interface_device::read_cs0 )
 
 //  { static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
 
-//  printf( "%s: read cs0 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
+//  logerror( "%s: read cs0 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
 
 	return result;
 }
@@ -157,7 +157,7 @@ READ16_MEMBER( ata_interface_device::read_cs1 )
 		if (elem->dev() != nullptr)
 			result &= elem->dev()->read_cs1(space, offset, mem_mask);
 
-//  printf( "%s: read cs1 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
+//  logerror( "%s: read cs1 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
 
 	return result;
 }
@@ -171,7 +171,7 @@ READ16_MEMBER( ata_interface_device::read_cs1 )
 
 void ata_interface_device::write_dma( uint16_t data )
 {
-//  printf( "%s: write_dma %04x\n", machine().describe_context(), data );
+//  logerror( "%s: write_dma %04x\n", machine().describe_context(), data );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
@@ -180,7 +180,7 @@ void ata_interface_device::write_dma( uint16_t data )
 
 WRITE16_MEMBER( ata_interface_device::write_cs0 )
 {
-//  printf( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
+//  logerror( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
@@ -189,7 +189,7 @@ WRITE16_MEMBER( ata_interface_device::write_cs0 )
 
 WRITE16_MEMBER( ata_interface_device::write_cs1 )
 {
-//  printf( "%s: write cs1 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
+//  logerror( "%s: write cs1 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
@@ -198,7 +198,7 @@ WRITE16_MEMBER( ata_interface_device::write_cs1 )
 
 WRITE_LINE_MEMBER( ata_interface_device::write_dmack )
 {
-//  printf( "%s: write_dmack %04x\n", machine().describe_context(), state );
+//  logerror( "%s: write_dmack %04x\n", machine().describe_context(), state );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)

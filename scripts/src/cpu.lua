@@ -720,6 +720,22 @@ if (CPUS["NANOPROCESSOR"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- HP Capricorn
+--@src/devices/cpu/capricorn/capricorn.h,CPUS["CAPRICORN"] = true
+--------------------------------------------------
+
+if (CPUS["CAPRICORN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/capricorn/capricorn.cpp",
+		MAME_DIR .. "src/devices/cpu/capricorn/capricorn.h",
+	}
+end
+
+if (CPUS["CAPRICORN"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/capricorn/capricorn_dasm.cpp")
+end
+
+--------------------------------------------------
 -- Hudsonsoft 6280
 --@src/devices/cpu/h6280/h6280.h,CPUS["H6280"] = true
 --------------------------------------------------
@@ -770,19 +786,19 @@ if (CPUS["IE15"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Intel 4004
---@src/devices/cpu/i4004/i4004.h,CPUS["I4004"] = true
+-- Intel MCS-40
+--@src/devices/cpu/mcs40/mcs40.h,CPUS["MCS40"] = true
 --------------------------------------------------
 
-if (CPUS["I4004"]~=null) then
+if (CPUS["MCS40"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/i4004/i4004.cpp",
-		MAME_DIR .. "src/devices/cpu/i4004/i4004.h",
+		MAME_DIR .. "src/devices/cpu/mcs40/mcs40.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs40/mcs40.h",
 	}
 end
 
-if (CPUS["I4004"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i4004/4004dasm.cpp")
+if (CPUS["MCS40"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs40/mcs40dasm.cpp")
 end
 
 --------------------------------------------------
@@ -1629,6 +1645,8 @@ if (CPUS["UPD7810"]~=null) then
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_opcodes.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_table.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_macros.h",
+		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.cpp",
+		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.h",
 	}
 end
 

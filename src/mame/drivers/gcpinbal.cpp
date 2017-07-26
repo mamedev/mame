@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( gcpinbal )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm6585_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM6585, XTAL_640kHz)
-	MCFG_MSM6585_VCLK_CB(WRITELINE(gcpinbal_state, gcp_adpcm_int))      /* VCK function */
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE(gcpinbal_state, gcp_adpcm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -173,7 +173,7 @@ void mea8000_device::device_start()
 
 int mea8000_device::accept_byte()
 {
-	return m_state == MEA8000_STOPPED || m_state == MEA8000_WAIT_FIRST || (m_state == MEA8000_STARTED && m_bufpos < 4);
+	return m_state == mea8000_state::STOPPED || m_state == mea8000_state::WAIT_FIRST || (m_state == mea8000_state::STARTED && m_bufpos < 4);
 }
 
 void mea8000_device::update_req()
@@ -415,7 +415,7 @@ void mea8000_device::stop_frame()
 {
 	/* enter stop mode */
 	m_timer->reset();
-	m_state = MEA8000_STOPPED;
+	m_state = mea8000_state::STOPPED;
 	m_stream->update();
 	m_output = 0;
 }
@@ -470,14 +470,14 @@ TIMER_CALLBACK_MEMBER( mea8000_device::timer_expire )
 			start_frame();
 		}
 		/* slow stop */
-		else if (m_state == MEA8000_STARTED)
+		else if (m_state == mea8000_state::STARTED)
 		{
 			m_ampl = 0;
 			LOG("%f mea8000_timer_expire: fade frame\n", machine().time().as_double());
 			start_frame();
-			m_state = MEA8000_SLOWING;
+			m_state = mea8000_state::SLOWING;
 		}
-		else if (m_state == MEA8000_SLOWING)
+		else if (m_state == mea8000_state::SLOWING)
 		{
 			LOG("%f mea8000_timer_expire: stop frame\n", machine().time().as_double());
 			stop_frame();
@@ -518,12 +518,12 @@ WRITE8_MEMBER( mea8000_device::write )
 	switch (offset)
 	{
 	case 0: /* data register */
-		if (m_state == MEA8000_STOPPED)
+		if (m_state == mea8000_state::STOPPED)
 		{
 			/* got pitch byte before first frame */
 			m_pitch = 2 * data;
 			LOG("%s %f: mea8000_w pitch %i\n", machine().describe_context(), machine().time().as_double(), m_pitch);
-			m_state = MEA8000_WAIT_FIRST;
+			m_state = mea8000_state::WAIT_FIRST;
 			m_bufpos = 0;
 		}
 		else if (m_bufpos == 4)
@@ -538,7 +538,7 @@ WRITE8_MEMBER( mea8000_device::write )
 					data, m_bufpos);
 			m_buf[m_bufpos] = data;
 			m_bufpos++;
-			if (m_bufpos == 4 && m_state == MEA8000_WAIT_FIRST)
+			if (m_bufpos == 4 && m_state == mea8000_state::WAIT_FIRST)
 			{
 				/* fade-in first frame */
 				int old_pitch = m_pitch;
@@ -548,7 +548,7 @@ WRITE8_MEMBER( mea8000_device::write )
 				m_last_pitch = old_pitch;
 				m_ampl = 0;
 				start_frame();
-				m_state = MEA8000_STARTED;
+				m_state = mea8000_state::STARTED;
 			}
 		}
 		update_req();

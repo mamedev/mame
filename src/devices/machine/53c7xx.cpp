@@ -23,29 +23,13 @@
 //  DEBUGGERY
 //**************************************************************************
 
-#define DEBUG_LOG           1
-#define DEBUG_LEVEL         0
+#define LOG_UNHANDLED       (1U << 0)
+#define LOG_HOST            (1U << 1)
+#define LOG_STATE           (1U << 2)
+#define LOG_SCRIPTS         (1U << 3)
+#define VERBOSE             (0)
 
-#if DEBUG_LOG
-	#define VERBOSE_LOG(machine, level, ...)        verbose_log(machine, level, __VA_ARGS__)
-#else
-	#define VERBOSE_LOG(machine, level, ...)
-#endif
-
-static void ATTR_PRINTF(3,4) verbose_log(running_machine &machine, int level, const char* format, ...)
-{
-	if (level <= DEBUG_LEVEL)
-	{
-		char buffer[32768];
-		va_list v;
-
-		va_start(v, format);
-		vsprintf(buffer, format, v);
-		va_end(v);
-
-		printf("53C7XX (%s): %s", machine.describe_context(), buffer);
-	}
-}
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -230,7 +214,7 @@ void ncr53c7xx_device::device_reset()
 
 READ32_MEMBER( ncr53c7xx_device::read )
 {
-	VERBOSE_LOG(machine(), 1, "REG R: [%x] (%08X)\n", offset, mem_mask);
+	LOGMASKED(LOG_HOST, "%s: REG R: [%x] (%08X)\n", machine().describe_context(), offset, mem_mask);
 
 	uint32_t ret = 0;
 
@@ -459,7 +443,7 @@ READ32_MEMBER( ncr53c7xx_device::read )
 
 		default:
 		{
-			VERBOSE_LOG(machine(), 0, "Unhandled register access");
+			LOGMASKED(LOG_UNHANDLED, "%s: Unhandled register access", machine().describe_context());
 		}
 	}
 
@@ -473,7 +457,7 @@ READ32_MEMBER( ncr53c7xx_device::read )
 
 WRITE32_MEMBER( ncr53c7xx_device::write )
 {
-	VERBOSE_LOG(machine(), 1, "REG W: [%x] (%08X) %x\n", offset, mem_mask, data);
+	LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", offset, mem_mask, data, machine().describe_context());
 
 	switch (offset)
 	{
@@ -672,7 +656,7 @@ WRITE32_MEMBER( ncr53c7xx_device::write )
 
 		default:
 		{
-			VERBOSE_LOG(machine(), 0, "Unhandled register access");
+			LOGMASKED(LOG_UNHANDLED, "%s: Unhandled register access", machine().describe_context());
 		}
 	}
 }
@@ -707,7 +691,7 @@ void ncr53c7xx_device::update_irqs()
 
 void ncr53c7xx_device::set_scsi_state(int state)
 {
-	VERBOSE_LOG(machine(), 2, "SCSI state change: %x to %x\n", m_scsi_state, state);
+	LOGMASKED(LOG_STATE, "SCSI state change: %x to %x\n", m_scsi_state, state);
 
 	m_scsi_state = state;
 }
@@ -790,7 +774,7 @@ void ncr53c7xx_device::step(bool timeout)
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint32_t data = scsi_bus->data_r();
 
-	VERBOSE_LOG(machine(), 2, "Step: CTRL:%x DATA:%x (%d.%d) Timeout:%d\n", ctrl, data, m_scsi_state & STATE_MASK, m_scsi_state >> SUB_SHIFT, timeout);
+	LOGMASKED(LOG_STATE, "Step: CTRL:%x DATA:%x (%d.%d) Timeout:%d\n", ctrl, data, m_scsi_state & STATE_MASK, m_scsi_state >> SUB_SHIFT, timeout);
 
 	// Check for disconnect from target
 	if (!(m_scntl[0] & SCNTL0_TRG) && m_connected && !(ctrl & S_BSY))
@@ -1210,7 +1194,7 @@ void ncr53c7xx_device::execute_run()
 						illegal();
 				}
 
-				VERBOSE_LOG(machine(), 3, "%s", disassemble_scripts());
+				LOGMASKED(LOG_SCRIPTS, "%s", disassemble_scripts());
 				break;
 			}
 
@@ -1432,7 +1416,7 @@ void ncr53c7xx_device::bm_i_wmov()
 		{
 			if (m_dbc == 0)
 			{
-				VERBOSE_LOG(machine(), 0, "DBC should not be 0\n");
+				LOGMASKED(LOG_UNHANDLED, "DBC should not be 0\n");
 				illegal();
 			}
 

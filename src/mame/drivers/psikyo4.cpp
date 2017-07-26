@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("ram") // main RAM (1 meg)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ps4_ymf_map, AS_0, 8, psikyo4_state )
+static ADDRESS_MAP_START( ps4_ymf_map, 0, 8, psikyo4_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK("ymfbank0")
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("ymfbank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("ymfbank2")
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( ps4big )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, ps4_ymf_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, ps4_ymf_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

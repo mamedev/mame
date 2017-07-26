@@ -426,6 +426,9 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 
 	m_mofetta->skdrcs_in(m_amigo->skdrcs_out());
 
+	// Clock to Oso
+	m_oso->clock_in(state);
+
 	int gromclk = m_mofetta->gromclk_out();
 
 	if (gromclk != m_gromclk)   // when it changed, propagate to the GROMs
@@ -2227,14 +2230,30 @@ enum
 	SHSK = 0x01
 };
 
-oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TI99_OSO, tag, owner, clock),
-	bus::ti99::hexbus::device_ti_hexbus_interface(mconfig, *this),
-	m_data(0),
-	m_status(0),
-	m_control(0),
-	m_xmit(0)
+/* Control register bits */
+enum
 {
+	WIEN = 0x80,
+	RIEN = 0x40,
+	BAVIAEN = 0x20,
+	BAVAIEN = 0x10,
+	BAVC = 0x08,
+	WEN = 0x04,
+	REN = 0x02,
+	CR7 = 0x01
+};
+
+oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
+	m_data(0),
+	m_status(0xff),
+	m_control(0),
+	m_xmit(0),
+	m_clkcount(0),
+	m_xmit_send(0)
+{
+	m_hexbus_inbound = nullptr;
+	m_hexbus_outbound = nullptr;
 }
 
 READ8_MEMBER( oso_device::read )
@@ -2276,8 +2295,7 @@ WRITE8_MEMBER( oso_device::write )
 		// write 5FF8: write transmit register
 		if (TRACE_OSO) logerror("Write transmit register %02x\n", data);
 		m_xmit = data;
-		// We set the status register directly in order to prevent lock-ups
-		// until we have a complete Hexbus implementation
+		m_xmit_send = 2;
 		m_status |= HSKWT;
 		break;
 	case 1:
@@ -2292,13 +2310,38 @@ WRITE8_MEMBER( oso_device::write )
 	}
 }
 
+void oso_device::hexbus_value_changed(uint8_t data)
+{
+	if (TRACE_OSO) logerror("Hexbus value changed to %02x\n", data);
+}
+
+/*
+    Phi3 incoming clock pulse
+*/
+WRITE_LINE_MEMBER( oso_device::clock_in )
+{
+	if (state==ASSERT_LINE) m_clkcount++;
+	if (m_clkcount > 30 && ((m_control & WEN)!=0) && (m_xmit_send > 0))
+	{
+		if (TRACE_OSO) logerror("Write nibble %d\n", 3-m_xmit_send);
+		hexbus_write(((m_xmit & 0x0c)<<4) | (m_xmit & 0x03));
+		m_xmit >>= 4;
+		m_clkcount = 0;
+		m_xmit_send--;
+	}
+}
+
 void oso_device::device_start()
 {
 	logerror("Starting\n");
 	m_status = m_xmit = m_control = m_data = 0;
 
-	m_hexbus = downcast<bus::ti99::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
-	m_hexbus->connect_master(this);
+	m_hexbus_outbound = dynamic_cast<bus::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
+
+	// Establish callback for inbound propagations
+	m_hexbus_outbound->set_chain_element(this);
+	// Establish callback
+	m_hexbus_outbound->set_chain_element(this);
 
 	save_item(NAME(m_data));
 	save_item(NAME(m_status));

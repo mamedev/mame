@@ -16,8 +16,6 @@
 #include "ui/selmenu.h"
 
 namespace ui {
-using s_bios = std::vector<std::pair<std::string, int>>;
-using s_parts = std::unordered_map<std::string, std::string>;
 
 // Menu Class
 class menu_select_software : public menu_select_launch
@@ -31,6 +29,7 @@ protected:
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
+
 	std::string         m_search;
 	const game_driver   *m_driver;
 	bool                m_has_empty_start;
@@ -67,55 +66,6 @@ private:
 
 	virtual void general_info(const game_driver *driver, std::string &buffer) override {}
 };
-
-class software_parts : public menu
-{
-public:
-	software_parts(mame_ui_manager &mui, render_container &container, s_parts parts, ui_software_info *ui_info);
-	virtual ~software_parts() override;
-
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-
-	ui_software_info *m_uiinfo;
-	s_parts m_parts;
-};
-
-class bios_selection : public menu
-{
-public:
-	bios_selection(mame_ui_manager &mui, render_container &container, s_bios biosname, void *driver, bool software, bool inlist);
-	virtual ~bios_selection() override;
-
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-
-	void    *m_driver;
-	bool    m_software, m_inlist;
-	s_bios  m_bios;
-};
-
-struct reselect_last
-{
-	static std::string driver, software, swlist;
-	static void set(bool value) { m_reselect = value; }
-	static bool get() { return m_reselect; }
-	static void reset() { driver.clear(); software.clear(); swlist.clear(); set(false); }
-
-private:
-	static bool m_reselect;
-};
-
-// Getter
-bool has_multiple_bios(const game_driver *driver, s_bios &biosname);
 
 } // namespace ui
 

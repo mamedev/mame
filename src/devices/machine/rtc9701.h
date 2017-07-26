@@ -45,14 +45,14 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
-	enum state_t
+	enum class state_t : u8
 	{
-		RTC9701_CMD_WAIT = 0,
-		RTC9701_RTC_READ,
-		RTC9701_RTC_WRITE,
-		RTC9701_EEPROM_READ,
-		RTC9701_EEPROM_WRITE,
-		RTC9701_AFTER_WRITE_ENABLE
+		CMD_WAIT = 0,
+		RTC_READ,
+		RTC_WRITE,
+		EEPROM_READ,
+		EEPROM_WRITE,
+		AFTER_WRITE_ENABLE
 
 	};
 

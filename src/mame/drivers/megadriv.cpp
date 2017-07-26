@@ -407,7 +407,19 @@ static MACHINE_CONFIG_DERIVED( genesis_tmss, ms_megadriv )
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","TMSS")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( dcat16_megadriv )
+	MCFG_FRAGMENT_ADD( dcat16_megadriv_base )
 
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
+
+	MCFG_SCREEN_MODIFY("megadriv")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+
+//  has SD card slot instead?
+//  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
+//  MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
+MACHINE_CONFIG_END
 
 /*************************************
  *

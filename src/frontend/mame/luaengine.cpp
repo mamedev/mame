@@ -139,6 +139,33 @@ namespace sol
 			}
 		};
 		template <>
+		struct checker<input_item_class>
+		{
+			template <typename Handler>
+			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
+			{
+				return stack::check<const std::string &>(L, index, handler);
+			}
+		};
+		template <>
+		struct getter<input_item_class>
+		{
+			static input_item_class get(lua_State* L, int index, record& tracking)
+			{
+				const std::string item_class =  stack::get<const std::string &>(L, index);
+				if(item_class == "switch")
+					return ITEM_CLASS_SWITCH;
+				else if(item_class == "absolute" || item_class == "abs")
+					return ITEM_CLASS_ABSOLUTE;
+				else if(item_class == "relative" || item_class == "rel")
+					return ITEM_CLASS_RELATIVE;
+				else if(item_class == "maximum" || item_class == "max")
+					return ITEM_CLASS_MAXIMUM;
+				else
+					return ITEM_CLASS_INVALID;
+			}
+		};
+		template <>
 		struct pusher<sol::buffer *>
 		{
 			static int push(lua_State* L, sol::buffer *buff)
@@ -515,7 +542,7 @@ lua_engine::lua_engine()
 {
 	m_machine = nullptr;
 	m_lua_state = luaL_newstate();  /* create state */
-	m_sol_state = new sol::state_view(m_lua_state); // create sol view
+	m_sol_state = std::make_unique<sol::state_view>(m_lua_state); // create sol view
 
 	luaL_checkversion(m_lua_state);
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
@@ -721,7 +748,7 @@ void lua_engine::initialize()
 	emu["app_version"] = &emulator_info::get_bare_build_version;
 	emu["gamename"] = [this](){ return machine().system().type.fullname(); };
 	emu["romname"] = [this](){ return machine().basename(); };
-	emu["softname"] = [this](){ return machine().options().software_name(); };
+	emu["softname"] = [this]() { return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
 	emu["time"] = [this](){ return machine().time().as_double(); };
 	emu["start"] = [this](const char *driver) {
@@ -1016,9 +1043,11 @@ void lua_engine::initialize()
 			"entries", sol::property([this](core_options &options) {
 				sol::table table = sol().create_table();
 				int unadorned_index = 0;
-				for(core_options::entry &curentry : options)
+				for (auto &curentry : options.entries())
 				{
-					const char *name = curentry.name();
+					const char *name = curentry->names().size() > 0
+						? curentry->name().c_str()
+						: nullptr;
 					bool is_unadorned = false;
 					// check if it's unadorned
 					if (name && strlen(name) && !strcmp(name, options.unadorned(unadorned_index)))
@@ -1026,8 +1055,8 @@ void lua_engine::initialize()
 						unadorned_index++;
 						is_unadorned = true;
 					}
-					if (!curentry.is_header() && !curentry.is_command() && !curentry.is_internal() && !is_unadorned)
-						table[name] = &curentry;
+					if (curentry->type() != core_options::option_type::HEADER && curentry->type() != core_options::option_type::COMMAND && !is_unadorned)
+						table[name] = &*curentry;
 				}
 				return table;
 			}));
@@ -1068,18 +1097,19 @@ void lua_engine::initialize()
 						e.set_value(val, OPTION_PRIORITY_CMDLINE);
 				},
 				[this](core_options::entry &e) -> sol::object {
-					if(!e.type())
+					if (e.type() == core_options::option_type::INVALID)
 						return sol::make_object(sol(), sol::nil);
 					switch(e.type())
 					{
-						case OPTION_BOOLEAN:
+						case core_options::option_type::BOOLEAN:
 							return sol::make_object(sol(), atoi(e.value()) != 0);
-						case OPTION_INTEGER:
+						case core_options::option_type::INTEGER:
 							return sol::make_object(sol(), atoi(e.value()));
-						case OPTION_FLOAT:
+						case core_options::option_type::FLOAT:
 							return sol::make_object(sol(), atof(e.value()));
+						default:
+							return sol::make_object(sol(), e.value());
 					}
-					return sol::make_object(sol(), e.value());
 				}),
 			"description", &core_options::entry::description,
 			"default_value", &core_options::entry::default_value,
@@ -1199,7 +1229,7 @@ void lua_engine::initialize()
 					sol::table sp_table = sol().create_table();
 					if(!memdev)
 						return sp_table;
-					for(address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp)
+					for(int sp = 0; sp < memdev->max_space_count(); ++sp)
 					{
 						if(memdev->has_space(sp))
 							sp_table[memdev->space(sp).name()] = addr_space(memdev->space(sp), *memdev);
@@ -1415,6 +1445,7 @@ void lua_engine::initialize()
 			"skip_this_frame", &video_manager::skip_this_frame,
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
+			"frame_update", &video_manager::frame_update,
 			"frameskip", sol::property(&video_manager::frameskip, &video_manager::set_frameskip),
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
@@ -1422,15 +1453,31 @@ void lua_engine::initialize()
 /* machine:input()
  * input:code_from_token(token) - get input_code for KEYCODE_* string token
  * input:code_pressed(code) - get pressed state for input_code
+ * input:code_to_token(code) - get KEYCODE_* string token for code
+ * input:code_name(code) - get code friendly name
  * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
  * input:seq_pressed(seq) - get pressed state for input_seq
+ * input:seq_to_token(seq) - get KEYCODE_* string tokens for seq
+ * input:seq_to_name(seq) - get seq friendly name
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
 			"code_from_token", [](input_manager &input, const char *token) { return sol::make_user(input.code_from_token(token)); },
 			"code_pressed", [](input_manager &input, sol::user<input_code> code) { return input.code_pressed(code); },
+			"code_to_token", [](input_manager &input, sol::user<input_code> code) { return input.code_to_token(code); },
+			"code_name", [](input_manager &input, sol::user<input_code> code) { return input.code_name(code); },
 			"seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return sol::make_user(seq); },
-			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); });
+			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); },
+			"seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); },
+			"seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); },
+			"seq_poll_start", [](input_manager &input, input_item_class cls, sol::object seq) {
+					input_seq *start = nullptr;
+					if(seq.is<sol::user<input_seq>>())
+						start = &seq.as<sol::user<input_seq>>();
+					input.seq_poll_start(cls, start);
+				},
+			"seq_poll", &input_manager::seq_poll,
+			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); });
 
 /* machine:uiinput()
  * uiinput:find_mouse() - returns x, y, button state, ui render target
@@ -1821,8 +1868,13 @@ bool lua_engine::frame_hook()
 
 void lua_engine::close()
 {
-	lua_settop(m_lua_state, 0);  /* clear stack */
-	lua_close(m_lua_state);
+	m_sol_state.reset();
+	if (m_lua_state)
+	{
+		lua_settop(m_lua_state, 0);  /* clear stack */
+		lua_close(m_lua_state);
+		m_lua_state = nullptr;
+	}
 }
 
 void lua_engine::resume(void *ptr, int nparam)

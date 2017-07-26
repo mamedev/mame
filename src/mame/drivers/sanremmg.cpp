@@ -4,7 +4,7 @@
 /* San Remo / Elsy Multigame? */
 
 // presumably a gambling game, maybe missing a sub-board?
-// http://www.citylan.it/wiki/index.php/Multigame_ID
+// http://www.citylan.it/wiki/index.php/Unknown_San_Remo_/_Elsy_Multigame
 
 
 #include "emu.h"
@@ -76,4 +76,4 @@ ROM_START( sanremmg )
 ROM_END
 
 
-GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )

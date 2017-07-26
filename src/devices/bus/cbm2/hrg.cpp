@@ -66,7 +66,7 @@ const tiny_rom_entry *cbm2_hrg_device::device_rom_region() const
 //  ADDRESS_MAP( hrg_a_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_a_map, AS_0, 8, cbm2_hrg_a_device )
+static ADDRESS_MAP_START( hrg_a_map, 0, 8, cbm2_hrg_a_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hrg_b_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_b_map, AS_0, 8, cbm2_hrg_b_device )
+static ADDRESS_MAP_START( hrg_b_map, 0, 8, cbm2_hrg_b_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
@@ -96,7 +96,7 @@ MACHINE_CONFIG_MEMBER( cbm2_hrg_a_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, hrg_a_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, hrg_a_map)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(1);
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x512);
@@ -112,7 +112,7 @@ MACHINE_CONFIG_MEMBER( cbm2_hrg_b_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, hrg_b_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, hrg_b_map)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(1);
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x256);

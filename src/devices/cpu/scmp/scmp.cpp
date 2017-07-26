@@ -40,6 +40,13 @@ scmp_device::scmp_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
+device_memory_interface::space_config_vector scmp_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scmp_device(mconfig, INS8060, tag, owner, clock)

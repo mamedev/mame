@@ -1123,6 +1123,26 @@ ROM_START( tazmani2 )
 	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
 ROM_END
 
+ROM_START( tazmani3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2ck.cpu",      0x0000, 0x1000, CRC(e8b6f9c3) SHA1(121f83274b3fdb4b2cb4bd0160d61886825c8793) ) // sldh
+	ROM_LOAD( "2ek.cpu",      0x1000, 0x1000, CRC(c2f92fc0) SHA1(d95746d82e213a523dcdc921454994c6f57056a4) ) // sldh
+	ROM_LOAD( "2fk.cpu",      0x2000, 0x1000, CRC(4362182f) SHA1(84f33578c49380e208f89c679e115fe2b13f646d) ) // sldh
+	ROM_LOAD( "2hk.cpu",      0x3000, 0x1000, CRC(3d9925ab) SHA1(f188cb44c91a1f117eb1adc5a0901b073e390fd4) ) // sldh
+	ROM_LOAD( "2jk.cpu",      0x4000, 0x1000, CRC(207c0a63) SHA1(5168ad793cf4a26d72bddd736d9776d315e66365) ) // sldh
+	ROM_LOAD( "2kk.cpu",      0x5000, 0x1000, CRC(c6253504) SHA1(d1c643a65ac6e69afb3ed1dac169e6de5f049c93) ) // sldh
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "rom0.snd",     0x0000, 0x0800, CRC(b8d741f1) SHA1(a1bb8a1e0d6b34111f05c539c8e92fffacf5aa5c) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "5f.cpu",       0x0000, 0x0800, CRC(2c5b612b) SHA1(32e3a41a9a4a8b1285b6a195213ff0d98012360a) )
+	ROM_LOAD( "5h.cpu",       0x0800, 0x0800, CRC(e726b559) SHA1(090a99dd52adba379011c26e119a5d816e8f669f) ) // sldh
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // sldh
+ROM_END
+
 /*
     Rescue
 
@@ -1605,6 +1625,7 @@ GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  scobra_state,  stratgyx, 
 GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scobra_state,  darkplnt,     ROT180, "Stern Electronics",                  "Dark Planet", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scobra_state,  tazmani2,     ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazmani3,  tazmania, type2,     tazmania,  scobra_state,  tazmani2,     ROT90,  "bootleg (Rodmar)",                   "Tazz-Mania (Rodmar bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different i8255 hook up
 
 GAME( 1982, rescue,    0,        rescue,    rescue,    scobra_state,  rescue,       ROT90,  "Stern Electronics",                  "Rescue", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, rescueb,   rescue,   rescueb,   rescue,    scobra_state,  rescue,       ROT90,  "bootleg (Videl Games)",              "Tuono Blu (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )

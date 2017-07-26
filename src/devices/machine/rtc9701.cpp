@@ -106,7 +106,7 @@ void rtc9701_device::device_start()
 	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
 	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
 
-	rtc_state = RTC9701_CMD_WAIT;
+	rtc_state = state_t::CMD_WAIT;
 	cmd_stream_pos = 0;
 	current_cmd = 0;
 
@@ -228,13 +228,13 @@ WRITE_LINE_MEMBER( rtc9701_device::write_bit )
 
 READ_LINE_MEMBER( rtc9701_device::read_bit )
 {
-	if (rtc_state == RTC9701_RTC_READ)
+	if (rtc_state == state_t::RTC_READ)
 	{
 		//printf("RTC data bits left c9701_data_pos %02x\n", rtc9701_data_pos);
 		return ((rtc9701_current_data) >> (rtc9701_data_pos-1))&1;
 
 	}
-	else if (rtc_state == RTC9701_EEPROM_READ)
+	else if (rtc_state == state_t::EEPROM_READ)
 	{
 		//printf("EEPROM data bits left c9701_data_pos %02x\n", rtc9701_data_pos);
 		return ((rtc9701_current_data) >> (rtc9701_data_pos-1))&1;
@@ -258,7 +258,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_cs_line )
 
 	if (m_reset_line != CLEAR_LINE)
 	{
-		rtc_state = RTC9701_CMD_WAIT;
+		rtc_state = state_t::CMD_WAIT;
 		cmd_stream_pos = 0;
 		current_cmd = 0;
 		rtc9701_address_pos = 0;
@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 
 			switch (rtc_state)
 			{
-				case RTC9701_CMD_WAIT:
+				case state_t::CMD_WAIT:
 
 					//logerror("xx\n");
 					current_cmd = (current_cmd << 1) | (m_latch&1);
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						if (current_cmd==0x00) /* 0000 */
 						{
 							//logerror("WRITE RTC MODE\n");
-							rtc_state = RTC9701_RTC_WRITE;
+							rtc_state = state_t::RTC_WRITE;
 							cmd_stream_pos = 0;
 							rtc9701_address_pos = 0;
 							rtc9701_current_address = 0;
@@ -307,7 +307,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						else if (current_cmd==0x02) /* 0010 */
 						{
 							//logerror("WRITE EEPROM MODE\n");
-							rtc_state = RTC9701_EEPROM_WRITE;
+							rtc_state = state_t::EEPROM_WRITE;
 							cmd_stream_pos = 0;
 							rtc9701_address_pos = 0;
 							rtc9701_current_address = 0;
@@ -318,13 +318,13 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						else if (current_cmd==0x06) /* 0110 */
 						{
 							//logerror("WRITE ENABLE\n");
-							rtc_state = RTC9701_AFTER_WRITE_ENABLE;
+							rtc_state = state_t::AFTER_WRITE_ENABLE;
 							cmd_stream_pos = 0;
 						}
 						else if (current_cmd==0x08) /* 1000 */
 						{
 							//logerror("READ RTC MODE\n");
-							rtc_state = RTC9701_RTC_READ;
+							rtc_state = state_t::RTC_READ;
 							cmd_stream_pos = 0;
 							rtc9701_address_pos = 0;
 							rtc9701_current_address = 0;
@@ -334,7 +334,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						else if (current_cmd==0x0a) /* 1010 */
 						{
 							//logerror("READ EEPROM MODE\n");
-							rtc_state = RTC9701_EEPROM_READ;
+							rtc_state = state_t::EEPROM_READ;
 							cmd_stream_pos = 0;
 							rtc9701_address_pos = 0;
 							rtc9701_current_address = 0;
@@ -352,17 +352,17 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					}
 					break;
 
-				case RTC9701_AFTER_WRITE_ENABLE:
+				case state_t::AFTER_WRITE_ENABLE:
 					cmd_stream_pos++;
 					if (cmd_stream_pos==12)
 					{
 						cmd_stream_pos = 0;
 						//logerror("Written 12 bits, going back to WAIT mode\n");
-						rtc_state = RTC9701_CMD_WAIT;
+						rtc_state = state_t::CMD_WAIT;
 					}
 					break;
 
-				case RTC9701_RTC_WRITE:
+				case state_t::RTC_WRITE:
 					cmd_stream_pos++;
 					if (cmd_stream_pos<=4)
 					{
@@ -385,13 +385,13 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						cmd_stream_pos = 0;
 						rtc_write(rtc9701_current_address,rtc9701_current_data);
 						//logerror("Written 12 bits, going back to WAIT mode\n");
-						rtc_state = RTC9701_CMD_WAIT;
+						rtc_state = state_t::CMD_WAIT;
 					}
 					break;
 
 
 
-				case RTC9701_EEPROM_READ:
+				case state_t::EEPROM_READ:
 					cmd_stream_pos++;
 					if (cmd_stream_pos<=12)
 					{
@@ -416,13 +416,13 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					{
 						cmd_stream_pos = 0;
 					//  //logerror("accesed 28 bits, going back to WAIT mode\n");
-					//  rtc_state = RTC9701_CMD_WAIT;
+					//  rtc_state = state_t::CMD_WAIT;
 					}
 					break;
 
 
 
-				case RTC9701_EEPROM_WRITE:
+				case state_t::EEPROM_WRITE:
 					cmd_stream_pos++;
 
 					if (cmd_stream_pos<=12)
@@ -446,11 +446,11 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						cmd_stream_pos = 0;
 						//printf("written 28 bits - writing data %04x to %04x and going back to WAIT mode\n", rtc9701_current_data, (rtc9701_current_address>>1)&0xff);
 						rtc9701_data[(rtc9701_current_address>>1)&0xff] = rtc9701_current_data;
-						rtc_state = RTC9701_CMD_WAIT;
+						rtc_state = state_t::CMD_WAIT;
 					}
 					break;
 
-				case RTC9701_RTC_READ:
+				case state_t::RTC_READ:
 					cmd_stream_pos++;
 					if (cmd_stream_pos<=4)
 					{
@@ -474,7 +474,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					{
 						cmd_stream_pos = 0;
 					//  //logerror("accessed 12 bits, going back to WAIT mode\n");
-					//  rtc_state = RTC9701_CMD_WAIT;
+					//  rtc_state = state_t::CMD_WAIT;
 					}
 					break;
 

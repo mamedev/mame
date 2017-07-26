@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 ADDRESS_MAP_END
 
 // gx400 voice data is not in a ROM but in sound RAM at $8000
-static ADDRESS_MAP_START( gx400_vlm_map, AS_0, 8, nemesis_state )
+static ADDRESS_MAP_START( gx400_vlm_map, 0, 8, nemesis_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x000, 0x7ff) AM_RAM AM_SHARE("voiceram")
 ADDRESS_MAP_END
@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(salamand_speech_start_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( salamand_vlm_map, AS_0, 8, nemesis_state )
+static ADDRESS_MAP_START( salamand_vlm_map, 0, 8, nemesis_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -1593,7 +1593,7 @@ static MACHINE_CONFIG_START( gx400 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, gx400_vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -1710,7 +1710,7 @@ static MACHINE_CONFIG_START( rf2_gx400 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, gx400_vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -1748,7 +1748,7 @@ static MACHINE_CONFIG_START( salamand )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, salamand_vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.50)
 
@@ -1944,7 +1944,7 @@ static MACHINE_CONFIG_START( hcrash )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, salamand_vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
@@ -2717,7 +2717,7 @@ static MACHINE_CONFIG_START( bubsys )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, gx400_vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

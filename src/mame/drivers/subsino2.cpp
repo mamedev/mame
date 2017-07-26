@@ -946,7 +946,7 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, subsino2_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, subsino2_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 

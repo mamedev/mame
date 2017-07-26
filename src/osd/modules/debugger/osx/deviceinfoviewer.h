@@ -23,4 +23,6 @@
 
 - (id)initWithDevice:(device_t &)d machine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+
 @end

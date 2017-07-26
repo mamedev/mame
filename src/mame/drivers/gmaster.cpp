@@ -239,7 +239,6 @@ static ADDRESS_MAP_START( gmaster_mem, AS_PROGRAM, 8, gmaster_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
-	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 

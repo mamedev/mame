@@ -20,7 +20,7 @@
 	debug_view      *view;
 	BOOL            wholeLineScroll;
 
-	int32_t           totalWidth, totalHeight, originTop;
+	int32_t         totalWidth, totalHeight, originTop;
 
 	NSFont          *font;
 	CGFloat         fontWidth, fontHeight, fontAscent;
@@ -55,6 +55,9 @@
 - (void)windowDidResignKey:(NSNotification *)notification;
 
 - (void)addContextMenuItemsToMenu:(NSMenu *)menu;
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
 
 @end
 

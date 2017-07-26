@@ -518,17 +518,17 @@ INTERRUPT_GEN_MEMBER(adp_state::adp_int)
 }
 */
 
-static ADDRESS_MAP_START( adp_hd63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( adp_hd63484_map, 0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
 	AM_RANGE(0x80000, 0x9ffff) AM_MIRROR(0x60000) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fashiong_hd63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( fashiong_hd63484_map, 0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fstation_hd63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( fstation_hd63484_map, 0, 16, adp_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
@@ -601,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( fashiong, skattv )
 	MCFG_HD63484_ADDRESS_MAP(fashiong_hd63484_map)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, adp_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, adp_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

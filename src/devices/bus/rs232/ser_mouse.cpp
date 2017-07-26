@@ -86,46 +86,42 @@ void serial_mouse_device::tra_callback()
  **************************************************************************/
 void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (id)
+	if (!id)
 	{
-		device_serial_interface::device_timer(timer, id, param, ptr);
-		return;
+		static int ox = 0, oy = 0;
+		int nx,ny;
+		int dx, dy, nb;
+		int mbc;
+
+		/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
+		if (m_head==m_tail)
+		{
+			nx = m_x->read();
+
+			dx = nx - ox;
+			if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
+			if (dx>=0x800) dx = nx - 0x1000 - ox;
+			ox = nx;
+
+			ny = m_y->read();
+
+			dy = ny - oy;
+			if (dy<=-0x800) dy = ny + 0x1000 - oy;
+			if (dy>=0x800) dy = ny - 0x1000 - oy;
+			oy = ny;
+
+			nb = m_btn->read();
+			mbc = nb^m_mb;
+			m_mb = nb;
+
+			/* check if there is any delta or mouse buttons changed */
+			if ( (dx!=0) || (dy!=0) || (mbc!=0) )
+				mouse_trans(dx, dy, nb, mbc);
+		}
+
+		if(m_tail != m_head && is_transmit_register_empty())
+			transmit_register_setup(unqueue_data());
 	}
-
-	static int ox = 0, oy = 0;
-	int nx,ny;
-	int dx, dy, nb;
-	int mbc;
-
-	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
-	if (m_head==m_tail)
-	{
-		nx = m_x->read();
-
-		dx = nx - ox;
-		if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
-		if (dx>=0x800) dx = nx - 0x1000 - ox;
-		ox = nx;
-
-		ny = m_y->read();
-
-		dy = ny - oy;
-		if (dy<=-0x800) dy = ny + 0x1000 - oy;
-		if (dy>=0x800) dy = ny - 0x1000 - oy;
-		oy = ny;
-
-		nb = m_btn->read();
-		mbc = nb^m_mb;
-		m_mb = nb;
-
-		/* check if there is any delta or mouse buttons changed */
-		if ( (dx!=0) || (dy!=0) || (mbc!=0) )
-			mouse_trans(dx, dy, nb, mbc);
-	}
-
-
-	if(m_tail != m_head && is_transmit_register_empty())
-		transmit_register_setup(unqueue_data());
 }
 
 void microsoft_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)

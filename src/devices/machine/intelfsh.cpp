@@ -109,9 +109,9 @@ DEFINE_DEVICE_TYPE(SHARP_UNK128MBIT,      sharp_unk128mbit_device,      "sharp_u
 DEFINE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device,       "intel_28f320j3d",       "Intel 28F320J3D Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device,        "intel_28f320j5",        "Intel 28F320J5 Flash")
 
-DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "atmel_49f4096",         "Atmel AT49F4096 Flash")
+DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39vf400a",          "SST 39VF400A Flash")
 
-DEFINE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device,         "sst_39vf400a",          "SST 39VF400A Flash")
+DEFINE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device,         "atmel_49f4096",         "Atmel AT49F4096 Flash")
 
 
 //**************************************************************************

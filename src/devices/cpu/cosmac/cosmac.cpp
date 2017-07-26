@@ -283,8 +283,8 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_write_dma(*this),
 		m_write_sc(*this),
 		m_op(0),
-		m_state(COSMAC_STATE_1_RESET),
-		m_mode(COSMAC_MODE_RESET),
+		m_state(cosmac_state::STATE_1_RESET),
+		m_mode(cosmac_mode::RESET),
 		m_irq(CLEAR_LINE),
 		m_dmain(CLEAR_LINE),
 		m_dmaout(CLEAR_LINE),
@@ -408,19 +408,12 @@ void cosmac_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *cosmac_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector cosmac_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_PROGRAM:
-		return &m_program_config;
-
-	case AS_IO:
-		return &m_io_config;
-
-	default:
-		return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
@@ -671,17 +664,17 @@ void cosmac_device::execute_run()
 
 		switch (m_mode)
 		{
-		case COSMAC_MODE_LOAD:
-			if (m_pmode == COSMAC_MODE_RESET)
+		case cosmac_mode::LOAD:
+			if (m_pmode == cosmac_mode::RESET)
 			{
-				m_pmode = COSMAC_MODE_LOAD;
+				m_pmode = cosmac_mode::LOAD;
 
 				// execute initialization cycle
-				m_state = COSMAC_STATE_1_INIT;
+				m_state = cosmac_state::STATE_1_INIT;
 				run();
 
 				// next state is IDLE
-				m_state = COSMAC_STATE_1_EXECUTE;
+				m_state = cosmac_state::STATE_1_EXECUTE;
 			}
 			else
 			{
@@ -693,37 +686,37 @@ void cosmac_device::execute_run()
 			}
 			break;
 
-		case COSMAC_MODE_RESET:
-			m_state = COSMAC_STATE_1_RESET;
+		case cosmac_mode::RESET:
+			m_state = cosmac_state::STATE_1_RESET;
 			run();
 			break;
 
-		case COSMAC_MODE_PAUSE:
+		case cosmac_mode::PAUSE:
 			m_icount--;
 			break;
 
-		case COSMAC_MODE_RUN:
+		case cosmac_mode::RUN:
 			switch (m_pmode)
 			{
-			case COSMAC_MODE_LOAD:
+			case cosmac_mode::LOAD:
 				// RUN mode cannot be initiated from LOAD mode
 				logerror("COSMAC '%s' Tried to initiate RUN mode from LOAD mode\n", tag());
-				m_mode = COSMAC_MODE_LOAD;
+				m_mode = cosmac_mode::LOAD;
 				break;
 
-			case COSMAC_MODE_RESET:
-				m_pmode = COSMAC_MODE_RUN;
-				m_state = COSMAC_STATE_1_INIT;
+			case cosmac_mode::RESET:
+				m_pmode = cosmac_mode::RUN;
+				m_state = cosmac_state::STATE_1_INIT;
 				run();
 				break;
 
-			case COSMAC_MODE_PAUSE:
-				m_pmode = COSMAC_MODE_RUN;
-				m_state = COSMAC_STATE_0_FETCH;
+			case cosmac_mode::PAUSE:
+				m_pmode = cosmac_mode::RUN;
+				m_state = cosmac_state::STATE_0_FETCH;
 				run();
 				break;
 
-			case COSMAC_MODE_RUN:
+			case cosmac_mode::RUN:
 				run();
 				break;
 			}
@@ -744,35 +737,35 @@ inline void cosmac_device::run()
 
 	switch (m_state)
 	{
-	case COSMAC_STATE_0_FETCH:
+	case cosmac_state::STATE_0_FETCH:
 		fetch_instruction();
 		break;
 
-	case COSMAC_STATE_1_RESET:
+	case cosmac_state::STATE_1_RESET:
 		reset();
 		debug();
 		break;
 
-	case COSMAC_STATE_1_INIT:
+	case cosmac_state::STATE_1_INIT:
 		initialize();
 		debug();
 		break;
 
-	case COSMAC_STATE_1_EXECUTE:
+	case cosmac_state::STATE_1_EXECUTE:
 		sample_ef_lines();
 		execute_instruction();
 		debug();
 		break;
 
-	case COSMAC_STATE_2_DMA_IN:
+	case cosmac_state::STATE_2_DMA_IN:
 		dma_input();
 		break;
 
-	case COSMAC_STATE_2_DMA_OUT:
+	case cosmac_state::STATE_2_DMA_OUT:
 		dma_output();
 		break;
 
-	case COSMAC_STATE_3_INT:
+	case cosmac_state::STATE_3_INT:
 		interrupt();
 		debug();
 		break;
@@ -826,7 +819,7 @@ inline void cosmac_device::sample_ef_lines()
 
 inline void cosmac_device::output_state_code()
 {
-	m_write_sc((offs_t)0, COSMAC_STATE_CODE[m_state]);
+	m_write_sc(offs_t(0), COSMAC_STATE_CODE[std::underlying_type_t<cosmac_state>(m_state)]);
 }
 
 
@@ -858,7 +851,7 @@ inline void cosmac_device::fetch_instruction()
 
 	m_icount -= CLOCKS_FETCH;
 
-	m_state = COSMAC_STATE_1_EXECUTE;
+	m_state = cosmac_state::STATE_1_EXECUTE;
 }
 
 
@@ -892,15 +885,15 @@ inline void cosmac_device::initialize()
 
 	if (m_dmain)
 	{
-		m_state = COSMAC_STATE_2_DMA_IN;
+		m_state = cosmac_state::STATE_2_DMA_IN;
 	}
 	else if (m_dmaout)
 	{
-		m_state = COSMAC_STATE_2_DMA_OUT;
+		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
 	else
 	{
-		m_state = COSMAC_STATE_0_FETCH;
+		m_state = cosmac_state::STATE_0_FETCH;
 	}
 }
 
@@ -918,19 +911,19 @@ inline void cosmac_device::execute_instruction()
 
 	if (m_dmain)
 	{
-		m_state = COSMAC_STATE_2_DMA_IN;
+		m_state = cosmac_state::STATE_2_DMA_IN;
 	}
 	else if (m_dmaout)
 	{
-		m_state = COSMAC_STATE_2_DMA_OUT;
+		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
 	else if (IE && m_irq)
 	{
-		m_state = COSMAC_STATE_3_INT;
+		m_state = cosmac_state::STATE_3_INT;
 	}
 	else if ((I > 0) || (N > 0)) // not idling
 	{
-		m_state = COSMAC_STATE_0_FETCH;
+		m_state = cosmac_state::STATE_0_FETCH;
 	}
 }
 
@@ -949,23 +942,23 @@ inline void cosmac_device::dma_input()
 
 	if (m_dmain)
 	{
-		m_state = COSMAC_STATE_2_DMA_IN;
+		m_state = cosmac_state::STATE_2_DMA_IN;
 	}
 	else if (m_dmaout)
 	{
-		m_state = COSMAC_STATE_2_DMA_OUT;
+		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
 	else if (IE && m_irq)
 	{
-		m_state = COSMAC_STATE_3_INT;
+		m_state = cosmac_state::STATE_3_INT;
 	}
-	else if (m_mode == COSMAC_MODE_LOAD)
+	else if (m_mode == cosmac_mode::LOAD)
 	{
-		m_state = COSMAC_STATE_1_EXECUTE;
+		m_state = cosmac_state::STATE_1_EXECUTE;
 	}
 	else
 	{
-		m_state = COSMAC_STATE_0_FETCH;
+		m_state = cosmac_state::STATE_0_FETCH;
 	}
 
 	standard_irq_callback(COSMAC_INPUT_LINE_DMAIN);
@@ -986,19 +979,19 @@ inline void cosmac_device::dma_output()
 
 	if (m_dmain)
 	{
-		m_state = COSMAC_STATE_2_DMA_IN;
+		m_state = cosmac_state::STATE_2_DMA_IN;
 	}
 	else if (m_dmaout)
 	{
-		m_state = COSMAC_STATE_2_DMA_OUT;
+		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
 	else if (IE && m_irq)
 	{
-		m_state = COSMAC_STATE_3_INT;
+		m_state = cosmac_state::STATE_3_INT;
 	}
 	else
 	{
-		m_state = COSMAC_STATE_0_FETCH;
+		m_state = cosmac_state::STATE_0_FETCH;
 	}
 
 	standard_irq_callback(COSMAC_INPUT_LINE_DMAOUT);
@@ -1020,15 +1013,15 @@ inline void cosmac_device::interrupt()
 
 	if (m_dmain)
 	{
-		m_state = COSMAC_STATE_2_DMA_IN;
+		m_state = cosmac_state::STATE_2_DMA_IN;
 	}
 	else if (m_dmaout)
 	{
-		m_state = COSMAC_STATE_2_DMA_OUT;
+		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
 	else
 	{
-		m_state = COSMAC_STATE_0_FETCH;
+		m_state = cosmac_state::STATE_0_FETCH;
 	}
 
 	standard_irq_callback(COSMAC_INPUT_LINE_INT);

@@ -2061,6 +2061,17 @@ ROM_START(dh_lx2)
 	ROM_LOAD16_BYTE("dh_snd.u6", 0x800000, 0x080000, CRC(793dcfb8) SHA1(c9b35e0511962f9fc372f98e937ee5989109056d))
 ROM_END
 
+ROM_START(dh_lf2)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("harr_lf2.rom", 0x00000, 0x80000, CRC(c4931917) SHA1(f7a366fade194ad7b3671acf55d894e3c31992d0))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("dh_snd.u2", 0x000000, 0x080000, CRC(dce5339a) SHA1(c89ec1c2f4f5201cbc40c7038cd1219b200066c7))
+	ROM_LOAD16_BYTE("dh_snd.u3", 0x200000, 0x080000, CRC(27c30ada) SHA1(388c0e533d1d5c88ae020ef8d8b98db4c603c157))
+	ROM_LOAD16_BYTE("dh_snd.u4", 0x400000, 0x080000, CRC(8bde0089) SHA1(8efdcc60daef06c65acf5cb805790d2b82d3c091))
+	ROM_LOAD16_BYTE("dh_snd.u5", 0x600000, 0x080000, CRC(bfacfbdb) SHA1(aa443906a0945586ba5d2910972b333b5d316894))
+	ROM_LOAD16_BYTE("dh_snd.u6", 0x800000, 0x080000, CRC(793dcfb8) SHA1(c9b35e0511962f9fc372f98e937ee5989109056d))
+ROM_END
+
 /*-----------------
 /  Indianapolis 500 #50026
 /------------------*/
@@ -2731,6 +2742,7 @@ GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "B
 GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (LX2)",                    MACHINE_MECHANICAL)
 GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (LA1)",                    MACHINE_MECHANICAL)
 GAME(1995,  dh_lx2,     0,          wpc_s,  dh,   wpc_s_state,  dh,    ROT0,  "Williams",     "Dirty Harry (LX-2)",                MACHINE_MECHANICAL)
+GAME(1995,  dh_lf2,     dh_lx2,     wpc_s,  dh,   wpc_s_state,  dh,    ROT0,  "Williams",     "Dirty Harry (LF-2)",                MACHINE_MECHANICAL)
 GAME(1995,  i500_11r,   0,          wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",           MACHINE_MECHANICAL)
 GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.0R)",           MACHINE_MECHANICAL)
 GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",    MACHINE_MECHANICAL)

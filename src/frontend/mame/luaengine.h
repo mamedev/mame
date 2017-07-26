@@ -110,7 +110,7 @@ public:
 private:
 	// internal state
 	lua_State *m_lua_state;
-	sol::state_view *m_sol_state;
+	std::unique_ptr<sol::state_view> m_sol_state;
 	running_machine *m_machine;
 
 	std::vector<std::string> m_menu;

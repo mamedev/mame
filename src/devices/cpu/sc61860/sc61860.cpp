@@ -62,6 +62,13 @@ sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+device_memory_interface::space_config_vector sc61860_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 offs_t sc61860_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {

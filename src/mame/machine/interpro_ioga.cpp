@@ -18,10 +18,14 @@
 #include "emu.h"
 #include "interpro_ioga.h"
 
+// the following enables some hacks which will allow all iogadiag tests to complete successfully, but also breaks scsi dma
+#define IOGA_DMA_DIAG_HACK 0
+
 #define LOG_GENERAL      (1 << 31)
-#define LOG_HWINT_ENABLE 0 //((1<<3) | LOG_GENERAL)
-#define LOG_DMA_ENABLE   ((1<<IOGA_DMA_FLOPPY) | LOG_GENERAL)
-#define LOG_TIMER_ENABLE   0
+#define LOG_HWINT_ENABLE 0
+#define LOG_DMA_ENABLE   0
+#define LOG_TIMER_ENABLE 0
+#define LOG_DMA_SERIAL_ENABLE 0
 
 #define VERBOSE 0
 
@@ -30,19 +34,38 @@
 #define LOG_TIMER(timer, ...)     if (LOG_TIMER_ENABLE & (1 << timer)) logerror(__VA_ARGS__)
 #define LOG_HWINT(interrupt, ...) if (LOG_HWINT_ENABLE & (1 << interrupt)) logerror(__VA_ARGS__)
 #define LOG_DMA(channel, ...)     if (LOG_DMA_ENABLE & (1 << channel)) logerror(__VA_ARGS__)
+#define LOG_DMA_SERIAL(channel, ...)     if (LOG_DMA_SERIAL_ENABLE & (1 << channel)) logerror(__VA_ARGS__)
+#define LOG_ETH(...)              logerror(__VA_ARGS__)
 #else
 #define LOG_INTERRUPT(...)
 #define LOG_TIMER(timer, ...)
 #define LOG_HWINT(interrupt, ...)
-#define LOG_DMA(channel, ...)
+#define LOG_DMA(channel, ...) do {} while(0)
+#define LOG_DMA_SERIAL(channel, ...)
+#define LOG_ETH(...)
 #endif
 
 DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
+	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_remap_r, eth_remap_w)
+	AM_RANGE(0x04, 0x07) AM_READWRITE(eth_map_page_r, eth_map_page_w)
+	AM_RANGE(0x08, 0x0b) AM_READWRITE(eth_control_r, eth_control_w)
+
 	AM_RANGE(0x0c, 0x1b) AM_READWRITE(dma_plotter_r, dma_plotter_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(dma_plotter_eosl_r, dma_plotter_eosl_w)
 	AM_RANGE(0x20, 0x2f) AM_READWRITE(dma_scsi_r, dma_scsi_w)
 	AM_RANGE(0x30, 0x3f) AM_READWRITE(dma_floppy_r, dma_floppy_w)
-	AM_RANGE(0x40, 0x57) AM_READWRITE(dma_serial_r, dma_serial_w)
+
+	AM_RANGE(0x40, 0x43) AM_READWRITE(dma_serial0_addr_r, dma_serial0_addr_w)
+	AM_RANGE(0x44, 0x47) AM_READWRITE16(dma_serial0_count_r, dma_serial0_count_w, 0x0000ffff)
+	AM_RANGE(0x44, 0x47) AM_READWRITE16(dma_serial0_ctrl_r, dma_serial0_ctrl_w, 0xffff0000)
+
+	AM_RANGE(0x48, 0x4b) AM_READWRITE(dma_serial1_addr_r, dma_serial1_addr_w)
+	AM_RANGE(0x4c, 0x4f) AM_READWRITE16(dma_serial1_count_r, dma_serial1_count_w, 0x0000ffff)
+	AM_RANGE(0x4c, 0x4f) AM_READWRITE16(dma_serial1_ctrl_r, dma_serial1_ctrl_w, 0xffff0000)
+
+	AM_RANGE(0x50, 0x53) AM_READWRITE(dma_serial2_addr_r, dma_serial2_addr_w)
+	AM_RANGE(0x54, 0x57) AM_READWRITE16(dma_serial2_count_r, dma_serial2_count_w, 0x0000ffff)
+	AM_RANGE(0x54, 0x57) AM_READWRITE16(dma_serial2_ctrl_r, dma_serial2_ctrl_w, 0xffff0000)
 
 	AM_RANGE(0x5c, 0x7f) AM_READWRITE16(icr_r, icr_w, 0xffffffff)
 	AM_RANGE(0x80, 0x83) AM_READWRITE16(icr18_r, icr18_w, 0x0000ffff)
@@ -70,11 +93,15 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const 
 	m_out_irq_func(*this),
 	m_memory_space(nullptr),
 	m_dma_channel{
-		{ 0,0,0,0,false, 0, {*this}, {*this}, ARBCTL_BGR_PLOT },
-		{ 0,0,0,0,false, 0, {*this}, {*this}, ARBCTL_BGR_SCSI },
-		{ 0,0,0,0,false, 0, {*this}, {*this}, ARBCTL_BGR_FDC },
-		{ 0,0,0,0,false, 0, {*this}, {*this}, ARBCTL_BGR_SER0 | ARBCTL_BGR_SER1 | ARBCTL_BGR_SER2 } },
-	m_fdc_tc_func(*this)
+		{ 0,0,0,0,0,IDLE, {*this}, {*this}, ARBCTL_BGR_PLOT, IOGA_DMA_PLOTTER, "plotter" },
+		{ 0,0,0,0,0,IDLE, {*this}, {*this}, ARBCTL_BGR_SCSI, IOGA_DMA_SCSI, "scsi" },
+		{ 0,0,0,0,0,IDLE, {*this}, {*this}, ARBCTL_BGR_FDC, IOGA_DMA_FLOPPY, "floppy" } },
+	m_dma_serial_channel {
+		{ 0,0,0,0,IDLE, {*this}, {*this}, ARBCTL_BGR_SER0, IOGA_DMA_SERIAL0, "serial0" },
+		{ 0,0,0,0,IDLE, {*this}, {*this}, ARBCTL_BGR_SER1, IOGA_DMA_SERIAL1, "serial1" },
+		{ 0,0,0,0,IDLE, {*this}, {*this}, ARBCTL_BGR_SER2, IOGA_DMA_SERIAL2, "serial2" } },
+	m_fdc_tc_func(*this),
+	m_eth_ca_func(*this)
 {
 }
 
@@ -116,15 +143,22 @@ void interpro_ioga_device::device_start()
 	// grab the main memory space from the mmu so we can do DMA to/from it
 	device_memory_interface *mmu;
 	siblingdevice("mmu")->interface(mmu);
-	m_memory_space = &mmu->space(AS_0);
+	m_memory_space = &mmu->space(0);
 
-	for (int i = 0; i < IOGA_DMA_CHANNELS; i++)
+	for (auto &dma_channel : m_dma_channel)
 	{
-		m_dma_channel[i].device_r.resolve_safe(0xff);
-		m_dma_channel[i].device_w.resolve();
+		dma_channel.device_r.resolve_safe(0xff);
+		dma_channel.device_w.resolve();
+	}
+
+	for (auto &dma_channel : m_dma_serial_channel)
+	{
+		dma_channel.device_r.resolve_safe(0xff);
+		dma_channel.device_w.resolve();
 	}
 
 	m_fdc_tc_func.resolve();
+	m_eth_ca_func.resolve();
 
 	// allocate ioga timers
 	m_timer[0] = timer_alloc(IOGA_TIMER_0);
@@ -135,10 +169,7 @@ void interpro_ioga_device::device_start()
 	for (auto & timer : m_timer)
 		timer->enable(false);
 
-	// allocate timer for DMA controller
-	m_dma_timer = timer_alloc(IOGA_TIMER_DMA);
-	m_dma_timer->adjust(attotime::never);
-
+	// allocate ioga interrupt and dma timer
 	m_ioga_clock = timer_alloc(IOGA_CLOCK);
 	m_ioga_clock->adjust(attotime::never);
 }
@@ -157,7 +188,7 @@ void interpro_ioga_device::device_reset()
 	m_timer_reg[0] = 0;
 	//m_timer[0]->adjust(attotime::zero, IOGA_TIMER_0, attotime::from_hz(60));
 
-	// configure ioga clock timer
+	// configure ioga interrupt and dma timer
 	m_ioga_clock->adjust(attotime::zero, IOGA_CLOCK, attotime::from_hz(clock()));
 }
 
@@ -282,12 +313,10 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		}
 		break;
 
-	case IOGA_TIMER_DMA:
-		dma_clock(param);
-		break;
-
 	case IOGA_CLOCK:
 		interrupt_clock();
+		dma_clock();
+		dma_serial_clock();
 		break;
 	}
 }
@@ -482,7 +511,8 @@ void interpro_ioga_device::interrupt_clock()
 	if (m_nmi_pending)
 	{
 		// check if nmi is enabled
-		if ((m_nmictrl & NMI_IE) == NMI_IE)
+		if (((m_nmictrl & NMI_IE) == NMI_IE)
+		|| ((m_nmictrl & (NMI_ALL | NMI_ENABLE1)) == (NMI_ALL | NMI_ENABLE1)))
 		{
 			LOG_INTERRUPT("nmi: accepting nmi\n");
 
@@ -607,7 +637,10 @@ WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
 
 	// check for a forced nmi (NMI_NEGPOL written from 1 to 0 with NMI_IE set)
 	if ((m_nmictrl & NMI_NEGPOL) && (data & (NMI_NEGPOL | NMI_IE)) == NMI_IE)
+	{
+		LOG_INTERRUPT("nmi: forced nmi\n");
 		m_nmi_pending = true;
+	}
 
 	m_nmictrl = data;
 }
@@ -628,166 +661,319 @@ WRITE16_MEMBER(interpro_ioga_device::softint_vector_w)
 /******************************************************************************
  DMA
 ******************************************************************************/
-void interpro_ioga_device::dma_clock(int channel)
+void interpro_ioga_device::dma_clock()
 {
-	struct dma &dma_channel = m_dma_channel[channel];
-
-	// if bus grant is not enabled, set the busy flag (iogadiag test 7.0265)
-	if (!(m_arbctl & dma_channel.arb_mask))
+	for (auto &dma_channel : m_dma_channel)
 	{
-		dma_channel.control |= DMA_CTRL_BUSY;
-		m_dma_channel[channel].control |= DMA_CTRL_BUSY;
-		m_dma_timer->adjust(attotime::from_hz(clock()), channel);
-
-		return;
-	}
-	else
-		dma_channel.control &= ~DMA_CTRL_BUSY;
-
-	// if the channel isn't active yet, make it active and log something
-	if (!dma_channel.dma_active)
-	{
-		LOG_DMA(channel, "dma: transfer %s device begun, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
-			(dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from",
-			channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
-		dma_channel.dma_active = true;
-	}
-
-	// transfer data while the device is requesting a data transfer and the transfer count is not zero
-	while (dma_channel.drq_state && dma_channel.transfer_count)
-	{
-		// transfer from the memory to device or device to memory
-		if (dma_channel.control & DMA_CTRL_WRITE)
-			dma_channel.device_w(m_memory_space->read_byte(dma_channel.real_address));
-		else
-			m_memory_space->write_byte(dma_channel.real_address, dma_channel.device_r());
-
-		// increment addresses and decrement count
-		dma_channel.real_address++;
-		dma_channel.virtual_address++;
-		dma_channel.transfer_count--;
-	}
-
-	// if there are no more bytes remaining, terminate the transfer
-	if (dma_channel.transfer_count == 0)
-	{
-		LOG_DMA(channel, "dma: transfer %s device ended, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
-			(dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from",
-			channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
-
-		if (channel == IOGA_DMA_FLOPPY)
+		switch (dma_channel.state)
 		{
-			LOG_DMA(channel, "dma: asserting fdc terminal count line\n");
+		case IDLE:
+			break;
 
-			m_fdc_tc_func(ASSERT_LINE);
-			m_fdc_tc_func(CLEAR_LINE);
+		case COMMAND:
+			// start a command
+			if (dma_channel.control & DMA_CTRL_BGR)
+				dma_channel.state = WAIT;
+			else
+				dma_channel.state = FINAL;
+			break;
+
+		case WAIT:
+			// if bus grant is enabled, clear wait flag and execute transfer
+			if (m_arbctl & dma_channel.arb_mask)
+			{
+				// clear bus wait flag
+				dma_channel.control &= ~DMA_CTRL_WAIT;
+
+				LOG_DMA(dma_channel.channel, "dma: transfer %s device begun, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
+					(dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from",
+					dma_channel.channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
+
+				dma_channel.state = TRANSFER;
+			}
+			else
+				// (7.0265) set the bus grant wait flag
+				dma_channel.control |= DMA_CTRL_WAIT;
+			break;
+
+		case TRANSFER:
+			if (dma_channel.transfer_count)
+			{
+				if (dma_channel.drq_state)
+				{
+					// transfer from the memory to device or device to memory
+					// TODO: implement virtual addressing when DMA_CTRL_VIRTUAL is set
+
+					if (dma_channel.control & DMA_CTRL_WRITE)
+						dma_channel.device_w(m_memory_space->read_byte(dma_channel.real_address));
+					else
+						m_memory_space->write_byte(dma_channel.real_address, dma_channel.device_r());
+
+					// increment addresses and decrement count
+					dma_channel.real_address++;
+					dma_channel.virtual_address++;
+					dma_channel.transfer_count--;
+				}
+			}
+			else
+				dma_channel.state = COMPLETE;
+#if IOGA_DMA_DIAG_HACK
+			else
+#define TAG ((dma_channel.control & DMA_CTRL_TAG) >> 3)
+
+				// hacks for forced dma bus error diagnostic tests
+				if ((dma_channel.control & 0xfe000000 && dma_channel.control & 0xe00) || ((dma_channel.control & DMA_CTRL_WMASK) == 0x41000000))
+				if (dma_channel.real_address & 0xff000000 || dma_channel.real_address == 0)
+				{
+					LOG_DMA(dma_channel.channel, "dma: forced bus error hack, control 0x%08x\n", dma_channel.control);
+
+					// (7.0267) trigger an interrupt
+					m_hwicr[dma_channel.channel + 1] |= IOGA_INTERRUPT_PENDING;
+
+					// (7.0268) set bus error bit
+					dma_channel.control |= DMA_CTRL_BERR;
+
+					// 7.0269, 7.0276, 7.0281, 7.0289: set error address from virtual or real dma address
+					// HACK: don't set error address for 7.0276 special case
+					if (!(dma_channel.control == 0x65400600 && dma_channel.real_address != 0))
+						m_error_address = dma_channel.control & DMA_CTRL_VIRTUAL ? dma_channel.virtual_address : dma_channel.real_address;
+
+					// compute bus error cycle type from control register
+					u8 cycle_type = 0x30;
+					switch ((dma_channel.control >> 24) & 0x8c)
+					{
+					case 0x00: cycle_type |= 2; break;
+					case 0x04: cycle_type |= 1; break;
+					case 0x08: cycle_type |= 3; break;
+					case 0x80: cycle_type |= 4; break;
+					case 0x84: cycle_type |= 8; break;
+					}
+
+					switch (dma_channel.control & ~DMA_CTRL_BERR)
+					{
+					case 0x61000800: // VIRTUAL | WRITE | TAG(3)
+						// (7.0266) trigger an nmi
+						m_nmi_pending = true;
+
+						// (7.0270) set error cycle type 0x52f0: SNAPOK | BERR | BG(IOD) | TAG(0c0) | CT(30)
+						m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | 0xf0;
+						break;
+
+					case 0x65000600: // VIRTUAL | WRITE | X | TAG(4)
+						if (dma_channel.real_address != 0)
+						{
+							// (7.0275) control register expect 0x64400800
+							dma_channel.control &= ~0x600;
+							dma_channel.control |= 0x800;
+
+							// (7.0277) set error cycle type 0x5331: SNAPOK | BERR | BG(IOD) | TAG(100) | CT(31)
+							m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | TAG | cycle_type;
+						}
+						else
+						{
+							// (7.0287) set error cycle type 0x62f0: SNAPOK | MMBE | BG(IOD) | TAG(0c0) | CT(30)
+							m_error_businfo = BINFO_SNAPOK | BINFO_MMBE | BINFO_BG_IOD | TAG | 0x30;
+						}
+						break;
+
+					default:
+						m_error_businfo = BINFO_SNAPOK | BINFO_BERR | BINFO_BG_IOD | TAG | cycle_type;
+						break;
+					}
+
+					dma_channel.state = COMPLETE;
+				}
+#endif
+			break;
+
+		case COMPLETE:
+			LOG_DMA(dma_channel.channel, "dma: transfer %s device ended, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
+				(dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from",
+				dma_channel.channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
+
+			if (dma_channel.channel == IOGA_DMA_FLOPPY)
+			{
+				LOG_DMA(dma_channel.channel, "dma: asserting fdc terminal count line\n");
+
+				m_fdc_tc_func(ASSERT_LINE);
+				m_fdc_tc_func(CLEAR_LINE);
+			}
+
+			// clear bus grant required
+			dma_channel.control &= ~DMA_CTRL_BGR;
+
+			// set transfer count zero flag
+			dma_channel.control |= DMA_CTRL_TCZERO;
+
+			dma_channel.state = FINAL;
+			break;
+
+		case FINAL:
+			dma_channel.state = IDLE;
+			break;
 		}
+	}
+}
 
-		dma_channel.control |= DMA_CTRL_TCZERO;
-		dma_channel.dma_active = false;
+void interpro_ioga_device::dma_serial_clock()
+{
+	for (auto &dma_channel : m_dma_serial_channel)
+	{
+		switch (dma_channel.state)
+		{
+		case IDLE:
+			if (dma_channel.drq_state && dma_channel.count)
+				dma_channel.state = WAIT;
+			break;
+
+		case COMMAND:
+		case WAIT:
+			if (m_arbctl & dma_channel.arb_mask)
+				dma_channel.state = TRANSFER;
+			break;
+
+		case TRANSFER:
+			if (dma_channel.count)
+			{
+				if (dma_channel.drq_state)
+				{
+					// transfer from the memory to device or device to memory
+					// TODO: work out which control register bits indicate read from device
+					if (true)
+					{
+						u8 data = m_memory_space->read_byte(dma_channel.address);
+
+						LOG_DMA_SERIAL(dma_channel.channel, "dma: transferring byte 0x%02x to serial channel %d\n", data, dma_channel.channel);
+
+						dma_channel.device_w(data);
+					}
+					else
+						m_memory_space->write_byte(dma_channel.address, dma_channel.device_r());
+
+					// increment address and decrement count
+					dma_channel.address++;
+					dma_channel.count--;
+				}
+			}
+			else
+				dma_channel.state = COMPLETE;
+			break;
+
+		case COMPLETE:
+			// transfer count zero
+			dma_channel.control |= 0x20;
+
+			dma_channel.state = FINAL;
+			break;
+
+		case FINAL:
+			// raise an interrupt
+			m_hwicr[16] |= IOGA_INTERRUPT_PENDING;
+
+			dma_channel.state = IDLE;
+			break;
+		}
 	}
 }
 
 void interpro_ioga_device::drq(int state, int channel)
 {
-	// a device is requesting a dma data transfer (read or write)
-	m_dma_channel[channel].drq_state = state;
+	struct dma &dma_channel = m_dma_channel[channel];
 
-	if (state)
-	{
-		LOG_DMA(channel, "dma: drq for channel %d asserted\n", channel);
+	dma_channel.drq_state = state;
 
-		m_dma_timer->adjust(attotime::zero, channel);
-	}
-	else
-		LOG_DMA(channel, "dma: drq for channel %d deasserted\n", channel);
+	// only log every 256 bytes
+	if ((dma_channel.transfer_count & 0xff) == 0)
+		LOG_DMA(channel, "dma: drq for channel %d %s, transfer_count 0x%08x\n", channel, state ? "asserted" : "deasserted", dma_channel.transfer_count);
 }
-/*
-0x94: error address reg: expect 0x7f200000 after bus error (from dma virtual address)
-0x98: error cycle type: expect 0x52f0 (after failed dma?)
-        0x5331 - forced berr with nmi/interrupts disabled?
-        0xc2f0
-        0x62f0
-*/
-// TODO: 7.0266 - forced BERR not working
+
+void interpro_ioga_device::drq_serial(int state, int channel)
+{
+	struct dma_serial &dma_channel = m_dma_serial_channel[channel];
+
+	dma_channel.drq_state = state;
+
+	LOG_DMA_SERIAL(channel, "dma: drq for serial channel %d %s, counter 0x%04x\n", channel, state ? "asserted" : "deasserted", dma_channel.count);
+}
 
 u32 interpro_ioga_device::dma_r(address_space &space, offs_t offset, u32 mem_mask, int channel)
 {
+	struct dma &dma_channel = m_dma_channel[channel];
+
 	switch (offset)
 	{
 	case 0:
-		return m_dma_channel[channel].real_address;
+		return dma_channel.real_address;
 
 	case 1:
-		return m_dma_channel[channel].virtual_address;
+		return dma_channel.virtual_address;
 
 	case 2:
-		return m_dma_channel[channel].transfer_count;
+		return dma_channel.transfer_count;
 
 	case 3:
-		return m_dma_channel[channel].control;
-	}
+		return dma_channel.control;
 
-	logerror("dma_r: unknown channel %d\n", channel);
-	return 0;
+	default:
+		logerror("dma_r: unknown dma register %d\n", offset);
+		return 0;
+	}
 }
 
 void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel)
 {
+	struct dma &dma_channel = m_dma_channel[channel];
+
 	switch (offset)
 	{
 	case 0:
 		LOG_DMA(channel, "dma: channel %d real address = 0x%08x (%s)\n", channel, data, machine().describe_context());
-		m_dma_channel[channel].real_address = data;
+		dma_channel.real_address = data;
 		break;
 
 	case 1:
 		LOG_DMA(channel, "dma: channel %d virtual address = 0x%08x (%s)\n", channel, data, machine().describe_context());
-		m_dma_channel[channel].virtual_address = data & ~0x3;
+		dma_channel.virtual_address = data & ~0x3;
 		break;
 
 	case 2:
 		LOG_DMA(channel, "dma: channel %d transfer count = 0x%08x (%s)\n", channel, data, machine().describe_context());
-		m_dma_channel[channel].transfer_count = data;
+		dma_channel.transfer_count = data;
 		break;
 
 	case 3:
 		LOG_DMA(channel, "dma: channel %d control = 0x%08x (%s)\n", channel, data, machine().describe_context());
-		m_dma_channel[channel].control = data & DMA_CTRL_WMASK;
 
-		// start a forced dma transfer if necessary
-		if ((data & DMA_CTRL_FORCED) == DMA_CTRL_FORCED)
-			m_dma_timer->adjust(attotime::from_hz(clock()), channel);
+		// (7.0272) if bus error flag is set, clear existing bus error (otherwise retain existing state)
+		if (data & DMA_CTRL_BERR)
+			dma_channel.control = data & DMA_CTRL_WMASK;
+		else
+			dma_channel.control = (data & DMA_CTRL_WMASK) | (dma_channel.control & DMA_CTRL_BERR);
+
+		dma_channel.state = COMMAND;
 		break;
 	}
 }
 
-u32 interpro_ioga_device::dma_serial_r(address_space &space, offs_t offset, u32 mem_mask)
+void interpro_ioga_device::dma_serial_addr_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel)
 {
-	int channel = offset >> 1;
+	LOG_DMA_SERIAL(channel, "dma: serial channel %d address = 0x%08x (%s)\n", channel, data, machine().describe_context());
 
-	if (offset & 1)
-		return m_dma_serial[channel].control;
-	else
-		return m_dma_serial[channel].address;
+	m_dma_serial_channel[channel].address = data;
 }
 
-void interpro_ioga_device::dma_serial_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
+void interpro_ioga_device::dma_serial_count_w(address_space &space, offs_t offset, u16 data, u16 mem_mask, int channel)
 {
-	int channel = offset >> 1;
+	LOG_DMA_SERIAL(channel, "dma: serial channel %d count = 0x%04x (%s)\n", channel, data, machine().describe_context());
 
-	if (offset & 1)
-	{
-		LOG_DMA(IOGA_DMA_SERIAL, "dma: channel %d(%d) control = 0x%08x, mask = 0x%08x (%s)\n", IOGA_DMA_SERIAL, channel, data, mem_mask, machine().describe_context());
+	m_dma_serial_channel[channel].count = data;
+}
 
-		m_dma_serial[channel].control = (m_dma_serial[channel].control & ~mem_mask) | data;
-	}
-	else
-	{
-		LOG_DMA(IOGA_DMA_SERIAL, "dma: channel %d(%d) address = 0x%08x, mask = 0x%08x (%s)\n", IOGA_DMA_SERIAL, channel, data, mem_mask, machine().describe_context());
+void interpro_ioga_device::dma_serial_ctrl_w(address_space &space, offs_t offset, u16 data, u16 mem_mask, int channel)
+{
+	LOG_DMA_SERIAL(channel, "dma: serial channel %d control = 0x%04x (%s)\n", channel, data, machine().describe_context());
 
-		m_dma_serial[channel].address = (m_dma_serial[channel].address & ~mem_mask) | data;
-	}
+	m_dma_serial_channel[channel].control = data;
 }
 
 READ32_MEMBER(interpro_ioga_device::error_businfo_r)
@@ -805,4 +991,42 @@ WRITE16_MEMBER(interpro_ioga_device::arbctl_w)
 	LOG_DMA(31, "dma: arbctl = 0x%04x (%s)\n", data, machine().describe_context());
 
 	m_arbctl = data;
+}
+
+WRITE32_MEMBER(interpro_ioga_device::eth_remap_w)
+{
+	LOG_ETH("eth: remap = 0x%08x (%s)\n", data, machine().describe_context());
+
+	m_eth_remap = data & ~0xf;
+}
+
+WRITE32_MEMBER(interpro_ioga_device::eth_map_page_w)
+{
+	LOG_ETH("eth: remap page = 0x%08x (%s)\n", data, machine().describe_context());
+
+	m_eth_map_page = data & ~0xf;
+}
+
+WRITE32_MEMBER(interpro_ioga_device::eth_control_w)
+{
+	LOG_ETH("eth: control = 0x%08x (%s)\n", data, machine().describe_context());
+
+	/* (7.0202) eth ctrl register input test patterns and expected outputs are:
+
+	   7809 -> 4000
+
+	   3809 -> 0800
+	   3409 -> 0400
+	   3209 -> 0200
+	   3109 -> 0100
+
+	   3089 -> 80
+	   3049 -> 40
+	   3019 -> 10
+	   300b -> 02
+	*/
+	if (data & ETH_RESET)
+		m_eth_control = ETH_RESET;
+	else
+		m_eth_control = data & 0x0ff2;
 }

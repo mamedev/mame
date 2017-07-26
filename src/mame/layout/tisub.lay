@@ -94,23 +94,6 @@
 		</text>
 	</element>
 
-	<element name="start" defstate="0">
-		<rect state="1">
-			<color red="0.0" green="1.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.0" green="0.3" blue="0.0" />
-		</rect>
-		<text string="START">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="TAKE">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
-	</element>
-
 	<element name="unknown" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="0.0" blue="0.0" />

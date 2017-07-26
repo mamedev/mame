@@ -122,7 +122,6 @@ void mps1230_state::machine_reset()
 static ADDRESS_MAP_START( mps1230_map, AS_PROGRAM, 8, mps1230_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // as per the service manual
-	AM_RANGE(0xff00, 0xffff) AM_RAM // tested at PC=77, then used for the 7810's stack
 ADDRESS_MAP_END
 
 /***************************************************************************

@@ -109,6 +109,7 @@ protected:
 	static const uint8_t semigraphics4_fontdata8x12[];
 	static const uint8_t semigraphics6_fontdata8x12[];
 	static const uint8_t s68047_fontdata8x12[];
+	static const uint8_t stripes[];
 
 	// pixel definitions
 	typedef uint32_t pixel_t;
@@ -186,6 +187,7 @@ protected:
 		uint8_t m_text_fontdata_inverse[64*12];
 		uint8_t m_text_fontdata_lower_case[64*12];
 		uint8_t m_text_fontdata_lower_case_inverse[64*12];
+		uint8_t m_stripes[128*12];
 
 		// optimized function that tests a single bit
 		ATTR_FORCE_INLINE pixel_t bit_test(uint8_t data, int shift, pixel_t color_0, pixel_t color_1)
@@ -289,7 +291,7 @@ protected:
 
 	// miscellaneous
 	void video_flush();
-	const char *describe_context();
+	std::string describe_context() const;
 
 	// setup functions
 	emu_timer *setup_timer(device_timer_id id, double offset, double period);
@@ -501,7 +503,7 @@ private:
 	int32_t get_clocks_since_hsync();
 
 	// debugging
-	const char *scanline_zone_string(scanline_zone zone);
+	std::string scanline_zone_string(scanline_zone zone) const;
 };
 
 // actual base class for MC6847 family of devices

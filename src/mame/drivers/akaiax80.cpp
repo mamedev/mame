@@ -68,7 +68,6 @@ static ADDRESS_MAP_START( ax80_map, AS_PROGRAM, 8, ax80_state )
 	AM_RANGE(0x1070, 0x1073) AM_DEVREADWRITE(PPI1_TAG, i8255_device, read, write)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("maincpu", 0x1000)    // external program EPROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( ax80 )

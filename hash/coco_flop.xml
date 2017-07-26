@@ -34,4 +34,18 @@
 		</part>
 	</software>
 
+	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
+	<!-- RUN"PACMAN" -->
+	<software name="pacman" supported ="partial">
+		<description>Pacman (z80 to 6809 Transcoded - v1.01) (512kb)</description>
+		<year>2017</year>
+		<publisher>Glen Hewlett</publisher>
+		<info name="author" value="Glen Hewlett" />
+		<info name="usage" value="CoCo 3 Only" />
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="pacman.dsk" size="161280" crc="d2433eb7" sha1="e86d791b0211267185230774db1f6ca01582a3a3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

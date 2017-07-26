@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( mcu_no_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, seicross_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, seicross_state )
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END

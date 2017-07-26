@@ -96,7 +96,9 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 ***********************************************************************************************/
 
-#define LOG_COMMANDS            0
+#define VERBOSE                 0
+#include "logmacro.h"
+
 #define RAINE_CHECK             0
 
 
@@ -148,7 +150,6 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 #if ES5506_MAKE_WAVS
 		m_wavraw(nullptr),
 #endif
-		m_eslog(nullptr),
 		m_region0(nullptr),
 		m_region1(nullptr),
 		m_region2(nullptr),
@@ -186,10 +187,6 @@ void es5506_device::device_start()
 	/* only override the number of channels if the value is in the valid range 1 .. 6 */
 	if (1 <= m_channels && m_channels <= 6)
 		channels = m_channels;
-
-	/* debugging */
-	if (LOG_COMMANDS && !m_eslog)
-		m_eslog = fopen("es.log", "w");
 
 	/* create the stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
@@ -317,13 +314,6 @@ void es550x_device::device_reset()
 
 void es550x_device::device_stop()
 {
-	/* debugging */
-	if (LOG_COMMANDS && m_eslog)
-	{
-		fclose(m_eslog);
-		m_eslog = nullptr;
-	}
-
 #if ES5506_MAKE_WAVS
 	{
 		int i;
@@ -357,10 +347,6 @@ void es5505_device::device_start()
 	/* only override the number of channels if the value is in the valid range 1 .. 4 */
 	if (1 <= m_channels && m_channels <= 4)
 		channels = m_channels;
-
-	/* debugging */
-	if (LOG_COMMANDS && !m_eslog)
-		m_eslog = fopen("es.log", "w");
 
 	/* create the stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
@@ -1159,69 +1145,58 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 	{
 		case 0x00/8:    /* CR */
 			voice->control = data & 0xffff;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
+			LOG("voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
 			break;
 
 		case 0x08/8:    /* FC */
 			voice->freqcount = data & 0x1ffff;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, freq count=%08x\n", m_current_page & 0x1f, voice->freqcount);
+			LOG("voice %d, freq count=%08x\n", m_current_page & 0x1f, voice->freqcount);
 			break;
 
 		case 0x10/8:    /* LVOL */
 			voice->lvol = data & 0xffff;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, left vol=%04x\n", m_current_page & 0x1f, voice->lvol);
+			LOG("voice %d, left vol=%04x\n", m_current_page & 0x1f, voice->lvol);
 			break;
 
 		case 0x18/8:    /* LVRAMP */
 			voice->lvramp = (data & 0xff00) >> 8;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, left vol ramp=%04x\n", m_current_page & 0x1f, voice->lvramp);
+			LOG("voice %d, left vol ramp=%04x\n", m_current_page & 0x1f, voice->lvramp);
 			break;
 
 		case 0x20/8:    /* RVOL */
 			voice->rvol = data & 0xffff;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, right vol=%04x\n", m_current_page & 0x1f, voice->rvol);
+			LOG("voice %d, right vol=%04x\n", m_current_page & 0x1f, voice->rvol);
 			break;
 
 		case 0x28/8:    /* RVRAMP */
 			voice->rvramp = (data & 0xff00) >> 8;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, right vol ramp=%04x\n", m_current_page & 0x1f, voice->rvramp);
+			LOG("voice %d, right vol ramp=%04x\n", m_current_page & 0x1f, voice->rvramp);
 			break;
 
 		case 0x30/8:    /* ECOUNT */
 			voice->ecount = data & 0x1ff;
 			voice->filtcount = 0;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, envelope count=%04x\n", m_current_page & 0x1f, voice->ecount);
+			LOG("voice %d, envelope count=%04x\n", m_current_page & 0x1f, voice->ecount);
 			break;
 
 		case 0x38/8:    /* K2 */
 			voice->k2 = data & 0xffff;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, K2=%04x\n", m_current_page & 0x1f, voice->k2);
+			LOG("voice %d, K2=%04x\n", m_current_page & 0x1f, voice->k2);
 			break;
 
 		case 0x40/8:    /* K2RAMP */
 			voice->k2ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, K2 ramp=%04x\n", m_current_page & 0x1f, voice->k2ramp);
+			LOG("voice %d, K2 ramp=%04x\n", m_current_page & 0x1f, voice->k2ramp);
 			break;
 
 		case 0x48/8:    /* K1 */
 			voice->k1 = data & 0xffff;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, K1=%04x\n", m_current_page & 0x1f, voice->k1);
+			LOG("voice %d, K1=%04x\n", m_current_page & 0x1f, voice->k1);
 			break;
 
 		case 0x50/8:    /* K1RAMP */
 			voice->k1ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, K1 ramp=%04x\n", m_current_page & 0x1f, voice->k1ramp);
+			LOG("voice %d, K1 ramp=%04x\n", m_current_page & 0x1f, voice->k1ramp);
 			break;
 
 		case 0x58/8:    /* ACTV */
@@ -1230,8 +1205,7 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 			m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 			m_stream->set_sample_rate(m_sample_rate);
 
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
+			LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			break;
 		}
 
@@ -1255,62 +1229,52 @@ inline void es5506_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 	{
 		case 0x00/8:    /* CR */
 			voice->control = data & 0xffff;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
+			LOG("voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
 			break;
 
 		case 0x08/8:    /* START */
 			voice->start = data & 0xfffff800;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, loop start=%08x\n", m_current_page & 0x1f, voice->start);
+			LOG("voice %d, loop start=%08x\n", m_current_page & 0x1f, voice->start);
 			break;
 
 		case 0x10/8:    /* END */
 			voice->end = data & 0xffffff80;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, loop end=%08x\n", m_current_page & 0x1f, voice->end);
+			LOG("voice %d, loop end=%08x\n", m_current_page & 0x1f, voice->end);
 			break;
 
 		case 0x18/8:    /* ACCUM */
 			voice->accum = data;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, accum=%08x\n", m_current_page & 0x1f, voice->accum);
+			LOG("voice %d, accum=%08x\n", m_current_page & 0x1f, voice->accum);
 			break;
 
 		case 0x20/8:    /* O4(n-1) */
 			voice->o4n1 = (int32_t)(data << 14) >> 14;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, O4(n-1)=%05x\n", m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
+			LOG("voice %d, O4(n-1)=%05x\n", m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
 		case 0x28/8:    /* O3(n-1) */
 			voice->o3n1 = (int32_t)(data << 14) >> 14;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, O3(n-1)=%05x\n", m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
+			LOG("voice %d, O3(n-1)=%05x\n", m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
 		case 0x30/8:    /* O3(n-2) */
 			voice->o3n2 = (int32_t)(data << 14) >> 14;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, O3(n-2)=%05x\n", m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
+			LOG("voice %d, O3(n-2)=%05x\n", m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
 		case 0x38/8:    /* O2(n-1) */
 			voice->o2n1 = (int32_t)(data << 14) >> 14;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, O2(n-1)=%05x\n", m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
+			LOG("voice %d, O2(n-1)=%05x\n", m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
 		case 0x40/8:    /* O2(n-2) */
 			voice->o2n2 = (int32_t)(data << 14) >> 14;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, O2(n-2)=%05x\n", m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
+			LOG("voice %d, O2(n-2)=%05x\n", m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
 		case 0x48/8:    /* O1(n-1) */
 			voice->o1n1 = (int32_t)(data << 14) >> 14;
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "voice %d, O1(n-1)=%05x\n", m_current_page & 0x1f, voice->o1n1 & 0x3ffff);
+			LOG("voice %d, O1(n-1)=%05x\n", m_current_page & 0x1f, voice->o1n1 & 0x3ffff);
 			break;
 
 		case 0x50/8:    /* W_ST */
@@ -1340,68 +1304,55 @@ inline void es5506_device::reg_write_test(es550x_voice *voice, offs_t offset, ui
 	switch (offset)
 	{
 		case 0x00/8:    /* CHANNEL 0 LEFT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 0 left test write %08x\n", data);
+			LOG("Channel 0 left test write %08x\n", data);
 			break;
 
 		case 0x08/8:    /* CHANNEL 0 RIGHT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 0 right test write %08x\n", data);
+			LOG("Channel 0 right test write %08x\n", data);
 			break;
 
 		case 0x10/8:    /* CHANNEL 1 LEFT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 1 left test write %08x\n", data);
+			LOG("Channel 1 left test write %08x\n", data);
 			break;
 
 		case 0x18/8:    /* CHANNEL 1 RIGHT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 1 right test write %08x\n", data);
+			LOG("Channel 1 right test write %08x\n", data);
 			break;
 
 		case 0x20/8:    /* CHANNEL 2 LEFT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 2 left test write %08x\n", data);
+			LOG("Channel 2 left test write %08x\n", data);
 			break;
 
 		case 0x28/8:    /* CHANNEL 2 RIGHT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 2 right test write %08x\n", data);
+			LOG("Channel 2 right test write %08x\n", data);
 			break;
 
 		case 0x30/8:    /* CHANNEL 3 LEFT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 3 left test write %08x\n", data);
+			LOG("Channel 3 left test write %08x\n", data);
 			break;
 
 		case 0x38/8:    /* CHANNEL 3 RIGHT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 3 right test write %08x\n", data);
+			LOG("Channel 3 right test write %08x\n", data);
 			break;
 
 		case 0x40/8:    /* CHANNEL 4 LEFT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 4 left test write %08x\n", data);
+			LOG("Channel 4 left test write %08x\n", data);
 			break;
 
 		case 0x48/8:    /* CHANNEL 4 RIGHT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 4 right test write %08x\n", data);
+			LOG("Channel 4 right test write %08x\n", data);
 			break;
 
 		case 0x50/8:    /* CHANNEL 5 LEFT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 5 left test write %08x\n", data);
+			LOG("Channel 5 left test write %08x\n", data);
 			break;
 
 		case 0x58/8:    /* CHANNEL 6 RIGHT */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Channel 5 right test write %08x\n", data);
+			LOG("Channel 5 right test write %08x\n", data);
 			break;
 
 		case 0x60/8:    /* EMPTY */
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "Test write EMPTY %08x\n", data);
+			LOG("Test write EMPTY %08x\n", data);
 			break;
 
 		case 0x68/8:    /* PAR - read only */
@@ -1630,8 +1581,7 @@ READ8_MEMBER( es5506_device::read )
 	if (shift != 0)
 		return m_read_latch >> (24 - shift);
 
-	if (LOG_COMMANDS && m_eslog)
-		fprintf(m_eslog, "read from %02x/%02x -> ", m_current_page, offset / 4 * 8);
+	LOG("read from %02x/%02x -> ", m_current_page, offset / 4 * 8);
 
 	/* force an update */
 	m_stream->update();
@@ -1644,8 +1594,7 @@ READ8_MEMBER( es5506_device::read )
 	else
 		m_read_latch = reg_read_test(voice, offset / 4);
 
-	if (LOG_COMMANDS && m_eslog)
-		fprintf(m_eslog, "%08x\n", m_read_latch);
+	LOG("%08x\n", m_read_latch);
 
 	/* return the high byte */
 	return m_read_latch >> 24;
@@ -1687,8 +1636,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 									((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
 			}
 
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask ^ 0xffff);
+			LOG("%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask ^ 0xffff);
 			break;
 
 		case 0x01:  /* FC */
@@ -1696,8 +1644,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				voice->freqcount = (voice->freqcount & ~0x001fe) | ((data & 0x00ff) << 1);
 			if (ACCESSING_BITS_8_15)
 				voice->freqcount = (voice->freqcount & ~0x1fe00) | ((data & 0xff00) << 1);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->freqcount);
+			LOG("%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->freqcount);
 			break;
 
 		case 0x02:  /* STRT (hi) */
@@ -1705,8 +1652,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				voice->start = (voice->start & ~0x03fc0000) | ((data & 0x00ff) << 18);
 			if (ACCESSING_BITS_8_15)
 				voice->start = (voice->start & ~0x7c000000) | ((data & 0x1f00) << 18);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->start);
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->start);
 			break;
 
 		case 0x03:  /* STRT (lo) */
@@ -1714,8 +1660,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				voice->start = (voice->start & ~0x00000380) | ((data & 0x00e0) << 2);
 			if (ACCESSING_BITS_8_15)
 				voice->start = (voice->start & ~0x0003fc00) | ((data & 0xff00) << 2);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->start);
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->start);
 			break;
 
 		case 0x04:  /* END (hi) */
@@ -1726,8 +1671,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->end);
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->end);
 			break;
 
 		case 0x05:  /* END (lo) */
@@ -1738,8 +1682,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->end);
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->end);
 			break;
 
 		case 0x06:  /* K2 */
@@ -1747,8 +1690,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				voice->k2 = (voice->k2 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
 				voice->k2 = (voice->k2 & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, K2=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->k2);
+			LOG("%s:voice %d, K2=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->k2);
 			break;
 
 		case 0x07:  /* K1 */
@@ -1756,22 +1698,19 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				voice->k1 = (voice->k1 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
 				voice->k1 = (voice->k1 & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, K1=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->k1);
+			LOG("%s:voice %d, K1=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->k1);
 			break;
 
 		case 0x08:  /* LVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->lvol = (voice->lvol & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, left vol=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol);
+			LOG("%s:voice %d, left vol=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol);
 			break;
 
 		case 0x09:  /* RVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->rvol = (voice->rvol & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, right vol=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol);
+			LOG("%s:voice %d, right vol=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol);
 			break;
 
 		case 0x0a:  /* ACC (hi) */
@@ -1779,8 +1718,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				voice->accum = (voice->accum & ~0x03fc0000) | ((data & 0x00ff) << 18);
 			if (ACCESSING_BITS_8_15)
 				voice->accum = (voice->accum & ~0x7c000000) | ((data & 0x1f00) << 18);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->accum);
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->accum);
 			break;
 
 		case 0x0b:  /* ACC (lo) */
@@ -1788,8 +1726,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				voice->accum = (voice->accum & ~0x000003fc) | ((data & 0x00ff) << 2);
 			if (ACCESSING_BITS_8_15)
 				voice->accum = (voice->accum & ~0x0003fc00) | ((data & 0xff00) << 2);
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->accum);
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->accum);
 			break;
 
 		case 0x0c:  /* unused */
@@ -1802,8 +1739,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, uin
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
 
-				if (LOG_COMMANDS && m_eslog)
-					fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
+				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
@@ -1835,8 +1771,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				voice->control |= ((data >> 2) & CONTROL_LPMASK) |
 									((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
 			}
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask);
+			LOG("%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask);
 			break;
 
 		case 0x01:  /* O4(n-1) */
@@ -1844,8 +1779,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				voice->o4n1 = (voice->o4n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o4n1 = (int16_t)((voice->o4n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, O4(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
+			LOG("%s:voice %d, O4(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
 		case 0x02:  /* O3(n-1) */
@@ -1853,8 +1787,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				voice->o3n1 = (voice->o3n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o3n1 = (int16_t)((voice->o3n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, O3(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
+			LOG("%s:voice %d, O3(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
 		case 0x03:  /* O3(n-2) */
@@ -1862,8 +1795,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				voice->o3n2 = (voice->o3n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o3n2 = (int16_t)((voice->o3n2 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, O3(n-2)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
+			LOG("%s:voice %d, O3(n-2)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
 		case 0x04:  /* O2(n-1) */
@@ -1871,8 +1803,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				voice->o2n1 = (voice->o2n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o2n1 = (int16_t)((voice->o2n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, O2(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
+			LOG("%s:voice %d, O2(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
 		case 0x05:  /* O2(n-2) */
@@ -1880,8 +1811,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				voice->o2n2 = (voice->o2n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o2n2 = (int16_t)((voice->o2n2 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, O2(n-2)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
+			LOG("%s:voice %d, O2(n-2)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
 		case 0x06:  /* O1(n-1) */
@@ -1889,8 +1819,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				voice->o1n1 = (voice->o1n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o1n1 = (int16_t)((voice->o1n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && m_eslog)
-				fprintf(m_eslog, "%s:voice %d, O1(n-1)=%05x (accum=%08x)\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n1 & 0x3ffff, voice->accum);
+			LOG("%s:voice %d, O1(n-1)=%05x (accum=%08x)\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n1 & 0x3ffff, voice->accum);
 			break;
 
 		case 0x07:
@@ -1908,8 +1837,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, ui
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
 
-				if (LOG_COMMANDS && m_eslog)
-					fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
+				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
@@ -1952,8 +1880,7 @@ inline void es5505_device::reg_write_test(es550x_voice *voice, offs_t offset, ui
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
 
-				if (LOG_COMMANDS && m_eslog)
-					fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
+				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
@@ -2194,8 +2121,7 @@ READ16_MEMBER( es5505_device::read )
 	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 	uint16_t result;
 
-	if (LOG_COMMANDS && m_eslog)
-		fprintf(m_eslog, "read from %02x/%02x -> ", m_current_page, offset);
+	LOG("read from %02x/%02x -> ", m_current_page, offset);
 
 	/* force an update */
 	m_stream->update();
@@ -2208,8 +2134,7 @@ READ16_MEMBER( es5505_device::read )
 	else
 		result = reg_read_test(voice, offset);
 
-	if (LOG_COMMANDS && m_eslog)
-		fprintf(m_eslog, "%04x (accum=%08x)\n", result, voice->accum);
+	LOG("%04x (accum=%08x)\n", result, voice->accum);
 
 	/* return the high byte */
 	return result;

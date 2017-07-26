@@ -363,13 +363,13 @@ static ADDRESS_MAP_START( systeme_map, AS_PROGRAM, 8, systeme_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, systeme_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, systeme_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, systeme_state )
+static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_OPCODES, 8, systeme_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
@@ -396,12 +396,12 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, systeme_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vdp1_map, AS_0, 8, systeme_state )
+static ADDRESS_MAP_START( vdp1_map, 0, 8, systeme_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp1_bank")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vdp2_map, AS_0, 8, systeme_state )
+static ADDRESS_MAP_START( vdp2_map, 0, 8, systeme_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp2_bank")
 ADDRESS_MAP_END
 
@@ -418,9 +418,6 @@ WRITE8_MEMBER(systeme_state::bank_write)
 
 WRITE8_MEMBER(systeme_state::coin_counters_write)
 {
-	if (data == 0xff)
-		return;
-
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
 	machine().output().set_lamp_value(0, BIT(data, 2)); // used only by hangonjr?
@@ -963,6 +960,7 @@ static MACHINE_CONFIG_START( systeme )
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(systeme_state, coin_counters_write))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
@@ -972,12 +970,12 @@ static MACHINE_CONFIG_START( systeme )
 
 	MCFG_DEVICE_ADD("vdp1", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vdp1_map)
 
 	MCFG_DEVICE_ADD("vdp2", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
 	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vdp2_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -997,7 +995,7 @@ static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // on 834-6193 I/O sub board
 	MCFG_UPD4701_PORTX("PAD1")
 	MCFG_UPD4701_PORTY("PAD2")
 

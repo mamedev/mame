@@ -33,8 +33,10 @@ device_matrix_keyboard_interface<ROW_COUNT>::device_matrix_keyboard_interface(ma
 template <uint8_t ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::interface_pre_start()
 {
-	m_scan_timer = device().timer_alloc(TIMER_ID_SCAN);
-	m_typematic_timer = device().timer_alloc(TIMER_ID_TYPEMATIC);
+	if (!m_scan_timer)
+		m_scan_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_matrix_keyboard_interface<ROW_COUNT>::scan_row), this));
+	if (!m_typematic_timer)
+		m_typematic_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_matrix_keyboard_interface<ROW_COUNT>::typematic), this));
 	reset_key_state();
 	typematic_stop();
 }
@@ -48,22 +50,6 @@ void device_matrix_keyboard_interface<ROW_COUNT>::interface_post_start()
 	device().save_item(NAME(m_processing));
 	device().save_item(NAME(m_typematic_row));
 	device().save_item(NAME(m_typematic_column));
-}
-
-
-template <uint8_t ROW_COUNT>
-void device_matrix_keyboard_interface<ROW_COUNT>::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_ID_SCAN:
-		scan_row();
-		break;
-	case TIMER_ID_TYPEMATIC:
-		assert((m_typematic_row != uint8_t(~0U)) || (m_typematic_column != uint8_t(~0U)));
-		key_repeat(m_typematic_row, m_typematic_column);
-		break;
-	}
 }
 
 
@@ -118,7 +104,7 @@ void device_matrix_keyboard_interface<ROW_COUNT>::typematic_stop()
 
 
 template <uint8_t ROW_COUNT>
-void device_matrix_keyboard_interface<ROW_COUNT>::scan_row()
+TIMER_CALLBACK_MEMBER(device_matrix_keyboard_interface<ROW_COUNT>::scan_row)
 {
 	assert(m_next_row < ARRAY_LENGTH(m_key_rows));
 	assert(m_next_row < ARRAY_LENGTH(m_key_states));
@@ -143,6 +129,14 @@ void device_matrix_keyboard_interface<ROW_COUNT>::scan_row()
 	}
 
 	m_next_row = (m_next_row + 1) % ARRAY_LENGTH(m_key_rows);
+}
+
+
+template <uint8_t ROW_COUNT>
+TIMER_CALLBACK_MEMBER(device_matrix_keyboard_interface<ROW_COUNT>::typematic)
+{
+	assert((m_typematic_row != uint8_t(~0U)) || (m_typematic_column != uint8_t(~0U)));
+	key_repeat(m_typematic_row, m_typematic_column);
 }
 
 

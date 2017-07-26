@@ -12,6 +12,8 @@
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEMemoryView
 
@@ -107,7 +109,8 @@
 
 - (void)selectSubviewAtIndex:(int)index {
 	int const   selected = view->source_list().indexof(*view->source());
-	if (selected != index) {
+	if (selected != index)
+	{
 		view->set_source(*view->source_list().find(index));
 		if ([[self window] firstResponder] != self)
 			view->set_cursor_visible(false);
@@ -194,6 +197,26 @@
 - (IBAction)changeBytesPerLine:(id)sender {
 	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
 	memView->set_chunks_per_row(memView->chunks_per_row() + [sender tag]);
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
+	node->set_attribute_int("reverse", memView->reverse() ? 1 : 0);
+	node->set_attribute_int("addressmode", memView->physical() ? 1 : 0);
+	node->set_attribute_int("dataformat", memView->get_data_format());
+	node->set_attribute_int("rowchunks", memView->chunks_per_row());
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
+	memView->set_reverse(0 != node->get_attribute_int("reverse", memView->reverse() ? 1 : 0));
+	memView->set_physical(0 != node->get_attribute_int("addressmode", memView->physical() ? 1 : 0));
+	memView->set_data_format(node->get_attribute_int("dataformat", memView->get_data_format()));
+	memView->set_chunks_per_row(node->get_attribute_int("rowchunks", memView->chunks_per_row()));
 }
 
 

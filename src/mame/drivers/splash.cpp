@@ -224,20 +224,27 @@ WRITE16_MEMBER(splash_state::funystrp_sh_irqtrigger_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+WRITE8_MEMBER(splash_state::funystrp_eeprom_w)
+{
+	m_eeprom->cs_write(BIT(data, 4));
+	m_eeprom->di_write(BIT(data, 6));
+	m_eeprom->clk_write(BIT(data, 5));
+}
+
 static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                 /* ROM */
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM                                                 /* protection? RAM */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("pixelram")                        /* Pixel Layer */
-	AM_RANGE(0x84000a, 0x84000b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
-	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(funystrp_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x840008, 0x840009) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x84000a, 0x84000b) AM_WRITE8(funystrp_eeprom_w, 0xff00) AM_READNOP
+	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(funystrp_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
-	AM_RANGE(0x881804, 0x881fff) AM_WRITENOP
+	AM_RANGE(0x881804, 0x881fff) AM_RAM
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_SHARE("spriteram")        /* Sprite RAM */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_MIRROR(0x10000) /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
@@ -442,9 +449,11 @@ static INPUT_PORTS_START( funystrp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0xffff, 0x0000, "Clear EEPROM" )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0xffff, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_DIPNAME( 0x02, 0x02, "Clear EEPROM" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
 
@@ -638,6 +647,8 @@ static MACHINE_CONFIG_START( funystrp )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)     /* 6MHz (24/4) */
 	MCFG_CPU_PROGRAM_MAP(funystrp_sound_map)
 	MCFG_CPU_IO_MAP(funystrp_sound_io_map)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

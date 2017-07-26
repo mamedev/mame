@@ -208,7 +208,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 2a) 'grdian'
 
   - US version, licensed to Kitkorp - name "Guardian".
-  - MCU missing and simulated.
+  - MCU dumped and emulated.
   - Difficulty determines the number of energy bars you get.
   - Each hit removes 1 enegy bar.
   - According to the manual, default difficulty shall be set to "Hard".
@@ -219,7 +219,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 2b) 'getstarj'
 
   - Japan version - name "Get Star".
-  - MCU missing and simulated.
+  - MCU dumped and emulated.
   - You always get 4 energy bars.
   - Difficulty determines how many energy bars you lose when you get hit.
   - I don't know what default difficulty shall be, so I set it to "Easy".

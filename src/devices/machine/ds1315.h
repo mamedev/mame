@@ -24,12 +24,6 @@
 class ds1315_device : public device_t
 {
 public:
-	enum mode_t
-	{
-		DS_SEEK_MATCHING,
-		DS_CALENDAR_IO
-	};
-
 	ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ds1315_device() {}
 
@@ -47,6 +41,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	enum mode_t : u8
+	{
+		DS_SEEK_MATCHING,
+		DS_CALENDAR_IO
+	};
+
 	// internal state
 	mode_t m_mode;
 

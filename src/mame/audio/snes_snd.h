@@ -14,20 +14,6 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-enum env_state_t32                        /* ADSR state type              */
-{
-	ATTACK,
-	DECAY,
-	SUSTAIN,
-	RELEASE
-};
-
-ALLOW_SAVE_TYPE(env_state_t32);
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
 class snes_sound_device : public device_t,
 							public device_sound_interface
 {
@@ -54,6 +40,14 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	enum class env_state_t32 : u8
+	{
+		ATTACK,
+		DECAY,
+		SUSTAIN,
+		RELEASE
+	};
+
 
 	static constexpr unsigned SNES_SPCRAM_SIZE = 0x10000;
 

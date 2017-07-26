@@ -90,7 +90,7 @@ public:
 
 	template <class Object> static devcb_base &set_res_rd_callback(device_t &device, Object &&cb) { return downcast<sam6883_device &>(device).m_read_res.set_callback(std::forward<Object>(cb)); }
 
-	static void configure_cpu(device_t &device, const char *tag, address_spacenum space)
+	static void configure_cpu(device_t &device, const char *tag, int space)
 	{
 		sam6883_device &dev = downcast<sam6883_device &>(device);
 		dev.m_cpu_tag = tag;
@@ -169,7 +169,7 @@ private:
 	};
 
 	const char *        m_cpu_tag;
-	address_spacenum    m_cpu_space_ref;
+	int    m_cpu_space_ref;
 
 	// incidentals
 	address_space *             m_cpu_space;

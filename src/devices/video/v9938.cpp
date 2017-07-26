@@ -132,6 +132,13 @@ v9958_device::v9958_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
+device_memory_interface::space_config_vector v99x8_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_DATA, &m_space_config)
+	};
+}
+
 
 void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -461,9 +468,9 @@ uint8_t v99x8_device::status_r()
 	case 1:
 		ret = m_stat_reg[1];
 		m_stat_reg[1] &= 0xfe;
+		// mouse mode: add button state
 		if ((m_cont_reg[8] & 0xc0) == 0x80)
-			// mouse mode: add button state
-		ret |= m_button_state & 0xc0;
+			ret |= m_button_state & 0xc0;
 		break;
 	case 2:
 		/*update_command ();*/

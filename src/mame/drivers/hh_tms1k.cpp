@@ -23,6 +23,7 @@
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
+ @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000   1980, Entex Blast It (6015)
@@ -94,7 +95,7 @@
  @M34018   TMS1100   1981, Coleco Head to Head Boxing
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
- *M34078A  TMS1100   1983, Milton Bradley Arcade Mania
+ @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
@@ -126,8 +127,9 @@
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
-  - 7in1ss: in 2-player mode, game select and skill select can be configured
-    after selecting a game?
+  - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
+  - arrball: shot button is unresponsive sometimes, maybe BTANB? no video of game on Youtube
+    ROM is good, PLAs are good, input mux is good
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
@@ -152,6 +154,8 @@
 // internal artwork
 #include "7in1ss.lh"
 #include "amaztron.lh" // clickable
+#include "arcmania.lh" // clickable
+#include "arrball.lh"
 #include "astro.lh"
 #include "bankshot.lh"
 #include "bcheetah.lh"
@@ -395,22 +399,23 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 	return ret;
 }
 
-
-// devices with a TMS0980 can auto power-off
-
-WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
-{
-	if (state)
-	{
-		m_power_on = false;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-}
-
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	m_power_on = (bool)(uintptr_t)param;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
+{
+	// devices with a TMS0980 can auto power-off
+	if (state)
+		power_off();
+}
+
+void hh_tms1k_state::power_off()
+{
+	m_power_on = false;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -545,6 +550,106 @@ static MACHINE_CONFIG_START( matchnum )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SPEAKER_LEVELS(4, matchnum_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  A-One LSI Arrange Ball
+  * PCB label Kaken, PT-249
+  * TMS1000NLL MP0166 (die label 1000B, MP0166)
+  * 2-digit 7seg LED display + 22 LEDs, 1-bit sound
+
+  known releases:
+  - Japan/World: Arrange Ball (black case)
+  - USA(1): Zingo (model 60-2123), published by Tandy (red case)
+  - USA(2): Computer Impulse, published by LJN (white case)
+  - Germany: Fixball, unknown publisher, same as LJN version
+
+***************************************************************************/
+
+class arrball_state : public hh_tms1k_state
+{
+public:
+	arrball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void arrball_state::prepare_display()
+{
+	set_display_segmask(0x10, 0x7f);
+	set_display_segmask(0x20, 0x06); // left digit only segments B and C
+	display_matrix(7, 7, m_o, m_r);
+}
+
+WRITE16_MEMBER(arrball_state::write_r)
+{
+	// R8: input mux (always set)
+	m_inp_mux = data >> 8 & 1;
+
+	// R9,R10: speaker out
+	m_speaker->level_w(data >> 9 & 3);
+
+	// R0-R6: digit/led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(arrball_state::write_o)
+{
+	// O0-O6: digit segments/led data
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(arrball_state::read_k)
+{
+	// K: multiplexed inputs (actually just 1)
+	return read_inputs(1);
+}
+
+
+// config
+
+static INPUT_PORTS_START( arrball )
+	PORT_START("IN.0") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shot")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Stop")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Speed" )
+	PORT_CONFSETTING(    0x00, "Slow" )
+	PORT_CONFSETTING(    0x08, "Fast" )
+INPUT_PORTS_END
+
+static const s16 arrball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+
+static MACHINE_CONFIG_START( arrball )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(arrball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(arrball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(arrball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_arrball)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, arrball_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3904,8 +4009,9 @@ protected:
 
 void gpoker_state::prepare_display()
 {
-	set_display_segmask(0x7ff, 0x7f);
-	display_matrix(12, 11, m_o | (m_r >> 3 & 0xf00), m_r & 0x7ff);
+	set_display_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
+	u16 segs = BITSWAP16(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
+	display_matrix(14, 11, segs | (m_r >> 3 & 0xf00), m_r & 0x7ff);
 }
 
 WRITE16_MEMBER(gpoker_state::write_r)
@@ -6285,6 +6391,117 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Milton Bradley Electronic Arcade Mania
+  * TMS1100 M34078A-N2LL (die label 1100G, M34078A)
+  * 9 LEDs, 3-bit sound
+
+  This is a board game. The mini arcade machine is the emulated part here.
+  External artwork is needed for the game overlays.
+
+***************************************************************************/
+
+class arcmania_state : public hh_tms1k_state
+{
+public:
+	arcmania_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(arcmania_state::write_r)
+{
+	// R1-R9: leds
+	display_matrix(9, 1, data >> 1, 1);
+}
+
+WRITE16_MEMBER(arcmania_state::write_o)
+{
+	// O0-O2(tied together): speaker out
+	m_speaker->level_w(data & 7);
+
+	// O3,O4,O6: input mux
+	m_inp_mux = (data >> 3 & 3) | (data >> 4 & 4);
+
+	// O5: power off when low (turn back on with button row 1)
+	if (~data & 0x20)
+		power_off();
+}
+
+READ8_MEMBER(arcmania_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+
+// config
+
+/* physical button layout and labels is like this:
+
+    (orange)    (orange)    (orange)
+    [1]         [2]         [3]
+
+    (red)       (yellow)    (blue)
+    [RUN]                   [SNEAK
+     AMUK]                   ATTACK]
+
+    (green)     (yellow)    (purple)
+    [Alien                  [Rattler]
+     Raiders]
+*/
+
+static INPUT_PORTS_START( arcmania )
+	PORT_START("IN.0") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Alien Raiders")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Yellow Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Rattler")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Run Amuk")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Yellow Button 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Sneak Attack")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // O6 (also O5 to power)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Orange Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Orange Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Orange Button 3") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static const s16 arcmania_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
+
+static MACHINE_CONFIG_START( arcmania )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 250000) // approximation - RC osc. R=56K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(arcmania_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(arcmania_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(arcmania_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_arcmania)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(8, arcmania_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Code Name: Sector, by Bob Doyle
   * TMS0970 MCU, MP0905BNL ZA0379 (die label 0970F-05B)
   * 6-digit 7seg LED display + 4 LEDs for compass, no sound
@@ -8472,6 +8689,17 @@ ROM_START( matchnum )
 ROM_END
 
 
+ROM_START( arrball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0166", 0x0000, 0x0400, CRC(a78694db) SHA1(362aa6e356288e8df7da610246bd01fe72985d57) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_arrball_output.pla", 0, 365, CRC(ffc206fb) SHA1(339be3f066fb2f075211c554e81260b49cd83d15) )
+ROM_END
+
+
 ROM_START( mathmagi )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp1030", 0x0000, 0x0800, CRC(a81d7ccb) SHA1(4756ce42f1ea28ce5fe6498312f8306f10370969) )
@@ -8967,6 +9195,17 @@ ROM_START( mbdtower )
 ROM_END
 
 
+ROM_START( arcmania )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34078a", 0x0000, 0x0800, CRC(90ea0087) SHA1(9780c9c1ba89300b1bbe72c47e5fec68d8bb6a77) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_arcmania_output.pla", 0, 365, CRC(a1517b15) SHA1(72eedd7fd41de9c9102219f325fe8668a7c02663) )
+ROM_END
+
+
 ROM_START( cnsector )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
@@ -9202,6 +9441,7 @@ ROM_END
 
 //    YEAR  NAME        PARENT    CMP MACHINE    INPUT      STATE         INIT  COMPANY, FULLNAME, FLAGS
 CONS( 1979, matchnum,   0,         0, matchnum,  matchnum,  matchnum_state,  0, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   0, "A-One LSI", "Arrange Ball", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
@@ -9259,6 +9499,7 @@ CONS( 1979, simonf,     simon,     0, simon,     simon,     simon_state,     0, 
 CONS( 1979, ssimon,     0,         0, ssimon,    ssimon,    ssimon_state,    0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,    0,         0, bigtrak,   bigtrak,   bigtrak_state,   0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
 CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  0, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
+CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  0, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
 
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  0, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    0, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

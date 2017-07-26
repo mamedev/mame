@@ -1707,7 +1707,6 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 	util::archive_file::ptr zipfile;
 
 	std::vector<char> layout_text;
-	util::xml::data_node *layout_xml = nullptr;
 
 	int i;
 
@@ -1736,7 +1735,7 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
 
 		/* parse the layout text */
-		layout_xml = util::xml::data_node::string_read(&layout_text[0], nullptr);
+		util::xml::file::ptr const layout_xml = util::xml::file::string_read(&layout_text[0], nullptr);
 		if (!layout_xml) throw rpk_exception(RPK_XML_ERROR);
 
 		// Now we work within the XML tree
@@ -1815,13 +1814,10 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 	catch (rpk_exception &)
 	{
 		newrpk->close();
-		if (layout_xml) layout_xml->file_free();
 
 		// rethrow the exception
 		throw;
 	}
-
-	if (layout_xml) layout_xml->file_free();
 
 	return newrpk;
 }

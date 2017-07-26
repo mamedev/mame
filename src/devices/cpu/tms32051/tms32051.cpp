@@ -82,6 +82,15 @@ tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+device_memory_interface::space_config_vector tms32051_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
 
 /**************************************************************************
  * TMS32053 Internal memory map

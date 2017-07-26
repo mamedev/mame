@@ -117,6 +117,14 @@ g65816_device::g65816_device(const machine_config &mconfig, device_type type, co
 }
 
 
+device_memory_interface::space_config_vector g65816_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+
 static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, _5a22_device)
 	AM_RANGE(0x4202, 0x4202) AM_MIRROR(0xbf0000) AM_WRITE(wrmpya_w)
 	AM_RANGE(0x4203, 0x4203) AM_MIRROR(0xbf0000) AM_WRITE(wrmpyb_w)

@@ -496,24 +496,24 @@ READ8_MEMBER(horshoes_state::trackball_r)
 }
 
 
-#define COMMON_BANKS_MAP \
-	AM_RANGE(0x0000, 0x5fff) AM_ROM         \
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")            \
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w) \
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
-	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w) \
-	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)       \
-	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)   \
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)         \
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)       \
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w) \
+static ADDRESS_MAP_START( common_banks_map, AS_PROGRAM, 8, taitol_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w)
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w)
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w)
+	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w)
+	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)
+	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
-
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fhawk_map, AS_PROGRAM, 8, fhawk_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
@@ -539,7 +539,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x87ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
@@ -575,7 +575,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( champwr_map, AS_PROGRAM, 8, champwr_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -607,7 +607,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_2cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
@@ -623,7 +623,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_1cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
@@ -634,7 +634,7 @@ ADDRESS_MAP_END
 
 /* bootleg, doesn't have the MCU */
 static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_1cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
@@ -645,7 +645,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( plotting_map, AS_PROGRAM, 8, taitol_1cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP    // Watchdog or interrupt ack
@@ -654,7 +654,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_1cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -664,7 +664,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_1cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -675,7 +675,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_READ(trackball_r)
@@ -687,7 +687,7 @@ static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8, taitol_2cpu_state )
-	COMMON_BANKS_MAP
+	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa807) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, read, write)

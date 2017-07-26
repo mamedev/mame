@@ -79,20 +79,20 @@ private:
 	void set_irq_line(int irq, int state);
 
 
-	enum pic8259_state_t
+	enum class state_t : u8
 	{
-		STATE_ICW1,
-		STATE_ICW2,
-		STATE_ICW3,
-		STATE_ICW4,
-		STATE_READY
+		ICW1,
+		ICW2,
+		ICW3,
+		ICW4,
+		READY
 	};
 
 	devcb_write_line m_out_int_func;
 	devcb_read_line m_sp_en_func;
 	devcb_read8 m_read_slave_ack_func;
 
-	pic8259_state_t m_state;
+	state_t m_state;
 
 	uint8_t m_isr;
 	uint8_t m_irr;

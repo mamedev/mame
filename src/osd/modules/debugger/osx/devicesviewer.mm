@@ -11,6 +11,8 @@
 
 #import "debugconsole.h"
 
+#include "util/xmlfile.h"
+
 
 @interface MAMEDeviceWrapper : NSObject
 {
@@ -178,6 +180,12 @@
 
 - (IBAction)showDeviceDetail:(id)sender {
 	[console debugNewInfoWindowForDevice:[(MAMEDeviceWrapper *)[sender itemAtRow:[sender clickedRow]] device]];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DEVICES_VIEWER);
 }
 
 

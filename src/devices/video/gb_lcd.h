@@ -32,9 +32,6 @@ public:
 	virtual DECLARE_READ8_MEMBER(video_r);
 	virtual DECLARE_WRITE8_MEMBER(video_w);
 
-	// FIXME: remove it when proper sgb support is added
-	void set_sgb_hack(bool val) { m_sgb_border_hack = val ? 1 : 0; }
-
 	virtual void update_state();
 
 protected:
@@ -90,7 +87,7 @@ protected:
 	// state variables
 	bitmap_ind16 m_bitmap;
 
-	uint8_t m_sgb_atf_data[4050];       /* (SGB) Attributes files */
+	uint8_t m_sgb_atf_data[4096];       /* (SGB) Attributes files 4050 bytes, but it's in WRAM, because 4k is transferred */
 	uint32_t m_sgb_atf;
 	uint16_t m_sgb_pal_data[4096];
 	uint8_t m_sgb_pal_map[20][18];
@@ -98,9 +95,6 @@ protected:
 	std::unique_ptr<uint8_t[]> m_sgb_tile_data;
 	uint8_t m_sgb_tile_map[2048];
 	uint8_t m_sgb_window_mask;
-
-	// this is temporarily needed for a bunch of games which draw the border differently...
-	int m_sgb_border_hack;
 
 	int m_window_lines_drawn;
 
@@ -262,6 +256,8 @@ protected:
 	virtual void update_sprites() override;
 	virtual void update_scanline(uint32_t cycles_to_go) override;
 	void refresh_border();
+
+	void sgb_vram_memcpy(uint8_t *dst, uint8_t start, size_t num_tiles);
 };
 
 

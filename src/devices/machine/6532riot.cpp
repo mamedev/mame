@@ -378,6 +378,33 @@ uint8_t riot6532_device::portb_out_get()
 }
 
 
+//-------------------------------------------------
+//  paN_w - write Port A lines individually
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(riot6532_device::pa0_w) { porta_in_set(state ? 0x01 : 0x00, 0x01); }
+WRITE_LINE_MEMBER(riot6532_device::pa1_w) { porta_in_set(state ? 0x02 : 0x00, 0x02); }
+WRITE_LINE_MEMBER(riot6532_device::pa2_w) { porta_in_set(state ? 0x04 : 0x00, 0x04); }
+WRITE_LINE_MEMBER(riot6532_device::pa3_w) { porta_in_set(state ? 0x08 : 0x00, 0x08); }
+WRITE_LINE_MEMBER(riot6532_device::pa4_w) { porta_in_set(state ? 0x10 : 0x00, 0x10); }
+WRITE_LINE_MEMBER(riot6532_device::pa5_w) { porta_in_set(state ? 0x20 : 0x00, 0x20); }
+WRITE_LINE_MEMBER(riot6532_device::pa6_w) { porta_in_set(state ? 0x40 : 0x00, 0x40); }
+WRITE_LINE_MEMBER(riot6532_device::pa7_w) { porta_in_set(state ? 0x80 : 0x00, 0x80); }
+
+//-------------------------------------------------
+//  pbN_w - write Port B lines individually
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(riot6532_device::pb0_w) { portb_in_set(state ? 0x01 : 0x00, 0x01); }
+WRITE_LINE_MEMBER(riot6532_device::pb1_w) { portb_in_set(state ? 0x02 : 0x00, 0x02); }
+WRITE_LINE_MEMBER(riot6532_device::pb2_w) { portb_in_set(state ? 0x04 : 0x00, 0x04); }
+WRITE_LINE_MEMBER(riot6532_device::pb3_w) { portb_in_set(state ? 0x08 : 0x00, 0x08); }
+WRITE_LINE_MEMBER(riot6532_device::pb4_w) { portb_in_set(state ? 0x10 : 0x00, 0x10); }
+WRITE_LINE_MEMBER(riot6532_device::pb5_w) { portb_in_set(state ? 0x20 : 0x00, 0x20); }
+WRITE_LINE_MEMBER(riot6532_device::pb6_w) { portb_in_set(state ? 0x40 : 0x00, 0x40); }
+WRITE_LINE_MEMBER(riot6532_device::pb7_w) { portb_in_set(state ? 0x80 : 0x00, 0x80); }
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************

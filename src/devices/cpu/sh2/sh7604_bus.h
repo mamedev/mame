@@ -26,14 +26,15 @@
 
 // ======================> sh7604_bus_device
 
-class sh7604_bus_device : public device_t,
-						  public device_memory_interface
+class sh7604_bus_device : public device_t
 {
 public:
 	// construction/destruction
 	sh7604_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
+	DECLARE_ADDRESS_MAP( bus_regs, 16 );
+
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_READ16_MEMBER( bus_control_1_r );
@@ -50,7 +51,6 @@ public:
 	DECLARE_WRITE16_MEMBER( refresh_timer_counter_w );
 	DECLARE_READ16_MEMBER( refresh_timer_constant_r );
 	DECLARE_WRITE16_MEMBER( refresh_timer_constant_w );
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 protected:
 	// device-level overrides

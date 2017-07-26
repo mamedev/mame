@@ -103,7 +103,7 @@ CPUS["MINX"] = true
 CPUS["SSEM"] = true
 CPUS["AVR8"] = true
 CPUS["TMS1000"] = true
-CPUS["I4004"] = true
+CPUS["MCS40"] = true
 CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
 CPUS["I8008"] = true
@@ -135,6 +135,7 @@ CPUS["SM510"] = true
 CPUS["MB86901"] = true
 CPUS["NANOPROCESSOR"] = true
 CPUS["CLIPPER"] = true
+CPUS["CAPRICORN"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -160,9 +161,9 @@ SOUNDS["YM3812"] = true
 SOUNDS["YM3526"] = true
 SOUNDS["Y8950"] = true
 SOUNDS["YMF262"] = true
---SOUNDS["YMF271"] = true
+SOUNDS["YMF271"] = true
 SOUNDS["YMF278B"] = true
---SOUNDS["YMZ280B"] = true
+SOUNDS["YMZ280B"] = true
 SOUNDS["SN76477"] = true
 SOUNDS["SN76496"] = true
 SOUNDS["POKEY"] = true
@@ -202,7 +203,7 @@ SOUNDS["K051649"] = true
 --SOUNDS["K054539"] = true
 --SOUNDS["K056800"] = true
 --SOUNDS["SEGAPCM"] = true
---SOUNDS["MULTIPCM"] = true
+SOUNDS["MULTIPCM"] = true
 SOUNDS["SCSP"] = true
 SOUNDS["AICA"] = true
 SOUNDS["RF5C68"] = true
@@ -326,6 +327,7 @@ VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
 VIDEOS["S2636"] = true
 VIDEOS["SAA5050"] = true
+VIDEOS["SDA5708"] = true
 VIDEOS["SED1200"] = true
 VIDEOS["SED1330"] = true
 VIDEOS["SED1520"] = true
@@ -461,6 +463,7 @@ MACHINES["MB87078"] = true
 MACHINES["MB8795"] = true
 MACHINES["MB89352"] = true
 MACHINES["MB89371"] = true
+MACHINES["MC14411"] = true
 MACHINES["MC146818"] = true
 MACHINES["MC2661"] = true
 MACHINES["MC6843"] = true
@@ -534,6 +537,7 @@ MACHINES["SECFLASH"] = true
 MACHINES["SEIBU_COP"] = true
 --MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
+MACHINES["SMIOC"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
@@ -604,6 +608,7 @@ MACHINES["APPLE_FDC"] = true
 MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
 MACHINES["FGA002"] = true
+MACHINES["I82586"] = true
 MACHINES["INPUT_MERGER"] = true
 -- MACHINES["K054321"] = true
 
@@ -636,6 +641,7 @@ BUSES["BW2"] = true
 BUSES["C64"] = true
 BUSES["CBM2"] = true
 BUSES["CBMIEC"] = true
+BUSES["CBUS"] = true
 BUSES["CENTRONICS"] = true
 BUSES["CGENIE_EXPANSION"] = true
 BUSES["CGENIE_PARALLEL"] = true
@@ -657,10 +663,12 @@ BUSES["GAMEBOY"] = true
 BUSES["GAMEGEAR"] = true
 BUSES["GBA"] = true
 BUSES["GENERIC"] = true
+BUSES["HEXBUS"] = true
 BUSES["HPHIL"] = true
 BUSES["HPDIO"] = true
 BUSES["IEEE488"] = true
 BUSES["IMI7000"] = true
+BUSES["INTELLEC4"] = true
 BUSES["INTV"] = true
 BUSES["INTV_CTRL"] = true
 BUSES["IQ151"] = true
@@ -2082,6 +2090,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp9k_3xx.cpp",
 	MAME_DIR .. "src/mame/drivers/hp64k.cpp",
 	MAME_DIR .. "src/mame/drivers/hp_ipc.cpp",
+	MAME_DIR .. "src/mame/drivers/hp80.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")
@@ -2116,11 +2125,14 @@ createMESSProjects(_target, _subtarget, "intel")
 files {
 	MAME_DIR .. "src/mame/drivers/basic52.cpp",
 	MAME_DIR .. "src/mame/drivers/imds.cpp",
+	MAME_DIR .. "src/mame/drivers/intellec4.cpp",
 	MAME_DIR .. "src/mame/drivers/ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/ipds.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8010.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8030.cpp",
+	MAME_DIR .. "src/mame/machine/imm6_76.cpp",
+	MAME_DIR .. "src/mame/machine/imm6_76.h",
 	MAME_DIR .. "src/mame/machine/isbc_215g.cpp",
 	MAME_DIR .. "src/mame/machine/isbc_215g.h",
 	MAME_DIR .. "src/mame/machine/isbc_208.cpp",
@@ -2145,8 +2157,6 @@ files {
 	MAME_DIR .. "src/mame/includes/interpro.h",
 	MAME_DIR .. "src/mame/machine/cammu.h",
 	MAME_DIR .. "src/mame/machine/cammu.cpp",
-	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
-	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
 	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
 	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
 	MAME_DIR .. "src/mame/machine/interpro_mcga.h",
@@ -2382,14 +2392,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc88va.cpp",
 	MAME_DIR .. "src/mame/drivers/pc100.cpp",
 	MAME_DIR .. "src/mame/drivers/pc9801.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_26.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_26.h",
-	MAME_DIR .. "src/mame/machine/pc9801_86.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_86.h",
-	MAME_DIR .. "src/mame/machine/pc9801_118.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_118.h",
-	MAME_DIR .. "src/mame/machine/pc9801_cbus.cpp",
-	MAME_DIR .. "src/mame/machine/pc9801_cbus.h",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_cd.cpp",
@@ -2554,6 +2556,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pcipc.cpp",
 	MAME_DIR .. "src/mame/drivers/tandy1t.cpp",
 	MAME_DIR .. "src/mame/drivers/tosh1000.cpp",
+	MAME_DIR .. "src/mame/drivers/compc.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.h",
 }
@@ -2811,6 +2814,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mz6500.cpp",
 	MAME_DIR .. "src/mame/drivers/zaurus.cpp",
 	MAME_DIR .. "src/mame/machine/pxa255.h",
+	MAME_DIR .. "src/mame/drivers/fontwriter.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sinclair")
@@ -3319,6 +3323,7 @@ createMESSProjects(_target, _subtarget, "yamaha")
 files {
 	MAME_DIR .. "src/mame/drivers/ymmu100.cpp",
 	MAME_DIR .. "src/mame/drivers/fb01.cpp",
+	MAME_DIR .. "src/mame/drivers/tg100.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "zenith")

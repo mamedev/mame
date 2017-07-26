@@ -66,13 +66,11 @@ WRITE32_MEMBER(lpc210x_device::flash_w)
 }
 
 
-const address_space_config *lpc210x_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector lpc210x_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	default:                   return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 

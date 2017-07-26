@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deadang_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, deadang_state )
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, deadang_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END

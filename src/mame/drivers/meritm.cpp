@@ -157,6 +157,7 @@ xx = game/version code:
  60 - Megatouch 5
  70 - Megatouch 5 Tournament
  80 - Megatouch 6
+ 90 - Megatouch 7 Encore
 
 Not all regional versions are available for each Megatouch series
  For Megatouch 4,       set 9255-40-62 is Croatia

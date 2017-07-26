@@ -30,6 +30,7 @@ DEFINE_DEVICE_TYPE(I82371SB, i82371sb_device, "i82371sb", "Intel 82371SB")
 i82371sb_device::i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: southbridge_device(mconfig, I82371SB, tag, owner, clock)
 	, pci_device_interface( mconfig, *this )
+	, m_boot_state_hook(*this)
 {
 }
 
@@ -147,6 +148,7 @@ void i82371sb_device::pci_write(pci_bus_device *pcibus, int function, int offset
 void i82371sb_device::device_start()
 {
 	southbridge_device::device_start();
+	m_boot_state_hook.resolve_safe();
 	/* setup save states */
 	save_item(NAME(m_regs));
 }
@@ -178,4 +180,9 @@ void i82371sb_device::device_reset()
 	m_regs[2][0x04] = 0x02800000;
 	m_regs[2][0x08] = 0x0c030000;
 	m_regs[2][0x0c] = 0x00000000;
+}
+
+void i82371sb_device::port80_debug_write(uint8_t value)
+{
+	m_boot_state_hook((offs_t)0, value);
 }

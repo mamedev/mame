@@ -767,6 +767,19 @@ if (BUSES["GENERIC"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/hexbus/hexbus.h,BUSES["HEXBUS"] = true
+---------------------------------------------------
+
+if (BUSES["HEXBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hexbus/hexbus.cpp",
+		MAME_DIR .. "src/devices/bus/hexbus/hexbus.h",
+		MAME_DIR .. "src/devices/bus/hexbus/hx5102.cpp",
+		MAME_DIR .. "src/devices/bus/hexbus/hx5102.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -843,6 +856,25 @@ if (BUSES["IMI7000"]~=null) then
 		MAME_DIR .. "src/devices/bus/imi7000/imi7000.h",
 		MAME_DIR .. "src/devices/bus/imi7000/imi5000h.cpp",
 		MAME_DIR .. "src/devices/bus/imi7000/imi5000h.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/intellec4/intellec4.h,BUSES["INTELLEC4"] = true
+---------------------------------------------------
+
+if (BUSES["INTELLEC4"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/intellec4/insdatastor.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/insdatastor.h",
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/intellec4.h",
+		MAME_DIR .. "src/devices/bus/intellec4/prommemory.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/prommemory.h",
+		MAME_DIR .. "src/devices/bus/intellec4/tapereader.cpp",
+		MAME_DIR .. "src/devices/bus/intellec4/tapereader.h",
 	}
 end
 
@@ -2375,7 +2407,6 @@ end
 --@src/devices/bus/ti99/joyport/joyport.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/peb/peribox.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/internal/genboard.h,BUSES["TI99"] = true
---@src/devices/bus/ti99/hexbus/hexbus.h,BUSES["TI99"] = true
 ---------------------------------------------------
 
 if (BUSES["TI99"]~=null) then
@@ -2405,10 +2436,6 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/gromport/multiconn.h",
 		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.h",
-		MAME_DIR .. "src/devices/bus/ti99/hexbus/hexbus.cpp",
-		MAME_DIR .. "src/devices/bus/ti99/hexbus/hexbus.h",
-		MAME_DIR .. "src/devices/bus/ti99/hexbus/hx5102.cpp",
-		MAME_DIR .. "src/devices/bus/ti99/hexbus/hx5102.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/joyport.cpp",
@@ -3085,5 +3112,25 @@ if (BUSES["PC1512"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
 		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/cbus/pc9801_cbus.h,BUSES["CBUS"] = true
+---------------------------------------------------
+
+if (BUSES["CBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
 	}
 end

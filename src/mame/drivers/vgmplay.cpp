@@ -26,13 +26,15 @@
 #include "sound/sn76496.h"
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
+#include "sound/ymf271.h"
+#include "sound/ymz280b.h"
 
 #include "debugger.h"
 #include "speaker.h"
 
 #include <zlib.h>
 
-#define AS_IO16             AS_1
+#define AS_IO16             1
 #define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
 
 class vgmplay_device : public cpu_device
@@ -62,6 +64,8 @@ public:
 		A_MULTIPCMB  = 0x00013010,
 		A_POKEYA     = 0x00013020,
 		A_POKEYB     = 0x00013030,
+		A_YMF271     = 0x00013040,
+		A_YMZ280B    = 0x00013050
 	};
 
 	enum io16_t
@@ -80,7 +84,7 @@ public:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -91,6 +95,8 @@ public:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	READ8_MEMBER(segapcm_rom_r);
+	READ8_MEMBER(ymf271_rom_r);
+	READ8_MEMBER(ymz280b_rom_r);
 	READ8_MEMBER(multipcma_rom_r);
 	READ8_MEMBER(multipcmb_rom_r);
 	READ8_MEMBER(k053260_rom_r);
@@ -171,6 +177,8 @@ private:
 	required_device<pokey_device> m_pokeyb;
 	required_device<c352_device> m_c352;
 	required_device<okim6295_device> m_okim6295;
+	required_device<ymf271_device> m_ymf271;
+	required_device<ymz280b_device> m_ymz280b;
 
 	uint32_t m_multipcma_bank_l;
 	uint32_t m_multipcma_bank_r;
@@ -355,6 +363,12 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 
+			case 0x5d:
+				m_io->write_byte(A_YMZ280B+0, m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_YMZ280B+1, m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+
 			case 0x61: {
 				uint32_t duration = m_file->read_word(m_pc+1);
 				m_icount -= duration;
@@ -495,6 +509,15 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
+			case 0xd1:
+			{
+				uint8_t offset = m_file->read_byte(m_pc+1);
+				m_io->write_byte(A_YMF271 + (offset & 7) * 2, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YMF271 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
+			}
+
 			case 0xe0:
 				m_ym2612_stream_offset = m_file->read_dword(m_pc+1);
 				m_pc += 5;
@@ -536,14 +559,13 @@ void vgmplay_device::execute_set_input(int inputnum, int state)
 {
 }
 
-const address_space_config *vgmplay_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector vgmplay_device::memory_space_config() const
 {
-	switch(spacenum) {
-	case AS_PROGRAM: return &m_file_config;
-	case AS_IO:      return &m_io_config;
-	case AS_IO16:    return &m_io16_config;
-	default:         return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_file_config),
+		std::make_pair(AS_IO,      &m_io_config),
+		std::make_pair(AS_IO16,    &m_io16_config)
+	};
 }
 
 void vgmplay_device::state_import(const device_state_entry &entry)
@@ -876,6 +898,16 @@ READ8_MEMBER(vgmplay_device::segapcm_rom_r)
 	return rom_r(0, 0x80, offset);
 }
 
+READ8_MEMBER(vgmplay_device::ymf271_rom_r)
+{
+	return rom_r(0, 0x85, offset);
+}
+
+READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
+{
+	return rom_r(0, 0x86, offset);
+}
+
 READ8_MEMBER(vgmplay_device::multipcma_rom_r)
 {
 	return rom_r(0, 0x89, offset);
@@ -927,6 +959,8 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_pokeyb(*this, "pokeyb")
 	, m_c352(*this, "c352")
 	, m_okim6295(*this, "okim6295")
+	, m_ymf271(*this, "ymf271")
+	, m_ymz280b(*this, "ymz280b")
 {
 }
 
@@ -948,7 +982,7 @@ void vgmplay_state::machine_start()
 {
 	//m_nescpu->
 	uint32_t size = 0;
-	if(m_file->exists()) {
+	if(m_file->exists() && m_file->length() > 0) {
 		size = m_file->length();
 		m_file_data.resize(size);
 		m_file->input(&m_file_data[0], size);
@@ -1055,10 +1089,12 @@ void vgmplay_state::machine_start()
 				logerror("Warning: file requests an unsupported YMF262\n");
 			if(version >= 0x151 && r32(0x60))
 				logerror("Warning: file requests an unsupported YMF278B\n");
-			if(version >= 0x151 && r32(0x64))
-				logerror("Warning: file requests an unsupported YMF271\n");
-			if(version >= 0x151 && r32(0x68))
-				logerror("Warning: file requests an unsupported YMZ280B\n");
+			if(version >= 0x151 && r32(0x64)) {
+				m_ymf271->set_unscaled_clock(r32(0x64));
+			}
+			if(version >= 0x151 && r32(0x68)) {
+				m_ymz280b->set_unscaled_clock(r32(0x68));
+			}
 			if(version >= 0x151 && r32(0x6c))
 				logerror("Warning: file requests an unsupported RF5C164\n");
 			if(version >= 0x151 && r32(0x70))
@@ -1140,7 +1176,7 @@ void vgmplay_state::machine_start()
 			}
 			if(version >= 0x161 && r32(0xb0)) {
 				uint32_t clock = r32(0xb0);
-				m_pokeya->set_unscaled_clock(clock);
+				m_pokeya->set_unscaled_clock(clock & ~0x40000000);
 				if (clock & 0x40000000) {
 					clock &= ~0x40000000;
 					m_pokeyb->set_unscaled_clock(clock);
@@ -1251,29 +1287,31 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_MULTIPCMB+8,  vgmplay_device::A_MULTIPCMB+11)  AM_WRITE(multipcm_bank_lo_b_w)
 	AM_RANGE(vgmplay_device::A_POKEYA,       vgmplay_device::A_POKEYA+0xf)    AM_DEVWRITE    ("pokeya",        pokey_device, write)
 	AM_RANGE(vgmplay_device::A_POKEYB,       vgmplay_device::A_POKEYB+0xf)    AM_DEVWRITE    ("pokeyb",        pokey_device, write)
+	AM_RANGE(vgmplay_device::A_YMF271,       vgmplay_device::A_YMF271+0xf)    AM_DEVWRITE    ("ymf271",        ymf271_device, write)
+	AM_RANGE(vgmplay_device::A_YMZ280B,      vgmplay_device::A_YMZ280B+0x1)   AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segapcm_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, segapcm_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multipcma_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( multipcma_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3fffff) AM_DEVREAD("vgmplay", vgmplay_device, multipcma_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multipcmb_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( multipcmb_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3fffff) AM_DEVREAD("vgmplay", vgmplay_device, multipcmb_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k053260_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( k053260_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k053260_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( okim6295_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( okim6295_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3ffff) AM_DEVREAD("vgmplay", vgmplay_device, okim6295_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c352_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
 ADDRESS_MAP_END
 
@@ -1296,6 +1334,7 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_CPU_IO16_MAP( soundchips16_map )
 
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
+	MCFG_BITBANGER_READONLY(true)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1317,17 +1356,17 @@ static MACHINE_CONFIG_START( vgmplay )
 
 	MCFG_SOUND_ADD("segapcm", SEGAPCM, 4000000)
 	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, segapcm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("multipcma", MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, multipcma_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcma_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("multipcmb", MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, multipcmb_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcmb_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -1379,7 +1418,7 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 
 	MCFG_K053260_ADD("k053260", 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, k053260_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -1392,14 +1431,24 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
 	MCFG_C352_ADD("c352", 1000000, 288)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, c352_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, c352_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_OKIM6295_ADD("okim6295", 1000000, PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, okim6295_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, okim6295_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+
+	MCFG_SOUND_ADD("ymf271", YMF271, 16934400)
+	MCFG_YMF271_EXT_READ_HANDLER(DEVREAD8("vgmplay", vgmplay_device, ymf271_rom_r))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_SOUND_ADD("ymz280b", YMZ280B, 16934400)
+	MCFG_YMZ280B_EXT_READ_HANDLER(DEVREAD8("vgmplay", vgmplay_device, ymz280b_rom_r))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )

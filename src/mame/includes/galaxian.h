@@ -44,14 +44,10 @@ public:
 			m_audiocpu(*this, "audiocpu"),
 			m_audio2(*this, "audio2"),
 			m_dac(*this, "dac"),
-			m_ay8910_0(*this, "8910.0"),
-			m_ay8910_1(*this, "8910.1"),
-			m_ay8910_2(*this, "8910.2"),
+			m_ay8910(*this, "8910.%u", 0),
 			m_ay8910_cclimber(*this, "cclimber_audio:aysnd"),
 			m_digitalker(*this, "digitalker"),
-			m_ppi8255_0(*this, "ppi8255_0"),
-			m_ppi8255_1(*this, "ppi8255_1"),
-			m_ppi8255_2(*this, "ppi8255_2"),
+			m_ppi8255(*this, "ppi8255_%u", 0),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
@@ -66,14 +62,10 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_audio2;
 	optional_device<dac_byte_interface> m_dac;
-	optional_device<ay8910_device> m_ay8910_0;
-	optional_device<ay8910_device> m_ay8910_1;
-	optional_device<ay8910_device> m_ay8910_2;
+	optional_device_array<ay8910_device, 3> m_ay8910;
 	optional_device<ay8910_device> m_ay8910_cclimber;
 	optional_device<digitalker_device> m_digitalker;
-	optional_device<i8255_device> m_ppi8255_0;
-	optional_device<i8255_device> m_ppi8255_1;
-	optional_device<i8255_device> m_ppi8255_2;
+	optional_device_array<i8255_device, 3> m_ppi8255;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -197,6 +189,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tenspot_unk_6000_w);
 	DECLARE_WRITE8_MEMBER(tenspot_unk_8000_w);
 	DECLARE_WRITE8_MEMBER(tenspot_unk_e000_w);
+	DECLARE_READ8_MEMBER(froggeram_ppi8255_r);
+	DECLARE_WRITE8_MEMBER(froggeram_ppi8255_w);
 	DECLARE_WRITE8_MEMBER(artic_gfxbank_w);
 	DECLARE_READ8_MEMBER(tenspot_dsw_read);
 	DECLARE_INPUT_CHANGED_MEMBER(gmgalax_game_changed);

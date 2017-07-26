@@ -9,6 +9,8 @@
 #include "emu.h"
 #import "deviceinfoviewer.h"
 
+#include "util/xmlfile.h"
+
 
 @interface MAMEDeviceInfoView : NSView
 {
@@ -185,7 +187,7 @@
 	if (device->interface(memory))
 	{
 		NSBox *memoryBox = nil;
-		for (address_spacenum i = AS_0; i < ADDRESS_SPACES; i++)
+		for (int i = 0; i < memory->max_space_count(); i++)
 		{
 			if (memory->has_space(i))
 			{
@@ -230,6 +232,12 @@
 
 	// don't forget the result
 	return self;
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER);
 }
 
 @end

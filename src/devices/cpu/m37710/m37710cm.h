@@ -233,7 +233,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define NFLAG_8(A)      (A)
 #define NFLAG_16(A)     ((A)>>8)
 
-#define CFLAG_AS_1()    ((FLAG_C>>8)&1)
+#define CFLAG_1()    ((FLAG_C>>8)&1)
 
 /* ======================================================================== */
 /* ========================== EFFECTIVE ADDRESSES ========================= */

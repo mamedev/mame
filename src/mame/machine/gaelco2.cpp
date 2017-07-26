@@ -10,9 +10,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eepromser.h"
 #include "includes/gaelco2.h"
+
+#include "machine/eepromser.h"
 #include "chd.h"
+
 
 /***************************************************************************
 
@@ -132,6 +134,26 @@ DRIVER_INIT_MEMBER(gaelco2_state,snowboar)
 	/* split ROM sb46 */
 	gaelco2_ROM16_split_gfx("gfx2", "gfx1", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
 }
+
+
+/***************************************************************************
+
+    MCU communication
+
+***************************************************************************/
+
+WRITE8_MEMBER(gaelco2_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(gaelco2_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
 
 /***************************************************************************
 

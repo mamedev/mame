@@ -141,7 +141,6 @@ gb_cart_slot_device_base::gb_cart_slot_device_base(const machine_config &mconfig
 	device_t(mconfig, type, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	device_slot_interface(mconfig, *this),
-	m_sgb_hack(0),
 	m_type(GB_MBC_UNKNOWN),
 	m_cart(nullptr)
 {
@@ -227,7 +226,7 @@ static int gb_get_pcb_id(const char *slot)
 			return elem.pcb_id;
 	}
 
-	return 0;
+	return GB_MBC_NONE;
 }
 
 static const char *gb_get_slot(int type)
@@ -386,12 +385,6 @@ image_init_result gb_cart_slot_device_base::call_load()
 
 		internal_header_logging(ROM + offset, len);
 
-		// Hack to support Donkey Kong Land 2 + 3 in SGB
-		// For some reason, these store the tile data differently. Hacks will go once it's been figured out
-		if (strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 2", 16) == 0 ||
-			strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 3", 16) == 0)
-			m_sgb_hack = 1;
-
 		return image_init_result::PASS;
 	}
 
@@ -480,9 +473,11 @@ bool gb_cart_slot_device_base::is_mbc1col_game(const uint8_t *ROM, uint32_t len)
 		"MORTALKOMBAT DUO",
 		/* Mortal Kombat I & II US */
 		"MORTALKOMBATI&II",
+		/* Super Chinese Land 1,2,3' */
+		"SUPERCHINESE 123"
 	};
 
-	const uint8_t rows = sizeof(internal_names) / sizeof(internal_names[0]);
+	const uint8_t rows = ARRAY_LENGTH(internal_names);
 
 	for (uint8_t i = 0x00; i < rows; ++i) {
 		if (0 == memcmp(&ROM[0x134], &internal_names[i][0], name_length))

@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, dietgo_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, dietgo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 

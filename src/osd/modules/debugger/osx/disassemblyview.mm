@@ -11,6 +11,8 @@
 
 #include "debug/debugvw.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEDisassemblyView
 
@@ -263,6 +265,20 @@
 	}
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	debug_view_disasm *const dasmView = downcast<debug_view_disasm *>(view);
+	node->set_attribute_int("rightbar", dasmView->right_column());
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	debug_view_disasm *const dasmView = downcast<debug_view_disasm *>(view);
+	dasmView->set_right_column((disasm_right_column)node->get_attribute_int("rightbar", dasmView->right_column()));
 }
 
 @end

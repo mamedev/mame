@@ -145,7 +145,7 @@ protected:
 	virtual void execute_one() { } // -> child class
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
 	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
@@ -213,7 +213,7 @@ protected:
 	u16 m_div;
 	bool m_1s;
 
-	bool wake_me_up();
+	virtual bool wake_me_up();
 	virtual void init_divider();
 	TIMER_CALLBACK_MEMBER(div_timer_cb);
 

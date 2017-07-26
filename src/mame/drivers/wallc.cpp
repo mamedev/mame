@@ -188,8 +188,8 @@ static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP
 	AM_RANGE(0xb100, 0xb100) AM_WRITE(wallc_coin_counter_w)
 	AM_RANGE(0xb200, 0xb200) AM_WRITENOP
-	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8912_device, address_w)
+	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -329,7 +329,7 @@ static MACHINE_CONFIG_START( wallc )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 12288000 / 8)
+	MCFG_SOUND_ADD("aysnd", AY8912, 12288000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

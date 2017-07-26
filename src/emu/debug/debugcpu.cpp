@@ -226,8 +226,8 @@ bool debugger_cpu::comment_save()
 	bool comments_saved = false;
 
 	// if we don't have a root, bail
-	util::xml::data_node *const root = util::xml::data_node::file_create();
-	if (root == nullptr)
+	util::xml::file::ptr const root = util::xml::file::create();
+	if (!root)
 		return false;
 
 	// wrap in a try/catch to handle errors
@@ -269,19 +269,17 @@ bool debugger_cpu::comment_save()
 			osd_file::error filerr = file.open(m_machine.basename(), ".cmt");
 			if (filerr == osd_file::error::NONE)
 			{
-				root->file_write(file);
+				root->write(file);
 				comments_saved = true;
 			}
 		}
 	}
 	catch (emu_exception &)
 	{
-		root->file_free();
 		return false;
 	}
 
 	// free and get out of here
-	root->file_free();
 	return comments_saved;
 }
 
@@ -301,11 +299,11 @@ bool debugger_cpu::comment_load(bool is_inline)
 		return false;
 
 	// wrap in a try/catch to handle errors
-	util::xml::data_node *const root = util::xml::data_node::file_read(file, nullptr);
+	util::xml::file::ptr const root = util::xml::file::read(file, nullptr);
 	try
 	{
 		// read the file
-		if (root == nullptr)
+		if (!root)
 			throw emu_exception();
 
 		// find the config node
@@ -342,13 +340,10 @@ bool debugger_cpu::comment_load(bool is_inline)
 	catch (emu_exception &)
 	{
 		// clean up in case of error
-		if (root != nullptr)
-			root->file_free();
 		return false;
 	}
 
-	// free the parser
-	root->file_free();
+	// success!
 	return true;
 }
 
@@ -705,7 +700,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 {
 	device_memory_interface &memory = space.device().memory();
 
-	u64 result = ~u64(0) & (~u64(0) >> (64 - 8*size)), result2;
+	u64 result = ~u64(0) & (~u64(0) >> (64 - 8*size));
 
 	/* keep in logical range */
 	address &= space.logbytemask();
@@ -729,104 +724,25 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 
 	/* keep in physical range */
 	address &= space.bytemask();
-	offs_t addrxor = 0;
-	switch (space.data_width() / 8 * 10 + size)
-	{
-		/* dump opcodes in bytes from a byte-sized bus */
-		case 11:
-			break;
-
-		/* dump opcodes in bytes from a word-sized bus */
-		case 21:
-			addrxor = (space.endianness() == ENDIANNESS_LITTLE) ? BYTE_XOR_LE(0) : BYTE_XOR_BE(0);
-			break;
-
-		/* dump opcodes in words from a word-sized bus */
-		case 22:
-			break;
-
-		/* dump opcodes in bytes from a dword-sized bus */
-		case 41:
-			addrxor = (space.endianness() == ENDIANNESS_LITTLE) ? BYTE4_XOR_LE(0) : BYTE4_XOR_BE(0);
-			break;
-
-		/* dump opcodes in words from a dword-sized bus */
-		case 42:
-			addrxor = (space.endianness() == ENDIANNESS_LITTLE) ? WORD_XOR_LE(0) : WORD_XOR_BE(0);
-			break;
-
-		/* dump opcodes in dwords from a dword-sized bus */
-		case 44:
-			break;
-
-		/* dump opcodes in bytes from a qword-sized bus */
-		case 81:
-			addrxor = (space.endianness() == ENDIANNESS_LITTLE) ? BYTE8_XOR_LE(0) : BYTE8_XOR_BE(0);
-			break;
-
-		/* dump opcodes in words from a qword-sized bus */
-		case 82:
-			addrxor = (space.endianness() == ENDIANNESS_LITTLE) ? WORD2_XOR_LE(0) : WORD2_XOR_BE(0);
-			break;
-
-		/* dump opcodes in dwords from a qword-sized bus */
-		case 84:
-			addrxor = (space.endianness() == ENDIANNESS_LITTLE) ? DWORD_XOR_LE(0) : DWORD_XOR_BE(0);
-			break;
-
-		/* dump opcodes in qwords from a qword-sized bus */
-		case 88:
-		case 86: // sharc case, 48-bits opcodes
-			break;
-
-		default:
-			fatalerror("read_opcode: unknown type = %d\n", space.data_width() / 8 * 10 + size);
-	}
 
 	/* switch off the size and handle unaligned accesses */
 	switch (size)
 	{
 		case 1:
-			result = space.direct().read_byte(address, addrxor);
+			result = space.read_byte(address);
 			break;
 
 		case 2:
-			result = space.direct().read_word(address & ~1, addrxor);
-			if (!WORD_ALIGNED(address))
-			{
-				result2 = space.direct().read_word((address & ~1) + 2, addrxor);
-				if (space.endianness() == ENDIANNESS_LITTLE)
-					result = (result >> (8 * (address & 1))) | (result2 << (16 - 8 * (address & 1)));
-				else
-					result = (result << (8 * (address & 1))) | (result2 >> (16 - 8 * (address & 1)));
-				result &= 0xffff;
-			}
+			result = space.read_word_unaligned(address);
 			break;
 
 		case 4:
-			result = space.direct().read_dword(address & ~3, addrxor);
-			if (!DWORD_ALIGNED(address))
-			{
-				result2 = space.direct().read_dword((address & ~3) + 4, addrxor);
-				if (space.endianness() == ENDIANNESS_LITTLE)
-					result = (result >> (8 * (address & 3))) | (result2 << (32 - 8 * (address & 3)));
-				else
-					result = (result << (8 * (address & 3))) | (result2 >> (32 - 8 * (address & 3)));
-				result &= 0xffffffff;
-			}
+			result = space.read_dword_unaligned(address);
 			break;
 
-		case 8:
 		case 6:
-			result = space.direct().read_qword(address & ~7, addrxor);
-			if (!QWORD_ALIGNED(address))
-			{
-				result2 = space.direct().read_qword((address & ~7) + 8, addrxor);
-				if (space.endianness() == ENDIANNESS_LITTLE)
-					result = (result >> (8 * (address & 7))) | (result2 << (64 - 8 * (address & 7)));
-				else
-					result = (result << (8 * (address & 7))) | (result2 >> (64 - 8 * (address & 7)));
-			}
+		case 8:
+			result = space.read_qword_unaligned(address);
 			break;
 	}
 
@@ -846,7 +762,8 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 void debugger_cpu::on_vblank(screen_device &device, bool vblank_state)
 {
 	/* just set a global flag to be consumed later */
-	m_vblank_occurred = true;
+	if (vblank_state)
+		m_vblank_occurred = true;
 }
 
 
@@ -1007,7 +924,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				memory = &device->memory();
 			}
 			auto dis = m_machine.disable_side_effect(disable_se);
-			return expression_read_program_direct(memory->space(AS_DECRYPTED_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
+			return expression_read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
 
@@ -1198,7 +1115,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				memory = &device->memory();
 			}
 			auto dis = m_machine.disable_side_effect(disable_se);
-			expression_write_program_direct(memory->space(AS_DECRYPTED_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			expression_write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
 
@@ -1396,7 +1313,7 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 		}
 		if (!device)
 			device = get_visible_cpu();
-		if (!device->interface(memory) || !memory->has_space(AS_DECRYPTED_OPCODES))
+		if (!device->interface(memory) || !memory->has_space(AS_OPCODES))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
 
@@ -1607,7 +1524,6 @@ device_debug::device_debug(device_t &device)
 	, m_track_mem(false)
 {
 	memset(m_pc_history, 0, sizeof(m_pc_history));
-	memset(m_wplist, 0, sizeof(m_wplist));
 
 	// find out which interfaces we have to work with
 	device.interface(m_exec);
@@ -1635,8 +1551,8 @@ device_debug::device_debug(device_t &device)
 				m_symtable.add("logunmapd", (void *)&m_memory->space(AS_DATA), get_logunmap, set_logunmap);
 			if (m_memory->has_space(AS_IO))
 				m_symtable.add("logunmapi", (void *)&m_memory->space(AS_IO), get_logunmap, set_logunmap);
-			if (m_memory->has_space(AS_DECRYPTED_OPCODES))
-				m_symtable.add("logunmapo", (void *)&m_memory->space(AS_DECRYPTED_OPCODES), get_logunmap, set_logunmap);
+			if (m_memory->has_space(AS_OPCODES))
+				m_symtable.add("logunmapo", (void *)&m_memory->space(AS_OPCODES), get_logunmap, set_logunmap);
 		}
 
 		// add all registers into it
@@ -2192,7 +2108,8 @@ void device_debug::breakpoint_enable_all(bool enable)
 
 int device_debug::watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action)
 {
-	assert(space.spacenum() < ARRAY_LENGTH(m_wplist));
+	if (space.spacenum() >= int(m_wplist.size()))
+		m_wplist.resize(space.spacenum()+1, nullptr);
 
 	// allocate a new one
 	u32 id = m_device.machine().debugger().cpu().get_watchpoint_index();
@@ -2216,7 +2133,7 @@ int device_debug::watchpoint_set(address_space &space, int type, offs_t address,
 bool device_debug::watchpoint_clear(int index)
 {
 	// scan the list to see if we own this breakpoint
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		for (watchpoint **wp = &m_wplist[spacenum]; *wp != nullptr; wp = &(*wp)->m_next)
 			if ((*wp)->m_index == index)
 			{
@@ -2240,7 +2157,7 @@ bool device_debug::watchpoint_clear(int index)
 void device_debug::watchpoint_clear_all()
 {
 	// clear the head until we run out
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		while (m_wplist[spacenum] != nullptr)
 			watchpoint_clear(m_wplist[spacenum]->index());
 }
@@ -2254,7 +2171,7 @@ void device_debug::watchpoint_clear_all()
 bool device_debug::watchpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this watchpoint
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		for (watchpoint *wp = m_wplist[spacenum]; wp != nullptr; wp = wp->next())
 			if (wp->m_index == index)
 			{
@@ -2276,7 +2193,7 @@ bool device_debug::watchpoint_enable(int index, bool enable)
 void device_debug::watchpoint_enable_all(bool enable)
 {
 	// apply the enable to all watchpoints we own
-	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_wplist.size()); ++spacenum)
 		for (watchpoint *wp = m_wplist[spacenum]; wp != nullptr; wp = wp->next())
 			watchpoint_enable(wp->index(), enable);
 }
@@ -2448,7 +2365,7 @@ void device_debug::set_track_pc_visited(const offs_t& pc)
 //  'not available'.
 //-------------------------------------------------
 
-offs_t device_debug::track_mem_pc_from_space_address_data(const address_spacenum& space,
+offs_t device_debug::track_mem_pc_from_space_address_data(const int& space,
 															const offs_t& address,
 															const u64& data) const
 {
@@ -2570,7 +2487,7 @@ u32 device_debug::compute_opcode_crc32(offs_t pc) const
 	assert(m_memory != nullptr);
 
 	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
+	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
 	address_space &space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 
@@ -2798,14 +2715,15 @@ void device_debug::watchpoint_update_flags(address_space &space)
 
 	// see if there are any enabled breakpoints
 	bool enablewrite = false;
-	for (watchpoint *wp = m_wplist[space.spacenum()]; wp != nullptr; wp = wp->m_next)
-		if (wp->m_enabled)
-		{
-			if (wp->m_type & WATCHPOINT_READ)
-				enableread = true;
-			if (wp->m_type & WATCHPOINT_WRITE)
-				enablewrite = true;
-		}
+	if (space.spacenum() < int(m_wplist.size()))
+		for (watchpoint *wp = m_wplist[space.spacenum()]; wp != nullptr; wp = wp->m_next)
+			if (wp->m_enabled)
+			{
+				if (wp->m_type & WATCHPOINT_READ)
+					enableread = true;
+				if (wp->m_type & WATCHPOINT_WRITE)
+					enablewrite = true;
+			}
 
 	// push the flags out globally
 	space.enable_read_watchpoints(enableread);
@@ -2823,7 +2741,7 @@ void device_debug::watchpoint_check(address_space& space, int type, offs_t addre
 	space.machine().debugger().cpu().watchpoint_check(space, type, address, value_to_write, mem_mask, m_wplist);
 }
 
-void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, device_debug::watchpoint** wplist)
+void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist)
 {
 	// if we're within debugger code, don't stop
 	if (m_within_instruction_hook || m_machine.side_effect_disabled())
@@ -2876,41 +2794,42 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 		m_wpdata = value_to_write;
 
 	// see if we match
-	for (device_debug::watchpoint *wp = wplist[space.spacenum()]; wp != nullptr; wp = wp->next())
-		if (wp->hit(type, address, size))
-		{
-			// halt in the debugger by default
-			m_execution_state = EXECUTION_STATE_STOPPED;
-
-			// if we hit, evaluate the action
-			if (!wp->action().empty())
-				m_machine.debugger().console().execute_command(wp->action(), false);
-
-			// print a notification, unless the action made us go again
-			if (m_execution_state == EXECUTION_STATE_STOPPED)
+	if (space.spacenum() < int(wplist.size()))
+		for (device_debug::watchpoint *wp = wplist[space.spacenum()]; wp != nullptr; wp = wp->next())
+			if (wp->hit(type, address, size))
 			{
-				static const char *const sizes[] =
-				{
-					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
-				};
-				offs_t pc = space.device().safe_pcbase();
-				std::string buffer;
+				// halt in the debugger by default
+				m_execution_state = EXECUTION_STATE_STOPPED;
 
-				if (type & WATCHPOINT_WRITE)
+				// if we hit, evaluate the action
+				if (!wp->action().empty())
+					m_machine.debugger().console().execute_command(wp->action(), false);
+
+				// print a notification, unless the action made us go again
+				if (m_execution_state == EXECUTION_STATE_STOPPED)
 				{
-					buffer = string_format("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
-					if (value_to_write >> 32)
-						buffer.append(string_format(" (data=%X%08X)", u32(value_to_write >> 32), u32(value_to_write)));
+					static const char *const sizes[] =
+					{
+						"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
+					};
+					offs_t pc = space.device().safe_pcbase();
+					std::string buffer;
+
+					if (type & WATCHPOINT_WRITE)
+					{
+						buffer = string_format("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
+						if (value_to_write >> 32)
+							buffer.append(string_format(" (data=%X%08X)", u32(value_to_write >> 32), u32(value_to_write)));
+						else
+							buffer.append(string_format(" (data=%X)", u32(value_to_write)));
+					}
 					else
-						buffer.append(string_format(" (data=%X)", u32(value_to_write)));
+						buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
+					m_machine.debugger().console().printf("%s\n", buffer.c_str());
+					space.device().debug()->compute_debug_flags();
 				}
-				else
-					buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
-				m_machine.debugger().console().printf("%s\n", buffer.c_str());
-				space.device().debug()->compute_debug_flags();
+				break;
 			}
-			break;
-		}
 
 	m_within_instruction_hook = false;
 }
@@ -2972,7 +2891,7 @@ u32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 	assert(m_memory != nullptr && m_disasm != nullptr);
 
 	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
+	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
 	address_space &space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 
@@ -3411,7 +3330,7 @@ device_debug::dasm_pc_tag::dasm_pc_tag(const offs_t& address, const u32& crc)
 //  dasm_memory_access - constructor
 //-------------------------------------------------
 
-device_debug::dasm_memory_access::dasm_memory_access(const address_spacenum& address_space,
+device_debug::dasm_memory_access::dasm_memory_access(const int& address_space,
 														const offs_t& address,
 														const u64& data,
 														const offs_t& pc)

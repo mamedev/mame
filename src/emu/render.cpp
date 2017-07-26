@@ -1700,14 +1700,16 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
-	// if the first character of the "file" is an open brace, assume it is an XML string
-	util::xml::data_node *rootnode;
+	util::xml::file::ptr rootnode;
 	if (filename[0] == '<')
-		rootnode = util::xml::data_node::string_read(filename, nullptr);
-
-	// otherwise, assume it is a file
+	{
+		// if the first character of the "file" is an open brace, assume it is an XML string
+		rootnode = util::xml::file::string_read(filename, nullptr);
+	}
 	else
 	{
+		// otherwise, assume it is a file
+
 		// build the path and optionally prepend the directory
 		std::string fname = std::string(filename).append(".lay");
 		if (dirname != nullptr)
@@ -1720,7 +1722,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			return false;
 
 		// read the file
-		rootnode = util::xml::data_node::file_read(layoutfile, nullptr);
+		rootnode = util::xml::file::read(layoutfile, nullptr);
 	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
@@ -1751,7 +1753,6 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	emulator_info::layout_file_cb(*rootnode);
 
 	// free the root node
-	rootnode->file_free();
 	return result;
 }
 

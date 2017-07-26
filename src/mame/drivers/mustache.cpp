@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mustache_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mustache_state )
 	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END

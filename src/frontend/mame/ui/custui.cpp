@@ -64,12 +64,10 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 
 menu_custom_ui::~menu_custom_ui()
 {
-	std::string error_string;
-	ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
+	ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
 	if (!m_lang.empty())
 	{
-		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-		machine().options().mark_changed(OPTION_LANGUAGE);
+		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang].c_str(), OPTION_PRIORITY_CMDLINE);
 		load_translation(machine().options());
 	}
 	ui_globals::reset = true;
@@ -215,22 +213,10 @@ menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_container &container) : 
 
 	m_info_size = moptions.infos_size();
 	m_font_size = moptions.font_rows();
-
-	for (ui_options::entry &f_entry : moptions)
-	{
-		const char *entry_name = f_entry.name();
-		if (entry_name && strlen(entry_name) && !strcmp(OPTION_INFOS_SIZE, f_entry.name()))
-		{
-			m_info_max = atof(f_entry.maximum());
-			m_info_min = atof(f_entry.minimum());
-		}
-		else if (entry_name && strlen(entry_name) && !strcmp(OPTION_FONT_ROWS, f_entry.name()))
-		{
-			m_font_max = atof(f_entry.maximum());
-			m_font_min = atof(f_entry.minimum());
-		}
-	}
-
+	m_info_max = atof(moptions.get_entry(OPTION_INFOS_SIZE)->maximum());
+	m_info_min = atof(moptions.get_entry(OPTION_INFOS_SIZE)->minimum());
+	m_font_max = atof(moptions.get_entry(OPTION_FONT_ROWS)->maximum());
+	m_font_max = atof(moptions.get_entry(OPTION_FONT_ROWS)->minimum());
 }
 
 //-------------------------------------------------
@@ -264,11 +250,9 @@ menu_font_ui::~menu_font_ui()
 			name.insert(0, "[B]");
 	}
 #endif
-	machine().options().set_value(OPTION_UI_FONT, name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().mark_changed(OPTION_UI_FONT);
-
-	moptions.set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE, error_string);
-	moptions.set_value(OPTION_FONT_ROWS, m_font_size, OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OPTION_UI_FONT, name, OPTION_PRIORITY_CMDLINE);
+	moptions.set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE);
+	moptions.set_value(OPTION_FONT_ROWS, m_font_size, OPTION_PRIORITY_CMDLINE);
 }
 
 //-------------------------------------------------
@@ -463,11 +447,11 @@ menu_colors_ui::menu_colors_ui(mame_ui_manager &mui, render_container &container
 
 menu_colors_ui::~menu_colors_ui()
 {
-	std::string error_string, dec_color;
+	std::string dec_color;
 	for (int index = 1; index < MUI_RESTORE; index++)
 	{
 		dec_color = string_format("%x", (uint32_t)m_color_table[index].color);
-		ui().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		ui().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE);
 	}
 }
 

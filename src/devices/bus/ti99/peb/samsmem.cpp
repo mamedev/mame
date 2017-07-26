@@ -120,9 +120,9 @@ MACHINE_CONFIG_END
 
 void sams_memory_expansion_device::device_start()
 {
-	save_pointer(NAME(m_mapper),16);
-	save_item(NAME(m_map_mode));
 	save_item(NAME(m_mapper));
+	save_item(NAME(m_map_mode));
+	save_item(NAME(m_access_mapper));
 }
 
 void sams_memory_expansion_device::device_reset()

@@ -2359,12 +2359,12 @@ static const uint16_t shogwarr_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0010, 0x0000, 0x0000, 0xFFFF
 };
 
-static ADDRESS_MAP_START( shogwarr_oki1_map, AS_0, 8, kaneko16_shogwarr_state )
+static ADDRESS_MAP_START( shogwarr_oki1_map, 0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank10")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shogwarr_oki2_map, AS_0, 8, kaneko16_shogwarr_state )
+static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
@@ -2420,11 +2420,11 @@ static MACHINE_CONFIG_START( shogwarr )
 
 	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, shogwarr_oki1_map)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, shogwarr_oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2439,14 +2439,14 @@ static const uint16_t brapboys_default_eeprom[64] = {
 	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x0035, 0xFFFF, 0xFFFF, 0xFFFF
 };
 
-static ADDRESS_MAP_START( brapboys_oki2_map, AS_0, 8, kaneko16_shogwarr_state )
+static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( brapboys, shogwarr )
 	MCFG_SOUND_MODIFY("oki2")
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, brapboys_oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 
 	MCFG_DEVICE_MODIFY("kan_hit")
 	kaneko_hit_device::set_type(*device, 2);

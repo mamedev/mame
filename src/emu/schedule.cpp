@@ -498,7 +498,15 @@ void device_scheduler::timeslice()
 					exec->m_totalcycles += ran;
 
 					// update the local time for this CPU
-					attotime deltatime(0, exec->m_attoseconds_per_cycle * ran);
+					attotime deltatime;
+					if (ran < exec->m_cycles_per_second)
+						deltatime = attotime(0, exec->m_attoseconds_per_cycle * ran);
+					else
+					{
+						u32 remainder;
+						s32 secs = divu_64x32_rem(ran, exec->m_cycles_per_second, &remainder);
+						deltatime = attotime(secs, u64(remainder) * exec->m_attoseconds_per_cycle);
+					}
 					assert(deltatime >= attotime::zero);
 					exec->m_localtime += deltatime;
 					LOG(("         %d ran, %d total, time = %s\n", ran, s32(exec->m_totalcycles), exec->m_localtime.as_string(PRECISION)));

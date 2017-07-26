@@ -60,6 +60,7 @@ MACHINES["TTL7474"] = true
 MACHINES["RIOT6532"] = true
 MACHINES["PIT8253"] = true
 MACHINES["Z80CTC"] = true
+MACHINES["Z80PIO"] = true
 MACHINES["68681"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["GEN_LATCH"] = true
@@ -147,6 +148,8 @@ files{
 	MAME_DIR .. "src/mame/includes/wrally.h",
 	MAME_DIR .. "src/mame/machine/wrally.cpp",
 	MAME_DIR .. "src/mame/video/wrally.cpp",
+	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.cpp",
+	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.h",
 	MAME_DIR .. "src/mame/drivers/looping.cpp",
 	MAME_DIR .. "src/mame/drivers/supertnk.cpp",
 }
