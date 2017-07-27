@@ -361,7 +361,7 @@ Ricoh RP65C02G CPU, 3MHz XTAL
 PCB label 510.1129A01
 basically same as (Par) Excellence hardware, reskinned board
 
-Designer 2100 (model 6103): exactly same, but running at 6MHz
+Designer 2100 (model 6103): exactly same, but running at 5MHz
 
 Designer 2100 Display (model 6106)
 ----------------
@@ -1793,7 +1793,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( fdes2100, fexcel )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M65C02, XTAL_6MHz) // WDC 65C02
+	MCFG_CPU_REPLACE("maincpu", M65C02, XTAL_5MHz) // WDC 65C02
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 
 	// change irq timer frequency
