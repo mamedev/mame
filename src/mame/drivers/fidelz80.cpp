@@ -13,6 +13,8 @@
     such as Arena(in editmode).
 
     TODO:
+    - Source organization is a big mess. Each machine family could be in its own
+      sub driverclass, and separate files.
     - VBRC card scanner
     - VBRC MCU T1 is unknown
     - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state

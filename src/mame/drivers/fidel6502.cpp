@@ -11,6 +11,8 @@
     such as Arena(in editmode).
 
     TODO:
+    - Source organization is a big mess. Each machine family could be in its own
+      sub driverclass, and separate files.
     - verify cpu speed and rom labels where unknown
     - improve SC12 CPU divider? it seems a little bit slower than the real machine.
       Currently, a dummy timer workaround is needed, or it's much worse.
