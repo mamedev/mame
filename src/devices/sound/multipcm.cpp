@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miguel Angel Horna
 /*
- * Sega System 32 Multi/Model 1/Model 2 custom PCM chip (315-5560) emulation.
+ * Yamaha YMW-258-F (aka Sega 315-5560) emulation.
  *
  * by Miguel Angel Horna (ElSemi) for Model 2 Emulator and MAME.
  * Information by R. Belmont and the YMF278B (OPL4) manual.
@@ -28,9 +28,8 @@
  * The next byte is Amplitude LFO size (copied to reg 7 ?)
  *
  * TODO
- * - The YM278B manual states that the chip supports 512 instruments. The MultiPCM probably supports them
- * too but the high bit position is unknown (probably reg 2 low bit). Any game use more than 256?
- *
+ * - http://dtech.lv/techarticles_yamaha_chips.html indicates FM and 12-bit sample support,
+ *   which we don't have yet.
  */
 
 #include "emu.h"
@@ -464,7 +463,7 @@ void multipcm_device::set_bank(uint32_t leftoffs, uint32_t rightoffs)
 	printf("%08x, %08x\n", leftoffs, rightoffs);
 }
 
-DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "multipcm", "Sega/Yamaha 315-5560 MultiPCM")
+DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
 
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MULTIPCM, tag, owner, clock),
