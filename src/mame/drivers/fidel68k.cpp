@@ -195,7 +195,6 @@ public:
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
 	DECLARE_WRITE8_MEMBER(eag_mux_w);
 	DECLARE_READ8_MEMBER(eag_input2_r);
-	DECLARE_READ8_MEMBER(eag_cart_r);
 };
 
 
@@ -270,14 +269,6 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	eag_prepare_display();
 }
 
-READ8_MEMBER(fidel68k_state::eag_cart_r)
-{
-	if (m_cart->exists())
-		return m_cart->read_rom(space, offset);
-	else
-		return 0;
-}
-
 
 
 /******************************************************************************
@@ -319,7 +310,7 @@ static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00) AM_READNOP
-	AM_RANGE(0x400000, 0x407fff) AM_READ8(eag_cart_r, 0xff00)
+	AM_RANGE(0x400000, 0x407fff) AM_READ8(cartridge_r, 0xff00)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE8(eag_mux_w, 0x00ff)
 	AM_RANGE(0x400002, 0x400007) AM_WRITENOP // ?
 	AM_RANGE(0x604000, 0x607fff) AM_RAM AM_SHARE("nvram")
@@ -332,7 +323,7 @@ static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP
-	AM_RANGE(0x400000, 0x407fff) AM_READ8(eag_cart_r, 0xff00ff00)
+	AM_RANGE(0x400000, 0x407fff) AM_READ8(cartridge_r, 0xff00ff00)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE8(eag_mux_w, 0x00ff0000)
 	AM_RANGE(0x400004, 0x400007) AM_WRITENOP // ?
 	AM_RANGE(0x604000, 0x607fff) AM_RAM AM_SHARE("nvram")
@@ -345,7 +336,7 @@ static ADDRESS_MAP_START( eagv11_map, AS_PROGRAM, 32, fidel68k_state )
 	AM_RANGE(0x00200000, 0x003fffff) AM_RAM
 	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
 	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP
-	AM_RANGE(0x00c00000, 0x00c07fff) AM_READ8(eag_cart_r, 0xff00ff00)
+	AM_RANGE(0x00c00000, 0x00c07fff) AM_READ8(cartridge_r, 0xff00ff00)
 	AM_RANGE(0x00c00000, 0x00c00003) AM_WRITE8(eag_mux_w, 0x00ff0000)
 	AM_RANGE(0x00c00004, 0x00c00007) AM_WRITENOP // ?
 	AM_RANGE(0x00e04000, 0x00e07fff) AM_RAM AM_SHARE("nvram")
