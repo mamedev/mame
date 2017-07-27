@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER(decodmd_type1_device::rowdata_w)
 
 WRITE_LINE_MEMBER(decodmd_type1_device::rowclock_w)
 {
-	if (!state & m_rowclock)  // on negative edge
+	if (~state & m_rowclock)  // on negative edge
 		m_rowselect = (m_rowselect << 1) | m_rowdata;
 	m_rowclock = state;
 }
