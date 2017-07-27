@@ -319,5 +319,4 @@ public:
 	void neruton_update_irq();
 	void jantouki_sound_update_irq();
 	void tenkai_show_6c();
-	void gekisha_set_rombank( uint8_t data );
 };

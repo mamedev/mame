@@ -61,7 +61,6 @@ private:
 	uint8_t m_ctrl;
 	uint8_t m_busy;
 	uint8_t m_command;
-	uint8_t m_bank;
 	uint8_t m_rowclock;
 	uint8_t m_rowdata;
 	uint32_t m_rowselect;
