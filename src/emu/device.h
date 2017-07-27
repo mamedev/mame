@@ -90,9 +90,10 @@ struct device_feature
 		PRINTER     = u32(1) << 10,
 		LAN         = u32(1) << 11,
 		WAN         = u32(1) << 12,
+		TIMING      = u32(1) << 13,
 
 		NONE        = u32(0),
-		ALL         = (u32(1) << 13) - 1U
+		ALL         = (u32(1) << 14) - 1U
 	};
 };
 

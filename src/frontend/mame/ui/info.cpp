@@ -38,7 +38,8 @@ constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
 		{ device_t::feature::DISK,          __("disk")          },
 		{ device_t::feature::PRINTER,       __("printer")       },
 		{ device_t::feature::LAN,           __("LAN")           },
-		{ device_t::feature::WAN,           __("WAN")           } };
+		{ device_t::feature::WAN,           __("WAN")           },
+		{ device_t::feature::TIMING,        __("timing")        } };
 
 } // anonymous namespace
 

@@ -156,7 +156,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST driver protection (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
 "\t\t<!ELEMENT feature EMPTY>\n"
-"\t\t\t<!ATTLIST feature type (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan) #REQUIRED>\n"
+"\t\t\t<!ATTLIST feature type (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing) #REQUIRED>\n"
 "\t\t\t<!ATTLIST feature status (unemulated|imperfect) #IMPLIED>\n"
 "\t\t\t<!ATTLIST feature overall (unemulated|imperfect) #IMPLIED>\n"
 "\t\t<!ELEMENT device (instance*, extension*)>\n"
@@ -1597,7 +1597,8 @@ void info_xml_creator::output_features(device_type type, device_t::feature_type 
 			{ device_t::feature::DISK,          "disk"          },
 			{ device_t::feature::PRINTER,       "printer"       },
 			{ device_t::feature::LAN,           "lan"           },
-			{ device_t::feature::WAN,           "wan"           } };
+			{ device_t::feature::WAN,           "wan"           },
+			{ device_t::feature::TIMING,        "timing"        } };
 
 	device_t::feature_type const flags(type.unemulated_features() | type.imperfect_features() | unemulated | imperfect);
 	for (auto const &feature : features)

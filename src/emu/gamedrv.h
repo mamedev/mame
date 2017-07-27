@@ -88,6 +88,7 @@ constexpr u64 MACHINE_IMPERFECT_CONTROLS        = 0x00000040'00000000;   // cont
 constexpr u64 MACHINE_NODEVICE_MICROPHONE       = 0x00000080'00000000;   // any game/system that has unemulated audio capture device
 constexpr u64 MACHINE_NODEVICE_PRINTER          = 0x00000100'00000000;   // any game/system that has unemulated hardcopy output device
 constexpr u64 MACHINE_NODEVICE_LAN              = 0x00000200'00000000;   // any game/system that has unemulated local networking
+constexpr u64 MACHINE_IMPERFECT_TIMING          = 0x00000400'00000000;   // timing is known to be imperfectly emulated
 
 // useful combinations of flags
 constexpr u64 MACHINE_IS_SKELETON               = MACHINE_NO_SOUND | MACHINE_NOT_WORKING; // flag combination for skeleton drivers
@@ -145,7 +146,8 @@ public:
 				((flags & MACHINE_IMPERFECT_COLORS)         ? device_t::feature::PALETTE    : device_t::feature::NONE) |
 				((flags & MACHINE_IMPERFECT_GRAPHICS)       ? device_t::feature::GRAPHICS   : device_t::feature::NONE) |
 				((flags & MACHINE_IMPERFECT_SOUND)          ? device_t::feature::SOUND      : device_t::feature::NONE) |
-				((flags & MACHINE_IMPERFECT_CONTROLS)       ? device_t::feature::CONTROLS   : device_t::feature::NONE);
+				((flags & MACHINE_IMPERFECT_CONTROLS)       ? device_t::feature::CONTROLS   : device_t::feature::NONE) |
+				((flags & MACHINE_IMPERFECT_TIMING)         ? device_t::feature::TIMING     : device_t::feature::NONE);
 	}
 
 	device_type                 type;               // static type info for driver class
