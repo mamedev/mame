@@ -60,6 +60,8 @@ public:
 	{
 	}
 
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );

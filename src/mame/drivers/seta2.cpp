@@ -529,12 +529,12 @@ ADDRESS_MAP_END
 
 // Outputs
 
-void seta2_state::staraudi_debug_outputs()
+void staraudi_state::staraudi_debug_outputs()
 {
 //  popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_lamps1_w)
+WRITE16_MEMBER(staraudi_state::staraudi_lamps1_w)
 {
 	COMBINE_DATA(&m_lamps1);
 	if (ACCESSING_BITS_0_7)
@@ -547,7 +547,7 @@ WRITE16_MEMBER(seta2_state::staraudi_lamps1_w)
 	staraudi_debug_outputs();
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_lamps2_w)
+WRITE16_MEMBER(staraudi_state::staraudi_lamps2_w)
 {
 	COMBINE_DATA(&m_lamps2);
 	if (ACCESSING_BITS_0_7)
@@ -559,7 +559,7 @@ WRITE16_MEMBER(seta2_state::staraudi_lamps2_w)
 	staraudi_debug_outputs();
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_camera_w)
+WRITE16_MEMBER(staraudi_state::staraudi_camera_w)
 {
 	COMBINE_DATA(&m_cam);
 	if (ACCESSING_BITS_0_7)
@@ -577,12 +577,12 @@ WRITE16_MEMBER(seta2_state::staraudi_camera_w)
 #define TILE0 (0x7c000)
 #define TILERAM(offset) ((uint16_t*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
 
-READ16_MEMBER(seta2_state::staraudi_tileram_r)
+READ16_MEMBER(staraudi_state::staraudi_tileram_r)
 {
 	return *TILERAM(offset);
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_tileram_w)
+WRITE16_MEMBER(staraudi_state::staraudi_tileram_w)
 {
 	COMBINE_DATA(TILERAM(offset));
 	int tile = TILE0 + ((offset * 2) % 0x20000) / (8*2);
@@ -590,7 +590,7 @@ WRITE16_MEMBER(seta2_state::staraudi_tileram_w)
 		m_gfxdecode->gfx(i)->mark_dirty(tile);
 }
 
-static ADDRESS_MAP_START( staraudi_map, AS_PROGRAM, 16, seta2_state )
+static ADDRESS_MAP_START( staraudi_map, AS_PROGRAM, 16, staraudi_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM                             // RAM
 
@@ -3558,8 +3558,10 @@ ROM_START( staraudi )
 	ROM_LOAD( "su1_snd.u32", 0x100000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
-DRIVER_INIT_MEMBER(seta2_state,staraudi)
+void staraudi_state::driver_start()
 {
+	seta2_state::driver_start();
+
 	// bad sound rom: replace the missing (zero) sample with the previous one
 	uint8_t *samples = memregion("x1snd")->base() + 0x100000;
 	for (int i = 0; i < 0x400000; i += 2)
@@ -3885,7 +3887,7 @@ GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state, 0,        ROT0
 GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, 0,        ROT0, "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, staraudi,  0,        staraudi, staraudi, seta2_state, staraudi, ROT0, "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_CAMERA | MACHINE_NODEVICE_PRINTER )
+GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, 0,     ROT0, "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, 0,        ROT0, "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, 0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
 GAME( 2000, penbrosk,  penbros,  penbrosk, penbros,  seta2_state, 0,        ROT0, "bootleg",               "Penguin Brothers (Japan, bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )

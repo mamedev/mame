@@ -109,6 +109,8 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
 	DECLARE_READ8_MEMBER(pia_r);
 	DECLARE_WRITE8_MEMBER(pia_w);
 	DECLARE_READ8_MEMBER(pia_pa_r);
@@ -638,5 +640,5 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME          FLAGS
-COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev A", ROT90 | MACHINE_IMPERFECT_KEYBOARD )
-COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD )
+COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev A", ROT90 )
+COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING )

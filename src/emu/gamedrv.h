@@ -50,7 +50,7 @@ struct machine_flags
 		NO_STANDALONE       = 0x00000400,   // this driver cannot stand alone
 		REQUIRES_ARTWORK    = 0x00000800,   // requires external artwork for key game elements
 		CLICKABLE_ARTWORK   = 0x00001000,   // artwork is clickable and requires mouse cursor
-		UNOFFICIAL          = 0x00002000,   // unofficial hardware change
+		UNOFFICIAL          = 0x00002000,   // unofficial hardware modification
 		NO_SOUND_HW         = 0x00004000,   // system has no sound output
 		MECHANICAL          = 0x00008000,   // contains mechanical parts (pinball, redemption games, ...)
 		IS_INCOMPLETE       = 0x00010000    // official system with blatantly incomplete hardware/software
@@ -84,16 +84,14 @@ constexpr u64 MACHINE_IMPERFECT_COLORS          = 0x00000004'00000000;   // colo
 constexpr u64 MACHINE_IMPERFECT_GRAPHICS        = 0x00000008'00000000;   // graphics are wrong/incomplete
 constexpr u64 MACHINE_NO_SOUND                  = 0x00000010'00000000;   // sound is missing
 constexpr u64 MACHINE_IMPERFECT_SOUND           = 0x00000020'00000000;   // sound is known to be wrong
-constexpr u64 MACHINE_IMPERFECT_KEYBOARD        = 0x00000040'00000000;   // keyboard is known to be wrong
-constexpr u64 MACHINE_NODEVICE_MICROPHONE       = 0x00000080'00000000;   // any game/system that has unemulated recording voice device peripheral
-constexpr u64 MACHINE_NODEVICE_CAMERA           = 0x00000100'00000000;   // any game/system that has unemulated capturing image device peripheral
-constexpr u64 MACHINE_NODEVICE_PRINTER          = 0x00000200'00000000;   // any game/system that has unemulated grabbing of screen content device
-constexpr u64 MACHINE_NODEVICE_LAN              = 0x00000400'00000000;   // any game/system that has unemulated multi-linking capability
-constexpr u64 MACHINE_NODEVICE_WAN              = 0x00000800'00000000;   // any game/system that has unemulated networking capability
+constexpr u64 MACHINE_IMPERFECT_CONTROLS        = 0x00000040'00000000;   // controls are known to be imperfectly emulated
+constexpr u64 MACHINE_NODEVICE_MICROPHONE       = 0x00000080'00000000;   // any game/system that has unemulated audio capture device
+constexpr u64 MACHINE_NODEVICE_PRINTER          = 0x00000100'00000000;   // any game/system that has unemulated hardcopy output device
+constexpr u64 MACHINE_NODEVICE_LAN              = 0x00000200'00000000;   // any game/system that has unemulated local networking
 
 // useful combinations of flags
-constexpr u64 MACHINE_IS_SKELETON               = MACHINE_NO_SOUND | MACHINE_NOT_WORKING; // mask for skelly games
-constexpr u64 MACHINE_IS_SKELETON_MECHANICAL    = MACHINE_IS_SKELETON | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK; // mask for skelly mechanical games
+constexpr u64 MACHINE_IS_SKELETON               = MACHINE_NO_SOUND | MACHINE_NOT_WORKING; // flag combination for skeleton drivers
+constexpr u64 MACHINE_IS_SKELETON_MECHANICAL    = MACHINE_IS_SKELETON | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK; // flag combination for skeleton mechanical machines
 
 
 //**************************************************************************
@@ -136,10 +134,8 @@ public:
 				((flags & MACHINE_WRONG_COLORS)             ? device_t::feature::PALETTE    : device_t::feature::NONE) |
 				((flags & MACHINE_NO_SOUND)                 ? device_t::feature::SOUND      : device_t::feature::NONE) |
 				((flags & MACHINE_NODEVICE_MICROPHONE)      ? device_t::feature::MICROPHONE : device_t::feature::NONE) |
-				((flags & MACHINE_NODEVICE_CAMERA)          ? device_t::feature::CAMERA     : device_t::feature::NONE) |
 				((flags & MACHINE_NODEVICE_PRINTER)         ? device_t::feature::PRINTER    : device_t::feature::NONE) |
-				((flags & MACHINE_NODEVICE_LAN)             ? device_t::feature::LAN        : device_t::feature::NONE) |
-				((flags & MACHINE_NODEVICE_WAN)             ? device_t::feature::WAN        : device_t::feature::NONE);
+				((flags & MACHINE_NODEVICE_LAN)             ? device_t::feature::LAN        : device_t::feature::NONE);
 	}
 
 	static constexpr device_t::feature_type imperfect_features(u64 flags)
@@ -149,7 +145,7 @@ public:
 				((flags & MACHINE_IMPERFECT_COLORS)         ? device_t::feature::PALETTE    : device_t::feature::NONE) |
 				((flags & MACHINE_IMPERFECT_GRAPHICS)       ? device_t::feature::GRAPHICS   : device_t::feature::NONE) |
 				((flags & MACHINE_IMPERFECT_SOUND)          ? device_t::feature::SOUND      : device_t::feature::NONE) |
-				((flags & MACHINE_IMPERFECT_KEYBOARD)       ? device_t::feature::KEYBOARD   : device_t::feature::NONE);
+				((flags & MACHINE_IMPERFECT_CONTROLS)       ? device_t::feature::CONTROLS   : device_t::feature::NONE);
 	}
 
 	device_type                 type;               // static type info for driver class

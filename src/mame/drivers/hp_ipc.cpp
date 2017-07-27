@@ -767,4 +767,4 @@ ROM_START(hp_ipc)
 ROM_END
 
 
-COMP(1985, hp_ipc, 0, 0, hp_ipc, hp_ipc, hp_ipc_state, 0, "HP", "Integral Personal Computer", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_KEYBOARD)
+COMP(1985, hp_ipc, 0, 0, hp_ipc, hp_ipc, hp_ipc_state, 0, "HP", "Integral Personal Computer", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
