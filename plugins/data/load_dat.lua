@@ -85,6 +85,7 @@ function datfile.open(file, vertag, fixupcb)
 		ver = tostring(lfs.attributes(filepath, "change"))
 	end
 	if ver == dbver then
+		fh:close()
 		return read, dbver
 	end
 
