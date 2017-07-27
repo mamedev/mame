@@ -2019,7 +2019,7 @@ int32_t mame_ui_manager::slider_crossoffset(running_machine &machine, void *arg,
 
 
 //-------------------------------------------------
-//  wrap_text
+//  create_layout
 //-------------------------------------------------
 
 ui::text_layout mame_ui_manager::create_layout(render_container &container, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)

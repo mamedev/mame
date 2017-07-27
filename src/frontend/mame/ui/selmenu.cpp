@@ -2452,9 +2452,21 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, m_info_view, 0, total - 1, title_size);
 	if (justify == 'f')
-		m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), xstart, xend, text_size);
+	{
+		m_total_lines = ui().wrap_text(
+				container(), m_info_buffer.c_str(),
+				0.0f, 0.0f, 1.0f - (2.0f * gutter_width),
+				xstart, xend,
+				text_size);
+	}
 	else
-		m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
+	{
+		m_total_lines = ui().wrap_text(
+				container(), m_info_buffer.c_str(),
+				origx1, origy1, origx2 - origx1 - (2.0f * gutter_width),
+				xstart, xend,
+				text_size);
+	}
 
 	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
 	if (m_total_lines < r_visible_lines)
@@ -2468,28 +2480,69 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	for (int r = 0; r < r_visible_lines; ++r)
 	{
 		int itemline = r + m_topline_datsview;
-		std::string tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
+		std::string const tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
 		if (tempbuf[0] == '#')
 			continue;
 
-		// up arrow
-		if (r == 0 && m_topline_datsview != 0)
+		if (r == 0 && m_topline_datsview != 0) // up arrow
+		{
 			draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-		// bottom arrow
-		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
+		}
+		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1) // bottom arrow
+		{
 			draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+		}
+		else if (justify == '2') // two-column layout
+		{
+			// split at first tab
+			std::string::size_type const splitpos(tempbuf.find('\t'));
+			std::string const leftcol(tempbuf.substr(0, (std::string::npos == splitpos) ? 0U : splitpos));
+			std::string const rightcol(tempbuf.substr((std::string::npos == splitpos) ? 0U : (splitpos + 1U)));
+
+			// measure space needed, condense if necessary
+			float const leftlen(ui().get_string_width(leftcol.c_str(), text_size));
+			float const rightlen(ui().get_string_width(rightcol.c_str(), text_size));
+			float const textlen(leftlen + rightlen);
+			float const tmp_size3((textlen > sc) ? (text_size * (sc / textlen)) : text_size);
+
+			// draw in two parts
+			ui().draw_text_full(
+					container(), leftcol.c_str(),
+					origx1 + gutter_width, oy1, sc,
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					nullptr, nullptr,
+					tmp_size3);
+			ui().draw_text_full(
+					container(), rightcol.c_str(),
+					origx1 + gutter_width, oy1, sc,
+					ui::text_layout::RIGHT, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					nullptr, nullptr,
+					tmp_size3);
+		}
 		else if (justify == 'f' || justify == 'p') // full or partial justify
 		{
 			// check size
-			float textlen = ui().get_string_width(tempbuf.c_str(), text_size);
+			float const textlen = ui().get_string_width(tempbuf.c_str(), text_size);
 			float tmp_size3 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
-			ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
-					ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
+			ui().draw_text_full(
+					container(), tempbuf.c_str(),
+					origx1 + gutter_width, oy1, origx2 - origx1,
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					nullptr, nullptr,
+					tmp_size3);
 		}
 		else
 		{
-			ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
-					ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
+			ui().draw_text_full(
+					container(), tempbuf.c_str(),
+					origx1 + gutter_width, oy1, origx2 - origx1,
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					nullptr, nullptr,
+					text_size);
 		}
 
 		oy1 += (line_height * text_size);

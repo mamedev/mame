@@ -1188,50 +1188,52 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 {
 	std::ostringstream str;
 
-	util::stream_format(str, _("Romset: %1$-.100s\n"), driver->name);
-	util::stream_format(str, _("Year: %1$s\n"), driver->year);
-	util::stream_format(str, _("Manufacturer: %1$-.100s\n"), driver->manufacturer);
+	str << "#j2\n";
+
+	util::stream_format(str, _("Romset\t%1$-.100s\n"), driver->name);
+	util::stream_format(str, _("Year\t%1$s\n"), driver->year);
+	util::stream_format(str, _("Manufacturer\t%1$-.100s\n"), driver->manufacturer);
 
 	int cloneof = driver_list::non_bios_clone(*driver);
 	if (cloneof != -1)
-		util::stream_format(str, _("Driver is Clone of: %1$-.100s\n"), driver_list::driver(cloneof).type.fullname());
+		util::stream_format(str, _("Driver is Clone of\t%1$-.100s\n"), driver_list::driver(cloneof).type.fullname());
 	else
-		str << _("Driver is Parent:\n");
+		str << _("Driver is Parent\t\n");
 
 	if (driver->flags & machine_flags::NOT_WORKING)
-		str << _("Overall: NOT WORKING\n");
+		str << _("Overall\tNOT WORKING\n");
 	else if ((driver->type.unemulated_features() | driver->type.imperfect_features()) & device_t::feature::PROTECTION)
-		str << _("Overall: Unemulated Protection\n");
+		str << _("Overall\tUnemulated Protection\n");
 	else
-		str << _("Overall: Working\n");
+		str << _("Overall\tWorking\n");
 
 	if (driver->type.unemulated_features() & device_t::feature::GRAPHICS)
-		str << _("Graphics: Unimplemented\n");
+		str << _("Graphics\tUnimplemented\n");
 	else if (driver->type.unemulated_features() & device_t::feature::PALETTE)
-		str << ("Graphics: Wrong Colors\n");
+		str << ("Graphics\tWrong Colors\n");
 	else if (driver->type.imperfect_features() & device_t::feature::PALETTE)
-		str << _("Graphics: Imperfect Colors\n");
+		str << _("Graphics\tImperfect Colors\n");
 	else if (driver->type.imperfect_features() & device_t::feature::GRAPHICS)
-		str << _("Graphics: Imperfect\n");
+		str << _("Graphics\tImperfect\n");
 	else
-		str << _("Graphics: OK\n");
+		str << _("Graphics\tOK\n");
 
 	if (driver->flags & machine_flags::NO_SOUND_HW)
-		str << _("Sound: None\n");
+		str << _("Sound\tNone\n");
 	else if (driver->type.unemulated_features() & device_t::feature::SOUND)
-		str << _("Sound: Unimplemented\n");
+		str << _("Sound\tUnimplemented\n");
 	else if (driver->type.imperfect_features() & device_t::feature::SOUND)
-		str << _("Sound: Imperfect\n");
+		str << _("Sound\tImperfect\n");
 	else
-		str << _("Sound: OK\n");
+		str << _("Sound\tOK\n");
 
-	util::stream_format(str, _("Game is Mechanical: %1$s\n"), ((driver->flags & machine_flags::MECHANICAL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Artwork: %1$s\n"), ((driver->flags & machine_flags::REQUIRES_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Clickable Artwork: %1$s\n"), ((driver->flags & machine_flags::CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Cocktail: %1$s\n"), ((driver->flags & machine_flags::NO_COCKTAIL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Driver is Bios: %1$s\n"), ((driver->flags & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Save: %1$s\n"), ((driver->flags & machine_flags::SUPPORTS_SAVE) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Screen Orientation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
+	util::stream_format(str, _("Game is Mechanical\t%1$s\n"), ((driver->flags & machine_flags::MECHANICAL) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Requires Artwork\t%1$s\n"), ((driver->flags & machine_flags::REQUIRES_ARTWORK) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Requires Clickable Artwork\t%1$s\n"), ((driver->flags & machine_flags::CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Support Cocktail\t%1$s\n"), ((driver->flags & machine_flags::NO_COCKTAIL) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Driver is Bios\t%1$s\n"), ((driver->flags & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Support Save\t%1$s\n"), ((driver->flags & machine_flags::SUPPORTS_SAVE) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Screen Orientation\t%1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
 	auto entries = rom_build_entries(driver->rom);
 	for (const rom_entry &rom : entries)
@@ -1240,7 +1242,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 			found = true;
 			break;
 		}
-	util::stream_format(str, _("Requires CHD: %1$s\n"), found ? _("Yes") : _("No"));
+	util::stream_format(str, _("Requires CHD\t%1$s\n"), found ? _("Yes") : _("No"));
 
 	// audit the game first to see if we're going to work
 	if (ui().options().info_audit())
@@ -1253,38 +1255,20 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-			str << _("Roms Audit Pass: OK\n");
+			str << _("Roms Audit Pass\tOK\n");
 		else
-			str << _("Roms Audit Pass: BAD\n");
+			str << _("Roms Audit Pass\tBAD\n");
 
 		if (summary_samples == media_auditor::NONE_NEEDED)
-			str << _("Samples Audit Pass: None Needed\n");
+			str << _("Samples Audit Pass\tNone Needed\n");
 		else if (summary_samples == media_auditor::CORRECT || summary_samples == media_auditor::BEST_AVAILABLE)
-			str << _("Samples Audit Pass: OK\n");
+			str << _("Samples Audit Pass\tOK\n");
 		else
-			str << _("Samples Audit Pass: BAD\n");
+			str << _("Samples Audit Pass\tBAD\n");
 	}
 	else
-		str << _("Roms Audit Pass: Disabled\nSamples Audit Pass: Disabled\n");
+		str << _("Roms Audit Pass\tDisabled\nSamples Audit Pass\tDisabled\n");
 
-	std::istringstream istr(str.str());
-	std::string line;
-	float spacewid = ui().get_char_width(0x200a);
-	str.clear();
-	str.seekp(0);
-	str << "#jp\n";
-	while(std::getline(istr, line))
-	{
-		int nspace = floor((0.35 - ui().get_string_width(line.c_str())) / spacewid);
-		if(nspace < 5)
-			nspace = 5;
-		std::string newstr;
-		newstr.reserve((nspace * 3) + line.length());
-		newstr.append(line.substr(0, line.find(':')));
-		for(int i = 0; i < nspace; i++)
-			newstr.append("\xE2\x80\x8A");
-		str << newstr.append(line.substr(line.find(':') + 1, line.npos)).append("\n");
-	}
 	buffer = str.str();
 }
 
