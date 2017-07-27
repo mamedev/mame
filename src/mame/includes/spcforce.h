@@ -45,8 +45,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_WRITE8_MEMBER(soundtrigger_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(misc_outputs_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_w);
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(spcforce);
