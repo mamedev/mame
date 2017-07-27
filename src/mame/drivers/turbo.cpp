@@ -410,7 +410,7 @@ WRITE_LINE_MEMBER(turbo_state::coin_meter_1_w)
 
 WRITE_LINE_MEMBER(turbo_state::coin_meter_2_w)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
