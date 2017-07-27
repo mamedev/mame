@@ -32,6 +32,7 @@ public:
 	bool has_bioses() const { return m_has_bioses; }
 
 	// message colour
+	rgb_t status_color() const;
 	rgb_t warnings_color() const;
 
 private:

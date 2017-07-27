@@ -128,7 +128,7 @@ menu_select_launch::system_flags::system_flags(machine_static_info const &info)
 	: m_machine_flags(info.machine_flags())
 	, m_unemulated_features(info.unemulated_features())
 	, m_imperfect_features(info.imperfect_features())
-	, m_warnings_color(info.warnings_color())
+	, m_status_color(info.status_color())
 {
 }
 
@@ -699,9 +699,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		else
 			tempbuf[4].append(_("Sound: OK"));
 
-		color = flags.warnings_color();
-		if (UI_BACKGROUND_COLOR == color)
-			color = UI_GREEN_COLOR;
+		color = flags.status_color();
 	}
 	else
 	{

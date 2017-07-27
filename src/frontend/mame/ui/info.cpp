@@ -73,6 +73,22 @@ machine_static_info::machine_static_info(machine_config const &config)
 
 
 //-------------------------------------------------
+//  status_color - returns suitable colour for
+//  driver status box
+//-------------------------------------------------
+
+rgb_t machine_static_info::status_color() const
+{
+	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
+		return UI_RED_COLOR;
+	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
+		return UI_YELLOW_COLOR;
+	else
+		return UI_GREEN_COLOR;
+}
+
+
+//-------------------------------------------------
 //  warnings_color - returns suitable colour for
 //  warning message based on severity
 //-------------------------------------------------

@@ -56,13 +56,13 @@ protected:
 		::machine_flags::type machine_flags() const { return m_machine_flags; }
 		device_t::feature_type unemulated_features() const { return m_unemulated_features; }
 		device_t::feature_type imperfect_features() const { return m_imperfect_features; }
-		rgb_t warnings_color() const { return m_warnings_color; }
+		rgb_t status_color() const { return m_status_color; }
 
 	private:
 		::machine_flags::type   m_machine_flags;
 		device_t::feature_type  m_unemulated_features;
 		device_t::feature_type  m_imperfect_features;
-		rgb_t                   m_warnings_color;
+		rgb_t                   m_status_color;
 	};
 
 	class reselect_last
