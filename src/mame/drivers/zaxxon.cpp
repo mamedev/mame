@@ -310,9 +310,9 @@ WRITE_LINE_MEMBER(zaxxon_state::vblank_int)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::int_enable_w)
+WRITE_LINE_MEMBER(zaxxon_state::int_enable_w)
 {
-	m_int_enabled = data & 1;
+	m_int_enabled = state;
 	if (!m_int_enabled)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -330,7 +330,6 @@ void zaxxon_state::machine_start()
 	/* register for save states */
 	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_coin_status));
-	save_item(NAME(m_coin_enable));
 }
 
 
@@ -382,28 +381,44 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
+WRITE8_MEMBER(zaxxon_state::zaxxon_control_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
+	// address decode for E0F8/E0F9 (74LS138 @ U57) has its G2B enable input in common with this latch
+	bool a3 = BIT(offset, 3);
+	m_mainlatch[1]->write_bit((a3 ? 4 : 0) | (offset & 3), BIT(data, 0));
+	if (a3 && !BIT(offset, 1))
+		bg_position_w(space, offset & 1, data);
+}
+
+
+WRITE_LINE_MEMBER(zaxxon_state::coin_counter_a_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(zaxxon_state::coin_counter_b_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
 // There is no external coin lockout circuitry; instead, the pcb simply latches
-// the coin input, which then needs to be explicitly cleared by the game.
-WRITE8_MEMBER(zaxxon_state::zaxxon_coin_enable_w)
+// each coin input, which then needs to be explicitly cleared by the game.
+// Each coin input first passes through a debounce circuit consisting of a
+// LS175 quad flip-flop and LS10 3-input NAND gate, which is not emulated.
+WRITE_LINE_MEMBER(zaxxon_state::coin_enable_w)
 {
-	m_coin_enable[offset] = data & 1;
-	if (!m_coin_enable[offset])
-		m_coin_status[offset] = 0;
+	for (int n = 0; n < 3; n++)
+		if (!BIT(m_mainlatch[0]->output_state(), n))
+			m_coin_status[n] = 0;
 }
 
 
 INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 {
-	if (newval)
-	{
-		m_coin_status[(int)(uintptr_t)param] = m_coin_enable[(int)(uintptr_t)param];
-	}
+	if (newval && BIT(m_mainlatch[0]->output_state(), (int)(uintptr_t)param))
+		m_coin_status[(int)(uintptr_t)param] = 1;
 }
 
 
@@ -431,15 +446,9 @@ static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
 	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
-	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_enable_w)
-	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
-	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
+	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x18f8) AM_DEVWRITE("mainlatch1", ls259_device, write_d0)
 	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
-	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_fg_color_w)
-	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_position_w)
-	AM_RANGE(0xe0fa, 0xe0fa) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_color_w)
-	AM_RANGE(0xe0fb, 0xe0fb) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_enable_w)
+	AM_RANGE(0xe0f0, 0xe0f3) AM_MIRROR(0x1f00) AM_SELECT(0x0008) AM_WRITE(zaxxon_control_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, zaxxon_state )
@@ -457,15 +466,9 @@ static ADDRESS_MAP_START( ixion_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
 	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
-	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_enable_w)
-	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
-	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
+	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x18f8) AM_DEVWRITE("mainlatch1", ls259_device, write_d0)
 	AM_RANGE(0xe03c, 0xe03c) AM_MIRROR(0x1f00) AM_DEVREADWRITE("usbsnd", usb_sound_device, status_r, data_w)
-	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
-	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_fg_color_w)
-	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_position_w)
-	AM_RANGE(0xe0fa, 0xe0fa) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_color_w)
-	AM_RANGE(0xe0fb, 0xe0fb) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_enable_w)
+	AM_RANGE(0xe0f0, 0xe0f3) AM_MIRROR(0x1f00) AM_SELECT(0x0008) AM_WRITE(zaxxon_control_w)
 ADDRESS_MAP_END
 
 
@@ -480,16 +483,9 @@ static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW03")
 	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("SW100")
-	AM_RANGE(0xc018, 0xc01a) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_enable_w)
-	AM_RANGE(0xc01b, 0xc01c) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_counter_w)
-	AM_RANGE(0xc01d, 0xc01d) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_bg_enable_w)
-	AM_RANGE(0xc01e, 0xc01e) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_flipscreen_w)
-	AM_RANGE(0xc01f, 0xc01f) AM_MIRROR(0x1fc0) AM_WRITE(int_enable_w)
-	AM_RANGE(0xc021, 0xc021) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_fg_color_w)
-	AM_RANGE(0xc023, 0xc023) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_bg_color_w)
-	AM_RANGE(0xc026, 0xc026) AM_MIRROR(0x1fc0) AM_WRITE(congo_fg_bank_w)
-	AM_RANGE(0xc027, 0xc027) AM_MIRROR(0x1fc0) AM_WRITE(congo_color_bank_w)
-	AM_RANGE(0xc028, 0xc029) AM_MIRROR(0x1fc4) AM_WRITE(zaxxon_bg_position_w)
+	AM_RANGE(0xc018, 0xc01f) AM_MIRROR(0x1fc0) AM_DEVWRITE("mainlatch1", ls259_device, write_d0)
+	AM_RANGE(0xc020, 0xc027) AM_MIRROR(0x1fc0) AM_DEVWRITE("mainlatch2", ls259_device, write_d0)
+	AM_RANGE(0xc028, 0xc029) AM_MIRROR(0x1fc4) AM_WRITE(bg_position_w)
 	AM_RANGE(0xc030, 0xc033) AM_MIRROR(0x1fc4) AM_WRITE(congo_sprite_custom_w)
 	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x1fc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
@@ -925,6 +921,20 @@ static MACHINE_CONFIG_START( root )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, zaxxon_sound_b_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, zaxxon_sound_c_w))
 
+	MCFG_DEVICE_ADD("mainlatch1", LS259, 0) // U55 on Zaxxon IC Board A
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN A
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN B
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // SERV EN
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, coin_counter_a_w)) // COUNT A
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(zaxxon_state, coin_counter_b_w)) // COUNT B
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, flipscreen_w)) // FLIP
+
+	MCFG_DEVICE_ADD("mainlatch2", LS259, 0) // U56 on Zaxxon IC Board A
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, fg_color_w)) // CREF 1
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaxxon)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1009,6 +1019,9 @@ static MACHINE_CONFIG_DERIVED( ixion, razmataze )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
+
+	MCFG_DEVICE_MODIFY("mainlatch1")
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // flip screen not used
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( congo, root )
@@ -1016,11 +1029,20 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(congo_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_DEVICE_REPLACE("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, congo_sound_b_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, congo_sound_c_w))
+
+	MCFG_DEVICE_MODIFY("mainlatch1") // U52 on Control Board
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
+
+	MCFG_DEVICE_MODIFY("mainlatch2") // U53 on Control Board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // not used
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, congo_fg_bank_w)) // BS
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, congo_color_bank_w)) // CBS
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
