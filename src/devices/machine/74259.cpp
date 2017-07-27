@@ -281,6 +281,17 @@ WRITE8_MEMBER(addressable_latch_device::write_a0)
 }
 
 //-------------------------------------------------
+//  write_a3 - write handler that uses three
+//  lowest bits of address bus as address and
+//  fourth lowest as data input
+//-------------------------------------------------
+
+WRITE8_MEMBER(addressable_latch_device::write_a3)
+{
+	write_bit(offset & 7, (offset & 8) >> 3);
+}
+
+//-------------------------------------------------
 //  write_nibble - write handler using LSB of
 //  data as input and next three bits as address
 //  (offset is ignored)

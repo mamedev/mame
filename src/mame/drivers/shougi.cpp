@@ -96,7 +96,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_alpha_8201(*this, "alpha_8201"),
-		m_mainlatch(*this, "mainlatch"),
 		m_videoram(*this, "videoram")
 	{ }
 
@@ -104,14 +103,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<alpha_8201_device> m_alpha_8201;
-	required_device<ls259_device> m_mainlatch;
 
 	required_shared_ptr<uint8_t> m_videoram;
 
 	uint8_t m_nmi_enabled;
 	int m_r;
 
-	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
@@ -230,14 +227,6 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 // maincpu side
 
-WRITE8_MEMBER(shougi_state::control_w)
-{
-	// 4800-480f connected to the 74LS259, A3 is data line
-	// so 4800-4807 write 0, and 4808-480f write 1
-	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
-}
-
-
 WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 {
 	m_nmi_enabled = state;
@@ -254,7 +243,7 @@ WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM /* 2114 x 2 (0x400 x 4bit each) */
-	AM_RANGE(0x4800, 0x480f) AM_WRITE(control_w)
+	AM_RANGE(0x4800, 0x480f) AM_DEVWRITE("mainlatch", ls259_device, write_a3)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW")
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* game won't boot if watchdog doesn't work */
