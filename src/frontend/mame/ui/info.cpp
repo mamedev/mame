@@ -43,19 +43,62 @@ constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
 } // anonymous namespace
 
 
+
+//-------------------------------------------------
+//  machine_static_info - constructor
+//-------------------------------------------------
+
+
+machine_static_info::machine_static_info(machine_config const &config)
+	: m_flags(config.gamedrv().flags)
+	, m_unemulated_features(config.gamedrv().type.unemulated_features())
+	, m_imperfect_features(config.gamedrv().type.imperfect_features())
+	, m_has_bioses(false)
+{
+
+	// build overall emulation status and look for BIOS options
+	for (device_t &device : device_iterator(config.root_device()))
+	{
+		if (dynamic_cast<device_sound_interface *>(&device))
+			m_flags &= ~::machine_flags::NO_SOUND_HW;
+
+		m_unemulated_features |= device.type().unemulated_features();
+		m_imperfect_features |= device.type().imperfect_features();
+
+		for (const rom_entry &rom : device.rom_region_vector())
+			if (ROMENTRY_ISSYSTEM_BIOS(&rom)) { m_has_bioses = true; break; }
+	}
+	m_imperfect_features &= ~m_unemulated_features;
+}
+
+
+//-------------------------------------------------
+//  warnings_color - returns suitable colour for
+//  warning message based on severity
+//-------------------------------------------------
+
+rgb_t machine_static_info::warnings_color() const
+{
+	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
+		return UI_RED_COLOR;
+	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
+		return UI_YELLOW_COLOR;
+	else
+		return UI_BACKGROUND_COLOR;
+}
+
+
+
 //-------------------------------------------------
 //  machine_info - constructor
 //-------------------------------------------------
 
 machine_info::machine_info(running_machine &machine)
-	: m_machine(machine)
-	, m_flags(m_machine.system().flags)
-	, m_unemulated_features(m_machine.system().type.unemulated_features())
-	, m_imperfect_features(m_machine.system().type.imperfect_features())
+	: machine_static_info(machine.config())
+	, m_machine(machine)
 	, m_has_configs(false)
 	, m_has_analog(false)
 	, m_has_dips(false)
-	, m_has_bioses(false)
 	, m_has_keyboard(false)
 	, m_has_test_switch(false)
 {
@@ -76,20 +119,6 @@ machine_info::machine_info(running_machine &machine)
 				m_has_analog = true;
 		}
 	}
-
-	// build overall emulation status and look for BIOS options
-	for (device_t &device : device_iterator(machine.root_device()))
-	{
-		if (dynamic_cast<device_sound_interface *>(&device))
-			m_flags &= ~machine_flags::NO_SOUND_HW;
-
-		m_unemulated_features |= device.type().unemulated_features();
-		m_imperfect_features |= device.type().imperfect_features();
-
-		for (const rom_entry &rom : device.rom_region_vector())
-			if (ROMENTRY_ISSYSTEM_BIOS(&rom)) { m_has_bioses = true; break; }
-	}
-	m_imperfect_features &= ~m_unemulated_features;
 }
 
 
@@ -114,7 +143,7 @@ std::string machine_info::warnings_string() const
 		buf << m_machine.rom_load().software_load_warnings_message();
 
 	// if we have at least one warning flag, print the general header
-	if ((m_machine.rom_load().knownbad() > 0) || (m_flags & (MACHINE_WARNINGS | MACHINE_BTANB)) || m_unemulated_features || m_imperfect_features)
+	if ((m_machine.rom_load().knownbad() > 0) || (machine_flags() & (MACHINE_WARNINGS | MACHINE_BTANB)) || unemulated_features() || imperfect_features())
 	{
 		if (!buf.str().empty())
 			buf << '\n';
@@ -126,13 +155,13 @@ std::string machine_info::warnings_string() const
 		buf << _("One or more ROMs/CHDs for this machine have not been correctly dumped.\n");
 
 	// add line for unemulated features
-	if (m_unemulated_features)
+	if (unemulated_features())
 	{
 		buf << _("Completely unemulated features: ");
 		bool first = true;
 		for (auto const &feature : FEATURE_NAMES)
 		{
-			if (m_unemulated_features & feature.first)
+			if (unemulated_features() & feature.first)
 			{
 				util::stream_format(buf, first ? _("%s") : _(", %s"), _(feature.second));
 				first = false;
@@ -142,13 +171,13 @@ std::string machine_info::warnings_string() const
 	}
 
 	// add line for imperfect features
-	if (m_imperfect_features)
+	if (imperfect_features())
 	{
 		buf << _("Imperfectly emulated features: ");
 		bool first = true;
 		for (auto const &feature : FEATURE_NAMES)
 		{
-			if (m_imperfect_features & feature.first)
+			if (imperfect_features() & feature.first)
 			{
 				util::stream_format(buf, first ? _("%s") : _(", %s"), _(feature.second));
 				first = false;
@@ -158,22 +187,22 @@ std::string machine_info::warnings_string() const
 	}
 
 	// add one line per machine warning flag
-	if (m_flags & machine_flags::NO_COCKTAIL)
+	if (machine_flags() & ::machine_flags::NO_COCKTAIL)
 		buf << _("Screen flipping in cocktail mode is not supported.\n");
-	if (m_flags & machine_flags::REQUIRES_ARTWORK) // check if external artwork is present before displaying this warning?
+	if (machine_flags() & ::machine_flags::REQUIRES_ARTWORK) // check if external artwork is present before displaying this warning?
 		buf << _("This machine requires external artwork files.\n");
-	if (m_flags & machine_flags::IS_INCOMPLETE )
+	if (machine_flags() & ::machine_flags::IS_INCOMPLETE )
 		buf << _("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
-	if (m_flags & machine_flags::NO_SOUND_HW )
+	if (machine_flags() & ::machine_flags::NO_SOUND_HW )
 		buf << _("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 
 	// these are more severe warnings
-	if (m_flags & machine_flags::NOT_WORKING)
+	if (machine_flags() & ::machine_flags::NOT_WORKING)
 		buf << _("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
-	if (m_flags & machine_flags::MECHANICAL)
+	if (machine_flags() & ::machine_flags::MECHANICAL)
 		buf << _("\nElements of this machine cannot be emulated as they requires physical interaction or consist of mechanical devices. It is not possible to fully experience this machine.\n");
 
-	if ((m_flags & MACHINE_ERRORS) || ((m_machine.system().type.unemulated_features() | m_machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
+	if ((machine_flags() & MACHINE_ERRORS) || ((m_machine.system().type.unemulated_features() | m_machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
 	{
 		// find the parent of this driver
 		driver_enumerator drivlist(m_machine.options());
@@ -369,22 +398,6 @@ std::string machine_info::get_screen_desc(screen_device &screen) const
 		return string_format(_("Screen '%1$s'"), screen.tag());
 	else
 		return _("Screen");
-}
-
-
-//-------------------------------------------------
-//  warnings_color - returns suitable colour for
-//  warning message based on severity
-//-------------------------------------------------
-
-rgb_t machine_info::warnings_color() const
-{
-	if ((m_flags & MACHINE_ERRORS) || ((m_unemulated_features | m_imperfect_features) & device_t::feature::PROTECTION))
-		return UI_RED_COLOR;
-	else if ((m_flags & MACHINE_WARNINGS) || m_unemulated_features || m_imperfect_features)
-		return UI_YELLOW_COLOR;
-	else
-		return UI_BACKGROUND_COLOR;
 }
 
 

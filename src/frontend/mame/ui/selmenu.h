@@ -24,6 +24,9 @@
 struct ui_software_info;
 
 namespace ui {
+
+class machine_static_info;
+
 class menu_select_launch : public menu
 {
 public:
@@ -35,10 +38,31 @@ protected:
 	// tab navigation
 	enum class focused_menu
 	{
-		main,
-		left,
-		righttop,
-		rightbottom
+		MAIN,
+		LEFT,
+		RIGHTTOP,
+		RIGHTBOTTOM
+	};
+
+	class system_flags
+	{
+	public:
+		system_flags(machine_static_info const &info);
+		system_flags(system_flags const &) = default;
+		system_flags(system_flags &&) = default;
+		system_flags &operator=(system_flags const &) = default;
+		system_flags &operator=(system_flags &&) = default;
+
+		::machine_flags::type machine_flags() const { return m_machine_flags; }
+		device_t::feature_type unemulated_features() const { return m_unemulated_features; }
+		device_t::feature_type imperfect_features() const { return m_imperfect_features; }
+		rgb_t warnings_color() const { return m_warnings_color; }
+
+	private:
+		::machine_flags::type   m_machine_flags;
+		device_t::feature_type  m_unemulated_features;
+		device_t::feature_type  m_imperfect_features;
+		rgb_t                   m_warnings_color;
 	};
 
 	class reselect_last
@@ -68,6 +92,8 @@ protected:
 
 	bool dismiss_error();
 	void set_error(reset_options ropt, std::string &&message);
+
+	system_flags const &get_system_flags(game_driver const &driver);
 
 	void launch_system(game_driver const &driver) { launch_system(ui(), driver, nullptr, nullptr, nullptr); }
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo) { launch_system(ui(), driver, &swinfo, nullptr, nullptr); }
@@ -141,6 +167,7 @@ private:
 	using cache_ptr = std::shared_ptr<cache>;
 	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
 
+	using flags_cache = util::lru_cache_map<game_driver const *, system_flags>;
 	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
 
 	static constexpr std::size_t MAX_ICONS_RENDER = 128;
@@ -234,6 +261,7 @@ private:
 
 	int                     m_right_visible_lines;  // right box lines
 
+	flags_cache             m_flags;
 	icon_cache              m_icons;
 
 	static std::mutex       s_cache_guard;

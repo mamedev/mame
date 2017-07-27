@@ -142,11 +142,11 @@ void menu_select_software::handle()
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			// handle selections
-			if (get_focus() == focused_menu::main)
+			if (get_focus() == focused_menu::MAIN)
 			{
 				inkey_select(menu_event);
 			}
-			else if (get_focus() == focused_menu::left)
+			else if (get_focus() == focused_menu::LEFT)
 			{
 				l_sw_hover = highlight;
 				check_filter = true;
@@ -321,7 +321,7 @@ void menu_select_software::handle()
 			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-		else if (menu_event->iptkey == IPT_OTHER && get_focus() == focused_menu::left)
+		else if (menu_event->iptkey == IPT_OTHER && get_focus() == focused_menu::LEFT)
 		{
 			l_sw_hover = highlight;
 			check_filter = true;
@@ -1038,7 +1038,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 				hover = phover + filter;
 			}
 
-			if (highlight == filter && get_focus() == focused_menu::left)
+			if (highlight == filter && get_focus() == focused_menu::LEFT)
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);

@@ -205,14 +205,14 @@ void menu_select_game::handle()
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			// handle selections
-			if (get_focus() == focused_menu::main)
+			if (get_focus() == focused_menu::MAIN)
 			{
 				if (isfavorite())
 					inkey_select_favorite(menu_event);
 				else
 					inkey_select(menu_event);
 			}
-			else if (get_focus() == focused_menu::left)
+			else if (get_focus() == focused_menu::LEFT)
 			{
 				l_hover = highlight;
 				check_filter = true;
@@ -440,7 +440,7 @@ void menu_select_game::handle()
 		}
 		else if (menu_event->iptkey == IPT_OTHER)
 		{
-			set_focus(focused_menu::left);
+			set_focus(focused_menu::LEFT);
 			m_prev_selected = nullptr;
 			l_hover = highlight;
 			check_filter = true;
@@ -1186,6 +1186,7 @@ void menu_select_game::populate_search()
 
 void menu_select_game::general_info(const game_driver *driver, std::string &buffer)
 {
+	system_flags const &flags(get_system_flags(*driver));
 	std::ostringstream str;
 
 	str << "#j2\n";
@@ -1200,40 +1201,85 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else
 		str << _("Driver is Parent\t\n");
 
-	if (driver->flags & machine_flags::NOT_WORKING)
+	if (flags.machine_flags() & machine_flags::NOT_WORKING)
 		str << _("Overall\tNOT WORKING\n");
-	else if ((driver->type.unemulated_features() | driver->type.imperfect_features()) & device_t::feature::PROTECTION)
+	else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
 		str << _("Overall\tUnemulated Protection\n");
 	else
 		str << _("Overall\tWorking\n");
 
-	if (driver->type.unemulated_features() & device_t::feature::GRAPHICS)
+	if (flags.unemulated_features() & device_t::feature::GRAPHICS)
 		str << _("Graphics\tUnimplemented\n");
-	else if (driver->type.unemulated_features() & device_t::feature::PALETTE)
+	else if (flags.unemulated_features() & device_t::feature::PALETTE)
 		str << ("Graphics\tWrong Colors\n");
-	else if (driver->type.imperfect_features() & device_t::feature::PALETTE)
+	else if (flags.imperfect_features() & device_t::feature::PALETTE)
 		str << _("Graphics\tImperfect Colors\n");
-	else if (driver->type.imperfect_features() & device_t::feature::GRAPHICS)
+	else if (flags.imperfect_features() & device_t::feature::GRAPHICS)
 		str << _("Graphics\tImperfect\n");
 	else
 		str << _("Graphics\tOK\n");
 
-	if (driver->flags & machine_flags::NO_SOUND_HW)
+	if (flags.machine_flags() & machine_flags::NO_SOUND_HW)
 		str << _("Sound\tNone\n");
-	else if (driver->type.unemulated_features() & device_t::feature::SOUND)
+	else if (flags.unemulated_features() & device_t::feature::SOUND)
 		str << _("Sound\tUnimplemented\n");
-	else if (driver->type.imperfect_features() & device_t::feature::SOUND)
+	else if (flags.imperfect_features() & device_t::feature::SOUND)
 		str << _("Sound\tImperfect\n");
 	else
 		str << _("Sound\tOK\n");
 
-	util::stream_format(str, _("Game is Mechanical\t%1$s\n"), ((driver->flags & machine_flags::MECHANICAL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Artwork\t%1$s\n"), ((driver->flags & machine_flags::REQUIRES_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Clickable Artwork\t%1$s\n"), ((driver->flags & machine_flags::CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Cocktail\t%1$s\n"), ((driver->flags & machine_flags::NO_COCKTAIL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Driver is Bios\t%1$s\n"), ((driver->flags & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Save\t%1$s\n"), ((driver->flags & machine_flags::SUPPORTS_SAVE) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Screen Orientation\t%1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
+	if (flags.unemulated_features() & device_t::feature::CONTROLS)
+		str << _("Controls\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CONTROLS)
+		str << _("Controls\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::KEYBOARD)
+		str << _("Keyboard\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::KEYBOARD)
+		str << _("Keyboard\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::MOUSE)
+		str << _("Mouse\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MOUSE)
+		str << _("Mouse\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::CAMERA)
+		str << _("Camera\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CAMERA)
+		str << _("Camera\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::DISK)
+		str << _("Disk\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::DISK)
+		str << _("Disk\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::PRINTER)
+		str << _("Printer\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::PRINTER)
+		str << _("Printer\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::LAN)
+		str << _("LAN\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::LAN)
+		str << _("LAN\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::WAN)
+		str << _("WAN\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::WAN)
+		str << _("WAN\tImperfect\n");
+
+	util::stream_format(str, _("Mechanical Machine\t%1$s\n"), ((flags.machine_flags() & machine_flags::MECHANICAL) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Requires Artwork\t%1$s\n"), ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Requires Clickable Artwork\t%1$s\n"), ((flags.machine_flags() & machine_flags::CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Support Cocktail\t%1$s\n"), ((flags.machine_flags() & machine_flags::NO_COCKTAIL) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Driver is Bios\t%1$s\n"), ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Support Save\t%1$s\n"), ((flags.machine_flags() & machine_flags::SUPPORTS_SAVE) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Screen Orientation\t%1$s\n"), ((flags.machine_flags() & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
 	auto entries = rom_build_entries(driver->rom);
 	for (const rom_entry &rom : entries)
@@ -1510,7 +1556,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 				menu::highlight(x1, y1, x2, y1 + line_height_max, bgcolor);
 			}
 
-			if (highlight == filter && get_focus() == focused_menu::left)
+			if (highlight == filter && get_focus() == focused_menu::LEFT)
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
