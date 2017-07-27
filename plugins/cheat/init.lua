@@ -82,6 +82,7 @@ function cheat.startplugin()
 	local cheatname = ""
 	local consolelog = nil
 	local consolelast = 0
+	local perodicset = false
 	local watches = {}
 	local breaks = {}
 
@@ -255,11 +256,13 @@ function cheat.startplugin()
 	end
 
 	local function periodiccb()
+		local last = consolelast
 		local msg = consolelog[#consolelog]
-		if #consolelog > consolelast and msg:find("Stopped at", 1, true) then
-			local point = msg:match("Stopped at breakpoint ([0-9]+)")
+		consolelast = #consolelog
+		if #consolelog > last and msg:find("Stopped at", 1, true) then
+			local point = tonumber(msg:match("Stopped at breakpoint ([0-9]+)"))
 			if not point then
-				point = msg:match("Stopped at watchpoint ([0-9]+")
+				point = tonumber(msg:match("Stopped at watchpoint ([0-9]+"))
 				if not point then
 					return -- ??
 				end
@@ -270,15 +273,14 @@ function cheat.startplugin()
 					-- don't use an b/wpset action because that will supress the b/wp index
 					manager:machine():debugger().execution_state = "run"
 				end
-				return
-			end
-			local bp = breaks[point]
-			if bp then
-				run_if(bp.cheat, bp.func)
-				manager:machine():debugger().execution_state = "run"
+			else
+				local bp = breaks[point]
+				if bp then
+					run_if(bp.cheat, bp.func)
+					manager:machine():debugger().execution_state = "run"
+				end
 			end
 		end
-		consolelast = #consolelog
 	end
 
 	local function bpset(cheat, dev, addr, func)
@@ -364,7 +366,10 @@ function cheat.startplugin()
 						wpset = function(space, wptype, addr, len, func) wpset(cheat, dev, space, wptype, addr, len, func) end }
 					cheat.bp = {}
 					cheat.wp = {}
-					emu.register_periodic(periodic_cb)
+					if not periodicset then
+						emu.register_periodic(periodic_cb)
+						periodicset = true
+					end
 				end
 			end
 		end
