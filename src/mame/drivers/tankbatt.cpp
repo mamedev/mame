@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(tankbatt_state::demo_interrupt_enable_w)
 
 WRITE_LINE_MEMBER(tankbatt_state::sh_expl_w)
 {
-	if (m_sound_enable)
+	if (state) // rising edge
 	{
 		m_samples->start(1, 3);
 	}
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER(tankbatt_state::sh_engine_w)
 
 WRITE_LINE_MEMBER(tankbatt_state::sh_fire_w)
 {
-	if (m_sound_enable)
+	if (state) // rising edge
 	{
 		m_samples->start(0, 0);
 	}
