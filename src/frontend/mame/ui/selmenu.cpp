@@ -128,6 +128,8 @@ menu_select_launch::system_flags::system_flags(machine_static_info const &info)
 	: m_machine_flags(info.machine_flags())
 	, m_unemulated_features(info.unemulated_features())
 	, m_imperfect_features(info.imperfect_features())
+	, m_has_keyboard(info.has_keyboard())
+	, m_has_analog(info.has_analog())
 	, m_status_color(info.status_color())
 {
 }
