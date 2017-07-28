@@ -53,6 +53,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 
@@ -628,16 +629,12 @@ DECLARE_ENUM_INCDEC_OPERATORS(item_layer)
 // a layout_element is a single named element, which may have multiple components
 class layout_element
 {
-	friend class simple_list<layout_element>;
-
 public:
 	// construction/destruction
 	layout_element(running_machine &machine, util::xml::data_node const &elemnode, const char *dirname);
 	virtual ~layout_element();
 
 	// getters
-	layout_element *next() const { return m_next; }
-	const char *name() const { return m_name.c_str(); }
 	running_machine &machine() const { return m_machine; }
 	int default_state() const { return m_defstate; }
 	int maxstate() const { return m_maxstate; }
@@ -686,220 +683,20 @@ private:
 		render_color        m_color;                    // color of the element
 	};
 
-	// image
-	class image_component : public component
-	{
-	public:
-		// construction/destruction
-		image_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-
-	private:
-		// internal helpers
-		void load_bitmap();
-
-		// internal state
-		bitmap_argb32       m_bitmap;                   // source bitmap for images
-		std::string         m_dirname;                  // directory name of image file (for lazy loading)
-		std::unique_ptr<emu_file> m_file;               // file object for reading image/alpha files
-		std::string         m_imagefile;                // name of the image file (for lazy loading)
-		std::string         m_alphafile;                // name of the alpha file (for lazy loading)
-		bool                m_hasalpha;                 // is there any alpha component present?
-	};
-
-	// rectangle
-	class rect_component : public component
-	{
-	public:
-		// construction/destruction
-		rect_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// ellipse
-	class disk_component : public component
-	{
-	public:
-		// construction/destruction
-		disk_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// text string
-	class text_component : public component
-	{
-	public:
-		// construction/destruction
-		text_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-
-	private:
-		// internal state
-		std::string         m_string;                   // string for text components
-		int                 m_textalign;                // text alignment to box
-	};
-
-	// 7-segment LCD
-	class led7seg_component : public component
-	{
-	public:
-		// construction/destruction
-		led7seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return 255; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// 8-segment fluorescent (Gottlieb System 1)
-	class led8seg_gts1_component : public component
-	{
-	public:
-		// construction/destruction
-		led8seg_gts1_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return 255; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// 14-segment LCD
-	class led14seg_component : public component
-	{
-	public:
-		// construction/destruction
-		led14seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return 16383; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// 16-segment LCD
-	class led16seg_component : public component
-	{
-	public:
-		// construction/destruction
-		led16seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return 65535; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// 14-segment LCD with semicolon (2 extra segments)
-	class led14segsc_component : public component
-	{
-	public:
-		// construction/destruction
-		led14segsc_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return 65535; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// 16-segment LCD with semicolon (2 extra segments)
-	class led16segsc_component : public component
-	{
-	public:
-		// construction/destruction
-		led16segsc_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return 262143; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-	};
-
-	// row of dots for a dotmatrix
-	class dotmatrix_component : public component
-	{
-	public:
-		// construction/destruction
-		dotmatrix_component(int dots, running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return (1 << m_dots) - 1; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-
-	private:
-		// internal state
-		int                 m_dots;
-	};
-
-	// simple counter
-	class simplecounter_component : public component
-	{
-	public:
-		// construction/destruction
-		simplecounter_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return m_maxstate; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-
-	private:
-		// internal state
-		int                 m_digits;                   // number of digits for simple counters
-		int                 m_textalign;                // text alignment to box
-		int                 m_maxstate;
-	};
-
-	// fruit machine reel
-	class reel_component : public component
-	{
-		static constexpr unsigned MAX_BITMAPS = 32;
-
-	public:
-		// construction/destruction
-		reel_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-
-	protected:
-		// overrides
-		virtual int maxstate() const override { return 65535; }
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
-
-	private:
-		// internal helpers
-		void draw_beltreel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
-		void load_reel_bitmap(int number);
-
-		// internal state
-		bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
-		std::string         m_dirname;                  // directory name of image file (for lazy loading)
-		std::unique_ptr<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
-		std::string         m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
-		std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
-		bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
-
-		// basically made up of multiple text strings / gfx
-		int                 m_numstops;
-		std::string         m_stopnames[MAX_BITMAPS];
-		int                 m_stateoffset;
-		int                 m_reelreversed;
-		int                 m_numsymbolsvisible;
-		int                 m_beltreel;
-	};
+	// component implementations
+	class image_component;
+	class rect_component;
+	class disk_component;
+	class text_component;
+	class led7seg_component;
+	class led8seg_gts1_component;
+	class led14seg_component;
+	class led16seg_component;
+	class led14segsc_component;
+	class led16segsc_component;
+	class dotmatrix_component;
+	class simplecounter_component;
+	class reel_component;
 
 	// a texture encapsulates a texture for a given element in a given state
 	class texture
@@ -930,9 +727,7 @@ private:
 	static make_component_map const s_make_component; // maps component XML names to creator functions
 
 	// internal state
-	layout_element *            m_next;         // link to next element
 	running_machine &           m_machine;      // reference to the owning machine
-	std::string                 m_name;         // name of this element
 	std::vector<component::ptr> m_complist;     // list of components
 	int                         m_defstate;     // default state of this element
 	int                         m_maxstate;     // maximum state value for all components
@@ -948,6 +743,8 @@ class layout_view
 	friend class simple_list<layout_view>;
 
 public:
+	using element_map = std::unordered_map<std::string, layout_element>;
+
 	// an item is a single backdrop, screen, overlay, bezel, cpanel, or marquee item
 	class item
 	{
@@ -956,7 +753,7 @@ public:
 
 	public:
 		// construction/destruction
-		item(running_machine &machine, util::xml::data_node const &itemnode, simple_list<layout_element> &elemlist);
+		item(running_machine &machine, util::xml::data_node const &itemnode, element_map &elemmap);
 		virtual ~item();
 
 		// getters
@@ -992,7 +789,7 @@ public:
 	};
 
 	// construction/destruction
-	layout_view(running_machine &machine, util::xml::data_node const &viewnode, simple_list<layout_element> &elemlist);
+	layout_view(running_machine &machine, util::xml::data_node const &viewnode, element_map &elemmap);
 	virtual ~layout_view();
 
 	// getters
@@ -1044,19 +841,21 @@ class layout_file
 	friend class simple_list<layout_file>;
 
 public:
+	using element_map = std::unordered_map<std::string, layout_element>;
+
 	// construction/destruction
 	layout_file(running_machine &machine, util::xml::data_node const &rootnode, const char *dirname);
 	virtual ~layout_file();
 
 	// getters
 	layout_file *next() const { return m_next; }
-	const simple_list<layout_element> &elements() const { return m_elemlist; }
+	const element_map &elements() const { return m_elemmap; }
 	const simple_list<layout_view> &views() const { return m_viewlist; }
 
 private:
 	// internal state
 	layout_file *       m_next;             // pointer to the next file in the list
-	simple_list<layout_element> m_elemlist; // list of shared layout elements
+	element_map         m_elemmap;          // list of shared layout elements
 	simple_list<layout_view> m_viewlist;    // list of views
 };
 
