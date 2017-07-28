@@ -12,9 +12,10 @@
 
 #include "ui/simpleselgame.h"
 
-#include "ui/ui.h"
+#include "ui/info.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
+#include "ui/ui.h"
 #include "ui/utils.h"
 
 #include "audit.h"
@@ -27,11 +28,21 @@
 
 
 namespace ui {
+
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
-simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename) : menu(mui, container), m_driverlist(driver_list::total() + 1)
+simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename)
+	: menu(mui, container)
+	, m_error(false), m_rerandomize(false)
+	, m_search()
+	, m_driverlist(driver_list::total() + 1)
+	, m_drivlist()
+	, m_cached_driver(nullptr)
+	, m_cached_flags(machine_flags::NOT_WORKING)
+	, m_cached_unemulated(device_t::feature::NONE), m_cached_imperfect(device_t::feature::NONE)
+	, m_cached_color(UI_BACKGROUND_COLOR)
 {
 	build_driver_list();
 	if (gamename)
@@ -63,10 +74,9 @@ void simple_menu_select_game::build_driver_list()
 
 	// open a path to the ROMs and find them in the array
 	file_enumerator path(machine().options().media_path());
-	const osd::directory::entry *dir;
 
 	// iterate while we get new objects
-	while ((dir = path.next()) != nullptr)
+	for (const osd::directory::entry *dir = path.next(); dir; dir = path.next())
 	{
 		char drivername[50];
 		char *dst = drivername;
@@ -133,10 +143,13 @@ void simple_menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	if (m_error)
-		ui().draw_text_box(container(),
-							"The selected game is missing one or more required ROM or CHD images. "
-							"Please select a different game.\n\nPress any key to continue.",
-							ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	{
+		ui().draw_text_box(
+				container(),
+				_("The selected game is missing one or more required ROM or CHD images. "
+				"Please select a different game.\n\nPress any key to continue."),
+				ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	}
 }
 
 
@@ -160,17 +173,16 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 		media_auditor auditor(enumerator);
 		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
-		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
+			// if everything looks good, schedule the new driver
 			mame_machine_manager::instance()->schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
 			stack_reset();
 		}
-
-		// otherwise, display an error
 		else
 		{
+			// otherwise, display an error
 			reset(reset_options::REMEMBER_REF);
 			m_error = true;
 		}
@@ -220,7 +232,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	int curitem;
 
 	for (curitem = matchcount = 0; m_driverlist[curitem] != nullptr && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
-		if (!(m_driverlist[curitem]->flags & MACHINE_NO_STANDALONE))
+		if (!(m_driverlist[curitem]->flags & machine_flags::NO_STANDALONE))
 			matchcount++;
 
 	// if nothing there, add a single multiline item and return
@@ -277,7 +289,6 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	float width, maxwidth;
 	float x1, y1, x2, y2;
 	std::string tempbuf[5];
-	rgb_t color;
 	int line;
 
 	// display the current typeahead
@@ -287,8 +298,12 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[0] = _("Type name or select: (random)");
 
 	// get the size of the text
-	ui().draw_text_full(container(), tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
+	ui().draw_text_full(
+			container(), tempbuf[0].c_str(),
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+			&width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = std::max(width, origx2 - origx1);
 
@@ -307,15 +322,17 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container(), tempbuf[0].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-						mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(
+			container(), tempbuf[0].c_str(),
+			x1, y1, x2 - x1,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+			nullptr, nullptr);
 
 	// determine the text to render below
 	driver = ((uintptr_t)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
-	if (driver != nullptr)
+	if (driver)
 	{
-		const char *gfxstat, *soundstat;
-
 		// first line is game name
 		tempbuf[0] = string_format(_("%1$-.100s"), driver->type.fullname());
 
@@ -325,23 +342,41 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		// next line source path
 		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->type.source()));
 
+		// update cached values if selection changed
+		if (driver != m_cached_driver)
+		{
+			emu_options clean_options;
+			machine_static_info const info(machine_config(*driver, clean_options));
+			m_cached_driver = driver;
+			m_cached_flags = info.machine_flags();
+			m_cached_unemulated = info.unemulated_features();
+			m_cached_imperfect = info.imperfect_features();
+			m_cached_color = info.status_color();
+		}
+
 		// next line is overall driver status
-		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3].assign(_("Overall: NOT WORKING"));
-		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3].assign(_("Overall: Unemulated Protection"));
+		if (m_cached_flags & machine_flags::NOT_WORKING)
+			tempbuf[3] = _("Overall: NOT WORKING");
+		else if ((m_cached_unemulated | m_cached_imperfect) & device_t::feature::PROTECTION)
+			tempbuf[3] = _("Overall: Unemulated Protection");
 		else
-			tempbuf[3].assign(_("Overall: Working"));
+			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
-		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
+		const char *gfxstat;
+		if (m_cached_unemulated & device_t::feature::GRAPHICS)
+			gfxstat = _("Unimplemented");
+		else if ((m_cached_unemulated | m_cached_imperfect) & (device_t::feature::GRAPHICS | device_t::feature::PALETTE))
 			gfxstat = _("Imperfect");
 		else
 			gfxstat = _("OK");
 
-		if (driver->flags & MACHINE_NO_SOUND)
+		const char *soundstat;
+		if (m_cached_flags & machine_flags::NO_SOUND_HW)
+			soundstat = _("None");
+		else if (m_cached_unemulated & device_t::feature::SOUND)
 			soundstat = _("Unimplemented");
-		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
+		else if (m_cached_imperfect & device_t::feature::SOUND)
 			soundstat = _("Imperfect");
 		else
 			soundstat = _("OK");
@@ -390,13 +425,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	y2 = origy2 + bottom;
 
 	// draw a box
-	color = UI_BACKGROUND_COLOR;
-	if (driver != nullptr)
-		color = UI_GREEN_COLOR;
-	if (driver != nullptr && (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
-		color = UI_YELLOW_COLOR;
-	if (driver != nullptr && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
-		color = UI_RED_COLOR;
+	rgb_t const color = driver ? m_cached_color : UI_BACKGROUND_COLOR;
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
 
 	// take off the borders

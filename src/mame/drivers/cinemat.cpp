@@ -120,19 +120,17 @@ READ8_MEMBER(cinemat_state::coin_input_r)
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::coin_reset_w)
+WRITE_LINE_MEMBER(cinemat_state::coin_reset_w)
 {
 	/* on the rising edge of a coin reset, clear the coin_detected flag */
-	if (m_coin_last_reset != data && data != 0)
+	if (state)
 		m_coin_detected = 0;
-	m_coin_last_reset = data;
 }
 
 
-WRITE8_MEMBER(cinemat_state::mux_select_w)
+WRITE_LINE_MEMBER(cinemat_state::mux_select_w)
 {
-	m_mux_select = data;
-	cinemat_sound_control_w(space, 0x07, data);
+	m_mux_select = state;
 }
 
 
@@ -272,7 +270,7 @@ READ8_MEMBER(cinemat_state::qb3_frame_r)
 }
 
 
-WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
+WRITE_LINE_MEMBER(cinemat_state::qb3_ram_bank_w)
 {
 	membank("bank1")->set_entry(m_maincpu->state_int(ccpu_cpu_device::CCPU_P) & 3);
 }
@@ -321,9 +319,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
 	AM_RANGE(0x10, 0x16) AM_READ(switches_r)
 	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
 
-	AM_RANGE(0x05, 0x05) AM_WRITE(coin_reset_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(cinemat_vector_control_w)
-	AM_RANGE(0x00, 0x07) AM_WRITE(cinemat_sound_control_w)
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -968,6 +964,10 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k )
 	MCFG_CPU_DATA_MAP(data_map)
 	MCFG_CPU_IO_MAP(io_map)
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 7J on CCG-1
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cinemat_state, coin_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cinemat_state, vector_control_w))
+
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -1048,6 +1048,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tailg, cinemat_nojmi_8k )
 	MCFG_FRAGMENT_ADD(tailg_sound)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cinemat_state, mux_select_w))
 MACHINE_CONFIG_END
 
 
@@ -1082,6 +1085,9 @@ static MACHINE_CONFIG_DERIVED( boxingb, cinemat_jmi_32k )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cinemat_state, mux_select_w))
 MACHINE_CONFIG_END
 
 
@@ -1112,6 +1118,9 @@ static MACHINE_CONFIG_DERIVED( qb3, cinemat_jmi_32k )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_qb3color)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, qb3_ram_bank_w))
 MACHINE_CONFIG_END
 
 
@@ -1434,23 +1443,15 @@ DRIVER_INIT_MEMBER(cinemat_state,sundance)
 }
 
 
-DRIVER_INIT_MEMBER(cinemat_state,tailg)
-{
-	m_maincpu->space(AS_IO).install_write_handler(0x07, 0x07, write8_delegate(FUNC(cinemat_state::mux_select_w),this));
-}
-
-
 DRIVER_INIT_MEMBER(cinemat_state,boxingb)
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(FUNC(cinemat_state::boxingb_dial_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x07, 0x07, write8_delegate(FUNC(cinemat_state::mux_select_w),this));
 }
 
 
 DRIVER_INIT_MEMBER(cinemat_state,qb3)
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x0f, 0x0f, read8_delegate(FUNC(cinemat_state::qb3_frame_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x00, 0x00, write8_delegate(FUNC(cinemat_state::qb3_ram_bank_w),this));
 
 	membank("bank1")->configure_entries(0, 4, m_rambase, 0x100*2);
 }
@@ -1469,7 +1470,7 @@ GAMEL(1979, barrier,  0,       barrier,  barrier,  cinemat_state, 0,        ORIE
 GAME( 1979, speedfrk, 0,       speedfrk, speedfrk, cinemat_state, speedfrk, ORIENTATION_FLIP_Y,   "Vectorbeam", "Speed Freak", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starhawk, 0,       starhawk, starhawk, cinemat_state, 0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Star Hawk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1979, sundance, 0,       sundance, sundance, cinemat_state, sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sundance )
-GAMEL(1979, tailg,    0,       tailg,    tailg,    cinemat_state, tailg,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tailg )
+GAMEL(1979, tailg,    0,       tailg,    tailg,    cinemat_state, 0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tailg )
 GAME( 1979, warrior,  0,       warrior,  warrior,  cinemat_state, 0,        ORIENTATION_FLIP_Y,   "Vectorbeam", "Warrior", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1980, armora,   0,       armora,   armora,   cinemat_state, 0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_armora )
 GAMEL(1980, armorap,  armora,  armora,   armora,   cinemat_state, 0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_armora )

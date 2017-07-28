@@ -446,4 +446,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     STATE          INIT  COMPANY  FULLNAME       FLAGS */
-CONS( 1984, ch2001,    0,        0,      ch2001,   ch2001,   cxgz80_state,  0,    "CXG",   "Chess 2001",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, ch2001,    0,        0,      ch2001,   ch2001,   cxgz80_state,  0,    "CXG",   "Chess 2001",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

@@ -62,6 +62,7 @@ Known issues:
 #include "includes/tankbatt.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "sound/samples.h"
 #include "screen.h"
 #include "speaker.h"
@@ -73,9 +74,14 @@ void tankbatt_state::machine_start()
 	save_item(NAME(m_sound_enable));
 }
 
-WRITE8_MEMBER(tankbatt_state::led_w)
+WRITE_LINE_MEMBER(tankbatt_state::led0_w)
 {
-	output().set_led_value(offset,data & 1);
+	machine().output().set_led_value(0, state);
+}
+
+WRITE_LINE_MEMBER(tankbatt_state::led1_w)
+{
+	machine().output().set_led_value(1, state);
 }
 
 READ8_MEMBER(tankbatt_state::in0_r)
@@ -102,21 +108,21 @@ READ8_MEMBER(tankbatt_state::dsw_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-WRITE8_MEMBER(tankbatt_state::interrupt_enable_w)
+WRITE_LINE_MEMBER(tankbatt_state::interrupt_enable_w)
 {
-	m_nmi_enable = !data;
-	m_sound_enable = !data;
+	m_nmi_enable = !state;
+	m_sound_enable = !state;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) m_samples->stop(2);
+	if (state) m_samples->stop(2);
 }
 
-WRITE8_MEMBER(tankbatt_state::demo_interrupt_enable_w)
+WRITE_LINE_MEMBER(tankbatt_state::demo_interrupt_enable_w)
 {
-	m_nmi_enable = data;
+	m_nmi_enable = state;
 }
 
-WRITE8_MEMBER(tankbatt_state::sh_expl_w)
+WRITE_LINE_MEMBER(tankbatt_state::sh_expl_w)
 {
 	if (m_sound_enable)
 	{
@@ -124,11 +130,11 @@ WRITE8_MEMBER(tankbatt_state::sh_expl_w)
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::sh_engine_w)
+WRITE_LINE_MEMBER(tankbatt_state::sh_engine_w)
 {
 	if (m_sound_enable)
 	{
-		if (data)
+		if (state)
 			m_samples->start(2, 2, true);
 		else
 			m_samples->start(2, 1, true);
@@ -136,7 +142,7 @@ WRITE8_MEMBER(tankbatt_state::sh_engine_w)
 	else m_samples->stop(2);
 }
 
-WRITE8_MEMBER(tankbatt_state::sh_fire_w)
+WRITE_LINE_MEMBER(tankbatt_state::sh_fire_w)
 {
 	if (m_sound_enable)
 	{
@@ -150,16 +156,15 @@ WRITE8_MEMBER(tankbatt_state::irq_ack_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(tankbatt_state::coincounter_w)
+WRITE_LINE_MEMBER(tankbatt_state::coincounter_w)
 {
-	machine().bookkeeping().coin_counter_w(0,data & 1);
-	machine().bookkeeping().coin_counter_w(1,data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(tankbatt_state::coinlockout_w)
+WRITE_LINE_MEMBER(tankbatt_state::coinlockout_w)
 {
-	machine().bookkeeping().coin_lockout_w(0,data & 1);
-	machine().bookkeeping().coin_lockout_w(1,data & 1);
+	machine().bookkeeping().coin_lockout_w(0, state);
+	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
@@ -167,18 +172,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0c07) AM_READ(in0_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(led_w)
-	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(coincounter_w)
-	AM_RANGE(0x0c03, 0x0c03) AM_WRITE(coinlockout_w)
-	AM_RANGE(0x0c08, 0x0c0f) AM_READ(in1_r)
-	AM_RANGE(0x0c08, 0x0c08) AM_WRITENOP //coin counter mirror?
-	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE(sh_engine_w)
-	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE(sh_fire_w)
-	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE(sh_expl_w) // bit 7 == led for the start 2 button
-	AM_RANGE(0x0c0e, 0x0c0e) AM_WRITENOP //bit 7 == led for the start 1 button
-	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE(demo_interrupt_enable_w)
+	AM_RANGE(0x0c00, 0x0c07) AM_READ(in0_r) AM_DEVWRITE("outlatch", cd4099_device, write_d0)
+	AM_RANGE(0x0c08, 0x0c0f) AM_READ(in1_r) AM_DEVWRITE("mainlatch", cd4099_device, write_d0)
 	AM_RANGE(0x0c10, 0x0c10) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x0c18, 0x0c1f) AM_READ(dsw_r)
 	AM_RANGE(0x0c18, 0x0c18) AM_WRITENOP    /* watchdog ?? */
@@ -288,6 +283,21 @@ static MACHINE_CONFIG_START( tankbatt )
 	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbatt_state,  interrupt)
+
+	MCFG_DEVICE_ADD("mainlatch", CD4099, 0) // latches at 4H and 5H (are the empty 4J and 5J locations for LS259 substitution?)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) //coin counter mirror?
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tankbatt_state, interrupt_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tankbatt_state, sh_engine_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tankbatt_state, sh_fire_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tankbatt_state, sh_expl_w)) // bit 7 also set by ASL instruction
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bit 7 also set by ASL instruction
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tankbatt_state, demo_interrupt_enable_w))
+
+	MCFG_DEVICE_ADD("outlatch", CD4099, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tankbatt_state, led0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tankbatt_state, led1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tankbatt_state, coincounter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tankbatt_state, coinlockout_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

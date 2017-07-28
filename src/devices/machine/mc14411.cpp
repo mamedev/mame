@@ -33,7 +33,7 @@
     MACROS
 ***************************************************************************/
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h 
+//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
 #define LOG_SETUP   (1U <<  1)
 
 //#define VERBOSE  (LOG_GENERAL|LOG_SETUP)
@@ -41,7 +41,7 @@
 
 #include "logmacro.h"
 
-//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h 
+//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 
 #ifdef _MSC_VER
@@ -58,7 +58,7 @@
 ***************************************************************************/
 
 const int mc14411_device::s_counter_divider[16] = {
-             ////////// X64 /////// X16 /////// X8 //////// X1 ////////
+			 ////////// X64 /////// X16 /////// X8 //////// X1 ////////
 	  3, // F1:     614.4 kHz   153.6 kHz   76800 Hz    9600 Hz
 	  4, // F2:     460.8 kHz   115.2 kHz   57600 Hz    7200 Hz
 	  6, // F3:     307.2 kHz   76800 Hz    36400 Hz    4800 Hz
@@ -125,7 +125,7 @@ void mc14411_device::device_start()
 		m_fx_timer[i] = timer_alloc(i);
 		m_timer_enabled[i] = !m_out_fx_cbs[i].isnull();
 	}
-	
+
 	save_item(NAME(m_divider));
 	save_item(NAME(m_reset));
 	save_item(NAME(m_timer_enabled));
@@ -189,7 +189,7 @@ void mc14411_device::arm_timer(int i)
 
 
 //------------------------------------------------------------------------
-//  device_reset - is called by the mame framework or by the owning device 
+//  device_reset - is called by the mame framework or by the owning device
 //  driver or by ASSERTING the reset line through set_reset_line
 //------------------------------------------------------------------------
 
@@ -201,7 +201,7 @@ void mc14411_device::device_reset()
 	{
 		if (!m_out_fx_cbs[i].isnull())
 		{
-			// Reset line according to datasheet and remember it for transitions to come 
+			// Reset line according to datasheet and remember it for transitions to come
 			(m_out_fx_cbs[i])(m_fx_state[i] = (i < TIMER_F15 ? 0 : 1));
 		}
 	}
@@ -242,7 +242,7 @@ void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int32_t 
 
 //--------------------------------------------------------
 //  rate_select_w - implements the RSA and RSB input pins
-// TODO: Needs to check real device behaviour how changing 
+// TODO: Needs to check real device behaviour how changing
 //       divider at run time affects wave forms
 //--------------------------------------------------------
 
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER(mc14411_device::reset_w)
 	LOGSETUP("%s %02x\n", FUNCNAME, state);
 
 	m_reset = state;
-	
+
 	if (m_reset == ASSERT_LINE)
 	{
 		LOGSETUP(" - Asserting reset\n");

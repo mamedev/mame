@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 
@@ -29,6 +30,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
+		m_latch3(*this, "latch3"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -36,6 +38,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<f9334_device> m_latch3;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -46,21 +49,23 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_width;
 
-	DECLARE_WRITE8_MEMBER(nmion_w);
+	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_WRITE8_MEMBER(wram_w);
-	DECLARE_WRITE8_MEMBER(width_w);
-	DECLARE_WRITE8_MEMBER(coin_lockout_w);
-	DECLARE_WRITE8_MEMBER(start_lamp_1_w);
-	DECLARE_WRITE8_MEMBER(start_lamp_2_w);
-	DECLARE_WRITE8_MEMBER(lamp_s_w);
-	DECLARE_WRITE8_MEMBER(lamp_k_w);
-	DECLARE_WRITE8_MEMBER(lamp_y_w);
-	DECLARE_WRITE8_MEMBER(lamp_d_w);
-	DECLARE_WRITE8_MEMBER(_2000_201F_w);
-	DECLARE_WRITE8_MEMBER(sound_enable_w);
-	DECLARE_WRITE8_MEMBER(whistle_w);
+	DECLARE_WRITE_LINE_MEMBER(width_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(start_lamp_1_w);
+	DECLARE_WRITE_LINE_MEMBER(start_lamp_2_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_s_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_k_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_y_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_d_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_i_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_v_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_e_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_r_w);
+	DECLARE_WRITE8_MEMBER(latch3_watchdog_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

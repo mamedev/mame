@@ -78,7 +78,6 @@ public:
 	uint8_t frc_mode;
 
 	bool m_cnt1;
-	bool m_cnt2;
 
 	uint16_t *shared_ram;
 
@@ -122,7 +121,6 @@ public:
 	void irq_timer_sync();
 	void irq_timer_start(int old_tmode);
 	WRITE_LINE_MEMBER(cnt1);
-	WRITE_LINE_MEMBER(cnt2);
 	DECLARE_DRIVER_INIT(crkdown);
 	DECLARE_DRIVER_INIT(quizmeku);
 	DECLARE_DRIVER_INIT(qrouka);

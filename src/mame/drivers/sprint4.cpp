@@ -11,6 +11,7 @@ Atari Sprint 4 driver
 #include "audio/sprint4.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    12096000
@@ -195,9 +196,24 @@ WRITE8_MEMBER(sprint4_state::da_latch_w)
 }
 
 
-WRITE8_MEMBER(sprint4_state::lamp_w)
+WRITE_LINE_MEMBER(sprint4_state::lamp0_w)
 {
-	output().set_led_value((offset >> 1) & 3, offset & 1);
+	output().set_led_value(0, state);
+}
+
+WRITE_LINE_MEMBER(sprint4_state::lamp1_w)
+{
+	output().set_led_value(1, state);
+}
+
+WRITE_LINE_MEMBER(sprint4_state::lamp2_w)
+{
+	output().set_led_value(2, state);
+}
+
+WRITE_LINE_MEMBER(sprint4_state::lamp3_w)
+{
+	output().set_led_value(3, state);
 }
 
 
@@ -208,29 +224,6 @@ WRITE8_MEMBER(sprint4_state::lockout_w)
 }
 #endif
 
-
-WRITE8_MEMBER(sprint4_state::screech_1_w)
-{
-	m_discrete->write(space, SPRINT4_SCREECH_EN_1, offset & 1);
-}
-
-
-WRITE8_MEMBER(sprint4_state::screech_2_w)
-{
-	m_discrete->write(space, SPRINT4_SCREECH_EN_2, offset & 1);
-}
-
-
-WRITE8_MEMBER(sprint4_state::screech_3_w)
-{
-	m_discrete->write(space, SPRINT4_SCREECH_EN_3, offset & 1);
-}
-
-
-WRITE8_MEMBER(sprint4_state::screech_4_w)
-{
-	m_discrete->write(space, SPRINT4_SCREECH_EN_4, offset & 1);
-}
 
 WRITE8_MEMBER(sprint4_state::bang_w)
 {
@@ -264,11 +257,7 @@ static ADDRESS_MAP_START( sprint4_cpu_map, AS_PROGRAM, 8, sprint4_state )
 	AM_RANGE(0x0040, 0x0041) AM_MIRROR(0x718) AM_WRITE(da_latch_w)
 	AM_RANGE(0x0042, 0x0043) AM_MIRROR(0x718) AM_WRITE(bang_w)
 	AM_RANGE(0x0044, 0x0045) AM_MIRROR(0x718) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0060, 0x0067) AM_MIRROR(0x710) AM_WRITE(lamp_w)
-	AM_RANGE(0x0068, 0x0069) AM_MIRROR(0x710) AM_WRITE(screech_1_w)
-	AM_RANGE(0x006a, 0x006b) AM_MIRROR(0x710) AM_WRITE(screech_2_w)
-	AM_RANGE(0x006c, 0x006d) AM_MIRROR(0x710) AM_WRITE(screech_3_w)
-	AM_RANGE(0x006e, 0x006f) AM_MIRROR(0x710) AM_WRITE(screech_4_w)
+	AM_RANGE(0x0060, 0x006f) AM_MIRROR(0x710) AM_DEVWRITE("latch", f9334_device, write_a0)
 
 	AM_RANGE(0x2000, 0x27ff) AM_NOP /* diagnostic ROM */
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
@@ -432,6 +421,16 @@ static MACHINE_CONFIG_START( sprint4 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_DEVICE_ADD("latch", F9334, 0) // at E11
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sprint4_state, lamp0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sprint4_state, lamp1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sprint4_state, lamp2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sprint4_state, lamp3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_1>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_2>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_3>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_4>))
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(sprint4)

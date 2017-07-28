@@ -40,7 +40,6 @@ WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
 		m_rombank1->set_entry(0);
-		m_bank = 0;
 		set_busy(B_SET,0);
 		m_rowselect = 0;
 		m_blank = 0;
@@ -102,42 +101,38 @@ WRITE8_MEMBER( decodmd_type1_device::dmd_port_w )
 		break;
 	case 0x84:
 		bit = data & 0x01;
-		switch(offset & 0xdc)
-		{
-		case 0x84:  // Bank bit 0
-			m_bank = (m_bank & ~0x01) | (~bit & 0x01);
-			m_rombank1->set_entry(m_bank);
-			break;
-		case 0x8c:  // Bank bit 1
-			m_bank = (m_bank & ~0x02) | ((~bit & 0x01) << 1);
-			m_rombank1->set_entry(m_bank);
-			break;
-		case 0x94:  // Bank bit 2
-			m_bank = (m_bank & ~0x04) | ((~bit & 0x01) << 2);
-			m_rombank1->set_entry(m_bank);
-			break;
-		case 0x9c:  // Blanking
-			m_blank = bit;
-			if(bit)
-				output_data();
-			break;
-		case 0xc4:  // Status
-			m_status = bit;
-			break;
-		case 0xcc:  // Row data
-			m_rowdata = bit;
-			break;
-		case 0xd4:  // Row clock
-			if(~bit & m_rowclock)  // on negative edge
-				m_rowselect = (m_rowselect << 1) | m_rowdata;
-			m_rowclock = bit;
-			break;
-		case 0xdc:  // Test
-			set_busy(B_SET,bit);
-			break;
-		}
+		m_bitlatch->write_bit((offset & 0x40) >> 4 | (offset & 0x18) >> 3, bit);
 		break;
 	}
+}
+
+WRITE_LINE_MEMBER(decodmd_type1_device::blank_w)
+{
+	m_blank = state;
+	if (state)
+		output_data();
+}
+
+WRITE_LINE_MEMBER(decodmd_type1_device::status_w)
+{
+	m_status = state;
+}
+
+WRITE_LINE_MEMBER(decodmd_type1_device::rowdata_w)
+{
+	m_rowdata = state;
+}
+
+WRITE_LINE_MEMBER(decodmd_type1_device::rowclock_w)
+{
+	if (!state && m_rowclock)  // on negative edge
+		m_rowselect = (m_rowselect << 1) | m_rowdata;
+	m_rowclock = state;
+}
+
+WRITE_LINE_MEMBER(decodmd_type1_device::test_w)
+{
+	set_busy(B_SET, state);
 }
 
 void decodmd_type1_device::output_data()
@@ -225,15 +220,23 @@ MACHINE_CONFIG_MEMBER( decodmd_type1_device::device_add_mconfig )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 
+	MCFG_DEVICE_ADD("bitlatch", HC259, 0) // U4
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(MEMBANK("dmdbank1")) MCFG_DEVCB_MASK(0x07) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(decodmd_type1_device, blank_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(decodmd_type1_device, status_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(decodmd_type1_device, rowdata_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(decodmd_type1_device, rowclock_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(decodmd_type1_device, test_w))
 MACHINE_CONFIG_END
 
 
 decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECODMD1, tag, owner, clock),
-		m_cpu(*this,"dmdcpu"),
-		m_rombank1(*this,"dmdbank1"),
-		m_rombank2(*this,"dmdbank2"),
-		m_ram(*this,RAM_TAG)
+		m_cpu(*this, "dmdcpu"),
+		m_rombank1(*this, "dmdbank1"),
+		m_rombank2(*this, "dmdbank2"),
+		m_ram(*this, RAM_TAG),
+		m_bitlatch(*this, "bitlatch")
 {}
 
 void decodmd_type1_device::device_start()
@@ -256,7 +259,6 @@ void decodmd_type1_device::device_reset()
 	m_rombank1->set_entry(0);
 	m_rombank2->set_entry(0);
 	m_status = 0;
-	m_bank = 0;
 	m_busy = 0;
 	set_busy(B_CLR|B_SET,0);
 	m_rowselect = 0;

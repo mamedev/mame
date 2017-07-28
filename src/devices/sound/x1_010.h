@@ -34,13 +34,13 @@ private:
 	// internal state
 
 	/* Variables only used here */
-	required_region_ptr<int8_t> m_region;       // ROM
-	int m_rate;                               // Output sampling rate (Hz)
-	int m_adr;                                // address
-	sound_stream *  m_stream;                 // Stream handle
-	int m_sound_enable;                       // sound output enable/disable
-	uint8_t   m_reg[0x2000];                // X1-010 Register & wave form area
-	uint8_t   m_HI_WORD_BUF[0x2000];            // X1-010 16bit access ram check avoidance work
+	required_region_ptr<int8_t> m_region;    // ROM
+	int m_rate;                              // Output sampling rate (Hz)
+	int m_adr;                               // address
+	sound_stream *  m_stream;                // Stream handle
+	int m_sound_enable;                      // sound output enable/disable
+	uint8_t   m_reg[0x2000];                 // X1-010 Register & wave form area
+	uint8_t   m_HI_WORD_BUF[0x2000];         // X1-010 16bit access ram check avoidance work
 	uint32_t  m_smp_offset[NUM_CHANNELS];
 	uint32_t  m_env_offset[NUM_CHANNELS];
 

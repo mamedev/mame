@@ -131,6 +131,7 @@ namespace bus { namespace ti99 { namespace peb {
 ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_RS232, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
+	m_crulatch(*this, "crulatch"),
 	m_piodev(nullptr),
 	m_dsrrom(nullptr),
 	m_pio_direction_in(false),
@@ -327,86 +328,89 @@ WRITE8_MEMBER(ti_rs232_pio_device::cruwrite)
 			return;
 		}
 
-		device_image_interface *image = dynamic_cast<device_image_interface *>(m_piodev);
-
 		int bit = (offset & 0x00ff)>>1;
-		switch (bit)
-		{
-		case 0:
-			m_selected = (data!=0);
-			break;
-
-		case 1:
-			m_pio_direction_in = (data!=0);
-			break;
-
-		case 2:
-			if ((data!=0) != m_pio_handshakeout)
-			{
-				m_pio_handshakeout = (data!=0);
-				if (m_pio_write && m_pio_writable && (!m_pio_direction_in))
-				{   /* PIO in output mode */
-					if (!m_pio_handshakeout)
-					{   /* write data strobe */
-						/* write data and acknowledge */
-						uint8_t buf = m_pio_out_buffer;
-						int ret = image->fwrite(&buf, 1);
-						if (ret)
-							m_pio_handshakein = 1;
-					}
-					else
-					{
-						/* end strobe */
-						/* we can write some data: set receiver ready */
-						m_pio_handshakein = 0;
-					}
-				}
-				if ((!m_pio_write) && m_pio_readable /*&& pio_direction_in*/)
-				{   /* PIO in input mode */
-					if (!m_pio_handshakeout)
-					{   /* receiver ready */
-						/* send data and strobe */
-						uint8_t buf;
-						if (image->fread(&buf, 1))
-							m_pio_in_buffer = buf;
-						m_pio_handshakein = 0;
-					}
-					else
-					{
-						/* data acknowledge */
-						/* we can send some data: set transmitter ready */
-						m_pio_handshakein = 1;
-					}
-				}
-			}
-			break;
-
-		case 3:
-			m_pio_spareout = (data!=0);
-			break;
-
-		case 4:
-			m_flag0 = (data!=0);
-			break;
-
-		case 5:
-			// Set the CTS line for RS232/1
-			if (TRACE_LINES) logerror("(1/3) Setting CTS* via CRU to %d\n", data);
-			output_line_state(0, tms9902_device::CTS, (data==0)? tms9902_device::CTS : 0);
-			break;
-
-		case 6:
-			// Set the CTS line for RS232/2
-			if (TRACE_LINES) logerror("(2/4) Setting CTS* via CRU to %d\n", data);
-			output_line_state(1, tms9902_device::CTS, (data==0)? tms9902_device::CTS : 0);
-			break;
-
-		case 7:
-			m_led = (data!=0);
-			break;
-		}
-		return;
+		m_crulatch->write_bit(bit, data);
 	}
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::selected_w)
+{
+	m_selected = state;
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::pio_direction_in_w)
+{
+	m_pio_direction_in = state;
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::pio_handshake_out_w)
+{
+	device_image_interface *image = dynamic_cast<device_image_interface *>(m_piodev);
+
+	m_pio_handshakeout = state;
+	if (m_pio_write && m_pio_writable && (!m_pio_direction_in))
+	{   /* PIO in output mode */
+		if (!m_pio_handshakeout)
+		{   /* write data strobe */
+			/* write data and acknowledge */
+			uint8_t buf = m_pio_out_buffer;
+			int ret = image->fwrite(&buf, 1);
+			if (ret)
+				m_pio_handshakein = 1;
+		}
+		else
+		{
+			/* end strobe */
+			/* we can write some data: set receiver ready */
+			m_pio_handshakein = 0;
+		}
+	}
+	if ((!m_pio_write) && m_pio_readable /*&& pio_direction_in*/)
+	{   /* PIO in input mode */
+		if (!m_pio_handshakeout)
+		{   /* receiver ready */
+			/* send data and strobe */
+			uint8_t buf;
+			if (image->fread(&buf, 1))
+				m_pio_in_buffer = buf;
+			m_pio_handshakein = 0;
+		}
+		else
+		{
+			/* data acknowledge */
+			/* we can send some data: set transmitter ready */
+			m_pio_handshakein = 1;
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::pio_spareout_w)
+{
+	m_pio_spareout = state;
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::flag0_w)
+{
+	m_flag0 = state;
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::cts0_w)
+{
+	// Set the CTS line for RS232/1
+	if (TRACE_LINES) logerror("(1/3) Setting CTS* via CRU to %d\n", state);
+	output_line_state(0, tms9902_device::CTS, state ? 0 : tms9902_device::CTS);
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::cts1_w)
+{
+	// Set the CTS line for RS232/2
+	if (TRACE_LINES) logerror("(2/4) Setting CTS* via CRU to %d\n", state);
+	output_line_state(1, tms9902_device::CTS, state ? 0 : tms9902_device::CTS);
+}
+
+WRITE_LINE_MEMBER(ti_rs232_pio_device::led_w)
+{
+	m_led = state;
 }
 
 /*
@@ -1150,6 +1154,16 @@ MACHINE_CONFIG_MEMBER( ti_rs232_pio_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("serdev0", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("serdev1", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("piodev", TI99_PIO_DEV, 0)
+
+	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U12
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ti_rs232_pio_device, selected_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(ti_rs232_pio_device, pio_direction_in_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(ti_rs232_pio_device, pio_handshake_out_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ti_rs232_pio_device, pio_spareout_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ti_rs232_pio_device, flag0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ti_rs232_pio_device, cts0_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ti_rs232_pio_device, cts1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ti_rs232_pio_device, led_w))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_rs232_pio_device::device_rom_region() const

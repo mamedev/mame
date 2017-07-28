@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
-#include "machine/gen_latch.h"
 #include "machine/tmp68301.h"
 #include "screen.h"
+#include "audio/nichisnd.h"
 
 #define VRAM_MAX    3
 
@@ -20,14 +20,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	// common
 	int m_scrollx[VRAM_MAX];
@@ -61,8 +59,6 @@ public:
 	uint8_t m_motor_on;
 
 	// common
-	DECLARE_WRITE8_MEMBER(soundbank_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_clear_w);
 	DECLARE_READ16_MEMBER(dipsw_r);
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);

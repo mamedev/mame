@@ -30,10 +30,8 @@ public:
 	tilemap_t *m_background;
 
 	// shangkid and chinhero
-	DECLARE_WRITE8_MEMBER(maincpu_bank_w);
-	DECLARE_WRITE8_MEMBER(bbx_enable_w);
-	DECLARE_WRITE8_MEMBER(cpu_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
 	DECLARE_READ8_MEMBER(soundlatch_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);

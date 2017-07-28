@@ -12,9 +12,6 @@ starts writing to unusual memory ports - either because the NMI/Interrupt
 timing is out, or the sheer fact that the Sound CPU code is rather poorly
 written, so it may be normal behaviour.
 
-Also, the OKI M6295 seems to be playing the wrong samples, however the current
-OKI M6295 sound ROM dump is bad.
-
 */
 
 #include "emu.h"
@@ -23,6 +20,7 @@ OKI M6295 sound ROM dump is bad.
 #include "cpu/z80/z80.h"
 #include "sound/3526intf.h"
 #include "sound/okim6295.h"
+#include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -34,9 +32,12 @@ public:
 		: bublbobl_state(mconfig, type, tag)
 		, m_bgvram(*this, "bgvram")
 		, m_bgpalette(*this, "bgpalette")
+		, m_oki(*this, "oki")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
+	DECLARE_WRITE8_MEMBER(missb2_oki_w);
+	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_DRIVER_INIT(missb2);
 	DECLARE_MACHINE_START(missb2);
@@ -48,6 +49,7 @@ protected:
 
 	required_shared_ptr<uint8_t> m_bgvram;
 	required_device<palette_device> m_bgpalette;
+	required_device<okim6295_device> m_oki;
 };
 
 
@@ -160,6 +162,16 @@ WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 	membank("bank3")->set_entry(bank);
 }
 
+WRITE8_MEMBER(missb2_state::missb2_oki_w)
+{
+	m_oki->write_command(BITSWAP8(data, 7,5,6,4,3,1,2,0));
+}
+
+READ8_MEMBER(missb2_state::missb2_oki_r)
+{
+	return BITSWAP8(m_oki->read_status(), 7,5,6,4,3,1,2,0);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
@@ -171,7 +183,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITENOP // sound cpu reset
-	AM_RANGE(0xfa80, 0xfa80) AM_WRITENOP
+	AM_RANGE(0xfa80, 0xfa80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) AM_MIRROR(0x007f)
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM         // ???
@@ -203,11 +215,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP // message for main cpu
 	AM_RANGE(0xb001, 0xb001) AM_READNOP AM_WRITE(bublbobl_sh_nmi_enable_w)  // bit 0: message pending for main cpu, bit 1: message pending for sound cpu
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0FFF)
 	AM_RANGE(0xe000, 0xefff) AM_ROM         // space for diagnostic ROM?
 ADDRESS_MAP_END
 
@@ -457,6 +469,9 @@ static MACHINE_CONFIG_START( missb2 )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 128);
+
 	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
 	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
 
@@ -522,7 +537,8 @@ ROM_START( missb2 )
 	ROM_LOAD16_BYTE( "msbub2-u.ic4", 0x000000, 0x80000, CRC(be71c9f0) SHA1(1961e931017f644486cea0ce431d50973679c848) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
-	ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(14f07386) SHA1(097897d92226f900e11dbbdd853aff3ac46ff016) )
+	//ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(14f07386) SHA1(097897d92226f900e11dbbdd853aff3ac46ff016) ) // this dump is bad, it has data of 0xFF for every address (only after and including address 0xB57E) where the low 8 bits of the address are in the range 0x40-0xBF. the rom from bublpong below has the same sample index at the beginning, and has the missing data intact, plus all the present data is a 1:1 match.
+	ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(7a4f4272) SHA1(07712494f5166bcc8156a2152ae552a74f2184eb) ) // taken from bublpong ic13, probably correct but marked as bad until redump
 
 	/* I doubt this prom is on the board, it's loaded so we can share video emulation with bubble bobble */
 	ROM_REGION( 0x0100, "proms", 0 )

@@ -10,6 +10,7 @@ Atari Ultra Tank driver
 #include "includes/ultratnk.h"
 #include "audio/sprint4.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_12_096MHz
@@ -134,30 +135,22 @@ WRITE8_MEMBER(ultratnk_state::da_latch_w)
 }
 
 
-WRITE8_MEMBER(ultratnk_state::led_1_w)
+WRITE_LINE_MEMBER(ultratnk_state::led_1_w)
 {
-	output().set_led_value(0, offset & 1); /* left player start */
+	output().set_led_value(0, state); /* left player start */
 }
-WRITE8_MEMBER(ultratnk_state::led_2_w)
+WRITE_LINE_MEMBER(ultratnk_state::led_2_w)
 {
-	output().set_led_value(1, offset & 1); /* right player start */
-}
-
-
-WRITE8_MEMBER(ultratnk_state::lockout_w)
-{
-	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
+	output().set_led_value(1, state); /* right player start */
 }
 
 
-WRITE8_MEMBER(ultratnk_state::fire_1_w)
+WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 {
-	m_discrete->write(space, ULTRATNK_FIRE_EN_1, offset & 1);
+	machine().bookkeeping().coin_lockout_global_w(!state);
 }
-WRITE8_MEMBER(ultratnk_state::fire_2_w)
-{
-	m_discrete->write(space, ULTRATNK_FIRE_EN_2, offset & 1);
-}
+
+
 WRITE8_MEMBER(ultratnk_state::attract_w)
 {
 	m_discrete->write(space, ULTRATNK_ATTRACT_EN, data & 1);
@@ -189,11 +182,7 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8, ultratnk_state )
 	AM_RANGE(0x2040, 0x2041) AM_MIRROR(0x718) AM_WRITE(da_latch_w)
 	AM_RANGE(0x2042, 0x2043) AM_MIRROR(0x718) AM_WRITE(explosion_w)
 	AM_RANGE(0x2044, 0x2045) AM_MIRROR(0x718) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2066, 0x2067) AM_MIRROR(0x710) AM_WRITE(lockout_w)
-	AM_RANGE(0x2068, 0x2069) AM_MIRROR(0x710) AM_WRITE(led_1_w)
-	AM_RANGE(0x206a, 0x206b) AM_MIRROR(0x710) AM_WRITE(led_2_w)
-	AM_RANGE(0x206c, 0x206d) AM_MIRROR(0x710) AM_WRITE(fire_2_w)
-	AM_RANGE(0x206e, 0x206f) AM_MIRROR(0x710) AM_WRITE(fire_1_w)
+	AM_RANGE(0x2060, 0x206f) AM_MIRROR(0x710) AM_DEVWRITE("latch", f9334_device, write_a0)
 
 	AM_RANGE(0x2800, 0x2fff) AM_NOP /* diagnostic ROM */
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
@@ -314,6 +303,13 @@ static MACHINE_CONFIG_START( ultratnk )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(ultratnk_cpu_map)
+
+	MCFG_DEVICE_ADD("latch", F9334, 0) // E11
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ultratnk_state, lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ultratnk_state, led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ultratnk_state, led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_2>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_1>))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)

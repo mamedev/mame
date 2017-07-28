@@ -29,7 +29,7 @@ void sprint8_state::set_pens()
 {
 	for (int i = 0; i < 0x10; i += 8)
 	{
-		if (*m_team & 1)
+		if (m_team)
 		{
 			m_palette->set_indirect_color(i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
 			m_palette->set_indirect_color(i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */

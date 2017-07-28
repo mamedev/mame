@@ -9,15 +9,15 @@
 ****************************************************************************/
 
 
+#include "machine/74259.h"
+
 class stactics_state : public driver_device
 {
 public:
 	stactics_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette_val(*this, "paletteram"),
-		m_motor_on(*this, "motor_on"),
-		m_lamps(*this, "lamps"),
+		m_outlatch(*this, "outlatch"),
 		m_display_buffer(*this, "display_buffer"),
 		m_videoram_b(*this, "videoram_b"),
 		m_videoram_d(*this, "videoram_d"),
@@ -25,10 +25,8 @@ public:
 		m_videoram_f(*this, "videoram_f") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_outlatch;
 
-	required_shared_ptr<uint8_t> m_palette_val;
-	required_shared_ptr<uint8_t> m_motor_on;
-	required_shared_ptr<uint8_t> m_lamps;
 	required_shared_ptr<uint8_t> m_display_buffer;
 	required_shared_ptr<uint8_t> m_videoram_b;
 	required_shared_ptr<uint8_t> m_videoram_d;
@@ -38,6 +36,7 @@ public:
 	/* machine state */
 	int    m_vert_pos;
 	int    m_horiz_pos;
+	bool   m_motor_on;
 
 	/* video state */
 	uint8_t  m_y_scroll_d;
@@ -49,14 +48,18 @@ public:
 	uint16_t m_beam_state;
 	uint16_t m_old_beam_state;
 	uint16_t m_beam_states_per_frame;
+	uint8_t  m_palette_bank;
 
 	DECLARE_READ8_MEMBER(vert_pos_r);
 	DECLARE_READ8_MEMBER(horiz_pos_r);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 	DECLARE_WRITE8_MEMBER(scroll_ram_w);
 	DECLARE_WRITE8_MEMBER(speed_latch_w);
 	DECLARE_WRITE8_MEMBER(shot_trigger_w);
 	DECLARE_WRITE8_MEMBER(shot_flag_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_w);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(get_frame_count_d3);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_shot_standby);
@@ -64,6 +67,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
 	INTERRUPT_GEN_MEMBER(interrupt);
+
+	DECLARE_WRITE_LINE_MEMBER(barrier_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(start_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(base_1_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(base_2_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(base_3_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(base_4_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(base_5_lamp_w);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

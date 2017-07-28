@@ -1362,7 +1362,7 @@ void validity_checker::validate_driver()
 	// determine if we are a clone
 	bool is_clone = (strcmp(m_current_driver->parent, "0") != 0);
 	int clone_of = m_drivlist.clone(*m_current_driver);
-	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
+	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 		is_clone = false;
 
 	// if we have at least 100 drivers, validate the clone
@@ -1422,17 +1422,24 @@ void validity_checker::validate_driver()
 		}
 
 	// make sure sound-less drivers are flagged
-	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && !iter.first() && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_NO_SOUND_HW)) == 0)
-		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
+	device_t::feature_type const unemulated(m_current_driver->type.unemulated_features());
+	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
+	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
+	{
+		sound_interface_iterator iter(m_current_config->root_device());
+		if (!iter.first())
+			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
+	}
 
 	// catch invalid flag combinations
-	if ((m_current_driver->flags & MACHINE_WRONG_COLORS) && (m_current_driver->flags & MACHINE_IMPERFECT_COLORS))
-		osd_printf_error("Driver cannot have colours that are both completely wrong and imperfect\n");
-	if ((m_current_driver->flags & MACHINE_NO_SOUND_HW) && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)))
-		osd_printf_error("Machine without sound hardware cannot have unemulated sound\n");
-	if ((m_current_driver->flags & MACHINE_NO_SOUND) && (m_current_driver->flags & MACHINE_IMPERFECT_SOUND))
-		osd_printf_error("Driver cannot have sound emulation that's both imperfect and not present\n");
+	if (unemulated & ~device_t::feature::ALL)
+		osd_printf_error("Driver has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+	if (imperfect & ~device_t::feature::ALL)
+		osd_printf_error("Driver has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+	if (unemulated & imperfect)
+		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+	if ((m_current_driver->flags & machine_flags::NO_SOUND_HW) && ((unemulated | imperfect) & device_t::feature::SOUND))
+		osd_printf_error("Machine without sound hardware cannot have unemulated/imperfect sound\n");
 }
 
 
@@ -1977,6 +1984,16 @@ void validity_checker::validate_device_types()
 		// check that reported type matches supplied type
 		if (dev->type().type() != type.type())
 			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
+
+		// catch invalid flag combinations
+		device_t::feature_type const unemulated(dev->type().unemulated_features());
+		device_t::feature_type const imperfect(dev->type().imperfect_features());
+		if (unemulated & ~device_t::feature::ALL)
+			osd_printf_error("Device has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+		if (imperfect & ~device_t::feature::ALL)
+			osd_printf_error("Device has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+		if (unemulated & imperfect)
+			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
 
 		config.device_remove(&config.root_device(), "_tmp");
 	}

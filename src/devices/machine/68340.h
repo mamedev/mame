@@ -6,7 +6,6 @@
 
 #pragma once
 
-
 #include "cpu/m68000/m68000.h"
 
 #include "68340sim.h"
@@ -14,11 +13,30 @@
 #include "68340ser.h"
 #include "68340tmu.h"
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+#define MCFG_MC68340_PA_INPUT_CB(_devcb) \
+	devcb = &m68340_cpu_device::set_pa_in_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_MC68340_PA_OUTPUT_CB(_devcb) \
+	devcb = &m68340_cpu_device::set_pa_out_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_MC68340_PB_INPUT_CB(_devcb) \
+	devcb = &m68340_cpu_device::set_pb_in_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_MC68340_PB_OUTPUT_CB(_devcb) \
+	devcb = &m68340_cpu_device::set_pb_out_callback (*device, DEVCB_##_devcb);
 
 class m68340_cpu_device : public fscpu32_device
 {
 public:
 	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> static devcb_base &set_pa_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pa_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pa_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
 
 	uint16_t get_cs(offs_t address);
 
@@ -62,6 +80,11 @@ protected:
 	uint16_t m_pitr;
 
 	emu_timer *m_irq_timer;
+
+	devcb_write8        m_pa_out_cb;
+	devcb_read8         m_pa_in_cb;
+	devcb_write8        m_pb_out_cb;
+	devcb_read8         m_pb_in_cb;
 };
 
 DECLARE_DEVICE_TYPE(M68340, m68340_cpu_device)

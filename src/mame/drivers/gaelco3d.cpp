@@ -253,16 +253,6 @@ WRITE16_MEMBER(gaelco3d_state::irq_ack_w)
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
-{
-	if (mem_mask == 0xffff0000)
-		irq_ack_w(space, offset, data, mem_mask >> 16);
-	else if (ACCESSING_BITS_0_7)
-		m_serial->tr_w(space, 0, data & 0x01);
-	else
-		logerror("%06X:irq_ack_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-}
-
 
 /*************************************
  *
@@ -288,52 +278,6 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 	if (LOG)
 		logerror("eeprom_data_r(%02X)\n", result);
 	return result;
-}
-
-READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
-{
-	if (ACCESSING_BITS_16_31)
-		return (eeprom_data_r(space, 0, mem_mask >> 16) << 16) | 0xffff;
-	else if (ACCESSING_BITS_0_7)
-	{
-		uint8_t data = m_serial->data_r(space,0);
-		if (LOG)
-			logerror("%06X:read(%02X) = %08X & %08X\n", m_maincpu->pc(), offset, data, mem_mask);
-		return  data | 0xffffff00;
-	}
-	else
-		logerror("%06X:read(%02X) = mask %08X\n", m_maincpu->pc(), offset, mem_mask);
-
-	return 0xffffffff;
-}
-
-
-WRITE16_MEMBER(gaelco3d_state::eeprom_data_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_eeprom->di_write(data & 0x01);
-	}
-	else if (mem_mask != 0xffff)
-		logerror("write mask: %08x data %08x\n", mem_mask, data);
-}
-
-
-WRITE16_MEMBER(gaelco3d_state::eeprom_clock_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
-
-
-WRITE16_MEMBER(gaelco3d_state::eeprom_cs_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-	}
 }
 
 
@@ -403,46 +347,29 @@ CUSTOM_INPUT_MEMBER(gaelco3d_state::analog_bit_r)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::analog_port_clock_w)
+WRITE_LINE_MEMBER(gaelco3d_state::analog_port_clock_w)
 {
 	/* a zero/one combo is written here to clock the next analog port bit */
-	if (ACCESSING_BITS_0_7)
+	if (!state)
 	{
-		if (!(data & 0xff))
-		{
-			m_analog_ports[0] <<= 1;
-			m_analog_ports[1] <<= 1;
-			m_analog_ports[2] <<= 1;
-			m_analog_ports[3] <<= 1;
-		}
-	}
-	else
-	{
-		if (LOG)
-			logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
+		m_analog_ports[0] <<= 1;
+		m_analog_ports[1] <<= 1;
+		m_analog_ports[2] <<= 1;
+		m_analog_ports[3] <<= 1;
 	}
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
+WRITE_LINE_MEMBER(gaelco3d_state::analog_port_latch_w)
 {
 	/* a zero is written here to read the analog ports, and a one is written when finished */
-	if (ACCESSING_BITS_0_7)
+	if (!state)
 	{
-		if (!(data & 0xff))
-		{
-			m_analog_ports[0] = m_analog[0].read_safe(0);
-			m_analog_ports[1] = m_analog[1].read_safe(0);
-			m_analog_ports[2] = m_analog[2].read_safe(0);
-			m_analog_ports[3] = m_analog[3].read_safe(0);
-		}
+		m_analog_ports[0] = m_analog[0].read_safe(0);
+		m_analog_ports[1] = m_analog[1].read_safe(0);
+		m_analog_ports[2] = m_analog[2].read_safe(0);
+		m_analog_ports[3] = m_analog[3].read_safe(0);
 	}
-	else
-	{
-		if (LOG)
-			logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-	}
-
 }
 
 
@@ -481,31 +408,30 @@ WRITE8_MEMBER(gaelco3d_state::tms_iack_w)
  *
  *************************************/
 
-WRITE16_MEMBER(gaelco3d_state::tms_reset_w)
+WRITE_LINE_MEMBER(gaelco3d_state::tms_reset_w)
 {
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
 	if (LOG)
-		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-	m_tms->set_input_line(INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
+		logerror("%06X:tms_reset_w = %d\n", m_maincpu->pc(), state);
+	m_tms->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::tms_irq_w)
+WRITE_LINE_MEMBER(gaelco3d_state::tms_irq_w)
 {
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
 	if (LOG)
-		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-	if (ACCESSING_BITS_0_7)
-		m_tms->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		logerror("%06X:tms_irq_w = %d\n", m_maincpu->pc(), state);
+	m_tms->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::tms_control3_w)
+WRITE_LINE_MEMBER(gaelco3d_state::tms_control3_w)
 {
 	if (LOG)
-		logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
+		logerror("%06X:tms_control3_w = %d\n", m_maincpu->pc(), state);
 }
 
 
@@ -708,31 +634,22 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
  *************************************/
 
 
-WRITE32_MEMBER(gaelco3d_state::radikalb_lamp_w)
+WRITE_LINE_MEMBER(gaelco3d_state::radikalb_lamp_w)
 {
 	/* arbitrary data written */
-	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_127_w = %02X\n", space.device().safe_pc(), data & 0xff);
-	else
-		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
+	logerror("%06X:unknown_127_w = %d\n", m_maincpu->pc(), state);
 }
 
-WRITE32_MEMBER(gaelco3d_state::unknown_137_w)
+WRITE_LINE_MEMBER(gaelco3d_state::unknown_137_w)
 {
 	/* only written $00 or $ff */
-	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_137_w = %02X\n", space.device().safe_pc(), data & 0xff);
-	else
-		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
+	logerror("%06X:unknown_137_w = %d\n", m_maincpu->pc(), state);
 }
 
-WRITE32_MEMBER(gaelco3d_state::unknown_13a_w)
+WRITE_LINE_MEMBER(gaelco3d_state::unknown_13a_w)
 {
 	/* only written $0000 or $0001 */
-	if (ACCESSING_BITS_0_15)
-		logerror("%06X:unknown_13a_w = %04X\n", space.device().safe_pc(), data & 0xffff);
-	else
-		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
+	logerror("%06X:unknown_13a_w = %04X\n", m_maincpu->pc(), state);
 }
 
 
@@ -742,6 +659,16 @@ WRITE32_MEMBER(gaelco3d_state::unknown_13a_w)
  *  Memory maps
  *
  *************************************/
+
+WRITE8_MEMBER(gaelco3d_state::mainlatch_68000_w)
+{
+	m_mainlatch->write_bit(offset >> 2, BIT(data, 0));
+}
+
+WRITE8_MEMBER(gaelco3d_state::outlatch_68000_w)
+{
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
+}
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -753,26 +680,25 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	AM_RANGE(0x51003c, 0x51003d) AM_READ_PORT("IN3")
 	AM_RANGE(0x510040, 0x510041) AM_WRITE(sound_data_w)
 	AM_RANGE(0x510042, 0x510043) AM_READ(sound_status_r)
-	AM_RANGE(0x510100, 0x510101) AM_READ(eeprom_data_r)
-	AM_RANGE(0x510100, 0x510101) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x510102, 0x510103) AM_DEVWRITE8("serial", gaelco_serial_device, tr_w, 0x00ff)
+	AM_RANGE(0x510100, 0x510101) AM_READWRITE(eeprom_data_r, irq_ack_w)
 	AM_RANGE(0x510102, 0x510103) AM_DEVREAD8("serial", gaelco_serial_device, data_r, 0x00ff)
+	AM_RANGE(0x510102, 0x510103) AM_SELECT(0x000038) AM_WRITE8(mainlatch_68000_w, 0x00ff)
 	AM_RANGE(0x510104, 0x510105) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff)
-	AM_RANGE(0x51010a, 0x51010b) AM_DEVWRITE8("serial", gaelco_serial_device, rts_w, 0x00ff)
-	AM_RANGE(0x510110, 0x510113) AM_WRITE(eeprom_data_w)
-	AM_RANGE(0x510116, 0x510117) AM_WRITE(tms_control3_w)
-	AM_RANGE(0x510118, 0x51011b) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x510120, 0x510123) AM_WRITE(eeprom_cs_w)
-	AM_RANGE(0x51012a, 0x51012b) AM_WRITE(tms_reset_w)
-	AM_RANGE(0x510132, 0x510133) AM_WRITE(tms_irq_w)
-	AM_RANGE(0x510146, 0x510147) AM_DEVWRITE8("serial", gaelco_serial_device, irq_enable, 0x00ff)
-	AM_RANGE(0x510156, 0x510157) AM_WRITE(analog_port_clock_w)
-	AM_RANGE(0x510166, 0x510167) AM_WRITE(analog_port_latch_w)
-	AM_RANGE(0x510176, 0x510177) AM_DEVWRITE8("serial", gaelco_serial_device, unknown_w, 0x00ff)
+	AM_RANGE(0x510106, 0x510107) AM_SELECT(0x000070) AM_WRITE8(outlatch_68000_w, 0x00ff)
 	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
 ADDRESS_MAP_END
 
+
+WRITE8_MEMBER(gaelco3d_state::mainlatch_68020_w)
+{
+	m_mainlatch->write_bit(offset >> 1, BIT(data, 0));
+}
+
+WRITE8_MEMBER(gaelco3d_state::outlatch_68020_w)
+{
+	m_outlatch->write_bit(offset >> 2, BIT(data, 0));
+}
 
 static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -783,23 +709,11 @@ static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x51003c, 0x51003f) AM_READ_PORT("IN3")
 	AM_RANGE(0x510040, 0x510043) AM_READ16(sound_status_r, 0x0000ffff)
 	AM_RANGE(0x510040, 0x510043) AM_WRITE16(sound_data_w, 0xffff0000)
-	AM_RANGE(0x510100, 0x510103) AM_READ(eeprom_data32_r)
-	AM_RANGE(0x510100, 0x510103) AM_WRITE(irq_ack32_w)
+	AM_RANGE(0x510100, 0x510103) AM_READWRITE16(eeprom_data_r, irq_ack_w, 0xffff0000)
+	AM_RANGE(0x510100, 0x510103) AM_DEVREAD8("serial", gaelco_serial_device, data_r, 0x000000ff)
+	AM_RANGE(0x510100, 0x510103) AM_SELECT(0x000038) AM_WRITE8(mainlatch_68020_w, 0x000000ff)
 	AM_RANGE(0x510104, 0x510107) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff0000)
-	AM_RANGE(0x510108, 0x51010b) AM_DEVWRITE8("serial", gaelco_serial_device, rts_w, 0x000000ff)
-	AM_RANGE(0x510110, 0x510113) AM_WRITE16(eeprom_data_w, 0x0000ffff)
-	AM_RANGE(0x510114, 0x510117) AM_WRITE16(tms_control3_w, 0x0000ffff)
-	AM_RANGE(0x510118, 0x51011b) AM_WRITE16(eeprom_clock_w, 0x0000ffff)
-	AM_RANGE(0x510120, 0x510123) AM_WRITE16(eeprom_cs_w, 0x0000ffff)
-	AM_RANGE(0x510124, 0x510127) AM_WRITE(radikalb_lamp_w)
-	AM_RANGE(0x510128, 0x51012b) AM_WRITE16(tms_reset_w, 0x0000ffff)
-	AM_RANGE(0x510130, 0x510133) AM_WRITE16(tms_irq_w, 0x0000ffff)
-	AM_RANGE(0x510134, 0x510137) AM_WRITE(unknown_137_w)
-	AM_RANGE(0x510138, 0x51013b) AM_WRITE(unknown_13a_w)
-	AM_RANGE(0x510144, 0x510147) AM_DEVWRITE8("serial", gaelco_serial_device, irq_enable, 0x000000ff)
-	AM_RANGE(0x510154, 0x510157) AM_WRITE16(analog_port_clock_w, 0x0000ffff)
-	AM_RANGE(0x510164, 0x510167) AM_WRITE16(analog_port_latch_w, 0x0000ffff)
-	AM_RANGE(0x510174, 0x510177) AM_DEVWRITE8("serial", gaelco_serial_device, unknown_w, 0x000000ff)
+	AM_RANGE(0x510104, 0x510107) AM_SELECT(0x000070) AM_WRITE8(outlatch_68020_w, 0x000000ff)
 	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
 ADDRESS_MAP_END
@@ -967,7 +881,6 @@ static MACHINE_CONFIG_START( gaelco3d )
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 
-
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -976,6 +889,25 @@ static MACHINE_CONFIG_START( gaelco3d )
 
 	MCFG_DEVICE_ADD("serial", GAELCO_SERIAL, 0)
 	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(gaelco3d_state, ser_irq))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC5 on bottom board next to EEPROM
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, tr_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, rts_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, tms_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(gaelco3d_state, tms_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gaelco3d_state, unknown_13a_w))
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC2 on top board near edge connector
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco3d_state, tms_control3_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco3d_state, radikalb_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco3d_state, unknown_137_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, irq_enable))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, analog_port_clock_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(gaelco3d_state, analog_port_latch_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, unknown_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

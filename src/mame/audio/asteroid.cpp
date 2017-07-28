@@ -7,8 +7,9 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "sound/discrete.h"
 #include "includes/asteroid.h"
+#include "machine/74259.h"
+#include "speaker.h"
 
 /************************************************************************/
 /* Asteroids Sound System Analog emulation by K.Wilkins Nov 2000        */
@@ -70,7 +71,7 @@ static const discrete_555_cc_desc asteroid_thump_555cc =
 #define ASTEROID_EXPLODE_SND        NODE_26
 #define ASTEROID_THRUST_SND         NODE_27
 
-DISCRETE_SOUND_START(asteroid)
+static DISCRETE_SOUND_START(asteroid)
 	/************************************************/
 	/* Asteroid Effects Relataive Gain Table        */
 	/*                                              */
@@ -216,7 +217,7 @@ DISCRETE_SOUND_START(asteroid)
 DISCRETE_SOUND_END
 
 
-DISCRETE_SOUND_START(astdelux)
+static DISCRETE_SOUND_START(astdelux)
 	/************************************************/
 	/* Asteroid delux sound hardware is mostly done */
 	/* in the Pokey chip except for the thrust and  */
@@ -308,18 +309,36 @@ WRITE8_MEMBER(asteroid_state::asteroid_thump_w)
 	m_discrete->write(space, ASTEROID_THUMP_DATA, data & 0x0f);
 }
 
-WRITE8_MEMBER(asteroid_state::asteroid_sounds_w)
-{
-	m_discrete->write(space, NODE_RELATIVE(ASTEROID_SAUCER_SND_EN, offset), data & 0x80);
-}
-
-WRITE8_MEMBER(asteroid_state::astdelux_sounds_w)
-{
-	/* Only ever activates the thrusters in Astdelux */
-	m_discrete->write(space, ASTEROID_THRUST_EN, data & 0x80);
-}
-
 WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 {
 	m_discrete->write(space, ASTEROID_NOISE_RESET, 0);
 }
+
+
+MACHINE_CONFIG_START(asteroid_sound)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(asteroid)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
+
+	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SND_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_FIRE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SEL>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SHIP_FIRE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_LIFE_EN>))
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(astdelux_sound)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(astdelux)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
+MACHINE_CONFIG_END

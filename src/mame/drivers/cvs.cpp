@@ -88,7 +88,7 @@ Additional work
 Todo & FIXME:
 
 - Emulate protection properly in later games (reads area 0x73fx);
-- Superbike hangs indefinitely when collecting balloon bonus the 
+- Superbike hangs indefinitely when collecting balloon bonus the
   second time around, protection or s2650 core bug?
 - the board most probably has discrete circuits. The 393Hz tone used
   for shots (superbike) and collisions (8ball) is just a guess.
@@ -1594,11 +1594,11 @@ DRIVER_INIT_MEMBER(cvs_state,superbik)
 	ROM[0x0168] = 0xc0;
 	ROM[0x0169] = 0xc0;
 	ROM[0x016a] = 0xc0;
-	
+
 	ROM[0x413f] = 0xc0;
 	ROM[0x4140] = 0xc0;
 	ROM[0x4141] = 0xc0;
-	
+
 	/* and speed up the protection check */
 	ROM[0x0099] = 0xc0;
 	ROM[0x009a] = 0xc0;

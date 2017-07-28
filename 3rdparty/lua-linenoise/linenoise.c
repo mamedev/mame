@@ -169,6 +169,12 @@ static int l_addcompletion(lua_State *L)
     return handle_ln_ok(L);
 }
 
+static int l_refresh(lua_State *L)
+{
+    linenoiseRefresh();
+    return handle_ln_ok(L);
+}
+
 luaL_Reg linenoise_funcs[] = {
     { "linenoise", l_linenoise },
     { "historyadd", l_historyadd },
@@ -179,6 +185,7 @@ luaL_Reg linenoise_funcs[] = {
     { "setcompletion", l_setcompletion},
     { "addcompletion", l_addcompletion },
     { "preload", l_preloadbuffer },
+    { "refresh", l_refresh },
 
     /* Aliases for more consistent function names */
     { "addhistory", l_historyadd },

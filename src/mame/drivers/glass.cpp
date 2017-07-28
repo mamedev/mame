@@ -14,10 +14,24 @@ except for the Promat licensed Korean version which is unprotected.
 #include "emu.h"
 #include "includes/glass.h"
 
+#include "machine/gaelco_ds5002fp.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+WRITE8_MEMBER(glass_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(glass_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
 
 
 WRITE16_MEMBER(glass_state::clr_int_w)
@@ -65,38 +79,52 @@ WRITE16_MEMBER(glass_state::OKIM6295_bankswitch_w)
 
 WRITE16_MEMBER(glass_state::coin_w)
 {
-	switch (offset >> 3)
-	{
-		case 0x00:  /* Coin Lockouts */
-		case 0x01:
-			machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
-			break;
-		case 0x02:  /* Coin Counters */
-		case 0x03:
-			machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
-			break;
-		case 0x04:  /* Sound Muting (if bit 0 == 1, sound output stream = 0) */
-			break;
-	}
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
 }
 
+WRITE_LINE_MEMBER(glass_state::coin1_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(glass_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+WRITE_LINE_MEMBER(glass_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(glass_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+
+static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, glass_state )
+	AM_RANGE(0x0000, 0xffff) AM_MASK(0x3fff) AM_READWRITE(shareram_r, shareram_w) // shared RAM with the main CPU
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")                            /* Video RAM */
-	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                     /* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                             /* Video Registers */
-	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)                                                        /* CLR INT Video */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                                               /* Sprite RAM */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                   // ROM
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")                                // Video RAM
+	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                   // Extra Video RAM
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                           // Video Registers
+	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)                                                      // CLR INT Video
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                                             // Sprite RAM
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x700008, 0x700009) AM_WRITE(blitter_w)                                                  /* serial blitter */
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                            /* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)              /* OKI6295 status register */
-	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(coin_w)                                                     /* Coin Counters/Lockout */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("mainram")                                                 /* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0x700008, 0x700009) AM_WRITE(blitter_w)                                                      // serial blitter
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE(coin_w)                                     // Coin Counters/Lockout
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                          // OKI6295 bankswitch
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)            // OKI6295 status register
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                              // Work RAM (partially shared with DS5002FP)
 ADDRESS_MAP_END
 
 
@@ -206,6 +234,12 @@ static MACHINE_CONFIG_START( glass )
 	MCFG_CPU_PROGRAM_MAP(glass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", glass_state,  interrupt)
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(glass_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(glass_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(glass_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(glass_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // Sound Muting (if bit 0 == 1, sound output stream = 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -228,13 +262,23 @@ static MACHINE_CONFIG_START( glass )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( glass_ds5002fp, glass )
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+MACHINE_CONFIG_END
+
 ROM_START( glass ) /* Version 1.1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
 	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	//DS5002FP_SET_MON( 0x88 )
+	//DS5002FP_SET_RPCTL( 0x00 )
+	//DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -256,8 +300,13 @@ ROM_START( glass10 ) /* Version 1.0 */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	//DS5002FP_SET_MON( x )
+	//DS5002FP_SET_RPCTL( x )
+	//DS5002FP_SET_CRCR( x )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -279,8 +328,13 @@ ROM_START( glass10a ) /* Title screen shows "GLASS" and under that "Break Editio
 	ROM_LOAD16_BYTE( "spl-c23.bin", 0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef) )
 	ROM_LOAD16_BYTE( "spl-c22.bin", 0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	//DS5002FP_SET_MON( x )
+	//DS5002FP_SET_RPCTL( x )
+	//DS5002FP_SET_CRCR( x )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -341,91 +395,6 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 	}
 }
 
-/* How does the protection work?
-
-  We know in World Rally it shares the whole of main RAM with the Dallas, with subtle reads and writes / values being checked.. so I guess this will be similar at least
-  and thus very hard to figure out if done properly
-
- */
-
-READ16_MEMBER( glass_state::mainram_r )
-{
-	uint16_t ret = m_mainram[offset];
-	int pc = space.device().safe_pc();
-
-	if (offset == (0xfede96 - 0xfec000)>>1)
-	{
-		// this address seems important, the game will abort with 'power failure' depending on some reads, presumably referring to the power to the battery
-
-		// there are also various code segments like the one below
-		/*
-		start:
-		tst.b   this address
-		bne     end
-		tst.b   $fede1d.l
-		nop << why?
-		bne     start
-		end:
-		*/
-		return 0x0000;
-		//printf("%06x read %06x - %04x %04x\n", pc , (offset*2 + 0xfec000), ret, mem_mask);
-	}
-	else if (offset == (0xfede1c - 0xfec000)>>1)
-	{
-		// related to above, could also be some command ack?
-		logerror("%06x read %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), ret, mem_mask);
-	}
-	else if (offset == (0xfede26 - 0xfec000)>>1)
-	{
-		logerror("%06x read %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), ret, mem_mask);
-	}
-	return ret;
-}
-
-WRITE16_MEMBER( glass_state::mainram_w )
-{
-	int pc = space.device().safe_pc();
-
-	COMBINE_DATA(&m_mainram[offset]);
-
-	if (offset == (0xfede02 - 0xfec000)>>1)
-	{
-//      printf("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
-		// several checks write here then expect it to appear mirrored, might be some kind of command + command ack
-		if (ACCESSING_BITS_8_15) // sometimes mask 0xff00, but not in cases which poll for change
-		{
-			mem_mask = 0x00ff;
-			data >>=8;
-			COMBINE_DATA(&m_mainram[offset]);
-		}
-		return;
-	}
-	else if (offset == (0xfede1c - 0xfec000)>>1)
-	{
-		// see notes about 0xfede96 in read, this address seems important
-		logerror("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
-		if (mem_mask == 0x00ff)
-		{
-			int realdata = data;
-
-			// don't store the bits written, game checks they get cleared?
-			data &= 0xff00;
-			COMBINE_DATA(&m_mainram[offset]);
-
-			// a command?
-			if (realdata == 0x0002)
-			{
-				// there is a check on address 0xfede26 just after writing 0002 here..
-				offset = (0xfede26 - 0xfec000) >> 1;
-				data = 0xff00;
-				mem_mask = 0xff00;
-				COMBINE_DATA(&m_mainram[offset]);
-			}
-		}
-		return;
-	}
-
-}
 
 DRIVER_INIT_MEMBER(glass_state, glass)
 {
@@ -450,21 +419,13 @@ DRIVER_INIT_MEMBER(glass_state, glass)
 }
 
 
-DRIVER_INIT_MEMBER(glass_state,glassp)
-{
-	DRIVER_INIT_CALL(glass);
-
-	/* install custom handler over RAM for protection */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec000, 0xfeffff, read16_delegate(FUNC(glass_state::mainram_r), this), write16_delegate(FUNC(glass_state::mainram_w),this));
-
-}
 
 // ALL versions of Glass contain the 'Break Edition' string (it just seems to be part of the title?)
 // The 2 version 1.0 releases are very similar code, it was thought that one was a break edition and the other wasn't, but as both contain the string this seems unlikely.
 // Version 1.1 releases also show Version 1994 on the title screen.  These versions do not have skulls in the playfield (at least not on early stages)
 // The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
 
-GAME( 1994, glass,    0,     glass, glass, glass_state, glassp, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Version 1994)",                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, glasskr,  glass, glass, glass, glass_state, glass,  ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE ) // promat stickers on program roms
-GAME( 1993, glass10,  glass, glass, glass, glass_state, glassp, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 1)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, glass10a, glass, glass, glass, glass_state, glassp, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 2)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Version 1994)",                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, glasskr,  glass, glass,          glass, glass_state, glass, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE ) // promat stickers on program roms
+GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 1)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 2)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

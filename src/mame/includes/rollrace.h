@@ -20,7 +20,6 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_fg_tilemap;
-	int m_charbank[2];
 	int m_bkgpage;
 	int m_bkgflip;
 	int m_chrbank;
@@ -35,16 +34,18 @@ public:
 
 	DECLARE_READ8_MEMBER(fake_d800_r);
 	DECLARE_WRITE8_MEMBER(fake_d800_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(charbank_0_w);
+	DECLARE_WRITE_LINE_MEMBER(charbank_1_w);
 	DECLARE_WRITE8_MEMBER(bkgpen_w);
-	DECLARE_WRITE8_MEMBER(spritebank_w);
+	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
 	DECLARE_WRITE8_MEMBER(backgroundpage_w);
 	DECLARE_WRITE8_MEMBER(backgroundcolor_w);
 	DECLARE_WRITE8_MEMBER(flipy_w);
-	DECLARE_WRITE8_MEMBER(flipx_w);
+	DECLARE_WRITE_LINE_MEMBER(flipx_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(cram_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

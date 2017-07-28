@@ -67,7 +67,7 @@ protected:
 	};
 
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size);
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_delegate map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -95,6 +95,8 @@ protected:
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
+	DECLARE_ADDRESS_MAP(program_2kb, 8);
+	DECLARE_ADDRESS_MAP(program_4kb, 8);
 
 private:
 	address_space_config m_program_config;
@@ -107,6 +109,8 @@ private:
 	// callbacks
 	devcb_read8 m_input_cb[4];
 	devcb_write8 m_output_cb[4];
+
+	uint32_t m_rom_size;
 
 	/* registers */
 	uint16_t m_pc;              /* program counter */
@@ -344,6 +348,13 @@ public:
 };
 
 
+class z8681_device : public z8_device
+{
+public:
+	z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // Zilog Z8601
 DECLARE_DEVICE_TYPE(Z8601, z8601_device)
 
@@ -352,5 +363,8 @@ DECLARE_DEVICE_TYPE(UB8830D, ub8830d_device)
 
 // Zilog Z8611
 DECLARE_DEVICE_TYPE(Z8611, z8611_device)
+
+// Zilog Z8681 ROMless
+DECLARE_DEVICE_TYPE(Z8681, z8681_device)
 
 #endif // MAME_CPU_Z8_Z8_H

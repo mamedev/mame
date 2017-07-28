@@ -263,9 +263,9 @@ uint32_t namco_audio_device::namco_update_one(stream_sample_t *buffer, int lengt
     0x1f:       ch 2    volume
 */
 
-WRITE8_MEMBER( namco_device::pacman_sound_enable_w )
+WRITE_LINE_MEMBER(namco_device::pacman_sound_enable_w)
 {
-	m_sound_enable = data;
+	m_sound_enable = state;
 }
 
 WRITE8_MEMBER( namco_device::pacman_sound_w )
@@ -491,9 +491,9 @@ WRITE8_MEMBER( namco_device::polepos_sound_w )
     0x3e        ch 7    waveform select & frequency
 */
 
-void namco_15xx_device::mappy_sound_enable(int enable)
+WRITE_LINE_MEMBER(namco_15xx_device::mappy_sound_enable)
 {
-	m_sound_enable = enable;
+	m_sound_enable = state;
 }
 
 WRITE8_MEMBER(namco_15xx_device::namco_15xx_w)

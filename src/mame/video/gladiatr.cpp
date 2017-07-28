@@ -127,14 +127,19 @@ WRITE8_MEMBER(gladiatr_state_base::paletteram_w)
 }
 
 
-WRITE8_MEMBER(gladiatr_state_base::spritebuffer_w)
+WRITE_LINE_MEMBER(gladiatr_state_base::spritebuffer_w)
 {
-	m_sprite_buffer = data & 1;
+	m_sprite_buffer = state;
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_spritebank_w)
+WRITE8_MEMBER(gladiatr_state_base::spritebuffer_w)
 {
-	m_sprite_bank = (data & 1) ? 4 : 2;
+	m_sprite_buffer = data & 0x01;
+}
+
+WRITE_LINE_MEMBER(gladiatr_state::spritebank_w)
+{
+	m_sprite_bank = state ? 4 : 2;
 }
 
 

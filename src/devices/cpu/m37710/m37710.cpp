@@ -150,10 +150,10 @@ std::vector<std::pair<int, const address_space_config *>> m37710_cpu_device::mem
 const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
 {
 	// maskable
-	0x6f,	// DMA3          0
-	0x6e,	// DMA2          1
-	0x6d,	// DMA1          2
-	0x6c,	// DMA0          3
+	0x6f,   // DMA3          0
+	0x6e,   // DMA2          1
+	0x6d,   // DMA1          2
+	0x6c,   // DMA0          3
 	0x70,   // ADC           4
 	0x73,   // UART 1 XMIT   5
 	0x74,   // UART 1 RECV   6
@@ -182,10 +182,10 @@ const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
 const int m37710_cpu_device::m37710_irq_vectors[M37710_LINE_MAX] =
 {
 	// maskable
-	0xffce,	// DMA3
-	0xffd0,	// DMA2
-	0xffd2,	// DMA1
-	0xffd4,	// DMA0
+	0xffce, // DMA3
+	0xffd0, // DMA2
+	0xffd2, // DMA1
+	0xffd4, // DMA0
 	0xffd6, // A-D converter
 	0xffd8, // UART1 transmit
 	0xffda, // UART1 receive
@@ -225,7 +225,7 @@ const char *const m37710_cpu_device::m37710_rnames[128] =
 	"Port P3 reg",
 	"Port P2 dir reg",
 	"Port P3 dir reg",
-	"Port P4 reg",		// 10 (0x0A) - ports 0, 1, 2, 3 don't exist on 37720
+	"Port P4 reg",      // 10 (0x0A) - ports 0, 1, 2, 3 don't exist on 37720
 	"Port P5 reg",
 	"Port P4 dir reg",
 	"Port P5 dir reg",
@@ -355,7 +355,7 @@ TIMER_CALLBACK_MEMBER( m37710_cpu_device::m37710_timer_cb )
 	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;
 
-//	logerror("Timer %d expired\n", which);
+//  logerror("Timer %d expired\n", which);
 
 	m_timers[which]->adjust(m_reload[which], param);
 

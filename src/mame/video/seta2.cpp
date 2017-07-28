@@ -493,9 +493,9 @@ WRITE_LINE_MEMBER(seta2_state::screen_vblank)
 }
 
 // staraudi
-void seta2_state::draw_rgbram(bitmap_ind16 &bitmap)
+void staraudi_state::draw_rgbram(bitmap_ind16 &bitmap)
 {
-	if (!m_rgbram || !(m_cam & 0x0008))
+	if (!(m_cam & 0x0008))
 		return;
 
 	for (int y = 0x100; y < 0x200; ++y)
@@ -508,10 +508,11 @@ void seta2_state::draw_rgbram(bitmap_ind16 &bitmap)
 		}
 	}
 }
-uint32_t seta2_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t staraudi_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update(screen, bitmap, cliprect);
-//  draw_rgbram(bitmap);
+	if (false)
+		draw_rgbram(bitmap);
 
 	return 0;
 }

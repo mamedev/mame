@@ -9,7 +9,6 @@ Atari Sprint 8 driver
 #include "emu.h"
 #include "includes/sprint8.h"
 #include "cpu/m6800/m6800.h"
-#include "speaker.h"
 
 
 
@@ -96,12 +95,17 @@ WRITE8_MEMBER(sprint8_state::lockout_w)
 }
 
 
-WRITE8_MEMBER(sprint8_state::int_reset_w)
+WRITE_LINE_MEMBER(sprint8_state::int_reset_w)
 {
-	m_collision_reset = !(data & 1);
+	m_collision_reset = !state;
 
 	if (m_collision_reset)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(sprint8_state::team_w)
+{
+	m_team = state;
 }
 
 
@@ -117,14 +121,8 @@ static ADDRESS_MAP_START( sprint8_map, AS_PROGRAM, 8, sprint8_state )
 	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_SHARE("pos_v_ram")
 	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_SHARE("pos_d_ram")
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(lockout_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(screech_w)
-	AM_RANGE(0x1d03, 0x1d03) AM_WRITENOP
-	AM_RANGE(0x1d04, 0x1d04) AM_WRITENOP
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_SHARE("team")
-	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(motor_w)
+	AM_RANGE(0x1d00, 0x1d07) AM_DEVWRITE("latch", f9334_device, write_d0)
+	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE("motor", f9334_device, write_d0)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITENOP /* probably a watchdog, disabled in service mode */
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -479,23 +477,7 @@ static MACHINE_CONFIG_START( sprint8 )
 	MCFG_PALETTE_INDIRECT_ENTRIES(18)
 	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
 
-	/* sound hardware */
-	/* the proper way is to hook up 4 speakers, but they are not really
-	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
-	MCFG_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)      /* front */
-	MCFG_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)     /* left */
-	MCFG_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)    /* back */
-	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)      /* right */
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(sprint8)
-	MCFG_SOUND_ROUTE(0, "speaker_1_2", 1.0)
-	/* volumes on other channels defaulted to off, */
-	/* user can turn them up if needed. */
-	/* The game does not sound good with all channels mixed to stereo. */
-	MCFG_SOUND_ROUTE(1, "speaker_3_7", 0.0)
-	MCFG_SOUND_ROUTE(2, "speaker_5_6", 0.0)
-	MCFG_SOUND_ROUTE(3, "speaker_4_8", 0.0)
+	MCFG_FRAGMENT_ADD(sprint8_audio)
 MACHINE_CONFIG_END
 
 

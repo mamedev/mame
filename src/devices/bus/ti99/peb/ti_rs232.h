@@ -16,6 +16,7 @@
 #pragma once
 
 #include "peribox.h"
+#include "machine/74259.h"
 #include "machine/tms9902.h"
 
 namespace bus { namespace ti99 { namespace peb {
@@ -45,14 +46,23 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( int0_callback );
-	DECLARE_WRITE_LINE_MEMBER( int1_callback );
-	DECLARE_WRITE_LINE_MEMBER( rcv0_callback );
-	DECLARE_WRITE_LINE_MEMBER( rcv1_callback );
-	DECLARE_WRITE8_MEMBER( xmit0_callback );
-	DECLARE_WRITE8_MEMBER( xmit1_callback );
-	DECLARE_WRITE8_MEMBER( ctrl0_callback );
-	DECLARE_WRITE8_MEMBER( ctrl1_callback );
+	DECLARE_WRITE_LINE_MEMBER(int0_callback);
+	DECLARE_WRITE_LINE_MEMBER(int1_callback);
+	DECLARE_WRITE_LINE_MEMBER(rcv0_callback);
+	DECLARE_WRITE_LINE_MEMBER(rcv1_callback);
+	DECLARE_WRITE8_MEMBER(xmit0_callback);
+	DECLARE_WRITE8_MEMBER(xmit1_callback);
+	DECLARE_WRITE8_MEMBER(ctrl0_callback);
+	DECLARE_WRITE8_MEMBER(ctrl1_callback);
+
+	DECLARE_WRITE_LINE_MEMBER(selected_w);
+	DECLARE_WRITE_LINE_MEMBER(pio_direction_in_w);
+	DECLARE_WRITE_LINE_MEMBER(pio_handshake_out_w);
+	DECLARE_WRITE_LINE_MEMBER(pio_spareout_w);
+	DECLARE_WRITE_LINE_MEMBER(flag0_w);
+	DECLARE_WRITE_LINE_MEMBER(cts0_w);
+	DECLARE_WRITE_LINE_MEMBER(cts1_w);
+	DECLARE_WRITE_LINE_MEMBER(led_w);
 
 	void        incoming_dtr(int uartind, line_state value);
 	void        transmit_data(int uartind, uint8_t value);
@@ -65,6 +75,8 @@ private:
 	void        output_line_state(int uartind, int mask, uint8_t value);
 	void        output_exception(int uartind, int param, uint8_t value);
 	void        ctrl_callback(int uartind, int type, uint8_t data);
+
+	required_device<ls259_device> m_crulatch;
 
 	// UART chips
 	tms9902_device*             m_uart[2];

@@ -69,6 +69,7 @@ C004      76489 #4 trigger
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/flt_rc.h"
@@ -79,6 +80,49 @@ C004      76489 #4 trigger
 
 void tp84_state::machine_start()
 {
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_sub_irq_mask));
+	save_item(NAME(m_flipscreen_x));
+	save_item(NAME(m_flipscreen_y));
+}
+
+
+INTERRUPT_GEN_MEMBER(tp84_state::main_vblank_irq)
+{
+	if (m_irq_enable)
+		device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+
+WRITE_LINE_MEMBER(tp84_state::irq_enable_w)
+{
+	m_irq_enable = state;
+	if (!m_irq_enable)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+
+WRITE_LINE_MEMBER(tp84_state::coin_counter_1_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(tp84_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+
+WRITE_LINE_MEMBER(tp84_state::flip_screen_x_w)
+{
+	m_flipscreen_x = state;
+}
+
+
+WRITE_LINE_MEMBER(tp84_state::flip_screen_y_w)
+{
+	m_flipscreen_y = state;
 }
 
 
@@ -132,9 +176,8 @@ static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("P1")
 	AM_RANGE(0x2840, 0x2840) AM_READ_PORT("P2")
 	AM_RANGE(0x2860, 0x2860) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2") AM_WRITEONLY
-	AM_RANGE(0x3004, 0x3004) AM_WRITEONLY AM_SHARE("flipscreen_x")
-	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_SHARE("flipscreen_y")
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2")
+	AM_RANGE(0x3000, 0x3007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITEONLY AM_SHARE("scroll_x")
@@ -158,9 +201,8 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x1a20, 0x1a20) AM_READ_PORT("P1")
 	AM_RANGE(0x1a40, 0x1a40) AM_READ_PORT("P2")
 	AM_RANGE(0x1a60, 0x1a60) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2") AM_WRITENOP
-	AM_RANGE(0x1c04, 0x1c04) AM_WRITEONLY AM_SHARE("flipscreen_x")
-	AM_RANGE(0x1c05, 0x1c05) AM_WRITEONLY AM_SHARE("flipscreen_y")
+	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1c00, 0x1c07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x1e80, 0x1e80) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITEONLY AM_SHARE("scroll_x")
@@ -291,7 +333,7 @@ static MACHINE_CONFIG_START( tp84 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
@@ -302,6 +344,13 @@ static MACHINE_CONFIG_START( tp84 )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3B
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tp84_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tp84_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tp84_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tp84_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tp84_state, flip_screen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

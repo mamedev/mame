@@ -24949,7 +24949,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="4in1_003">
 		<description>4 in 1 (Euro, 4B-003)</description>
 		<year>19??</year>
@@ -24962,8 +24962,6 @@
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- 4in1_003 missing -->
 
 	<software name="4in1_004">
 		<description>4 in 1 (Euro, 4B-004)</description>

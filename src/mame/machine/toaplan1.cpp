@@ -182,20 +182,26 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound_w)
 }
 
 
-WRITE8_MEMBER(toaplan1_rallybik_state::rallybik_coin_w)
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_counter_1_w)
 {
-	switch (data) {
-		case 0x08: if (m_coin_count) { machine().bookkeeping().coin_counter_w(0, 1); machine().bookkeeping().coin_counter_w(0, 0); } break;
-		case 0x09: if (m_coin_count) { machine().bookkeeping().coin_counter_w(2, 1); machine().bookkeeping().coin_counter_w(2, 0); } break;
-		case 0x0a: if (m_coin_count) { machine().bookkeeping().coin_counter_w(1, 1); machine().bookkeeping().coin_counter_w(1, 0); } break;
-		case 0x0b: if (m_coin_count) { machine().bookkeeping().coin_counter_w(3, 1); machine().bookkeeping().coin_counter_w(3, 0); } break;
-		case 0x0c: machine().bookkeeping().coin_lockout_w(0, 1); machine().bookkeeping().coin_lockout_w(2, 1); break;
-		case 0x0d: machine().bookkeeping().coin_lockout_w(0, 0); machine().bookkeeping().coin_lockout_w(2, 0); break;
-		case 0x0e: machine().bookkeeping().coin_lockout_w(1, 1); machine().bookkeeping().coin_lockout_w(3, 1); break;
-		case 0x0f: machine().bookkeeping().coin_lockout_w(1, 0); machine().bookkeeping().coin_lockout_w(3, 0); m_coin_count=1; break;
-		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",space.device().safe_pcbase(),data); break;
-	}
+	machine().bookkeeping().coin_counter_w(0, state);
 }
+
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_lockout_1_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_lockout_2_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
 
 WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
 {
@@ -247,7 +253,6 @@ WRITE_LINE_MEMBER(toaplan1_state::toaplan1_reset_callback)
 MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 {
 	m_intenable = 0;
-	m_coin_count = 0;
 	machine().bookkeeping().coin_lockout_global_w(0);
 }
 
@@ -276,7 +281,6 @@ MACHINE_RESET_MEMBER(toaplan1_state,vimana)
 void toaplan1_state::toaplan1_driver_savestate()
 {
 	save_item(NAME(m_intenable));
-	save_item(NAME(m_coin_count));
 }
 
 void toaplan1_state::demonwld_driver_savestate()

@@ -38,11 +38,12 @@ public:
 	uint8_t m_irq_mask;
 	uint8_t m_SN76496_latch;
 
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(konami_SN76496_latch_w) { m_SN76496_latch = data; };
 	DECLARE_WRITE8_MEMBER(konami_SN76496_w) { m_sn->write(space, offset, m_SN76496_latch); };
 

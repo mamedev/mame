@@ -49,15 +49,17 @@ public:
 	int      m_old_gfx_bank;                    // needed by atlantol
 	int      m_sprites_gfx_banked;
 
-	uint8_t    m_irq_mask;
-	uint8_t    m_yieartf_nmi_mask;
-	DECLARE_WRITE8_MEMBER(coin_w);
+	bool     m_irq_mask;
+	bool     m_nmi_mask;
+
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(questions_bank_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(yieartf_nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
 	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
-	DECLARE_WRITE8_MEMBER(trackfld_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
 	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
 	DECLARE_READ8_MEMBER(trackfld_speech_r);

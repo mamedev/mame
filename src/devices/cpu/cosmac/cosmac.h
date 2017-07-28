@@ -384,24 +384,24 @@ protected:
 	devcb_write8           m_write_sc;
 
 	// control modes
-	enum cosmac_mode
+	enum class cosmac_mode : u8
 	{
-		COSMAC_MODE_LOAD = 0,
-		COSMAC_MODE_RESET,
-		COSMAC_MODE_PAUSE,
-		COSMAC_MODE_RUN
+		LOAD = 0,
+		RESET,
+		PAUSE,
+		RUN
 	};
 
 	// execution states
-	enum cosmac_state
+	enum class cosmac_state : u8
 	{
-		COSMAC_STATE_0_FETCH = 0,
-		COSMAC_STATE_1_RESET,
-		COSMAC_STATE_1_INIT,
-		COSMAC_STATE_1_EXECUTE,
-		COSMAC_STATE_2_DMA_IN,
-		COSMAC_STATE_2_DMA_OUT,
-		COSMAC_STATE_3_INT
+		STATE_0_FETCH = 0,
+		STATE_1_RESET,
+		STATE_1_INIT,
+		STATE_1_EXECUTE,
+		STATE_2_DMA_IN,
+		STATE_2_DMA_OUT,
+		STATE_3_INT
 	};
 
 	// internal state

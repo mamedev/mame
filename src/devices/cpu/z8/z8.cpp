@@ -155,45 +155,53 @@ enum
 DEFINE_DEVICE_TYPE(Z8601,   z8601_device,   "z8601",   "Z8601")
 DEFINE_DEVICE_TYPE(UB8830D, ub8830d_device, "ub8830d", "UB8830D")
 DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Z8611")
+DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Z8681")
 
 
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, z8_device )
+DEVICE_ADDRESS_MAP_START( program_2kb, 8, z8_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, z8_device )
+DEVICE_ADDRESS_MAP_START( program_4kb, 8, z8_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_delegate map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, (size == 4) ? ADDRESS_MAP_NAME(program_4kb) : ADDRESS_MAP_NAME(program_2kb))
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, map)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_input_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
+	, m_rom_size(rom_size)
 {
 }
 
 
 z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8601, tag, owner, clock, 2)
+	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, address_map_delegate(FUNC(z8601_device::program_2kb), this))
 {
 }
 
 
 ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, UB8830D, tag, owner, clock, 2)
+	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, address_map_delegate(FUNC(ub8830d_device::program_2kb), this))
 {
 }
 
 
 z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8611, tag, owner, clock, 4)
+	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, address_map_delegate(FUNC(z8611_device::program_4kb), this))
+{
+}
+
+
+z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z8681, tag, owner, clock, 0, address_map_delegate())
 {
 }
 
@@ -774,6 +782,10 @@ void z8_device::execute_run()
 void z8_device::device_reset()
 {
 	m_pc = 0x000c;
+
+	// crude hack for Z8681
+	if (m_rom_size == 0)
+		m_pc |= m_input_cb[0]() << 8;
 
 	register_write(Z8_REGISTER_TMR, 0x00);
 	register_write(Z8_REGISTER_PRE1, PRE1 & 0xfc);

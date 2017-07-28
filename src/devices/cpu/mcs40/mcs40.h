@@ -146,7 +146,7 @@ public:
 		AS_RAM_PORTS,
 		AS_PROGRAM_MEMORY
 	};
-	enum class phase { A1, A2, A3, M1, M2, X1, X2, X3 };
+	enum class phase : u8 { A1, A2, A3, M1, M2, X1, X2, X3 };
 
 	// step isn't a real signal, but realistically anything watching the bus will have a counter to track it
 	typedef device_delegate<void (phase step, u8 sync, u8 data)> bus_cycle_delegate;
@@ -170,8 +170,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(get_4289_f_l) const { return BIT(m_4289_f_l, 0); } // 1 = odd, 0 = even
 
 protected:
-	enum class cycle { OP, IM, IN };
-	enum class pmem { NONE, READ, WRITE };
+	enum class cycle : u8 { OP, IM, IN };
+	enum class pmem : u8 { NONE, READ, WRITE };
 
 	mcs40_cpu_device_base(
 			machine_config const &mconfig,

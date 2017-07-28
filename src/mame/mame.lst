@@ -137,6 +137,7 @@ intruder                        // (c) 1980 GamePlan (Taito)
 invaddlx                        // 852 [1980] Midway
 invader4                        // bootleg
 invaderl                        // bootleg
+invadernc                       // bootleg (Nas Corp)
 invadersem                      // Electromar
 invadpt2                        // 852 [1980] Taito
 invadpt2br                      // Taito do Brasil
@@ -862,9 +863,18 @@ acrnsys1                        // 1979 Acorn System 1 (Microcomputer Kit)
 @source:actfancr.cpp
 actfancr                        // (c) 1989 Data East Corporation (World)
 actfancr1                       // (c) 1989 Data East Corporation (World)
+actfancr2                       // (c) 1989 Data East Corporation (World)
 actfancrj                       // (c) 1989 Data East Corporation (Japan)
 triothep                        // (c) 1989 Data East Corporation (World)
 triothepj                       // (c) 1989 Data East Corporation (Japan)
+
+@source:acvirus.cpp
+virusa							// (c) 1997 Access Gmbh
+virusb							// (c) 1999 Access Gmbh
+virusc							// (c) 2002 Access Gmbh
+virusrck						// (c) 2001 Access Gmbh
+virusrckxl						// (c) 2002 Access Gmbh
+viruscl							// (c) 2004 Access Gmbh
 
 @source:adam.cpp
 adam                            // Coleco Adam
@@ -10049,6 +10059,7 @@ sf2m6                           // hack
 sf2m7                           // hack
 sf2m8                           // bootleg
 sf2qp1                          // hack
+sf2qp2                          // hack
 sf2rb                           // hack
 sf2rb2                          // hack
 sf2rb3                          // hack
@@ -10506,15 +10517,24 @@ airraid                         // (c) 1987 Seibu Kaihatsu
 cshooter                        // (c) 1987 JKH (bootleg)
 
 @source:csplayh5.cpp
+aimode                          // (c) 1999
 bikiniko                        // (c) 1999
 csplayh1                        // (c) 1995
 csplayh5                        // (c) 1998
+csplayh6                        // (c) 1999
 csplayh7                        // (c) 1999
 fuudol                          // (c) 2000
 junai                           // (c) 1998
 junai2                          // (c) 1998
+mogitate                        // (c) 1998
+nichidvd                        //
+nichisel                        // (c) 2000
+mjgalpri                        // (c) 1998
 mjmania                         // (c) 1999
+pokoachu                        // (c) 1999
+renaimj                         // (c) 1999
 thenanpa                        // (c) 1999
+tsuwaku                         // (c) 2000
 
 @source:cswat.cpp
 cswat                           // (c) 1984
@@ -12028,6 +12048,10 @@ btm2105                         // 1985 BT Merlin M2105
 @source:elekscmp.cpp
 elekscmp                        //
 
+@source:elektronmono.cpp
+monomach						// MK2 (c) 2004 Elektron
+machdrum						// MK2 (c) 2007 Elektron
+
 @source:elf.cpp
 elf2                            //
 
@@ -12477,6 +12501,7 @@ fscc9b                          //
 fscc9c                          //
 fscc9ps                         //
 fscc12                          //
+fscc12b                         //
 granits                         // RCS
 reversic                        //
 super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
@@ -12617,7 +12642,7 @@ fmtownssj                       // FM-Towns II SJ
 fmtownsux                       // 1991.11 FM-Towns II UX
 
 @source:fontwriter.cpp
-fw700ger						// (c) Sharp
+fw700ger                        // (c) Sharp
 
 @source:foodf.cpp
 foodf                           // 136020           (c) 1982        // made by Gencomp
@@ -12829,8 +12854,8 @@ aligator                        // (c) 1994 - Ref 940411
 aligatorun                      // (c) 1994 - Ref 940411 (unprotected)
 bang                            // (c) 1998 - Ref ???
 bangj                           // (c) 1999 - Ref ???
-grtesoro                        // (c) 1999 - Ref ???
-grtesoro4                       // (c) 1999 - Ref ???
+play2000                        // (c) 1999 - Ref ???
+play2000a                       // (c) 1999 - Ref ???
 maniacsq                        // (c) 1996 - Ref 940411 - (unprotected)
 maniacsqa                       // (c) 1996 - Ref 940411
 snowboar                        // (c) 1996 - Ref 960419/1
@@ -13664,6 +13689,8 @@ gvrxpsup                        // Global VR XP OS Update/Install - 06/11/02
 gvrxpsys                        // Global VR XP OS Install - 09/30/01
 hyperv2                         // Hyper V2 (Global VR) Install - 06/12/02
 hyperv2a                        // Hyper V2 (Global VR) Install - 09/30/01
+nfs                             // Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)
+nfsgt                           // Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)
 nfsug                           // Need For Speed: Underground Install (2 Discs) (v1.1)
 
 @source:gluck2.cpp
@@ -14095,7 +14122,9 @@ gticlubj                        // GX688 (c)1996 Japan JAA
 gticlubu                        // GX688 (c)1996 USA UAA
 hangplt                         // GX685 (c)1997 Japan JAB
 hangpltu                        // GX685 (c)1997 USA UAA
-slrasslt                        // GX792 (c)1996 USA UAA
+slrasslt                        // GX792 (c)1997 USA UAA
+slrassltj                       // GX792 (c)1997 Japan JAA (Solar Assault Revised)
+slrassltj1                      // GX672 (c)1997 Japan JAA (original Solar Assault)
 thunderh                        // GX680 (c)1996 Euro EAA
 thunderhu                       // GX680 (c)1996 USA UAA
 
@@ -14548,15 +14577,21 @@ gnw_jr55                        // Nintendo
 gnw_mc25                        // Nintendo
 gnw_ml102                       // Nintendo
 gnw_mw56                        // Nintendo
+kbilly                          // Konami
 kblades                         // Konami
 kbucky                          // Konami
 kcontra                         // Konami
+kdribble                        // Konami
+kgarfld                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
+knfl                            // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
 nupogodi                        // Elektronika
 tddragon                        // Tiger
+tgaunt                          // Tiger
+tsjam                           // Tiger
 tsonic                          // Tiger
 
 @source:hh_tms1k.cpp
@@ -28502,6 +28537,7 @@ metlhawkj                       // (c) 1988
 mirninja                        // (c) 1988 (Japan)
 ordyne                          // (c) 1988
 ordynej                         // (c) 1988
+ordyneje                        // (c) 1988
 phelios                         // (c) 1988
 pheliosj                        // (c) 1988 (Japan)
 rthun2                          // (c) 1990
@@ -32171,6 +32207,7 @@ retofinv                        // A37 (c) 1985 Taito Corporation
 retofinvb                       // bootleg
 retofinvb1                      // bootleg
 retofinvb2                      // bootleg
+retofinvb3                      // bootleg
 
 @source:rex6000.cpp
 ds2                             //
@@ -33677,7 +33714,7 @@ qzkklgy2                        // (c) 1993 Tecmo
 qzkklogy                        // (c) 1992 Tecmo
 rezon                           // (c) 1991 Allumer
 rezont                          // (c) 1991 Allumer / Taito
-setaroul                        // UF   (c) 19?? Seta / Visco
+setaroul                        // UF   (c) 1989? Visco
 simpsonjr                       // bootleg of J. J. Squawkers by Daigom
 sokonuke                        // (c) 1995 Sammy Industries
 stg                             // (c) 1991 Athena / Tecmo
@@ -35114,6 +35151,7 @@ super80v                        //
 superchs                        // D46 (c) 1992 Taito Corporation Japan (World)
 superchsj                       // D46 (c) 1992 Taito Corporation (Japan)
 superchsp                       // prototype
+superchsp2                      // prototype
 superchsu                       // D46 (c) 1992 Taito America Corporation (US)
 
 @source:supercrd.cpp
@@ -36016,6 +36054,9 @@ tetrisp2                        // (c) 1997 Jaleco
 tetrisp2j                       // (c) 1997 Jaleco
 tetrisp2ja                      // (c) 1997 Jaleco
 
+@source:tg100.cpp
+tg100                           // (c) 1991
+
 @source:tgtpanic.cpp
 tgtpanic                        // GX601 (c) 1996
 
@@ -36399,7 +36440,8 @@ insectxj                        // B97 (c) 1989 Taito Corporation (Japan)
 jpopnics                        // (c)1992 NICs, based on Plump Pop code
 kabukiz                         // B50 (c) 1988 Taito Corporation Japan (World)
 kabukizj                        // B50 (c) 1988 Taito Corporation (Japan)
-kageki                          // B35 (c) 1988 Taito America Corporation + Romstar license (US)
+kageki                          // B35 (c) 1988 Taito Corporation
+kagekiu                         // B35 (c) 1988 Taito America Corporation + Romstar license (US)
 kagekih                         // B35 (c) 1992 (hack)
 kagekij                         // B35 (c) 1988 Taito Corporation (Japan)
 plumppop                        // A98 (c) 1987 Taito Corporation (Japan)
@@ -37371,6 +37413,7 @@ vt240                           // 1983 Digital Equipment Corporation
 
 @source:vt320.cpp
 vt320                           // 1987 Digital Equipment Corporation
+vt330                           // 1987 Digital Equipment Corporation
 
 @source:vt520.cpp
 vt520                           // 1994 Digital Equipment Corporation

@@ -1,23 +1,24 @@
 local dat = {}
 local ver, info
 local datread = require("data/load_dat")
-local space_wid = mame_manager:ui():get_char_width(0x200a)
 datread, ver = datread.open("story.dat", "# version")
 
 function dat.check(set, softlist)
 	if softlist or not datread then
 		return nil
 	end
-	local status
-	status, info = pcall(datread, "story", "info", set)
-	if not status or not info then
+	local status, data = pcall(datread, "story", "info", set)
+	if not status or not data then
 		return nil
 	end
-	info = "#jf\n" .. info:gsub("([^%s]-)(%f[_]_+%f[0-9])([0-9.]+)",
-		function(name, sep, score)
-			local wid = mame_manager:ui():get_string_width(name .. score, 1.0)
-			return name .. string.rep(utf8.char(0x200a), math.floor((.4 - wid) / space_wid)) .. score
-		end)
+	local lines = {}
+	data = data:gsub("MAMESCORE records : ([^\n]+)", "MAMESCORE records :\t\n%1", 1)
+	for line in data:gmatch("[^\n]*") do
+		if not (#lines == 0 and line == "") and not (lines[#lines] == "" and line == "") then
+			lines[#lines + 1] = line:gsub("^(.-)_+([0-9.]+)$", "%1\t%2")
+		end
+	end
+	info = "#j2\n" .. table.concat(lines, "\n")
 	return "Mamescore"
 end
 

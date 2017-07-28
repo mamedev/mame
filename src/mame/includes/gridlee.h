@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "machine/74259.h"
 #include "sound/samples.h"
 #include "screen.h"
 
@@ -32,13 +33,15 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_latch(*this, "latch") { }
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_latch;
 
 	uint8_t m_last_analog_input[2];
 	uint8_t m_last_analog_output[2];
@@ -54,10 +57,11 @@ public:
 
 	DECLARE_READ8_MEMBER(analog_port_r);
 	DECLARE_READ8_MEMBER(random_num_r);
-	DECLARE_WRITE8_MEMBER(led_0_w);
-	DECLARE_WRITE8_MEMBER(led_1_w);
-	DECLARE_WRITE8_MEMBER(gridlee_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(gridlee_cocktail_flip_w);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_WRITE_LINE_MEMBER(led_0_w);
+	DECLARE_WRITE_LINE_MEMBER(led_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(cocktail_flip_w);
 	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
 	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
 	virtual void machine_start() override;

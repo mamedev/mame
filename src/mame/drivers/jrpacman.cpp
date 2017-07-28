@@ -104,6 +104,7 @@
 #include "includes/pacman.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -114,7 +115,7 @@ public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(jrpacman);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
@@ -127,9 +128,9 @@ WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(jrpacman_state::irq_mask_w)
+WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
 {
-	m_irq_mask = data & 1;
+	m_irq_mask = state;
 }
 
 /*************************************
@@ -144,20 +145,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jrpacman_state )
 	AM_RANGE(0x4800, 0x4fef) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
+	AM_RANGE(0x5000, 0x5007) AM_DEVWRITE("latch1", ls259_device, write_d0)
 	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
 	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x5070, 0x5070) AM_WRITE(pengo_palettebank_w)
-	AM_RANGE(0x5071, 0x5071) AM_WRITE(pengo_colortablebank_w)
-	AM_RANGE(0x5073, 0x5073) AM_WRITE(jrpacman_bgpriority_w)
-	AM_RANGE(0x5074, 0x5074) AM_WRITE(jrpacman_charbank_w)
-	AM_RANGE(0x5075, 0x5075) AM_WRITE(jrpacman_spritebank_w)
+	AM_RANGE(0x5070, 0x5077) AM_DEVWRITE("latch2", ls259_device, write_d0)
 	AM_RANGE(0x5080, 0x50bf) AM_READ_PORT("DSW")
 	AM_RANGE(0x5080, 0x5080) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_WRITENOP
+	AM_RANGE(0x50c0, 0x50c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
@@ -282,6 +277,21 @@ static MACHINE_CONFIG_START( jrpacman )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jrpacman_state,  vblank_irq)
+
+	MCFG_DEVICE_ADD("latch1", LS259, 0) // 5P
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jrpacman_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jrpacman_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(jrpacman_state, coin_counter_w))
+
+	MCFG_DEVICE_ADD("latch2", LS259, 0) // 1H
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jrpacman_state, pengo_palettebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jrpacman_state, pengo_colortablebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jrpacman_state, jrpacman_bgpriority_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(jrpacman_state, jrpacman_charbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(jrpacman_state, jrpacman_spritebank_w))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

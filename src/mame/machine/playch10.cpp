@@ -82,7 +82,7 @@ CUSTOM_INPUT_MEMBER(playch10_state::pc10_int_detect_r)
 	return ~m_pc10_int_detect & 1;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_SDCS_w)
+WRITE_LINE_MEMBER(playch10_state::sdcs_w)
 {
 	/*
 	    Hooked to CLR on LS194A - Sheet 2, bottom left.
@@ -90,47 +90,37 @@ WRITE8_MEMBER(playch10_state::pc10_SDCS_w)
 	    It's used to keep the screen black during redraws.
 	    Also hooked to the video sram. Prevent writes.
 	*/
-	m_pc10_sdcs = ~data & 1;
+	m_pc10_sdcs = !state;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_CNTRLMASK_w)
+WRITE_LINE_MEMBER(playch10_state::cntrl_mask_w)
 {
-	m_cntrl_mask = ~data & 1;
+	m_cntrl_mask = !state;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_DISPMASK_w)
+WRITE_LINE_MEMBER(playch10_state::disp_mask_w)
 {
-	m_pc10_dispmask = ~data & 1;
+	m_pc10_dispmask = !state;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_SOUNDMASK_w)
+WRITE_LINE_MEMBER(playch10_state::sound_mask_w)
 {
 	/* should mute the APU - unimplemented yet */
 }
 
-WRITE8_MEMBER(playch10_state::pc10_NMIENABLE_w)
+WRITE_LINE_MEMBER(playch10_state::nmi_enable_w)
 {
-	m_pc10_nmi_enable = data & 1;
+	m_pc10_nmi_enable = state;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_DOGDI_w)
+WRITE_LINE_MEMBER(playch10_state::dog_di_w)
 {
-	m_pc10_dog_di = data & 1;
+	m_pc10_dog_di = state;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_GAMERES_w)
+WRITE_LINE_MEMBER(playch10_state::ppu_reset_w)
 {
-	machine().device("cart")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
-}
-
-WRITE8_MEMBER(playch10_state::pc10_GAMESTOP_w)
-{
-	machine().device("cart")->execute().set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
-}
-
-WRITE8_MEMBER(playch10_state::pc10_PPURES_w)
-{
-	if (data & 1)
+	if (state)
 		machine().device("ppu")->reset();
 }
 
@@ -141,10 +131,9 @@ READ8_MEMBER(playch10_state::pc10_detectclr_r)
 	return 0;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_CARTSEL_w)
+WRITE8_MEMBER(playch10_state::cart_sel_w)
 {
-	m_cart_sel &= ~(1 << offset);
-	m_cart_sel |= (data & 1) << offset;
+	m_cart_sel = data;
 }
 
 

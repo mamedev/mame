@@ -42,6 +42,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "includes/apple2.h"
 #include "video/apple2.h"
 
+#include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "imagedev/flopdrv.h"
 
@@ -112,7 +113,8 @@ public:
 		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
-		m_upperbank(*this, A2_UPPERBANK_TAG)
+		m_upperbank(*this, A2_UPPERBANK_TAG),
+		m_softlatch(*this, "softlatch")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -128,6 +130,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
+	required_device<addressable_latch_device> m_softlatch;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
@@ -143,6 +146,14 @@ public:
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(c000_r);
 	DECLARE_WRITE8_MEMBER(c000_w);
+	DECLARE_WRITE_LINE_MEMBER(txt_w);
+	DECLARE_WRITE_LINE_MEMBER(mix_w);
+	DECLARE_WRITE_LINE_MEMBER(scr_w);
+	DECLARE_WRITE_LINE_MEMBER(res_w);
+	DECLARE_WRITE_LINE_MEMBER(an0_w);
+	DECLARE_WRITE_LINE_MEMBER(an1_w);
+	DECLARE_WRITE_LINE_MEMBER(an2_w);
+	DECLARE_WRITE_LINE_MEMBER(an3_w);
 	DECLARE_READ8_MEMBER(c080_r);
 	DECLARE_WRITE8_MEMBER(c080_w);
 	DECLARE_READ8_MEMBER(c100_r);
@@ -489,69 +500,10 @@ void napple2_state::do_io(address_space &space, int offset)
 			m_speaker->level_w(m_speaker_state);
 			break;
 
-		case 0x50:  // graphics mode
-			machine().first_screen()->update_now();
-			m_video->m_graphics = true; break;
-
-		case 0x51:  // text mode
-			machine().first_screen()->update_now();
-			m_video->m_graphics = false; break;
-
-		case 0x52:  // no mix
-			machine().first_screen()->update_now();
-			m_video->m_mix = false; break;
-
-		case 0x53:  // mixed mode
-			machine().first_screen()->update_now();
-			m_video->m_mix = true; break;
-
-		case 0x54:  // set page 1
-			machine().first_screen()->update_now();
-			m_page2 = false;
-			m_video->m_page2 = false;
+		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
+		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
+			m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
 			break;
-
-		case 0x55:  // set page 2
-			machine().first_screen()->update_now();
-			m_page2 = true;
-			m_video->m_page2 = true;
-			break;
-
-		case 0x56: // select lo-res
-			machine().first_screen()->update_now();
-			m_video->m_hires = false; break;
-
-		case 0x57: // select hi-res
-			machine().first_screen()->update_now();
-			m_video->m_hires = true; break;
-
-		case 0x58: // AN0 off
-			m_an0 = false; break;
-
-		case 0x59: // AN0 on
-			m_an0 = true; break;
-
-		case 0x5a: // AN1 off
-			m_an1 = false; break;
-
-		case 0x5b: // AN1 on
-			m_an1 = true; break;
-
-		case 0x5c: // AN2 off
-			m_an2 = false;
-			m_video->m_an2 = false;
-			break;
-
-		case 0x5d: // AN2 on
-			m_an2 = true;
-			m_video->m_an2 = true;
-			break;
-
-		case 0x5e: // AN3 off
-			m_an3 = false; break;
-
-		case 0x5f: // AN3 on
-			m_an3 = true; break;
 
 		case 0x68:  // IIgs STATE register, which ProDOS touches
 			break;
@@ -564,6 +516,56 @@ void napple2_state::do_io(address_space &space, int offset)
 			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
 			break;
 	}
+}
+
+WRITE_LINE_MEMBER(napple2_state::txt_w)
+{
+	// select graphics or text mode
+	machine().first_screen()->update_now();
+	m_video->m_graphics = !state;
+}
+
+WRITE_LINE_MEMBER(napple2_state::mix_w)
+{
+	// select mixed mode or nomix
+	machine().first_screen()->update_now();
+	m_video->m_mix = state;
+}
+
+WRITE_LINE_MEMBER(napple2_state::scr_w)
+{
+	// select primary or secondary page
+	machine().first_screen()->update_now();
+	m_page2 = state;
+	m_video->m_page2 = state;
+}
+
+WRITE_LINE_MEMBER(napple2_state::res_w)
+{
+	// select lo-res or hi-res
+	machine().first_screen()->update_now();
+	m_video->m_hires = state;
+}
+
+WRITE_LINE_MEMBER(napple2_state::an0_w)
+{
+	m_an0 = state;
+}
+
+WRITE_LINE_MEMBER(napple2_state::an1_w)
+{
+	m_an1 = state;
+}
+
+WRITE_LINE_MEMBER(napple2_state::an2_w)
+{
+	m_an2 = state;
+	m_video->m_an2 = state;
+}
+
+WRITE_LINE_MEMBER(napple2_state::an3_w)
+{
+	m_an3 = state;
 }
 
 READ8_MEMBER(napple2_state::c000_r)
@@ -1344,6 +1346,17 @@ static MACHINE_CONFIG_START( apple2_common )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+
+	/* soft switches */
+	MCFG_DEVICE_ADD("softlatch", F9334, 0) // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(napple2_state, txt_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(napple2_state, mix_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(napple2_state, scr_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(napple2_state, res_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(napple2_state, an0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(napple2_state, an1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(napple2_state, an2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(napple2_state, an3_w))
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(A2_KBDC_TAG, AY3600, 0)

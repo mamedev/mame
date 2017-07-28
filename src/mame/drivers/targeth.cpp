@@ -52,6 +52,7 @@ Sound: OKI M6295
 #include "emu.h"
 #include "includes/targeth.h"
 
+#include "machine/gaelco_ds5002fp.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -100,10 +101,37 @@ WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(targeth_state::coin_counter_w)
+WRITE16_MEMBER(targeth_state::output_latch_w)
 {
-	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
 }
+
+WRITE_LINE_MEMBER(targeth_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(targeth_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE8_MEMBER(targeth_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(targeth_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
+
+static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, targeth_state )
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -121,11 +149,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("SYSTEM")             /* Coins, Start & Fire buttons */
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")            /* Service & Guns Reload? */
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE(output_latch_w)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)    /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status register */
-	AM_RANGE(0x700010, 0x70001b) AM_WRITENOP                        /* ??? Guns reload related? */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(coin_counter_w)   /* Coin counters */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                             /* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0x700010, 0x700011) AM_WRITENOP                        /* ??? Guns reload related? */
+	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
+	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                     /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
 
 
@@ -134,6 +163,10 @@ static ADDRESS_MAP_START( oki_map, 0, 8, targeth_state )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
+void targeth_state::machine_start()
+{
+	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+}
 
 static INPUT_PORTS_START( targeth )
 	PORT_START("GUNX1")
@@ -227,6 +260,13 @@ static MACHINE_CONFIG_START( targeth )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", targeth_state, interrupt, "screen", 0, 1)
 
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
+	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(targeth_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(targeth_state, coin2_counter_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -253,8 +293,14 @@ ROM_START( targeth )
 	ROM_LOAD16_BYTE( "th2_b_c_23.c23", 0x000000, 0x040000, CRC(840887d6) SHA1(9a36b346608d531a62a2e0704ea44f12e07f9d91) ) // The "B" was hand written
 	ROM_LOAD16_BYTE( "th2_b_c_22.c22", 0x000001, 0x040000, CRC(d2435eb8) SHA1(ce75a115dad8019c8e66a1c3b3e15f54781f65ae) ) // The "B" was hand written
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	//DS5002FP_SET_MON( x )
+	//DS5002FP_SET_RPCTL( x )
+	//DS5002FP_SET_CRCR( x )
+
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Graphics */
 	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
@@ -273,8 +319,13 @@ ROM_START( targetha )
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(e38a54e2) SHA1(239bfa6f1c0fc8aa0ad7de9be237bef55b384007) )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(24fe3efb) SHA1(8f48f08a6db28966c9263be119883c9179e349ed) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	//DS5002FP_SET_MON( x )
+	//DS5002FP_SET_RPCTL( x )
+	//DS5002FP_SET_CRCR( x )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Graphics */
 	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )

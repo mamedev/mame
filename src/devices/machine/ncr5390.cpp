@@ -464,7 +464,7 @@ void ncr5390_device::step(bool timeout)
 			break;
 
 		// check for command complete
-		if ((dma_command && tcounter == 0)									// dma in/out: transfer counter == 0
+		if ((dma_command && tcounter == 0)                                  // dma in/out: transfer counter == 0
 		|| (!dma_command && (xfr_phase & S_INP) == 0 && fifo_pos == 0)      // non-dma out: fifo empty
 		|| (!dma_command && (xfr_phase & S_INP) == S_INP && fifo_pos == 1)) // non-dma in: every byte
 			state = INIT_XFR_BUS_COMPLETE;

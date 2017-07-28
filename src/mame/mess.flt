@@ -173,6 +173,7 @@ ec65.cpp
 einstein.cpp
 electron.cpp
 elekscmp.cpp
+elektronmono.cpp
 elf.cpp
 elwro800.cpp
 enmirage.cpp
@@ -204,6 +205,7 @@ fidelz80.cpp
 fk1.cpp
 fm7.cpp
 fmtowns.cpp
+fontwriter.cpp
 force68k.cpp
 fp1100.cpp
 fp200.cpp
@@ -619,6 +621,7 @@ tekxp33x.cpp
 terak.cpp
 test_t400.cpp
 testconsole.cpp
+tg100.cpp
 thomson.cpp
 ti630.cpp
 ti74.cpp

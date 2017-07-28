@@ -37,6 +37,9 @@ public:
 	// construction/destruction
 	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// device flags
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
 	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );

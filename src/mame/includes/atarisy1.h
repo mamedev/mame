@@ -6,8 +6,10 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/atarigen.h"
 #include "sound/tms5220.h"
+#include "sound/ym2151.h"
 #include "video/atarimo.h"
 
 class atarisy1_state : public atarigen_state
@@ -25,7 +27,8 @@ public:
 			m_yscroll_reset_timer(*this, "yreset_timer"),
 			m_scanline_timer(*this, "scan_timer"),
 			m_int3off_timer(*this, "int3off_timer"),
-			m_tms(*this, "tms") { }
+			m_tms(*this, "tms"),
+			m_outlatch(*this, "outlatch") { }
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<atari_sound_comm_device> m_soundcomm;
@@ -57,6 +60,8 @@ public:
 	/* speech */
 	required_device<tms5220_device> m_tms;
 
+	required_device<ls259_device> m_outlatch;
+
 	/* graphics bank tracking */
 	uint8_t           m_bank_gfx[3][8];
 	uint8_t           m_bank_color_shift[MAX_GFX_ELEMENTS];
@@ -67,7 +72,10 @@ public:
 	DECLARE_WRITE16_MEMBER(joystick_w);
 	DECLARE_READ16_MEMBER(trakball_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE_LINE_MEMBER(led_1_w);
+	DECLARE_WRITE_LINE_MEMBER(led_2_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE8_MEMBER(via_pa_w);
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pb_w);

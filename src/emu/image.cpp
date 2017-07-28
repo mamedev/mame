@@ -200,10 +200,12 @@ void image_manager::options_extract()
 			std::string image_opt;
 			if (image.exists())
 			{
-				if (image.loaded_through_softlist())
-					image_opt = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
-				else
+				if (!image.loaded_through_softlist())
 					image_opt = image.filename();
+				else if (image.part_entry() && !image.part_entry()->name().empty())
+					image_opt = util::string_format("%s:%s:%s", image.software_list_name(), image.full_software_name(), image.part_entry()->name());
+				else
+					image_opt = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
 			}
 
 			// and set the option (provided that it hasn't been removed out from under us)

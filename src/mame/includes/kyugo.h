@@ -47,8 +47,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	uint8_t       m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(kyugo_sub_cpu_control_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(kyugo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(kyugo_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(kyugo_bgvideoram_w);
@@ -57,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kyugo_scroll_x_lo_w);
 	DECLARE_WRITE8_MEMBER(kyugo_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(kyugo_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(kyugo_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_DRIVER_INIT(srdmissn);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

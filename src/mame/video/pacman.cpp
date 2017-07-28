@@ -195,9 +195,9 @@ WRITE8_MEMBER(pacman_state::pacman_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE8_MEMBER(pacman_state::pacman_flipscreen_w)
+WRITE_LINE_MEMBER(pacman_state::flipscreen_w)
 {
-	m_flipscreen = data & 1;
+	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
 }
 
@@ -325,32 +325,23 @@ VIDEO_START_MEMBER(pacman_state,pengo)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
 }
 
-WRITE8_MEMBER(pacman_state::pengo_palettebank_w)
+WRITE_LINE_MEMBER(pacman_state::pengo_palettebank_w)
 {
-	if (m_palettebank != data)
-	{
-		m_palettebank = data;
-		m_bg_tilemap->mark_all_dirty();
-	}
+	m_palettebank = state;
+	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pacman_state::pengo_colortablebank_w)
+WRITE_LINE_MEMBER(pacman_state::pengo_colortablebank_w)
 {
-	if (m_colortablebank != data)
-	{
-		m_colortablebank = data;
-		m_bg_tilemap->mark_all_dirty();
-	}
+	m_colortablebank = state;
+	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pacman_state::pengo_gfxbank_w)
+WRITE_LINE_MEMBER(pacman_state::pengo_gfxbank_w)
 {
-	if (m_charbank != (data & 1))
-	{
-		m_spritebank = data & 1;
-		m_charbank = data & 1;
-		m_bg_tilemap->mark_all_dirty();
-	}
+	m_spritebank = state;
+	m_charbank = state;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -565,18 +556,15 @@ WRITE8_MEMBER(pacman_state::jrpacman_videoram_w)
 	jrpacman_mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_charbank_w)
+WRITE_LINE_MEMBER(pacman_state::jrpacman_charbank_w)
 {
-	if (m_charbank != (data & 1))
-	{
-		m_charbank = data & 1;
-		m_bg_tilemap->mark_all_dirty();
-	}
+	m_charbank = state;
+	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_spritebank_w)
+WRITE_LINE_MEMBER(pacman_state::jrpacman_spritebank_w)
 {
-	m_spritebank = (data & 1);
+	m_spritebank = state;
 }
 
 WRITE8_MEMBER(pacman_state::jrpacman_scroll_w)
@@ -588,7 +576,7 @@ WRITE8_MEMBER(pacman_state::jrpacman_scroll_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_bgpriority_w)
+WRITE_LINE_MEMBER(pacman_state::jrpacman_bgpriority_w)
 {
-	m_bgpriority = (data & 1);
+	m_bgpriority = state;
 }

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
 #include "sound/samples.h"
@@ -34,7 +35,8 @@ public:
 		m_msm(*this, "msm"),
 		m_dac_1(*this, "dac1"),
 		m_dac_2(*this, "dac2"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_mainlatch(*this, "mainlatch")
 	{ }
 
 	/* memory pointers */
@@ -80,6 +82,7 @@ public:
 	required_device<dac_byte_interface> m_dac_1;
 	required_device<dac_byte_interface> m_dac_2;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<ls259_device> m_mainlatch;
 
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
@@ -89,18 +92,18 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_8155_portc_w);
 	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
+	DECLARE_WRITE8_MEMBER(mainlatch_w);
 	DECLARE_READ8_MEMBER(mcu_ram_r);
 	DECLARE_WRITE8_MEMBER(mcu_ram_w);
-	DECLARE_WRITE16_MEMBER(mcu_start_w);
-	DECLARE_WRITE16_MEMBER(mcu_switch_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_switch_w);
 	DECLARE_READ8_MEMBER(equites_fg_videoram_r);
 	DECLARE_WRITE8_MEMBER(equites_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(equites_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(equites_bgcolor_w);
 	DECLARE_WRITE16_MEMBER(equites_scrollreg_w);
-	DECLARE_WRITE16_MEMBER(splndrbt_selchar_w);
-	DECLARE_WRITE16_MEMBER(equites_flipw_w);
-	DECLARE_WRITE8_MEMBER(equites_flipb_w);
+	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);

@@ -13,12 +13,12 @@ class trackfld_audio_device : public device_t, public device_sound_interface
 public:
 	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(konami_sh_irqtrigger_w );
-	DECLARE_READ8_MEMBER(trackfld_sh_timer_r );
-	DECLARE_READ8_MEMBER(trackfld_speech_r );
-	DECLARE_WRITE8_MEMBER(trackfld_sound_w );
-	DECLARE_READ8_MEMBER(hyperspt_sh_timer_r );
-	DECLARE_WRITE8_MEMBER(hyperspt_sound_w );
+	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	DECLARE_READ8_MEMBER(trackfld_sh_timer_r);
+	DECLARE_READ8_MEMBER(trackfld_speech_r);
+	DECLARE_WRITE8_MEMBER(trackfld_sound_w);
+	DECLARE_READ8_MEMBER(hyperspt_sh_timer_r);
+	DECLARE_WRITE8_MEMBER(hyperspt_sound_w);
 
 protected:
 	// device-level overrides

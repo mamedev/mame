@@ -36,11 +36,11 @@ xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t 
 
 
 //-------------------------------------------------
-//  add_device_mconfig - device-specific machine
+//  device_add_mconfig - device-specific machine
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(xxx_device::add_device_mconfig)
+MACHINE_CONFIG_MEMBER(xxx_device::device_add_mconfig)
 	//MCFG_CPU_ADD(...)
 MACHINE_CONFIG_END
 

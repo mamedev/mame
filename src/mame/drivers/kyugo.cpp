@@ -27,6 +27,7 @@
 #include "includes/kyugo.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -65,21 +66,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::kyugo_nmi_mask_w)
+WRITE_LINE_MEMBER(kyugo_state::nmi_mask_w)
 {
-	m_nmi_mask = data & 1;
-}
-
-WRITE8_MEMBER(kyugo_state::kyugo_sub_cpu_control_w)
-{
-	m_subcpu->set_input_line(INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	m_nmi_mask = state;
 }
 
 static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_WRITE(kyugo_nmi_mask_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(kyugo_flipscreen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(kyugo_sub_cpu_control_w)
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -499,11 +493,6 @@ void kyugo_state::machine_start()
 
 void kyugo_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	// must start with interrupts and sub CPU disabled
-	m_nmi_mask = 0;
-	kyugo_sub_cpu_control_w(space, 0, 0);
-
 	m_scroll_x_lo = 0;
 	m_scroll_x_hi = 0;
 	m_scroll_y = 0;
@@ -533,6 +522,10 @@ static MACHINE_CONFIG_START( kyugo_base )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kyugo_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kyugo_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

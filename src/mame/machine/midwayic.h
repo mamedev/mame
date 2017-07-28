@@ -165,7 +165,6 @@ public:
 	void set_shuffle_state(int state);
 	void fifo_w(uint16_t data);
 	void fifo_full_w(uint16_t data);
-	void output_w(uint32_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
 	DECLARE_READ16_MEMBER(fifo_r);

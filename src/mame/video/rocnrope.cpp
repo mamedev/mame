@@ -94,13 +94,9 @@ WRITE8_MEMBER(rocnrope_state::rocnrope_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(rocnrope_state::rocnrope_flipscreen_w)
+WRITE_LINE_MEMBER(rocnrope_state::flip_screen_w)
 {
-	if (flip_screen() != (~data & 0x01))
-	{
-		flip_screen_set(~data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(!state);
 }
 
 TILE_GET_INFO_MEMBER(rocnrope_state::get_bg_tile_info)

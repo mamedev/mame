@@ -43,9 +43,10 @@ Verify Color PROM resistor values (Last 8 colors)
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/stactics.h"
 #include "stactics.lh"
+
+#include "cpu/i8085/i8085.h"
 
 
 
@@ -55,11 +56,17 @@ Verify Color PROM resistor values (Last 8 colors)
  *
  *************************************/
 
+WRITE_LINE_MEMBER(stactics_state::motor_w)
+{
+	m_motor_on = state;
+}
+
+
 CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
 {
-	/* if the motor is self-centering, but not centered yet */
-	return ((*m_motor_on & 0x01) == 0) &&
-			((m_horiz_pos != 0) || (m_vert_pos != 0));
+	// if the motor is self-centering, but not centered yet
+	return (!m_motor_on &&
+			(m_horiz_pos != 0 || m_vert_pos != 0));
 }
 
 
@@ -77,8 +84,8 @@ READ8_MEMBER(stactics_state::horiz_pos_r)
 
 void stactics_state::move_motor()
 {
-		/* monitor motor under joystick control */
-	if (*m_motor_on & 0x01)
+	// monitor motor under joystick control
+	if (m_motor_on)
 	{
 		int ip3 = ioport("IN3")->read();
 		int ip4 = ioport("FAKE")->read();
@@ -137,9 +144,15 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::coinlockout_w)
+WRITE_LINE_MEMBER(stactics_state::coin_lockout_1_w)
 {
-	machine().bookkeeping().coin_lockout_w(offset, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+
+WRITE_LINE_MEMBER(stactics_state::coin_lockout_2_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
 }
 
 
@@ -170,12 +183,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, stactics_state )
 	AM_RANGE(0x4000, 0x40ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ_PORT("IN1")
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(coinlockout_w)
-	AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITENOP
-	AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("paletteram")
-	/* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE(sound_w) */
-	AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("motor_on")  /* Note: This overlaps rocket sound */
-	AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("lamps")
+	AM_RANGE(0x6000, 0x6007) AM_MIRROR(0x0f08) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_DEVWRITE("audiolatch", ls259_device, write_d0)
+	AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_DEVWRITE("lamplatch", ls259_device, write_d0)
 	AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE(speed_latch_w)
 	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE(shot_trigger_w)
 	AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE(shot_flag_clear_w)
@@ -283,10 +293,11 @@ void stactics_state::machine_start()
 {
 	m_vert_pos = 0;
 	m_horiz_pos = 0;
-	*m_motor_on = 0;
+	m_motor_on = false;
 
 	save_item(NAME(m_vert_pos));
 	save_item(NAME(m_horiz_pos));
+	save_item(NAME(m_motor_on));
 }
 
 
@@ -304,6 +315,30 @@ static MACHINE_CONFIG_START( stactics )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stactics_state,  interrupt)
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 50
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, coin_lockout_1_w)) // COIN REJECT 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, coin_lockout_2_w)) // COIN REJECT 2
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, palette_bank_w)) // FLM COL 0
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(stactics_state, palette_bank_w)) // FLM COL 1
+
+	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // 58 - TODO: implement these switches
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // MUTE
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // INV. DISTANCE A
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // INV. DISTANCE B
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // UFO
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // INVADER
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // EMEGENCY (sic)
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, motor_w)) // overlaps rocket sound
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // SOUND ON
+
+	MCFG_DEVICE_ADD("lamplatch", LS259, 0) // 96
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, base_5_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, base_4_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(stactics_state, base_3_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stactics_state, base_2_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(stactics_state, base_1_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(stactics_state, start_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, barrier_lamp_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(stactics_video)

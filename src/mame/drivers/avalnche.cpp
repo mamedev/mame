@@ -33,10 +33,9 @@
 #include "emu.h"
 #include "includes/avalnche.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
-#include "sound/discrete.h"
 #include "screen.h"
-#include "speaker.h"
 
 #include "avalnche.lh"
 
@@ -87,9 +86,9 @@ uint32_t avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(avalnche_state::avalance_video_invert_w)
+WRITE_LINE_MEMBER(avalnche_state::video_invert_w)
 {
-	m_avalance_video_inverted = data & 0x01;
+	m_avalance_video_inverted = state;
 }
 
 WRITE8_MEMBER(avalnche_state::catch_coin_counter_w)
@@ -98,19 +97,19 @@ WRITE8_MEMBER(avalnche_state::catch_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE8_MEMBER(avalnche_state::avalance_credit_1_lamp_w)
+WRITE_LINE_MEMBER(avalnche_state::credit_1_lamp_w)
 {
-	output().set_led_value(0, data & 1);
+	output().set_led_value(0, state);
 }
 
-WRITE8_MEMBER(avalnche_state::avalance_credit_2_lamp_w)
+WRITE_LINE_MEMBER(avalnche_state::credit_2_lamp_w)
 {
-	output().set_led_value(1, data & 1);
+	output().set_led_value(1, state);
 }
 
-WRITE8_MEMBER(avalnche_state::avalance_start_lamp_w)
+WRITE_LINE_MEMBER(avalnche_state::start_lamp_w)
 {
-	output().set_led_value(2, data & 1);
+	output().set_led_value(2, state);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
@@ -121,12 +120,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READNOP
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
-	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_WRITE(avalnche_attract_enable_w)
-	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
-	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_2_lamp_w)
-	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_WRITE(avalnche_audio_w)
-	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE(avalance_start_lamp_w)
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x0ff8) AM_DEVWRITE("latch", f9334_device, write_d0)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(avalnche_noise_amplitude_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -139,12 +133,7 @@ static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8, avalnche_state )
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READNOP
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
-//  AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_WRITE(avalnche_attract_enable_w) /* It is attract_enable just like avalnche, but not hooked up yet. */
-	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
-	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_2_lamp_w)
-	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_WRITE(catch_audio_w)
-	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE(avalance_start_lamp_w)
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x0ff8) AM_DEVWRITE("latch", f9334_device, write_d0)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_WRITE(catch_coin_counter_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -241,17 +230,19 @@ void avalnche_state::machine_start()
 	save_item(NAME(m_avalance_video_inverted));
 }
 
-void avalnche_state::machine_reset()
-{
-	m_avalance_video_inverted = 0;
-}
-
-static MACHINE_CONFIG_START( avalnche )
+static MACHINE_CONFIG_START( avalnche_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
+
+	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(avalnche_state, credit_1_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(avalnche_state, video_invert_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(avalnche_state, credit_2_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(avalnche_state, start_lamp_w))
+	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -262,25 +253,21 @@ static MACHINE_CONFIG_START( avalnche )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(avalnche)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( catch, avalnche )
+static MACHINE_CONFIG_DERIVED( avalnche, avalnche_base)
+	/* sound hardware */
+	MCFG_FRAGMENT_ADD(avalnche_sound)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( catch, avalnche_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(catch_map)
 
 	/* sound hardware... */
-	MCFG_DEVICE_REMOVE("discrete")
-	MCFG_DEVICE_REMOVE("mono")
-
+	MCFG_FRAGMENT_ADD(catch_sound)
 MACHINE_CONFIG_END
 
 

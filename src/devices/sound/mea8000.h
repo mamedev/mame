@@ -43,12 +43,12 @@ private:
 	static constexpr unsigned NOISE_LEN = 8192;
 
 	/* finite machine state controlling frames */
-	enum mea8000_state
+	enum class mea8000_state : u8
 	{
-		MEA8000_STOPPED,    /* nothing to do, timer disabled */
-		MEA8000_WAIT_FIRST, /* received pitch, wait for first full trame, timer disabled */
-		MEA8000_STARTED,    /* playing a frame, timer on */
-		MEA8000_SLOWING     /* repeating last frame with decreasing amplitude, timer on */
+		STOPPED,    /* nothing to do, timer disabled */
+		WAIT_FIRST, /* received pitch, wait for first full trame, timer disabled */
+		STARTED,    /* playing a frame, timer on */
+		SLOWING     /* repeating last frame with decreasing amplitude, timer on */
 	};
 
 	struct filter_t

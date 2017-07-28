@@ -89,13 +89,15 @@ public:
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
 	// MVS-specific
+	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
 
 	uint32_t screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(io_control_w);
-	DECLARE_WRITE8_MEMBER(system_control_w);
+	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
+	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
 	DECLARE_READ16_MEMBER(banked_vectors_r);
 	DECLARE_WRITE16_MEMBER(write_banksel);
 	DECLARE_WRITE16_MEMBER(write_bankprot);
@@ -104,6 +106,9 @@ public:
 	DECLARE_WRITE16_MEMBER(write_bankprot_kf2k3bl);
 	DECLARE_WRITE16_MEMBER(write_bankprot_kof10th);
 	DECLARE_READ16_MEMBER(read_lorom_kof10th);
+
+	DECLARE_WRITE_LINE_MEMBER(set_screen_shadow);
+	DECLARE_WRITE_LINE_MEMBER(set_palette_bank);
 
 	DECLARE_DRIVER_INIT(neogeo);
 
@@ -201,11 +206,8 @@ private:
 
 	void create_rgb_lookups();
 	void set_pens();
-	void set_screen_shadow(int data);
-	void set_palette_bank(int data);
 
 	void audio_cpu_check_nmi();
-	void set_save_ram_unlock(uint8_t data);
 	void set_output_latch(uint8_t data);
 	void set_output_data(uint8_t data);
 

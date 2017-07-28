@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "cpu/ccpu/ccpu.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "video/vector.h"
@@ -19,6 +20,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ay1(*this, "ay1")
+		, m_outlatch(*this, "outlatch")
 		, m_samples(*this, "samples")
 		, m_vector(*this, "vector")
 		, m_screen(*this, "screen")
@@ -29,6 +31,7 @@ public:
 
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
+	required_device<ls259_device> m_outlatch;
 	optional_device<samples_device> m_samples;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
@@ -37,10 +40,6 @@ public:
 	optional_ioport m_analog_x;
 	optional_ioport m_analog_y;
 
-	typedef void (cinemat_state::*sound_func)(uint8_t sound_val, uint8_t bits_changed);
-
-	sound_func m_sound_handler;
-	uint8_t m_sound_control;
 	uint32_t m_current_shift;
 	uint32_t m_last_shift;
 	uint32_t m_last_shift2;
@@ -66,41 +65,26 @@ public:
 	DECLARE_READ8_MEMBER(inputs_r);
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_READ8_MEMBER(coin_input_r);
-	DECLARE_WRITE8_MEMBER(coin_reset_w);
-	DECLARE_WRITE8_MEMBER(mux_select_w);
+	WRITE_LINE_MEMBER(coin_reset_w);
+	WRITE_LINE_MEMBER(mux_select_w);
 	DECLARE_READ8_MEMBER(speedfrk_wheel_r);
 	DECLARE_READ8_MEMBER(speedfrk_gear_r);
 	DECLARE_READ8_MEMBER(sundance_inputs_r);
 	DECLARE_READ8_MEMBER(boxingb_dial_r);
 	DECLARE_READ8_MEMBER(qb3_frame_r);
-	DECLARE_WRITE8_MEMBER(qb3_ram_bank_w);
-	DECLARE_WRITE8_MEMBER(cinemat_vector_control_w);
-	DECLARE_WRITE8_MEMBER(cinemat_sound_control_w);
-	DECLARE_WRITE8_MEMBER(qb3_sound_w);
+	DECLARE_WRITE_LINE_MEMBER(qb3_ram_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(vector_control_w);
 	DECLARE_READ8_MEMBER(joystick_read);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(speedfrk);
 	DECLARE_DRIVER_INIT(boxingb);
-	DECLARE_DRIVER_INIT(tailg);
 	DECLARE_DRIVER_INIT(sundance);
 	DECLARE_DRIVER_INIT(qb3);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
+	virtual void sound_reset() override;
 	virtual void video_start() override;
-	DECLARE_SOUND_RESET(spacewar);
-	DECLARE_SOUND_RESET(barrier);
-	DECLARE_SOUND_RESET(speedfrk);
-	DECLARE_SOUND_RESET(starhawk);
-	DECLARE_SOUND_RESET(sundance);
-	DECLARE_SOUND_RESET(tailg);
-	DECLARE_SOUND_RESET(warrior);
-	DECLARE_SOUND_RESET(armora);
-	DECLARE_SOUND_RESET(ripoff);
-	DECLARE_SOUND_RESET(starcas);
-	DECLARE_SOUND_RESET(solarq);
-	DECLARE_SOUND_RESET(boxingb);
-	DECLARE_SOUND_RESET(wotw);
 	DECLARE_SOUND_RESET(demon);
 	DECLARE_SOUND_RESET(qb3);
 	DECLARE_VIDEO_START(cinemat_16level);
@@ -114,22 +98,66 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_portb_w);
 	DECLARE_WRITE8_MEMBER(sound_output_w);
 	TIMER_CALLBACK_MEMBER(synced_sound_w);
-	void generic_init(sound_func sound_handler);
 	void cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift);
-	void spacewar_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void barrier_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void speedfrk_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void starhawk_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void sundance_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void tailg_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void warrior_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void armora_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void ripoff_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void starcas_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void solarq_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void boxingb_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void wotw_sound_w(uint8_t sound_val, uint8_t bits_changed);
-	void demon_sound_w(uint8_t sound_val, uint8_t bits_changed);
+	DECLARE_WRITE_LINE_MEMBER(spacewar_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(spacewar_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(spacewar_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(spacewar_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(spacewar_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(barrier_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(barrier_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(barrier_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(speedfrk_start_led_w);
+	DECLARE_WRITE_LINE_MEMBER(speedfrk_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(speedfrk_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(starhawk_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(starhawk_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(starhawk_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(starhawk_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(starhawk_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(starhawk_sound7_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound7_w);
+	DECLARE_WRITE_LINE_MEMBER(tailg_sound_w);
+	DECLARE_WRITE_LINE_MEMBER(warrior_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(warrior_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(warrior_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(warrior_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(warrior_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(armora_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(armora_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(armora_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(armora_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(armora_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(ripoff_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(ripoff_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(ripoff_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(ripoff_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(ripoff_sound7_w);
+	DECLARE_WRITE_LINE_MEMBER(starcas_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(starcas_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(starcas_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(starcas_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(starcas_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(solarq_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(solarq_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(solarq_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(wotw_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(wotw_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(wotw_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(wotw_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(wotw_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(qb3_sound4_w);
 };
 
 /*----------- defined in audio/cinemat.c -----------*/

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "peribox.h"
+#include "machine/74259.h"
 #include "machine/tmc0430.h"
 
 namespace bus { namespace ti99 { namespace peb {
@@ -45,11 +46,15 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
+	DECLARE_WRITE_LINE_MEMBER(ready_line);
+
+	DECLARE_WRITE_LINE_MEMBER(pcpage_w);
+	DECLARE_WRITE_LINE_MEMBER(ekrpg_w);
 
 	void                debugger_read(address_space& space, uint16_t addr, uint8_t& value);
 	tmc0430_device*     m_grom[8];
 	uint8_t*              m_rom;
+	required_device<ls259_device> m_crulatch;
 	int                 m_bank_select;
 	bool                m_active;
 	int                 m_clock_count;

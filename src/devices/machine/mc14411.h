@@ -15,7 +15,7 @@
                      F9  7 |   MC14411   | 18  F15
                     F11  8 |             | 17  F2
                     F14  9 |             | 16  F4
-                 Reset* 10 |             | 15  F6 
+                 Reset* 10 |             | 15  F6
               Not Used  11 |             | 14  F12
                    VSS  12 |_____________| 13  F13
 
@@ -121,8 +121,8 @@ private:
 
 	devcb_write_line m_out_fx_cbs[16];
 
-	uint32_t m_divider;	// main divider to use, 0-3 column index into counter_divider 
-	uint32_t m_reset;	// Reset line state
+	uint32_t m_divider; // main divider to use, 0-3 column index into counter_divider
+	uint32_t m_reset;   // Reset line state
 
 	bool m_timer_enabled[16];
 };

@@ -166,14 +166,14 @@ WRITE8_MEMBER(timeplt_state::colorram_w)
 }
 
 
-WRITE8_MEMBER(timeplt_state::flipscreen_w)
+WRITE_LINE_MEMBER(timeplt_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(!state);
 }
 
-WRITE8_MEMBER(timeplt_state::video_enable_w)
+WRITE_LINE_MEMBER(timeplt_state::video_enable_w)
 {
-	m_video_enable = data & 1;
+	m_video_enable = state;
 }
 
 READ8_MEMBER(timeplt_state::scanline_r)

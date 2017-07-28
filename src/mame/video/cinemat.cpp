@@ -69,7 +69,7 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
+WRITE_LINE_MEMBER(cinemat_state::vector_control_w)
 {
 	int r, g, b, i;
 	cpu_device *cpu = m_maincpu;
@@ -78,13 +78,13 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 	{
 		case COLOR_BILEVEL:
 			/* color is either bright or dim, selected by the value sent to the port */
-			m_vector_color = (data & 1) ? rgb_t(0x80,0x80,0x80) : rgb_t(0xff,0xff,0xff);
+			m_vector_color = state ? rgb_t(0x80,0x80,0x80) : rgb_t(0xff,0xff,0xff);
 			break;
 
 		case COLOR_16LEVEL:
 			/* on the rising edge of the data value, latch bits 0-3 of the */
 			/* X register as the intensity */
-			if (data != m_last_control && data)
+			if (state)
 			{
 				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X) & 0x0f;
 				i = (xval + 1) * 255 / 16;
@@ -95,7 +95,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 		case COLOR_64LEVEL:
 			/* on the rising edge of the data value, latch bits 2-7 of the */
 			/* X register as the intensity */
-			if (data != m_last_control && data)
+			if (state)
 			{
 				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X);
 				xval = (~xval >> 2) & 0x3f;
@@ -107,7 +107,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 		case COLOR_RGB:
 			/* on the rising edge of the data value, latch the X register */
 			/* as 4-4-4 BGR values */
-			if (data != m_last_control && data)
+			if (state)
 			{
 				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X);
 				r = (~xval >> 0) & 0x0f;
@@ -126,7 +126,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 				/* they will be restored on the rising edge; this is to simulate the fact */
 				/* that the Rockola color hardware did not overwrite the beam X,Y position */
 				/* on an IV instruction if data == 0 here */
-				if (data != m_last_control && !data)
+				if (!state)
 				{
 					m_qb3_lastx = cpu->state_int(ccpu_cpu_device::CCPU_X);
 					m_qb3_lasty = cpu->state_int(ccpu_cpu_device::CCPU_Y);
@@ -134,7 +134,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 
 				/* on the rising edge of the data value, latch the Y register */
 				/* as 2-3-3 BGR values */
-				if (data != m_last_control && data)
+				if (state)
 				{
 					int yval = cpu->state_int(ccpu_cpu_device::CCPU_Y);
 					r = (~yval >> 0) & 0x07;
@@ -152,9 +152,6 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 			}
 			break;
 	}
-
-	/* remember the last value */
-	m_last_control = data;
 }
 
 

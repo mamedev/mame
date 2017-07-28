@@ -3775,6 +3775,21 @@ ROM_START( invaderl )
 	ROM_LOAD( "sv06.bin",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
 ROM_END
 
+ROM_START( invadernc ) // PCBs etched LOGITEC EK-104-101A and EK-104-102, but bootleg Nas Corp set
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.ic65",     0x0000, 0x0400, CRC(499f253a) SHA1(e13353194277f5d35e92db9b11912b5f392f51b7) )
+	ROM_LOAD( "2.ic66",     0x0400, 0x0400, CRC(4b7f232e) SHA1(222987a29225d625557273547660b1bbcc06bcba) )
+	ROM_LOAD( "3.ic67",     0x0800, 0x0400, CRC(5c6bdd47) SHA1(2ead561b6bef68ed973a9536418dc6afe78a84ca) )
+	ROM_LOAD( "7.ic57",     0x1000, 0x0400, CRC(5a7bbf1f) SHA1(659f2a8c646660d316d6e70f1d9548375f1da63f) )
+	ROM_LOAD( "4.ic70",     0x1400, 0x0400, CRC(455b1fa7) SHA1(668800a0a3ba18d8b54c2aa4dfd4bd01a667d679) )
+	ROM_LOAD( "5.ic71",     0x1800, 0x0400, CRC(b9ea71a0) SHA1(fcf99955798043a34dcbabecf3219972f836ac96) )
+	ROM_LOAD( "6.ic72",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // reads weren't consistent. Below are listed the two best reads
+	ROM_LOAD( "82s137_1.ic17",     0x0000, 0x0400, CRC(1eb2bc60) SHA1(663f3186af8f64bd0f3f9b113011fc045e44cbc0) )
+	//ROM_LOAD( "82s137_2.ic17",     0x0000, 0x0400, CRC(2d653d0f) SHA1(57c212c8b6dbaeffdc1cd54d4b0defbf69c96b66) )
+ROM_END
+
 ROM_START( invader4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "spin4.a",      0x0000, 0x0800, CRC(bb386dfe) SHA1(cc00f3e4f6ca4c05bae038a24ccdb213fb951cfc) )
@@ -5008,6 +5023,7 @@ GAME( 1979, sicv,       invaders, invadpt2,  sicv,      _8080bw_state,  0,      
 GAME( 1979, sicv1,      invaders, invadpt2,  sicv,      _8080bw_state,  0,        ROT270, "Taito", "Space Invaders (CV Version, smaller roms)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1978, invadrmr,   invaders, invaders,  invadrmr,  mw8080bw_state, 0,        ROT270, "Taito / Model Racing", "Space Invaders (Model Racing)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, invaderl,   invaders, invaders,  sicv,      mw8080bw_state, 0,        ROT270, "Taito / Logitec", "Space Invaders (Logitec)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1978, invadernc,  invaders, invaders,  sicv,      mw8080bw_state, 0,        ROT270, "bootleg (Nas Corp)", "Space Invaders (Nas Corp bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_invaders ) // runs on original Logitec PCB, PROM dump might be bad, needs correct decoding anyway
 GAMEL(1978, spcewars,   invaders, spcewars,  spcewars,  _8080bw_state,  0,        ROT270, "Taito / Sanritsu", "Space War (Sanritsu)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAME (1979, spcewarla,  invaders, spcewarla, spcewars,  _8080bw_state,  0,        ROT270, "bootleg (Leisure and Allied)", "Space War (Leisure and Allied)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unclassified, licensed or bootleg?
 GAMEL(1978, spceking,   invaders, invaders,  sicv,      mw8080bw_state, 0,        ROT270, "Taito / Leijac Corporation", "Space King", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?

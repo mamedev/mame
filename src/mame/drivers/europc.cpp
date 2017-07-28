@@ -476,6 +476,16 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END
 
+/* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */
+static MACHINE_CONFIG_START( cfg_builtin_720K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("35dd")
+	MCFG_SLOT_FIXED(true)
+
+	MCFG_DEVICE_MODIFY("fdc:1")
+	MCFG_SLOT_DEFAULT_OPTION("")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( europc )
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(europc_map)
@@ -488,6 +498,7 @@ static MACHINE_CONFIG_START( europc )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "lpt", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "com", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "fdc_xt", false)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_builtin_720K)
 
 	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
@@ -497,6 +508,9 @@ static MACHINE_CONFIG_START( europc )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
 MACHINE_CONFIG_END
 
 ROM_START( europc )

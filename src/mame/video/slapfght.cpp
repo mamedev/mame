@@ -116,14 +116,14 @@ WRITE8_MEMBER(slapfght_state::scrolly_w)
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(slapfght_state::flipscreen_w)
+WRITE_LINE_MEMBER(slapfght_state::flipscreen_w)
 {
-	flip_screen_set(offset ? 0 : 1);
+	flip_screen_set(state ? 0 : 1);
 }
 
-WRITE8_MEMBER(slapfght_state::palette_bank_w)
+WRITE_LINE_MEMBER(slapfght_state::palette_bank_w)
 {
-	m_palette_bank = offset;
+	m_palette_bank = state;
 }
 
 

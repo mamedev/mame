@@ -106,6 +106,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "speaker.h"
@@ -118,33 +119,14 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
  *************************************/
 
 
-WRITE8_MEMBER(tubep_state::tubep_LS259_w)
+WRITE_LINE_MEMBER(tubep_state::coin1_counter_w)
 {
-	switch(offset)
-	{
-		case 0:
-		case 1:
-				/*
-				    port b0: bit0 - coin 1 counter
-				    port b1  bit0 - coin 2 counter
-				*/
-				machine().bookkeeping().coin_counter_w(offset,data&1);
-				break;
-		case 2:
-				//something...
-				break;
-		case 5:
-				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
-				break;
-		case 6:
-				tubep_background_romselect_w(space,offset,data);    /* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
-				break;
-		case 7:
-				tubep_colorproms_A4_line_w(space,offset,data);  /* bit0 = line A4 (color proms address) state */
-				break;
-		default:
-				break;
-	}
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(tubep_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -181,7 +163,7 @@ static ADDRESS_MAP_START( tubep_main_portmap, AS_IO, 8, tubep_state )
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("P1")
 
 	AM_RANGE(0x80, 0x80) AM_WRITE(main_cpu_irq_line_clear_w)
-	AM_RANGE(0xb0, 0xb7) AM_WRITE(tubep_LS259_w)
+	AM_RANGE(0xb0, 0xb7) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(tubep_soundlatch_w)
 ADDRESS_MAP_END
 
@@ -395,23 +377,6 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(tubep_state::rjammer_LS259_w)
-{
-	switch(offset)
-	{
-		case 0:
-		case 1:
-				machine().bookkeeping().coin_counter_w(offset,data&1);   /* bit 0 = coin counter */
-				break;
-		case 5:
-				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
-				break;
-		default:
-				break;
-	}
-}
-
-
 WRITE8_MEMBER(tubep_state::rjammer_soundlatch_w)
 {
 	m_sound_latch = data;
@@ -436,7 +401,7 @@ static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8, tubep_state )
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("P1")
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P2")
 
-	AM_RANGE(0xd0, 0xd7) AM_WRITE(rjammer_LS259_w)
+	AM_RANGE(0xd0, 0xd7) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(main_cpu_irq_line_clear_w)    /* clear IRQ interrupt */
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(rjammer_soundlatch_w)
 ADDRESS_MAP_END
@@ -875,6 +840,14 @@ static MACHINE_CONFIG_START( tubep )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tubep_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tubep_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) //something...
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tubep_state, screen_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(tubep_state, background_romselect_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tubep_state, colorproms_A4_line_w))
+
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,tubep)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
 
@@ -935,6 +908,11 @@ static MACHINE_CONFIG_START( rjammer )
 
 	MCFG_CPU_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3A
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tubep_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tubep_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tubep_state, screen_flip_w))
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,rjammer)

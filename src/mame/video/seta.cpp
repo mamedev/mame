@@ -144,6 +144,9 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
 static const game_offset game_offsets[] =
 {
+	// x offsets
+	// "game",    {spr, spr_flip}, {tmap, tmap_flip}
+
 	/* only sprites */
 	{ "tndrcade", {  0,  0 } },             // correct (start grid, wall at beginning of game)
 	{ "tndrcadej",{  0,  0 } },             // "
@@ -171,7 +174,7 @@ static const game_offset game_offsets[] =
 	{ "calibr50", { -1,  2 }, { -3, -2 } }, // correct (test grid and roof in animation at beginning of game)
 	{ "arbalest", {  0,  1 }, { -2, -1 } }, // correct (test grid and landing pad at beginning of game)
 	{ "metafox",  {  0,  0 }, { 16,-19 } }, // sprites unknown, tilemap correct (test grid)
-	{ "setaroul", {  0,  0 }, {  0,  0 } }, // unknown
+	{ "setaroul", {  7,  0 }, {  5,  0 } }, // unknown (flipped offsets are unused: game handles flipping manually without setting the flip bit)
 	{ "drgnunit", {  2,  2 }, { -2, -2 } }, // correct (test grid and I/O test)
 	{ "jockeyc",  {  0,  0 }, { -2,  0 } }, // sprites unknown, tilemap correct (test grid)
 	{ "inttoote", {  0,  0 }, { -2,  0 } }, // "
@@ -360,7 +363,7 @@ Offset + 0x1000:
 Offset + 0x0:                               Scroll X
 Offset + 0x2:                               Scroll Y
 Offset + 0x4:
-                    fedc ba98 7654 3210     -
+                    fedc ba98 765- ----     -
                     ---- ---- ---4 ----     Tilemap color mode switch (used in blandia and the other games using 6bpp graphics)
                     ---- ---- ---- 3---     Tilemap Select (There Are 2 Tilemaps Per Layer)
                     ---- ---- ---- -21-     0 (1 only in eightfrc, when flip is on!)
@@ -510,13 +513,13 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 	m_tilemap_1->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(seta_state,setaroul_1_layer)
+VIDEO_START_MEMBER(setaroul_state,setaroul_1_layer)
 {
 	VIDEO_START_CALL_MEMBER(seta_1_layer);
 
 	// position kludges
-	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
-	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
+	m_seta001->set_bg_yoffsets( 0, -0x1 );
+	m_seta001->set_bg_xoffsets( 0, 0x2 );
 }
 
 VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
@@ -682,7 +685,7 @@ PALETTE_INIT_MEMBER(seta_state,inttoote)
 	}
 }
 
-PALETTE_INIT_MEMBER(seta_state,setaroul)
+PALETTE_INIT_MEMBER(setaroul_state,setaroul)
 {
 	m_gfxdecode->gfx(0)->set_granularity(16);
 	m_gfxdecode->gfx(1)->set_granularity(16);
@@ -1053,16 +1056,17 @@ uint32_t seta_state::screen_update_seta_layers(screen_device &screen, bitmap_ind
 }
 
 
-uint32_t seta_state::screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t setaroul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x0, cliprect);
 
-	seta_layers_update(screen, bitmap, cliprect, 0x800, 1 );
+	if (m_led & 0x80)
+		seta_layers_update(screen, bitmap, cliprect, 0x800, 1 );
 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(seta_state::screen_vblank_setaroul)
+WRITE_LINE_MEMBER(setaroul_state::screen_vblank)
 {
 	// rising edge
 	if (state)

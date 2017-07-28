@@ -676,14 +676,6 @@ WRITE_LINE_MEMBER(segas24_state::cnt1)
 	m_cnt1 = bool(state);
 }
 
-WRITE_LINE_MEMBER(segas24_state::cnt2)
-{
-	if (bool(state) != m_cnt2)
-		machine().device("ymsnd")->reset();
-
-	m_cnt2 = bool(state);
-}
-
 
 // Rom board bank access
 
@@ -1212,7 +1204,7 @@ void segas24_state::machine_start()
 void segas24_state::machine_reset()
 {
 	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	m_cnt1 = m_cnt2 = true;
+	m_cnt1 = true;
 	fdc_init();
 	curbank = 0;
 	reset_bank();
@@ -1897,7 +1889,7 @@ static MACHINE_CONFIG_START( system24 )
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
 	MCFG_315_5296_OUT_PORTH_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas24_state, cnt1))
-	MCFG_315_5296_OUT_CNT2_CB(WRITELINE(segas24_state, cnt2))
+	MCFG_315_5296_OUT_CNT2_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
 
 	MCFG_TIMER_DRIVER_ADD("irq_timer", segas24_state, irq_timer_cb)
 	MCFG_TIMER_DRIVER_ADD("irq_timer_clear", segas24_state, irq_timer_clear_cb)

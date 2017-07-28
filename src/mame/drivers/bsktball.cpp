@@ -28,6 +28,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/bsktball.h"
+#include "machine/74259.h"
 #include "sound/discrete.h"
 #include "screen.h"
 #include "speaker.h"
@@ -83,13 +84,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bsktball_state )
 	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW")
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP /* Timer Reset */
 	AM_RANGE(0x1010, 0x1010) AM_WRITE(bsktball_bounce_w) /* Crowd Amp / Bounce */
-	AM_RANGE(0x1022, 0x1023) AM_WRITENOP /* Coin Counter */
-	AM_RANGE(0x1024, 0x1025) AM_WRITE(bsktball_led1_w) /* LED 1 */
-	AM_RANGE(0x1026, 0x1027) AM_WRITE(bsktball_led2_w) /* LED 2 */
-	AM_RANGE(0x1028, 0x1029) AM_WRITE(bsktball_ld1_w) /* LD 1 */
-	AM_RANGE(0x102a, 0x102b) AM_WRITE(bsktball_ld2_w) /* LD 2 */
-	AM_RANGE(0x102c, 0x102d) AM_WRITE(bsktball_noise_reset_w) /* Noise Reset */
-	AM_RANGE(0x102e, 0x102f) AM_WRITE(bsktball_nmion_w) /* NMI On */
+	AM_RANGE(0x1020, 0x102f) AM_DEVWRITE("outlatch", f9334_device, write_a0)
 	AM_RANGE(0x1030, 0x1030) AM_WRITE(bsktball_note_w) /* Music Ckt Note Dvsr */
 	AM_RANGE(0x1800, 0x1bbf) AM_RAM_WRITE(bsktball_videoram_w) AM_SHARE("videoram") /* DISPLAY */
 	AM_RANGE(0x1bc0, 0x1bff) AM_RAM AM_SHARE("motion")
@@ -229,7 +224,6 @@ void bsktball_state::machine_start()
 
 void bsktball_state::machine_reset()
 {
-	m_nmi_on = 0;
 //  m_i256v = 0;
 	m_ld1 = 0;
 	m_ld2 = 0;
@@ -251,6 +245,14 @@ static MACHINE_CONFIG_START( bsktball )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bsktball_state, bsktball_scanline, "screen", 0, 1)
 
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // M6
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // Coin Counter
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(bsktball_state, led1_w)) // LED 1
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bsktball_state, led2_w)) // LED 2
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(bsktball_state, ld1_w)) // LD 1
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(bsktball_state, ld2_w)) // LD 2
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<BSKTBALL_NOISE_EN>)) // Noise Reset
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(bsktball_state, nmion_w)) // NMI On
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -52,6 +52,7 @@ public:
 
 	u16 read_inputs(int columns);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
+	virtual DECLARE_READ8_MEMBER(cartridge_r);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)

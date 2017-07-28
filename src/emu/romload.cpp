@@ -439,8 +439,11 @@ void rom_load_manager::verify_length_and_hash(const char *name, u32 explength, c
 	else if (hashes != acthashes)
 	{
 		/* otherwise, it's just bad */
+		util::hash_collection &all_acthashes = acthashes.hash_types() == util::hash_collection::HASH_TYPES_ALL
+			? acthashes
+			: m_file->hashes(util::hash_collection::HASH_TYPES_ALL);
 		m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", name));
-		dump_wrong_and_correct_checksums(hashes, acthashes);
+		dump_wrong_and_correct_checksums(hashes, all_acthashes);
 		m_warnings++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */

@@ -26,6 +26,7 @@ System80 is based on the SRU platform, but with more outputs and finally a separ
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
+#include "machine/74259.h"
 #include "machine/tms9902.h"
 #include "speaker.h"
 
@@ -55,6 +56,11 @@ public:
 	{ }
 	virtual void machine_reset() override;
 
+	DECLARE_WRITE_LINE_MEMBER(int1_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(int2_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
+	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
+
 protected:
 
 	// devices
@@ -63,6 +69,22 @@ public:
 	DECLARE_DRIVER_INIT(jpms80);
 };
 
+WRITE_LINE_MEMBER(jpms80_state::int1_enable_w)
+{
+}
+
+WRITE_LINE_MEMBER(jpms80_state::int2_enable_w)
+{
+}
+
+WRITE_LINE_MEMBER(jpms80_state::watchdog_w)
+{
+}
+
+WRITE_LINE_MEMBER(jpms80_state::io_enable_w)
+{
+}
+
 static ADDRESS_MAP_START( jpms80_map, AS_PROGRAM, 8, jpms80_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
@@ -70,11 +92,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jpms80_io_map, AS_IO, 8, jpms80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-//  AM_RANGE(0x0000, 0x000f) // I/O & Optic (in) / Reels (out)
-//  AM_RANGE(0x0050, 0x0050) // INT1 enable (lv3)
-//  AM_RANGE(0x0051, 0x0051) // INT2 enable (lv4)
-//  AM_RANGE(0x0052, 0x0052) // Watchdog
-//  AM_RANGE(0x0053, 0x0053) // I/O Enable
+//  AM_RANGE(0x0000, 0x001f) // I/O & Optic (in)
+	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("outlatch0", ls259_device, write_d0)
+	AM_RANGE(0x0008, 0x000f) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
+	AM_RANGE(0x0010, 0x0017) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
+	AM_RANGE(0x0018, 0x001f) AM_DEVWRITE("outlatch3", ls259_device, write_d0)
+	AM_RANGE(0x0020, 0x0027) AM_DEVWRITE("outlatch4", ls259_device, write_d0)
+	AM_RANGE(0x0028, 0x002f) AM_DEVWRITE("outlatch5", ls259_device, write_d0)
+	AM_RANGE(0x0030, 0x0037) AM_DEVWRITE("outlatch6", ls259_device, write_d0)
+	AM_RANGE(0x0038, 0x003f) AM_DEVWRITE("outlatch7", ls259_device, write_d0)
+	AM_RANGE(0x0040, 0x0047) AM_DEVWRITE("outlatch8", ls259_device, write_d0)
+	AM_RANGE(0x0048, 0x004f) AM_DEVWRITE("outlatch9", ls259_device, write_d0)
+	AM_RANGE(0x0050, 0x0057) AM_DEVWRITE("outlatch10", ls259_device, write_d0)
 //  AM_RANGE(0x0140, 0x015f) // AY
 	AM_RANGE(0x01e0, 0x01ff) AM_DEVREADWRITE("tms9902duart", tms9902_device, cruread, cruwrite)
 //  Lamps, Meters etc. can move around
@@ -99,6 +128,23 @@ static MACHINE_CONFIG_START( jpms80 )
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // I/O IC5
+	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // I/O IC6
+	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // I/O IC7
+	MCFG_DEVICE_ADD("outlatch3", LS259, 0) // I/O IC8
+	MCFG_DEVICE_ADD("outlatch4", LS259, 0) // I/O IC9
+	MCFG_DEVICE_ADD("outlatch5", LS259, 0) // I/O IC10
+	MCFG_DEVICE_ADD("outlatch6", LS259, 0) // I/O IC11
+	MCFG_DEVICE_ADD("outlatch7", LS259, 0) // I/O IC12
+	MCFG_DEVICE_ADD("outlatch8", LS259, 0) // I/O IC13
+	MCFG_DEVICE_ADD("outlatch9", LS259, 0) // I/O IC14
+
+	MCFG_DEVICE_ADD("outlatch10", LS259, 0) // I/O IC15
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jpms80_state, int1_enable_w)) // 50 - INT1 enable (lv3)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jpms80_state, int2_enable_w)) // 51 - INT2 enable (lv4)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(jpms80_state, watchdog_w)) // 52 - Watchdog
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jpms80_state, io_enable_w)) // 53 - I/O Enable
 
 	MCFG_DEVICE_ADD("tms9902duart", TMS9902, DUART_CLOCK)
 

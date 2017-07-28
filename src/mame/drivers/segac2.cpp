@@ -215,6 +215,14 @@ public:
 };
 
 
+class segac2_pc_state : public segac2_state
+{
+public:
+	using segac2_state::segac2_state;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+};
+
+
 /******************************************************************************
     Machine init
 *******************************************************************************
@@ -2566,7 +2574,7 @@ GAME( 1994, puyopuy2,  0,        segac2, puyopuy2, segac2_state, puyopuy2, ROT0,
 GAME( 1994, zunkyou,   0,        segac2, zunkyou, segac2_state,  zunkyou,  ROT0,   "Sega", "Zunzunkyou No Yabou (Japan)", 0 )
 
 /* Atlus Print Club 'Games' (C-2 Hardware, might not be possible to support them because they use camera + printer, really just put here for reference) */
-GAME( 1995, pclubj,    0,        segac2, pclub, segac2_state,    pclub,    ROT0,   "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
-GAME( 1995, pclubjv2,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv2, ROT0,   "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
-GAME( 1996, pclubjv4,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv4, ROT0,   "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
-GAME( 1996, pclubjv5,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv5, ROT0,   "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
+GAME( 1995, pclubj,    0,        segac2, pclub,    segac2_pc_state, pclub,    ROT0, "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )
+GAME( 1995, pclubjv2,  pclubj,   segac2, pclubjv2, segac2_pc_state, pclubjv2, ROT0, "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING )
+GAME( 1996, pclubjv4,  pclubj,   segac2, pclubjv2, segac2_pc_state, pclubjv4, ROT0, "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING )
+GAME( 1996, pclubjv5,  pclubj,   segac2, pclubjv2, segac2_pc_state, pclubjv5, ROT0, "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING )

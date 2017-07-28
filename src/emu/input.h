@@ -51,7 +51,7 @@ enum input_device_class
 	DEVICE_CLASS_INTERNAL,
 	DEVICE_CLASS_MAXIMUM
 };
-DECLARE_ENUM_OPERATORS(input_device_class)
+DECLARE_ENUM_INCDEC_OPERATORS(input_device_class)
 
 
 // device index
@@ -338,7 +338,7 @@ enum input_item_id
 	// absolute maximum ID
 	ITEM_ID_ABSOLUTE_MAXIMUM = 0xfff
 };
-DECLARE_ENUM_OPERATORS(input_item_id)
+DECLARE_ENUM_INCDEC_OPERATORS(input_item_id)
 
 
 

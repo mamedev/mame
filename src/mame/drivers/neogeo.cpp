@@ -464,6 +464,7 @@
 #include "emu.h"
 #include "includes/neogeo.h"
 
+#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "softlist.h"
@@ -737,9 +738,9 @@ READ16_MEMBER(neogeo_state::unmapped_r)
  *
  *************************************/
 
-void neogeo_state::set_save_ram_unlock( uint8_t data )
+WRITE_LINE_MEMBER(neogeo_state::set_save_ram_unlock)
 {
-	m_save_ram_unlocked = data;
+	m_save_ram_unlocked = state;
 }
 
 
@@ -848,50 +849,18 @@ READ8_MEMBER(neogeo_state::audio_cpu_bank_select_r)
  *
  *************************************/
 
-WRITE8_MEMBER(neogeo_state::system_control_w)
+
+WRITE_LINE_MEMBER(neogeo_state::set_use_cart_vectors)
 {
-	uint8_t bit = (offset >> 3) & 0x01;
+	m_use_cart_vectors = state;
+}
 
-	switch (offset & 0x07)
-	{
-		default:
-		case 0x00:
-			set_screen_shadow(bit);
-			break;
 
-		case 0x01:
-			if (m_type == NEOGEO_CD)
-				printf("NeoCD: write to regular vector change address? %d\n", bit); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
-			else
-				m_use_cart_vectors = bit;
-			break;
-
-		case 0x05:
-			if (m_type == NEOGEO_MVS)
-			{
-				m_use_cart_audio = bit;
-				m_sprgen->neogeo_set_fixed_layer_source(bit);
-				m_bank_audio_main->set_entry(m_use_cart_audio);
-			}
-			break;
-
-		case 0x06:
-			if (m_type == NEOGEO_MVS)
-				set_save_ram_unlock(bit);
-			break;
-
-		case 0x07:
-			set_palette_bank(bit);
-			break;
-
-		case 0x02: // memory card 1: write enable/disable
-		case 0x03: // memory card 2: write disable/enable
-		case 0x04: // memory card: register select enable/set to normal (what does it mean?)
-			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
-			break;
-	}
-
-	if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
+WRITE_LINE_MEMBER(neogeo_state::set_use_cart_audio)
+{
+	m_use_cart_audio = state;
+	m_sprgen->neogeo_set_fixed_layer_source(state);
+	m_bank_audio_main->set_entry(m_use_cart_audio);
 }
 
 
@@ -1398,13 +1367,6 @@ void neogeo_state::neogeo_postload()
 
 void neogeo_state::machine_reset()
 {
-	offs_t offs;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	// reset system control registers
-	for (offs = 0; offs < 8; offs++)
-		system_control_w(space, offs, 0);
-
 	// disable audiocpu nmi
 	m_audio_cpu_nmi_enabled = false;
 	m_audio_cpu_nmi_pending = false;
@@ -1458,7 +1420,7 @@ ADDRESS_MAP_START( neogeo_main_map, AS_PROGRAM, 16, neogeo_state )
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff) // BITW1 (system control registers)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(unmapped_r)
@@ -1495,7 +1457,7 @@ static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, aes_state )
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(unmapped_r)
@@ -1652,6 +1614,14 @@ MACHINE_CONFIG_START( neogeo_base )
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
+	MCFG_DEVICE_ADD("systemlatch", HC259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(neogeo_state, set_screen_shadow))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(neogeo_state, set_use_cart_vectors))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // memory card 1: write enable/disable
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // memory card 2: write disable/enable
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // memory card: register select enable/set to normal (what does it mean?)
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(neogeo_state, set_palette_bank))
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -1685,6 +1655,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED( neogeo_arcade, neogeo_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_slot)
+
+	MCFG_DEVICE_MODIFY("systemlatch")
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(neogeo_state, set_use_cart_audio))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(neogeo_state, set_save_ram_unlock))
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK))

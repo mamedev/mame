@@ -1255,7 +1255,7 @@ void dcs_audio_device::denver_alloc_dmadac()
 	if (m_channels < 6)
 		dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, false);
 	//if (enable)
-	//	recompute_sample_rate();
+	//  recompute_sample_rate();
 }
 
 READ16_MEMBER( dcs_audio_device::denver_r )
@@ -1626,7 +1626,7 @@ uint16_t dcs_audio_device::data_r()
 TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
 {
 	//if (LOG_DCS_IO)
-	//	logerror("output_control = %04X\n", param);
+	//  logerror("output_control = %04X\n", param);
 	m_output_control = param;
 	m_output_control_cycles = 0;
 }
@@ -1657,7 +1657,7 @@ int dcs_audio_device::data2_r()
 	if (m_rev >= 3) {
 		// Not sure about this but allows sf2049 and roadburn to pass audio initialization tests at boot
 		return m_output_control << 8;
-	} 
+	}
 	else {
 		return m_output_control;
 	}

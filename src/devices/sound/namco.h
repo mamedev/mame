@@ -82,13 +82,13 @@ class namco_device : public namco_audio_device
 public:
 	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( pacman_sound_enable_w );
-	DECLARE_WRITE8_MEMBER( pacman_sound_w );
+	DECLARE_WRITE_LINE_MEMBER(pacman_sound_enable_w);
+	DECLARE_WRITE8_MEMBER(pacman_sound_w);
 
 	void polepos_sound_enable(int enable);
 
-	DECLARE_READ8_MEMBER( polepos_sound_r );
-	DECLARE_WRITE8_MEMBER( polepos_sound_w );
+	DECLARE_READ8_MEMBER(polepos_sound_r);
+	DECLARE_WRITE8_MEMBER(polepos_sound_w);
 
 protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -104,7 +104,7 @@ public:
 	DECLARE_READ8_MEMBER( sharedram_r );
 	DECLARE_WRITE8_MEMBER( sharedram_w );
 
-	void mappy_sound_enable(int enable);
+	DECLARE_WRITE_LINE_MEMBER(mappy_sound_enable);
 
 protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;

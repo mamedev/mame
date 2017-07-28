@@ -842,7 +842,7 @@ static ADDRESS_MAP_START( dec8_mcu_io_map, AS_IO, 8, dec8_state )
 ADDRESS_MAP_END
 
 /*
-	Super Real Darwin is similar but only appears to have a single port
+    Super Real Darwin is similar but only appears to have a single port
 */
 
 READ8_MEMBER(dec8_state::srdarwin_mcu_from_main_r)
@@ -2352,7 +2352,7 @@ static MACHINE_CONFIG_START( srdarwin )
 	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
-		
+
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz) /* unknown frequency */
 	MCFG_CPU_IO_MAP(srdarwin_mcu_io_map)
 

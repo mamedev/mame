@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "sound/2203intf.h"
 #include "video/bufsprite.h"
 
 class gng_state : public driver_device
@@ -17,6 +18,7 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_maincpu(*this, "maincpu"),
+		m_ym(*this, "ym%u", 1),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -32,13 +34,15 @@ public:
 	uint8_t      m_scrolly[2];
 
 	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(gng_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(ym_reset_w);
 	DECLARE_READ8_MEMBER(diamond_hack_r);
 	DECLARE_WRITE8_MEMBER(gng_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(gng_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(gng_bgscrollx_w);
 	DECLARE_WRITE8_MEMBER(gng_bgscrolly_w);
-	DECLARE_WRITE8_MEMBER(gng_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_DRIVER_INIT(diamond);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -48,6 +52,7 @@ public:
 	uint32_t screen_update_gng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device_array<ym2203_device, 2> m_ym;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };

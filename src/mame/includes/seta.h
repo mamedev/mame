@@ -8,6 +8,8 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/ticket.h"
+#include "machine/upd4992.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
 
@@ -166,10 +168,6 @@ public:
 	DECLARE_READ16_MEMBER(keroppi_protection_init_r);
 	DECLARE_READ16_MEMBER(keroppi_coin_r);
 	DECLARE_WRITE16_MEMBER(keroppi_prize_w);
-	DECLARE_WRITE16_MEMBER(setaroul_spriteylow_w);
-	DECLARE_WRITE16_MEMBER(setaroul_spritectrl_w);
-	DECLARE_WRITE16_MEMBER(setaroul_spritecode_w);
-	DECLARE_READ16_MEMBER(setaroul_spritecode_r);
 	DECLARE_READ16_MEMBER(krzybowl_input_r);
 	DECLARE_WRITE16_MEMBER(msgundam_vregs_w);
 	DECLARE_READ16_MEMBER(kiwame_nvram_r);
@@ -225,13 +223,11 @@ public:
 	DECLARE_VIDEO_START(seta_no_layers);
 	DECLARE_VIDEO_START(kyustrkr_no_layers);
 	DECLARE_VIDEO_START(twineagl_1_layer);
-	DECLARE_VIDEO_START(setaroul_1_layer);
 	DECLARE_VIDEO_START(seta_1_layer);
 	DECLARE_MACHINE_RESET(calibr50);
 	DECLARE_PALETTE_INIT(usclssic);
 	DECLARE_VIDEO_START(seta_2_layers);
 	DECLARE_PALETTE_INIT(blandia);
-	DECLARE_PALETTE_INIT(setaroul);
 	DECLARE_PALETTE_INIT(zingzip);
 	DECLARE_MACHINE_START(wrofaero);
 	DECLARE_PALETTE_INIT(gundhara);
@@ -242,11 +238,9 @@ public:
 	uint32_t screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_seta_buffer_sprites);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_setaroul);
 	DECLARE_READ16_MEMBER(ipl0_ack_r);
 	DECLARE_WRITE16_MEMBER(ipl0_ack_w);
 	DECLARE_READ16_MEMBER(ipl1_ack_r);
@@ -262,7 +256,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(setaroul_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(inttoote_interrupt);
 	void seta_coin_lockout_w(int data);
@@ -276,4 +269,62 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(utoukond_ym3438_interrupt);
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+};
+
+class setaroul_state : public seta_state
+{
+public:
+	setaroul_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta_state(mconfig, type, tag),
+		m_rtc(*this, "rtc"),
+		m_hopper(*this, "hopper"),
+		m_bet(*this, "BET.%02X", 0),
+		m_mux(0),
+		m_pay(0),
+		m_led(0),
+		m_coin_start_cycles(0)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(rtc_w);
+	DECLARE_READ16_MEMBER(rtc_r);
+
+	DECLARE_READ16_MEMBER(inputs_r);
+	DECLARE_WRITE16_MEMBER(mux_w);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+
+	DECLARE_WRITE8_MEMBER(pay_w);
+	DECLARE_WRITE8_MEMBER(led_w);
+
+	DECLARE_READ16_MEMBER(spritecode_r);
+	DECLARE_WRITE16_MEMBER(spritecode_w);
+
+	DECLARE_WRITE16_MEMBER(spriteylow_w);
+
+	DECLARE_WRITE16_MEMBER(spritectrl_w);
+
+	DECLARE_MACHINE_RESET(setaroul);
+
+	DECLARE_VIDEO_START(setaroul_1_layer);
+	DECLARE_PALETTE_INIT(setaroul);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+private:
+	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
+	required_device<ticket_dispenser_device> m_hopper;
+	required_ioport_array<26> m_bet;
+
+	uint8_t m_mux;
+
+	uint8_t m_pay;
+	uint8_t m_led;
+
+	uint64_t m_coin_start_cycles;
+
+	void show_outputs();
 };

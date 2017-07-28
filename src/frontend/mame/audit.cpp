@@ -273,7 +273,10 @@ media_auditor::summary media_auditor::summarize(const char *name, std::ostream *
 		// output the game name, file name, and length (if applicable)
 		if (output)
 		{
-			util::stream_format(*output, "%-12s: %s", name, record.name());
+			if (name)
+				util::stream_format(*output, "%-12s: %s", name, record.name());
+			else
+				util::stream_format(*output, "%s", record.name());
 			if (record.expected_length() > 0)
 				util::stream_format(*output, " (%d bytes)", record.expected_length());
 			*output << " - ";

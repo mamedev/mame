@@ -575,7 +575,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 	if (m_screen != nullptr)
 	{
 		// set the initial orientation and brightness/contrast/gamma
-		m_user.m_orientation = manager.machine().system().flags & ORIENTATION_MASK;
+		m_user.m_orientation = manager.machine().system().flags & machine_flags::MASK_ORIENTATION;
 		m_user.m_brightness = manager.machine().options().brightness();
 		m_user.m_contrast = manager.machine().options().contrast();
 		m_user.m_gamma = manager.machine().options().gamma();
@@ -948,7 +948,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
-		m_base_orientation = orientation_reverse(manager.machine().system().flags & ORIENTATION_MASK);
+		m_base_orientation = orientation_reverse(manager.machine().system().flags & machine_flags::MASK_ORIENTATION);
 
 	// rotate left/right
 	if (manager.machine().options().ror() || (manager.machine().options().auto_ror() && (manager.machine().system().flags & ORIENTATION_SWAP_XY)))
@@ -1700,14 +1700,16 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
-	// if the first character of the "file" is an open brace, assume it is an XML string
-	util::xml::data_node *rootnode;
+	util::xml::file::ptr rootnode;
 	if (filename[0] == '<')
-		rootnode = util::xml::data_node::string_read(filename, nullptr);
-
-	// otherwise, assume it is a file
+	{
+		// if the first character of the "file" is an open brace, assume it is an XML string
+		rootnode = util::xml::file::string_read(filename, nullptr);
+	}
 	else
 	{
+		// otherwise, assume it is a file
+
 		// build the path and optionally prepend the directory
 		std::string fname = std::string(filename).append(".lay");
 		if (dirname != nullptr)
@@ -1720,7 +1722,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			return false;
 
 		// read the file
-		rootnode = util::xml::data_node::file_read(layoutfile, nullptr);
+		rootnode = util::xml::file::read(layoutfile, nullptr);
 	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
@@ -1751,7 +1753,6 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	emulator_info::layout_file_cb(*rootnode);
 
 	// free the root node
-	rootnode->file_free();
 	return result;
 }
 

@@ -42,7 +42,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t<!ATTLIST __XML_ROOT__ build CDATA #IMPLIED>\n"
 "\t<!ATTLIST __XML_ROOT__ debug (yes|no) \"no\">\n"
 "\t<!ATTLIST __XML_ROOT__ mameconfig CDATA #REQUIRED>\n"
-"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, device*, slot*, softwarelist*, ramoption*)>\n"
+"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>\n"
 "\t\t<!ATTLIST __XML_TOP__ name CDATA #REQUIRED>\n"
 "\t\t<!ATTLIST __XML_TOP__ sourcefile CDATA #IMPLIED>\n"
 "\t\t<!ATTLIST __XML_TOP__ isbios (yes|no) \"no\">\n"
@@ -155,6 +155,10 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST driver cocktail (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver protection (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
+"\t\t<!ELEMENT feature EMPTY>\n"
+"\t\t\t<!ATTLIST feature type (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing) #REQUIRED>\n"
+"\t\t\t<!ATTLIST feature status (unemulated|imperfect) #IMPLIED>\n"
+"\t\t\t<!ATTLIST feature overall (unemulated|imperfect) #IMPLIED>\n"
 "\t\t<!ELEMENT device (instance*, extension*)>\n"
 "\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
@@ -370,22 +374,22 @@ void info_xml_creator::output_footer()
 
 void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *devtypes)
 {
-	// no action if not a game
 	const game_driver &driver = drivlist.driver();
-	if (driver.flags & MACHINE_NO_STANDALONE)
-		return;
-
 	std::shared_ptr<machine_config> const config(drivlist.config());
 	device_iterator iter(config->root_device());
 
-	// allocate input ports
+	// allocate input ports and build overall emulation status
 	ioport_list portlist;
 	std::string errors;
+	device_t::feature_type overall_unemulated(driver.type.unemulated_features());
+	device_t::feature_type overall_imperfect(driver.type.imperfect_features());
 	for (device_t &device : iter)
 	{
 		portlist.append(device, errors);
+		overall_unemulated |= device.type().unemulated_features();
+		overall_imperfect |= device.type().imperfect_features();
 
-		if (devtypes && device.owner() && device.shortname() && *device.shortname())
+		if (devtypes && device.owner())
 			devtypes->insert(&device.type());
 	}
 
@@ -429,16 +433,16 @@ void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *
 	fprintf(m_output, " sourcefile=\"%s\"", util::xml::normalize_string(start));
 
 	// append bios and runnable flags
-	if (driver.flags & MACHINE_IS_BIOS_ROOT)
+	if (driver.flags & machine_flags::IS_BIOS_ROOT)
 		fprintf(m_output, " isbios=\"yes\"");
-	if (driver.flags & MACHINE_NO_STANDALONE)
+	if (driver.flags & machine_flags::NO_STANDALONE)
 		fprintf(m_output, " runnable=\"no\"");
-	if (driver.flags & MACHINE_MECHANICAL)
+	if (driver.flags & machine_flags::MECHANICAL)
 		fprintf(m_output, " ismechanical=\"yes\"");
 
 	// display clone information
 	int clone_of = drivlist.find(driver.parent);
-	if (clone_of != -1 && !(drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
+	if (clone_of != -1 && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 		fprintf(m_output, " cloneof=\"%s\"", util::xml::normalize_string(drivlist.driver(clone_of).name));
 	if (clone_of != -1)
 		fprintf(m_output, " romof=\"%s\"", util::xml::normalize_string(drivlist.driver(clone_of).name));
@@ -472,7 +476,8 @@ void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *
 	output_switches(portlist, "", IPT_CONFIG, "configuration", "confsetting");
 	output_ports(portlist);
 	output_adjusters(portlist);
-	output_driver(driver);
+	output_driver(driver, overall_unemulated, overall_imperfect);
+	output_features(driver.type, overall_unemulated, overall_imperfect);
 	output_images(config->root_device(), "");
 	output_slots(*config, config->root_device(), "", devtypes);
 	output_software_list(config->root_device());
@@ -495,11 +500,19 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 	sound_interface_iterator snditer(device);
 	if (snditer.first() != nullptr)
 		has_speaker = true;
-	// generate input list
+
+	// generate input list and build overall emulation status
 	ioport_list portlist;
 	std::string errors;
+	device_t::feature_type overall_unemulated(device.type().unemulated_features());
+	device_t::feature_type overall_imperfect(device.type().imperfect_features());
 	for (device_t &dev : device_iterator(device))
+	{
 		portlist.append(dev, errors);
+		overall_unemulated |= dev.type().unemulated_features();
+		overall_imperfect |= dev.type().imperfect_features();
+	}
+
 	// check if the device adds player inputs (other than dsw and configs) to the system
 	for (auto &port : portlist)
 		for (ioport_field &field : port.second->fields())
@@ -535,6 +548,7 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 	output_switches(portlist, devtag, IPT_DIPSWITCH, "dipswitch", "dipvalue");
 	output_switches(portlist, devtag, IPT_CONFIG, "configuration", "confsetting");
 	output_adjusters(portlist);
+	output_features(device.type(), overall_unemulated, overall_imperfect);
 	output_images(device, devtag);
 	output_slots(config, device, devtag, nullptr);
 	fprintf(m_output, "\t</%s>\n", XML_TOP);
@@ -829,7 +843,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 //  displays
 //-------------------------------------------------
 
-void info_xml_creator::output_display(device_t &device, u32 const *flags, const char *root_tag)
+void info_xml_creator::output_display(device_t &device, machine_flags::type const *flags, const char *root_tag)
 {
 	// iterate over screens
 	for (const screen_device &screendev : screen_device_iterator(device))
@@ -853,7 +867,7 @@ void info_xml_creator::output_display(device_t &device, u32 const *flags, const 
 			// output the orientation as a string
 			if (flags)
 			{
-				switch (*flags & ORIENTATION_MASK)
+				switch (*flags & machine_flags::MASK_ORIENTATION)
 				{
 				case ORIENTATION_FLIP_X:
 					fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
@@ -1504,62 +1518,110 @@ void info_xml_creator::output_adjusters(const ioport_list &portlist)
 //  output_driver - print driver status
 //-------------------------------------------------
 
-void info_xml_creator::output_driver(game_driver const &driver)
+void info_xml_creator::output_driver(game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
 {
 	fprintf(m_output, "\t\t<driver");
 
-	/* The status entry is an hint for frontend authors */
-	/* to select working and not working games without */
-	/* the need to know all the other status entries. */
-	/* Games marked as status=good are perfectly emulated, games */
-	/* marked as status=imperfect are emulated with only */
-	/* some minor issues, games marked as status=preliminary */
-	/* don't work or have major emulation problems. */
+	/*
+	The status entry is an hint for frontend authors to select working
+	and not working games without the need to know all the other status
+	entries.  Games marked as status=good are perfectly emulated, games
+	marked as status=imperfect are emulated with only some minor issues,
+	games marked as status=preliminary don't work or have major
+	emulation problems.
+	*/
+
+	auto const print_feature =
+			[this, unemulated, imperfect] (device_t::feature_type feature, char const *name, bool show_good)
+			{
+				if (unemulated & feature)
+					fprintf(m_output, " %s=\"preliminary\"", name);
+				else if (imperfect & feature)
+					fprintf(m_output, " %s=\"imperfect\"", name);
+				else if (show_good)
+					fprintf(m_output, " %s=\"good\"", name);
+			};
 
 	u32 const flags = driver.flags;
-	if (flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_MECHANICAL))
+	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
+	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
+	bool const imperfect_preliminary((unemulated | imperfect) & device_t::feature::PROTECTION);
+
+	if (machine_preliminary || unemulated_preliminary || imperfect_preliminary)
 		fprintf(m_output, " status=\"preliminary\"");
-	else if (flags & (MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS))
+	else if (imperfect)
 		fprintf(m_output, " status=\"imperfect\"");
 	else
 		fprintf(m_output, " status=\"good\"");
 
-	if (flags & MACHINE_NOT_WORKING)
+	if (flags & machine_flags::NOT_WORKING)
 		fprintf(m_output, " emulation=\"preliminary\"");
 	else
 		fprintf(m_output, " emulation=\"good\"");
 
-	if (flags & MACHINE_WRONG_COLORS)
-		fprintf(m_output, " color=\"preliminary\"");
-	else if (flags & MACHINE_IMPERFECT_COLORS)
-		fprintf(m_output, " color=\"imperfect\"");
-	else
-		fprintf(m_output, " color=\"good\"");
+	print_feature(device_t::feature::PALETTE, "color", true);
+	print_feature(device_t::feature::SOUND, "sound", true);
+	print_feature(device_t::feature::GRAPHICS, "graphic", true);
 
-	if (flags & MACHINE_NO_SOUND)
-		fprintf(m_output, " sound=\"preliminary\"");
-	else if (flags & MACHINE_IMPERFECT_SOUND)
-		fprintf(m_output, " sound=\"imperfect\"");
-	else
-		fprintf(m_output, " sound=\"good\"");
-
-	if (flags & MACHINE_IMPERFECT_GRAPHICS)
-		fprintf(m_output, " graphic=\"imperfect\"");
-	else
-		fprintf(m_output, " graphic=\"good\"");
-
-	if (flags & MACHINE_NO_COCKTAIL)
+	if (flags & machine_flags::NO_COCKTAIL)
 		fprintf(m_output, " cocktail=\"preliminary\"");
 
-	if (flags & MACHINE_UNEMULATED_PROTECTION)
-		fprintf(m_output, " protection=\"preliminary\"");
+	print_feature(device_t::feature::PROTECTION, "protection", false);
 
-	if (flags & MACHINE_SUPPORTS_SAVE)
+	if (flags & machine_flags::SUPPORTS_SAVE)
 		fprintf(m_output, " savestate=\"supported\"");
 	else
 		fprintf(m_output, " savestate=\"unsupported\"");
 
 	fprintf(m_output, "/>\n");
+}
+
+
+//-------------------------------------------------
+//  output_features - print emulation features of
+//
+//-------------------------------------------------
+
+void info_xml_creator::output_features(device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect)
+{
+	static constexpr std::pair<device_t::feature_type, char const *> features[] = {
+			{ device_t::feature::PROTECTION,    "protection"    },
+			{ device_t::feature::PALETTE,       "palette"       },
+			{ device_t::feature::GRAPHICS,      "graphics"      },
+			{ device_t::feature::SOUND,         "sound"         },
+			{ device_t::feature::CONTROLS,      "controls"      },
+			{ device_t::feature::KEYBOARD,      "keyboard"      },
+			{ device_t::feature::MOUSE,         "mouse"         },
+			{ device_t::feature::MICROPHONE,    "microphone"    },
+			{ device_t::feature::CAMERA,        "camera"        },
+			{ device_t::feature::DISK,          "disk"          },
+			{ device_t::feature::PRINTER,       "printer"       },
+			{ device_t::feature::LAN,           "lan"           },
+			{ device_t::feature::WAN,           "wan"           },
+			{ device_t::feature::TIMING,        "timing"        } };
+
+	device_t::feature_type const flags(type.unemulated_features() | type.imperfect_features() | unemulated | imperfect);
+	for (auto const &feature : features)
+	{
+		if (flags & feature.first)
+		{
+			fprintf(m_output, "\t\t<feature type=\"%s\"", feature.second);
+			if (type.unemulated_features() & feature.first)
+			{
+				fprintf(m_output, " status=\"unemulated\"");
+			}
+			else
+			{
+				if (type.imperfect_features() & feature.first)
+					fprintf(m_output, " status=\"imperfect\"");
+				if (unemulated & feature.first)
+					fprintf(m_output, " overall=\"unemulated\"");
+				else if ((~type.imperfect_features() & imperfect) & feature.first)
+					fprintf(m_output, " overall=\"imperfect\"");
+			}
+			fprintf(m_output, "/>\n");
+		}
+	}
 }
 
 

@@ -52,13 +52,14 @@ private:
 	void output_device_roms(device_t &root);
 	void output_sample(device_t &device);
 	void output_chips(device_t &device, const char *root_tag);
-	void output_display(device_t &device, u32 const *flags, const char *root_tag);
+	void output_display(device_t &device, machine_flags::type const *flags, const char *root_tag);
 	void output_sound(device_t &device);
 	void output_input(const ioport_list &portlist);
 	void output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag);
 	void output_ports(const ioport_list &portlist);
 	void output_adjusters(const ioport_list &portlist);
-	void output_driver(game_driver const &driver);
+	void output_driver(game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect);
+	void output_features(device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
 	void output_images(device_t &device, const char *root_tag);
 	void output_slots(machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
 	void output_software_list(device_t &root);
