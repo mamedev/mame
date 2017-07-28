@@ -13,13 +13,10 @@
 
 void playch10_state::machine_reset()
 {
-	/* initialize latches and flip-flops */
-	m_pc10_nmi_enable = m_pc10_dog_di = m_pc10_dispmask = m_pc10_sdcs = m_pc10_int_detect = 0;
+	m_pc10_int_detect = 0;
 
-	m_pc10_game_mode = m_pc10_dispmask_old = 0;
-
-	m_cart_sel = 0;
-	m_cntrl_mask = 1;
+	m_pc10_game_mode = 0;
+	m_pc10_dispmask_old = 0;
 
 	m_input_latch[0] = m_input_latch[1] = 0;
 
