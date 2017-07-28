@@ -17229,6 +17229,9 @@ kramermc                        // 1987 Kramer MC
 @source:kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
+@source:krz2000.cpp
+k2000							// (c) 1990 Kurzweil Music Systems
+
 @source:ksayakyu.cpp
 ksayakyu                        // ??? (c) 1985 Taito Corporation
 
