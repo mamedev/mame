@@ -338,7 +338,7 @@ WRITE_LINE_MEMBER(cinemat_state::starhawk_sound4_w)
 WRITE_LINE_MEMBER(cinemat_state::starhawk_sound7_w)
 {
 	/* K exit - 1=on, 0=off */
-	if (state)
+	if (state && !m_outlatch->q3_r())
 		m_samples->start(3, 5, true);
 	if (!state)
 		m_samples->stop(3);
