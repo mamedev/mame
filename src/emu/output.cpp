@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles
+// copyright-holders:Nicola Salmoria, Aaron Giles, Vas Crabb
 /***************************************************************************
 
     output.c
@@ -13,6 +13,56 @@
 
 
 #define OUTPUT_VERBOSE  0
+
+
+
+//**************************************************************************
+//  OUTPUT ITEM
+//**************************************************************************
+
+output_manager::output_item::output_item(
+		output_manager &manager,
+		std::string &&name,
+		u32 id,
+		s32 value)
+	: m_manager(manager)
+	, m_name(std::move(name))
+	, m_id(id)
+	, m_value(value)
+	, m_notifylist()
+{
+}
+
+
+void output_manager::output_item::notify(s32 value)
+{
+	if (OUTPUT_VERBOSE)
+		m_manager.machine().logerror("Output %s = %d (was %d)\n", m_name, value, m_value);
+	m_value = value;
+
+	// call the local notifiers first
+	for (auto const &notify : m_notifylist)
+		notify(m_name.c_str(), value);
+
+	// call the global notifiers next
+	for (auto const &notify : m_manager.m_global_notifylist)
+		notify(m_name.c_str(), value);
+}
+
+
+
+//**************************************************************************
+//  OUTPUT ITEM PROXY
+//**************************************************************************
+
+void output_manager::item_proxy::resolve(device_t &device, std::string const &name)
+{
+	assert(!m_item);
+	m_item = device.machine().output().find_item(name.c_str());
+	if (!m_item)
+		m_item = &device.machine().output().create_new_item(name.c_str(), 0);
+}
+
 
 
 //**************************************************************************
@@ -50,18 +100,14 @@ output_manager::output_item* output_manager::find_item(const char *string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-output_manager::output_item *output_manager::create_new_item(const char *outname, s32 value)
+output_manager::output_item &output_manager::create_new_item(const char *outname, s32 value)
 {
-	output_item item;
-
-	/* fill in the data */
-	item.name = outname;
-	item.id = m_uniqueid++;
-	item.value = value;
-
-	/* add us to the hash table */
-	m_itemtable.insert(std::pair<std::string, output_item>(outname, item));
-	return &m_itemtable.find(outname)->second;
+	auto const ins(m_itemtable.emplace(
+			std::piecewise_construct,
+			std::forward_as_tuple(outname),
+			std::forward_as_tuple(*this, outname, m_uniqueid++, value)));
+	assert(ins.second);
+	return ins.first->second;
 }
 
 /*-------------------------------------------------
@@ -85,37 +131,13 @@ void output_manager::resume()
 
 void output_manager::set_value(const char *outname, s32 value)
 {
-	output_item *item = find_item(outname);
-	s32 oldval;
+	output_item *const item = find_item(outname);
 
-	/* if no item of that name, create a new one and send the item's state */
-	if (item == nullptr)
-	{
-		item = create_new_item(outname, value);
-		oldval = value + 1;
-	}
-
+	// if no item of that name, create a new one and force notification
+	if (!item)
+		create_new_item(outname, value).notify(value);
 	else
-	{
-		/* set the new value */
-		oldval = item->value;
-		item->value = value;
-	}
-
-	/* if the value is different, signal the notifier */
-	if (oldval != value)
-	{
-		if (OUTPUT_VERBOSE)
-			machine().logerror("Output %s = %d (was %d)\n", outname, value, oldval);
-
-		/* call the local notifiers first */
-		for (auto notify : item->notifylist)
-			(*notify.m_notifier)(outname, value, notify.m_param);
-
-		/* call the global notifiers next */
-		for (auto notify : m_global_notifylist)
-			(*notify.m_notifier)(outname, value, notify.m_param);
-	}
+		item->set(value); // set the new value (notifies on change)
 }
 
 
@@ -152,12 +174,10 @@ void output_manager::set_indexed_value(const char *basename, int index, int valu
 
 s32 output_manager::get_value(const char *outname)
 {
-	output_item *item = find_item(outname);
+	output_item const *const item = find_item(outname);
 
-	/* if no item, value is 0 */
-	if (item == nullptr)
-		return 0;
-	return item->value;
+	// if no item, value is 0
+	return item ? item->get() : 0;
 }
 
 
@@ -195,20 +215,16 @@ s32 output_manager::get_indexed_value(const char *basename, int index)
 
 void output_manager::set_notifier(const char *outname, output_notifier_func callback, void *param)
 {
-	output_notify notify(callback, param);
-	/* if an item is specified, find it */
-	if (outname != nullptr)
+	// if an item is specified, find/create it
+	if (outname)
 	{
-		output_item *item = find_item(outname);
-
-		/* if no item of that name, create a new one */
-		if (item == nullptr)
-			item = create_new_item(outname, 0);
-
-		item->notifylist.push_back(notify);
+		output_item *const item = find_item(outname);
+		(item ? *item : create_new_item(outname, 0)).set_notifier(callback, param);
 	}
 	else
-		m_global_notifylist.push_back(notify);
+	{
+		m_global_notifylist.emplace_back(callback, param);
+	}
 }
 
 
@@ -220,7 +236,7 @@ void output_manager::set_notifier(const char *outname, output_notifier_func call
 void output_manager::notify_all(output_module *module)
 {
 	for (auto &item : m_itemtable)
-		module->notify(item.second.name.c_str(), item.second.value);
+		module->notify(item.second.name().c_str(), item.second.get());
 }
 
 
@@ -231,12 +247,9 @@ void output_manager::notify_all(output_module *module)
 
 u32 output_manager::name_to_id(const char *outname)
 {
-	output_item *item = find_item(outname);
-
-	/* if no item, ID is 0 */
-	if (item == nullptr)
-		return 0;
-	return item->id;
+	// if no item, ID is 0
+	output_item const *const item = find_item(outname);
+	return item ? item->id() : 0;
 }
 
 
@@ -248,8 +261,8 @@ u32 output_manager::name_to_id(const char *outname)
 const char *output_manager::id_to_name(u32 id)
 {
 	for (auto &item : m_itemtable)
-		if (item.second.id == id)
-			return item.second.name.c_str();
+		if (item.second.id() == id)
+			return item.second.name().c_str();
 
 	/* nothing found, return nullptr */
 	return nullptr;
