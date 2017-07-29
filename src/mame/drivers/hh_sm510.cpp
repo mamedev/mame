@@ -35,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_speaker(*this, "speaker"),
 		m_inp_lines(0),
 		m_display_wait(33)
@@ -43,6 +44,7 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<7> m_inp_matrix; // max 7
+	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
@@ -86,6 +88,9 @@ protected:
 
 void hh_sm510_state::machine_start()
 {
+	// resolve output handlers
+	m_out_x.resolve();
+
 	// zerofill
 	m_inp_mux = 0;
 	/* m_inp_lines = 0; */ // not here
@@ -145,6 +150,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 				m_display_decay[y][zx]--;
 			u8 active_state = (m_display_decay[y][zx] < m_display_wait) ? 0 : 1;
 
+			// on change, send to output
 			if (active_state != m_display_cache[y][zx])
 			{
 				// SM510 series: output to x.y.z, where:
@@ -156,10 +162,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 				// x = O group (0-*)
 				// y = O segment 1-4 (0-3)
 				// z = common H1/H2 (0/1)
-				char buf[0x10];
-				sprintf(buf, "%d.%d.%d", zx >> m_display_z_len, y, zx & z_mask);
-				output().set_value(buf, active_state);
-
+				m_out_x[zx >> m_display_z_len][y][zx & z_mask] = active_state;
 				m_display_cache[y][zx] = active_state;
 			}
 		}
