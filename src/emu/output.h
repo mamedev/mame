@@ -113,8 +113,8 @@ public:
 				proxies[j].resolve(m_device, util::string_format(m_format, std::forward<T>(i)..., j + m_start_args[A]));
 		}
 
-		template <unsigned A, unsigned C, typename T, typename... U>
-		void resolve(T (&proxies)[C], U &&... i)
+		template <unsigned A, unsigned C, unsigned D, typename T, typename... U>
+		void resolve(T (&proxies)[C][D], U &&... i)
 		{
 			for (unsigned j = 0U; C > j; ++j)
 				resolve<A + 1>(proxies[j], std::forward<U>(i)..., j + m_start_args[A]);
