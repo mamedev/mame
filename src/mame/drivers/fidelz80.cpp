@@ -588,6 +588,11 @@ public:
 
 void fidelbase_state::machine_start()
 {
+	// resolve handlers
+	m_out_x.resolve();
+	m_out_a.resolve();
+	m_out_digit.resolve();
+
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
@@ -658,29 +663,19 @@ void fidelbase_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
+			// output to digity
 			if (m_display_segmask[y] != 0)
-				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				m_out_digit[y] = active_state[y] & m_display_segmask[y];
 
-			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
 			{
 				int state = active_state[y] >> x & 1;
-				char buf1[0x10]; // lampyx
-				char buf2[0x10]; // y.x
 
-				if (x == m_display_maxx)
-				{
-					// always-on if selected
-					sprintf(buf1, "lamp%da", y);
-					sprintf(buf2, "%d.a", y);
-				}
+				// output to y.x, or y.a when always-on
+				if (x != m_display_maxx)
+					m_out_x[y][x] = state;
 				else
-				{
-					sprintf(buf1, "lamp%d", y * mul + x);
-					sprintf(buf2, "%d.%d", y, x);
-				}
-				output().set_value(buf1, state);
-				output().set_value(buf2, state);
+					m_out_a[y] = state;
 			}
 		}
 

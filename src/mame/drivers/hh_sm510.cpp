@@ -88,7 +88,7 @@ protected:
 
 void hh_sm510_state::machine_start()
 {
-	// resolve output handlers
+	// resolve handlers
 	m_out_x.resolve();
 
 	// zerofill
