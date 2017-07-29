@@ -802,14 +802,13 @@ void menu_select_game::inkey_select(const event *menu_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((machine().system().flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE)
+			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-					if (!swlistdev.get_info().empty())
-					{
-						menu::stack_push<menu_select_software>(ui(), container(), driver);
-						return;
-					}
+				if (!swlistdev.get_info().empty())
+				{
+					menu::stack_push<menu_select_software>(ui(), container(), driver);
+					return;
+				}
 			}
 
 			if (!select_bios(*driver, false))
@@ -861,14 +860,13 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((machine().system().flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE)
+			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-					if (!swlistdev.get_info().empty())
-					{
-						menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
-						return;
-					}
+				if (!swlistdev.get_info().empty())
+				{
+					menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
+					return;
+				}
 			}
 
 			// if everything looks good, schedule the new driver
