@@ -3362,6 +3362,12 @@ ROM_START( dkgensanm82 )
 	ROM_LOAD( "gen_(m81)_a-h0-a.ic57",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
 	ROM_LOAD( "gen_(m81)_a-h1-a.ic56",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
 
+	ROM_REGION( 0x080000, "sprites2", 0 ) // leftover from Major Title
+	ROM_LOAD( "mt_f0.ic38",    0x00000, 0x20000, CRC(2d5e05d5) SHA1(18bdc9c561dbf0f91642161ca985d2154bd58b5d) )  /* sprites #2 */
+	ROM_LOAD( "mt_f1.ic39",    0x20000, 0x20000, CRC(c68cd65f) SHA1(8999b558b4af0f453ada9e4ef705163df96844e6) )
+	ROM_LOAD( "mt_f2.ic40",    0x40000, 0x20000, CRC(a71feb2d) SHA1(47e366b422772bed08ee4d1c338970687d6c3b4c) )
+	ROM_LOAD( "mt_f3.ic41",    0x60000, 0x20000, CRC(179f7562) SHA1(6d28b199daffc62e8fa9009878ac0bb976ccbb2a) )
+
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "gen_(m84)_a-v0-d.ic12",   0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
 ROM_END
