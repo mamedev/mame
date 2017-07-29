@@ -831,7 +831,8 @@ public:
 	private:
 		// internal state
 		layout_element *    m_element;          // pointer to the associated element (non-screens only)
-		std::string         m_output_name;      // name of this item
+		output_finder<>     m_output;           // associated output
+		bool const          m_have_output;      // whether we actually have an output
 		std::string         m_input_tag;        // input tag of this item
 		ioport_port *       m_input_port;       // input port of this item
 		ioport_value        m_input_mask;       // input mask of this item

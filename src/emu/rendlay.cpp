@@ -2612,7 +2612,8 @@ layout_view::item::item(
 		element_map &elemmap,
 		render_bounds const &transform)
 	: m_element(nullptr)
-	, m_output_name(xml_get_attribute_string_with_subst(machine, itemnode, "name", ""))
+	, m_output(machine.root_device(), xml_get_attribute_string_with_subst(machine, itemnode, "name", ""))
+	, m_have_output(xml_get_attribute_string_with_subst(machine, itemnode, "name", "")[0])
 	, m_input_tag(xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", ""))
 	, m_input_port(nullptr)
 	, m_input_mask(0)
@@ -2631,13 +2632,17 @@ layout_view::item::item(
 			throw emu_fatalerror("Unable to find layout element %s", name);
 	}
 
+	// outputs need resolving
+	if (m_have_output)
+		m_output.resolve();
+
 	// fetch common data
 	int index = xml_get_attribute_int_with_subst(machine, itemnode, "index", -1);
 	if (index != -1)
 		m_screen = screen_device_iterator(machine.root_device()).byindex(index);
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
-	if (m_output_name[0] != 0 && m_element != nullptr)
-		machine.output().set_value(m_output_name.c_str(), m_element->default_state());
+	if (m_have_output && m_element)
+		m_output = m_element->default_state();
 	parse_bounds(machine, itemnode.get_child("bounds"), m_rawbounds);
 	render_bounds_transform(m_rawbounds, transform);
 	parse_color(machine, itemnode.get_child("color"), m_color);
@@ -2690,10 +2695,10 @@ int layout_view::item::state() const
 {
 	assert(m_element);
 
-	if (!m_output_name.empty())
+	if (m_have_output)
 	{
-		// if configured to an output, fetch the output value
-		return m_element->machine().output().get_value(m_output_name.c_str());
+		// if configured to track an output, fetch its value
+		return m_output;
 	}
 	else if (!m_input_tag.empty())
 	{
