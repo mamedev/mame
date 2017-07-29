@@ -238,6 +238,7 @@ void gt64xxx_device::device_start()
 	save_item(NAME(m_pci_stall_state));
 	save_item(NAME(m_retry_count));
 	save_item(NAME(m_pci_cpu_stalled));
+	save_item(NAME(m_stall_windex));
 	save_item(NAME(m_cpu_stalled_offset));
 	save_item(NAME(m_cpu_stalled_data));
 	save_item(NAME(m_cpu_stalled_mem_mask));
@@ -312,9 +313,7 @@ void gt64xxx_device::device_reset()
 	m_pci_stall_state = 0;
 	m_retry_count = 0;
 	m_pci_cpu_stalled = 0;
-	m_cpu_stalled_offset = 0;
-	m_cpu_stalled_data = 0;
-	m_cpu_stalled_mem_mask = 0;
+	m_stall_windex = 0;
 
 	m_dma_active = 0;
 	m_dma_timer->adjust(attotime::never);
@@ -473,11 +472,20 @@ WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
 		// Check if it is a stalled cpu access and re-issue
 		if (m_pci_cpu_stalled) {
 			m_pci_cpu_stalled = 0;
-			// master_mem0_w -- Should actually be checking for master_mem1_w as well
-			this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO] << 21) | (m_cpu_stalled_offset * 4), m_cpu_stalled_data, m_cpu_stalled_mem_mask);
+			int index = 0;
+			// Should actually check for a stall after each write...
+			while (m_stall_windex > 0) {
+				// master_mem0_w -- Should actually be checking for master_mem1_w as well
+				this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO] << 21) | (m_cpu_stalled_offset[index] * 4),
+					m_cpu_stalled_data[index], m_cpu_stalled_mem_mask[index]);
+				LOGGALILEO("pci_stall: Writing index: %d offset: %08x data: %08x mask: %08x\n",
+					index, m_cpu_stalled_offset[index] * 4, m_cpu_stalled_data[index], m_cpu_stalled_mem_mask[index]);
+				m_stall_windex--;
+				index++;
+			}
 			/* resume CPU execution */
 			machine().scheduler().trigger(45678);
-			LOGGALILEO("Resuming CPU on PCI Stall offset=0x%08X data=0x%08X\n", m_cpu_stalled_offset * 4, m_cpu_stalled_data);
+			LOGGALILEO("Resuming CPU on PCI Stall\n");
 		}
 	}
 
@@ -506,14 +514,21 @@ READ32_MEMBER (gt64xxx_device::master_mem0_r)
 WRITE32_MEMBER (gt64xxx_device::master_mem0_w)
 {
 	if (m_pci_stall_state) {
-		// Save the write data and stall the cpu
-		m_pci_cpu_stalled = 1;
-		m_cpu_stalled_offset = offset;
-		m_cpu_stalled_data = data;
-		m_cpu_stalled_mem_mask = mem_mask;
-		// Stall cpu until trigger
-		m_cpu_space->device().execute().spin_until_trigger(45678);
-		LOGMASKED(LOG_GALILEO | LOG_PCI, "%08X:Stalling CPU on PCI Stall\n", m_cpu_space->device().safe_pc());
+		if (m_stall_windex < 2) {
+			// Save the write data and stall the cpu
+			// For some reason sometimes two writes get through before the cpu is stalled (calspeed) so need to store multiple accesses.
+			m_pci_cpu_stalled = 1;
+			m_cpu_stalled_offset[m_stall_windex] = offset;
+			m_cpu_stalled_data[m_stall_windex] = data;
+			m_cpu_stalled_mem_mask[m_stall_windex] = mem_mask;
+			m_stall_windex++;
+			// Stall cpu until trigger
+			m_cpu_space->device().execute().spin_until_trigger(45678);
+			LOGMASKED(LOG_GALILEO | LOG_PCI, "%08X:Stalling CPU on PCI Stall\n", m_cpu_space->device().safe_pc());
+		}
+		else {
+			fatalerror("master_mem0_w: m_stall_windex full\n");
+		}
 		return;
 	}
 	this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
