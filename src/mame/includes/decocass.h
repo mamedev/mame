@@ -192,14 +192,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 private:
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
-	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect);
 	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mark_bg_tile_dirty(offs_t offset);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color,
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect, int color,
 					int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 					uint8_t *sprite_ram, int interleave);
 
-	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
+	void draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect,
 					int missile_y_adjust, int missile_y_adjust_flip_screen,
 					uint8_t *missile_ram, int interleave);
 protected:
