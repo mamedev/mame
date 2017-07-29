@@ -1,58 +1,25 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     rendlay.c
 
     Core rendering layout parser and manager.
 
-****************************************************************************
-
-    Overview of objects:
-
-        layout_file -- A layout_file comprises a list of elements and a
-            list of views. The elements are reusable items that the views
-            reference.
-
-        layout_view -- A layout_view describes a single view within a
-            layout_file. The view is described using arbitrary coordinates
-            that are scaled to fit within the render target. Pixels within
-            a view are assumed to be square.
-
-        view_item -- Each view has four lists of view_items, one for each
-            "layer." Each view item is specified using floating point
-            coordinates in arbitrary units, and is assumed to have square
-            pixels. Each view item can control its orientation independently.
-            Each item can also have an optional name, and can be set at
-            runtime into different "states", which control how the embedded
-            elements are displayed.
-
-        layout_element -- A layout_element is a description of a piece of
-            visible artwork. Most view_items (except for those in the screen
-            layer) have exactly one layout_element which describes the
-            contents of the item. Elements are separate from items because
-            they can be re-used multiple times within a layout. Even though
-            an element can contain a number of components, they are treated
-            as if they were a single bitmap.
-
-        element_component -- Each layout_element contains one or more
-            components. Each component can describe either an image or
-            a rectangle/disk primitive. Each component also has a "state"
-            associated with it, which controls whether or not the component
-            is visible (if the owning item has the same state, it is
-            visible).
-
 ***************************************************************************/
 
-#include <ctype.h>
-
 #include "emu.h"
+
 #include "emuopts.h"
 #include "render.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
 #include "xmlfile.h"
+
+#include <ctype.h>
+#include <sstream>
+#include <type_traits>
 
 
 
@@ -118,15 +85,10 @@ render_screen_list render_target::s_empty_screen_list;
 //  of two integers using the Euclidean algorithm
 //-------------------------------------------------
 
-inline int gcd(int a, int b)
+template <typename M, typename N>
+constexpr std::common_type_t<M, N> gcd(M a, N b)
 {
-	while (b != 0)
-	{
-		int t = b;
-		b = a % b;
-		a = t;
-	}
-	return a;
+	return b ? gcd(b, a % b) : a;
 }
 
 
@@ -135,17 +97,32 @@ inline int gcd(int a, int b)
 //  dividing out common factors
 //-------------------------------------------------
 
-inline void reduce_fraction(int &num, int &den)
+template <typename M, typename N>
+inline void reduce_fraction(M &num, N &den)
 {
 	// search the greatest common divisor
-	int div = gcd(num, den);
+	auto const div = gcd(num, den);
 
 	// reduce the fraction if a common divisor has been found
-	if (div > 1)
+	if (div)
 	{
 		num /= div;
 		den /= div;
 	}
+}
+
+
+//-------------------------------------------------
+//  render_bounds_transform - apply translation/
+//  scaling
+//-------------------------------------------------
+
+inline void render_bounds_transform(render_bounds &bounds, render_bounds const &transform)
+{
+	bounds.x0 = (bounds.x0 * transform.x1) + transform.x0;
+	bounds.y0 = (bounds.y0 * transform.y1) + transform.y0;
+	bounds.x1 = (bounds.x1 * transform.x1) + transform.x0;
+	bounds.y1 = (bounds.y1 * transform.y1) + transform.y0;
 }
 
 
@@ -432,7 +409,7 @@ layout_element::layout_element(running_machine &machine, util::xml::data_node co
 
 	// parse components in order
 	bool first = true;
-	render_bounds bounds = { 0 };
+	render_bounds bounds = { 0.0, 0.0, 0.0, 0.0 };
 	for (util::xml::data_node const *compnode = elemnode.get_first_child(); compnode; compnode = compnode->get_next_sibling())
 	{
 		make_component_map::const_iterator const make_func(s_make_component.find(compnode->get_name()));
@@ -446,7 +423,7 @@ layout_element::layout_element(running_machine &machine, util::xml::data_node co
 		if (first)
 			bounds = newcomp.bounds();
 		else
-			union_render_bounds(&bounds, &newcomp.bounds());
+			union_render_bounds(bounds, newcomp.bounds());
 		first = false;
 
 		// determine the maximum state
@@ -478,6 +455,146 @@ layout_element::layout_element(running_machine &machine, util::xml::data_node co
 layout_element::~layout_element()
 {
 }
+
+
+
+//**************************************************************************
+//  LAYOUT GROUP
+//**************************************************************************
+
+//-------------------------------------------------
+//  layout_group - constructor
+//-------------------------------------------------
+
+layout_group::layout_group(running_machine &machine, util::xml::data_node const &groupnode)
+	: m_machine(machine)
+	, m_groupnode(groupnode)
+	, m_bounds{ 0.0f, 0.0f, 0.0f, 0.0f }
+	, m_bounds_resolved(false)
+{
+}
+
+
+//-------------------------------------------------
+//  ~layout_group - destructor
+//-------------------------------------------------
+
+layout_group::~layout_group()
+{
+}
+
+
+//-------------------------------------------------
+//  make_transform - create abbreviated transform
+//  matrix for given destination bounds
+//-------------------------------------------------
+
+render_bounds layout_group::make_transform(render_bounds const &dest) const
+{
+	assert(m_bounds_resolved);
+
+	return render_bounds{
+			dest.x0 - (m_bounds.x0 * (dest.x1 - dest.x0) / (m_bounds.x1 - m_bounds.x0)),
+			dest.y0 - (m_bounds.y0 * (dest.y1 - dest.y0) / (m_bounds.y1 - m_bounds.y0)),
+			(dest.x1 - dest.x0) / (m_bounds.x1 - m_bounds.x0),
+			(dest.y1 - dest.y0) / (m_bounds.y1 - m_bounds.y0) };
+}
+
+render_bounds layout_group::make_transform(render_bounds const &dest, render_bounds const &transform) const
+{
+	render_bounds const next(make_transform(dest));
+	return render_bounds{
+			(transform.x0 * next.x1) + next.x0,
+			(transform.y0 * next.y1) + next.y0,
+			transform.x1 * next.x1,
+			transform.y1 * next.y1 };
+}
+
+
+//-------------------------------------------------
+//  resolve_bounds - calculate bounds taking
+//  nested groups into consideration
+//-------------------------------------------------
+
+void layout_group::resolve_bounds(group_map &groupmap)
+{
+	if (!m_bounds_resolved)
+	{
+		std::vector<layout_group const *> seen;
+		resolve_bounds(groupmap, seen);
+	}
+}
+
+void layout_group::resolve_bounds(group_map &groupmap, std::vector<layout_group const *> &seen)
+{
+	if (seen.end() != std::find(seen.begin(), seen.end(), this))
+	{
+		// a wild loop appears!
+		std::ostringstream path;
+		for (layout_group const *const group : seen)
+			path << ' ' << group->m_groupnode.get_name();
+		path << ' ' << m_groupnode.get_name();
+		throw emu_fatalerror("Recursively nested layout groups:%s", path.str().c_str());
+	}
+
+	seen.push_back(this);
+	if (!m_bounds_resolved)
+	{
+		util::xml::data_node const *const boundsnode(m_groupnode.get_child("bounds"));
+		if (boundsnode)
+		{
+			// use explicit bounds
+			parse_bounds(m_machine, boundsnode, m_bounds);
+		}
+		else
+		{
+			// otherwise build from items
+			for (util::xml::data_node const *itemnode = m_groupnode.get_first_child(); itemnode; itemnode = itemnode->get_next_sibling())
+			{
+				if (!strcmp(itemnode->get_name(), "backdrop") ||
+					!strcmp(itemnode->get_name(), "screen") ||
+					!strcmp(itemnode->get_name(), "overlay") ||
+					!strcmp(itemnode->get_name(), "bezel") ||
+					!strcmp(itemnode->get_name(), "cpanel") ||
+					!strcmp(itemnode->get_name(), "marquee"))
+				{
+					render_bounds itembounds;
+					parse_bounds(m_machine, itemnode->get_child("bounds"), itembounds);
+					union_render_bounds(m_bounds, itembounds);
+				}
+				else if (!strcmp(itemnode->get_name(), "group"))
+				{
+					char const *ref(xml_get_attribute_string_with_subst(m_machine, *itemnode, "ref", nullptr));
+					if (!ref)
+						throw emu_fatalerror("Nested layout group must have a ref!");
+
+					group_map::iterator const found(groupmap.find(ref));
+					if (groupmap.end() == found)
+						throw emu_fatalerror("Unable to find layout group %s", ref);
+
+					found->second.resolve_bounds(groupmap, seen);
+					util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
+					if (itemboundsnode)
+					{
+						render_bounds itembounds;
+						parse_bounds(m_machine, itemboundsnode, itembounds);
+						union_render_bounds(m_bounds, itembounds);
+					}
+					else
+					{
+						union_render_bounds(m_bounds, found->second.m_bounds);
+					}
+				}
+				else if (strcmp(itemnode->get_name(), "bounds"))
+				{
+					throw emu_fatalerror("Unknown group element: %s", itemnode->get_name());
+				}
+			}
+		}
+		m_bounds_resolved = true;
+	}
+}
+
 
 
 //-------------------------------------------------
@@ -2242,49 +2359,27 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 //  LAYOUT VIEW
 //**************************************************************************
 
-const simple_list<layout_view::item> layout_view::s_null_list;
-
 //-------------------------------------------------
 //  layout_view - constructor
 //-------------------------------------------------
 
-layout_view::layout_view(running_machine &machine, util::xml::data_node const &viewnode, element_map &elemmap)
-	: m_next(nullptr)
+layout_view::layout_view(
+		running_machine &machine,
+		util::xml::data_node const &viewnode,
+		element_map &elemmap,
+		group_map const &groupmap)
+	: m_name(xml_get_attribute_string_with_subst(machine, viewnode, "name", ""))
 	, m_aspect(1.0f)
 	, m_scraspect(1.0f)
 {
-	// allocate a copy of the name
-	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
-
 	// if we have a bounds item, load it
 	util::xml::data_node const *const boundsnode = viewnode.get_child("bounds");
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
-	if (boundsnode != nullptr)
+	if (boundsnode)
 		parse_bounds(machine, boundsnode, m_expbounds);
 
-	// load backdrop items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("backdrop"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("backdrop"))
-		m_backdrop_list.append(*global_alloc(item(machine, *itemnode, elemmap)));
-
-	// load screen items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("screen"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("screen"))
-		m_screen_list.append(*global_alloc(item(machine, *itemnode, elemmap)));
-
-	// load overlay items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("overlay"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("overlay"))
-		m_overlay_list.append(*global_alloc(item(machine, *itemnode, elemmap)));
-
-	// load bezel items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("bezel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("bezel"))
-		m_bezel_list.append(*global_alloc(item(machine, *itemnode, elemmap)));
-
-	// load cpanel items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("cpanel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("cpanel"))
-		m_cpanel_list.append(*global_alloc(item(machine, *itemnode, elemmap)));
-
-	// load marquee items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("marquee"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("marquee"))
-		m_marquee_list.append(*global_alloc(item(machine, *itemnode, elemmap)));
+	// load items
+	add_items(machine, viewnode, elemmap, groupmap, render_bounds{ 0.0f, 0.0f, 1.0f, 1.0f });
 
 	// recompute the data for the view based on a default layer config
 	recompute(render_layer_config());
@@ -2304,17 +2399,17 @@ layout_view::~layout_view()
 //  items - return the appropriate list
 //-------------------------------------------------
 
-const simple_list<layout_view::item> &layout_view::items(item_layer layer) const
+layout_view::item_list &layout_view::items(item_layer layer)
 {
 	switch (layer)
 	{
-		case ITEM_LAYER_BACKDROP:   return m_backdrop_list;
-		case ITEM_LAYER_SCREEN:     return m_screen_list;
-		case ITEM_LAYER_OVERLAY:    return m_overlay_list;
-		case ITEM_LAYER_BEZEL:      return m_bezel_list;
-		case ITEM_LAYER_CPANEL:     return m_cpanel_list;
-		case ITEM_LAYER_MARQUEE:    return m_marquee_list;
-		default:                    return s_null_list;
+	case ITEM_LAYER_BACKDROP:   return m_backdrop_list;
+	case ITEM_LAYER_SCREEN:     return m_screen_list;
+	case ITEM_LAYER_OVERLAY:    return m_overlay_list;
+	case ITEM_LAYER_BEZEL:      return m_bezel_list;
+	case ITEM_LAYER_CPANEL:     return m_cpanel_list;
+	case ITEM_LAYER_MARQUEE:    return m_marquee_list;
+	default:                    throw false; // calling this with an invalid layer is bad, m'kay?
 	}
 }
 
@@ -2355,16 +2450,16 @@ void layout_view::recompute(render_layer_config layerconfig)
 				if (first)
 					m_bounds = curitem.m_rawbounds;
 				else
-					union_render_bounds(&m_bounds, &curitem.m_rawbounds);
+					union_render_bounds(m_bounds, curitem.m_rawbounds);
 				first = false;
 
 				// accumulate screen bounds
-				if (curitem.m_screen != nullptr)
+				if (curitem.m_screen)
 				{
 					if (scrfirst)
 						m_scrbounds = curitem.m_rawbounds;
 					else
-						union_render_bounds(&m_scrbounds, &curitem.m_rawbounds);
+						union_render_bounds(m_scrbounds, curitem.m_rawbounds);
 					scrfirst = false;
 
 					// accumulate the screens in use while we're scanning
@@ -2420,9 +2515,9 @@ void layout_view::recompute(render_layer_config layerconfig)
 }
 
 
-//-----------------------------
+//-------------------------------------------------
 //  resolve_tags - resolve tags
-//-----------------------------
+//-------------------------------------------------
 
 void layout_view::resolve_tags()
 {
@@ -2431,6 +2526,72 @@ void layout_view::resolve_tags()
 		for (item &curitem : items(layer))
 		{
 			curitem.resolve_tags();
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  add_items - add items, recursing for groups
+//-------------------------------------------------
+
+void layout_view::add_items(
+		running_machine &machine,
+		util::xml::data_node const &parentnode,
+		element_map &elemmap,
+		group_map const &groupmap,
+		render_bounds const &transform)
+{
+	for (util::xml::data_node const *itemnode = parentnode.get_first_child(); itemnode; itemnode = itemnode->get_next_sibling())
+	{
+		if (!strcmp(itemnode->get_name(), "backdrop"))
+		{
+			m_backdrop_list.emplace_back(machine, *itemnode, elemmap, transform);
+		}
+		else if (!strcmp(itemnode->get_name(), "screen"))
+		{
+			m_screen_list.emplace_back(machine, *itemnode, elemmap, transform);
+		}
+		else if (!strcmp(itemnode->get_name(), "overlay"))
+		{
+			m_overlay_list.emplace_back(machine, *itemnode, elemmap, transform);
+		}
+		else if (!strcmp(itemnode->get_name(), "bezel"))
+		{
+			m_bezel_list.emplace_back(machine, *itemnode, elemmap, transform);
+		}
+		else if (!strcmp(itemnode->get_name(), "cpanel"))
+		{
+			m_cpanel_list.emplace_back(machine, *itemnode, elemmap, transform);
+		}
+		else if (!strcmp(itemnode->get_name(), "marquee"))
+		{
+			m_marquee_list.emplace_back(machine, *itemnode, elemmap, transform);
+		}
+		else if (!strcmp(itemnode->get_name(), "group"))
+		{
+			char const *ref(xml_get_attribute_string_with_subst(machine, *itemnode, "ref", nullptr));
+			if (!ref)
+				throw emu_fatalerror("Nested layout group must have a ref!");
+
+			group_map::const_iterator const found(groupmap.find(ref));
+			if (groupmap.end() == found)
+				throw emu_fatalerror("Unable to find layout group %s", ref);
+
+			render_bounds grouptrans(transform);
+			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
+			if (itemboundsnode)
+			{
+				render_bounds itembounds;
+				parse_bounds(machine, itemboundsnode, itembounds);
+				grouptrans = found->second.make_transform(itembounds, transform);
+			}
+
+			add_items(machine, found->second.get_groupnode(), elemmap, groupmap, grouptrans);
+		}
+		else if (strcmp(itemnode->get_name(), "bounds"))
+		{
+			throw emu_fatalerror("Unknown view item: %s", itemnode->get_name());
 		}
 	}
 }
@@ -2445,20 +2606,19 @@ void layout_view::resolve_tags()
 //  item - constructor
 //-------------------------------------------------
 
-layout_view::item::item(running_machine &machine, util::xml::data_node const &itemnode, element_map &elemmap)
-	: m_next(nullptr)
-	, m_element(nullptr)
+layout_view::item::item(
+		running_machine &machine,
+		util::xml::data_node const &itemnode,
+		element_map &elemmap,
+		render_bounds const &transform)
+	: m_element(nullptr)
+	, m_output_name(xml_get_attribute_string_with_subst(machine, itemnode, "name", ""))
+	, m_input_tag(xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", ""))
 	, m_input_port(nullptr)
 	, m_input_mask(0)
 	, m_screen(nullptr)
 	, m_orientation(ROT0)
 {
-	// allocate a copy of the output name
-	m_output_name = xml_get_attribute_string_with_subst(machine, itemnode, "name", "");
-
-	// allocate a copy of the input tag
-	m_input_tag = xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", "");
-
 	// find the associated element
 	char const *const name = xml_get_attribute_string_with_subst(machine, itemnode, "element", nullptr);
 	if (name)
@@ -2479,6 +2639,7 @@ layout_view::item::item(running_machine &machine, util::xml::data_node const &it
 	if (m_output_name[0] != 0 && m_element != nullptr)
 		machine.output().set_value(m_output_name.c_str(), m_element->default_state());
 	parse_bounds(machine, itemnode.get_child("bounds"), m_rawbounds);
+	render_bounds_transform(m_rawbounds, transform);
 	parse_color(machine, itemnode.get_child("color"), m_color);
 	parse_orientation(machine, itemnode.get_child("orientation"), m_orientation);
 
@@ -2527,25 +2688,25 @@ render_container *layout_view::item::screen_container(running_machine &machine) 
 
 int layout_view::item::state() const
 {
-	int state = 0;
+	assert(m_element);
 
-	assert(m_element != nullptr);
-
-	// if configured to an output, fetch the output value
-	if (m_output_name[0] != 0)
-		state = m_element->machine().output().get_value(m_output_name.c_str());
-
-	// if configured to an input, fetch the input value
-	else if (m_input_tag[0] != 0)
+	if (!m_output_name.empty())
 	{
-		if (m_input_port != nullptr)
+		// if configured to an output, fetch the output value
+		return m_element->machine().output().get_value(m_output_name.c_str());
+	}
+	else if (!m_input_tag.empty())
+	{
+		// if configured to an input, fetch the input value
+		if (m_input_port)
 		{
-			ioport_field *field = m_input_port->field(m_input_mask);
-			if (field != nullptr)
-				state = ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
+			ioport_field const *const field = m_input_port->field(m_input_mask);
+			if (field)
+				return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 		}
 	}
-	return state;
+
+	return 0;
 }
 
 
@@ -2573,7 +2734,8 @@ void layout_view::item::resolve_tags()
 //-------------------------------------------------
 
 layout_file::layout_file(running_machine &machine, util::xml::data_node const &rootnode, const char *dirname)
-	: m_next(nullptr)
+	: m_elemmap()
+	, m_viewlist()
 {
 	// find the layout node
 	util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
@@ -2583,16 +2745,30 @@ layout_file::layout_file(running_machine &machine, util::xml::data_node const &r
 	// validate the config data version
 	int const version = mamelayoutnode->get_attribute_int("version", 0);
 	if (version != LAYOUT_VERSION)
-		throw emu_fatalerror("Invalid XML file: unsupported version");
+		throw emu_fatalerror("Invalid layout XML file: unsupported version");
 
 	// parse all the elements
 	for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode; elemnode = elemnode->get_next_sibling("element"))
 	{
 		char const *const name(xml_get_attribute_string_with_subst(machine, *elemnode, "name", nullptr));
 		if (!name)
-			throw emu_fatalerror("All layout elements must have a name!\n");
-		m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(machine, *elemnode, dirname));
+			throw emu_fatalerror("All layout elements must have a name!");
+		if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(machine, *elemnode, dirname)).second)
+			throw emu_fatalerror("Duplicate layout element name: %s", name);
 	}
+
+	// parse all the groups
+	group_map groupmap;
+	for (util::xml::data_node const *groupnode = mamelayoutnode->get_child("group"); groupnode; groupnode = groupnode->get_next_sibling("group"))
+	{
+		char const *const name(xml_get_attribute_string_with_subst(machine, *groupnode, "name", nullptr));
+		if (!name)
+			throw emu_fatalerror("All layout groups must have a name!");
+		if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(machine, *groupnode)).second)
+			throw emu_fatalerror("Duplicate layout group name: %s", name);
+	}
+	for (group_map::value_type &group : groupmap)
+		group.second.resolve_bounds(groupmap);
 
 	// parse all the views
 	for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
@@ -2603,7 +2779,7 @@ layout_file::layout_file(running_machine &machine, util::xml::data_node const &r
 		// if the emu_fatalerror is allowed to propagate, the entire layout is dropped so you can't select the useful view
 		try
 		{
-			m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemmap)));
+			m_viewlist.emplace_back(machine, *viewnode, m_elemmap, groupmap);
 		}
 		catch (emu_fatalerror const &)
 		{

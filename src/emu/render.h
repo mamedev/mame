@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     render.h
@@ -624,9 +624,14 @@ DECLARE_ENUM_INCDEC_OPERATORS(item_layer)
 //**************************************************************************
 
 
-// ======================> layout_element
-
-// a layout_element is a single named element, which may have multiple components
+/// \brief A description of a piece of visible artwork
+///
+/// Most view_items (except for those in the screen layer) have exactly
+/// one layout_element which describes the contents of the item.
+/// Elements are separate from items because they can be re-used
+/// multiple times within a layout.  Even though an element can contain
+/// a number of components, they are treated as if they were a single
+/// bitmap.
 class layout_element
 {
 public:
@@ -641,7 +646,13 @@ public:
 	render_texture *state_texture(int state);
 
 private:
-	// a component represents an image, rectangle, or disk in an element
+	/// \brief An image, rectangle, or disk in an element
+	///
+	/// Each layout_element contains one or more components. Each
+	/// component can describe either an image or a rectangle/disk
+	/// primitive. Each component also has a "state" associated with it,
+	/// which controls whether or not the component is visible (if the
+	/// owning item has the same state, it is visible).
 	class component
 	{
 	public:
@@ -735,29 +746,73 @@ private:
 };
 
 
-// ======================> layout_view
+/// \brief A reusable group of elements
+///
+/// Views expand/flatten groups into their component elements applying
+/// an optional coordinate transform.  This is mainly useful duplicating
+/// the same sublayout in multiple views.  It would be more useful
+/// within a view if it could be parameterised.  Groups only exist while
+/// parsing a layout file - no information about element grouping is
+/// preserved.
+class layout_group
+{
+public:
+	typedef std::unordered_map<std::string, layout_group> group_map;
 
-// a layout_view encapsulates a named list of items
+	layout_group(running_machine &machine, util::xml::data_node const &groupnode);
+	~layout_group();
+
+	util::xml::data_node const &get_groupnode() const { return m_groupnode; }
+
+	render_bounds make_transform(render_bounds const &dest) const;
+	render_bounds make_transform(render_bounds const &dest, render_bounds const &transform) const;
+
+	void resolve_bounds(group_map &groupmap);
+
+private:
+	void resolve_bounds(group_map &groupmap, std::vector<layout_group const *> &seen);
+
+	running_machine &               m_machine;
+	util::xml::data_node const &    m_groupnode;
+	render_bounds                   m_bounds;
+	bool                            m_bounds_resolved;
+};
+
+
+/// \brief A single view within a layout_file
+///
+/// The view is described using arbitrary coordinates that are scaled to
+/// fit within the render target.  Pixels within a view are assumed to
+/// be square.
 class layout_view
 {
-	friend class simple_list<layout_view>;
-
 public:
 	using element_map = std::unordered_map<std::string, layout_element>;
+	using group_map = std::unordered_map<std::string, layout_group>;
 
-	// an item is a single backdrop, screen, overlay, bezel, cpanel, or marquee item
+	/// \brief A single backdrop/screen/overlay/bezel/cpanel/marquee item
+	///
+	/// Each view has four lists of view_items, one for each "layer."
+	/// Each view item is specified using floating point coordinates in
+	/// arbitrary units, and is assumed to have square pixels.  Each
+	/// view item can control its orientation independently. Each item
+	/// can also have an optional name, and can be set at runtime into
+	/// different "states", which control how the embedded elements are
+	/// displayed.
 	class item
 	{
 		friend class layout_view;
-		friend class simple_list<item>;
 
 	public:
 		// construction/destruction
-		item(running_machine &machine, util::xml::data_node const &itemnode, element_map &elemmap);
-		virtual ~item();
+		item(
+				running_machine &machine,
+				util::xml::data_node const &itemnode,
+				element_map &elemmap,
+				render_bounds const &transform);
+		~item();
 
 		// getters
-		item *next() const { return m_next; }
 		layout_element *element() const { return m_element; }
 		screen_device *screen() { return m_screen; }
 		const render_bounds &bounds() const { return m_bounds; }
@@ -775,7 +830,6 @@ public:
 
 	private:
 		// internal state
-		item *              m_next;             // link to next item
 		layout_element *    m_element;          // pointer to the associated element (non-screens only)
 		std::string         m_output_name;      // name of this item
 		std::string         m_input_tag;        // input tag of this item
@@ -787,22 +841,26 @@ public:
 		render_bounds       m_rawbounds;        // raw (original) bounds of the item
 		render_color        m_color;            // color of the item
 	};
+	using item_list = std::list<item>;
 
 	// construction/destruction
-	layout_view(running_machine &machine, util::xml::data_node const &viewnode, element_map &elemmap);
-	virtual ~layout_view();
+	layout_view(
+			running_machine &machine,
+			util::xml::data_node const &viewnode,
+			element_map &elemmap,
+			group_map const &groupmap);
+	~layout_view();
 
 	// getters
-	layout_view *next() const { return m_next; }
-	const simple_list<item> &items(item_layer layer) const;
-	const char *name() const { return m_name.c_str(); }
+	item_list &items(item_layer layer);
+	const std::string &name() const { return m_name; }
 	const render_bounds &bounds() const { return m_bounds; }
 	const render_bounds &screen_bounds() const { return m_scrbounds; }
 	const render_screen_list &screens() const { return m_screens; }
 	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
 
 	//
-	bool has_art() const { return (m_backdrop_list.count() + m_overlay_list.count() + m_bezel_list.count() + m_cpanel_list.count() + m_marquee_list.count() != 0); }
+	bool has_art() const { return !m_backdrop_list.empty() || !m_overlay_list.empty() || !m_bezel_list.empty() || !m_cpanel_list.empty() || !m_marquee_list.empty(); }
 	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && m_screens.count() != 0) ? m_scraspect : m_aspect; }
 
 	// operations
@@ -812,8 +870,15 @@ public:
 	void resolve_tags();
 
 private:
+	// add items, recursing for groups
+	void add_items(
+			running_machine &machine,
+			util::xml::data_node const &parentnode,
+			element_map &elemmap,
+			group_map const &groupmap,
+			render_bounds const &transform);
+
 	// internal state
-	layout_view *       m_next;             // pointer to next layout in the list
 	std::string         m_name;             // name of the layout
 	float               m_aspect;           // X/Y of the layout
 	float               m_scraspect;        // X/Y of the screen areas
@@ -822,41 +887,39 @@ private:
 	render_bounds       m_scrbounds;        // computed bounds of the screens within the view
 	render_bounds       m_expbounds;        // explicit bounds of the view
 	bool                m_layenabled[ITEM_LAYER_MAX]; // is this layer enabled?
-	simple_list<item>   m_backdrop_list;    // list of backdrop items
-	simple_list<item>   m_screen_list;      // list of screen items
-	simple_list<item>   m_overlay_list;     // list of overlay items
-	simple_list<item>   m_bezel_list;       // list of bezel items
-	simple_list<item>   m_cpanel_list;      // list of marquee items
-	simple_list<item>   m_marquee_list;     // list of marquee items
-
-	static const simple_list<item> s_null_list;
+	item_list           m_backdrop_list;    // list of backdrop items
+	item_list           m_screen_list;      // list of screen items
+	item_list           m_overlay_list;     // list of overlay items
+	item_list           m_bezel_list;       // list of bezel items
+	item_list           m_cpanel_list;      // list of marquee items
+	item_list           m_marquee_list;     // list of marquee items
 };
 
 
-// ======================> layout_file
-
-// a layout_file consists of a list of elements and a list of views
+/// \brief Layout description file
+///
+/// Comprises a list of elements and a list of views.  The elements are
+/// reusable items that the views reference.
 class layout_file
 {
-	friend class simple_list<layout_file>;
-
 public:
 	using element_map = std::unordered_map<std::string, layout_element>;
+	using group_map = std::unordered_map<std::string, layout_group>;
+	using view_list = std::list<layout_view>;
 
 	// construction/destruction
-	layout_file(running_machine &machine, util::xml::data_node const &rootnode, const char *dirname);
-	virtual ~layout_file();
+	layout_file(running_machine &machine, util::xml::data_node const &rootnode, char const *dirname);
+	~layout_file();
 
 	// getters
-	layout_file *next() const { return m_next; }
-	const element_map &elements() const { return m_elemmap; }
-	const simple_list<layout_view> &views() const { return m_viewlist; }
+	element_map const &elements() const { return m_elemmap; }
+	view_list &views() { return m_viewlist; }
+	view_list const &views() const { return m_viewlist; }
 
 private:
 	// internal state
-	layout_file *       m_next;             // pointer to the next file in the list
-	element_map         m_elemmap;          // list of shared layout elements
-	simple_list<layout_view> m_viewlist;    // list of views
+	element_map     m_elemmap;      // list of shared layout elements
+	view_list       m_viewlist;     // list of views
 };
 
 // ======================> render_target
@@ -961,7 +1024,7 @@ private:
 	bool config_save(util::xml::data_node &targetnode);
 
 	// view lookups
-	layout_view *view_by_index(int index) const;
+	layout_view *view_by_index(int index);
 	int view_index(layout_view &view) const;
 
 	// optimized clearing
@@ -978,7 +1041,7 @@ private:
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
 	layout_view *           m_curview;                  // current view
-	simple_list<layout_file> m_filelist;                // list of layout files
+	std::list<layout_file>  m_filelist;                 // list of layout files
 	u32                     m_flags;                    // creation flags
 	render_primitive_list   m_primlist[NUM_PRIMLISTS];  // list of primitives
 	int                     m_listindex;                // index of next primlist to use
