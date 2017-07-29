@@ -64,7 +64,6 @@
 
 
 TODO:
-  - confirm that bmcfball is the same rom/serial as ssfball (game seems identical)
   - games that rely on the fact that faster/longer strobed elements appear brighter:
     tactix(player 2)
 
@@ -2684,7 +2683,7 @@ ROM_END
 
 ROM_START( bmcfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-031", 0x0000, 0x0800, BAD_DUMP CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
 
 	ROM_REGION( 331352, "svg", 0)
 	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
