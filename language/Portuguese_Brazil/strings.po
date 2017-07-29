@@ -258,7 +258,7 @@ msgstr "Geral: Funcionando"
 
 #: src/frontend/mame/ui/selmenu.cpp:687
 msgid "Graphics: Unimplemented, "
-msgstr "Gráficos: Não Implemetado"
+msgstr "Gráficos: Não Implementado"
 
 #: src/frontend/mame/ui/selmenu.cpp:689
 msgid "Graphics: Imperfect, "
