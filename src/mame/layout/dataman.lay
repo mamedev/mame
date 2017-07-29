@@ -42,35 +42,35 @@
 
 <!-- math symbols custom digit -->
 
-		<bezel name="lamp26" element="lamp_dash"><bounds x="21.5" y="7.35" width="7" height="0.5" /></bezel>
+		<bezel name="2.6" element="lamp_dash"><bounds x="21.5" y="7.35" width="7" height="0.5" /></bezel>
 
-		<bezel name="lamp21" element="lamp_dash"><bounds x="24.75" y="3.7" width="0.5" height="3.0" /></bezel>
-		<bezel name="lamp24" element="lamp_dash"><bounds x="24.75" y="8.5" width="0.5" height="3.0" /></bezel>
+		<bezel name="2.1" element="lamp_dash"><bounds x="24.75" y="3.7" width="0.5" height="3.0" /></bezel>
+		<bezel name="2.4" element="lamp_dash"><bounds x="24.75" y="8.5" width="0.5" height="3.0" /></bezel>
 
-		<bezel name="lamp20" element="lamp_dot"><bounds x="24.25" y="1.8" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp23" element="lamp_dot"><bounds x="24.25" y="11.9" width="1.5" height="1.5" /></bezel>
+		<bezel name="2.0" element="lamp_dot"><bounds x="24.25" y="1.8" width="1.5" height="1.5" /></bezel>
+		<bezel name="2.3" element="lamp_dot"><bounds x="24.25" y="11.9" width="1.5" height="1.5" /></bezel>
 
-		<bezel name="lamp25" element="lamp_slash"><bounds x="24.3" y="-0.5" width="5" height="7.5" /></bezel>
-		<bezel name="lamp25" element="lamp_slash"><bounds x="20.7" y="7" width="5" height="7.5" /></bezel>
-		<bezel name="lamp25" element="lamp_backslash"><bounds x="20.7" y="-0.5" width="5" height="7.5" /></bezel>
-		<bezel name="lamp25" element="lamp_backslash"><bounds x="24.3" y="7" width="5" height="7.5" /></bezel>
+		<bezel name="2.5" element="lamp_slash"><bounds x="24.3" y="-0.5" width="5" height="7.5" /></bezel>
+		<bezel name="2.5" element="lamp_slash"><bounds x="20.7" y="7" width="5" height="7.5" /></bezel>
+		<bezel name="2.5" element="lamp_backslash"><bounds x="20.7" y="-0.5" width="5" height="7.5" /></bezel>
+		<bezel name="2.5" element="lamp_backslash"><bounds x="24.3" y="7" width="5" height="7.5" /></bezel>
 
 <!-- equals sign digit -->
 
-		<bezel name="lamp47" element="lamp_dash"><bounds x="51.5" y="3.7" width="7" height="1" /></bezel>
-		<bezel name="lamp47" element="lamp_dash"><bounds x="51.5" y="10.5" width="7" height="1" /></bezel>
+		<bezel name="4.7" element="lamp_dash"><bounds x="51.5" y="3.7" width="7" height="1" /></bezel>
+		<bezel name="4.7" element="lamp_dash"><bounds x="51.5" y="10.5" width="7" height="1" /></bezel>
 
 <!-- "bulls eye" digit, it's supposed to be a segmented circle but that's not really possible to draw here -->
 
-		<bezel name="lamp86" element="lamp_dash"><bounds x="92" y="3" width="1" height="4" /></bezel>
-		<bezel name="lamp84" element="lamp_dash"><bounds x="92" y="8" width="1" height="4" /></bezel>
-		<bezel name="lamp81" element="lamp_dash"><bounds x="104" y="3" width="1" height="4" /></bezel>
-		<bezel name="lamp87" element="lamp_dash"><bounds x="104" y="8" width="1" height="4" /></bezel>
+		<bezel name="8.6" element="lamp_dash"><bounds x="92" y="3" width="1" height="4" /></bezel>
+		<bezel name="8.4" element="lamp_dash"><bounds x="92" y="8" width="1" height="4" /></bezel>
+		<bezel name="8.1" element="lamp_dash"><bounds x="104" y="3" width="1" height="4" /></bezel>
+		<bezel name="8.7" element="lamp_dash"><bounds x="104" y="8" width="1" height="4" /></bezel>
 
-		<bezel name="lamp85" element="lamp_dash"><bounds x="94" y="1" width="4" height="1" /></bezel>
-		<bezel name="lamp80" element="lamp_dash"><bounds x="99" y="1" width="4" height="1" /></bezel>
-		<bezel name="lamp83" element="lamp_dash"><bounds x="94" y="13" width="4" height="1" /></bezel>
-		<bezel name="lamp82" element="lamp_dash"><bounds x="99" y="13" width="4" height="1" /></bezel>
+		<bezel name="8.5" element="lamp_dash"><bounds x="94" y="1" width="4" height="1" /></bezel>
+		<bezel name="8.0" element="lamp_dash"><bounds x="99" y="1" width="4" height="1" /></bezel>
+		<bezel name="8.3" element="lamp_dash"><bounds x="94" y="13" width="4" height="1" /></bezel>
+		<bezel name="8.2" element="lamp_dash"><bounds x="99" y="13" width="4" height="1" /></bezel>
 
 	</view>
 </mamelayout>

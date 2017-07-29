@@ -7040,7 +7040,7 @@ MACHINE_CONFIG_END
 
   *: higher number indicates higher difficulty
 
-  display layout, where number xy is lamp R(x),O(y)
+  display layout, where number yx is lamp R(y).O(x)
 
        00    02    04
     10 01 12 03 14 05 16
@@ -8466,8 +8466,12 @@ public:
 
 void phpball_state::prepare_display()
 {
+	// rectangular LEDs under LEDs D,F and E,G are directly connected
+	// to the left and right flipper buttons - output them to 10.a and 9.a
+	u16 in1 = m_inp_matrix[1]->read() << 7 & 0x600;
+
 	set_display_segmask(7, 0x7f);
-	display_matrix(7, 9, m_o, m_r);
+	display_matrix(7, 11, m_o, (m_r & 0x1ff) | in1);
 }
 
 WRITE16_MEMBER(phpball_state::write_r)
@@ -8508,15 +8512,13 @@ static INPUT_PORTS_START( phpball )
 
 	PORT_START("IN.1") // Vss!
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, (void *)1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, (void *)0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
 {
-	// rectangular LEDs under LEDs D,F and E,G are directly connected
-	// to the left and right flipper buttons - output them to lamp90 and 91
-	output().set_lamp_value(90 + (int)(uintptr_t)param, newval);
+	prepare_display();
 }
 
 static MACHINE_CONFIG_START( phpball )

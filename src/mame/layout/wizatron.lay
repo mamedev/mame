@@ -29,7 +29,6 @@
 	</element>
 
 
-
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -63,16 +62,16 @@
 
 <!-- math symbols custom digit -->
 
-		<bezel name="lamp65" element="lamp_dash"><bounds x="21.5" y="7.25" width="7" height="0.5" /></bezel>
+		<bezel name="6.5" element="lamp_dash"><bounds x="21.5" y="7.25" width="7" height="0.5" /></bezel>
 
-		<bezel name="lamp61" element="lamp_slash"><bounds x="24" y="-0.5" width="5" height="7.5" /></bezel>
-		<bezel name="lamp64" element="lamp_slash"><bounds x="21" y="7" width="5" height="7.5" /></bezel>
+		<bezel name="6.1" element="lamp_slash"><bounds x="24" y="-0.5" width="5" height="7.5" /></bezel>
+		<bezel name="6.4" element="lamp_slash"><bounds x="21" y="7" width="5" height="7.5" /></bezel>
 
-		<bezel name="lamp66" element="lamp_backslash"><bounds x="21" y="-0.5" width="5" height="7.5" /></bezel>
-		<bezel name="lamp62" element="lamp_backslash"><bounds x="24" y="7" width="5" height="7.5" /></bezel>
+		<bezel name="6.6" element="lamp_backslash"><bounds x="21" y="-0.5" width="5" height="7.5" /></bezel>
+		<bezel name="6.2" element="lamp_backslash"><bounds x="24" y="7" width="5" height="7.5" /></bezel>
 
-		<bezel name="lamp60" element="lamp_dot"><bounds x="24.25" y="2.25" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp63" element="lamp_dot"><bounds x="24.25" y="11.75" width="1.5" height="1.5" /></bezel>
+		<bezel name="6.0" element="lamp_dot"><bounds x="24.25" y="2.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="6.3" element="lamp_dot"><bounds x="24.25" y="11.75" width="1.5" height="1.5" /></bezel>
 
 	</view>
 </mamelayout>

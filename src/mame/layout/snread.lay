@@ -33,16 +33,16 @@
 		<bezel name="digit8" element="digit"><bounds x="88" y="4" width="10" height="15" /></bezel>
 		<bezel name="digit13" element="digit"><bounds x="99" y="4" width="10" height="15" /></bezel>
 
-		<bezel name="lamp14" element="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp114" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp214" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp314" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp414" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp514" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp614" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp714" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp814" element="triangle_mark"><bounds x="92" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp1314" element="triangle_mark"><bounds x="103" y="0" width="4" height="3" /></bezel>
+		<bezel name="0.14" element="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></bezel>
+		<bezel name="1.14" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
+		<bezel name="2.14" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
+		<bezel name="3.14" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
+		<bezel name="4.14" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
+		<bezel name="5.14" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
+		<bezel name="6.14" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
+		<bezel name="7.14" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
+		<bezel name="8.14" element="triangle_mark"><bounds x="92" y="0" width="4" height="3" /></bezel>
+		<bezel name="13.14" element="triangle_mark"><bounds x="103" y="0" width="4" height="3" /></bezel>
 
 	</view>
 </mamelayout>

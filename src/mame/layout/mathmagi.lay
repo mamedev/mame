@@ -84,6 +84,5 @@
 		<bezel name="10.3" element="lamp_dot"><bounds x="51" y="1" width="4" height="4" /></bezel>
 		<bezel name="10.6" element="lamp_dot"><bounds x="76" y="1" width="4" height="4" /></bezel>
 
-
 	</view>
 </mamelayout>
