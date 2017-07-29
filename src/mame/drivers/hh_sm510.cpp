@@ -73,7 +73,6 @@ public:
 	u8 m_display_z_len;             // lcd number of commons
 	u32 m_display_state[0x20];      // lcd segment data (max. 5-bit offset)
 	u8 m_display_decay[0x20][0x20]; // (internal use)
-	u8 m_display_cache[0x20][0x20]; // (internal use)
 
 	void set_display_size(u8 x, u8 y, u8 z);
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
@@ -101,7 +100,6 @@ void hh_sm510_state::machine_start()
 	m_display_z_len = 0;
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_cache, ~0, sizeof(m_display_cache));
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -113,7 +111,6 @@ void hh_sm510_state::machine_start()
 	save_item(NAME(m_display_z_len));
 	save_item(NAME(m_display_state));
 	save_item(NAME(m_display_decay));
-	/* save_item(NAME(m_display_cache)); */ // don't save!
 }
 
 void hh_sm510_state::machine_reset()
@@ -150,21 +147,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 				m_display_decay[y][zx]--;
 			u8 active_state = (m_display_decay[y][zx] < m_display_wait) ? 0 : 1;
 
-			// on change, send to output
-			if (active_state != m_display_cache[y][zx])
-			{
-				// SM510 series: output to x.y.z, where:
-				// x = group a/b/bs/c (0/1/2/3)
-				// y = segment 1-16 (0-15)
-				// z = common H1-H4 (0-3)
+			// SM510 series: output to x.y.z, where:
+			// x = group a/b/bs/c (0/1/2/3)
+			// y = segment 1-16 (0-15)
+			// z = common H1-H4 (0-3)
 
-				// SM500 series: output to x.y.z, where:
-				// x = O group (0-*)
-				// y = O segment 1-4 (0-3)
-				// z = common H1/H2 (0/1)
-				m_out_x[zx >> m_display_z_len][y][zx & z_mask] = active_state;
-				m_display_cache[y][zx] = active_state;
-			}
+			// SM500 series: output to x.y.z, where:
+			// x = O group (0-*)
+			// y = O segment 1-4 (0-3)
+			// z = common H1/H2 (0/1)
+			m_out_x[zx >> m_display_z_len][y][zx & z_mask] = active_state;
 		}
 	}
 }

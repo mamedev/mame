@@ -595,7 +595,6 @@ void fidelbase_state::machine_start()
 
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
@@ -612,7 +611,6 @@ void fidelbase_state::machine_start()
 	save_item(NAME(m_display_wait));
 
 	save_item(NAME(m_display_state));
-	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
 	save_item(NAME(m_display_segmask));
 
@@ -641,11 +639,9 @@ void fidelbase_state::machine_reset()
 
 void fidelbase_state::display_update()
 {
-	u32 active_state[0x20];
-
 	for (int y = 0; y < m_display_maxy; y++)
 	{
-		active_state[y] = 0;
+		u32 active_state = 0;
 
 		for (int x = 0; x <= m_display_maxx; x++)
 		{
@@ -655,31 +651,19 @@ void fidelbase_state::display_update()
 
 			// determine active state
 			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state[y] |= (ds << x);
+			active_state |= (ds << x);
+
+			// output to y.x, or y.a when always-on
+			if (x != m_display_maxx)
+				m_out_x[y][x] = ds;
+			else
+				m_out_a[y] = ds;
 		}
+
+		// output to digity
+		if (m_display_segmask[y] != 0)
+			m_out_digit[y] = active_state & m_display_segmask[y];
 	}
-
-	// on difference, send to output
-	for (int y = 0; y < m_display_maxy; y++)
-		if (m_display_cache[y] != active_state[y])
-		{
-			// output to digity
-			if (m_display_segmask[y] != 0)
-				m_out_digit[y] = active_state[y] & m_display_segmask[y];
-
-			for (int x = 0; x <= m_display_maxx; x++)
-			{
-				int state = active_state[y] >> x & 1;
-
-				// output to y.x, or y.a when always-on
-				if (x != m_display_maxx)
-					m_out_x[y][x] = state;
-				else
-					m_out_a[y] = state;
-			}
-		}
-
-	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(fidelbase_state::display_decay_tick)
