@@ -9,10 +9,10 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-07-28 11:19+1000\n"
-"PO-Revision-Date: 2016-04-15 03:34+0800\n"
+"PO-Revision-Date: 2017-07-29 10:35+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
-"Language: zh\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -259,7 +259,7 @@ msgstr "整体： 可以执行"
 
 #: src/frontend/mame/ui/selmenu.cpp:687
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "图形： 不完整，"
 
 #: src/frontend/mame/ui/selmenu.cpp:689
 msgid "Graphics: Imperfect, "
@@ -271,7 +271,7 @@ msgstr "图形： OK， "
 
 #: src/frontend/mame/ui/selmenu.cpp:694
 msgid "Sound: None"
-msgstr ""
+msgstr "声音： 无"
 
 #: src/frontend/mame/ui/selmenu.cpp:696
 msgid "Sound: Unimplemented"
@@ -344,55 +344,55 @@ msgstr "快进"
 
 #: src/frontend/mame/ui/info.cpp:29
 msgid "protection"
-msgstr ""
+msgstr "保护"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "color palette"
-msgstr ""
+msgstr "色盘"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "graphics"
-msgstr ""
+msgstr "图形"
 
 #: src/frontend/mame/ui/info.cpp:32
 msgid "sound"
-msgstr ""
+msgstr "声音"
 
 #: src/frontend/mame/ui/info.cpp:33
 msgid "controls"
-msgstr ""
+msgstr "控制"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "keyboard"
-msgstr ""
+msgstr "键盘"
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "mouse"
-msgstr ""
+msgstr "滑鼠"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "microphone"
-msgstr ""
+msgstr "麦克风"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "camera"
-msgstr ""
+msgstr "相机"
 
 #: src/frontend/mame/ui/info.cpp:38
 msgid "disk"
-msgstr ""
+msgstr "磁碟"
 
 #: src/frontend/mame/ui/info.cpp:39
 msgid "printer"
-msgstr ""
+msgstr "印表机"
 
 #: src/frontend/mame/ui/info.cpp:40
 msgid "LAN"
-msgstr ""
+msgstr "区域网"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgid "WAN"
-msgstr ""
+msgstr "广域网"
 
 #: src/frontend/mame/ui/info.cpp:156
 msgid ""
@@ -415,22 +415,22 @@ msgstr "本机械有一个或更多的 ROM/CHD 尚未正确地被 DUMP。\n"
 
 #: src/frontend/mame/ui/info.cpp:176
 msgid "Completely unemulated features: "
-msgstr ""
+msgstr "未完整模拟功能: "
 
 #: src/frontend/mame/ui/info.cpp:182 src/frontend/mame/ui/info.cpp:198
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: src/frontend/mame/ui/info.cpp:182 src/frontend/mame/ui/info.cpp:198
 #: src/frontend/mame/ui/info.cpp:243
 #, c-format
 msgid ", %s"
-msgstr ""
+msgstr ", %s"
 
 #: src/frontend/mame/ui/info.cpp:192
 msgid "Imperfectly emulated features: "
-msgstr ""
+msgstr "未完美模拟功能: "
 
 #: src/frontend/mame/ui/info.cpp:207
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -438,7 +438,7 @@ msgstr "尚未支援台面型筐体模式的画面翻转。"
 
 #: src/frontend/mame/ui/info.cpp:209
 msgid "This machine requires external artwork files.\n"
-msgstr ""
+msgstr "此机械需要额外的装饰图档"
 
 #: src/frontend/mame/ui/info.cpp:211
 msgid ""
@@ -468,7 +468,8 @@ msgid ""
 "Elements of this machine cannot be emulated as they requires physical "
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
-msgstr ""
+msgstr "此机械的部分元件无法模拟，因其需要实际活动的互动或机械装置的组合。"
+"故无法完成此机械的体验。\n"
 
 #: src/frontend/mame/ui/info.cpp:241
 #, c-format
@@ -476,7 +477,7 @@ msgid ""
 "\n"
 "\n"
 "There are working clones of this machine: %s"
-msgstr ""
+msgstr "本机械尚有可执行的彷製版： %s"
 
 #: src/frontend/mame/ui/info.cpp:254
 msgid ""
@@ -838,172 +839,172 @@ msgstr ""
 #: src/frontend/mame/ui/selgame.cpp:1195
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr ""
+msgstr "年代\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1196
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
-msgstr ""
+msgstr "製造商\t%1$-.100s\"
 
 #: src/frontend/mame/ui/selgame.cpp:1200
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr ""
+msgstr "驱动相容于\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1202
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "驱动为主档\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1205
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "整体\t不可执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1207
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "整体\t未模拟保护\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1209
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "整体\t可以执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1212
 msgid "Graphics\tUnimplemented\n"
-msgstr ""
+msgstr "图形\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1216
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "图形\t色彩不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1218
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "图形\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1220
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "图形\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1223
 msgid "Sound\tNone\n"
-msgstr ""
+msgstr "声音\t无\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1225
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "声音\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1227
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "声音\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1229
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "声音\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1232
 msgid "Controls\tUnimplemented\n"
-msgstr ""
+msgstr "控制\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1234
 msgid "Controls\tImperfect\n"
-msgstr ""
+msgstr "控制\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1237
 msgid "Keyboard\tUnimplemented\n"
-msgstr ""
+msgstr "键盘\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1239
 msgid "Keyboard\tImperfect\n"
-msgstr ""
+msgstr "键盘\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1242
 msgid "Mouse\tUnimplemented\n"
-msgstr ""
+msgstr "滑鼠\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1244
 msgid "Mouse\tImperfect\n"
-msgstr ""
+msgstr "滑鼠\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1247
 msgid "Microphone\tUnimplemented\n"
-msgstr ""
+msgstr "麦克风\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1249
 msgid "Microphone\tImperfect\n"
-msgstr ""
+msgstr "麦克风\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1252
 msgid "Camera\tUnimplemented\n"
-msgstr ""
+msgstr "相机\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1254
 msgid "Camera\tImperfect\n"
-msgstr ""
+msgstr "相机\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1257
 msgid "Disk\tUnimplemented\n"
-msgstr ""
+msgstr "磁碟\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1259
 msgid "Disk\tImperfect\n"
-msgstr ""
+msgstr "磁碟\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1262
 msgid "Printer\tUnimplemented\n"
-msgstr ""
+msgstr "印表机\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1264
 msgid "Printer\tImperfect\n"
-msgstr ""
+msgstr "印表机\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1267
 msgid "LAN\tUnimplemented\n"
-msgstr ""
+msgstr "区域网路\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1269
 msgid "LAN\tImperfect\n"
-msgstr ""
+msgstr "区域网路\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1272
 msgid "WAN\tUnimplemented\n"
-msgstr ""
+msgstr "外部网路\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1274
 msgid "WAN\tImperfect\n"
-msgstr ""
+msgstr "外部网路\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1276
 #, c-format
 msgid "Mechanical Machine\t%1$s\n"
-msgstr ""
+msgstr "机械式机台"
 
 #: src/frontend/mame/ui/selgame.cpp:1277
 #, c-format
 msgid "Requires Artwork\t%1$s\n"
-msgstr ""
+msgstr "需要装饰图\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1278
 #, c-format
 msgid "Requires Clickable Artwork\t%1$s\n"
-msgstr ""
+msgstr "需要可点击的装饰图\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1279
 #, c-format
 msgid "Support Cocktail\t%1$s\n"
-msgstr ""
+msgstr "支援檯面型筐体\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1280
 #, c-format
 msgid "Driver is Bios\t%1$s\n"
-msgstr ""
+msgstr "驱动为 BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1281
 #, c-format
 msgid "Support Save\t%1$s\n"
-msgstr ""
+msgstr "支援即时存档\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1282
 #, c-format
 msgid "Screen Orientation\t%1$s\n"
-msgstr ""
+msgstr "画面方向\t%1$s\"
 
 #: src/frontend/mame/ui/selgame.cpp:1282
 msgid "Vertical"
@@ -1016,33 +1017,35 @@ msgstr "水平"
 #: src/frontend/mame/ui/selgame.cpp:1291
 #, c-format
 msgid "Requires CHD\t%1$s\n"
-msgstr ""
+msgstr "需要 CHD\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1304
 msgid "Roms Audit Pass\tOK\n"
-msgstr ""
+msgstr "ROM 验证通过\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1306
 msgid "Roms Audit Pass\tBAD\n"
-msgstr ""
+msgstr "ROM 验证通过\t错误\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1309
 msgid "Samples Audit Pass\tNone Needed\n"
-msgstr ""
+msgstr "样本档验证通过\t不需要\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1311
 msgid "Samples Audit Pass\tOK\n"
-msgstr ""
+msgstr "样本档验证通过\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1313
 msgid "Samples Audit Pass\tBAD\n"
-msgstr ""
+msgstr "样本档验证通过\t错误\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1316
 msgid ""
 "Roms Audit Pass\tDisabled\n"
 "Samples Audit Pass\tDisabled\n"
 msgstr ""
+"ROM 验证通过\t已停用\n"
+"样本档验证通过\t已停用\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1676
 #, c-format
@@ -1080,15 +1083,17 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
+"选定的机械缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他机械。"
+"\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1737 src/frontend/mame/ui/selsoft.cpp:630
 msgid "Press any key to continue."
-msgstr ""
+msgstr "按任意键继续。"
 
 #: src/frontend/mame/ui/slotopt.cpp:290
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [内部]"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
@@ -1474,7 +1479,7 @@ msgstr "超频 CPU %1$s"
 #: src/frontend/mame/ui/ui.cpp:1408
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr ""
+msgstr "超频 %1$s 声音"
 
 #: src/frontend/mame/ui/ui.cpp:1429
 #, c-format
@@ -1812,7 +1817,7 @@ msgstr "鼠标经过"
 
 #: src/frontend/mame/ui/custui.cpp:817
 msgid "ARGB Settings"
-msgstr ""
+msgstr "ARGB 设定"
 
 #: src/frontend/mame/ui/custui.cpp:822 src/frontend/mame/ui/custui.cpp:825
 msgid "Alpha"
@@ -1991,6 +1996,8 @@ msgid ""
 "different software.\n"
 "\n"
 msgstr ""
+"选定的软件缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他软体。\n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:1153
 #, c-format
@@ -2130,7 +2137,7 @@ msgstr "汇出 TXT 格式列表 （同 -listfull）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:763
 msgid "Bios"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:767
 msgid "Driver"
@@ -2158,7 +2165,7 @@ msgstr "设定机台："
 
 #: src/frontend/mame/ui/state.cpp:389
 msgid "Load State"
-msgstr ""
+msgstr "载入状态"
 
 #: src/frontend/mame/ui/state.cpp:389
 msgid "Select position to load from"
@@ -2166,7 +2173,7 @@ msgstr "选择载入位置"
 
 #: src/frontend/mame/ui/state.cpp:413
 msgid "Save State"
-msgstr ""
+msgstr "保存状态"
 
 #: src/frontend/mame/ui/state.cpp:413
 msgid "Select position to save to"
@@ -2179,6 +2186,9 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"选定的游戏缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他游戏。"
+"\n"
+"按任意键继续。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:242
 #, c-format
@@ -2224,7 +2234,7 @@ msgstr "确认"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:376
 msgid "None"
-msgstr ""
+msgstr "无"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:384
 #, c-format
