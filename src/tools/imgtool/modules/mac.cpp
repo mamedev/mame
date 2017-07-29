@@ -5741,13 +5741,12 @@ static imgtoolerr_t mac_image_writefile(imgtool::partition &partition, const cha
 
 
 
-static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const char *path, imgtool_forkent *ents, size_t len)
+static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const char *path, std::vector<imgtool::fork_entry> &forks)
 {
 	imgtoolerr_t err;
 	uint32_t parID;
 	mac_str255 filename;
 	mac_dirent cat_info;
-	int fork_num = 0;
 	imgtool::image &img(partition.image());
 	struct mac_l2_imgref *image = get_imgref(img);
 
@@ -5758,22 +5757,15 @@ static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const cha
 	if (cat_info.dataRecType != hcrt_File)
 		return IMGTOOLERR_FILENOTFOUND;
 
-	/* specify data fork */
-	ents[fork_num].type = FORK_DATA;
-	ents[fork_num].forkname[0] = '\0';
-	ents[fork_num].size = cat_info.dataLogicalSize;
-	fork_num++;
+	// specify data fork
+	forks.emplace_back(cat_info.dataLogicalSize, imgtool::fork_entry::type_t::DATA);
 
 	if (cat_info.rsrcLogicalSize > 0)
 	{
-		/* specify the resource fork */
-		ents[fork_num].type = FORK_RESOURCE;
-		strcpy(ents[fork_num].forkname, "RESOURCE_FORK");
-		ents[fork_num].size = cat_info.rsrcLogicalSize;
-		fork_num++;
+		// specify the resource fork
+		forks.emplace_back(cat_info.rsrcLogicalSize, imgtool::fork_entry::type_t::RESOURCE);
 	}
 
-	ents[fork_num].type = FORK_END;
 	return IMGTOOLERR_SUCCESS;
 }
 
