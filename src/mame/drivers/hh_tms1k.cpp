@@ -5068,13 +5068,16 @@ WRITE32_MEMBER(horseran_state::lcd_output_w)
 	if (offset > 2)
 		return;
 
-	// output segments (lamp row*100 + col)
-	for (int i = 0; i < 24; i++)
-		output().set_lamp_value(offset*100 + i+1, data >> i & 1);
+	// update lcd segments
+	display_matrix(24, 3, data, 1 << offset, false);
 
 	// col5-11 and col13-19 are 7segs
 	for (int i = 0; i < 2; i++)
-		output().set_digit_value(offset << 1 | i, BITSWAP8(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
+		m_display_state[3 + (offset << 1 | i)] = BITSWAP8(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f;
+
+	set_display_segmask(0x3f<<3, 0x7f);
+	set_display_size(24, 3+6);
+	display_update();
 }
 
 WRITE16_MEMBER(horseran_state::write_r)
@@ -5170,6 +5173,7 @@ static MACHINE_CONFIG_START( horseran )
 	/* video hardware */
 	MCFG_DEVICE_ADD("lcd", HLCD0569, 1100) // C=0.022uF
 	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(horseran_state, lcd_output_w))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_horseran)
 
 	/* no sound! */
