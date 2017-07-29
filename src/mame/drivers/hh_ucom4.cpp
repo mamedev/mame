@@ -60,7 +60,7 @@
   128     uPD650C  1981, Roland TR-606 -> tr606.cpp
   133     uPD650C  1982, Roland TB-303 -> tb303.cpp
 
-  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
+  (* means undumped unless noted, @ denotes it's in this driver)
 
 
 TODO:

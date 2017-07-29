@@ -66,7 +66,7 @@
 
  *89      HD44801C  1985, CXG Advanced Portachess
 
-  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
+  (* means undumped unless noted, @ denotes it's in this driver)
 
 
   TODO:

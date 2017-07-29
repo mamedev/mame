@@ -30,7 +30,7 @@
  *533     1650A   19??, "
  *536     1650    1982, GI Teleview Autodialer/Terminal Identifier
 
-  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
+  (* means undumped unless noted, @ denotes it's in this driver)
 
 
   TODO:
