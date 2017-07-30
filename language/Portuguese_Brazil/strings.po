@@ -416,7 +416,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:176
 msgid "Completely unemulated features: "
-msgstr "Características completamente não emuladas"
+msgstr "Características completamente não emuladas: "
 
 #: src/frontend/mame/ui/info.cpp:182 src/frontend/mame/ui/info.cpp:198
 #, c-format
@@ -427,11 +427,11 @@ msgstr "%s"
 #: src/frontend/mame/ui/info.cpp:243
 #, c-format
 msgid ", %s"
-msgstr "%s"
+msgstr ", %s"
 
 #: src/frontend/mame/ui/info.cpp:192
 msgid "Imperfectly emulated features: "
-msgstr "Características emuladas imperfeitamente"
+msgstr "Características emuladas imperfeitamente: "
 
 #: src/frontend/mame/ui/info.cpp:207
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -439,7 +439,7 @@ msgstr "Inversão de tela no modo coquetel não é suportada.\n"
 
 #: src/frontend/mame/ui/info.cpp:209
 msgid "This machine requires external artwork files.\n"
-msgstr "Esta máquina requer arquivos de artwork externos"
+msgstr "Esta máquina requer arquivos de artwork externos.\n"
 
 #: src/frontend/mame/ui/info.cpp:211
 msgid ""
@@ -447,7 +447,7 @@ msgid ""
 "elements that are not bugs in the emulation.\n"
 msgstr ""
 "Esta máquina nunca foi completada. Ela poderá ter um comportamento estranho "
-"or faltar elementos que não são bugs na emulação"
+"or faltar elementos que não são bugs na emulação.\n"
 
 #: src/frontend/mame/ui/info.cpp:213
 msgid ""
@@ -455,7 +455,7 @@ msgid ""
 "expected behaviour.\n"
 msgstr ""
 "Esta máquina não tem hardware de som, MAME não irá produzir som algum, isto "
-"já é esperado."
+"já é esperado.\n"
 
 #: src/frontend/mame/ui/info.cpp:217
 msgid ""
