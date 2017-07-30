@@ -542,22 +542,6 @@ void *imgtool::image::malloc(size_t size)
 }
 
 
-//-------------------------------------------------
-//  imgtool::image::rand - returns a random number
-//-------------------------------------------------
-
-uint64_t imgtool::image::rand()
-{
-	// we can't use mame_rand() here
-#ifdef rand
-#undef rand
-#endif
-	return ((uint64_t) std::rand()) << 32
-		| ((uint64_t)std::rand()) << 0;
-}
-
-
-
 /***************************************************************************
 
     Imgtool partition management

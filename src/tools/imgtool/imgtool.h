@@ -104,7 +104,6 @@ namespace imgtool
 		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts, ptr &image);
 		static imgtoolerr_t create(const imgtool_module *module, const std::string &filename, util::option_resolution *opts);
 		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts);
-		static uint64_t rand();
 
 		std::string info();
 		imgtoolerr_t get_geometry(uint32_t *tracks, uint32_t *heads, uint32_t *sectors);
