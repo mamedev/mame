@@ -1,7 +1,3 @@
-// Define suppresses costly smooth scroll / updates when debugging:
-// ENABLE BY UNCOMMENTING.  ADDITIONALLY, SET SMOOTH SCROLL IN EMULATION (DISABLE BY SETTING JUMP SCROLL. To enter SETUP hit ScrollLock)-
-//#define BOOST_DEBUG_PERFORMANCE
-
 // license:GPL-2.0+
 // copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /***************************************************************************************************
@@ -356,10 +352,12 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "machine/wd2010.h"
 #include "machine/corvushd.h"
 
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/bitbngr.h"
 #include "machine/com8116.h"
+#include "bus/rs232/terminal.h"
+#include "bus/rs232/ser_mouse.h"
 
 #include "machine/i8251.h"
 #include "machine/clock.h"
@@ -614,7 +612,7 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	TIMER_DEVICE_CALLBACK_MEMBER(motor_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(hd_motor_tick);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -665,9 +663,10 @@ private:
 
 	required_device<corvus_hdc_device> m_corvus_hdc;
 
-	required_device<upd7201_device> m_mpsc;
+	required_device<upd7201_new_device> m_mpsc;
 	required_device<com8116_device> m_dbrg_A;
 	required_device<com8116_device> m_dbrg_B;
+
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -720,8 +719,6 @@ private:
 	bool m_kbd_tx_ready, m_kbd_rx_ready;
 	int m_KBD;
 
-	int MOTOR_DISABLE_counter;
-
 	uint8_t m_diagnostic;
 
 	uint8_t m_z80_private[0x800];     // Z80 private 2K
@@ -730,7 +727,7 @@ private:
 	void update_kbd_irq();
 	virtual void machine_reset() override;
 
-	int m_unit;
+	int m_present_drive;
 	floppy_image_device *m_floppy;
 
 	int m_irq_high;
@@ -751,6 +748,7 @@ private:
 
 	bool m_POWER_GOOD;
 	emu_timer   *cmd_timer;
+	emu_timer   *switch_off_timer;
 
 	const int vectors[9] = { 0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20, 0x02 };
 
@@ -761,6 +759,8 @@ private:
 	// FULL RANGE video levels for 100-B model, taken from page 46 of PDF
 	const uint8_t video_levels[16] = { 255, 217,  201,186, 171, 156, 140, 125, 110, 97, 79, 66, 54, 31, 18, 0 };
 	uint8_t m_PORT50;
+
+	const int comm_rates[16] = { 50,75,110,134,150,200,300,600,1200,1800,2000,2400,3600,4800,9600,19200 };
 };
 
 
@@ -796,15 +796,6 @@ printf("\n** OPTION GRFX. RESET **\n");
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 {
-#ifdef BOOST_DEBUG_PERFORMANCE
-	uint8_t *ram = memregion("maincpu")->base();
-   if( !(m_p_vol_ram[0x84] == 0x00) )
-	{
-		if( (MOTOR_DISABLE_counter) || (ram[0xEFFFE] & 16) ) // if HDD/FDD ACTIVITY -OR- SMOOTH SCROLL IN PROGRESS
-			return;
-	}
-#endif
-
 	const rgb_t *paletteX = m_palette2->palette()->entry_list_raw();
 
 	int xi;
@@ -864,8 +855,11 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START(rainbow_floppies)
 SLOT_INTERFACE("525qd0", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
 SLOT_INTERFACE("525qd1", FLOPPY_525_QD)
+//SLOT_INTERFACE("525qd2", FLOPPY_525_QD)
+//SLOT_INTERFACE("525qd3", FLOPPY_525_QD)
 SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
 SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
+SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster 
 SLOT_INTERFACE_END
 
 void rainbow_state::machine_start()
@@ -874,7 +868,8 @@ void rainbow_state::machine_start()
 	cmd_timer = timer_alloc(0);
 	cmd_timer->adjust(attotime::from_msec(MS_TO_POWER_GOOD));
 
-	MOTOR_DISABLE_counter = 2; // soon resets drv.LEDs
+	switch_off_timer = timer_alloc(1);
+	switch_off_timer->adjust(attotime::from_msec(10));
 
 	m_SCREEN_BLANK = false;
 
@@ -980,7 +975,7 @@ AM_RANGE(0x56, 0x57) AM_DEVREADWRITE("upd7220", upd7220_device, read, write) // 
 // 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
 // ===========================================================
 // 0x60 -> 0x6f ***** RD51 HD. CONTROLLER   / Option Select 2.
-AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("hdc", wd2010_device, read, write)
+AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("hdc", wd2010_device, read, write) AM_MIRROR(0x100)
 AM_RANGE(0x68, 0x68) AM_READWRITE(hd_status_68_r, hd_status_68_w)
 AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // ===========================================================
@@ -1073,12 +1068,12 @@ PORT_DIPSETTING(0xE0000, "896 K (100-B MAX.   MEMORY)")
 
 // EXT.COMM.card -or- RD51 HD. controller (marketed later).
 PORT_START("DEC HARD DISK") // BUNDLE_OPTION
-PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK") PORT_TOGGLE
+PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK (#1)") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
 PORT_START("CORVUS HARD DISKS")
-PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS") PORT_TOGGLE
+PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS (#2 to #5)") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
@@ -1142,7 +1137,6 @@ void rainbow_state::machine_reset()
 	uint32_t unmap_start = m_inp8->read();
 
 	// Verify RAM size matches hardware (DIP switches)
-	uint8_t *nv = memregion("maincpu")->base();
 	uint8_t NVRAM_LOCATION;
 	uint32_t check;
 
@@ -1155,7 +1149,7 @@ void rainbow_state::machine_reset()
 	}
 
 	check = (unmap_start >> 16)-1;  // guess.
-	NVRAM_LOCATION = nv[0xed084];   // location not verified yet. DMT RAM check tests offset $84 !
+	NVRAM_LOCATION = m_p_nvram[0x84];   // location not verified yet. DMT RAM check tests offset $84 !
 
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
@@ -1173,7 +1167,7 @@ void rainbow_state::machine_reset()
 	}
 
 	check = (unmap_start >> 16) - 2;
-	NVRAM_LOCATION = nv[0xed0db];
+	NVRAM_LOCATION = m_p_nvram[0xdb];
 
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
@@ -1212,6 +1206,8 @@ void rainbow_state::machine_reset()
 		local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 		output().set_value("led1", 0);
+		switch_off_timer->adjust(attotime::from_msec(500));
+
 		if (local_hard_disk)
 		{
 			hard_disk_info *info;
@@ -1231,11 +1227,11 @@ void rainbow_state::machine_reset()
 		}
 	}
 
-	if (m_inp6->read() == 0x00) // Unmap port if Corvus not present
+	if (m_inp6->read() == 0x00) // Unmap port if Corvus not present 
 			io.unmap_readwrite(0x20, 0x20);
 
 	// *********** FLOPPY DISK CONTROLLER [ NOT OPTIONAL ]
-	m_unit = INVALID_DRIVE;
+	m_present_drive = INVALID_DRIVE;
 	m_fdc->reset();
 	m_fdc->set_floppy(nullptr);
 	m_fdc->dden_w(0);
@@ -1306,7 +1302,23 @@ void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int para
 			printf("\n**** WATCHDOG: CPU RESET ****\n");
 			m_i8088->reset(); // gives 'ERROR_16 - INTERRUPTS OFF' (indicates hardware failure or software bug).
 		}
-	} // switch
+		break; // case 0
+
+		case 1:
+
+		switch_off_timer->adjust(attotime::never);
+
+		output().set_value("driveled0", 0); // DRIVE 0 (A)
+		output().set_value("driveled1", 0); // DRIVE 1 (B)
+		output().set_value("driveled2", 0); // DRIVE 2 (C)
+		output().set_value("driveled3", 0); // DRIVE 3 (D)
+
+		output().set_value("led1", 1);  // 1 = OFF (One of the CPU LEDs as drive LED for DEC hard disk)
+		output().set_value("led2", 1);  // 1 = OFF (One of the CPU LEDs as drive LED for Corvus HD)
+
+		break; // case 1
+
+	} // switch (timer ID)
 }
 
 uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1331,15 +1343,6 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 		old_palette = palette_selected;
 		m_color_map_changed = true;
 	}
-
-#ifdef BOOST_DEBUG_PERFORMANCE
-	uint8_t *ram = memregion("maincpu")->base();
-	if( !(m_p_vol_ram[0x84] == 0x00) )
-	{
-		if( (MOTOR_DISABLE_counter) || (ram[0xEFFFE] & 16) ) // if HDD/FDD ACTIVITY -OR- SMOOTH SCROLL IN PROGRESS
-			return 0;
-	}
-#endif
 
 	m_crtc->palette_select(palette_selected);
 
@@ -1405,10 +1408,10 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
 	m_dbrg_A->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
-	printf("\nRECEIVE bitrate = %02x HEX\n",data & 0x0f);
+	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
 	m_dbrg_A->stt_w( ((data & 0xf0) >> 4) );
-	printf("\nTRANSMIT bitrate = %02x HEX\n",(data & 0xf0) >> 4);
+	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
 // PORT 0x0e : Printer bit rates
@@ -1416,15 +1419,15 @@ WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 {
 	m_dbrg_B->str_w(data & 7); // bits 0 - 2
 	m_dbrg_B->stt_w(data & 7); // TX and RX rate cannot be programmed independently.
-	printf("\n(PRINTER) RECEIVE / TRANSMIT bitrate = %02x HEX\n",data & 7);
+	logerror("\n(PRINTER) receive = transmit bitrate: %d ($%02x)", 9600 / ( 1 << (7 - (data & 7))) , data & 7);
 
 	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
-	printf(" - CLOCK (0 = internal): %02x", data & 8);
+	logerror(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
 {
-	m_mpsc->rxca_w(state);
+	m_mpsc->rxca_w(state); 
 }
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
@@ -1609,13 +1612,13 @@ READ8_MEMBER(rainbow_state::corvus_status_r)
 {
 	if(m_inp6->read() == 0) // Corvus controller
 	{
-		popmessage("Corvus controller invoked - but not switched on. Check DIP and perform a reset.");
+		popmessage("Corvus controller invoked - but switched OFF.\nCheck DIP and perform a reset.\n\nIncompatible software also triggers this warning (illegal access to port $21)");
 		return 0;
 	}
 		else
 	{
 		output().set_value("led2", 0);
-		MOTOR_DISABLE_counter = 5;
+		switch_off_timer->adjust(attotime::from_msec(500));
 
 		uint8_t status = m_corvus_hdc->status_r(space, 0);
 		uint8_t data = (status & 0x80) ? 1 : 0; // 0x80 BUSY (Set = Busy, Clear = Ready)
@@ -1727,6 +1730,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 		{
 			read_status = 2; //          logerror("\nTRYING TO READ");
 			output().set_value("led1", 0);
+			switch_off_timer->adjust(attotime::from_msec(500));
 
 			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
 			uint16_t cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
@@ -1797,7 +1801,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 		)
 	{
 		output().set_value("led1", 0);  // (1 = OFF ) =HARD DISK ACTIVITY =
-		MOTOR_DISABLE_counter = 20;
+		switch_off_timer->adjust(attotime::from_msec(500));
 
 		if (rainbow_hdc_file(0) != nullptr)
 		{
@@ -1834,6 +1838,7 @@ int rainbow_state::do_write_sector()
 {
 	int feedback = 0; // no error
 	output().set_value("led1", 0); // ON
+	switch_off_timer->adjust(attotime::from_msec(500));
 
 	hard_disk_file *local_hard_disk;
 	local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
@@ -1989,7 +1994,7 @@ WRITE8_MEMBER(rainbow_state::hd_status_68_w)
 	if (data & 0x01)
 	{
 		output().set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED) = HARD DISK ACTIVITY =
-		MOTOR_DISABLE_counter = 20;
+		switch_off_timer->adjust(attotime::from_msec(500));
 
 		m_hdc->buffer_ready(true);
 	}
@@ -2057,7 +2062,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_step)
 	m_hdc_step_latch = true;
 
 	output().set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)  = HARD DISK ACTIVITY =
-	MOTOR_DISABLE_counter = 20;
+	switch_off_timer->adjust(attotime::from_msec(500));
 }
 
 WRITE_LINE_MEMBER(rainbow_state::hdc_direction)
@@ -2177,11 +2182,12 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 	if (m_POWER_GOOD)
 		is_mhfu_enabled = m_crtc->MHFU(MHFU_IS_ENABLED);
 
-	return  (
+	return          (
 			(is_mhfu_enabled ? 0x00 : 0x20) |   // (L) status of MHFU flag => bit pos.5
 			((INT88) ? 0x00 : 0x40) |           // (L)
 			((INTZ80) ? 0x00 : 0x80)            // (L)
 			);
+
 }
 
 // ******* TODO: 4 control bits * MISSING * ********************************************************
@@ -2193,7 +2199,7 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 // 3 COMM RTS        (controls request to send line of COMM)
 WRITE8_MEMBER(rainbow_state::comm_control_w)
 {
-	printf("%02x to COMM.CONTROL REGISTER ", data);
+	logerror("%02x to COMM.CONTROL REGISTER ", data);
 
 	/* 8088 LEDs:
 	5  7  6  4    <- BIT POSITION
@@ -2206,13 +2212,11 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 	output().set_value("led7", BIT(data, 4)); // LED "D3"
 }
 
-
-
 // 8088 writes to port 0x00 (interrupts Z80)
 // See page 133 (4-34)
 WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 {
-	//    printf("%02x to Z80 mailbox\n", data);
+	//    logerror("%02x to Z80 mailbox\n", data);
 
 	// The interrupt vector address(F7H) placed on the bus is hardwired into the Z80A interrupt vector encoder.
 	// The F7H interrupt vector address causes the Z80A processor to perform an RST 30 instruction in
@@ -2227,7 +2231,7 @@ WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 // See page 134 (4-35)
 READ8_MEMBER(rainbow_state::z80_latch_r)
 {
-	//    printf("Read %02x from Z80 mailbox\n", m_z80_mailbox);
+	//    logerror("Read %02x from Z80 mailbox\n", m_z80_mailbox);
 	m_z80->set_input_line(0, CLEAR_LINE);
 
 	INTZ80 = false;
@@ -2238,7 +2242,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 // See page 134 (4-35)
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
-	//    printf("%02x to 8088 mailbox\n", data);
+	//    logerror("%02x to 8088 mailbox\n", data);
 	raise_8088_irq(IRQ_8088_MAILBOX);
 	m_8088_mailbox = data;
 
@@ -2248,7 +2252,7 @@ WRITE8_MEMBER(rainbow_state::z80_latch_w)
 // 8088 reads port 0x00. See page 133 (4-34)
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
-	//    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
+	//    logerror("Read %02x from 8088 mailbox\n", m_8088_mailbox);
 	lower_8088_irq(IRQ_8088_MAILBOX);
 
 	INT88 = false;
@@ -2297,37 +2301,36 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 	D0 : ZFLIP L: (read from the diagnostic control register of Z80A)
 	*/
 	static int last_track;
-
 	int track = 0;
+
 	int fdc_step = 0;
 	int fdc_ready = 0;
 	int tk00 = 0;
 	int fdc_write_gate = 0;
 	int last_dir = 0;
 
-//  printf("\nFLOPPY %02d - ", m_unit);
-	if (m_fdc)
+	uint8_t fdc_status;
+
+	if(m_fdc)
 	{
-			track = m_fdc->track_r(space, 0);
-			if (track != last_track)
-				fdc_step = 1;  // calculate STEP (sic)
+		track = m_fdc->track_r(space, 0);
+		if(track == 0)
+			tk00 = 1;
 
-			last_dir = track > last_track ? 0 : 1; // see WD_FDC
-			last_track = track;
-	}
+		if (track != last_track)
+			fdc_step = 1;  // calculate STEP (sic)
 
-	if (m_floppy)
-	{
-			if (!m_floppy->ready_r()) // weird (see wd_fdc)
-				fdc_ready = 1;
+		last_dir = track > last_track ? 0 : 1; // see WD_FDC
+		last_track = track;
 
-			if ((fdc_ready) && (m_floppy->wpt_r() != 1) && m_POWER_GOOD)
-				fdc_write_gate = 1; // * FAKE * WRITE GATE !
+		fdc_status = m_fdc->status_r();
 
-									// "valid only when drive is selected" !
-			if (!m_floppy->trk00_r()) // weird (see wd_fdc)
-				tk00 = 1;
-	}
+		if ( (fdc_status & 0x80) == 0) // (see WD_FDC: S_WP = 0x40, S_NRDY = 0x80, S_TR00 = 0x04)
+			fdc_ready = 1;
+
+		if ( fdc_ready && ((fdc_status & 0x40) == 0) && m_POWER_GOOD )
+			fdc_write_gate = 1; // "valid only when drive is selected" !
+	} 
 
 	int data = (
 		((fdc_step) ? 0x00 : 0x80) |
@@ -2348,41 +2351,40 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 // 40H diskette status Register **** READ ONLY *** ( 4-60 of TM100.pdf )
 READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 {
-	int track = 0;
-	int data = m_z80_diskcontrol & (255 - 0x80 - 0x40 - 0x20 - 4);
+	int track = 0xEE;
+	int data = m_z80_diskcontrol & (255 - 0x80 - 0x40 - 0x20 - 0x04); // 00011011
 
 	// D7: DRQ: reflects status of DATA REQUEST signal from FDC.
 	// '1' indicates that FDC has read data OR requires new write data.
-	if (m_fdc)
-		data |= m_fdc->drq_r() ? 0x80 : 0x00;
 
 	// D6: IRQ: indicates INTERRUPT REQUEST signal from FDC. Indicates that a
 	//          status bit has changed. Set to 1 at the completion of any
 	//          command (.. see page 207 or 5-25).
 	if (m_fdc)
+	{
+		data |= m_fdc->drq_r()   ? 0x80 : 0x00;
 		data |= m_fdc->intrq_r() ? 0x40 : 0x00;
+		track = m_fdc->track_r(space, 0);
+
+		// D2: TG43 * LOW ACTIVE * :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
+		// (asserted when writing data to tracks 44 through 79)
+		data |= (track > 43) ? 0x00 : 0x04;  // ! LOW ACTIVE !
+	}
 
 	// D5: SIDE 0 * HIGH ACTIVE *: status of side select signal at J2 + J3 of RX50 controller.
 	//              For 1 sided drives, this bit will always read low (0).
-	if (m_floppy)
+	if (m_floppy != nullptr)
 		data |= m_floppy->ss_r() ? 0x20 : 0x00;
 
 	// *LOW ACTIVE *
 	// D4: MOTOR 1 ON L: 0 = indicates MOTOR 1 ON bit is set in drive control reg.
 	// D3: MOTOR 0 ON L: 0 = indicates MOTOR 0 ON bit is set in drive  "
 
-	if (m_fdc)
-		track = m_fdc->track_r(space, 0);
-
 	// Print HEX track number
 	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
 	// 0...9 ,A (0x77), b (0x7c), C (0x39) , d (0x5e), E (0x79), F (0x71)
 	output().set_digit_value(0, bcd2hex[(track >> 4) & 0x0f]);
-	output().set_digit_value(1, bcd2hex[(track - ((track >> 4) << 4)) & 0x0f]);
-
-	// D2: TG43 * LOW ACTIVE * :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
-	// (asserted when writing data to tracks 44 through 79)
-	data |= (track > 43) ? 0x00 : 0x04;  // ! LOW ACTIVE !
+	output().set_digit_value(1, bcd2hex[ track & 0x0f]);
 
 	// D1: DS1 H: reflect status of bits 0 and 1 from disk.control reg.
 	// D0: DS0 H: "
@@ -2397,6 +2399,9 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 // BIT 5 : SIDE 0 L : For single sided drives, this bit is always set to 0 for side O.
 WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 {
+	int enable_start;
+	int disable_start; // set defaults
+
 	int selected_drive = INVALID_DRIVE;
 	static const char *names[] = { FD1793_TAG ":0", FD1793_TAG ":1", FD1793_TAG ":2", FD1793_TAG ":3" };
 
@@ -2415,31 +2420,14 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		m_floppy = con->get_device();
 		if (m_floppy)
 			selected_drive = drive;
-//      printf("%i <- SELECTED DRIVE...\n", m_unit);
 	}
 
 	if (selected_drive == INVALID_DRIVE)
 	{
-		printf("(m_unit = %i)   ** SELECTED DRIVE ** INVALID. (selected drive = %i)\n", m_unit, selected_drive);
-		m_unit = INVALID_DRIVE;
-		m_floppy = nullptr;
-	}
+		logerror("(m_present_drive = %i)   ** SELECTED DRIVE ** INVALID. (selected drive = %i)\n", m_present_drive, selected_drive);
 
-	if (m_floppy != nullptr)
-	{
-		m_fdc->set_floppy(m_floppy);  // Sets new  _image device_
-		m_fdc->dden_w(0); // 0 = MFM
-		if (!m_floppy->exists()) // invalidate selection
-		{
-			m_floppy = nullptr;
-			printf("(m_unit = %i) SELECTED IMAGE *** DOES NOT EXIST *** (selected drive = %i)\n", m_unit, selected_drive);
-			selected_drive = m_unit;
-		}
-		else
-		{
-			m_floppy->ss_w((data & 0x20) ? 1 : 0); // RX50 board in Rainbow has 'side select'
-			m_floppy->set_rpm(300.);
-		}
+		m_present_drive = INVALID_DRIVE;
+		m_floppy = nullptr;
 	}
 
 	output().set_value("driveled0", (selected_drive == 0) ? 1 : 0);
@@ -2447,59 +2435,58 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 	output().set_value("driveled2", (selected_drive == 2) ? 1 : 0);
 	output().set_value("driveled3", (selected_drive == 3) ? 1 : 0);
+	switch_off_timer->adjust(attotime::from_msec(500));
 
-	if (selected_drive < 4)
+	if (m_floppy != nullptr)
 	{
-		m_unit = selected_drive;
+		m_fdc->set_floppy(m_floppy);  // Sets new  _image device_
+		m_fdc->dden_w(0); // 0 = MFM
+		m_floppy->ss_w((data & 0x20) ? 1 : 0); // RX50 board in Rainbow has 'side select'
+		m_floppy->set_rpm(300.);
 
-		if (MOTOR_DISABLE_counter == 0) // "one shot"
-			MOTOR_DISABLE_counter = 20;
+		if ( !m_floppy->exists() && (selected_drive > 1) ) 
+			popmessage("NO IMAGE ATTACHED TO %c\n", 65 + selected_drive );
+	} 
 
-		// FORCE_READY = 1 : assert DRIVE READY on FDC (diagnostic override; USED BY BIOS!)
+	if(selected_drive < MAX_FLOPPIES)
+	{
+		m_present_drive = selected_drive;
+
 		bool force_ready = ((data & 4) == 0) ? true : false;
-		m_fdc->set_force_ready(force_ready);
-	}
+		m_fdc->set_force_ready(force_ready); // 1 : assert DRIVE READY on FDC (diagnostic override)
 
-	int enable_start = 0;
-	int disable_start = 2; // set defaults
+		if (selected_drive < 2)
+		{	data |= 8;
+			enable_start = 0;
+			disable_start = 2; 
+		}
+			else
+		{
+			data |= 16;
 
-	bool motor_on = false;
-	if (selected_drive < 2)
-	{
-		motor_on = true;
-		data |= 8;
-	}
+			enable_start = 2;
+			disable_start = 4;
+		}
 
-	if (selected_drive > 1)
-	{
-		motor_on = true;
-		data |= 16;
-
-		enable_start = 2;
-		disable_start = 4;
-	}
-
-	if (motor_on)
-	{
 		// RX-50 has head A and head B (1 for each of the 2 disk slots in a RX-50).
 		// Assume the other one is switched off -
 		for (int f_num = 0; f_num < MAX_FLOPPIES; f_num++)
 		{
-			floppy_connector *con = machine().device<floppy_connector>(names[f_num]);
-			floppy_image_device *tmp_floppy = con->get_device();
+		floppy_connector *con = machine().device<floppy_connector>(names[f_num]);
+		floppy_image_device *tmp_floppy = con->get_device();
 
-			tmp_floppy->mon_w(ASSERT_LINE);
-			if ((f_num >= enable_start) && (f_num < disable_start))
-				tmp_floppy->mon_w(CLEAR_LINE); // enable
+		tmp_floppy->mon_w(ASSERT_LINE);
+		if ((f_num >= enable_start) && (f_num < disable_start))
+			tmp_floppy->mon_w(CLEAR_LINE); // enable
 		}
 	}
 
 	data = (data & (255 - 3)); // invalid drive = DRIVE 0 ?!
 
-	if (m_unit == INVALID_DRIVE)
+	if (m_present_drive == INVALID_DRIVE)
 		printf("\n**** INVALID DRIVE ****");
 	else
-		data = data | m_unit;
+		data = data | m_present_drive;
 
 	m_z80_diskcontrol = data;
 }
@@ -2528,8 +2515,9 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 				if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged...
 					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
 
-				if (i == IRQ_COMM_PTR_INTR_L)
-					m_mpsc->m1_r();  // serial interrupt acknowledge
+// Edstrom: "The call to m1_r() on line 2571 is not needed as the 7201 does not have an M1 input, instead it expects to get a software iack."
+//				if (i == IRQ_COMM_PTR_INTR_L)
+//					m_mpsc->m1_r();  // serial interrupt acknowledge
 
 				intnum = vectors[i] | m_irq_high;
 				break;
@@ -2771,8 +2759,9 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_device, cd_ba_w) );
+			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device, cd_ba_w) );
 			printf("\n **** COMM HANDLER INSTALLED **** ");
+			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}
 
 	// BIT 6: Transfer data from volatile memory to NVM  (PROGRAM: 1 => 0   BIT 6)
@@ -2818,26 +2807,12 @@ WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
 	m_kbd8251->write_rxc(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::hd_motor_tick)
 {
 	if (m_POWER_GOOD)
 		m_crtc->MHFU(MHFU_COUNT); // // Increment IF ENABLED and POWER_GOOD, return count
 
 	m_hdc_index_latch = true; // HDC drive index signal (not working ?)
-
-	if (MOTOR_DISABLE_counter)
-		MOTOR_DISABLE_counter--;
-
-	if (MOTOR_DISABLE_counter < 2)
-	{
-		output().set_value("driveled0", 0); // DRIVE 0 (A)
-		output().set_value("driveled1", 0); // DRIVE 1 (B)
-		output().set_value("driveled2", 0); // DRIVE 2 (C)
-		output().set_value("driveled3", 0); // DRIVE 3 (D)
-
-		output().set_value("led1", 1);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)
-		output().set_value("led2", 1);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)
-	}
 }
 
 // on 100-B, DTR from the keyboard 8051 controls bit 7 of IRQ vectors
@@ -3026,12 +3001,11 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_COLOR_MAP ) // 0x20
 			{
-				m_color_map_changed = true;
-
 				m_GDC_COLOR_MAP[m_GDC_color_map_index++] = ~data; // tilde data verified by DIAGNOSTIC!
 				if(m_GDC_color_map_index == 32)
 				{
 					m_GDC_color_map_index = 0; // 0...31  (CPU accesses 32 bytes
+					m_color_map_changed = true;
 
 					printf("\n * COLOR MAP FULLY LOADED *");
 					for(int zi =0; zi <16; zi++)
@@ -3074,7 +3048,6 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN)
 			{
 				// NOTE : Pattern Multiplier MUST BE LOADED before (!)
-				OPTION_RESET_PATTERNS
 				m_vpat = data;
 				break;
 			}
@@ -3183,7 +3156,8 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		case 5: // 55h   Write Mask HIGH
 			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			break;
-	}
+	} // switch
+
 }
 
 
@@ -3263,6 +3237,8 @@ MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 MCFG_FD1793_ADD(FD1793_TAG, XTAL_24_0734MHz / 24) // no separate 1 Mhz quartz
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd0", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd1", rainbow_state::floppy_formats)
+//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd2", rainbow_state::floppy_formats)
+//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd3", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
 MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
@@ -3312,28 +3288,30 @@ MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
 
 MCFG_UPD7201_ADD("upd7201", XTAL_2_5MHz, 0, 0, 0, 0)    // 2.5 Mhz from schematics
-MCFG_Z80DART_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
+MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
 
-MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
-MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
-MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
+MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
+MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
+MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
 
-MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
-MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
-MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
+MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
+MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
+MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
 
 MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxa_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_device, ctsa_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, dcda_w))
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxa_w))
+MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsa_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcda_w))
 
 MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_device, ctsb_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, dcdb_w))
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxb_w))
+MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsb_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcdb_w))
 
 MCFG_DEVICE_MODIFY("rs232_a")
-MCFG_SLOT_DEFAULT_OPTION("null_modem")
+MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
+MCFG_SLOT_OPTION_ADD("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
+MCFG_SLOT_DEFAULT_OPTION("microsoft_mouse")
 
 MCFG_DEVICE_MODIFY("rs232_b")
 MCFG_SLOT_DEFAULT_OPTION("printer")
@@ -3349,7 +3327,7 @@ MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
 MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 16) // 8251 is set to /16 on the clock input
 MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rainbow_state, write_keyboard_clock))
 
-MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, motor_tick, attotime::from_hz(60))
+MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 
 MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
@@ -3462,3 +3440,4 @@ ROM_END
 COMP(1982, rainbow100a, rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, 0,    "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
 COMP(1983, rainbow,     0,       0,      rainbow, rainbow100b_in, rainbow_state, 0,    "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS)
 COMP(1985, rainbow190,  rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, 0,    "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)
+
