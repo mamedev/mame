@@ -16,6 +16,7 @@ ac1.cpp
 accomm.cpp
 aceex.cpp
 acrnsys1.cpp
+acvirus.cpp
 adam.cpp
 advision.cpp
 agat.cpp
@@ -312,6 +313,7 @@ kim1.cpp
 konin.cpp
 kramermc.cpp
 kron.cpp
+krz2000.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
