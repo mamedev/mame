@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( mario_base )
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mario_state, gfx_bank_w)) // ~T ROM
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // 2 PSL
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mario_state, flip_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mario_state, palette_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mario_state, palette_bank_w)) // CREF 0
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mario_state, nmi_mask_w)) // NMI EI
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("z80dma", z80dma_device, rdy_w)) // DMA SET
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mario_state, coin_counter_1_w)) // COUNTER 2 (misnumbered on schematic)
