@@ -360,7 +360,7 @@ void cli_frontend::listfull(const std::vector<std::string> &args)
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
-		if ((drivlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
+		if ((drivlist.driver().flags & machine_flags::NO_STANDALONE) == 0)
 			osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
 }
 
@@ -403,7 +403,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	{
 		// if we have a non-bios clone and it matches, keep it
 		int clone_of = drivlist.clone();
-		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
+		if ((clone_of >= 0) && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
 				drivlist.include();
 	}
@@ -427,7 +427,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
+		if ((clone_of >= 0) && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 			osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 	}
 }

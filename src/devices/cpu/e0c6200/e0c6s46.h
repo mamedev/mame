@@ -56,16 +56,16 @@ enum
 
 
 // lcd driver
-#define MCFG_E0C6S46_PIXEL_UPDATE_CB(_cb) \
-	e0c6s46_device::static_set_pixel_update_cb(*device, _cb);
+#define MCFG_E0C6S46_PIXEL_UPDATE_CB(_class, _method) \
+	e0c6s46_device::static_set_pixel_update_cb(*device, e0c6s46_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#define E0C6S46_PIXEL_UPDATE_CB(name) void name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
+#define E0C6S46_PIXEL_UPDATE(name) void name(bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
 
 
 class e0c6s46_device : public e0c6200_cpu_device
 {
 public:
-	typedef void (*pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state);
+	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)> pixel_update_delegate;
 
 	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -85,7 +85,7 @@ public:
 	template <class Object> static devcb_base &set_write_p2_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_p2.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_p3_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_p3.set_callback(std::forward<Object>(cb)); }
 
-	static void static_set_pixel_update_cb(device_t &device, pixel_update_func cb) { downcast<e0c6s46_device &>(device).m_pixel_update_handler = cb; }
+	static void static_set_pixel_update_cb(device_t &device, pixel_update_delegate &&cb) { downcast<e0c6s46_device &>(device).m_pixel_update_cb = std::move(cb); }
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -114,7 +114,7 @@ private:
 
 	u8 m_lcd_control;
 	u8 m_lcd_contrast;
-	pixel_update_func m_pixel_update_handler;
+	pixel_update_delegate m_pixel_update_cb;
 
 	// i/o ports
 	devcb_write8 m_write_r0, m_write_r1, m_write_r2, m_write_r3, m_write_r4;

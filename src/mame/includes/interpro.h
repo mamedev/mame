@@ -83,7 +83,7 @@ public:
 	required_device<mc146818_device> m_rtc;
 	required_device<n82077aa_device> m_fdc;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr53c90a_device> m_scsi;
+	required_device<ncr53c94_device> m_scsi;
 	required_device<interpro_ioga_device> m_ioga;
 	required_device<interpro_fmcc_device> m_mcga;
 	required_device<interpro_sga_device> m_sga;

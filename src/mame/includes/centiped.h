@@ -57,14 +57,19 @@ public:
 	DECLARE_READ8_MEMBER(centiped_IN2_r);
 	DECLARE_READ8_MEMBER(milliped_IN1_r);
 	DECLARE_READ8_MEMBER(milliped_IN2_r);
-	DECLARE_WRITE8_MEMBER(input_select_w);
-	DECLARE_WRITE8_MEMBER(control_select_w);
+	DECLARE_WRITE_LINE_MEMBER(input_select_w);
+	DECLARE_WRITE_LINE_MEMBER(control_select_w);
 	DECLARE_READ8_MEMBER(mazeinv_input_r);
 	DECLARE_WRITE8_MEMBER(mazeinv_input_select_w);
 	DECLARE_READ8_MEMBER(bullsdrt_data_port_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
-	DECLARE_WRITE8_MEMBER(bullsdrt_coin_count_w);
+	DECLARE_WRITE_LINE_MEMBER(led_1_w);
+	DECLARE_WRITE_LINE_MEMBER(led_2_w);
+	DECLARE_WRITE_LINE_MEMBER(led_3_w);
+	DECLARE_WRITE_LINE_MEMBER(led_4_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
 	DECLARE_READ8_MEMBER(caterplr_unknown_r);
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
@@ -74,7 +79,7 @@ public:
 
 	// video/centiped.c
 	DECLARE_WRITE8_MEMBER(centiped_videoram_w);
-	DECLARE_WRITE8_MEMBER(centiped_flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(multiped_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_tilesbank_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_sprites_bank_w);

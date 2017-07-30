@@ -5,6 +5,8 @@
     Sega Zaxxon hardware
 
 ***************************************************************************/
+
+#include "machine/74259.h"
 #include "sound/samples.h"
 
 class zaxxon_state : public driver_device
@@ -13,6 +15,7 @@ public:
 	zaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainlatch(*this, "mainlatch%u", 1),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -23,6 +26,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device_array<ls259_device, 2> m_mainlatch;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -36,7 +40,6 @@ public:
 
 	uint8_t m_int_enabled;
 	uint8_t m_coin_status[3];
-	uint8_t m_coin_enable[3];
 
 	uint8_t m_razmataz_dial_pos[2];
 	uint16_t m_razmataz_counter;
@@ -54,17 +57,19 @@ public:
 	const uint8_t *m_color_codes;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(int_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
 	DECLARE_READ8_MEMBER(razmataz_counter_r);
-	DECLARE_WRITE8_MEMBER(zaxxon_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_coin_enable_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_fg_color_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_bg_position_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_bg_color_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_bg_enable_w);
-	DECLARE_WRITE8_MEMBER(congo_fg_bank_w);
-	DECLARE_WRITE8_MEMBER(congo_color_bank_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_control_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_a_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_b_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(fg_color_w);
+	DECLARE_WRITE8_MEMBER(bg_position_w);
+	DECLARE_WRITE_LINE_MEMBER(bg_color_w);
+	DECLARE_WRITE_LINE_MEMBER(bg_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(congo_fg_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(congo_color_bank_w);
 	DECLARE_WRITE8_MEMBER(zaxxon_videoram_w);
 	DECLARE_WRITE8_MEMBER(congo_colorram_w);
 	DECLARE_WRITE8_MEMBER(congo_sprite_custom_w);

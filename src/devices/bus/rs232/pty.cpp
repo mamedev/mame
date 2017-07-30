@@ -90,7 +90,7 @@ void pseudo_terminal_device::device_timer(emu_timer &timer, device_timer_id id, 
 		break;
 
 	default:
-		device_serial_interface::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 

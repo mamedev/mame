@@ -429,7 +429,7 @@ class mos8563_device : public mc6845_device,
 public:
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( status_r );

@@ -483,10 +483,6 @@ void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		check_external_panel_server();
 	}
-	else
-	{
-		device_serial_interface::device_timer(timer, id, param, ptr);
-	}
 }
 
 void esqpanel_device::rcv_complete()    // Rx completed receiving byte
@@ -688,7 +684,7 @@ MACHINE_CONFIG_MEMBER(esqpanel2x40_vfx_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqpanel_device(mconfig, ESQPANEL2X40, tag, owner, clock),
+	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
 	m_eps_mode = false;

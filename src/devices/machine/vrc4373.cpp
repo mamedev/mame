@@ -99,7 +99,7 @@ vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> vrc4373_device::memory_space_config() const
+device_memory_interface::space_config_vector vrc4373_device::memory_space_config() const
 {
 	auto r = pci_bridge_device::memory_space_config();
 	r.emplace_back(std::make_pair(AS_PCI_MEM, &m_mem_config));

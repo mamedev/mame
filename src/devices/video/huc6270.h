@@ -54,18 +54,18 @@ protected:
 	inline void next_horz_state();
 
 private:
-	enum huc6270_v_state {
-		HUC6270_VSW,
-		HUC6270_VDS,
-		HUC6270_VDW,
-		HUC6270_VCR
+	enum class v_state : u8 {
+		VSW,
+		VDS,
+		VDW,
+		VCR
 	};
 
-	enum huc6270_h_state {
-		HUC6270_HDS,
-		HUC6270_HDW,
-		HUC6270_HDE,
-		HUC6270_HSW
+	enum class h_state : u8 {
+		HDS,
+		HDW,
+		HDE,
+		HSW
 	};
 
 
@@ -104,8 +104,8 @@ private:
 	int m_vsync;
 
 	/* internal variables */
-	huc6270_v_state m_vert_state;
-	huc6270_h_state m_horz_state;
+	v_state m_vert_state;
+	h_state m_horz_state;
 	int m_vd_triggered;
 	int m_vert_to_go;
 	int m_horz_to_go;

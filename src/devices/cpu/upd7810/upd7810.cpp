@@ -383,7 +383,11 @@ DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "uPD78C05")
 DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "uPD78C06")
 
 
-static ADDRESS_MAP_START( upd_internal_map, AS_PROGRAM, 8, upd7810_device )
+static ADDRESS_MAP_START( upd_internal_128_ram_map, AS_PROGRAM, 8, upd7810_device )
+	AM_RANGE(0xff80, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( upd_internal_256_ram_map, AS_PROGRAM, 8, upd7810_device )
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -430,7 +434,7 @@ void upd7810_device::configure_ops()
 }
 
 upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7810, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+	: upd7810_device(mconfig, UPD7810, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_256_ram_map))
 {
 }
 
@@ -448,7 +452,7 @@ void upd7807_device::configure_ops()
 
 
 upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7807, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+	: upd7810_device(mconfig, UPD7807, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_256_ram_map))
 {
 }
 
@@ -465,7 +469,7 @@ void upd7801_device::configure_ops()
 }
 
 upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7801, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+	: upd7810_device(mconfig, UPD7801, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_128_ram_map))
 {
 }
 
@@ -487,7 +491,7 @@ upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag,
 }
 
 upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, type, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_map))
+	: upd7810_device(mconfig, type, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_128_ram_map))
 {
 }
 
@@ -508,9 +512,9 @@ upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> upd7810_device::memory_space_config() const
+device_memory_interface::space_config_vector upd7810_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }

@@ -14,6 +14,8 @@
 
 #include "modules/lib/osdobj_common.h"
 
+#include "util/xmlfile.h"
+
 #include <string.h>
 
 
@@ -201,7 +203,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)adjustSizeAndRecomputeVisible {
-	NSSize const clip = [[[self enclosingScrollView] contentView] bounds].size;
+	NSScrollView *const scroller = [self enclosingScrollView];
+	NSSize const clip = [[scroller contentView] bounds].size;
 	NSSize content = NSMakeSize((fontWidth * totalWidth) + (2 * [textContainer lineFragmentPadding]),
 								fontHeight * totalHeight);
 	if (wholeLineScroll)
@@ -209,6 +212,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
 								  ceil(std::max(clip.height, content.height)))];
 	[self recomputeVisible];
+	[scroller reflectScrolledClipView:[scroller contentView]];
 }
 
 
@@ -285,6 +289,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 				content.height += (fontHeight * 2) - 1;
 			[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
 										  ceil(std::max(clip.height, content.height)))];
+			[scroller reflectScrolledClipView:[scroller contentView]];
 		}
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
@@ -484,6 +489,54 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	if (view->cursor_supported())
+	{
+		util::xml::data_node *const selection = node->add_child("selection", nullptr);
+		if (selection)
+		{
+			debug_view_xy const pos = view->cursor_position();
+			selection->set_attribute_int("visible", view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int("start_x", pos.x);
+			selection->set_attribute_int("start_y", pos.y);
+		}
+	}
+
+	util::xml::data_node *const scroll = node->add_child("scroll", nullptr);
+	if (scroll)
+	{
+		NSRect const visible = [self visibleRect];
+		scroll->set_attribute_float("position_x", visible.origin.x);
+		scroll->set_attribute_float("position_y", visible.origin.y);
+	}
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	if (view->cursor_supported())
+	{
+		util::xml::data_node const *const selection = node->get_child("selection");
+		if (selection)
+		{
+			debug_view_xy pos = view->cursor_position();
+			view->set_cursor_visible(0 != selection->get_attribute_int("visible", view->cursor_visible() ? 1 : 0));
+			pos.x = selection->get_attribute_int("start_x", pos.x);
+			pos.y = selection->get_attribute_int("start_y", pos.y);
+			view->set_cursor_position(pos);
+		}
+	}
+
+	util::xml::data_node const *const scroll = node->get_child("scroll");
+	if (scroll)
+	{
+		NSRect visible = [self visibleRect];
+		visible.origin.x = scroll->get_attribute_float("position_x", visible.origin.x);
+		visible.origin.y = scroll->get_attribute_float("position_y", visible.origin.y);
+		[self scrollRectToVisible:visible];
+	}
+}
+
+
 - (BOOL)acceptsFirstResponder {
 	return view->cursor_supported();
 }
@@ -492,13 +545,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (BOOL)becomeFirstResponder {
 	if (view->cursor_supported())
 	{
-		debug_view_xy pos;
 		view->set_cursor_visible(true);
-		pos = view->cursor_position();
-		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
-											 pos.y * fontHeight,
-											 fontWidth,
-											 fontHeight)]; // FIXME: metrics
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
 	}
@@ -796,6 +843,18 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		}
 	}
 	[self interpretKeyEvents:[NSArray arrayWithObject:event]];
+}
+
+
+- (void)keyUp:(NSEvent *)event {
+	if (view->cursor_supported() && view->cursor_visible())
+	{
+		debug_view_xy const pos = view->cursor_position();
+		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
+											 pos.y * fontHeight,
+											 fontWidth,
+											 fontHeight)]; // FIXME: metrics
+	}
 }
 
 

@@ -267,13 +267,13 @@ DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 	m_bank_fxxx->configure_entries(0, 1, m_ram->pointer() + 0xF000, 0);
 	m_bank_fxxx->configure_entries(1, 1, m_ram->pointer() + 0x10000, 0);
 
-	m_video_timer = timer_alloc(TIMER_VIDEO);
+	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::video_callback), this));
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(osborne1_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
 			8, 10, 128, 32);
 
-	m_acia_rxc_txc_timer = timer_alloc(TIMER_ACIA_RXC_TXC);
+	m_acia_rxc_txc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::acia_rxc_txc_callback), this));
 
 	save_item(NAME(m_screen_pac));
 	save_item(NAME(m_acia_rxc_txc_div));
@@ -357,22 +357,6 @@ uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_VIDEO:
-		video_callback(ptr, param);
-		break;
-	case TIMER_ACIA_RXC_TXC:
-		m_acia_rxc_txc_state = m_acia_rxc_txc_state ? 0 : 1;
-		update_acia_rxc_txc();
-		break;
-	default:
-		assert_always(false, "Unknown id in osborne1_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
 	int const y = machine().first_screen()->vpos();
@@ -449,6 +433,12 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
 
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
+}
+
+TIMER_CALLBACK_MEMBER(osborne1_state::acia_rxc_txc_callback)
+{
+	m_acia_rxc_txc_state = m_acia_rxc_txc_state ? 0 : 1;
+	update_acia_rxc_txc();
 }
 
 

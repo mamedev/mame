@@ -107,9 +107,9 @@ upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> ucom4_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector ucom4_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};

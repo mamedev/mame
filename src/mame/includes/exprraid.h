@@ -52,7 +52,6 @@ public:
 	DECLARE_READ8_MEMBER(exprraid_prot_status_r);
 	DECLARE_READ8_MEMBER(exprraid_prot_data_r);
 	DECLARE_WRITE8_MEMBER(exprraid_prot_data_w);
-	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(exprraid_videoram_w);
 	DECLARE_WRITE8_MEMBER(exprraid_colorram_w);
@@ -62,8 +61,6 @@ public:
 	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
-
-	DECLARE_READ8_MEMBER(sound_cpu_command_r);
 
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_DRIVER_INIT(exprraid);

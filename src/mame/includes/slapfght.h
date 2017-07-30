@@ -72,9 +72,8 @@ public:
 	uint8_t m_tigerhb_cmd;
 
 	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(prg_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -84,8 +83,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
 	DECLARE_WRITE8_MEMBER(scroll_from_mcu_w);
 

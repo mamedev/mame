@@ -403,15 +403,23 @@ WRITE8_MEMBER(tubep_state::tubep_textram_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_background_romselect_w)
+WRITE_LINE_MEMBER(tubep_state::screen_flip_w)
 {
-	m_background_romsel = data & 1;
+	// screen flip, active high
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_colorproms_A4_line_w)
+WRITE_LINE_MEMBER(tubep_state::background_romselect_w)
 {
-	m_color_A4 = (data & 1)<<4;
+	// 0->select roms: B1,B3,B5; 1->select roms: B2,B4,B6
+	m_background_romsel = state;
+}
+
+
+WRITE_LINE_MEMBER(tubep_state::colorproms_A4_line_w)
+{
+	// line A4 (color proms address) state
+	m_color_A4 = state << 4;
 }
 
 

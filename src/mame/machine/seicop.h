@@ -32,7 +32,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	cpu_device *m_host_cpu;      /**< reference to the host cpu */

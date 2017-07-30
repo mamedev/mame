@@ -119,9 +119,9 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 #endif
 }
 
-std::vector<std::pair<int, const address_space_config *>> sh34_base_device::memory_space_config() const
+device_memory_interface::space_config_vector sh34_base_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_IO,      &m_io_config)
 	};

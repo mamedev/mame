@@ -1562,23 +1562,87 @@ void memory_manager::allocate(device_memory_interface &memory)
 	for (int spacenum = 0; spacenum < memory.max_space_count(); ++spacenum)
 	{
 		// if there is a configuration for this space, we need an address space
-		const address_space_config *spaceconfig = memory.space_config(spacenum);
-		if (spaceconfig != nullptr)
-			address_space::allocate(m_spacelist, *this, *spaceconfig, memory, spacenum);
+		address_space_config const *const spaceconfig = memory.space_config(spacenum);
+		if (spaceconfig)
+		{
+			// allocate one of the appropriate type
+			bool const large(spaceconfig->addr2byte_end(0xffffffffUL >> (32 - spaceconfig->m_addrbus_width)) >= (1 << 18));
+
+			switch (spaceconfig->data_width())
+			{
+			case 8:
+				if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+				{
+					if (large)
+						memory.allocate<address_space_8le_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_8le_small>(*this, spacenum);
+				}
+				else
+				{
+					if (large)
+						memory.allocate<address_space_8be_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_8be_small>(*this, spacenum);
+				}
+				break;
+
+			case 16:
+				if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+				{
+					if (large)
+						memory.allocate<address_space_16le_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_16le_small>(*this, spacenum);
+				}
+				else
+				{
+					if (large)
+						memory.allocate<address_space_16be_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_16be_small>(*this, spacenum);
+				}
+				break;
+
+			case 32:
+				if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+				{
+					if (large)
+						memory.allocate<address_space_32le_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_32le_small>(*this, spacenum);
+				}
+				else
+				{
+					if (large)
+						memory.allocate<address_space_32be_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_32be_small>(*this, spacenum);
+				}
+				break;
+
+			case 64:
+				if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+				{
+					if (large)
+						memory.allocate<address_space_64le_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_64le_small>(*this, spacenum);
+				}
+				else
+				{
+					if (large)
+						memory.allocate<address_space_64be_large>(*this, spacenum);
+					else
+						memory.allocate<address_space_64be_small>(*this, spacenum);
+				}
+				break;
+
+			default:
+				throw emu_fatalerror("Invalid width %d specified for memory_manager::allocate", spaceconfig->data_width());
+			}
+		}
 	}
-}
-
-//-------------------------------------------------
-//  configure - configure the address spaces
-//-------------------------------------------------
-
-void memory_manager::configure()
-{
-	// loop over devices to configure the address spaces
-	memory_interface_iterator iter(machine().root_device());
-	for (device_memory_interface &memory : iter)
-		memory.load_configs();
-	m_machine.m_dummy_space.load_configs();
 }
 
 //-------------------------------------------------
@@ -1589,33 +1653,35 @@ void memory_manager::initialize()
 {
 	// loop over devices and spaces within each device
 	memory_interface_iterator iter(machine().root_device());
+	std::vector<device_memory_interface *> memories;
 	for (device_memory_interface &memory : iter)
+	{
+		memories.push_back(&memory);
 		allocate(memory);
+	}
 
 	allocate(m_machine.m_dummy_space);
 
 	// construct and preprocess the address_map for each space
-	for (auto &space : m_spacelist)
-		space->prepare_map();
+	for (auto const memory : memories)
+		memory->prepare_maps();
 
 	// create the handlers from the resulting address maps
-	for (auto &space : m_spacelist)
-		space->populate_from_map();
+	for (auto const memory : memories)
+		memory->populate_from_maps();
 
 	// allocate memory needed to back each address space
-	for (auto &space : m_spacelist)
-		space->allocate_memory();
+	for (auto const memory : memories)
+		memory->allocate_memory();
 
 	// find all the allocated pointers
-	for (auto &space : m_spacelist)
-		space->locate_memory();
+	for (auto const memory : memories)
+		memory->locate_memory();
 
 	// disable logging of unmapped access when no one receives it
-	for (auto &space : m_spacelist)
-	{
-		if (!machine().options().log() && !machine().options().oslog() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
-			space->set_log_unmap(false);
-	}
+	if (!machine().options().log() && !machine().options().oslog() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
+		for (auto const memory : memories)
+			memory->set_log_unmap(false);
 
 	// register a callback to reset banks when reloading state
 	machine().save().register_postload(save_prepost_delegate(FUNC(memory_manager::bank_reattach), this));
@@ -1625,35 +1691,6 @@ void memory_manager::initialize()
 
 	// we are now initialized
 	m_initialized = true;
-}
-
-
-//-------------------------------------------------
-//  dump - dump the internal memory tables to the
-//  given file
-//-------------------------------------------------
-
-void memory_manager::dump(FILE *file)
-{
-	// skip if we can't open the file
-	if (file == nullptr)
-		return;
-
-	// loop over address spaces
-	for (auto &space : m_spacelist)
-	{
-		fprintf(file, "\n\n"
-						"====================================================\n"
-						"Device '%s' %s address space read handler dump\n"
-						"====================================================\n", space->device().tag(), space->name());
-		space->dump_map(file, read_or_write::READ);
-
-		fprintf(file, "\n\n"
-						"====================================================\n"
-						"Device '%s' %s address space write handler dump\n"
-						"====================================================\n", space->device().tag(), space->name());
-		space->dump_map(file, read_or_write::WRITE);
-	}
 }
 
 
@@ -1714,7 +1751,9 @@ static void generate_memdump(running_machine &machine)
 		FILE *file = fopen("memdump.log", "w");
 		if (file)
 		{
-			machine.memory().dump(file);
+			memory_interface_iterator iter(machine.root_device());
+			for (device_memory_interface &memory : iter)
+				memory.dump(file);
 			fclose(file);
 		}
 	}
@@ -1760,8 +1799,6 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 		m_manager(manager),
 		m_machine(memory.device().machine())
 {
-	// notify the device
-	memory.set_address_space(spacenum, *this);
 }
 
 
@@ -1771,90 +1808,6 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 
 address_space::~address_space()
 {
-}
-
-
-//-------------------------------------------------
-//  allocate - static smart allocator of subtypes
-//-------------------------------------------------
-
-void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_list,memory_manager &manager, const address_space_config &config, device_memory_interface &memory, int spacenum)
-{
-	// allocate one of the appropriate type
-	bool large = (config.addr2byte_end(0xffffffffUL >> (32 - config.m_addrbus_width)) >= (1 << 18));
-
-	switch (config.data_width())
-	{
-		case 8:
-			if (config.endianness() == ENDIANNESS_LITTLE)
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_8le_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_8le_small>(manager, memory, spacenum));
-			}
-			else
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_8be_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_8be_small>(manager, memory, spacenum));
-			}
-			break;
-
-		case 16:
-			if (config.endianness() == ENDIANNESS_LITTLE)
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_16le_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_16le_small>(manager, memory, spacenum));
-			}
-			else
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_16be_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_16be_small>(manager, memory, spacenum));
-			}
-			break;
-
-		case 32:
-			if (config.endianness() == ENDIANNESS_LITTLE)
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_32le_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_32le_small>(manager, memory, spacenum));
-			}
-			else
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_32be_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_32be_small>(manager, memory, spacenum));
-			}
-			break;
-
-		case 64:
-			if (config.endianness() == ENDIANNESS_LITTLE)
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_64le_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_64le_small>(manager, memory, spacenum));
-			}
-			else
-			{
-				if (large)
-					space_list.push_back(std::make_unique<address_space_64be_large>(manager, memory, spacenum));
-				else
-					space_list.push_back(std::make_unique<address_space_64be_small>(manager, memory, spacenum));
-			}
-			break;
-		default:
-			throw emu_fatalerror("Invalid width %d specified for address_space::allocate", config.data_width());
-	}
 }
 
 

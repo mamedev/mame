@@ -110,11 +110,11 @@ WRITE8_MEMBER(ladybug_state::ladybug_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
+WRITE_LINE_MEMBER(ladybug_state::flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (flip_screen() != state)
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(state);
 		machine().tilemap().mark_all_dirty();
 	}
 }

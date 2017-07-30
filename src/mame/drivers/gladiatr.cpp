@@ -195,6 +195,7 @@ TODO:
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 
+#include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 
@@ -204,12 +205,6 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-
-WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
-{
-	// ROM bankswitching
-	membank("bank1")->set_entry(data & 0x01);
-}
 
 MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 {
@@ -224,7 +219,10 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 	/* bit 7   : SSRST = sound reset ? */
 	/* bit 6-1 : N.C.                  */
 	/* bit 0   : ??                    */
+	m_ccpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_cctl->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
+
 /* YM2203 IRQ */
 WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 {
@@ -255,9 +253,9 @@ READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
 	return m_soundlatch->read(space,0);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
+WRITE_LINE_MEMBER(gladiatr_state::flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(state);
 }
 
 
@@ -292,9 +290,10 @@ READ8_MEMBER(gladiatr_state::ucpu_p2_r)
 
 WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
 {
-	// FIXME: active high or active low?  (bootleg MCU never uses these outputs)
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 7));
+	// almost certainly active low (bootleg MCU never uses these outputs, which makes them always high)
+	// coin counters and lockout pass through 4049 inverting buffer at 12L
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(1, !BIT(data, 7));
 }
 
 READ_LINE_MEMBER(gladiatr_state::tclk_r)
@@ -508,12 +507,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(spritebuffer_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
 	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
-	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
+	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("ucpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
 ADDRESS_MAP_END
@@ -525,7 +520,7 @@ static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0x40, 0x40) AM_NOP // WRITE(sub_irq_ack_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("cctl", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ccpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0xa0, 0xa7) AM_NOP // filters on sound output
+	AM_RANGE(0xa0, 0xa7) AM_DEVWRITE("filtlatch", ls259_device, write_d0)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(gladiator_cpu_sound_command_w)
 ADDRESS_MAP_END
 
@@ -745,7 +740,14 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gladiatr_state, spritebuffer_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gladiatr_state, flipscreen_w))
 
 	MCFG_DEVICE_ADD("cctl", I8741, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(3)
@@ -811,6 +813,8 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+
+	MCFG_DEVICE_ADD("filtlatch", LS259, 0) // 9R - filters on sound output
 MACHINE_CONFIG_END
 
 

@@ -253,11 +253,5 @@ void octopus_keyboard_device::device_reset()
 	start_processing(attotime::from_hz(9600));
 }
 
-void octopus_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-	buffered_rs232_device::device_timer(timer, id, param, ptr);
-}
-
 
 DEFINE_DEVICE_TYPE(OCTOPUS_KEYBOARD, octopus_keyboard_device, "octopus_kb", "Octopus Keyboard")

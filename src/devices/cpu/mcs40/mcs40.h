@@ -146,7 +146,7 @@ public:
 		AS_RAM_PORTS,
 		AS_PROGRAM_MEMORY
 	};
-	enum class phase { A1, A2, A3, M1, M2, X1, X2, X3 };
+	enum class phase : u8 { A1, A2, A3, M1, M2, X1, X2, X3 };
 
 	// step isn't a real signal, but realistically anything watching the bus will have a counter to track it
 	typedef device_delegate<void (phase step, u8 sync, u8 data)> bus_cycle_delegate;
@@ -170,8 +170,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(get_4289_f_l) const { return BIT(m_4289_f_l, 0); } // 1 = odd, 0 = even
 
 protected:
-	enum class cycle { OP, IM, IN };
-	enum class pmem { NONE, READ, WRITE };
+	enum class cycle : u8 { OP, IM, IN };
+	enum class pmem : u8 { NONE, READ, WRITE };
 
 	mcs40_cpu_device_base(
 			machine_config const &mconfig,
@@ -193,7 +193,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface configuration
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface implementation
 	virtual void state_import(device_state_entry const &entry) override;
@@ -293,9 +293,9 @@ private:
 	void update_4289_f_l(u8 val);
 
 	// address spaces
-	address_space_config    m_space_config[7];
-	address_space           *m_spaces[7];
-	direct_read_data        *m_direct;
+	address_space_config const  m_space_config[7];
+	address_space               *m_spaces[7];
+	direct_read_data            *m_direct;
 
 	// bus snooping callback
 	bus_cycle_delegate      m_bus_cycle_cb;

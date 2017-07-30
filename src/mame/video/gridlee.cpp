@@ -82,9 +82,9 @@ void gridlee_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(gridlee_state::gridlee_cocktail_flip_w)
+WRITE_LINE_MEMBER(gridlee_state::cocktail_flip_w)
 {
-	m_cocktail_flip = data & 1;
+	m_cocktail_flip = state;
 }
 
 

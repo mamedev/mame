@@ -168,14 +168,14 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 
 
 // orientation of bitmaps
-#define ORIENTATION_FLIP_X              0x0001  /* mirror everything in the X direction */
-#define ORIENTATION_FLIP_Y              0x0002  /* mirror everything in the Y direction */
-#define ORIENTATION_SWAP_XY             0x0004  /* mirror along the top-left/bottom-right diagonal */
+constexpr int ORIENTATION_FLIP_X   = 0x0001;  // mirror everything in the X direction
+constexpr int ORIENTATION_FLIP_Y   = 0x0002;  // mirror everything in the Y direction
+constexpr int ORIENTATION_SWAP_XY  = 0x0004;  // mirror along the top-left/bottom-right diagonal
 
-#define ROT0                            0
-#define ROT90                           (ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X)  /* rotate clockwise 90 degrees */
-#define ROT180                          (ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y)   /* rotate 180 degrees */
-#define ROT270                          (ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y)  /* rotate counter-clockwise 90 degrees */
+constexpr int ROT0                 = 0;
+constexpr int ROT90                = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X;  // rotate clockwise 90 degrees
+constexpr int ROT180               = ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;   // rotate 180 degrees
+constexpr int ROT270               = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y;  // rotate counter-clockwise 90 degrees
 
 
 
@@ -188,12 +188,20 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 	TYPE(const TYPE &) = delete; \
 	TYPE &operator=(const TYPE &) = delete
 
-// macro for declaring enumerator operators that increment/decrement like plain old C
-#define DECLARE_ENUM_OPERATORS(TYPE) \
+// macro for declaring enumeration operators that increment/decrement like plain old C
+#define DECLARE_ENUM_INCDEC_OPERATORS(TYPE) \
 inline TYPE &operator++(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) + 1); } \
-inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
 inline TYPE &operator--(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) - 1); } \
+inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
 inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; return old; }
+
+// macro for declaring bitwise operators for an enumerated type
+#define DECLARE_ENUM_BITWISE_OPERATORS(TYPE) \
+constexpr TYPE operator~(TYPE value) { return TYPE(~std::underlying_type_t<TYPE>(value)); } \
+constexpr TYPE operator&(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) & std::underlying_type_t<TYPE>(b)); } \
+constexpr TYPE operator|(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) | std::underlying_type_t<TYPE>(b)); } \
+inline TYPE &operator&=(TYPE &a, TYPE b) { return a = a & b; } \
+inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 
 
 // this macro passes an item followed by a string version of itself as two consecutive parameters

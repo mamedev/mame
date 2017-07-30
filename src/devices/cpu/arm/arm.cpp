@@ -228,9 +228,9 @@ DEFINE_DEVICE_TYPE(ARM,    arm_cpu_device,    "arm_le", "ARM (little)")
 DEFINE_DEVICE_TYPE(ARM_BE, arm_be_cpu_device, "arm_be", "ARM (big)")
 
 
-std::vector<std::pair<int, const address_space_config *>> arm_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector arm_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }

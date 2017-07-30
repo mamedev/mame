@@ -4,6 +4,7 @@
 // * HP Capricorn processor disassembler
 // ********************************************************************************
 
+#include "emu.h"
 #include "capricorn.h"
 
 typedef offs_t (*fn_dis_param)(std::ostream &stream , offs_t pc , const uint8_t *oprom);

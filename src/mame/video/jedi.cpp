@@ -35,8 +35,21 @@ VIDEO_START_MEMBER(jedi_state,jedi)
 	/* register for saving */
 	save_item(NAME(m_vscroll));
 	save_item(NAME(m_hscroll));
+	save_item(NAME(m_foreground_bank));
+	save_item(NAME(m_video_off));
 }
 
+
+WRITE_LINE_MEMBER(jedi_state::foreground_bank_w)
+{
+	m_foreground_bank = state;
+}
+
+
+WRITE_LINE_MEMBER(jedi_state::video_off_w)
+{
+	m_video_off = state;
+}
 
 
 /*************************************
@@ -139,7 +152,7 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 	uint8_t *prom2 = &memregion("proms")->base()[0x0800 | ((*m_smoothing_table & 0x03) << 8)];
 	int vscroll = m_vscroll;
 	int hscroll = m_hscroll;
-	int tx_bank = *m_foreground_bank;
+	int tx_bank = m_foreground_bank;
 	uint8_t *tx_ram = m_foregroundram;
 	uint8_t *bg_ram = m_backgroundram;
 
@@ -165,7 +178,7 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 			offs_t bg_offs = ((sy & 0x1f0) << 1) | ((sx & 0x1f0) >> 4);
 
 			/* get the character codes */
-			int tx_code = ((tx_bank & 0x80) << 1) | tx_ram[tx_offs];
+			int tx_code = (tx_bank << 8) | tx_ram[tx_offs];
 			int bg_bank = bg_ram[0x0400 | bg_offs];
 			int bg_code = bg_ram[0x0000 | bg_offs] |
 							((bg_bank & 0x01) << 8) |
@@ -326,7 +339,7 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 uint32_t jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* if no video, clear it all to black */
-	if (*m_video_off & 0x01)
+	if (m_video_off)
 		bitmap.fill(rgb_t::black(), cliprect);
 	else
 	{

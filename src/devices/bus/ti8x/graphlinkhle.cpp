@@ -30,8 +30,6 @@ graph_link_hle_device::graph_link_hle_device(
 
 void graph_link_hle_device::device_start()
 {
-	device_serial_interface::register_save_state(machine().save(), this);
-
 	m_buffer = std::make_unique<u8 []>(BUFLEN);
 
 	save_pointer(NAME(m_buffer.get()), BUFLEN);
@@ -48,13 +46,6 @@ void graph_link_hle_device::device_reset()
 	m_head = m_tail = 0;
 	m_empty = true;
 	m_ready = true;
-}
-
-
-void graph_link_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_ti8x_link_port_byte_interface::device_timer(timer, id, param, ptr);
-	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 

@@ -101,13 +101,10 @@ WRITE8_MEMBER(hyperspt_state::colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(hyperspt_state::flipscreen_w)
+WRITE_LINE_MEMBER(hyperspt_state::flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(hyperspt_state::get_bg_tile_info)

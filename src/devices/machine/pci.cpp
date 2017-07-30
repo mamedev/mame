@@ -448,9 +448,9 @@ READ8_MEMBER(pci_bridge_device::header_type_r)
 	return 0x01;
 }
 
-std::vector<std::pair<int, const address_space_config *>> pci_bridge_device::memory_space_config() const
+device_memory_interface::space_config_vector pci_bridge_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PCI_CONFIG, &configure_space_config)
 	};
 }

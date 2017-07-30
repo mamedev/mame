@@ -32,10 +32,9 @@ public:
 	tilemap_t *m_tilemap_1;
 
 	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(subcpu_reset_w);
-	DECLARE_WRITE8_MEMBER(main_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(main_irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(vram_0_w);
 	DECLARE_WRITE8_MEMBER(vram_1_w);
 

@@ -297,7 +297,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 		default:
 			if (LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-			osd_printf_debug("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			osd_printf_debug("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context().c_str(), offset*4, result, mem_mask);
 			break;
 	}
 	if (offset!=0x4/4)
@@ -443,7 +443,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 		default:
 			if (LOG_FPGA)
 					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-			osd_printf_debug("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			osd_printf_debug("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context().c_str(), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -771,7 +771,7 @@ READ32_MEMBER( iteagle_periph_device::ctrl_r )
 		case 0x0/4:
 			if (LOG_PERIPH)
 				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context().c_str(), offset*4, result, mem_mask);
 			break;
 		case 0x70/4:
 			if (ACCESSING_BITS_8_15) {
@@ -801,7 +801,7 @@ READ32_MEMBER( iteagle_periph_device::ctrl_r )
 		default:
 			if (LOG_PERIPH)
 				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context().c_str(), offset*4, result, mem_mask);
 			break;
 	}
 	return result;

@@ -44,6 +44,7 @@ public:
 		, m_bg_videoram(*this, "bg_videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_ay(*this, "ay%u", 1)
 	{
 	}
 
@@ -73,6 +74,7 @@ public:
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<ay8912_device, 3> m_ay;
 };
 
 
@@ -128,20 +130,20 @@ WRITE8_MEMBER(ettrivia_state::b800_w)
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0: break;
-		case 0xc4: m_b000_ret = machine().device<ay8910_device>("ay1")->data_r(space, 0);    break;
-		case 0x94: m_b000_ret = machine().device<ay8910_device>("ay2")->data_r(space, 0);    break;
-		case 0x86: m_b000_ret = machine().device<ay8910_device>("ay3")->data_r(space, 0);    break;
+		case 0xc4: m_b000_ret = m_ay[0]->data_r(space, 0);    break;
+		case 0x94: m_b000_ret = m_ay[1]->data_r(space, 0);    break;
+		case 0x86: m_b000_ret = m_ay[2]->data_r(space, 0);    break;
 
 		case 0x80:
 			switch(m_b800_prev)
 			{
-				case 0xe0: machine().device<ay8910_device>("ay1")->address_w(space,0,m_b000_val);    break;
-				case 0x98: machine().device<ay8910_device>("ay2")->address_w(space,0,m_b000_val);    break;
-				case 0x83: machine().device<ay8910_device>("ay3")->address_w(space,0,m_b000_val);    break;
+				case 0xe0: m_ay[0]->address_w(space,0,m_b000_val);    break;
+				case 0x98: m_ay[1]->address_w(space,0,m_b000_val);    break;
+				case 0x83: m_ay[2]->address_w(space,0,m_b000_val);    break;
 
-				case 0xa0: machine().device<ay8910_device>("ay1")->data_w(space,0,m_b000_val);   break;
-				case 0x88: machine().device<ay8910_device>("ay2")->data_w(space,0,m_b000_val);   break;
-				case 0x81: machine().device<ay8910_device>("ay3")->data_w(space,0,m_b000_val);   break;
+				case 0xa0: m_ay[0]->data_w(space,0,m_b000_val);   break;
+				case 0x88: m_ay[1]->data_w(space,0,m_b000_val);   break;
+				case 0x81: m_ay[2]->data_w(space,0,m_b000_val);   break;
 
 			}
 		break;
@@ -311,14 +313,14 @@ static MACHINE_CONFIG_START( ettrivia )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay3", AY8912, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

@@ -79,8 +79,8 @@ enum {
 	DVSSR = 0x13
 };
 
-ALLOW_SAVE_TYPE(huc6270_device::huc6270_v_state);
-ALLOW_SAVE_TYPE(huc6270_device::huc6270_h_state);
+ALLOW_SAVE_TYPE(huc6270_device::v_state);
+ALLOW_SAVE_TYPE(huc6270_device::h_state);
 
 
 /* Bits in the VDC status register */
@@ -331,26 +331,26 @@ inline void huc6270_device::next_vert_state()
 {
 	switch ( m_vert_state )
 	{
-	case HUC6270_VSW:
-		m_vert_state = HUC6270_VDS;
+	case v_state::VSW:
+		m_vert_state = v_state::VDS;
 		m_vert_to_go = ( ( m_vpr >> 8 ) & 0xFF ) + 2;
 		break;
 
-	case HUC6270_VDS:
-		m_vert_state = HUC6270_VDW;
+	case v_state::VDS:
+		m_vert_state = v_state::VDW;
 		m_vert_to_go = ( m_vdw & 0x1FF ) + 1;
 		m_byr_latched = m_byr;
 		m_vd_triggered = 0;
 		break;
 
-	case HUC6270_VDW:
-		m_vert_state = HUC6270_VCR;
+	case v_state::VDW:
+		m_vert_state = v_state::VCR;
 		m_vert_to_go = ( m_vcr & 0xFF );
 		handle_vblank();
 		break;
 
-	case HUC6270_VCR:
-		m_vert_state = HUC6270_VSW;
+	case v_state::VCR:
+		m_vert_state = v_state::VSW;
 		m_vert_to_go = ( m_vpr & 0x1F ) + 1;
 		break;
 	}
@@ -361,10 +361,10 @@ inline void huc6270_device::next_horz_state()
 {
 	switch ( m_horz_state )
 	{
-	case HUC6270_HDS:
+	case h_state::HDS:
 		m_bxr_latched = m_bxr;
 		//LOG("latched bxr vpos=%d, hpos=%d\n", video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()));
-		m_horz_state = HUC6270_HDW;
+		m_horz_state = h_state::HDW;
 		m_horz_to_go = ( m_hdr & 0x7F ) + 1;
 		{
 			static const int width_shift[4] = { 5, 6, 7, 7 };
@@ -380,18 +380,18 @@ inline void huc6270_device::next_horz_state()
 		}
 		break;
 
-	case HUC6270_HDW:
-		m_horz_state = HUC6270_HDE;
+	case h_state::HDW:
+		m_horz_state = h_state::HDE;
 		m_horz_to_go = ( ( m_hdr >> 8 ) & 0x7F ) + 1;
 		break;
 
-	case HUC6270_HDE:
-		m_horz_state = HUC6270_HSW;
+	case h_state::HDE:
+		m_horz_state = h_state::HSW;
 		m_horz_to_go = ( m_hsr & 0x1F ) + 1;
 		break;
 
-	case HUC6270_HSW:
-		m_horz_state = HUC6270_HDS;
+	case h_state::HSW:
+		m_horz_state = h_state::HDS;
 		m_horz_to_go = std::max( ( ( m_hsr >> 8 ) & 0x7F ), 2 ) + 1;
 
 		/* If section has ended, advance to next vertical state */
@@ -411,10 +411,10 @@ READ16_MEMBER( huc6270_device::next_pixel )
 	uint16_t data = HUC6270_SPRITE;
 
 	/* Check if we're on an active display line */
-	if ( m_vert_state == HUC6270_VDW )
+	if ( m_vert_state == v_state::VDW )
 	{
 		/* Check if we're in active display area */
-		if ( m_horz_state == HUC6270_HDW )
+		if ( m_horz_state == h_state::HDW )
 		{
 			uint8_t sprite_data = m_sprite_row[ m_sprite_row_index ] & 0x00FF;
 			int collission = ( m_sprite_row[ m_sprite_row_index ] & 0x8000 ) ? 1 : 0;
@@ -489,7 +489,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 		/* Check for low->high VSYNC transition */
 		if ( state )
 		{
-			m_vert_state = HUC6270_VCR;
+			m_vert_state = v_state::VCR;
 			m_vert_to_go = 0;
 
 			while ( m_vert_to_go == 0 )
@@ -550,12 +550,12 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			}
 		}
 
-		m_horz_state = HUC6270_HSW;
+		m_horz_state = h_state::HSW;
 		m_horz_to_go = 0;
 		m_horz_steps = 0;
 		m_byr_latched += 1;
 		m_raster_count += 1;
-		if ( m_vert_to_go == 1 && m_vert_state == HUC6270_VDS )
+		if ( m_vert_to_go == 1 && m_vert_state == v_state::VDS )
 		{
 			m_raster_count = 0x40;
 		}
@@ -881,10 +881,10 @@ void huc6270_device::device_reset()
 	m_satb_countdown = 0;
 	m_raster_count = 0x4000;
 	m_vert_to_go = 0;
-	m_vert_state = HUC6270_VSW;
+	m_vert_state = v_state::VSW;
 	m_horz_steps = 0;
 	m_horz_to_go = 0;
-	m_horz_state = HUC6270_HDS;
+	m_horz_state = h_state::HDS;
 	m_hsync = 0;
 	m_vsync = 0;
 	m_dma_enabled = 0;

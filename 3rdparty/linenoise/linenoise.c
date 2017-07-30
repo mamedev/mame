@@ -160,6 +160,7 @@ static int history_len = 0;
 static char **history = NULL;
 static char preload_buf[LINENOISE_MAX_LINE];
 static int preload = 0;
+static int refresh = 0;
 
 /* Structure to contain the status of the current (being edited) line */
 struct current {
@@ -184,6 +185,7 @@ struct current {
 
 static int fd_read(struct current *current);
 static int getWindowSize(struct current *current);
+static void refreshLine(const char *prompt, struct current *current);
 
 void linenoiseHistoryFree(void) {
     if (history) {
@@ -408,6 +410,23 @@ static int fd_read_char(int fd, int timeout)
  */
 static int fd_read(struct current *current)
 {
+    struct pollfd p;
+    int ret;
+    p.fd = current->fd;
+    p.events = POLLIN;
+    while(1) {
+        ret = poll(&p, 1, 100);
+        if (ret == -1)
+            return -1;
+        else if (!ret) {
+            if (!refresh)
+                continue;
+            refresh = 0;
+            refreshLine(current->prompt, current);
+        }
+        else
+            break;
+    }
 #ifdef USE_UTF8
     char buf[4];
     int n;
@@ -799,7 +818,15 @@ static int fd_read(struct current *current)
     while (1) {
         INPUT_RECORD irec;
         DWORD n;
-        if (WaitForSingleObject(current->inh, INFINITE) != WAIT_OBJECT_0) {
+        DWORD ret = WaitForSingleObject(current->inh, 100);
+        if (ret == WAIT_TIMEOUT) {
+            if (!refresh)
+                continue;
+            refresh = 0;
+            refreshLine(current->prompt, current);
+            continue;
+        }
+        else if (ret != WAIT_OBJECT_0) {
             break;
         }
         if (!ReadConsoleInput (current->inh, &irec, 1, &n)) {
@@ -1578,6 +1605,11 @@ void linenoisePreloadBuffer(const char* preloadText)
         return;
     preload = 1;
     strcpy(preload_buf, preloadText);
+}
+
+void linenoiseRefresh(void)
+{
+    refresh = 1;
 }
 
 char *linenoise(const char *prompt)

@@ -280,9 +280,9 @@ void abc1600_mover_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> abc1600_mover_device::memory_space_config() const
+device_memory_interface::space_config_vector abc1600_mover_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

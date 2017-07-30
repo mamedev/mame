@@ -16,7 +16,6 @@
 
 #include <ctype.h>
 #include <type_traits>
-#include <typeindex>
 #include <typeinfo>
 
 
@@ -1363,7 +1362,7 @@ void validity_checker::validate_driver()
 	// determine if we are a clone
 	bool is_clone = (strcmp(m_current_driver->parent, "0") != 0);
 	int clone_of = m_drivlist.clone(*m_current_driver);
-	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
+	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 		is_clone = false;
 
 	// if we have at least 100 drivers, validate the clone
@@ -1423,17 +1422,24 @@ void validity_checker::validate_driver()
 		}
 
 	// make sure sound-less drivers are flagged
-	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && !iter.first() && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_NO_SOUND_HW)) == 0)
-		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
+	device_t::feature_type const unemulated(m_current_driver->type.unemulated_features());
+	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
+	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
+	{
+		sound_interface_iterator iter(m_current_config->root_device());
+		if (!iter.first())
+			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
+	}
 
 	// catch invalid flag combinations
-	if ((m_current_driver->flags & MACHINE_WRONG_COLORS) && (m_current_driver->flags & MACHINE_IMPERFECT_COLORS))
-		osd_printf_error("Driver cannot have colours that are both completely wrong and imperfect\n");
-	if ((m_current_driver->flags & MACHINE_NO_SOUND_HW) && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)))
-		osd_printf_error("Machine without sound hardware cannot have unemulated sound\n");
-	if ((m_current_driver->flags & MACHINE_NO_SOUND) && (m_current_driver->flags & MACHINE_IMPERFECT_SOUND))
-		osd_printf_error("Driver cannot have sound emulation that's both imperfect and not present\n");
+	if (unemulated & ~device_t::feature::ALL)
+		osd_printf_error("Driver has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+	if (imperfect & ~device_t::feature::ALL)
+		osd_printf_error("Driver has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+	if (unemulated & imperfect)
+		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+	if ((m_current_driver->flags & machine_flags::NO_SOUND_HW) && ((unemulated | imperfect) & device_t::feature::SOUND))
+		osd_printf_error("Machine without sound hardware cannot have unemulated/imperfect sound\n");
 }
 
 
@@ -1903,91 +1909,93 @@ void validity_checker::validate_device_types()
 	m_verbose_text.clear();
 
 	std::unordered_map<std::string, std::add_pointer_t<device_type> > device_name_map, device_shortname_map;
-	std::unordered_set<std::type_index> device_types;
 	machine_config config(GAME_NAME(___empty), m_drivlist.options());
 	for (device_type type : registered_device_types)
 	{
-		if (!device_types.emplace(type.type()).second)
+		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+
+		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
+		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
+
+		// ensure shortname exists
+		if (!dev->shortname() || !*dev->shortname())
 		{
-			osd_printf_error("Device class '%s' registered multiple times\n", type.type().name());
+			osd_printf_error("Device %s does not have short name defined\n", description.c_str());
 		}
 		else
 		{
-			device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+			// make sure the device name is not too long
+			if (strlen(dev->shortname()) > 32)
+				osd_printf_error("Device short name must be 32 characters or less\n");
 
-			char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
-			std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
-
-			// ensure shortname exists
-			if (!dev->shortname() || !*dev->shortname())
+			// check for invalid characters in shortname
+			for (char const *s = dev->shortname(); *s; ++s)
 			{
-				osd_printf_error("Device %s does not have short name defined\n", description.c_str());
-			}
-			else
-			{
-				// make sure the device name is not too long
-				if (strlen(dev->shortname()) > 32)
-					osd_printf_error("Device short name must be 32 characters or less\n");
-
-				// check for invalid characters in shortname
-				for (char const *s = dev->shortname(); *s; ++s)
+				if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '_'))
 				{
-					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '_'))
-					{
-						osd_printf_error("Device %s short name contains invalid characters\n", description.c_str());
-						break;
-					}
-				}
-
-				// check for name conflicts
-				auto const drvname(m_names_map.find(dev->shortname()));
-				auto const devname(device_shortname_map.emplace(dev->shortname(), &type));
-				if (m_names_map.end() != drvname)
-				{
-					game_driver const &dup(*drvname->second);
-					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
-				}
-				else if (!devname.second)
-				{
-					device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
-					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-					config.device_remove(&config.root_device(), "_dup");
+					osd_printf_error("Device %s short name contains invalid characters\n", description.c_str());
+					break;
 				}
 			}
 
-			// ensure name exists
-			if (!dev->name() || !*dev->name())
+			// check for name conflicts
+			auto const drvname(m_names_map.find(dev->shortname()));
+			auto const devname(device_shortname_map.emplace(dev->shortname(), &type));
+			if (m_names_map.end() != drvname)
 			{
-				osd_printf_error("Device %s does not have name defined\n", description.c_str());
+				game_driver const &dup(*drvname->second);
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
 			}
-			else
+			else if (!devname.second)
 			{
-				// check for description conflicts
-				auto const drvdesc(m_descriptions_map.find(dev->name()));
-				auto const devdesc(device_name_map.emplace(dev->name(), &type));
-				if (m_names_map.end() != drvdesc)
-				{
-					game_driver const &dup(*drvdesc->second);
-					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
-				}
-				else if (!devdesc.second)
-				{
-					device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
-					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-					config.device_remove(&config.root_device(), "_dup");
-				}
+				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				config.device_remove(&config.root_device(), "_dup");
 			}
-
-			// ensure source exists
-			if (!dev->source() || !*dev->source())
-				osd_printf_error("Device %s does not have source defined\n", description.c_str());
-
-			// check that reported type matches supplied type
-			if (dev->type().type() != type.type())
-				osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
-
-			config.device_remove(&config.root_device(), "_tmp");
 		}
+
+		// ensure name exists
+		if (!dev->name() || !*dev->name())
+		{
+			osd_printf_error("Device %s does not have name defined\n", description.c_str());
+		}
+		else
+		{
+			// check for description conflicts
+			auto const drvdesc(m_descriptions_map.find(dev->name()));
+			auto const devdesc(device_name_map.emplace(dev->name(), &type));
+			if (m_names_map.end() != drvdesc)
+			{
+				game_driver const &dup(*drvdesc->second);
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+			}
+			else if (!devdesc.second)
+			{
+				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				config.device_remove(&config.root_device(), "_dup");
+			}
+		}
+
+		// ensure source exists
+		if (!dev->source() || !*dev->source())
+			osd_printf_error("Device %s does not have source defined\n", description.c_str());
+
+		// check that reported type matches supplied type
+		if (dev->type().type() != type.type())
+			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
+
+		// catch invalid flag combinations
+		device_t::feature_type const unemulated(dev->type().unemulated_features());
+		device_t::feature_type const imperfect(dev->type().imperfect_features());
+		if (unemulated & ~device_t::feature::ALL)
+			osd_printf_error("Device has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+		if (imperfect & ~device_t::feature::ALL)
+			osd_printf_error("Device has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+		if (unemulated & imperfect)
+			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+
+		config.device_remove(&config.root_device(), "_tmp");
 	}
 
 	// if we had warnings or errors, output

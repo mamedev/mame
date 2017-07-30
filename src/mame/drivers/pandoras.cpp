@@ -30,6 +30,7 @@ Boards:
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -46,49 +47,27 @@ Boards:
 INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_master_interrupt)
 {
 	if (m_irq_enable_a)
-		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_slave_interrupt)
 {
 	if (m_irq_enable_b)
-		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_int_control_w)
+WRITE_LINE_MEMBER(pandoras_state::cpua_irq_enable_w)
 {
-	/*  byte 0: irq enable (CPU A)
-	    byte 2: coin counter 1
-	    byte 3: coin counter 2
-	    byte 5: flip screen
-	    byte 6: irq enable (CPU B)
-	    byte 7: NMI to CPU B
+	if (!state)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_irq_enable_a = state;
+}
 
-	    other bytes unknown */
-
-
-	switch (offset)
-	{
-		case 0x00:  if (!data)
-					m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-				m_irq_enable_a = data;
-				break;
-		case 0x02:  machine().bookkeeping().coin_counter_w(0,data & 0x01);
-				break;
-		case 0x03:  machine().bookkeeping().coin_counter_w(1,data & 0x01);
-				break;
-		case 0x05:  pandoras_flipscreen_w(space, 0, data);
-				break;
-		case 0x06:  if (!data)
-					m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-				m_irq_enable_b = data;
-				break;
-		case 0x07:  m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-				break;
-
-		default:    logerror("%04x: (irq_ctrl) write %02x to %02x\n",space.device().safe_pc(), data, offset);
-				break;
-	}
+WRITE_LINE_MEMBER(pandoras_state::cpub_irq_enable_w)
+{
+	if (!state)
+		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_irq_enable_b = state;
 }
 
 WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
@@ -127,13 +106,22 @@ WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
+WRITE_LINE_MEMBER(pandoras_state::coin_counter_1_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(pandoras_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
 
 
 static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("spriteram")               /* Work RAM (Shared with CPU B) */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("colorram") /* Color RAM (shared with CPU B) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("videoram") /* Video RAM (shared with CPU B) */
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)                               /* INT control */
+	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)               /* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pandoras_scrolly_w)                                   /* bg scroll */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)                            /* cause INT on the Z80 */
 	AM_RANGE(0x1e00, 0x1e00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)                                            /* sound command to the Z80 */
@@ -149,7 +137,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("colorram")             /* Color RAM (shared with CPU A) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("videoram")             /* Video RAM (shared with CPU A) */
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)                               /* INT control */
+	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)               /* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1a01, 0x1a01) AM_READ_PORT("P1")
 	AM_RANGE(0x1a02, 0x1a02) AM_READ_PORT("P2")
@@ -304,11 +292,7 @@ void pandoras_state::machine_reset()
 {
 	m_firq_old_data_a = 0;
 	m_firq_old_data_b = 0;
-	m_irq_enable_a = 0;
-	m_irq_enable_b = 0;
 	m_i8039_status = 0;
-
-	m_flipscreen = 0;
 }
 
 READ8_MEMBER(pandoras_state::pandoras_portA_r)
@@ -342,6 +326,15 @@ static MACHINE_CONFIG_START( pandoras )
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pandoras_state, i8039_irqen_and_status_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C3
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pandoras_state, cpua_irq_enable_w)) // ENA
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // OFSET - unknown
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(pandoras_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pandoras_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pandoras_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pandoras_state, cpub_irq_enable_w)) // ENB
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // RESETB
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

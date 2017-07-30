@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/74259.h"
 #include "sound/tc8830f.h"
 #include "screen.h"
 
@@ -19,6 +20,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_mainlatch(*this, "mainlatch"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -30,6 +32,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_colorram;
@@ -45,15 +48,17 @@ public:
 	bool    m_video_enable;
 
 	/* common */
-	DECLARE_WRITE8_MEMBER(coincounter_w);
+	DECLARE_WRITE8_MEMBER(mainlatch_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_READ8_MEMBER(scanline_r);
 
 	/* all but psurge */
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(video_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
 
 	/* psurge */
 	DECLARE_READ8_MEMBER(psurge_protection_r);

@@ -262,9 +262,9 @@ void clipper_device::execute_set_input(int inputnum, int state)
  * The CLIPPER has a true Harvard architecture. In the InterPro, these are tied back together
  * again by the MMU, which then directs the access to one of 3 address spaces: main, i/o or boot.
  */
-std::vector<std::pair<int, const address_space_config *>> clipper_device::memory_space_config() const
+device_memory_interface::space_config_vector clipper_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_insn_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};
@@ -452,7 +452,8 @@ int clipper_device::execute_instruction ()
 	case 0x16:
 		// popw: pop word
 		m_r[R2] = m_data->read_dword(m_r[R1]);
-		m_r[R1] += 4;
+		if (R1 != R2)
+			m_r[R1] += 4;
 		// TRAPS: C,U,A,P,R
 		break;
 

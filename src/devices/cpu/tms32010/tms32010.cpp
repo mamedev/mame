@@ -125,9 +125,9 @@ tms32016_device::tms32016_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> tms32010_device::memory_space_config() const
+device_memory_interface::space_config_vector tms32010_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config),
 		std::make_pair(AS_IO,      &m_io_config)

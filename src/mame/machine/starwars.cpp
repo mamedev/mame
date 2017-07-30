@@ -42,7 +42,6 @@ TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
 	m_math_run = 0;
 }
 
-
 /*************************************
  *
  *  X2212 nvram store
@@ -56,48 +55,40 @@ WRITE8_MEMBER(starwars_state::starwars_nstore_w)
 	machine().device<x2212_device>("x2212")->store(0);
 }
 
+WRITE_LINE_MEMBER(starwars_state::recall_w)
+{
+	machine().device<x2212_device>("x2212")->recall(!state);
+}
+
 /*************************************
  *
- *  Output latch
+ *  Coin counters and LEDs
  *
  *************************************/
 
-WRITE8_MEMBER(starwars_state::starwars_out_w)
+WRITE_LINE_MEMBER(starwars_state::coin1_counter_w)
 {
-	switch (offset & 7)
-	{
-		case 0:     /* Coin counter 1 */
-			machine().bookkeeping().coin_counter_w(0, data);
-			break;
+	machine().bookkeeping().coin_counter_w(0, state);
+}
 
-		case 1:     /* Coin counter 2 */
-			machine().bookkeeping().coin_counter_w(1, data);
-			break;
+WRITE_LINE_MEMBER(starwars_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
 
-		case 2:     /* LED 3 */
-			output().set_led_value(2, ~data & 0x80);
-			break;
+WRITE_LINE_MEMBER(starwars_state::led1_w)
+{
+	output().set_led_value(0, !state);
+}
 
-		case 3:     /* LED 2 */
-			output().set_led_value(1, ~data & 0x80);
-			break;
+WRITE_LINE_MEMBER(starwars_state::led2_w)
+{
+	output().set_led_value(1, !state);
+}
 
-		case 4:     /* bank switch */
-			membank("bank1")->set_entry((data >> 7) & 1);
-			if (m_is_esb)
-				membank("bank2")->set_entry((data >> 7) & 1);
-			break;
-		case 5:     /* reset PRNG */
-			break;
-
-		case 6:     /* LED 1 */
-			output().set_led_value(0, ~data & 0x80);
-			break;
-
-		case 7:     /* NVRAM array recall */
-			machine().device<x2212_device>("x2212")->recall(~data & 0x80);
-			break;
-	}
+WRITE_LINE_MEMBER(starwars_state::led3_w)
+{
+	output().set_led_value(2, !state);
 }
 
 
@@ -379,6 +370,10 @@ READ8_MEMBER(starwars_state::starwars_prng_r)
 
 	/* Use MAME's PRNG for now */
 	return machine().rand();
+}
+
+WRITE_LINE_MEMBER(starwars_state::prng_reset_w)
+{
 }
 
 

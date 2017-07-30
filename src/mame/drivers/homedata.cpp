@@ -585,7 +585,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
 ADDRESS_MAP_END
 
 /**************************************************************************/
@@ -613,7 +612,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pteacher_upd7807_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
 ADDRESS_MAP_END
 
 /**************************************************************************/

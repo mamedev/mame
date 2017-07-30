@@ -37,23 +37,23 @@
 		<bezel name="digit6" element="digit"><bounds x="66" y="4" width="10" height="15" /></bezel>
 		<bezel name="digit7" element="digit"><bounds x="77" y="4" width="10" height="15" /></bezel>
 
-		<bezel name="lamp14" element="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp114" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp214" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp314" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp414" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp514" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp614" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp714" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
+		<bezel name="0.14" element="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></bezel>
+		<bezel name="1.14" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
+		<bezel name="2.14" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
+		<bezel name="3.14" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
+		<bezel name="4.14" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
+		<bezel name="5.14" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
+		<bezel name="6.14" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
+		<bezel name="7.14" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
 
-		<bezel name="lamp15" element="lamp_dp"><bounds x="9" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp115" element="lamp_dp"><bounds x="20" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp215" element="lamp_dp"><bounds x="31" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp315" element="lamp_dp"><bounds x="42" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp415" element="lamp_dp"><bounds x="53" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp515" element="lamp_dp"><bounds x="64" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp615" element="lamp_dp"><bounds x="75" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp715" element="lamp_dp"><bounds x="86" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="0.15" element="lamp_dp"><bounds x="9" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="1.15" element="lamp_dp"><bounds x="20" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="2.15" element="lamp_dp"><bounds x="31" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="3.15" element="lamp_dp"><bounds x="42" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="4.15" element="lamp_dp"><bounds x="53" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="5.15" element="lamp_dp"><bounds x="64" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="6.15" element="lamp_dp"><bounds x="75" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="7.15" element="lamp_dp"><bounds x="86" y="17.5" width="1.5" height="1.5" /></bezel>
 
 	</view>
 </mamelayout>

@@ -53,8 +53,13 @@ void driver_device::set_game_driver(const game_driver &game)
 
 	// and set the search path to include all parents
 	m_searchpath = game.name;
+	std::set<game_driver const *> seen;
 	for (int parent = driver_list::clone(game); parent != -1; parent = driver_list::clone(parent))
+	{
+		if (!seen.insert(&driver_list::driver(parent)).second)
+			throw emu_fatalerror("driver_device::set_game_driver(%s): parent/clone relationships form a loop", game.name);
 		m_searchpath.append(";").append(driver_list::driver(parent).name);
+	}
 }
 
 

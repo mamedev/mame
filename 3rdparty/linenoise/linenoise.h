@@ -125,4 +125,6 @@ int linenoiseColumns(void);
 
 void linenoisePreloadBuffer(const char* preloadText);
 
+void linenoiseRefresh(void);
+
 #endif /* __LINENOISE_H */

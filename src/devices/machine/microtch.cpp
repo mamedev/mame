@@ -118,55 +118,52 @@ void microtouch_device::send_touch_packet()
 
 void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(id)
+	if (!id)
 	{
-		device_serial_interface::device_timer(timer, id, param, ptr);
-		return;
-	}
-
-	if ( m_tx_buffer_ptr < m_tx_buffer_num )
-	{
-		if(is_transmit_register_empty())
+		if ( m_tx_buffer_ptr < m_tx_buffer_num )
 		{
-			m_output = m_tx_buffer[m_tx_buffer_ptr++];
-			m_output_valid = true;
-			tra_complete();
-		}
-
-		if ( m_tx_buffer_ptr == m_tx_buffer_num )
-		{
-			m_tx_buffer_ptr = m_tx_buffer_num = 0;
-		}
-		return;
-	}
-
-	if ( (m_reset_done == 0) ||
-			(m_format == FORMAT_UNKNOWN) ||
-			(m_mode != MODE_STREAM))
-	{
-		return;
-	}
-
-	// send format tablet packet
-	if (m_touch->read())
-	{
-		send_touch_packet();
-	}
-	else
-	{
-		if ( m_last_touch_state == 1 )
-		{
-			m_last_touch_state = 0;
-			switch( m_format )
+			if(is_transmit_register_empty())
 			{
-				case FORMAT_TABLET:
-					send_format_table_packet(0x88, m_last_x, m_last_y);
-					break;
-				case FORMAT_DECIMAL:
-					send_format_decimal_packet(m_last_x, m_last_y);
-					break;
-				case FORMAT_UNKNOWN:
-					break;
+				m_output = m_tx_buffer[m_tx_buffer_ptr++];
+				m_output_valid = true;
+				tra_complete();
+			}
+
+			if ( m_tx_buffer_ptr == m_tx_buffer_num )
+			{
+				m_tx_buffer_ptr = m_tx_buffer_num = 0;
+			}
+			return;
+		}
+
+		if ( (m_reset_done == 0) ||
+				(m_format == FORMAT_UNKNOWN) ||
+				(m_mode != MODE_STREAM))
+		{
+			return;
+		}
+
+		// send format tablet packet
+		if (m_touch->read())
+		{
+			send_touch_packet();
+		}
+		else
+		{
+			if ( m_last_touch_state == 1 )
+			{
+				m_last_touch_state = 0;
+				switch( m_format )
+				{
+					case FORMAT_TABLET:
+						send_format_table_packet(0x88, m_last_x, m_last_y);
+						break;
+					case FORMAT_DECIMAL:
+						send_format_decimal_packet(m_last_x, m_last_y);
+						break;
+					case FORMAT_UNKNOWN:
+						break;
+				}
 			}
 		}
 	}

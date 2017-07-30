@@ -112,6 +112,8 @@ protected:
 		INIT_XFR_RECV_PAD,
 		INIT_XFR_RECV_BYTE_ACK,
 		INIT_XFR_RECV_BYTE_NACK,
+		INIT_XFR_FUNCTION_COMPLETE,
+		INIT_XFR_BUS_COMPLETE,
 		INIT_XFR_WAIT_REQ,
 		INIT_CPT_RECV_BYTE_ACK,
 		INIT_CPT_RECV_WAIT_REQ,
@@ -236,6 +238,8 @@ private:
 
 	void delay(int cycles);
 	void delay_cycles(int cycles);
+
+	void decrement_tcounter();
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;

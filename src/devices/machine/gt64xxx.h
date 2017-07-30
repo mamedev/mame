@@ -107,7 +107,7 @@ public:
 
 protected:
 	address_space *m_cpu_space;
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -144,9 +144,10 @@ private:
 	int m_pci_stall_state;
 	int m_retry_count;
 	int m_pci_cpu_stalled;
-	uint32_t m_cpu_stalled_offset;
-	uint32_t m_cpu_stalled_data;
-	uint32_t m_cpu_stalled_mem_mask;
+	uint32_t m_stall_windex;
+	uint32_t m_cpu_stalled_offset[2];
+	uint32_t m_cpu_stalled_data[2];
+	uint32_t m_cpu_stalled_mem_mask[2];
 
 	address_space_config m_mem_config, m_io_config;
 

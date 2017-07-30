@@ -57,7 +57,7 @@ ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, dev
 	m_address(0),
 	m_DRQ(0),
 	m_IRQ(0),
-	m_lastval(0),
+	m_crulatch(*this, "crulatch"),
 	m_DVENA(0),
 	m_inDsrArea(false),
 	m_WAITena(false),
@@ -246,65 +246,55 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 WRITE8_MEMBER(ti_fdc_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
-	{
-		int bit = (offset >> 1) & 0x07;
-		switch (bit)
-		{
-		case 0:
-			// (De)select the card. Indicated by a LED on the board.
-			m_selected = (data!=0);
-			if (TRACE_CRU) logerror("tifdc: Map DSR (bit 0) = %d\n", m_selected);
-			break;
+		m_crulatch->write_bit((offset >> 1) & 0x07, BIT(data, 0));
+}
 
-		case 1:
-			// Activate motor
-			if (data==1 && m_lastval==0)
-			{   // On rising edge, set motor_running for 4.23s
-				if (TRACE_CRU) logerror("tifdc: trigger motor (bit 1)\n");
-				set_floppy_motors_running(true);
-			}
-			m_lastval = data;
-			break;
+WRITE_LINE_MEMBER(ti_fdc_device::dskpgena_w)
+{
+	// (De)select the card. Indicated by a LED on the board.
+	m_selected = state;
+	if (TRACE_CRU) logerror("tifdc: Map DSR (bit 0) = %d\n", m_selected);
+}
 
-		case 2:
-			// Set disk ready/hold (bit 2)
-			// 0: ignore IRQ and DRQ
-			// 1: TMS9900 is stopped until IRQ or DRQ are set
-			// OR the motor stops rotating - rotates for 4.23s after write
-			// to CRU bit 1
-			m_WAITena = (data != 0);
-			if (TRACE_CRU) logerror("tifdc: arm wait state logic (bit 2) = %d\n", data);
-			break;
-
-		case 3:
-			// Load disk heads (HLT pin) (bit 3). Not implemented.
-			if (TRACE_CRU) logerror("tifdc: set head load (bit 3) = %d\n", data);
-			break;
-
-		case 4:
-			m_DSEL = (data != 0)? (m_DSEL | 0x01) : (m_DSEL & 0xfe);
-			set_drive();
-			break;
-		case 5:
-			m_DSEL = (data != 0)? (m_DSEL | 0x02) : (m_DSEL & 0xfd);
-			set_drive();
-			break;
-		case 6:
-			m_DSEL = (data != 0)? (m_DSEL | 0x04) : (m_DSEL & 0xfb);
-			set_drive();
-			break;
-
-		case 7:
-			// Select side of disk (bit 7)
-			m_SIDSEL = (data==1)? ASSERT_LINE : CLEAR_LINE;
-			if (TRACE_CRU) logerror("tifdc: set side (bit 7) = %d\n", data);
-			if (m_current != NONE) m_floppy[m_current]->ss_w(data);
-			break;
-
-		default:
-			break;
-		}
+WRITE_LINE_MEMBER(ti_fdc_device::kaclk_w)
+{
+	// Activate motor
+	if (state)
+	{   // On rising edge, set motor_running for 4.23s
+		if (TRACE_CRU) logerror("tifdc: trigger motor (bit 1)\n");
+		set_floppy_motors_running(true);
 	}
+}
+
+WRITE_LINE_MEMBER(ti_fdc_device::waiten_w)
+{
+	// Set disk ready/hold (bit 2)
+	// 0: ignore IRQ and DRQ
+	// 1: TMS9900 is stopped until IRQ or DRQ are set
+	// OR the motor stops rotating - rotates for 4.23s after write
+	// to CRU bit 1
+	m_WAITena = state;
+	if (TRACE_CRU) logerror("tifdc: arm wait state logic (bit 2) = %d\n", state);
+}
+
+WRITE_LINE_MEMBER(ti_fdc_device::hlt_w)
+{
+	// Load disk heads (HLT pin) (bit 3). Not implemented.
+	if (TRACE_CRU) logerror("tifdc: set head load (bit 3) = %d\n", state);
+}
+
+WRITE_LINE_MEMBER(ti_fdc_device::dsel_w)
+{
+	m_DSEL = m_crulatch->q4_r() | (m_crulatch->q5_r() << 1) | (m_crulatch->q6_r() << 2);
+	set_drive();
+}
+
+WRITE_LINE_MEMBER(ti_fdc_device::sidsel_w)
+{
+	// Select side of disk (bit 7)
+	m_SIDSEL = state ? ASSERT_LINE : CLEAR_LINE;
+	if (TRACE_CRU) logerror("tifdc: set side (bit 7) = %d\n", state);
+	if (m_current != NONE) m_floppy[m_current]->ss_w(state);
 }
 
 void ti_fdc_device::set_drive()
@@ -390,7 +380,6 @@ void ti_fdc_device::device_start()
 	save_item(NAME(m_address));
 	save_item(NAME(m_DRQ));
 	save_item(NAME(m_IRQ));
-	save_item(NAME(m_lastval));
 	save_item(NAME(m_DVENA));
 	save_item(NAME(m_inDsrArea));
 	save_item(NAME(m_WAITena));
@@ -403,7 +392,6 @@ void ti_fdc_device::device_start()
 void ti_fdc_device::device_reset()
 {
 	logerror("tifdc: TI FDC reset\n");
-	m_lastval = 0;
 	if (m_genmod)
 	{
 		m_select_mask = 0x1fe000;
@@ -471,6 +459,16 @@ MACHINE_CONFIG_MEMBER( ti_fdc_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("2", tifdc_floppies, nullptr, ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
+
+	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U23
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ti_fdc_device, dskpgena_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(ti_fdc_device, kaclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(ti_fdc_device, waiten_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ti_fdc_device, hlt_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ti_fdc_device, dsel_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ti_fdc_device, dsel_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ti_fdc_device, dsel_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ti_fdc_device, sidsel_w))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_fdc_device::device_rom_region() const

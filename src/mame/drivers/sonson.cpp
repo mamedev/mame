@@ -54,33 +54,28 @@ TODO:
 #include "includes/sonson.h"
 
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)
+WRITE_LINE_MEMBER(sonson_state::sh_irqtrigger_w)
 {
-	data &= 1;
-
-	if (m_last_irq == 0 && data == 1)
-	{
-		/* setting bit 0 low then high triggers IRQ on the sound CPU */
+	// setting bit 0 low then high triggers IRQ on the sound CPU
+	if (state)
 		m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
-	}
-
-	m_last_irq = data;
 }
 
-WRITE8_MEMBER(sonson_state::sonson_coin1_counter_w)
+WRITE_LINE_MEMBER(sonson_state::coin1_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(sonson_state::sonson_coin2_counter_w)
+WRITE_LINE_MEMBER(sonson_state::coin2_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sonson_state )
@@ -96,10 +91,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x3006, 0x3006) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3008, 0x3008) AM_WRITENOP    // might be Y scroll, but the game always sets it to 0
 	AM_RANGE(0x3010, 0x3010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3018, 0x3018) AM_WRITE(sonson_flipscreen_w)
-	AM_RANGE(0x3019, 0x3019) AM_WRITE(sonson_sh_irqtrigger_w)
-	AM_RANGE(0x301e, 0x301e) AM_WRITE(sonson_coin2_counter_w)
-	AM_RANGE(0x301f, 0x301f) AM_WRITE(sonson_coin1_counter_w)
+	AM_RANGE(0x3018, 0x301f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -231,16 +223,6 @@ GFXDECODE_END
 
 
 
-void sonson_state::machine_start()
-{
-	save_item(NAME(m_last_irq));
-}
-
-void sonson_state::machine_reset()
-{
-	m_last_irq = 0;
-}
-
 static MACHINE_CONFIG_START( sonson )
 
 	/* basic machine hardware */
@@ -252,6 +234,11 @@ static MACHINE_CONFIG_START( sonson )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sonson_state, irq0_line_hold, 4*60)    /* FIRQs are triggered by the main CPU */
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // A9
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sonson_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sonson_state, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sonson_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(sonson_state, coin1_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

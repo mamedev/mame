@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
@@ -21,6 +22,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
+		m_adpcm_select(*this, "adpcm_select"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
@@ -46,7 +48,6 @@ public:
 	int           m_i8751_return;
 	int           m_i8751_current_command;
 	int           m_i8751_init_ptr;
-	int           m_msm5205next;
 	int           m_adpcm_toggle;
 	int           m_coin_command_pending;
 
@@ -54,6 +55,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
+	required_device<ls157_device> m_adpcm_select;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -63,10 +65,10 @@ public:
 	DECLARE_READ8_MEMBER(firetrap_8751_bootleg_r);
 	DECLARE_READ8_MEMBER(firetrap_8751_r);
 	DECLARE_WRITE8_MEMBER(firetrap_8751_w);
-	DECLARE_WRITE8_MEMBER(firetrap_sound_command_w);
-	DECLARE_WRITE8_MEMBER(firetrap_sound_2400_w);
-	DECLARE_WRITE8_MEMBER(firetrap_sound_bankselect_w);
-	DECLARE_WRITE8_MEMBER(firetrap_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_flip_flop_w);
+	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(firetrap_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg1videoram_w);

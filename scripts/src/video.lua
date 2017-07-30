@@ -708,6 +708,17 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/sda5708.h,VIDEOS["SDA5708"] = true
+--------------------------------------------------
+if (VIDEOS["SDA5708"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sda5708.cpp",
+		MAME_DIR .. "src/devices/video/sda5708.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/snes_ppu.h,VIDEOS["SNES_PPU"] = true
 --------------------------------------------------
 if (VIDEOS["SNES_PPU"]~=null) then

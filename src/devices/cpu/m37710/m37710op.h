@@ -2508,6 +2508,10 @@ TABLE_FUNCTION(void, set_line, (int line, int state))
 		case M37710_LINE_IRQ2:
 		case M37710_LINE_IRQ1:
 		case M37710_LINE_IRQ0:
+		case M37710_LINE_DMA0:
+		case M37710_LINE_DMA1:
+		case M37710_LINE_DMA2:
+		case M37710_LINE_DMA3:
 			switch(state)
 			{
 				case CLEAR_LINE:

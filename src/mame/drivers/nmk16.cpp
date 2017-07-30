@@ -8050,7 +8050,7 @@ GAME( 1997, redhawki, stagger1, redhawki, stagger1, nmk16_state, 0,         ROT0
 GAME( 1997, redhawkg, stagger1, redhawki, stagger1, nmk16_state, 0,         ROT0,   "Afega",                             "Red Hawk (Greece)", 0 )
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, nmk16_state, 0,         ROT270, "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 )
 GAME( 1997, redhawkk, stagger1, stagger1, stagger1, nmk16_state, 0,         ROT270, "Afega",                             "Red Hawk (Korea)", 0 )
-GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, nmk16_state, 0,         ROT0,   "bootleg",                           "Red Hawk (bootleg)", 0 )
+GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, nmk16_state, 0,         ROT0,   "bootleg",                           "Vince (bootleg of Red Hawk)", 0 )
 
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, nmk16_state, 0,         ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
 GAME( 1998, grdnstrmv,grdnstrm, grdnstrmk,grdnstrk, nmk16_state, grdnstrm,  ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )

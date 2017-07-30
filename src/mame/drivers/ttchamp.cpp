@@ -91,14 +91,13 @@ public:
 	uint16_t m_videoram0[0x10000 / 2];
 	uint16_t m_videoram2[0x10000 / 2];
 
-	enum picmode
+	enum class picmode : u8
 	{
-		PIC_IDLE = 0,
-		PIC_SET_READADDRESS = 1,
-		PIC_SET_WRITEADDRESS = 2,
-		PIC_SET_WRITELATCH = 3,
-		PIC_SET_READLATCH = 4
-
+		IDLE = 0,
+		SET_READADDRESS = 1,
+		SET_WRITEADDRESS = 2,
+		SET_WRITELATCH = 3,
+		SET_READLATCH = 4
 	};
 
 	picmode m_picmodex;
@@ -152,7 +151,7 @@ void ttchamp_state::machine_start()
 	m_rom16 = (uint16_t*)memregion("maincpu")->base();
 	m_rom8 = memregion("maincpu")->base();
 
-	m_picmodex = PIC_IDLE;
+	m_picmodex = picmode::IDLE;
 
 	m_bakram = std::make_unique<uint8_t[]>(0x100);
 	machine().device<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
@@ -281,10 +280,10 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 READ16_MEMBER(ttchamp_state::pic_r)
 {
 //  printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
-	if (m_picmodex == PIC_SET_READLATCH)
+	if (m_picmodex == picmode::SET_READLATCH)
 	{
 //      printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
-		m_picmodex = PIC_IDLE;
+		m_picmodex = picmode::IDLE;
 
 		return m_pic_latched << 8;
 
@@ -296,26 +295,26 @@ READ16_MEMBER(ttchamp_state::pic_r)
 WRITE16_MEMBER(ttchamp_state::pic_w)
 {
 //  printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, m_picmodex);
-	if (m_picmodex == PIC_IDLE)
+	if (m_picmodex == picmode::IDLE)
 	{
 		if (data == 0x11)
 		{
-			m_picmodex = PIC_SET_READADDRESS;
+			m_picmodex = picmode::SET_READADDRESS;
 //          printf("state = SET_READADDRESS\n");
 		}
 		else if (data == 0x12)
 		{
-			m_picmodex = PIC_SET_WRITELATCH;
+			m_picmodex = picmode::SET_WRITELATCH;
 //          printf("latch write data.. \n" );
 		}
 		else if (data == 0x20)
 		{
-			m_picmodex = PIC_SET_WRITEADDRESS;
-//          printf("state = PIC_SET_WRITEADDRESS\n");
+			m_picmodex = picmode::SET_WRITEADDRESS;
+//          printf("state = picmode::SET_WRITEADDRESS\n");
 		}
 		else if (data == 0x21) // write latched data
 		{
-			m_picmodex = PIC_IDLE;
+			m_picmodex = picmode::IDLE;
 			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
 	//      printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
 		}
@@ -326,27 +325,27 @@ WRITE16_MEMBER(ttchamp_state::pic_w)
 			m_pic_latched = m_bakram[m_pic_readaddr>>1];
 
 //          printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
-			m_picmodex = PIC_SET_READLATCH; // waiting to read...
+			m_picmodex = picmode::SET_READLATCH; // waiting to read...
 		}
 		else
 		{
 //          printf("unknown\n");
 		}
 	}
-	else if (m_picmodex == PIC_SET_READADDRESS)
+	else if (m_picmodex == picmode::SET_READADDRESS)
 	{
 		m_pic_readaddr = data;
-		m_picmodex = PIC_IDLE;
+		m_picmodex = picmode::IDLE;
 	}
-	else if (m_picmodex == PIC_SET_WRITEADDRESS)
+	else if (m_picmodex == picmode::SET_WRITEADDRESS)
 	{
 		m_pic_writeaddr = data;
-		m_picmodex = PIC_IDLE;
+		m_picmodex = picmode::IDLE;
 	}
-	else if (m_picmodex == PIC_SET_WRITELATCH)
+	else if (m_picmodex == picmode::SET_WRITELATCH)
 	{
 		m_pic_writelatched = data;
-		m_picmodex = PIC_IDLE;
+		m_picmodex = picmode::IDLE;
 	}
 
 }

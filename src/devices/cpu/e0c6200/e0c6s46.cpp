@@ -50,7 +50,6 @@ e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, d
 	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, ADDRESS_MAP_NAME(e0c6s46_program), ADDRESS_MAP_NAME(e0c6s46_data))
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
-	, m_pixel_update_handler(nullptr)
 	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this)
 	, m_read_p0(*this), m_read_p1(*this), m_read_p2(*this), m_read_p3(*this)
 	, m_write_p0(*this), m_write_p1(*this), m_write_p2(*this), m_write_p3(*this), m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr),
@@ -83,6 +82,8 @@ void e0c6s46_device::device_start()
 	m_write_p1.resolve_safe();
 	m_write_p2.resolve_safe();
 	m_write_p3.resolve_safe();
+
+	m_pixel_update_cb.bind_relative_to(*owner());
 
 	// create timers
 	m_core_256_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::core_256_cb), this));
@@ -602,8 +603,8 @@ u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				int seg = offset / 2;
 				int com = bank * 8 + (offset & 1) * 4 + c;
 
-				if (m_pixel_update_handler != nullptr)
-					m_pixel_update_handler(*this, bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
+				if (!m_pixel_update_cb.isnull())
+					m_pixel_update_cb(bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
 				else if (cliprect.contains(seg, com))
 					bitmap.pix16(com, seg) = pixel;
 			}

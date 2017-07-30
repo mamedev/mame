@@ -200,9 +200,9 @@ sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const ch
 }
 
 
-std::vector<std::pair<int, const address_space_config *>> sega315_5124_device::memory_space_config() const
+device_memory_interface::space_config_vector sega315_5124_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

@@ -53,7 +53,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_memory_interface overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	// internal helpers

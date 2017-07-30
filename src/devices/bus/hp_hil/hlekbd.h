@@ -19,6 +19,8 @@ class hle_device_base
 public:
 	virtual ~hle_device_base() override;
 
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
 protected:
 	// constructor/destructor
 	hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
@@ -26,7 +28,6 @@ protected:
 	// device overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_matrix_keyboard_interface overrides
 	virtual void key_make(uint8_t row, uint8_t column) override;
@@ -36,9 +37,6 @@ protected:
 	virtual void hil_write(uint16_t data) override;
 
 private:
-	// device_serial_interface uses 10'000 range
-	// device_matrix_keyboard_interface uses 20'000 range
-
 	void transmit_byte(uint8_t byte);
 
 	util::fifo<uint8_t, 8> m_fifo;

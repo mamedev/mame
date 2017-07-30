@@ -21,9 +21,9 @@ void linear_flash_pccard_device::device_start()
 	m_space = &space(0);
 }
 
-std::vector<std::pair<int, const address_space_config *>> linear_flash_pccard_device::memory_space_config() const
+device_memory_interface::space_config_vector linear_flash_pccard_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

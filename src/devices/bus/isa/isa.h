@@ -211,7 +211,7 @@ public:
 	template <class Object> static devcb_base &set_out_drq3_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_drq3_cb.set_callback(std::forward<Object>(cb)); }
 
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits = 8)
@@ -369,7 +369,7 @@ public:
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( irq10_w );
 	DECLARE_WRITE_LINE_MEMBER( irq11_w );

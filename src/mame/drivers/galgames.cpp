@@ -277,7 +277,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_space_config;
 	address_space *m_space;
@@ -300,9 +300,9 @@ protected:
 	bool m_is_ram_active;
 };
 
-std::vector<std::pair<int, const address_space_config *>> galgames_slot_device::memory_space_config() const
+device_memory_interface::space_config_vector galgames_slot_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_space_config)
 	};
 }

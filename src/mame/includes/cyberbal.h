@@ -12,6 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
+#include "sound/ym2151.h"
 #include "screen.h"
 
 class cyberbal_state : public atarigen_state
@@ -26,6 +27,7 @@ public:
 			m_rdac(*this, "rdac"),
 			m_ldac(*this, "ldac"),
 			m_soundcomm(*this, "soundcomm"),
+			m_ymsnd(*this, "ymsnd"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -43,6 +45,7 @@ public:
 	optional_device<dac_word_interface> m_rdac;
 	optional_device<dac_word_interface> m_ldac;
 	optional_device<atari_sound_comm_device> m_soundcomm;
+	optional_device<ym2151_device> m_ymsnd;
 	optional_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;

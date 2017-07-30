@@ -221,7 +221,6 @@ static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8, fitfight_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* ??? External ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 READ8_MEMBER(fitfight_state::snd_porta_r)

@@ -65,9 +65,9 @@ void ramdac_device::static_set_palette_tag(device_t &device, const char *tag)
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> ramdac_device::memory_space_config() const
+device_memory_interface::space_config_vector ramdac_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

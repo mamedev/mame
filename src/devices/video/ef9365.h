@@ -74,7 +74,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_config_memory_interface overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// address space configurations
 	const address_space_config      m_space_config;

@@ -58,6 +58,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "cpu/cop400/cop400.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -115,7 +116,8 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_watchdog(*this, "watchdog") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -126,33 +128,29 @@ public:
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
 
-	/* sound state */
-	uint8_t       m_sound[8];
-
-	int     m_last;
-
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(looping_videoram_w);
 	DECLARE_WRITE8_MEMBER(looping_colorram_w);
-	DECLARE_WRITE8_MEMBER(level2_irq_set);
-	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(looping_souint_clr);
+	DECLARE_WRITE_LINE_MEMBER(level2_irq_set);
+	DECLARE_WRITE_LINE_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
+	DECLARE_WRITE_LINE_MEMBER(looping_souint_clr);
 	DECLARE_WRITE8_MEMBER(looping_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(ballon_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(ballon_enable_w);
 	DECLARE_WRITE8_MEMBER(out_0_w);
 	DECLARE_WRITE8_MEMBER(out_2_w);
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE8_MEMBER(adc_w);
-	DECLARE_WRITE8_MEMBER(plr2_w);
+	DECLARE_WRITE_LINE_MEMBER(plr2_w);
 	DECLARE_READ8_MEMBER(cop_unk_r);
 	DECLARE_READ_LINE_MEMBER(cop_serial_r);
 	DECLARE_WRITE8_MEMBER(cop_l_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
 	DECLARE_WRITE8_MEMBER(looping_sound_sw);
-	DECLARE_WRITE8_MEMBER(ay_enable_w);
-	DECLARE_WRITE8_MEMBER(speech_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(ay_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(speech_enable_w);
 	DECLARE_DRIVER_INIT(looping);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
@@ -168,6 +166,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<watchdog_timer_device> m_watchdog;
 };
 
 
@@ -248,16 +247,16 @@ void looping_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::flip_screen_x_w)
+WRITE_LINE_MEMBER(looping_state::flip_screen_x_w)
 {
-	flip_screen_x_set(~data & 0x01);
+	flip_screen_x_set(!state);
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? 128 : 0);
 }
 
 
-WRITE8_MEMBER(looping_state::flip_screen_y_w)
+WRITE_LINE_MEMBER(looping_state::flip_screen_y_w)
 {
-	flip_screen_y_set(~data & 0x01);
+	flip_screen_y_set(!state);
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? 128 : 0);
 }
 
@@ -345,7 +344,6 @@ uint32_t looping_state::screen_update_looping(screen_device &screen, bitmap_ind1
 
 void looping_state::machine_start()
 {
-	save_item(NAME(m_sound));
 }
 
 void looping_state::machine_reset()
@@ -366,25 +364,30 @@ INTERRUPT_GEN_MEMBER(looping_state::looping_interrupt)
 }
 
 
-WRITE8_MEMBER(looping_state::level2_irq_set)
+WRITE_LINE_MEMBER(looping_state::level2_irq_set)
 {
-	logerror("Level 2 int = %d\n", data);
-	if (!(data & 1))
+	logerror("Level 2 int = %d\n", state);
+	if (state == 0)
 		m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(looping_state::main_irq_ack_w)
+WRITE_LINE_MEMBER(looping_state::main_irq_ack_w)
 {
-	if (data == 0)
+	if (state == 0)
 		m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
 }
 
-
-WRITE8_MEMBER(looping_state::looping_souint_clr)
+WRITE_LINE_MEMBER(looping_state::watchdog_w)
 {
-	logerror("Soundint clr = %d\n", data);
-	if (data == 0)
+	m_watchdog->watchdog_reset();
+}
+
+
+WRITE_LINE_MEMBER(looping_state::looping_souint_clr)
+{
+	logerror("Soundint clr = %d\n", state);
+	if (state == 0)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -421,8 +424,7 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 	    0007 = AFA
 	*/
 
-	m_sound[offset + 1] = data ^ 1;
-	m_dac->write(((m_sound[2] << 1) + m_sound[3]) * m_sound[7]);
+	m_dac->write(((BIT(~data, 2) << 1) + BIT(~data, 3)) * BIT(~data, 7));
 }
 
 
@@ -433,7 +435,7 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::ay_enable_w)
+WRITE_LINE_MEMBER(looping_state::ay_enable_w)
 {
 	device_t *device = machine().device("aysnd");
 	int output;
@@ -441,24 +443,22 @@ WRITE8_MEMBER(looping_state::ay_enable_w)
 	device_sound_interface *sound;
 	device->interface(sound);
 	for (output = 0; output < 3; output++)
-		sound->set_output_gain(output, (data & 1) ? 1.0 : 0.0);
+		sound->set_output_gain(output, state ? 1.0 : 0.0);
 }
 
 
-WRITE8_MEMBER(looping_state::speech_enable_w)
+WRITE_LINE_MEMBER(looping_state::speech_enable_w)
 {
 	device_t *device = machine().device("tms");
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(0, (data & 1) ? 1.0 : 0.0);
+	sound->set_output_gain(0, state ? 1.0 : 0.0);
 }
 
 
-WRITE8_MEMBER(looping_state::ballon_enable_w)
+WRITE_LINE_MEMBER(looping_state::ballon_enable_w)
 {
-	if (m_last != data)
-		osd_printf_debug("ballon_enable_w = %d\n", data);
-	m_last = data;
+	osd_printf_debug("ballon_enable_w = %d\n", state);
 }
 
 
@@ -475,7 +475,7 @@ WRITE8_MEMBER(looping_state::out_2_w){ osd_printf_debug("out2 = %02X\n", data); 
 READ8_MEMBER(looping_state::adc_r){ osd_printf_debug("%04X:ADC read\n", space.device().safe_pc()); return 0xff; }
 WRITE8_MEMBER(looping_state::adc_w){ osd_printf_debug("%04X:ADC write = %02X\n", space.device().safe_pc(), data); }
 
-WRITE8_MEMBER(looping_state::plr2_w)
+WRITE_LINE_MEMBER(looping_state::plr2_w)
 {
 	/* set to 1 after IDLE, cleared to 0 during processing */
 	/* is this an LED on the PCB? */
@@ -545,9 +545,7 @@ static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x98ff) AM_MIRROR(0x0700) AM_RAM
 
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x07f8) AM_WRITE(level2_irq_set)
-	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE(flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE(flip_screen_y_w)
+	AM_RANGE(0xb000, 0xb007) AM_MIRROR(0x07f8) AM_DEVWRITE("videolatch", ls259_device, write_d0)
 
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE(out_0_w)                 /* /OUT0 */
@@ -557,14 +555,7 @@ static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
-	/* 400 = A16 */
-	/* 401 = A17 */
-	/* 402 = COLOR 9 */
-	AM_RANGE(0x403, 0x403) AM_WRITE(plr2_w)
-	/* 404 = C0 */
-	/* 405 = C1 */
-	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x407, 0x407) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0x400, 0x407) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -582,12 +573,8 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
-	AM_RANGE(0x000, 0x000) AM_WRITE(looping_souint_clr)
-	AM_RANGE(0x001, 0x007) AM_WRITE(looping_sound_sw)
-	AM_RANGE(0x008, 0x008) AM_WRITE(ay_enable_w)
-	AM_RANGE(0x009, 0x009) AM_WRITE(speech_enable_w)
-	AM_RANGE(0x00a, 0x00a) AM_WRITE(ballon_enable_w)
-	AM_RANGE(0x00b, 0x00f) AM_NOP
+	AM_RANGE(0x000, 0x007) AM_DEVWRITE("sen0", ls259_device, write_d0)
+	AM_RANGE(0x008, 0x00f) AM_DEVWRITE("sen1", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -638,6 +625,16 @@ static MACHINE_CONFIG_START( looping )
 	MCFG_COP400_READ_IN_CB(READ8(looping_state, cop_unk_r))
 	MCFG_COP400_READ_SI_CB(READLINE(looping_state, cop_serial_r))
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C9 on CPU board
+	// Q0 = A16
+	// Q1 = A17
+	// Q2 = COLOR 9
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(looping_state, plr2_w))
+	// Q4 = C0
+	// Q5 = C1
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(looping_state, main_irq_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(looping_state, watchdog_w))
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -650,6 +647,11 @@ static MACHINE_CONFIG_START( looping )
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
+
+	MCFG_DEVICE_ADD("videolatch", LS259, 0) // E2 on video board
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(looping_state, level2_irq_set))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(looping_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(looping_state, flip_screen_y_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -667,6 +669,15 @@ static MACHINE_CONFIG_START( looping )
 	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
+	MCFG_DEVICE_ADD("sen0", LS259, 0) // B3 on sound board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(looping_state, looping_souint_clr))
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(looping_state, looping_sound_sw))
+
+	MCFG_DEVICE_ADD("sen1", LS259, 0) // A1 on sound board with outputs connected to 4016 at B1
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(looping_state, ay_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(looping_state, speech_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(looping_state, ballon_enable_w))
 MACHINE_CONFIG_END
 
 

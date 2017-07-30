@@ -102,7 +102,7 @@ public:
 		m_read_k.set_callback(std::forward<K>(k));
 	}
 
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	uint8_t read(address_space &space, offs_t offset, int &cs0, int &cs1);
 	void write(address_space &space, offs_t offset, uint8_t data, int &cs0, int &cs1);

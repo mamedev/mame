@@ -30,15 +30,16 @@ public:
 	/* misc */
 	uint8_t    m_irq_enable;
 
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pooyan);
 

@@ -12,6 +12,7 @@
 
   * Golden Poker Double Up (Big Boy),                 1981, Bonanza Enterprises, Ltd.
   * Golden Poker Double Up (Mini Boy),                1981, Bonanza Enterprises, Ltd.
+  * Golden Poker Double Up (bootleg),                 198?, Bootleg.
   * Videotron Poker (cards selector, set 1),          198?, Unknown.
   * Videotron Poker (cards selector, set 2),          198?, Unknown.
   * Videotron Poker (normal controls),                198?, Unknown.
@@ -4753,6 +4754,34 @@ ROM_START( goldnpkb )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
+
+/*
+  Unknown Golden Poker.
+
+  Bootleg (maybe French) board.
+  Program mapped at 0x5000-0x7fff
+  GFX ROMs are missing.
+
+*/
+ROM_START( goldnpkc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732-1.bin",  0x5000, 0x1000, CRC(33a3b7c7) SHA1(b9713f534811963284d96239e4d8ab567adfb15a) )
+	ROM_LOAD( "2732-2.bin",  0x6000, 0x1000, CRC(12f403ba) SHA1(e84c0bf235ff3a4b2d54141468e4867c49ea0bd7) )
+	ROM_LOAD( "2732-3.bin",  0x7000, 0x1000, CRC(96a51764) SHA1(c175fadaa87a85af60619edfdb32e0ec7faf6682) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
+	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
+	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+
+	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
+	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
+	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
+	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+
+	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
+	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 
 /*  Videotron Poker.
     Alternative controls set, with cards selector...
@@ -10941,7 +10970,6 @@ ROM_START( megadpkrb )
 ROM_END
 
 
-
 /*********************************************
 *                Driver Init                 *
 *********************************************/
@@ -11357,6 +11385,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT     COMPANY                     FULLNAME                                      FLAGS             LAYOUT
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",           0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",          0,                layout_goldnpkr )
+GAMEL( 198?, goldnpkc,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg)",           0,                layout_goldnpkr )
 
 GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
 GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )

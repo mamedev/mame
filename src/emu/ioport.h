@@ -54,7 +54,7 @@ enum input_seq_type
 	SEQ_TYPE_DECREMENT,
 	SEQ_TYPE_TOTAL
 };
-DECLARE_ENUM_OPERATORS(input_seq_type)
+DECLARE_ENUM_INCDEC_OPERATORS(input_seq_type)
 
 
 // crosshair types
@@ -402,7 +402,7 @@ enum ioport_type
 
 	IPT_COUNT
 };
-DECLARE_ENUM_OPERATORS(ioport_type)
+DECLARE_ENUM_INCDEC_OPERATORS(ioport_type)
 // aliases for some types
 #define IPT_PADDLE_H        IPT_PADDLE
 #define IPT_PEDAL1          IPT_PEDAL
@@ -874,7 +874,7 @@ private:
 	u8                          m_current4way;                                  // current 4-way value
 	u8                          m_previous;                                     // previous value
 };
-DECLARE_ENUM_OPERATORS(digital_joystick::direction_t)
+DECLARE_ENUM_INCDEC_OPERATORS(digital_joystick::direction_t)
 
 
 // ======================> ioport_condition

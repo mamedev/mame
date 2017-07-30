@@ -805,11 +805,6 @@ void mc68681_channel::device_reset()
 	CSR = 0;
 }
 
-void mc68681_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
 // serial device virtual overrides
 void mc68681_channel::rcv_complete()
 {

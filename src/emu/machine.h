@@ -127,7 +127,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_memory_interface overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	const address_space_config  m_space_config;
@@ -248,7 +248,7 @@ public:
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	void strlog(const char *str) const;
 	u32 rand();
-	const char *describe_context();
+	std::string describe_context() const;
 	std::string compose_saveload_filename(std::string &&base_filename, const char **searchpath = nullptr);
 
 	// CPU information
@@ -346,7 +346,6 @@ private:
 	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
-	std::string             m_context;              // context string buffer
 	int                     m_sample_rate;          // the digital audio sample rate
 	std::unique_ptr<emu_file>  m_logfile;              // pointer to the active log file
 
@@ -397,6 +396,23 @@ private:
 
 	// configuration state
 	dummy_space_device m_dummy_space;
+
+#if defined(EMSCRIPTEN)
+private:
+	static running_machine *emscripten_running_machine;
+	static void emscripten_main_loop();
+public:
+	static void emscripten_set_running_machine(running_machine *machine);
+	static running_machine * emscripten_get_running_machine();
+	static ui_manager * emscripten_get_ui();
+	static sound_manager * emscripten_get_sound();
+
+	static void emscripten_exit();
+	static void emscripten_hard_reset();
+	static void emscripten_soft_reset();
+	static void emscripten_save(const char *name);
+	static void emscripten_load(const char *name);
+#endif
 };
 
 

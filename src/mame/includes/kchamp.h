@@ -8,6 +8,7 @@
 
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
+#include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/dac.h"
 
@@ -22,6 +23,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_ay(*this, "ay%u", 1),
 		m_adpcm_select(*this, "adpcm_select"),
 		m_msm(*this, "msm"),
 		m_dac(*this, "dac"),
@@ -46,6 +48,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device_array<ay8910_device, 2> m_ay;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_device<msm5205_device> m_msm;
 	optional_device<dac_8bit_r2r_device> m_dac;
@@ -53,14 +56,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(sound_msm_w);
 	DECLARE_READ8_MEMBER(sound_reset_r);
 	DECLARE_WRITE8_MEMBER(kc_sound_control_w);
 	DECLARE_WRITE8_MEMBER(kchamp_videoram_w);
 	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
-	DECLARE_WRITE8_MEMBER(kchamp_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_DRIVER_INIT(kchampvs);
 	DECLARE_DRIVER_INIT(kchampvs2);

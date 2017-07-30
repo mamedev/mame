@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
@@ -10,14 +10,12 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_HEXBUS_HEXBUS_H
-#define MAME_BUS_TI99_HEXBUS_HEXBUS_H
+#ifndef MAME_BUS_HEXBUS_HEXBUS_H
+#define MAME_BUS_HEXBUS_HEXBUS_H
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
-
-namespace bus { namespace ti99 { namespace hexbus {
+namespace bus { namespace hexbus {
 
 enum
 {
@@ -32,14 +30,14 @@ class hexbus_chained_device;
     Interface for a device that connects to the Hexbus
 ********************************************************************/
 
-class device_ti_hexbus_interface : public device_slot_card_interface
+class device_hexbus_interface : public device_slot_card_interface
 {
 public:
 	virtual uint8_t bus_read(int dir) =0;
 	virtual void bus_write(int dir, uint8_t data) =0;
 
 protected:
-	device_ti_hexbus_interface(const machine_config &mconfig, device_t &device) :
+	device_hexbus_interface(const machine_config &mconfig, device_t &device) :
 		device_slot_card_interface(mconfig, device) { }
 };
 
@@ -47,7 +45,7 @@ protected:
     Common parent class of all devices attached to the hexbus port
     This class implements the signal propagation in both directions
 ********************************************************************/
-class hexbus_chained_device : public device_t, public device_ti_hexbus_interface
+class hexbus_chained_device : public device_t, public device_hexbus_interface
 {
 	friend class hexbus_device;
 
@@ -57,6 +55,8 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	void set_outbound_hexbus(hexbus_device *outbound) { m_hexbus_outbound = outbound; }
 
 	// Link to the inbound Hexbus (if not null, see Oso chip)
 	hexbus_device *m_hexbus_inbound;
@@ -78,7 +78,6 @@ protected:
 	// For interrupts
 	virtual void hexbus_value_changed(uint8_t data) { };
 
-private:
 	uint8_t m_myvalue;
 };
 
@@ -102,7 +101,7 @@ public:
 
 protected:
 	void device_start() override;
-	device_ti_hexbus_interface *m_next_dev;
+	device_hexbus_interface *m_next_dev;
 
 private:
 	// owner of this Hexbus socket; may be the owning component or another
@@ -112,13 +111,13 @@ private:
 };
 
 #define MCFG_HEXBUS_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI_HEXBUS, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE( ti_hexbus_conn, nullptr, false)
+	MCFG_DEVICE_ADD(_tag, HEXBUS, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE( hexbus_conn, nullptr, false)
 
-}   }   }  // end namespace bus::ti99::hexbus
+}   }   // end namespace bus::hexbus
 
-SLOT_INTERFACE_EXTERN( ti_hexbus_conn );
+SLOT_INTERFACE_EXTERN( hexbus_conn );
 
-DECLARE_DEVICE_TYPE_NS(TI_HEXBUS, bus::ti99::hexbus, hexbus_device)
+DECLARE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device)
 
-#endif // MAME_BUS_TI99_HEXBUS_HEXBUS_H
+#endif // MAME_BUS_HEXBUS_HEXBUS_H

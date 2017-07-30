@@ -41,10 +41,6 @@ void snes_miracle_device::device_timer(emu_timer &timer, device_timer_id id, int
 	{
 		m_strobe_clock++;
 	}
-	else
-	{
-		device_serial_interface::device_timer(timer, id, param, ptr);
-	}
 }
 
 //**************************************************************************

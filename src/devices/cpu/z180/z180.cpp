@@ -779,16 +779,16 @@ static std::unique_ptr<uint8_t[]> SZHVC_sub;
 #include "z180op.hxx"
 
 
-std::vector<std::pair<int, const address_space_config *>> z180_device::memory_space_config() const
+device_memory_interface::space_config_vector z180_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config),
 			std::make_pair(AS_IO,      &m_io_config)
 		};
 	else
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_IO,      &m_io_config)
 		};

@@ -203,7 +203,7 @@ SOUNDS["K051649"] = true
 --SOUNDS["K054539"] = true
 --SOUNDS["K056800"] = true
 --SOUNDS["SEGAPCM"] = true
---SOUNDS["MULTIPCM"] = true
+SOUNDS["MULTIPCM"] = true
 SOUNDS["SCSP"] = true
 SOUNDS["AICA"] = true
 SOUNDS["RF5C68"] = true
@@ -327,6 +327,7 @@ VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
 VIDEOS["S2636"] = true
 VIDEOS["SAA5050"] = true
+VIDEOS["SDA5708"] = true
 VIDEOS["SED1200"] = true
 VIDEOS["SED1330"] = true
 VIDEOS["SED1520"] = true
@@ -396,7 +397,6 @@ MACHINES["CR589"] = true
 MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
 MACHINES["CXD1095"] = true
-MACHINES["DM9334"] = true
 MACHINES["DP8390"] = true
 --MACHINES["DS1204"] = true
 MACHINES["DS1302"] = true
@@ -560,6 +560,7 @@ MACHINES["TTL74161"] = true
 MACHINES["TTL74164"] = true
 MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
+MACHINES["TTL74259"] = true
 MACHINES["TTL7474"] = true
 MACHINES["UPD1990A"] = true
 --MACHINES["UPD4992"] = true
@@ -607,6 +608,7 @@ MACHINES["APPLE_FDC"] = true
 MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
 MACHINES["FGA002"] = true
+MACHINES["I82586"] = true
 MACHINES["INPUT_MERGER"] = true
 -- MACHINES["K054321"] = true
 
@@ -661,6 +663,7 @@ BUSES["GAMEBOY"] = true
 BUSES["GAMEGEAR"] = true
 BUSES["GBA"] = true
 BUSES["GENERIC"] = true
+BUSES["HEXBUS"] = true
 BUSES["HPHIL"] = true
 BUSES["HPDIO"] = true
 BUSES["IEEE488"] = true
@@ -893,6 +896,7 @@ FORMATS["ZX81_P"] = true
 --------------------------------------------------
 function linkProjects_mame_mess(_target, _subtarget)
 	links {
+		"access",
 		"acorn",
 		"act",
 		"adc",
@@ -949,6 +953,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"einis",
 		"elektor",
 		"elektrka",
+		"elektron",
 		"ensoniq",
 		"enterprise",
 		"entex",
@@ -985,6 +990,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"isc",
 		"kaypro",
 		"koei",
+		"kurzweil",
 		"kyocera",
 		"luxor",
 		"magnavox",
@@ -1296,6 +1302,11 @@ files {
 --------------------------------------------------
 -- manufacturer-specific groupings for drivers
 --------------------------------------------------
+
+createMESSProjects(_target, _subtarget, "access")
+files {
+	MAME_DIR .. "src/mame/drivers/acvirus.cpp",
+}
 
 createMESSProjects(_target, _subtarget, "acorn")
 files {
@@ -1878,6 +1889,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/junior.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "elektron")
+files {
+	MAME_DIR .. "src/mame/drivers/elektronmono.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "ensoniq")
 files {
 	MAME_DIR .. "src/mame/drivers/esq1.cpp",
@@ -2128,6 +2144,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/isbc.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8010.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8030.cpp",
+	MAME_DIR .. "src/mame/machine/imm6_76.cpp",
+	MAME_DIR .. "src/mame/machine/imm6_76.h",
 	MAME_DIR .. "src/mame/machine/isbc_215g.cpp",
 	MAME_DIR .. "src/mame/machine/isbc_215g.h",
 	MAME_DIR .. "src/mame/machine/isbc_208.cpp",
@@ -2152,8 +2170,6 @@ files {
 	MAME_DIR .. "src/mame/includes/interpro.h",
 	MAME_DIR .. "src/mame/machine/cammu.h",
 	MAME_DIR .. "src/mame/machine/cammu.cpp",
-	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
-	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
 	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
 	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
 	MAME_DIR .. "src/mame/machine/interpro_mcga.h",
@@ -2201,6 +2217,11 @@ files {
 createMESSProjects(_target, _subtarget, "koei")
 files {
 	MAME_DIR .. "src/mame/drivers/pasogo.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "kurzweil")
+files {
+	MAME_DIR .. "src/mame/drivers/krz2000.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "kyocera")
@@ -2553,6 +2574,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pcipc.cpp",
 	MAME_DIR .. "src/mame/drivers/tandy1t.cpp",
 	MAME_DIR .. "src/mame/drivers/tosh1000.cpp",
+	MAME_DIR .. "src/mame/drivers/compc.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.h",
 }
@@ -2810,6 +2832,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mz6500.cpp",
 	MAME_DIR .. "src/mame/drivers/zaurus.cpp",
 	MAME_DIR .. "src/mame/machine/pxa255.h",
+	MAME_DIR .. "src/mame/drivers/fontwriter.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sinclair")
@@ -3318,6 +3341,7 @@ createMESSProjects(_target, _subtarget, "yamaha")
 files {
 	MAME_DIR .. "src/mame/drivers/ymmu100.cpp",
 	MAME_DIR .. "src/mame/drivers/fb01.cpp",
+	MAME_DIR .. "src/mame/drivers/tg100.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "zenith")

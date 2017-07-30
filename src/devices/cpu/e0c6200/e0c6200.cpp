@@ -173,9 +173,9 @@ void e0c6200_cpu_device::do_interrupt()
 	standard_irq_callback(m_irq_id);
 }
 
-std::vector<std::pair<int, const address_space_config *>> e0c6200_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector e0c6200_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};

@@ -26,6 +26,18 @@ void wrally_state::machine_start()
 
 ***************************************************************************/
 
+WRITE8_MEMBER(wrally_state::shareram_w)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+READ8_MEMBER(wrally_state::shareram_r)
+{
+	// why isn't there an AM_SOMETHING macro for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
 WRITE16_MEMBER(wrally_state::vram_w)
 {
 	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
@@ -34,9 +46,14 @@ WRITE16_MEMBER(wrally_state::vram_w)
 	m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 }
 
-WRITE16_MEMBER(wrally_state::flipscreen_w)
+WRITE8_MEMBER(wrally_state::latch_w)
 {
-	flip_screen_set(data & 0x01);
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
+{
+	flip_screen_set(state);
 }
 
 WRITE16_MEMBER(wrally_state::okim6295_bankswitch_w)
@@ -46,12 +63,22 @@ WRITE16_MEMBER(wrally_state::okim6295_bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(wrally_state::coin_counter_w)
+WRITE_LINE_MEMBER(wrally_state::coin1_counter_w)
 {
-	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE16_MEMBER(wrally_state::coin_lockout_w)
+WRITE_LINE_MEMBER(wrally_state::coin2_counter_w)
 {
-	machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin1_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
 }

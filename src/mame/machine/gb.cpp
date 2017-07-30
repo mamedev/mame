@@ -190,10 +190,6 @@ MACHINE_START_MEMBER(gb_state,sgb)
 
 	save_gb_base();
 	save_sgb_only();
-
-	if (m_cartslot && m_cartslot->get_sgb_hack()) {
-		dynamic_cast<sgb_ppu_device*>(m_ppu.target())->set_sgb_hack(true);
-	}
 }
 
 void gb_state::machine_reset()
@@ -323,38 +319,38 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 #ifdef MAME_DEBUG
 static const char *const sgbcmds[32] =
 {
-	"PAL01   ",
-	"PAL23   ",
-	"PAL03   ",
-	"PAL12   ",
-	"ATTR_BLK",
-	"ATTR_LIN",
-	"ATTR_DIV",
-	"ATTR_CHR",
-	"SOUND   ",
-	"SOU_TRN ",
-	"PAL_SET ",
-	"PAL_TRN ",
-	"ATRC_EN ",
-	"TEST_EN ",
-	"ICON_EN ",
-	"DATA_SND",
-	"DATA_TRN",
-	"MLT_REG ",
-	"JUMP    ",
-	"CHR_TRN ",
-	"PCT_TRN ",
-	"ATTR_TRN",
-	"ATTR_SET",
-	"MASK_EN ",
-	"OBJ_TRN ",
-	"????????",
-	"????????",
-	"????????",
-	"????????",
-	"????????",
-	"????????",
-	"????????"
+	/* 0x00 */ "PAL01   ",
+	/* 0x01 */ "PAL23   ",
+	/* 0x02 */ "PAL03   ",
+	/* 0x03 */ "PAL12   ",
+	/* 0x04 */ "ATTR_BLK",
+	/* 0x05 */ "ATTR_LIN",
+	/* 0x06 */ "ATTR_DIV",
+	/* 0x07 */ "ATTR_CHR",
+	/* 0x08 */ "SOUND   ",
+	/* 0x09 */ "SOU_TRN ",
+	/* 0x0A */ "PAL_SET ",
+	/* 0x0B */ "PAL_TRN ",
+	/* 0x0C */ "ATRC_EN ",
+	/* 0x0D */ "TEST_EN ",
+	/* 0x0E */ "ICON_EN ",
+	/* 0x0F */ "DATA_SND",
+	/* 0x10 */ "DATA_TRN",
+	/* 0x11 */ "MLT_REG ",
+	/* 0x12 */ "JUMP    ",
+	/* 0x13 */ "CHR_TRN ",
+	/* 0x14 */ "PCT_TRN ",
+	/* 0x15 */ "ATTR_TRN",
+	/* 0x16 */ "ATTR_SET",
+	/* 0x17 */ "MASK_EN ",
+	/* 0x18 */ "OBJ_TRN ",
+	/* 0x19 */ "PAL_PRI ",
+	/* 0x1A */ "????????",
+	/* 0x1B */ "????????",
+	/* 0x1C */ "????????",
+	/* 0x1D */ "????????",
+	/* 0x1E */ "????????",
+	/* 0x1F */ "????????"
 };
 #endif
 

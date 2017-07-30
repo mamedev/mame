@@ -331,9 +331,9 @@ void mcs40_cpu_device_base::execute_run()
     device_memory_interface implementation
 ***********************************************************************/
 
-std::vector<std::pair<int, const address_space_config *>> mcs40_cpu_device_base::memory_space_config() const
+device_memory_interface::space_config_vector mcs40_cpu_device_base::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 			std::make_pair(AS_ROM,            &m_space_config[AS_ROM]),
 			std::make_pair(AS_RAM_MEMORY,     &m_space_config[AS_RAM_MEMORY]),
 			std::make_pair(AS_ROM_PORTS,      &m_space_config[AS_ROM_PORTS]),

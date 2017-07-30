@@ -127,8 +127,6 @@ public:
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 	static bool get_mmm01_candidate(const uint8_t *ROM, uint32_t len);
 	static bool is_mbc1col_game(const uint8_t *ROM, uint32_t len);
-	// remove me when SGB is properly emulated
-	int get_sgb_hack() { return m_sgb_hack; }
 
 	void setup_ram(uint8_t banks);
 	void internal_header_logging(uint8_t *ROM, uint32_t len);
@@ -155,9 +153,6 @@ public:
 
 protected:
 	gb_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	// Donkey Kong Land 2 + 3 store SGB border tiles differently... this will be hopefully be removed when SGB is properly emulated!
-	int m_sgb_hack;
 
 	int m_type;
 	device_gb_cart_interface*       m_cart;

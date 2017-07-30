@@ -169,7 +169,6 @@ TODO:
 #define CLR_HNZC    CC&=0xd2
 #define CLR_NZVC    CC&=0xf0
 #define CLR_Z       CC&=0xfb
-#define CLR_NZC     CC&=0xf2
 #define CLR_ZC      CC&=0xfa
 #define CLR_C       CC&=0xfe
 
@@ -274,6 +273,7 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 /* Macros for branch instructions */
 #define BRANCH(f) {IMMBYTE(t);if(f){PC+=SIGNED(t);}}
 #define NXORV  ((CC&0x08)^((CC&0x02)<<2))
+#define NXORC  ((CC&0x08)^((CC&0x01)<<3))
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
@@ -362,15 +362,15 @@ nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> m6800_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector m6800_cpu_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config)
 		};
 	else
-		return std::vector<std::pair<int, const address_space_config *>> {
+		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config)
 		};
 }

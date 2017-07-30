@@ -68,12 +68,14 @@ public:
 	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(std::forward<Object>(cb)); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( register_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(register_w);
+	DECLARE_WRITE8_MEMBER(data_w);
+
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
 	// device-level overrides
@@ -258,6 +260,7 @@ private:
 	uint8_t                  m_lastreg;
 	devcb_write_line       m_irqhandler;
 	devcb_write8           m_portwritehandler;
+	bool                   m_reset_active;
 
 	void init_tables();
 	void calculate_timers();

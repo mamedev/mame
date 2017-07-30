@@ -161,7 +161,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override { }
 	virtual void device_clock_changed() override { }
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	TIMER_CALLBACK_MEMBER(timer1_callback);

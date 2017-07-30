@@ -79,9 +79,9 @@ cesblit_device::cesblit_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> cesblit_device::memory_space_config() const
+device_memory_interface::space_config_vector cesblit_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_space_config)
 	};
 }

@@ -29,7 +29,7 @@ P0-044B                 88 Caliber 50                           Taito / RomStar
 P0-045A  (M6100429A)    89 DownTown                             Taito / RomStar
 P0-045A                 89 Arbalester                           Taito / RomStar
 P0-046A  (M6100430A)    89 U.S. Classic(2)                      Taito / RomStar
-P0-047A                 ?? Seta Roulette                        Seta / Visco
+P0-047A                 89 The Roulette                         Visco
 P1-036-A + P0-045-A +
 P1-049A                 89 Meta Fox                             Taito / RomStar
 P0-053-1                89 Castle of Dragon/Dragon Unit         Taito / RomStar / Athena
@@ -1383,6 +1383,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "screen.h"
 #include "speaker.h"
 
+#include "setaroul.lh"
 
 #if __uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark
@@ -2361,29 +2362,53 @@ static ADDRESS_MAP_START( drgnunit_map, AS_PROGRAM, 16, seta_state )
 ADDRESS_MAP_END
 
 /***************************************************************************
-        Seta Roulette
+                                The Roulette
 ***************************************************************************/
+
+// Coin drop
+MACHINE_RESET_MEMBER(setaroul_state, setaroul)
+{
+	m_coin_start_cycles = 0;
+}
+
+INPUT_CHANGED_MEMBER( setaroul_state::coin_drop_start )
+{
+	if (newval && !m_coin_start_cycles)
+		m_coin_start_cycles = m_maincpu->total_cycles();
+}
+
+CUSTOM_INPUT_MEMBER( setaroul_state::coin_sensors_r )
+{
+	uint8_t data = 0x03;
+
+	// simulates the passage of coins through multiple sensors
+	if (m_coin_start_cycles)
+	{
+		attotime diff = m_maincpu->cycles_to_attotime(m_maincpu->total_cycles() - m_coin_start_cycles);
+
+		if (diff <= attotime::from_msec(16*10))
+			data &= ~0x02;
+
+		if (diff > attotime::from_msec(16*5) && diff < attotime::from_msec(16*15))
+			data &= ~0x01;
+
+		if (diff > attotime::from_msec(16*15))
+			m_coin_start_cycles = 0;
+	}
+
+	return data;
+}
 
 // the spritey low bits are mapped to 1 in every 4 bytes here as if it were a 32-bit bus..which is weird
 // other ram is similar..
 
-WRITE16_MEMBER(seta_state::setaroul_spriteylow_w)
-{
-	if ((offset&1)==0) m_seta001->spriteylow_w8(space, offset>>1, (data & 0xff00) >> 8);
-}
-
-WRITE16_MEMBER(seta_state::setaroul_spritectrl_w)
-{
-	if ((offset&1)==0) m_seta001->spritectrl_w8(space, offset>>1, (data & 0xff00) >> 8);
-}
-
-WRITE16_MEMBER(seta_state::setaroul_spritecode_w)
+WRITE16_MEMBER(setaroul_state::spritecode_w)
 {
 	if ((offset&1)==1) m_seta001->spritecodelow_w8(space, offset>>1, (data & 0xff00) >> 8);
 	if ((offset&1)==0) m_seta001->spritecodehigh_w8(space, offset>>1, (data & 0xff00) >> 8);
 }
 
-READ16_MEMBER(seta_state::setaroul_spritecode_r)
+READ16_MEMBER(setaroul_state::spritecode_r)
 {
 	uint16_t ret;
 	if ((offset&1)==1)
@@ -2393,36 +2418,116 @@ READ16_MEMBER(seta_state::setaroul_spritecode_r)
 	return ret << 8;
 }
 
+WRITE16_MEMBER(setaroul_state::spriteylow_w)
+{
+	if ((offset&1)==0) m_seta001->spriteylow_w8(space, offset>>1, (data & 0xff00) >> 8);
+}
 
+WRITE16_MEMBER(setaroul_state::spritectrl_w)
+{
+	if ((offset&1)==0) m_seta001->spritectrl_w8(space, offset>>1, (data & 0xff00) >> 8);
+}
 
+// RTC (To do: write a D4911C device)
+READ16_MEMBER(setaroul_state::rtc_r)
+{
+	if (offset >= 7)
+		++offset;
+	if (offset/2 >= 7)
+		return 0;
+	return (m_rtc->read(space, offset/2, mem_mask) >> ((offset & 1) * 4)) & 0xf;
+}
 
+WRITE16_MEMBER(setaroul_state::rtc_w)
+{
+}
 
-static ADDRESS_MAP_START( setaroul_map, AS_PROGRAM, 16, seta_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM                             // ROM
+// Inputs
+READ16_MEMBER(setaroul_state::inputs_r)
+{
+	if (m_mux < 0x1a)
+		return m_bet[m_mux]->read();
+	return 0xff;
+}
+WRITE16_MEMBER(setaroul_state::mux_w)
+{
+	m_mux = data;
+}
+
+// Outputs
+void setaroul_state::show_outputs()
+{
+#ifdef MAME_DEBUG
+	popmessage("Pay: %02X Led: %02X", m_pay, m_led);
+#endif
+}
+
+WRITE8_MEMBER(setaroul_state::pay_w)
+{
+	m_pay = data;
+
+	machine().bookkeeping().coin_counter_w(6,   data  & 0x01);  // coin in         (meter 6 in input test, touch '7')
+	machine().bookkeeping().coin_counter_w(5,   data  & 0x02);  // coupon in       (meter 5 in input test, touch '6')
+	machine().bookkeeping().coin_counter_w(4,   data  & 0x04);  // coin drop       (meter 4 in input test, touch '5')
+	machine().bookkeeping().coin_counter_w(3,   data  & 0x08);  // unused?         (meter 3 in input test, touch '4')
+	machine().bookkeeping().coin_counter_w(2,   data  & 0x10);  // medal out       (meter 2 in input test, touch '3')
+	machine().bookkeeping().coin_counter_w(1,   data  & 0x20);  // note in         (meter 1 in input test, touch '2')
+	//                                          data  & 0x40    // hopper lock-out (lock.o  in input test, touch '8')
+	//                                          data  & 0x80    // hopper motor    (hop.h   in input test, touch '0')
+	m_hopper->write(space, 0,(!(data & 0x40) && (data & 0x80)) ? 0x80 : 0x00);
+
+	show_outputs();
+}
+
+WRITE8_MEMBER(setaroul_state::led_w)
+{
+	m_led = data;
+
+	output().set_led_value(0,   data  & 0x01);  // pay out        (hop.c in input test, touch '1')
+	output().set_led_value(1,   data  & 0x02);  // call attendant (cal.o in input test, touch '9')
+	//
+	//                          data  & 0x10    // hopper divider (divider in input test, touch '10')
+	//                          data  & 0x80    // video enable?
+
+	show_outputs();
+}
+
+static ADDRESS_MAP_START( setaroul_map, AS_PROGRAM, 16, setaroul_state )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+
+	AM_RANGE(0x800000, 0x800003) AM_NOP // RS232C Auto Time Set: r/w
 
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_RAM
-	AM_RANGE(0xc80000, 0xc80001) AM_NOP
+	AM_RANGE(0xc40000, 0xc40001) AM_NOP // lev. 2/5 irq ack
+	AM_RANGE(0xc80000, 0xc80001) AM_NOP // lev. 4   irq ack
 
+	AM_RANGE(0xcc0000, 0xcc001f) AM_READWRITE(rtc_r, rtc_w)
 
-	AM_RANGE(0xcc0000, 0xcc0019) AM_READ_PORT("UNK0") // rtc?
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 
-	AM_RANGE(0xd00000, 0xd00001) AM_NOP // watchdog?
-	AM_RANGE(0xd40000, 0xd40001) AM_READ_PORT("UNK1")
-	AM_RANGE(0xd40004, 0xd40005) AM_READ_PORT("UNK2")
-	AM_RANGE(0xd40006, 0xd40007) AM_READ_PORT("UNK3")
-	AM_RANGE(0xd40008, 0xd40009) AM_READ_PORT("UNK4")
-	AM_RANGE(0xd4000a, 0xd4000b) AM_READ_PORT("UNK5")
-	AM_RANGE(0xd40010, 0xd40011) AM_READ_PORT("UNK6") AM_WRITENOP // multiplex?
+	AM_RANGE(0xd40000, 0xd40001) AM_READ_PORT("DSW1-A") AM_WRITE8(pay_w, 0x00ff)
+	AM_RANGE(0xd40002, 0xd40003) AM_READ_PORT("DSW1-B")
 
-	AM_RANGE(0xdc0000, 0xdc3fff) AM_RAM
+	AM_RANGE(0xd40004, 0xd40005) AM_READ_PORT("DSW2-A")
+	AM_RANGE(0xd40006, 0xd40007) AM_READ_PORT("DSW2-B")
 
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM - draws wheel if you reset enough times..
+	AM_RANGE(0xd40008, 0xd40009) AM_READ_PORT("COIN") AM_WRITE8(led_w, 0x00ff)
+	AM_RANGE(0xd4000a, 0xd4000b) AM_READ_PORT("DOOR")
+
+	AM_RANGE(0xd40010, 0xd40011) AM_READWRITE(inputs_r, mux_w)
+
+	AM_RANGE(0xd40018, 0xd40019) AM_READ_PORT("DSW3")
+
+	AM_RANGE(0xdc0000, 0xdc3fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
+
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0xe40000, 0xe40005) AM_RAM AM_SHARE("vctrl_0")     // VRAM Ctrl
-	AM_RANGE(0xf00000, 0xf03fff) AM_READWRITE(setaroul_spritecode_r, setaroul_spritecode_w)
-	AM_RANGE(0xf40000, 0xf40bff) AM_WRITE(setaroul_spriteylow_w)
-	AM_RANGE(0xf40c00, 0xf40c11) AM_WRITE(setaroul_spritectrl_w)
+	AM_RANGE(0xf00000, 0xf03fff) AM_READWRITE(spritecode_r, spritecode_w)
+	AM_RANGE(0xf40000, 0xf40bff) AM_WRITE(spriteylow_w)
+	AM_RANGE(0xf40c00, 0xf40c11) AM_WRITE(spritectrl_w)
+
+//  AM_RANGE(0xf80000, 0xf80001) AM_WRITE // $40 at boot
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -4017,350 +4122,151 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                                Seta Roulette
+                                The Roulette
 ***************************************************************************/
 
 static INPUT_PORTS_START( setaroul )
-	PORT_START("UNK0")
-	PORT_DIPNAME( 0x0001, 0x0001, "0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x000e, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // rtc?
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("DSW1-A") // d40001.b
+	PORT_DIPNAME( 0x01, 0x01, "Accept Coins" )          PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Accept Note/Coupon" )    PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPNAME( 0x08, 0x00, "Menu 3:Log 4:RS232" )    PORT_DIPLOCATION("SW1:5") // enable menus 3 & 4 in stats screen
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 
-	PORT_START("UNK1")
-	PORT_DIPNAME( 0x0001, 0x0001, "1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("DSW1-B") // d40003.b
+	PORT_DIPNAME( 0x01, 0x00, "Play Jingle?" )          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPNAME( 0x02, 0x02, "Use Hopper" )            PORT_DIPLOCATION("SW1:3") // needed for payout
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW1:2?" )                PORT_DIPLOCATION("SW1:2") // unused? not shown in input test
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW1:1?" )                PORT_DIPLOCATION("SW1:1") // unused? not shown in input test
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("UNK2")
-	PORT_DIPNAME( 0x0001, 0x0001, "2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("DSW2-A") // d40005.b
+	PORT_DIPNAME( 0x01, 0x00, "Check Door 1?" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPNAME( 0x02, 0x00, "Check Door 2?" )         PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x00, "Check Door 3?" )         PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW2:2" )                 PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("UNK3")
-	PORT_DIPNAME( 0x0001, 0x0001, "3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("DSW2-B") // d40007.b
+	PORT_DIPNAME( 0x01, 0x01, "SW2:4" )                 PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Menu 5:RS323? 6:Sound 7:Gfx 8:Clock" ) PORT_DIPLOCATION("SW2:3") // enable 4 *hidden* menus and debug key
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW2:5" )                 PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x08, 0x08 )                          PORT_DIPLOCATION("SW2:1") // service mode
 
-	PORT_START("UNK4")
-	PORT_DIPNAME( 0x0001, 0x0001, "4" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW) // 'reset switch'
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("COIN") // d40009.b
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // medal (causes hopper over run / empty if the dsw is on)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset")         // rst     (button SW5? Press twice quickly to enter the keyboard test)
+	PORT_DIPNAME( 0x04, 0x04, "Credit Meter" )    PORT_DIPLOCATION("SW6:1")  // crt.mtr (switch SW6? Shows stats screen. With added menus, if their dsw is on)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Attendant Pay") // att.pay (clears error)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3    ) PORT_NAME("Note")          // note    (same as 100 coins)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_NAME("Coupon")        // cupon   (same as  10 coins)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, setaroul_state, coin_sensors_r, nullptr)
 
-	// hold COIN1 and press COIN2 to get credits..  both bits must change! (coin must pass 2 sensors?)  gives a coinjam / timeout after a while if this doesn't happen..
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_COIN2 ) //
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 ) // ^^
+	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, setaroul_state, coin_drop_start, nullptr)
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("DOOR") // d4000b.b
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Drop") // drop    ("coin drop jam or time out" error when stuck low)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )                   // hop.ovf (hopper overflow, ignored?)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("Door 1") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("Door 3") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT    )
 
-	PORT_START("UNK5")
-	PORT_DIPNAME( 0x0001, 0x0001, "5" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+#define PORT_BET(_TAG) \
+	PORT_START(_TAG) \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 0") \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 1") \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 2") \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 3") \
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 4") \
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 5") \
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 6") \
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(_TAG " Row 7")
 
-	PORT_START("UNK6")
-	PORT_DIPNAME( 0x0001, 0x0001, "6" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// d40011.b (26 columns, 1 bit per row)
+	PORT_BET("BET.00")
+	PORT_BET("BET.01")
+	PORT_BET("BET.02")
+	PORT_BET("BET.03")
+	PORT_BET("BET.04")
+	PORT_BET("BET.05")
+	PORT_BET("BET.06")
+	PORT_BET("BET.07")
+	PORT_BET("BET.08")
+	PORT_BET("BET.09")
+	PORT_BET("BET.0A")
+	PORT_BET("BET.0B")
+	PORT_BET("BET.0C")
+	PORT_BET("BET.0D")
+	PORT_BET("BET.0E")
+	PORT_BET("BET.0F")
+	PORT_BET("BET.10")
+	PORT_BET("BET.11")
+	PORT_BET("BET.12")
+	PORT_BET("BET.13")
+	PORT_BET("BET.14")
+	PORT_BET("BET.15")
+	PORT_BET("BET.16")
+	PORT_BET("BET.17")
+	PORT_BET("BET.18")
+	PORT_BET("BET.19")
+
+	PORT_START("DSW3") // d40019.b
+	PORT_DIPNAME( 0x03, 0x03, "Payout %" )             PORT_DIPLOCATION("SW3:7,8")
+	PORT_DIPSETTING(    0x00, "65"   )
+	PORT_DIPSETTING(    0x01, "75"   )
+	PORT_DIPSETTING(    0x02, "85"   )
+	PORT_DIPSETTING(    0x03, "97.3" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )     PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x10, 0x10, "Menu 1:Time 2:Payout" ) PORT_DIPLOCATION("SW3:4") // dsw3 4 (enable menus 1 & 2 in stats screen)
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Key" )           PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Divider" )       PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Hopper Sensor" )        PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x80, "Active Low (Error)"  ) // "Hopper Over Run" error
+	PORT_DIPSETTING(    0x00, "Active High" )
 INPUT_PORTS_END
-
 
 /***************************************************************************
                                 DownTown
@@ -7469,12 +7375,12 @@ static GFXDECODE_START( downtown )
 GFXDECODE_END
 
 /***************************************************************************
-                                Seta Roulette
+                                The Roulette
 ***************************************************************************/
 
 static GFXDECODE_START( setaroul )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0x100, 16 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp, 512*0, 2 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp,               512*0, 32 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -7515,7 +7421,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( qzkklgy2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,    512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed,      512*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed,          512*0, 32 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -8383,27 +8289,31 @@ static MACHINE_CONFIG_START( qzkklgy2 )
 MACHINE_CONFIG_END
 
 /***************************************************************************
-                                Seta Roulette
+                                The Roulette
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::setaroul_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 248)
-		m_maincpu->set_input_line(4, HOLD_LINE);
+	if ((scanline % 32) == 0) // every 2ms?
+		m_maincpu->set_input_line(2, HOLD_LINE); // read 1 board column (out of 26) every other call
 
-	if(scanline == 112)
-		m_maincpu->set_input_line(2, HOLD_LINE);
+	if (scanline == 248)
+		m_maincpu->set_input_line(4, HOLD_LINE); // vblank
+
+	// lev 6: RS232
 }
-
 
 static MACHINE_CONFIG_START( setaroul )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(setaroul_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, setaroul_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
+	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8411,31 +8321,38 @@ static MACHINE_CONFIG_START( setaroul )
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_setaroul)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_setaroul))
+	MCFG_SCREEN_UPDATE_DRIVER(setaroul_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(setaroul_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", setaroul)
 
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(seta_state,setaroul)
+	MCFG_PALETTE_INIT_OWNER(setaroul_state,setaroul)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,setaroul_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(setaroul_state,setaroul_1_layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_16MHz)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
 
+	/* devices */
+	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL_32_768kHz) // ! Actually D4911C !
+
+	// layout
+	MCFG_DEFAULT_LAYOUT(layout_setaroul)
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Eight Force
@@ -11383,49 +11300,181 @@ ROM_START( inttootea )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
 
-/*
+/***************************************************************************
+
+The Roulette (Visco)
+
 PCB P0-047A
 
 3x8 DSW
 SETA X1-004 (826100) (input)
 SETA X1-010 (811101) (sound)
-MC68B50P (timer?)
+MC68B50P (ACIA)
+uPD4911C (RTC)
 M68000
-16Mhz OSC, near CPU
-SETA X1-002A (sprites? - near 005 - 008)
-SETA X1-001A (sprites? ^)
+16MHz OSC, near CPU
+SETA X1-002A (sprites, near 005 - 008)
+SETA X1-001A (sprites, "")
 SETA X1-007 (737100)
 SETA X1-011
 SETA X1-012
-*/
+ _____________________________________________________________________________________________________________________
+|     W              T  S      R     P   N     M     L   K      J     H     F    E      D            C     B    A     |
+|          __________      _______   _______   _______   _______                 ______________________________       |
+|         |Hd74LS74AF|    |UF0    | |UF0    | |UF0    | |UF0    |               |                              |      |
+|         |__________|    |008    | |007    | |006    | |005    |               |                              |     1|
+|  __________________     |       | |       | |       | |       |               |                              |      |
+| |UF0_009        W15|    |TOSHIBA| |TOSHIBA| |TOSHIBA| |TOSHIBA|               |                              |      |
+| |                  |    |       | |       | |       | |       |               |                              |      |
+| |   4M             |    |TMM2725| |TMM2725| |TMM2725| |TMM2725|   __          |______________________________|     2|
+| |U13               |    |6AD_20 | |6AD_20 | |6BD_15 | |6BD_15 |  |  |   __                                          |
+| |__________________|    |       | |       | |       | |       |  |  |  |  |       __                                |
+|  __________________     |       | |       | |       | |       |  |S |  |  |  __  |  |                              3|
+| |UF0_010        W16|    |       | |       | |       | |       |  |  |  |T | |  | |  |                               |
+| |                  |    |       | |       | |       | |       |  |  |  |  | |  | |U |                               |
+| |   4M             |    |_______| |_______| |_______| |_______|  |__|  |  | |A1| |  |                              4|
+| |U15               |  __                                               |__| |  | |  |                               |
+| |__________________| |  |     _______________________________    _____      |  | |__|        __________________     |
+|  __________________  |  |    |                               |  |XTAL |     |__|            |UF1 002           |    |
+| |UF0_011        W17| |  |    |             SETA              |  |     |   __                |                  |   5|
+| |                  | |  |    |            8820KX             |  |16MHz|  |  |    __   __    |                  |    |
+| |   4M             | |  |    |            X1_002A            |  |     |  |  |   |  | |  |   |27512             |    |
+| |U22               | |__|    |                               |  |     |  |B |   |  | |  |   |__________________|   6|
+| |__________________|         |                               |  |_____|  |  |   |V | |W |    __________________     |
+|  __________________          |_______________________________|           |  |   |  | |  |   |UF1 003           |    |
+| |UF0_012        W18|  __                                            __   |__|   |  | |  |   |                  |    |
+| |                  | |  |     _______________________________      |  |         |__| |__|   |                  |   7|
+| |   4M             | |  |    |                               |     |  |                     |27512             |    |
+| |U29               | |  |    |             SETA              |     |  |   __     __         |__________________|    |
+| |__________________| |  |    |            8836KX             |     |X |  |  |   |  |                                |
+|  __________________  |  |    |            X1_001A            |     |  |  |  |   |  |                                |
+| |UF0_013        W19| |__|    |                               |     |  |  |D |   |D |                               8|
+| |                  |         |                               |     |  |  |  |   |  |         __________________     |
+| |   4M             |         |_______________________________|     |  |  |  |   |  |        |   TMM2063AP_12   |    |
+| |U37               |                                               |__|  |__|   |__|        |__________________|    |
+| |__________________|                                                __    __    __                                  |
+|  __________________                                                |  |  |  |  |  |   __                           9|
+| |UF0_014        W20|     ____________                              |  |  |  |  |  |  |  |    __________________     |
+| |                  |    |            |      __________________     |  |  |  |  |  |  |  |   |                  |    |
+| |   4M             |    |    SETA    |     |   TMM2063AP_10   |    |Y |  |A |  |A |  |S |   |__________________|    |
+| |U38               |    |   X1_011   |     |__________________|    |  |  |  |  |  |  |  |       _______________     |
+| |__________________|    |            |                             |  |  |  |  |  |  |  |      |               |    |
+|  __________________     |            |                             |  |  |  |  |  |  |  |      |   MC68B50P    |    |
+| |UF0_015        W21|    |____________|                             |  |  |  |  |  |  |__|      |   T6A J8905   |  10|
+| |                  |                                               |__|  |__|  |__|            |               |    |
+| |   4M             |                                                                           |_______________|    |
+| |U40               |                                                                                                |
+| |__________________|                               _______          __    __    __                                  |
+|  __________________      ____________             |       |        |  |  |  |  |  |                                 |
+| |UF0_016        W22|    |            |            |       |        |  |  |  |  |  |                                 |
+| |                  |    |    SETA    |            |_______|        |  |  |  |  |  |             ___  O              |
+| |                  |    |   X1_012   |                             |A |  |Z |  |A |          O | |#| F            11|
+| |                  |    |            |                             |  |  |  |  |  |      __  N |___| F              |
+| |__________________|    |            |                             |  |  |  |  |  |     |  |  _________             |
+|   ___________           |____________|                             |  |  |  |  |  |     |  | |74HC00AP |            |
+|  |           |                                                     |  |  |  |  |  |     |  | |_________|            |
+|  |___________|                                                     |__|  |__|  |__|     |A2|                      12|
+|   ___________                                                                           |  |                        |
+|  |           |                                                                 __       |  |                        |
+|  |___________|          __    __    __             _______          __    __  |  |      |__|   ________________     |
+|                        |  |  |  |  |  |           |       |        |  |  |  | |  |            |  TMM2063AP_12  |  13|
+|  __________________    |  |  |  |  |  |           |       |        |  |  |  | |A |            |________________|    |
+| |                  |   |L |  |I |  |K |           |_______|        |C |  |B | |  |           ___________________    |
+| |       SETA       |   |  |  |  |  |  |                            |  |  |  | |  |          |UF1 004            |   |
+| |      X1_007      |   |  |  |  |  |  |                            |  |  |  | |  |          |                   | 14|
+| |      737100      |   |__|  |__|  |__|                            |__|  |__| |__|          |  TC571001D_20     |   |
+| |__________________|                                                           __           |                   |   |
+|                           __________                                          |  |          |___________________|   |
+|                          |          |   __   __   __    __    __    __    __  |  |                         ____   15|
+|                          |__________|  |  | |  | |  |  |  |  |  |  |  |  |  | |  |     __________    __   |    |    |
+|                                        |  | |  | |  |  |  |  |  |  |  |  |  | |A |    |          |  |  |  |    |    |
+|                           __________   |  | |C | |G |  |F |  |E |  |D |  |  | |  |    | SETA     |  |  |  |DIP1|    |
+|                ___  O    |          |  |  | |  | |  |  |  |  |  |  |  |  |  | |  |    |  X1_010  |  |H |  |    |  16|
+|             O |#| | F    |__________|  |  | |  | |  |  |  |  |  |  |  |  |  | |  |    |  811101  |  |  |  |    |    |
+|             N |___| F                  |__| |__| |__|  |__|  |__|  |__|  |__| |__|    |__________|  |  |  |____|    |
+|          __________      _______                _________    _________                              |__|   ____     |
+|         |    O     |    |   M   |              |    I    |  |    I    |                                   |    |  17|
+|         |__________|    |_______|              |_________|  |_________|                 __________   __   |    |    |
+|   ___    __________      _______    ________                                           |74HC273AP | |  |  |DIP2|    |
+|  |   |  |    O     |    |   N   |  |   I    |   _________                              |__________| |  |  |    |    |
+|  |___|  |__________|    |_______|  |________|  |    J    |                              __________  |H |  |    |  18|
+|                                                |_________|                             |74HC273AP | |  |  |____|    |
+|                                     ________                                           |__________| |  |   ____     |
+|                                    |   P    |                                                       |__|  |    |  19|
+|                                    |________|                                  _____________________      |    |    |
+|          ___             _______    ________    _________    __________       |      SETA X1_004    |     |DIP3|    |
+|         |   |           |   Q   |  |   Q    |  |    Q    |  |    P     |      |        826100       |     |    |  20|
+|         |___|           |_______|  |________|  |_________|  |__________|      |                     |     |    |    |
+|                                                                               |_____________________|     |____|    |
+|                                     ________    _________    __________    ___________    _________   _________     |
+|                                    |        |  |         |  |    R     |  |     A     |  |    Q    | |    Q    |  21|
+|                                    |________|  |_________|  |__________|  |___________|  |_________| |_________|    |
+|                                                                                                                     |
+|                                                         _   _                                                       |
+|                                                        | | | |                                                    22|
+|                                                        |_| |_|                                                      |
+|                                                                                                                     |
+|                                                                                                                   23|
+|                        _______ |||||||||||||||||||||||||||||||||||||||||||||||||||||| __ ||||||| _____              |
+|                       |       ||||||||||||||||||||||||||||||||||||||||||||||||||||||||  |||||||||     |             |
+|_______________________|       |______________________________________________________|  |_______|     |_____________|
+
+
+A = 74HC245AP      O = TC74HC4520P
+B = MB74LS32       P = TC4069UBP
+C = 74HC02AP       Q = TC4050BP
+D = SN74HC138N     R = MC14504B
+E = MC74HC32       S = 74HC367AP
+F = TC24HC27P      T = M74LS04P
+G = SN74LS260N     U = MC74HC20
+H = M74LS253P      V = 74HC161AP
+I = 74HC74AP       W = SN74LS146N
+J = TC74HC174P     X = MC74F244N
+K = TC74HC157P     Y = MC74F374N
+L = MB74LS08       Z = M74LS245P
+M = HD14040BP      A1= 74HC60AP
+N = TC4013BP       A2= D4911C
+
+
+DIP1:                     DIP2:                     DIP3:
+|___________________|     |___________________|     |___________________|
+| ON                |     | ON                |     | ON                |
+| |_______________| |     | |_______________| |     | |_______________| |
+| |_|_|_|_|_|#|#|#| |     | |_|_|#|#|_|_|_|_| |     | |_|_|#|#|_|_|#|_| |
+| |#|#|#|#|#| | | | |     | |#|#| | |#|#|#|#| |     | |#|#| | |#|#| |#| |
+| |_______________| |     | |_______________| |     | |_______________| |
+|  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |
+|___________________|     |___________________|     |___________________|
+
+***************************************************************************/
 
 ROM_START( setaroul )
 	ROM_REGION( 0x0c0000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "uf1002.u14", 0x000000, 0x010000, CRC(b3a622b0) SHA1(bc4a02167002579149c19640e65e679b7c19fa66) )
-	ROM_LOAD16_BYTE( "uf1003.u16", 0x000001, 0x010000, CRC(a6afd769) SHA1(82c54c8a2219f20d08faf9f7afcf821d83511660) )
+	ROM_LOAD16_BYTE( "uf1-002.u14", 0x000000, 0x010000, CRC(b3a622b0) SHA1(bc4a02167002579149c19640e65e679b7c19fa66) )
+	ROM_LOAD16_BYTE( "uf1-003.u16", 0x000001, 0x010000, CRC(a6afd769) SHA1(82c54c8a2219f20d08faf9f7afcf821d83511660) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD16_BYTE( "uf0005.u3", 0x010001, 0x008000, CRC(383c2d57) SHA1(3bbf0464f80f657dfa275e885fbce064a0a08f4a) )
-	ROM_LOAD16_BYTE( "uf0006.u4", 0x010000, 0x008000, CRC(90c9dae6) SHA1(a226aab82f5b8174644281fa3efab4f8a8f8d827) )
-	ROM_LOAD16_BYTE( "uf0007.u5", 0x000001, 0x008000, CRC(e72c3dba) SHA1(aaebb484e76d8f3da0ecff26c3c1bad4f3f11ac0) )
-	ROM_LOAD16_BYTE( "uf0008.u6", 0x000000, 0x008000, CRC(e198e602) SHA1(f53fa36d1ea51239e71fe1ea7432bb4b7b8b3466) )
+	ROM_LOAD16_BYTE( "uf0-005.u3", 0x010001, 0x008000, CRC(383c2d57) SHA1(3bbf0464f80f657dfa275e885fbce064a0a08f4a) )
+	ROM_LOAD16_BYTE( "uf0-006.u4", 0x010000, 0x008000, CRC(90c9dae6) SHA1(a226aab82f5b8174644281fa3efab4f8a8f8d827) )
+	ROM_LOAD16_BYTE( "uf0-007.u5", 0x000001, 0x008000, CRC(e72c3dba) SHA1(aaebb484e76d8f3da0ecff26c3c1bad4f3f11ac0) )
+	ROM_LOAD16_BYTE( "uf0-008.u6", 0x000000, 0x008000, CRC(e198e602) SHA1(f53fa36d1ea51239e71fe1ea7432bb4b7b8b3466) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 1 - 8bpp? */
-	ROM_LOAD( "uf0010.u15",  0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
-	ROM_LOAD( "uf0009.u13",  0x080000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
-	ROM_LOAD( "uf0012.u29",  0x100000, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
-	ROM_LOAD( "uf0011.u22",  0x180000, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
-	ROM_LOAD( "uf0014.u38",  0x200000, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
-	ROM_LOAD( "uf0013.u37",  0x280000, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
-	ROM_LOAD( "uf0015.u40",  0x300000, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
-	ROM_LOAD( "uf0016.u48",  0x380000, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 1 - 8bpp */
+	ROM_LOAD( "uf0-010.u15", 0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
+	ROM_LOAD( "uf0-009.u13", 0x080000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
+	ROM_LOAD( "uf0-012.u29", 0x100000, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
+	ROM_LOAD( "uf0-011.u22", 0x180000, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
+	ROM_LOAD( "uf0-014.u38", 0x200000, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
+	ROM_LOAD( "uf0-013.u37", 0x280000, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
+	ROM_LOAD( "uf0-015.u40", 0x300000, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
+	ROM_LOAD( "uf0-016.u48", 0x380000, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "uf1004.u52", 0x000000, 0x020000, CRC(d63ea334) SHA1(93aaf58c90c4f704caae19b63785e471b2c1281a) )
+	ROM_REGION( 0x100000, "x1snd", ROMREGION_ERASE00 )  /* Samples */
+	ROM_LOAD( "uf1-004.u52",     0x040000, 0x020000, CRC(6638054d) SHA1(f5c4a4c822ee56cfcbb4e8401253ae0a2c2c1df7) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD16_BYTE( "ufo017.bin", 0x000, 0x200, CRC(bf50c303) SHA1(31685ed4849e5c27654f02945678db425d54bf5e) )
-	ROM_LOAD16_BYTE( "ufo018.bin", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
+	ROM_LOAD16_BYTE( "uf0-017.u50", 0x000, 0x200, CRC(bf50c303) SHA1(31685ed4849e5c27654f02945678db425d54bf5e) )
+	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
 READ16_MEMBER(seta_state::twineagl_debug_r)
@@ -11717,7 +11766,7 @@ GAME( 1989, metafox,  0,        metafox,  metafox,  seta_state, metafox,  ROT270
 
 /* 68000 */
 
-GAME( 198?, setaroul, 0,        setaroul, setaroul, seta_state, 0,        ROT270, "Visco",                  "Visco Roulette", MACHINE_NOT_WORKING ) // I can't see a title in the GFX roms.  Press F2 twice to boot..
+GAME( 1989?,setaroul, 0,        setaroul, setaroul, setaroul_state, 0,    ROT270, "Visco",                  "The Roulette (Visco)", 0 )
 
 GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, seta_state, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
 

@@ -908,9 +908,9 @@ offs_t tms57002_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	return CPU_DISASSEMBLE_NAME(tms57002)(this, stream, pc, oprom, opram, options);
 }
 
-std::vector<std::pair<int, const address_space_config *>> tms57002_device::memory_space_config() const
+device_memory_interface::space_config_vector tms57002_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &program_config),
 		std::make_pair(AS_DATA, &data_config)
 	};

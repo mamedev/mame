@@ -24,16 +24,13 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(cpu1_reset_w);
-	DECLARE_WRITE8_MEMBER(cpu2_reset_w);
-	DECLARE_WRITE8_MEMBER(mcu_reset_w);
 	DECLARE_WRITE8_MEMBER(cpu2_m6000_w);
 	DECLARE_READ8_MEMBER(cpu0_mf800_r);
 	DECLARE_WRITE8_MEMBER(soundcommand_w);
-	DECLARE_WRITE8_MEMBER(irq0_ack_w);
-	DECLARE_WRITE8_MEMBER(irq1_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(irq1_ack_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);

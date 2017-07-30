@@ -504,8 +504,7 @@ WRITE8_MEMBER( spinb_state::ppim_a_w )
 WRITE8_MEMBER( spinb_state::ppia_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
-	if (BIT(data, 5) != BIT(m_portc_a, 5))
-		m_msm_a->set_prescaler_selector(*m_msm_a, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
+	m_msm_a->s1_w(BIT(data, 5));
 	m_msm_a->reset_w(BIT(data, 6));
 	m_ic5a->clear_w(!BIT(data, 6));
 	m_portc_a = data & 0xfe;
@@ -514,8 +513,7 @@ WRITE8_MEMBER( spinb_state::ppia_c_w )
 WRITE8_MEMBER( spinb_state::ppim_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
-	if (BIT(data, 5) != BIT(m_portc_m, 5))
-		m_msm_m->set_prescaler_selector(*m_msm_m, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
+	m_msm_m->s1_w(BIT(data, 5));
 	m_msm_m->reset_w(BIT(data, 6));
 	m_ic5m->clear_w(!BIT(data, 6));
 	m_portc_m = data & 0xfe;
@@ -710,17 +708,28 @@ static MACHINE_CONFIG_START( spinb )
 	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5a_w))
 
-	MCFG_DEVICE_ADD("ic14a", HC157, 0)
+	MCFG_DEVICE_ADD("ic14a", HC157, 0) // actually IC15 on Jolly Park
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_a", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5m_w))
 
-	MCFG_DEVICE_ADD("ic14m", HC157, 0)
+	MCFG_DEVICE_ADD("ic14m", HC157, 0) // actually IC15 on Jolly Park
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vrnwrld, spinb )
+static MACHINE_CONFIG_DERIVED( jolypark, spinb )
+	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL_640kHz)
+	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
+	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
+	MCFG_SOUND_REPLACE("msm_m", MSM6585, XTAL_640kHz)
+	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5m", ttl7474_device, clock_w))
+	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( vrnwrld, jolypark )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vrnwrld_map)
@@ -857,8 +866,8 @@ ROM_START(vrnwrld)
 	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
 ROM_END
 
-GAME(1993, bushido,   0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, bushidoa,  bushido, spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, jolypark,  0,       spinb,   spinb, spinb_state,  game1,  ROT0,  "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, vrnwrld,   0,       vrnwrld, spinb, spinb_state,  game2,  ROT0,  "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, game0,  ROT0,  "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, game0,  ROT0,  "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, game0,  ROT0,  "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, game1,  ROT0,  "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, game2,  ROT0,  "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)

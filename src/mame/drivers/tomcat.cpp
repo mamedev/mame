@@ -30,6 +30,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
+#include "machine/74259.h"
 #include "machine/timekpr.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -50,7 +51,8 @@ public:
 		m_tms(*this, "tms"),
 		m_shared_ram(*this, "shared_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_dsp(*this, "dsp") { }
+		m_dsp(*this, "dsp"),
+		m_mainlatch(*this, "mainlatch") { }
 
 	required_device<tms5220_device> m_tms;
 	int m_control_num;
@@ -61,22 +63,15 @@ public:
 	DECLARE_WRITE16_MEMBER(tomcat_adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_adcread_r);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
-	DECLARE_WRITE16_MEMBER(tomcat_led1on_w);
-	DECLARE_WRITE16_MEMBER(tomcat_led2on_w);
-	DECLARE_WRITE16_MEMBER(tomcat_led2off_w);
-	DECLARE_WRITE16_MEMBER(tomcat_led1off_w);
-	DECLARE_WRITE16_MEMBER(tomcat_lnkmodel_w);
-	DECLARE_WRITE16_MEMBER(tomcat_errl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_errh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_ackl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_ackh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_lnkmodeh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_txbuffl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_txbuffh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_sndresl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_sndresh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_mresl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_mresh_w);
+	DECLARE_WRITE16_MEMBER(main_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
+	DECLARE_WRITE_LINE_MEMBER(led2_w);
+	DECLARE_WRITE_LINE_MEMBER(lnkmode_w);
+	DECLARE_WRITE_LINE_MEMBER(err_w);
+	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	DECLARE_WRITE_LINE_MEMBER(txbuff_w);
+	DECLARE_WRITE_LINE_MEMBER(sndres_w);
+	DECLARE_WRITE_LINE_MEMBER(mres_w);
 	DECLARE_WRITE16_MEMBER(tomcat_irqclr_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs2_r);
 	DECLARE_READ16_MEMBER(tomcat_320bio_r);
@@ -87,6 +82,7 @@ public:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
+	required_device<ls259_device> m_mainlatch;
 };
 
 
@@ -115,93 +111,61 @@ READ16_MEMBER(tomcat_state::tomcat_inputs_r)
 	return result;
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led1on_w)
+WRITE16_MEMBER(tomcat_state::main_latch_w)
 {
-	output().set_led_value(1, 1);
+	// A1-A3 = address, A4 = data
+	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led2on_w)
+WRITE_LINE_MEMBER(tomcat_state::led1_w)
 {
-	output().set_led_value(2, 1);
+	// Low = ON, High = OFF
+	output().set_led_value(1, !state);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led2off_w)
+WRITE_LINE_MEMBER(tomcat_state::led2_w)
 {
-	output().set_led_value(2, 0);
+	// Low = ON, High = OFF
+	output().set_led_value(2, !state);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led1off_w)
+WRITE_LINE_MEMBER(tomcat_state::lnkmode_w)
 {
-	output().set_led_value(1, 0);
+	// Link Mode
+	// When Low: Master does not respond to Interrupts
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_lnkmodel_w)
+WRITE_LINE_MEMBER(tomcat_state::err_w)
 {
-	// Link Mode Low (address strobe)
-	// Master does not respond to Interrupts
+	// Link Error Flag
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_errl_w)
+WRITE_LINE_MEMBER(tomcat_state::ack_w)
 {
-	// Link Error Flag Low (address strobe)
+	// Link ACK Flag
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_errh_w)
+WRITE_LINE_MEMBER(tomcat_state::txbuff_w)
 {
-	// Link Error Flag High (address strobe)
+	// Link Buffer Control
+	// When High: Turn off TX (Link) Buffer
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_ackl_w)
+WRITE_LINE_MEMBER(tomcat_state::sndres_w)
 {
-	// Link ACK Flag Low (address strobe)
+	// Sound Reset
+	// When Low: Reset Sound System
+	// When High: Release reset of sound system
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_ackh_w)
+WRITE_LINE_MEMBER(tomcat_state::mres_w)
 {
-	// Link ACK Flag High (address strobe)
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_lnkmodeh_w)
-{
-	// Link Mode high (address strobe)
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_txbuffl_w)
-{
-	// Link Buffer Control (address strobe)
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_txbuffh_w)
-{
-	// Link Buffer Control high (address strobe)
-	// Turn off TX (Link) Buffer
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_sndresl_w)
-{
-	// Sound Reset Low       (Address Strobe)
-	// Reset Sound System
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_sndresh_w)
-{
-	// Sound Reset high      (Address Strobe)
-	// Release reset of sound system
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_mresl_w)
-{
-	// 320 Reset Low         (Address Strobe)
-	// Reset TMS320
-	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
-{
-	// 320 Reset high        (Address Strobe)
-	// Release reset of TMS320
-	m_dsp_BIO = 0;
-	m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	// 320 Reset
+	// When Low: Reset TMS320
+	// When High: Release reset of TMS320
+	if (state)
+		m_dsp_BIO = 0;
+	m_dsp->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_irqclr_w)
@@ -281,22 +245,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x406000, 0x406001) AM_DEVWRITE("avg", avg_tomcat_device, reset_word_w)
 	AM_RANGE(0x408000, 0x408001) AM_READ(tomcat_inputs2_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x40a000, 0x40a001) AM_READWRITE(tomcat_320bio_r, tomcat_irqclr_w)
-	AM_RANGE(0x40e000, 0x40e001) AM_WRITE(tomcat_led1on_w)
-	AM_RANGE(0x40e002, 0x40e003) AM_WRITE(tomcat_led2on_w)
-	AM_RANGE(0x40e004, 0x40e005) AM_WRITE(tomcat_mresl_w)
-	AM_RANGE(0x40e006, 0x40e007) AM_WRITE(tomcat_sndresl_w)
-	AM_RANGE(0x40e008, 0x40e009) AM_WRITE(tomcat_lnkmodel_w)
-	AM_RANGE(0x40e00a, 0x40e00b) AM_WRITE(tomcat_errl_w)
-	AM_RANGE(0x40e00c, 0x40e00d) AM_WRITE(tomcat_ackl_w)
-	AM_RANGE(0x40e00e, 0x40e00f) AM_WRITE(tomcat_txbuffl_w)
-	AM_RANGE(0x40e010, 0x40e011) AM_WRITE(tomcat_led1off_w)
-	AM_RANGE(0x40e012, 0x40e013) AM_WRITE(tomcat_led2off_w)
-	AM_RANGE(0x40e014, 0x40e015) AM_WRITE(tomcat_mresh_w)
-	AM_RANGE(0x40e016, 0x40e017) AM_WRITE(tomcat_sndresh_w)
-	AM_RANGE(0x40e018, 0x40e019) AM_WRITE(tomcat_lnkmodeh_w)
-	AM_RANGE(0x40e01a, 0x40e01b) AM_WRITE(tomcat_errh_w)
-	AM_RANGE(0x40e01c, 0x40e01d) AM_WRITE(tomcat_ackh_w)
-	AM_RANGE(0x40e01e, 0x40e01f) AM_WRITE(tomcat_txbuffh_w)
+	AM_RANGE(0x40e000, 0x40e01f) AM_WRITE(main_latch_w)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("vectorram")
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM
@@ -401,6 +350,16 @@ static MACHINE_CONFIG_START( tomcat )
 	// IRQ CB connected to IRQ line of 6502
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tomcat_state, led1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tomcat_state, led2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tomcat_state, mres_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tomcat_state, sndres_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tomcat_state, lnkmode_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tomcat_state, err_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(tomcat_state, ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tomcat_state, txbuff_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

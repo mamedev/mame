@@ -569,9 +569,9 @@ void es5510_device::device_reset() {
 	memset(&ram_pp, 0, sizeof(ram_t));
 }
 
-std::vector<std::pair<int, const address_space_config *>> es5510_device::memory_space_config() const
+device_memory_interface::space_config_vector es5510_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 	};
 }
 

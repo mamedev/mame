@@ -20,7 +20,7 @@
 
 #include "bus/ti99/ti99defs.h"
 #include "bus/ti99/gromport/gromport.h"
-#include "bus/ti99/hexbus/hexbus.h"
+#include "bus/hexbus/hexbus.h"
 
 #include "bus/ti99/internal/ioport.h"
 #include "machine/ram.h"
@@ -422,21 +422,29 @@ private:
 /*
     Custom chip: OSO
 */
-class oso_device : public bus::ti99::hexbus::hexbus_chained_device
+class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
 	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start() override;
+	// Don't add a hexbus connector; we use the one from the driver instance
+	virtual void device_add_mconfig(machine_config &config) override { };
 
 	void hexbus_value_changed(uint8_t data) override;
+
+	WRITE_LINE_MEMBER( clock_in );
 
 private:
 	uint8_t m_data;
 	uint8_t m_status;
 	uint8_t m_control;
 	uint8_t m_xmit;
+
+	int m_clkcount;
+
+	int m_xmit_send;
 };
 
 class mainboard8_device : public device_t

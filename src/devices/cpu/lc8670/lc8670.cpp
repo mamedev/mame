@@ -392,9 +392,9 @@ void lc8670_cpu_device::state_string_export(const device_state_entry &entry, std
 //  the space doesn't exist
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> lc8670_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector lc8670_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config),
 		std::make_pair(AS_IO,      &m_io_config)
@@ -1006,7 +1006,7 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 			break;
 		case 0x07:
 			if (data & HOLD_MODE)
-				fatalerror("%s: unemulated HOLD mode\n", machine().describe_context());
+				fatalerror("%s: unemulated HOLD mode\n", machine().describe_context().c_str());
 			break;
 		case 0x10:
 			if (!(data & 0x80))
@@ -1144,7 +1144,7 @@ inline uint16_t lc8670_cpu_device::get_addr()
 	else if (mode > 0x03 && mode <= 0x07)
 		addr = read_data(GET_RI | ((REG_PSW>>1) & 0x0c)) | ((GET_RI & 0x02) ? 0x100 : 0x00);
 	else
-		fatalerror("%s: invalid get_addr in mode %x\n", machine().describe_context(), mode);
+		fatalerror("%s: invalid get_addr in mode %x\n", machine().describe_context().c_str(), mode);
 
 	return addr;
 }

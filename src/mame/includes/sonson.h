@@ -27,21 +27,16 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 
-	/* misc */
-	int        m_last_irq;
-
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	DECLARE_WRITE8_MEMBER(sonson_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sonson_coin1_counter_w);
-	DECLARE_WRITE8_MEMBER(sonson_coin2_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	DECLARE_WRITE8_MEMBER(sonson_videoram_w);
 	DECLARE_WRITE8_MEMBER(sonson_colorram_w);
 	DECLARE_WRITE8_MEMBER(sonson_scrollx_w);
-	DECLARE_WRITE8_MEMBER(sonson_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sonson);
 	uint32_t screen_update_sonson(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

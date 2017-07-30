@@ -245,9 +245,9 @@ void namco_c45_road_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> namco_c45_road_device::memory_space_config() const
+device_memory_interface::space_config_vector namco_c45_road_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

@@ -24,7 +24,11 @@ M37710 CPU Emulator v0.1
 enum
 {
 	// these interrupts are maskable
-	M37710_LINE_ADC = 0,
+	M37710_LINE_DMA3 = 0,
+	M37710_LINE_DMA2,
+	M37710_LINE_DMA1,
+	M37710_LINE_DMA0,
+	M37710_LINE_ADC,
 	M37710_LINE_UART1XMIT,
 	M37710_LINE_UART1RECV,
 	M37710_LINE_UART0XMIT,
@@ -93,8 +97,8 @@ enum
 class m37710_cpu_device : public cpu_device
 {
 public:
-	DECLARE_READ16_MEMBER( m37710_internal_word_r );
-	DECLARE_WRITE16_MEMBER( m37710_internal_word_w );
+	DECLARE_READ8_MEMBER( m37710_internal_r );
+	DECLARE_WRITE8_MEMBER( m37710_internal_w );
 
 protected:
 	// construction/destruction
@@ -172,6 +176,10 @@ private:
 	uint8_t m_m37710_regs[128];
 	attotime m_reload[8];
 	emu_timer *m_timers[8];
+	uint32_t m_dma0_src, m_dma0_dst, m_dma0_cnt, m_dma0_mode;
+	uint32_t m_dma1_src, m_dma1_dst, m_dma1_cnt, m_dma1_mode;
+	uint32_t m_dma2_src, m_dma2_dst, m_dma2_cnt, m_dma2_mode;
+	uint32_t m_dma3_src, m_dma3_dst, m_dma3_cnt, m_dma3_mode;
 
 	// for debugger
 	uint32_t m_debugger_pc;
@@ -2038,10 +2046,19 @@ protected:
 	DECLARE_ADDRESS_MAP(map, 16);
 };
 
+class m37720s1_device : public m37710_cpu_device
+{
+public:
+	// construction/destruction
+	m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	DECLARE_ADDRESS_MAP(map, 16);
+};
 
 DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)
 DECLARE_DEVICE_TYPE(M37702S1, m37702s1_device)
 DECLARE_DEVICE_TYPE(M37710S4, m37710s4_device)
+DECLARE_DEVICE_TYPE(M37720S1, m37720s1_device)
 
 
 /* ======================================================================== */

@@ -12,6 +12,8 @@
 #pragma once
 
 #include "cpu/i86/i186.h"
+#include "machine/am9517a.h"
+#include "bus/rs232/rs232.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -38,6 +40,22 @@ protected:
 private:
 	/* Attached devices */
 	required_device<cpu_device> m_smioccpu;
+
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
+	required_device<am9517a_device> m_dma8237_3;
+	required_device<am9517a_device> m_dma8237_4;
+	required_device<am9517a_device> m_dma8237_5;
+
+	required_device<rs232_port_device> m_rs232_p1;
+	required_device<rs232_port_device> m_rs232_p2;
+	required_device<rs232_port_device> m_rs232_p3;
+	required_device<rs232_port_device> m_rs232_p4;
+	required_device<rs232_port_device> m_rs232_p5;
+	required_device<rs232_port_device> m_rs232_p6;
+	required_device<rs232_port_device> m_rs232_p7;
+	required_device<rs232_port_device> m_rs232_p8;
+
 	required_shared_ptr<uint8_t> m_smioc_ram;
 };
 

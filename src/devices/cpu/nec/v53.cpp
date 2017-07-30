@@ -172,7 +172,7 @@ m_DST = 0x00;
 m_DMK = 0x0f;
 */
 
-std::vector<std::pair<int, const address_space_config *>> v53_base_device::memory_space_config() const
+device_memory_interface::space_config_vector v53_base_device::memory_space_config() const
 {
 	auto r = nec_common_device::memory_space_config();
 	r.emplace_back(std::make_pair(AS_IO, &m_io_space_config));

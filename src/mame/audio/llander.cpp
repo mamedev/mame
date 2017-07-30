@@ -8,8 +8,9 @@
 
 #include "emu.h"
 #include "includes/asteroid.h"
-#include "sound/discrete.h"
 #include "audio/llander.h"
+#include "sound/discrete.h"
+#include "speaker.h"
 
 /************************************************************************/
 /* Lunar Lander Sound System Analog emulation by K.Wilkins Nov 2000     */
@@ -41,7 +42,7 @@ static const discrete_lfsr_desc llander_lfsr =
 	14          /* Output bit */
 };
 
-DISCRETE_SOUND_START(llander)
+static DISCRETE_SOUND_START(llander)
 	/************************************************/
 	/* llander Effects Relataive Gain Table         */
 	/*                                              */
@@ -96,3 +97,12 @@ WRITE8_MEMBER(asteroid_state::llander_sounds_w)
 	m_discrete->write(space, LLANDER_TONE6K_EN, data & 0x20);        /* Tone 6KHz enable */
 	m_discrete->write(space, LLANDER_EXPLOD_EN, data & 0x08);        /* Explosion */
 }
+
+
+MACHINE_CONFIG_START( llander_sound )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(llander)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END

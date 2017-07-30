@@ -32,12 +32,6 @@ ioport_constructor serial_terminal_device::device_input_ports() const
 	return INPUT_PORTS_NAME(serial_terminal);
 }
 
-void serial_terminal_device::device_start()
-{
-	generic_terminal_device::device_start();
-	device_buffered_serial_interface::register_save_state(machine().save(), this);
-}
-
 WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
 {
 	clear_fifo();
@@ -70,12 +64,6 @@ void serial_terminal_device::device_reset()
 	generic_terminal_device::device_reset();
 
 	update_serial(0);
-}
-
-void serial_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	generic_terminal_device::device_timer(timer, id, param, ptr);
-	device_buffered_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void serial_terminal_device::send_key(uint8_t code)

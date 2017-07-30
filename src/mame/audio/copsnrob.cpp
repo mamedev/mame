@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "includes/copsnrob.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 
 /* Discrete Sound Input Nodes */
@@ -589,7 +590,7 @@ DISCRETE_RESET(copsnrob_zings_555_astable)
  ************************************************/
 
 
-DISCRETE_SOUND_START(copsnrob)
+static DISCRETE_SOUND_START(copsnrob)
 
 	/************************************************
 	 * Input register mapping
@@ -687,57 +688,29 @@ DISCRETE_SOUND_START(copsnrob)
 DISCRETE_SOUND_END
 
 
-WRITE8_MEMBER(copsnrob_state::copsnrob_misc_w)
+WRITE_LINE_MEMBER(copsnrob_state::one_start_w)
 {
-	uint8_t latched_data = m_ic_h3_data;
-	uint8_t special_data = data & 0x01;
-
-	/* ignore if no change */
-	if (((latched_data >> offset) & 0x01) == special_data)
-		return;
-
-	if (special_data)
-		latched_data |= 1 << offset;
-	else
-		latched_data &= ~(1 << offset);
-
-	switch (offset)
-	{
-		case 0x00:
-			m_discrete->write(space, COPSNROB_MOTOR3_INV, special_data);
-			break;
-
-		case 0x01:
-			m_discrete->write(space, COPSNROB_MOTOR2_INV, special_data);
-			break;
-
-		case 0x02:
-			m_discrete->write(space, COPSNROB_MOTOR1_INV, special_data);
-			break;
-
-		case 0x03:
-			m_discrete->write(space, COPSNROB_MOTOR0_INV, special_data);
-			break;
-
-		case 0x04:
-			m_discrete->write(space, COPSNROB_SCREECH_INV, special_data);
-			break;
-
-		case 0x05:
-			m_discrete->write(space, COPSNROB_CRASH_INV, special_data);
-			break;
-
-		case 0x06:
-			/* One Start */
-			output().set_led_value(0, !special_data);
-			break;
-
-		case 0x07:
-			m_discrete->write(space, COPSNROB_AUDIO_ENABLE, special_data);
-			//machine().sound().system_mute(special_data);
-			break;
-
-	}
-
-	m_ic_h3_data = latched_data;
+	/* One Start */
+	output().set_led_value(0, !state);
 }
+
+
+MACHINE_CONFIG_START( copsnrob_audio )
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(copsnrob)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("latch", F9334, 0) // H3 on audio board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR3_INV>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR2_INV>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR1_INV>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR0_INV>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_SCREECH_INV>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_CRASH_INV>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(copsnrob_state, one_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_AUDIO_ENABLE>))
+MACHINE_CONFIG_END

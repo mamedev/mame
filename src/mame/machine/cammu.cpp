@@ -149,9 +149,9 @@ void cammu_device::device_reset()
 {
 }
 
-std::vector<std::pair<int, const address_space_config *>> cammu_device::memory_space_config() const
+device_memory_interface::space_config_vector cammu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_main_space_config),
 		std::make_pair(1, &m_io_space_config),
 		std::make_pair(2, &m_boot_space_config)
@@ -215,7 +215,7 @@ READ32_MEMBER(cammu_device::insn_r)
 
 	case 6: // cache purge
 	case 7: // main memory, slave mode
-		fatalerror("system tag %d not supported %s\n", (pte & 0xe00) >> 9, machine().describe_context());
+		fatalerror("system tag %d not supported %s\n", (pte & 0xe00) >> 9, machine().describe_context().c_str());
 	}
 
 	return 0;
@@ -285,7 +285,7 @@ READ32_MEMBER(cammu_device::data_r)
 
 	case 6: // cache purge
 	case 7: // main memory, slave mode
-		fatalerror("data_r: system tag %d not supported at %s\n", (pte & 0xe00) >> 9, machine().describe_context());
+		fatalerror("data_r: system tag %d not supported at %s\n", (pte & 0xe00) >> 9, machine().describe_context().c_str());
 	}
 
 	return 0;
@@ -364,7 +364,7 @@ WRITE32_MEMBER(cammu_device::data_w)
 
 	case 6: // cache purge
 	case 7: // main memory, slave mode
-		fatalerror("data_w: system tag %d not supported at %s\n", (pte & 0xe00) >> 9, machine().describe_context());
+		fatalerror("data_w: system tag %d not supported at %s\n", (pte & 0xe00) >> 9, machine().describe_context().c_str());
 		break;
 	}
 #else
@@ -386,11 +386,11 @@ u32 cammu_c4_device::get_pte(u32 va, int user, bool data)
 
 		u32 pto = m_main_space->read_dword(pdo | (va & 0xffc00000) >> 20);
 		if (pto & 0x1)
-			fatalerror("can't deal with pto faults va 0x%08x %s\n", va, machine().describe_context());
+			fatalerror("can't deal with pto faults va 0x%08x %s\n", va, machine().describe_context().c_str());
 
 		u32 pte = m_main_space->read_dword((pto & 0xfffff000) | (va & 0x003ff000) >> 10);
 		if (pte & 0x1)
-			fatalerror("can't deal with pte faults va 0x%08x %s\n", va, machine().describe_context());
+			fatalerror("can't deal with pte faults va 0x%08x %s\n", va, machine().describe_context().c_str());
 
 		m_tlb[tlb_index].va = va & 0xfffff000;
 		m_tlb[tlb_index].pte = pte;
@@ -406,11 +406,11 @@ u32 cammu_c3_device::get_pte(u32 va, int user, bool data)
 
 	u32 pto = m_main_space->read_dword(pdo | (va & 0xffc00000) >> 20);
 	if (pto & 0x1)
-		fatalerror("can't deal with pto faults va 0x%08x %s\n", va, machine().describe_context());
+		fatalerror("can't deal with pto faults va 0x%08x %s\n", va, machine().describe_context().c_str());
 
 	u32 pte = m_main_space->read_dword((pto & 0xfffff000) | (va & 0x003ff000) >> 10);
 	if (pte & 0x1)
-		fatalerror("can't deal with pte faults va 0x%08x %s\n", va, machine().describe_context());
+		fatalerror("can't deal with pte faults va 0x%08x %s\n", va, machine().describe_context().c_str());
 
 	return pte;
 }

@@ -28,12 +28,6 @@
 class osborne1_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_VIDEO,
-		TIMER_ACIA_RXC_TXC
-	};
-
 	osborne1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -102,8 +96,8 @@ public:
 	required_device<floppy_connector>       m_floppy1;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	TIMER_CALLBACK_MEMBER(video_callback);
+	TIMER_CALLBACK_MEMBER(acia_rxc_txc_callback);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

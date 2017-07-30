@@ -35,12 +35,12 @@ public:
 
 	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<gaelco_serial_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_READ8_MEMBER( status_r);
-	DECLARE_WRITE8_MEMBER( data_w);
-	DECLARE_READ8_MEMBER( data_r);
-	DECLARE_WRITE8_MEMBER( rts_w );
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(data_w);
+	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_WRITE_LINE_MEMBER(rts_w);
 	/* Set to 1 during transmit, 0 for receive */
-	DECLARE_WRITE8_MEMBER( tr_w);
+	DECLARE_WRITE_LINE_MEMBER(tr_w);
 
 
 	/* Big questions marks, related to serial i/o */
@@ -48,11 +48,11 @@ public:
 	/* Not used in surfplnt, but in radikalb
 	 * Set at beginning of transfer sub, cleared at end
 	 */
-	DECLARE_WRITE8_MEMBER( unknown_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_w);
 
 
 	/* only used in radikalb, set at beginning of receive isr, cleared at end */
-	DECLARE_WRITE8_MEMBER( irq_enable );
+	DECLARE_WRITE_LINE_MEMBER(irq_enable);
 
 protected:
 	// device-level overrides

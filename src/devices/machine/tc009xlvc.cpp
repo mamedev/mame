@@ -281,9 +281,9 @@ void tc0091lvc_device::device_start()
 	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(&palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
 }
 
-std::vector<std::pair<int, const address_space_config *>> tc0091lvc_device::memory_space_config() const
+device_memory_interface::space_config_vector tc0091lvc_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

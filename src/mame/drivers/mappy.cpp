@@ -553,6 +553,7 @@ TODO:
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74157.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -581,379 +582,66 @@ TODO:
 
 /***************************************************************************/
 
-void mappy_state::common_latch_w(uint32_t offset)
+WRITE_LINE_MEMBER(mappy_state::int_on_w)
 {
-	int bit = offset & 1;
-
-	switch (offset & 0x0e)
-	{
-		case 0x00:  /* INT ON 2 */
-			m_sub_irq_mask = bit;
-			if (!bit)
-				m_subcpu->set_input_line(0, CLEAR_LINE);
-			break;
-
-		case 0x02:  /* INT ON */
-			m_main_irq_mask = bit;
-			if (!bit)
-				m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
-
-		case 0x04:  /* n.c. */
-			break;
-
-		case 0x06:  /* SOUND ON */
-			m_namco_15xx->mappy_sound_enable(bit);
-			break;
-
-		case 0x0a:  /* SUB RESET */
-			m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			break;
-
-		case 0x0c:  /* n.c. */
-			break;
-
-		case 0x0e:  /* n.c. */
-			break;
-	}
+	m_main_irq_mask = state;
+	if (!state)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mappy_state::superpac_latch_w)
+WRITE_LINE_MEMBER(mappy_state::int_on_2_w)
 {
-	int bit = offset & 1;
-
-	switch (offset & 0x0e)
-	{
-		case 0x08:  /* 4 RESET */
-			switch (m_type)
-			{
-				case GAME_SUPERPAC:
-					m_namco56xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					m_namco56xx_2->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					break;
-				case GAME_PACNPAL:
-					m_namco56xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					m_namco59xx->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					break;
-				case GAME_GROBDA:
-					m_namco58xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					m_namco56xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					break;
-			}
-			break;
-
-		default:
-			common_latch_w(offset);
-			break;
-	}
+	m_sub_irq_mask = state;
+	if (!state)
+		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mappy_state::phozon_latch_w)
+WRITE_LINE_MEMBER(mappy_state::int_on_3_w)
 {
-	int bit = offset & 1;
-
-	switch (offset & 0x0e)
-	{
-		case 0x04:
-			m_sub2_irq_mask = bit;
-			if (!bit)
-				m_subcpu2->set_input_line(0, CLEAR_LINE);
-			break;
-
-		case 0x08:
-			m_namco58xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-			m_namco56xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-			break;
-
-		case 0x0c:
-			m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			break;
-
-		default:
-			common_latch_w(offset);
-			break;
-	}
+	m_sub2_irq_mask = state;
+	if (!state)
+		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mappy_state::mappy_latch_w)
+WRITE_LINE_MEMBER(mappy_state::mappy_flip_w)
 {
-	int bit = offset & 1;
-
-	switch (offset & 0x0e)
-	{
-		case 0x04:  /* FLIP */
-			flip_screen_set(bit);
-			break;
-
-		case 0x08:  /* 4 RESET */
-			switch (m_type)
-			{
-				case GAME_MAPPY:
-					m_namco58xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					m_namco58xx_2->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					break;
-				case GAME_DRUAGA:
-				case GAME_DIGDUG2:
-					m_namco58xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					m_namco56xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					break;
-				case GAME_MOTOS:
-					m_namco56xx_1->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					m_namco56xx_2->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
-					break;
-			}
-			break;
-
-		default:
-			common_latch_w(offset);
-			break;
-	}
+	flip_screen_set(state);
 }
 
-MACHINE_RESET_MEMBER(mappy_state,superpac)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* Reset all latches */
-	for (int i = 0; i < 0x10; i += 2)
-		superpac_latch_w(space, i, 0);
-}
-
-MACHINE_RESET_MEMBER(mappy_state,phozon)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* Reset all latches */
-	for (int i = 0; i < 0x10; i += 2)
-		phozon_latch_w(space, i, 0);
-}
-
-MACHINE_RESET_MEMBER(mappy_state,mappy)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* Reset all latches */
-	for (int i = 0; i < 0x10; i += 2)
-		mappy_latch_w(space, i, 0);
-}
-
-
-/* different games need different interrupt generators & timers because they use different Namco I/O devices */
 
 void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-		case TIMER_SUPERPAC_IO_RUN:
-			superpac_io_run(ptr, param);
-			break;
-		case TIMER_PACNPAL_IO_RUN:
-			pacnpal_io_run(ptr, param);
-			break;
-		case TIMER_GROBDA_IO_RUN:
-			grobda_io_run(ptr, param);
-			break;
-		case TIMER_PHOZON_IO_RUN:
-			phozon_io_run(ptr, param);
-			break;
-		case TIMER_MAPPY_IO_RUN:
-			mappy_io_run(ptr, param);
-			break;
-		case TIMER_DIGDUG2_IO_RUN:
-			digdug2_io_run(ptr, param);
-			break;
-		case TIMER_MOTOS_IO_RUN:
-			motos_io_run(ptr, param);
+		case TIMER_IO_RUN:
+			m_namcoio[param]->customio_run();
 			break;
 		default:
 			assert_always(false, "Unknown id in mappy_state::device_timer");
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::superpac_io_run)
-{
-	switch (param)
-	{
-		case 0:
-			m_namco56xx_1->customio_run();
-			break;
-		case 1:
-			m_namco56xx_2->customio_run();
-			break;
-	}
-}
-
-INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
+INTERRUPT_GEN_MEMBER(mappy_state::main_vblank_irq)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
-	if (!m_namco56xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_SUPERPAC_IO_RUN);
+	if (!m_namcoio[0]->read_reset_line())        // give the cpu a tiny bit of time to write the command before processing it
+		timer_set(attotime::from_usec(50), TIMER_IO_RUN, 0);
 
-	if (!m_namco56xx_2->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_SUPERPAC_IO_RUN, 1);
-}
-
-TIMER_CALLBACK_MEMBER(mappy_state::pacnpal_io_run)
-{
-	switch (param)
-	{
-		case 0:
-			m_namco56xx_1->customio_run();
-			break;
-		case 1:
-			m_namco59xx->customio_run();
-			break;
-	}
-}
-
-INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
-{
-	if (m_main_irq_mask)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	if (!m_namco56xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_PACNPAL_IO_RUN);
-
-	if (!m_namco59xx->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_PACNPAL_IO_RUN, 1);
-}
-
-TIMER_CALLBACK_MEMBER(mappy_state::grobda_io_run)
-{
-	switch (param)
-	{
-		case 0:
-			m_namco58xx_1->customio_run();
-			break;
-		case 1:
-			m_namco56xx_1->customio_run();
-			break;
-	}
-}
-
-INTERRUPT_GEN_MEMBER(mappy_state::grobda_main_vblank_irq)
-{
-	if (m_main_irq_mask)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	if (!m_namco58xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_GROBDA_IO_RUN);
-
-	if (!m_namco56xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_GROBDA_IO_RUN, 1);
-}
-
-TIMER_CALLBACK_MEMBER(mappy_state::phozon_io_run)
-{
-	switch (param)
-	{
-		case 0:
-			m_namco58xx_1->customio_run();
-			break;
-		case 1:
-			m_namco56xx_1->customio_run();
-			break;
-	}
-}
-
-INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
-{
-	if (m_main_irq_mask)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	if (!m_namco58xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_PHOZON_IO_RUN);
-
-	if (!m_namco56xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_PHOZON_IO_RUN, 1);
-}
-
-TIMER_CALLBACK_MEMBER(mappy_state::mappy_io_run)
-{
-	switch (param)
-	{
-		case 0:
-			m_namco58xx_1->customio_run();
-			break;
-		case 1:
-			m_namco58xx_2->customio_run();
-			break;
-	}
-}
-
-INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
-{
-	if(m_main_irq_mask)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	if (!m_namco58xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_MAPPY_IO_RUN);
-
-	if (!m_namco58xx_2->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_MAPPY_IO_RUN, 1);
-}
-
-TIMER_CALLBACK_MEMBER(mappy_state::digdug2_io_run)
-{
-	switch (param)
-	{
-		case 0:
-			m_namco58xx_1->customio_run();
-			break;
-		case 1:
-			m_namco56xx_1->customio_run();
-			break;
-	}
-}
-
-INTERRUPT_GEN_MEMBER(mappy_state::digdug2_main_vblank_irq)
-{
-	if(m_main_irq_mask)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	if (!m_namco58xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_DIGDUG2_IO_RUN);
-
-	if (!m_namco56xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_DIGDUG2_IO_RUN, 1);
-}
-
-TIMER_CALLBACK_MEMBER(mappy_state::motos_io_run)
-{
-	switch (param)
-	{
-		case 0:
-			m_namco56xx_1->customio_run();
-			break;
-		case 1:
-			m_namco56xx_2->customio_run();
-			break;
-	}
-}
-
-INTERRUPT_GEN_MEMBER(mappy_state::motos_main_vblank_irq)
-{
-	if(m_main_irq_mask)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	if (!m_namco56xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_MOTOS_IO_RUN);
-
-	if (!m_namco56xx_2->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_MOTOS_IO_RUN, 1);
+	if (!m_namcoio[1]->read_reset_line())        // give the cpu a tiny bit of time to write the command before processing it
+		timer_set(attotime::from_usec(50), TIMER_IO_RUN, 1);
 }
 
 INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)
 {
-	if(m_sub_irq_mask)
+	if (m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
 {
-	if(m_sub2_irq_mask)
+	if (m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
@@ -964,7 +652,7 @@ static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)      /* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE(superpac_latch_w)             /* various control bits */
+	AM_RANGE(0x5000, 0x500f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)               /* various control bits */
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -975,7 +663,7 @@ static ADDRESS_MAP_START( phozon_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)      /* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE(phozon_latch_w)               /* various control bits */
+	AM_RANGE(0x5000, 0x500f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)               /* various control bits */
 	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                 /* ROM */
 ADDRESS_MAP_END
@@ -987,14 +675,14 @@ static ADDRESS_MAP_START( mappy_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)      /* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE(mappy_latch_w)                /* various control bits */
+	AM_RANGE(0x5000, 0x500f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)               /* various control bits */
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                 /* ROM code (only a000-ffff in Mappy) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superpac_cpu2_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the main CPU (also sound registers) */
-	AM_RANGE(0x2000, 0x200f) AM_WRITE(superpac_latch_w)                   /* various control bits */
+	AM_RANGE(0x2000, 0x200f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)   /* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1005,7 +693,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mappy_cpu2_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the main CPU (also sound registers) */
-	AM_RANGE(0x2000, 0x200f) AM_WRITE(mappy_latch_w)                        /* various control bits */
+	AM_RANGE(0x2000, 0x200f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)   /* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM                                         /* ROM code */
 ADDRESS_MAP_END
 
@@ -1616,32 +1304,8 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-MACHINE_START_MEMBER(mappy_state,mappy)
+void mappy_state::machine_start()
 {
-	switch (m_type)
-	{
-		case GAME_SUPERPAC:
-		case GAME_MOTOS:
-			m_namco56xx_1 = machine().device<namco56xx_device>("namcoio_1");
-			m_namco56xx_2 = machine().device<namco56xx_device>("namcoio_2");
-			break;
-		case GAME_MAPPY:
-			m_namco58xx_1 = machine().device<namco58xx_device>("namcoio_1");
-			m_namco58xx_2 = machine().device<namco58xx_device>("namcoio_2");
-			break;
-		case GAME_GROBDA:
-		case GAME_PHOZON:
-		case GAME_DRUAGA:
-		case GAME_DIGDUG2:
-			m_namco58xx_1 = machine().device<namco58xx_device>("namcoio_1");
-			m_namco56xx_1 = machine().device<namco56xx_device>("namcoio_2");
-			break;
-		case GAME_PACNPAL:
-			m_namco56xx_1 = machine().device<namco56xx_device>("namcoio_1");
-			m_namco59xx = machine().device<namco59xx_device>("namcoio_2");
-			break;
-	}
-
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));
@@ -1653,19 +1317,28 @@ static MACHINE_CONFIG_START( superpac_common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  superpac_main_vblank_irq)    // also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)    // also update the custom I/O chips
 
 	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 													/* synchronization of the CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
-	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,superpac)
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superpac)
@@ -1705,18 +1378,11 @@ static MACHINE_CONFIG_START( superpac )
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
 	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pacnpal )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  pacnpal_main_vblank_irq) // also update the custom I/O chips
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
@@ -1731,19 +1397,12 @@ static MACHINE_CONFIG_START( pacnpal )
 	MCFG_NAMCO59XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO59XX_IN_3_CB(IOPORT("DSW0"))
 	MCFG_NAMCO59XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( grobda )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  grobda_main_vblank_irq)  // also update the custom I/O chips
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
@@ -1758,10 +1417,6 @@ static MACHINE_CONFIG_START( grobda )
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
 	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
-
 	/* sound hardware */
 	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // alternate route to 15XX-related DAC?
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1774,7 +1429,7 @@ static MACHINE_CONFIG_START( phozon )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,  PIXEL_CLOCK/4)  /* MAIN CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)  // also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)  // also update the custom I/O chips
 
 	MCFG_CPU_ADD("sub", M6809,  PIXEL_CLOCK/4)  /* SOUND CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu2_map)
@@ -1784,13 +1439,20 @@ static MACHINE_CONFIG_START( phozon )
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub2_vblank_irq)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5C
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mappy_state, int_on_3_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namco58xx_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namco56xx_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 													/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
-	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,phozon)
-
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
@@ -1835,18 +1497,29 @@ static MACHINE_CONFIG_START( mappy_common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  mappy_main_vblank_irq)   // also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)   // also update the custom I/O chips
 
 	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mappy_state, mappy_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 													/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
-	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,mappy)
+
+	MCFG_DEVICE_ADD("dipmux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
+	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mappy)
@@ -1885,18 +1558,11 @@ static MACHINE_CONFIG_START( mappy )
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("DSW0"))
 	MCFG_NAMCO58XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( digdug2 )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  digdug2_main_vblank_irq)  // also update the custom I/O chips
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
@@ -1913,10 +1579,6 @@ static MACHINE_CONFIG_START( digdug2 )
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
 	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
@@ -1931,9 +1593,6 @@ static MACHINE_CONFIG_START( motos )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  motos_main_vblank_irq)    // also update the custom I/O chips
-
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
@@ -1947,10 +1606,6 @@ static MACHINE_CONFIG_START( motos )
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
 	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 
@@ -2411,20 +2066,8 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(mappy_state,superpac)
-{
-	m_type = GAME_SUPERPAC;
-}
-
-DRIVER_INIT_MEMBER(mappy_state,pacnpal)
-{
-	m_type = GAME_PACNPAL;
-}
-
 DRIVER_INIT_MEMBER(mappy_state,grobda)
 {
-	m_type = GAME_GROBDA;
-
 	/* The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
 	   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
 	   probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
@@ -2436,56 +2079,34 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
 }
 
-DRIVER_INIT_MEMBER(mappy_state,phozon)
-{
-	m_type = GAME_PHOZON;
-}
-
-DRIVER_INIT_MEMBER(mappy_state,mappy)
-{
-	m_type = GAME_MAPPY;
-}
-
-DRIVER_INIT_MEMBER(mappy_state,druaga)
-{
-	m_type = GAME_DRUAGA;
-}
-
 
 DRIVER_INIT_MEMBER(mappy_state,digdug2)
 {
-	m_type = GAME_DIGDUG2;
-
 	/* appears to not use the watchdog */
 	m_maincpu->space(AS_PROGRAM).nop_write(0x8000, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(mappy_state,motos)
-{
-	m_type = GAME_MOTOS;
-}
-
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
-GAME( 1982, superpac, 0,        superpac, superpac,  mappy_state, superpac, ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, superpacm,superpac, superpac, superpac,  mappy_state, superpac, ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpac, 0,        superpac, superpac,  mappy_state, 0,        ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpacm,superpac, superpac, superpac,  mappy_state, 0,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, grobda,   0,        grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, grobda2,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, grobda3,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
-GAME( 1983, phozon,   0,        phozon,    phozon,   mappy_state, phozon,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, phozons,  phozon,   phozon,    phozon,   mappy_state, phozon,   ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozon,   0,        phozon,    phozon,   mappy_state, 0,        ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozons,  phozon,   phozon,    phozon,   mappy_state, 0,        ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
-GAME( 1983, mappy,    0,        mappy,     mappy,    mappy_state, mappy,    ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mappyj,   mappy,    mappy,     mappy,    mappy_state, mappy,    ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state, druaga,   ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state, druaga,   ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state, druaga,   ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappy,    0,        mappy,     mappy,    mappy_state, 0,        ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappyj,   mappy,    mappy,     mappy,    mappy_state, 0,        ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state, 0,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, digdug2,  0,        digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, digdug2o, digdug2,  digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, motos,    0,        motos,     motos,    mappy_state, motos,    ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, motos,    0,        motos,     motos,    mappy_state, 0,        ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )

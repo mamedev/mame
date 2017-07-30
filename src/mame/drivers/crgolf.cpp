@@ -93,6 +93,7 @@ protected or a snippet should do the aforementioned string copy.
 #include "includes/crgolf.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "screen.h"
@@ -128,6 +129,10 @@ void crgolf_state::machine_start()
 	save_item(NAME(m_sound_to_main_data));
 	save_item(NAME(m_sample_offset));
 	save_item(NAME(m_sample_count));
+	save_item(NAME(m_color_select));
+	save_item(NAME(m_screen_flip));
+	save_item(NAME(m_screena_enable));
+	save_item(NAME(m_screenb_enable));
 }
 
 
@@ -290,10 +295,34 @@ WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
 	}
 }
 
-WRITE8_MEMBER(crgolf_state::screen_select_w)
+
+WRITE_LINE_MEMBER(crgolf_state::color_select_w)
 {
-//  if (data & 0xfe) printf("vram_page_select_w %02x\n", data);
-	m_vrambank->set_bank(data & 0x1);
+	m_color_select = state;
+}
+
+
+WRITE_LINE_MEMBER(crgolf_state::screen_flip_w)
+{
+	m_screen_flip = state;
+}
+
+
+WRITE_LINE_MEMBER(crgolf_state::screen_select_w)
+{
+	m_vrambank->set_bank(state);
+}
+
+
+WRITE_LINE_MEMBER(crgolf_state::screena_enable_w)
+{
+	m_screena_enable = state;
+}
+
+
+WRITE_LINE_MEMBER(crgolf_state::screenb_enable_w)
+{
+	m_screenb_enable = state;
 }
 
 
@@ -308,11 +337,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("color_select")
-	AM_RANGE(0x8004, 0x8004) AM_WRITEONLY AM_SHARE("screen_flip")
-	AM_RANGE(0x8005, 0x8005) AM_WRITE( screen_select_w )
-	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_SHARE("screenb_enable")
-	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_SHARE("screena_enable")
+	AM_RANGE(0x8000, 0x8007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
@@ -357,13 +382,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastrglf_io, AS_IO, 8, crgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	AM_RANGE(0x03, 0x03) AM_WRITEONLY AM_SHARE("color_select")
-	AM_RANGE(0x04, 0x04) AM_WRITEONLY AM_SHARE("screen_flip")
-	AM_RANGE(0x05, 0x05) AM_WRITE( screen_select_w )
-	AM_RANGE(0x06, 0x06) AM_WRITEONLY AM_SHARE("screenb_enable")
-	AM_RANGE(0x07, 0x07) AM_WRITEONLY AM_SHARE("screena_enable")
-
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 //  AM_RANGE(0x20, 0x20) AM_WRITE( main_to_sound_w )
 	AM_RANGE(0x40, 0x40) AM_WRITE( main_to_sound_w )
 	AM_RANGE(0xa0, 0xa0) AM_READ( sound_to_main_r )
@@ -504,6 +523,13 @@ static MACHINE_CONFIG_START( crgolf )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1H
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(crgolf_state, color_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(crgolf_state, screen_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(crgolf_state, screen_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(crgolf_state, screenb_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(crgolf_state, screena_enable_w))
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)

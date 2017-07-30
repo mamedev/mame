@@ -131,7 +131,7 @@ protected:
 
 	const address_space_config m_io_space_config;
 
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	// devices/pointers

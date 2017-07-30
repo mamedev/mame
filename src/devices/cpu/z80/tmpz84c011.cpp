@@ -53,7 +53,7 @@ tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *
 	memset(m_pio_latch, 0, 5);
 }
 
-std::vector<std::pair<int, const address_space_config *>> tmpz84c011_device::memory_space_config() const
+device_memory_interface::space_config_vector tmpz84c011_device::memory_space_config() const
 {
 	auto r = z80_device::memory_space_config();
 	r.back().second = &m_io_space_config;

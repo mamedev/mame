@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SETA2_H
+#define MAME_INCLUDES_SETA2_H
+
+#pragma once
+
 
 #include "machine/tmp68301.h"
 #include "machine/eepromser.h"
@@ -26,7 +31,6 @@ public:
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram", 0),
 		m_tileram(*this, "tileram", 0),
-		m_rgbram(*this, "rgbram", 0),
 		m_vregs(*this, "vregs", 0),
 		m_funcube_outputs(*this, "funcube_outputs"),
 		m_funcube_leds(*this, "funcube_leds")
@@ -45,7 +49,6 @@ public:
 	optional_shared_ptr<uint16_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_tileram;
-	optional_shared_ptr<uint16_t> m_rgbram;
 	optional_shared_ptr<uint16_t> m_vregs;
 	optional_shared_ptr<uint16_t> m_funcube_outputs;
 	optional_shared_ptr<uint16_t> m_funcube_leds;
@@ -57,8 +60,6 @@ public:
 
 	uint64_t m_funcube_coin_start_cycles;
 	uint8_t m_funcube_hopper_motor;
-
-	uint16_t m_lamps1, m_lamps2, m_cam;
 
 	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
 	DECLARE_READ16_MEMBER(spriteram16_word_r);
@@ -94,16 +95,9 @@ public:
 	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
 	DECLARE_READ16_MEMBER(funcube_battery_r);
 
-	DECLARE_WRITE16_MEMBER(staraudi_camera_w);
-	DECLARE_WRITE16_MEMBER(staraudi_lamps1_w);
-	DECLARE_WRITE16_MEMBER(staraudi_lamps2_w);
-	DECLARE_READ16_MEMBER(staraudi_tileram_r);
-	DECLARE_WRITE16_MEMBER(staraudi_tileram_w);
-
 	DECLARE_DRIVER_INIT(funcube3);
 	DECLARE_DRIVER_INIT(funcube);
 	DECLARE_DRIVER_INIT(funcube2);
-	DECLARE_DRIVER_INIT(staraudi);
 
 	DECLARE_MACHINE_START(mj4simai);
 	DECLARE_MACHINE_START(funcube);
@@ -114,15 +108,46 @@ public:
 	DECLARE_VIDEO_START(xoffset);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void draw_rgbram(bitmap_ind16 &bitmap);
 
 	INTERRUPT_GEN_MEMBER(seta2_interrupt);
 	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
 	void funcube_debug_outputs();
-	void staraudi_debug_outputs();
 };
+
+
+class staraudi_state : public seta2_state
+{
+public:
+	staraudi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta2_state(mconfig, type, tag),
+		m_rgbram(*this, "rgbram", 0)
+	{
+	}
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+
+	DECLARE_WRITE16_MEMBER(staraudi_camera_w);
+	DECLARE_WRITE16_MEMBER(staraudi_lamps1_w);
+	DECLARE_WRITE16_MEMBER(staraudi_lamps2_w);
+	DECLARE_READ16_MEMBER(staraudi_tileram_r);
+	DECLARE_WRITE16_MEMBER(staraudi_tileram_w);
+
+	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	virtual void driver_start() override;
+
+	void staraudi_debug_outputs();
+
+private:
+	void draw_rgbram(bitmap_ind16 &bitmap);
+
+	required_shared_ptr<uint16_t> m_rgbram;
+
+	uint16_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;
+};
+
+#endif // MAME_INCLUDES_SETA2_H

@@ -153,9 +153,9 @@ void score7_cpu_device::state_string_export(const device_state_entry &entry, std
 //  the space doesn't exist
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> score7_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector score7_cpu_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }

@@ -104,7 +104,6 @@ namespace imgtool
 		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts, ptr &image);
 		static imgtoolerr_t create(const imgtool_module *module, const std::string &filename, util::option_resolution *opts);
 		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts);
-		static uint64_t rand();
 
 		std::string info();
 		imgtoolerr_t get_geometry(uint32_t *tracks, uint32_t *heads, uint32_t *sectors);
@@ -227,9 +226,8 @@ namespace imgtool
 		std::unique_ptr<uint8_t[]> m_extra_bytes;
 
 		// methods
-		imgtoolerr_t cannonicalize_path(uint32_t flags, const char **path, char **alloc_path);
+		imgtoolerr_t cannonicalize_path(uint32_t flags, const char *path, std::string &result);
 		imgtoolerr_t cannonicalize_fork(const char **fork);
-		char *normalize_filename(const char *src);
 		imgtoolerr_t map_block_to_image_block(uint64_t partition_block, uint64_t &image_block) const;
 	};
 

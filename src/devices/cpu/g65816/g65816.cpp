@@ -117,9 +117,9 @@ g65816_device::g65816_device(const machine_config &mconfig, device_type type, co
 }
 
 
-std::vector<std::pair<int, const address_space_config *>> g65816_device::memory_space_config() const
+device_memory_interface::space_config_vector g65816_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }

@@ -344,9 +344,9 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-std::vector<std::pair<int, const address_space_config *>> i8155_device::memory_space_config() const
+device_memory_interface::space_config_vector i8155_device::memory_space_config() const
 {
-	return std::vector<std::pair<int, const address_space_config *>> {
+	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
 }

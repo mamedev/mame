@@ -48,7 +48,7 @@ private:
 	void GetStatistics(uint32_t &uNPitchPeriods, uint32_t &uNVoiced, uint32_t &uNControlWords);
 	void SetPrintLevel(uint32_t uPrintLevel) { m_uPrintLevel = uPrintLevel; }
 
-	enum states
+	enum class states : u8
 	{
 		IDLE = 0,
 		WORDWAIT,

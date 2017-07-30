@@ -448,16 +448,6 @@ static MACHINE_CONFIG_START( cfg_single_360K )
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
 
-// Commodore PC 10 / PC 20 / PC 30
-static MACHINE_CONFIG_DERIVED( compc10, pccga )
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("mda")
-	
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K, 640K")
-MACHINE_CONFIG_END
-
 //Data General One
 static MACHINE_CONFIG_DERIVED( dgone, pccga )
 	MCFG_DEVICE_MODIFY("isa2")
@@ -738,40 +728,6 @@ ROM_START( compc1 )
 	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
 ROM_END
 
-ROM_START( compc10 )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_DEFAULT_BIOS("v205")
-	ROM_SYSTEM_BIOS(0, "v203", "v2.03")
-	ROMX_LOAD("380258-03", 0xc000, 0x4000, CRC(fbe53865) SHA1(a6d6433c055d1c328f71403a2ed2fd5908c23d40), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "v205", "v2.05")
-	ROMX_LOAD("380258-04", 0xc000, 0x4000, CRC(e61084da) SHA1(dfb360a6ec6cb1250d8a6243f12a0d702e8479cb), ROM_BIOS(2))
-ROM_END
-
-// Note: Commodore PC20-III, PC10-III and COLT share the same BIOS
-ROM_START( pc10iii )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_DEFAULT_BIOS("v441")
-	ROM_SYSTEM_BIOS(0, "v435", "v4.35")
-	ROMX_LOAD("318085-01.u201", 0x8000, 0x8000, CRC(be752d1e) SHA1(5e5e63cd6d6269816cd691602e4c4d209fe3df67), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "v436", "v4.36")
-	ROMX_LOAD("318085-02.u201", 0x8000, 0x8000, CRC(db0c9d04) SHA1(1314ce606840f4f78e58e5f78909e8971387f387), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "v436b", "v4.36b")
-	ROMX_LOAD("318085-04.u201", 0x8000, 0x8000, CRC(559e6b76) SHA1(cdfd4781f3520db7f5111469ebb29c10b39ab587), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(3, "v436c", "v4.36c")
-	ROMX_LOAD("318085-04.u201", 0x8000, 0x8000, CRC(f81e67f0) SHA1(b46613cb5c6ac4beb769778bc35f81777ebe02e1), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(4, "v438", "v4.38")
-	ROMX_LOAD("318085-05.u201", 0x8000, 0x8000, CRC(ae9e6a31) SHA1(853ee251cf230818c407a8d13ef060a21c90a8c1), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(5, "v439", "v4.39")
-	ROMX_LOAD("318085-06.u201", 0x8000, 0x8000, CRC(1901993c) SHA1(f75060c1c442376bd42c61e74fa9eee053351791), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(6, "v440", "v4.40")
-	ROMX_LOAD("318085-07.u201", 0x8000, 0x8000, CRC(505d52b0) SHA1(f717c6ab791d51f35e1c38ffbc81a44075b5f2f8), ROM_BIOS(7))
-	ROM_SYSTEM_BIOS(7, "v441", "v4.41")
-	ROMX_LOAD("318085-08.u201", 0x8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc), ROM_BIOS(8))
-	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("318086-02.u607", 0x0000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6))
-	//ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* temp so you can read the text */
-ROM_END
-
 ROM_START( iskr3104 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 	ROMX_LOAD( "198.bin", 0xc000, 0x2000, CRC(bcfd8e41) SHA1(e21ddf78839aa51fa5feb23f511ff5e2da31b433),ROM_SKIP(1))
@@ -925,8 +881,6 @@ ROM_END
 COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
 COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
 COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
-COMP( 1984,   compc10,          ibm5150,    0,          compc10,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC 10",      MACHINE_NOT_WORKING )
-COMP( 1987,   pc10iii,          ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-10 III",  MACHINE_NOT_WORKING )
 COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
 COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    pc_state, 0,        "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
 COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    pc_state, 0,        "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )

@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "ui/utils.h"
 
+#include "softlist.h"
+
+
 extern const char UI_VERSION_TAG[];
 const char UI_VERSION_TAG[] = "# UI INFO ";
 
@@ -194,4 +197,40 @@ void c_year::set(const char *str)
 		return;
 
 	ui.push_back(name);
+}
+
+
+ui_software_info::ui_software_info(
+		software_info const &info,
+		software_part const &p,
+		game_driver const &d,
+		std::string const &li,
+		std::string const &is,
+		std::string const &de)
+	: shortname(info.shortname()), longname(info.longname()), parentname(info.parentname())
+	, year(info.year()), publisher(info.publisher())
+	, supported(info.supported())
+	, part(p.name())
+	, driver(&d)
+	, listname(li), interface(p.interface()), instance(is)
+	, startempty(0)
+	, parentlongname()
+	, usage()
+	, devicetype(de)
+	, available(false)
+{
+	for (feature_list_item const &feature : info.other_info())
+	{
+		if (feature.name() == "usage")
+		{
+			usage = feature.value();
+			break;
+		}
+	}
+}
+
+// info for starting empty
+ui_software_info::ui_software_info(game_driver const &d)
+	: shortname(d.name), longname(d.type.fullname()), driver(&d), startempty(1), available(true)
+{
 }

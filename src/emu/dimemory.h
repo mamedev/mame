@@ -92,9 +92,6 @@ public:
 	bool has_configured_map(int index = 0) const { return index >= 0 && index < int(m_address_map.size()) && m_address_map[index]; }
 	address_space &space(int index = 0) const { assert(index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]); return *m_addrspace[index]; }
 
-	// address space accessors
-	void set_address_space(int spacenum, address_space &space);
-
 	// address translation
 	bool translate(int spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
 
@@ -102,16 +99,34 @@ public:
 	// just use it
 	device_memory_interface &memory() { return *this; }
 
-	void load_configs();
+	// setup functions - these are called in sequence for all device_memory_interface by the memory manager
+	template <typename Space> void allocate(memory_manager &manager, int spacenum)
+	{
+		assert((0 <= spacenum) && (max_space_count() > spacenum));
+		m_addrspace.resize(std::max<std::size_t>(m_addrspace.size(), spacenum + 1));
+		assert(!m_addrspace[spacenum]);
+		m_addrspace[spacenum] = std::make_unique<Space>(manager, *this, spacenum);
+	}
+	void prepare_maps() { for (auto const &space : m_addrspace) { if (space) { space->prepare_map(); } } }
+	void populate_from_maps() { for (auto const &space : m_addrspace) { if (space) { space->populate_from_map(); } } }
+	void allocate_memory() { for (auto const &space : m_addrspace) { if (space) { space->allocate_memory(); } } }
+	void locate_memory() { for (auto const &space : m_addrspace) { if (space) { space->locate_memory(); } } }
+	void set_log_unmap(bool log) { for (auto const &space : m_addrspace) { if (space) { space->set_log_unmap(log); } } }
+
+	// diagnostic functions
+	void dump(FILE *file) const;
 
 protected:
+	using space_config_vector = std::vector<std::pair<int, const address_space_config *>>;
+
 	// required overrides
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const = 0;
+	virtual space_config_vector memory_space_config() const = 0;
 
 	// optional operation overrides
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
 
 	// interface-level overrides
+	virtual void interface_config_complete() override;
 	virtual void interface_validity_check(validity_checker &valid) const override;
 
 	// configuration
@@ -119,8 +134,8 @@ protected:
 
 private:
 	// internal state
-	std::vector<const address_space_config *> m_address_config; // configuration for each space
-	std::vector<address_space *>              m_addrspace; // reported address spaces
+	std::vector<const address_space_config *>   m_address_config; // configuration for each space
+	std::vector<std::unique_ptr<address_space>> m_addrspace; // reported address spaces
 };
 
 // iterator

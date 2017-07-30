@@ -61,7 +61,7 @@ public:
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual std::vector<std::pair<int, const address_space_config *>> memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	// device-level overrides

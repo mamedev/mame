@@ -85,6 +85,7 @@ function datfile.open(file, vertag, fixupcb)
 		ver = tostring(lfs.attributes(filepath, "change"))
 	end
 	if ver == dbver then
+		fh:close()
 		return read, dbver
 	end
 
@@ -140,6 +141,7 @@ function datfile.open(file, vertag, fixupcb)
 				set:gsub("([^,]+)", function(s) sets[#sets + 1] = s end)
 				if #tags > 0 and #sets > 0 then
 					local tag1 = info2:match("^$([^%s]*)")
+					data = data:gsub("\r", "") -- strip crs
 					if fixupcb then
 						data = fixupcb(data)
 					end

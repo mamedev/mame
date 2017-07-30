@@ -226,8 +226,6 @@ protected:
 
 public:
 	virtual ~address_space();
-	// public allocator
-	static void allocate(std::vector<std::unique_ptr<address_space>> &space_list, memory_manager &manager, const address_space_config &config, device_memory_interface &memory, int spacenum);
 
 	// getters
 	memory_manager &manager() const { return m_manager; }
@@ -643,7 +641,6 @@ class memory_manager
 public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
-	void configure();
 	void initialize();
 
 	// getters
@@ -651,9 +648,6 @@ public:
 	const std::unordered_map<std::string, std::unique_ptr<memory_bank>> &banks() const { return m_banklist; }
 	const std::unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
 	const std::unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
-
-	// dump the internal memory tables to the given file
-	void dump(FILE *file);
 
 	// pointers to a bank pointer (internal usage only)
 	u8 **bank_pointer_addr(u8 index) { return &m_bank_ptr[index]; }
@@ -674,7 +668,6 @@ private:
 
 	u8 *                        m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
 
-	std::vector<std::unique_ptr<address_space>>  m_spacelist;            // list of address spaces
 	std::vector<std::unique_ptr<memory_block>>   m_blocklist;            // head of the list of memory blocks
 
 	std::unordered_map<std::string,std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank

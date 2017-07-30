@@ -107,6 +107,10 @@ ADDRESS_MAP_END
 
 m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, ADDRESS_MAP_NAME(m68340_internal_map))
+	,m_pa_out_cb(*this)
+	,m_pa_in_cb(*this)
+	,m_pb_out_cb(*this)
+	,m_pb_in_cb(*this)
 {
 	m68340SIM = nullptr;
 	m68340DMA = nullptr;

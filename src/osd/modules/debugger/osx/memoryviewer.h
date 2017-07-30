@@ -29,4 +29,7 @@
 
 - (IBAction)changeSubview:(id)sender;
 
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
+
 @end
