@@ -1408,10 +1408,10 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
 	m_dbrg_A->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
-	printf("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
+	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
 	m_dbrg_A->stt_w( ((data & 0xf0) >> 4) );
-	printf("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
+	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
 // PORT 0x0e : Printer bit rates
@@ -1419,10 +1419,10 @@ WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 {
 	m_dbrg_B->str_w(data & 7); // bits 0 - 2
 	m_dbrg_B->stt_w(data & 7); // TX and RX rate cannot be programmed independently.
-	printf("\n(PRINTER) receive = transmit bitrate: %d ($%02x)", 9600 / ( 1 << (7 - (data & 7))) , data & 7);
+	logerror("\n(PRINTER) receive = transmit bitrate: %d ($%02x)", 9600 / ( 1 << (7 - (data & 7))) , data & 7);
 
 	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
-	printf(" - CLOCK (0 = internal): %02x", data & 8);
+	logerror(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
@@ -2199,7 +2199,7 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 // 3 COMM RTS        (controls request to send line of COMM)
 WRITE8_MEMBER(rainbow_state::comm_control_w)
 {
-	printf("%02x to COMM.CONTROL REGISTER ", data);
+	logerror("%02x to COMM.CONTROL REGISTER ", data);
 
 	/* 8088 LEDs:
 	5  7  6  4    <- BIT POSITION
@@ -2216,7 +2216,7 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 // See page 133 (4-34)
 WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 {
-	//    printf("%02x to Z80 mailbox\n", data);
+	//    logerror("%02x to Z80 mailbox\n", data);
 
 	// The interrupt vector address(F7H) placed on the bus is hardwired into the Z80A interrupt vector encoder.
 	// The F7H interrupt vector address causes the Z80A processor to perform an RST 30 instruction in
@@ -2231,7 +2231,7 @@ WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 // See page 134 (4-35)
 READ8_MEMBER(rainbow_state::z80_latch_r)
 {
-	//    printf("Read %02x from Z80 mailbox\n", m_z80_mailbox);
+	//    logerror("Read %02x from Z80 mailbox\n", m_z80_mailbox);
 	m_z80->set_input_line(0, CLEAR_LINE);
 
 	INTZ80 = false;
@@ -2242,7 +2242,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 // See page 134 (4-35)
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
-	//    printf("%02x to 8088 mailbox\n", data);
+	//    logerror("%02x to 8088 mailbox\n", data);
 	raise_8088_irq(IRQ_8088_MAILBOX);
 	m_8088_mailbox = data;
 
@@ -2252,7 +2252,7 @@ WRITE8_MEMBER(rainbow_state::z80_latch_w)
 // 8088 reads port 0x00. See page 133 (4-34)
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
-	//    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
+	//    logerror("Read %02x from 8088 mailbox\n", m_8088_mailbox);
 	lower_8088_irq(IRQ_8088_MAILBOX);
 
 	INT88 = false;
