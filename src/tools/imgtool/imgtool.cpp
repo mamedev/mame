@@ -2212,9 +2212,8 @@ imgtool::directory::directory(imgtool::partition &partition)
 //  enumerating files on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const std::string &path_string, imgtool::directory::ptr &outenum)
+imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const std::string &path, imgtool::directory::ptr &outenum)
 {
-	const char *path = path_string.c_str();
 	imgtoolerr_t err = imgtoolerr_t(IMGTOOLERR_SUCCESS);
 	imgtool::directory::ptr enumeration;
 
@@ -2224,7 +2223,7 @@ imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const std::
 		return imgtoolerr_t(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
 	std::string cannonical_path;
-	err = partition.cannonicalize_path(PATH_MUSTBEDIR, path, cannonical_path);
+	err = partition.cannonicalize_path(PATH_MUSTBEDIR, path.c_str(), cannonical_path);
 	if (err)
 		return err;
 
