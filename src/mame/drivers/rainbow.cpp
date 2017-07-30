@@ -2424,7 +2424,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 	if (selected_drive == INVALID_DRIVE)
 	{
-		printf("(m_present_drive = %i)   ** SELECTED DRIVE ** INVALID. (selected drive = %i)\n", m_present_drive, selected_drive);
+		logerror("(m_present_drive = %i)   ** SELECTED DRIVE ** INVALID. (selected drive = %i)\n", m_present_drive, selected_drive);
 
 		m_present_drive = INVALID_DRIVE;
 		m_floppy = nullptr;
