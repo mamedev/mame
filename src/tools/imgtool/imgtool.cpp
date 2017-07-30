@@ -1694,8 +1694,18 @@ imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fo
 		if (m_prefer_ucase)
 		{
 			std::ostringstream s;
-			for (size_t i = 0; filename[i]; i++)
-				s << toupper(filename[i]);
+			size_t i = 0;
+			while (filename[i])
+			{
+				char32_t ch;
+				int count = uchar_from_utf8(&ch, &filename[i], UTF8_CHAR_MAX);
+				if (count > 0)
+				{
+					char32_t upper_ch = uchar_toupper(ch);
+					s << utf8_from_uchar(upper_ch);
+				}
+				i += count > 0 ? count : 1;
+			}
 			ucase_str = s.str();
 			filename = ucase_str.c_str();
 		}
@@ -2282,13 +2292,13 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 	if (err)
 		return markerrorsource(err);
 
-	imgtool::charconverter *charconverter = (imgtool::charconverter *) m_partition.get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER);
-	if (charconverter)
+	imgtool::charconverter * const converter  = reinterpret_cast<imgtool::charconverter * const>(m_partition.get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER));
+	if (converter)
 	{
 		std::string new_fname;
 		try
 		{
-			new_fname = charconverter->to_utf8(ent.filename);
+			new_fname = converter->to_utf8(ent.filename);
 		}
 		catch (charconverter_exception)
 		{
