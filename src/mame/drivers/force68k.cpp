@@ -334,7 +334,7 @@ void force68k_state::machine_start ()
 	}
 
 	// Set up the BRG divider. TODO: Make RSA a selectable DIP switch RSB is always set High
-	m_brg->rate_select_w( m_maincpu->space(AS_PROGRAM), 0, MCFG_MC14411_RSB, 0xff);
+	m_brg->rate_select_w( m_maincpu->space(AS_PROGRAM), 0, mc14411_device::RSB, 0xff);
 }
 
 /* A very ineffecient User cart emulation of two 8 bit sockets (odd and even) */
