@@ -26,6 +26,9 @@ class debug_view_textbuf : public debug_view
 {
 	friend class debug_view_manager;
 
+public:
+	void clear();
+
 protected:
 	// construction/destruction
 	debug_view_textbuf(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate, text_buffer &textbuf);
