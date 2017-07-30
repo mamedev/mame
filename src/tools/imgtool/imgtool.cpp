@@ -1130,10 +1130,10 @@ imgtoolerr_t imgtool::partition::cannonicalize_path(uint32_t flags, const char *
 
 	// normalize the path into the native character set
 	std::string converted_path;
-	imgtool::charconverter *charconverter = (imgtool::charconverter *) get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER);
-	if (charconverter)
+	imgtool::charconverter * const converter = reinterpret_cast<imgtool::charconverter * const>(get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER));
+	if (converter)
 	{
-		converted_path = charconverter->from_utf8(path);
+		converted_path = converter->from_utf8(path);
 		path = converted_path.c_str();
 	}
 
