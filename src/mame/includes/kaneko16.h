@@ -11,7 +11,6 @@
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "video/kan_pand.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
 #include "machine/eepromser.h"
@@ -36,7 +35,6 @@ public:
 		m_view2_0(*this, "view2_0"),
 		m_view2_1(*this, "view2_1"),
 		m_kaneko_spr(*this, "kan_spr"),
-		m_pandora(*this, "pandora"),
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
 		m_soundlatch(*this, "soundlatch"),
@@ -54,7 +52,6 @@ public:
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 	optional_device<kaneko_view2_tilemap_device> m_view2_1;
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
-	optional_device<kaneko_pandora_device> m_pandora;
 	required_device<palette_device> m_palette;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<generic_latch_8_device> m_soundlatch;
