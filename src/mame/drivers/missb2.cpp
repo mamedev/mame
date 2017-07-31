@@ -16,7 +16,12 @@ written, so it may be normal behaviour.
 
 #include "emu.h"
 #include "includes/bublbobl.h"
+#include "cpu/z80/z80.h"
+#include "sound/3526intf.h"
 #include "sound/okim6295.h"
+#include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 class missb2_state : public bublbobl_state
 {
@@ -167,14 +172,14 @@ READ8_MEMBER(missb2_state::missb2_oki_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( missb2_maincpu_map, AS_PROGRAM, 8, missb2_state )
+static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(common_fromSound_latch_r, common_fromMain_latch_w) AM_MIRROR(0x007c)
+	AM_RANGE(0xfa00, 0xfa00) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa01, 0xfa01) AM_READ(common_sound_semaphores_r) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa80, 0xfa80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) AM_MIRROR(0x007f)
@@ -191,7 +196,7 @@ static ADDRESS_MAP_START( missb2_maincpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xff98, 0xff98) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( missb2_subcpu_map, AS_PROGRAM, 8, missb2_state )
+static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
@@ -207,14 +212,14 @@ ADDRESS_MAP_END
 // Looks like the original bublbobl code modified to support the OKI M6295.
 // due to some really wacky bugs in the way the oki6295 was hacked in place, writes will happen to
 // many addresses other than 9000: 9000-9001, 0000-0001, 3827-3828, 44a8-44a9
-static ADDRESS_MAP_START( missb2_sound_map, AS_PROGRAM, 8, missb2_state )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0FFF)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write) AM_MIRROR(0x0FFE)
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE(common_fromMain_latch_r, common_fromSound_latch_w) AM_MIRROR(0x0FFC)
-	AM_RANGE(0xb001, 0xb001) AM_READWRITE(common_sound_semaphores_r, bublbobl_sh_nmi_enable_w) AM_MIRROR(0x0FFC)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w) AM_MIRROR(0x0FFC)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0fff) ???
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write) AM_MIRROR(0x0ffe)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("main_to_sound", generic_latch_8_device, read) AM_DEVWRITE("sound_to_main", generic_latch_8_device, write) AM_MIRROR(0x0ffc)
+	AM_RANGE(0xb001, 0xb001) AM_READWRITE(common_sound_semaphores_r, bublbobl_sh_nmi_enable_w) AM_MIRROR(0x0ffc)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w) AM_MIRROR(0x0ffc)
 	AM_RANGE(0xe000, 0xefff) AM_ROM         // space for diagnostic ROM?
 ADDRESS_MAP_END
 
@@ -448,15 +453,15 @@ static MACHINE_CONFIG_START( missb2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(missb2_maincpu_map)
+	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(missb2_subcpu_map)
+	MCFG_CPU_PROGRAM_MAP(subcpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(missb2_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
@@ -486,6 +491,11 @@ static MACHINE_CONFIG_START( missb2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(bublbobl_state, main_to_sound_cb))
+
+	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, MAIN_XTAL/8)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))

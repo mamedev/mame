@@ -5,6 +5,8 @@
 #include "cpu/m6800/m6801.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
+#include "machine/input_merger.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "screen.h"
@@ -34,6 +36,9 @@ public:
 		, m_palette(*this, "palette")
 		, m_ym2203(*this, "ym2203")
 		, m_ym3526(*this, "ym3526")
+		, m_soundirq(*this, "soundirq")
+		, m_main_to_sound(*this, "main_to_sound")
+		, m_sound_to_main(*this, "sound_to_main")
 	{ }
 
 	/* memory pointers */
@@ -41,20 +46,11 @@ public:
 	required_shared_ptr<uint8_t> m_objectram;
 	optional_shared_ptr<uint8_t> m_mcu_sharedram;
 
-	/* general */
-	bool     m_is_tokio_hw;
-
 	/* video-related */
 	bool     m_video_enable;
 
 	/* sound-related */
 	bool     m_sound_nmi_enable;
-	uint8_t  m_fromMain;
-	uint8_t  m_fromSound;
-	bool     m_MainHasWritten;
-	bool     m_SoundHasWritten;
-	bool     m_ym2203_irq;
-	bool     m_ym3526_irq;
 	int      m_sreset_old;
 
 	/* mcu-related */
@@ -86,22 +82,21 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<ym2203_device> m_ym2203;
 	optional_device<ym3526_device> m_ym3526;
+	optional_device<input_merger_active_high_device> m_soundirq;
+	required_device<generic_latch_8_device> m_main_to_sound;
+	required_device<generic_latch_8_device> m_sound_to_main;
+
 
 	void common_sreset(int state);
 	DECLARE_WRITE8_MEMBER(bublbobl_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(ym3526_irqhandler);
 	DECLARE_READ8_MEMBER(tokiob_mcu_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_sh_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_sh_nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(main_to_sound_cb);
 	DECLARE_WRITE8_MEMBER(bublbobl_soundcpu_reset_w);
-	DECLARE_READ8_MEMBER(common_fromMain_latch_r);
-	DECLARE_WRITE8_MEMBER(common_fromMain_latch_w);
-	DECLARE_READ8_MEMBER(common_fromSound_latch_r);
-	DECLARE_WRITE8_MEMBER(common_fromSound_latch_w);
 	DECLARE_READ8_MEMBER(common_sound_semaphores_r);
 	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr1_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr1_w);
@@ -124,9 +119,8 @@ public:
 	DECLARE_WRITE8_MEMBER(boblbobl_ic43_b_w);
 	DECLARE_READ8_MEMBER(boblbobl_ic43_b_r);
 
-	DECLARE_DRIVER_INIT(tokio);
 	DECLARE_DRIVER_INIT(dland);
-	DECLARE_DRIVER_INIT(bublbobl);
+	DECLARE_DRIVER_INIT(common);
 	DECLARE_MACHINE_START(tokio);
 	DECLARE_MACHINE_RESET(tokio);
 	DECLARE_MACHINE_START(bublbobl);

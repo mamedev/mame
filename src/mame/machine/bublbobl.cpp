@@ -12,19 +12,18 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/bublbobl.h"
+#include "machine/input_merger.h"
 
 void bublbobl_state::common_sreset(int state)
 {
 	if ((state != CLEAR_LINE) && (state != m_sreset_old))
 	{
 		if (m_ym2203 != nullptr) m_ym2203->reset(); // ym2203, if present, is reset
-		m_ym2203_irq = false;
 		if (m_ym3526 != nullptr) m_ym3526->reset(); // ym3526, if present, is reset
-		m_ym3526_irq = false;
-		m_SoundHasWritten = false; // sound->main semaphore is cleared
+		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // if a sound irq is active, it is cleared. is this necessary? if the above two devices de-assert /IRQ on reset (as a device_line write) properly, it shouldn't be...
+		m_sound_to_main->acknowledge_w(m_audiocpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // sound->main semaphore is cleared
 		m_sound_nmi_enable = false; // sound nmi enable is unset
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // if a sound nmi is active, it is cleared
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // if a sound irq is active, it is cleared
 	}
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state); // soundcpu is reset
 	m_sreset_old = state;
@@ -123,10 +122,6 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
 
 
 
-
-
-
-
 READ8_MEMBER(bublbobl_state::tokiob_mcu_r)
 {
 	/* This return value is literally set by a resistor on the bootleg tokio pcb;
@@ -157,8 +152,16 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_disable_w)
 WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_enable_w)
 {
 	m_sound_nmi_enable = true;
-	if ((m_MainHasWritten == true) && (m_sound_nmi_enable == true))
+	if (m_main_to_sound->pending_r() && (m_sound_nmi_enable == true))
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(bublbobl_state::main_to_sound_cb)
+{
+	if (state && (m_sound_nmi_enable == true))
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 	else
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -169,43 +172,11 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_soundcpu_reset_w)
 	common_sreset(data?ASSERT_LINE:CLEAR_LINE);
 }
 
-READ8_MEMBER(bublbobl_state::common_fromMain_latch_r)
-{
-	if (!machine().side_effect_disabled())
-	{
-		m_MainHasWritten = false;
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
-	return m_fromMain;
-}
-
-WRITE8_MEMBER(bublbobl_state::common_fromMain_latch_w)
-{
-	m_fromMain = data;
-	m_MainHasWritten = true;
-	if ((m_MainHasWritten == true) && (m_sound_nmi_enable == true))
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-READ8_MEMBER(bublbobl_state::common_fromSound_latch_r)
-{
-	m_SoundHasWritten = false;
-	return m_fromSound;
-}
-
-WRITE8_MEMBER(bublbobl_state::common_fromSound_latch_w)
-{
-	m_fromSound = data;
-	m_SoundHasWritten = true;
-}
-
 READ8_MEMBER(bublbobl_state::common_sound_semaphores_r)
 {
 	uint8_t ret = 0xFC;
-	ret |= m_MainHasWritten?0x2:0;
-	ret |= m_SoundHasWritten?0x1:0;
+	ret |= m_main_to_sound->pending_r()?0x2:0x0;
+	ret |= m_sound_to_main->pending_r()?0x1:0x0;
 	return ret;
 }
 

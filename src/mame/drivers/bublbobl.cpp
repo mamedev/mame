@@ -265,7 +265,7 @@ TODO:
   accesses done by the sound CPU to the YM2203 I/O ports. At the very least, there
   could be some filters.
 
- there are also Bubble Bobble bootlegs with a P8749H MCU, however the MCU
+ There are also Bubble Bobble bootlegs with a P8749H MCU, however the MCU
  is protected against reading and the main code only differs by 1 byte from
  Bubble Bobble.  If the MCU were to be dumped that would also make for
  interesting comparisons.
@@ -274,6 +274,15 @@ TODO:
 
 #include "emu.h"
 #include "includes/bublbobl.h"
+
+#include "cpu/m6800/m6801.h"
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
+#include "sound/2203intf.h"
+#include "sound/3526intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_XTAL   XTAL_24MHz
 
@@ -294,7 +303,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bublbobl_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_IMPORT_FROM(common_maincpu_map)
-	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(common_fromSound_latch_r, common_fromMain_latch_w) AM_MIRROR(0x007c)
+	AM_RANGE(0xfa00, 0xfa00) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa01, 0xfa01) AM_READ(common_sound_semaphores_r) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa80, 0xfa80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) AM_MIRROR(0x007f)
@@ -339,7 +348,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write) AM_MIRROR(0x0ffe)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym3526_device, read, write) AM_MIRROR(0x0ffe)
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE(common_fromMain_latch_r, common_fromSound_latch_w) AM_MIRROR(0x0ffc)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("main_to_sound", generic_latch_8_device, read) AM_DEVWRITE("sound_to_main", generic_latch_8_device, write) AM_MIRROR(0x0ffc)
 	AM_RANGE(0xb001, 0xb001) AM_READWRITE(common_sound_semaphores_r, bublbobl_sh_nmi_enable_w) AM_MIRROR(0x0ffc)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w) AM_MIRROR(0x0ffc)
 	AM_RANGE(0xe000, 0xffff) AM_ROM // space for diagnostic ROM?
@@ -360,7 +369,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_IMPORT_FROM(common_maincpu_map)
-	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(common_fromSound_latch_r, common_fromMain_latch_w) AM_MIRROR(0x007c)
+	AM_RANGE(0xfa00, 0xfa00) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa01, 0xfa01) AM_READ(common_sound_semaphores_r) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w) AM_MIRROR(0x007c)
 	AM_RANGE(0xfa80, 0xfa80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) AM_MIRROR(0x007f)
@@ -391,7 +400,7 @@ static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(tokio_bankswitch_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_WRITE(tokio_videoctrl_w)
 	AM_RANGE(0xfb80, 0xfb80) AM_WRITE(bublbobl_nmitrigger_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(common_fromSound_latch_r, common_fromMain_latch_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write) AM_MIRROR(0x007c)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map_mcu, AS_PROGRAM, 8, bublbobl_state )
@@ -413,7 +422,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(common_fromMain_latch_r, common_fromSound_latch_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("main_to_sound", generic_latch_8_device, read) AM_DEVWRITE("sound_to_main", generic_latch_8_device, write)
 	AM_RANGE(0x9800, 0x9800) AM_READ(common_sound_semaphores_r)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(bublbobl_sh_nmi_disable_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(bublbobl_sh_nmi_enable_w)
@@ -799,12 +808,6 @@ MACHINE_START_MEMBER(bublbobl_state,common)
 	m_sreset_old = CLEAR_LINE;
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_video_enable));
-	save_item(NAME(m_fromMain));
-	save_item(NAME(m_fromSound));
-	save_item(NAME(m_MainHasWritten));
-	save_item(NAME(m_SoundHasWritten));
-	save_item(NAME(m_ym2203_irq));
-	save_item(NAME(m_ym3526_irq));
 	save_item(NAME(m_sreset_old));
 }
 
@@ -849,7 +852,7 @@ static MACHINE_CONFIG_START( tokio )
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MAIN_XTAL/8) // 3 Mhz
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu") // is this necessary?
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
@@ -871,6 +874,11 @@ static MACHINE_CONFIG_START( tokio )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(bublbobl_state, main_to_sound_cb))
+
+	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
@@ -880,26 +888,24 @@ static MACHINE_CONFIG_START( tokio )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bublboblp, tokio )
+	MCFG_DEVICE_REMOVE("bmcu") // no mcu, socket is empty
 
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_REMOVE("bmcu")
 	// watchdog circuit is actually present on the prototype pcb, but is either
 	// hooked up wrong in MAME for tokio in general, or is disabled with a wire
 	// jumper under the epoxy
 	MCFG_DEVICE_REMOVE("watchdog")
+	MCFG_WATCHDOG_ADD("watchdog") // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
 
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_CPU_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(tokio_map) // no mcu or resistors at all
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tokiob, tokio )
+	MCFG_DEVICE_REMOVE("bmcu") // no mcu, but see below...
 
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_REMOVE("bmcu")
-
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map_bootleg) // resistor tying mcu's footprint PA6 pin low so it always reads as 0xBF
+	MCFG_CPU_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_CPU_PROGRAM_MAP(tokio_map_bootleg) // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
@@ -982,34 +988,22 @@ static MACHINE_CONFIG_START( bublbobl )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_INPUT_MERGER_ACTIVE_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+
+	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(bublbobl_state, main_to_sound_cb))
+
+	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+
 	MCFG_SOUND_ADD("ym1", YM2203, MAIN_XTAL/8)
-	//MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(bublbobl_state, ym2203_irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_active_high_device, in0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(bublbobl_state, ym3526_irqhandler))
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_active_high_device, in1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
-
-WRITE_LINE_MEMBER(bublbobl_state::ym2203_irqhandler)
-{
-	m_ym2203_irq = state;
-	if (m_ym2203_irq || m_ym3526_irq)
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(bublbobl_state::ym3526_irqhandler)
-{
-	m_ym3526_irq = state;
-	if (m_ym2203_irq || m_ym3526_irq)
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 {
@@ -2001,19 +1995,10 @@ void bublbobl_state::configure_banks(  )
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
+DRIVER_INIT_MEMBER(bublbobl_state,common)
 {
 	configure_banks();
-	m_is_tokio_hw = false;
 }
-
-DRIVER_INIT_MEMBER(bublbobl_state,tokio)
-{
-	configure_banks();
-	m_is_tokio_hw = true;
-}
-
-
 
 DRIVER_INIT_MEMBER(bublbobl_state,dland)
 {
@@ -2026,7 +2011,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
 	for (i = 0x40000; i < 0x80000; i++)
 		src[i] = BITSWAP8(src[i],7,4,5,6,3,0,1,2);
 
-	DRIVER_INIT_CALL(bublbobl);
+	DRIVER_INIT_CALL(common);
 }
 
 
@@ -2035,32 +2020,32 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
  *  Game driver(s)
  *
  *************************************/
+//    YEAR  NAME        PARENT    MACHINE   INPUT       STATE           INIT    ROT    COMPANY     FULLNAME      FLAGS
+GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, tokio,    ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp, bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
+GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp, bublbobl_state, tokio,    ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
-GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
+GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bub68705_state, common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, bublbobl, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
-GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bub68705_state, bublbobl, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dland,      bublbobl, boblbobl, dland,      bublbobl_state, dland,  ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, dland,      bublbobl, boblbobl, dland,      bublbobl_state, dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 2013, bbredux,    bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
+GAME( 2013, bublboblb,  bublbobl, boblbobl, boblcave,   bublbobl_state, common, ROT0,  "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)",                      MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
 
-GAME( 2013, bbredux,    bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
-GAME( 2013, bublboblb,  bublbobl, boblbobl, boblcave,   bublbobl_state, bublbobl, ROT0,  "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)",                      MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
-
-GAME( 2013, bublcave,   bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2",                         MACHINE_SUPPORTS_SAVE )
-GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1",                         MACHINE_SUPPORTS_SAVE )
-GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2013, bublcave,   bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0",                         MACHINE_SUPPORTS_SAVE )
