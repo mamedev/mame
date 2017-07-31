@@ -51,7 +51,7 @@ public:
 	required_device_array<ay8910_device, 2> m_ay;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_device<msm5205_device> m_msm;
-	optional_device<dac_8bit_r2r_device> m_dac;
+	optional_device<dac08_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
