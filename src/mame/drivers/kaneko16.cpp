@@ -764,7 +764,8 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( blazeon_soundmem, AS_PROGRAM, 8, kaneko16_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM     // ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM     // ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM     // ROM (supposed to be banked?)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM     // RAM
 ADDRESS_MAP_END
 
