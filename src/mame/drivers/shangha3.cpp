@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( heberpop )
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -683,7 +683,7 @@ ROM_END
 ROM_START( heberpop ) /* PCB labeled SUN-06 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hbp_ic31.ic31",  0x0000, 0x80000, CRC(c430d264) SHA1(4be12b1fa90da09047db3a31171ffda8ab8bd851) )
-	ROM_LOAD16_BYTE( "hbp_ic32.oc32",  0x0001, 0x80000, CRC(bfa555a8) SHA1(754f581554022b98ba8e78ee96f846faa2cedc69) )
+	ROM_LOAD16_BYTE( "hbp_ic32.ic32",  0x0001, 0x80000, CRC(bfa555a8) SHA1(754f581554022b98ba8e78ee96f846faa2cedc69) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "hbp_ic34_v1.0.ic34",  0x0000, 0x10000, CRC(0cf056c6) SHA1(9992cd3879d9a57fcb784fc1e11d6b6d87e5a366) )
