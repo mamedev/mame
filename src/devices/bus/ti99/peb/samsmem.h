@@ -18,6 +18,7 @@
 #pragma once
 
 #include "peribox.h"
+#include "machine/74259.h"
 #include "machine/ram.h"
 
 namespace bus { namespace ti99 { namespace peb {
@@ -39,8 +40,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(access_mapper_w);
+	DECLARE_WRITE_LINE_MEMBER(map_mode_w);
+
 	// Console RAM
 	required_device<ram_device> m_ram;
+	required_device<ls259_device> m_crulatch;
 	int     m_mapper[16];
 	bool    m_map_mode;
 	bool    m_access_mapper;
