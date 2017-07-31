@@ -68,7 +68,6 @@ Stephh's additional notes :
 #include "emu.h"
 #include "includes/galpanic.h"
 #include "includes/galpnipt.h"
-#include "includes/kaneko16.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
