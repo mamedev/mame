@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-07-28 11:19+1000\n"
-"PO-Revision-Date: 2016-07-09 10:52+0300\n"
+"PO-Revision-Date: 2017-07-31 10:45+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -130,7 +130,7 @@ msgstr "PCBs"
 
 #: src/frontend/mame/ui/selmenu.cpp:52 src/frontend/mame/ui/dirmenu.cpp:47
 msgid "Flyers"
-msgstr "Flyers"
+msgstr "Φυλλάδια"
 
 #: src/frontend/mame/ui/selmenu.cpp:53 src/frontend/mame/ui/dirmenu.cpp:48
 msgid "Titles"
@@ -259,7 +259,7 @@ msgstr "Συνολικά: Λειτουργεί"
 
 #: src/frontend/mame/ui/selmenu.cpp:687
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "Γραφικά: Μη υλοποιημένα, "
 
 #: src/frontend/mame/ui/selmenu.cpp:689
 msgid "Graphics: Imperfect, "
@@ -271,7 +271,7 @@ msgstr "Γραφικά: OK, "
 
 #: src/frontend/mame/ui/selmenu.cpp:694
 msgid "Sound: None"
-msgstr ""
+msgstr "Ήχος: Δεν Έχει Υλοποιηθεί"
 
 #: src/frontend/mame/ui/selmenu.cpp:696
 msgid "Sound: Unimplemented"
@@ -344,55 +344,55 @@ msgstr "Γρήγορη Προώθηση"
 
 #: src/frontend/mame/ui/info.cpp:29
 msgid "protection"
-msgstr ""
+msgstr "προστασία"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "color palette"
-msgstr ""
+msgstr "χρωματική παλέτα"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "graphics"
-msgstr ""
+msgstr "γραφικά"
 
 #: src/frontend/mame/ui/info.cpp:32
 msgid "sound"
-msgstr ""
+msgstr "ήχος"
 
 #: src/frontend/mame/ui/info.cpp:33
 msgid "controls"
-msgstr ""
+msgstr "χειρισμός"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "keyboard"
-msgstr ""
+msgstr "πληκτρολόγιο"
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "mouse"
-msgstr ""
+msgstr "ποντίκι"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "microphone"
-msgstr ""
+msgstr "μικρόφωνο"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "camera"
-msgstr ""
+msgstr "κάμερα"
 
 #: src/frontend/mame/ui/info.cpp:38
 msgid "disk"
-msgstr ""
+msgstr "δίσκος"
 
 #: src/frontend/mame/ui/info.cpp:39
 msgid "printer"
-msgstr ""
+msgstr "εκτυπωτής"
 
 #: src/frontend/mame/ui/info.cpp:40
 msgid "LAN"
-msgstr ""
+msgstr "Δίκτυο LAN"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgid "WAN"
-msgstr ""
+msgstr "Δίκτυο WAN"
 
 #: src/frontend/mame/ui/info.cpp:156
 msgid ""
@@ -419,22 +419,22 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:176
 msgid "Completely unemulated features: "
-msgstr ""
+msgstr "Εντελώς μη εξομοιωμένα χαρακτηριστικά: "
 
 #: src/frontend/mame/ui/info.cpp:182 src/frontend/mame/ui/info.cpp:198
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: src/frontend/mame/ui/info.cpp:182 src/frontend/mame/ui/info.cpp:198
 #: src/frontend/mame/ui/info.cpp:243
 #, c-format
 msgid ", %s"
-msgstr ""
+msgstr ", %s"
 
 #: src/frontend/mame/ui/info.cpp:192
 msgid "Imperfectly emulated features: "
-msgstr ""
+msgstr "Μερικώς εξομοιωμένα χαρακτηριστικά: "
 
 #: src/frontend/mame/ui/info.cpp:207
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -443,7 +443,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:209
 msgid "This machine requires external artwork files.\n"
-msgstr ""
+msgstr "Αυτό το μηχάνημα απαιτεί εξωτερικά αρχεία artwork.\n"
 
 #: src/frontend/mame/ui/info.cpp:211
 msgid ""
@@ -481,6 +481,10 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"Στοιχεία αυτού του μηχανήματος δεν μπορούν να εξομοιωθούν, καθώς απαιτούν "
+"φυσική αλληλεπίδραση ή αποτελούνται από μηχανικές συσκευές. Δεν είναι "
+"δυνατόν να δοκιμάσετε πλήρως αυτό το μηχάνημα.\n"
 
 #: src/frontend/mame/ui/info.cpp:241
 #, c-format
@@ -489,6 +493,9 @@ msgid ""
 "\n"
 "There are working clones of this machine: %s"
 msgstr ""
+"\n"
+"\n"
+"Υπάρχουν κλώνοι αυτού του μηχανήματος που λειτουργούν: %s"
 
 #: src/frontend/mame/ui/info.cpp:254
 msgid ""
@@ -513,7 +520,7 @@ msgstr ""
 "%2$s %3$s\n"
 "Οδηγός: %4$s\n"
 "\n"
-"CPU:\n"
+"Επεξεργαστής:\n"
 
 #: src/frontend/mame/ui/info.cpp:304 src/frontend/mame/ui/info.cpp:342
 msgid "MHz"
@@ -850,177 +857,177 @@ msgstr "Πρόσθετα"
 #: src/frontend/mame/ui/selgame.cpp:1194
 #, c-format
 msgid "Romset\t%1$-.100s\n"
-msgstr ""
+msgstr "Romset\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1195
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr ""
+msgstr "Έτος\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1196
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
-msgstr ""
+msgstr "Κατασκευαστής\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1200
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr ""
+msgstr "Ο Οδηγός είναι Κλώνος του\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1202
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "Ο Οδηγός είναι γονικός\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1205
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "Συνολικά\tΔΕΝ ΛΕΙΤΟΥΡΓΕΙ\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1207
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "Συνολικά\tΜη εξομοιωμένη προστασία\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1209
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "Συνολικά\tΛειτουργεί\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1212
 msgid "Graphics\tUnimplemented\n"
-msgstr ""
+msgstr "Γραφικά\tΜη υλοποιημένα\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1216
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "Γραφικά\tΑτελή χρώματα\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1218
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "Γραφικά\tΑτελή\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1220
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "Γραφικά\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1223
 msgid "Sound\tNone\n"
-msgstr ""
+msgstr "Ήχος\tΚανένας\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1225
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "Ήχος\tΜη υλοποιημένος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1227
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Ήχος\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1229
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "Ήχος\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1232
 msgid "Controls\tUnimplemented\n"
-msgstr ""
+msgstr "Χειρισμός\tΜη υλοποιημένος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1234
 msgid "Controls\tImperfect\n"
-msgstr ""
+msgstr "Χειρισμός\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1237
 msgid "Keyboard\tUnimplemented\n"
-msgstr ""
+msgstr "Πληκτρολόγιο\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1239
 msgid "Keyboard\tImperfect\n"
-msgstr ""
+msgstr "Πληκτρολόγιο\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1242
 msgid "Mouse\tUnimplemented\n"
-msgstr ""
+msgstr "Ποντίκι\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1244
 msgid "Mouse\tImperfect\n"
-msgstr ""
+msgstr "Ποντίκι\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1247
 msgid "Microphone\tUnimplemented\n"
-msgstr ""
+msgstr "Μικρόφωνο\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1249
 msgid "Microphone\tImperfect\n"
-msgstr ""
+msgstr "Μικρόφωνο\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1252
 msgid "Camera\tUnimplemented\n"
-msgstr ""
+msgstr "Κάμερα\tΜη υλοποιημένη\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1254
 msgid "Camera\tImperfect\n"
-msgstr ""
+msgstr "Κάμερα\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1257
 msgid "Disk\tUnimplemented\n"
-msgstr ""
+msgstr "Δίσκος\tΜη υλοποιημένος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1259
 msgid "Disk\tImperfect\n"
-msgstr ""
+msgstr "Δίσκος\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1262
 msgid "Printer\tUnimplemented\n"
-msgstr ""
+msgstr "Εκτυπωτής\tΜη υλοποιημένος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1264
 msgid "Printer\tImperfect\n"
-msgstr ""
+msgstr "Εκτυπωτής\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1267
 msgid "LAN\tUnimplemented\n"
-msgstr ""
+msgstr "LAN\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1269
 msgid "LAN\tImperfect\n"
-msgstr ""
+msgstr "LAN\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1272
 msgid "WAN\tUnimplemented\n"
-msgstr ""
+msgstr "WAN\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1274
 msgid "WAN\tImperfect\n"
-msgstr ""
+msgstr "WAN\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1276
 #, c-format
 msgid "Mechanical Machine\t%1$s\n"
-msgstr ""
+msgstr "Μηχανική Συσκευή\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1277
 #, c-format
 msgid "Requires Artwork\t%1$s\n"
-msgstr ""
+msgstr "Απαιτεί Artwork\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1278
 #, c-format
 msgid "Requires Clickable Artwork\t%1$s\n"
-msgstr ""
+msgstr "Απαιτεί Artwork για κλικ\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1279
 #, c-format
 msgid "Support Cocktail\t%1$s\n"
-msgstr ""
+msgstr "Υποστήριξη Cocktail\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1280
 #, c-format
 msgid "Driver is Bios\t%1$s\n"
-msgstr ""
+msgstr "Ο οδηγός είναι Bios\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1281
 #, c-format
 msgid "Support Save\t%1$s\n"
-msgstr ""
+msgstr "Υποστήριξη Αποθήκευσης\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1282
 #, c-format
 msgid "Screen Orientation\t%1$s\n"
-msgstr ""
+msgstr "Προσανατολισμός Οθόνης\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1282
 msgid "Vertical"
@@ -1033,33 +1040,35 @@ msgstr "Οριζόντιος"
 #: src/frontend/mame/ui/selgame.cpp:1291
 #, c-format
 msgid "Requires CHD\t%1$s\n"
-msgstr ""
+msgstr "Απαιτεί CHD\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1304
 msgid "Roms Audit Pass\tOK\n"
-msgstr ""
+msgstr "Έλεγχος ROMs\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1306
 msgid "Roms Audit Pass\tBAD\n"
-msgstr ""
+msgstr "Έλεγχος ROMs\tΛάθος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1309
 msgid "Samples Audit Pass\tNone Needed\n"
-msgstr ""
+msgstr "Έλεγχος Δειγμάτων Ήχου\tΔεν απαιτείται\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1311
 msgid "Samples Audit Pass\tOK\n"
-msgstr ""
+msgstr "Έλεγχος Δειγμάτων Ήχου\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1313
 msgid "Samples Audit Pass\tBAD\n"
-msgstr ""
+msgstr "Έλεγχος Δειγμάτων Ήχου\tΛάθος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1316
 msgid ""
 "Roms Audit Pass\tDisabled\n"
 "Samples Audit Pass\tDisabled\n"
 msgstr ""
+"Έλεγχος ROMs\tΑπενεργοποιημένος\n"
+"Έλεγχος Δειγμάτων Ήχου\tΑπενεργοποιημένος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1676
 #, c-format
@@ -1097,15 +1106,18 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
+"Στο επιλεγμένο μηχάνημα λείπουν ένα ή περισσότερα απαιτούμενα αρχεία ROM ή "
+"CHD. Επιλέξτε διαφορετικό μηχάνημα.\n"
+"\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1737 src/frontend/mame/ui/selsoft.cpp:630
 msgid "Press any key to continue."
-msgstr ""
+msgstr "Πιέστε ένα πλήκτρο για συνέχεια."
 
 #: src/frontend/mame/ui/slotopt.cpp:290
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [εσωτερικό]"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
@@ -1494,7 +1506,7 @@ msgstr "Υπερχρονισμός CPU %1$s"
 #: src/frontend/mame/ui/ui.cpp:1408
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr ""
+msgstr "Υπερχρονισμός %1$s ήχου"
 
 #: src/frontend/mame/ui/ui.cpp:1429
 #, c-format
@@ -1833,7 +1845,7 @@ msgstr "Mouse Over"
 
 #: src/frontend/mame/ui/custui.cpp:817
 msgid "ARGB Settings"
-msgstr ""
+msgstr "Ρυθμίσεις ARGB"
 
 #: src/frontend/mame/ui/custui.cpp:822 src/frontend/mame/ui/custui.cpp:825
 msgid "Alpha"
@@ -1896,7 +1908,7 @@ msgstr "ROMs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
-msgstr ""
+msgstr "Μέσα Λογισμικού"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
@@ -2012,6 +2024,9 @@ msgid ""
 "different software.\n"
 "\n"
 msgstr ""
+"Στο επιλεγμένο λογισμικό λείπει ένα ή περισσότερα απαραίτητα αρχεία. "
+"Επιλέξτε ένα διαφορετικό λογισμικό.\n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:1153
 #, c-format
@@ -2159,7 +2174,7 @@ msgstr "Οδηγός"
 
 #: src/frontend/mame/ui/miscmenu.cpp:770
 msgid "This machine has no bios."
-msgstr ""
+msgstr "Αυτό το μηχάνημα δεν έχει bios."
 
 #: src/frontend/mame/ui/miscmenu.cpp:779 src/frontend/mame/ui/mainmenu.cpp:145
 msgid "Add To Favorites"
@@ -2179,7 +2194,7 @@ msgstr "Ρύθμιση μηχανήματος:"
 
 #: src/frontend/mame/ui/state.cpp:389
 msgid "Load State"
-msgstr ""
+msgstr "Φόρτωση Κατάστασης"
 
 #: src/frontend/mame/ui/state.cpp:389
 msgid "Select position to load from"
@@ -2187,7 +2202,7 @@ msgstr "Επιλέξτε τη θέση φόρτωσης από"
 
 #: src/frontend/mame/ui/state.cpp:413
 msgid "Save State"
-msgstr ""
+msgstr "Αποθήκευση Κατάστασης"
 
 #: src/frontend/mame/ui/state.cpp:413
 msgid "Select position to save to"
@@ -2200,6 +2215,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Στο επιλεγμένο παιχνίδι λείπει ένα ή περισσότερα απαιτούμενα αρχεία ROM ή "
+"CHD. Επιλέξτε ένα διαφορετικό παιχνίδι.\n"
+"\n"
+"Πιέστε ένα πλήκτρο για συνέχεια."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:242
 #, c-format
@@ -2247,7 +2266,7 @@ msgstr "OK"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:376
 msgid "None"
-msgstr ""
+msgstr "Κανένα"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:384
 #, c-format
