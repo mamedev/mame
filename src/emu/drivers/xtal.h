@@ -84,6 +84,7 @@ enum
 	XTAL_5_0688MHz      = 5068800,      /* Usually used as MC2661 or COM8116 baud rate clock */
 	XTAL_5_3586MHz      = 5358600,      /* Eltec EurocomII */
 	XTAL_5_46MHz        = 5460000,      /* ec1840 and ec1841 keyboard */
+	XTAL_5_5296MHz      = 5529600,      /* Kontron PSI98 keyboard */
 	XTAL_5_626MHz       = 5626000,      /* RCA CDP1869 PAL dot clock */
 	XTAL_5_67MHz        = 5670000,      /* RCA CDP1869 NTSC dot clock */
 	XTAL_5_7143MHz      = 5714300,      /* Cidelsa Destroyer */
