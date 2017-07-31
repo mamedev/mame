@@ -1491,10 +1491,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ghox_hd647180_mem_map, AS_PROGRAM, 8, toaplan2_state )
-	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
-	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
-
-	AM_RANGE(0x3fe00, 0x3ffff) AM_RAM   /* RAM (is this actually just internal RAM getting mapped badly?) */
+	AM_RANGE(0x00000, 0x03fff) AM_ROM   // Internal 16k byte ROM
+	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   // Internal 512 byte RAM
+	AM_RANGE(0x3fe00, 0x3ffff) AM_RAM   // Relocated internal RAM (RMCR = 30)
 
 	AM_RANGE(0x40000, 0x4f7ff) AM_RAM AM_SHARE("shared_ram") 
 
