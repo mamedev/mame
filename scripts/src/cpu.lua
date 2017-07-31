@@ -948,7 +948,7 @@ if (CPUS["I86"]~=null) then
 	}
 end
 
-if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null or CPUS["I86"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["I86"]~=null or CPUS["I386"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 end
 
