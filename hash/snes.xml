@@ -37914,9 +37914,18 @@ List of unclassified roms
 		<info name="alt_title" value="ドラゴンボールZ超悟空伝 覚醒 編" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411B 9531 B" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dragon ball z - super gokuu den - kakusei hen (japan).sfc" size="2097152" crc="3172cd4f" sha1="3b7278a54f8d470dcb1bd92060d744380325f30b" offset="0x000000" />
+				<rom name="shvc-a2zj-0.u1" size="2097152" crc="3172cd4f" sha1="3b7278a54f8d470dcb1bd92060d744380325f30b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
