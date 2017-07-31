@@ -22,6 +22,11 @@ AY-3-8910 @ 1.789766MHz [10.7386/6]
 10 position DIPSW
 NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 
+TODO:
+- A timer apparently expires when beating stage 4 (signalled by a long beeping sound).
+  Player needs to insert another credit and press start button (?) in order to continue.
+  Is this timer supposed to be shown on screen or there are additional 7-LEDs not handled? 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -125,17 +130,19 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pengadvb )
 	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(1)
-	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	// bit 1 is also tested, unknown purpose.
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0xee, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -171,7 +178,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
 }
 
 READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
-{
+{	
 	// TODO: dipswitch
 	switch (m_kb_matrix_row)
 	{
