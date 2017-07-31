@@ -363,7 +363,8 @@ function cheat.startplugin()
 					end
 					cheat.cheat_env[name] = {
 						bpset = function(addr, func) bpset(cheat, dev, addr, func) end,
-						wpset = function(space, wptype, addr, len, func) wpset(cheat, dev, space, wptype, addr, len, func) end }
+						wpset = function(space, wptype, addr, len, func) wpset(cheat, dev, space, wptype, addr, len, func) end, 
+						regs = dev.state }
 					cheat.bp = {}
 					cheat.wp = {}
 					if not periodicset then
