@@ -123,18 +123,26 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t\t<!ATTLIST control ways CDATA #IMPLIED>\n"
 "\t\t\t\t<!ATTLIST control ways2 CDATA #IMPLIED>\n"
 "\t\t\t\t<!ATTLIST control ways3 CDATA #IMPLIED>\n"
-"\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
+"\t\t<!ELEMENT dipswitch (diplocation*, dipvalue*)>\n"
 "\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT diplocation EMPTY>\n"
+"\t\t\t\t<!ATTLIST diplocation name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST diplocation number CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST diplocation inverted (yes|no) \"no\">\n"
 "\t\t\t<!ELEMENT dipvalue EMPTY>\n"
 "\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
-"\t\t<!ELEMENT configuration (confsetting*)>\n"
+"\t\t<!ELEMENT configuration (conflocation*, confsetting*)>\n"
 "\t\t\t<!ATTLIST configuration name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST configuration tag CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST configuration mask CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT conflocation EMPTY>\n"
+"\t\t\t\t<!ATTLIST conflocation name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST conflocation number CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST conflocation inverted (yes|no) \"no\">\n"
 "\t\t\t<!ELEMENT confsetting EMPTY>\n"
 "\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST confsetting value CDATA #REQUIRED>\n"
@@ -466,14 +474,14 @@ void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *
 	// now print various additional information
 	output_bios(driver);
 	output_rom(&drivlist, config->root_device());
-	output_device_roms(config->root_device());
+	output_device_refs(config->root_device());
 	output_sample(config->root_device());
 	output_chips(config->root_device(), "");
 	output_display(config->root_device(), &drivlist.driver().flags, "");
 	output_sound(config->root_device());
 	output_input(portlist);
-	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "dipvalue");
-	output_switches(portlist, "", IPT_CONFIG, "configuration", "confsetting");
+	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "diplocation", "dipvalue");
+	output_switches(portlist, "", IPT_CONFIG, "configuration", "conflocation", "confsetting");
 	output_ports(portlist);
 	output_adjusters(portlist);
 	output_driver(driver, overall_unemulated, overall_imperfect);
@@ -535,6 +543,7 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 	fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(device.name()));
 
 	output_rom(nullptr, device);
+	output_device_refs(device);
 
 	if (device.type().type() != typeid(samples_device)) // ignore samples_device itself
 		output_sample(device);
@@ -545,8 +554,8 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 		output_sound(device);
 	if (has_input)
 		output_input(portlist);
-	output_switches(portlist, devtag, IPT_DIPSWITCH, "dipswitch", "dipvalue");
-	output_switches(portlist, devtag, IPT_CONFIG, "configuration", "confsetting");
+	output_switches(portlist, devtag, IPT_DIPSWITCH, "dipswitch", "diplocation", "dipvalue");
+	output_switches(portlist, devtag, IPT_CONFIG, "configuration", "conflocation", "confsetting");
 	output_adjusters(portlist);
 	output_features(device.type(), overall_unemulated, overall_imperfect);
 	output_images(device, devtag);
@@ -600,14 +609,14 @@ void info_xml_creator::output_devices(device_type_set const *filter)
 
 
 //------------------------------------------------
-//  output_device_roms - when a driver uses roms
-//  included in a device set, print a reference
+//  output_device_refs - when a machine uses a
+//  subdevice, print a reference
 //-------------------------------------------------
 
-void info_xml_creator::output_device_roms(device_t &root)
+void info_xml_creator::output_device_refs(device_t &root)
 {
 	for (device_t &device : device_iterator(root))
-		if (device.owner())
+		if (&device != &root)
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", util::xml::normalize_string(device.shortname()));
 }
 
@@ -1448,11 +1457,11 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 //  DIP switch settings
 //-------------------------------------------------
 
-void info_xml_creator::output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag)
+void info_xml_creator::output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag)
 {
 	// iterate looking for DIP switches
 	for (auto &port : portlist)
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 			if (field.type() == type)
 			{
 				std::ostringstream output;
@@ -1461,15 +1470,22 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 				// output the switch name information
-				std::string normalized_field_name(util::xml::normalize_string(field.name()));
-				std::string normalized_newtag(util::xml::normalize_string(newtag.c_str()));
-				util::stream_format(output,"\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field.mask());
+				std::string const normalized_field_name(util::xml::normalize_string(field.name()));
+				std::string const normalized_newtag(util::xml::normalize_string(newtag.c_str()));
+				util::stream_format(output, "\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field.mask());
+
+				// loop over locations
+				for (ioport_diplocation const &diploc : field.diplocations())
+				{
+					util::stream_format(output, "\t\t\t<%s name=\"%s\" number=\"%u\"", loctag, util::xml::normalize_string(diploc.name()), diploc.number());
+					if (diploc.inverted())
+						output << " inverted=\"yes\"";
+					output << "/>\n";
+				}
 
 				// loop over settings
-				for (ioport_setting &setting : field.settings())
-				{
+				for (ioport_setting const &setting : field.settings())
 					util::stream_format(output,"\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, util::xml::normalize_string(setting.name()), setting.value(), setting.value() == field.defvalue() ? " default=\"yes\"" : "");
-				}
 
 				// terminate the switch entry
 				util::stream_format(output,"\t\t</%s>\n", outertag);

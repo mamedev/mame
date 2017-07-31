@@ -7,8 +7,8 @@
 #include <algorithm>
 
 
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_SLOT, bus::intellec4, univ_slot_device, "intlc4univslot", "INTELLEC 4/MOD 40 Universal Slot")
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_BUS,  bus::intellec4, univ_bus_device,  "intlc4univbus",  "INTELLEC 4/MOD 40 Universal Bus")
+DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_SLOT, bus::intellec4, univ_slot_device, "intlc4univslot", "INTELLEC 4 Universal Slot")
+DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_BUS,  bus::intellec4, univ_bus_device,  "intlc4univbus",  "INTELLEC 4 Universal Bus")
 
 
 namespace bus { namespace intellec4 {
