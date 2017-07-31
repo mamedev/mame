@@ -24,7 +24,6 @@ public:
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
-		m_shared_ram16(*this, "shared_ram16"),
 		m_paletteram(*this, "palette"),
 		m_tx_videoram(*this, "tx_videoram"),
 		m_tx_lineselect(*this, "tx_lineselect"),
@@ -48,7 +47,6 @@ public:
 		m_hopper(*this, "hopper") { }
 
 	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<uint16_t> m_shared_ram16;     // Really 8 bit RAM connected to Z180
 	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_tx_videoram;
 	optional_shared_ptr<uint16_t> m_tx_lineselect;
@@ -93,10 +91,6 @@ public:
 	DECLARE_WRITE16_MEMBER(toaplan2_hd647180_cpu_w);
 	DECLARE_READ16_MEMBER(ghox_p1_h_analog_r);
 	DECLARE_READ16_MEMBER(ghox_p2_h_analog_r);
-	DECLARE_READ16_MEMBER(ghox_mcu_r);
-	DECLARE_WRITE16_MEMBER(ghox_mcu_w);
-	DECLARE_READ16_MEMBER(ghox_shared_ram_r);
-	DECLARE_WRITE16_MEMBER(ghox_shared_ram_w);
 	DECLARE_WRITE16_MEMBER(fixeight_subcpu_ctrl_w);
 	DECLARE_WRITE16_MEMBER(fixeightbl_oki_bankswitch_w);
 	DECLARE_READ8_MEMBER(fixeight_region_r);
