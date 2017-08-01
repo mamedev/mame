@@ -20225,7 +20225,7 @@ more investigation needed...
 		<description>Pilotwings (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNSP-PW-NOE" />
+		<info name="serial" value="SNSP-PW-NOE, SNSP-PW-ESP" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-1B0N-03" />
@@ -20234,9 +20234,9 @@ more investigation needed...
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D413A 9247 BA" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-ESP" />
 			<feature name="slot" value="lorom_dsp" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-pw-0.u1" size="524288" crc="def45776" sha1="d450d6d580d163fdfcc4f58d5bf8fafd7f510750" offset="0x000000" />
