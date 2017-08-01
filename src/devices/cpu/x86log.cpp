@@ -12,6 +12,7 @@
 #include <cassert>
 #include "emu.h"
 #include "x86log.h"
+#include "cpu/i386/i386dasm.h"
 
 
 
@@ -20,7 +21,6 @@
 ***************************************************************************/
 
 static void reset_log(x86log_context *log) noexcept;
-extern int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const uint8_t *oprom, int mode);
 
 
 
