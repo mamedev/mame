@@ -18,7 +18,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(DS2404, ds2404_device, "ds2404", "DS2404")
+DEFINE_DEVICE_TYPE(DS2404, ds2404_device, "ds2404", "DS2404 EconoRAM Time Chip")
 
 //-------------------------------------------------
 //  ds2404_device - constructor
