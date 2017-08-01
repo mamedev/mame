@@ -320,7 +320,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 		case -2: // bus granularity 32
 			switch(alignment) {
-			case 1: // bus granularity 32, alignement 32, endianness irrelevant
+			case 1: // bus granularity 32, alignment 32, endianness irrelevant
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					u32 *dest = get_ptr<u32>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc++)
@@ -532,8 +532,8 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			break;
 
 		case  3: // bus granularity 1, alignment 16, little endian (bit addressing, stored as u16, tms3401x)
-			assert(alignement == 16);
-			assert(endianness == ENDIANNESS_LITTLE);
+			assert(alignment == 16);
+			assert(endian == ENDIANNESS_LITTLE);
 			m_do_fill = [this](offs_t lstart, offs_t lend) {
 				u16 *dest = reinterpret_cast<u16 *>(&m_buffer[0]) + ((lstart - m_lstart) >> 4);
 				lstart >>= 4;
@@ -930,7 +930,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			break;
 
 		case  3: // bus granularity 1, u16 storage, no paging
-			assert(endianness == ENDIANNESS_LITTLE);
+			assert(endian == ENDIANNESS_LITTLE);
 			assert(!m_page_mask);
 			m_do_r8  = [](offs_t pc) -> u8  { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r8 access on 1-bit/16 wide granularity bus\n"); };
 			m_do_r16 = [this](offs_t pc) -> u16 {
@@ -1187,7 +1187,6 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 }
 
 debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
-	m_device(device),
 	m_buf_raw(dynamic_cast<device_disasm_interface &>(device)),
 	m_buf_opcodes(dynamic_cast<device_disasm_interface &>(device)),
 	m_buf_params(dynamic_cast<device_disasm_interface &>(device))

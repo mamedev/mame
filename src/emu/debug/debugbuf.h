@@ -81,7 +81,6 @@ private:
 
 	};
 
-	device_t &m_device;
 	device_disasm_interface *m_dintf;
 	device_memory_interface *m_mintf;
 

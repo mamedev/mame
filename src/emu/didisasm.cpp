@@ -76,17 +76,6 @@ offs_t device_disasm_interface::disassemble(std::ostream &stream, offs_t pc, con
 
 	// make sure we get good results
 	assert((result & DASMFLAG_LENGTHMASK) != 0);
-#ifdef MAME_DEBUG
-	device_memory_interface *memory;
-	if (device().interface(memory))
-	{
-		address_space &space = memory->space(AS_PROGRAM);
-		int bytes = space.address_to_byte(result & DASMFLAG_LENGTHMASK);
-		assert(bytes >= min_opcode_bytes());
-		assert(bytes <= max_opcode_bytes());
-		(void) bytes; // appease compiler
-	}
-#endif
 
 	return result;
 }
