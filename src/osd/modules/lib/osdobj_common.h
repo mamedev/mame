@@ -169,7 +169,6 @@ public:
 	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
 	const float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
 
-private:
 	static const options_entry s_option_entries[];
 };
 

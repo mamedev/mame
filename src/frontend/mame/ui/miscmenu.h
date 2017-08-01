@@ -15,17 +15,9 @@
 
 #include "crsshair.h"
 #include "emuopts.h"
-#include "modules/lib/osdobj_common.h"
 
 #include <utility>
 #include <vector>
-
-#ifdef WIN32
-#include "windows/winmain.h"
-typedef windows_options actual_options;
-#else
-typedef osd_options actual_options;
-#endif
 
 namespace ui {
 class menu_keyboard_mode : public menu
@@ -167,7 +159,7 @@ private:
 	virtual void handle() override;
 
 	const game_driver *m_drv;
-	actual_options m_opts;
+	emu_options m_opts;
 	float x0, y0;
 	s_bios m_bios;
 	std::size_t m_curbios;
