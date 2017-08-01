@@ -4012,13 +4012,12 @@ void i386_device::execute_run()
 
 /*************************************************************************/
 
-bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
+int i386_device::memory_translate(int spacenum, int intention, offs_t &address) const
 {
-	bool ret = true;
 	if(spacenum == AS_PROGRAM)
-		ret = i386_translate_address(intention, &address, nullptr);
+		spacenum = i386_translate_address(intention, &address, nullptr) ? AS_PROGRAM : AS_INVALID;
 	address &= m_a20_mask;
-	return ret;
+	return spacenum;
 }
 
 offs_t i386_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)

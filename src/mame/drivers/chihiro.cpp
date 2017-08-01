@@ -614,10 +614,10 @@ St.     Instr.       Comment
 /* jamtable disassembler */
 void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint32_t size) // 0xff000080 == fff00080
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
+	device_memory_interface &memory = space.device().memory();
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
-	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
+	if (memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr) != space.spacenum())
 	{
 		con.printf("Address is unmapped.\n");
 		return;
@@ -626,11 +626,11 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = cpu.read_byte(space, addr, true);
+		uint32_t opcode = memory.read_byte(space.spacenum(), addr, TRANSLATE_READ_DEBUG);
 		addr++;
-		uint32_t op1 = cpu.read_dword(space, addr, true);
+		uint32_t op1 = memory.read_dword(space.spacenum(), addr, TRANSLATE_READ_DEBUG);
 		addr += 4;
-		uint32_t op2 = cpu.read_dword(space, addr, true);
+		uint32_t op2 = memory.read_dword(space.spacenum(), addr, TRANSLATE_READ_DEBUG);
 		addr += 4;
 
 		char sop1[16];

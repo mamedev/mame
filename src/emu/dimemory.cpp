@@ -9,6 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "debugger.h"
+#include "debug/debugcpu.h"
 
 
 //**************************************************************************
@@ -197,10 +199,10 @@ void device_memory_interface::dump(FILE *file) const
 //  translation is supported
 //-------------------------------------------------
 
-bool device_memory_interface::memory_translate(int spacenum, int intention, offs_t &address)
+int device_memory_interface::memory_translate(int spacenum, int intention, offs_t &address) const
 {
 	// by default it maps directly
-	return true;
+	return spacenum;
 }
 
 
@@ -239,4 +241,428 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 			addrmap.map_validity_check(valid, spacenum);
 		}
 	}
+}
+
+
+
+//**************************************************************************
+//  DEBUGGER MEMORY ACCESSORS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_byte - return a byte from the specified
+//  memory space
+//-------------------------------------------------
+
+u8 device_memory_interface::read_byte(int spacenum, offs_t address, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	// translate if necessary
+	if (intention != TRANSLATE_NONE)
+	{
+		assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ);
+		spacenum = translate(spacenum, intention, address);
+
+		// if not mapped, return 0xff
+		if (spacenum == AS_INVALID)
+			return 0xff;
+	}
+
+	// otherwise, call the byte reading function for the translated address
+	return space(spacenum).read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  read_word - return a word from the specified
+//  memory space
+//-------------------------------------------------
+
+u16 device_memory_interface::read_word(int spacenum, offs_t address, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	if (!WORD_ALIGNED(address))
+	{
+		// if this is misaligned read, or if there are no word readers, just read two bytes
+		u8 byte0 = read_byte(spacenum, address + 0, intention);
+		u8 byte1 = read_byte(spacenum, address + 1, intention);
+
+		// based on the endianness, the result is assembled differently
+		if (space(spacenum).endianness() == ENDIANNESS_LITTLE)
+			return byte0 | (byte1 << 8);
+		else
+			return byte1 | (byte0 << 8);
+	}
+	else
+	{
+		// otherwise, this proceeds like the byte case
+		if (intention != TRANSLATE_NONE)
+		{
+			// translate if necessary
+			assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ);
+			spacenum = translate(spacenum, intention, address);
+
+			// if not mapped, return 0xffff
+			if (spacenum == AS_INVALID)
+				return 0xffff;
+		}
+
+		// otherwise, call the byte reading function for the translated address
+		return space(spacenum).read_word(address);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_dword - return a dword from the specified
+//  memory space
+//-------------------------------------------------
+
+u32 device_memory_interface::read_dword(int spacenum, offs_t address, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	if (!DWORD_ALIGNED(address))
+	{
+		// if this is a misaligned read, or if there are no dword readers, just read two words
+		u16 word0 = read_word(spacenum, address + 0, intention);
+		u16 word1 = read_word(spacenum, address + 2, intention);
+
+		// based on the endianness, the result is assembled differently
+		if (space(spacenum).endianness() == ENDIANNESS_LITTLE)
+			return word0 | (word1 << 16);
+		else
+			return word1 | (word0 << 16);
+	}
+	else
+	{
+		// otherwise, this proceeds like the byte case
+		if (intention != TRANSLATE_NONE)
+		{
+			// translate if necessary
+			assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ);
+			spacenum = translate(spacenum, intention, address);
+
+			// if not mapped, return 0xffffffff
+			if (spacenum == AS_INVALID)
+				return 0xffffffff;
+		}
+
+		// otherwise, call the byte reading function for the translated address
+		return space(spacenum).read_dword(address);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_qword - return a qword from the specified
+//  memory space
+//-------------------------------------------------
+
+u64 device_memory_interface::read_qword(int spacenum, offs_t address, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	if (!QWORD_ALIGNED(address))
+	{
+		// if this is a misaligned read, or if there are no qword readers, just read two dwords
+		u32 dword0 = read_dword(spacenum, address + 0, intention);
+		u32 dword1 = read_dword(spacenum, address + 4, intention);
+
+		// based on the endianness, the result is assembled differently
+		if (space(spacenum).endianness() == ENDIANNESS_LITTLE)
+			return dword0 | (u64(dword1) << 32);
+		else
+			return dword1 | (u64(dword0) << 32);
+	}
+	else
+	{
+		// otherwise, this proceeds like the byte case
+		if (intention != TRANSLATE_NONE)
+		{
+			// translate if necessary
+			assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ);
+			spacenum = translate(spacenum, intention, address);
+
+			// if not mapped, return 0xffffffffffffffff
+			if (spacenum == AS_INVALID)
+				return ~u64(0);
+		}
+
+		// otherwise, call the byte reading function for the translated address
+		return space(spacenum).read_qword(address);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_memory - return 1,2,4 or 8 bytes
+//  from the specified memory space
+//-------------------------------------------------
+
+u64 device_memory_interface::read_memory(int spacenum, offs_t address, int size, int intention)
+{
+	u64 result = ~u64(0) >> (64 - 8*size);
+	switch (size)
+	{
+		case 1:     result = read_byte(spacenum, address, intention);    break;
+		case 2:     result = read_word(spacenum, address, intention);    break;
+		case 4:     result = read_dword(spacenum, address, intention);   break;
+		case 8:     result = read_qword(spacenum, address, intention);   break;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_byte - write a byte to the specified
+//  memory space
+//-------------------------------------------------
+
+void device_memory_interface::write_byte(int spacenum, offs_t address, u8 data, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	// translate if necessary
+	if (intention != TRANSLATE_NONE)
+	{
+		assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE);
+		spacenum = translate(spacenum, intention, address);
+
+		// if not mapped, we're done
+		if (spacenum == AS_INVALID)
+			return;
+	}
+
+	// otherwise, call the byte reading function for the translated address
+	space(spacenum).write_byte(address, data);
+
+	if ((device().machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		device().machine().debugger().cpu().set_memory_modified(true);
+}
+
+
+//-------------------------------------------------
+//  write_word - write a word to the specified
+//  memory space
+//-------------------------------------------------
+
+void device_memory_interface::write_word(int spacenum, offs_t address, u16 data, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	// if this is a misaligned write, or if there are no word writers, just read two bytes
+	if (!WORD_ALIGNED(address))
+	{
+		if (space(spacenum).endianness() == ENDIANNESS_LITTLE)
+		{
+			write_byte(spacenum, address + 0, data >> 0, intention);
+			write_byte(spacenum, address + 1, data >> 8, intention);
+		}
+		else
+		{
+			write_byte(spacenum, address + 0, data >> 8, intention);
+			write_byte(spacenum, address + 1, data >> 0, intention);
+		}
+	}
+
+	// otherwise, this proceeds like the byte case
+	else
+	{
+		// translate if necessary
+		if (intention != TRANSLATE_NONE)
+		{
+			assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE);
+			spacenum = translate(spacenum, intention, address);
+
+			// if not mapped, we're done
+			if (spacenum == AS_INVALID)
+				return;
+		}
+
+		// otherwise, call the byte reading function for the translated address
+		space(spacenum).write_word(address, data);
+
+		if ((device().machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+			device().machine().debugger().cpu().set_memory_modified(true);
+	}
+}
+
+
+//-------------------------------------------------
+//  write_dword - write a dword to the specified
+//  memory space
+//-------------------------------------------------
+
+void device_memory_interface::write_dword(int spacenum, offs_t address, u32 data, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	// if this is a misaligned write, or if there are no dword writers, just read two words
+	if (!DWORD_ALIGNED(address))
+	{
+		if (space(spacenum).endianness() == ENDIANNESS_LITTLE)
+		{
+			write_word(spacenum, address + 0, data >> 0, intention);
+			write_word(spacenum, address + 2, data >> 16, intention);
+		}
+		else
+		{
+			write_word(spacenum, address + 0, data >> 16, intention);
+			write_word(spacenum, address + 2, data >> 0, intention);
+		}
+	}
+
+	// otherwise, this proceeds like the byte case
+	else
+	{
+		// translate if necessary
+		if (intention != TRANSLATE_NONE)
+		{
+			assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE);
+			spacenum = translate(spacenum, intention, address);
+
+			// if not mapped, we're done
+			if (spacenum == AS_INVALID)
+				return;
+		}
+
+		// otherwise, call the byte reading function for the translated address
+		space(spacenum).write_dword(address, data);
+
+		if ((device().machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+			device().machine().debugger().cpu().set_memory_modified(true);
+	}
+}
+
+
+//-------------------------------------------------
+//  write_qword - write a qword to the specified
+//  memory space
+//-------------------------------------------------
+
+void device_memory_interface::write_qword(int spacenum, offs_t address, u64 data, int intention)
+{
+	// mask against the logical byte mask
+	address &= space(spacenum).logbytemask();
+
+	// if this is a misaligned write, or if there are no qword writers, just read two dwords
+	if (!QWORD_ALIGNED(address))
+	{
+		if (space(spacenum).endianness() == ENDIANNESS_LITTLE)
+		{
+			write_dword(spacenum, address + 0, data >> 0, intention);
+			write_dword(spacenum, address + 4, data >> 32, intention);
+		}
+		else
+		{
+			write_dword(spacenum, address + 0, data >> 32, intention);
+			write_dword(spacenum, address + 4, data >> 0, intention);
+		}
+	}
+
+	// otherwise, this proceeds like the byte case
+	else
+	{
+		// translate if necessary
+		if (intention != TRANSLATE_NONE)
+		{
+			assert((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE);
+			spacenum = translate(spacenum, intention, address);
+
+			// if not mapped, we're done
+			if (spacenum == AS_INVALID)
+				return;
+		}
+
+		// otherwise, call the byte reading function for the translated address
+		space(spacenum).write_qword(address, data);
+
+		if ((device().machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+			device().machine().debugger().cpu().set_memory_modified(true);
+	}
+}
+
+
+//-------------------------------------------------
+//  write_memory - write 1,2,4 or 8 bytes to the
+//  specified memory space
+//--------------------------------------------------
+
+void device_memory_interface::write_memory(int spacenum, offs_t address, u64 data, int size, int intention)
+{
+	switch (size)
+	{
+		case 1:     write_byte(spacenum, address, data, intention);  break;
+		case 2:     write_word(spacenum, address, data, intention);  break;
+		case 4:     write_dword(spacenum, address, data, intention); break;
+		case 8:     write_qword(spacenum, address, data, intention); break;
+	}
+}
+
+
+//-------------------------------------------------
+//  read_opcode - read 1,2,4 or 8 bytes at the
+//  given offset from opcode space
+//-------------------------------------------------
+
+u64 device_memory_interface::read_opcode(int spacenum, offs_t address, int size)
+{
+	u64 result = ~u64(0) & (~u64(0) >> (64 - 8*size));
+
+	// keep in logical range
+	address &= space(spacenum).logbytemask();
+
+	// if we're bigger than the address bus, break into smaller pieces
+	if (size > space(spacenum).data_width() / 8)
+	{
+		int halfsize = size / 2;
+		u64 r0 = read_opcode(spacenum, address + 0, halfsize);
+		u64 r1 = read_opcode(spacenum, address + halfsize, halfsize);
+
+		if (space(spacenum).endianness() == ENDIANNESS_LITTLE)
+			return r0 | (r1 << (8 * halfsize));
+		else
+			return r1 | (r0 << (8 * halfsize));
+	}
+
+	// keep in physical range
+	address &= space(spacenum).bytemask();
+
+	// translate to physical first
+	spacenum = translate(spacenum, TRANSLATE_FETCH_DEBUG, address);
+	if (spacenum == AS_INVALID)
+		return result;
+
+	// switch off the size and handle unaligned accesses
+	switch (size)
+	{
+		case 1:
+			result = space(spacenum).read_byte(address);
+			break;
+
+		case 2:
+			result = space(spacenum).read_word_unaligned(address);
+			break;
+
+		case 4:
+			result = space(spacenum).read_dword_unaligned(address);
+			break;
+
+		case 6:
+		case 8:
+			result = space(spacenum).read_qword_unaligned(address);
+			break;
+	}
+
+	return result;
 }

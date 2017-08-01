@@ -231,6 +231,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 {
 	auto dis = machine().disable_side_effect();
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+	device_memory_interface &memory = source.m_space.device().memory();
 
 	// compute the increment
 	int minlen = source.m_space.byte_to_address(source.m_disasmintf->min_opcode_bytes());
@@ -255,8 +256,8 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 		while (curpcbyte < fillpcbyte)
 		{
 			fillpcbyte--;
-			opbuf[1000 + fillpcbyte - targetpcbyte] = machine().debugger().cpu().read_opcode(source.m_decrypted_space, fillpcbyte, 1);
-			argbuf[1000 + fillpcbyte - targetpcbyte] = machine().debugger().cpu().read_opcode(source.m_space, fillpcbyte, 1);
+			opbuf[1000 + fillpcbyte - targetpcbyte] = memory.read_opcode(source.m_decrypted_space.spacenum(), fillpcbyte, 1);
+			argbuf[1000 + fillpcbyte - targetpcbyte] = memory.read_opcode(source.m_space.spacenum(), fillpcbyte, 1);
 		}
 
 		// loop until we get past the target instruction
@@ -270,7 +271,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 
 			// get the disassembly, but only if mapped
 			instlen = 1;
-			if (source.m_space.device().memory().translate(source.m_space.spacenum(), TRANSLATE_FETCH, physpcbyte))
+			if (memory.translate(source.m_space.spacenum(), TRANSLATE_FETCH, physpcbyte) != AS_INVALID)
 			{
 				std::ostringstream dasmbuffer;
 				instlen = source.m_disasmintf->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
@@ -310,13 +311,14 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 std::string debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int granularity, bool encrypted)
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+	device_memory_interface &memory = source.m_space.device().memory();
 	const int char_num = source.m_space.is_octal() ? 3 : 2;
 	std::ostringstream ostr;
 
 	for (int byte = 0; byte < numbytes; byte += granularity) {
 		if (byte)
 			ostr << ' ';
-		util::stream_format(ostr, source.m_space.is_octal() ? "%0*o" : "%0*X", granularity * char_num, machine().debugger().cpu().read_opcode(encrypted ? source.m_space : source.m_decrypted_space, pcbyte + byte, granularity));
+		util::stream_format(ostr, source.m_space.is_octal() ? "%0*o" : "%0*X", granularity * char_num, memory.read_opcode(encrypted ? source.m_space.spacenum() : source.m_decrypted_space.spacenum(), pcbyte + byte, granularity));
 	}
 
 	return ostr.str();
@@ -334,6 +336,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 	bool changed = false;
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+	device_memory_interface &memory = source.m_space.device().memory();
 	const int char_num = source.m_space.is_octal() ? 3 : 2;
 
 	// determine how many characters we need for an address and set the divider
@@ -389,15 +392,15 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		std::ostringstream dasm;
 		int numbytes = 0;
 		offs_t physpcbyte = pcbyte;
-		if (source.m_space.device().memory().translate(source.m_space.spacenum(), TRANSLATE_FETCH_DEBUG, physpcbyte))
+		if (memory.translate(source.m_space.spacenum(), TRANSLATE_FETCH_DEBUG, physpcbyte) != AS_INVALID)
 		{
 			u8 opbuf[64], argbuf[64];
 
 			// fetch the bytes up to the maximum
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = machine().debugger().cpu().read_opcode(source.m_decrypted_space, pcbyte + numbytes, 1);
-				argbuf[numbytes] = machine().debugger().cpu().read_opcode(source.m_space, pcbyte + numbytes, 1);
+				opbuf[numbytes] = memory.read_opcode(source.m_decrypted_space.spacenum(), pcbyte + numbytes, 1);
+				argbuf[numbytes] = memory.read_opcode(source.m_space.spacenum(), pcbyte + numbytes, 1);
 			}
 
 			// disassemble the result

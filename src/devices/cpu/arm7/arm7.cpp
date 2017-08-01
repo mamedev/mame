@@ -443,14 +443,14 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 }
 
 
-bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
+int arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &address) const
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if( spacenum == AS_PROGRAM && ( m_control & COPRO_CTRL_MMU_EN ) )
 	{
-		return arm7_tlb_translate(address, 0);
+		return const_cast<arm7_cpu_device &>(*this).arm7_tlb_translate(address, 0) ? AS_PROGRAM : AS_INVALID;
 	}
-	return true;
+	return spacenum;
 }
 
 

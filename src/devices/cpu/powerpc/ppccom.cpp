@@ -1272,7 +1272,7 @@ void ppc_device::ppccom_dcstore_callback()
     filling
 -------------------------------------------------*/
 
-uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &address)
+uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &address) const
 {
 	int transpriv = ((intention & TRANSLATE_USER_MASK) == 0);   // 1 for supervisor, 0 for user
 	int transtype = intention & TRANSLATE_TYPE_MASK;
@@ -1467,14 +1467,14 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
     from logical to physical
 -------------------------------------------------*/
 
-bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address)
+int ppc_device::memory_translate(int spacenum, int intention, offs_t &address) const
 {
 	/* only applies to the program address space */
 	if (spacenum != AS_PROGRAM)
-		return true;
+		return spacenum;
 
 	/* translation is successful if the internal routine returns 0 or 1 */
-	return (ppccom_translate_address_internal(intention, address) <= 1);
+	return (ppccom_translate_address_internal(intention, address) <= 1) ? AS_PROGRAM : AS_INVALID;
 }
 
 

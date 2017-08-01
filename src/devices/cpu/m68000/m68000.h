@@ -395,7 +395,7 @@ public:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_memory_interface overrides
-	virtual bool memory_translate(int space, int intention, offs_t &address) override;
+	virtual int memory_translate(int space, int intention, offs_t &address) const override;
 };
 
 
@@ -596,7 +596,7 @@ public:
 
 	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
-	virtual bool memory_translate(int space, int intention, offs_t &address) override;
+	virtual int memory_translate(int space, int intention, offs_t &address) const override;
 
 	// device-level overrides
 	virtual void device_start() override;

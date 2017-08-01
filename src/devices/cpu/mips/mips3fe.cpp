@@ -39,7 +39,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	// compute the physical PC
 	assert((desc.physpc & 3) == 0);
-	if (!m_mips3->memory_translate(AS_PROGRAM, TRANSLATE_FETCH, desc.physpc))
+	if (!m_mips3->translate_address_internal(TRANSLATE_FETCH, desc.physpc))
 	{
 		// uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and
 		// mark as needing to validate; otherwise, just end the sequence here

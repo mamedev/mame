@@ -2552,13 +2552,13 @@ void z180_device::execute_set_input(int irqline, int state)
 }
 
 /* logical to physical address translation */
-bool z180_device::memory_translate(int spacenum, int intention, offs_t &address)
+int z180_device::memory_translate(int spacenum, int intention, offs_t &address) const
 {
 	if (spacenum == AS_PROGRAM)
 	{
 		address = MMU_REMAP_ADDR(address);
 	}
-	return true;
+	return spacenum;
 }
 
 
