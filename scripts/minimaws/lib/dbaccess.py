@@ -167,19 +167,47 @@ class QueryCursor(object):
 
     def get_devices_referenced(self, machine):
         return self.dbcurs.execute(
-                'SELECT devicereference.device AS shortname, machine.description AS description ' \
-                'FROM devicereference LEFT JOIN machine ON devicereference.device = machine.shortname ' \
-                'WHERE devicereference.machine = ? ' \
-                'ORDER BY machine.description ASC, devicereference.device ASC',
+                'SELECT devicereference.device AS shortname, machine.description AS description, sourcefile.filename AS sourcefile ' \
+                'FROM devicereference LEFT JOIN machine ON devicereference.device = machine.shortname LEFT JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
+                'WHERE devicereference.machine = ?',
                 (machine, ))
 
     def get_device_references(self, shortname):
         return self.dbcurs.execute(
-                'SELECT shortname, description ' \
-                'FROM machine ' \
-                'WHERE id IN (SELECT machine FROM devicereference WHERE device = ?) ' \
-                'ORDER BY description ASC',
+                'SELECT machine.shortname AS shortname, machine.description AS description, sourcefile.filename AS sourcefile ' \
+                'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
+                'WHERE machine.id IN (SELECT machine FROM devicereference WHERE device = ?)',
                 (shortname, ))
+
+    def get_sourcefile_id(self, filename):
+        return (self.dbcurs.execute('SELECT id FROM sourcefile WHERE filename = ?', (filename, )).fetchone() or (None, ))[0]
+
+    def get_sourcefile_machines(self, id):
+        return self.dbcurs.execute(
+                'SELECT machine.shortname AS shortname, machine.description AS description, machine.isdevice AS isdevice, machine.runnable AS runnable, sourcefile.filename AS sourcefile, system.year AS year, system.manufacturer AS manufacturer, cloneof.parent AS cloneof, romof.parent AS romof ' \
+                'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id LEFT JOIN system ON machine.id = system.id LEFT JOIN cloneof ON system.id = cloneof.id LEFT JOIN romof ON system.id = romof.id ' \
+                'WHERE machine.sourcefile = ?',
+                (id, ))
+
+    def get_sourcefiles(self, pattern):
+        if pattern is not None:
+            return self.dbcurs.execute(
+                    'SELECT sourcefile.filename AS filename, COUNT(machine.id) AS machines ' \
+                    'FROM sourcefile LEFT JOIN machine ON sourcefile.id = machine.sourcefile ' \
+                    'WHERE sourcefile.filename GLOB ?' \
+                    'GROUP BY sourcefile.id ',
+                    (pattern, ))
+        else:
+            return self.dbcurs.execute(
+                    'SELECT sourcefile.filename AS filename, COUNT(machine.id) AS machines ' \
+                    'FROM sourcefile LEFT JOIN machine ON sourcefile.id = machine.sourcefile ' \
+                    'GROUP BY sourcefile.id')
+
+    def count_sourcefiles(self, pattern):
+        if pattern is not None:
+            return self.dbcurs.execute('SELECT COUNT(*) FROM sourcefile WHERE filename GLOB ?', (pattern, )).fetchone()[0]
+        else:
+            return self.dbcurs.execute('SELECT COUNT(*) FROM sourcefile').fetchone()[0]
 
 
 class UpdateCursor(object):
