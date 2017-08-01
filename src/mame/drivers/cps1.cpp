@@ -1914,6 +1914,42 @@ static INPUT_PORTS_START( sf2amf )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sf2accp2 )
+	PORT_INCLUDE( sf2 )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x80, 0x00, "Shot Type" )   PORT_DIPLOCATION("SW(A):8")
+	PORT_DIPSETTING(    0x80, "Directional shots curve up or down" )
+	PORT_DIPSETTING(    0x00, "3D wave shots slow-med-fast" )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x38, 0x20, "Game speed" )   PORT_DIPLOCATION("SW(B):4,5,6") // Manual has some errors here
+	PORT_DIPSETTING(    0x38, "Extremely fast" ) // loop counter 30
+	PORT_DIPSETTING(    0x30, "Very fast" ) // loop counter 70
+	PORT_DIPSETTING(    0x28, "Fast" ) // loop counter 90
+	PORT_DIPSETTING(    0x20, "Normal" ) // loop counter 150
+	PORT_DIPSETTING(    0x18, "Slow" ) // loop counter 190
+	PORT_DIPSETTING(    0x10, "Very slow" ) // loop counter 230
+	PORT_DIPSETTING(    0x00, "Slowest" ) // loop counter 310
+	PORT_DIPSETTING(    0x08, "Speed test mode" ) // loop counter 1
+	// Manual says: we suggest changing the "Special rapid multiple shots feature on a random basis,
+	// never turning on more than 1 at any one time, as this feature will prolong the game time.
+	PORT_DIPNAME( 0x40, 0x40, "Guile special rapid multiple shots" )   PORT_DIPLOCATION("SW(B):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Blanka special rapid multiple shots" )   PORT_DIPLOCATION("SW(B):8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "Ken special rapid multiple shots" )   PORT_DIPLOCATION("SW(C):1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Ryu special rapid multiple shots" )   PORT_DIPLOCATION("SW(C):2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( 3wonders )
 	PORT_INCLUDE( cps1_3b )
 
@@ -12567,7 +12603,7 @@ GAME( 1992, sf2red,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     
 GAME( 1992, sf2v004,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (V004, bootleg)", MACHINE_SUPPORTS_SAVE )             // 102092 !!! - based on (heavily modified) World version
 GAME( 1992, sf2acc,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on World version
 GAME( 1992, sf2acca,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on World version
-GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator Pt.II, bootleg)", MACHINE_SUPPORTS_SAVE )        // 920313 - based on World version
+GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2accp2, cps_state,   cps1,     ROT0,   "bootleg (Testron)", "Street Fighter II': Champion Edition (Accelerator Pt.II, bootleg)", MACHINE_SUPPORTS_SAVE )        // 920313 - based on World version
 GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Alpha Magic-F, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", MACHINE_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
