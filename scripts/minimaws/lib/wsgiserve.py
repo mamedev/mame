@@ -49,7 +49,7 @@ class ErrorPageHandler(HandlerBase):
     def __init__(self, code, app, application_uri, environ, start_response, **kwargs):
         super(ErrorPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.code = code
-        self.start_response('%d %s' % (self.code, self.STATUS_MESSAGE[code]), [('Content-type', 'text/html; charset=utf-8')])
+        self.start_response('%d %s' % (self.code, self.STATUS_MESSAGE[code]), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
 
     def __iter__(self):
         return self.error_page(self.code)
@@ -63,27 +63,27 @@ class AssetHandler(HandlerBase):
 
     def __iter__(self):
         if not self.asset:
-            self.start_response('403 %s' % (self.STATUS_MESSAGE[403], ), [('Content-type', 'text/html; charset=utf-8')])
+            self.start_response('403 %s' % (self.STATUS_MESSAGE[403], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(403)
         elif self.environ['PATH_INFO']:
-            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8')])
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(404)
         else:
             path = os.path.join(self.directory, self.asset)
             if not os.path.isfile(path):
-                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8')])
+                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(404)
             elif self.environ['REQUEST_METHOD'] != 'GET':
-                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS')])
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(405)
             else:
                 try:
                     f = open(path, 'rb')
                     type, encoding = mimetypes.guess_type(path)
-                    self.start_response('200 OK', [('Content-type', type or 'application/octet-stream')])
+                    self.start_response('200 OK', [('Content-type', type or 'application/octet-stream'), ('Cache-Control', 'public, max-age=3600')])
                     return wsgiref.util.FileWrapper(f)
                 except:
-                    self.start_response('500 %s' % (self.STATUS_MESSAGE[500], ), [('Content-type', 'text/html; charset=utf-8')])
+                    self.start_response('500 %s' % (self.STATUS_MESSAGE[500], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                     return self.error_page(500)
 
 
@@ -107,22 +107,22 @@ class MachineHandler(QueryPageHandler):
     def __iter__(self):
         if not self.shortname:
             # could probably list machines here or something
-            self.start_response('403 %s' % (self.STATUS_MESSAGE[403], ), [('Content-type', 'text/html; charset=utf-8')])
+            self.start_response('403 %s' % (self.STATUS_MESSAGE[403], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(403)
         elif self.environ['PATH_INFO']:
             # subdirectory of a machine
-            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8')])
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(404)
         else:
             machine_info = self.dbcurs.get_machine_info(self.shortname).fetchone()
             if not machine_info:
-                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8')])
+                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(404)
             elif self.environ['REQUEST_METHOD'] != 'GET':
-                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS')])
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(405)
             else:
-                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8')])
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                 return self.machine_page(machine_info)
 
     def machine_page(self, machine_info):
@@ -213,10 +213,10 @@ class SourceFileHandler(QueryPageHandler):
             self.filename = self.filename[1:]
         if not self.filename:
             if self.environ['REQUEST_METHOD'] != 'GET':
-                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS')])
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(405)
             else:
-                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8')])
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                 return self.sourcefile_listing_page(None)
         else:
             id = self.dbcurs.get_sourcefile_id(self.filename)
@@ -224,22 +224,22 @@ class SourceFileHandler(QueryPageHandler):
                 if ('*' not in self.filename) and ('?' not in self.filename) and ('?' not in self.filename):
                     self.filename += '*' if self.filename[-1] == '/' else '/*'
                     if not self.dbcurs.count_sourcefiles(self.filename):
-                        self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8')])
+                        self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                         return self.error_page(404)
                     elif self.environ['REQUEST_METHOD'] != 'GET':
-                        self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS')])
+                        self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
                         return self.error_page(405)
                     else:
-                        self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8')])
+                        self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                         return self.sourcefile_listing_page(self.filename)
                 else:
-                    self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8')])
+                    self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                     return self.error_page(404)
             elif self.environ['REQUEST_METHOD'] != 'GET':
-                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS')])
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(405)
             else:
-                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8')])
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                 return self.sourcefile_page(id)
 
     def sourcefile_listing_page(self, pattern):
