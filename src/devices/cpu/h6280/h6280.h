@@ -86,7 +86,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual int memory_translate(int spacenum, int intention, offs_t &address) const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override;
@@ -177,7 +177,7 @@ protected:
 
 	PROTOTYPES(op)
 
-	uint32_t translated(uint16_t addr) const;
+	uint32_t translated(uint16_t addr);
 	void h6280_cycles(int cyc);
 	void set_nz(uint8_t n);
 	void clear_t();

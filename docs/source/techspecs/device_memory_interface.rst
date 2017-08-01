@@ -102,72 +102,14 @@ version tests for AS_PROGRAM/AS_0.
 5. MMU support for disassembler
 -------------------------------
 
-| int **translate**\ (int spacenum, int intention, offs_t &address)
+| bool **translate**\ (int spacenum, int intention, offs_t &address)
 
 Does a logical to physical address translation through the device's
 MMU.  spacenum gives the space number, intention the type of the
 future access (TRANSLATE_(READ|WRITE|FETCH)(|_USER|_DEBUG)) and
 address is an inout parameter with the address to translate and its
-translated version.  This returns the translated space number if
-the translation went correctly, or AS_INVALID if the address is
-unmapped.
+translated version.  Should return true if the translation went
+correctly, false if the address is unmapped.
 
-Note that the device itself must override the virtual method
-**memory_translate** with the same signature.
-
-
-| u8 **read_byte**\ (int spacenum, offs_t address, int intention)
-
-Returns a byte from the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_READ(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| u16 **read_word**\ (int spacenum, offs_t address, int intention)
-
-Returns a word from the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_READ(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| u32 **read_dword**\ (int spacenum, offs_t address, int intention)
-
-Returns a dword from the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_READ(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| u64 **read_qword**\ (int spacenum, offs_t address, int intention)
-Returns a qword from the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_READ(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| u64 **read_memory**\ (int spacenum, offs_t address, int size, int intention)
-Returns 1, 2, 4 or 8 bytes from the specified memory space, as per
-**read_byte**, **read_word**, **read_dword** or **read_qword**.
-
-| void **write_byte**\ (int spacenum, offs_t address, u8 data, int intention)
-Writes a byte to the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_WRITE(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| void **write_word**\ (int spacenum, offs_t address, u16 data, int intention)
-Writes a word to the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_WRITE(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| void **write_dword**\ (int spacenum, offs_t address, u32 data, int intention)
-Writes a dword to the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_WRITE(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| void **write_qword**\ (int spacenum, offs_t address, u64 data, int intention)
-Writes a qword to the specified memory space, doing address
-translation if requested. The intention must be specified as either
-TRANSLATE_WRITE(|_USER|_DEBUG) or TRANSLATE_NONE.
-
-| void **write_memory**\ (int spacenum, offs_t address, u64 data, int size, int intention)
-Writes 1, 2, 4 or 8 bytes to the specified memory space, as per
-**write_byte**, **write_word**, **write_dword** or **write_qword**.
-
-| u64 read_opcode(int spacenum, offs_t offset, int size)
-Reads 1, 2, 4 or 8 bytes at the given offset from the specified
-opcode space. This calls **translate** with TRANSLATE_FETCH_DEBUG
-as the intention.
+Note that for some historical reason the device itself must override
+the virtual method **memory_translate** with the same signature.

@@ -740,25 +740,22 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 	if (source.m_space != nullptr)
 	{
 		auto dis = machine().disable_side_effect();
-		int spacenum = source.m_space->spacenum();
 
 		bool ismapped = offs <= m_maxaddr;
 		if (ismapped && !m_no_translation)
 		{
 			offs_t dummyaddr = offs;
-			spacenum = source.m_memintf->translate(spacenum, TRANSLATE_READ_DEBUG, dummyaddr);
-			ismapped = spacenum != AS_INVALID;
+			ismapped = source.m_memintf->translate(source.m_space->spacenum(), TRANSLATE_READ_DEBUG, dummyaddr);
 		}
 		data = ~u64(0);
 		if (ismapped)
 		{
-			int intention = m_no_translation ? TRANSLATE_NONE : TRANSLATE_READ_DEBUG;
 			switch (size)
 			{
-				case 1: data = source.m_memintf->read_byte(spacenum, offs, intention); break;
-				case 2: data = source.m_memintf->read_word(spacenum, offs, intention); break;
-				case 4: data = source.m_memintf->read_dword(spacenum, offs, intention); break;
-				case 8: data = source.m_memintf->read_qword(spacenum, offs, intention); break;
+				case 1: data = machine().debugger().cpu().read_byte(*source.m_space, offs, !m_no_translation); break;
+				case 2: data = machine().debugger().cpu().read_word(*source.m_space, offs, !m_no_translation); break;
+				case 4: data = machine().debugger().cpu().read_dword(*source.m_space, offs, !m_no_translation); break;
+				case 8: data = machine().debugger().cpu().read_qword(*source.m_space, offs, !m_no_translation); break;
 			}
 		}
 		return ismapped;
@@ -826,16 +823,13 @@ void debug_view_memory::write(u8 size, offs_t offs, u64 data)
 	if (source.m_space != nullptr)
 	{
 		auto dis = machine().disable_side_effect();
-		device_memory_interface &memory = source.m_space->device().memory();
-		int spacenum = source.m_space->spacenum();
-		int intention = m_no_translation ? TRANSLATE_NONE : TRANSLATE_WRITE_DEBUG;
 
 		switch (size)
 		{
-			case 1: memory.write_byte(spacenum, offs, data, intention); break;
-			case 2: memory.write_word(spacenum, offs, data, intention); break;
-			case 4: memory.write_dword(spacenum, offs, data, intention); break;
-			case 8: memory.write_qword(spacenum, offs, data, intention); break;
+			case 1: machine().debugger().cpu().write_byte(*source.m_space, offs, data, !m_no_translation); break;
+			case 2: machine().debugger().cpu().write_word(*source.m_space, offs, data, !m_no_translation); break;
+			case 4: machine().debugger().cpu().write_dword(*source.m_space, offs, data, !m_no_translation); break;
+			case 8: machine().debugger().cpu().write_qword(*source.m_space, offs, data, !m_no_translation); break;
 		}
 		return;
 	}

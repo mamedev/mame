@@ -30,7 +30,7 @@ public:
 protected:
 	uint32_t map_offset[2];
 	uint8_t map_enable;
-	mutable bool nomap;
+	bool nomap;
 
 	class mi_4510_normal : public memory_interface {
 	public:
@@ -54,9 +54,9 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual int memory_translate(int spacenum, int intention, offs_t &address) const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
-	inline uint32_t map(uint16_t adr) const {
+	inline uint32_t map(uint16_t adr) {
 		if(map_enable & (1 << (adr >> 13))) {
 			nomap = false;
 			return adr + map_offset[adr >> 15];

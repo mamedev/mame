@@ -329,7 +329,7 @@ void h6280_device::device_stop()
 }
 
 
-inline uint32_t h6280_device::translated(uint16_t addr) const
+inline uint32_t h6280_device::translated(uint16_t addr)
 {
 	return ((m_mmr[((addr) >> 13) & 7] << 13) | ((addr) & 0x1fff));
 }
@@ -2571,12 +2571,12 @@ WRITE8_MEMBER( h6280_device::timer_w )
 	}
 }
 
-int h6280_device::memory_translate(int spacenum, int intention, offs_t &address) const
+bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (spacenum == AS_PROGRAM)
 		address = translated(address);
 
-	return spacenum;
+	return true;
 }
 
 uint8_t h6280_device::io_get_buffer()

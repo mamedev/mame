@@ -371,12 +371,12 @@ void i80286_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-int i80286_cpu_device::memory_translate(int spacenum, int intention, offs_t &address) const
+bool i80286_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if(spacenum == AS_PROGRAM)
 		address &= m_amask;
 
-	return spacenum;
+	return true;
 }
 
 void i80286_cpu_device::execute_set_input(int inptnum, int state)

@@ -41,9 +41,7 @@ const size_t debugger_commands::MAX_GLOBALS = 1000;
 
 bool debugger_commands::cheat_address_is_valid(address_space &space, offs_t address)
 {
-	device_memory_interface &memory = space.device().memory();
-	int tspacenum = memory.translate(space.spacenum(), TRANSLATE_READ, address);
-	return tspacenum != AS_INVALID && memory.space(tspacenum).get_write_ptr(address) != nullptr;
+	return space.device().memory().translate(space.spacenum(), TRANSLATE_READ, address) && (space.get_write_ptr(address) != nullptr);
 }
 
 
@@ -93,7 +91,7 @@ u64 debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, u64 value)
 
 u64 debugger_commands::cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
 {
-	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, space.device().memory().read_memory(space.spacenum(), address, cheatsys->width, TRANSLATE_READ_DEBUG)));
+	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, m_cpu.read_memory(space, address, cheatsys->width, true)));
 }
 
 debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console)
@@ -1669,10 +1667,9 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now write the data out */
-	device_memory_interface &memory = space->device().memory();
 	for (i = offset; i <= endoffset; i++)
 	{
-		u8 byte = memory.read_byte(space->spacenum(), i, TRANSLATE_READ_DEBUG);
+		u8 byte = m_cpu.read_byte(*space, i, true);
 		fwrite(&byte, 1, 1, f);
 	}
 
@@ -1722,13 +1719,12 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	offset = space->address_to_byte(offset) & space->bytemask();
 
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
-	device_memory_interface &memory = space->device().memory();
 	for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
 	{
 		char byte;
 		f.read(&byte, 1);
 		if (f)
-			memory.write_byte(space->spacenum(), i, byte, TRANSLATE_WRITE_DEBUG);
+			m_cpu.write_byte(*space, i, byte, true);
 	}
 
 	if (!f.good())
@@ -1787,7 +1783,6 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		return;
 	}
 
-	device_memory_interface &memory = space->device().memory();
 	u64 endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
 	offset = space->address_to_byte(offset) & space->bytemask();
 
@@ -1816,9 +1811,9 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 			if (i + j <= endoffset)
 			{
 				offs_t curaddr = i + j;
-				if (memory.translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) != AS_INVALID)
+				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					u64 value = memory.read_memory(space->spacenum(), i + j, width, TRANSLATE_READ_DEBUG);
+					u64 value = m_cpu.read_memory(*space, i + j, width, true);
 					util::stream_format(output, " %0*X", width * 2, value);
 				}
 				else
@@ -1837,9 +1832,9 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
-				if (memory.translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) != AS_INVALID)
+				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					u8 byte = memory.read_byte(space->spacenum(), i + j, TRANSLATE_READ_DEBUG);
+					u8 byte = m_cpu.read_byte(*space, i + j, true);
 					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 				}
 				else
@@ -2368,8 +2363,6 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now search */
-	device_memory_interface &memory = space->device().memory();
-	int spacenum = space->spacenum();
 	for (u64 i = offset; i <= endoffset; i += data_size[0])
 	{
 		int suboffset = 0;
@@ -2380,10 +2373,10 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 		{
 			switch (data_size[j])
 			{
-				case 1: match = (u8(memory.read_byte(spacenum, i + suboffset, TRANSLATE_READ_DEBUG)) == u8(data_to_find[j]));    break;
-				case 2: match = (u16(memory.read_word(spacenum, i + suboffset, TRANSLATE_READ_DEBUG)) == u16(data_to_find[j]));  break;
-				case 4: match = (u32(memory.read_dword(spacenum, i + suboffset, TRANSLATE_READ_DEBUG)) == u32(data_to_find[j])); break;
-				case 8: match = (u64(memory.read_qword(spacenum, i + suboffset, TRANSLATE_READ_DEBUG)) == u64(data_to_find[j])); break;
+				case 1: match = (u8(m_cpu.read_byte(*space, i + suboffset, true)) == u8(data_to_find[j]));    break;
+				case 2: match = (u16(m_cpu.read_word(*space, i + suboffset, true)) == u16(data_to_find[j]));  break;
+				case 4: match = (u32(m_cpu.read_dword(*space, i + suboffset, true)) == u32(data_to_find[j])); break;
+				case 8: match = (u64(m_cpu.read_qword(*space, i + suboffset, true)) == u64(data_to_find[j])); break;
 				default:    /* all other cases are wildcards */     break;
 			}
 			suboffset += data_size[j] & 0x0f;
@@ -2411,7 +2404,7 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 {
 	u64 offset, length, bytes = 1;
 	int minbytes, maxbytes, byteswidth;
-	address_space *space;
+	address_space *space, *decrypted_space;
 	FILE *f;
 	int j;
 
@@ -2424,7 +2417,10 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 		return;
 	if (!validate_cpu_space_parameter(params.size() > 4 ? params[4].c_str() : nullptr, AS_PROGRAM, space))
 		return;
-	int opcode_spacenum = space->device().memory().has_space(AS_OPCODES) ? AS_OPCODES : space->spacenum();
+	if (space->device().memory().has_space(AS_OPCODES))
+		decrypted_space = &space->device().memory().space(AS_OPCODES);
+	else
+		decrypted_space = space;
 
 	/* determine the width of the bytes */
 	device_disasm_interface *dasmintf;
@@ -2458,6 +2454,7 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 	{
 		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
 		const char *comment;
+		offs_t tempaddr;
 		int numbytes = 0;
 		output.clear();
 		output.rdbuf()->clear();
@@ -2468,8 +2465,8 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 		stream_format(output, "%0*X: ", space->logaddrchars(), u32(space->byte_to_address(pcbyte)));
 
 		/* make sure we can translate the address */
-		offs_t tempaddr = pcbyte;
-		if (space->device().memory().translate(space->spacenum(), TRANSLATE_FETCH_DEBUG, tempaddr) != AS_INVALID)
+		tempaddr = pcbyte;
+		if (space->device().memory().translate(space->spacenum(), TRANSLATE_FETCH_DEBUG, tempaddr))
 		{
 			{
 				u8 opbuf[64], argbuf[64];
@@ -2477,8 +2474,8 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 				/* fetch the bytes up to the maximum */
 				for (numbytes = 0; numbytes < maxbytes; numbytes++)
 				{
-					opbuf[numbytes] = space->device().memory().read_opcode(opcode_spacenum, pcbyte + numbytes, 1);
-					argbuf[numbytes] = space->device().memory().read_opcode(space->spacenum(), pcbyte + numbytes, 1);
+					opbuf[numbytes] = m_cpu.read_opcode(*decrypted_space, pcbyte + numbytes, 1);
+					argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
 				}
 
 				/* disassemble the result */
@@ -2491,7 +2488,7 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 				auto const startdex = output.tellp();
 				numbytes = space->address_to_byte(numbytes);
 				for (j = 0; j < numbytes; j += minbytes)
-					stream_format(output, "%0*X ", minbytes * 2, space->device().memory().read_opcode(opcode_spacenum, pcbyte + j, minbytes));
+					stream_format(output, "%0*X ", minbytes * 2, m_cpu.read_opcode(*decrypted_space, pcbyte + j, minbytes));
 				if ((output.tellp() - startdex) < byteswidth)
 					stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
 				stream_format(output, "  ");
@@ -2643,10 +2640,13 @@ void debugger_commands::execute_traceflush(int ref, const std::vector<std::strin
 void debugger_commands::execute_history(int ref, const std::vector<std::string> &params)
 {
 	/* validate parameters */
-	address_space *space;
+	address_space *space, *decrypted_space;
 	if (!validate_cpu_space_parameter(!params.empty() ? params[0].c_str() : nullptr, AS_PROGRAM, space))
 		return;
-	int opcode_spacenum = space->device().memory().has_space(AS_OPCODES) ? AS_OPCODES : space->spacenum();
+	if (space->device().memory().has_space(AS_OPCODES))
+		decrypted_space = &space->device().memory().space(AS_OPCODES);
+	else
+		decrypted_space = space;
 
 	u64 count = device_debug::HISTORY_SIZE;
 	if (params.size() > 1 && !validate_number_parameter(params[1], count))
@@ -2675,8 +2675,8 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
 		u8 opbuf[64], argbuf[64];
 		for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 		{
-			opbuf[numbytes] = space->device().memory().read_opcode(opcode_spacenum, pcbyte + numbytes, 1);
-			argbuf[numbytes] = space->device().memory().read_opcode(space->spacenum(), pcbyte + numbytes, 1);
+			opbuf[numbytes] = m_cpu.read_opcode(*decrypted_space, pcbyte + numbytes, 1);
+			argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
 		}
 
 		util::ovectorstream buffer;
@@ -2791,7 +2791,7 @@ void debugger_commands::execute_pcatmem(int ref, const std::vector<std::string> 
 
 	// Get the value of memory at the address
 	const int native_data_width = space->data_width() / 8;
-	const u64 data = space->device().memory().read_memory(space->spacenum(), space->address_to_byte(address), native_data_width, TRANSLATE_READ_DEBUG);
+	const u64 data = m_cpu.read_memory(*space, space->address_to_byte(address), native_data_width, true);
 
 	// Recover the pc & print
 	const int space_num = (int)ref;
@@ -2866,6 +2866,7 @@ void debugger_commands::execute_source(int ref, const std::vector<std::string> &
 void debugger_commands::execute_map(int ref, const std::vector<std::string> &params)
 {
 	address_space *space;
+	offs_t taddress;
 	u64 address;
 	int intention;
 
@@ -2881,8 +2882,8 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 	for (intention = TRANSLATE_READ_DEBUG; intention <= TRANSLATE_FETCH_DEBUG; intention++)
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
-		offs_t taddress = space->address_to_byte(address) & space->bytemask();
-		if (space->device().memory().translate(space->spacenum(), intention, taddress) != AS_INVALID)
+		taddress = space->address_to_byte(address) & space->bytemask();
+		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
 			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(

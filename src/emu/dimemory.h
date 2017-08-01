@@ -27,10 +27,9 @@ constexpr int TRANSLATE_TYPE_MASK       = 0x03;     // read write or fetch
 constexpr int TRANSLATE_USER_MASK       = 0x04;     // user mode or fully privileged
 constexpr int TRANSLATE_DEBUG_MASK      = 0x08;     // debug mode (no side effects)
 
-constexpr int TRANSLATE_NONE            = 0;        // direct read/write without translation
-constexpr int TRANSLATE_READ            = 1;        // translate for read
-constexpr int TRANSLATE_WRITE           = 2;        // translate for write
-constexpr int TRANSLATE_FETCH           = 3;        // translate for instruction fetch
+constexpr int TRANSLATE_READ            = 0;        // translate for read
+constexpr int TRANSLATE_WRITE           = 1;        // translate for write
+constexpr int TRANSLATE_FETCH           = 2;        // translate for instruction fetch
 constexpr int TRANSLATE_READ_USER       = (TRANSLATE_READ | TRANSLATE_USER_MASK);
 constexpr int TRANSLATE_WRITE_USER      = (TRANSLATE_WRITE | TRANSLATE_USER_MASK);
 constexpr int TRANSLATE_FETCH_USER      = (TRANSLATE_FETCH | TRANSLATE_USER_MASK);
@@ -38,7 +37,6 @@ constexpr int TRANSLATE_READ_DEBUG      = (TRANSLATE_READ | TRANSLATE_DEBUG_MASK
 constexpr int TRANSLATE_WRITE_DEBUG     = (TRANSLATE_WRITE | TRANSLATE_DEBUG_MASK);
 constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 
-constexpr int AS_INVALID                = -1;       // invalid address space (failed translation)
 
 
 //**************************************************************************
@@ -95,20 +93,7 @@ public:
 	address_space &space(int index = 0) const { assert(index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]); return *m_addrspace[index]; }
 
 	// address translation
-	int translate(int spacenum, int intention, offs_t &address) const { return memory_translate(spacenum, intention, address); }
-
-	// user/debugger memory accessors
-	u8 read_byte(int spacenum, offs_t address, int intention);
-	u16 read_word(int spacenum, offs_t address, int intention);
-	u32 read_dword(int spacenum, offs_t address, int intention);
-	u64 read_qword(int spacenum, offs_t address, int intention);
-	u64 read_memory(int spacenum, offs_t address, int size, int intention);
-	void write_byte(int spacenum, offs_t address, u8 data, int intention);
-	void write_word(int spacenum, offs_t address, u16 data, int intention);
-	void write_dword(int spacenum, offs_t address, u32 data, int intention);
-	void write_qword(int spacenum, offs_t address, u64 data, int intention);
-	void write_memory(int spacenum, offs_t address, u64 data, int size, int intention);
-	u64 read_opcode(int spacenum, offs_t offset, int size);
+	bool translate(int spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
 
 	// deliberately ambiguous functions; if you have the memory interface
 	// just use it
@@ -138,7 +123,7 @@ protected:
 	virtual space_config_vector memory_space_config() const = 0;
 
 	// optional operation overrides
-	virtual int memory_translate(int spacenum, int intention, offs_t &address) const;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
 
 	// interface-level overrides
 	virtual void interface_config_complete() override;

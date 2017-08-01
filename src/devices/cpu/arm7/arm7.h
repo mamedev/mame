@@ -68,7 +68,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual int memory_translate(int spacenum, int intention, offs_t &address) const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;

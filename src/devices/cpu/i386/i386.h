@@ -60,7 +60,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual int memory_translate(int spacenum, int intention, offs_t &address) const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -296,8 +296,8 @@ protected:
 	void register_state_i386_x87();
 	void register_state_i386_x87_xmm();
 	inline uint32_t i386_translate(int segment, uint32_t ip, int rwn);
-	inline vtlb_entry get_permissions(uint32_t pte, int wp) const;
-	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry) const;
+	inline vtlb_entry get_permissions(uint32_t pte, int wp);
+	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry);
 	inline bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
 	inline void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);

@@ -86,7 +86,7 @@ protected:
 
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int inputnum, int state) override;
-	int memory_translate(int spacenum, int intention, offs_t &address) const override;
+	bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	virtual void interrupt(int int_num, int trap = 1) override { if(trap) throw TRAP(int_num, (uint16_t)-1); else interrupt_descriptor(int_num, 0, 0); }
 	virtual uint8_t read_port_byte(uint16_t port) override;

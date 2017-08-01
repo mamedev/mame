@@ -305,7 +305,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual int memory_translate(int spacenum, int intention, offs_t &address) const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;
@@ -575,7 +575,6 @@ private:
 	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
 
-	bool translate_address_internal(int intention, offs_t &address) const;
 };
 
 

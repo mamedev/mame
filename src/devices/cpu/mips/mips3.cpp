@@ -952,22 +952,17 @@ void mips3_device::device_reset()
 }
 
 
-int mips3_device::memory_translate(int spacenum, int intention, offs_t &address) const
+bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	/* only applies to the program address space */
 	if (spacenum == AS_PROGRAM)
-		return translate_address_internal(intention, address) ? AS_PROGRAM : AS_INVALID;
-	return spacenum;
-}
-
-
-bool mips3_device::translate_address_internal(int intention, offs_t &address) const
-{
-	const vtlb_entry *table = vtlb_table();
-	vtlb_entry entry = table[address >> MIPS3_MIN_PAGE_SHIFT];
-	if ((entry & (1 << (intention & (TRANSLATE_TYPE_MASK | TRANSLATE_USER_MASK)))) == 0)
-		return false;
-	address = (entry & ~MIPS3_MIN_PAGE_MASK) | (address & MIPS3_MIN_PAGE_MASK);
+	{
+		const vtlb_entry *table = vtlb_table();
+		vtlb_entry entry = table[address >> MIPS3_MIN_PAGE_SHIFT];
+		if ((entry & (1 << (intention & (TRANSLATE_TYPE_MASK | TRANSLATE_USER_MASK)))) == 0)
+			return false;
+		address = (entry & ~MIPS3_MIN_PAGE_MASK) | (address & MIPS3_MIN_PAGE_MASK);
+	}
 	return true;
 }
 

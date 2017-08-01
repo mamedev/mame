@@ -380,7 +380,7 @@ uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
 
 #define VTLB_FLAG_DIRTY 0x100
 
-vtlb_entry i386_device::get_permissions(uint32_t pte, int wp) const
+vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
 {
 	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
 	if(!wp)
@@ -390,7 +390,7 @@ vtlb_entry i386_device::get_permissions(uint32_t pte, int wp) const
 	return ret;
 }
 
-bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry) const
+bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
 {
 	uint32_t a = *address;
 	uint32_t pdbr = m_cr[3] & 0xfffff000;

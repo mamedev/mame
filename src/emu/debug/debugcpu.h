@@ -509,6 +509,41 @@ public:
 	bool comment_load(bool is_inline);
 
 
+	/* ----- debugger memory accessors ----- */
+
+	/* return a byte from the specified memory space */
+	u8 read_byte(address_space &space, offs_t address, bool apply_translation);
+
+	/* return a word from the specified memory space */
+	u16 read_word(address_space &space, offs_t address, bool apply_translation);
+
+	/* return a dword from the specified memory space */
+	u32 read_dword(address_space &space, offs_t address, bool apply_translation);
+
+	/* return a qword from the specified memory space */
+	u64 read_qword(address_space &space, offs_t address, bool apply_translation);
+
+	/* return 1,2,4 or 8 bytes from the specified memory space */
+	u64 read_memory(address_space &space, offs_t address, int size, bool apply_translation);
+
+	/* write a byte to the specified memory space */
+	void write_byte(address_space &space, offs_t address, u8 data, bool apply_translation);
+
+	/* write a word to the specified memory space */
+	void write_word(address_space &space, offs_t address, u16 data, bool apply_translation);
+
+	/* write a dword to the specified memory space */
+	void write_dword(address_space &space, offs_t address, u32 data, bool apply_translation);
+
+	/* write a qword to the specified memory space */
+	void write_qword(address_space &space, offs_t address, u64 data, bool apply_translation);
+
+	/* write 1,2,4 or 8 bytes to the specified memory space */
+	void write_memory(address_space &space, offs_t address, u64 data, int size, bool apply_translation);
+
+	/* read 1,2,4 or 8 bytes at the given offset from opcode space */
+	u64 read_opcode(address_space &space, offs_t offset, int size);
+
 	// getters
 	bool within_instruction_hook() const { return m_within_instruction_hook; }
 	bool memory_modified() const { return m_memory_modified; }

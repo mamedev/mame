@@ -143,6 +143,7 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 {
 	offs_t tableindex = address >> m_pageshift;
 	vtlb_entry entry = m_table[tableindex];
+	offs_t taddress;
 
 #if PRINTF_TLB
 	osd_printf_debug("vtlb_fill: %08X(%X) ... ", address, intention);
@@ -161,8 +162,8 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 	}
 
 	// ask the CPU core to translate for us
-	offs_t taddress = address;
-	if (device().memory().translate(m_space, intention, taddress) != m_space)
+	taddress = address;
+	if (!device().memory().translate(m_space, intention, taddress))
 	{
 #if PRINTF_TLB
 		osd_printf_debug("failed: no translation\n");

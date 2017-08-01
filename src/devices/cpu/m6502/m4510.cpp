@@ -56,14 +56,14 @@ void m4510_device::device_reset()
 	m65ce02_device::device_reset();
 }
 
-int m4510_device::memory_translate(int spacenum, int intention, offs_t &address) const
+bool m4510_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (spacenum == AS_PROGRAM)
 	{
 		address = map(address);
 	}
 
-	return spacenum;
+	return true;
 }
 
 m4510_device::mi_4510_normal::mi_4510_normal(m4510_device *_base)

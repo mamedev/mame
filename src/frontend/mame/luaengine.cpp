@@ -315,35 +315,33 @@ template <typename T>
 T lua_engine::addr_space::log_mem_read(offs_t address)
 {
 	T mem_content = 0;
-	int tspacenum = dev.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address);
-	if (tspacenum == AS_INVALID)
+	if(!dev.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		return 0;
-	address_space &tspace = space.device().memory().space(tspacenum);
-	address = tspace.address_to_byte(address);
+	address = space.address_to_byte(address);
 
 	switch(sizeof(mem_content) * 8) {
 		case 8:
-			mem_content = tspace.read_byte(address);
+			mem_content = space.read_byte(address);
 			break;
 		case 16:
 			if (WORD_ALIGNED(address)) {
-				mem_content = tspace.read_word(address);
+				mem_content = space.read_word(address);
 			} else {
-				mem_content = tspace.read_word_unaligned(address);
+				mem_content = space.read_word_unaligned(address);
 			}
 			break;
 		case 32:
 			if (DWORD_ALIGNED(address)) {
-				mem_content = tspace.read_dword(address);
+				mem_content = space.read_dword(address);
 			} else {
-				mem_content = tspace.read_dword_unaligned(address);
+				mem_content = space.read_dword_unaligned(address);
 			}
 			break;
 		case 64:
 			if (QWORD_ALIGNED(address)) {
-				mem_content = tspace.read_qword(address);
+				mem_content = space.read_qword(address);
 			} else {
-				mem_content = tspace.read_qword_unaligned(address);
+				mem_content = space.read_qword_unaligned(address);
 			}
 			break;
 		default:
@@ -361,35 +359,33 @@ T lua_engine::addr_space::log_mem_read(offs_t address)
 template <typename T>
 void lua_engine::addr_space::log_mem_write(offs_t address, T val)
 {
-	int tspacenum = dev.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address);
-	if (tspacenum == AS_INVALID)
+	if(!dev.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		return;
-	address_space &tspace = space.device().memory().space(tspacenum);
-	address = tspace.address_to_byte(address);
+	address = space.address_to_byte(address);
 
 	switch(sizeof(val) * 8) {
 		case 8:
-			tspace.write_byte(address, val);
+			space.write_byte(address, val);
 			break;
 		case 16:
 			if (WORD_ALIGNED(address)) {
-				tspace.write_word(address, val);
+				space.write_word(address, val);
 			} else {
-				tspace.write_word_unaligned(address, val);
+				space.write_word_unaligned(address, val);
 			}
 			break;
 		case 32:
 			if (DWORD_ALIGNED(address)) {
-				tspace.write_dword(address, val);
+				space.write_dword(address, val);
 			} else {
-				tspace.write_dword_unaligned(address, val);
+				space.write_dword_unaligned(address, val);
 			}
 			break;
 		case 64:
 			if (QWORD_ALIGNED(address)) {
-				tspace.write_qword(address, val);
+				space.write_qword(address, val);
 			} else {
-				tspace.write_qword_unaligned(address, val);
+				space.write_qword_unaligned(address, val);
 			}
 			break;
 		default:

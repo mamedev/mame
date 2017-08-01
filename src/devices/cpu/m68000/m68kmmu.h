@@ -1111,7 +1111,7 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 
 
 /* Apple HMMU translation is much simpler */
-static inline uint32_t hmmu_translate_addr(const m68000_base_device *m68k, uint32_t addr_in)
+static inline uint32_t hmmu_translate_addr(m68000_base_device *m68k, uint32_t addr_in)
 {
 	uint32_t addr_out;
 

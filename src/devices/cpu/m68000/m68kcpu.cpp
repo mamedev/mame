@@ -704,7 +704,7 @@ static void m68k_cause_bus_error(m68000_base_device *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_BUS_ERROR);
 }
 
-int m68000_base_device::memory_translate(int space, int intention, offs_t &address) const
+bool m68000_base_device::memory_translate(int space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	{
@@ -712,29 +712,28 @@ int m68000_base_device::memory_translate(int space, int intention, offs_t &addre
 		if ((space == AS_PROGRAM) && ((pmmu_enabled) || (CPU_TYPE_IS_040_PLUS(cpu_type))))
 		{
 			// FIXME: mmu_tmp_sr will be overwritten in pmmu_translate_addr_with_fc
-			auto &cpu = const_cast<m68000_base_device &>(*this);
-			uint16_t temp_mmu_tmp_sr = cpu.mmu_tmp_sr;
+			uint16_t temp_mmu_tmp_sr = mmu_tmp_sr;
 			int mode = s_flag ? FUNCTION_CODE_SUPERVISOR_PROGRAM : FUNCTION_CODE_USER_PROGRAM;
 //          uint32_t va=address;
 
 			if (CPU_TYPE_IS_040_PLUS(cpu_type))
 			{
-				address = pmmu_translate_addr_with_fc_040(&cpu, address, mode, 1);
+				address = pmmu_translate_addr_with_fc_040(this, address, mode, 1);
 			}
 			else
 			{
-				address = pmmu_translate_addr_with_fc(&cpu, address, mode, 1);
+				address = pmmu_translate_addr_with_fc(this, address, mode, 1);
 			}
 
-			if ((cpu.mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
+			if ((mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
 //              logerror("cpu_translate_m68k failed with mmu_sr=%04x va=%08x pa=%08x\n",mmu_tmp_sr,va ,address);
 				address = 0;
 			}
 
-			cpu.mmu_tmp_sr = temp_mmu_tmp_sr;
+			mmu_tmp_sr = temp_mmu_tmp_sr;
 		}
 	}
-	return space;
+	return true;
 }
 
 
@@ -2628,7 +2627,7 @@ void m68020pmmu_device::device_start()
 	init_cpu_m68020pmmu();
 }
 
-int m68020hmmu_device::memory_translate(int space, int intention, offs_t &address) const
+bool m68020hmmu_device::memory_translate(int space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	{
@@ -2637,7 +2636,7 @@ int m68020hmmu_device::memory_translate(int space, int intention, offs_t &addres
 			address = hmmu_translate_addr(this, address);
 		}
 	}
-	return space;
+	return true;
 }
 
 
