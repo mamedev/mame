@@ -89,8 +89,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
 	/* GUESS: bit 6 is video enable "/BLACK" */
 	m_video_enable = data & 0x40; // guess
 
-	/* bit 7 is unknown */
-	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	/* bit 7 is unknown but used */
 }
 
 /* tokio videoctrl reg
@@ -119,8 +118,6 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
-
-
 
 READ8_MEMBER(bublbobl_state::tokiob_mcu_r)
 {
@@ -174,9 +171,9 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_soundcpu_reset_w)
 
 READ8_MEMBER(bublbobl_state::common_sound_semaphores_r)
 {
-	uint8_t ret = 0xFC;
-	ret |= m_main_to_sound->pending_r()?0x2:0x0;
-	ret |= m_sound_to_main->pending_r()?0x1:0x0;
+	uint8_t ret = 0xfc;
+	ret |= m_main_to_sound->pending_r() ? 0x2 : 0x0;
+	ret |= m_sound_to_main->pending_r() ? 0x1 : 0x0;
 	return ret;
 }
 

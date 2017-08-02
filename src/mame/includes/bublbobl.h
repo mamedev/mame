@@ -2,15 +2,11 @@
 // copyright-holders:Chris Moore, Nicola Salmoria
 
 #include "cpu/m6805/m68705.h"
-#include "cpu/m6800/m6801.h"
-#include "cpu/z80/z80.h"
-#include "machine/watchdog.h"
 #include "machine/input_merger.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "screen.h"
-#include "speaker.h"
 
 #include "machine/taito68705interface.h"
 
