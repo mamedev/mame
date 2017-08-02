@@ -176,10 +176,7 @@ FLOPPY_FORMATS_MEMBER(beta_disk_device::floppy_formats)
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( beta_disk_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
-	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
-	SLOT_INTERFACE( "drive2", FLOPPY_525_QD )
-	SLOT_INTERFACE( "drive3", FLOPPY_525_QD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 
@@ -271,13 +268,13 @@ ROM_END
 
 MACHINE_CONFIG_MEMBER( beta_disk_device::device_add_mconfig )
 	MCFG_KR1818VG93_ADD("wd179x", XTAL_8MHz / 8)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "drive1", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "drive2", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "drive3", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

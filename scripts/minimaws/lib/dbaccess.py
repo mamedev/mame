@@ -7,6 +7,14 @@ import sqlite3
 
 
 class SchemaQueries(object):
+    CREATE_TEMPORARY_DEVICEREFERENCE = 'CREATE TEMPORARY TABLE temp_devicereference (id INTEGER PRIMARY KEY, machine INTEGER NOT NULL, device TEXT NOT NULL, UNIQUE (machine, device))'
+    CREATE_TEMPORARY_SLOTOPTION = 'CREATE TEMPORARY TABLE temp_slotoption (id INTEGER PRIMARY KEY, slot INTEGER NOT NULL, device TEXT NOT NULL, name TEXT NOT NULL)'
+    CREATE_TEMPORARY_SLOTDEFAULT = 'CREATE TEMPORARY TABLE temp_slotdefault (id INTEGER PRIMARY KEY, slotoption INTEGER NOT NULL)'
+
+    DROP_TEMPORARY_DEVICEREFERENCE = 'DROP TABLE IF EXISTS temp_devicereference'
+    DROP_TEMPORARY_SLOTOPTION = 'DROP TABLE IF EXISTS temp_slotoption'
+    DROP_TEMPORARY_SLOTDEFAULT = 'DROP TABLE IF EXISTS temp_slotdefault'
+
     INDEX_MACHINE_ISDEVICE_SHORTNAME = 'CREATE INDEX machine_isdevice_shortname ON machine (isdevice ASC, shortname ASC)'
     INDEX_MACHINE_ISDEVICE_DESCRIPTION = 'CREATE INDEX machine_isdevice_description ON machine (isdevice ASC, description ASC)'
     INDEX_MACHINE_RUNNABLE_SHORTNAME = 'CREATE INDEX machine_runnable_shortname ON machine (runnable ASC, shortname ASC)'
@@ -18,8 +26,6 @@ class SchemaQueries(object):
     INDEX_ROMOF_PARENT = 'CREATE INDEX romof_parent ON romof (parent ASC)'
 
     INDEX_CLONEOF_PARENT = 'CREATE INDEX cloneof_parent ON cloneof (parent ASC)'
-
-    INDEX_DEVICEREFERENCE_DEVICE = 'CREATE INDEX devicereference_device ON devicereference (device ASC)'
 
     INDEX_DIPSWITCH_MACHINE_ISCONFIG = 'CREATE INDEX dipswitch_machine_isconfig ON dipswitch (machine ASC, isconfig ASC)'
 
@@ -35,8 +41,6 @@ class SchemaQueries(object):
 
     DROP_CLONEOF_PARENT = 'DROP INDEX IF EXISTS cloneof_parent'
 
-    DROP_DEVICEREFERENCE_DEVICE = 'DROP INDEX IF EXISTS devicereference_device'
-
     DROP_DIPSWITCH_MACHINE_ISCONFIG = 'DROP INDEX IF EXISTS dipswitch_machine_isconfig'
 
 
@@ -47,11 +51,19 @@ class UpdateQueries(object):
     ADD_SYSTEM = 'INSERT INTO system (id, year, manufacturer) VALUES (?, ?, ?)'
     ADD_CLONEOF = 'INSERT INTO cloneof (id, parent) VALUES (?, ?)'
     ADD_ROMOF = 'INSERT INTO romof (id, parent) VALUES (?, ?)'
-    ADD_DEVICEREFERENCE = 'INSERT OR IGNORE INTO devicereference (machine, device) VALUES (?, ?)'
     ADD_DIPSWITCH = 'INSERT INTO dipswitch (machine, isconfig, name, tag, mask) VALUES (?, ?, ?, ?, ?)'
     ADD_DIPLOCATION = 'INSERT INTO diplocation (dipswitch, bit, name, num, inverted) VALUES (?, ?, ?, ?, ?)'
     ADD_DIPVALUE = 'INSERT INTO dipvalue (dipswitch, name, value, isdefault) VALUES (?, ?, ?, ?)'
     ADD_FEATURE = 'INSERT INTO feature (machine, featuretype, status, overall) SELECT ?, id, ?, ? FROM featuretype WHERE name = ?'
+    ADD_SLOT = 'INSERT INTO slot (machine, name) VALUES (?, ?)'
+
+    ADD_TEMPORARY_DEVICEREFERENCE = 'INSERT OR IGNORE INTO temp_devicereference (machine, device) VALUES (?, ?)'
+    ADD_TEMPORARY_SLOTOPTION = 'INSERT INTO temp_slotoption (slot, device, name) VALUES (?, ?, ?)'
+    ADD_TEMPORARY_SLOTDEFAULT = 'INSERT INTO temp_slotdefault (id, slotoption) VALUES (?, ?)'
+
+    FINALISE_DEVICEREFERENCES = 'INSERT INTO devicereference (id, machine, device) SELECT temp_devicereference.id, temp_devicereference.machine, machine.id FROM temp_devicereference LEFT JOIN machine ON temp_devicereference.device = machine.shortname'
+    FINALISE_SLOTOPTIONS = 'INSERT INTO slotoption (id, slot, device, name) SELECT temp_slotoption.id, temp_slotoption.slot, machine.id, temp_slotoption.name FROM temp_slotoption LEFT JOIN machine ON temp_slotoption.device = machine.shortname'
+    FINALISE_SLOTDEFAULTS = 'INSERT INTO slotdefault (id, slotoption) SELECT id, slotoption FROM temp_slotdefault'
 
 
 class QueryCursor(object):
@@ -140,21 +152,21 @@ class QueryCursor(object):
             return self.dbcurs.execute(
                     'SELECT shortname, description ' \
                     'FROM machine ' \
-                    'WHERE id IN (SELECT machine FROM devicereference WHERE device IN (SELECT shortname FROM machine WHERE sourcefile IN (SELECT id FROM sourcefile WHERE filename GLOB ?))) AND runnable = 1 ' \
+                    'WHERE id IN (SELECT machine FROM devicereference WHERE device IN (SELECT id FROM machine WHERE sourcefile IN (SELECT id FROM sourcefile WHERE filename GLOB ?))) AND runnable = 1 ' \
                     'ORDER BY shortname ASC',
                     patterns)
         elif self.is_glob(*patterns):
             return self.dbcurs.execute(
                     'SELECT shortname, description ' \
                     'FROM machine ' \
-                    'WHERE id IN (SELECT machine FROM devicereference WHERE device IN (SELECT shortname FROM machine WHERE sourcefile IN (SELECT id FROM sourcefile WHERE filename GLOB ?' + (' OR filename GLOB ?' * (len(patterns) - 1)) + '))) AND runnable = 1 ' \
+                    'WHERE id IN (SELECT machine FROM devicereference WHERE device IN (SELECT id FROM machine WHERE sourcefile IN (SELECT id FROM sourcefile WHERE filename GLOB ?' + (' OR filename GLOB ?' * (len(patterns) - 1)) + '))) AND runnable = 1 ' \
                     'ORDER BY shortname ASC',
                     patterns)
         else:
             return self.dbcurs.execute(
                     'SELECT shortname, description ' \
                     'FROM machine ' \
-                    'WHERE id IN (SELECT machine FROM devicereference WHERE device IN (SELECT shortname FROM machine WHERE sourcefile IN (SELECT id FROM sourcefile WHERE filename IN (?' + (', ?' * (len(patterns) - 1)) + ')))) AND runnable = 1 ' \
+                    'WHERE id IN (SELECT machine FROM devicereference WHERE device IN (SELECT id FROM machine WHERE sourcefile IN (SELECT id FROM sourcefile WHERE filename IN (?' + (', ?' * (len(patterns) - 1)) + ')))) AND runnable = 1 ' \
                     'ORDER BY shortname ASC',
                     patterns)
 
@@ -167,17 +179,17 @@ class QueryCursor(object):
 
     def get_devices_referenced(self, machine):
         return self.dbcurs.execute(
-                'SELECT devicereference.device AS shortname, machine.description AS description, sourcefile.filename AS sourcefile ' \
-                'FROM devicereference LEFT JOIN machine ON devicereference.device = machine.shortname LEFT JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
+                'SELECT machine.shortname AS shortname, machine.description AS description, sourcefile.filename AS sourcefile ' \
+                'FROM devicereference LEFT JOIN machine ON devicereference.device = machine.id LEFT JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
                 'WHERE devicereference.machine = ?',
                 (machine, ))
 
-    def get_device_references(self, shortname):
+    def get_device_references(self, device):
         return self.dbcurs.execute(
                 'SELECT machine.shortname AS shortname, machine.description AS description, sourcefile.filename AS sourcefile ' \
                 'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
                 'WHERE machine.id IN (SELECT machine FROM devicereference WHERE device = ?)',
-                (shortname, ))
+                (device, ))
 
     def get_sourcefile_id(self, filename):
         return (self.dbcurs.execute('SELECT id FROM sourcefile WHERE filename = ?', (filename, )).fetchone() or (None, ))[0]
@@ -241,7 +253,7 @@ class UpdateCursor(object):
         return self.dbcurs.lastrowid
 
     def add_devicereference(self, machine, device):
-        self.dbcurs.execute(UpdateQueries.ADD_DEVICEREFERENCE, (machine, device))
+        self.dbcurs.execute(UpdateQueries.ADD_TEMPORARY_DEVICEREFERENCE, (machine, device))
 
     def add_dipswitch(self, machine, isconfig, name, tag, mask):
         self.dbcurs.execute(UpdateQueries.ADD_DIPSWITCH, (machine, isconfig, name, tag, mask))
@@ -257,6 +269,18 @@ class UpdateCursor(object):
 
     def add_feature(self, machine, featuretype, status, overall):
         self.dbcurs.execute(UpdateQueries.ADD_FEATURE, (machine, status, overall, featuretype))
+        return self.dbcurs.lastrowid
+
+    def add_slot(self, machine, name):
+        self.dbcurs.execute(UpdateQueries.ADD_SLOT, (machine, name))
+        return self.dbcurs.lastrowid
+
+    def add_slotoption(self, slot, device, name):
+        self.dbcurs.execute(UpdateQueries.ADD_TEMPORARY_SLOTOPTION, (slot, device, name))
+        return self.dbcurs.lastrowid
+
+    def add_slotdefault(self, slot, slotoption):
+        self.dbcurs.execute(UpdateQueries.ADD_TEMPORARY_SLOTDEFAULT, (slot, slotoption))
         return self.dbcurs.lastrowid
 
 
@@ -293,6 +317,26 @@ class UpdateConnection(object):
     def cursor(self):
         return UpdateCursor(self.dbconn)
 
+    def prepare_for_load(self):
+        self.drop_indexes()
+        self.dbconn.execute(SchemaQueries.CREATE_TEMPORARY_DEVICEREFERENCE)
+        self.dbconn.execute(SchemaQueries.CREATE_TEMPORARY_SLOTOPTION)
+        self.dbconn.execute(SchemaQueries.CREATE_TEMPORARY_SLOTDEFAULT)
+        self.dbconn.commit()
+
+    def finalise_load(self):
+        self.dbconn.execute(UpdateQueries.FINALISE_DEVICEREFERENCES)
+        self.dbconn.commit()
+        self.dbconn.execute(SchemaQueries.DROP_TEMPORARY_DEVICEREFERENCE)
+        self.dbconn.execute(UpdateQueries.FINALISE_SLOTOPTIONS)
+        self.dbconn.commit()
+        self.dbconn.execute(SchemaQueries.DROP_TEMPORARY_SLOTOPTION)
+        self.dbconn.execute(UpdateQueries.FINALISE_SLOTDEFAULTS)
+        self.dbconn.commit()
+        self.dbconn.execute(SchemaQueries.DROP_TEMPORARY_SLOTDEFAULT)
+        self.create_indexes()
+        self.dbconn.commit()
+
     def drop_indexes(self):
         self.dbconn.execute(SchemaQueries.DROP_MACHINE_ISDEVICE_SHORTNAME)
         self.dbconn.execute(SchemaQueries.DROP_MACHINE_ISDEVICE_DESCRIPTION)
@@ -302,9 +346,7 @@ class UpdateConnection(object):
         self.dbconn.execute(SchemaQueries.DROP_SYSTEM_MANUFACTURER)
         self.dbconn.execute(SchemaQueries.DROP_ROMOF_PARENT)
         self.dbconn.execute(SchemaQueries.DROP_CLONEOF_PARENT)
-        self.dbconn.execute(SchemaQueries.DROP_DEVICEREFERENCE_DEVICE)
         self.dbconn.execute(SchemaQueries.DROP_DIPSWITCH_MACHINE_ISCONFIG)
-        self.dbconn.commit()
 
     def create_indexes(self):
         self.dbconn.execute(SchemaQueries.INDEX_MACHINE_ISDEVICE_SHORTNAME)
@@ -315,6 +357,4 @@ class UpdateConnection(object):
         self.dbconn.execute(SchemaQueries.INDEX_SYSTEM_MANUFACTURER)
         self.dbconn.execute(SchemaQueries.INDEX_ROMOF_PARENT)
         self.dbconn.execute(SchemaQueries.INDEX_CLONEOF_PARENT)
-        self.dbconn.execute(SchemaQueries.INDEX_DEVICEREFERENCE_DEVICE)
         self.dbconn.execute(SchemaQueries.INDEX_DIPSWITCH_MACHINE_ISCONFIG)
-        self.dbconn.commit()

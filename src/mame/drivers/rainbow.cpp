@@ -853,10 +853,7 @@ FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START(rainbow_floppies)
-SLOT_INTERFACE("525qd0", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
-SLOT_INTERFACE("525qd1", FLOPPY_525_QD)
-//SLOT_INTERFACE("525qd2", FLOPPY_525_QD)
-//SLOT_INTERFACE("525qd3", FLOPPY_525_QD)
+SLOT_INTERFACE("525qd", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
 SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
 SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
 SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster 
@@ -3235,10 +3232,10 @@ MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240)
 MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
 MCFG_FD1793_ADD(FD1793_TAG, XTAL_24_0734MHz / 24) // no separate 1 Mhz quartz
-MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd0", rainbow_state::floppy_formats)
-MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd1", rainbow_state::floppy_formats)
-//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd2", rainbow_state::floppy_formats)
-//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd3", rainbow_state::floppy_formats)
+MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
 MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")

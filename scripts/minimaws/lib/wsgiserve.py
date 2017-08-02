@@ -126,6 +126,7 @@ class MachineHandler(QueryPageHandler):
                 return self.machine_page(machine_info)
 
     def machine_page(self, machine_info):
+        id = machine_info['id']
         description = machine_info['description']
         yield htmltmpl.MACHINE_PROLOGUE.substitute(
                 assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
@@ -163,7 +164,7 @@ class MachineHandler(QueryPageHandler):
         yield '</table>\n'.encode('utf-8')
 
         first = True
-        for name, desc, src in self.dbcurs.get_devices_referenced(machine_info['id']):
+        for name, desc, src in self.dbcurs.get_devices_referenced(id):
             if first:
                 yield \
                         '<h2>Devices Referenced</h2>\n' \
@@ -178,7 +179,7 @@ class MachineHandler(QueryPageHandler):
             yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-dev-refs"));</script>\n'.encode('utf-8')
 
         first = True
-        for name, desc, src in self.dbcurs.get_device_references(self.shortname):
+        for name, desc, src in self.dbcurs.get_device_references(id):
             if first:
                 yield \
                         '<h2>Referenced By</h2>\n' \

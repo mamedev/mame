@@ -41,9 +41,10 @@ CREATE TABLE romof (
 CREATE TABLE devicereference (
 	id              INTEGER PRIMARY KEY,
 	machine         INTEGER NOT NULL,
-	device          TEXT    NOT NULL,
+	device          INTEGER NOT NULL,
 	UNIQUE (machine ASC, device ASC),
-	FOREIGN KEY (machine) REFERENCES machine (id));
+	FOREIGN KEY (machine) REFERENCES machine (id),
+	FOREIGN KEY (device) REFERENCES machine (id));
 
 CREATE TABLE dipswitch (
 	id              INTEGER PRIMARY KEY,
@@ -82,3 +83,25 @@ CREATE TABLE feature (
 	UNIQUE (machine ASC, featuretype ASC),
 	FOREIGN KEY (machine) REFERENCES machine (id),
 	FOREIGN KEY (featuretype) REFERENCES featuretype (id));
+
+CREATE TABLE slot (
+	id              INTEGER PRIMARY KEY,
+	machine         INTEGER NOT NULL,
+	name            TEXT    NOT NULL,
+	UNIQUE (machine ASC, name ASC),
+	FOREIGN KEY (machine) REFERENCES machine (id));
+
+CREATE TABLE slotoption (
+	id              INTEGER PRIMARY KEY,
+	slot            INTEGER NOT NULL,
+	device          INTEGER NOT NULL,
+	name            TEXT    NOT NULL,
+	UNIQUE (slot ASC, name ASC),
+	FOREIGN KEY (slot) REFERENCES slot (id),
+	FOREIGN KEY (device) REFERENCES machine (id));
+
+CREATE TABLE slotdefault (
+	id              INTEGER PRIMARY KEY,
+	slotoption      INTEGER NOT NULL,
+	FOREIGN KEY (id) REFERENCES slot (id),
+	FOREIGN KEY (slotoption) REFERENCES slotoption (id));

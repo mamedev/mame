@@ -134,7 +134,32 @@ class DipSwitchHandler(ElementHandler):
         self.setChildHandler(name, attrs, self.IGNORE)
 
 
+class SlotHandler(ElementHandler):
+    def __init__(self, parent, **kwargs):
+        super(SlotHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = parent.dbcurs
+        self.machine = parent.id
+
+    def startMainElement(self, name, attrs):
+        self.id = self.dbcurs.add_slot(self.machine, attrs['name'])
+
+    def startChildElement(self, name, attrs):
+        if name == 'slotoption':
+            option = self.dbcurs.add_slotoption(self.id, attrs['devname'], attrs['name'])
+            if attrs.get('default') == 'yes':
+                self.dbcurs.add_slotdefault(self.id, option)
+        self.setChildHandler(name, attrs, self.IGNORE)
+
+
 class MachineHandler(ElementHandler):
+    CHILD_HANDLERS = {
+            'description':      TextAccumulator,
+            'year':             TextAccumulator,
+            'manufacturer':     TextAccumulator,
+            'dipswitch':        DipSwitchHandler,
+            'configuration':    DipSwitchHandler,
+            'slot':             SlotHandler }
+
     def __init__(self, parent, **kwargs):
         super(MachineHandler, self).__init__(parent=parent, **kwargs)
         self.dbcurs = self.dbconn.cursor()
@@ -149,10 +174,8 @@ class MachineHandler(ElementHandler):
         self.dbcurs.add_sourcefile(self.sourcefile)
 
     def startChildElement(self, name, attrs):
-        if (name == 'description') or (name == 'year') or (name == 'manufacturer'):
-            self.setChildHandler(name, attrs, TextAccumulator(self))
-        elif (name == 'dipswitch') or (name == 'configuration'):
-            self.setChildHandler(name, attrs, DipSwitchHandler(self))
+        if name in self.CHILD_HANDLERS:
+            self.setChildHandler(name, attrs, self.CHILD_HANDLERS[name](self))
         else:
             if name == 'device_ref':
                 self.dbcurs.add_devicereference(self.id, attrs['name'])
@@ -178,7 +201,6 @@ class MachineHandler(ElementHandler):
             self.dbcurs.add_system(self.id, self.year, self.manufacturer)
 
     def endMainElement(self, name):
-        self.dbconn.commit()
         self.dbcurs.close()
 
 
@@ -199,11 +221,12 @@ class ListXmlHandler(ElementHandler):
                     msg=('Expected "mame" element but found "%s"' % (name, )),
                     exception=None,
                     locator=self.locator)
-        self.dbconn.drop_indexes()
+        self.dbconn.prepare_for_load()
+        self.machines = 0
 
     def endMainElement(self, name):
         # TODO: build index by first letter or whatever
-        self.dbconn.create_indexes()
+        self.dbconn.finalise_load()
 
     def startChildElement(self, name, attrs):
         if name != 'machine':
@@ -212,6 +235,14 @@ class ListXmlHandler(ElementHandler):
                     exception=None,
                     locator=self.locator)
         self.setChildHandler(name, attrs, MachineHandler(self))
+
+    def endChildHandler(self, name, handler):
+        if name == 'machine':
+            if self.machines >= 1023:
+                self.dbconn.commit()
+                self.machines = 0
+            else:
+                self.machines += 1
 
     def processingInstruction(self, target, data):
         pass

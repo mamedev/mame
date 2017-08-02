@@ -433,8 +433,7 @@ static const z80_daisy_config daisy_chain[] =
 /* WD1793 Interface */
 
 static SLOT_INTERFACE_START( bigbord2_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_8_DSDD )
-	SLOT_INTERFACE( "drive1", FLOPPY_8_DSDD )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
 
@@ -622,9 +621,9 @@ static MACHINE_CONFIG_START( bigbord2 )
 
 	MCFG_MB8877_ADD("fdc", XTAL_16MHz / 8) // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
 	//MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", ??)) // info missing from schematic
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_16MHz / 8)
