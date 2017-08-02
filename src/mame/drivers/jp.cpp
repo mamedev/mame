@@ -10,7 +10,6 @@
 
 ToDo:
 - Mechanical sounds
-- Extra sound board for some games - no schematic available
 - Even though nvram is fitted, all credits and scores are lost at reboot
 - Pimbal: outhole not working
 - Petaco: different hardware - manual is very poor copy
@@ -21,7 +20,10 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74157.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
+#include "sound/msm5205.h"
 #include "speaker.h"
 
 #include "jp.lh"
@@ -33,22 +35,43 @@ public:
 	jp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_latch(*this, "latch%u", 0)
+		, m_sw(*this, "SW.%u", 0)
+		, m_msm(*this, "msm")
+		, m_adpcm_select(*this, "adpcm_select")
+		, m_adpcm_bank(*this, "adpcm_bank")
 	{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(sol_w) {};
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) {};
-	DECLARE_WRITE8_MEMBER(lamp2_w) {};
+	DECLARE_WRITE8_MEMBER(out1_w);
+	DECLARE_WRITE8_MEMBER(out2_w);
+	DECLARE_WRITE_LINE_MEMBER(disp_data_w);
+	DECLARE_WRITE_LINE_MEMBER(disp_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(disp_strobe_w);
+	DECLARE_WRITE_LINE_MEMBER(row_w);
+	DECLARE_WRITE8_MEMBER(sample_bank_w);
+	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(vck_w);
+	IRQ_CALLBACK_MEMBER(sound_int_cb);
 	DECLARE_DRIVER_INIT(jp);
+
 private:
-	bool m_clock_bit;
-	uint8_t m_row;
-	uint32_t m_disp_data;
+	void update_display();
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	uint32_t m_disp_data;
+	bool m_adpcm_ff;
+
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	required_device_array<ls259_device, 10> m_latch;
+	required_ioport_array<8> m_sw;
+	optional_device<msm5205_device> m_msm;
+	optional_device<ls157_device> m_adpcm_select;
+	optional_memory_bank m_adpcm_bank;
 };
 
 
@@ -58,10 +81,17 @@ static ADDRESS_MAP_START( jp_map, AS_PROGRAM, 8, jp_state )
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay", ay8910_device, address_w)
 	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0x1ffc) AM_DEVREAD("ay", ay8910_device, data_r)
 	AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay", ay8910_device, data_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_WRITE(sol_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_WRITE(disp_w)
-	AM_RANGE(0xa002, 0xa007) AM_MIRROR(0x1ff8) AM_WRITE(lamp1_w)
-	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x1ff8) AM_WRITE(lamp2_w)
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_WRITE(out1_w)
+	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x1ff8) AM_WRITE(out2_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jp_sound_map, AS_PROGRAM, 8, jp_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM // includes ADPCM data from 0x0400 to 0x3fff
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(sample_bank_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(adpcm_reset_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("adpcm_bank")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jp )
@@ -183,84 +213,102 @@ static INPUT_PORTS_START( jp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-WRITE8_MEMBER( jp_state::disp_w )
+WRITE8_MEMBER(jp_state::out1_w)
 {
-	uint8_t i;
-	m_row = data >> 3; // d3..d7 = switch strobes
+	for (int i = 0; i < 8; i++)
+		m_latch[i]->write_bit(offset, BIT(data, i));
+}
 
-	// d0 = data; d1 = clock; d2 = strobe
-	data ^= 7;
-	if ((data & 6) == 2)
+WRITE8_MEMBER(jp_state::out2_w)
+{
+	for (int i = 0; i < 2; i++)
+		m_latch[8 + i]->write_bit(offset, BIT(data, i));
+}
+
+WRITE_LINE_MEMBER(jp_state::row_w)
+{
+}
+
+WRITE_LINE_MEMBER(jp_state::disp_data_w)
+{
+}
+
+WRITE_LINE_MEMBER(jp_state::disp_clock_w)
+{
+	if (state)
 	{
-		m_clock_bit = BIT(data, 1);
-		m_disp_data = (m_disp_data << 1) | BIT(data, 0);
+		bool data_bit = !m_latch[0]->q1_r();
+		m_disp_data = (m_disp_data << 1) | data_bit;
 	}
+	if (!m_latch[2]->q1_r())
+		update_display();
+}
 
-	if (BIT(data, 2))
-	{
-		uint8_t segment, t = (m_disp_data >> 24) & 15;
-		if (t == 8)
-		{ // ball number
-			segment = m_disp_data >> 6;
-			output().set_digit_value(94, BITSWAP8(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
-		}
+WRITE_LINE_MEMBER(jp_state::disp_strobe_w)
+{
+	if (state)
+		update_display();
+}
+
+void jp_state::update_display()
+{
+	uint8_t segment, t = (m_disp_data >> 24) & 15;
+	if (t == 8)
+	{ // ball number
+		segment = m_disp_data >> 6;
+		output().set_digit_value(94, BITSWAP8(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
+	}
+	else if (t < 8)
+	{ // main displays
+		if (t == 7)
+			segment = 128;
 		else
-		if (t < 8)
-		{ // main displays
-			if (t == 7)
-				segment = 128;
+			segment = 1 << (6-t);
+
+		for (int i = 0; i < 32; i++)
+			if (BIT(m_disp_data, i))
+				output().set_digit_value(i, (output().get_digit_value(i) & ~segment));
 			else
-				segment = 1 << (6-t);
-
-			for (i = 0; i < 32; i++)
-				if (BIT(m_disp_data, i))
-					output().set_digit_value(i, (output().get_digit_value(i) & ~segment));
-				else
-					output().set_digit_value(i, (output().get_digit_value(i) | segment));
-		}
+				output().set_digit_value(i, (output().get_digit_value(i) | segment));
 	}
 }
 
-WRITE8_MEMBER( jp_state::porta_w )
+READ8_MEMBER(jp_state::porta_r)
 {
+	uint8_t result = 0xff;
+	if (m_latch[3]->q1_r() == 0)
+		result &= m_sw[1]->read();
+	if (m_latch[4]->q1_r() == 0)
+		result &= m_sw[7]->read();
+	if (m_latch[7]->q1_r() == 0)
+		result &= m_sw[2]->read();
+	return result;
 }
 
-READ8_MEMBER( jp_state::porta_r )
+READ8_MEMBER(jp_state::portb_r)
 {
-	switch (m_row)
-	{
-		case 0x1e:
-			return ioport("SW.1")->read();
-		case 0x1d:
-			return ioport("SW.7")->read();
-		case 0x0f:
-			return ioport("SW.2")->read();
-	}
-	return 0xff;
+	uint8_t result = 0xff;
+	if (m_latch[3]->q1_r() == 0)
+		result &= m_sw[0]->read();
+	if (m_latch[4]->q1_r() == 0)
+		result &= m_sw[3]->read();
+	if (m_latch[5]->q1_r() == 0)
+		result &= m_sw[4]->read();
+	if (m_latch[6]->q1_r() == 0)
+		result &= m_sw[5]->read();
+	if (m_latch[7]->q1_r() == 0)
+		result &= m_sw[6]->read();
+	return result;
 }
 
-READ8_MEMBER( jp_state::portb_r )
+void jp_state::machine_start()
 {
-	switch (m_row)
-	{
-		case 0x1e:
-			return ioport("SW.0")->read();
-		case 0x1d:
-			return ioport("SW.3")->read();
-		case 0x1b:
-			return ioport("SW.4")->read();
-		case 0x17:
-			return ioport("SW.5")->read();
-		case 0x0f:
-			return ioport("SW.6")->read();
-	}
-	return 0xff;
+	if (m_adpcm_bank.found())
+		m_adpcm_bank->configure_entries(0, 8, memregion("sound1")->base(), 0x8000);
 }
 
 void jp_state::machine_reset()
 {
-	m_row = 0;
-	m_clock_bit = 0;
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	output().set_digit_value(96, 0x3f);
 	output().set_digit_value(97, 0x3f);
@@ -277,7 +325,36 @@ static MACHINE_CONFIG_START( jp )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, XTAL_8MHz / 8192) // 4020 divider
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("latch0", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, disp_data_w)) MCFG_DEVCB_INVERT
+
+	MCFG_DEVICE_ADD("latch1", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, disp_clock_w)) MCFG_DEVCB_INVERT
+
+	MCFG_DEVICE_ADD("latch2", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, disp_strobe_w)) MCFG_DEVCB_INVERT
+
+	MCFG_DEVICE_ADD("latch3", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+
+	MCFG_DEVICE_ADD("latch4", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+
+	MCFG_DEVICE_ADD("latch5", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+
+	MCFG_DEVICE_ADD("latch6", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+
+	MCFG_DEVICE_ADD("latch7", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+
+	MCFG_DEVICE_ADD("latch8", LS259, 0)
+
+	MCFG_DEVICE_ADD("latch9", LS259, 0)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_jp)
@@ -287,9 +364,53 @@ static MACHINE_CONFIG_START( jp )
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay", AY8910, XTAL_8MHz / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(jp_state, porta_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(jp_state, porta_w))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(jp_state, portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 0.9)
+MACHINE_CONFIG_END
+
+WRITE8_MEMBER(jp_state::sample_bank_w)
+{
+	m_adpcm_bank->set_entry(data & 7);
+}
+
+WRITE8_MEMBER(jp_state::adpcm_reset_w)
+{
+	m_msm->reset_w(BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(jp_state::vck_w)
+{
+	if (state)
+	{
+		m_adpcm_ff = !m_adpcm_ff;
+		m_adpcm_select->select_w(m_adpcm_ff);
+		if (m_adpcm_ff)
+			m_soundcpu->set_input_line(0, ASSERT_LINE);
+	}
+}
+
+IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
+{
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
+}
+
+static MACHINE_CONFIG_DERIVED( jps, jp )
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(jp_sound_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // not labeled in manual; might even be a CD4019
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+
+	MCFG_SPEAKER_STANDARD_MONO("msmvol")
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) // not labeled in manual; clock unknown
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(jp_state, vck_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
+
+	MCFG_DEVICE_MODIFY("latch9")
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI)) // only external input for sound board
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -299,8 +420,8 @@ ROM_START(america)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("cpvi1492.dat", 0x0000, 0x2000, CRC(e1d3bd57) SHA1(049c17cd717404e58339100ab8efd4d6bf8ee791))
 
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("sbvi1492.dat", 0x00000, 0x4000, CRC(38934e06) SHA1(eef850a5096a7436b728921aed22fe5f3d85b4ee))
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("sbvi1492.dat", 0x0000, 0x4000, CRC(38934e06) SHA1(eef850a5096a7436b728921aed22fe5f3d85b4ee))
 
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("b1vi1492.dat", 0x0000, 0x8000, CRC(e93083ed) SHA1(6a44675d8cc8b8af40091646f589b833245bf092))
@@ -319,8 +440,8 @@ ROM_START(aqualand)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("jpaqcpu", 0x0000, 0x2000, CRC(53230fab) SHA1(0b049f3be412be598982537e7fa7abf9b2766a16))
 
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("jpaqsds", 0x00000, 0x4000, CRC(ff1e0cd2) SHA1(ef58d2b59929c7250dd30c413a3ba31ebfd7e09d))
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("jpaqsds", 0x0000, 0x4000, CRC(ff1e0cd2) SHA1(ef58d2b59929c7250dd30c413a3ba31ebfd7e09d))
 
 	ROM_REGION(0x80000, "sound1", 0)
 	ROM_LOAD("jpaq-1sd", 0x0000, 0x8000, CRC(7cdf2f7a) SHA1(e00482a6accd11e96fd0d444b3167b7d36332f7b))
@@ -354,8 +475,8 @@ ROM_START(halley)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("halley.cpu", 0x0000, 0x2000, CRC(b158a0d7) SHA1(ad071ac3d06a99a8fbd4df461071fe03dc1e1a26))
 
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("hc_sh", 0x00000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("hc_sh", 0x0000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
 
 	ROM_REGION(0x80000, "sound1", 0)
 	ROM_LOAD("hc_s1",   0x0000,  0x8000, CRC(3146b12f) SHA1(9d3974c267e1b2f8d0a8edc78f4013823e4d5e9b))
@@ -380,8 +501,8 @@ ROM_START(halleya)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("hc_pgm", 0x0000, 0x2000, CRC(dc5eaa8f) SHA1(2f3af60ba5439f67e9c69de543167ac31abc09f1))
 
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("hc_sh", 0x00000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("hc_sh", 0x0000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
 
 	ROM_REGION(0x80000, "sound1", 0)
 	ROM_LOAD("hc_s1",   0x0000,  0x8000, CRC(3146b12f) SHA1(9d3974c267e1b2f8d0a8edc78f4013823e4d5e9b))
@@ -427,8 +548,8 @@ ROM_START(olympus)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("olympus.dat", 0x0000, 0x2000, CRC(08b021e8) SHA1(9662d37ccef94b6e6bc3c8c81dea0c0a34c8052d))
 
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("cs.128", 0x00000, 0x4000, CRC(39b9107a) SHA1(8a11fa0c1558d0b1d309446b8a6f97e761b6559d))
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("cs.128", 0x0000, 0x4000, CRC(39b9107a) SHA1(8a11fa0c1558d0b1d309446b8a6f97e761b6559d))
 
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("c1.256", 0x0000, 0x8000, CRC(93ceefbf) SHA1(be50b3d4485d4e8291047a52ca60656b55729555))
@@ -469,8 +590,8 @@ ROM_START(petaco2)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("petaco2.dat", 0x0000, 0x2000, CRC(9a3d6409) SHA1(bca061e254c3214b940080c92d2cf88904f1b81c))
 
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("jpsonid0.dat", 0x00000, 0x4000, CRC(1bdbdd60) SHA1(903012e58cdb4041e5546a377f5c9df83dc93737))
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("jpsonid0.dat", 0x0000, 0x4000, CRC(1bdbdd60) SHA1(903012e58cdb4041e5546a377f5c9df83dc93737))
 
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("jpsonid1.dat", 0x0000, 0x8000, CRC(e39da92a) SHA1(79eb60710bdf6b826349e02ae909426cb81e131e))
@@ -488,12 +609,12 @@ GAME(1984,  petaco,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares"
 // mostly ok
 GAME(1985,  petacon,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1985,  petacona,   0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1985,  petaco2,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1985,  petaco2,    0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1985,  faeton,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Faeton",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  halley,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1986,  halleya,    halley, jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1986,  aqualand,   0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1986,  america,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "America 1492",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1986,  olympus,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Olympus",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1986,  halley,     0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  halleya,    halley, jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  aqualand,   0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  america,    0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "America 1492",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  olympus,    0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Olympus",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1987,  lortium,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  pimbal,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL)
