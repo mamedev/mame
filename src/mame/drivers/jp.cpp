@@ -304,7 +304,7 @@ READ8_MEMBER(jp_state::portb_r)
 void jp_state::machine_start()
 {
 	if (m_adpcm_bank.found())
-		m_adpcm_bank->configure_entries(0, 8, memregion("sound1")->base(), 0x8000);
+		m_adpcm_bank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
 }
 
 void jp_state::machine_reset()
@@ -370,7 +370,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(jp_state::sample_bank_w)
 {
-	m_adpcm_bank->set_entry(data & 7);
+	m_adpcm_bank->set_entry(data & 15);
 }
 
 WRITE8_MEMBER(jp_state::adpcm_reset_w)
@@ -423,7 +423,7 @@ ROM_START(america)
 	ROM_REGION(0x4000, "soundcpu", 0)
 	ROM_LOAD("sbvi1492.dat", 0x0000, 0x4000, CRC(38934e06) SHA1(eef850a5096a7436b728921aed22fe5f3d85b4ee))
 
-	ROM_REGION(0x40000, "sound1", 0)
+	ROM_REGION(0x80000, "sound1", 0)
 	ROM_LOAD("b1vi1492.dat", 0x0000, 0x8000, CRC(e93083ed) SHA1(6a44675d8cc8b8af40091646f589b833245bf092))
 	ROM_LOAD("b2vi1492.dat", 0x8000, 0x8000, CRC(88be85a0) SHA1(ebf9d88847d6fd787892f0a34258f38e48445014))
 	ROM_LOAD("b3vi1492.dat", 0x10000, 0x8000, CRC(1304c87b) SHA1(f84eb3116dd9841892f46106f9443c09cc094675))
@@ -551,7 +551,7 @@ ROM_START(olympus)
 	ROM_REGION(0x4000, "soundcpu", 0)
 	ROM_LOAD("cs.128", 0x0000, 0x4000, CRC(39b9107a) SHA1(8a11fa0c1558d0b1d309446b8a6f97e761b6559d))
 
-	ROM_REGION(0x40000, "sound1", 0)
+	ROM_REGION(0x80000, "sound1", 0)
 	ROM_LOAD("c1.256", 0x0000, 0x8000, CRC(93ceefbf) SHA1(be50b3d4485d4e8291047a52ca60656b55729555))
 	ROM_LOAD("c2.256", 0x8000, 0x8000, CRC(8d404cf7) SHA1(e521ff1cf999496bada5348b7f845c468f053f0f))
 	ROM_LOAD("c3.256", 0x10000, 0x8000, CRC(266eb5dd) SHA1(0eb7c098ddb7f257daf625e5209a54c306d365bf))
@@ -593,7 +593,7 @@ ROM_START(petaco2)
 	ROM_REGION(0x4000, "soundcpu", 0)
 	ROM_LOAD("jpsonid0.dat", 0x0000, 0x4000, CRC(1bdbdd60) SHA1(903012e58cdb4041e5546a377f5c9df83dc93737))
 
-	ROM_REGION(0x40000, "sound1", 0)
+	ROM_REGION(0x80000, "sound1", 0)
 	ROM_LOAD("jpsonid1.dat", 0x0000, 0x8000, CRC(e39da92a) SHA1(79eb60710bdf6b826349e02ae909426cb81e131e))
 	ROM_LOAD("jpsonid2.dat", 0x8000, 0x8000, CRC(88456f1e) SHA1(168fe88ae9da5114d0ef6427df0503ca2eea9089))
 	ROM_LOAD("jpsonid3.dat", 0x10000, 0x8000, CRC(c7597d29) SHA1(45abe1b28ad14610ac8e2bc3a70af46bbe6277f4))
