@@ -8,13 +8,15 @@ from . import htmltmpl
 
 import cgi
 import inspect
+import json
 import mimetypes
 import os.path
+import re
 import sys
 import wsgiref.simple_server
 import wsgiref.util
 
-if sys.version_info > (3, ):
+if sys.version_info >= (3, ):
     import urllib.parse as urlparse
 else:
     import urlparse
@@ -37,6 +39,7 @@ class HandlerBase(object):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
         super(HandlerBase, self).__init__(**kwargs)
         self.app = app
+        self.js_escape = app.js_escape
         self.application_uri = application_uri
         self.environ = environ
         self.start_response = start_response
@@ -99,6 +102,31 @@ class QueryPageHandler(HandlerBase):
         return cgi.escape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (sourcefile, )), True)
 
 
+class MachineRpcHandlerBase(QueryPageHandler):
+    def __init__(self, app, application_uri, environ, start_response, **kwargs):
+        super(MachineRpcHandlerBase, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        self.shortname = wsgiref.util.shift_path_info(environ)
+
+    def __iter__(self):
+        if not self.shortname:
+            self.start_response('403 %s' % (self.STATUS_MESSAGE[403], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(403)
+        elif self.environ['PATH_INFO']:
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(404)
+        else:
+            machine = self.dbcurs.get_machine_id(self.shortname)
+            if machine is None:
+                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(404)
+            elif self.environ['REQUEST_METHOD'] != 'GET':
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(405)
+            else:
+                self.start_response('200 OK', [('Content-type', 'application/json; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.data_page(machine)
+
+
 class MachineHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
         super(MachineHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
@@ -110,7 +138,6 @@ class MachineHandler(QueryPageHandler):
             self.start_response('403 %s' % (self.STATUS_MESSAGE[403], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(403)
         elif self.environ['PATH_INFO']:
-            # subdirectory of a machine
             self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(404)
         else:
@@ -129,7 +156,8 @@ class MachineHandler(QueryPageHandler):
         id = machine_info['id']
         description = machine_info['description']
         yield htmltmpl.MACHINE_PROLOGUE.substitute(
-                assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
+                app=self.js_escape(cgi.escape(self.application_uri, True)),
+                assets=self.js_escape(cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True)),
                 sourcehref=self.sourcefile_href(machine_info['sourcefile']),
                 description=cgi.escape(description),
                 shortname=cgi.escape(self.shortname),
@@ -146,22 +174,42 @@ class MachineHandler(QueryPageHandler):
             if parent:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
-                        (cgi.escape('%s/machine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
+                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
             else:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
-                        (cgi.escape('%s/machine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(machine_info['cloneof']))).encode('utf-8')
+                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(machine_info['cloneof']))).encode('utf-8')
         if (machine_info['romof'] is not None) and (machine_info['romof'] != machine_info['cloneof']):
             parent = self.dbcurs.listfull(machine_info['romof']).fetchone()
             if parent:
                 yield (
                         '    <tr><th>Parent ROM set:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
-                        (cgi.escape('%s/machine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
+                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
             else:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
-                        (cgi.escape('%s/machine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(machine_info['romof']))).encode('utf-8')
+                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(machine_info['romof']))).encode('utf-8')
+        unemulated = []
+        imperfect = []
+        for feature, status, overall in self.dbcurs.get_feature_flags(id):
+            if overall == 1:
+                imperfect.append(feature)
+            elif overall > 1:
+                unemulated.append(feature)
+        if (unemulated):
+            unemulated.sort()
+            yield(
+                    ('    <tr><th>Unemulated Features:</th><td>%s' + (', %s' * (len(unemulated) - 1)) + '</td></tr>\n') %
+                    tuple(unemulated)).encode('utf-8');
+        if (imperfect):
+            yield(
+                    ('    <tr><th>Imperfect Features:</th><td>%s' + (', %s' * (len(imperfect) - 1)) + '</td></tr>\n') %
+                    tuple(imperfect)).encode('utf-8');
         yield '</table>\n'.encode('utf-8')
+
+        if self.dbcurs.count_slots(id):
+            yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER.substitute(
+                    machine=self.js_escape(self.shortname)).encode('utf=8')
 
         first = True
         for name, desc, src in self.dbcurs.get_devices_referenced(id):
@@ -317,7 +365,57 @@ class SourceFileHandler(QueryPageHandler):
                 parent=cgi.escape(machine_info['cloneof'] or '')).encode('utf-8')
 
 
+class FlagsRpcHandler(MachineRpcHandlerBase):
+    def data_page(self, machine):
+        result = { 'features': { } }
+        for feature, status, overall in self.dbcurs.get_feature_flags(machine):
+            detail = { }
+            if status == 1:
+                detail['status'] = 'imperfect'
+            elif status > 1:
+                detail['status'] = 'unemulated'
+            if overall == 1:
+                detail['overall'] = 'imperfect'
+            elif overall > 1:
+                detail['overall'] = 'unemulated'
+            result['features'][feature] = detail
+        yield json.dumps(result).encode('utf-8')
+
+
+class SlotsRpcHandler(MachineRpcHandlerBase):
+    def data_page(self, machine):
+        result = { 'defaults': { }, 'slots': { } }
+
+        # get defaults and slot options
+        for slot, default in self.dbcurs.get_slot_defaults(machine):
+            result['defaults'][slot] = default
+        prev = None
+        for slot, option, shortname, description in self.dbcurs.get_slot_options(machine):
+            if slot != prev:
+                if slot in result['slots']:
+                    options = result['slots'][slot]
+                else:
+                    options = { }
+                    result['slots'][slot] = options
+                prev = slot
+            options[option] = { 'device': shortname, 'description': description }
+
+        # remove slots that come from default cards in other slots
+        for slot in tuple(result['slots'].keys()):
+            slot += ':'
+            for candidate in tuple(result['slots'].keys()):
+                if candidate.startswith(slot):
+                    del result['slots'][candidate]
+
+        yield json.dumps(result).encode('utf-8')
+
+
 class MiniMawsApp(object):
+    JS_ESCAPE = re.compile('([\"\'\\\\])')
+    RPC_SERVICES = {
+            'flags':    FlagsRpcHandler,
+            'slots':    SlotsRpcHandler }
+
     def __init__(self, dbfile, **kwargs):
         super(MiniMawsApp, self).__init__(**kwargs)
         self.dbconn = dbaccess.QueryConnection(dbfile)
@@ -334,10 +432,21 @@ class MiniMawsApp(object):
             return SourceFileHandler(self, application_uri, environ, start_response)
         elif module == 'static':
             return AssetHandler(self.assetsdir, self, application_uri, environ, start_response)
+        elif module == 'rpc':
+            service = wsgiref.util.shift_path_info(environ)
+            if not service:
+                return ErrorPageHandler(403, self, application_uri, environ, start_response)
+            elif service in self.RPC_SERVICES:
+                return self.RPC_SERVICES[service](self, application_uri, environ, start_response)
+            else:
+                return ErrorPageHandler(404, self, application_uri, environ, start_response)
         elif not module:
             return ErrorPageHandler(403, self, application_uri, environ, start_response)
         else:
             return ErrorPageHandler(404, self, application_uri, environ, start_response)
+
+    def js_escape(self, str):
+        return self.JS_ESCAPE.sub('\\\\\\1', str).replace('\0', '\\0')
 
 
 def run_server(options):

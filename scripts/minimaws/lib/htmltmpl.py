@@ -27,8 +27,12 @@ MACHINE_PROLOGUE = string.Template(
         '    <meta http-equiv="Content-Style-Type" content="text/css">\n' \
         '    <meta http-equiv="Content-Script-Type" content="text/javascript">\n' \
         '    <link rel="stylesheet" type="text/css" href="${assets}/style.css">\n' \
-        '    <script type="text/javascript">var assetsurl="${assets}"</script>\n' \
+        '    <script type="text/javascript">\n' \
+        '        var appurl="${app}"\n' \
+        '        var assetsurl="${assets}"\n' \
+        '    </script>\n' \
         '    <script type="text/javascript" src="${assets}/common.js"></script>\n' \
+        '    <script type="text/javascript" src="${assets}/machine.js"></script>\n' \
         '    <title>Machine: ${description} (${shortname})</title>\n' \
         '</head>\n' \
         '<body>\n' \
@@ -38,6 +42,13 @@ MACHINE_PROLOGUE = string.Template(
         '    <tr><th>Is device:</th><td>${isdevice}</td></tr>\n' \
         '    <tr><th>Runnable:</th><td>${runnable}</td></tr>\n' \
         '    <tr><th>Source file:</th><td><a href="${sourcehref}">${sourcefile}</a></td></tr>\n')
+
+MACHINE_SLOTS_PLACEHOLDER = string.Template(
+        '<h2>Options</h2>\n' \
+        '<p id="para-cmd-preview"></p>\n' \
+        '<h3>Slots</h3>\n' \
+        '<p id="para-slots-placeholder">Loading slot information&hellip;<p>\n' \
+        '<script>fetch_slots("${machine}");</script>\n')
 
 MACHINE_ROW = string.Template(
         '        <tr>\n' \

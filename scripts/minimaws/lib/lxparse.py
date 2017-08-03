@@ -179,7 +179,7 @@ class MachineHandler(ElementHandler):
         else:
             if name == 'device_ref':
                 self.dbcurs.add_devicereference(self.id, attrs['name'])
-            elif name == 'feaure':
+            elif name == 'feature':
                 self.dbcurs.add_featuretype(attrs['type'])
                 status = 0 if 'status' not in attrs else 2 if attrs['status'] == 'unemulated' else 1
                 overall = status if 'overall' not in attrs else 2 if attrs['overall'] == 'unemulated' else 1

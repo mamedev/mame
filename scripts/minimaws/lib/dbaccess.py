@@ -4,6 +4,10 @@
 ## copyright-holders:Vas Crabb
 
 import sqlite3
+import sys
+
+if sys.version_info >= (3, 4):
+    import urllib.request
 
 
 class SchemaQueries(object):
@@ -170,6 +174,9 @@ class QueryCursor(object):
                     'ORDER BY shortname ASC',
                     patterns)
 
+    def get_machine_id(self, machine):
+        return (self.dbcurs.execute('SELECT id FROM machine WHERE shortname = ?', (machine, )).fetchone() or (None, ))[0]
+
     def get_machine_info(self, machine):
         return self.dbcurs.execute(
                 'SELECT machine.id AS id, machine.description AS description, machine.isdevice AS isdevice, machine.runnable AS runnable, sourcefile.filename AS sourcefile, system.year AS year, system.manufacturer AS manufacturer, cloneof.parent AS cloneof, romof.parent AS romof ' \
@@ -220,6 +227,31 @@ class QueryCursor(object):
             return self.dbcurs.execute('SELECT COUNT(*) FROM sourcefile WHERE filename GLOB ?', (pattern, )).fetchone()[0]
         else:
             return self.dbcurs.execute('SELECT COUNT(*) FROM sourcefile').fetchone()[0]
+
+    def count_slots(self, machine):
+        return self.dbcurs.execute(
+                'SELECT COUNT(*) FROM slot WHERE machine = ?', (machine, )).fetchone()[0]
+
+    def get_feature_flags(self, machine):
+        return self.dbcurs.execute(
+                'SELECT featuretype.name AS featuretype, feature.status AS status, feature.overall AS overall ' \
+                'FROM feature JOIN featuretype ON feature.featuretype = featuretype.id ' \
+                'WHERE feature.machine = ?',
+                (machine, ))
+
+    def get_slot_defaults(self, machine):
+        return self.dbcurs.execute(
+                'SELECT slot.name AS name, slotoption.name AS option ' \
+                'FROM slot JOIN slotdefault ON slot.id = slotdefault.id JOIN slotoption ON slotdefault.slotoption = slotoption.id ' \
+                'WHERE slot.machine = ?',
+                (machine, ))
+
+    def get_slot_options(self, machine):
+        return self.dbcurs.execute(
+                'SELECT slot.name AS slot, slotoption.name AS option, machine.shortname AS shortname, machine.description AS description ' \
+                'FROM slot JOIN slotoption ON slot.id = slotoption.slot JOIN machine ON slotoption.device = machine.id ' \
+                'WHERE slot.machine = ?',
+                (machine, ))
 
 
 class UpdateCursor(object):
@@ -286,9 +318,11 @@ class UpdateCursor(object):
 
 class QueryConnection(object):
     def __init__(self, database, **kwargs):
-        # TODO: detect python versions that allow URL-based read-only connection
         super(QueryConnection, self).__init__(**kwargs)
-        self.dbconn = sqlite3.connect(database)
+        if sys.version_info >= (3, 4):
+            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True)
+        else:
+            self.dbconn = sqlite3.connect(database)
         self.dbconn.row_factory = sqlite3.Row
         self.dbconn.execute('PRAGMA foreign_keys = ON')
 
