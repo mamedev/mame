@@ -68,7 +68,15 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 		// no break
 	case 1: sectors = header[0];
 		// no break
-	case 0: tracks = (size - header_size) / sector_size / sectors / heads;
+	case 0:	tracks = (size - header_size) / sector_size / sectors / heads;
+
+		// assume double sided when larger than 84 tracks without header
+		if (tracks > 84 && header_size == 0)
+		{
+			tracks /= 2;
+			heads = 2;
+		}
+
 		break;
 	}
 
