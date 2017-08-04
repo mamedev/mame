@@ -38,6 +38,18 @@ CREATE TABLE romof (
 	parent          TEXT    NOT NULL,
 	FOREIGN KEY (id) REFERENCES machine (id));
 
+CREATE TABLE biosset (
+	id              INTEGER PRIMARY KEY,
+	machine         INTEGER NOT NULL,
+	name            TEXT    NOT NULL,
+	description     TEXT    NOT NULL,
+	UNIQUE (machine ASC, name ASC),
+	FOREIGN KEY (machine) REFERENCES machine (id));
+
+CREATE TABLE biossetdefault (
+	id              INTEGER PRIMARY KEY,
+	FOREIGN KEY (id) REFERENCES biosset (id));
+
 CREATE TABLE devicereference (
 	id              INTEGER PRIMARY KEY,
 	machine         INTEGER NOT NULL,

@@ -472,7 +472,7 @@ void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *
 		fprintf(m_output, "\t\t<manufacturer>%s</manufacturer>\n", util::xml::normalize_string(driver.manufacturer));
 
 	// now print various additional information
-	output_bios(driver);
+	output_bios(config->root_device());
 	output_rom(&drivlist, config->root_device());
 	output_device_refs(config->root_device());
 	output_sample(config->root_device());
@@ -542,6 +542,7 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 	fprintf(m_output, ">\n");
 	fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(device.name()));
 
+	output_bios(device);
 	output_rom(nullptr, device);
 	output_device_refs(device);
 
@@ -644,35 +645,30 @@ void info_xml_creator::output_sampleof(device_t &device)
 
 
 //-------------------------------------------------
-//  output_bios - print the BIOS set for a
-//  game
+//  output_bios - print BIOS sets for a device
 //-------------------------------------------------
 
-void info_xml_creator::output_bios(game_driver const &driver)
+void info_xml_creator::output_bios(device_t const &device)
 {
-	// skip if no ROMs
-	if (driver.rom)
+	// first determine the default BIOS name
+	std::string defaultname;
+	for (const rom_entry &rom : device.rom_region_vector())
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			defaultname = ROM_GETNAME(&rom);
+
+	// iterate over ROM entries and look for BIOSes
+	for (const rom_entry &rom : device.rom_region_vector())
 	{
-		auto rom_entries = rom_build_entries(driver.rom);
-
-		// first determine the default BIOS name
-		std::string defaultname;
-		for (const rom_entry &rom : rom_entries)
-			if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-				defaultname = ROM_GETNAME(&rom);
-
-		// iterate over ROM entries and look for BIOSes
-		for (const rom_entry &rom : rom_entries)
-			if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-			{
-				// output extracted name and descriptions
-				fprintf(m_output, "\t\t<biosset");
-				fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(&rom)));
-				fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(ROM_GETHASHDATA(&rom)));
-				if (defaultname == ROM_GETNAME(&rom))
-					fprintf(m_output, " default=\"yes\"");
-				fprintf(m_output, "/>\n");
-			}
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
+		{
+			// output extracted name and descriptions
+			fprintf(m_output, "\t\t<biosset");
+			fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(&rom)));
+			fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(ROM_GETHASHDATA(&rom)));
+			if (defaultname == ROM_GETNAME(&rom))
+				fprintf(m_output, " default=\"yes\"");
+			fprintf(m_output, "/>\n");
+		}
 	}
 }
 

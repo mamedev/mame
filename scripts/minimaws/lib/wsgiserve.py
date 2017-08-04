@@ -390,6 +390,14 @@ class SourceFileHandler(QueryPageHandler):
                 parent=cgi.escape(machine_info['cloneof'] or '')).encode('utf-8')
 
 
+class BiosRpcHandler(MachineRpcHandlerBase):
+    def data_page(self, machine):
+        result = { }
+        for name, description, isdefault in self.dbcurs.get_biossets(machine):
+            result[name] = { 'description': description, 'isdefault': True if isdefault else False }
+        yield json.dumps(result).encode('utf-8')
+
+
 class FlagsRpcHandler(MachineRpcHandlerBase):
     def data_page(self, machine):
         result = { 'features': { } }
@@ -438,6 +446,7 @@ class SlotsRpcHandler(MachineRpcHandlerBase):
 class MiniMawsApp(object):
     JS_ESCAPE = re.compile('([\"\'\\\\])')
     RPC_SERVICES = {
+            'bios':     BiosRpcHandler,
             'flags':    FlagsRpcHandler,
             'slots':    SlotsRpcHandler }
 

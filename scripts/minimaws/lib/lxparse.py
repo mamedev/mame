@@ -126,11 +126,11 @@ class DipSwitchHandler(ElementHandler):
             while (0 != self.mask) and not (self.mask & 1):
                 self.mask >>= 1
                 self.bit += 1
-            self.dbcurs.add_diplocation(self.id, self.bit, attrs['name'], attrs['number'], attrs['inverted'] == 'yes' if 'inverted' in attrs else False)
+            self.dbcurs.add_diplocation(self.id, self.bit, attrs['name'], attrs['number'], attrs.get('inverted', 'no')  == 'yes')
             self.mask >>= 1
             self.bit += 1
         elif (name == 'dipvalue') or (name == 'confsetting'):
-            self.dbcurs.add_dipvalue(self.id, attrs['name'], attrs['value'], attrs['default'] == 'yes' if 'default' in attrs else False)
+            self.dbcurs.add_dipvalue(self.id, attrs['name'], attrs['value'], attrs.get('default', 'no') == 'yes')
         self.setChildHandler(name, attrs, self.IGNORE)
 
 
@@ -167,8 +167,8 @@ class MachineHandler(ElementHandler):
     def startMainElement(self, name, attrs):
         self.shortname = attrs['name']
         self.sourcefile = attrs['sourcefile']
-        self.isdevice = attrs['isdevice'] == 'yes' if 'isdevice' in attrs else False
-        self.runnable = attrs['runnable'] == 'yes' if 'runnable' in attrs else True
+        self.isdevice = attrs.get('isdevice', 'no') == 'yes'
+        self.runnable = attrs.get('runnable', 'yes') == 'yes'
         self.cloneof = attrs.get('cloneof')
         self.romof = attrs.get('romof')
         self.dbcurs.add_sourcefile(self.sourcefile)
@@ -177,7 +177,11 @@ class MachineHandler(ElementHandler):
         if name in self.CHILD_HANDLERS:
             self.setChildHandler(name, attrs, self.CHILD_HANDLERS[name](self))
         else:
-            if name == 'device_ref':
+            if name == 'biosset':
+                bios = self.dbcurs.add_biosset(self.id, attrs['name'], attrs['description'])
+                if attrs.get('default', 'no') == 'yes':
+                    self.dbcurs.add_biossetdefault(bios)
+            elif name == 'device_ref':
                 self.dbcurs.add_devicereference(self.id, attrs['name'])
             elif name == 'feature':
                 self.dbcurs.add_featuretype(attrs['type'])

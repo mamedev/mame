@@ -47,7 +47,7 @@ private:
 
 	void output_one(driver_enumerator &drivlist, device_type_set *devtypes);
 	void output_sampleof(device_t &device);
-	void output_bios(game_driver const &driver);
+	void output_bios(device_t const &device);
 	void output_rom(driver_enumerator *drivlist, device_t &device);
 	void output_device_refs(device_t &root);
 	void output_sample(device_t &device);

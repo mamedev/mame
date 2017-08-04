@@ -2,6 +2,7 @@
 // copyright-holders:Vas Crabb
 
 var slot_info = Object.create(null);
+var bios_sets = Object.create(null);
 var machine_flags = Object.create(null);
 
 
@@ -17,7 +18,10 @@ function update_cmd_preview()
 			if (item.nodeName == 'DT')
 			{
 				var selection = item.lastChild.selectedOptions[0];
-				if (selection.getAttribute('data-isdefault') != 'yes')
+				var biospopup = document.getElementById(('select-slot-bios-' + item.getAttribute('data-slotname')).replace(/:/g, '-'));
+				var defcard = selection.getAttribute('data-isdefault') == 'yes';
+				var defbios = !biospopup || (biospopup.selectedOptions[0].getAttribute('data-isdefault') == 'yes');
+				if (!defcard || !defbios)
 				{
 					if (first)
 						first = false;
@@ -27,12 +31,49 @@ function update_cmd_preview()
 					if (card == '')
 						card = '""';
 					result += '-' + item.getAttribute('data-slotname') + ' ' + card;
+					if (!defbios)
+						result += ',bios=' + biospopup.value;
 				}
 			}
 		}
 	}
 	document.getElementById('para-cmd-preview').textContent = result;
 }
+
+
+var fetch_bios_sets = (function ()
+		{
+			var pending = Object.create(null);
+			return function (device)
+			{
+				if (!Object.prototype.hasOwnProperty.call(bios_sets, device) && !Object.prototype.hasOwnProperty.call(pending, device))
+				{
+					pending[device] = true;
+					var req = new XMLHttpRequest();
+					req.open('GET', appurl + 'rpc/bios/' + device, true);
+					req.responseType = 'json';
+					req.onload =
+							function ()
+							{
+								delete pending[device];
+								if (req.status == 200)
+								{
+									bios_sets[device] = req.response;
+									var slotslist = document.getElementById('list-slot-options');
+									if (slotslist)
+									{
+										for (var item = slotslist.firstChild; item; item = item.nextSibling)
+										{
+											if ((item.nodeName == 'DT') && (item.getAttribute('data-slotcard') == device))
+												add_bios_row(item.getAttribute('data-slotname'), item.nextSibling.firstChild, device);
+										}
+									}
+								}
+							};
+					req.send();
+				}
+			};
+		})();
 
 
 var fetch_machine_flags = (function ()
@@ -83,23 +124,62 @@ function add_flag_rows(table, device)
 	len = unemulated.length;
 	if (len > 0)
 	{
-		row = table.appendChild(document.createElement('tr'));
+		row = document.createElement('tr');
 		row.appendChild(document.createElement('th')).textContent = 'Unemulated features:';
 		cell = row.appendChild(document.createElement('td'));
 		cell.textContent = unemulated[0];
 		for (i = 1; i < len; i++)
 			cell.textContent += ', ' + unemulated[i];
+		if (tbl.lastChild.getAttribute('class') == 'devbios')
+			tbl.insertBefore(row, tbl.lastChild);
+		else
+			tbl.appendChild(row)
 	}
 
 	len = imperfect.length;
 	if (len > 0)
 	{
-		row = table.appendChild(document.createElement('tr'));
+		row = document.createElement('tr');
 		row.appendChild(document.createElement('th')).textContent = 'Imperfect features:';
 		cell = row.appendChild(document.createElement('td'));
 		cell.textContent = imperfect[0];
 		for (i = 1; i < len; i++)
 			cell.textContent += ', ' + unemulated[i];
+		if (tbl.lastChild.getAttribute('class') == 'devbios')
+			tbl.insertBefore(row, tbl.lastChild);
+		else
+			tbl.appendChild(row)
+	}
+}
+
+
+function add_bios_row(slot, table, device)
+{
+	var sorted_sets = Object.keys(bios_sets[device]).sort();
+	var len = sorted_sets.length;
+	if (len > 0)
+	{
+		var row = document.createElement('tr');
+		row.setAttribute('class', 'devbios');
+		row.appendChild(document.createElement('th')).textContent = 'BIOS:';
+		var popup = document.createElement('select');
+		popup.setAttribute('id', ('select-slot-bios-' + slot).replace(/:/g, '-'));
+		popup.onchange = slot_bios_change_handler;
+		for (var i = 0; i < len; i++)
+		{
+			var set = sorted_sets[i];
+			var detail = bios_sets[device][set];
+			var option = document.createElement('option');
+			option.setAttribute('value', set);
+			option.setAttribute('data-isdefault', detail.isdefault ? 'yes' : 'no');
+			option.textContent = set + ' - ' + detail.description;
+			popup.appendChild(option);
+			if (detail.isdefault)
+				popup.selectedIndex = i;
+		}
+		row.appendChild(document.createElement('td')).appendChild(popup);
+		table.appendChild(row);
+		update_cmd_preview();
 	}
 }
 
@@ -251,6 +331,11 @@ function make_slot_change_handler(name, slot, defaults)
 			else
 				add_flag_rows(tbl, selection.device);
 
+			if (!Object.prototype.hasOwnProperty.call(bios_sets, selection.device))
+				fetch_bios_sets(selection.device);
+			else
+				add_bios_row(slotname, tbl, selection.device);
+
 			if (def.firstChild)
 				def.replaceChild(tbl, def.firstChild);
 			else
@@ -260,6 +345,12 @@ function make_slot_change_handler(name, slot, defaults)
 		}
 		update_cmd_preview();
 	};
+}
+
+
+function slot_bios_change_handler(event)
+{
+	update_cmd_preview();
 }
 
 
