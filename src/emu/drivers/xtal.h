@@ -144,6 +144,7 @@ enum
 	XTAL_13_333MHz      = 13333000,     /* Ojanko High School */
 	XTAL_13_4MHz        = 13400000,     /* TNK3, Ikari Warriors h/w */
 	XTAL_13_4952MHz     = 13495200,     /* Used on Shadow Force pcb and maybe other Technos pcbs? */
+	XTAL_13_5168MHz     = 13516800,     /* Kontron KDT6 */
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
 	XTAL_14_3MHz        = 14300000,     /* Agat-7 */

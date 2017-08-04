@@ -990,6 +990,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"isc",
 		"kaypro",
 		"koei",
+		"kontron",
 		"kurzweil",
 		"kyocera",
 		"luxor",
@@ -2217,6 +2218,11 @@ files {
 createMESSProjects(_target, _subtarget, "koei")
 files {
 	MAME_DIR .. "src/mame/drivers/pasogo.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "kontron")
+files {
+	MAME_DIR .. "src/mame/drivers/kdt6.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "kurzweil")
