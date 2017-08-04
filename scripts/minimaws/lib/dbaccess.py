@@ -542,9 +542,14 @@ class UpdateConnection(object):
 
     def prepare_for_load(self):
         # here be dragons - this is a poor man's DROP ALL TABLES etc.
-        self.dbconn.execute('PRAGMA writable_schema = 1')
-        self.dbconn.execute('delete from sqlite_master where type in (\'table\', \'index\', \'trigger\')')
-        self.dbconn.execute('PRAGMA writable_schema = 0')
+        self.dbconn.execute('PRAGMA foreign_keys = OFF')
+        for query in self.dbconn.execute('SELECT \'DROP INDEX \' || name FROM sqlite_master WHERE type = \'index\' AND NOT name GLOB \'sqlite_autoindex_*\'').fetchall():
+            self.dbconn.execute(query[0])
+        for query in self.dbconn.execute('SELECT \'DROP TABLE \' || name FROM sqlite_master WHERE type = \'table\'').fetchall():
+            self.dbconn.execute(query[0])
+        self.dbconn.execute('PRAGMA foreign_keys = ON')
+
+        # this is where the sanity starts
         for query in SchemaQueries.DROP_INDEXES:
             self.dbconn.execute(query)
         for query in SchemaQueries.CREATE_TABLES:

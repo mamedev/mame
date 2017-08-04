@@ -10,11 +10,8 @@
 ## -h or --help).
 ##
 ## Before you can use the scripts, you need to load MAME system
-## information into a database.  This currently requires a few manual
-## steps, and you need to start with a completely clean database:
+## information into a database:
 ##
-## $ rm minimaws.sqlite3
-## $ sqlite3 minimaws.sqlite3 < schema.sql
 ## $ python minimaws.py load --executable path/to/mame
 ##
 ## (The script uses the name "minimaws.sqlite3" for the database by

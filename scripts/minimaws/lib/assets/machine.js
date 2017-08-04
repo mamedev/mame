@@ -10,6 +10,17 @@ function update_cmd_preview()
 {
 	var result = '';
 	var first = true;
+
+	var sysbios = document.getElementById('select-system-bios');
+	if (sysbios && (sysbios.selectedOptions[0].getAttribute('data-isdefault') != 'yes'))
+	{
+		if (first)
+			first = false;
+		else
+			result += ' ';
+		result += '-bios ' + sysbios.value;
+	}
+
 	var slotslist = document.getElementById('list-slot-options');
 	if (slotslist)
 	{
@@ -38,6 +49,22 @@ function update_cmd_preview()
 		}
 	}
 	document.getElementById('para-cmd-preview').textContent = result;
+}
+
+
+function set_default_system_bios()
+{
+	var sysbios = document.getElementById('select-system-bios');
+	var len = sysbios.options.length;
+	for (var i = 0; i < len; i++)
+	{
+		if (sysbios.options[i].getAttribute('data-isdefault') == 'yes')
+		{
+			sysbios.selectedIndex = i;
+			break;
+		}
+	}
+	update_cmd_preview();
 }
 
 

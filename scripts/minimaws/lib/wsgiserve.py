@@ -207,7 +207,25 @@ class MachineHandler(QueryPageHandler):
                     tuple(imperfect)).encode('utf-8');
         yield '</table>\n'.encode('utf-8')
 
+        # allow system BIOS selection
+        haveoptions = False
+        for name, desc, isdef in self.dbcurs.get_biossets(id):
+            if not haveoptions:
+                haveoptions = True;
+                yield htmltmpl.MACHINE_OPTIONS_HEADING.substitute().encode('utf-8')
+                yield htmltmpl.MACHINE_BIOS_PROLOGUE.substitute().encode('utf-8')
+            yield htmltmpl.MACHINE_BIOS_OPTION.substitute(
+                    name=cgi.escape(name, True),
+                    description=cgi.escape(desc),
+                    isdefault=('yes' if isdef else 'no')).encode('utf-8')
+        if haveoptions:
+            yield '</select>\n<script>set_default_system_bios();</script>\n'.encode('utf-8')
+
+        # placeholder for machine slots - populated by client-side JavaScript
         if self.dbcurs.count_slots(id):
+            if not haveoptions:
+                haveoptions = True
+                yield htmltmpl.MACHINE_OPTIONS_HEADING.substitute().encode('utf-8')
             yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER.substitute(
                     machine=self.js_escape(self.shortname)).encode('utf=8')
 
