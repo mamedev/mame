@@ -393,7 +393,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 {
 	//logerror("midvunit_wheel_board_w: %08X\n", data);
 
-	// U8 PAL22V10 "DECODE0" TODO: Needs dump
+	// U8 PAL22V10 "DECODE0" TODO: Needs dump "A-19674"
 	if (BIT(data, 11) && !BIT(m_wheel_board_last, 11))
 	{
 		logerror("Wheel board (U8 PAL22V10; DECODE0) = %03X\n", BIT(data, 11) | ((data & 0xF) << 1) | ((data & 0x700) << 1));
@@ -414,7 +414,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 		uint8_t wa = BIT(m_wheel_board_u8_latch, 6) | (BIT(m_wheel_board_u8_latch, 5) << 1) | (BIT(m_wheel_board_u8_latch, 4) << 2);
 		if (BIT(m_wheel_board_u8_latch, 3))
 		{
-			// U19 PAL22V10 "GALIL" TODO: Needs dump, needs Galil emulation
+			// U19 PAL22V10 "GALIL" TODO: Needs dump "A-19675", needs Galil emulation
 			logerror("Wheel board (U19 PAL22V10; GALIL) = %03X\n", (m_wheel_board_u8_latch & 0x78) | ((data & 0x3F) << 6));
 			switch (wa)
 			{
