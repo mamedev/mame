@@ -198,6 +198,13 @@ class QueryCursor(object):
                 'WHERE machine.id IN (SELECT machine FROM devicereference WHERE device = ?)',
                 (device, ))
 
+    def get_compatible_slots(self, device):
+        return self.dbcurs.execute(
+                'SELECT machine.shortname AS shortname, machine.description AS description, slot.name AS slot, slotoption.name AS slotoption, sourcefile.filename AS sourcefile ' \
+                'FROM slotoption JOIN slot ON slotoption.slot = slot.id JOIN machine on slot.machine = machine.id JOIN sourcefile ON machine.sourcefile = sourcefile.id '
+                'WHERE slotoption.device = ?',
+                (device, ))
+
     def get_sourcefile_id(self, filename):
         return (self.dbcurs.execute('SELECT id FROM sourcefile WHERE filename = ?', (filename, )).fetchone() or (None, ))[0]
 

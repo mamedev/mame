@@ -211,6 +211,7 @@ class MachineHandler(QueryPageHandler):
             yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER.substitute(
                     machine=self.js_escape(self.shortname)).encode('utf=8')
 
+        # list devices referenced by this system/device
         first = True
         for name, desc, src in self.dbcurs.get_devices_referenced(id):
             if first:
@@ -224,8 +225,32 @@ class MachineHandler(QueryPageHandler):
                 first = False
             yield self.machine_row(name, desc, src)
         if not first:
-            yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-dev-refs"));</script>\n'.encode('utf-8')
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-dev-refs').encode('utf-8')
 
+        # list slots where this device is an option
+        first = True
+        for name, desc, slot, opt, src in self.dbcurs.get_compatible_slots(id):
+            if (first):
+                yield \
+                        '<h2>Compatible Slots</h2>\n' \
+                        '<table id="tbl-comp-slots">\n' \
+                        '    <thead>\n' \
+                        '        <tr><th>Short name</th><th>Description</th><th>Slot</th><th>Choice</th><th>Source file</th></tr>\n' \
+                        '    </thead>\n' \
+                        '    <tbody>\n'.encode('utf-8')
+                first = False
+            yield htmltmpl.COMPATIBLE_SLOT_ROW.substitute(
+                    machinehref=self.machine_href(name),
+                    sourcehref=self.sourcefile_href(src),
+                    shortname=cgi.escape(name),
+                    description=cgi.escape(desc),
+                    sourcefile=cgi.escape(src),
+                    slot=cgi.escape(slot),
+                    slotoption=cgi.escape(opt)).encode('utf-8')
+        if not first:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-comp-slots').encode('utf-8')
+
+        # list systems/devices that reference this device
         first = True
         for name, desc, src in self.dbcurs.get_device_references(id):
             if first:
@@ -239,7 +264,7 @@ class MachineHandler(QueryPageHandler):
                 first = False
             yield self.machine_row(name, desc, src)
         if not first:
-            yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-ref-by"));</script>\n'.encode('utf-8')
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-ref-by').encode('utf-8')
 
         yield '</html>\n'.encode('utf-8')
 

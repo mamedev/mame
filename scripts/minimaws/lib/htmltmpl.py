@@ -19,6 +19,11 @@ ERROR_PAGE = string.Template(
         '</html>\n')
 
 
+SORTABLE_TABLE_EPILOGUE = string.Template(
+        '    </tbody>\n'
+        '</table>\n'
+        '<script>make_table_sortable(document.getElementById("${id}"));</script>\n')
+
 MACHINE_PROLOGUE = string.Template(
         '<!DOCTYPE html>\n' \
         '<html>\n' \
@@ -62,6 +67,15 @@ EXCL_MACHINE_ROW = string.Template(
         '            <td><a href="${machinehref}">${shortname}</a></td>\n' \
         '            <td></td>\n' \
         '            <td></td>\n' \
+        '        </tr>\n')
+
+COMPATIBLE_SLOT_ROW = string.Template(
+        '        <tr>\n' \
+        '            <td><a href="${machinehref}">${shortname}</a></td>\n' \
+        '            <td><a href="${machinehref}">${description}</a></td>\n' \
+        '            <td>${slot}</td>\n' \
+        '            <td>${slotoption}</td>\n' \
+        '            <td><a href="${sourcehref}">${sourcefile}</a></td>\n' \
         '        </tr>\n')
 
 
