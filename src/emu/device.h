@@ -455,7 +455,7 @@ public:
 	ioport_constructor input_ports() const { return device_input_ports(); }
 	u8 default_bios() const { return m_default_bios; }
 	u8 system_bios() const { return m_system_bios; }
-	std::string default_bios_tag() const { return m_default_bios_tag; }
+	const std::string &default_bios_tag() const { return m_default_bios_tag; }
 
 	// interface helpers
 	interface_list &interfaces() { return m_interfaces; }
@@ -495,7 +495,7 @@ public:
 	void add_machine_configuration(machine_config &config) { device_add_mconfig(config); }
 	static void static_set_clock(device_t &device, u32 clock);
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
-	static void static_set_default_bios_tag(device_t &device, const char *tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
+	static void static_set_default_bios_tag(device_t &device, const char *tag) { device.m_default_bios_tag = tag; }
 
 	// state helpers
 	void config_complete();
