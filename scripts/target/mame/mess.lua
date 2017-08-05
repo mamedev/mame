@@ -2416,6 +2416,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc88va.cpp",
 	MAME_DIR .. "src/mame/drivers/pc100.cpp",
 	MAME_DIR .. "src/mame/drivers/pc9801.cpp",
+	MAME_DIR .. "src/mame/includes/pc9801.h",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_cd.cpp",
