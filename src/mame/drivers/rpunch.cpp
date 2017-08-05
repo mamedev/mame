@@ -116,7 +116,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        16000000
+#define MASTER_CLOCK        XTAL_16MHz
+#define VIDEO_CLOCK         XTAL_13_333MHz
 
 
 /*************************************
@@ -514,7 +515,7 @@ static MACHINE_CONFIG_START( rpunch )
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
@@ -559,7 +560,7 @@ static MACHINE_CONFIG_START( svolleybl )
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
