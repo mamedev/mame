@@ -28,7 +28,7 @@ std::vector<submenu::option> const submenu::misc_options = {
 	{ submenu::option_type::EMU,  __("Skip information screen at startup"),      OPTION_SKIP_GAMEINFO },
 	{ submenu::option_type::UI,   __("Force 4:3 aspect for snapshot display"),   OPTION_FORCED4X3 },
 	{ submenu::option_type::UI,   __("Use image as background"),                 OPTION_USE_BACKGROUND },
-	{ submenu::option_type::UI,   __("Skip bios selection menu"),                OPTION_SKIP_BIOS_MENU },
+	{ submenu::option_type::UI,   __("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
 	{ submenu::option_type::UI,   __("Skip software parts selection menu"),      OPTION_SKIP_PARTS_MENU },
 	{ submenu::option_type::UI,   __("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
 	{ submenu::option_type::UI,   __("Hide romless machine from available list"),OPTION_HIDE_ROMLESS },
