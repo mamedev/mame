@@ -872,7 +872,7 @@ msgstr "Fabricante\t%1$-.100s\n"
 #: src/frontend/mame/ui/selgame.cpp:1200
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr "Controlador es un Clon de\t%1$-.100s\n"
+msgstr "Controlador es un clon de\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1202
 msgid "Driver is Parent\t\n"
@@ -2198,7 +2198,7 @@ msgstr "Configurar máquina:"
 
 #: src/frontend/mame/ui/state.cpp:389
 msgid "Load State"
-msgstr "Cargr estado de la máquina"
+msgstr "Cargar estado de la máquina"
 
 #: src/frontend/mame/ui/state.cpp:389
 msgid "Select position to load from"
