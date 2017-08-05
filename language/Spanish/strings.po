@@ -396,7 +396,7 @@ msgstr "Red local"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgid "WAN"
-msgstr "Red global/Internet"
+msgstr "Red global"
 
 #: src/frontend/mame/ui/info.cpp:156
 msgid ""
@@ -505,7 +505,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Pulsa cualquier tecla (menos ESC) para continuar."
+"Pulsa cualquier tecla para continuar."
 
 #: src/frontend/mame/ui/info.cpp:269
 #, c-format
@@ -1112,7 +1112,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:1737 src/frontend/mame/ui/selsoft.cpp:630
 msgid "Press any key to continue."
-msgstr "Pulsa cualquier tecla (menos ESC) para continuar."
+msgstr "Pulsa cualquier tecla para continuar."
 
 #: src/frontend/mame/ui/slotopt.cpp:290
 #, c-format
@@ -1552,22 +1552,22 @@ msgstr "Posición vertical %1$s"
 #: src/frontend/mame/ui/ui.cpp:1467
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Estiramiento horizontal de laserdisc «%1$s»"
+msgstr "Estiramiento horizontal de Laserdisc «%1$s»"
 
 #: src/frontend/mame/ui/ui.cpp:1469
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Posición horizontal de laserdisc «%1$s»"
+msgstr "Posición horizontal de Laserdisc «%1$s»"
 
 #: src/frontend/mame/ui/ui.cpp:1471
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Estiramiento vertical de laserdisc «%1$s»"
+msgstr "Estiramiento vertical de Laserdisc «%1$s»"
 
 #: src/frontend/mame/ui/ui.cpp:1473
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Posición vertical de laserdisc «%1$s»"
+msgstr "Posición vertical de Laserdisc «%1$s»"
 
 #: src/frontend/mame/ui/ui.cpp:1485
 msgid "Vector Flicker"
@@ -2222,7 +2222,7 @@ msgstr ""
 "Al juego elegido le falta una o varias ROMs o imágenes CHD necesarias. "
 "Por favor elige otro distinto."
 "\n"
-"Pulsa cualquier tecla (menos ESC) para continuar."
+"Pulsa cualquier tecla para continuar."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:242
 #, c-format
@@ -2444,7 +2444,7 @@ msgstr "Elegir máquina nueva"
 #~ "Falta la máquina seleccionada o una o más de sus ROMs o imágenes CHD. Por "
 #~ "favor, elige otra máquina.\n"
 #~ "\n"
-#~ "Pulsa cualquier tecla (menos ESC) para continuar."
+#~ "Pulsa cualquier tecla para continuar."
 
 #~ msgid "Romset: %1$-.100s\n"
 #~ msgstr "Conjunto de ROMs: %1$-.100s\n"
@@ -2552,7 +2552,7 @@ msgstr "Elegir máquina nueva"
 #~ "Al software elegido le falta uno o varios archivos necesarios. Por favor, "
 #~ "elige otro software.\n"
 #~ "\n"
-#~ "Pulsa cualquier tecla (menos ESC) para continuar."
+#~ "Pulsa cualquier tecla para continuar."
 
 #~ msgid " [internal]"
 #~ msgstr " [interno]"
@@ -2596,7 +2596,7 @@ msgstr "Elegir máquina nueva"
 #~ "Falta la máquina seleccionada o una o más de sus ROMs o imágenes CHD. Por "
 #~ "favor, elige otra máquina.\n"
 #~ "\n"
-#~ "Pulsa cualquier tecla (menos ESC) para continuar."
+#~ "Pulsa cualquier tecla para continuar."
 
 #~ msgid ""
 #~ "The selected software is missing one or more required files. Please "
@@ -2607,7 +2607,7 @@ msgstr "Elegir máquina nueva"
 #~ "Al software elegido le falta uno o varios archivos necesarios. Por favor, "
 #~ "elige otro software.\n"
 #~ "\n"
-#~ "Pulsa cualquier tecla (menos ESC) para continuar."
+#~ "Pulsa cualquier tecla para continuar."
 
 #~ msgid "Skip displaying information's screen at startup"
 #~ msgstr "No mostrar la pantalla de información al inicio"
