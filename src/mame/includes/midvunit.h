@@ -103,8 +103,9 @@ public:
 	const char *m_galil_input;
 	uint8_t m_galil_output_index;
 	char m_galil_output[450];
-	uint32_t m_output;
-	uint8_t m_output_mode;
+	uint32_t m_wheel_board_output;
+	uint32_t m_wheel_board_last;
+	uint32_t m_wheel_board_u8_latch;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
@@ -140,8 +141,8 @@ public:
 	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
 	DECLARE_WRITE8_MEMBER(midvplus_xf1_w);
 	DECLARE_READ32_MEMBER(generic_speedup_r);
-	DECLARE_READ32_MEMBER(midvunit_output_r);
-	DECLARE_WRITE32_MEMBER(midvunit_output_w);
+	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
+	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
 	DECLARE_DRIVER_INIT(crusnu40);
 	DECLARE_DRIVER_INIT(crusnu21);
 	DECLARE_DRIVER_INIT(crusnwld);

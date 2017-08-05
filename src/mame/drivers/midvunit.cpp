@@ -57,8 +57,9 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_last_port0));
 	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_timer_rate));
-	save_item(NAME(m_output_mode));
-	save_item(NAME(m_output));
+	save_item(NAME(m_wheel_board_output));
+	save_item(NAME(m_wheel_board_last));
+	save_item(NAME(m_wheel_board_u8_latch));
 }
 
 
@@ -375,9 +376,10 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
-READ32_MEMBER(midvunit_state::midvunit_output_r)
+READ32_MEMBER(midvunit_state::midvunit_wheel_board_r)
 {
-	return m_output;
+	//logerror("midvunit_wheel_board_r: %08X\n", m_wheel_board_output);
+	return m_wheel_board_output;
 }
 
 void midvunit_state::set_input(const char *s)
@@ -387,49 +389,39 @@ void midvunit_state::set_input(const char *s)
 	m_galil_input_length = strlen(s);
 }
 
-WRITE32_MEMBER(midvunit_state::midvunit_output_w)
+WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 {
-	uint8_t op = (data >> 8) & 0xF;
-	uint8_t arg = data & 0xFF;
-	switch (op)
+	//logerror("midvunit_wheel_board_w: %08X\n", data);
+
+	// U8 PAL22V10 "DECODE0" TODO: Needs dump "A-19674"
+	if (BIT(data, 11) && !BIT(m_wheel_board_last, 11))
 	{
-		default:
-			logerror("Unknown output (%02X) = %02X\n", op, arg);
-			break;
-
-		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
-
-		case 0x7:
-			m_output_mode = arg;
-			break;
-
-		case 0xB:
-			switch (m_output_mode)
+		logerror("Wheel board (U8 PAL22V10; DECODE0) = %03X\n", BIT(data, 11) | ((data & 0xF) << 1) | ((data & 0x700) << 1));
+		m_wheel_board_u8_latch = 0;
+		m_wheel_board_u8_latch |= BIT(data, 0) << 6; // WA0; A for U9
+		m_wheel_board_u8_latch |= BIT(data, 1) << 5; // WA1; B for U9
+		m_wheel_board_u8_latch |= BIT(data, 2) << 4; // WA2; C for U9
+		m_wheel_board_u8_latch |= BIT(data, 3) << 3; // WA3; G2B for U9
+	}
+	
+	if (!BIT(data, 9))
+	{
+		logerror("Wheel board (U13 74HC245; DCS) = %02X\n", data & 0xFF);
+	}
+	else if (!BIT(data, 10)) // G2A for U9
+	{
+		uint8_t arg = data & 0xFF;
+		uint8_t wa = BIT(m_wheel_board_u8_latch, 6) | (BIT(m_wheel_board_u8_latch, 5) << 1) | (BIT(m_wheel_board_u8_latch, 4) << 2);
+		if (BIT(m_wheel_board_u8_latch, 3))
+		{
+			// U19 PAL22V10 "GALIL" TODO: Needs dump "A-19675", needs Galil emulation
+			logerror("Wheel board (U19 PAL22V10; GALIL) = %03X\n", (m_wheel_board_u8_latch & 0x78) | ((data & 0x3F) << 6));
+			switch (wa)
 			{
-				default:
-					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
+				case 0:
+					m_wheel_board_output = m_galil_input[m_galil_input_index++] << 8;
 					break;
-
-				case 0x00: //device init? 3C 1C are the only 2 writes at boot.
-					set_input(":");
-					m_galil_output_index = 0;
-					memset(m_galil_output, 0, 450);
-					break;
-
-				case 0x04: //wheel motor delta. signed byte.
-					output().set_value("wheel", arg);
-					break;
-
-				case 0x05:
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_lamp_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x08: //get next character from input string.
-					m_output = m_galil_input[m_galil_input_index++] << 8;
-					break;
-
-				case 0x09: //Galil command input. ascii inputs terminated with carriage return.
+				case 1:
 					if (arg != 0xD)
 					{
 						m_galil_output[m_galil_output_index] = (char)arg;
@@ -439,11 +431,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 					else
 					{
 						// G, W, S, and Q are commented out because they are error commands.
-						// When the motion tests succeeds it will send the program over to
-						// the motion controller and as this is not a real system it will
-						// assume it wants to execute them which turns off the motion system.
-						// If anyone wishes to implement a real Galil motion controller feel
-						// free to do so. This will only dump everything to stdout.
 						if (strstr(m_galil_output,"MG \"V\" IBO {$2.0}"))
 							set_input("V$00");
 						else if (strstr(m_galil_output,"MG \"X\", _TSX {$2.0}"))
@@ -467,24 +454,55 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 						m_galil_output_index = 0;
 					}
 					break;
-
-				case 0x0A: //set output to 0x8000 if there is data available, otherwise 0.
-					m_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0;
+				case 2:
+					m_wheel_board_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0;
 					break;
-
-				case 0x0B: break; //0 written at boot.
-
-				case 0x0C: break; //0 written at boot.
-
-				case 0x0E: break; //0 written after test.
+				case 3: // Galil init?
+					break;
+				case 4: // Galil init?
+					set_input(":");
+					m_galil_output_index = 0;
+					memset(m_galil_output, 0, 450);
+					break;
 			}
-			break;
-
-		case 0xD: //receives same data as midvunit_sound_w. unsure what its purpose is, but it is redundant.
-			logerror("Wheelboard Sound W = %02X\n", arg);
-			//m_dcs->data_w(arg);
-			break;
+		}
+		else
+		{
+			// U9 74LS138
+			switch (wa)
+			{
+				case 0: // SNDCTLZ
+					logerror("Wheel board (U14 74HC574; DCS Control) = %02X\n", arg);
+					break;
+				case 1: // GALCTLZ
+					logerror("Wheel board (U19 PAL22V10; Galil Control) = %02X\n", arg); 
+					break;
+				case 2: // ATODWRZ
+					logerror("Wheel board (ATODWRZ) = %02X\n", arg);
+					break;
+				case 3: // ATODRDZ
+					logerror("Wheel board (ATODRDZ) = %02X\n", arg);
+					break;
+				case 4: // WHLCTLZ
+					output().set_value("wheel", arg);
+					//logerror("Wheel board (U4 74HC574; Motor) = %02X\n", arg);
+					break;
+				case 5: // DRVCTLZ
+					for (uint8_t bit = 0; bit < 8; bit++)
+						output().set_lamp_value(bit, BIT(data, bit));
+					//logerror("Wheel board (U10 74HC574; Lamps) = %02X\n", arg);
+					break;
+				case 6: // PRTCTLZ
+					logerror("Wheel board (PRTCTLZ) = %02X\n", arg);
+					break;
+				case 7: // PRTSTATZ
+					logerror("Wheel board (PRTSTATZ) = %02X\n", arg);
+					break;
+			}
+		}
 	}
+	
+	m_wheel_board_last = data;
 }
 
 
@@ -592,7 +610,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_output_r, midvunit_output_w)
+	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_wheel_board_r, midvunit_wheel_board_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP // communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
