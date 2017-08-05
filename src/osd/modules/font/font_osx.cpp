@@ -122,39 +122,48 @@ bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 	UniChar const uni_char(chnum);
 	CFIndex const count(1);
 	CGGlyph glyph;
-	CTFontGetGlyphsForCharacters(m_font, &uni_char, &glyph, count);
+	if (!CTFontGetGlyphsForCharacters(m_font, &uni_char, &glyph, count))
+	{
+		osd_printf_verbose("osd_font_osd::get_bitmap: failed to get glyph for U+%04X\n", unsigned(chnum));
+		return false;
+	}
+
+	// try to get glyph bounds
+	CGRect bounds;
+	if (CGRectEqualToRect(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, &bounds, count), CGRectNull))
+	{
+		osd_printf_verbose("osd_font_osd::get_bitmap: failed to get glyph bounds for U+%04X\n", unsigned(chnum));
+		return false;
+	}
 
 	// try to get metrics
-	CGRect const bounds(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontDefaultOrientation, &glyph, nullptr, count));
 	CGSize advance;
-	CTFontGetAdvancesForGlyphs(m_font, kCTFontDefaultOrientation, &glyph, &advance, count);
-	if (!CGRectEqualToRect(bounds, CGRectNull))
-	{
-		// turn everything into integers for MAME and allocate output bitmap
-		std::size_t const bitmap_width(std::max(std::ceil(bounds.size.width), CGFloat(1.0)));
-		std::size_t const bitmap_height(m_height);
-		width = std::ceil(advance.width);
-		xoffs = std::ceil(bounds.origin.x);
-		yoffs = 0;
-		bitmap.allocate(bitmap_width, bitmap_height);
+	CTFontGetAdvancesForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, &advance, count);
 
-		// create graphics context
-		CGBitmapInfo const bitmap_info(kCGBitmapByteOrder32Host | kCGImageAlphaPremultipliedFirst);
-		CGColorSpaceRef const color_space(CGColorSpaceCreateDeviceRGB());
-		CGContextRef const context_ref(CGBitmapContextCreate(bitmap.raw_pixptr(0), bitmap_width, bitmap_height, 8, bitmap.rowpixels() * 4, color_space, bitmap_info));
-		if (context_ref)
-		{
-			CGFontRef const font_ref(CTFontCopyGraphicsFont(m_font, nullptr));
-			CGContextSetTextPosition(context_ref, -bounds.origin.x, m_baseline);
-			CGContextSetRGBFillColor(context_ref, 1.0, 1.0, 1.0, 1.0);
-			CGContextSetFont(context_ref, font_ref);
-			CGContextSetFontSize(context_ref, POINT_SIZE);
-			CGContextShowGlyphs(context_ref, &glyph, count);
-			CGFontRelease(font_ref);
-			CGContextRelease(context_ref);
-		}
-		CGColorSpaceRelease(color_space);
+	// turn everything into integers for MAME and allocate output bitmap
+	std::size_t const bitmap_width(std::max(std::ceil(bounds.size.width), CGFloat(1.0)));
+	std::size_t const bitmap_height(m_height);
+	width = std::ceil(advance.width);
+	xoffs = std::ceil(bounds.origin.x);
+	yoffs = 0;
+	bitmap.allocate(bitmap_width, bitmap_height);
+
+	// create graphics context and draw
+	CGBitmapInfo const bitmap_info(kCGBitmapByteOrder32Host | kCGImageAlphaPremultipliedFirst);
+	CGColorSpaceRef const color_space(CGColorSpaceCreateDeviceRGB());
+	CGContextRef const context_ref(CGBitmapContextCreate(bitmap.raw_pixptr(0), bitmap_width, bitmap_height, 8, bitmap.rowpixels() * 4, color_space, bitmap_info));
+	if (context_ref)
+	{
+		CGFontRef const font_ref(CTFontCopyGraphicsFont(m_font, nullptr));
+		CGContextSetTextPosition(context_ref, -bounds.origin.x, m_baseline);
+		CGContextSetRGBFillColor(context_ref, 1.0, 1.0, 1.0, 1.0);
+		CGContextSetFont(context_ref, font_ref);
+		CGContextSetFontSize(context_ref, POINT_SIZE);
+		CGContextShowGlyphs(context_ref, &glyph, count);
+		CGFontRelease(font_ref);
+		CGContextRelease(context_ref);
 	}
+	CGColorSpaceRelease(color_space);
 
 	// bitmap will be valid if we drew to it
 	return bitmap.valid();
