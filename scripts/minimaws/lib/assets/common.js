@@ -19,8 +19,7 @@ function sort_table(tbl, col, dir, numeric)
 function make_table_sortable(tbl)
 {
 	var headers = tbl.tHead.rows[0].cells;
-	var i;
-	for (i = 0; i < headers.length; i++)
+	for (var i = 0; i < headers.length; i++)
 	{
 		(function (col)
 		{
@@ -32,9 +31,9 @@ function make_table_sortable(tbl)
 			headers[col].appendChild(sorticon);
 			headers[col].addEventListener(
 					'click',
-					function ()
+					function (event)
 					{
-						imgsrc = sorticon.getAttribute('src');
+						var imgsrc = sorticon.getAttribute('src');
 						imgsrc = imgsrc.substr(imgsrc.lastIndexOf('/') + 1);
 						if (imgsrc != 'sortind.png')
 							dir = -dir;
@@ -42,8 +41,7 @@ function make_table_sortable(tbl)
 							sorticon.setAttribute('src', assetsurl + '/sortdesc.png');
 						else
 							sorticon.setAttribute('src', assetsurl + '/sortasc.png');
-						var i;
-						for (i = 0; i < headers.length; i++)
+						for (var i = 0; i < headers.length; i++)
 						{
 							if (i != col)
 								headers[i].lastChild.setAttribute('src', assetsurl + '/sortind.png');
@@ -52,4 +50,29 @@ function make_table_sortable(tbl)
 					});
 		}(i));
 	}
+}
+
+
+function make_restore_default_handler(popup, index)
+{
+	return function (event)
+	{
+		if (popup.selectedIndex != index)
+		{
+			popup.selectedIndex = index;
+			popup.dispatchEvent(new Event('change'));
+		}
+	}
+}
+
+
+function make_restore_default_button(title, id, popup, index)
+{
+	var btn = document.createElement('button');
+	btn.setAttribute('id', id);
+	btn.setAttribute('type', 'button');
+	btn.disabled = popup.selectedIndex == index;
+	btn.textContent = title;
+	btn.onclick = make_restore_default_handler(popup, index);
+	return btn;
 }

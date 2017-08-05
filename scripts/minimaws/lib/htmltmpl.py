@@ -54,7 +54,7 @@ MACHINE_OPTIONS_HEADING = string.Template(
 
 MACHINE_BIOS_PROLOGUE = string.Template(
         '<h3>System BIOS</h3>' \
-        '<select id="select-system-bios" onchange="update_cmd_preview()">')
+        '<div><select id="select-system-bios" onchange="update_cmd_preview()"></div>')
 
 MACHINE_BIOS_OPTION = string.Template(
         '    <option value="${name}" data-isdefault="${isdefault}">${name} - ${description}</option>\n')
