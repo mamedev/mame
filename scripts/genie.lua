@@ -20,6 +20,9 @@ MAME_DIR = (path.getabsolute("..") .. "/")
 --MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
 local naclToolchain = ""
+if (_OPTIONS["PROJECT"] ~= nil) then
+	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
+end
 
 newoption {
 	trigger = "precompile",
@@ -62,6 +65,24 @@ function findfunction(x)
 	else
 	return nil, "expected function, not "..type(f)
 	end
+end
+
+function getBaseSrcDir()
+	if _OPTIONS["PROJECT"] ~= nil then
+		return PROJECT_DIR .. "src/"
+	else
+		return MAME_DIR .. "src/"
+	end
+end
+
+function getMainFilePath(_target, _subtarget)
+	local base_path = getBaseSrcDir()
+	local mainfile = base_path .._target .."/" .. _subtarget ..".cpp"
+	if not os.isfile(mainfile) then
+		mainfile = base_path .._target .."/" .. _target ..".cpp"
+	end
+
+	return mainfile;
 end
 
 function layoutbuildtask(_folder, _name)
@@ -525,7 +546,6 @@ msgprecompile ("Precompiling $(subst ../,,$<)...")
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
 if (_OPTIONS["PROJECT"] ~= nil) then
-	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
 	if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
