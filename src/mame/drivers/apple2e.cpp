@@ -293,6 +293,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ram4000_w);
 	DECLARE_READ8_MEMBER(cec4000_r);
 	DECLARE_READ8_MEMBER(cec8000_r);
+	DECLARE_WRITE8_MEMBER(ram8000_w);
 	DECLARE_READ8_MEMBER(auxram0000_r);
 	DECLARE_WRITE8_MEMBER(auxram0000_w);
 	DECLARE_READ8_MEMBER(auxram0200_r);
@@ -671,45 +672,30 @@ void apple2e_state::machine_start()
 	{
 		m_lcbank->set_bank(3);
 		m_cec_ptr = m_cecbanks->base();
+		m_iscec = true;
 
-		uint8_t *cecwlrom = m_cec_ptr;
-		uint8_t c, ch;
-
-		for(int i=0; i<0x040000; i++)
+		// data is bit-order reversed (and byte interleaved, which the ROM loader takes care of)
+		// let's do that in the modern MAME way
+		for (int i=0; i<0x040000; i++)
 		{
-			ch = cecwlrom[((i&1)?0x020000:0) + (i>>1) ];
-			c = 0;
-
-			for(int j=0;j<7;j++)
-			{
-				if (ch&1)
-				{
-					c = c | 1;
-				}
-
-				ch = ch>>1;
-				c = c<<1;
-			}
-
-			if (ch&1)
-			{
-				c = c | 1;
-			}
-			m_cec_remap[i] = c;
+			m_cec_remap[i] = BITSWAP8(m_cec_ptr[i], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 
 		// remap cec gfx1 rom
 		// for ALTCHARSET
 		uint8_t *rom = m_video->m_char_ptr;
-		for(int i=0;i<0x1000;i++)
+		for(int i=0; i<0x1000; i++)
 		{
 			rom[i+0x1000] = rom[i];
 		}
-
-		for(int i=0x040*8;i<0x80*8;i++)
+		for(int i=0x040*8; i<0x80*8; i++)
 		{
 			rom[i] = rom[i+0x1000-0x040*8];
 		}
+	}
+	else
+	{
+		m_iscec = false;
 	}
 
 	// setup save states
@@ -789,13 +775,7 @@ void apple2e_state::machine_reset()
 	m_yirq = false;
 	m_mockingboard4c = false;
 	m_intc8rom = false;
-	m_iscec = false;
 	m_cec_bank = 0;
-
-	if ((m_rom_ptr[0x7bb3] == 0x8d) || (m_rom_ptr[0x7bb3] == 0xea))
-	{
-		m_iscec = true;
-	}
 
 	// IIe prefers INTCXROM default to off, IIc has it always on
 	if (m_rom_ptr[0x3bc0] == 0x00)
@@ -1031,6 +1011,10 @@ void apple2e_state::auxbank_update()
 		if (m_ramrd)
 		{
 			m_4000bank->set_bank(4);    // read CEC bank, write normal RAM
+		}
+		else
+		{
+			m_4000bank->set_bank(0);    // read/write RAM
 		}
 	}
 }
@@ -2020,7 +2004,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 			}
 			else
 			{
-				if (m_iscec)
+				if ((m_iscec) && (slot == 3))
 				{
 					return m_cec_bank;
 				}
@@ -2534,6 +2518,7 @@ READ8_MEMBER(apple2e_state::ram2000_r)  { return m_ram_ptr[offset+0x2000]; }
 WRITE8_MEMBER(apple2e_state::ram2000_w) { m_ram_ptr[offset+0x2000] = data; }
 READ8_MEMBER(apple2e_state::ram4000_r)  { return m_ram_ptr[offset+0x4000]; }
 WRITE8_MEMBER(apple2e_state::ram4000_w) { m_ram_ptr[offset+0x4000] = data; }
+WRITE8_MEMBER(apple2e_state::ram8000_w) { m_ram_ptr[offset+0x8000] = data; }
 READ8_MEMBER(apple2e_state::cec4000_r)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
@@ -2678,7 +2663,7 @@ static ADDRESS_MAP_START( r4000bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x10000, 0x17fff) AM_READWRITE(ram4000_r, auxram4000_w)
 	AM_RANGE(0x18000, 0x1ffff) AM_READWRITE(auxram4000_r, auxram4000_w)
 	AM_RANGE(0x20000, 0x23fff) AM_READWRITE(cec4000_r, ram4000_w)
-	AM_RANGE(0x24000, 0x27fff) AM_READWRITE(cec8000_r, ram4000_w)
+	AM_RANGE(0x24000, 0x27fff) AM_READWRITE(cec8000_r, ram8000_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c100bank_map, AS_PROGRAM, 8, apple2e_state )
@@ -4360,11 +4345,11 @@ ROM_START(ceci)
 
 	ROM_SYSTEM_BIOS(2, "diag", "self test")
 	ROMX_LOAD( "u7.selftest.bin", 0x000000, 0x008000, CRC(4b045a44) SHA1(d2c716d0eb9f1c70e108d16c6a88d44b894e39fd), ROM_BIOS(3) )
-	ROMX_LOAD( "u35.alt", 0x008000, 0x008000, CRC(a4f40181) SHA1(db1ed69b2ed3280b1c90f76dbd637370d5bc11b0), ROM_BIOS(3) )
+	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(3) )
 
 	ROM_REGION(0x40000,"cecexp",0)
-	ROM_LOAD( "u33.mx231024-0059.bin", 0x000000, 0x020000, CRC(a2a59f35) SHA1(01c787e150bf1378088a9333ec9338387aae0f50) )
-	ROM_LOAD( "u34.mx231024-0060.bin", 0x020000, 0x020000, CRC(f23470ce) SHA1(dc4cbe19e202d2afb56998ff04255b3171b58e14) )
+	ROM_LOAD16_BYTE( "u33.mx231024-0059.bin", 0x000000, 0x020000, CRC(a2a59f35) SHA1(01c787e150bf1378088a9333ec9338387aae0f50) )
+	ROM_LOAD16_BYTE( "u34.mx231024-0060.bin", 0x000001, 0x020000, CRC(f23470ce) SHA1(dc4cbe19e202d2afb56998ff04255b3171b58e14) )
 
 	ROM_REGION(0x800,"keyboard",0)
 	ROM_LOAD( "u26.9433c-0201.rcl-zh-16.bin", 0x000000, 0x000800, CRC(f3190603) SHA1(7efdf6f4ee0ed01ff06341c601496a43d06afd6b) )
