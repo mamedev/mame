@@ -933,34 +933,20 @@ static const gfx_layout objlayout =
 static GFXDECODE_START( decocass )
 	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
 	GFXDECODE_ENTRY( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
-	GFXDECODE_ENTRY( nullptr, 0xd000, tilelayout,      32, 2 )  /* background tiles */
-	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,       48, 4 )  /* object */
+	GFXDECODE_ENTRY( nullptr, 0xd000, tilelayout,       0, 8 )  /* background tiles */
+	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
 GFXDECODE_END
 
 PALETTE_INIT_MEMBER(decocass_state, decocass)
 {
 	int i;
 
-	/* set up 32 colors 1:1 pens */
+	// set up 32 colors 1:1 pens and flipped colors for background tiles (D7 of color_center_bot)
 	for (i = 0; i < 32; i++)
-		palette.set_pen_indirect(i, i);
-
-	/* setup straight/flipped colors for background tiles (D7 of color_center_bot ?) */
-	for (i = 0; i < 8; i++)
 	{
-		palette.set_pen_indirect(32+i, 3*8+i);
-		palette.set_pen_indirect(40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
+		palette.set_pen_indirect(i, i);
+		palette.set_pen_indirect(32+i, BITSWAP8(i, 7, 6, 5, 4, 3, 1, 2, 0));
 	}
-
-	/* setup 4 colors for 1bpp object */
-	palette.set_pen_indirect(48+0*2+0, 0);
-	palette.set_pen_indirect(48+0*2+1, 25); /* testtape red from 4th palette section? */
-	palette.set_pen_indirect(48+1*2+0, 0);
-	palette.set_pen_indirect(48+1*2+1, 28); /* testtape blue from 4th palette section? */
-	palette.set_pen_indirect(48+2*2+0, 0);
-	palette.set_pen_indirect(48+2*2+1, 26); /* testtape green from 4th palette section? */
-	palette.set_pen_indirect(48+3*2+0, 0);
-	palette.set_pen_indirect(48+3*2+1, 23); /* ???? */
 }
 
 
@@ -993,7 +979,7 @@ static MACHINE_CONFIG_START( decocass )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", decocass)
-	MCFG_PALETTE_ADD("palette", 32+2*8+2*4)
+	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)
 
@@ -2117,7 +2103,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /*    */ GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 2)", 0 )
 /* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (Japan)", 0 )
-/* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette) (Japan)", MACHINE_WRONG_COLORS )
+/* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette) (Japan)", 0 )
 /* 35 */ GAME( 1985, cflyball,  decocass, decocass, cflyball, decocass_nodong_state,decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
 /* 36 */ // 1984.04 Genesis/Boomer Rang'r
 /* 37 */ GAME( 1983, czeroize,  decocass, czeroize, czeroize, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette) (US)", 0 )

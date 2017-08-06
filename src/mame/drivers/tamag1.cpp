@@ -23,17 +23,27 @@ public:
 	tamag1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	output_finder<16, 40> m_out_x;
 
 	DECLARE_WRITE8_MEMBER(speaker_w);
-
 	DECLARE_PALETTE_INIT(tama);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	E0C6S46_PIXEL_UPDATE(pixel_update);
+
+protected:
+	virtual void machine_start() override;
 };
+
+void tamag1_state::machine_start()
+{
+	m_out_x.resolve();
+}
 
 
 /***************************************************************************
@@ -42,7 +52,7 @@ public:
 
 ***************************************************************************/
 
-static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 {
 	// 16 COM(common) pins, 40 SEG(segment) pins from MCU,
 	// 32x16 LCD screen:
@@ -62,17 +72,10 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 	// 2 rows of indicators:
 	// above screen: 0:meal, 1:lamp, 2:play, 3:medicine
 	// under screen: 4:bath, 5:scales, 6:shout, 7:attention
-
 	// they are on pin SEG8(x=35) + COM0-3, pin SEG28(x=36) + COM12-15
-	if (x == 35 && y < 4)
-		device.machine().output().set_lamp_value(y, state);
-	else if (x == 36 && y >= 12)
-		device.machine().output().set_lamp_value(y-8, state);
 
-	// output for svg2lay
-	char buf[0x10];
-	sprintf(buf, "%d.%d", y, x);
-	device.machine().output().set_value(buf, state);
+	// output to y.x
+	m_out_x[y][x] = state;
 }
 
 PALETTE_INIT_MEMBER(tamag1_state, tama)
@@ -132,7 +135,7 @@ static MACHINE_CONFIG_START( tama )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)
-	MCFG_E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+	MCFG_E0C6S46_PIXEL_UPDATE_CB(tamag1_state, pixel_update)
 	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(tamag1_state, speaker_w))
 
 	/* video hardware */

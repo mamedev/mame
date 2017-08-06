@@ -539,6 +539,8 @@ void v25_common_device::device_start()
 	state_add( V25_SS,    "SS", m_debugger_temp).callimport().callexport().formatstr("%04X");
 	state_add( V25_DS,    "DS0", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
+	state_add( V25_IDB,   "IDB", m_IDB).mask(0xffe00).callimport();
+
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
@@ -640,6 +642,10 @@ void v25_common_device::state_import(const device_state_entry &entry)
 
 		case V25_DS:
 			Sreg(DS0) = m_debugger_temp;
+			break;
+
+		case V25_IDB:
+			m_IDB |= 0xe00;
 			break;
 	}
 }

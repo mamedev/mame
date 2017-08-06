@@ -250,7 +250,7 @@ public: // HACK FOR MC6845
 	required_memory_bank m_bank7; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank8; //                          bbcm
 
-	required_device<input_merger_active_high_device> m_irqs;
+	required_device<input_merger_device> m_irqs;
 
 	machine_type_t m_machinetype;
 

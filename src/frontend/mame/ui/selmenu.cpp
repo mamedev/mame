@@ -119,7 +119,22 @@ bool menu_select_launch::reselect_last::s_reselect = false;
 std::mutex menu_select_launch::s_cache_guard;
 menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
 
+// this needs to be here to allow the names from the data plugin to be localised
+// it can't have static linkage, and it can't be private or clang will complain
+// it also has to be kept in sync with the data plugin
+char const *const menu_select_launch::s_info_titles[] = {
+		__("Command"),
+		__("Gameinit"),
+		__("High Scores"),
+		__("History"),
+		__("MAMEinfo"),
+		__("MARPScore"),
+		__("MESSinfo"),
+		__("Mamescore"),
+		__("Sysinfo") };
 
+
+// instantiate possible variants of select_bios so derived classes don't get link errors
 template bool menu_select_launch::select_bios(game_driver const &, bool);
 template bool menu_select_launch::select_bios(ui_software_info const &, bool);
 
@@ -128,6 +143,8 @@ menu_select_launch::system_flags::system_flags(machine_static_info const &info)
 	: m_machine_flags(info.machine_flags())
 	, m_unemulated_features(info.unemulated_features())
 	, m_imperfect_features(info.imperfect_features())
+	, m_has_keyboard(info.has_keyboard())
+	, m_has_analog(info.has_analog())
 	, m_status_color(info.status_color())
 {
 }
@@ -353,7 +370,7 @@ void menu_select_launch::bios_selection::handle()
 void menu_select_launch::bios_selection::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	ui().draw_text_full(container(), _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("BIOS selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = std::max(origx2 - origx1, width);
@@ -373,7 +390,7 @@ void menu_select_launch::bios_selection::custom_render(void *selectedref, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container(), _("Bios selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("BIOS selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -2384,7 +2401,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	else if (driver)
 	{
 		m_info_software = nullptr;
-		first = "General Info";
+		first = __("General Info");
 
 		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{

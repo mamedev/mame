@@ -104,7 +104,6 @@ namespace imgtool
 		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts, ptr &image);
 		static imgtoolerr_t create(const imgtool_module *module, const std::string &filename, util::option_resolution *opts);
 		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts);
-		static uint64_t rand();
 
 		std::string info();
 		imgtoolerr_t get_geometry(uint32_t *tracks, uint32_t *heads, uint32_t *sectors);
@@ -159,7 +158,7 @@ namespace imgtool
 		imgtoolerr_t get_file(const char *filename, const char *fork, const char *dest, filter_getinfoproc filter);
 		imgtoolerr_t put_file(const char *newfname, const char *fork, const char *source, util::option_resolution *opts, filter_getinfoproc filter);
 		imgtoolerr_t delete_file(const char *fname);
-		imgtoolerr_t list_file_forks(const char *path, imgtool_forkent *ents, size_t len);
+		imgtoolerr_t list_file_forks(const char *path, std::vector<imgtool::fork_entry> &forks);
 		imgtoolerr_t create_directory(const char *path);
 		imgtoolerr_t delete_directory(const char *path);
 		imgtoolerr_t list_file_attributes(const char *path, uint32_t *attrs, size_t len);
@@ -210,7 +209,7 @@ namespace imgtool
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)> m_read_file;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)> m_write_file;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *filename)> m_delete_file;
-		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path, imgtool_forkent *ents, size_t len)> m_list_forks;
+		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path, std::vector<imgtool::fork_entry> &forks)> m_list_forks;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path)> m_create_dir;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path)> m_delete_dir;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path, uint32_t *attrs, size_t len)> m_list_attrs;
@@ -227,9 +226,8 @@ namespace imgtool
 		std::unique_ptr<uint8_t[]> m_extra_bytes;
 
 		// methods
-		imgtoolerr_t cannonicalize_path(uint32_t flags, const char **path, char **alloc_path);
+		imgtoolerr_t cannonicalize_path(uint32_t flags, const char *path, std::string &result);
 		imgtoolerr_t cannonicalize_fork(const char **fork);
-		char *normalize_filename(const char *src);
 		imgtoolerr_t map_block_to_image_block(uint64_t partition_block, uint64_t &image_block) const;
 	};
 

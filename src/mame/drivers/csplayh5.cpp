@@ -83,12 +83,15 @@ public:
 	DECLARE_DRIVER_INIT(fuudol);
 	DECLARE_DRIVER_INIT(junai);
 	DECLARE_DRIVER_INIT(junai2);
+	DECLARE_DRIVER_INIT(konhaji);
 	DECLARE_DRIVER_INIT(mjgalpri);
 	DECLARE_DRIVER_INIT(mjmania);
 	DECLARE_DRIVER_INIT(mogitate);
 	DECLARE_DRIVER_INIT(nichisel);
+	DECLARE_DRIVER_INIT(nuretemi);
 	DECLARE_DRIVER_INIT(pokoachu);
 	DECLARE_DRIVER_INIT(renaimj);
+	DECLARE_DRIVER_INIT(sengomjk);
 	DECLARE_DRIVER_INIT(thenanpa);
 	DECLARE_DRIVER_INIT(tsuwaku);
 
@@ -255,54 +258,49 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0000, "DSWA" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0000, "DSWB" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) //enters into analyzer in some games otherwise
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	// comes from csplayh5 manual, other games might change slightly
+	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:1,2,3")
+	PORT_DIPSETTING(      0x0007, "1" )
+	PORT_DIPSETTING(      0x0006, "2" )
+	PORT_DIPSETTING(      0x0005, "3" )
+	PORT_DIPSETTING(      0x0004, "4" )
+	PORT_DIPSETTING(      0x0003, "5" )
+	PORT_DIPSETTING(      0x0002, "6" )
+	PORT_DIPSETTING(      0x0001, "7" )
+	PORT_DIPSETTING(      0x0000, "8" )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0010, 0x0000, "Show girls in attract mode" ) PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Color Test" ) PORT_DIPLOCATION("SWA:7") // shows color bars during POST
+	PORT_DIPSETTING(      0x0040, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SWA:8" )
+ 
+	// A note indicates inoshikachou, shichigosan, hanami de ippai, tsukimi de ippai to be used, which are Koi Koi rulesets
+	PORT_DIPNAME( 0x0100, 0x0100, "Use Koi Koi local ruleset" ) PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0200, 0x0000, "Koi Koi input layout" ) PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(      0x0000, "A Type" ) // Yes: Riichi No: Ron
+	PORT_DIPSETTING(      0x0200, "B Type" ) // Yes: M No: N
+	PORT_DIPUNUSED_DIPLOC( 0x0400, IP_ACTIVE_LOW, "SWB:3" )
+	// TODO: duplicate of SWA:5? Maybe applies to nudity, will see once the DVD part works.
+	PORT_DIPNAME( 0x1800, 0x1800, "Background type" ) PORT_DIPLOCATION("SWB:4,5")
+//	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0800, "Color in-game and attract" )
+	PORT_DIPSETTING(      0x1000, "Girls in-game, color in attract" )
+	PORT_DIPSETTING(      0x1800, "Girls in-game and attract" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Analyzer" ) PORT_DIPLOCATION("SWB:6") //in some games
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( No ) )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SWB:8" )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
@@ -415,15 +413,18 @@ DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(0x585c/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(0x4cb4/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh6)  { general_init(0x5976/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,konhaji)   { general_init(0x9200/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,mjgalpri)  { general_init(0x5396/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,mogitate)  { general_init(0x6ab4/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,nichisel)  { general_init(0x9cd6/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,nuretemi)  { general_init(0x8de2/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,pokoachu)  { general_init(0x7b1e/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,renaimj)   { general_init(0x568c/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,sengomjk)  { general_init(0x5226/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
 
@@ -502,6 +503,27 @@ ROM_START( mjgalpri )
 	DISK_IMAGE_READONLY( "nb8001", 0, SHA1(30f356af4e08567273a88758bb0ddd3544eea228) )
 ROM_END
 
+ROM_START( sengomjk )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(a202bf13) SHA1(01e15e7577f6ac6a90b7ab30f402def211360d4d) )
+    ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(98d4979a) SHA1(477361ec183674220e282fed8bfce098b0f75873) )
+
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+    ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(c0bf69c6) SHA1(dd06ec9b3232f025de2c87765b88cb101eab47f5) )
+	
+	DVD_BIOS
+	
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(20791a5a) SHA1(03c38e9b8e60b0dded7504b2725210df5405110c) )
+    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(1ed72387) SHA1(7e2b8ce49561d6fd79dcf0d427569e5f6ef8dc67) )
+	
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8002", 0, SHA1(d3502496526e62a877f12dccc27b32ae33d3704d) )
+
+	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+    ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
+ROM_END
+
 ROM_START( junai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(5923bf2e) SHA1(8fc7b95a44eb792ce03c1bffb9ad56f82d34b470) )
@@ -565,8 +587,8 @@ ROM_END
 
 ROM_START( mogitate )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(42ec6c2e) SHA1(a0279502e1f7e62f072ec6612caf198aa0ae3af7) )
 	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(f71546c6) SHA1(546b0d12e7b1627c96d5a17c015bdbbca1e93232) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(42ec6c2e) SHA1(a0279502e1f7e62f072ec6612caf198aa0ae3af7) )
 
 	DVD_BIOS
 
@@ -754,8 +776,8 @@ ROM_END
 
 ROM_START( fuudol )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(0cab2a72) SHA1(32d098bdd693a11f3cea6bbed3515c4217f40e23) )
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(b1fa335e) SHA1(8a881c9c511fb63b00a3a7e433bae12aa9c2c262) )
+	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(0cab2a72) SHA1(32d098bdd693a11f3cea6bbed3515c4217f40e23) )
 
 	DVD_BIOS
 
@@ -773,10 +795,32 @@ ROM_START( fuudol )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, CRC(30719630) SHA1(a8c7b6d0304c38691775c5af6c32fbeeefd9f9fa) )
 ROM_END
 
+ROM_START( nuretemi )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(da303352) SHA1(91c8752c93ca4022e978744bf42261d1a0e899a1) )
+    ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(53ef6360) SHA1(ec90f01e4e78821511a6dba885c0d38f594a3a86) )
+
+	DVD_BIOS
+
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	// identical to vol. 19, probably an attempt to fix a dead board.
+    ROM_LOAD( "11.ic51", 0x000000, 0x020000, BAD_DUMP CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
+    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+    ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000369, CRC(39f3edc7) SHA1(be07e8133cf2afa4f806d902d8d971d523326dd5) )
+ROM_END
+
 ROM_START( tsuwaku )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(a9890007) SHA1(3cd36c653d387842289f74c3cf35435f9d2a3aca) )
 	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(4577bf7b) SHA1(fed88157ded8ac72cc28cdd3b2ee36c293a6ee93) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(a9890007) SHA1(3cd36c653d387842289f74c3cf35435f9d2a3aca) )
 
 	DVD_BIOS
 
@@ -796,8 +840,8 @@ ROM_END
 
 ROM_START( nichisel )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(95fb8e74) SHA1(79aa45ed1c3bd3e1a83b02afb64268efb386100e) )
 	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(fb84fc3e) SHA1(6b87c3516ceec59ec96012ea6a3d2fa9670a1cb3) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(95fb8e74) SHA1(79aa45ed1c3bd3e1a83b02afb64268efb386100e) )
 
 	DVD_BIOS
 
@@ -815,36 +859,65 @@ ROM_START( nichisel )
 	ROM_LOAD( "palce16v8h.020", 0x000000, 0x040000, CRC(228b98fb) SHA1(53b57a09610425a5bb9d0ffe0f68dce2d9ab3bf6) )
 ROM_END
 
+ROM_START( konhaji )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(f16c88db) SHA1(bd8b4619817bd95fffe3e7e6ca57cc2223f372fa) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(9360eabe) SHA1(ecae0c8090f5cadd87fb544190112b53193f54ee) )
+
+	DVD_BIOS
+	
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
+	
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(88f31da7) SHA1(dc76532fa3261b3b238a42e2ca8f270f2b2ea1fa) )
+    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(35893109) SHA1(6a55bd147a75913af59bc355abf010e1b75063bf) )
+    
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8019", 0, SHA1(f59ac1587009d7d15618549dc60cbd24c263a95f) )
+
+	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+    ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
+ROM_END
+
+
+
+/***************************************************************************
+
+	Game metadatas
+
+***************************************************************************/
+
 // 1995
 GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
 GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,                       ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
-/* 01 */ GAME( 1998, mjgalpri,  nichidvd,   csplayh5, csplayh5,  csplayh5_state,  mjgalpri,        ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
-// 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
-/* 03 */ GAME( 1998, junai,     nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai,           ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,        ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
-/* 05 */ GAME( 1998, junai2,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai2,          ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
-/* 06 */ GAME( 1998, mogitate,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mogitate,        ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate", MACHINE_NOT_WORKING )
+/* 01 */ GAME( 1998, mjgalpri,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjgalpri,  ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
+/* 02 */ GAME( 1998, sengomjk,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  sengomjk,  ROT0, "Nichibutsu/Just&Just", "Sengoku Mahjong Kurenai Otome-tai (Japan)", MACHINE_NOT_WORKING )
+/* 03 */ GAME( 1998, junai,     nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai,     ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,  ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
+/* 05 */ GAME( 1998, junai2,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai2,    ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
+/* 06 */ GAME( 1998, mogitate,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mogitate,  ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate (Japan)", MACHINE_NOT_WORKING )
 
 // 1999
-/* 07 */ GAME( 1999, mjmania,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjmania,         ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
-/* 08 */ GAME( 1999, renaimj,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
-/* 09 */ GAME( 1999, bikiniko,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,        ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
-/* 10 */ GAME( 1999, csplayh6,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh6,        ROT0, "Nichibutsu/eic",   "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
-/* 11 */ GAME( 1999, thenanpa,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
-/* 12 */ GAME( 1999, pokoachu,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  pokoachu,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
-/* 13 */ GAME( 1999, csplayh7,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
-/* 14 */ GAME( 1999, aimode,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  aimode,          ROT0, "Nichibutsu/eic", "Ai-mode - Pet Shiiku", MACHINE_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjmania,   ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
+/* 08 */ GAME( 1999, renaimj,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  renaimj,   ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,  ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
+/* 10 */ GAME( 1999, csplayh6,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh6,  ROT0, "Nichibutsu/eic",   "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
+/* 11 */ GAME( 1999, thenanpa,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,  ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
+/* 12 */ GAME( 1999, pokoachu,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  pokoachu,  ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
+/* 13 */ GAME( 1999, csplayh7,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,  ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
+/* 14 */ GAME( 1999, aimode,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  aimode,    ROT0, "Nichibutsu/eic", "Ai-mode - Pet Shiiku (Japan)", MACHINE_NOT_WORKING )
 
 // 2000
-/* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
-// 16 : Nurete Mitaino... - Net Idol Hen : Nichibutsu/Love Factory
-/* 17 */ GAME( 2000, tsuwaku,    nichidvd,   csplayh5,  csplayh5, csplayh5_state, tsuwaku,         ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
+/* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
+/* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING ) 
+/* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
 // 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
-/* sp */ GAME( 2000, nichisel,    nichidvd,  csplayh5,  csplayh5, csplayh5_state, nichisel,        ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
+/* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
-// 19 : Konnano Hajimete! : Nichibutsu/Love Factory
+/* 19 */ GAME( 2001, konhaji,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  konhaji,   ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING ) 
 // 20 : Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic

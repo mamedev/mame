@@ -95,6 +95,7 @@ write:
 #include "includes/mario.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/z80dma.h"
 #include "screen.h"
 
@@ -117,14 +118,21 @@ WRITE8_MEMBER(mario_state::memory_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-WRITE8_MEMBER(mario_state::mario_z80dma_rdy_w)
+WRITE_LINE_MEMBER(mario_state::nmi_mask_w)
 {
-	m_z80dma->rdy_w(data & 0x01);
+	m_nmi_mask = state;
+	if (!state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mario_state::nmi_mask_w)
+WRITE_LINE_MEMBER(mario_state::coin_counter_1_w)
 {
-	m_nmi_mask = data & 1;
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(mario_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 /*************************************
@@ -142,11 +150,7 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(mario_sh2_w) /* Luigi run sample */
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
 	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(mario_z80dma_rdy_w)   /* ==> DMA Chip */
+	AM_RANGE(0x7e80, 0x7e87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")    /* DSW */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -161,11 +165,7 @@ static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
 	AM_RANGE(0x7e00, 0x7e00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(mario_z80dma_rdy_w)   /* ==> DMA Chip */
+	AM_RANGE(0x7e80, 0x7e87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(masao_sh_irqtrigger_w)
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")    /* DSW */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -329,7 +329,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(mario_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( mario_base )
@@ -345,6 +345,16 @@ static MACHINE_CONFIG_START( mario_base )
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(mario_state, memory_read_byte))
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(mario_state, memory_write_byte))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2L (7E80H)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mario_state, gfx_bank_w)) // ~T ROM
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // 2 PSL
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mario_state, flip_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mario_state, palette_bank_w)) // CREF 0
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mario_state, nmi_mask_w)) // NMI EI
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("z80dma", z80dma_device, rdy_w)) // DMA SET
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mario_state, coin_counter_1_w)) // COUNTER 2 (misnumbered on schematic)
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mario_state, coin_counter_2_w)) // COUNTER 1 (misnumbered on schematic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -28,6 +28,7 @@ class aha1542_device : public device_t,
 						public device_isa16_card_interface
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
 	// construction/destruction
 	aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

@@ -193,8 +193,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 static SLOT_INTERFACE_START( pulsar_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_HD )
-	SLOT_INTERFACE( "drive1", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
 /* Input ports */
@@ -257,9 +256,9 @@ static MACHINE_CONFIG_START( pulsar )
 	MCFG_COM8116_FT_HANDLER(WRITELINE(pulsar_state, ft_w))
 
 	MCFG_FD1797_ADD("fdc", XTAL_4MHz / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

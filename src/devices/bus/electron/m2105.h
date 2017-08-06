@@ -49,7 +49,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<tms5220_device> m_tms;
 	required_device<centronics_device> m_centronics;
-	required_device<input_merger_active_high_device> m_irqs;
+	required_device<input_merger_device> m_irqs;
 };
 
 

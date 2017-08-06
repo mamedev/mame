@@ -8,7 +8,6 @@ Undumped Self-Published Titles:
 * Alpine Games (R. & J. Graf)
 * CGE 5th (Songbird Productions, CF30B2)
 * Championship Rally (Songbird Productions, CF2006)
-* Crystal Mines II - Buried Treasure (Songbird Productions, CF2008)
 * Cyber Virus (Songbird Productions, CF2007)
 * Cyber Virus - CinciClassic Edition (Songbird Productions, CF20B1)
 * Lynx Othello (H. Dodgson)
@@ -245,6 +244,18 @@ Known undumped prototypes:
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="crystal mines ii (euro, usa).bin" size="131072" crc="aec474c8" sha1="3364bde38508c5c4fed5575295cc80c6f72edebe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+		<software name="cmines2bt" cloneof="cmines2">
+		<description>Crystal Mines II - Buried Treasure (Euro, USA)</description>
+		<year>2003</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF2008" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="crystal mines ii - buried treasure.bin" size="262144" crc="122ec861" sha1="c0977ce9f22b0182b332af96290a36f0e7b8fbe6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

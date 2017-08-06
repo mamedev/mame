@@ -56,12 +56,16 @@ protected:
 		::machine_flags::type machine_flags() const { return m_machine_flags; }
 		device_t::feature_type unemulated_features() const { return m_unemulated_features; }
 		device_t::feature_type imperfect_features() const { return m_imperfect_features; }
+		bool has_keyboard() const { return m_has_keyboard; }
+		bool has_analog() const { return m_has_analog; }
 		rgb_t status_color() const { return m_status_color; }
 
 	private:
 		::machine_flags::type   m_machine_flags;
 		device_t::feature_type  m_unemulated_features;
 		device_t::feature_type  m_imperfect_features;
+		bool                    m_has_keyboard;
+		bool                    m_has_analog;
 		rgb_t                   m_status_color;
 	};
 
@@ -117,6 +121,8 @@ protected:
 	void    *m_prev_selected;
 	int     m_total_lines;
 	int     m_topline_datsview;   // right box top line
+
+	static char const *const s_info_titles[];
 
 private:
 	using bitmap_vector = std::vector<bitmap_argb32>;

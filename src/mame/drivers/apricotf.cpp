@@ -88,7 +88,7 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
-	required_device<input_merger_active_high_device> m_irqs;
+	required_device<input_merger_device> m_irqs;
 	required_shared_ptr<uint16_t> m_p_scrollram;
 	required_shared_ptr<uint16_t> m_p_paletteram;
 	required_device<palette_device> m_palette;
@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( act_f1 )
 	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
 	MCFG_CPU_IO_MAP(act_f1_io)
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	/* video hardware */
@@ -354,10 +354,10 @@ static MACHINE_CONFIG_START( act_f1 )
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_active_high_device, in0_w))
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("irqs", input_merger_active_high_device, in1_w))
+	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(f1_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
 

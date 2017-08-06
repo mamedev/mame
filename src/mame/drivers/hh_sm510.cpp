@@ -35,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_speaker(*this, "speaker"),
 		m_inp_lines(0),
 		m_display_wait(33)
@@ -43,6 +44,7 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<7> m_inp_matrix; // max 7
+	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
@@ -71,7 +73,6 @@ public:
 	u8 m_display_z_len;             // lcd number of commons
 	u32 m_display_state[0x20];      // lcd segment data (max. 5-bit offset)
 	u8 m_display_decay[0x20][0x20]; // (internal use)
-	u8 m_display_cache[0x20][0x20]; // (internal use)
 
 	void set_display_size(u8 x, u8 y, u8 z);
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
@@ -86,6 +87,9 @@ protected:
 
 void hh_sm510_state::machine_start()
 {
+	// resolve handlers
+	m_out_x.resolve();
+
 	// zerofill
 	m_inp_mux = 0;
 	/* m_inp_lines = 0; */ // not here
@@ -96,7 +100,6 @@ void hh_sm510_state::machine_start()
 	m_display_z_len = 0;
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_cache, ~0, sizeof(m_display_cache));
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -108,7 +111,6 @@ void hh_sm510_state::machine_start()
 	save_item(NAME(m_display_z_len));
 	save_item(NAME(m_display_state));
 	save_item(NAME(m_display_decay));
-	/* save_item(NAME(m_display_cache)); */ // don't save!
 }
 
 void hh_sm510_state::machine_reset()
@@ -145,23 +147,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 				m_display_decay[y][zx]--;
 			u8 active_state = (m_display_decay[y][zx] < m_display_wait) ? 0 : 1;
 
-			if (active_state != m_display_cache[y][zx])
-			{
-				// SM510 series: output to x.y.z, where:
-				// x = group a/b/bs/c (0/1/2/3)
-				// y = segment 1-16 (0-15)
-				// z = common H1-H4 (0-3)
+			// SM510 series: output to x.y.z, where:
+			// x = group a/b/bs/c (0/1/2/3)
+			// y = segment 1-16 (0-15)
+			// z = common H1-H4 (0-3)
 
-				// SM500 series: output to x.y.z, where:
-				// x = O group (0-*)
-				// y = O segment 1-4 (0-3)
-				// z = common H1/H2 (0/1)
-				char buf[0x10];
-				sprintf(buf, "%d.%d.%d", zx >> m_display_z_len, y, zx & z_mask);
-				output().set_value(buf, active_state);
-
-				m_display_cache[y][zx] = active_state;
-			}
+			// SM500 series: output to x.y.z, where:
+			// x = O group (0-*)
+			// y = O segment 1-4 (0-3)
+			// z = common H1/H2 (0/1)
+			m_out_x[zx >> m_display_z_len][y][zx & z_mask] = active_state;
 		}
 	}
 }
@@ -271,6 +266,8 @@ WRITE8_MEMBER(hh_sm510_state::piezo_input_w)
 
   BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
   may show 2 balls at the same time. It's the same on the real handheld.
+  Another BTANB? If a period is over at the same time a defender on the
+  2nd column grabs the ball, his arm won't be erased until it's redrawn.
 
 ***************************************************************************/
 
@@ -921,7 +918,7 @@ static INPUT_PORTS_START( kbucky )
 
 	PORT_START("IN.1") // S2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Sound")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Sound")
 

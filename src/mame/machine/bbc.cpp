@@ -294,7 +294,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	if (tempIRR!=m_ACCCON_IRR)
 	{
-		m_irqs->in3_w(m_ACCCON_IRR);
+		m_irqs->in_w<3>(m_ACCCON_IRR);
 	}
 
 	if (m_ACCCON_Y)

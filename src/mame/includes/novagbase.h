@@ -26,6 +26,9 @@ public:
 		m_beeper(*this, "beeper"),
 		m_lcd(*this, "hd44780"),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u", 0U, 0U),
+		m_out_a(*this, "%u.a", 0U),
+		m_out_digit(*this, "digit%u", 0U),
 		m_display_wait(33),
 		m_display_maxy(1),
 		m_display_maxx(0)
@@ -37,6 +40,9 @@ public:
 	optional_device<beep_device> m_beeper;
 	optional_device<hd44780_device> m_lcd;
 	optional_ioport_array<9> m_inp_matrix; // max 9
+	output_finder<0x20, 0x20> m_out_x;
+	output_finder<0x20> m_out_a;
+	output_finder<0x20> m_out_digit;
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed keypad mask
@@ -53,7 +59,6 @@ public:
 
 	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
 	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u32 m_display_cache[0x20];      // (internal use)
 	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);

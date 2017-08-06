@@ -31,11 +31,23 @@ public:
 	// has... getters
 	bool has_bioses() const { return m_has_bioses; }
 
+	// has input types getters
+	bool has_dips() const { return m_has_dips; }
+	bool has_configs() const { return m_has_configs; }
+	bool has_keyboard() const { return m_has_keyboard; }
+	bool has_test_switch() const { return m_has_test_switch; }
+	bool has_analog() const { return m_has_analog; }
+
 	// message colour
 	rgb_t status_color() const;
 	rgb_t warnings_color() const;
 
+protected:
+	machine_static_info(machine_config const &config, ioport_list const &ports);
+
 private:
+	machine_static_info(machine_config const &config, ioport_list const *ports);
+
 	// overall feature status
 	::machine_flags::type   m_flags;
 	device_t::feature_type  m_unemulated_features;
@@ -43,6 +55,13 @@ private:
 
 	// has...
 	bool                    m_has_bioses;
+
+	// has input types
+	bool                    m_has_dips;
+	bool                    m_has_configs;
+	bool                    m_has_keyboard;
+	bool                    m_has_test_switch;
+	bool                    m_has_analog;
 };
 
 
@@ -51,13 +70,6 @@ class machine_info : public machine_static_info
 public:
 	// construction
 	machine_info(running_machine &machine);
-
-	// has... getters
-	bool has_configs() const { return m_has_configs; }
-	bool has_analog() const { return m_has_analog; }
-	bool has_dips() const { return m_has_dips; }
-	bool has_keyboard() const { return m_has_keyboard; }
-	bool has_test_switch() const { return m_has_test_switch; }
 
 	// text generators
 	std::string warnings_string() const;
@@ -68,13 +80,6 @@ public:
 private:
 	// reference to machine
 	running_machine &   m_machine;
-
-	// has...
-	bool                m_has_configs;
-	bool                m_has_analog;
-	bool                m_has_dips;
-	bool                m_has_keyboard;
-	bool                m_has_test_switch;
 };
 
 

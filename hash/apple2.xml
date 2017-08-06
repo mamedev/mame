@@ -5489,6 +5489,20 @@
 				<rom name="nibbler.do" size="143360" crc="79fb7ff7" sha1="598cdd5e93695d6ae8a26b83c6853e6067e53074" offset="0x0000" />
 			</dataarea>
 		</part>
+		
+	</software>	<software name="nightmar">
+		<!-- Left & Right arrows or Paddle0 for controls - Select with "K" for keyboard / "P" for paddle -->
+		<!-- press SLASH "/" to fire with keyboard or use Button0 when using the paddle -->
+		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause  -->
+		<description>Nightmare Gallery (clean crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="nightmare Gallery (1982)(synergistic)(clean crack).dsk" size="143360" crc="070c08bf" sha1="803dda9229bd086979f400949b4300d18285c75b" offset="0x0000" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="nightmsn">

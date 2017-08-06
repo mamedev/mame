@@ -469,6 +469,28 @@ std::string normalize_unicode(const char *s, size_t length, unicode_normalizatio
 
 
 //-------------------------------------------------
+//  uchar_toupper - uses utf8proc to convert to
+//	upper case
+//-------------------------------------------------
+
+char32_t uchar_toupper(char32_t ch)
+{
+	return utf8proc_toupper(ch);
+}
+
+
+//-------------------------------------------------
+//  uchar_tolower - uses utf8proc to convert to
+//	lower case
+//-------------------------------------------------
+
+char32_t uchar_tolower(char32_t ch)
+{
+	return utf8proc_tolower(ch);
+}
+
+
+//-------------------------------------------------
 //  utf8_previous_char - return a pointer to the
 //  previous character in a string
 //-------------------------------------------------

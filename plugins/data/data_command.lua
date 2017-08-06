@@ -3,7 +3,7 @@ local info, ver
 local datread = require("data/load_dat")
 do
 	local convert = require("data/button_char")
-	datread, ver = datread.open("command.dat", "# Command List%-Shorthand", convert)
+	datread, ver = datread.open("command.dat", "# Command List%-.+hand", convert)
 end
 
 function dat.check(set, softlist)
@@ -21,6 +21,10 @@ end
 
 function dat.get()
 	return info
+end
+
+function dat.ver()
+	return ver
 end
 
 return dat

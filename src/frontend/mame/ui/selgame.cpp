@@ -252,29 +252,7 @@ void menu_select_game::handle()
 			else if (ui_globals::rpanel == RP_INFOS)
 			{
 				// Infos
-				if (!isfavorite())
-				{
-					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view > 0)
-					{
-						ui_globals::curdats_view--;
-						m_topline_datsview = 0;
-					}
-				}
-				else
-				{
-					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view > 0)
-					{
-						ui_globals::curdats_view--;
-						m_topline_datsview = 0;
-					}
-					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
-					{
-						ui_globals::cur_sw_dats_view--;
-						m_topline_datsview = 0;
-					}
-				}
+				change_info_pane(-1);
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_RIGHT)
@@ -290,29 +268,7 @@ void menu_select_game::handle()
 			else if (ui_globals::rpanel == RP_INFOS)
 			{
 				// Infos
-				if (!isfavorite())
-				{
-					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
-					{
-						ui_globals::curdats_view++;
-						m_topline_datsview = 0;
-					}
-				}
-				else
-				{
-					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
-					{
-						ui_globals::curdats_view++;
-						m_topline_datsview = 0;
-					}
-					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
-					{
-						ui_globals::cur_sw_dats_view++;
-						m_topline_datsview = 0;
-					}
-				}
+				change_info_pane(1);
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > FILTER_FIRST)
@@ -802,14 +758,13 @@ void menu_select_game::inkey_select(const event *menu_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((machine().system().flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE)
+			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-					if (!swlistdev.get_info().empty())
-					{
-						menu::stack_push<menu_select_software>(ui(), container(), driver);
-						return;
-					}
+				if (!swlistdev.get_info().empty())
+				{
+					menu::stack_push<menu_select_software>(ui(), container(), driver);
+					return;
+				}
 			}
 
 			if (!select_bios(*driver, false))
@@ -861,14 +816,13 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((machine().system().flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE)
+			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-					if (!swlistdev.get_info().empty())
-					{
-						menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
-						return;
-					}
+				if (!swlistdev.get_info().empty())
+				{
+					menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
+					return;
+				}
 			}
 
 			// if everything looks good, schedule the new driver
@@ -1065,6 +1019,41 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 }
 
 //-------------------------------------------------
+//  change what's displayed in the info box
+//-------------------------------------------------
+
+void menu_select_game::change_info_pane(int delta)
+{
+	auto const cap_delta = [this, &delta] (uint8_t &current, uint8_t &total)
+	{
+		if ((0 > delta) && (-delta > current))
+			delta = -int(unsigned(current));
+		else if ((0 < delta) && ((current + unsigned(delta)) >= total))
+			delta = int(unsigned(total - current - 1));
+		if (delta)
+		{
+			current += delta;
+			m_topline_datsview = 0;
+		}
+	};
+	game_driver const *drv;
+	ui_software_info const *soft;
+	get_selection(soft, drv);
+	if (!isfavorite())
+	{
+		if (uintptr_t(drv) > skip_main_items)
+			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
+	}
+	else if (uintptr_t(soft) > skip_main_items)
+	{
+		if (soft->startempty)
+			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
+		else
+			cap_delta(ui_globals::cur_sw_dats_view, ui_globals::cur_sw_dats_total);
+	}
+}
+
+//-------------------------------------------------
 //  build custom display list
 //-------------------------------------------------
 
@@ -1201,6 +1190,11 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else
 		str << _("Driver is Parent\t\n");
 
+	if (flags.has_analog())
+		str << _("Analog Controls\tYes\n");
+	if (flags.has_keyboard())
+		str << _("Keyboard Inputs\tYes\n");
+
 	if (flags.machine_flags() & machine_flags::NOT_WORKING)
 		str << _("Overall\tNOT WORKING\n");
 	else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
@@ -1282,7 +1276,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	util::stream_format(str, _("Requires Artwork\t%1$s\n"), ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Requires Clickable Artwork\t%1$s\n"), ((flags.machine_flags() & machine_flags::CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Support Cocktail\t%1$s\n"), ((flags.machine_flags() & machine_flags::NO_COCKTAIL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Driver is Bios\t%1$s\n"), ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
+	util::stream_format(str, _("Driver is BIOS\t%1$s\n"), ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Support Save\t%1$s\n"), ((flags.machine_flags() & machine_flags::SUPPORTS_SAVE) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Screen Orientation\t%1$s\n"), ((flags.machine_flags() & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;

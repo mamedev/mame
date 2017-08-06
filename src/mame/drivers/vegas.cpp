@@ -460,16 +460,17 @@ void vegas_state::machine_reset()
 /*************************************
 *  Watchdog interrupts
 *************************************/
+#define WD_IRQ 0x1
 WRITE_LINE_MEMBER(vegas_state::watchdog_irq)
 {
-	if (state && !(m_sio_irq_state & 0x01)) {
-		logerror("%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
-		m_sio_irq_state |= 0x01;
+	logerror("%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
+	if (state && !(m_sio_irq_state & WD_IRQ)) {
+		m_sio_irq_state |= WD_IRQ;
 		update_sio_irqs();
 	}
-	else if (!state && (m_sio_irq_state & 0x01)) {
+	else if (!state && (m_sio_irq_state & WD_IRQ)) {
 		//logerror("%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
-		m_sio_irq_state &= ~0x01;
+		m_sio_irq_state &= ~WD_IRQ;
 		update_sio_irqs();
 	}
 }
@@ -753,7 +754,7 @@ WRITE8_MEMBER(vegas_state::cpu_io_w)
 {
 	// 0: system LED
 	// 1: PLD Config / Clock Gen
-	// 2: PLD Status / Jammma Serial Sense
+	// 2: PLD Status / Jammma Serial Sense Bit 7:4=>Revision, Bit 1=>Busy, Bit 0=>Config Done
 	// 3: System Reset Bit 0=>enable sio, Bit 1=>enable ide, Bit 2=>enable PCI
 	m_cpuio_data[offset] = data;
 	switch (offset) {
@@ -821,7 +822,7 @@ READ8_MEMBER( vegas_state::cpu_io_r )
 	uint32_t result = 0;
 	if (offset < 4)
 		result = m_cpuio_data[offset];
-	if (LOG_SIO && !(offset == 2 && !(m_cpuio_data[3] & 0x1)))
+	if (LOG_SIO && !(!(m_cpuio_data[3] & 0x1)))
 		logerror("%08X:cpu_io_r offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, result);
 	return result;
 }
@@ -1183,9 +1184,11 @@ static INPUT_PORTS_START( gauntdl )
 	PORT_DIPNAME( 0x0004, 0x0004, "DRAM" )
 	PORT_DIPSETTING(      0x0004, "8MB" )
 	PORT_DIPSETTING(      0x0000, "32MB" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Boot ROM Test" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Test Mode" )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, "Disk-based Test" )
+	PORT_DIPSETTING(      0x0080, "EPROM-based Test" )
+	PORT_DIPSETTING(      0x0000, "Interactive Diagnostics" )
 	PORT_DIPNAME( 0x0800, 0x0800, "SIO Rev" )
 	PORT_DIPSETTING(      0x0800, "1 or later")
 	PORT_DIPSETTING(      0x0000, "0")
@@ -1270,16 +1273,12 @@ static INPUT_PORTS_START( roadburn )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x0002, 0x0002, "Boot ROM Test" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Quantum 3dfx card rev" )
-	PORT_DIPSETTING(      0x0040, "4" )
-	PORT_DIPSETTING(      0x0000, "?" )
-	PORT_DIPNAME( 0x0080, 0x0080, "PM Dump" )
-	PORT_DIPSETTING(      0x0080, "Watchdog resets only" )
-	PORT_DIPSETTING(      0x0000, "All resets" )
-	PORT_DIPNAME( 0x0300, 0x0300, "Resolution" )
+	PORT_DIPNAME( 0x0003, 0x0003, "Test Mode" )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, "Disk-based Test" )
+	PORT_DIPSETTING(      0x0001, "EPROM-based Test" )
+	PORT_DIPSETTING(      0x0000, "Interactive Diagnostics" )
+	PORT_DIPNAME( 0x0300, 0x0200, "Resolution" )
 	PORT_DIPSETTING(      0x0300, "Standard Res 512x256" )
 	PORT_DIPSETTING(      0x0200, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" )
@@ -1993,8 +1992,8 @@ ROM_START( nbanfl )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
 	ROM_LOAD( "blitz00_sep22_1999.u27", 0x000000, 0x80000, CRC(6a9bd382) SHA1(18b942df6af86ea944c24166dbe88148334eaff9) ) // 16:00:32 Sep 22 1999 BIOS FOR BLITZ00 USING BANSHEE / 16:00:26 Sep 22 1999 POST FOR BLITZ00 USING BANSHEE
 //  ROM_LOAD( "bootnflnba.bin", 0x000000, 0x80000, CRC(3def7053) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) ) // 1 byte different to above (0x51b95 is 0x1b instead of 0x18)
-	// Possibly bad dump
-	//ROM_LOAD( "blitz00_nov30_1999.u27", 0x000000, 0x80000, CRC(4242bf14) SHA1(c1fcec67d7463df5f41afc89f22c3b4484279534) ) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
+	// Bad dump: First 3 bytes of reset vector (0x0) are FF's.  Reset vector is fixed in driver init.
+	ROM_LOAD( "blitz00_nov30_1999.u27", 0x000000, 0x80000, CRC(4242bf14) SHA1(c1fcec67d7463df5f41afc89f22c3b4484279534) BAD_DUMP) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
@@ -2148,6 +2147,14 @@ DRIVER_INIT_MEMBER(vegas_state,nbashowt)
 
 DRIVER_INIT_MEMBER(vegas_state,nbanfl)
 {
+	// The first three bytes of the blitz00_nov30_1999.u27 ROM are FF's which breaks the reset vector.
+	// These bytes are from blitz00_sep22_1999.u27 which allows the other ROM to start.
+	// The last byte which is part of the checksum is also FF. By changing it to 0x01 the 4 byte checksum matches with the other 3 changes.
+	uint8_t *romPtr = machine().root_device().memregion(PCI_ID_NILE":rom")->base();
+	romPtr[0x0] = 0xe2;
+	romPtr[0x1] = 0x00;
+	romPtr[0x2] = 0xf0;
+	romPtr[0x7ffff] = 0x01;
 }
 
 

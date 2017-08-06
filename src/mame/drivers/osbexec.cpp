@@ -580,14 +580,14 @@ static MACHINE_CONFIG_START( osbexec )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osbexec_state, osbexec_pia0_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in0_w))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in0_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in1_w))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in1_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<3>))
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("mainirq")
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
@@ -597,7 +597,7 @@ static MACHINE_CONFIG_START( osbexec )
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
 	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in2_w))
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<4>))
 
 	MCFG_DEVICE_ADD("ctc", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK / 13) // divided by 74S161 @ UC25

@@ -72,7 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(sundance_inputs_r);
 	DECLARE_READ8_MEMBER(boxingb_dial_r);
 	DECLARE_READ8_MEMBER(qb3_frame_r);
-	DECLARE_WRITE_LINE_MEMBER(qb3_ram_bank_w);
+	DECLARE_WRITE8_MEMBER(qb3_ram_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(vector_control_w);
 	DECLARE_READ8_MEMBER(joystick_read);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);

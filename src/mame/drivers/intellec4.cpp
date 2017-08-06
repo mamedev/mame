@@ -37,7 +37,6 @@
  Paper tape reader run/stop is sent to RTS on the serial port.
 
  TODO:
- * Universal slot cards
  * Expose general-purpose I/O?
  */
 #include "emu.h"
@@ -117,6 +116,11 @@ protected:
 		, m_sw_addr_data(*this, "ADDRDAT")
 		, m_sw_passes(*this, "PASSES")
 		, m_sw_prom_prgm(*this, "PROM")
+		, m_led_address(*this, "led_address_a%u_%u", 1U, 0U)
+		, m_led_instruction(*this, "led_instruction_m%u_%u", 1U, 0U)
+		, m_led_active_bank(*this, "led_active_bank_%u", 0U)
+		, m_led_execution(*this, "led_execution_x%u_%u", 2U, 0U)
+		, m_led_last_ptr(*this, "led_last_ptr_x%u_%u", 2U, 0U)
 	{
 	}
 
@@ -178,6 +182,11 @@ private:
 	required_shared_ptr<u8>     m_memory, m_status;
 	required_ioport             m_sw_control, m_sw_addr_data, m_sw_passes;
 	required_ioport             m_sw_prom_prgm;
+	output_finder<3, 4>         m_led_address;
+	output_finder<2, 4>         m_led_instruction;
+	output_finder<4>            m_led_active_bank;
+	output_finder<2, 4>         m_led_execution;
+	output_finder<2, 4>         m_led_last_ptr;
 
 	emu_timer   *m_reset_timer = nullptr;
 
@@ -197,7 +206,7 @@ private:
 
 	// front panel state
 	u16     m_latched_addr = 0U, m_display_addr = 0U;
-	u8      m_display_instr = 0U, m_display_bank = 0U, m_display_exec = 0U, m_display_ptr = 0U;
+	u8      m_display_instr = 0U, m_display_exec = 0U, m_display_ptr = 0U;
 	u8      m_pass_counter = 0U;
 	bool    m_panel_reset = false;
 	bool    m_next_inst = false, m_adr_cmp_latch = false, m_search_complete = false;
@@ -741,6 +750,12 @@ void intellec4_state::driver_start()
 {
 	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intellec4_state::reset_expired), this));
 
+	m_led_address.resolve();
+	m_led_instruction.resolve();
+	m_led_active_bank.resolve();
+	m_led_execution.resolve();
+	m_led_last_ptr.resolve();
+
 	save_item(NAME(m_ram_page));
 	save_item(NAME(m_ram_data));
 	save_item(NAME(m_ram_write));
@@ -757,7 +772,6 @@ void intellec4_state::driver_start()
 	save_item(NAME(m_latched_addr));
 	save_item(NAME(m_display_addr));
 	save_item(NAME(m_display_instr));
-	save_item(NAME(m_display_bank));
 	save_item(NAME(m_display_exec));
 	save_item(NAME(m_display_ptr));
 	save_item(NAME(m_pass_counter));
@@ -856,110 +870,68 @@ void intellec4_state::display_address(u16 value, u16 mask)
 {
 	u16 const diff((value ^ m_display_addr) & mask);
 	m_display_addr ^= diff;
-	if (BIT(diff, 0))
-		machine().output().set_value("led_address_a1_0", BIT(value, 0));
-	if (BIT(diff, 1))
-		machine().output().set_value("led_address_a1_1", BIT(value, 1));
-	if (BIT(diff, 2))
-		machine().output().set_value("led_address_a1_2", BIT(value, 2));
-	if (BIT(diff, 3))
-		machine().output().set_value("led_address_a1_3", BIT(value, 3));
-	if (BIT(diff, 4))
-		machine().output().set_value("led_address_a2_0", BIT(value, 4));
-	if (BIT(diff, 5))
-		machine().output().set_value("led_address_a2_1", BIT(value, 5));
-	if (BIT(diff, 6))
-		machine().output().set_value("led_address_a2_2", BIT(value, 6));
-	if (BIT(diff, 7))
-		machine().output().set_value("led_address_a2_3", BIT(value, 7));
-	if (BIT(diff, 8))
-		machine().output().set_value("led_address_a3_0", BIT(value, 8));
-	if (BIT(diff, 9))
-		machine().output().set_value("led_address_a3_1", BIT(value, 9));
-	if (BIT(diff, 10))
-		machine().output().set_value("led_address_a3_2", BIT(value, 10));
-	if (BIT(diff, 11))
-		machine().output().set_value("led_address_a3_3", BIT(value, 11));
+	m_led_address[0][0] = BIT(m_display_addr, 0);
+	m_led_address[0][1] = BIT(m_display_addr, 1);
+	m_led_address[0][2] = BIT(m_display_addr, 2);
+	m_led_address[0][3] = BIT(m_display_addr, 3);
+	m_led_address[1][0] = BIT(m_display_addr, 4);
+	m_led_address[1][1] = BIT(m_display_addr, 5);
+	m_led_address[1][2] = BIT(m_display_addr, 6);
+	m_led_address[1][3] = BIT(m_display_addr, 7);
+	m_led_address[2][0] = BIT(m_display_addr, 8);
+	m_led_address[2][1] = BIT(m_display_addr, 9);
+	m_led_address[2][2] = BIT(m_display_addr, 10);
+	m_led_address[2][3] = BIT(m_display_addr, 11);
 }
 
 void intellec4_state::display_instruction(u8 value, u8 mask)
 {
 	u16 const diff((value ^ m_display_instr) & mask);
 	m_display_instr ^= diff;
-	if (BIT(diff, 0))
-		machine().output().set_value("led_instruction_m2_0", BIT(value, 0));
-	if (BIT(diff, 1))
-		machine().output().set_value("led_instruction_m2_1", BIT(value, 1));
-	if (BIT(diff, 2))
-		machine().output().set_value("led_instruction_m2_2", BIT(value, 2));
-	if (BIT(diff, 3))
-		machine().output().set_value("led_instruction_m2_3", BIT(value, 3));
-	if (BIT(diff, 4))
-		machine().output().set_value("led_instruction_m1_0", BIT(value, 4));
-	if (BIT(diff, 5))
-		machine().output().set_value("led_instruction_m1_1", BIT(value, 5));
-	if (BIT(diff, 6))
-		machine().output().set_value("led_instruction_m1_2", BIT(value, 6));
-	if (BIT(diff, 7))
-		machine().output().set_value("led_instruction_m1_3", BIT(value, 7));
+	m_led_instruction[1][0] = BIT(m_display_instr, 0);
+	m_led_instruction[1][1] = BIT(m_display_instr, 1);
+	m_led_instruction[1][2] = BIT(m_display_instr, 2);
+	m_led_instruction[1][3] = BIT(m_display_instr, 3);
+	m_led_instruction[0][0] = BIT(m_display_instr, 4);
+	m_led_instruction[0][1] = BIT(m_display_instr, 5);
+	m_led_instruction[0][2] = BIT(m_display_instr, 6);
+	m_led_instruction[0][3] = BIT(m_display_instr, 7);
 }
 
 void intellec4_state::display_active_bank(u8 value)
 {
-	u8 const diff((value ^ m_display_bank) & 0x0fU);
-	m_display_bank ^= diff;
-	if (BIT(diff, 0))
-		machine().output().set_value("led_active_bank_0", BIT(value, 0));
-	if (BIT(diff, 1))
-		machine().output().set_value("led_active_bank_1", BIT(value, 1));
-	if (BIT(diff, 2))
-		machine().output().set_value("led_active_bank_2", BIT(value, 2));
-	if (BIT(diff, 3))
-		machine().output().set_value("led_active_bank_3", BIT(value, 3));
+	m_led_active_bank[0] = BIT(value, 0);
+	m_led_active_bank[1] = BIT(value, 1);
+	m_led_active_bank[2] = BIT(value, 2);
+	m_led_active_bank[3] = BIT(value, 3);
 }
 
 void intellec4_state::display_execution(u8 value, u8 mask)
 {
 	u16 const diff((value ^ m_display_exec) & mask);
 	m_display_exec ^= diff;
-	if (BIT(diff, 0))
-		machine().output().set_value("led_execution_x3_0", BIT(value, 0));
-	if (BIT(diff, 1))
-		machine().output().set_value("led_execution_x3_1", BIT(value, 1));
-	if (BIT(diff, 2))
-		machine().output().set_value("led_execution_x3_2", BIT(value, 2));
-	if (BIT(diff, 3))
-		machine().output().set_value("led_execution_x3_3", BIT(value, 3));
-	if (BIT(diff, 4))
-		machine().output().set_value("led_execution_x2_0", BIT(value, 4));
-	if (BIT(diff, 5))
-		machine().output().set_value("led_execution_x2_1", BIT(value, 5));
-	if (BIT(diff, 6))
-		machine().output().set_value("led_execution_x2_2", BIT(value, 6));
-	if (BIT(diff, 7))
-		machine().output().set_value("led_execution_x2_3", BIT(value, 7));
+	m_led_execution[1][0] = BIT(m_display_exec, 0);
+	m_led_execution[1][1] = BIT(m_display_exec, 1);
+	m_led_execution[1][2] = BIT(m_display_exec, 2);
+	m_led_execution[1][3] = BIT(m_display_exec, 3);
+	m_led_execution[0][0] = BIT(m_display_exec, 4);
+	m_led_execution[0][1] = BIT(m_display_exec, 5);
+	m_led_execution[0][2] = BIT(m_display_exec, 6);
+	m_led_execution[0][3] = BIT(m_display_exec, 7);
 }
 
 void intellec4_state::display_pointer(u8 value, u8 mask)
 {
 	u16 const diff((value ^ m_display_ptr) & mask);
 	m_display_ptr ^= diff;
-	if (BIT(diff, 0))
-		machine().output().set_value("led_last_ptr_x3_0", BIT(value, 0));
-	if (BIT(diff, 1))
-		machine().output().set_value("led_last_ptr_x3_1", BIT(value, 1));
-	if (BIT(diff, 2))
-		machine().output().set_value("led_last_ptr_x3_2", BIT(value, 2));
-	if (BIT(diff, 3))
-		machine().output().set_value("led_last_ptr_x3_3", BIT(value, 3));
-	if (BIT(diff, 4))
-		machine().output().set_value("led_last_ptr_x2_0", BIT(value, 4));
-	if (BIT(diff, 5))
-		machine().output().set_value("led_last_ptr_x2_1", BIT(value, 5));
-	if (BIT(diff, 6))
-		machine().output().set_value("led_last_ptr_x2_2", BIT(value, 6));
-	if (BIT(diff, 7))
-		machine().output().set_value("led_last_ptr_x2_3", BIT(value, 7));
+	m_led_last_ptr[1][0] = BIT(m_display_ptr, 0);
+	m_led_last_ptr[1][1] = BIT(m_display_ptr, 1);
+	m_led_last_ptr[1][2] = BIT(m_display_ptr, 2);
+	m_led_last_ptr[1][3] = BIT(m_display_ptr, 3);
+	m_led_last_ptr[0][0] = BIT(m_display_ptr, 4);
+	m_led_last_ptr[0][1] = BIT(m_display_ptr, 5);
+	m_led_last_ptr[0][2] = BIT(m_display_ptr, 6);
+	m_led_last_ptr[0][3] = BIT(m_display_ptr, 7);
 }
 
 
@@ -1209,6 +1181,7 @@ class mod40_state : public intellec4_state
 public:
 	mod40_state(machine_config const &mconfig, device_type type, char const *tag)
 		: intellec4_state(mconfig, type, tag)
+		, m_led_status_run(*this, "led_status_run")
 	{
 	}
 
@@ -1234,6 +1207,8 @@ private:
 	};
 
 	TIMER_CALLBACK_MEMBER(single_step_expired);
+
+	output_finder<> m_led_status_run;
 
 	emu_timer   *m_single_step_timer = nullptr;
 
@@ -1304,7 +1279,7 @@ WRITE_LINE_MEMBER(mod40_state::stp_ack)
 		}
 	}
 	m_stp_ack = 0 == state;
-	machine().output().set_value("led_status_run",  !m_stp_ack);
+	m_led_status_run = !m_stp_ack;
 	m_bus->stop_acknowledge_in(state);
 }
 
@@ -1337,7 +1312,7 @@ INPUT_CHANGED_MEMBER(mod40_state::sw_stop)
 	// overridden by the single-step monostable and the bus stop signal
 	if (!m_single_step)
 	{
-	   if (!m_bus_stop)
+		if (!m_bus_stop)
 			m_cpu->set_input_line(I4040_STP_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 		m_bus->stop_in(newval ? 1 : 0);
 	}
@@ -1374,6 +1349,8 @@ void mod40_state::driver_start()
 {
 	intellec4_state::driver_start();
 
+	m_led_status_run.resolve();
+
 	m_single_step_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mod40_state::single_step_expired), this));
 
 	save_item(NAME(m_stp_ack));
@@ -1403,7 +1380,7 @@ void mod40_state::driver_reset()
 	m_bus->stop_in((m_sw_stop && !m_single_step) ? 0 : 1);
 
 	// set front panel LEDs
-	machine().output().set_value("led_status_run", !m_stp_ack);
+	m_led_status_run = !m_stp_ack;
 }
 
 

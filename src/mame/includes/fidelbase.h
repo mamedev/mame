@@ -25,6 +25,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u", 0U, 0U),
+		m_out_a(*this, "%u.a", 0U),
+		m_out_digit(*this, "digit%u", 0U),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
 		m_dac(*this, "dac"),
@@ -37,6 +40,9 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<11> m_inp_matrix; // max 11
+	output_finder<0x20, 0x20> m_out_x;
+	output_finder<0x20> m_out_a;
+	output_finder<0x20> m_out_digit;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
 	optional_device<dac_bit_interface> m_dac;
@@ -61,7 +67,6 @@ public:
 
 	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
 	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u32 m_display_cache[0x20];      // (internal use)
 	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);

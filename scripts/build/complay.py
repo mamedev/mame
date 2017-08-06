@@ -101,8 +101,10 @@ class LayoutChecker(Minifyer):
         self.locator = None
         self.errors = 0
         self.elements = { }
+        self.groups = { }
         self.views = { }
-        self.referenced = { }
+        self.referenced_elements = { }
+        self.referenced_groups = { }
         self.have_bounds = [ ]
         self.have_color = [ ]
 
@@ -163,6 +165,38 @@ class LayoutChecker(Minifyer):
             except:
                 self.handleError('Element color attribute %s "%s" is not numeric' % (name, attrs[name]))
 
+    def checkGroupViewItem(self, name, attrs):
+        if name in self.OBJECTS:
+            if 'element' not in attrs:
+                self.handleError('Element %s missing attribute element', (name, ))
+            elif attrs['element'] not in self.referenced_elements:
+                self.referenced_elements[attrs['element']] = self.formatLocation()
+            self.in_object = True
+            self.have_bounds.append(False)
+        elif 'screen' == name:
+            if 'index' in attrs:
+                try:
+                    index = long(attrs['index'])
+                    if 0 > index:
+                        self.handleError('Element screen attribute index "%s" is negative' % (attrs['index'], ))
+                except:
+                    self.handleError('Element screen attribute index "%s" is not an integer' % (attrs['index'], ))
+            self.in_object = True
+            self.have_bounds.append(False)
+        elif 'group' == name:
+            if 'ref' not in attrs:
+                self.handleError('Element group missing attribute ref')
+            elif attrs['ref'] not in self.referenced_groups:
+                self.referenced_groups[attrs['ref']] = self.formatLocation()
+            self.in_object = True
+            self.have_bounds.append(False)
+        elif 'bounds' == name:
+            self.checkBounds(attrs)
+            self.ignored_depth = 1
+        else:
+            self.handleError('Encountered unexpected element %s' % (name, ))
+            self.ignored_depth = 1
+
     def setDocumentLocator(self, locator):
         self.locator = locator
         super(LayoutChecker, self).setDocumentLocator(locator)
@@ -170,6 +204,7 @@ class LayoutChecker(Minifyer):
     def startDocument(self):
         self.in_layout = False
         self.in_element = False
+        self.in_group = False
         self.in_view = False
         self.in_shape = False
         self.in_object = False
@@ -179,8 +214,10 @@ class LayoutChecker(Minifyer):
     def endDocument(self):
         self.locator = None
         self.elements.clear()
+        self.groups.clear()
         self.views.clear()
-        self.referenced.clear()
+        self.referenced_elements.clear()
+        self.referenced_groups.clear()
         del self.have_bounds[:]
         del self.have_color[:]
         super(LayoutChecker, self).endDocument()
@@ -238,29 +275,8 @@ class LayoutChecker(Minifyer):
                 self.have_color.append(False)
             else:
                 self.ignored_depth = 1
-        elif self.in_view:
-            if name in self.OBJECTS:
-                if 'element' not in attrs:
-                    self.handleError('Element %s missing attribute element', (name, ))
-                elif attrs['element'] not in self.referenced:
-                    self.referenced[attrs['element']] = self.formatLocation()
-                self.in_object = True
-                self.have_bounds.append(False)
-            elif 'screen' == name:
-                if 'index' in attrs:
-                    try:
-                        index = long(attrs['index'])
-                        if 0 > index:
-                            self.handleError('Element screen attribute index "%s" is negative' % (attrs['index'], ))
-                    except:
-                        self.handleError('Element screen attribute index "%s" is not an integer' % (attrs['index'], ))
-                self.in_object = True
-                self.have_bounds.append(False)
-            elif 'bounds' == name:
-                self.checkBounds(attrs)
-                self.ignored_depth = 1
-            else:
-                self.ignored_depth = 1
+        elif self.in_group or self.in_view:
+            self.checkGroupViewItem(name, attrs)
         elif 'element' == name:
             if 'name' not in attrs:
                 self.handleError('Element element missing attribute name')
@@ -270,6 +286,16 @@ class LayoutChecker(Minifyer):
                 else:
                     self.elements[attrs['name']] = self.formatLocation()
             self.in_element = True
+        elif 'group' == name:
+            if 'name' not in attrs:
+                self.handleError('Element group missing attribute name')
+            else:
+                if attrs['name'] in self.groups:
+                    self.handleError('Element group has duplicate name (previous %s)' % (self.groups[attrs['name']], ))
+                else:
+                    self.groups[attrs['name']] = self.formatLocation()
+            self.in_group = True
+            self.have_bounds.append(False)
         elif 'view' == name:
             if 'name' not in attrs:
                 self.handleError('Element view missing attribute name')
@@ -280,7 +306,10 @@ class LayoutChecker(Minifyer):
                     self.views[attrs['name']] = self.formatLocation()
             self.in_view = True
             self.have_bounds.append(False)
+        elif 'script' == name:
+            self.ignored_depth = 1
         else:
+            self.handleError('Encountered unexpected element %s' % (name, ))
             self.ignored_depth = 1
         super(LayoutChecker, self).startElement(name, attrs)
 
@@ -296,13 +325,19 @@ class LayoutChecker(Minifyer):
             self.have_color.pop()
         elif self.in_element:
             self.in_element = False
+        elif self.in_group:
+            self.in_group = False
+            self.have_bounds.pop()
         elif self.in_view:
             self.in_view = False
             self.have_bounds.pop()
         elif self.in_layout:
-            for element in self.referenced:
+            for element in self.referenced_elements:
                 if element not in self.elements:
-                    self.handleError('Element "%s" not found (first referenced at %s)' % (element, self.referenced[element]))
+                    self.handleError('Element "%s" not found (first referenced at %s)' % (element, self.referenced_elements[element]))
+            for group in self.referenced_groups:
+                if group not in self.groups:
+                    self.handleError('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
             self.in_layout = False
         super(LayoutChecker, self).endElement(name)
 

@@ -85,7 +85,6 @@ Needed roms:
 - Head to Head Baseball      (ever finished/released?, by Nintendo, 1986)
 - Lionex                     (prototype by Sunsoft, 1987)
 - Madura no Tsubasa          (prototype by Sunsoft, 1987)
-- Predators                  (prototype by Williams, 1984)
 - Pro Yakyuu Family Stadium  (by Namco, 1986; Japan version of RBI Baseball)
 - Quest of Ki                (by Namco/Game Studio, 1988)
 - Super Chinese              (by Namco/Culture Brain, 1988)

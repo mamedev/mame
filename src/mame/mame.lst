@@ -1271,6 +1271,7 @@ mprof3                          // Microprofessor III
 prav8c                          // Pravetz 8C
 tk3000                          // Microdigital TK3000
 spectred
+ceci							// China Education Computer-I
 
 @source:apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
@@ -9931,7 +9932,8 @@ captcommu                       // 28/09/1991 (c) 1991 (USA)
 cawing                          // 12/10/1990 (c) 1990 (World)
 cawingj                         // 12/10/1990 (c) 1990 (Japan)
 cawingr1                        // 09/10/1990 (c) 1990 (World)
-cawingu                         // 12/10/1990 (c) 1990 (USA)
+cawingu                         // 30/11/1990 (c) 1990 (USA)
+cawingur1                       // 12/10/1990 (c) 1990 (USA)
 chikij                          // 19/06/1990 (c) 1990 (Japan)
 cworld2j                        // 11/06/1992 (c) 1992 (Japan)
 cworld2ja                       // 11/06/1992 (c) 1992 (Japan)
@@ -10526,13 +10528,16 @@ csplayh7                        // (c) 1999
 fuudol                          // (c) 2000
 junai                           // (c) 1998
 junai2                          // (c) 1998
+konhaji							// (c) 2001
 mogitate                        // (c) 1998
-nichidvd                        //
-nichisel                        // (c) 2000
 mjgalpri                        // (c) 1998
 mjmania                         // (c) 1999
+nichidvd                        //
+nichisel                        // (c) 2000
+nuretemi						// (c) 2000
 pokoachu                        // (c) 1999
 renaimj                         // (c) 1999
+sengomjk						// (c) 1998
 thenanpa                        // (c) 1999
 tsuwaku                         // (c) 2000
 
@@ -16995,8 +17000,9 @@ blazeon                         // (c) 1992 Atlus
 bloodwar                        // (c) 1994 Kaneko
 bonkadv                         // (c) 1994 Kaneko
 brapboys                        // (c) 1992 Kaneko
-brapboysj                       // (c) 1992 Kaneko
-brapboysu                       // (c) 1992 Kaneko
+brapboysp                       // (c) 1992 Kaneko
+brapboyspj                      // (c) 1992 Kaneko
+brapboyspu                      // (c) 1992 Kaneko
 explbrkr                        // (c) 1992 Kaneko
 fjbuster                        // (c) 1992 Kaneko
 gtmr                            // (c) 1994 Kaneko
@@ -17061,6 +17067,9 @@ karatevs                        // (c) 1984 Data East Corporation (Japan)
 kchamp                          // (c) 1984 Data East USA (US)
 kchampvs                        // (c) 1984 Data East USA (US)
 kchampvs2                       // (c) 1984 Data East USA (US)
+
+@source:kdt6.cpp
+psi98							// (c) 1984 Kontron
 
 @source:kenseim.cpp
 kenseim                         // 18/04/1994 (c) 1994 Togo/Sigma (Japan) not listed on Capcom's site
@@ -17228,6 +17237,9 @@ kramermc                        // 1987 Kramer MC
 
 @source:kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
+
+@source:krz2000.cpp
+k2000							// (c) 1990 Kurzweil Music Systems
 
 @source:ksayakyu.cpp
 ksayakyu                        // ??? (c) 1985 Taito Corporation
@@ -17834,6 +17846,7 @@ dbreed                          // (c) 1989
 dbreedm72                       // (c) 1989
 dkgensan                        // (c) 1990 (Japan)
 dkgensanm72                     // (c) 1990 (Japan)
+dkgensanm82                     // (c) 1990 (Japan)
 gallop                          // (c) 1991 (Japan)
 hharry                          // (c) 1990 (World)
 hharryu                         // (c) 1990 Irem America (US)
@@ -30941,7 +30954,8 @@ ddp2hk                          //
 ddp2j                           //
 ddp2k                           //
 ddp2t                           //
-ddpdoj                          // (c) 2002 DoDonPachi Dai-Ou-Jou
+ddp3							// (c) 2002 DoDonPachi Dai-Ou-Jou / DoDonPachi III
+ddpdoj                          // 
 ddpdoja                         //
 ddpdojb                         //
 ddpdojblk                       //
@@ -33774,6 +33788,7 @@ sfj                             // 8/1987 (c) 1987 (Japan)
 sfjan
 sfp                             // 8/1987 (c) 1987
 sfua                            // 8/1987 (c) 1987 (US)
+sfw                             // 8/1987 (c) 1987 (World)
 
 @source:sfbonus.cpp
 abnudge                         // (c) 2003 Amcoe - Animal Bonus Nudge
@@ -36950,6 +36965,9 @@ uts20                           //
 
 @source:unixpc.cpp
 3b1                             // 3B1 "Unix PC"
+
+@source:unkfr.cpp
+unkfr                           // 1998?
 
 @source:unkhorse.cpp
 unkhorse                        //

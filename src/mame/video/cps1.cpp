@@ -1461,7 +1461,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"nemoj",       CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B, still not dumped
 	{"cawing",      CPS_B_16,     mapper_CA24B },
 	{"cawingr1",    CPS_B_16,     mapper_CA24B },
-	{"cawingu",     CPS_B_16,     mapper_CA24B },
+	{"cawingu",     CPS_B_05,     mapper_CA22B },   // equivalent to CA24B
+	{"cawingur1",   CPS_B_16,     mapper_CA24B },
 	{"cawingj",     CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
 	{"cawingbl",    CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
 	{"sf2",         CPS_B_11,     mapper_STF29,  0x36 },

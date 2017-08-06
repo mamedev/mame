@@ -114,41 +114,41 @@
 	<view name="Internal Layout">
 		<bounds left="0.4" right="21" top="-0.2" bottom="12.2" />
 
-		<bezel name="lamp124" element="text_purse"><bounds x="4" y="0" width="5" height="1" /></bezel>
-		<bezel name="lamp101" element="text_curyear"><bounds x="0" y="1" width="10" height="1" /></bezel>
-		<bezel name="lamp123" element="text_lastrace"><bounds x="0" y="2" width="10" height="1" /></bezel>
-		<bezel name="lamp102" element="text_pastyear"><bounds x="0" y="3" width="10" height="1" /></bezel>
-		<bezel name="lamp122" element="text_2rb"><bounds x="0" y="4" width="10" height="1" /></bezel>
-		<bezel name="lamp103" element="text_rsl"><bounds x="0" y="5" width="10" height="1" /></bezel>
-		<bezel name="lamp121" element="text_3rb"><bounds x="0" y="6" width="10" height="1" /></bezel>
-		<bezel name="lamp104" element="text_distance"><bounds x="0" y="7" width="6" height="1" /></bezel>
+		<bezel name="1.23" element="text_purse"><bounds x="4" y="0" width="5" height="1" /></bezel>
+		<bezel name="1.0"  element="text_curyear"><bounds x="0" y="1" width="10" height="1" /></bezel>
+		<bezel name="1.22" element="text_lastrace"><bounds x="0" y="2" width="10" height="1" /></bezel>
+		<bezel name="1.1"  element="text_pastyear"><bounds x="0" y="3" width="10" height="1" /></bezel>
+		<bezel name="1.21" element="text_2rb"><bounds x="0" y="4" width="10" height="1" /></bezel>
+		<bezel name="1.2"  element="text_rsl"><bounds x="0" y="5" width="10" height="1" /></bezel>
+		<bezel name="1.20" element="text_3rb"><bounds x="0" y="6" width="10" height="1" /></bezel>
+		<bezel name="1.3"  element="text_distance"><bounds x="0" y="7" width="6" height="1" /></bezel>
 
-		<bezel name="lamp224" element="text_postpos"><bounds x="8" y="0" width="8" height="1" /></bezel>
-		<bezel name="lamp201" element="text_lback"><bounds x="6" y="1" width="10" height="1" /></bezel>
-		<bezel name="lamp223" element="text_races"><bounds x="6" y="2" width="10" height="1" /></bezel>
-		<bezel name="lamp202" element="text_1call"><bounds x="6" y="3" width="10" height="1" /></bezel>
-		<bezel name="lamp222" element="text_wins"><bounds x="6" y="4" width="10" height="1" /></bezel>
-		<bezel name="lamp203" element="text_2call"><bounds x="6" y="5" width="10" height="1" /></bezel>
-		<bezel name="lamp221" element="text_daysaway"><bounds x="6" y="6" width="10" height="1" /></bezel>
-		<bezel name="lamp204" element="text_2bsr"><bounds x="4.5" y="7" width="10" height="1" /></bezel>
+		<bezel name="2.23" element="text_postpos"><bounds x="8" y="0" width="8" height="1" /></bezel>
+		<bezel name="2.0"  element="text_lback"><bounds x="6" y="1" width="10" height="1" /></bezel>
+		<bezel name="2.22" element="text_races"><bounds x="6" y="2" width="10" height="1" /></bezel>
+		<bezel name="2.1"  element="text_1call"><bounds x="6" y="3" width="10" height="1" /></bezel>
+		<bezel name="2.21" element="text_wins"><bounds x="6" y="4" width="10" height="1" /></bezel>
+		<bezel name="2.2"  element="text_2call"><bounds x="6" y="5" width="10" height="1" /></bezel>
+		<bezel name="2.20" element="text_daysaway"><bounds x="6" y="6" width="10" height="1" /></bezel>
+		<bezel name="2.3"  element="text_2bsr"><bounds x="4.5" y="7" width="10" height="1" /></bezel>
 
-		<bezel name="lamp1"  element="text_places"><bounds x="12" y="1" width="10" height="1" /></bezel>
-		<bezel name="lamp23" element="text_3call"><bounds x="12" y="2" width="10" height="1" /></bezel>
-		<bezel name="lamp2"  element="text_shows"><bounds x="12" y="3" width="10" height="1" /></bezel>
-		<bezel name="lamp22" element="text_finish"><bounds x="12" y="4" width="10" height="1" /></bezel>
-		<bezel name="lamp3"  element="text_earnings"><bounds x="12" y="5" width="10" height="1" /></bezel>
-		<bezel name="lamp21" element="text_finpos"><bounds x="12" y="6" width="10" height="1" /></bezel>
-		<bezel name="lamp4"  element="text_oflast5"><bounds x="12.25" y="7" width="10" height="1" /></bezel>
+		<bezel name="0.0"  element="text_places"><bounds x="12" y="1" width="10" height="1" /></bezel>
+		<bezel name="0.22" element="text_3call"><bounds x="12" y="2" width="10" height="1" /></bezel>
+		<bezel name="0.1"  element="text_shows"><bounds x="12" y="3" width="10" height="1" /></bezel>
+		<bezel name="0.23" element="text_finish"><bounds x="12" y="4" width="10" height="1" /></bezel>
+		<bezel name="0.2"  element="text_earnings"><bounds x="12" y="5" width="10" height="1" /></bezel>
+		<bezel name="0.20" element="text_finpos"><bounds x="12" y="6" width="10" height="1" /></bezel>
+		<bezel name="0.3"  element="text_oflast5"><bounds x="12.25" y="7" width="10" height="1" /></bezel>
 
-		<bezel name="digit3" element="digit"><bounds x="4" y="8.2" width="2" height="3" /></bezel>
-		<bezel name="digit5" element="digit"><bounds x="6" y="8.2" width="2" height="3" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="8" y="8.2" width="2" height="3" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="10" y="8.2" width="2" height="3" /></bezel>
-		<bezel name="digit4" element="digit"><bounds x="12" y="8.2" width="2" height="3" /></bezel>
-		<bezel name="digit0" element="digit"><bounds x="14" y="8.2" width="2" height="3" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="4" y="8.2" width="2" height="3" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="6" y="8.2" width="2" height="3" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="8" y="8.2" width="2" height="3" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="10" y="8.2" width="2" height="3" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="12" y="8.2" width="2" height="3" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="14" y="8.2" width="2" height="3" /></bezel>
 
-		<bezel name="lamp120" element="text_postpos"><bounds x="2.5" y="11.3" width="6" height="0.66" /></bezel>
-		<bezel name="lamp20" element="text_rating"><bounds x="10.5" y="11.3" width="6" height="0.66" /></bezel>
+		<bezel name="1.19" element="text_postpos"><bounds x="2.5" y="11.3" width="6" height="0.66" /></bezel>
+		<bezel name="0.19" element="text_rating"><bounds x="10.5" y="11.3" width="6" height="0.66" /></bezel>
 
 	</view>
 </mamelayout>

@@ -17,6 +17,7 @@
 #include "softlist.h"
 #include "emuopts.h"
 
+
 namespace ui {
 
 namespace {
@@ -46,30 +47,71 @@ constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
 
 
 //-------------------------------------------------
-//  machine_static_info - constructor
+//  machine_static_info - constructors
 //-------------------------------------------------
 
-
 machine_static_info::machine_static_info(machine_config const &config)
+	: machine_static_info(config, nullptr)
+{
+}
+
+machine_static_info::machine_static_info(machine_config const &config, ioport_list const &ports)
+	: machine_static_info(config, &ports)
+{
+}
+
+machine_static_info::machine_static_info(machine_config const &config, ioport_list const *ports)
 	: m_flags(config.gamedrv().flags)
 	, m_unemulated_features(config.gamedrv().type.unemulated_features())
 	, m_imperfect_features(config.gamedrv().type.imperfect_features())
 	, m_has_bioses(false)
+	, m_has_dips(false)
+	, m_has_configs(false)
+	, m_has_keyboard(false)
+	, m_has_test_switch(false)
+	, m_has_analog(false)
 {
-
-	// build overall emulation status and look for BIOS options
+	ioport_list local_ports;
+	std::string sink;
 	for (device_t &device : device_iterator(config.root_device()))
 	{
+		// the "no sound hardware" warning doesn't make sense when you plug in a sound card
 		if (dynamic_cast<device_sound_interface *>(&device))
 			m_flags &= ~::machine_flags::NO_SOUND_HW;
 
+		// build overall emulation status
 		m_unemulated_features |= device.type().unemulated_features();
 		m_imperfect_features |= device.type().imperfect_features();
 
-		for (const rom_entry &rom : device.rom_region_vector())
+		// look for BIOS options
+		for (rom_entry const &rom : device.rom_region_vector())
 			if (ROMENTRY_ISSYSTEM_BIOS(&rom)) { m_has_bioses = true; break; }
+
+		// if we don't have ports passed in, build here
+		if (!ports)
+			local_ports.append(device, sink);
 	}
+
+	// unemulated trumps imperfect when aggregating (always be pessimistic)
 	m_imperfect_features &= ~m_unemulated_features;
+
+	// scan the input port array to see what options we need to enable
+	for (ioport_list::value_type const &port : (ports ? *ports : local_ports))
+	{
+		for (ioport_field const &field : port.second->fields())
+		{
+			switch (field.type())
+			{
+			case IPT_DIPSWITCH: m_has_dips = true;          break;
+			case IPT_CONFIG:    m_has_configs = true;       break;
+			case IPT_KEYBOARD:  m_has_keyboard = true;      break;
+			case IPT_SERVICE:   m_has_test_switch = true;   break;
+			default: break;
+			}
+			if (field.is_analog())
+				m_has_analog = true;
+		}
+	}
 }
 
 
@@ -111,31 +153,9 @@ rgb_t machine_static_info::warnings_color() const
 //-------------------------------------------------
 
 machine_info::machine_info(running_machine &machine)
-	: machine_static_info(machine.config())
+	: machine_static_info(machine.config(), machine.ioport().ports())
 	, m_machine(machine)
-	, m_has_configs(false)
-	, m_has_analog(false)
-	, m_has_dips(false)
-	, m_has_keyboard(false)
-	, m_has_test_switch(false)
 {
-	// scan the input port array to see what options we need to enable
-	for (auto &port : machine.ioport().ports())
-	{
-		for (ioport_field &field : port.second->fields())
-		{
-			switch (field.type())
-			{
-			case IPT_DIPSWITCH: m_has_dips = true;          break;
-			case IPT_CONFIG:    m_has_configs = true;       break;
-			case IPT_KEYBOARD:  m_has_keyboard = true;      break;
-			case IPT_SERVICE:   m_has_test_switch = true;   break;
-			default: break;
-			}
-			if (field.is_analog())
-				m_has_analog = true;
-		}
-	}
 }
 
 

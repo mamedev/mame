@@ -270,7 +270,7 @@ READ8_MEMBER(cinemat_state::qb3_frame_r)
 }
 
 
-WRITE_LINE_MEMBER(cinemat_state::qb3_ram_bank_w)
+WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
 {
 	membank("bank1")->set_entry(m_maincpu->state_int(ccpu_cpu_device::CCPU_P) & 3);
 }
@@ -320,6 +320,12 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
 	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
 
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( io_map_qb3, AS_IO, 8, cinemat_state )
+	AM_RANGE(0x00, 0x00) AM_WRITE(qb3_ram_bank_w)
+	AM_RANGE(0x0f, 0x0f) AM_READ(qb3_frame_r)
+	AM_IMPORT_FROM(io_map)
 ADDRESS_MAP_END
 
 
@@ -1115,12 +1121,10 @@ static MACHINE_CONFIG_DERIVED( qb3, cinemat_jmi_32k )
 	MCFG_FRAGMENT_ADD(qb3_sound)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(data_map_qb3)
+	MCFG_CPU_IO_MAP(io_map_qb3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_qb3color)
-
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, qb3_ram_bank_w))
 MACHINE_CONFIG_END
 
 
@@ -1451,8 +1455,6 @@ DRIVER_INIT_MEMBER(cinemat_state,boxingb)
 
 DRIVER_INIT_MEMBER(cinemat_state,qb3)
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x0f, 0x0f, read8_delegate(FUNC(cinemat_state::qb3_frame_r),this));
-
 	membank("bank1")->configure_entries(0, 4, m_rambase, 0x100*2);
 }
 
