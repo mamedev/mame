@@ -6041,10 +6041,10 @@ ROM_END
 /* B-Board 89625B-1 */
 ROM_START( cawingu )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "cau_36.12f",  0x00000, 0x20000, CRC(c2574c0c) SHA1(dc74a02cc81f7ef283e4c750b1f3c08a85c7f9a4) )
-	ROM_LOAD16_BYTE( "cau_42.12h",  0x00001, 0x20000, CRC(d89e00be) SHA1(4c64648f0f80c7e85170a50f5e558a100b937c8f) )
-	ROM_LOAD16_BYTE( "cau_37.13f",  0x40000, 0x20000, CRC(8e6d4f8a) SHA1(dd9c429e753b8e4c10a16f5121ebd727c7c653a4) )
-	ROM_LOAD16_BYTE( "cau_43.13h",  0x40001, 0x20000, CRC(ece07955) SHA1(46e3f0123c9f651b3d7c3798938ca14dd0227f76) )
+	ROM_LOAD16_BYTE( "cau_36.12f",  0x00000, 0x20000, CRC(c2574c0c) SHA1(dc74a02cc81f7ef283e4c750b1f3c08a85c7f9a4) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_42.12h",  0x00001, 0x20000, CRC(d89e00be) SHA1(4c64648f0f80c7e85170a50f5e558a100b937c8f) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_37.13f",  0x40000, 0x20000, CRC(8e6d4f8a) SHA1(dd9c429e753b8e4c10a16f5121ebd727c7c653a4) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_43.13h",  0x40001, 0x20000, CRC(ece07955) SHA1(46e3f0123c9f651b3d7c3798938ca14dd0227f76) )   // these 4 had a red stripe across label
 	ROM_LOAD16_BYTE( "cau_34.10f",  0x80000, 0x20000, CRC(5fda906e) SHA1(7b3ef17d494a2f92e58ab7e34a3beaad8c149fca) )
 	ROM_LOAD16_BYTE( "cau_40.10h",  0x80001, 0x20000, CRC(736c1835) SHA1(a91f479fab30603a111304adc0478d430faa80fc) )
 	ROM_LOAD16_BYTE( "cau_35.11f",  0xc0000, 0x20000, CRC(74c2ddf0) SHA1(df1b50649fdad9cc57dfddbf12345056a2f1d121) )
@@ -6084,7 +6084,7 @@ ROM_START( cawingu )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "ca22b.1a",     0x0000, 0x0117, CRC(5152e678) SHA1(ac61df30cd073b26f2145e3ea0c513ec804d047a) )
+	ROM_LOAD( "ca22b.1a",     0x0000, 0x0117, CRC(5152e678) SHA1(ac61df30cd073b26f2145e3ea0c513ec804d047a) )   // photo shows this to be labeled CA222B
 	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )    /* seen the same pcb with LWIO.12E */
 ROM_END
 
