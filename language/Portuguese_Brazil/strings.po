@@ -55,7 +55,9 @@ msgstr "Ler esta imagem, escrever para diff"
 msgid ""
 "%s\n"
 " added to favorites list."
-msgstr " adicionado à lista de favoritos."
+msgstr ""
+"%s\n"
+" adicionado à lista de favoritos."
 
 #: src/frontend/mame/ui/selgame.cpp:384 src/frontend/mame/ui/selgame.cpp:393
 #: src/frontend/mame/ui/selsoft.cpp:242
@@ -63,7 +65,9 @@ msgstr " adicionado à lista de favoritos."
 msgid ""
 "%s\n"
 " removed from favorites list."
-msgstr " removido da lista de favoritos."
+msgstr ""
+"%s\n"
+" removido da lista de favoritos."
 
 #: src/frontend/mame/ui/selgame.cpp:593
 #: src/frontend/mame/ui/simpleselgame.cpp:272
@@ -149,7 +153,7 @@ msgstr "Som\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1230
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Som\tImperfeitos\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1232
 msgid "Sound\tOK\n"
@@ -513,11 +517,11 @@ msgstr "Exibir visualização de DATs"
 
 #: src/frontend/mame/ui/selmenu.cpp:126
 msgid "Command"
-msgstr ""
+msgstr "Command"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "Gameinit"
-msgstr ""
+msgstr "Gameinit"
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "High Scores"
@@ -525,11 +529,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "History"
-msgstr ""
+msgstr "História"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "MAMEinfo"
-msgstr ""
+msgstr "MAMEinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MARPScore"
@@ -537,15 +541,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MESSinfo"
-msgstr ""
+msgstr "MESSinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "Mamescore"
-msgstr ""
+msgstr "MAMEscore"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Sysinfo"
-msgstr ""
+msgstr "Sysinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:250 src/frontend/mame/ui/selmenu.cpp:270
 msgid "Software part selection:"
@@ -658,7 +662,7 @@ msgstr " (padrão)"
 
 #: src/frontend/mame/ui/selmenu.cpp:2404
 msgid "General Info"
-msgstr ""
+msgstr "Información general"
 
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
@@ -1251,14 +1255,15 @@ msgstr ""
 msgid ""
 "There are known problems with this machine\n"
 "\n"
-msgstr "Existem problemas conhecidos com esta máquina"
+msgstr ""
+"Existem problemas conhecidos com esta máquina\n"
+"\n"
 
 #: src/frontend/mame/ui/info.cpp:192
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
-"Uma ou mais ROMs/CHDs para esta máquina não foram corretamente dumpadas. \n"
-" "
+"Uma ou mais ROMs/CHDs para esta máquina não foram corretamente dumpadas.\n"
 
 #: src/frontend/mame/ui/info.cpp:197
 msgid "Completely unemulated features: "
@@ -1323,7 +1328,7 @@ msgid ""
 msgstr ""
 "Elementos desta máquina não podem ser emulados pois necessitam de interação "
 "física ou consistem em ser dispositivos mecânicos. Não é possível ter uma "
-"experiência completa com esta máquina .\n"
+"experiência completa com esta máquina.\n"
 
 #: src/frontend/mame/ui/info.cpp:262
 #, c-format
@@ -1331,14 +1336,20 @@ msgid ""
 "\n"
 "\n"
 "There are working clones of this machine: %s"
-msgstr "Existem clones funcionando com esta máquina: %s"
+msgstr ""
+"\n"
+"\n"
+"Existem clones funcionando com esta máquina: %s"
 
 #: src/frontend/mame/ui/info.cpp:275
 msgid ""
 "\n"
 "\n"
 "Press any key to continue"
-msgstr "Pressione qualquer tecla para continuar"
+msgstr ""
+"\n"
+"\n"
+"Pressione qualquer tecla para continuar"
 
 #: src/frontend/mame/ui/info.cpp:290
 #, c-format
@@ -1367,17 +1378,21 @@ msgstr "kHz"
 msgid ""
 "\n"
 "Sound:\n"
-msgstr "Som:"
+msgstr ""
+"\n"
+"Som:\n"
 
 #: src/frontend/mame/ui/info.cpp:367
 msgid ""
 "\n"
 "Video:\n"
-msgstr "Vídeo:"
+msgstr ""
+"\n"
+"Vídeo:\n"
 
 #: src/frontend/mame/ui/info.cpp:371
 msgid "None\n"
-msgstr "Nada"
+msgstr "Nada\n"
 
 #: src/frontend/mame/ui/info.cpp:378
 msgid "Vector"
@@ -1935,14 +1950,18 @@ msgstr "Emulado"
 msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
 "\n"
-msgstr "Tempo em execução: %1$d:%2$02d:%3$02d\n"
+msgstr ""
+"Tempo em execução: %1$d:%2$02d:%3$02d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:241
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d\n"
 "\n"
-msgstr "Tempo em execução: %1$d:%2$02d\n"
+msgstr ""
+"Tempo em execução: %1$d:%2$02d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:245
 #, c-format
@@ -2392,24 +2411,3 @@ msgstr "Sem"
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "Gfx: %s, Som: %s"
-
-#~ msgid "Bios selection:"
-#~ msgstr "Seleção da Bios"
-
-#~ msgid "Som\tImperfect\n"
-#~ msgstr "Som\tImperfeito\n"
-
-#~ msgid "Driver is Bios\t%1$s\n"
-#~ msgstr "Driver é Bios\t%1$s\n"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Pular menu de seleção da bios"
-
-#~ msgid "Bios"
-#~ msgstr "Bios"
-
-#~ msgid "This machine has no bios."
-#~ msgstr "Esta máquina não possui Bios"
-
-#~ msgid "Bios Selection"
-#~ msgstr "Seleção da Bios"

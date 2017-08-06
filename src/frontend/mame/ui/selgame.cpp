@@ -252,29 +252,7 @@ void menu_select_game::handle()
 			else if (ui_globals::rpanel == RP_INFOS)
 			{
 				// Infos
-				if (!isfavorite())
-				{
-					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view > 0)
-					{
-						ui_globals::curdats_view--;
-						m_topline_datsview = 0;
-					}
-				}
-				else
-				{
-					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view > 0)
-					{
-						ui_globals::curdats_view--;
-						m_topline_datsview = 0;
-					}
-					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
-					{
-						ui_globals::cur_sw_dats_view--;
-						m_topline_datsview = 0;
-					}
-				}
+				change_info_pane(-1);
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_RIGHT)
@@ -290,29 +268,7 @@ void menu_select_game::handle()
 			else if (ui_globals::rpanel == RP_INFOS)
 			{
 				// Infos
-				if (!isfavorite())
-				{
-					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
-					{
-						ui_globals::curdats_view++;
-						m_topline_datsview = 0;
-					}
-				}
-				else
-				{
-					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
-					{
-						ui_globals::curdats_view++;
-						m_topline_datsview = 0;
-					}
-					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
-					{
-						ui_globals::cur_sw_dats_view++;
-						m_topline_datsview = 0;
-					}
-				}
+				change_info_pane(1);
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > FILTER_FIRST)
@@ -1059,6 +1015,41 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 			}
 			break;
 		}
+	}
+}
+
+//-------------------------------------------------
+//  change what's displayed in the info box
+//-------------------------------------------------
+
+void menu_select_game::change_info_pane(int delta)
+{
+	auto const cap_delta = [this, &delta] (uint8_t &current, uint8_t &total)
+	{
+		if ((0 > delta) && (-delta > current))
+			delta = -int(unsigned(current));
+		else if ((0 < delta) && ((current + unsigned(delta)) >= total))
+			delta = int(unsigned(total - current - 1));
+		if (delta)
+		{
+			current += delta;
+			m_topline_datsview = 0;
+		}
+	};
+	game_driver const *drv;
+	ui_software_info const *soft;
+	get_selection(soft, drv);
+	if (!isfavorite())
+	{
+		if (uintptr_t(drv) > skip_main_items)
+			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
+	}
+	else if (uintptr_t(soft) > skip_main_items)
+	{
+		if (soft->startempty)
+			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
+		else
+			cap_delta(ui_globals::cur_sw_dats_view, ui_globals::cur_sw_dats_total);
 	}
 }
 

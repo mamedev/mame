@@ -279,7 +279,7 @@ msgstr "Soporta cóctel\t%1$s\n"
 #: src/frontend/mame/ui/selgame.cpp:1288
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "El controlador es una BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1289
 #, c-format
@@ -522,11 +522,11 @@ msgstr "Mostrar vista de DATs"
 
 #: src/frontend/mame/ui/selmenu.cpp:126
 msgid "Command"
-msgstr ""
+msgstr "Orden"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "Gameinit"
-msgstr ""
+msgstr "Inicio de partida"
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "High Scores"
@@ -534,11 +534,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "History"
-msgstr ""
+msgstr "Historial"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "MAMEinfo"
-msgstr ""
+msgstr "Información de MAME"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MARPScore"
@@ -546,15 +546,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MESSinfo"
-msgstr ""
+msgstr "Información de MESS"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "Mamescore"
-msgstr ""
+msgstr "Puntuación MAME"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Sysinfo"
-msgstr ""
+msgstr "Información del sistema"
 
 #: src/frontend/mame/ui/selmenu.cpp:250 src/frontend/mame/ui/selmenu.cpp:270
 msgid "Software part selection:"
@@ -562,7 +562,7 @@ msgstr "Selección de partes de software:"
 
 #: src/frontend/mame/ui/selmenu.cpp:373 src/frontend/mame/ui/selmenu.cpp:393
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Selección de BIOS:"
 
 #: src/frontend/mame/ui/selmenu.cpp:647 src/frontend/mame/ui/selmenu.cpp:683
 #: src/frontend/mame/ui/simpleselgame.cpp:340
@@ -667,7 +667,7 @@ msgstr " (predeterminado)"
 
 #: src/frontend/mame/ui/selmenu.cpp:2404
 msgid "General Info"
-msgstr ""
+msgstr "Información general"
 
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
@@ -1476,7 +1476,7 @@ msgstr "Control de cinta"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "Selección de BIOS"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1597,8 +1597,7 @@ msgstr "Ajustes tipográficos de interfaz"
 #: src/frontend/mame/ui/custui.cpp:392
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
-"Texto de ejemplo - Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-"La cigüeña olía el paté de atún del camión más lejano."
+"Texto de ejemplo - La cigüeña olía el paté de atún del camión más lejano."
 
 #: src/frontend/mame/ui/custui.cpp:490
 msgid "Normal text"
@@ -2026,7 +2025,7 @@ msgstr "Exportar lista en formato TXT (igual que -listfull)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:763
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:767
 msgid "Driver"
@@ -2034,7 +2033,7 @@ msgstr "Controlador"
 
 #: src/frontend/mame/ui/miscmenu.cpp:770
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "Esta máquina no tiene BIOS."
 
 #: src/frontend/mame/ui/miscmenu.cpp:784
 msgid "Save machine configuration"
@@ -2078,7 +2077,7 @@ msgstr "Utilizar imagen de fondo"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "Saltar el menú de selección de BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -2419,21 +2418,3 @@ msgstr "Ninguno"
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "Gráficos: %s, Sonido: %s"
-
-#~ msgid "Bios selection:"
-#~ msgstr "Selección de BIOS:"
-
-#~ msgid "Driver is Bios\t%1$s\n"
-#~ msgstr "El controlador es una BIOS\t%1$s\n"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Saltar el menú de selección de BIOS"
-
-#~ msgid "Bios"
-#~ msgstr "BIOS"
-
-#~ msgid "This machine has no bios."
-#~ msgstr "Esta máquina no tiene BIOS"
-
-#~ msgid "Bios Selection"
-#~ msgstr "Selección de BIOS"

@@ -273,7 +273,7 @@ msgstr "支援檯面型筐体\t%1$s\n"
 #: src/frontend/mame/ui/selgame.cpp:1288
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "驱动为 BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1289
 #, c-format
@@ -513,7 +513,7 @@ msgstr "显示文件检视"
 
 #: src/frontend/mame/ui/selmenu.cpp:126
 msgid "Command"
-msgstr ""
+msgstr "出招表"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "Gameinit"
@@ -525,11 +525,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "History"
-msgstr ""
+msgstr "历史"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "MAMEinfo"
-msgstr ""
+msgstr "MAMEinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MARPScore"
@@ -537,11 +537,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MESSinfo"
-msgstr ""
+msgstr "MESSinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "Mamescore"
-msgstr ""
+msgstr "Mamescore"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Sysinfo"
@@ -553,7 +553,7 @@ msgstr "软件部分选项： "
 
 #: src/frontend/mame/ui/selmenu.cpp:373 src/frontend/mame/ui/selmenu.cpp:393
 msgid "BIOS selection:"
-msgstr ""
+msgstr "选择 BIOS："
 
 #: src/frontend/mame/ui/selmenu.cpp:647 src/frontend/mame/ui/selmenu.cpp:683
 #: src/frontend/mame/ui/simpleselgame.cpp:340
@@ -658,7 +658,7 @@ msgstr " (缺省)"
 
 #: src/frontend/mame/ui/selmenu.cpp:2404
 msgid "General Info"
-msgstr ""
+msgstr "一般信息"
 
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
@@ -1447,7 +1447,7 @@ msgstr "磁带控制"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "选择 BIOS"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1992,7 +1992,7 @@ msgstr "汇出 TXT 格式列表 （同 -listfull）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:763
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:767
 msgid "Driver"
@@ -2000,7 +2000,7 @@ msgstr "驱动"
 
 #: src/frontend/mame/ui/miscmenu.cpp:770
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "此机台没有 BIOS。"
 
 #: src/frontend/mame/ui/miscmenu.cpp:784
 msgid "Save machine configuration"
@@ -2044,7 +2044,7 @@ msgstr "使用图片作为背景"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "略过 BIOS 选择菜单"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -2382,21 +2382,3 @@ msgstr "无"
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "图形： %s, 声音: %s"
-
-#~ msgid "Bios selection:"
-#~ msgstr "选择 BIOS："
-
-#~ msgid "Driver is Bios\t%1$s\n"
-#~ msgstr "驱动为 BIOS\t%1$s\n"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "略过 BIOS 选择菜单"
-
-#~ msgid "Bios"
-#~ msgstr "BIOS"
-
-#~ msgid "This machine has no bios."
-#~ msgstr "此机台没有 BIOS。"
-
-#~ msgid "Bios Selection"
-#~ msgstr "选择 BIOS"

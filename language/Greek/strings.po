@@ -275,7 +275,7 @@ msgstr "Υποστήριξη Cocktail\t%1$s\n"
 #: src/frontend/mame/ui/selgame.cpp:1288
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "Ο οδηγός είναι BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1289
 #, c-format
@@ -518,7 +518,7 @@ msgstr "Εμφάνιση προβολής DATs"
 
 #: src/frontend/mame/ui/selmenu.cpp:126
 msgid "Command"
-msgstr ""
+msgstr "Εντολή"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "Gameinit"
@@ -530,11 +530,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "History"
-msgstr ""
+msgstr "Ιστορία"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "MAMEinfo"
-msgstr ""
+msgstr "MAMEinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MARPScore"
@@ -542,15 +542,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MESSinfo"
-msgstr ""
+msgstr "MESSinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "Mamescore"
-msgstr ""
+msgstr "Mamescore"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Sysinfo"
-msgstr ""
+msgstr "Sysinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:250 src/frontend/mame/ui/selmenu.cpp:270
 msgid "Software part selection:"
@@ -558,7 +558,7 @@ msgstr "Επιλογή τμημάτων λογισμικού:"
 
 #: src/frontend/mame/ui/selmenu.cpp:373 src/frontend/mame/ui/selmenu.cpp:393
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Επιλογή BIOS:"
 
 #: src/frontend/mame/ui/selmenu.cpp:647 src/frontend/mame/ui/selmenu.cpp:683
 #: src/frontend/mame/ui/simpleselgame.cpp:340
@@ -663,7 +663,7 @@ msgstr " (προεπιλογή)"
 
 #: src/frontend/mame/ui/selmenu.cpp:2404
 msgid "General Info"
-msgstr ""
+msgstr "Γενικές Πληροφορίες"
 
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
@@ -1475,7 +1475,7 @@ msgstr "Έλεγχος Κασσέτας"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "Επιλογή BIOS"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -2022,7 +2022,7 @@ msgstr "Εξαγωγή σε μορφή TXT(όπως -listfull)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:763
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:767
 msgid "Driver"
@@ -2030,7 +2030,7 @@ msgstr "Οδηγός"
 
 #: src/frontend/mame/ui/miscmenu.cpp:770
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "Αυτό το μηχάνημα δεν έχει BIOS."
 
 #: src/frontend/mame/ui/miscmenu.cpp:784
 msgid "Save machine configuration"
@@ -2074,7 +2074,7 @@ msgstr "Χρήση εικόνας ως φόντου"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "Παράλειψη μενού επιλογής BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -2416,21 +2416,3 @@ msgstr "Κανένα"
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "Gfx: %s, Ήχος: %s"
-
-#~ msgid "Bios selection:"
-#~ msgstr "Επιλογή BIOS:"
-
-#~ msgid "Driver is Bios\t%1$s\n"
-#~ msgstr "Ο οδηγός είναι Bios\t%1$s\n"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Παράλειψη μενού επιλογής bios"
-
-#~ msgid "Bios"
-#~ msgstr "Bios"
-
-#~ msgid "This machine has no bios."
-#~ msgstr "Αυτό το μηχάνημα δεν έχει bios."
-
-#~ msgid "Bios Selection"
-#~ msgstr "Επιλογή BIOS"

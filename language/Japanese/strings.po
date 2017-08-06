@@ -276,7 +276,7 @@ msgstr "カクテルモード対応\t%1$s\n"
 #: src/frontend/mame/ui/selgame.cpp:1288
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "BIOSドライバ\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1289
 #, c-format
@@ -519,11 +519,11 @@ msgstr "DATビューを表示"
 
 #: src/frontend/mame/ui/selmenu.cpp:126
 msgid "Command"
-msgstr ""
+msgstr "コマンドファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "Gameinit"
-msgstr ""
+msgstr "Gameinitファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "High Scores"
@@ -531,11 +531,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "History"
-msgstr ""
+msgstr "ヒストリファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "MAMEinfo"
-msgstr ""
+msgstr "MAMEinfoファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MARPScore"
@@ -543,15 +543,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MESSinfo"
-msgstr ""
+msgstr "MESSinfoファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "Mamescore"
-msgstr ""
+msgstr "Mamescoreファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Sysinfo"
-msgstr ""
+msgstr "Sysinfoファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:250 src/frontend/mame/ui/selmenu.cpp:270
 msgid "Software part selection:"
@@ -559,7 +559,7 @@ msgstr "選択中のソフトウェアパーツ:"
 
 #: src/frontend/mame/ui/selmenu.cpp:373 src/frontend/mame/ui/selmenu.cpp:393
 msgid "BIOS selection:"
-msgstr ""
+msgstr "BIOS選択："
 
 #: src/frontend/mame/ui/selmenu.cpp:647 src/frontend/mame/ui/selmenu.cpp:683
 #: src/frontend/mame/ui/simpleselgame.cpp:340
@@ -1468,7 +1468,7 @@ msgstr "テープ操作"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "BIOS選択"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -2015,7 +2015,7 @@ msgstr "TXT形式でリストを出力（-listfull同様）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:763
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:767
 msgid "Driver"
@@ -2023,7 +2023,7 @@ msgstr "ドライバ"
 
 #: src/frontend/mame/ui/miscmenu.cpp:770
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "このマシンにはBIOSがありません。"
 
 #: src/frontend/mame/ui/miscmenu.cpp:784
 msgid "Save machine configuration"
@@ -2067,7 +2067,7 @@ msgstr "画像を背景に使用する"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "BIOS選択メニューをスキップする"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -2352,6 +2352,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"選択したゲームに必要な1つ以上のROMまたはCHDが不足しています。別のゲームを選択"
+"してください。\n"
+"\n"
+"進めるには、何かキーを押してください。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:242
 #, c-format
@@ -2398,30 +2402,12 @@ msgstr "正常"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:376
 msgid "None"
-msgstr ""
+msgstr "なし"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:384
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "グラフィックス：%s　サウンド：%s"
-
-#~ msgid "Bios selection:"
-#~ msgstr "BIOS選択："
-
-#~ msgid "Driver is Bios\t%1$s\n"
-#~ msgstr "BIOSドライバ\t%1$s\n"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "BIOS選択メニューをスキップする"
-
-#~ msgid "Bios"
-#~ msgstr "BIOS"
-
-#~ msgid "This machine has no bios."
-#~ msgstr "このマシンにはBIOSがありません。"
-
-#~ msgid "Bios Selection"
-#~ msgstr "BIOS選択"
 
 #~ msgid ""
 #~ "\n"

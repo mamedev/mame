@@ -67,6 +67,8 @@ private:
 	virtual std::string make_software_description(ui_software_info const &software) const override;
 
 	// internal methods
+	void change_info_pane(int delta);
+
 	void build_custom();
 	void build_category();
 	void build_available_list();
