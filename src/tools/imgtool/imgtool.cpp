@@ -2035,6 +2035,8 @@ imgtool_partition_features imgtool::partition::get_features() const
 		features.supports_creation_time = 1;
 	if (m_supports_lastmodified_time)
 		features.supports_lastmodified_time = 1;
+	if (m_get_iconinfo)
+		features.supports_geticoninfo = 1;
 	if (!features.supports_writing && !features.supports_createdir && !features.supports_deletefile && !features.supports_deletedir)
 		features.is_read_only = 1;
 	return features;
