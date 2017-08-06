@@ -1271,6 +1271,7 @@ mprof3                          // Microprofessor III
 prav8c                          // Pravetz 8C
 tk3000                          // Microdigital TK3000
 spectred
+ceci							// China Education Computer-I
 
 @source:apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
