@@ -979,6 +979,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ninjakd2, ninjakd2_core )
 	MCFG_CPU_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
