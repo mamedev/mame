@@ -174,16 +174,17 @@ READ8_MEMBER(missb2_state::missb2_oki_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
+static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)
-	AM_RANGE(0xfa03, 0xfa03) AM_WRITENOP // sound cpu reset
-	AM_RANGE(0xfa80, 0xfa80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) AM_MIRROR(0x007f)
+	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x007c) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
+	AM_RANGE(0xfa01, 0xfa01) AM_MIRROR(0x007c) AM_READ(common_sound_semaphores_r)
+	AM_RANGE(0xfa03, 0xfa03) AM_MIRROR(0x007c) AM_WRITE(bublbobl_soundcpu_reset_w)
+	AM_RANGE(0xfa80, 0xfa80) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM         // ???
@@ -197,7 +198,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xff98, 0xff98) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
+static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
@@ -211,15 +212,16 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
 ADDRESS_MAP_END
 
 // Looks like the original bublbobl code modified to support the OKI M6295.
-
+// due to some really wacky bugs in the way the oki6295 was hacked in place, writes will happen to
+// many addresses other than 9000: 9000-9001, 0000-0001, 3827-3828, 44a8-44a9
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP // message for main cpu
-	AM_RANGE(0xb001, 0xb001) AM_READNOP AM_WRITE(bublbobl_sh_nmi_enable_w)  // bit 0: message pending for main cpu, bit 1: message pending for sound cpu
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w)
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0FFF)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0fff) ???
+	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVREAD("main_to_sound", generic_latch_8_device, read) AM_DEVWRITE("sound_to_main", generic_latch_8_device, write)
+	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_READ(common_sound_semaphores_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<0>)
+	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<0>)
 	AM_RANGE(0xe000, 0xefff) AM_ROM         // space for diagnostic ROM?
 ADDRESS_MAP_END
 
@@ -439,28 +441,23 @@ MACHINE_START_MEMBER(missb2_state,missb2)
 {
 	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_sound_status));
 	save_item(NAME(m_video_enable));
 }
 
 MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
-	m_sound_status = 0;
+	MACHINE_RESET_CALL_MEMBER(common);
 }
 
 static MACHINE_CONFIG_START( missb2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_CPU_PROGRAM_MAP(subcpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
@@ -495,7 +492,10 @@ static MACHINE_CONFIG_START( missb2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, MAIN_XTAL/8)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))
@@ -518,7 +518,7 @@ ROM_START( missb2 )
 	ROM_LOAD( "msbub2-u.203", 0x10000, 0x10000, CRC(29fd8afe) SHA1(94ead80d20cd3974dd4fb0358915e3bd8b793158) )
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x10000, "slave", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "subcpu", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "msbub2-u.11",  0x0000, 0x10000, CRC(003dc092) SHA1(dff3c2b31d0804a308e5c42cf9705cd3d6144ad7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the third CPU */
@@ -552,7 +552,7 @@ ROM_START( bublpong )
 	ROM_LOAD( "u203", 0x10000, 0x10000, CRC(29fd8afe) SHA1(94ead80d20cd3974dd4fb0358915e3bd8b793158) )
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x10000, "slave", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "subcpu", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "ic11",  0x0000, 0x10000, CRC(dc1c72ba) SHA1(89b3835884f46bea1ca49356a1faeddd87f772c9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the third CPU */
@@ -582,13 +582,13 @@ ROM_END
 void missb2_state::configure_banks()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	uint8_t *SLAVE = memregion("slave")->base();
+	uint8_t *SUBCPU = memregion("subcpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	/* 2009-11 FP: isn't there a way to configure both at once? */
-	membank("bank2")->configure_entries(0, 7, &SLAVE[0x8000], 0x1000);
-	membank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
+	membank("bank2")->configure_entries(0, 7, &SUBCPU[0x8000], 0x1000);
+	membank("bank3")->configure_entries(0, 7, &SUBCPU[0x9000], 0x1000);
 }
 
 DRIVER_INIT_MEMBER(missb2_state,missb2)

@@ -1927,15 +1927,15 @@ static MACHINE_CONFIG_START( aristmk5 )
 
 	// TL16C452FN U71
 	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in0_w))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<0>))
 	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in1_w))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<1>))
 
 	// TL16C452FN U72
 	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in2_w))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<2>))
 	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in3_w))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<3>))
 
 	// COMM port 4 - 5
 	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
@@ -1949,7 +1949,7 @@ static MACHINE_CONFIG_START( aristmk5 )
 	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
 //  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("uart_irq")
+	MCFG_INPUT_MERGER_ANY_HIGH("uart_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(aristmk5_state, uart_irq_callback))
 
 	MCFG_DS1302_ADD("rtc", XTAL_32_768kHz)
