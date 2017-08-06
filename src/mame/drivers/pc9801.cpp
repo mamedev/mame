@@ -1954,6 +1954,7 @@ static SLOT_INTERFACE_START( pc9801_cbus )
 //  Speak Board
 //  Spark Board
 //  AMD-98 (AmuseMent boarD)
+	SLOT_INTERFACE( "pc9801_amd98", PC9801_AMD98 )
 	SLOT_INTERFACE( "mpu_pc98", MPU_PC98 )
 SLOT_INTERFACE_END
 
