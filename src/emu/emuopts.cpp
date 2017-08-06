@@ -1022,23 +1022,6 @@ slot_option &emu_options::slot_option(const std::string &device_name)
 
 
 //-------------------------------------------------
-//  find_image_option
-//-------------------------------------------------
-
-const image_option *emu_options::find_image_option(const std::string &device_name) const
-{
-	auto iter = m_image_options.find(device_name);
-	return iter != m_image_options.end() ? iter->second : nullptr;
-}
-
-image_option *emu_options::find_image_option(const std::string &device_name)
-{
-	auto iter = m_image_options.find(device_name);
-	return iter != m_image_options.end() ? iter->second : nullptr;
-}
-
-
-//-------------------------------------------------
 //  image_option
 //-------------------------------------------------
 
