@@ -1,7 +1,7 @@
 // license:MIT
 // copyright-holders:Ole Christian Eidheim, Miodrag Milanovic
-#ifndef SERVER_WS_IMPL_HPP
-#define SERVER_WS_IMPL_HPP
+#ifndef MAME_LIB_UTIL_SERVER_WS_IMPL_HPP
+#define MAME_LIB_UTIL_SERVER_WS_IMPL_HPP
 #include "path_to_regex.hpp"
 #include "crypto.hpp"
 
@@ -714,4 +714,4 @@ namespace webpp {
 		ws_server() : SocketServer<WS>::SocketServer() {}
 	};
 }
-#endif  /* SERVER_WS_IMPL_HPP */
+#endif  /* MAME_LIB_UTIL_SERVER_WS_IMPL_HPP */

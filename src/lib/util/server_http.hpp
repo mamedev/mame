@@ -1,7 +1,7 @@
 // license:MIT
 // copyright-holders:Ole Christian Eidheim, Miodrag Milanovic
-#ifndef SERVER_HTTP_HPP
-#define SERVER_HTTP_HPP
+#ifndef MAME_LIB_UTIL_SERVER_HTTP_HPP
+#define MAME_LIB_UTIL_SERVER_HTTP_HPP
 
 #include "path_to_regex.hpp"
 
@@ -63,4 +63,4 @@ namespace webpp {
 	
 	class http_server;
 }
-#endif  /* SERVER_HTTP_HPP */
+#endif  /* MAME_LIB_UTIL_SERVER_HTTP_HPP */

@@ -1,7 +1,7 @@
 // license:MIT
 // copyright-holders:Ole Christian Eidheim, Miodrag Milanovic
-#ifndef SERVER_HTTP_IMPL_HPP
-#define SERVER_HTTP_IMPL_HPP
+#ifndef MAME_LIB_UTIL_SERVER_HTTP_IMPL_HPP
+#define MAME_LIB_UTIL_SERVER_HTTP_IMPL_HPP
 
 #if defined(_MSC_VER)
 #pragma warning(disable:4503)
@@ -479,4 +479,4 @@ namespace webpp {
 		http_server() : Server<HTTP>::Server() {}
 	};
 }
-#endif  /* SERVER_HTTP_IMPL_HPP */
+#endif  /* MAME_LIB_UTIL_SERVER_HTTP_IMPL_HPP */

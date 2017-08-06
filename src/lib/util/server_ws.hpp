@@ -1,7 +1,7 @@
 // license:MIT
 // copyright-holders:Ole Christian Eidheim, Miodrag Milanovic
-#ifndef SERVER_WS_HPP
-#define SERVER_WS_HPP
+#ifndef MAME_LIB_UTIL_SERVER_WS_HPP
+#define MAME_LIB_UTIL_SERVER_WS_HPP
 #include <memory>
 #include <atomic>
 
@@ -46,4 +46,4 @@ namespace webpp {
 	
 	class ws_server;
 }
-#endif  /* SERVER_WS_HPP */
+#endif  /* MAME_LIB_UTIL_SERVER_WS_HPP */
