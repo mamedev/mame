@@ -19,6 +19,8 @@ HTTP server handling
 
 #include <thread>
 #include <time.h>
+#include "server_http.hpp"
+#include "server_ws.hpp"
 
 //**************************************************************************
 //    TYPE DEFINITIONS
@@ -29,11 +31,6 @@ namespace asio
 {
 	class io_context;
 }
-namespace webpp
-{
-	class http_server;
-	class ws_server;
-}
 
 class http_manager
 {
@@ -41,7 +38,7 @@ class http_manager
 public:
 
 	/** An HTTP Request. */
-	struct http_request : public std::enable_shared_from_this<http_request>
+	struct http_request
 	{
 		/** Retrieves the requested resource. */
 		virtual const std::string get_resource() = 0; // The entire resource: path, query and fragment.
@@ -67,7 +64,7 @@ public:
 	typedef std::shared_ptr<http_request> http_request_ptr;
 
 	/** An HTTP response. */
-	struct http_response : public std::enable_shared_from_this<http_response>
+	struct http_response
 	{
 		/** Sets the HTTP status to be returned to the client. */
 		virtual void set_status(int status) = 0;
@@ -84,7 +81,7 @@ public:
 	typedef std::shared_ptr<http_response> http_response_ptr;
 
 	/** Identifies a Websocket connection. */
-	struct websocket_connection : public std::enable_shared_from_this<websocket_connection>
+	struct websocket_connection
 	{
 		/** Sends a message to the client that is connected on the other end of this Websocket connection. */
 		virtual void send_message(const std::string &payload, int opcode) = 0;
@@ -162,13 +159,13 @@ public:
 	}
 
 private:
-	void on_open(http_manager::websocket_endpoint_ptr endpoint, void *onnection);
+	void on_open(http_manager::websocket_endpoint_ptr endpoint, std::shared_ptr<webpp::Connection> connection);
 
-	void on_message(http_manager::websocket_endpoint_ptr endpoint, void *connection, const std::string& payload, int opcode);
+	void on_message(http_manager::websocket_endpoint_ptr endpoint, std::shared_ptr<webpp::Connection> connection, const std::string& payload, int opcode);
 
-	void on_close(http_manager::websocket_endpoint_ptr endpoint, void *connection, int status, const std::string& reason);
+	void on_close(http_manager::websocket_endpoint_ptr endpoint, std::shared_ptr<webpp::Connection> connection, int status, const std::string& reason);
 
-	void on_error(http_manager::websocket_endpoint_ptr endpoint, void *connection, const std::error_code& error_code);
+	void on_error(http_manager::websocket_endpoint_ptr endpoint, std::shared_ptr<webpp::Connection> connection, const std::error_code& error_code);
 
 	bool read_file(std::ostream &os, const std::string &path);
 
