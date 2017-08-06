@@ -11,7 +11,6 @@
 	- not sure if it's AY8910 or YM2203, from a PCB pic it looks with stock AY logos?
 	- Third AY (uses port B from BOTH AYs);
 	- PIT control;
-	- identification doesn't seem really working?
 	- PCM section;
 	
 =============================================================================

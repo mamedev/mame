@@ -650,6 +650,24 @@ WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
 //  m_sasibus->write_sel(BIT(data, 0));
 }
 
+READ8_MEMBER(pc9801_state::f0_r)
+{
+	if(offset == 0)
+	{
+		// iterate thru all devices to check if an AMD98 is present
+		for (pc9801_amd98_device &amd98 : device_type_iterator<pc9801_amd98_device>(machine().root_device())) 
+		{
+			logerror("Read AMD98 ID %s\n",amd98.tag());
+			return 0x18; // return the right ID
+		}
+		
+		logerror("Read port 0 from 0xf0 (AMD98 check?)\n");
+		return 0; // card not present
+	}
+	
+	return 0xff;
+}
+
 static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE(tvram_r,tvram_w) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(gvram_r,gvram_w,0xffff) //bitmap VRAM
@@ -691,6 +709,7 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2dd", upd765a_device, map, 0x00ff)
 	AM_RANGE(0x00cc, 0x00cd) AM_READWRITE8(fdc_2dd_ctrl_r, fdc_2dd_ctrl_w, 0x00ff) //upd765a 2dd / <undefined>
+	AM_RANGE(0x00f0, 0x00ff) AM_READ8(f0_r,0x00ff)
 	AM_IMPORT_FROM(pc9801_common_io)
 ADDRESS_MAP_END
 
@@ -776,7 +795,7 @@ READ8_MEMBER(pc9801_state::a20_ctrl_r)
 	else if(offset == 0x03)
 		return (m_gate_a20 ^ 1) | (m_nmi_ff << 1);
 
-	return 0x00;
+	return f0_r(space,offset);
 }
 
 WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
