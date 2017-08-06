@@ -10750,6 +10750,36 @@ more investigation needed...
 		</part>
 	</software>
 
+<!-- Pending
+
+	<software name="dkongc2s" cloneof="dkongc2">
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Esp, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="SNSP-ADND-EUR" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J1M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D413B 9546 C" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-ESP" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="spal-adnd-0.u1" size="4194304" crc="" sha1="" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+-->
+
 	<software name="dkongc2ua" cloneof="dkongc2">
 		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA)</description>
 		<year>1995</year>
@@ -20195,7 +20225,7 @@ more investigation needed...
 		<description>Pilotwings (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNSP-PW-NOE" />
+		<info name="serial" value="SNSP-PW-NOE, SNSP-PW-ESP" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-1B0N-03" />
@@ -20204,9 +20234,9 @@ more investigation needed...
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D413A 9247 BA" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-ESP" />
 			<feature name="slot" value="lorom_dsp" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-pw-0.u1" size="524288" crc="def45776" sha1="d450d6d580d163fdfcc4f58d5bf8fafd7f510750" offset="0x000000" />
@@ -37914,9 +37944,18 @@ List of unclassified roms
 		<info name="alt_title" value="ドラゴンボールZ超悟空伝 覚醒 編" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411B 9531 B" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dragon ball z - super gokuu den - kakusei hen (japan).sfc" size="2097152" crc="3172cd4f" sha1="3b7278a54f8d470dcb1bd92060d744380325f30b" offset="0x000000" />
+				<rom name="shvc-a2zj-0.u1" size="2097152" crc="3172cd4f" sha1="3b7278a54f8d470dcb1bd92060d744380325f30b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -52303,6 +52342,35 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Pending
+
+	<software name="ranmab" cloneof="ranma">
+		<description>Ranma ½ (Euro, Rev. B)</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<info name="serial" value="SNSP-R2-UKV" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2J0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D413A 9344 CB" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-UKV" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="spal-r2-0 p0.u1" size="" crc="" sha1="" offset="0x000000" />
+				<rom name="spal-r2-0 p1.u1" size="" crc="" sha1="" offset="0x200000" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+-->
 
 	<software name="ranma">
 		<description>Ranma ½ (Euro)</description>
