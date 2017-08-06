@@ -17,7 +17,7 @@ function dat.check(set, softlist)
 	if drvinfo then
 		info = info .. "\n\n--- DRIVER INFO ---\nDriver: " .. sourcefile .. "\n\n" .. drvinfo
 	end
-	return "Mameinfo"
+	return "MAMEinfo"
 end
 
 function dat.get()

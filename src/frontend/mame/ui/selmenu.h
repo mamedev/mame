@@ -122,6 +122,8 @@ protected:
 	int     m_total_lines;
 	int     m_topline_datsview;   // right box top line
 
+	static char const *const s_info_titles[];
+
 private:
 	using bitmap_vector = std::vector<bitmap_argb32>;
 	using texture_ptr_vector = std::vector<texture_ptr>;

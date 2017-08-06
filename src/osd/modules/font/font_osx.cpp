@@ -54,38 +54,53 @@ private:
 
 bool osd_font_osx::open(std::string const &font_path, std::string const &name, int &height)
 {
-	osd_printf_verbose("FONT NAME %s\n", name.c_str());
-
-	CFStringRef const font_name = CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8);
-	if (font_name && (kCFNotFound != CFStringFind(font_name, CFSTR(".BDF"), kCFCompareCaseInsensitive | kCFCompareBackwards | kCFCompareAnchored | kCFCompareNonliteral).location))
+	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", name.c_str());
+	CFStringRef const font_name(CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8));
+	if (!font_name)
 	{
-		// handle bdf fonts in the core
+		osd_printf_verbose("osd_font_osx::open: failed to create CFString from font name (invalid UTF-8?)\n");
+		return false;
+	}
+
+	if (kCFNotFound != CFStringFind(font_name, CFSTR(".BDF"), kCFCompareCaseInsensitive | kCFCompareBackwards | kCFCompareAnchored | kCFCompareNonliteral).location)
+	{
+		// handle BDF fonts in the core
 		CFRelease(font_name);
 		return false;
 	}
-	CTFontRef ct_font = nullptr;
-	if (font_name)
+
+	CTFontDescriptorRef const font_descriptor(CTFontDescriptorCreateWithNameAndSize(font_name, 0.0));
+	CFRelease(font_name);
+	if (!font_descriptor)
 	{
-		CTFontDescriptorRef const font_descriptor = CTFontDescriptorCreateWithNameAndSize(font_name, 0.0);
-		if (font_descriptor)
-		{
-			ct_font = CTFontCreateWithFontDescriptor(font_descriptor, POINT_SIZE, &CGAffineTransformIdentity);
-			CFRelease(font_descriptor);
-		}
-		CFRelease(font_name);
+		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font descriptor for \"%s\"\n", name.c_str());
+		return false;
 	}
 
+	CTFontRef const ct_font(CTFontCreateWithFontDescriptor(font_descriptor, POINT_SIZE, &CGAffineTransformIdentity));
+	CFRelease(font_descriptor);
 	if (!ct_font)
 	{
-		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.c_str());
+		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font for \"%s\"\n", name.c_str());
 		return false;
 	}
 
-	CFStringRef const real_name = CTFontCopyPostScriptName(ct_font);
-	char real_name_c_string[255];
-	CFStringGetCString(real_name, real_name_c_string, 255, kCFStringEncodingUTF8);
-	osd_printf_verbose("Matching font: %s\n", real_name_c_string);
-	CFRelease(real_name);
+	CFStringRef const real_name(CTFontCopyPostScriptName(ct_font));
+	if (real_name)
+	{
+		char const *real_name_c_string(CFStringGetCStringPtr(real_name, kCFStringEncodingUTF8));
+		std::unique_ptr<char []> buf;
+		if (!real_name_c_string)
+		{
+			CFIndex const len(CFStringGetLength(real_name));
+			CFIndex const space(CFStringGetMaximumSizeForEncoding(len, kCFStringEncodingUTF8) + 1);
+			buf.reset(new char[space]);
+			CFStringGetCString(real_name, buf.get(), space, kCFStringEncodingUTF8);
+			real_name_c_string = buf.get();
+		}
+		osd_printf_verbose("osd_font_osx::open: matching font: %s\n", real_name_c_string);
+		CFRelease(real_name);
+	}
 
 	m_baseline = CTFontGetDescent(ct_font) + CTFontGetLeading(ct_font);
 	m_height = CTFontGetAscent(ct_font) + m_baseline;
@@ -103,7 +118,7 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &name, i
 
 void osd_font_osx::close()
 {
-	if (m_font != nullptr)
+	if (m_font)
 		CFRelease(m_font);
 	m_font = nullptr;
 }
@@ -128,17 +143,17 @@ bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 		return false;
 	}
 
-	// try to get glyph bounds
-	CGRect bounds;
-	if (CGRectEqualToRect(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, &bounds, count), CGRectNull))
+	// try to get glyph metrics
+	CGRect const bounds(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, nullptr, count));
+	CGSize advance(CGSizeZero);
+	CTFontGetAdvancesForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, &advance, count);
+
+	// CGNullRect can indicate failure, but it's also a valid rectangle for spaces in some fonts (e.g. Hiragino family)
+	if (CGRectEqualToRect(bounds, CGRectNull) && CGSizeEqualToSize(advance, CGSizeZero))
 	{
-		osd_printf_verbose("osd_font_osd::get_bitmap: failed to get glyph bounds for U+%04X\n", unsigned(chnum));
+		osd_printf_verbose("osd_font_osd::get_bitmap: failed to get glyph metrics for U+%04X\n", unsigned(chnum));
 		return false;
 	}
-
-	// try to get metrics
-	CGSize advance;
-	CTFontGetAdvancesForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, &advance, count);
 
 	// turn everything into integers for MAME and allocate output bitmap
 	std::size_t const bitmap_width(std::max(std::ceil(bounds.size.width), CGFloat(1.0)));
@@ -182,19 +197,23 @@ public:
 private:
 	static CFComparisonResult sort_callback(CTFontDescriptorRef first, CTFontDescriptorRef second, void *refCon)
 	{
-		CFStringRef left = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(first, kCTFontDisplayNameAttribute, nullptr);
-		if (!left) left = (CFStringRef)CTFontDescriptorCopyAttribute(first, kCTFontNameAttribute);
-		CFStringRef right = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(second, kCTFontDisplayNameAttribute, nullptr);
-		if (!right) right = (CFStringRef)CTFontDescriptorCopyAttribute(second, kCTFontNameAttribute);
+		CFStringRef left(CFStringRef(CTFontDescriptorCopyLocalizedAttribute(first, kCTFontDisplayNameAttribute, nullptr)));
+		if (!left)
+			left = CFStringRef(CTFontDescriptorCopyAttribute(first, kCTFontNameAttribute));
+		CFStringRef right(CFStringRef(CTFontDescriptorCopyLocalizedAttribute(second, kCTFontDisplayNameAttribute, nullptr)));
+		if (!right)
+			right = CFStringRef(CTFontDescriptorCopyAttribute(second, kCTFontNameAttribute));
 
-		CFComparisonResult result;
-		if (left && right) result = CFStringCompareWithOptions(left, right, CFRangeMake(0, CFStringGetLength(left)), kCFCompareCaseInsensitive | kCFCompareLocalized | kCFCompareNonliteral);
-		else if (!left) result = kCFCompareLessThan;
-		else if (!right) result = kCFCompareGreaterThan;
-		else result = kCFCompareEqualTo;
+		CFComparisonResult const result(
+				(left && right) ? CFStringCompareWithOptions(left, right, CFRangeMake(0, CFStringGetLength(left)), kCFCompareCaseInsensitive | kCFCompareLocalized | kCFCompareNonliteral) :
+				!left ? kCFCompareLessThan :
+				!right ? kCFCompareGreaterThan :
+				kCFCompareEqualTo);
 
-		if (left) CFRelease(left);
-		if (right) CFRelease(right);
+		if (left)
+			CFRelease(left);
+		if (right)
+			CFRelease(right);
 		return result;
 	}
 };
@@ -245,8 +264,10 @@ bool font_osx::get_font_families(std::string const &font_path, std::vector<std::
 			result.emplace_back(std::move(utf8name), std::move(utf8display));
 		}
 
-		if (name) CFRelease(name);
-		if (display) CFRelease(display);
+		if (name)
+			CFRelease(name);
+		if (display)
+			CFRelease(display);
 	}
 
 	return true;
