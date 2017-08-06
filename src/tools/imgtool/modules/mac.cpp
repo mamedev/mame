@@ -6040,7 +6040,7 @@ static int bundle_discriminator(const void *resource, uint16_t id, uint32_t leng
 
 
 
-static int get_pixel(const uint8_t *src, int width, int height, int bpp,
+static uint8_t get_pixel(const uint8_t *src, int width, int height, int bpp,
 	int x, int y)
 {
 	uint8_t byte, mask;
@@ -6054,46 +6054,44 @@ static int get_pixel(const uint8_t *src, int width, int height, int bpp,
 
 
 
-static int load_icon(uint32_t *dest, const void *resource_fork, uint64_t resource_fork_length,
+static bool load_icon(uint32_t *dest, const void *resource_fork, uint64_t resource_fork_length,
 	uint32_t resource_type, uint16_t resource_id, int width, int height, int bpp,
-	const uint32_t *palette, int has_mask)
+	const uint32_t *palette, bool has_mask)
 {
-	int success = false;
-	int y, x, color, is_masked;
-	uint32_t pixel;
-	const uint8_t *src;
+	bool success = false;
+	uint32_t frame_length = width * height * bpp / 8;
+	uint32_t total_length = frame_length * (has_mask ? 2 : 1);
 	uint32_t resource_length;
-	uint32_t frame_length;
-	uint32_t total_length;
 
-	frame_length = width * height * bpp / 8;
-	total_length = frame_length * (has_mask ? 2 : 1);
-
-	/* attempt to fetch resource */
-	src = (const uint8_t*)mac_get_resource(resource_fork, resource_fork_length, resource_type,
+	// attempt to fetch resource
+	const uint8_t *src = (const uint8_t*)mac_get_resource(resource_fork, resource_fork_length, resource_type,
 		resource_id, &resource_length);
 	if (src && (resource_length == total_length))
 	{
-		for (y = 0; y < height; y++)
+		for (int y = 0; y < height; y++)
 		{
-			for (x = 0; x < width; x ++)
+			for (int x = 0; x < width; x ++)
 			{
-				/* first check mask bit */
-				if (has_mask)
-					is_masked = get_pixel(src + frame_length, width, height, bpp, x, y);
-				else
-					is_masked = dest[y * width + x] >= 0x80000000;
+				// check the color
+				uint8_t color = get_pixel(src, width, height, bpp, x, y);
 
-				if (is_masked)
+				// then check the mask
+				bool is_masked = has_mask 
+					? get_pixel(src + frame_length, width, height, bpp, x, y) != 0
+					: dest[y * width + x] >= 0x80000000;
+
+				// is this actually masked?  (note there is a special case when bpp == 1; Mac B&W icons
+				// had a XOR effect, and this cannot be blocked by the mask)
+				uint32_t pixel;
+				if (is_masked || (color && bpp == 1))
 				{
-					/* mask is ok; check the actual icon */
-					color = get_pixel(src, width, height, bpp, x, y);
+					// mask is ok; check the actual icon
 					pixel = palette[color] | 0xFF000000;
 				}
 				else
 				{
-					/* masked out; nothing */
-					pixel = 0;
+					// masked out; nothing
+					pixel = 0x00000000;
 				}
 
 				dest[y * width + x] = pixel;
