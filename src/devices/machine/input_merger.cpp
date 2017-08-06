@@ -53,6 +53,7 @@ input_merger_device::~input_merger_device()
 void input_merger_device::device_start()
 {
 	m_output_handler.resolve_safe();
+	save_item(NAME(m_state));
 }
 
 
@@ -70,11 +71,12 @@ input_merger_active_high_device::input_merger_active_high_device(machine_config 
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  device_start - device-specific startup
 //-------------------------------------------------
 
-void input_merger_active_high_device::device_reset()
+void input_merger_active_high_device::device_start()
 {
+	input_merger_device::device_start();
 	std::fill(std::begin(m_state), std::end(m_state), false);
 }
 
@@ -103,11 +105,12 @@ input_merger_active_low_device::input_merger_active_low_device(machine_config co
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  device_start - device-specific startup
 //-------------------------------------------------
 
-void input_merger_active_low_device::device_reset()
+void input_merger_active_low_device::device_start()
 {
+	input_merger_device::device_start();
 	std::fill(std::begin(m_state), std::end(m_state), true);
 }
 

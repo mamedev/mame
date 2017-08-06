@@ -76,7 +76,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_start() override;
 
 	// input_merger device overrides
 	virtual void update_state() override;
@@ -91,7 +91,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_start() override;
 
 	// input_merger device overrides
 	virtual void update_state() override;

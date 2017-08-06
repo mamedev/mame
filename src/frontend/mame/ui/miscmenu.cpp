@@ -760,14 +760,14 @@ void menu_machine_configure::handle()
 void menu_machine_configure::populate(float &customtop, float &custombottom)
 {
 	// add options items
-	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
+	item_append(_("BIOS"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
 		uint32_t arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(uintptr_t)BIOS);
 	}
 	else
-		item_append(_("This machine has no bios."), "", FLAG_DISABLE, nullptr);
+		item_append(_("This machine has no BIOS."), "", FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(uintptr_t)ADVANCED);

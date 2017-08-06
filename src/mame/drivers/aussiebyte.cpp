@@ -439,8 +439,7 @@ WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
 }
 
 static SLOT_INTERFACE_START( aussiebyte_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
-	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 /***********************************************************
@@ -543,9 +542,9 @@ static MACHINE_CONFIG_START( aussiebyte )
 	MCFG_WD2797_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(aussiebyte_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(aussiebyte_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aussiebyte_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* devices */

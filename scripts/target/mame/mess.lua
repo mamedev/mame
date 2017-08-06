@@ -990,6 +990,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"isc",
 		"kaypro",
 		"koei",
+		"kontron",
 		"kurzweil",
 		"kyocera",
 		"luxor",
@@ -2219,6 +2220,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/pasogo.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "kontron")
+files {
+	MAME_DIR .. "src/mame/drivers/kdt6.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "kurzweil")
 files {
 	MAME_DIR .. "src/mame/drivers/krz2000.cpp",
@@ -2410,6 +2416,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc88va.cpp",
 	MAME_DIR .. "src/mame/drivers/pc100.cpp",
 	MAME_DIR .. "src/mame/drivers/pc9801.cpp",
+	MAME_DIR .. "src/mame/includes/pc9801.h",
+	MAME_DIR .. "src/mame/video/pc9801.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_cd.cpp",

@@ -81,15 +81,6 @@ static const u32 s_flags[] =
 	0
 };
 
-// next program counter in sequence (relative)
-static const s8 s_next_pc[0x40] =
-{
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32+0x40 /* rollback */,
-	-32, -31, -30, -29, -28, -27, -26, -25, -24, -23, -22, -21, -20, -19, -18, -17,
-	-15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, -1
-};
-
 
 static const u8 hmcs40_mnemonic[0x400] =
 {
@@ -226,6 +217,5 @@ CPU_DISASSEMBLE(hmcs40)
 		}
 	}
 
-	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return 1 | s_flags[instr] | DASMFLAG_SUPPORTED;
 }

@@ -1405,14 +1405,6 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-#ifdef USE_HD64x180
-static ADDRESS_MAP_START( hd647180_mem, AS_PROGRAM, 8, toaplan2_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM     // Internal 512 bytes of RAM
-ADDRESS_MAP_END
-#endif
-
-
 static ADDRESS_MAP_START( v25_mem, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1495,7 +1487,7 @@ static ADDRESS_MAP_START( ghox_hd647180_mem_map, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   // Internal 512 byte RAM
 	AM_RANGE(0x3fe00, 0x3ffff) AM_RAM   // Relocated internal RAM (RMCR = 30)
 
-	AM_RANGE(0x40000, 0x4f7ff) AM_RAM AM_SHARE("shared_ram") 
+	AM_RANGE(0x40000, 0x407ff) AM_RAM AM_SHARE("shared_ram") 
 
 	AM_RANGE(0x80002, 0x80002) AM_READ_PORT("DSWA")
 	AM_RANGE(0x80004, 0x80004) AM_READ_PORT("DSWB")

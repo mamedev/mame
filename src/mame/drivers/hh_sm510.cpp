@@ -266,6 +266,8 @@ WRITE8_MEMBER(hh_sm510_state::piezo_input_w)
 
   BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
   may show 2 balls at the same time. It's the same on the real handheld.
+  Another BTANB? If a period is over at the same time a defender on the
+  2nd column grabs the ball, his arm won't be erased until it's redrawn.
 
 ***************************************************************************/
 

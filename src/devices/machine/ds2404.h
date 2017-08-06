@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 #define MCFG_DS2404_ADD(_tag, _ref_year, _ref_month, _ref_day) \
-	MCFG_DEVICE_ADD(_tag, DS2404, 0) \
+	MCFG_DEVICE_ADD(_tag, DS2404, XTAL_32_768kHz) \
 	MCFG_DS2404_REF_YEAR(_ref_year) \
 	MCFG_DS2404_REF_MONTH(_ref_month) \
 	MCFG_DS2404_REF_DAY(_ref_day)

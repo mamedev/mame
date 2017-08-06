@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER( dmax8000_state::ctc_z0_w )
 }
 
 static SLOT_INTERFACE_START( floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_8_DSDD )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dmax8000 )
@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( dmax8000 )
 	MCFG_FD1793_ADD("fdc", XTAL_2MHz) // no idea
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dmax8000_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0) // MM58174

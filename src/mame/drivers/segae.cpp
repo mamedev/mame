@@ -760,7 +760,7 @@ static INPUT_PORTS_START( opaopa ) /* Used By Opa Opa */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
-	PORT_INCLUDE( segae_joy1_generic )
+	PORT_INCLUDE( segae_joy2_generic )
 
 	PORT_MODIFY("f3")   /* Read from Port 0xf3 */
 	//"SW2:1" unused

@@ -17066,6 +17066,9 @@ kchamp                          // (c) 1984 Data East USA (US)
 kchampvs                        // (c) 1984 Data East USA (US)
 kchampvs2                       // (c) 1984 Data East USA (US)
 
+@source:kdt6.cpp
+psi98							// (c) 1984 Kontron
+
 @source:kenseim.cpp
 kenseim                         // 18/04/1994 (c) 1994 Togo/Sigma (Japan) not listed on Capcom's site
 
@@ -30949,7 +30952,8 @@ ddp2hk                          //
 ddp2j                           //
 ddp2k                           //
 ddp2t                           //
-ddpdoj                          // (c) 2002 DoDonPachi Dai-Ou-Jou
+ddp3							// (c) 2002 DoDonPachi Dai-Ou-Jou / DoDonPachi III
+ddpdoj                          // 
 ddpdoja                         //
 ddpdojb                         //
 ddpdojblk                       //

@@ -5,7 +5,7 @@
 #include "teeconn.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI8X_TEE_CONNECTOR, bus::ti8x, tee_connector_device, "it8x_tconn", "TI-8x T-connector")
+DEFINE_DEVICE_TYPE_NS(TI8X_TEE_CONNECTOR, bus::ti8x, tee_connector_device, "ti8x_tconn", "TI-8x T-connector")
 
 
 namespace bus { namespace ti8x {
