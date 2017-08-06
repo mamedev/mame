@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Jack Rabbit memory map (preliminary)
+Zaccaria Z80µP hardware
 
 driver by Nicola Salmoria
 thanks to Andrea Babich for the manual.
@@ -25,10 +25,10 @@ TODO:
 
 
 Notes:
-- There is a protection device on the memory board which is unidentified on the
-  schematics but appears to be a PAL16. It sits on bits 4-7 of the data bus, and
-  is read from locations where only bits 0-3 are connected to regular devices
-  (6400-6407 has 4-bit RAM, while 6c00-6c07 has a 4-bit input port).
+- The protection device at 1A on the ROM board (1B11147) is unidentified on the
+  schematics but appears to be a PAL16L8 or PAL16R4. It sits on bits 4-7 of the
+  data bus, and is read from locations where only bits 0-3 are connected to regular
+  devices (6400-6407 has 4-bit RAM, while 6c00-6c07 has a 4-bit input port).
 
 - The 6802 driving the TMS5220 has a push button connected to the NMI line. On
   Zaccaria pinballs, when pressed, this causes the speech 6802 and the slave
@@ -43,6 +43,7 @@ Notes:
 #include "includes/zaccaria.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
 #include "screen.h"
@@ -58,7 +59,6 @@ void zaccaria_state::machine_start()
 void zaccaria_state::machine_reset()
 {
 	m_dsw_sel = 0;
-	m_nmi_mask = 0;
 }
 
 WRITE8_MEMBER(zaccaria_state::dsw_sel_w)
@@ -133,14 +133,16 @@ READ8_MEMBER(zaccaria_state::prot2_r)
 }
 
 
-WRITE8_MEMBER(zaccaria_state::coin_w)
+WRITE_LINE_MEMBER(zaccaria_state::coin_w)
 {
-	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(zaccaria_state::nmi_mask_w)
+WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
 {
-	m_nmi_mask = data & 1;
+	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
@@ -151,12 +153,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x6800, 0x683f) AM_WRITE(attributes_w) AM_SHARE("attributesram")
 	AM_RANGE(0x6840, 0x685f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x6c00, 0x6c00) AM_MIRROR(0x81f8) AM_WRITE(flip_screen_x_w)
-	AM_RANGE(0x6c01, 0x6c01) AM_MIRROR(0x81f8) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0x6c02, 0x6c02) AM_MIRROR(0x81f8) AM_WRITE(ressound_w)
-	AM_RANGE(0x6c06, 0x6c06) AM_MIRROR(0x81f8) AM_WRITE(coin_w)
-	AM_RANGE(0x6c07, 0x6c07) AM_MIRROR(0x81f8) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x6c00, 0x6c07) AM_MIRROR(0x81f8) AM_READ(prot2_r)
+	AM_RANGE(0x6c00, 0x6c07) AM_MIRROR(0x81f8) AM_READ(prot2_r) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x6e00, 0x6e00) AM_MIRROR(0x81f8) AM_READ(dsw_r) AM_DEVWRITE("audiopcb", zac1b11142_audio_device, hs_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -164,11 +161,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER(zaccaria_state::ressound_w)
-{
-	m_audiopcb->ressound_w(data & 0x01);
-}
 
 static INPUT_PORTS_START( monymony )
 	PORT_START("DSW.0")
@@ -333,8 +325,8 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -347,6 +339,13 @@ static MACHINE_CONFIG_START( zaccaria )
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3G on 1B1141 I/O (Z80) board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaccaria_state, flip_screen_x_w)) // VCMA
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaccaria_state, flip_screen_y_w)) // HCMA
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("audiopcb", zac1b11142_audio_device, ressound_w)) // RESSOUND
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaccaria_state, coin_w)) // COUNT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaccaria_state, nmi_mask_w)) // INTST
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
