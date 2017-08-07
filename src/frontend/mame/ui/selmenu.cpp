@@ -246,29 +246,12 @@ void menu_select_launch::software_parts::handle()
 
 void menu_select_launch::software_parts::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
-	ui().draw_text_full(container(), _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = std::max(origx2 - origx1, width);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	ui().draw_text_full(container(), _("Software part selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	char const *const text[] = { _("Software part selection:") };
+	draw_text_box(
+			std::begin(text), std::end(text),
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
 }
 
 
@@ -369,29 +352,12 @@ void menu_select_launch::bios_selection::handle()
 
 void menu_select_launch::bios_selection::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
-	ui().draw_text_full(container(), _("BIOS selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = std::max(origx2 - origx1, width);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	ui().draw_text_full(container(), _("BIOS selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	char const *const text[] = { _("BIOS selection:") };
+	draw_text_box(
+			std::begin(text), std::end(text),
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
 }
 
 
@@ -587,47 +553,15 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 
 	// determine the text for the header
 	make_topbox_text(tempbuf[0], tempbuf[1], tempbuf[2]);
+	float const y1 = origy1 - 3.0f * UI_BOX_TB_BORDER - ui().get_line_height();
+	draw_text_box(
+			tempbuf, tempbuf + 3,
+			origx1, origx2, origy1 - top, y1,
+			ui::text_layout::CENTER, ui::text_layout::NEVER, true,
+			UI_TEXT_COLOR, UI_BACKGROUND_COLOR, 1.0f);
 
-	// get the size of the text
-	float maxwidth = origx2 - origx1;
-	for (int line = 0; line < 3; ++line)
-	{
-		float width;
-		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = (std::max)(width, maxwidth);
-	}
-
-	float text_size = 1.0f;
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	float tbarspace = ui().get_line_height();
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - 3.0f * UI_BOX_TB_BORDER - tbarspace;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	for (int line = 0; line < 3; ++line)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
+	// draw toolbar
+	draw_toolbar(origx1, y1, origx2, origy1 - UI_BOX_TB_BORDER);
 
 	// determine the text to render below
 	ui_software_info const *swinfo;
@@ -730,58 +664,16 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		tempbuf[4].clear();
 	}
 
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = y2;
-	y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw toolbar
-	draw_toolbar(x1, y1, x2, y2);
-
-	// get the size of the text
-	maxwidth = origx2 - origx1;
-
-	for (auto &elem : tempbuf)
-	{
-		float width;
-		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = (std::max)(maxwidth, width);
-	}
-
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + bottom;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
+	// draw the footer
+	draw_text_box(
+			std::begin(tempbuf), std::end(tempbuf),
+			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+			ui::text_layout::CENTER, ui::text_layout::NEVER, true,
+			UI_TEXT_COLOR, color, 1.0f);
 
 	// is favorite? draw the star
 	if (isstar)
-		draw_star(x1, y1);
-
-	// draw all lines
-	for (auto &elem : tempbuf)
-	{
-		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
+		draw_star(origx1 + UI_BOX_LR_BORDER, origy2 + (2.0f * UI_BOX_TB_BORDER));
 }
 
 

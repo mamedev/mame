@@ -299,23 +299,47 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 	}
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset"), "", 0, ITEMREF_RESET);
+
+	// leave space for the name of the current option at the bottom
+	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
 //-------------------------------------------------
-//  handle
+//  custom_render - draw extra menu content
+//-------------------------------------------------
+
+void menu_slot_devices::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+{
+	if (selectedref && (ITEMREF_RESET != selectedref))
+	{
+		device_slot_interface *const slot(reinterpret_cast<device_slot_interface *>(selectedref));
+		device_slot_option const *const option(get_current_option(*slot));
+		char const *const text[] = { option ? option->devtype().fullname() : _("[empty slot]") };
+		draw_text_box(
+				std::begin(text), std::end(text),
+				origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+				UI_TEXT_COLOR, UI_BACKGROUND_COLOR, 1.0f);
+	}
+}
+
+
+//-------------------------------------------------
+//  handle - process an input event
 //-------------------------------------------------
 
 void menu_slot_devices::handle()
 {
 	// process the menu
-	const event *menu_event = process(0);
+	event const *const menu_event(process(0));
 
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (menu_event && menu_event->itemref != nullptr)
 	{
-		if (menu_event->itemref == ITEMREF_RESET && menu_event->iptkey == IPT_UI_SELECT)
+		if (menu_event->itemref == ITEMREF_RESET)
 		{
-			machine().schedule_hard_reset();
+			if (menu_event->iptkey == IPT_UI_SELECT)
+				machine().schedule_hard_reset();
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{

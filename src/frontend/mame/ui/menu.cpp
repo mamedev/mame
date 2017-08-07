@@ -1302,8 +1302,8 @@ void menu::extra_text_position(float origx1, float origx2, float origy, float ys
 
 void menu::extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer)
 {
-	header = ((header != nullptr) && (header[0] != '\0')) ? header : nullptr;
-	footer = ((footer != nullptr) && (footer[0] != '\0')) ? footer : nullptr;
+	header = (header && *header) ? header : nullptr;
+	footer = (footer && *footer) ? footer : nullptr;
 
 	if (header != nullptr)
 		extra_text_draw_box(origx1, origx2, origy1, top, header, -1);
