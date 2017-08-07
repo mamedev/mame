@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-06 12:10+1000\n"
-"PO-Revision-Date: 2017-07-29 10:35+0800\n"
+"PO-Revision-Date: 2017-08-07 21:40+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -64,7 +64,9 @@ msgstr ""
 msgid ""
 "%s\n"
 " removed from favorites list."
-msgstr " 从最爱清单移除。"
+msgstr ""
+"%s\n"
+" 已从最爱清单移除。"
 
 #: src/frontend/mame/ui/selgame.cpp:593
 #: src/frontend/mame/ui/simpleselgame.cpp:272
@@ -83,7 +85,7 @@ msgstr "插件"
 #: src/frontend/mame/ui/selgame.cpp:1192
 #, c-format
 msgid "Romset\t%1$-.100s\n"
-msgstr ""
+msgstr "ROM组\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1193
 #, c-format
@@ -106,11 +108,11 @@ msgstr "驱动为主档\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1203
 msgid "Analog Controls\tYes\n"
-msgstr ""
+msgstr "类比控制\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1205
 msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "键盘输入\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1208
 msgid "Overall\tNOT WORKING\n"
@@ -230,11 +232,11 @@ msgstr "外部网路\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1280
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "计时\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1282
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "计时\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1284
 #, c-format
@@ -521,7 +523,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "High Scores"
-msgstr ""
+msgstr "高分"
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "History"
@@ -533,7 +535,7 @@ msgstr "MAMEinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MARPScore"
-msgstr ""
+msgstr "MARPScore"
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MESSinfo"
