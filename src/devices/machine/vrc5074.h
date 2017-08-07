@@ -9,6 +9,8 @@
 
 #include "pci.h"
 #include "cpu/mips/mips3.h"
+#include "machine/ins8250.h"
+#include "bus/rs232/rs232.h"
 
 #define MCFG_VRC5074_ADD(_tag, _cpu_tag) \
 	MCFG_PCI_HOST_ADD(_tag, VRC5074, 0x1033005a, 0x04, 0x00000000) \
@@ -25,7 +27,9 @@ public:
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
 
 	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	required_device<ns16550_device> m_uart;
 
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -65,6 +69,9 @@ public:
 	DECLARE_READ32_MEMBER (target1_r);
 	DECLARE_WRITE32_MEMBER(target1_w);
 
+	// Serial port
+	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
+
 protected:
 	address_space *m_cpu_space;
 	virtual space_config_vector memory_space_config() const override;
@@ -103,7 +110,6 @@ private:
 	address_map_delegate m_cs_maps[7];
 
 	uint32_t m_cpu_regs[0x1ff / 4];
-	uint32_t m_serial_regs[0x40 / 4];
 	uint16_t m_nile_irq_state;
 
 	void setup_pci_space();
