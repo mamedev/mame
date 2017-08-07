@@ -441,12 +441,16 @@ MACHINE_START_MEMBER(missb2_state,missb2)
 {
 	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 
+	m_sreset_old = CLEAR_LINE;
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_sreset_old));
 }
 
 MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
+	m_oki->reset();
+	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
 static MACHINE_CONFIG_START( missb2 )
