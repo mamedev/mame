@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+
+#include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "video/vsystem_gga.h"
 #include "screen.h"
@@ -11,6 +13,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
 		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -22,6 +25,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -32,9 +36,6 @@ public:
 	required_shared_ptr<uint16_t> m_bitmapram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	uint8_t m_sound_data;
-	uint8_t m_sound_busy;
-	uint8_t m_ym2151_irq;
 	uint8_t m_upd_rom_bank;
 	int m_sprite_palette;
 	int m_sprite_xoffs;
@@ -43,9 +44,7 @@ public:
 	uint8_t m_gins;
 	tilemap_t *m_background[2];
 	emu_timer *m_crtc_timer;
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_READ8_MEMBER(sound_command_r);
+
 	DECLARE_READ16_MEMBER(sound_busy_r);
 	DECLARE_WRITE16_MEMBER(rpunch_videoram_w);
 	DECLARE_WRITE16_MEMBER(rpunch_videoreg_w);
@@ -68,7 +67,6 @@ public:
 
 
 	uint32_t screen_update_rpunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(sound_command_w_callback);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
