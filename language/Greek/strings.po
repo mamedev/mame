@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-06 12:08+1000\n"
-"PO-Revision-Date: 2017-07-31 10:45+0300\n"
+"PO-Revision-Date: 2017-08-06 17:35+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -108,11 +108,11 @@ msgstr "Ο Οδηγός είναι γονικός\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1203
 msgid "Analog Controls\tYes\n"
-msgstr ""
+msgstr "Αναλογικός Χειρισμός\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1205
 msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "Εισαγωγή Πληκτρολογίου\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1208
 msgid "Overall\tNOT WORKING\n"
@@ -172,7 +172,7 @@ msgstr "Πληκτρολόγιο\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1242
 msgid "Keyboard\tImperfect\n"
-msgstr "Πληκτρολόγιο\tΑτελής\n"
+msgstr "Πληκτρολόγιο\tΑτελές\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1245
 msgid "Mouse\tUnimplemented\n"
@@ -180,7 +180,7 @@ msgstr "Ποντίκι\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1247
 msgid "Mouse\tImperfect\n"
-msgstr "Ποντίκι\tΑτελής\n"
+msgstr "Ποντίκι\tΑτελές\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1250
 msgid "Microphone\tUnimplemented\n"
@@ -188,7 +188,7 @@ msgstr "Μικρόφωνο\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1252
 msgid "Microphone\tImperfect\n"
-msgstr "Μικρόφωνο\tΑτελής\n"
+msgstr "Μικρόφωνο\tΑτελές\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1255
 msgid "Camera\tUnimplemented\n"
@@ -220,7 +220,7 @@ msgstr "LAN\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1272
 msgid "LAN\tImperfect\n"
-msgstr "LAN\tΑτελής\n"
+msgstr "LAN\tΑτελές\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1275
 msgid "WAN\tUnimplemented\n"
@@ -228,15 +228,15 @@ msgstr "WAN\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1277
 msgid "WAN\tImperfect\n"
-msgstr "WAN\tΑτελής\n"
+msgstr "WAN\tΑτελές\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1280
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "Χρονισμός\tΜη υλοποιημένος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1282
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "Χρονισμός\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1284
 #, c-format
@@ -270,7 +270,7 @@ msgstr "Απαιτεί Artwork για κλικ\t%1$s\n"
 #: src/frontend/mame/ui/selgame.cpp:1287
 #, c-format
 msgid "Support Cocktail\t%1$s\n"
-msgstr "Υποστήριξη Cocktail\t%1$s\n"
+msgstr "Υποστήριξη Κοκτέιλ\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1288
 #, c-format
@@ -306,7 +306,7 @@ msgstr "Έλεγχος ROMs\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1314
 msgid "Roms Audit Pass\tBAD\n"
-msgstr "Έλεγχος ROMs\tΛάθος\n"
+msgstr "Έλεγχος ROMs\tΛΑΘΟΣ\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1317
 msgid "Samples Audit Pass\tNone Needed\n"
@@ -318,7 +318,7 @@ msgstr "Έλεγχος Δειγμάτων Ήχου\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1321
 msgid "Samples Audit Pass\tBAD\n"
-msgstr "Έλεγχος Δειγμάτων Ήχου\tΛάθος\n"
+msgstr "Έλεγχος Δειγμάτων Ήχου\tΛΑΘΟΣ\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1324
 msgid ""
@@ -365,7 +365,7 @@ msgid ""
 "\n"
 msgstr ""
 "Στο επιλεγμένο μηχάνημα λείπουν ένα ή περισσότερα απαιτούμενα αρχεία ROM ή "
-"CHD. Επιλέξτε διαφορετικό μηχάνημα.\n"
+"CHD. Παρακαλώ επιλέξτε διαφορετικό μηχάνημα.\n"
 "\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1745 src/frontend/mame/ui/selsoft.cpp:630
@@ -522,11 +522,11 @@ msgstr "Εντολή"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "Gameinit"
-msgstr ""
+msgstr "Αρχικοποίηση παιχνιδιού"
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "High Scores"
-msgstr ""
+msgstr "Υψηλά σκορ"
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "History"
@@ -538,7 +538,7 @@ msgstr "MAMEinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MARPScore"
-msgstr ""
+msgstr "MARPScore"
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MESSinfo"
@@ -630,7 +630,7 @@ msgstr "Γραφικά: OK, "
 
 #: src/frontend/mame/ui/selmenu.cpp:711
 msgid "Sound: None"
-msgstr "Ήχος: Δεν Έχει Υλοποιηθεί"
+msgstr "Ήχος: Κανένας"
 
 #: src/frontend/mame/ui/selmenu.cpp:713
 msgid "Sound: Unimplemented"
@@ -683,7 +683,7 @@ msgstr "εγγραφή"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(recording)"
-msgstr "(καταγραφή)"
+msgstr "(εγγραφή)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:95
 msgid "Pause/Stop"
@@ -943,7 +943,7 @@ msgid ""
 "Please select a different one."
 msgstr ""
 "Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες ROMs ή εικόνες CHD. "
-"Παρακαλούμε επιλέξτε ένα διαφορετικό."
+"Παρακαλώ επιλέξτε ένα διαφορετικό."
 
 #: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:99
 msgid "Pseudo terminals"
@@ -1241,7 +1241,7 @@ msgstr "Δίκτυο WAN"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr ""
+msgstr "χρονισμός"
 
 #: src/frontend/mame/ui/info.cpp:177
 msgid ""
@@ -1443,7 +1443,7 @@ msgstr "Χειρισμός (τρέχων Μηχάνημα)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:66
 msgid "Analog Controls"
-msgstr "Αναλογικά Χειριστήρια "
+msgstr "Αναλογικά Χειριστήρια"
 
 #: src/frontend/mame/ui/mainmenu.cpp:68
 msgid "Dip Switches"
@@ -1495,7 +1495,7 @@ msgstr "Λειτουργία Πληκτρολογίου"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Slider Controls"
-msgstr "Έλεγχος Slider "
+msgstr "Έλεγχος Slider"
 
 #: src/frontend/mame/ui/mainmenu.cpp:124 src/frontend/mame/ui/submenu.cpp:99
 msgid "Video Options"
@@ -1531,7 +1531,7 @@ msgstr "Επιλέξτε Νέο Μηχάνημα"
 
 #: src/frontend/mame/ui/custui.cpp:30
 msgid "Show All"
-msgstr "Προβολή όλων"
+msgstr "Προβολή Όλων"
 
 #: src/frontend/mame/ui/custui.cpp:31
 msgid "Hide Filters"
@@ -1559,7 +1559,7 @@ msgstr "Γλώσσα"
 
 #: src/frontend/mame/ui/custui.cpp:151
 msgid "Show side panels"
-msgstr "Εμφάνιση πλευρικών πάνελ"
+msgstr "Προβολή πλευρικών πάνελ"
 
 #: src/frontend/mame/ui/custui.cpp:165 src/frontend/mame/ui/custui.cpp:185
 msgid "Custom UI Settings"
@@ -1685,7 +1685,7 @@ msgstr "Κανονικό"
 
 #: src/frontend/mame/ui/custui.cpp:586
 msgid "Subitem"
-msgstr "Δευτερεύον στοιχείο "
+msgstr "Δευτερεύον στοιχείο"
 
 #: src/frontend/mame/ui/custui.cpp:587
 msgid "Selected"
@@ -1724,7 +1724,7 @@ msgstr "Επιλέξτε από την παλέτα"
 
 #: src/frontend/mame/ui/custui.cpp:890
 msgid "Color preview ="
-msgstr "Προεπισκόπηση χρώματος="
+msgstr "Προεπισκόπηση χρώματος ="
 
 #: src/frontend/mame/ui/custui.cpp:971
 msgid "White"
@@ -1881,7 +1881,7 @@ msgid ""
 "\n"
 msgstr ""
 "Στο επιλεγμένο λογισμικό λείπει ένα ή περισσότερα απαραίτητα αρχεία. "
-"Επιλέξτε ένα διαφορετικό λογισμικό.\n"
+"Παρακαλώ επιλέξτε ένα διαφορετικό λογισμικό.\n"
 "\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:1153
@@ -1997,7 +1997,7 @@ msgstr "Ορατή Καθυστέρηση"
 #: src/frontend/mame/ui/miscmenu.cpp:604
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr "%s.XML αποθηκεύτηκε στο φάκελο ui."
+msgstr "%s.xml αποθηκεύτηκε στο φάκελο ui."
 
 #: src/frontend/mame/ui/miscmenu.cpp:630
 msgid "Name:             Description:\n"
@@ -2054,7 +2054,7 @@ msgstr "Μεγέθυνση εικόνων στο δεξιό πίνακα"
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
-msgstr "Εμφάνιση δείκτη ποντικιού"
+msgstr "Προβολή δείκτη ποντικιού"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
@@ -2150,11 +2150,11 @@ msgstr "Κάθετη περιστροφή"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Artwork Options"
-msgstr "Επιλογές artwork"
+msgstr "Επιλογές Artwork"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Crop"
-msgstr "Αποκοπή Artworks"
+msgstr "Αποκοπή Artwork"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Use Backdrops"
@@ -2258,7 +2258,7 @@ msgstr "Χαρτογράφηση Συσκευών"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Lightgun Device Assignment"
-msgstr "Ανάθεση Συσκευής Lightgun "
+msgstr "Ανάθεση Συσκευής Lightgun"
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Trackball Device Assignment"
@@ -2360,7 +2360,7 @@ msgid ""
 "Press any key to continue."
 msgstr ""
 "Στο επιλεγμένο παιχνίδι λείπει ένα ή περισσότερα απαιτούμενα αρχεία ROM ή "
-"CHD. Επιλέξτε ένα διαφορετικό παιχνίδι.\n"
+"CHD. Παρακαλώ επιλέξτε ένα διαφορετικό παιχνίδι.\n"
 "\n"
 "Πιέστε ένα πλήκτρο για συνέχεια."
 
