@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/selmenu.h"
 
 #include "ui/icorender.h"

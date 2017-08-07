@@ -30,11 +30,12 @@ protected:
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 
-	std::string         m_search;
-	const game_driver   *m_driver;
-	bool                m_has_empty_start;
-	s_filter            m_filter;
-	int                 highlight;
+	std::string             m_search;
+	const game_driver       *m_driver;
+	bool                    m_has_empty_start;
+	s_filter                m_filter;
+	software_filter::type   m_filter_type;
+	int                     highlight;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;

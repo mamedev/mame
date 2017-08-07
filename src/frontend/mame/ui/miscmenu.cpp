@@ -720,7 +720,7 @@ void menu_machine_configure::handle()
 					break;
 				case DELFAV:
 					mame_machine_manager::instance()->favorite().remove_favorite_game();
-					if (main_filters::actual == FILTER_FAVORITE)
+					if (main_filters::actual == machine_filter::FAVORITE)
 					{
 						m_fav_reset = true;
 						menu::stack_pop();

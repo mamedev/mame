@@ -132,8 +132,6 @@ protected:
 	std::vector<menu_item>  item;         // array of items
 
 	int top_line;           // main box top line
-	int l_sw_hover;
-	int l_hover;
 	int skip_main_items;
 	int selected;           // which item is selected
 

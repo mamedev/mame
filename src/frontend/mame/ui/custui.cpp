@@ -26,11 +26,12 @@
 
 
 namespace ui {
+
 const char *const menu_custom_ui::HIDE_STATUS[] = {
-	__("Show All"),
-	__("Hide Filters"),
-	__("Hide Info/Image"),
-	__("Hide Both") };
+		__("Show All"),
+		__("Hide Filters"),
+		__("Hide Info/Image"),
+		__("Hide Both") };
 
 //-------------------------------------------------
 //  ctor
@@ -88,42 +89,51 @@ void menu_custom_ui::handle()
 	{
 		switch ((uintptr_t)menu_event->itemref)
 		{
-			case FONT_MENU:
-				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_font_ui>(ui(), container());
-				break;
-			case COLORS_MENU:
-				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_colors_ui>(ui(), container());
-				break;
-			case HIDE_MENU:
+		case FONT_MENU:
+			if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_font_ui>(ui(), container());
+			break;
+		case COLORS_MENU:
+			if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_colors_ui>(ui(), container());
+			break;
+		case HIDE_MENU:
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 			{
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-				{
-					changed = true;
-					(menu_event->iptkey == IPT_UI_RIGHT) ? ui_globals::panels_status++ : ui_globals::panels_status--;
-				}
-				else if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					std::vector<std::string> s_sel(ARRAY_LENGTH(HIDE_STATUS));
-					std::transform(std::begin(HIDE_STATUS), std::end(HIDE_STATUS), s_sel.begin(), [](auto &s) { return _(s); });
-					menu::stack_push<menu_selector>(ui(), container(), std::move(s_sel), ui_globals::panels_status);
-				}
-				break;
+				changed = true;
+				(menu_event->iptkey == IPT_UI_RIGHT) ? ui_globals::panels_status++ : ui_globals::panels_status--;
 			}
-			case LANGUAGE_MENU:
+			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-				{
-					changed = true;
-					(menu_event->iptkey == IPT_UI_RIGHT) ? m_currlang++ : m_currlang--;
-				}
-				else if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					menu::stack_push<menu_selector>(ui(), container(), m_lang, m_currlang);
-				}
-				break;
+				std::vector<std::string> s_sel(ARRAY_LENGTH(HIDE_STATUS));
+				std::transform(std::begin(HIDE_STATUS), std::end(HIDE_STATUS), s_sel.begin(), [](auto &s) { return _(s); });
+				menu::stack_push<menu_selector>(
+						ui(), container(), std::move(s_sel), ui_globals::panels_status,
+						[this] (int selection)
+						{
+							ui_globals::panels_status = selection;
+							reset(reset_options::REMEMBER_REF);
+						});
 			}
+			break;
+		case LANGUAGE_MENU:
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+			{
+				changed = true;
+				(menu_event->iptkey == IPT_UI_RIGHT) ? m_currlang++ : m_currlang--;
+			}
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+			{
+				// copying list of language names - expensive
+				menu::stack_push<menu_selector>(
+						ui(), container(), std::vector<std::string>(m_lang), m_currlang,
+						[this] (int selection)
+						{
+							m_currlang = selection;
+							reset(reset_options::REMEMBER_REF);
+						});
+			}
+			break;
 		}
 	}
 
@@ -278,8 +288,15 @@ void menu_font_ui::handle()
 				{
 					std::vector<std::string> display_names;
 					display_names.reserve(m_fonts.size());
-					for (auto const &font : m_fonts) display_names.emplace_back(font.second);
-					menu::stack_push<menu_selector>(ui(), container(), std::move(display_names), m_actual);
+					for (auto const &font : m_fonts)
+						display_names.emplace_back(font.second);
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::move(display_names), m_actual,
+							[this] (int selection)
+							{
+								m_actual = selection;
+								reset(reset_options::REMEMBER_REF);
+							});
 					changed = true;
 				}
 				break;

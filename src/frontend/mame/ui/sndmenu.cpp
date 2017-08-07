@@ -97,7 +97,13 @@ void menu_sound_options::handle()
 				for (int index = 0; index < total; index++)
 					s_sel[index] = std::to_string(m_sound_rate[index]);
 
-				menu::stack_push<menu_selector>(ui(), container(), s_sel, m_cur_rates);
+				menu::stack_push<menu_selector>(
+						ui(), container(), std::move(s_sel), m_cur_rates,
+						[this] (int selection)
+						{
+							m_cur_rates = selection;
+							reset(reset_options::REMEMBER_REF);
+						});
 			}
 			break;
 

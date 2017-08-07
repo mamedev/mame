@@ -9,38 +9,29 @@
 *********************************************************************/
 
 #include "emu.h"
-
 #include "ui/selector.h"
-#include "ui/ui.h"
-#include "ui/inifile.h"
 
-#include "mame.h"
+#include "ui/ui.h"
+#include "ui/utils.h"
+
 
 namespace ui {
+
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &s_sel, uint16_t &s_actual, int category, int _hover)
+menu_selector::menu_selector(
+		mame_ui_manager &mui,
+		render_container &container,
+		std::vector<std::string> &&sel,
+		int initial,
+		std::function<void (int)> &&handler)
 	: menu(mui, container)
 	, m_search()
-	, m_selector(s_actual)
-	, m_category(category)
-	, m_hover(_hover)
-	, m_first_pass(true)
-	, m_str_items(s_sel)
-{
-	m_searchlist[0] = nullptr;
-}
-
-menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&s_sel, uint16_t &s_actual, int category, int _hover)
-	: menu(mui, container)
-	, m_search()
-	, m_selector(s_actual)
-	, m_category(category)
-	, m_hover(_hover)
-	, m_first_pass(true)
-	, m_str_items(std::move(s_sel))
+	, m_str_items(std::move(sel))
+	, m_handler(std::move(handler))
+	, m_initial(initial)
 {
 	m_searchlist[0] = nullptr;
 }
@@ -62,37 +53,12 @@ void menu_selector::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			for (size_t idx = 0; idx < m_str_items.size(); ++idx)
+			int selection(-1);
+			for (size_t idx = 0; (m_str_items.size() > idx) && (0 > selection); ++idx)
 				if ((void*)&m_str_items[idx] == menu_event->itemref)
-					m_selector = idx;
+					selection = int(unsigned(idx));
 
-			switch (m_category)
-			{
-			case INIFILE:
-				mame_machine_manager::instance()->inifile().set_file(m_selector);
-				mame_machine_manager::instance()->inifile().set_cat(0);
-				reset_parent(reset_options::REMEMBER_REF);
-				break;
-
-			case CATEGORY:
-				mame_machine_manager::instance()->inifile().set_cat(m_selector);
-				reset_parent(reset_options::REMEMBER_REF);
-				break;
-
-			case GAME:
-				main_filters::actual = m_hover;
-				reset_parent(reset_options::SELECT_FIRST);
-				break;
-
-			case SOFTWARE:
-				sw_filters::actual = m_hover;
-				reset_parent(reset_options::SELECT_FIRST);
-				break;
-
-			default:
-				reset_parent(reset_options::REMEMBER_REF);
-				break;
-			}
+			m_handler(selection);
 
 			ui_globals::switch_image = true;
 			stack_pop();
@@ -127,20 +93,18 @@ void menu_selector::populate(float &customtop, float &custombottom)
 	}
 	else
 	{
-		for (size_t index = 0, added = 0; index < m_str_items.size(); ++index)
-			if (m_str_items[index] != "_skip_")
-			{
-				if (m_first_pass && m_selector == index)
-					selected = added;
+		for (size_t index = 0; index < m_str_items.size(); ++index)
+		{
+			if ((0 <= m_initial) && (unsigned(m_initial) == index))
+				selected = index;
 
-				added++;
-				item_append(m_str_items[index], "", 0, (void *)&m_str_items[index]);
-			}
+			item_append(m_str_items[index], "", 0, (void *)&m_str_items[index]);
+		}
 	}
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	m_first_pass = false;
+	m_initial = -1;
 }
 
 //-------------------------------------------------
@@ -161,7 +125,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
 			UI_TEXT_COLOR, UI_RED_COLOR, 1.0f);
 }
 
@@ -177,9 +141,6 @@ void menu_selector::find_matches(const char *str)
 
 	for (; index < m_str_items.size(); ++index)
 	{
-		if (m_str_items[index] == "_skip_")
-			continue;
-
 		int curpenalty = fuzzy_substring(str, m_str_items[index]);
 
 		// insert into the sorted table of matches

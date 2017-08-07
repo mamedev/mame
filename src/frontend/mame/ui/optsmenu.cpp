@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-
 #include "ui/optsmenu.h"
 
 #include "ui/ui.h"
@@ -27,6 +26,7 @@
 #include "rendfont.h"
 
 namespace ui {
+
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
@@ -42,7 +42,7 @@ menu_game_options::menu_game_options(mame_ui_manager &mui, render_container &con
 
 menu_game_options::~menu_game_options()
 {
-	main_filters::actual = m_main;
+	main_filters::actual = machine_filter::type(m_main);
 	reset_topmost(reset_options::SELECT_FIRST);
 	ui().save_ui_options();
 	ui_globals::switch_image = true;
@@ -80,12 +80,17 @@ void menu_game_options::handle()
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					int total = main_filters::length;
-					std::vector<std::string> s_sel(total);
-					for (int index = 0; index < total; ++index)
-						s_sel[index] = main_filters::text[index];
+					std::vector<std::string> s_sel(machine_filter::COUNT);
+					for (unsigned index = 0; index < s_sel.size(); ++index)
+						s_sel[index] = machine_filter::display_name(machine_filter::type(index));
 
-					menu::stack_push<menu_selector>(ui(), container(), s_sel, m_main);
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::move(s_sel), m_main,
+							[this] (int selection)
+							{
+								m_main = selection;
+								reset(reset_options::REMEMBER_REF);
+							});
 				}
 				break;
 			}
@@ -110,7 +115,14 @@ void menu_game_options::handle()
 					for (size_t index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_file(index);
 
-					menu::stack_push<menu_selector>(ui(), container(), s_sel, ifile.cur_file(), menu_selector::INIFILE);
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::move(s_sel), ifile.cur_file(),
+							[this] (int selection)
+							{
+								mame_machine_manager::instance()->inifile().set_file(selection);
+								mame_machine_manager::instance()->inifile().set_cat(0);
+								reset(reset_options::REMEMBER_REF);
+							});
 				}
 				break;
 			}
@@ -134,7 +146,14 @@ void menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_category(index);
 
-					menu::stack_push<menu_selector>(ui(), container(), s_sel, ifile.cur_cat(), menu_selector::CATEGORY);
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::move(s_sel), ifile.cur_cat(),
+							[this] (int selection)
+							{
+								mame_machine_manager::instance()->inifile().cur_cat() = selection;
+								mame_machine_manager::instance()->inifile().set_cat(selection);
+								reset(reset_options::REMEMBER_REF);
+							});
 				}
 				break;
 			}
@@ -145,7 +164,15 @@ void menu_game_options::handle()
 					changed = true;
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_selector>(ui(), container(), c_mnfct::ui, c_mnfct::actual);
+				{
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::vector<std::string>(c_mnfct::ui), c_mnfct::actual,
+							[this] (int selection)
+							{
+								c_mnfct::actual = selection;
+								reset(reset_options::REMEMBER_REF);
+							});
+				}
 
 				break;
 			case YEAR_CAT_FILTER:
@@ -155,7 +182,15 @@ void menu_game_options::handle()
 					changed = true;
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_selector>(ui(), container(), c_year::ui, c_year::actual);
+				{
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::vector<std::string>(c_year::ui), c_year::actual,
+							[this] (int selection)
+							{
+								c_year::actual = selection;
+								reset(reset_options::REMEMBER_REF);
+							});
+				}
 
 				break;
 			case CONF_DIR:
@@ -228,11 +263,11 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 		std::string fbuff;
 
 		// add filter item
-		uint32_t arrow_flags = get_arrow_flags<uint16_t>(FILTER_FIRST, FILTER_LAST, m_main);
-		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(uintptr_t)FILTER_MENU);
+		uint32_t arrow_flags = get_arrow_flags<uint16_t>(machine_filter::FIRST, machine_filter::LAST, m_main);
+		item_append(_("Filter"), machine_filter::display_name(machine_filter::type(m_main)), arrow_flags, (void *)(uintptr_t)FILTER_MENU);
 
 		// add category subitem
-		if (m_main == FILTER_CATEGORY && mame_machine_manager::instance()->inifile().total() > 0)
+		if (m_main == machine_filter::CATEGORY && mame_machine_manager::instance()->inifile().total() > 0)
 		{
 			inifile_manager &inif = mame_machine_manager::instance()->inifile();
 
@@ -247,7 +282,7 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 			item_append(fbuff, inif.get_category(), arrow_flags, (void *)(uintptr_t)CATEGORY_FILTER);
 		}
 		// add manufacturer subitem
-		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
+		else if (m_main == machine_filter::MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(c_mnfct::ui.size() - 1), c_mnfct::actual);
 			fbuff = _("^!Manufacturer");
@@ -255,7 +290,7 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 			item_append(fbuff, c_mnfct::ui[c_mnfct::actual], arrow_flags, (void *)(uintptr_t)MANUFACT_CAT_FILTER);
 		}
 		// add year subitem
-		else if (m_main == FILTER_YEAR && c_year::ui.size() > 0)
+		else if (m_main == machine_filter::YEAR && c_year::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(c_year::ui.size() - 1), c_year::actual);
 			fbuff.assign(_("^!Year"));
@@ -263,7 +298,7 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 			item_append(fbuff, c_year::ui[c_year::actual], arrow_flags, (void *)(uintptr_t)YEAR_CAT_FILTER);
 		}
 		// add custom subitem
-		else if (m_main == FILTER_CUSTOM)
+		else if (m_main == machine_filter::CUSTOM)
 		{
 			fbuff = _("^!Setup custom filter");
 			convert_command_glyph(fbuff);

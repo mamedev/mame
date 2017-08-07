@@ -11,7 +11,83 @@
 #include "emu.h"
 #include "ui/utils.h"
 
+#include "language.h"
+
 #include "softlist.h"
+
+
+namespace ui {
+
+namespace {
+
+constexpr char const *machine_filter_names[machine_filter::COUNT] = {
+		__("Unfiltered"),
+		__("Available"),
+		__("Unavailable"),
+		__("Working"),
+		__("Not Working"),
+		__("Mechanical"),
+		__("Not Mechanical"),
+		__("Category"),
+		__("Favorites"),
+		__("BIOS"),
+		__("Parents"),
+		__("Clones"),
+		__("Manufacturers"),
+		__("Release Years"),
+		__("Save Supported"),
+		__("Save Unsupported"),
+		__("CHD Required"),
+		__("No CHD Required"),
+		__("Vertical Screen"),
+		__("Horizontal Screen"),
+		__("Custom Filter") };
+
+constexpr char const *software_filter_names[software_filter::COUNT] = {
+		__("Unfiltered"),
+		__("Available"),
+		__("Unavailable"),
+		__("Parents"),
+		__("Clones"),
+		__("Release Years"),
+		__("Publishers"),
+		__("Supported"),
+		__("Partially Supported"),
+		__("Unsupported"),
+		__("Release Region"),
+		__("Device Type"),
+		__("Software List"),
+		__("Custom Filter") };
+
+} // anonymous namespace
+
+
+char const *machine_filter::config_name(type n)
+{
+	assert(COUNT > n);
+	return machine_filter_names[n];
+}
+
+char const *machine_filter::display_name(type n)
+{
+	assert(COUNT > n);
+	return _(machine_filter_names[n]);
+}
+
+
+char const *software_filter::config_name(type n)
+{
+	assert(COUNT > n);
+	return software_filter_names[n];
+}
+
+char const *software_filter::display_name(type n)
+{
+	assert(COUNT > n);
+	return _(software_filter_names[n]);
+}
+
+} // namesapce ui
 
 
 extern const char UI_VERSION_TAG[];
@@ -27,17 +103,7 @@ std::vector<std::string> c_mnfct::ui;
 std::unordered_map<std::string, int> c_mnfct::uimap;
 
 // Main filters
-uint16_t main_filters::actual = 0;
-const char *main_filters::text[] = { "All", "Available", "Unavailable", "Working", "Not Working", "Mechanical", "Not Mechanical",
-	"Category", "Favorites", "BIOS", "Parents", "Clones", "Manufacturers", "Years", "Support Save",
-	"Not Support Save", "CHD", "No CHD", "Vertical", "Horizontal", "Custom" };
-size_t main_filters::length = ARRAY_LENGTH(main_filters::text);
-
-// Software filters
-uint16_t sw_filters::actual = 0;
-const char *sw_filters::text[] = { "All", "Available", "Unavailable", "Parents", "Clones", "Years", "Publishers", "Supported",
-	"Partial Supported", "Unsupported", "Region", "Device Type", "Software List", "Custom" };
-size_t sw_filters::length = ARRAY_LENGTH(sw_filters::text);
+ui::machine_filter::type main_filters::actual = ui::machine_filter::ALL;
 
 // Globals
 uint8_t ui_globals::rpanel = 0;
@@ -56,17 +122,17 @@ uint16_t ui_globals::panels_status = 0;
 bool ui_globals::has_icons = false;
 
 // Custom filter
-uint16_t custfltr::main = 0;
+ui::machine_filter::type custfltr::main = ui::machine_filter::ALL;
 uint16_t custfltr::numother = 0;
-uint16_t custfltr::other[MAX_CUST_FILTER];
+ui::machine_filter::type custfltr::other[MAX_CUST_FILTER];
 uint16_t custfltr::mnfct[MAX_CUST_FILTER];
 uint16_t custfltr::year[MAX_CUST_FILTER];
 uint16_t custfltr::screen[MAX_CUST_FILTER];
 
 // Custom filter
-uint16_t sw_custfltr::main = 0;
+ui::software_filter::type sw_custfltr::main = ui::software_filter::ALL;
 uint16_t sw_custfltr::numother = 0;
-uint16_t sw_custfltr::other[MAX_CUST_FILTER];
+ui::software_filter::type sw_custfltr::other[MAX_CUST_FILTER];
 uint16_t sw_custfltr::mnfct[MAX_CUST_FILTER];
 uint16_t sw_custfltr::year[MAX_CUST_FILTER];
 uint16_t sw_custfltr::region[MAX_CUST_FILTER];

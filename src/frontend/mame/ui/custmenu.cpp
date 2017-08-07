@@ -9,8 +9,9 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
 #include "ui/custmenu.h"
+
+#include "ui/ui.h"
 #include "ui/selector.h"
 #include "ui/inifile.h"
 
@@ -18,6 +19,7 @@
 
 
 namespace ui {
+
 /**************************************************
     MENU CUSTOM FILTER
 **************************************************/
@@ -52,61 +54,70 @@ void menu_custom_filter::handle()
 	{
 		switch ((uintptr_t)menu_event->itemref)
 		{
-			case MAIN_FILTER:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-				{
-					(menu_event->iptkey == IPT_UI_RIGHT) ? custfltr::main++ : custfltr::main--;
-					changed = true;
-				}
-				break;
+		case MAIN_FILTER:
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+			{
+				(menu_event->iptkey == IPT_UI_RIGHT) ? custfltr::main++ : custfltr::main--;
+				changed = true;
+			}
+			break;
 
-			case ADD_FILTER:
-				if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					custfltr::numother++;
-					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
-					m_added = true;
-				}
-				break;
+		case ADD_FILTER:
+			if (menu_event->iptkey == IPT_UI_SELECT)
+			{
+				custfltr::numother++;
+				custfltr::other[custfltr::numother] = machine_filter::UNAVAILABLE;
+				++custfltr::other[custfltr::numother];
+				m_added = true;
+			}
+			break;
 
-			case REMOVE_FILTER:
-				if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
-					custfltr::numother--;
-					changed = true;
-				}
-				break;
+		case REMOVE_FILTER:
+			if (menu_event->iptkey == IPT_UI_SELECT)
+			{
+				custfltr::other[custfltr::numother] = machine_filter::UNAVAILABLE;
+				++custfltr::other[custfltr::numother];
+				custfltr::numother--;
+				changed = true;
+			}
+			break;
 		}
 
 		if ((uintptr_t)menu_event->itemref >= OTHER_FILTER && (uintptr_t)menu_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
 		{
 			int pos = (int)((uintptr_t)menu_event->itemref - OTHER_FILTER);
-			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::other[pos] > FILTER_UNAVAILABLE + 1)
+			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::other[pos] > machine_filter::UNAVAILABLE + 1)
 			{
 				custfltr::other[pos]--;
-				for ( ; custfltr::other[pos] > FILTER_UNAVAILABLE && (custfltr::other[pos] == FILTER_CATEGORY
-						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]--) { };
+				for ( ; custfltr::other[pos] > machine_filter::UNAVAILABLE && (custfltr::other[pos] == machine_filter::CATEGORY
+						|| custfltr::other[pos] == machine_filter::FAVORITE); custfltr::other[pos]--) { };
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT && custfltr::other[pos] < FILTER_LAST - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && custfltr::other[pos] < machine_filter::LAST - 1)
 			{
 				custfltr::other[pos]++;
-				for ( ; custfltr::other[pos] < FILTER_LAST && (custfltr::other[pos] == FILTER_CATEGORY
-						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]++) { };
+				for ( ; custfltr::other[pos] < machine_filter::LAST && (custfltr::other[pos] == machine_filter::CATEGORY
+						|| custfltr::other[pos] == machine_filter::FAVORITE); custfltr::other[pos]++) { };
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				size_t total = main_filters::length;
-				std::vector<std::string> s_sel(total);
-				for (size_t index = 0; index < total; ++index)
-					if (index <= FILTER_UNAVAILABLE || index == FILTER_CATEGORY || index == FILTER_FAVORITE || index == FILTER_CUSTOM)
-						s_sel[index] = "_skip_";
-					else
-						s_sel[index] = main_filters::text[index];
-
-				menu::stack_push<menu_selector>(ui(), container(), s_sel, custfltr::other[pos]);
+				std::vector<machine_filter::type> types;
+				std::vector<std::string> names;
+				types.reserve(machine_filter::COUNT);
+				names.reserve(machine_filter::COUNT);
+				int sel(-1);
+				for (machine_filter::type index = machine_filter::FIRST; index < machine_filter::COUNT; ++index)
+				{
+					if ((index > machine_filter::UNAVAILABLE) && (index != machine_filter::CATEGORY) && (index != machine_filter::FAVORITE) && (index != machine_filter::CUSTOM))
+					{
+						if (custfltr::other[pos] == index)
+							sel = types.size();
+						types.emplace_back(index);
+						names.emplace_back(machine_filter::display_name(index));
+					}
+				}
+				menu::stack_push<menu_selector>(ui(), container(), std::move(names), sel, [this, pos, t = std::move(types)] (int selection) { custfltr::other[pos] = t[selection]; reset(reset_options::REMEMBER_REF); });
 			}
 		}
 		else if ((uintptr_t)menu_event->itemref >= YEAR_FILTER && (uintptr_t)menu_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
@@ -123,7 +134,9 @@ void menu_custom_filter::handle()
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_selector>(ui(), container(), c_year::ui, custfltr::year[pos]);
+			{
+				menu::stack_push<menu_selector>(ui(), container(), std::vector<std::string>(c_year::ui), custfltr::year[pos], [this, pos] (int selection) { custfltr::year[pos] = selection; reset(reset_options::REMEMBER_REF); });
+			}
 		}
 		else if ((uintptr_t)menu_event->itemref >= MNFCT_FILTER && (uintptr_t)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
@@ -139,7 +152,9 @@ void menu_custom_filter::handle()
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_selector>(ui(), container(), c_mnfct::ui, custfltr::mnfct[pos]);
+			{
+				menu::stack_push<menu_selector>(ui(), container(), std::vector<std::string>(c_mnfct::ui), custfltr::mnfct[pos], [this, pos] (int selection) { custfltr::mnfct[pos] = selection; reset(reset_options::REMEMBER_REF); });
+			}
 		}
 	}
 
@@ -155,8 +170,8 @@ void menu_custom_filter::handle()
 void menu_custom_filter::populate(float &customtop, float &custombottom)
 {
 	// add main filter
-	uint32_t arrow_flags = get_arrow_flags<uint16_t>(FILTER_ALL, FILTER_UNAVAILABLE, custfltr::main);
-	item_append(_("Main filter"), main_filters::text[custfltr::main], arrow_flags, (void *)(uintptr_t)MAIN_FILTER);
+	uint32_t arrow_flags = get_arrow_flags<uint16_t>(machine_filter::ALL, machine_filter::UNAVAILABLE, custfltr::main);
+	item_append(_("Main filter"), machine_filter::display_name(custfltr::main), arrow_flags, (void *)(uintptr_t)MAIN_FILTER);
 
 	// add other filters
 	for (int x = 1; x <= custfltr::numother; x++)
@@ -164,14 +179,14 @@ void menu_custom_filter::populate(float &customtop, float &custombottom)
 		item_append(menu_item_type::SEPARATOR);
 
 		// add filter items
-		arrow_flags = get_arrow_flags<uint16_t>(FILTER_UNAVAILABLE + 1, FILTER_LAST - 1, custfltr::other[x]);
-		item_append(_("Other filter"), main_filters::text[custfltr::other[x]], arrow_flags, (void *)(uintptr_t)(OTHER_FILTER + x));
+		arrow_flags = get_arrow_flags<uint16_t>(machine_filter::UNAVAILABLE + 1, machine_filter::LAST - 1, custfltr::other[x]);
+		item_append(_("Other filter"), machine_filter::display_name(custfltr::other[x]), arrow_flags, (void *)(uintptr_t)(OTHER_FILTER + x));
 
 		if (m_added)
 			selected = item.size() - 2;
 
 		// add manufacturer subitem
-		if (custfltr::other[x] == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
+		if (custfltr::other[x] == machine_filter::MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags<uint16_t>(0, c_mnfct::ui.size() - 1, custfltr::mnfct[x]);
 			std::string fbuff(_("^!Manufacturer"));
@@ -180,7 +195,7 @@ void menu_custom_filter::populate(float &customtop, float &custombottom)
 		}
 
 		// add year subitem
-		else if (custfltr::other[x] == FILTER_YEAR && c_year::ui.size() > 0)
+		else if (custfltr::other[x] == machine_filter::YEAR && c_year::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags<uint16_t>(0, c_year::ui.size() - 1, custfltr::year[x]);
 			std::string fbuff(_("^!Year"));
@@ -227,14 +242,14 @@ void menu_custom_filter::save_custom_filters()
 		// generate custom filters info
 		std::ostringstream cinfo;
 		util::stream_format(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
-		util::stream_format(cinfo, "Main filter = %s\n", main_filters::text[custfltr::main]);
+		util::stream_format(cinfo, "Main filter = %s\n", machine_filter::config_name(custfltr::main));
 
 		for (int x = 1; x <= custfltr::numother; x++)
 		{
-			util::stream_format(cinfo, "Other filter = %s\n", main_filters::text[custfltr::other[x]]);
-			if (custfltr::other[x] == FILTER_MANUFACTURER)
+			util::stream_format(cinfo, "Other filter = %s\n", machine_filter::config_name(custfltr::other[x]));
+			if (custfltr::other[x] == machine_filter::MANUFACTURER)
 				util::stream_format(cinfo, "  Manufacturer filter = %s\n", c_mnfct::ui[custfltr::mnfct[x]]);
-			else if (custfltr::other[x] == FILTER_YEAR)
+			else if (custfltr::other[x] == machine_filter::YEAR)
 				util::stream_format(cinfo, "  Year filter = %s\n", c_year::ui[custfltr::year[x]]);
 		}
 		file.puts(cinfo.str().c_str());
@@ -288,7 +303,8 @@ void menu_swcustom_filter::handle()
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					sw_custfltr::numother++;
-					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
+					sw_custfltr::other[sw_custfltr::numother] = software_filter::UNAVAILABLE;
+					++sw_custfltr::other[sw_custfltr::numother];
 					m_added = true;
 				}
 				break;
@@ -296,7 +312,8 @@ void menu_swcustom_filter::handle()
 			case REMOVE_FILTER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
+					sw_custfltr::other[sw_custfltr::numother] = software_filter::UNAVAILABLE;
+					++sw_custfltr::other[sw_custfltr::numother];
 					sw_custfltr::numother--;
 					changed = true;
 				}
@@ -306,27 +323,34 @@ void menu_swcustom_filter::handle()
 		if ((uintptr_t)menu_event->itemref >= OTHER_FILTER && (uintptr_t)menu_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
 		{
 			int pos = (int)((uintptr_t)menu_event->itemref - OTHER_FILTER);
-			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::other[pos] > UI_SW_UNAVAILABLE + 1)
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::other[pos] > software_filter::UNAVAILABLE + 1)
 			{
 				sw_custfltr::other[pos]--;
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::other[pos] < UI_SW_LAST - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::other[pos] < software_filter::LAST - 1)
 			{
 				sw_custfltr::other[pos]++;
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				size_t total = sw_filters::length;
-				std::vector<std::string> s_sel(total);
-				for (size_t index = 0; index < total; ++index)
-					if (index <= UI_SW_UNAVAILABLE|| index == UI_SW_CUSTOM)
-						s_sel[index] = "_skip_";
-					else
-						s_sel[index] = sw_filters::text[index];
-
-				menu::stack_push<menu_selector>(ui(), container(), s_sel, sw_custfltr::other[pos]);
+				std::vector<software_filter::type> types;
+				std::vector<std::string> names;
+				types.reserve(software_filter::COUNT);
+				names.reserve(software_filter::COUNT);
+				uint16_t sel(0);
+				for (software_filter::type index = software_filter::FIRST; index < software_filter::COUNT; ++index)
+				{
+					if ((index >= software_filter::UNAVAILABLE) && (index != software_filter::CUSTOM))
+					{
+						if (sw_custfltr::other[pos] == index)
+							sel = types.size();
+						types.emplace_back(index);
+						names.emplace_back(software_filter::display_name(index));
+					}
+				}
+				menu::stack_push<menu_selector>(ui(), container(), std::move(names), sel, [this, pos, t = std::move(types)] (int selection) { sw_custfltr::other[pos] = t[selection]; reset(reset_options::REMEMBER_REF); });
 			}
 		}
 		else if ((uintptr_t)menu_event->itemref >= YEAR_FILTER && (uintptr_t)menu_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
@@ -343,7 +367,9 @@ void menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_selector>(ui(), container(), m_filter.year.ui, sw_custfltr::year[pos]);
+			{
+				menu::stack_push<menu_selector>(ui(), container(), std::vector<std::string>(m_filter.year.ui), sw_custfltr::year[pos], [this, pos] (int selection) { sw_custfltr::year[pos] = selection; reset(reset_options::REMEMBER_REF); });
+			}
 		}
 		else if ((uintptr_t)menu_event->itemref >= TYPE_FILTER && (uintptr_t)menu_event->itemref < TYPE_FILTER + MAX_CUST_FILTER)
 		{
@@ -359,7 +385,9 @@ void menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_selector>(ui(), container(), m_filter.type.ui, sw_custfltr::type[pos]);
+			{
+				menu::stack_push<menu_selector>(ui(), container(), std::vector<std::string>(m_filter.type.ui), sw_custfltr::type[pos], [this, pos] (int selection) { sw_custfltr::type[pos] = selection; reset(reset_options::REMEMBER_REF); });
+			}
 		}
 		else if ((uintptr_t)menu_event->itemref >= MNFCT_FILTER && (uintptr_t)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
@@ -375,7 +403,9 @@ void menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_selector>(ui(), container(), m_filter.publisher.ui, sw_custfltr::mnfct[pos]);
+			{
+				menu::stack_push<menu_selector>(ui(), container(), std::vector<std::string>(m_filter.publisher.ui), sw_custfltr::mnfct[pos], [this, pos] (int selection) { sw_custfltr::mnfct[pos] = selection; reset(reset_options::REMEMBER_REF); });
+			}
 		}
 		else if ((uintptr_t)menu_event->itemref >= REGION_FILTER && (uintptr_t)menu_event->itemref < REGION_FILTER + MAX_CUST_FILTER)
 		{
@@ -391,7 +421,9 @@ void menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_selector>(ui(), container(), m_filter.region.ui, sw_custfltr::region[pos]);
+			{
+				menu::stack_push<menu_selector>(ui(), container(), std::vector<std::string>(m_filter.region.ui), sw_custfltr::region[pos], [this, pos] (int selection) { sw_custfltr::region[pos] = selection; reset(reset_options::REMEMBER_REF); });
+			}
 		}
 		else if ((uintptr_t)menu_event->itemref >= LIST_FILTER && (uintptr_t)menu_event->itemref < LIST_FILTER + MAX_CUST_FILTER)
 		{
@@ -407,7 +439,9 @@ void menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_selector>(ui(), container(), m_filter.swlist.description, sw_custfltr::list[pos]);
+			{
+				menu::stack_push<menu_selector>(ui(), container(), std::vector<std::string>(m_filter.swlist.description), sw_custfltr::list[pos], [this, pos] (int selection) { sw_custfltr::list[pos] = selection; reset(reset_options::REMEMBER_REF); });
+			}
 		}
 	}
 
@@ -423,8 +457,8 @@ void menu_swcustom_filter::handle()
 void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 {
 	// add main filter
-	uint32_t arrow_flags = get_arrow_flags<uint16_t>(UI_SW_ALL, UI_SW_UNAVAILABLE, sw_custfltr::main);
-	item_append(_("Main filter"), sw_filters::text[sw_custfltr::main], arrow_flags, (void *)(uintptr_t)MAIN_FILTER);
+	uint32_t arrow_flags = get_arrow_flags<uint16_t>(software_filter::ALL, software_filter::UNAVAILABLE, sw_custfltr::main);
+	item_append(_("Main filter"), software_filter::display_name(sw_custfltr::main), arrow_flags, (void *)(uintptr_t)MAIN_FILTER);
 
 	// add other filters
 	for (int x = 1; x <= sw_custfltr::numother; x++)
@@ -432,14 +466,14 @@ void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 		item_append(menu_item_type::SEPARATOR);
 
 		// add filter items
-		arrow_flags = get_arrow_flags<uint16_t>(UI_SW_UNAVAILABLE + 1, UI_SW_LAST - 1, sw_custfltr::other[x]);
-		item_append(_("Other filter"), sw_filters::text[sw_custfltr::other[x]], arrow_flags, (void *)(uintptr_t)(OTHER_FILTER + x));
+		arrow_flags = get_arrow_flags<uint16_t>(software_filter::UNAVAILABLE + 1, software_filter::LAST - 1, sw_custfltr::other[x]);
+		item_append(_("Other filter"), software_filter::display_name(sw_custfltr::other[x]), arrow_flags, (void *)(uintptr_t)(OTHER_FILTER + x));
 
 		if (m_added)
 			selected = item.size() - 2;
 
 		// add publisher subitem
-		if (sw_custfltr::other[x] == UI_SW_PUBLISHERS && m_filter.publisher.ui.size() > 0)
+		if (sw_custfltr::other[x] == software_filter::PUBLISHERS && m_filter.publisher.ui.size())
 		{
 			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
 			std::string fbuff(_("^!Publisher"));
@@ -448,7 +482,7 @@ void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 		}
 
 		// add year subitem
-		else if (sw_custfltr::other[x] == UI_SW_YEARS && m_filter.year.ui.size() > 0)
+		else if (sw_custfltr::other[x] == software_filter::YEARS && m_filter.year.ui.size())
 		{
 			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.year.ui.size() - 1, sw_custfltr::year[x]);
 			std::string fbuff(_("^!Year"));
@@ -457,7 +491,7 @@ void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 		}
 
 		// add year subitem
-		else if (sw_custfltr::other[x] == UI_SW_LIST && m_filter.swlist.name.size() > 0)
+		else if (sw_custfltr::other[x] == software_filter::LIST && m_filter.swlist.name.size())
 		{
 			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.swlist.name.size() - 1, sw_custfltr::list[x]);
 			std::string fbuff(_("^!Software List"));
@@ -466,7 +500,7 @@ void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 		}
 
 		// add device type subitem
-		else if (sw_custfltr::other[x] == UI_SW_TYPE && m_filter.type.ui.size() > 0)
+		else if (sw_custfltr::other[x] == software_filter::DEVICE_TYPE && m_filter.type.ui.size())
 		{
 			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.type.ui.size() - 1, sw_custfltr::type[x]);
 			std::string fbuff(_("^!Device type"));
@@ -475,7 +509,7 @@ void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 		}
 
 		// add region subitem
-		else if (sw_custfltr::other[x] == UI_SW_REGION && m_filter.region.ui.size() > 0)
+		else if (sw_custfltr::other[x] == software_filter::REGION && m_filter.region.ui.size())
 		{
 			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.region.ui.size() - 1, sw_custfltr::region[x]);
 			std::string fbuff(_("^!Region"));
@@ -523,20 +557,20 @@ void menu_swcustom_filter::save_sw_custom_filters()
 		// generate custom filters info
 		std::ostringstream cinfo;
 		util::stream_format(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
-		util::stream_format(cinfo, "Main filter = %s\n", sw_filters::text[sw_custfltr::main]);
+		util::stream_format(cinfo, "Main filter = %s\n", software_filter::config_name(sw_custfltr::main));
 
 		for (int x = 1; x <= sw_custfltr::numother; x++)
 		{
-			util::stream_format(cinfo, "Other filter = %s\n", sw_filters::text[sw_custfltr::other[x]]);
-			if (sw_custfltr::other[x] == UI_SW_PUBLISHERS)
+			util::stream_format(cinfo, "Other filter = %s\n", software_filter::config_name(sw_custfltr::other[x]));
+			if (sw_custfltr::other[x] == software_filter::PUBLISHERS)
 				util::stream_format(cinfo, "  Manufacturer filter = %s\n", m_filter.publisher.ui[sw_custfltr::mnfct[x]]);
-			else if (sw_custfltr::other[x] == UI_SW_LIST)
+			else if (sw_custfltr::other[x] == software_filter::LIST)
 				util::stream_format(cinfo, "  Software List filter = %s\n", m_filter.swlist.name[sw_custfltr::list[x]]);
-			else if (sw_custfltr::other[x] == UI_SW_YEARS)
+			else if (sw_custfltr::other[x] == software_filter::YEARS)
 				util::stream_format(cinfo, "  Year filter = %s\n", m_filter.year.ui[sw_custfltr::year[x]]);
-			else if (sw_custfltr::other[x] == UI_SW_TYPE)
+			else if (sw_custfltr::other[x] == software_filter::DEVICE_TYPE)
 				util::stream_format(cinfo, "  Type filter = %s\n", m_filter.type.ui[sw_custfltr::type[x]]);
-			else if (sw_custfltr::other[x] == UI_SW_REGION)
+			else if (sw_custfltr::other[x] == software_filter::REGION)
 				util::stream_format(cinfo, "  Region filter = %s\n", m_filter.region.ui[sw_custfltr::region[x]]);
 		}
 		file.puts(cinfo.str().c_str());

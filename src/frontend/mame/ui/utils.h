@@ -7,44 +7,90 @@
     Internal UI user interface.
 
 ***************************************************************************/
+#ifndef MAME_FRONTEND_UI_UTILS_H
+#define MAME_FRONTEND_UI_UTILS_H
 
 #pragma once
 
-#ifndef __UI_UTILS_H__
-#define __UI_UTILS_H__
-
 #include "unicode.h"
+
+
+namespace ui {
+
+class machine_filter
+{
+public:
+	enum type : uint16_t
+	{
+		ALL = 0,
+		AVAILABLE,
+		UNAVAILABLE,
+		WORKING,
+		NOT_WORKING,
+		MECHANICAL,
+		NOT_MECHANICAL,
+		CATEGORY,
+		FAVORITE,
+		BIOS,
+		PARENT,
+		CLONES,
+		MANUFACTURER,
+		YEAR,
+		SAVE,
+		NOSAVE,
+		CHD,
+		NOCHD,
+		VERTICAL,
+		HORIZONTAL,
+		CUSTOM,
+
+		COUNT,
+		FIRST = 0,
+		LAST = COUNT - 1
+	};
+
+	static char const *config_name(type n);
+	static char const *display_name(type n);
+};
+
+DECLARE_ENUM_INCDEC_OPERATORS(machine_filter::type)
+
+
+class software_filter
+{
+public:
+	enum type : uint16_t
+	{
+		ALL = 0,
+		AVAILABLE,
+		UNAVAILABLE,
+		PARENTS,
+		CLONES,
+		YEARS,
+		PUBLISHERS,
+		SUPPORTED,
+		PARTIAL_SUPPORTED,
+		UNSUPPORTED,
+		REGION,
+		DEVICE_TYPE,
+		LIST,
+		CUSTOM,
+
+		COUNT,
+		FIRST = 0,
+		LAST = COUNT - 1
+	};
+
+	static char const *config_name(type n);
+	static char const *display_name(type n);
+};
+
+DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
+
+} // namespace ui
 
 #define MAX_CHAR_INFO            256
 #define MAX_CUST_FILTER          8
-
-// GLOBAL ENUMERATORS
-enum : uint16_t
-{
-	FILTER_FIRST = 0,
-	FILTER_ALL = FILTER_FIRST,
-	FILTER_AVAILABLE,
-	FILTER_UNAVAILABLE,
-	FILTER_WORKING,
-	FILTER_NOT_WORKING,
-	FILTER_MECHANICAL,
-	FILTER_NOT_MECHANICAL,
-	FILTER_CATEGORY,
-	FILTER_FAVORITE,
-	FILTER_BIOS,
-	FILTER_PARENT,
-	FILTER_CLONES,
-	FILTER_MANUFACTURER,
-	FILTER_YEAR,
-	FILTER_SAVE,
-	FILTER_NOSAVE,
-	FILTER_CHD,
-	FILTER_NOCHD,
-	FILTER_VERTICAL,
-	FILTER_HORIZONTAL,
-	FILTER_CUSTOM,
-	FILTER_LAST = FILTER_CUSTOM
-};
 
 enum
 {
@@ -84,26 +130,6 @@ enum
 	HIDE_BOTH
 };
 
-enum : uint16_t
-{
-	UI_SW_FIRST = 0,
-	UI_SW_ALL = UI_SW_FIRST,
-	UI_SW_AVAILABLE,
-	UI_SW_UNAVAILABLE,
-	UI_SW_PARENTS,
-	UI_SW_CLONES,
-	UI_SW_YEARS,
-	UI_SW_PUBLISHERS,
-	UI_SW_SUPPORTED,
-	UI_SW_PARTIAL_SUPPORTED,
-	UI_SW_UNSUPPORTED,
-	UI_SW_REGION,
-	UI_SW_TYPE,
-	UI_SW_LIST,
-	UI_SW_CUSTOM,
-	UI_SW_LAST = UI_SW_CUSTOM
-};
-
 enum
 {
 	HOVER_DAT_UP = -1000,
@@ -118,9 +144,9 @@ enum
 	HOVER_RPANEL_ARROW,
 	HOVER_LPANEL_ARROW,
 	HOVER_FILTER_FIRST,
-	HOVER_FILTER_LAST = (HOVER_FILTER_FIRST) + 1 + FILTER_LAST,
+	HOVER_FILTER_LAST = (HOVER_FILTER_FIRST) + ui::machine_filter::COUNT,
 	HOVER_SW_FILTER_FIRST,
-	HOVER_SW_FILTER_LAST = (HOVER_SW_FILTER_FIRST) + 1 + UI_SW_LAST,
+	HOVER_SW_FILTER_LAST = (HOVER_SW_FILTER_FIRST) + ui::software_filter::COUNT,
 	HOVER_RP_FIRST,
 	HOVER_RP_LAST = (HOVER_RP_FIRST) + 1 + RP_LAST
 };
@@ -203,23 +229,14 @@ struct ui_globals
 	static bool         has_icons;
 };
 
-#define main_struct(name) \
-struct name##_filters \
-{ \
-	static uint16_t actual; \
-	static const char *text[]; \
-	static size_t length; \
-};
-
-main_struct(main);
-main_struct(sw);
+struct main_filters { static ui::machine_filter::type actual; };
 
 // Custom filter
 struct custfltr
 {
-	static uint16_t  main;
+	static ui::machine_filter::type  main;
 	static uint16_t  numother;
-	static uint16_t  other[MAX_CUST_FILTER];
+	static ui::machine_filter::type  other[MAX_CUST_FILTER];
 	static uint16_t  mnfct[MAX_CUST_FILTER];
 	static uint16_t  screen[MAX_CUST_FILTER];
 	static uint16_t  year[MAX_CUST_FILTER];
@@ -228,9 +245,9 @@ struct custfltr
 // Software custom filter
 struct sw_custfltr
 {
-	static uint16_t  main;
+	static ui::software_filter::type main;
 	static uint16_t  numother;
-	static uint16_t  other[MAX_CUST_FILTER];
+	static ui::software_filter::type other[MAX_CUST_FILTER];
 	static uint16_t  mnfct[MAX_CUST_FILTER];
 	static uint16_t  year[MAX_CUST_FILTER];
 	static uint16_t  region[MAX_CUST_FILTER];
@@ -295,4 +312,4 @@ bool input_character(std::string &buffer, char32_t unichar, F &&filter)
 }
 
 
-#endif /* __UI_UTILS_H__ */
+#endif // MAME_FRONTEND_UI_UTILS_H
