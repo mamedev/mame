@@ -1085,6 +1085,9 @@ altos5                          //
 @source:altos486.cpp
 altos486
 
+@source:altos8600.cpp
+altos8600
+
 @source:alvg.cpp
 agsoccer                        //
 dinoeggs                        //
