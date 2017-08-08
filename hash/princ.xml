@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="princ" description="Tomy Prin-C cartridges">
+	<software name="hobik" supported="no">
+		<description>Hobī Kurabu</description>
+		<year>1996</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ホビークラブ"/>
+		<part name="rom" interface="princ_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="01.bin" size="0x80000" crc="ee9f4328" sha1="0a1bb00e261a1076f38cbb2a1337cc146990ed5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kno" supported="no">
+		<description>Kodomo No Omocha</description>
+		<year>1996</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="こどものおもちゃ"/>
+		<part name="rom" interface="princ_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="01.bin" size="0x80000" crc="353d4690" sha1="03e7da042a403e7496ea22c11d9f404cf1b7545c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
