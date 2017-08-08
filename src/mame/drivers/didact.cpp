@@ -60,31 +60,43 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
-
 #include "screen.h"
 
 // Generated artwork includes
 #include "mp68a.lh"
 #include "md6802.lh"
 
-#define VERBOSE 0
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) LOGPRINT(x)
-#define LOGSCAN(x) {}
-#define LOGSER(x) {}
-#define LOGSCREEN(x) {}
-#define RLOG(x) {}
-#define LOGCS(x) {}
+//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
+#define LOG_SETUP   (1U <<  1)
+#define LOG_SCAN    (1U <<  2)
+#define LOG_SERIAL  (1U <<  3)
+#define LOG_SCREEN  (1U <<  4)
+#define LOG_READ    (1U <<  5)
+#define LOG_CS      (1U <<  6)
 
-#if VERBOSE >= 2
-#define logerror printf
-#endif
+//#define VERBOSE  (LOG_GENERAL|LOG_SETUP|LOG_SCREEN)
+//#define LOG_OUTPUT_FUNC printf
+
+#include "logmacro.h"
+
+//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
+#define LOGSETUP(...)  LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGSCAN(...)   LOGMASKED(LOG_SCAN, __VA_ARGS__)
+#define LOGSER(...)    LOGMASKED(LOG_SERIAL, __VA_ARGS__)
+#define LOGSCREEN(...) LOGMASKED(LOG_SCREEN, __VA_ARGS__)
+#define LOGR(...)      LOGMASKED(LOG_READ, __VA_ARGS__)
+#define LOGCS(...)     LOGMASKED(LOG_CS, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
+#define LLFORMAT "%I64d"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
+#define LLFORMAT "%lld"
 #endif
 
 #define PIA1_TAG "pia1"
@@ -217,7 +229,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 	if (m_shift)
 	{
 		pa &= 0x7f;   // Clear shift bit if button being pressed (PA7) to ground (internal pullup)
-		LOG( ("SHIFT is pressed\n") );
+		LOG("SHIFT is pressed\n");
 	}
 
 	// Serial IN - needs debug/verification
@@ -231,7 +243,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 {
 	uint8_t digit_nbr;
 
-//  LOG(("--->%s(%02x)\n", FUNCNAME, data));
+//  LOG("--->%s(%02x)\n", FUNCNAME, data);
 
 	digit_nbr = (data >> 4) & 0x07;
 	m_tb16_74145->write( digit_nbr );
@@ -244,7 +256,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 /* PIA 2 Port B is all outputs to drive the display so it is very unlikelly that this function is called */
 READ8_MEMBER( md6802_state::pia2_kbB_r )
 {
-	LOG( ("Warning, trying to read from Port B designated to drive the display, please check why\n") );
+	LOG("Warning, trying to read from Port B designated to drive the display, please check why\n");
 	logerror("Warning, trying to read from Port B designated to drive the display, please check why\n");
 	return 0;
 }
@@ -252,7 +264,7 @@ READ8_MEMBER( md6802_state::pia2_kbB_r )
 /* Port B is fully used ouputting the segment pattern to the display */
 WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 {
-//  LOG(("--->%s(%02x)\n", FUNCNAME, data));
+//  LOG("--->%s(%02x)\n", FUNCNAME, data);
 
 	/* Store the segment pattern but do not lit up the digit here, done by pulling the correct cathode low on Port A */
 	m_segments = BITSWAP8(data, 0, 4, 5, 3, 2, 1, 7, 6);
@@ -260,7 +272,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 
 WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 {
-	LOG(("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state));
+	LOG("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
 	output().set_led_value(m_led, !state);
 
 	// Serial Out - needs debug/verification
@@ -271,7 +283,7 @@ WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 
 void md6802_state::machine_start()
 {
-	LOG(("--->%s()\n", FUNCNAME));
+	LOG("--->%s()\n", FUNCNAME);
 	save_item(NAME(m_shift));
 	save_item(NAME(m_led));
 	save_item(NAME(m_reset));
@@ -279,7 +291,7 @@ void md6802_state::machine_start()
 
 void md6802_state::machine_reset()
 {
-	LOG(("--->%s()\n", FUNCNAME));
+	LOG("--->%s()\n", FUNCNAME);
 	m_led = 1;
 	m_maincpu->reset();
 }
@@ -376,7 +388,7 @@ protected:
 
 READ8_MEMBER( mp68a_state::pia2_kbA_r )
 {
-	LOG(("--->%s\n", FUNCNAME));
+	LOG("--->%s\n", FUNCNAME);
 
 	return 0;
 }
@@ -408,7 +420,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 {
 	uint8_t a012, line, pb;
 
-	LOG(("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift));
+	LOG("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift);
 
 	a012 = 0;
 	if ((line = (m_line0 | m_line1)) != 0)
@@ -430,17 +442,17 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 		pb |= 0x80;   // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
 		output().set_led_value(m_led, m_shift);
-		LOG( ("SHIFT is released\n") );
+		LOG("SHIFT is released\n");
 	}
 
-	LOG(("%02x\n", pb));
+	LOG("%02x\n", pb);
 
 	return pb;
 }
 
 WRITE8_MEMBER( mp68a_state::pia2_kbB_w )
 {
-	LOG(("--->%s(%02x)\n", FUNCNAME, data));
+	LOG("--->%s(%02x)\n", FUNCNAME, data);
 }
 
 READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
@@ -452,7 +464,7 @@ READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
 
 #if VERBOSE
 	if ((m_line0 | m_line1 | m_line2 | m_line3) != 0)
-		LOG(("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_line0, m_line1, m_line2, m_line3));
+		LOG("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_line0, m_line1, m_line2, m_line3);
 #endif
 
 	return (m_line0 | m_line1 | m_line2 | m_line3) != 0 ? 0 : 1;
@@ -460,13 +472,13 @@ READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
 
 void mp68a_state::machine_reset()
 {
-	LOG(("--->%s()\n", FUNCNAME));
+	LOG("--->%s()\n", FUNCNAME);
 	m_maincpu->reset();
 }
 
 void mp68a_state::machine_start()
 {
-	LOG(("--->%s()\n", FUNCNAME));
+	LOG("--->%s()\n", FUNCNAME);
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
@@ -565,7 +577,7 @@ public:
 	uint8_t *m_char_ptr;
 	uint8_t *m_vram;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
+	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
@@ -597,7 +609,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
 
 void e100_state::machine_start()
 {
-	LOG(("%s()\n", FUNCNAME));
+	LOG("%s()\n", FUNCNAME);
 	m_char_ptr  = memregion("chargen")->base();
 	m_vram      = (uint8_t *)m_videoram.target();
 
@@ -615,7 +627,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	uint8_t *chardata;
 	uint8_t charcode;
 
-	LOGSCREEN(("%s()\n", FUNCNAME));
+	LOGSCREEN("%s()\n", FUNCNAME);
 	vramad = 0;
 	for (int row = 0; row < 32 * 8; row += 8)
 	{
@@ -623,22 +635,22 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		{
 			/* look up the character data */
 			charcode = m_vram[vramad];
-			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n %c at X=%d Y=%d: ", charcode, col, row));
+			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
 			chardata = &m_char_ptr[(charcode * 8)];
 			/* plot the character */
 			for (y = 0; y < 8; y++)
 			{
-				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n  %02x: ", *chardata));
+				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n  %02x: ", *chardata);
 				for (x = 0; x < 8; x++)
 				{
-					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN((" %02x: ", *chardata));
+					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
 					bitmap.pix16(row + y, col + x) = (*chardata & (1 << x)) ? 1 : 0;
 				}
 				chardata++;
 			}
 			vramad++;
 		}
-		if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n"));
+		if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n");
 	}
 
 	return 0;
@@ -647,20 +659,20 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 /* PIA write - the Esselte 100 allows the PIA:s to be accessed simultaneously */
 WRITE8_MEMBER( e100_state::pia_w )
 {
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 	if ((offset & 0x08) == 0x08)
 	{
-		LOG(("- PIA1\n"));
+		LOG("- PIA1\n");
 		m_pia1->write(space, offset, data);
 	}
 	if ((offset & 0x10) == 0x10)
 	{
-		LOG(("- PIA2\n"));
+		LOG("- PIA2\n");
 		m_pia2->write(space, offset, data);
 	}
 	if (VERBOSE && (offset & 0x18) == 0x18)
 	{
-		LOGCS(("- Dual device write access!\n"));
+		LOGCS("- Dual device write access!\n");
 	}
 	if (VERBOSE && (offset & 0x18) == 0x00)
 	{
@@ -681,16 +693,16 @@ READ8_MEMBER( e100_state::pia_r )
 			uint8_t data2 =  m_pia2->read(space, offset);
 			logerror("%s: Dual device read may have caused unpredictable results on real hardware\n", FUNCNAME);
 			data = data1 & data2; // We assume that the stable behaviour is that data lines with a low level by either device succeeds
-			LOGCS(("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data));
+			LOGCS("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data);
 		}
 		break;
 	case 0x08: // PIA1
 		data = m_pia1->read(space, offset);
-		LOGCS(("%s %s(%02x)\n", PIA1_TAG, FUNCNAME, data));
+		LOGCS("%s %s(%02x)\n", PIA1_TAG, FUNCNAME, data);
 		break;
 	case 0x10: // PIA2
 		data = m_pia2->read(space, offset);
-		LOGCS(("%s %s(%02x)\n", PIA2_TAG, FUNCNAME, data));
+		LOGCS("%s %s(%02x)\n", PIA2_TAG, FUNCNAME, data);
 		break;
 	default: // None of the devices are selected
 		logerror("%s: Funny read at offset %02x\n", FUNCNAME, offset);
@@ -700,7 +712,7 @@ READ8_MEMBER( e100_state::pia_r )
 
 WRITE8_MEMBER( e100_state::pia1_kbA_w )
 {
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 READ8_MEMBER( e100_state::pia1_kbA_r )
@@ -727,7 +739,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
 	case 1 << 9: pa = (~m_io_line9->read()) & 0xff; break;
 	default: logerror("Keyboard is misconfigured, please report!: %04x", ls145); break;
 	}
-	if (VERBOSE && ls145 && pa) LOGSCAN(("%s  [%03x]%04x\n", FUNCNAME, ls145, pa));
+	if (VERBOSE && ls145 && pa) LOGSCAN("%s  [%03x]%04x\n", FUNCNAME, ls145, pa);
 
 	return ~pa;
 }
@@ -766,7 +778,7 @@ WRITE8_MEMBER( e100_state::pia1_kbB_w )
 	uint8_t col;
 
 	// Keyboard
-	//  if (VERBOSE && data != m_pia1_B) LOGSCAN(("%s(%02x)\n", FUNCNAME, data));
+	//  if (VERBOSE && data != m_pia1_B) LOGSCAN("%s(%02x)\n", FUNCNAME, data);
 	m_pia1_B = data;
 	col = data & 0x0f;
 	m_kbd_74145->write( col );
@@ -876,8 +888,8 @@ public:
 #endif
 		{ }
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
-	virtual void machine_start() override { LOG(("%s()\n", FUNCNAME)); };
+	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
+	virtual void machine_start() override { LOG("%s()\n", FUNCNAME); };
 	DECLARE_READ8_MEMBER( pia1_A_r );
 	DECLARE_READ8_MEMBER( pia1_B_r );
 	DECLARE_WRITE8_MEMBER( pia1_B_w );
@@ -902,29 +914,29 @@ protected:
 
 READ8_MEMBER( can09t_state::pia1_A_r )
 {
-	LOG(("%s()\n", FUNCNAME));
+	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
 READ8_MEMBER( can09t_state::pia1_B_r )
 {
-	LOG(("%s()\n", FUNCNAME));
+	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
 WRITE8_MEMBER( can09t_state::pia1_B_w )
 {
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 WRITE_LINE_MEMBER(can09t_state::pia1_cb2_w)
 {
-	LOG(("%s(%02x)\n", FUNCNAME, state));
+	LOG("%s(%02x)\n", FUNCNAME, state);
 }
 
 WRITE_LINE_MEMBER(can09t_state::pia2_cb2_w)
 {
-	LOG(("%s(%02x)\n", FUNCNAME, state));
+	LOG("%s(%02x)\n", FUNCNAME, state);
 }
 
 WRITE_LINE_MEMBER (can09t_state::write_acia_clock){
@@ -996,13 +1008,13 @@ protected:
 
 void can09_state::machine_reset()
 {
-	LOG(("%s()\n", FUNCNAME));
+	LOG("%s()\n", FUNCNAME);
 	m_bank1->set_entry(0);
 }
 
 void can09_state::machine_start()
 {
-	LOG(("%s()\n", FUNCNAME));
+	LOG("%s()\n", FUNCNAME);
 	m_bank1->configure_entries(0, 8, m_ram->pointer(), 0x8000);
 }
 
@@ -1015,7 +1027,7 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT8 charcode;
 #endif
 
-	LOGSCREEN(("%s()\n", FUNCNAME));
+	LOGSCREEN("%s()\n", FUNCNAME);
 	//  vramad = 0;
 	for (int row = 0; row < 72 * 8; row += 8)
 	{
@@ -1024,23 +1036,23 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 #if 0
 			/* look up the character data */
 			charcode = m_vram[vramad];
-			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n %c at X=%d Y=%d: ", charcode, col, row));
+			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
 			chardata = &m_char_ptr[(charcode * 8)];
 #endif
 			/* plot the character */
 			for (y = 0; y < 8; y++)
 			{
-				//              if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n  %02x: ", *chardata));
+				//              if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n  %02x: ", *chardata);
 				for (x = 0; x < 8; x++)
 				{
-					//                  if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN((" %02x: ", *chardata));
+					//                  if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
 					bitmap.pix16(row + y, col + x) = x & 1; //(*chardata & (1 << x)) ? 1 : 0;
 				}
 				//              chardata++;
 			}
 			//          vramad++;
 		}
-		//      if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n"));
+		//      if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n");
 	}
 
 	return 0;
@@ -1048,25 +1060,25 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 READ8_MEMBER( can09_state::pia1_A_r )
 {
-	LOG(("%s()\n", FUNCNAME));
+	LOG("%s()\n", FUNCNAME);
 	return 0x40;
 }
 
 WRITE8_MEMBER( can09_state::pia1_A_w )
 {
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 READ8_MEMBER( can09_state::pia1_B_r )
 {
-	LOG(("%s()\n", FUNCNAME));
+	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
 WRITE8_MEMBER( can09_state::pia1_B_w )
 {
 	//  UINT8 *RAM = memregion("maincpu")->base();
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 	//  membank("bank1")->set_entry((data & 0x70) >> 4);
 	m_bank1->set_entry((data & 0x70) >> 4);
 #if 0
@@ -1086,7 +1098,7 @@ WRITE8_MEMBER( can09_state::pia1_B_w )
 
 WRITE_LINE_MEMBER(can09_state::pia1_cb2_w)
 {
-	LOG(("%s(%02x)\n", FUNCNAME, state));
+	LOG("%s(%02x)\n", FUNCNAME, state);
 }
 
 static INPUT_PORTS_START( can09 )
@@ -1318,12 +1330,12 @@ DEVICE_INPUT_DEFAULTS_END
 // TODO: Fix shift led for mp68a correctly, workaround doesn't work anymore! Shift works though...
 TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 {
-	//  LOG(("--->%s()\n", FUNCNAME));
+	//  LOG("--->%s()\n", FUNCNAME);
 
 	// Poll the artwork Reset key
 	if ( (m_io_line4->read() & 0x04) )
 	{
-		LOG( ("RESET is pressed, resetting the CPU\n") );
+		LOG("RESET is pressed, resetting the CPU\n");
 		m_shift = 0;
 		output().set_led_value(m_led, m_shift); // For mp68a only
 		if (m_reset == 0)
@@ -1336,7 +1348,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 		// Poll the artwork SHIFT/* key
 	else if ( (m_io_line4->read() & 0x08) )
 	{
-		LOG( ("%s", !m_shift ? "SHIFT is set\n" : "") );
+		LOG("%s", !m_shift ? "SHIFT is set\n" : "");
 		m_shift = 1;
 		output().set_led_value(m_led, m_shift); // For mp68a only
 	}
