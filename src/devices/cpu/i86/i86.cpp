@@ -295,6 +295,9 @@ void i8086_cpu_device::device_start()
 {
 	i8086_common_cpu_device::device_start();
 	m_out_if_func.resolve_safe();
+	m_stack = has_space(AS_STACK) ? &space(AS_STACK) : m_program;
+	m_code = has_space(AS_CODE) ? &space(AS_CODE) : m_program;
+	m_extra = has_space(AS_EXTRA) ? &space(AS_EXTRA) : m_program;
 	state_add( I8086_ES, "ES", m_sregs[ES] ).formatstr("%04X");
 	state_add( I8086_CS, "CS", m_sregs[CS] ).callimport().formatstr("%04X");
 	state_add( I8086_SS, "SS", m_sregs[SS] ).formatstr("%04X");
