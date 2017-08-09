@@ -6,6 +6,11 @@
 #include "cpu/i8089/i8089.h"
 #include "machine/ram.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/i8255.h"
+#include "machine/z80sio.h"
+#include "machine/wd_fdc.h"
+#include "bus/rs232/rs232.h"
 
 class altos8600_state : public driver_device
 {
@@ -17,6 +22,7 @@ public:
 		m_pic1(*this, "pic8259_1"),
 		m_pic2(*this, "pic8259_2"),
 		m_pic3(*this, "pic8259_3"),
+		m_uart8274(*this, "uart8274"),
 		m_ram(*this, RAM_TAG),
 		m_bios(*this, "bios")
 	{}
@@ -46,7 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cattn_w);
 	DECLARE_WRITE16_MEMBER(mode_w);
 	DECLARE_WRITE_LINE_MEMBER(cpuif_w);
-
+	DECLARE_WRITE_LINE_MEMBER(tmr0_w);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -60,6 +66,7 @@ private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<pic8259_device> m_pic3;
+	required_device<i8274_new_device> m_uart8274;
 	required_device<ram_device> m_ram;
 	required_memory_region m_bios;
 	u8 m_mmuaddr[256];
@@ -77,6 +84,13 @@ void altos8600_state::machine_reset()
 	m_mode = (m_mode & 0x10) | 2;
 	m_cpuif = false;
 	m_user = false;
+}
+
+
+WRITE_LINE_MEMBER(altos8600_state::tmr0_w)
+{
+	m_uart8274->rxca_w(state);
+	m_uart8274->txca_w(state);
 }
 
 WRITE_LINE_MEMBER(altos8600_state::cpuif_w)
@@ -199,6 +213,8 @@ void altos8600_state::xlate_w(address_space &space, offs_t offset, u16 data, u16
 	}
 	else if(m_user && !BIT(flags, permbit))
 		seterr(offset, mem_mask, 1 << permbit);
+	else if(m_user && BIT(flags, 3) && ((offset & 0x7ff) < 64))
+		seterr(offset, mem_mask, 8);
 	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
 }
 
@@ -259,7 +275,7 @@ WRITE16_MEMBER(altos8600_state::cpuio_w)
 		seterr(offset, mem_mask, 0x800);
 		return;
 	}
-	m_dmac->space(AS_IO).write_word_unaligned(offset << 1, mem_mask);
+	m_dmac->space(AS_IO).write_word_unaligned(offset << 1, data, mem_mask);
 }
 
 READ16_MEMBER(altos8600_state::dmacram_r)
@@ -327,15 +343,32 @@ static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
 	AM_RANGE(0x0010, 0x0017) AM_READ(errlo_r)
 	AM_RANGE(0x0018, 0x001f) AM_READ(errhi_r)
 	AM_RANGE(0x0030, 0x0037) AM_WRITE(mode_w)
+	AM_RANGE(0x0038, 0x003f) AM_WRITE8(cattn_w, 0xffff)
+	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0xff00)
+	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("uart8274", i8274_new_device, cd_ba_r, cd_ba_w, 0x00ff)
+	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0xff00)
 	AM_RANGE(0x0058, 0x005f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0068, 0x006f) AM_DEVREADWRITE8("pic8259_3", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0070, 0x0077) AM_NOP
-	AM_RANGE(0x0078, 0x007f) AM_WRITE8(cattn_w, 0xffff)
 	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(mmuflags_r, mmuflags_w)
 	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(mmuaddr_r, mmuaddr_w)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
 ADDRESS_MAP_END
+
+static SLOT_INTERFACE_START(altos8600_floppies)
+	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
+SLOT_INTERFACE_END
+
+static DEVICE_INPUT_DEFAULTS_START(altos8600_terminal)
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START(altos8600)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
@@ -362,6 +395,43 @@ static MACHINE_CONFIG_START(altos8600)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("512K")
+
+	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, 0, 0, 0, 0)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir7_w))
+
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsb_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", altos8600_terminal)
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(1228800)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(altos8600_state, tmr0_w))
+	MCFG_PIT8253_CLK1(1228800)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxtxcb_w))
+	MCFG_PIT8253_CLK2(1228800)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_1", pic8259_device, ir1_w))
+
+	MCFG_FD1797_ADD("fd1797", 1000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic8259_2", pic8259_device, ir1_w))
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 ROM_START(altos8600)
