@@ -379,7 +379,7 @@ msgid ""
 "\n"
 msgstr ""
 "Falta la máquina seleccionada o una o más de sus ROMs o imágenes CHD. "
-" Por favor, elige otra máquina.\n"
+"Por favor, elige otra máquina.\n"
 "\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1518 src/frontend/mame/ui/selsoft.cpp:529
@@ -540,7 +540,7 @@ msgstr "Inicio de partida"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "High Scores"
-msgstr "Máximas puntuaciones"
+msgstr "Puntuaciones más altas"
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "History"
