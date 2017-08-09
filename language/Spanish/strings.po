@@ -350,17 +350,17 @@ msgstr "%1$s %2$s ( %3$d / %4$d máquinas (%5$d BIOS) )"
 #: src/frontend/mame/ui/selgame.cpp:1475
 #, c-format
 msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-msgstr ""
+msgstr "%1$s (%2$s - %3$s) - Buscar: %4$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1486 src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Buscar: %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1488 src/frontend/mame/ui/selsoft.cpp:759
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "Buscar: %1$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1498
 #, c-format
@@ -1105,11 +1105,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:35
 msgid "Working"
-msgstr ""
+msgstr "Funciona"
 
 #: src/frontend/mame/ui/utils.cpp:36
 msgid "Not Working"
-msgstr ""
+msgstr "No Funciona"
 
 #: src/frontend/mame/ui/utils.cpp:37
 msgid "Mechanical"
@@ -1125,7 +1125,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:40
 msgid "Favorites"
-msgstr ""
+msgstr "Favoritos"
 
 #: src/frontend/mame/ui/utils.cpp:41 src/frontend/mame/ui/miscmenu.cpp:763
 msgid "BIOS"
@@ -1141,11 +1141,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:44
 msgid "Manufacturer"
-msgstr ""
+msgstr "Fabricante"
 
 #: src/frontend/mame/ui/utils.cpp:45 src/frontend/mame/ui/utils.cpp:60
 msgid "Year"
-msgstr ""
+msgstr "Año"
 
 #: src/frontend/mame/ui/utils.cpp:46
 msgid "Save Supported"
@@ -1177,7 +1177,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Publisher"
-msgstr ""
+msgstr "Editor"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Supported"
@@ -1197,11 +1197,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgid "Device Type"
-msgstr ""
+msgstr "Tipo de dispositivo"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Software List"
-msgstr ""
+msgstr "Lista de software"
 
 #: src/frontend/mame/ui/utils.cpp:215
 msgid "<set up filters>"
@@ -2462,35 +2462,11 @@ msgstr "Ninguno"
 msgid "Gfx: %s, Sound: %s"
 msgstr "Gráficos: %s, Sonido: %s"
 
-#~ msgid "%1$s (%2$s - %3$s) - "
-#~ msgstr "%1$s (%2$s - %3$s) - "
-
-#~ msgid "%1$s (%2$s) - "
-#~ msgstr "%1$s (%2$s) - "
-
-#~ msgid "%1$s Search: %2$s_"
-#~ msgstr "%1$s Buscar: %2$s_"
-
 #~ msgid "Main filter"
 #~ msgstr "Filtro principal"
 
 #~ msgid "Other filter"
 #~ msgstr "Otros filtros"
-
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!Fabricante"
-
-#~ msgid "^!Year"
-#~ msgstr "^!Año"
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!Editor"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!Lista de software"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!Tipo de dispositivo"
 
 #~ msgid "^!Region"
 #~ msgstr "^!Región"
@@ -2500,18 +2476,3 @@ msgstr "Gráficos: %s, Sonido: %s"
 
 #~ msgid "Region: %1$s -"
 #~ msgstr "Región: %1$s -"
-
-#~ msgid "Publisher: %1$s -"
-#~ msgstr "Editor: %1$s -"
-
-#~ msgid "Year: %1$s -"
-#~ msgstr "Año: %1$s -"
-
-#~ msgid "Software List: %1$s -"
-#~ msgstr "Lista de software: %1$s -"
-
-#~ msgid "Device type: %1$s -"
-#~ msgstr "Tipo de dispositivo: %1$s -"
-
-#~ msgid "%s Search: %s_"
-#~ msgstr "%s Buscar: %s_"

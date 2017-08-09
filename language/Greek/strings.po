@@ -346,17 +346,17 @@ msgstr "%1$s %2$s ( %3$d / %4$d μηχανήματα (%5$d BIOS) )"
 #: src/frontend/mame/ui/selgame.cpp:1475
 #, c-format
 msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-msgstr ""
+msgstr "%1$s (%2$s - %3$s) - Αναζήτηση: %4$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1486 src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Αναζήτηση: %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1488 src/frontend/mame/ui/selsoft.cpp:759
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "Αναζήτηση: %1$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1498
 #, c-format
@@ -1101,11 +1101,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:35
 msgid "Working"
-msgstr ""
+msgstr "Λειτουργεί"
 
 #: src/frontend/mame/ui/utils.cpp:36
 msgid "Not Working"
-msgstr ""
+msgstr "Δεν Λειτουργεί"
 
 #: src/frontend/mame/ui/utils.cpp:37
 msgid "Mechanical"
@@ -1137,11 +1137,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:44
 msgid "Manufacturer"
-msgstr ""
+msgstr "Κατασκευαστής"
 
 #: src/frontend/mame/ui/utils.cpp:45 src/frontend/mame/ui/utils.cpp:60
 msgid "Year"
-msgstr ""
+msgstr "Έτος"
 
 #: src/frontend/mame/ui/utils.cpp:46
 msgid "Save Supported"
@@ -1173,7 +1173,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Publisher"
-msgstr ""
+msgstr "Εκδότης"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Supported"
@@ -1193,11 +1193,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgid "Device Type"
-msgstr ""
+msgstr "Τύπος συσκευής"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Software List"
-msgstr ""
+msgstr "Λίστα Λογισμικού"
 
 #: src/frontend/mame/ui/utils.cpp:215
 msgid "<set up filters>"
@@ -2460,35 +2460,11 @@ msgstr "Κανένα"
 msgid "Gfx: %s, Sound: %s"
 msgstr "Gfx: %s, Ήχος: %s"
 
-#~ msgid "%1$s (%2$s - %3$s) - "
-#~ msgstr "%1$s (%2$s - %3$s) - "
-
-#~ msgid "%1$s (%2$s) - "
-#~ msgstr "%1$s (%2$s) - "
-
-#~ msgid "%1$s Search: %2$s_"
-#~ msgstr "%1$s Αναζήτηση: %2$s_"
-
 #~ msgid "Main filter"
 #~ msgstr "Κύριο φίλτρο"
 
 #~ msgid "Other filter"
 #~ msgstr "Άλλο φίλτρο"
-
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!Κατασκευαστής"
-
-#~ msgid "^!Year"
-#~ msgstr "^!Έτος"
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!Εκδότης"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!Λίστα Λογισμικού"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!Τύπος συσκευής"
 
 #~ msgid "^!Region"
 #~ msgstr "^!Περιοχή"
@@ -2498,18 +2474,3 @@ msgstr "Gfx: %s, Ήχος: %s"
 
 #~ msgid "Region: %1$s -"
 #~ msgstr "Περιοχή: %1$s -"
-
-#~ msgid "Publisher: %1$s -"
-#~ msgstr "Εκδότης: %1$s -"
-
-#~ msgid "Year: %1$s -"
-#~ msgstr "Έτος: %1$s -"
-
-#~ msgid "Software List: %1$s -"
-#~ msgstr "Λίστα Λογισμικού: %1$s -"
-
-#~ msgid "Device type: %1$s -"
-#~ msgstr "Τύπος συσκευής: %1$s -"
-
-#~ msgid "%s Search: %s_"
-#~ msgstr "%s Αναζήτηση: %s_"

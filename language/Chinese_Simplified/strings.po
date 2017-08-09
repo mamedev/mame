@@ -346,17 +346,17 @@ msgstr "%1$s %2$s ( %3$d / %4$d 机械 (%5$d BIOS) )"
 #: src/frontend/mame/ui/selgame.cpp:1475
 #, c-format
 msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-msgstr ""
+msgstr "%1$s (%2$s - %3$s) - 搜寻： %4$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1486 src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s： %2$s - 搜寻： %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1488 src/frontend/mame/ui/selsoft.cpp:759
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "搜寻： %1$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1498
 #, c-format
@@ -1097,11 +1097,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:35
 msgid "Working"
-msgstr ""
+msgstr "可以执行"
 
 #: src/frontend/mame/ui/utils.cpp:36
 msgid "Not Working"
-msgstr ""
+msgstr "不可执行"
 
 #: src/frontend/mame/ui/utils.cpp:37
 msgid "Mechanical"
@@ -1133,11 +1133,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:44
 msgid "Manufacturer"
-msgstr ""
+msgstr "制造商"
 
 #: src/frontend/mame/ui/utils.cpp:45 src/frontend/mame/ui/utils.cpp:60
 msgid "Year"
-msgstr ""
+msgstr "年代"
 
 #: src/frontend/mame/ui/utils.cpp:46
 msgid "Save Supported"
@@ -1169,7 +1169,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Publisher"
-msgstr ""
+msgstr "出版商"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Supported"
@@ -1189,11 +1189,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgid "Device Type"
-msgstr ""
+msgstr "装置类别"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Software List"
-msgstr ""
+msgstr "软件清单"
 
 #: src/frontend/mame/ui/utils.cpp:215
 msgid "<set up filters>"
@@ -1602,14 +1602,20 @@ msgid ""
 "\n"
 "\n"
 "There are working clones of this machine: %s"
-msgstr "本机械尚有可执行的彷製版： %s"
+msgstr ""
+"\n"
+"\n"
+"本机械尚有可执行的彷製版： %s"
 
 #: src/frontend/mame/ui/info.cpp:275
 msgid ""
 "\n"
 "\n"
 "Press any key to continue"
-msgstr "按任意按键继续"
+msgstr ""
+"\n"
+"\n"
+"按任意按键继续"
 
 #: src/frontend/mame/ui/info.cpp:290
 #, c-format
@@ -2428,35 +2434,11 @@ msgstr "无"
 msgid "Gfx: %s, Sound: %s"
 msgstr "图形： %s, 声音: %s"
 
-#~ msgid "%1$s (%2$s - %3$s) - "
-#~ msgstr "%1$s (%2$s - %3$s) - "
-
-#~ msgid "%1$s (%2$s) - "
-#~ msgstr "%1$s (%2$s) - "
-
-#~ msgid "%1$s Search: %2$s_"
-#~ msgstr "%1$s 搜寻： %2$s_"
-
 #~ msgid "Main filter"
 #~ msgstr "主要过滤器"
 
 #~ msgid "Other filter"
 #~ msgstr "其他过滤器"
-
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!制造商"
-
-#~ msgid "^!Year"
-#~ msgstr "^!年代"
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!出版商"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!软件清单"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!装置类别"
 
 #~ msgid "^!Region"
 #~ msgstr "^!区域"
@@ -2466,18 +2448,3 @@ msgstr "图形： %s, 声音: %s"
 
 #~ msgid "Region: %1$s -"
 #~ msgstr "区域： %1$s -"
-
-#~ msgid "Publisher: %1$s -"
-#~ msgstr "出版商： %1$s -"
-
-#~ msgid "Year: %1$s -"
-#~ msgstr "年代： %1$s -"
-
-#~ msgid "Software List: %1$s -"
-#~ msgstr "软件清单： %1$s -"
-
-#~ msgid "Device type: %1$s -"
-#~ msgstr "装置类别： %1$s -"
-
-#~ msgid "%s Search: %s_"
-#~ msgstr "%s 搜寻： %s_"
