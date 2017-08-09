@@ -770,7 +770,7 @@ class inclusive_machine_filter_impl : public simple_filter_impl_base<machine_fil
 public:
 	inclusive_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &drv) const { return true; }
+	virtual bool apply(game_driver const &drv) const override { return true; }
 };
 
 using all_machine_filter            = inclusive_machine_filter_impl<machine_filter::ALL>;
