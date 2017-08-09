@@ -208,9 +208,13 @@ void image_manager::options_extract()
 					image_opt = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
 			}
 
-			// and set the option (provided that it hasn't been removed out from under us)
-			if (machine().options().exists(image.instance_name()))
-				machine().options().image_option(image.instance_name()).specify(std::move(image_opt));
+			// and set the option; note that we have to account for the following two scenarios:
+			//  - The image device was unmounted, in which case the option will no longer exist
+			//	- The image device is still there, but with a different name (e.g. - floppydisk vs floppydisk1), hence
+			//    the need to use the canonical option name (which in the above example, will always be 'floppydisk1')
+			auto opt = machine().options().find_image_option_canonical(image.instance_name());
+			if (opt)
+				opt->specify(std::move(image_opt));
 		}
 	}
 
