@@ -722,6 +722,40 @@ ROM_START( popeyej )
 	ROM_LOAD( "TPP1-T.3J.82S129", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
 ROM_END
 
+ROM_START( popeyejo )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "tpp1-c.2a.bin",     0x0000, 0x1000, CRC(4176761e) SHA1(6977da294e88bb2d08ce02901f35c99df69dd6a5) ) 
+	ROM_LOAD( "tpp1-c.2b.bin",     0x1000, 0x1000, CRC(2cc76c54) SHA1(56b9970c930e83dc9d5c6d5581160c42382f5c89) ) // diff from popeyej
+	ROM_LOAD( "TPP1-C.2C.2732",    0x2000, 0x1000, CRC(b1c18b7e) SHA1(12a067e2914a9d2051b2507de0673ac4a5198329) ) 
+	//	ROM_LOAD( "tpp1-c.2c.bin", 0x2000, 0x1000, CRC(d3061b82) SHA1(52fe1ab8f1dc79383894eb3c3a8b4039ab7dfaf0) )
+	//  Actual Dump had Fixed Bits but when compared the stuck bit accounted for all the errors compared to popeyej's 2C, so we use that one.
+	ROM_LOAD( "tpp1-c.2d.bin",     0x3000, 0x1000, CRC(79d0e988) SHA1(7c8ee46918996dab39b417e4361edef259935dbf) ) 
+	ROM_LOAD( "tpp1-c.2e.bin",     0x4000, 0x1000, CRC(74854ca1) SHA1(9b9e5112e32105a9726fff23162be38b5b9e3f7b) ) 
+	ROM_LOAD( "tpp1-c.2f.bin",     0x5000, 0x1000, CRC(e2b08891) SHA1(e73b1d355f543772c79e1970426e3e9696b2b23c) ) 
+	ROM_LOAD( "tpp1-c.2g.bin",     0x6000, 0x1000, CRC(b74a1a97) SHA1(3a51b08f80d378403b1e0df8446057b69157ea9b) ) 
+	ROM_LOAD( "tpp1-c.2h.bin",     0x7000, 0x1000, CRC(a1dcf54d) SHA1(de2574c0437eba6d01658f8936a1f9285a362b4b) ) // diff from popeyej
+	
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "tpp1-v.3h.bin",     0x0000, 0x0800, CRC(fa52a752) SHA1(45b8f52e4c15f9fe761d7c7f7109b4a70ada0cda) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "tpp1-e.1e.bin",     0x0000, 0x2000, CRC(90889e1d) SHA1(11af14ce7e2583a1aced942031284219eaf63e66) ) 
+	ROM_LOAD( "tpp1-e.2e.bin",     0x2000, 0x2000, CRC(ed06af50) SHA1(68db835d9747e11ca85d0dd945e52bc1f538e251) ) 
+	ROM_LOAD( "tpp1-e.3e.bin",     0x4000, 0x2000, CRC(72b258f2) SHA1(a1fe2a380f3c46bd54043dc001c168734873d854) ) 
+	ROM_LOAD( "tpp1-e.5e.bin",     0x6000, 0x2000, CRC(7355ff16) SHA1(15d3cb701ad360a36c26eb5c34b2e89b5972ba82) ) 
+
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "TPP1-T.4A.82S123",    0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
+	ROM_LOAD( "TPP1-T.1A.82S123",    0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
+
+	ROM_REGION( 0x0200, "sprpal", 0 )
+	ROM_LOAD( "TPP1-T.3A.82S129",   0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD( "TPP1-T.2A.82S129",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+
+	ROM_REGION( 0x0100, "prot", 0 )
+	ROM_LOAD( "TPP1-T.3J.82S129", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
+ROM_END
+
 
 DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 {
@@ -767,4 +801,5 @@ GAME( 1982, popeye,   0,      popeye,   popeye,   popeye_state, popeye,   ROT0, 
 GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, popeyebl, popeye, popeyebl, popeye,   popeye_state, 0,        ROT0, "bootleg",  "Popeye (bootleg)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, popeyej,  popeye, popeyej,  popeye,   popeye_state, skyskipr, ROT0, "Nintendo", "Popeye (Japan, Sky Skipper hardware)", MACHINE_SUPPORTS_SAVE ) // this is the original Japanese release on the same hardware as Sky Skipper
+GAME( 1982, popeyej,  popeye, popeyej,  popeye,   popeye_state, skyskipr, ROT0, "Nintendo", "Popeye (Japan, Sky Skipper hardware)", MACHINE_SUPPORTS_SAVE ) // this is the original Japanese release on the same hardware as Sky Skipper
+GAME( 1982, popeyejo, popeye, popeyej,  popeye,   popeye_state, skyskipr, ROT0, "Nintendo", "Popeye (Japan, Sky Skipper hardware, Older)", MACHINE_SUPPORTS_SAVE )
