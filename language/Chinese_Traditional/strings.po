@@ -351,7 +351,7 @@ msgstr "%1$s (%2$s - %3$s) - 搜尋： %4$s_"
 #: src/frontend/mame/ui/selgame.cpp:1486 src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr "%1$s： %2$s -搜搜尋： %3$s_"
+msgstr "%1$s： %2$s - 搜搜尋： %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1488 src/frontend/mame/ui/selsoft.cpp:759
 #, c-format
