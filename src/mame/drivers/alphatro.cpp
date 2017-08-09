@@ -20,7 +20,6 @@
 
     ToDo:
     - Newer ROM set from Team Europe and try to work out the graphics expansion
-    - uPD765 oddness that prevents Disk BASIC from loading
 
 ***************************************************************************/
 
@@ -33,6 +32,8 @@
 #include "machine/bankdev.h"
 #include "machine/upd765.h"
 #include "machine/i8257.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
@@ -69,6 +70,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_dmac(*this, "dmac")
 		, m_config(*this, "CONFIG")
+		, m_cart(*this, "cartslot")
 	{ }
 
 	DECLARE_READ8_MEMBER (ram0000_r);
@@ -96,6 +98,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
+
 private:
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
@@ -121,6 +126,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<i8257_device> m_dmac;
 	required_ioport m_config;
+	required_device<generic_slot_device> m_cart;
 };
 
 void alphatro_state::update_banking()
@@ -172,6 +178,7 @@ READ8_MEMBER (alphatro_state::ram0000_r)
 
 WRITE8_MEMBER(alphatro_state::ram0000_w)
 {
+
 	if (offset < 0xf000)
 	{
 		m_ram_ptr[offset] = data;
@@ -392,7 +399,7 @@ static ADDRESS_MAP_START( rombank_map, AS_PROGRAM, 8, alphatro_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cartbank_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("cart", 0x0000)
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom) AM_WRITE(rama000_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(rama000_r, rama000_w)
 ADDRESS_MAP_END
 
@@ -591,6 +598,24 @@ void alphatro_state::machine_reset()
 	m_beep->set_state(0);
 }
 
+image_init_result alphatro_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+{
+	uint32_t size = slot->common_get_size("rom");
+
+	if (!image.loaded_through_softlist())
+	{
+		if (size != 0x4000)
+		{
+			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid size, must be 16 K" );
+		}
+	}
+
+	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
 PALETTE_INIT_MEMBER(alphatro_state, alphatro)
 {
 	// RGB colours
@@ -712,6 +737,11 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
+	MCFG_GENERIC_EXTENSIONS("bin")
+	MCFG_GENERIC_LOAD(alphatro_state, cart_load)
+
 	/* 0000 banking */
 	MCFG_DEVICE_ADD("lowbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
@@ -748,8 +778,6 @@ ROM_START( alphatro )
 	ROM_REGION( 0xa000, "roms", ROMREGION_ERASE00)
 	ROM_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
 	ROM_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) )
-
-	ROM_REGION( 0x4000, "cart", ROMREGION_ERASE00)
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) )
