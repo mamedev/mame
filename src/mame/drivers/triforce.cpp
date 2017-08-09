@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Ville Linde, Segher Boessenkool
 /* Triforce Skeleton
  -- split from Naomi.c
 
@@ -504,7 +504,7 @@ static INPUT_PORTS_START( triforce )
 INPUT_PORTS_END
 
 // bootrom descrambler reversed by segher
-// Copyright 2008 Segher Boessenkool <segher@kernel.crashing.org>
+// Copyright 2008-2017 Segher Boessenkool <segher@kernel.crashing.org>
 static void descrambler(uint8_t* data, uint32_t size)
 {
 	uint8_t acc = 0;
