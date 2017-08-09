@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/utils.h
@@ -14,10 +14,111 @@
 
 #include "unicode.h"
 
+#include <algorithm>
+#include <limits>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+
+class mame_ui_manager;
+class render_container;
+
+
+// TODO: namespace this thing
+struct ui_software_info
+{
+	ui_software_info() { }
+
+	// info for software list item
+	ui_software_info(
+			software_info const &info,
+			software_part const &p,
+			game_driver const &d,
+			std::string const &li,
+			std::string const &is,
+			std::string const &de);
+
+	// info for starting empty
+	ui_software_info(game_driver const &d);
+
+	// copyable/movable
+	ui_software_info(ui_software_info const &) = default;
+	ui_software_info(ui_software_info &&) = default;
+	ui_software_info &operator=(ui_software_info const &) = default;
+	ui_software_info &operator=(ui_software_info &&) = default;
+
+	bool operator==(ui_software_info const &r)
+	{
+		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
+			   && year == r.year && publisher == r.publisher && supported == r.supported
+			   && part == r.part && driver == r.driver && listname == r.listname
+			   && interface == r.interface && instance == r.instance && startempty == r.startempty
+			   && parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype;
+	}
+
+	std::string shortname;
+	std::string longname;
+	std::string parentname;
+	std::string year;
+	std::string publisher;
+	uint8_t supported = 0;
+	std::string part;
+	const game_driver *driver = nullptr;
+	std::string listname;
+	std::string interface;
+	std::string instance;
+	uint8_t startempty = 0;
+	std::string parentlongname;
+	std::string usage;
+	std::string devicetype;
+	bool available = false;
+};
+
 
 namespace ui {
 
-class machine_filter
+struct s_filter; // FIXME: this is declared in custmenu.h, it shouldn't be
+
+template <class Impl, typename Entry>
+class filter_base
+{
+public:
+	typedef std::unique_ptr<Impl> ptr;
+
+	virtual ~filter_base() { }
+
+	virtual char const *config_name() const = 0;
+	virtual char const *display_name() const = 0;
+	virtual char const *filter_text() const = 0;
+
+	virtual bool apply(Entry const &info) const = 0;
+
+	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Impl &)> &&handler) = 0;
+
+	virtual bool wants_adjuster() const = 0;
+	virtual char const *adjust_text() const = 0;
+	virtual uint32_t arrow_flags() const = 0;
+	virtual bool adjust_left() = 0;
+	virtual bool adjust_right() = 0;
+
+	virtual void save_ini(emu_file &file, unsigned indent) const = 0;
+
+	template <typename InputIt, class OutputIt>
+	void apply(InputIt first, InputIt last, OutputIt dest) const
+	{
+		std::copy_if(first, last, dest, [this] (Entry const *info) { return apply(*info); });
+	}
+
+protected:
+	using entry_type = Entry;
+
+	filter_base() { }
+};
+
+
+class machine_filter : public filter_base<machine_filter, game_driver>
 {
 public:
 	enum type : uint16_t
@@ -32,7 +133,7 @@ public:
 		CATEGORY,
 		FAVORITE,
 		BIOS,
-		PARENT,
+		PARENTS,
 		CLONES,
 		MANUFACTURER,
 		YEAR,
@@ -49,14 +150,28 @@ public:
 		LAST = COUNT - 1
 	};
 
+	virtual type get_type() const = 0;
+	virtual std::string adorned_display_name(type n) const = 0;
+
+	static ptr create(type n) { return create(n, nullptr, nullptr, 0); }
+	static ptr create(emu_file &file) { return create(file, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
+
+	using filter_base<machine_filter, game_driver>::config_name;
+	using filter_base<machine_filter, game_driver>::display_name;
+
+protected:
+	machine_filter();
+
+	static ptr create(type n, char const *value, emu_file *file, unsigned indent);
+	static ptr create(emu_file &file, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(machine_filter::type)
 
 
-class software_filter
+class software_filter : public filter_base<software_filter, ui_software_info>
 {
 public:
 	enum type : uint16_t
@@ -66,7 +181,7 @@ public:
 		UNAVAILABLE,
 		PARENTS,
 		CLONES,
-		YEARS,
+		YEAR,
 		PUBLISHERS,
 		SUPPORTED,
 		PARTIAL_SUPPORTED,
@@ -81,8 +196,22 @@ public:
 		LAST = COUNT - 1
 	};
 
+	virtual type get_type() const = 0;
+	virtual std::string adorned_display_name(type n) const = 0;
+
+	static ptr create(type n, s_filter const &data) { return create(n, data, nullptr, nullptr, 0); }
+	static ptr create(emu_file &file, s_filter const &data) { return create(file, data, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
+
+	using filter_base<software_filter, ui_software_info>::config_name;
+	using filter_base<software_filter, ui_software_info>::display_name;
+
+protected:
+	software_filter();
+
+	static ptr create(type n, s_filter const &data, char const *value, emu_file *file, unsigned indent);
+	static ptr create(emu_file &file, s_filter const &data, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
@@ -151,73 +280,7 @@ enum
 	HOVER_RP_LAST = (HOVER_RP_FIRST) + 1 + RP_LAST
 };
 
-// GLOBAL STRUCTURES
-struct ui_software_info
-{
-	ui_software_info() { }
-
-	// info for software list item
-	ui_software_info(
-			software_info const &info,
-			software_part const &p,
-			game_driver const &d,
-			std::string const &li,
-			std::string const &is,
-			std::string const &de);
-
-	// info for starting empty
-	ui_software_info(game_driver const &d);
-
-	// copyable/movable
-	ui_software_info(ui_software_info const &) = default;
-	ui_software_info(ui_software_info &&) = default;
-	ui_software_info &operator=(ui_software_info const &) = default;
-	ui_software_info &operator=(ui_software_info &&) = default;
-
-	bool operator==(ui_software_info const &r)
-	{
-		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
-			   && year == r.year && publisher == r.publisher && supported == r.supported
-			   && part == r.part && driver == r.driver && listname == r.listname
-			   && interface == r.interface && instance == r.instance && startempty == r.startempty
-			   && parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype;
-	}
-
-	std::string shortname;
-	std::string longname;
-	std::string parentname;
-	std::string year;
-	std::string publisher;
-	uint8_t supported = 0;
-	std::string part;
-	const game_driver *driver = nullptr;
-	std::string listname;
-	std::string interface;
-	std::string instance;
-	uint8_t startempty = 0;
-	std::string parentlongname;
-	std::string usage;
-	std::string devicetype;
-	bool available = false;
-};
-
-// Manufacturers
-struct c_mnfct
-{
-	static void set(const char *str);
-	static std::string getname(const char *str);
-	static std::vector<std::string> ui;
-	static std::unordered_map<std::string, int> uimap;
-	static uint16_t actual;
-};
-
-// Years
-struct c_year
-{
-	static void set(const char *str);
-	static std::vector<std::string> ui;
-	static uint16_t actual;
-};
+// FIXME: this stuff shouldn't all be globals
 
 // GLOBAL CLASS
 struct ui_globals
@@ -229,30 +292,23 @@ struct ui_globals
 	static bool         has_icons;
 };
 
-struct main_filters { static ui::machine_filter::type actual; };
-
-// Custom filter
-struct custfltr
+// Manufacturers
+struct c_mnfct
 {
-	static ui::machine_filter::type  main;
-	static uint16_t  numother;
-	static ui::machine_filter::type  other[MAX_CUST_FILTER];
-	static uint16_t  mnfct[MAX_CUST_FILTER];
-	static uint16_t  screen[MAX_CUST_FILTER];
-	static uint16_t  year[MAX_CUST_FILTER];
+	static std::string getname(const char *str);
+	static std::vector<std::string> ui;
 };
 
-// Software custom filter
-struct sw_custfltr
+// Years
+struct c_year
 {
-	static ui::software_filter::type main;
-	static uint16_t  numother;
-	static ui::software_filter::type other[MAX_CUST_FILTER];
-	static uint16_t  mnfct[MAX_CUST_FILTER];
-	static uint16_t  year[MAX_CUST_FILTER];
-	static uint16_t  region[MAX_CUST_FILTER];
-	static uint16_t  type[MAX_CUST_FILTER];
-	static uint16_t  list[MAX_CUST_FILTER];
+	static std::vector<std::string> ui;
+};
+
+struct main_filters
+{
+	static ui::machine_filter::type actual;
+	static std::map<ui::machine_filter::type, ui::machine_filter::ptr> filters;
 };
 
 // GLOBAL FUNCTIONS

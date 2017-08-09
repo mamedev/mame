@@ -7,13 +7,14 @@
     UI main options menu manager.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_OPTSMENU_H
 #define MAME_FRONTEND_UI_OPTSMENU_H
 
+#pragma once
+
 #include "ui/menu.h"
+#include "ui/utils.h"
+
 
 namespace ui {
 class menu_game_options : public menu
@@ -30,8 +31,7 @@ private:
 	{
 		FILTER_MENU = 1,
 		FILE_CATEGORY_FILTER,
-		MANUFACT_CAT_FILTER,
-		YEAR_CAT_FILTER,
+		FILTER_ADJUST,
 		CATEGORY_FILTER,
 		CONF_DIR,
 		DISPLAY_MENU,
@@ -42,14 +42,13 @@ private:
 		ADVANCED_MENU,
 		SAVE_OPTIONS,
 		CGI_MENU,
-		CUSTOM_FILTER,
 		SAVE_CONFIG
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	uint16_t m_main;
+	machine_filter::type m_main;
 };
 
 } // namespace ui

@@ -2015,7 +2015,7 @@ DRIVER_INIT_MEMBER(neogeo_state, neogeo)
 
 
 /*    YEAR  NAME    PARENT  COMPAT MACHINE   INPUT          INIT    */
-CONS( 1990, neogeo, 0,      0,     mvs,      neogeo_6slot,  neogeo_state,  neogeo,  "SNK", "Neo-Geo",     MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+CONS( 1990, neogeo, 0,      0,     mvs,      neogeo_6slot,  neogeo_state,  neogeo,  "SNK", "Neo-Geo MVS", MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
 CONS( 1990, aes,    0,      0,     aes,      aes,           aes_state,     0,       "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
 
 

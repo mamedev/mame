@@ -69,10 +69,8 @@ private:
 	// internal methods
 	void change_info_pane(int delta);
 
-	void build_custom();
 	void build_category();
 	void build_available_list();
-	void build_list(const char *filter_text = nullptr, int filter = 0, bool bioscheck = false, std::vector<const game_driver *> vec = {});
 
 	bool isfavorite() const;
 	void populate_search();

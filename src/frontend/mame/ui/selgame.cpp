@@ -74,48 +74,39 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	if (!load_available_machines())
 		build_available_list();
 
-	// load custom filter
-	load_custom_filters();
-
 	if (first_start)
 	{
 		reselect_last::set_driver(moptions.last_used_machine());
+
 		std::string tmp(moptions.last_used_filter());
-		std::size_t found = tmp.find_first_of(",");
+		std::size_t const found = tmp.find_first_of(",");
+		std::string fake_ini;
 		if (found == std::string::npos)
-			last_filter = tmp;
+		{
+			fake_ini = util::string_format("%s = 1\n", tmp);
+		}
 		else
 		{
-			last_filter = tmp.substr(0, found);
-			sub_filter = tmp.substr(found + 1);
+			std::string const sub_filter(tmp.substr(found + 1));
+			tmp.resize(found);
+			fake_ini = util::string_format("%s = %s\n", tmp, sub_filter);
 		}
 
-		main_filters::actual = machine_filter::ALL;
-		for (machine_filter::type ind = machine_filter::FIRST; ind < machine_filter::COUNT; ++ind)
+		emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
+		if (file.open_ram(fake_ini.c_str(), fake_ini.size()) == osd_file::error::NONE)
 		{
-			if (last_filter == machine_filter::config_name(ind))
+			machine_filter::ptr flt(machine_filter::create(file));
+			if (flt)
 			{
-				main_filters::actual = ind;
-				break;
+				main_filters::actual = flt->get_type();
+				main_filters::filters.emplace(main_filters::actual, std::move(flt));
 			}
+			file.close();
 		}
-
-		if (main_filters::actual == machine_filter::CATEGORY)
-			main_filters::actual = machine_filter::ALL;
-		else if (main_filters::actual == machine_filter::MANUFACTURER)
-		{
-			for (size_t id = 0; id < c_mnfct::ui.size(); ++id)
-				if (sub_filter == c_mnfct::ui[id])
-					c_mnfct::actual = id;
-		}
-		else if (main_filters::actual == machine_filter::YEAR)
-		{
-			for (size_t id = 0; id < c_year::ui.size(); ++id)
-				if (sub_filter == c_year::ui[id])
-					c_year::actual = id;
-		}
-		first_start = false;
 	}
+
+	// do this after processing the last used filter setting so it overwrites the placeholder
+	load_custom_filters();
 
 	if (!moptions.remember_last())
 		reselect_last::reset();
@@ -151,11 +142,17 @@ menu_select_game::~menu_select_game()
 	else if (swinfo && m_prev_selected)
 		last_driver = reinterpret_cast<ui_software_info *>(m_prev_selected)->shortname;
 
-	std::string filter(machine_filter::config_name(main_filters::actual));
-	if (main_filters::actual == machine_filter::MANUFACTURER)
-		filter.append(",").append(c_mnfct::ui[c_mnfct::actual]);
-	else if (main_filters::actual == machine_filter::YEAR)
-		filter.append(",").append(c_year::ui[c_year::actual]);
+	std::string filter;
+	auto const active_filter(main_filters::filters.find(main_filters::actual));
+	if (main_filters::filters.end() != active_filter)
+	{
+		char const *val(active_filter->second->filter_text());
+		filter = val ? util::string_format("%s,%s", active_filter->second->config_name(), val) : active_filter->second->config_name();
+	}
+	else
+	{
+		filter = machine_filter::config_name(main_filters::actual);
+	}
 
 	ui_options &mopt = ui().options();
 	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE);
@@ -423,43 +420,38 @@ void menu_select_game::handle()
 	if (check_filter)
 	{
 		m_search.clear();
-		if (l_hover == machine_filter::CATEGORY)
+		switch (l_hover)
 		{
+		case machine_filter::CATEGORY:
+			// FIXME: this should be unified with the other filters
 			main_filters::actual = machine_filter::type(l_hover);
 			menu::stack_push<menu_game_options>(ui(), container());
-		}
-		else if (l_hover == machine_filter::CUSTOM)
-		{
-			main_filters::actual = machine_filter::type(l_hover);
-			menu::stack_push<menu_custom_filter>(ui(), container(), true);
-		}
-		else if (l_hover == machine_filter::MANUFACTURER)
-		{
-			menu::stack_push<menu_selector>(
-					ui(), container(), std::vector<std::string>(c_mnfct::ui), c_mnfct::actual,
-					[this] (int selection)
-					{
-						c_mnfct::actual = selection;
-						main_filters::actual = machine_filter::type(l_hover);
-						reset(reset_options::SELECT_FIRST);
-					});
-		}
-		else if (l_hover == machine_filter::YEAR)
-		{
-			menu::stack_push<menu_selector>(
-					ui(), container(), std::vector<std::string>(c_year::ui), c_year::actual,
-					[this] (int selection)
-					{
-						c_year::actual = selection;
-						main_filters::actual = machine_filter::type(l_hover);
-						reset(reset_options::SELECT_FIRST);
-					});
-		}
-		else
-		{
+			break;
+		default:
 			if (l_hover >= machine_filter::ALL)
-				main_filters::actual = machine_filter::type(l_hover);
-			reset(reset_options::SELECT_FIRST);
+			{
+				auto it(main_filters::filters.find(machine_filter::type(l_hover)));
+				if (main_filters::filters.end() == it)
+					it = main_filters::filters.emplace(machine_filter::type(l_hover), machine_filter::create(machine_filter::type(l_hover))).first;
+				it->second->show_ui(
+						ui(),
+						container(),
+						[this] (machine_filter &filter)
+						{
+							machine_filter::type const new_type(filter.get_type());
+							if (machine_filter::CUSTOM == new_type)
+							{
+								emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+								if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
+								{
+									filter.save_ini(file, 0);
+									file.close();
+								}
+							}
+							main_filters::actual = new_type;
+							reset(reset_options::SELECT_FIRST);
+						});
+			}
 		}
 	}
 }
@@ -479,7 +471,9 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		// if search is not empty, find approximate matches
 		if (!m_search.empty())
+		{
 			populate_search();
+		}
 		else
 		{
 			// reset search string
@@ -489,21 +483,27 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 			// if filter is set on category, build category list
 			switch (main_filters::actual)
 			{
+			case machine_filter::ALL:
+				m_displaylist = m_sortedlist;
+				break;
+			case machine_filter::AVAILABLE:
+				m_displaylist = m_availsortedlist;
+				break;
+			case machine_filter::UNAVAILABLE:
+				m_displaylist = m_unavailsortedlist;
+				break;
 			case machine_filter::CATEGORY:
 				build_category();
 				break;
-			case machine_filter::MANUFACTURER:
-				build_list(c_mnfct::ui[c_mnfct::actual].c_str());
-				break;
-			case machine_filter::YEAR:
-				build_list(c_year::ui[c_year::actual].c_str());
-				break;
-			case machine_filter::CUSTOM:
-				build_custom();
-				break;
 			default:
-				build_list();
-				break;
+				{
+					auto const it(main_filters::filters.find(main_filters::actual));
+					std::copy_if(
+							m_sortedlist.begin(),
+							m_sortedlist.end(),
+							std::back_inserter(m_displaylist),
+							[&flt = *it->second] (game_driver const *drv) { return flt.apply(*drv); });
+				}
 			}
 
 			// iterate over entries
@@ -907,139 +907,6 @@ void menu_select_game::inkey_special(const event *menu_event)
 
 
 //-------------------------------------------------
-//  build list
-//-------------------------------------------------
-
-void menu_select_game::build_list(const char *filter_text, int filter, bool bioscheck, std::vector<const game_driver *> s_drivers)
-{
-	if (s_drivers.empty())
-	{
-		filter = main_filters::actual;
-		if (filter == machine_filter::AVAILABLE)
-			s_drivers = m_availsortedlist;
-		else if (filter == machine_filter::UNAVAILABLE)
-			s_drivers = m_unavailsortedlist;
-		else
-			s_drivers = m_sortedlist;
-	}
-
-	for (auto & s_driver : s_drivers)
-	{
-		if (!bioscheck && filter != machine_filter::BIOS && (s_driver->flags & machine_flags::IS_BIOS_ROOT) != 0)
-			continue;
-
-		switch (filter)
-		{
-		case machine_filter::ALL:
-		case machine_filter::AVAILABLE:
-		case machine_filter::UNAVAILABLE:
-			m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::WORKING:
-			if (!(s_driver->flags & machine_flags::NOT_WORKING))
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::NOT_MECHANICAL:
-			if (!(s_driver->flags & machine_flags::MECHANICAL))
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::BIOS:
-			if (s_driver->flags & machine_flags::IS_BIOS_ROOT)
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::PARENT:
-		case machine_filter::CLONES:
-			{
-				bool cloneof = strcmp(s_driver->parent, "0");
-				if (cloneof)
-				{
-					auto cx = driver_list::find(s_driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
-						cloneof = false;
-				}
-
-				if (filter == machine_filter::CLONES && cloneof)
-					m_displaylist.push_back(s_driver);
-				else if (filter == machine_filter::PARENT && !cloneof)
-					m_displaylist.push_back(s_driver);
-			}
-			break;
-		case machine_filter::NOT_WORKING:
-			if (s_driver->flags & machine_flags::NOT_WORKING)
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::MECHANICAL:
-			if (s_driver->flags & machine_flags::MECHANICAL)
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::SAVE:
-			if (s_driver->flags & machine_flags::SUPPORTS_SAVE)
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::NOSAVE:
-			if (!(s_driver->flags & machine_flags::SUPPORTS_SAVE))
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::YEAR:
-			if (!core_stricmp(filter_text, s_driver->year))
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::VERTICAL:
-			if (s_driver->flags & ORIENTATION_SWAP_XY)
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::HORIZONTAL:
-			if (!(s_driver->flags & ORIENTATION_SWAP_XY))
-				m_displaylist.push_back(s_driver);
-			break;
-
-		case machine_filter::MANUFACTURER:
-			{
-				std::string name = c_mnfct::getname(s_driver->manufacturer);
-				if (!core_stricmp(filter_text, name.c_str()))
-					m_displaylist.push_back(s_driver);
-			}
-			break;
-		case machine_filter::CHD:
-			{
-				auto entries = rom_build_entries(s_driver->rom);
-				for (const rom_entry &rom : entries)
-					if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
-					{
-						m_displaylist.push_back(s_driver);
-						break;
-					}
-				}
-			break;
-		case machine_filter::NOCHD:
-			{
-				auto entries = rom_build_entries(s_driver->rom);
-				bool found = false;
-				for (const rom_entry &rom : entries)
-					if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
-					{
-						found = true;
-						break;
-					}
-				if (!found)
-					m_displaylist.push_back(s_driver);
-			}
-			break;
-		}
-	}
-}
-
-//-------------------------------------------------
 //  change what's displayed in the info box
 //-------------------------------------------------
 
@@ -1071,55 +938,6 @@ void menu_select_game::change_info_pane(int delta)
 			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
 		else
 			cap_delta(ui_globals::cur_sw_dats_view, ui_globals::cur_sw_dats_total);
-	}
-}
-
-//-------------------------------------------------
-//  build custom display list
-//-------------------------------------------------
-
-void menu_select_game::build_custom()
-{
-	std::vector<const game_driver *> s_drivers;
-	bool bioscheck = false;
-
-	if (custfltr::main == machine_filter::AVAILABLE)
-		s_drivers = m_availsortedlist;
-	else if (custfltr::main == machine_filter::UNAVAILABLE)
-		s_drivers = m_unavailsortedlist;
-	else
-		s_drivers = m_sortedlist;
-
-	for (auto & elem : s_drivers)
-	{
-		m_displaylist.push_back(elem);
-	}
-
-	for (int count = 1; count <= custfltr::numother; ++count)
-	{
-		int filter = custfltr::other[count];
-		if (filter == machine_filter::BIOS)
-			bioscheck = true;
-	}
-
-	for (int count = 1; count <= custfltr::numother; ++count)
-	{
-		int filter = custfltr::other[count];
-		s_drivers = m_displaylist;
-		m_displaylist.clear();
-
-		switch (filter)
-		{
-		case machine_filter::YEAR:
-			build_list(c_year::ui[custfltr::year[count]].c_str(), filter, bioscheck, s_drivers);
-			break;
-		case machine_filter::MANUFACTURER:
-			build_list(c_mnfct::ui[custfltr::mnfct[count]].c_str(), filter, bioscheck, s_drivers);
-			break;
-		default:
-			build_list(nullptr, filter, bioscheck, s_drivers);
-			break;
-		}
 	}
 }
 
@@ -1378,24 +1196,27 @@ void menu_select_game::init_sorted_list()
 		return;
 
 	// generate full list
+	std::unordered_set<std::string> manufacturers, years;
 	for (int x = 0; x < driver_list::total(); ++x)
 	{
-		const game_driver *driver = &driver_list::driver(x);
-		if (driver == &GAME_NAME(___empty))
-			continue;
-		if (driver->flags & machine_flags::IS_BIOS_ROOT)
-			m_isabios++;
+		game_driver const &driver(driver_list::driver(x));
+		if (&driver != &GAME_NAME(___empty))
+		{
+			if (driver.flags & machine_flags::IS_BIOS_ROOT)
+				m_isabios++;
 
-		m_sortedlist.push_back(driver);
-		c_mnfct::set(driver->manufacturer);
-		c_year::set(driver->year);
+			m_sortedlist.push_back(&driver);
+			manufacturers.emplace(c_mnfct::getname(driver.manufacturer));
+			years.emplace(driver.year);
+		}
 	}
 
-	for (auto & e : c_mnfct::uimap)
-		c_mnfct::ui.emplace_back(e.first);
-
 	// sort manufacturers - years and driver
-	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
+	for (auto it = manufacturers.begin(); manufacturers.end() != it; it = manufacturers.erase(it))
+		c_mnfct::ui.emplace_back(*it);
+	std::sort(c_mnfct::ui.begin(), c_mnfct::ui.end(), [] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+	for (auto it = years.begin(); years.end() != it; it = years.erase(it))
+		c_year::ui.emplace_back(*it);
 	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
 	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sorted_game_list);
 }
@@ -1457,60 +1278,12 @@ bool menu_select_game::load_available_machines()
 
 void menu_select_game::load_custom_filters()
 {
-	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
 	{
-		char buffer[MAX_CHAR_INFO];
-
-		// get number of filters
-		file.gets(buffer, MAX_CHAR_INFO);
-		char *pb = strchr(buffer, '=');
-		custfltr::numother = atoi(++pb) - 1;
-
-		// get main filter
-		file.gets(buffer, MAX_CHAR_INFO);
-		pb = strchr(buffer, '=') + 2;
-
-		for (machine_filter::type y = machine_filter::FIRST; y < machine_filter::COUNT; ++y)
-		{
-			char const *const name(machine_filter::config_name(y));
-			if (!strncmp(pb, name, strlen(name)))
-			{
-				custfltr::main = y;
-				break;
-			}
-		}
-
-		for (int x = 1; x <= custfltr::numother; ++x)
-		{
-			file.gets(buffer, MAX_CHAR_INFO);
-			char *cb = strchr(buffer, '=') + 2;
-			for (machine_filter::type y = machine_filter::FIRST; y < machine_filter::COUNT; ++y)
-			{
-				char const *const name(machine_filter::config_name(y));
-				if (!strncmp(cb, name, strlen(name)))
-				{
-					custfltr::other[x] = y;
-					if (y == machine_filter::MANUFACTURER)
-					{
-						file.gets(buffer, MAX_CHAR_INFO);
-						char *ab = strchr(buffer, '=') + 2;
-						for (size_t z = 0; z < c_mnfct::ui.size(); ++z)
-							if (!strncmp(ab, c_mnfct::ui[z].c_str(), c_mnfct::ui[z].length()))
-								custfltr::mnfct[x] = z;
-					}
-					else if (y == machine_filter::YEAR)
-					{
-						file.gets(buffer, MAX_CHAR_INFO);
-						char *db = strchr(buffer, '=') + 2;
-						for (size_t z = 0; z < c_year::ui.size(); ++z)
-							if (!strncmp(db, c_year::ui[z].c_str(), c_year::ui[z].length()))
-								custfltr::year[x] = z;
-					}
-				}
-			}
-		}
+		machine_filter::ptr flt(machine_filter::create(file));
+		if (flt)
+			main_filters::filters[flt->get_type()] = std::move(flt); // not emplace/insert - could replace bogus filter from ui.ini line
 		file.close();
 	}
 
@@ -1527,13 +1300,13 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 	if (ui_globals::panels_status == SHOW_PANELS || ui_globals::panels_status == HIDE_RIGHT_PANEL)
 	{
+		auto const active_filter(main_filters::filters.find(main_filters::actual));
 		float origy1 = y1;
 		float origy2 = y2;
 		float text_size = ui().options().infos_size();
 		float line_height_max = line_height * text_size;
 		float left_width = 0.0f;
 		int line_count = machine_filter::COUNT;
-		int afilter = main_filters::actual;
 		int phover = HOVER_FILTER_FIRST;
 		float sc = y2 - y1 - (2.0f * UI_BOX_TB_BORDER);
 
@@ -1544,7 +1317,9 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 			line_height_max = line_height * text_size;
 		}
 
-		float text_sign = ui().get_string_width("_# ", text_size);
+		std::string tmp("_# ");
+		convert_command_glyph(tmp);
+		float text_sign = ui().get_string_width(tmp.c_str(), text_size);
 		for (machine_filter::type x = machine_filter::FIRST; x < machine_filter::COUNT; ++x)
 		{
 			float total_width;
@@ -1569,7 +1344,21 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 		for (machine_filter::type filter = machine_filter::FIRST; filter < machine_filter::COUNT; ++filter)
 		{
-			std::string str(machine_filter::display_name(filter));
+			std::string str;
+			if (main_filters::filters.end() != active_filter)
+			{
+				str = active_filter->second->adorned_display_name(filter);
+			}
+			else
+			{
+				if (main_filters::actual == filter)
+				{
+					str = std::string("_> ") + str;
+					convert_command_glyph(str);
+				}
+				str.append(machine_filter::display_name(filter));
+			}
+
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
 			rgb_t fgcolor = UI_TEXT_COLOR;
 
@@ -1589,35 +1378,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 			}
 
-			float x1t = x1 + text_sign;
-			if (afilter == machine_filter::CUSTOM)
-			{
-				if (filter == custfltr::main)
-				{
-					str = std::string("@custom1 ") + str;
-					x1t -= text_sign;
-				}
-				else
-				{
-					for (int count = 1; count <= custfltr::numother; ++count)
-					{
-						int cfilter = custfltr::other[count];
-						if (cfilter == filter)
-						{
-							str = string_format("@custom%d %s", count + 1, str);
-							x1t -= text_sign;
-							break;
-						}
-					}
-				}
-				convert_command_glyph(str);
-			}
-			else if (filter == main_filters::actual)
-			{
-				str = std::string("_> ") + str;
-				x1t -= text_sign;
-				convert_command_glyph(str);
-			}
+			float const x1t = x1 + ((str == machine_filter::display_name(filter)) ? text_sign : 0.0f);
 
 			ui().draw_text_full(container(), str.c_str(), x1t, y1, x2 - x1, ui::text_layout::LEFT, ui::text_layout::NEVER,
 					mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
@@ -1705,32 +1466,27 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 			(driver_list::total() - 1),
 			m_isabios);
 
-	std::string filtered;
+	if (isfavorite())
+	{
+		line1.clear();
+	}
 	if (main_filters::actual == machine_filter::CATEGORY && inifile.total() > 0)
 	{
-		filtered = string_format(_("%1$s (%2$s - %3$s) - "),
+		line1 = string_format(_("%1$s (%2$s - %3$s) - Search: %4$s_"),
 				machine_filter::display_name(main_filters::actual),
 				inifile.get_file(),
-				inifile.get_category());
+				inifile.get_category(),
+				m_search);
 	}
-	else if (main_filters::actual == machine_filter::MANUFACTURER)
-	{
-		filtered = string_format(_("%1$s (%2$s) - "),
-				machine_filter::display_name(main_filters::actual),
-				c_mnfct::ui[c_mnfct::actual]);
-	}
-	else if (main_filters::actual == machine_filter::YEAR)
-	{
-		filtered = string_format(_("%1$s (%2$s) - "),
-				machine_filter::display_name(main_filters::actual),
-				c_year::ui[c_year::actual]);
-	}
-
-	// display the current typeahead
-	if (isfavorite())
-		line1.clear();
 	else
-		line1 = string_format(_("%1$s Search: %2$s_"), filtered, m_search);
+	{
+		auto const it(main_filters::filters.find(main_filters::actual));
+		char const *const filter((main_filters::filters.end() != it) ? it->second->filter_text() : nullptr);
+		if (filter)
+			line1 = string_format(_("%1$s: %2$s - Search: %3$s_"), it->second->display_name(), filter, m_search);
+		else
+			line1 = string_format(_("Search: %1$s_"), m_search);
+	}
 
 	line2.clear();
 }

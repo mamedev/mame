@@ -14,6 +14,8 @@
 
 #include "ui/custmenu.h"
 #include "ui/selmenu.h"
+#include "ui/utils.h"
+
 
 namespace ui {
 
@@ -30,10 +32,13 @@ protected:
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 
+	typedef std::map<software_filter::type, software_filter::ptr> filter_map;
+
 	std::string             m_search;
 	const game_driver       *m_driver;
 	bool                    m_has_empty_start;
-	s_filter                m_filter;
+	s_filter                m_filter_data;
+	filter_map              m_filters;
 	software_filter::type   m_filter_type;
 	int                     highlight;
 
@@ -56,8 +61,6 @@ private:
 	std::vector<ui_software_info>     m_swinfo;
 
 	void build_software_list();
-	void build_list(std::vector<ui_software_info *> &vec, const char *filter_text = nullptr, int filter = -1);
-	void build_custom();
 	void find_matches(const char *str, int count);
 	void load_sw_custom_filters();
 
