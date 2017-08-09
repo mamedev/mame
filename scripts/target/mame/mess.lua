@@ -2472,6 +2472,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vboy.cpp",
 	MAME_DIR .. "src/mame/audio/vboy.cpp",
 	MAME_DIR .. "src/mame/audio/vboy.h",
+	MAME_DIR .. "src/mame/drivers/gamecube.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "nokia")
