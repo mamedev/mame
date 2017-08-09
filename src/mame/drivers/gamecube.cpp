@@ -150,7 +150,7 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 ROM_START( gcjp )
-	ROM_REGION64_BE(0x200000, "ipl", 0)
+	ROM_REGION(0x200000, "ipl", 0)
 	ROM_DEFAULT_BIOS("v12")
 	ROM_SYSTEM_BIOS(0, "v10", "IPL 1.0")
 	ROMX_LOAD("jpn_v10.bin", 0x000000, 0x200000, CRC(6dac1f2a) SHA1(a1837968288253ed541f2b11440b68f5a9b33875), ROM_BIOS(1))
@@ -190,7 +190,7 @@ ROM_START( gcus )
 ROM_END
 
 ROM_START( gceu )
-	ROM_REGION64_BE(0x200000, "ipl", 0)
+	ROM_REGION(0x200000, "ipl", 0)
 	ROM_DEFAULT_BIOS("v12")
 	ROM_SYSTEM_BIOS(0, "v10", "IPL 1.0")
 	ROMX_LOAD("pal_v10.bin", 0x000000, 0x200000, CRC(4f319f43) SHA1(f27c63e5394e2fd1606f70df004c4fc2d6027700), ROM_BIOS(1))
@@ -210,7 +210,7 @@ ROM_START( gceu )
 ROM_END
 
 ROM_START( gcbr )
-	ROM_REGION64_BE(0x200000, "ipl", 0)
+	ROM_REGION(0x200000, "ipl", 0)
 	ROM_LOAD("bra_v10.bin", 0x000000, 0x200000, CRC(667d0b64) SHA1(f3cd0c7c61cbcefa85e7de3aff4cfa50bc508714))
 
 	ROM_REGION(0x20000, "dvd", 0)
