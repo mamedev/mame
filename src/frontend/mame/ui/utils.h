@@ -219,7 +219,6 @@ DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
 } // namespace ui
 
 #define MAX_CHAR_INFO            256
-#define MAX_CUST_FILTER          8
 
 enum
 {
