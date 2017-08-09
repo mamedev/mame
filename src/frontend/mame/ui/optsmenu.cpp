@@ -176,7 +176,7 @@ void menu_game_options::handle()
 									file.close();
 								}
 							}
-							reset_options::REMEMBER_REF;
+							reset(reset_options::REMEMBER_REF);
 						});
 			}
 			break;
