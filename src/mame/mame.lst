@@ -20359,10 +20359,11 @@ mt_wwar                         // 48
 
 @source:megazone.cpp
 megazone                        // GX319 (c) 1983
-megazonea                       // GX319 (c) 1983
-megazoneb                       // GX319 (c) 1983 + Kosuka
-megazonec                       // GX319 (c) 1983 + Kosuka
-megazonei                       // GX319 (c) 1983 + Interlogic / Kosuka
+megazonea                       // GX319 (c) 1983 + Interlogic / Kosuka
+megazoneb                       // GX319 (c) 1983 
+megazoneh                       // GX319 (c) 1983 + Kosuka
+megazonei                       // GX319 (c) 1983
+megazonej                       // GX319 (c) 1983 + Interlogic / Kosuka
 
 @source:meijinsn.cpp
 meijinsn                        // (c) 1986 SNK
