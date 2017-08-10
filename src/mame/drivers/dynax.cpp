@@ -1380,8 +1380,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekisha_banked_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x00000, 0x0ffff ) AM_ROM AM_REGION("maincpu", 0x8000)
+	AM_RANGE( 0x10000, 0x10000 ) AM_WRITENOP   // ? 0
 	AM_RANGE( 0x10001, 0x10001 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
-//  AM_RANGE( 0x10002, 0x10002 )    // ? 1
+	AM_RANGE( 0x10002, 0x10002 ) AM_WRITENOP   // ? 1
 	AM_RANGE( 0x10003, 0x10003 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
 	AM_RANGE( 0x10010, 0x10017 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE( 0x10020, 0x10021 ) AM_WRITE(gekisha_hopper_w)
@@ -1397,7 +1398,7 @@ static ADDRESS_MAP_START( gekisha_banked_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x10066, 0x10066 ) AM_READ_PORT("DSW4")         // DSW
 	AM_RANGE( 0x10067, 0x10067 ) AM_READ_PORT("DSW2")         // DSW
 	AM_RANGE( 0x10070, 0x10071 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-//  AM_RANGE( 0x10080, 0x10080 )     // ? 0,1,6 (bit 0 = screen disable?)
+	AM_RANGE( 0x10080, 0x10080 ) AM_WRITENOP   // ? 0,1,6 (bit 0 = screen disable?)
 ADDRESS_MAP_END
 
 
@@ -7341,6 +7342,8 @@ ROM_END
 
 Mahjong Gekisha
 1989 Dynax
+
+Alternate title on flyers: Mahjoung Exposé (sic)
 
 PCB Layout
 ----------
