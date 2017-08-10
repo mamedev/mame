@@ -62,7 +62,6 @@ private:
 
 	// handlers
 	void inkey_select(const event *menu_event);
-	void inkey_special(const event *menu_event);
 
 	virtual void general_info(const game_driver *driver, std::string &buffer) override {}
 };

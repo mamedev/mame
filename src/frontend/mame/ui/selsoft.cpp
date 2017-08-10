@@ -244,11 +244,6 @@ void menu_select_software::handle()
 						}
 					}
 				}
-				else if (menu_event->iptkey == IPT_SPECIAL)
-				{
-					// typed characters append to the buffer
-					inkey_special(menu_event);
-				}
 			}
 		}
 	}
@@ -526,16 +521,6 @@ void menu_select_software::inkey_select(const event *menu_event)
 			set_error(reset_options::REMEMBER_POSITION, str.str());
 		}
 	}
-}
-
-//-------------------------------------------------
-//  handle special key event
-//-------------------------------------------------
-
-void menu_select_software::inkey_special(const event *menu_event)
-{
-	if (input_character(m_search, menu_event->unichar, uchar_is_printable))
-		reset(reset_options::SELECT_FIRST);
 }
 
 

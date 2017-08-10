@@ -195,6 +195,7 @@ private:
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
+	virtual bool accept_search() const { return true; }
 	void select_prev()
 	{
 		if (!m_prev_selected)

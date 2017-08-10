@@ -56,6 +56,7 @@ private:
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
+	virtual bool accept_search() const override { return !isfavorite(); }
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const override;
@@ -88,7 +89,6 @@ private:
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_select_favorite(const event *menu_event);
-	void inkey_special(const event *menu_event);
 	void inkey_export();
 };
 

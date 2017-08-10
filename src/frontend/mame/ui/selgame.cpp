@@ -224,11 +224,6 @@ void menu_select_game::handle()
 				highlight = machine_filter::LAST;
 			break;
 
-		case IPT_SPECIAL:
-			// typed characters append to the buffer
-			inkey_special(menu_event);
-			break;
-
 		case IPT_OTHER:
 			// this is generated when something in the left box is clicked
 			m_prev_selected = nullptr;
@@ -849,22 +844,9 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 //  returns if the search can be activated
 //-------------------------------------------------
 
-inline bool menu_select_game::isfavorite() const
+bool menu_select_game::isfavorite() const
 {
-	return (main_filters::actual == machine_filter::FAVORITE);
-}
-
-//-------------------------------------------------
-//  handle special key event
-//-------------------------------------------------
-
-void menu_select_game::inkey_special(const event *menu_event)
-{
-	if (!isfavorite())
-	{
-		if (input_character(m_search, menu_event->unichar, uchar_is_printable))
-			reset(reset_options::SELECT_FIRST);
-	}
+	return machine_filter::FAVORITE == main_filters::actual;
 }
 
 
@@ -1432,7 +1414,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 	{
 		line1.clear();
 	}
-	if (main_filters::actual == machine_filter::CATEGORY && inifile.total() > 0)
+	else if (main_filters::actual == machine_filter::CATEGORY && inifile.total() > 0)
 	{
 		line1 = string_format(_("%1$s (%2$s - %3$s) - Search: %4$s_"),
 				machine_filter::display_name(main_filters::actual),

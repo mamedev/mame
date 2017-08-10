@@ -22,7 +22,7 @@ msgstr ""
 #: src/frontend/mame/ui/slotopt.cpp:290
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [intern]"
 
 #: src/frontend/mame/ui/slotopt.cpp:301 src/frontend/mame/ui/inputmap.cpp:625
 #: src/frontend/mame/ui/miscmenu.cpp:97
@@ -97,26 +97,26 @@ msgstr "Erweiterungen"
 #: src/frontend/mame/ui/selgame.cpp:1022
 #, c-format
 msgid "Romset\t%1$-.100s\n"
-msgstr ""
+msgstr "ROM-Satz\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1023
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr ""
+msgstr "Jahr\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1024
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
-msgstr ""
+msgstr "Hersteller\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1028
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr ""
+msgstr "Treiber ist ein Klon von\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1030
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "Treiber ist Ursprungs-Treiber\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1033
 msgid "Analog Controls\tYes\n"
@@ -128,47 +128,47 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:1038
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "Insgesamt\tFUNKTIONIERT NICHT\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1040
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "Insgesamt\tNicht emulierter Kopierschutz\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1042
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "Insgesamt\tFunktioniert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1045
 msgid "Graphics\tUnimplemented\n"
-msgstr ""
+msgstr "Grafik\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1049
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "Grafik\tFehlerhafte Farben\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1051
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "Grafik\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1053
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "Grafik\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1056
 msgid "Sound\tNone\n"
-msgstr ""
+msgstr "Sound\tKeine\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1058
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "Sound\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1060
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Sound\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1062
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "Sound\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1065
 msgid "Controls\tUnimplemented\n"
@@ -272,32 +272,32 @@ msgstr "Nein"
 #: src/frontend/mame/ui/selgame.cpp:1115
 #, c-format
 msgid "Requires Artwork\t%1$s\n"
-msgstr ""
+msgstr "Benötigt Illustrationen\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1116
 #, c-format
 msgid "Requires Clickable Artwork\t%1$s\n"
-msgstr ""
+msgstr "Benötigt klickbare Illustrationen\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1117
 #, c-format
 msgid "Support Cocktail\t%1$s\n"
-msgstr ""
+msgstr "Unterstützt Cocktail-Modus\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1118
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "Treiber ist BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1119
 #, c-format
 msgid "Support Save\t%1$s\n"
-msgstr ""
+msgstr "Unterstützt Speichern\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1120
 #, c-format
 msgid "Screen Orientation\t%1$s\n"
-msgstr ""
+msgstr "Bildschirm-Ausrichtung\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1120
 msgid "Vertical"
@@ -310,33 +310,35 @@ msgstr "Horizontal"
 #: src/frontend/mame/ui/selgame.cpp:1129
 #, c-format
 msgid "Requires CHD\t%1$s\n"
-msgstr ""
+msgstr "Benötigt CHD\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1142
 msgid "Roms Audit Pass\tOK\n"
-msgstr ""
+msgstr "ROM-Überprüfung\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1144
 msgid "Roms Audit Pass\tBAD\n"
-msgstr ""
+msgstr "ROM-Überprüfung\tFEHLERHAFT\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1147
 msgid "Samples Audit Pass\tNone Needed\n"
-msgstr ""
+msgstr "Samples-Überprüfung\tNicht nötig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1149
 msgid "Samples Audit Pass\tOK\n"
-msgstr ""
+msgstr "Samples-Überprüfung\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1151
 msgid "Samples Audit Pass\tBAD\n"
-msgstr ""
+msgstr "Samples-Überprüfung\tFEHLERHAFT\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1154
 msgid ""
 "Roms Audit Pass\tDisabled\n"
 "Samples Audit Pass\tDisabled\n"
 msgstr ""
+"ROM-Überprüfung\tDeaktiviert\n"
+"Samples-Überprüfung\tDeaktiviert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1462
 #, c-format
@@ -346,17 +348,17 @@ msgstr "%1$s %2$s ( %3$d / %4$d Maschinen (%5$d BIOS) )"
 #: src/frontend/mame/ui/selgame.cpp:1475
 #, c-format
 msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-msgstr ""
+msgstr "%1$s (%2$s - %3$s) - Suche: %4$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1486 src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Suche: %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1488 src/frontend/mame/ui/selsoft.cpp:759
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "Suche: %1$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1498
 #, c-format
@@ -374,10 +376,13 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
+"Der gewählten Maschine fehlen ein oder mehrere benötigte ROM- oder CHD-"
+"Abbilder. Bitte wählen Sie eine andere Maschine aus.\n"
+"\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1518 src/frontend/mame/ui/selsoft.cpp:529
 msgid "Press any key to continue."
-msgstr ""
+msgstr "Drücken Sie eine beliebige Taste, um fortzufahren."
 
 #: src/frontend/mame/ui/cheatopt.cpp:92
 #, c-format
@@ -565,7 +570,7 @@ msgstr "Softwareauswahl:"
 
 #: src/frontend/mame/ui/selmenu.cpp:354
 msgid "BIOS selection:"
-msgstr ""
+msgstr "BIOS-Auswahl:"
 
 #: src/frontend/mame/ui/selmenu.cpp:580 src/frontend/mame/ui/selmenu.cpp:616
 #: src/frontend/mame/ui/simpleselgame.cpp:312
@@ -611,7 +616,7 @@ msgstr "Treiber ist Ursprungs-Treiber"
 #: src/frontend/mame/ui/selmenu.cpp:629
 #: src/frontend/mame/ui/simpleselgame.cpp:331
 msgid "Overall: NOT WORKING"
-msgstr "Insgesamt: FUNKTIONIERT NICHT\n"
+msgstr "Insgesamt: FUNKTIONIERT NICHT"
 
 #: src/frontend/mame/ui/selmenu.cpp:631
 #: src/frontend/mame/ui/simpleselgame.cpp:333
@@ -625,7 +630,7 @@ msgstr "Insgesamt: Funktioniert\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:637
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "Grafik: Nicht implementiert, "
 
 #: src/frontend/mame/ui/selmenu.cpp:639
 msgid "Graphics: Imperfect, "
@@ -637,11 +642,11 @@ msgstr "Grafik: OK, "
 
 #: src/frontend/mame/ui/selmenu.cpp:644
 msgid "Sound: None"
-msgstr ""
+msgstr "Sound: Keine"
 
 #: src/frontend/mame/ui/selmenu.cpp:646
 msgid "Sound: Unimplemented"
-msgstr "Sound: nicht implementiert"
+msgstr "Sound: Nicht implementiert"
 
 #: src/frontend/mame/ui/selmenu.cpp:648
 msgid "Sound: Imperfect"
@@ -722,7 +727,7 @@ msgstr "Weitere Bedienelemente"
 
 #: src/frontend/mame/ui/swlist.cpp:88
 msgid "[file manager]"
-msgstr "Dateimanager"
+msgstr "[Dateimanager]"
 
 #: src/frontend/mame/ui/swlist.cpp:228
 msgid "Switch Item Ordering"
@@ -1018,7 +1023,7 @@ msgstr "Mouseover"
 
 #: src/frontend/mame/ui/custui.cpp:740
 msgid "ARGB Settings"
-msgstr ""
+msgstr "ARGB-Einstellungen"
 
 #: src/frontend/mame/ui/custui.cpp:745 src/frontend/mame/ui/custui.cpp:748
 msgid "Alpha"
@@ -1098,11 +1103,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:35
 msgid "Working"
-msgstr ""
+msgstr "Funktioniert"
 
 #: src/frontend/mame/ui/utils.cpp:36
 msgid "Not Working"
-msgstr ""
+msgstr "Funktioniert Nicht"
 
 #: src/frontend/mame/ui/utils.cpp:37
 msgid "Mechanical"
@@ -1122,7 +1127,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:41 src/frontend/mame/ui/miscmenu.cpp:763
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:42 src/frontend/mame/ui/utils.cpp:58
 msgid "Parents"
@@ -1134,11 +1139,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:44
 msgid "Manufacturer"
-msgstr ""
+msgstr "Hersteller"
 
 #: src/frontend/mame/ui/utils.cpp:45 src/frontend/mame/ui/utils.cpp:60
 msgid "Year"
-msgstr ""
+msgstr "Jahr"
 
 #: src/frontend/mame/ui/utils.cpp:46
 msgid "Save Supported"
@@ -1170,7 +1175,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Publisher"
-msgstr ""
+msgstr "Herausgeber"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Supported"
@@ -1190,11 +1195,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgid "Device Type"
-msgstr ""
+msgstr "Gerätetyp"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Software List"
-msgstr ""
+msgstr "Softwareliste"
 
 #: src/frontend/mame/ui/utils.cpp:215
 msgid "<set up filters>"
@@ -1295,7 +1300,7 @@ msgstr "CPU %1$s übertakten"
 #: src/frontend/mame/ui/ui.cpp:1408
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr ""
+msgstr "Sound %1$s übertakten"
 
 #: src/frontend/mame/ui/ui.cpp:1429
 #, c-format
@@ -1551,13 +1556,13 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:203 src/frontend/mame/ui/info.cpp:219
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: src/frontend/mame/ui/info.cpp:203 src/frontend/mame/ui/info.cpp:219
 #: src/frontend/mame/ui/info.cpp:264
 #, c-format
 msgid ", %s"
-msgstr ""
+msgstr ", %s"
 
 #: src/frontend/mame/ui/info.cpp:213
 msgid "Imperfectly emulated features: "
@@ -1569,7 +1574,7 @@ msgstr "Die Bildschirmdrehung im Cocktailmodus wird nicht unterstützt.\n"
 
 #: src/frontend/mame/ui/info.cpp:230
 msgid "This machine requires external artwork files.\n"
-msgstr ""
+msgstr "Die Maschine benötigt externe Illustrationsdateien.\n"
 
 #: src/frontend/mame/ui/info.cpp:232
 msgid ""
@@ -1615,6 +1620,9 @@ msgid ""
 "\n"
 "There are working clones of this machine: %s"
 msgstr ""
+"\n"
+"\n"
+"Es gibt funktionsfähige Klone dieser Maschine: %s"
 
 #: src/frontend/mame/ui/info.cpp:275
 msgid ""
@@ -1745,7 +1753,7 @@ msgstr "Bedienung Cassettendeck"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "BIOS-Auswahl"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1961,6 +1969,9 @@ msgid ""
 "different software.\n"
 "\n"
 msgstr ""
+"Dem gewählten Programm fehlen eine oder mehrere Dateien. Bitte wählen Sie "
+"ein anderes Programm aus.\n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:751
 #, c-format
@@ -2075,7 +2086,7 @@ msgstr "Treiber"
 
 #: src/frontend/mame/ui/miscmenu.cpp:770
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "Diese Maschine besitzt kein BIOS."
 
 #: src/frontend/mame/ui/miscmenu.cpp:784
 msgid "Save machine configuration"
@@ -2119,7 +2130,7 @@ msgstr "Bild als Hintergrund verwenden"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "Menü zur BIOS-Auswahl überspringen"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -2434,42 +2445,18 @@ msgstr "OK"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:348
 msgid "None"
-msgstr ""
+msgstr "Keine"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:356
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "Grafik: %s, Sound: %s"
 
-#~ msgid "%1$s (%2$s - %3$s) - "
-#~ msgstr "%1$s (%2$s - %3$s) - "
-
-#~ msgid "%1$s (%2$s) - "
-#~ msgstr "%1$s (%2$s) - "
-
-#~ msgid "%1$s Search: %2$s_"
-#~ msgstr "%1$s Suche: %2$s_"
-
 #~ msgid "Main filter"
 #~ msgstr "Hauptfilter"
 
 #~ msgid "Other filter"
 #~ msgstr "Weiterer Filter"
-
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!Hersteller"
-
-#~ msgid "^!Year"
-#~ msgstr "Jahr: "
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!Herausgeber"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!Softwareliste"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!Gerätetyp"
 
 #~ msgid "^!Region"
 #~ msgstr "^!Region"
@@ -2480,47 +2467,8 @@ msgstr "Grafik: %s, Sound: %s"
 #~ msgid "Region: %1$s -"
 #~ msgstr "Region: %1$s -"
 
-#~ msgid "Publisher: %1$s -"
-#~ msgstr "Herausgeber: %1$s -"
-
-#~ msgid "Year: %1$s -"
-#~ msgstr "Jahr: %1$s -"
-
-#~ msgid "Software List: %1$s -"
-#~ msgstr "Softwareliste: %1$s -"
-
-#~ msgid "Device type: %1$s -"
-#~ msgstr "Gerätetyp: %1$s -"
-
-#~ msgid "%s Search: %s_"
-#~ msgstr "%s Suche: %s_"
-
-#~ msgid "Bios selection:"
-#~ msgstr "BIOS-Auswahl"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Menü zur BIOS-Auswahl überspringen"
-
-#~ msgid "Bios"
-#~ msgstr "BIOS"
-
-#~ msgid "This machine has no bios."
-#~ msgstr "Diese Maschine besitzt kein BIOS."
-
-#~ msgid "Bios Selection"
-#~ msgstr "BIOS-Auswahl"
-
-#~ msgid " - ARGB Settings"
-#~ msgstr " - ARGB-Einstellungen"
-
 #~ msgid "Software History"
 #~ msgstr "Geschichte der Software"
-
-#~ msgid "Mameinfo"
-#~ msgstr "Mameinfo"
-
-#~ msgid "Messinfo"
-#~ msgstr "Messinfo"
 
 #~ msgid "The keyboard emulation may not be 100% accurate.\n"
 #~ msgstr "Die Tastaturemulation könnte nicht 100% korrekt sein.\n"
@@ -2540,9 +2488,6 @@ msgstr "Grafik: %s, Sound: %s"
 #~ msgid "The machine lacks sound.\n"
 #~ msgstr "Der Maschine fehlt die Soundemulation.\n"
 
-#~ msgid "The machine requires external artwork files\n"
-#~ msgstr "Die Maschine benötigt externe Illustrationsdateien\n"
-
 #~ msgid "The machine has protection which isn't fully emulated.\n"
 #~ msgstr ""
 #~ "Die Maschine besitzt einen Kopierschutz, der nicht vollständig emuliert "
@@ -2560,136 +2505,17 @@ msgstr "Grafik: %s, Sound: %s"
 #~ "beinhalten. Es ist nicht möglich, diese Maschine vollständig zu "
 #~ "verwenden.\n"
 
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "There are working clones of this machine: "
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Es gibt funktionsfähige Klone dieser Maschine: "
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key to continue."
-#~ msgstr ""
-#~ "Der gewählten Maschine fehlen ein oder mehrere benötigte ROM- oder CHD-"
-#~ "Abbilder. Bitte wählen Sie eine andere Maschine aus.\n"
-#~ "\n"
-#~ "Drücken Sie eine beliebige Taste, um fortzufahren."
-
-#~ msgid "Romset: %1$-.100s\n"
-#~ msgstr "ROM-Satz: %1$-.100s\n"
-
-#~ msgid "Year: %1$s\n"
-#~ msgstr "Jahr: %1$s\n"
-
-#~ msgid "Manufacturer: %1$-.100s\n"
-#~ msgstr "Hersteller: %1$-.100s\n"
-
-#~ msgid "Driver is Clone of: %1$-.100s\n"
-#~ msgstr "Treiber ist ein Klon von: %1$-.100s\n"
-
-#~ msgid "Driver is Parent\n"
-#~ msgstr "Treiber ist Ursprungs-Treiber\n"
-
-#~ msgid "Overall: NOT WORKING\n"
-#~ msgstr "Insgesamt: FUNKTIONIERT NICHT\n"
-
-#~ msgid "Overall: Unemulated Protection\n"
-#~ msgstr "Insgesamt: Nicht emulierter Kopierschutz\n"
-
-#~ msgid "Overall: Working\n"
-#~ msgstr "Insgesamt: Funktioniert\n"
-
-#~ msgid "Graphics: Imperfect Colors\n"
-#~ msgstr "Grafik: Fehlerhafte Farben\n"
-
-#~ msgid "Graphics: Imperfect\n"
-#~ msgstr "Grafik: Fehlerhaft\n"
-
-#~ msgid "Graphics: OK\n"
-#~ msgstr "Grafik: OK\n"
-
 #~ msgid "Sound: Unimplemented\n"
 #~ msgstr "Sound: nicht implementiert\n"
 
-#~ msgid "Sound: Imperfect\n"
-#~ msgstr "Sound: Fehlerhaft\n"
-
-#~ msgid "Sound: OK\n"
-#~ msgstr "Sound: OK\n"
-
-#~ msgid "Driver is Skeleton: %1$s\n"
-#~ msgstr "Treiber ist ein \"Skelett\": %s\n"
-
 #~ msgid "Game is Mechanical: %1$s\n"
 #~ msgstr "Spiel ist mechanisch: %1$s\n"
-
-#~ msgid "Requires Artwork: %1$s\n"
-#~ msgstr "Benötigt Illustrationen: %1$s\n"
-
-#~ msgid "Requires Clickable Artwork: %1$s\n"
-#~ msgstr "Benötigt klickbare Illustrationen: %1$s\n"
-
-#~ msgid "Support Cocktail: %1$s\n"
-#~ msgstr "Unterstützt Cocktail-Modus: %1$s\n"
-
-#~ msgid "Driver is Bios: %1$s\n"
-#~ msgstr "Treiber ist BIOS: %1$s\n"
-
-#~ msgid "Support Save: %1$s\n"
-#~ msgstr "Unterstützt Speichern: %1$s\n"
-
-#~ msgid "Screen Orientation: %1$s\n"
-#~ msgstr "Bildschirm-Ausrichtung: %1$s\n"
-
-#~ msgid "Requires CHD: %1$s\n"
-#~ msgstr "Benötigt CHD: %1$s\n"
-
-#~ msgid "Roms Audit Pass: OK\n"
-#~ msgstr "ROM-Überprüfung: OK\n"
-
-#~ msgid "Roms Audit Pass: BAD\n"
-#~ msgstr "ROM-Überprüfung: FEHLERHAFT\n"
-
-#~ msgid "Samples Audit Pass: None Needed\n"
-#~ msgstr "Samples-Überprüfung: Nicht nötig\n"
-
-#~ msgid "Samples Audit Pass: OK\n"
-#~ msgstr "Samples-Überprüfung: OK\n"
-
-#~ msgid "Samples Audit Pass: BAD\n"
-#~ msgstr "Samples-Überprüfung: FEHLERHAFT\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass: Disabled\n"
-#~ "Samples Audit Pass: Disabled\n"
-#~ msgstr ""
-#~ "ROM-Überprüfung: Deaktiviert\n"
-#~ "Samples-Überprüfung: Deaktiviert\n"
 
 #~ msgid "Usage"
 #~ msgstr "Verwendung"
 
 #~ msgid "No Infos Available"
 #~ msgstr "Keine Informationen verfügbar"
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key to continue."
-#~ msgstr ""
-#~ "Dem gewählten Programm fehlen eine oder mehrere Dateien. Bitte wählen Sie "
-#~ "ein anderes Programm aus.\n"
-#~ "\n"
-#~ "Drücken Sie eine beliebige Taste, um fortzufahren."
-
-#~ msgid " [internal]"
-#~ msgstr " [intern]"
 
 #~ msgid "DATs info"
 #~ msgstr "DAT-Informationen"
@@ -2705,12 +2531,6 @@ msgstr "Grafik: %s, Sound: %s"
 
 #~ msgid "Load from position %s"
 #~ msgstr "Lade von Position %s"
-
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "Im XML-Format exportieren"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "Im TXT-Format exportieren"
 
 #~ msgid "Dummy"
 #~ msgstr "Platzhalter"
@@ -2767,55 +2587,3 @@ msgstr "Grafik: %s, Sound: %s"
 #~ "\n"
 #~ "Andernfalls geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links "
 #~ "und dann nach rechts um fortzufahren"
-
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "Type OK or move the joystick left then right to continue"
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links und dann "
-#~ "nach rechts, um fortzufahren"
-
-#~ msgid "Multi-Threaded Rendering"
-#~ msgstr "Multi-Thread-Rendering"
-
-#~ msgid "Hardware Stretch"
-#~ msgstr "Hardware-Streckung"
-
-#~ msgid "**Error loading %s.ini**"
-#~ msgstr "**Fehler beim Laden von %s.ini**"
-
-#~ msgid "**Error loading ui.ini**"
-#~ msgstr "**Fehler beim Laden von ui.ini**"
-
-#~ msgid "Double click or press "
-#~ msgstr "Doppelklicken Sie oder drücken Sie "
-
-#~ msgid " to change the color value"
-#~ msgstr " um den Farbwert zu ändern"
-
-#~ msgid " to select"
-#~ msgstr " um auszuwählen"
-
-#~ msgid "Current "
-#~ msgstr "Aktuelle "
-
-#~ msgid " Folders"
-#~ msgstr " Ordner"
-
-#~ msgid "Change)"
-#~ msgstr "Ändern)"
-
-#~ msgid "Add"
-#~ msgstr "Hinzufügen"
-
-#~ msgid " Folder - Search: "
-#~ msgstr " Ordner - Suche: "
-
-#~ msgid "Remove "
-#~ msgstr "Entferne "
-
-#~ msgid " Folder"
-#~ msgstr " Ordner"

@@ -907,7 +907,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 		switch (local_menu_event.event_type)
 		{
 			// if we are hovering over a valid item, select it with a single click
-			case UI_EVENT_MOUSE_DOWN:
+			case ui_event::MOUSE_DOWN:
 				if (custom_mouse_down())
 					return;
 
@@ -943,7 +943,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				break;
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-			case UI_EVENT_MOUSE_DOUBLE_CLICK:
+			case ui_event::MOUSE_DOUBLE_CLICK:
 				if (!(flags & PROCESS_ONLYCHAR) && hover >= 0 && hover < item.size())
 				{
 					selected = hover;
@@ -958,7 +958,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				break;
 
 			// caught scroll event
-			case UI_EVENT_MOUSE_WHEEL:
+			case ui_event::MOUSE_WHEEL:
 				if (!(flags & PROCESS_ONLYCHAR))
 				{
 					if (local_menu_event.zdelta > 0)
@@ -991,7 +991,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				break;
 
 			// translate CHAR events into specials
-			case UI_EVENT_CHAR:
+			case ui_event::IME_CHAR:
 				ev.iptkey = IPT_SPECIAL;
 				ev.unichar = local_menu_event.ch;
 				stop = true;

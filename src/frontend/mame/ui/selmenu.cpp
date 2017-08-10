@@ -1310,9 +1310,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 
 void menu_select_launch::handle_events(uint32_t flags, event &ev)
 {
-	bool stop = false;
-	ui_event local_menu_event;
-
 	if (m_pressed)
 	{
 		bool const pressed = mouse_pressed();
@@ -1331,12 +1328,14 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 	}
 
 	// loop while we have interesting events
+	bool stop(false), search_changed(false);
+	ui_event local_menu_event;
 	while (!stop && machine().ui_input().pop_event(&local_menu_event))
 	{
 		switch (local_menu_event.event_type)
 		{
 		// if we are hovering over a valid item, select it with a single click
-		case UI_EVENT_MOUSE_DOWN:
+		case ui_event::MOUSE_DOWN:
 			if (m_ui_error)
 			{
 				ev.iptkey = IPT_OTHER;
@@ -1433,7 +1432,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-		case UI_EVENT_MOUSE_DOUBLE_CLICK:
+		case ui_event::MOUSE_DOUBLE_CLICK:
 			if (hover >= 0 && hover < item.size())
 			{
 				selected = hover;
@@ -1449,7 +1448,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// caught scroll event
-		case UI_EVENT_MOUSE_WHEEL:
+		case ui_event::MOUSE_WHEEL:
 			if (hover >= 0 && hover < item.size() - skip_main_items - 1)
 			{
 				if (local_menu_event.zdelta > 0)
@@ -1481,21 +1480,25 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// translate CHAR events into specials
-		case UI_EVENT_CHAR:
+		case ui_event::IME_CHAR:
 			if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
 			{
 				ev.iptkey = IPT_UI_CONFIGURE;
 				stop = true;
 			}
-			else
+			else if (m_ui_error)
 			{
 				ev.iptkey = IPT_SPECIAL;
-				ev.unichar = local_menu_event.ch;
 				stop = true;
+			}
+			else if (accept_search())
+			{
+				if (input_character(m_search, local_menu_event.ch, uchar_is_printable))
+					search_changed = true;
 			}
 			break;
 
-		case UI_EVENT_MOUSE_RDOWN:
+		case ui_event::MOUSE_RDOWN:
 			if (hover >= 0 && hover < item.size() - skip_main_items - 1)
 			{
 				selected = hover;
@@ -1512,7 +1515,30 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 		default:
 			break;
 		}
+
+		// need to update search before processing certain kinds of events, but others don't matter
+		if (search_changed)
+		{
+			switch (machine().ui_input().peek_event_type())
+			{
+			case ui_event::MOUSE_DOWN:
+			case ui_event::MOUSE_RDOWN:
+			case ui_event::MOUSE_DOUBLE_CLICK:
+			case ui_event::MOUSE_WHEEL:
+				stop = true;
+				break;
+			case ui_event::NONE:
+			case ui_event::MOUSE_MOVE:
+			case ui_event::MOUSE_LEAVE:
+			case ui_event::MOUSE_UP:
+			case ui_event::MOUSE_RUP:
+			case ui_event::IME_CHAR:
+				break;
+			}
+		}
 	}
+	if (search_changed)
+		reset(reset_options::SELECT_FIRST);
 }
 
 
