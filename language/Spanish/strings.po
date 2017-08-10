@@ -114,7 +114,7 @@ msgstr "Fabricante\t%1$-.100s\n"
 #: src/frontend/mame/ui/selgame.cpp:1028
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr "Controlador es un clon de\t%1$-.100s\n"
+msgstr "El controlador es un clon de\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1030
 msgid "Driver is Parent\t\n"
@@ -122,11 +122,11 @@ msgstr "Es un controlador padre\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1033
 msgid "Analog Controls\tYes\n"
-msgstr ""
+msgstr "Controles analógicos\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1035
 msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "Entradas de teclado\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1038
 msgid "Overall\tNOT WORKING\n"
@@ -246,11 +246,11 @@ msgstr "Red global\tImperfecta\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1110
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "Cronometraje\tNo implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1112
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "Cronometraje\tImperfecto\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1114
 #, c-format
@@ -378,8 +378,8 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
-"Falta la máquina seleccionada o una o más de sus ROMs o imágenes CHD. Por "
-"favor, elige otra máquina.\n"
+"Falta la máquina seleccionada o una o más de sus ROMs o imágenes CHD. "
+"Por favor, elige otra máquina.\n"
 "\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1518 src/frontend/mame/ui/selsoft.cpp:529
@@ -540,7 +540,7 @@ msgstr "Inicio de partida"
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "High Scores"
-msgstr ""
+msgstr "Puntuaciones más altas"
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "History"
@@ -552,7 +552,7 @@ msgstr "Información de MAME"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "MARPScore"
-msgstr ""
+msgstr "Puntuación MARP"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MESSinfo"
@@ -1093,15 +1093,15 @@ msgstr "Haz doble clic o pulsa %1$s para elegir"
 
 #: src/frontend/mame/ui/utils.cpp:32 src/frontend/mame/ui/utils.cpp:55
 msgid "Unfiltered"
-msgstr ""
+msgstr "Sin filtrar"
 
 #: src/frontend/mame/ui/utils.cpp:33 src/frontend/mame/ui/utils.cpp:56
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 #: src/frontend/mame/ui/utils.cpp:34 src/frontend/mame/ui/utils.cpp:57
 msgid "Unavailable"
-msgstr ""
+msgstr "No disponible"
 
 #: src/frontend/mame/ui/utils.cpp:35
 msgid "Working"
@@ -1113,15 +1113,15 @@ msgstr "No Funciona"
 
 #: src/frontend/mame/ui/utils.cpp:37
 msgid "Mechanical"
-msgstr ""
+msgstr "Mecánica"
 
 #: src/frontend/mame/ui/utils.cpp:38
 msgid "Not Mechanical"
-msgstr ""
+msgstr "No mecánica"
 
 #: src/frontend/mame/ui/utils.cpp:39
 msgid "Category"
-msgstr ""
+msgstr "Categoría"
 
 #: src/frontend/mame/ui/utils.cpp:40
 msgid "Favorites"
@@ -1133,11 +1133,11 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:42 src/frontend/mame/ui/utils.cpp:58
 msgid "Parents"
-msgstr ""
+msgstr "Padres"
 
 #: src/frontend/mame/ui/utils.cpp:43 src/frontend/mame/ui/utils.cpp:59
 msgid "Clones"
-msgstr ""
+msgstr "Clones"
 
 #: src/frontend/mame/ui/utils.cpp:44
 msgid "Manufacturer"
@@ -1149,31 +1149,31 @@ msgstr "Año"
 
 #: src/frontend/mame/ui/utils.cpp:46
 msgid "Save Supported"
-msgstr ""
+msgstr "Soporta guardado"
 
 #: src/frontend/mame/ui/utils.cpp:47
 msgid "Save Unsupported"
-msgstr ""
+msgstr "No soporta guardado"
 
 #: src/frontend/mame/ui/utils.cpp:48
 msgid "CHD Required"
-msgstr ""
+msgstr "Requiere CHD"
 
 #: src/frontend/mame/ui/utils.cpp:49
 msgid "No CHD Required"
-msgstr ""
+msgstr "No requiere CHD"
 
 #: src/frontend/mame/ui/utils.cpp:50
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Pantalla vertical"
 
 #: src/frontend/mame/ui/utils.cpp:51
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Pantalla horizontal"
 
 #: src/frontend/mame/ui/utils.cpp:52 src/frontend/mame/ui/utils.cpp:68
 msgid "Custom Filter"
-msgstr ""
+msgstr "Filtro personalizado"
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Publisher"
@@ -1181,19 +1181,19 @@ msgstr "Editor"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Supported"
-msgstr ""
+msgstr "Soportado"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Partially Supported"
-msgstr ""
+msgstr "Parcialmente soportado"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Unsupported"
-msgstr ""
+msgstr "No soportado"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Release Region"
-msgstr ""
+msgstr "Región de la versión"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgid "Device Type"
@@ -1205,7 +1205,7 @@ msgstr "Lista de software"
 
 #: src/frontend/mame/ui/utils.cpp:215
 msgid "<set up filters>"
-msgstr ""
+msgstr "<configurar filtros>"
 
 #: src/frontend/mame/ui/utils.cpp:324
 msgid "Select custom filters:"
@@ -1528,7 +1528,7 @@ msgstr "Red global"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr ""
+msgstr "cronometraje"
 
 #: src/frontend/mame/ui/info.cpp:177
 msgid ""
