@@ -3148,5 +3148,7 @@ if (BUSES["PSI_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/psi_kbd/psi_kbd.h",
 		MAME_DIR .. "src/devices/bus/psi_kbd/ergoline.cpp",
 		MAME_DIR .. "src/devices/bus/psi_kbd/ergoline.h",
+		MAME_DIR .. "src/devices/bus/psi_kbd/hle.cpp",
+		MAME_DIR .. "src/devices/bus/psi_kbd/hle.h",
 	}
 end

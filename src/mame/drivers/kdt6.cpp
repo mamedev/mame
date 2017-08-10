@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
-	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "ergoline")
+	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
 	MCFG_PSI_KEYBOARD_RX_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg1))
 
