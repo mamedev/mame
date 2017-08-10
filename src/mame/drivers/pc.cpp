@@ -280,7 +280,7 @@ Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddi
 On board ports: speaker
 Options: 8087 FPU
 
-VTech Laser XT/3
+AEG Olympia Olytext 30
 =======================
 Form Factor: Desktop
 CPU: NEC V20 @ 4.77MHz
