@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="princ" description="Tomy Prin-C cartridges">
 	<software name="hobik" supported="no">
-		<description>Hobī Kurabu</description>
+		<description>Hobby Club</description>
 		<year>1996</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ホビークラブ"/>
@@ -14,7 +14,7 @@
 	</software>
 
 	<software name="kno" supported="no">
-		<description>Kodomo No Omocha</description>
+		<description>Kodomo no Omocha</description>
 		<year>1996</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="こどものおもちゃ"/>
