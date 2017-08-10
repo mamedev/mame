@@ -15,8 +15,8 @@
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
-    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version)
-    Vamp 1/2                        (c) 1999 Danbi & F2 System  (Korea version)
+    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version 1.1.0908)
+    Vamp 1/2                        (c) 1999 Danbi & F2 System  (Korea version 1.1.0908)
     Date Quiz Go Go Episode 2       (c) 2000 SemiCom
     Mission Craft                   (c) 2000 Sun                (version 2.7 and 2.4)
     Mr. Dig                         (c) 2000 Sun
@@ -1222,7 +1222,7 @@ ROML* / U*:    Graphics, device is MX29F1610ML (surface mounted SOP44 MASK ROM)
 ROM_START( vamphalf )
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
-	ROM_LOAD( "prg.rom1", 0x80000, 0x80000, CRC(9b1fc6c5) SHA1(acf10a50d2119ac893b6cbd494911982a9352350) )
+	ROM_LOAD( "prg.rom1", 0x80000, 0x80000, CRC(9b1fc6c5) SHA1(acf10a50d2119ac893b6cbd494911982a9352350) ) /* at 0x16554: Europe Version 1.1.0908 */
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* 16x16x8 Sprites */
 	ROM_LOAD32_WORD( "eur.roml00", 0x000000, 0x200000, CRC(bdee9a46) SHA1(7e240b07377201afbe0cd0911ccee4ad52a74079) )
@@ -1238,7 +1238,7 @@ ROM_END
 ROM_START( vamphalfk )
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
-	ROM_LOAD( "prom1", 0x80000, 0x80000, CRC(f05e8e96) SHA1(c860e65c811cbda2dc70300437430fb4239d3e2d) )
+	ROM_LOAD( "prom1", 0x80000, 0x80000, CRC(f05e8e96) SHA1(c860e65c811cbda2dc70300437430fb4239d3e2d) ) /* at 0x1653C: Korean Version 1.1.0908 */
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* 16x16x8 Sprites */
 	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(cc075484) SHA1(6496d94740457cbfdac3d918dce2e52957341616) )
@@ -2998,8 +2998,8 @@ GAME( 1999, luplup,    suplup,   suplup,    common,   vamphalf_state, luplup,   
 GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, puzlbang,  suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, puzlbanga, suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalf,  0,        vamphalf,  common,   vamphalf_state, vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfk, vamphalf, vamphalf,  common,   vamphalf_state, vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalf,  0,        vamphalf,  common,   vamphalf_state, vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfk, vamphalf, vamphalf,  common,   vamphalf_state, vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, dquizgo2,  0,        coolmini,  common,   vamphalf_state, dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
 GAME( 2000, misncrft,  0,        misncrft,  common,   vamphalf_state, misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, misncrfta, misncrft, misncrft,  common,   vamphalf_state, misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
