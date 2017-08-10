@@ -7,7 +7,7 @@
 *  with help from Kevin 'kevtris' Horton
 *  Special thanks to Professor Nicholas Gessler for loaning several PSS units
 *
-*  The votrax PSS was sold from around 35th week of 1982 until october, 1990 (LONG product life)
+*  The votrax PSS was sold from around 35th week of 1982 until october, 1990
 
 Main xtal is 8MHz
 AY-3-8910 and i8253 clock is running at 2 MHz (xtal/4)
@@ -41,7 +41,7 @@ AY-3-8910 I/O ports:
 		IOB0-IOB7 = dip switches
 
 I8251 UART:
-	RESET is taken from teh same inverter that resets the counters
+	RESET is taken from the same inverter that resets the counters
 
 Things to be looked at:
 - Serial doesn't work, so has been disabled.
