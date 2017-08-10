@@ -183,7 +183,6 @@ public:
 	DECLARE_READ8_MEMBER(jantouki_soundlatch_status_r);
 	DECLARE_READ8_MEMBER(mjelctrn_keyboard_1_r);
 	DECLARE_READ8_MEMBER(mjelctrn_dsw_r);
-	DECLARE_WRITE8_MEMBER(mjelctrn_blitter_ack_w);
 	DECLARE_WRITE8_MEMBER(tenkai_ipsel_w);
 	DECLARE_WRITE8_MEMBER(tenkai_ip_w);
 	DECLARE_READ8_MEMBER(tenkai_ip_r);
@@ -266,10 +265,7 @@ public:
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
-	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
 
 	void tenkai_update_rombank();
@@ -316,7 +312,6 @@ public:
 	void sprtmtch_update_irq();
 	void jantouki_update_irq();
 	void mjelctrn_update_irq();
-	void neruton_update_irq();
 	void jantouki_sound_update_irq();
 	void tenkai_show_6c();
 };

@@ -81,6 +81,7 @@ TODO:
 
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
@@ -1018,72 +1019,63 @@ READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
 	return ioport(dswnames[dsw])->read();
 }
 
-WRITE8_MEMBER(dynax_state::mjelctrn_blitter_ack_w)
-{
-	m_blitter_irq = 0;
-}
-
 static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
-	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-	AM_RANGE( 0x11, 0x12 ) AM_WRITE(mjelctrn_blitter_ack_w) //?
-//  AM_RANGE( 0x20, 0x20 ) AM_WRITENOP   // CRT Controller
-//  AM_RANGE( 0x21, 0x21 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x40, 0x47 ) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-//  AM_RANGE( 0x64, 0x64 ) AM_WRITE(dynax_extra_scrollx_w)      // screen scroll X
-//  AM_RANGE( 0x66, 0x66 ) AM_WRITE(dynax_extra_scrolly_w)      // screen scroll Y
-	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x80, 0x80 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
-	AM_RANGE( 0x81, 0x81 ) AM_READ_PORT("COINS")            // Coins
-	AM_RANGE( 0x82, 0x82 ) AM_READ(mjelctrn_keyboard_1_r)       // P2
-	AM_RANGE( 0x83, 0x83 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x84, 0x84 ) AM_READ(mjelctrn_dsw_r)          // DSW8 x 4
-	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("SW1")              // DSW2
-	AM_RANGE( 0xa1, 0xa7 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0xc0, 0xc7 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0xe0, 0xe0 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0xe1, 0xe1 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0xe2, 0xe2 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
-	AM_RANGE( 0xe3, 0xe3 ) AM_WRITE(dynax_blit_palette23_w) //
-	AM_RANGE( 0xe4, 0xe4 ) AM_WRITE(hanamai_priority_w)     // layer priority and enable
-	AM_RANGE( 0xe5, 0xe5 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0xe6, 0xe6 ) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0xe7, 0xe7 ) AM_WRITE(hnoridur_palbank_w)
+	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0xff00) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
+	AM_RANGE( 0x02, 0x02 ) AM_MIRROR(0xff00) AM_WRITE(adpcm_data_w)           // MSM5205 data
+	AM_RANGE( 0x04, 0x05 ) AM_MIRROR(0xff00) AM_DEVWRITE("ym2413", ym2413_device, write)        //
+	AM_RANGE( 0x08, 0x08 ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, data_w)   // AY8912
+	AM_RANGE( 0x0a, 0x0a ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
+//  AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x21, 0x21 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
+	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0xff00) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	AM_RANGE( 0x60, 0x60 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
+	AM_RANGE( 0x62, 0x62 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
+//  AM_RANGE( 0x64, 0x64 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrollx_w)      // screen scroll X
+//  AM_RANGE( 0x66, 0x66 ) AM_MIRROR(0xff00) AM_WRITE(dynax_extra_scrolly_w)      // screen scroll Y
+	AM_RANGE( 0x6a, 0x6a ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
+	AM_RANGE( 0x80, 0x80 ) AM_MIRROR(0xff00) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
+	AM_RANGE( 0x81, 0x81 ) AM_MIRROR(0xff00) AM_READ_PORT("COINS")            // Coins
+	AM_RANGE( 0x82, 0x82 ) AM_MIRROR(0xff00) AM_READ(mjelctrn_keyboard_1_r)       // P2
+	AM_RANGE( 0x83, 0x83 ) AM_MIRROR(0xff00) AM_READ(hanamai_keyboard_0_r)        // P1
+	AM_RANGE( 0x84, 0x84 ) AM_MIRROR(0xff00) AM_READ(mjelctrn_dsw_r)          // DSW8 x 4
+	AM_RANGE( 0x85, 0x85 ) AM_MIRROR(0xff00) AM_READ_PORT("SW1")              // DSW2
+	AM_RANGE( 0xa1, 0xa7 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+	AM_RANGE( 0xc0, 0xc7 ) AM_MIRROR(0xff00) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	AM_RANGE( 0xe0, 0xe0 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
+	AM_RANGE( 0xe1, 0xe1 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
+	AM_RANGE( 0xe2, 0xe2 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
+	AM_RANGE( 0xe3, 0xe3 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_palette23_w) //
+	AM_RANGE( 0xe4, 0xe4 ) AM_MIRROR(0xff00) AM_WRITE(hanamai_priority_w)     // layer priority and enable
+	AM_RANGE( 0xe5, 0xe5 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_backpen_w)       // Background Color
+	AM_RANGE( 0xe6, 0xe6 ) AM_MIRROR(0xff00) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
+	AM_RANGE( 0xe7, 0xe7 ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_palbank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjembase_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE("ym2413", ym2413_device, write)       //
-	AM_RANGE( 0x06, 0x06 ) AM_DEVREAD("aysnd", ay8912_device, data_r)        // AY8912, dsw0
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8912_device, data_w)       //
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
-	AM_RANGE( 0x11, 0x12 ) AM_WRITE(mjelctrn_blitter_ack_w) //?
-	AM_RANGE( 0x1c, 0x1c ) AM_READ_PORT("DSW1")
-	AM_RANGE( 0x1e, 0x1e ) AM_READ_PORT("DSW2")
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(hanamai_keyboard_w)         // keyboard row select
-	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("COINS")                // Coins
-	AM_RANGE( 0x22, 0x22 ) AM_READ(mjelctrn_keyboard_1_r)       // P2
-	AM_RANGE( 0x23, 0x23 ) AM_READ(hanamai_keyboard_0_r)        // P1
-	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT("DSW3")
-//  AM_RANGE( 0x40, 0x40 ) AM_WRITENOP   // CRT Controller
-//  AM_RANGE( 0x41, 0x41 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x61, 0x67 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x80, 0x87 ) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE( 0xa0, 0xa0 ) AM_WRITE(hnoridur_rombank_w)         // BANK ROM Select
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(dynax_blit_pen_w)           // Destination Pen
-	AM_RANGE( 0xc1, 0xc1 ) AM_WRITE(mjembase_blit_dest_w)       // Destination Layer
-	AM_RANGE( 0xc2, 0xc2 ) AM_WRITE(dynax_blit_palette01_w)     // Layers Palettes
-	AM_RANGE( 0xc3, 0xc3 ) AM_WRITE(mjembase_blit_palette23_w)  //
-	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE(mjembase_priority_w)        // layer priority and enable
-	AM_RANGE( 0xc5, 0xc5 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
-	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0xc7, 0xc7 ) AM_WRITE(hnoridur_palbank_w)
+	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x04, 0x05 ) AM_MIRROR(0xff00) AM_DEVWRITE("ym2413", ym2413_device, write)       //
+	AM_RANGE( 0x06, 0x06 ) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8912_device, data_r)        // AY8912, dsw0
+	AM_RANGE( 0x08, 0x08 ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, data_w)       //
+	AM_RANGE( 0x0a, 0x0a ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8912_device, address_w)    //
+	AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_WRITE(hanamai_keyboard_w)         // keyboard row select
+	AM_RANGE( 0x21, 0x21 ) AM_MIRROR(0xff00) AM_READ_PORT("COINS")                // Coins
+	AM_RANGE( 0x22, 0x22 ) AM_MIRROR(0xff00) AM_READ(mjelctrn_keyboard_1_r)       // P2
+	AM_RANGE( 0x23, 0x23 ) AM_MIRROR(0xff00) AM_READ(hanamai_keyboard_0_r)        // P1
+	AM_RANGE( 0x24, 0x24 ) AM_MIRROR(0xff00) AM_READ_PORT("DSW3")
+//  AM_RANGE( 0x40, 0x40 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x41, 0x41 ) AM_MIRROR(0xff00) AM_WRITENOP   // CRT Controller
+	AM_RANGE( 0x61, 0x67 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+	AM_RANGE( 0x80, 0x87 ) AM_MIRROR(0xff00) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	AM_RANGE( 0xa0, 0xa0 ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_rombank_w)         // BANK ROM Select
+	AM_RANGE( 0xc0, 0xc0 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_pen_w)           // Destination Pen
+	AM_RANGE( 0xc1, 0xc1 ) AM_MIRROR(0xff00) AM_WRITE(mjembase_blit_dest_w)       // Destination Layer
+	AM_RANGE( 0xc2, 0xc2 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_palette01_w)     // Layers Palettes
+	AM_RANGE( 0xc3, 0xc3 ) AM_MIRROR(0xff00) AM_WRITE(mjembase_blit_palette23_w)  //
+	AM_RANGE( 0xc4, 0xc4 ) AM_MIRROR(0xff00) AM_WRITE(mjembase_priority_w)        // layer priority and enable
+	AM_RANGE( 0xc5, 0xc5 ) AM_MIRROR(0xff00) AM_WRITE(dynax_blit_backpen_w)       // Background Color
+	AM_RANGE( 0xc6, 0xc6 ) AM_MIRROR(0xff00) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
+	AM_RANGE( 0xc7, 0xc7 ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_palbank_w)
 ADDRESS_MAP_END
 
 
@@ -4741,23 +4733,18 @@ MACHINE_CONFIG_END
     0xf8 is vblank  */
 void dynax_state::mjelctrn_update_irq()
 {
-	m_blitter_irq = 1;
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
-}
-
-INTERRUPT_GEN_MEMBER(dynax_state::mjelctrn_vblank_interrupt)
-{
-	// This is a kludge to avoid losing blitter interrupts
-	// there should be a vblank ack mechanism
-	if (!m_blitter_irq)
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xf8);
+	// TODO: emulate blitter IRQ triggers more accurately than this
+	auto &cpu = downcast<tmpz84c015_device &>(*m_maincpu);
+	cpu.trg1(0);
+	cpu.trg2(0);
+	cpu.trg1(1);
+	cpu.trg2(1);
 }
 
 static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", TMPZ84C015, XTAL_22MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(mjelctrn_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  mjelctrn_vblank_interrupt)   /* IM 2 needs a vector on the data bus */
 
 	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
@@ -4765,21 +4752,23 @@ static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
 	// Q3, Q4 seem to be related to wrap around enable
 
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjembase, hnoridur )
-	MCFG_CPU_MODIFY("maincpu")  // TMPZ84015
-	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
+static MACHINE_CONFIG_DERIVED( mjembase, mjelctrn )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjembase_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  mjelctrn_vblank_interrupt)   /* IM 2 needs a vector on the data bus */
+	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW1"))
+	MCFG_TMPZ84C015_IN_PB_CB(IOPORT("DSW2"))
 
-	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
+	MCFG_DEVICE_MODIFY("mainlatch") // 13C
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, coincounter_1_w))
+
+	MCFG_DEVICE_REMOVE("outlatch")
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjembase)
 MACHINE_CONFIG_END
@@ -4792,58 +4781,9 @@ MACHINE_CONFIG_END
     0x42 and 0x44 are very similar, they should be triggered by the blitter
     0x40 is vblank
     0x46 is a periodic irq? */
-void dynax_state::neruton_update_irq()
-{
-	m_blitter_irq = 1;
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x42);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::neruton_irq_scanline)
-{
-	int scanline = param;
-
-	// This is a kludge to avoid losing blitter interrupts
-	// there should be a vblank ack mechanism
-	if (m_blitter_irq)  return;
-
-	if(scanline == 256)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
-	else if((scanline % 32) == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x46);
-}
 
 static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dynax_state, neruton_irq_scanline, "screen", 0, 1)
-
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
-MACHINE_CONFIG_END
-
-/***************************************************************************
-                                    Mahjong X-Tal 7
-***************************************************************************/
-
-/*  It runs in IM 2, thus needs a vector on the data bus:
-    0x42 and 0x44 are very similar, they should be triggered by the blitter
-    0x40 is vblank  */
-
-TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::majxtal7_vblank_interrupt)
-{
-	int scanline = param;
-
-	// This is a kludge to avoid losing blitter interrupts
-	// there should be a vblank ack mechanism
-	if (m_blitter_irq)  return;
-
-	if(scanline == 256)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
-	else if((scanline % 32) == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x44); // temp kludge
-}
-
-static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(dynax_state, majxtal7_vblank_interrupt)
 MACHINE_CONFIG_END
 
 
@@ -7448,7 +7388,7 @@ GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state, mjelct3,  ROT18
 GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majxtal7, 0,        neruton,  majxtal7, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, hanayara, 0,        yarunara, hanayara, dynax_state, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
