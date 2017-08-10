@@ -122,11 +122,11 @@ msgstr "Es un controlador padre\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1033
 msgid "Analog Controls\tYes\n"
-msgstr "Controles analógicos"
+msgstr "Controles analógicos\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1035
 msgid "Keyboard Inputs\tYes\n"
-msgstr "Entradas de teclado"
+msgstr "Entradas de teclado\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1038
 msgid "Overall\tNOT WORKING\n"
@@ -246,11 +246,11 @@ msgstr "Red global\tImperfecta\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1110
 msgid "Timing\tUnimplemented\n"
-msgstr "Cronometraje\tNo implementado"
+msgstr "Cronometraje\tNo implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1112
 msgid "Timing\tImperfect\n"
-msgstr "Cronometraje\tImperfecto"
+msgstr "Cronometraje\tImperfecto\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1114
 #, c-format
