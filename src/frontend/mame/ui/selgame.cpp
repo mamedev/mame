@@ -196,220 +196,182 @@ void menu_select_game::handle()
 
 	// process the menu
 	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event && menu_event->itemref)
+	if (menu_event)
 	{
 		if (dismiss_error())
 		{
 			// reset the error on any future menu_event
 		}
-		else if (menu_event->iptkey == IPT_UI_SELECT)
+		else switch (menu_event->iptkey)
 		{
-			// handle selections
-			if (get_focus() == focused_menu::MAIN)
-			{
-				if (isfavorite())
-					inkey_select_favorite(menu_event);
-				else
-					inkey_select(menu_event);
-			}
-			else if (get_focus() == focused_menu::LEFT)
-			{
-				l_hover = highlight;
-				check_filter = true;
-				m_prev_selected = nullptr;
-			}
-		}
-		else if (menu_event->iptkey == IPT_CUSTOM)
-		{
-			// handle IPT_CUSTOM (mouse right click)
-			if (!isfavorite())
-			{
-				menu::stack_push<menu_machine_configure>(
-						ui(), container(),
-						reinterpret_cast<const game_driver *>(m_prev_selected),
-						menu_event->mouse.x0, menu_event->mouse.y0);
-			}
-			else
-			{
-				ui_software_info *sw = reinterpret_cast<ui_software_info *>(m_prev_selected);
-				menu::stack_push<menu_machine_configure>(
-						ui(), container(),
-						(const game_driver *)sw->driver,
-						menu_event->mouse.x0, menu_event->mouse.y0);
-			}
-		}
-		else if (menu_event->iptkey == IPT_UI_LEFT)
-		{
-			// handle UI_LEFT
+		case IPT_UI_UP:
+			if ((get_focus() == focused_menu::LEFT) && (machine_filter::FIRST < highlight))
+				--highlight;
+			break;
 
-			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
-			{
-				// Images
-				ui_globals::curimage_view--;
-				ui_globals::switch_image = true;
-				ui_globals::default_image = false;
-			}
-			else if (ui_globals::rpanel == RP_INFOS)
-			{
-				// Infos
-				change_info_pane(-1);
-			}
-		}
-		else if (menu_event->iptkey == IPT_UI_RIGHT)
-		{
-			// handle UI_RIGHT
-			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
-			{
-				// Images
-				ui_globals::curimage_view++;
-				ui_globals::switch_image = true;
-				ui_globals::default_image = false;
-			}
-			else if (ui_globals::rpanel == RP_INFOS)
-			{
-				// Infos
-				change_info_pane(1);
-			}
-		}
-		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > machine_filter::FIRST)
-		{
-			// handle UI_UP_FILTER
-			highlight--;
-		}
-		else if (menu_event->iptkey == IPT_UI_DOWN_FILTER && highlight < machine_filter::LAST)
-		{
-			// handle UI_DOWN_FILTER
-			highlight++;
-		}
-		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
-		{
-			// handle UI_LEFT_PANEL
-			ui_globals::rpanel = RP_IMAGES;
-		}
-		else if (menu_event->iptkey == IPT_UI_RIGHT_PANEL)
-		{
-			// handle UI_RIGHT_PANEL
-			ui_globals::rpanel = RP_INFOS;
-		}
-		else if (menu_event->iptkey == IPT_UI_CANCEL && !m_search.empty())
-		{
-			// escape pressed with non-empty text clears the text
-			m_search.clear();
-			reset(reset_options::SELECT_FIRST);
-		}
-		else if (menu_event->iptkey == IPT_UI_DATS)
-		{
-			// handle UI_DATS
-			if (!isfavorite())
-			{
-				const game_driver *driver = (const game_driver *)menu_event->itemref;
-				if ((uintptr_t)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
-					menu::stack_push<menu_dats_view>(ui(), container(), driver);
-			}
-			else
-			{
-				ui_software_info *ui_swinfo  = (ui_software_info *)menu_event->itemref;
+		case IPT_UI_DOWN:
+			if ((get_focus() == focused_menu::LEFT) && (machine_filter::LAST > highlight))
+				highlight++;
+			break;
 
-				if ((uintptr_t)ui_swinfo > skip_main_items)
-				{
-					if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
-						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-					else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
-							menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
-				}
-			}
-		}
-		else if (menu_event->iptkey == IPT_UI_FAVORITES)
-		{
-			// handle UI_FAVORITES
-			if (!isfavorite())
-			{
-				const game_driver *driver = (const game_driver *)menu_event->itemref;
-				if ((uintptr_t)driver > skip_main_items)
-				{
-					favorite_manager &mfav = mame_machine_manager::instance()->favorite();
-					if (!mfav.isgame_favorite(driver))
-					{
-						mfav.add_favorite_game(driver);
-						machine().popmessage(_("%s\n added to favorites list."), driver->type.fullname());
-					}
+		case IPT_UI_HOME:
+			if (get_focus() == focused_menu::LEFT)
+				highlight = machine_filter::FIRST;
+			break;
 
-					else
-					{
-						mfav.remove_favorite_game();
-						machine().popmessage(_("%s\n removed from favorites list."), driver->type.fullname());
-					}
-				}
-			}
-			else
-			{
-				ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
-				if ((uintptr_t)swinfo > skip_main_items)
-				{
-					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
-					mame_machine_manager::instance()->favorite().remove_favorite_game(*swinfo);
-					reset(reset_options::SELECT_FIRST);
-				}
-			}
-		}
-		else if (menu_event->iptkey == IPT_UI_EXPORT)
-		{
-			// handle UI_EXPORT
-			inkey_export();
-		}
-		else if (menu_event->iptkey == IPT_UI_AUDIT_FAST && !m_unavailsortedlist.empty())
-		{
-			// handle UI_AUDIT_FAST
-			menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, m_unavailsortedlist, 1);
-		}
-		else if (menu_event->iptkey == IPT_UI_AUDIT_ALL)
-		{
-			// handle UI_AUDIT_ALL
-			menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, m_unavailsortedlist, 2);
-		}
-		else if (menu_event->iptkey == IPT_SPECIAL)
-		{
+		case IPT_UI_END:
+			if (get_focus() == focused_menu::LEFT)
+				highlight = machine_filter::LAST;
+			break;
+
+		case IPT_SPECIAL:
 			// typed characters append to the buffer
 			inkey_special(menu_event);
-		}
-		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
-		{
-			inkey_navigation();
-		}
-		else if (menu_event->iptkey == IPT_OTHER)
-		{
+			break;
+
+		case IPT_OTHER:
+			// this is generated when something in the left box is clicked
 			m_prev_selected = nullptr;
 			check_filter = true;
 			highlight = l_hover;
-		}
-	}
+			break;
 
-	if (menu_event && !menu_event->itemref)
-	{
-		if (menu_event->iptkey == IPT_SPECIAL)
-		{
-			inkey_special(menu_event);
-		}
-		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
-		{
+		case IPT_UI_CONFIGURE:
 			inkey_navigation();
-		}
-		else if (menu_event->iptkey == IPT_OTHER)
-		{
-			set_focus(focused_menu::LEFT);
-			m_prev_selected = nullptr;
-			l_hover = highlight;
-			check_filter = true;
-		}
-		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > machine_filter::FIRST)
-		{
-			// handle UI_UP_FILTER
-			highlight--;
-		}
-		else if (menu_event->iptkey == IPT_UI_DOWN_FILTER && highlight < machine_filter::LAST)
-		{
-			// handle UI_DOWN_FILTER
-			highlight++;
+			break;
+
+		default:
+			if (menu_event->itemref)
+			{
+				switch (menu_event->iptkey)
+				{
+				case IPT_UI_SELECT:
+					if (get_focus() == focused_menu::MAIN)
+					{
+						if (isfavorite())
+							inkey_select_favorite(menu_event);
+						else
+							inkey_select(menu_event);
+					}
+					else if (get_focus() == focused_menu::LEFT)
+					{
+						l_hover = highlight;
+						check_filter = true;
+						m_prev_selected = nullptr;
+					}
+					break;
+
+				case IPT_CUSTOM:
+					// handle IPT_CUSTOM (mouse right click)
+					if (!isfavorite())
+					{
+						menu::stack_push<menu_machine_configure>(
+								ui(), container(),
+								reinterpret_cast<const game_driver *>(m_prev_selected),
+								menu_event->mouse.x0, menu_event->mouse.y0);
+					}
+					else
+					{
+						ui_software_info *sw = reinterpret_cast<ui_software_info *>(m_prev_selected);
+						menu::stack_push<menu_machine_configure>(
+								ui(), container(),
+								(const game_driver *)sw->driver,
+								menu_event->mouse.x0, menu_event->mouse.y0);
+					}
+					break;
+
+				case IPT_UI_LEFT:
+					if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
+					{
+						// Images
+						ui_globals::curimage_view--;
+						ui_globals::switch_image = true;
+						ui_globals::default_image = false;
+					}
+					else if (ui_globals::rpanel == RP_INFOS)
+					{
+						// Infos
+						change_info_pane(-1);
+					}
+					break;
+
+				case IPT_UI_RIGHT:
+					if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
+					{
+						// Images
+						ui_globals::curimage_view++;
+						ui_globals::switch_image = true;
+						ui_globals::default_image = false;
+					}
+					else if (ui_globals::rpanel == RP_INFOS)
+					{
+						// Infos
+						change_info_pane(1);
+					}
+					break;
+
+				case IPT_UI_DATS:
+					if (!isfavorite())
+					{
+						const game_driver *driver = (const game_driver *)menu_event->itemref;
+						if ((uintptr_t)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
+							menu::stack_push<menu_dats_view>(ui(), container(), driver);
+					}
+					else
+					{
+						ui_software_info *ui_swinfo  = (ui_software_info *)menu_event->itemref;
+
+						if ((uintptr_t)ui_swinfo > skip_main_items)
+						{
+							if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
+								menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
+							else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
+									menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
+						}
+					}
+
+				case IPT_UI_FAVORITES:
+					if (uintptr_t(menu_event->itemref) > skip_main_items)
+					{
+						favorite_manager &mfav(mame_machine_manager::instance()->favorite());
+						if (!isfavorite())
+						{
+							game_driver const *const driver(reinterpret_cast<game_driver const *>(menu_event->itemref));
+							if (!mfav.isgame_favorite(driver))
+							{
+								mfav.add_favorite_game(driver);
+								machine().popmessage(_("%s\n added to favorites list."), driver->type.fullname());
+							}
+							else
+							{
+								mfav.remove_favorite_game();
+								machine().popmessage(_("%s\n removed from favorites list."), driver->type.fullname());
+							}
+						}
+						else
+						{
+							ui_software_info const *const swinfo(reinterpret_cast<ui_software_info const *>(menu_event->itemref));
+							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname);
+							mfav.remove_favorite_game(*swinfo);
+							reset(reset_options::SELECT_FIRST);
+						}
+					}
+					break;
+
+				case IPT_UI_EXPORT:
+					inkey_export();
+					break;
+
+				case IPT_UI_AUDIT_FAST:
+					if (!m_unavailsortedlist.empty())
+						menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, m_unavailsortedlist, 1);
+					break;
+
+				case IPT_UI_AUDIT_ALL:
+					menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, m_unavailsortedlist, 2);
+					break;
+				}
+			}
 		}
 	}
 

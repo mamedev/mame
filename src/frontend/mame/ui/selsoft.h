@@ -26,15 +26,11 @@ public:
 	menu_select_software(mame_ui_manager &mui, render_container &container, const game_driver *driver);
 	virtual ~menu_select_software() override;
 
-protected:
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
-
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 
 	typedef std::map<software_filter::type, software_filter::ptr> filter_map;
 
-	std::string             m_search;
 	const game_driver       *m_driver;
 	bool                    m_has_empty_start;
 	s_filter                m_filter_data;

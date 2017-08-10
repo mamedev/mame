@@ -1106,11 +1106,23 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		return;
 	}
 
-	// hitting cancel also pops the stack
 	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
 	{
-		if (!m_ui_error && !menu_has_search_active())
+		if (m_ui_error)
+		{
+			// dismiss error
+		}
+		else if (menu_has_search_active())
+		{
+			// escape pressed with non-empty search text clears it
+			m_search.clear();
+			reset(reset_options::SELECT_FIRST);
+		}
+		else
+		{
+			// otherwise pop the stack
 			stack_pop();
+		}
 		return;
 	}
 
@@ -1118,17 +1130,17 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
-	bool leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
-	bool rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
+	bool const ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
+	bool const ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
+	bool const leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
+	bool const rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 
 	// accept left/right keys as-is with repeat
 	if (!ignoreleft && exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
 		// Swap the right panel
 		if (m_focus == focused_menu::RIGHTTOP)
-			iptkey = IPT_UI_LEFT_PANEL;
+			ui_globals::rpanel = RP_IMAGES;
 		return;
 	}
 
@@ -1136,30 +1148,26 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	{
 		// Swap the right panel
 		if (m_focus == focused_menu::RIGHTTOP)
-			iptkey = IPT_UI_RIGHT_PANEL;
+			ui_globals::rpanel = RP_INFOS;
 		return;
 	}
 
 	// up backs up by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_UP, 6))
 	{
-		// Filter
 		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_UP_FILTER;
 			return;
 		}
-
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_UP_PANEL;
 			m_topline_datsview--;
 			return;
 		}
-
-		if (selected == visible_items + 1 || is_first_selected() || m_ui_error)
+		else if (selected == visible_items + 1 || is_first_selected() || m_ui_error)
+		{
 			return;
+		}
 
 		selected--;
 
@@ -1170,26 +1178,21 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// down advances by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_DOWN, 6))
 	{
-		// Filter
 		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_DOWN_FILTER;
 			return;
 		}
-
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
 			m_topline_datsview++;
 			return;
 		}
-
-		if (is_last_selected() || selected == visible_items - 1 || m_ui_error)
+		else if (is_last_selected() || selected == visible_items - 1 || m_ui_error)
+		{
 			return;
+		}
 
 		selected++;
-
 		if (selected == top_line + m_visible_items + (top_line != 0))
 			top_line++;
 	}
@@ -1200,7 +1203,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
 			m_topline_datsview -= m_right_visible_lines - 1;
 			return;
 		}
@@ -1222,7 +1224,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
 			m_topline_datsview += m_right_visible_lines - 1;
 			return;
 		}
@@ -1241,10 +1242,12 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// home goes to the start
 	if (exclusive_input_pressed(iptkey, IPT_UI_HOME, 0))
 	{
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
+			return;
+		}
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		{
 			m_topline_datsview = 0;
 			return;
 		}
@@ -1259,10 +1262,12 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// end goes to the last
 	if (exclusive_input_pressed(iptkey, IPT_UI_END, 0))
 	{
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
+			return;
+		}
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		{
 			m_topline_datsview = m_total_lines;
 			return;
 		}
@@ -1320,7 +1325,9 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				machine().ui_input().push_mouse_down_event(mouse_target, target_x, target_y);
 		}
 		else
+		{
 			reset_pressed();
+		}
 	}
 
 	// loop while we have interesting events
@@ -1328,177 +1335,182 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 	{
 		switch (local_menu_event.event_type)
 		{
-			// if we are hovering over a valid item, select it with a single click
-			case UI_EVENT_MOUSE_DOWN:
+		// if we are hovering over a valid item, select it with a single click
+		case UI_EVENT_MOUSE_DOWN:
+			if (m_ui_error)
 			{
-				if (m_ui_error)
+				ev.iptkey = IPT_OTHER;
+				stop = true;
+			}
+			else
+			{
+				if (hover >= 0 && hover < item.size())
 				{
+					if (hover >= visible_items - 1 && selected < visible_items)
+						m_prev_selected = get_selection_ref();
+					selected = hover;
+					m_focus = focused_menu::MAIN;
+				}
+				else if (hover == HOVER_ARROW_UP)
+				{
+					selected -= m_visible_items;
+					if (selected < 0)
+						selected = 0;
+					top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
+					set_pressed();
+				}
+				else if (hover == HOVER_ARROW_DOWN)
+				{
+					selected += m_visible_lines - 2 + (selected == 0);
+					if (selected >= visible_items)
+						selected = visible_items - 1;
+					top_line += m_visible_lines - 2;
+					set_pressed();
+				}
+				else if (hover == HOVER_UI_RIGHT)
+					ev.iptkey = IPT_UI_RIGHT;
+				else if (hover == HOVER_UI_LEFT)
+					ev.iptkey = IPT_UI_LEFT;
+				else if (hover == HOVER_DAT_DOWN)
+					m_topline_datsview += m_right_visible_lines - 1;
+				else if (hover == HOVER_DAT_UP)
+					m_topline_datsview -= m_right_visible_lines - 1;
+				else if (hover == HOVER_LPANEL_ARROW)
+				{
+					if (ui_globals::panels_status == HIDE_LEFT_PANEL)
+						ui_globals::panels_status = SHOW_PANELS;
+					else if (ui_globals::panels_status == HIDE_BOTH)
+						ui_globals::panels_status = HIDE_RIGHT_PANEL;
+					else if (ui_globals::panels_status == SHOW_PANELS)
+						ui_globals::panels_status = HIDE_LEFT_PANEL;
+					else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+						ui_globals::panels_status = HIDE_BOTH;
+				}
+				else if (hover == HOVER_RPANEL_ARROW)
+				{
+					if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+						ui_globals::panels_status = SHOW_PANELS;
+					else if (ui_globals::panels_status == HIDE_BOTH)
+						ui_globals::panels_status = HIDE_LEFT_PANEL;
+					else if (ui_globals::panels_status == SHOW_PANELS)
+						ui_globals::panels_status = HIDE_RIGHT_PANEL;
+					else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
+						ui_globals::panels_status = HIDE_BOTH;
+				}
+				else if (hover == HOVER_B_FAV)
+				{
+					ev.iptkey = IPT_UI_FAVORITES;
+					stop = true;
+				}
+				else if (hover == HOVER_B_EXPORT)
+				{
+					ev.iptkey = IPT_UI_EXPORT;
+					stop = true;
+				}
+				else if (hover == HOVER_B_DATS)
+				{
+					ev.iptkey = IPT_UI_DATS;
+					stop = true;
+				}
+				else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
+				{
+					ui_globals::rpanel = (HOVER_RP_FIRST - hover) * (-1);
+					stop = true;
+				}
+				else if (hover >= HOVER_SW_FILTER_FIRST && hover <= HOVER_SW_FILTER_LAST)
+				{
+					l_sw_hover = (HOVER_SW_FILTER_FIRST - hover) * (-1);
 					ev.iptkey = IPT_OTHER;
 					stop = true;
 				}
-				else
+				else if (hover >= HOVER_FILTER_FIRST && hover <= HOVER_FILTER_LAST)
 				{
-					if (hover >= 0 && hover < item.size())
-					{
-						if (hover >= visible_items - 1 && selected < visible_items)
-							m_prev_selected = get_selection_ref();
-						selected = hover;
-						m_focus = focused_menu::MAIN;
-					}
-					else if (hover == HOVER_ARROW_UP)
-					{
-						selected -= m_visible_items;
-						if (selected < 0)
-							selected = 0;
-						top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
-						set_pressed();
-					}
-					else if (hover == HOVER_ARROW_DOWN)
-					{
-						selected += m_visible_lines - 2 + (selected == 0);
-						if (selected >= visible_items)
-							selected = visible_items - 1;
-						top_line += m_visible_lines - 2;
-						set_pressed();
-					}
-					else if (hover == HOVER_UI_RIGHT)
-						ev.iptkey = IPT_UI_RIGHT;
-					else if (hover == HOVER_UI_LEFT)
-						ev.iptkey = IPT_UI_LEFT;
-					else if (hover == HOVER_DAT_DOWN)
-						m_topline_datsview += m_right_visible_lines - 1;
-					else if (hover == HOVER_DAT_UP)
-						m_topline_datsview -= m_right_visible_lines - 1;
-					else if (hover == HOVER_LPANEL_ARROW)
-					{
-						if (ui_globals::panels_status == HIDE_LEFT_PANEL)
-							ui_globals::panels_status = SHOW_PANELS;
-						else if (ui_globals::panels_status == HIDE_BOTH)
-							ui_globals::panels_status = HIDE_RIGHT_PANEL;
-						else if (ui_globals::panels_status == SHOW_PANELS)
-							ui_globals::panels_status = HIDE_LEFT_PANEL;
-						else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
-							ui_globals::panels_status = HIDE_BOTH;
-					}
-					else if (hover == HOVER_RPANEL_ARROW)
-					{
-						if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
-							ui_globals::panels_status = SHOW_PANELS;
-						else if (ui_globals::panels_status == HIDE_BOTH)
-							ui_globals::panels_status = HIDE_LEFT_PANEL;
-						else if (ui_globals::panels_status == SHOW_PANELS)
-							ui_globals::panels_status = HIDE_RIGHT_PANEL;
-						else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
-							ui_globals::panels_status = HIDE_BOTH;
-					}
-					else if (hover == HOVER_B_FAV)
-					{
-						ev.iptkey = IPT_UI_FAVORITES;
-						stop = true;
-					}
-					else if (hover == HOVER_B_EXPORT)
-					{
-						ev.iptkey = IPT_UI_EXPORT;
-						stop = true;
-					}
-					else if (hover == HOVER_B_DATS)
-					{
-						ev.iptkey = IPT_UI_DATS;
-						stop = true;
-					}
-					else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
-					{
-						ui_globals::rpanel = (HOVER_RP_FIRST - hover) * (-1);
-						stop = true;
-					}
-					else if (hover >= HOVER_SW_FILTER_FIRST && hover <= HOVER_SW_FILTER_LAST)
-					{
-						l_sw_hover = (HOVER_SW_FILTER_FIRST - hover) * (-1);
-						ev.iptkey = IPT_OTHER;
-						stop = true;
-					}
-					else if (hover >= HOVER_FILTER_FIRST && hover <= HOVER_FILTER_LAST)
-					{
-						l_hover = (HOVER_FILTER_FIRST - hover) * (-1);
-						ev.iptkey = IPT_OTHER;
-						stop = true;
-					}
+					l_hover = (HOVER_FILTER_FIRST - hover) * (-1);
+					ev.iptkey = IPT_OTHER;
+					stop = true;
 				}
-				break;
+			}
+			break;
+
+		// if we are hovering over a valid item, fake a UI_SELECT with a double-click
+		case UI_EVENT_MOUSE_DOUBLE_CLICK:
+			if (hover >= 0 && hover < item.size())
+			{
+				selected = hover;
+				ev.iptkey = IPT_UI_SELECT;
 			}
 
-			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-			case UI_EVENT_MOUSE_DOUBLE_CLICK:
-				if (hover >= 0 && hover < item.size())
-				{
-					selected = hover;
-					ev.iptkey = IPT_UI_SELECT;
-				}
+			if (is_last_selected())
+			{
+				ev.iptkey = IPT_UI_CANCEL;
+				stack_pop();
+			}
+			stop = true;
+			break;
 
-				if (is_last_selected())
+		// caught scroll event
+		case UI_EVENT_MOUSE_WHEEL:
+			if (hover >= 0 && hover < item.size() - skip_main_items - 1)
+			{
+				if (local_menu_event.zdelta > 0)
 				{
-					ev.iptkey = IPT_UI_CANCEL;
-					stack_pop();
-				}
-				stop = true;
-				break;
-
-			// caught scroll event
-			case UI_EVENT_MOUSE_WHEEL:
-				if (hover >= 0 && hover < item.size() - skip_main_items - 1)
-				{
-					if (local_menu_event.zdelta > 0)
-					{
-						if (selected >= visible_items || is_first_selected() || m_ui_error)
-							break;
-						selected -= local_menu_event.num_lines;
-						if (selected < top_line + (top_line != 0))
-							top_line -= local_menu_event.num_lines;
-					}
-					else
-					{
-						if (selected >= visible_items - 1 || m_ui_error)
-							break;
-						selected += local_menu_event.num_lines;
-						if (selected > visible_items - 1)
-							selected = visible_items - 1;
-						if (selected >= top_line + m_visible_items + (top_line != 0))
-							top_line += local_menu_event.num_lines;
-					}
-				}
-				break;
-
-			// translate CHAR events into specials
-			case UI_EVENT_CHAR:
-				if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
-				{
-					ev.iptkey = IPT_UI_CONFIGURE;
-					stop = true;
+					if (selected >= visible_items || is_first_selected() || m_ui_error)
+						break;
+					selected -= local_menu_event.num_lines;
+					if (selected < top_line + (top_line != 0))
+						top_line -= local_menu_event.num_lines;
 				}
 				else
 				{
-					ev.iptkey = IPT_SPECIAL;
-					ev.unichar = local_menu_event.ch;
-					stop = true;
+					if (selected >= visible_items - 1 || m_ui_error)
+						break;
+					selected += local_menu_event.num_lines;
+					if (selected > visible_items - 1)
+						selected = visible_items - 1;
+					if (selected >= top_line + m_visible_items + (top_line != 0))
+						top_line += local_menu_event.num_lines;
 				}
-				break;
+			}
+			else if (hover == HOVER_INFO_TEXT)
+			{
+				if (local_menu_event.zdelta > 0)
+					m_topline_datsview -= local_menu_event.num_lines;
+				else
+					m_topline_datsview += local_menu_event.num_lines;
+			}
+			break;
 
-			case UI_EVENT_MOUSE_RDOWN:
-				if (hover >= 0 && hover < item.size() - skip_main_items - 1)
-				{
-					selected = hover;
-					m_prev_selected = get_selection_ref();
-					m_focus = focused_menu::MAIN;
-					ev.iptkey = IPT_CUSTOM;
-					ev.mouse.x0 = local_menu_event.mouse_x;
-					ev.mouse.y0 = local_menu_event.mouse_y;
-					stop = true;
-				}
-				break;
+		// translate CHAR events into specials
+		case UI_EVENT_CHAR:
+			if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
+			{
+				ev.iptkey = IPT_UI_CONFIGURE;
+				stop = true;
+			}
+			else
+			{
+				ev.iptkey = IPT_SPECIAL;
+				ev.unichar = local_menu_event.ch;
+				stop = true;
+			}
+			break;
 
-			// ignore everything else
-			default:
-				break;
+		case UI_EVENT_MOUSE_RDOWN:
+			if (hover >= 0 && hover < item.size() - skip_main_items - 1)
+			{
+				selected = hover;
+				m_prev_selected = get_selection_ref();
+				m_focus = focused_menu::MAIN;
+				ev.iptkey = IPT_CUSTOM;
+				ev.mouse.x0 = local_menu_event.mouse_x;
+				ev.mouse.y0 = local_menu_event.mouse_y;
+				stop = true;
+			}
+			break;
+
+		// ignore everything else
+		default:
+			break;
 		}
 	}
 }
@@ -2060,16 +2072,20 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 
 	if (bgcolor != UI_TEXT_BG_COLOR)
 	{
-		ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
+		ui().draw_textured_box(
+				container(),
+				origx1 + ((middle - title_size) * 0.5f), origy1 + UI_BOX_TB_BORDER,
+				origx1 + ((middle + title_size) * 0.5f), origy1 + UI_BOX_TB_BORDER + line_height,
+				bgcolor, rgb_t(43, 43, 43),
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
 	ui().draw_text_full(container(),
-			snaptext.c_str(), origx1, origy1, origx2 - origx1,
+			snaptext.c_str(), origx1, origy1 + UI_BOX_TB_BORDER, origx2 - origx1,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr, tmp_size);
 
-	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
+	draw_common_arrow(origx1, origy1 + UI_BOX_TB_BORDER, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
 	return searchstr;
 }
@@ -2101,7 +2117,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 	if (tmp_bitmap->valid())
 	{
 		float panel_width = origx2 - origx1 - 0.02f;
-		float panel_height = origy2 - origy1 - 0.02f - (2.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
+		float panel_height = origy2 - origy1 - 0.02f - (3.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
 		int screen_width = machine().render().ui_target().width();
 		int screen_height = machine().render().ui_target().height();
 
@@ -2182,7 +2198,7 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		float const line_height = ui().get_line_height();
 		float const x1 = origx1 + 0.01f;
 		float const x2 = origx2 - 0.01f;
-		float const y1 = origy1 + UI_BOX_TB_BORDER + line_height;
+		float const y1 = origy1 + (2.0f * UI_BOX_TB_BORDER) + line_height;
 		float const y2 = origy2 - UI_BOX_TB_BORDER - line_height;
 
 		// apply texture
@@ -2325,6 +2341,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	else
 		return;
 
+	origy1 += UI_BOX_TB_BORDER;
 	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float oy1 = origy1 + line_height;
@@ -2409,7 +2426,10 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (m_topline_datsview + r_visible_lines >= m_total_lines)
 		m_topline_datsview = m_total_lines - r_visible_lines;
 
-	sc = origx2 - origx1 - (2.0f * UI_BOX_LR_BORDER);
+	if (mouse_in_rect(origx1 + gutter_width, oy1, origx2 - gutter_width, origy2))
+		hover = HOVER_INFO_TEXT;
+
+	sc = origx2 - origx1 - (2.0f * gutter_width);
 	for (int r = 0; r < r_visible_lines; ++r)
 	{
 		int itemline = r + m_topline_datsview;

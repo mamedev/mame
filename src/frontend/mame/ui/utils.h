@@ -276,7 +276,8 @@ enum
 	HOVER_SW_FILTER_FIRST,
 	HOVER_SW_FILTER_LAST = (HOVER_SW_FILTER_FIRST) + ui::software_filter::COUNT,
 	HOVER_RP_FIRST,
-	HOVER_RP_LAST = (HOVER_RP_FIRST) + 1 + RP_LAST
+	HOVER_RP_LAST = (HOVER_RP_FIRST) + 1 + RP_LAST,
+	HOVER_INFO_TEXT
 };
 
 // FIXME: this stuff shouldn't all be globals

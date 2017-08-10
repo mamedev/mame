@@ -132,9 +132,9 @@ void menu_select_software::handle()
 		{
 			// reset the error on any future event
 		}
-		else if (menu_event->iptkey == IPT_UI_SELECT)
+		else switch (menu_event->iptkey)
 		{
-			// handle selections
+		case IPT_UI_SELECT:
 			if (get_focus() == focused_menu::LEFT)
 			{
 				l_sw_hover = highlight;
@@ -145,10 +145,9 @@ void menu_select_software::handle()
 			{
 				inkey_select(menu_event);
 			}
-		}
-		else if (menu_event->iptkey == IPT_UI_LEFT)
-		{
-			// handle UI_LEFT
+			break;
+
+		case IPT_UI_LEFT:
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
 			{
 				// Images
@@ -162,10 +161,9 @@ void menu_select_software::handle()
 				ui_globals::cur_sw_dats_view--;
 				m_topline_datsview = 0;
 			}
-		}
-		else if (menu_event->iptkey == IPT_UI_RIGHT)
-		{
-			// handle UI_RIGHT
+			break;
+
+		case IPT_UI_RIGHT:
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
 			{
 				// Images
@@ -179,80 +177,78 @@ void menu_select_software::handle()
 				ui_globals::cur_sw_dats_view++;
 				m_topline_datsview = 0;
 			}
-		}
-		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
-		{
-			// handle UI_LEFT_PANEL
-			ui_globals::rpanel = RP_IMAGES;
-		}
-		else if (menu_event->iptkey == IPT_UI_RIGHT_PANEL)
-		{
-			// handle UI_RIGHT_PANEL
-			ui_globals::rpanel = RP_INFOS;
-		}
-		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > software_filter::FIRST)
-		{
-			// handle UI_UP_FILTER
-			highlight--;
-		}
-		else if (menu_event->iptkey == IPT_UI_DOWN_FILTER && highlight < software_filter::LAST)
-		{
-			// handle UI_DOWN_FILTER
-			highlight++;
-		}
-		else if (menu_event->iptkey == IPT_OTHER)
-		{
+			break;
+
+		case IPT_UI_UP:
+			if ((get_focus() == focused_menu::LEFT) && (software_filter::FIRST < highlight))
+				--highlight;
+			break;
+
+		case IPT_UI_DOWN:
+			if ((get_focus() == focused_menu::LEFT) && (software_filter::LAST > highlight))
+				++highlight;
+			break;
+
+		case IPT_UI_HOME:
+			if (get_focus() == focused_menu::LEFT)
+				highlight = software_filter::FIRST;
+			break;
+
+		case IPT_UI_END:
+			if (get_focus() == focused_menu::LEFT)
+				highlight = software_filter::LAST;
+			break;
+
+		case IPT_OTHER:
+			// this is generated when something in the left box is clicked
 			highlight = l_sw_hover;
 			check_filter = true;
 			m_prev_selected = nullptr;
-		}
-		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
-		{
+			break;
+
+		case IPT_UI_CONFIGURE:
 			inkey_navigation();
-		}
-		else if (menu_event->itemref)
-		{
-			if (menu_event->iptkey == IPT_UI_DATS)
-			{
-				// handle UI_DATS
-				ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
+			break;
 
-				if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
-					menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-				else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
-					menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
-			}
-			else if (menu_event->iptkey == IPT_UI_CANCEL && !m_search.empty())
+		default:
+			if (menu_event->itemref)
 			{
-				// escape pressed with non-empty text clears the text
-				m_search.clear();
-				reset(reset_options::SELECT_FIRST);
-			}
-			else if (menu_event->iptkey == IPT_UI_FAVORITES)
-			{
-				// handle UI_FAVORITES
-				ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
-
-				if ((uintptr_t)swinfo > 2)
+				if (menu_event->iptkey == IPT_UI_DATS)
 				{
-					favorite_manager &mfav = mame_machine_manager::instance()->favorite();
-					if (!mfav.isgame_favorite(*swinfo))
-					{
-						mfav.add_favorite_game(*swinfo);
-						machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
-					}
+					// handle UI_DATS
+					ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 
-					else
+					if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
+						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
+					else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
+						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
+				}
+				else if (menu_event->iptkey == IPT_UI_FAVORITES)
+				{
+					// handle UI_FAVORITES
+					ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
+
+					if ((uintptr_t)swinfo > 2)
 					{
-						machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
-						mfav.remove_favorite_game();
+						favorite_manager &mfav = mame_machine_manager::instance()->favorite();
+						if (!mfav.isgame_favorite(*swinfo))
+						{
+							mfav.add_favorite_game(*swinfo);
+							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
+						}
+
+						else
+						{
+							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
+							mfav.remove_favorite_game();
+						}
 					}
 				}
-			}
-			else if (menu_event->iptkey == IPT_SPECIAL)
-			{
-				// typed characters append to the buffer
-				inkey_special(menu_event);
+				else if (menu_event->iptkey == IPT_SPECIAL)
+				{
+					// typed characters append to the buffer
+					inkey_special(menu_event);
+				}
 			}
 		}
 	}

@@ -232,8 +232,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	int curitem;
 
 	for (curitem = matchcount = 0; m_driverlist[curitem] != nullptr && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
-		if (!(m_driverlist[curitem]->flags & machine_flags::NO_STANDALONE))
-			matchcount++;
+		matchcount++;
 
 	// if nothing there, add a single multiline item and return
 	if (matchcount == 0)

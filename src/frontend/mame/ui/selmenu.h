@@ -117,11 +117,12 @@ protected:
 	template <typename T> bool select_bios(T const &driver, bool inlist);
 	bool select_part(software_info const &info, ui_software_info const &ui_info);
 
-	int     l_hover, l_sw_hover;
-	int     visible_items;
-	void    *m_prev_selected;
-	int     m_total_lines;
-	int     m_topline_datsview;   // right box top line
+	int         l_hover, l_sw_hover;
+	int         visible_items;
+	void        *m_prev_selected;
+	int         m_total_lines;
+	int         m_topline_datsview;   // right box top line
+	std::string m_search;
 
 	static char const *const s_info_titles[];
 
@@ -224,6 +225,9 @@ private:
 
 	// handle mouse
 	virtual void handle_events(uint32_t flags, event &ev) override;
+
+	// live search active?
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 	// draw game list
 	virtual void draw(uint32_t flags) override;

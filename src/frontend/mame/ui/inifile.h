@@ -113,7 +113,7 @@ public:
 
 	// remove
 	void remove_favorite_game();
-	void remove_favorite_game(ui_software_info &swinfo);
+	void remove_favorite_game(ui_software_info const &swinfo);
 
 private:
 	const char *favorite_filename = "favorites.ini";

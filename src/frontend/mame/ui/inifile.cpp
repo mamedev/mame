@@ -241,7 +241,7 @@ void favorite_manager::add_favorite_game()
 //  remove a favorite from list
 //-------------------------------------------------
 
-void favorite_manager::remove_favorite_game(ui_software_info &swinfo)
+void favorite_manager::remove_favorite_game(ui_software_info const &swinfo)
 {
 	for (auto e = m_list.begin(); e != m_list.end(); ++e)
 		if (e->second == swinfo)

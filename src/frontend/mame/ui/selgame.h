@@ -28,9 +28,6 @@ public:
 	// force game select menu
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
-protected:
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
-
 private:
 	enum
 	{
@@ -40,7 +37,6 @@ private:
 	};
 
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	std::string m_search;
 	static bool first_start;
 	static int m_isabios;
 	int highlight;
