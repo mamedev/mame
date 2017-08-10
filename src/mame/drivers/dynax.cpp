@@ -4138,6 +4138,7 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	save_item(NAME(m_blitter_irq));
 	save_item(NAME(m_blitter_irq_mask));
 	save_item(NAME(m_blitter2_irq));
+	save_item(NAME(m_blitter2_irq_mask));
 	save_item(NAME(m_soundlatch_irq));
 	save_item(NAME(m_sound_vblank_irq));
 
