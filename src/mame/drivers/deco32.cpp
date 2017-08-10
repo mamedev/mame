@@ -520,13 +520,21 @@ READ32_MEMBER(dragngun_state::service_r)
 	return ioport("IN2")->read();
 }
 
+// TODO: improve this, Y axis not understood at all
 READ32_MEMBER(dragngun_state::lockload_gun_mirror_r)
 {
 //logerror("%08x:Read gun %d\n",space.device().safe_pc(),offset);
-//return ((machine().rand()%0xffff)<<16) | machine().rand()%0xffff;
-	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return ioport("IN4")->read() | ((machine().rand()%0xff)<<16);
-	return ioport("IN3")->read() | ioport("LIGHT0_X")->read() | (ioport("LIGHT0_X")->read()<<16) | (ioport("LIGHT0_X")->read()<<24); //((machine().rand()%0xff)<<16);
+
+	switch(offset)
+	{
+		case 0:
+			return ioport("IN3")->read() | (ioport("LIGHT0_X")->read()) | (ioport("LIGHT0_X")->read()<<11) | (ioport("LIGHT0_Y")->read()<<19);
+			
+		case 1:
+			return ioport("IN4")->read() | (ioport("LIGHT1_X")->read()) | (ioport("LIGHT1_X")->read()<<11) | (ioport("LIGHT1_Y")->read()<<19);
+	}
+
+	return ~0;
 }
 
 READ32_MEMBER(dragngun_state::lightgun_r)
