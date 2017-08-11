@@ -42,7 +42,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
 * それいけ!アンパンマンのみんなできょうそうアンパンマン! - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
-* アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
 * いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
@@ -305,6 +304,20 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+		<software name="poohcornsw" cloneof="poohcorn">
+		<description>Ett År med Nalle Puh (Swe)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49021-24"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18576-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18576-t.ic1" size="524288" crc="0a48bbb9" sha1="a702d91a72066bea72e7cff9013f1b94f2623761" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohcornu" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (USA)</description>
 		<year>1994</year>
@@ -419,6 +432,25 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="PICO-9516S" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pico-9516s.ic1" size="1048576" crc="68bc6c65" sha1="94d3c164524fd9b5667bcba7a6533993b673366a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<software name="anpanwpk">
+		<description>Anpanman Pico Wakuwaku Pan Koujou (Jpn)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133350"/>
+		<info name="release" value="200106xx"/>
+		<info name="alt_title" value="アンパンマンピコ わくわくパン工場 ~ Anpanman Pico Wakuwaku Pan Koujou"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7967" />
+			<feature name="ic1" value="9K0-0041A" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74" />
+			<feature name="ic4" value="HC125" />
+			<dataarea name="rom" size="1048576">
+				<rom name="9k0-0041a-rv.ic1" size="1048576" crc="a10118a5" sha1="b9fce10b2558f73048d30398410b0e3340e87610" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2563,6 +2595,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+		<software name="lionkingsw" cloneof="lionking" supported="no">
+		<description>Lejonkungen Äventyr (Swe)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49037-24"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18578-U" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18578-u.ic1" size="1048576" crc="c515eb6e" sha1="f72f9037c7f21a6ba5bebd7f835ae74be352d29a"  offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lionkingu" cloneof="lionking" supported="no">
 		<description>The Lion King - Adventure at Pride Rock (USA)</description>
 		<year>19??</year>
@@ -2577,6 +2623,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+<!-- This was also released for the Swedish market with serial MK-49026-24, pcb 171-6882A. ROM is marked MPR-17729-T but contents match -->
 	<software name="magiccra">
 		<description>Magic Crayons (Euro)</description>
 		<year>1994</year>
