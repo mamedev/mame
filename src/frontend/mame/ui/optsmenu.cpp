@@ -13,17 +13,16 @@
 
 #include "ui/ui.h"
 #include "ui/submenu.h"
-#include "ui/inifile.h"
 #include "ui/selector.h"
 #include "ui/custui.h"
 #include "ui/sndmenu.h"
-#include "ui/custmenu.h"
 #include "ui/inputmap.h"
 #include "ui/dirmenu.h"
 
 #include "mame.h"
 #include "mameopts.h"
 #include "rendfont.h"
+
 
 namespace ui {
 
@@ -88,65 +87,6 @@ void menu_game_options::handle()
 						[this] (int selection)
 						{
 							m_main = machine_filter::type(selection);
-							reset(reset_options::REMEMBER_REF);
-						});
-			}
-			break;
-		case FILE_CATEGORY_FILTER:
-			if (menu_event->iptkey == IPT_UI_LEFT)
-			{
-				mame_machine_manager::instance()->inifile().move_file(-1);
-				changed = true;
-			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT)
-			{
-				mame_machine_manager::instance()->inifile().move_file(1);
-				changed = true;
-			}
-			else if (menu_event->iptkey == IPT_UI_SELECT)
-			{
-				inifile_manager &ifile = mame_machine_manager::instance()->inifile();
-				int total = ifile.total();
-				std::vector<std::string> s_sel(total);
-				mame_machine_manager::instance()->inifile().set_cat(0);
-				for (size_t index = 0; index < total; ++index)
-					s_sel[index] = ifile.get_file(index);
-
-				menu::stack_push<menu_selector>(
-						ui(), container(), std::move(s_sel), ifile.cur_file(),
-						[this] (int selection)
-						{
-							mame_machine_manager::instance()->inifile().set_file(selection);
-							mame_machine_manager::instance()->inifile().set_cat(0);
-							reset(reset_options::REMEMBER_REF);
-						});
-			}
-			break;
-		case CATEGORY_FILTER:
-			if (menu_event->iptkey == IPT_UI_LEFT)
-			{
-				mame_machine_manager::instance()->inifile().move_cat(-1);
-				changed = true;
-			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT)
-			{
-				mame_machine_manager::instance()->inifile().move_cat(1);
-				changed = true;
-			}
-			else if (menu_event->iptkey == IPT_UI_SELECT)
-			{
-				inifile_manager &ifile = mame_machine_manager::instance()->inifile();
-				int total = ifile.cat_total();
-				std::vector<std::string> s_sel(total);
-				for (int index = 0; index < total; ++index)
-					s_sel[index] = ifile.get_category(index);
-
-				menu::stack_push<menu_selector>(
-						ui(), container(), std::move(s_sel), ifile.cur_cat(),
-						[this] (int selection)
-						{
-							mame_machine_manager::instance()->inifile().cur_cat() = selection;
-							mame_machine_manager::instance()->inifile().set_cat(selection);
 							reset(reset_options::REMEMBER_REF);
 						});
 			}
@@ -247,38 +187,17 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 
 		// add filter item
 		uint32_t arrow_flags = get_arrow_flags<uint16_t>(machine_filter::FIRST, machine_filter::LAST, m_main);
-		if (machine_filter::CATEGORY == m_main)
+		auto active_filter(main_filters::filters.find(m_main));
+		if (main_filters::filters.end() == active_filter)
+			active_filter = main_filters::filters.emplace(m_main, machine_filter::create(m_main)).first;
+		item_append(_("Filter"), active_filter->second->display_name(), arrow_flags, (void *)(uintptr_t)FILTER_MENU);
+
+		// add subitem if the filter wants it
+		if (active_filter->second->wants_adjuster())
 		{
-			item_append(_("Filter"), machine_filter::display_name(m_main), arrow_flags, (void *)(uintptr_t)FILTER_MENU);
-			if (mame_machine_manager::instance()->inifile().total() > 0)
-			{
-				inifile_manager &inif = mame_machine_manager::instance()->inifile();
-
-				arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(inif.total() - 1), inif.cur_file());
-				fbuff = _(" ^!File");
-				convert_command_glyph(fbuff);
-				item_append(fbuff, inif.get_file(), arrow_flags, (void *)(uintptr_t)FILE_CATEGORY_FILTER);
-
-				arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(inif.cat_total() - 1), inif.cur_cat());
-				fbuff = _(" ^!Category");
-				convert_command_glyph(fbuff);
-				item_append(fbuff, inif.get_category(), arrow_flags, (void *)(uintptr_t)CATEGORY_FILTER);
-			}
-		}
-		else
-		{
-			auto active_filter(main_filters::filters.find(m_main));
-			if (main_filters::filters.end() == active_filter)
-				active_filter = main_filters::filters.emplace(m_main, machine_filter::create(m_main)).first;
-			item_append(_("Filter"), active_filter->second->display_name(), arrow_flags, (void *)(uintptr_t)FILTER_MENU);
-
-			// add subitem if the filter wants it
-			if (active_filter->second->wants_adjuster())
-			{
-				std::string name("^!");
-				convert_command_glyph(name);
-				item_append(name, active_filter->second->adjust_text(), active_filter->second->arrow_flags(), (void *)(FILTER_ADJUST));
-			}
+			std::string name("^!");
+			convert_command_glyph(name);
+			item_append(name, active_filter->second->adjust_text(), active_filter->second->arrow_flags(), (void *)(FILTER_ADJUST));
 		}
 
 		item_append(menu_item_type::SEPARATOR);

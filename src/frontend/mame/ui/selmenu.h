@@ -114,10 +114,16 @@ protected:
 
 	bool draw_error_text();
 
+	template <typename Filter>
+	float draw_left_panel(
+			typename Filter::type current,
+			std::map<typename Filter::type, typename Filter::ptr> const &filters,
+			int focus,
+			float x1, float y1, float x2, float y2);
+
 	template <typename T> bool select_bios(T const &driver, bool inlist);
 	bool select_part(software_info const &info, ui_software_info const &ui_info);
 
-	int         l_hover, l_sw_hover;
 	int         visible_items;
 	void        *m_prev_selected;
 	int         m_total_lines;
@@ -188,6 +194,7 @@ private:
 
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
+	float draw_collapsed_left_panel(float x1, float y1, float x2, float y2);
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);

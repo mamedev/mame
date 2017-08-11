@@ -20,7 +20,6 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "mame.h"
-#include "rendfont.h"
 #include "rendutil.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
@@ -119,12 +118,11 @@ void menu_select_software::handle()
 	if (m_prev_selected == nullptr)
 		m_prev_selected = item[0].ref;
 
-	bool check_filter = false;
-
 	// ignore pause keys by swallowing them before we process the menu
 	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
+	bool check_filter(false);
 	const event *menu_event = process(PROCESS_LR_REPEAT);
 	if (menu_event)
 	{
@@ -137,7 +135,6 @@ void menu_select_software::handle()
 		case IPT_UI_SELECT:
 			if (get_focus() == focused_menu::LEFT)
 			{
-				l_sw_hover = highlight;
 				check_filter = true;
 				m_prev_selected = nullptr;
 			}
@@ -201,8 +198,9 @@ void menu_select_software::handle()
 
 		case IPT_OTHER:
 			// this is generated when something in the left box is clicked
-			highlight = l_sw_hover;
 			check_filter = true;
+			highlight = hover - HOVER_FILTER_FIRST;
+			assert((software_filter::FIRST <= highlight) && (software_filter::LAST >= highlight));
 			m_prev_selected = nullptr;
 			break;
 
@@ -256,9 +254,9 @@ void menu_select_software::handle()
 	{
 		m_search.clear();
 
-		filter_map::const_iterator it(m_filters.find(software_filter::type(l_sw_hover)));
+		filter_map::const_iterator it(m_filters.find(software_filter::type(highlight)));
 		if (m_filters.end() == it)
-			it = m_filters.emplace(software_filter::type(l_sw_hover), software_filter::create(software_filter::type(l_sw_hover), m_filter_data)).first;
+			it = m_filters.emplace(software_filter::type(highlight), software_filter::create(software_filter::type(highlight), m_filter_data)).first;
 		it->second->show_ui(
 				ui(),
 				container(),
@@ -585,134 +583,9 @@ void menu_select_software::find_matches(const char *str, int count)
 
 float menu_select_software::draw_left_panel(float x1, float y1, float x2, float y2)
 {
-	if (ui_globals::panels_status == SHOW_PANELS || ui_globals::panels_status == HIDE_RIGHT_PANEL)
-	{
-		filter_map::const_iterator active_filter(m_filters.find(m_filter_type));
-		if (m_filters.end() == active_filter)
-			active_filter = m_filters.emplace(m_filter_type, software_filter::create(m_filter_type, m_filter_data)).first;
-		float origy1 = y1;
-		float origy2 = y2;
-		float text_size = 0.75f;
-		float l_height = ui().get_line_height();
-		float line_height = l_height * text_size;
-		float left_width = 0.0f;
-		int line_count = software_filter::COUNT;
-		int phover = HOVER_SW_FILTER_FIRST;
-		float sc = y2 - y1 - (2.0f * UI_BOX_TB_BORDER);
-
-		if ((line_count * line_height) > sc)
-		{
-			float lm = sc / (line_count);
-			text_size = lm / l_height;
-			line_height = l_height * text_size;
-		}
-
-		std::string tmp("_# ");
-		convert_command_glyph(tmp);
-		float text_sign = ui().get_string_width(tmp.c_str(), text_size);
-		for (software_filter::type x = software_filter::FIRST; x < software_filter::COUNT; ++x)
-		{
-			float total_width;
-
-			// compute width of left hand side
-			total_width = ui().get_string_width(software_filter::display_name(x), text_size);
-			total_width += text_sign;
-
-			// track the maximum
-			if (total_width > left_width)
-				left_width = total_width;
-		}
-
-		x2 = x1 + left_width + 2.0f * UI_BOX_LR_BORDER;
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-		// take off the borders
-		x1 += UI_BOX_LR_BORDER;
-		x2 -= UI_BOX_LR_BORDER;
-		y1 += UI_BOX_TB_BORDER;
-		y2 -= UI_BOX_TB_BORDER;
-
-		for (software_filter::type filter = software_filter::FIRST; filter < software_filter::COUNT; ++filter)
-		{
-			std::string const str(active_filter->second->adorned_display_name(filter));
-			rgb_t bgcolor = UI_TEXT_BG_COLOR;
-			rgb_t fgcolor = UI_TEXT_COLOR;
-
-			if (mouse_in_rect(x1, y1, x2, y1 + line_height))
-			{
-				bgcolor = UI_MOUSEOVER_BG_COLOR;
-				fgcolor = UI_MOUSEOVER_COLOR;
-				hover = phover + filter;
-			}
-
-			if (highlight == filter && get_focus() == focused_menu::LEFT)
-			{
-				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-			}
-
-			if (bgcolor != UI_TEXT_BG_COLOR)
-			{
-				ui().draw_textured_box(container(), x1, y1, x2, y1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
-						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
-			}
-
-			float const x1t = x1 + ((str == software_filter::display_name(filter)) ? text_sign : 0.0f);
-
-			ui().draw_text_full(container(), str.c_str(), x1t, y1, x2 - x1, ui::text_layout::LEFT, ui::text_layout::NEVER,
-					mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
-			y1 += line_height;
-		}
-
-		x1 = x2 + UI_BOX_LR_BORDER;
-		x2 = x1 + 2.0f * UI_BOX_LR_BORDER;
-		y1 = origy1;
-		y2 = origy2;
-		float space = x2 - x1;
-		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
-
-		// set left-right arrows dimension
-		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
-		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
-
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
-
-		if (mouse_in_rect(x1, y1, x2, y2))
-		{
-			fgcolor = UI_MOUSEOVER_COLOR;
-			hover = HOVER_LPANEL_ARROW;
-		}
-
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
-		return x2 + UI_BOX_LR_BORDER;
-	}
-	else
-	{
-		float space = x2 - x1;
-		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
-
-		// set left-right arrows dimension
-		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
-		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
-
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
-
-		if (mouse_in_rect(x1, y1, x2, y2))
-		{
-			fgcolor = UI_MOUSEOVER_COLOR;
-			hover = HOVER_LPANEL_ARROW;
-		}
-
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
-		return x2 + UI_BOX_LR_BORDER;
-	}
+	return menu_select_launch::draw_left_panel<software_filter>(m_filter_type, m_filters, highlight, x1, y1, x2, y2);
 }
+
 
 //-------------------------------------------------
 //  get selected software and/or driver

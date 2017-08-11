@@ -45,7 +45,7 @@ constexpr char const *region_lists[] = {
 //  set software regions
 //-------------------------------------------------
 
-void c_sw_region::set(std::string &str)
+void c_sw_region::set(std::string const &str)
 {
 	std::string name(getname(str));
 	std::vector<std::string>::iterator const pos(std::lower_bound(ui.begin(), ui.end(), name));
@@ -97,11 +97,11 @@ void c_sw_year::set(std::string &str)
 //  set software publishers
 //-------------------------------------------------
 
-void c_sw_publisher::set(std::string &str)
+void c_sw_publisher::set(std::string const &str)
 {
 	std::string name(getname(str));
 	std::vector<std::string>::iterator const pos(std::lower_bound(ui.begin(), ui.end(), name));
-	if ((ui.end() == pos) || (*pos != str))
+	if ((ui.end() == pos) || (*pos != name))
 		ui.emplace(pos, std::move(name));
 }
 

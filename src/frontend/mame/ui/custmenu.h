@@ -21,7 +21,7 @@ namespace ui {
 struct c_sw_region
 {
 	std::vector<std::string> ui;
-	void set(std::string &str);
+	void set(std::string const &str);
 	std::string getname(std::string const &str) const;
 };
 
@@ -29,7 +29,7 @@ struct c_sw_region
 struct c_sw_publisher
 {
 	std::vector<std::string> ui;
-	void set(std::string &str);
+	void set(std::string const &str);
 	std::string getname(std::string const &str) const;
 };
 

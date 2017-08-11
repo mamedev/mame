@@ -2467,12 +2467,3 @@ msgstr "Gráficos: %s, Sonido: %s"
 
 #~ msgid "Other filter"
 #~ msgstr "Otros filtros"
-
-#~ msgid "^!Region"
-#~ msgstr "^!Región"
-
-#~ msgid "^!Setup custom filter"
-#~ msgstr "^!Aplicar filtro personalizado"
-
-#~ msgid "Region: %1$s -"
-#~ msgstr "Región: %1$s -"

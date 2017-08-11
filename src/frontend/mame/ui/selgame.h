@@ -66,7 +66,6 @@ private:
 	// internal methods
 	void change_info_pane(int delta);
 
-	void build_category();
 	void build_available_list();
 
 	bool isfavorite() const;

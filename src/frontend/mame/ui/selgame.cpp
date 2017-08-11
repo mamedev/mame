@@ -27,7 +27,6 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "mame.h"
-#include "rendfont.h"
 #include "rendutil.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
@@ -170,8 +169,6 @@ void menu_select_game::handle()
 	if (!m_prev_selected)
 		m_prev_selected = item[0].ref;
 
-	bool check_filter = false;
-
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
 	{
@@ -195,6 +192,7 @@ void menu_select_game::handle()
 	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
+	bool check_filter(false);
 	const event *menu_event = process(PROCESS_LR_REPEAT);
 	if (menu_event)
 	{
@@ -228,7 +226,8 @@ void menu_select_game::handle()
 			// this is generated when something in the left box is clicked
 			m_prev_selected = nullptr;
 			check_filter = true;
-			highlight = l_hover;
+			highlight = hover - HOVER_FILTER_FIRST;
+			assert((machine_filter::FIRST <= highlight) && (machine_filter::LAST >= highlight));
 			break;
 
 		case IPT_UI_CONFIGURE:
@@ -250,7 +249,6 @@ void menu_select_game::handle()
 					}
 					else if (get_focus() == focused_menu::LEFT)
 					{
-						l_hover = highlight;
 						check_filter = true;
 						m_prev_selected = nullptr;
 					}
@@ -377,38 +375,29 @@ void menu_select_game::handle()
 	if (check_filter)
 	{
 		m_search.clear();
-		switch (l_hover)
+		if ((machine_filter::FIRST <= highlight) && (machine_filter::LAST >= highlight))
 		{
-		case machine_filter::CATEGORY:
-			// FIXME: this should be unified with the other filters
-			main_filters::actual = machine_filter::type(l_hover);
-			menu::stack_push<menu_game_options>(ui(), container());
-			break;
-		default:
-			if (l_hover >= machine_filter::ALL)
-			{
-				auto it(main_filters::filters.find(machine_filter::type(l_hover)));
-				if (main_filters::filters.end() == it)
-					it = main_filters::filters.emplace(machine_filter::type(l_hover), machine_filter::create(machine_filter::type(l_hover))).first;
-				it->second->show_ui(
-						ui(),
-						container(),
-						[this] (machine_filter &filter)
+			auto it(main_filters::filters.find(machine_filter::type(highlight)));
+			if (main_filters::filters.end() == it)
+				it = main_filters::filters.emplace(machine_filter::type(highlight), machine_filter::create(machine_filter::type(highlight))).first;
+			it->second->show_ui(
+					ui(),
+					container(),
+					[this] (machine_filter &filter)
+					{
+						machine_filter::type const new_type(filter.get_type());
+						if (machine_filter::CUSTOM == new_type)
 						{
-							machine_filter::type const new_type(filter.get_type());
-							if (machine_filter::CUSTOM == new_type)
+							emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+							if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
 							{
-								emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-								if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
-								{
-									filter.save_ini(file, 0);
-									file.close();
-								}
+								filter.save_ini(file, 0);
+								file.close();
 							}
-							main_filters::actual = new_type;
-							reset(reset_options::SELECT_FIRST);
-						});
-			}
+						}
+						main_filters::actual = new_type;
+						reset(reset_options::SELECT_FIRST);
+					});
 		}
 	}
 }
@@ -448,9 +437,6 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 				break;
 			case machine_filter::UNAVAILABLE:
 				m_displaylist = m_unavailsortedlist;
-				break;
-			case machine_filter::CATEGORY:
-				build_category();
 				break;
 			default:
 				{
@@ -886,22 +872,6 @@ void menu_select_game::change_info_pane(int delta)
 }
 
 //-------------------------------------------------
-//  build category list
-//-------------------------------------------------
-
-void menu_select_game::build_category()
-{
-	m_displaylist.clear();
-	std::vector<int> temp_filter;
-	mame_machine_manager::instance()->inifile().load_ini_category(temp_filter);
-
-	for (auto actual : temp_filter)
-		m_displaylist.push_back(&driver_list::driver(actual));
-
-	std::stable_sort(m_displaylist.begin(), m_displaylist.end(), sorted_game_list);
-}
-
-//-------------------------------------------------
 //  populate search list
 //-------------------------------------------------
 
@@ -1240,145 +1210,8 @@ void menu_select_game::load_custom_filters()
 
 float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 {
-	float line_height = ui().get_line_height();
-
-	if (ui_globals::panels_status == SHOW_PANELS || ui_globals::panels_status == HIDE_RIGHT_PANEL)
-	{
-		auto const active_filter(main_filters::filters.find(main_filters::actual));
-		float origy1 = y1;
-		float origy2 = y2;
-		float text_size = ui().options().infos_size();
-		float line_height_max = line_height * text_size;
-		float left_width = 0.0f;
-		int line_count = machine_filter::COUNT;
-		int phover = HOVER_FILTER_FIRST;
-		float sc = y2 - y1 - (2.0f * UI_BOX_TB_BORDER);
-
-		if ((line_count * line_height_max) > sc)
-		{
-			float lm = sc / (line_count);
-			text_size = lm / line_height;
-			line_height_max = line_height * text_size;
-		}
-
-		std::string tmp("_# ");
-		convert_command_glyph(tmp);
-		float text_sign = ui().get_string_width(tmp.c_str(), text_size);
-		for (machine_filter::type x = machine_filter::FIRST; x < machine_filter::COUNT; ++x)
-		{
-			float total_width;
-
-			// compute width of left hand side
-			total_width = ui().get_string_width(machine_filter::display_name(x), text_size);
-			total_width += text_sign;
-
-			// track the maximum
-			if (total_width > left_width)
-				left_width = total_width;
-		}
-
-		x2 = x1 + left_width + 2.0f * UI_BOX_LR_BORDER;
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-		// take off the borders
-		x1 += UI_BOX_LR_BORDER;
-		x2 -= UI_BOX_LR_BORDER;
-		y1 += UI_BOX_TB_BORDER;
-		y2 -= UI_BOX_TB_BORDER;
-
-		for (machine_filter::type filter = machine_filter::FIRST; filter < machine_filter::COUNT; ++filter)
-		{
-			std::string str;
-			if (main_filters::filters.end() != active_filter)
-			{
-				str = active_filter->second->adorned_display_name(filter);
-			}
-			else
-			{
-				if (main_filters::actual == filter)
-				{
-					str = std::string("_> ") + str;
-					convert_command_glyph(str);
-				}
-				str.append(machine_filter::display_name(filter));
-			}
-
-			rgb_t bgcolor = UI_TEXT_BG_COLOR;
-			rgb_t fgcolor = UI_TEXT_COLOR;
-
-			if (mouse_in_rect(x1, y1, x2, y1 + line_height_max))
-			{
-				bgcolor = UI_MOUSEOVER_BG_COLOR;
-				fgcolor = UI_MOUSEOVER_COLOR;
-				hover = phover + filter;
-				menu::highlight(x1, y1, x2, y1 + line_height_max, bgcolor);
-			}
-
-			if (highlight == filter && get_focus() == focused_menu::LEFT)
-			{
-				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-				ui().draw_textured_box(container(), x1, y1, x2, y1 + line_height_max, bgcolor, rgb_t(255, 43, 43, 43),
-						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
-			}
-
-			float const x1t = x1 + ((str == machine_filter::display_name(filter)) ? text_sign : 0.0f);
-
-			ui().draw_text_full(container(), str.c_str(), x1t, y1, x2 - x1, ui::text_layout::LEFT, ui::text_layout::NEVER,
-					mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
-			y1 += line_height_max;
-		}
-
-		x1 = x2 + UI_BOX_LR_BORDER;
-		x2 = x1 + 2.0f * UI_BOX_LR_BORDER;
-		y1 = origy1;
-		y2 = origy2;
-		float space = x2 - x1;
-		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
-
-		// set left-right arrows dimension
-		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
-		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
-
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
-
-		if (mouse_in_rect(x1, y1, x2, y2))
-		{
-			fgcolor = UI_MOUSEOVER_COLOR;
-			hover = HOVER_LPANEL_ARROW;
-		}
-
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
-		return x2 + UI_BOX_LR_BORDER;
-	}
-	else
-	{
-		float space = x2 - x1;
-		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
-
-		// set left-right arrows dimension
-		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
-		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
-
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
-
-		if (mouse_in_rect(x1, y1, x2, y2))
-		{
-			fgcolor = UI_MOUSEOVER_COLOR;
-			hover = HOVER_LPANEL_ARROW;
-		}
-
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
-		return x2 + UI_BOX_LR_BORDER;
-	}
+	return menu_select_launch::draw_left_panel<machine_filter>(main_filters::actual, main_filters::filters, highlight, x1, y1, x2, y2);
 }
-
 
 
 //-------------------------------------------------
@@ -1401,8 +1234,6 @@ void menu_select_game::get_selection(ui_software_info const *&software, game_dri
 
 void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
 {
-	inifile_manager &inifile = mame_machine_manager::instance()->inifile();
-
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
 			emulator_info::get_appname(),
 			bare_build_version,
@@ -1413,14 +1244,6 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 	if (isfavorite())
 	{
 		line1.clear();
-	}
-	else if (main_filters::actual == machine_filter::CATEGORY && inifile.total() > 0)
-	{
-		line1 = string_format(_("%1$s (%2$s - %3$s) - Search: %4$s_"),
-				machine_filter::display_name(main_filters::actual),
-				inifile.get_file(),
-				inifile.get_category(),
-				m_search);
 	}
 	else
 	{
