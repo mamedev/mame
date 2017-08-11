@@ -272,7 +272,7 @@ enum
 	HOVER_RPANEL_ARROW,
 	HOVER_LPANEL_ARROW,
 	HOVER_FILTER_FIRST,
-	HOVER_FILTER_LAST = HOVER_FILTER_FIRST + std::max<unsigned>(ui::machine_filter::COUNT, ui::software_filter::COUNT),
+	HOVER_FILTER_LAST = HOVER_FILTER_FIRST + std::max<int>(ui::machine_filter::COUNT, ui::software_filter::COUNT),
 	HOVER_RP_FIRST,
 	HOVER_RP_LAST = HOVER_RP_FIRST + 1 + RP_LAST,
 	HOVER_INFO_TEXT

@@ -745,7 +745,7 @@ template <template <machine_filter::type T> class Base, machine_filter::type Typ
 class inverted_machine_filter : public Base<Type>
 {
 public:
-	using Base<Type>::Base;
+	inverted_machine_filter(char const *value, emu_file *file, unsigned indent) : Base<Type>(value, file, indent) { }
 
 	virtual bool apply(game_driver const &driver) const override { return !Base<Type>::apply(driver); }
 };
