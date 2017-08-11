@@ -655,7 +655,7 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		png_free(&png);
 		return false;
 	}
-	if (png.interlace_method != 0)
+	if (png.interlace_method != 0 && png.interlace_method != 1)
 	{
 		osd_printf_error("%s: Interlace unsupported\n", filename);
 		png_free(&png);
@@ -696,59 +696,86 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 
 static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 {
+	// FIXME: this function is basically copy/pasted from the PNG code in util, and should be unified with it
 	u8 accumalpha = 0xff;
-	u8 *src;
-	int x, y;
 
-	/* handle 8bpp palettized case */
-	if (png->color_type == 3)
+	// colour format table
+	static constexpr unsigned samples[] = { 1, 0, 3, 1, 2, 0, 4 };
+
+	// adam7 interlace tables
+	static constexpr unsigned x_bias[7] = { 7, 3, 3, 1, 1, 0, 0 };
+	static constexpr unsigned y_bias[7] = { 7, 7, 3, 3, 1, 1, 0 };
+	static constexpr unsigned x_shift[7] = { 3, 3, 2, 2, 1, 1, 0 };
+	static constexpr unsigned y_shift[7] = { 3, 3, 3, 2, 2, 1, 1 };
+
+	unsigned const pass_count(png->interlace_method ? 7 : 1);
+	u32 pass_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	for (unsigned pass = 0; pass_count > pass; ++pass)
 	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src++)
+		// calculate offset for next interlace pass
+		u32 const width(png->interlace_method ? ((png->width + x_bias[pass]) >> x_shift[pass]) : png->width);
+		u32 const height(png->interlace_method ? ((png->height + y_bias[pass]) >> y_shift[pass]) : png->height);
+		u32 const rowbytes(((width * samples[png->color_type] * png->bit_depth) + 7) >> 3);
+		pass_offset[pass + 1] = pass_offset[pass] + (height * (rowbytes + 1));
+		u8 const *src(png->image + pass_offset[pass]);
+		auto const x_trans = [offs = (1 << x_shift[pass]) - x_bias[pass] - 1, shift = x_shift[pass]] (u32 x) { return (x << shift) + offs; };
+		auto const y_trans = [offs = (1 << y_shift[pass]) - y_bias[pass] - 1, shift = y_shift[pass]] (u32 y) { return (y << shift) + offs; };
+
+		if (png->color_type == 3)
+		{
+			// handle 8bpp palettized case
+			for (u32 y = 0; height > y; ++y)
 			{
-				/* determine alpha and expand to 32bpp */
-				u8 alpha = (*src < png->num_trans) ? png->trans[*src] : 0xff;
-				accumalpha &= alpha;
-				bitmap.pix32(y, x) = rgb_t(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
+				for (u32 x = 0; width > x; ++x, ++src)
+				{
+					// determine alpha and expand to 32bpp
+					u8 alpha = (*src < png->num_trans) ? png->trans[*src] : 0xff;
+					accumalpha &= alpha;
+					rgb_t const pix(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
+					(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x)) = pix;
+				}
 			}
-	}
-
-	/* handle 8bpp grayscale case */
-	else if (png->color_type == 0)
-	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src++)
-				bitmap.pix32(y, x) = rgb_t(0xff, *src, *src, *src);
-	}
-
-	/* handle 32bpp non-alpha case */
-	else if (png->color_type == 2)
-	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src += 3)
-				bitmap.pix32(y, x) = rgb_t(0xff, src[0], src[1], src[2]);
-	}
-
-	/* handle 32bpp alpha case */
-	else
-	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src += 4)
+		}
+		else if (png->color_type == 0)
+		{
+			// handle 8bpp grayscale case
+			for (u32 y = 0; height > y; ++y)
 			{
-				accumalpha &= src[3];
-				bitmap.pix32(y, x) = rgb_t(src[3], src[0], src[1], src[2]);
+				for (u32 x = 0; width > x; ++x, ++src)
+				{
+					rgb_t const pix(0xff, *src, *src, *src);
+					(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x)) = pix;
+				}
 			}
+		}
+		else if (png->color_type == 2)
+		{
+			// handle 32bpp non-alpha case
+			for (u32 y = 0; height > y; ++y)
+			{
+				for (u32 x = 0; width > x; ++x, src += 3)
+				{
+					rgb_t const pix(0xff, src[0], src[1], src[2]);
+					(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x)) = pix;
+				}
+			}
+		}
+		else
+		{
+			// handle 32bpp alpha case
+			for (u32 y = 0; height > y; ++y)
+			{
+				for (u32 x = 0; width > x; ++x, src += 4)
+				{
+					accumalpha &= src[3];
+					rgb_t const pix(src[3], src[0], src[1], src[2]);
+					(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x)) = pix;
+				}
+			}
+		}
 	}
 
-	/* set the hasalpha flag */
+	// set the hasalpha flag
 	return (accumalpha != 0xff);
 }
 
@@ -760,69 +787,92 @@ static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 
 static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 {
+	// FIXME: this function is basically copy/pasted from the PNG code in util, and should be unified with it
 	u8 accumalpha = 0xff;
-	u8 *src;
-	int x, y;
 
-	/* handle 8bpp palettized case */
-	if (png->color_type == 3)
+	// colour format table
+	static constexpr unsigned samples[] = { 1, 0, 3, 1, 2, 0, 4 };
+
+	// adam7 interlace tables
+	static constexpr unsigned x_bias[7] = { 7, 3, 3, 1, 1, 0, 0 };
+	static constexpr unsigned y_bias[7] = { 7, 7, 3, 3, 1, 1, 0 };
+	static constexpr unsigned x_shift[7] = { 3, 3, 2, 2, 1, 1, 0 };
+	static constexpr unsigned y_shift[7] = { 3, 3, 3, 2, 2, 1, 1 };
+
+	unsigned const pass_count(png->interlace_method ? 7 : 1);
+	u32 pass_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	for (unsigned pass = 0; pass_count > pass; ++pass)
 	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src++)
+		// calculate offset for next interlace pass
+		u32 const width(png->interlace_method ? ((png->width + x_bias[pass]) >> x_shift[pass]) : png->width);
+		u32 const height(png->interlace_method ? ((png->height + y_bias[pass]) >> y_shift[pass]) : png->height);
+		u32 const rowbytes(((width * samples[png->color_type] * png->bit_depth) + 7) >> 3);
+		pass_offset[pass + 1] = pass_offset[pass] + (height * (rowbytes + 1));
+		u8 const *src(png->image + pass_offset[pass]);
+		auto const x_trans = [offs = (1 << x_shift[pass]) - x_bias[pass] - 1, shift = x_shift[pass]] (u32 x) { return (x << shift) + offs; };
+		auto const y_trans = [offs = (1 << y_shift[pass]) - y_bias[pass] - 1, shift = y_shift[pass]] (u32 y) { return (y << shift) + offs; };
+
+		if (png->color_type == 3)
+		{
+			// handle 8bpp palettized case
+			for (u32 y = 0; height > y; ++y)
 			{
-				rgb_t pixel = bitmap.pix32(y, x);
-				u8 alpha = rgb_t(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]).brightness();
-				accumalpha &= alpha;
-				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
+				for (u32 x = 0; width > x; ++x, ++src)
+				{
+					bitmap_argb32::pixel_t &dest(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					rgb_t const pixel(dest);
+					u8 const alpha(rgb_t(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]).brightness());
+					accumalpha &= alpha;
+					dest = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
+				}
 			}
+		}
+		else if (png->color_type == 0)
+		{
+			// handle 8bpp grayscale case
+			for (u32 y = 0; height > y; ++y)
+			{
+				for (u32 x = 0; width > x; ++x, ++src)
+				{
+					bitmap_argb32::pixel_t &dest(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					rgb_t const pixel(dest);
+					accumalpha &= *src;
+					dest = rgb_t(*src, pixel.r(), pixel.g(), pixel.b());
+				}
+			}
+		}
+		else if (png->color_type == 2)
+		{
+			// handle 32bpp non-alpha case
+			for (u32 y = 0; height > y; ++y)
+			{
+				for (u32 x = 0; width > x; ++x, src += 3)
+				{
+					bitmap_argb32::pixel_t &dest(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					rgb_t const pixel(dest);
+					u8 const alpha(rgb_t(src[0], src[1], src[2]).brightness());
+					accumalpha &= alpha;
+					dest = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
+				}
+			}
+		}
+		else
+		{
+			// handle 32bpp alpha case
+			for (u32 y = 0; height > y; ++y)
+			{
+				for (u32 x = 0; width > x; ++x, src += 4)
+				{
+					bitmap_argb32::pixel_t &dest(png->interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					rgb_t const pixel(dest);
+					u8 const alpha(rgb_t(src[0], src[1], src[2]).brightness());
+					accumalpha &= alpha;
+					dest = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
+				}
+			}
+		}
 	}
 
-	/* handle 8bpp grayscale case */
-	else if (png->color_type == 0)
-	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src++)
-			{
-				rgb_t pixel = bitmap.pix32(y, x);
-				accumalpha &= *src;
-				bitmap.pix32(y, x) = rgb_t(*src, pixel.r(), pixel.g(), pixel.b());
-			}
-	}
-
-	/* handle 32bpp non-alpha case */
-	else if (png->color_type == 2)
-	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src += 3)
-			{
-				rgb_t pixel = bitmap.pix32(y, x);
-				u8 alpha = rgb_t(src[0], src[1], src[2]).brightness();
-				accumalpha &= alpha;
-				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
-			}
-	}
-
-	/* handle 32bpp alpha case */
-	else
-	{
-		/* loop over width/height */
-		src = png->image;
-		for (y = 0; y < png->height; y++)
-			for (x = 0; x < png->width; x++, src += 4)
-			{
-				rgb_t pixel = bitmap.pix32(y, x);
-				u8 alpha = rgb_t(src[0], src[1], src[2]).brightness();
-				accumalpha &= alpha;
-				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
-			}
-	}
-
-	/* set the hasalpha flag */
+	// set the hasalpha flag
 	return (accumalpha != 0xff);
 }

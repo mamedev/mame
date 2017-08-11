@@ -2059,7 +2059,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 	game_driver const *driver;
 	get_selection(software, driver);
 
-	if (software && ((software->startempty != 1) || !driver))
+	if (software && (!software->startempty || !driver))
 	{
 		m_cache->set_snapx_driver(nullptr);
 
