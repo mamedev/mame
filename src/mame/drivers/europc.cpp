@@ -8,7 +8,7 @@
 * Manuals and BIOS files: ftp://ftp.cpcszene.de/pub/Computer/Schneider_PC/EuroPC_XT/
 *
 * Euro PC: Computer and floppy drive integrated into the keyboard, 8088, 512K RAM, there was an upgrade card for the ISA slot that took it to 640K, single ISA slot
-* Euro PC II: like Euro PC, 768K RAM on board, driver on Schneider DOS disk allowed the portion over 640K to be used as extended memory or ramdisk.
+* Euro PC II: like Euro PC, socket for 8087, 768K RAM on board, driver on Schneider DOS disk allowed the portion over 640K to be used as extended memory or ramdisk.
 * Euro XT: conventional desktop, specs like Euro PC II, two ISA slots
 *
 * Only BIOS versions >2.06 supported so far, because of changes in the memory management, according to https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/
@@ -549,4 +549,19 @@ ROM_START( europc )
 	// ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(6)) // does not work, see comment section
 ROM_END
 
+ROM_START( europc2 )
+	ROM_REGION(0x10000,"bios", 0)
+	// hdd bios integrated!
+	ROM_LOAD("europcii_bios_v3.01_500145.bin", 0x8000, 0x8000, CRC(ecca89c8) SHA1(802b89babdf0ab0a0a9c21d1234e529c8386d6fb))
+ROM_END
+
+ROM_START( euroxt )
+	ROM_REGION(0x10000,"bios", 0)
+	// hdd bios integrated!
+	ROM_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2))
+ROM_END
+
+//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT   STATE                INIT        COMPANY              FULLNAME        FLAGS
 COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)
+COMP( 198?, europc2,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)
+COMP( 198?, euroxt,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)
