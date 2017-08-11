@@ -14,7 +14,6 @@
 #include "ui/ui.h"
 #include "ui/miscmenu.h"
 #include "ui/inifile.h"
-#include "ui/datmenu.h"
 #include "ui/optsmenu.h"
 #include "ui/selector.h"
 #include "ui/selsoft.h"
@@ -48,7 +47,6 @@ int menu_select_game::m_isabios = 0;
 menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename)
 	: menu_select_launch(mui, container, false)
 {
-	highlight = 0;
 	std::string error_string, last_filter, sub_filter;
 	ui_options &moptions = mui.options();
 
@@ -106,6 +104,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 
 	// do this after processing the last used filter setting so it overwrites the placeholder
 	load_custom_filters();
+	m_filter_highlight = main_filters::actual;
 
 	if (!moptions.remember_last())
 		reselect_last::reset();
@@ -192,7 +191,6 @@ void menu_select_game::handle()
 	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
-	bool check_filter(false);
 	const event *menu_event = process(PROCESS_LR_REPEAT);
 	if (menu_event)
 	{
@@ -203,35 +201,35 @@ void menu_select_game::handle()
 		else switch (menu_event->iptkey)
 		{
 		case IPT_UI_UP:
-			if ((get_focus() == focused_menu::LEFT) && (machine_filter::FIRST < highlight))
-				--highlight;
+			if ((get_focus() == focused_menu::LEFT) && (machine_filter::FIRST < m_filter_highlight))
+				--m_filter_highlight;
 			break;
 
 		case IPT_UI_DOWN:
-			if ((get_focus() == focused_menu::LEFT) && (machine_filter::LAST > highlight))
-				highlight++;
+			if ((get_focus() == focused_menu::LEFT) && (machine_filter::LAST > m_filter_highlight))
+				m_filter_highlight++;
 			break;
 
 		case IPT_UI_HOME:
 			if (get_focus() == focused_menu::LEFT)
-				highlight = machine_filter::FIRST;
+				m_filter_highlight = machine_filter::FIRST;
 			break;
 
 		case IPT_UI_END:
 			if (get_focus() == focused_menu::LEFT)
-				highlight = machine_filter::LAST;
-			break;
-
-		case IPT_OTHER:
-			// this is generated when something in the left box is clicked
-			m_prev_selected = nullptr;
-			check_filter = true;
-			highlight = hover - HOVER_FILTER_FIRST;
-			assert((machine_filter::FIRST <= highlight) && (machine_filter::LAST >= highlight));
+				m_filter_highlight = machine_filter::LAST;
 			break;
 
 		case IPT_UI_CONFIGURE:
 			inkey_navigation();
+			break;
+
+		case IPT_UI_EXPORT:
+			inkey_export();
+			break;
+
+		case IPT_UI_DATS:
+			inkey_dats();
 			break;
 
 		default:
@@ -246,11 +244,6 @@ void menu_select_game::handle()
 							inkey_select_favorite(menu_event);
 						else
 							inkey_select(menu_event);
-					}
-					else if (get_focus() == focused_menu::LEFT)
-					{
-						check_filter = true;
-						m_prev_selected = nullptr;
 					}
 					break;
 
@@ -303,26 +296,6 @@ void menu_select_game::handle()
 					}
 					break;
 
-				case IPT_UI_DATS:
-					if (!isfavorite())
-					{
-						const game_driver *driver = (const game_driver *)menu_event->itemref;
-						if ((uintptr_t)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
-							menu::stack_push<menu_dats_view>(ui(), container(), driver);
-					}
-					else
-					{
-						ui_software_info *ui_swinfo  = (ui_software_info *)menu_event->itemref;
-
-						if ((uintptr_t)ui_swinfo > skip_main_items)
-						{
-							if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
-								menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-							else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
-									menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
-						}
-					}
-
 				case IPT_UI_FAVORITES:
 					if (uintptr_t(menu_event->itemref) > skip_main_items)
 					{
@@ -351,10 +324,6 @@ void menu_select_game::handle()
 					}
 					break;
 
-				case IPT_UI_EXPORT:
-					inkey_export();
-					break;
-
 				case IPT_UI_AUDIT_FAST:
 					if (!m_unavailsortedlist.empty())
 						menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, m_unavailsortedlist, 1);
@@ -370,36 +339,6 @@ void menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	draw_error_text();
-
-	// handle filters selection from key shortcuts
-	if (check_filter)
-	{
-		m_search.clear();
-		if ((machine_filter::FIRST <= highlight) && (machine_filter::LAST >= highlight))
-		{
-			auto it(main_filters::filters.find(machine_filter::type(highlight)));
-			if (main_filters::filters.end() == it)
-				it = main_filters::filters.emplace(machine_filter::type(highlight), machine_filter::create(machine_filter::type(highlight))).first;
-			it->second->show_ui(
-					ui(),
-					container(),
-					[this] (machine_filter &filter)
-					{
-						machine_filter::type const new_type(filter.get_type());
-						if (machine_filter::CUSTOM == new_type)
-						{
-							emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-							if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
-							{
-								filter.save_ini(file, 0);
-								file.close();
-							}
-						}
-						main_filters::actual = new_type;
-						reset(reset_options::SELECT_FIRST);
-					});
-		}
-	}
 }
 
 //-------------------------------------------------
@@ -1210,7 +1149,7 @@ void menu_select_game::load_custom_filters()
 
 float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 {
-	return menu_select_launch::draw_left_panel<machine_filter>(main_filters::actual, main_filters::filters, highlight, x1, y1, x2, y2);
+	return menu_select_launch::draw_left_panel<machine_filter>(main_filters::actual, main_filters::filters, x1, y1, x2, y2);
 }
 
 
@@ -1270,6 +1209,36 @@ std::string menu_select_game::make_software_description(ui_software_info const &
 {
 	// first line is system
 	return string_format(_("System: %1$-.100s"), software.driver->type.fullname());
+}
+
+
+void menu_select_game::filter_selected()
+{
+	if ((machine_filter::FIRST <= m_filter_highlight) && (machine_filter::LAST >= m_filter_highlight))
+	{
+		m_search.clear();
+		auto it(main_filters::filters.find(machine_filter::type(m_filter_highlight)));
+		if (main_filters::filters.end() == it)
+			it = main_filters::filters.emplace(machine_filter::type(m_filter_highlight), machine_filter::create(machine_filter::type(m_filter_highlight))).first;
+		it->second->show_ui(
+				ui(),
+				container(),
+				[this] (machine_filter &filter)
+				{
+					machine_filter::type const new_type(filter.get_type());
+					if (machine_filter::CUSTOM == new_type)
+					{
+						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+						if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
+						{
+							filter.save_ini(file, 0);
+							file.close();
+						}
+					}
+					main_filters::actual = new_type;
+					reset(reset_options::SELECT_FIRST);
+				});
+	}
 }
 
 

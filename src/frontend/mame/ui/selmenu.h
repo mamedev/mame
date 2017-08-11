@@ -107,6 +107,8 @@ protected:
 
 	// handlers
 	void inkey_navigation();
+	virtual void inkey_export() = 0;
+	void inkey_dats();
 
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
@@ -118,16 +120,22 @@ protected:
 	float draw_left_panel(
 			typename Filter::type current,
 			std::map<typename Filter::type, typename Filter::ptr> const &filters,
-			int focus,
 			float x1, float y1, float x2, float y2);
 
 	template <typename T> bool select_bios(T const &driver, bool inlist);
 	bool select_part(software_info const &info, ui_software_info const &ui_info);
 
+	void *get_selection_ptr() const
+	{
+		void *const selected_ref(get_selection_ref());
+		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
+	}
+
 	int         visible_items;
 	void        *m_prev_selected;
 	int         m_total_lines;
-	int         m_topline_datsview;   // right box top line
+	int         m_topline_datsview;
+	int         m_filter_highlight;
 	std::string m_search;
 
 	static char const *const s_info_titles[];
@@ -254,6 +262,9 @@ private:
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
 	virtual std::string make_driver_description(game_driver const &driver) const = 0;
 	virtual std::string make_software_description(ui_software_info const &software) const = 0;
+
+	// filter navigation
+	virtual void filter_selected() = 0;
 
 	static void launch_system(mame_ui_manager &mui, game_driver const &driver, ui_software_info const *swinfo, std::string const *part, int const *bios);
 	static bool select_part(mame_ui_manager &mui, render_container &container, software_info const &info, ui_software_info const &ui_info);

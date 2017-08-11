@@ -36,7 +36,6 @@ private:
 	s_filter                m_filter_data;
 	filter_map              m_filters;
 	software_filter::type   m_filter_type;
-	int                     highlight;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
@@ -51,6 +50,12 @@ private:
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const override;
 	virtual std::string make_driver_description(game_driver const &driver) const override;
 	virtual std::string make_software_description(ui_software_info const &software) const override;
+
+	// filter navigation
+	virtual void filter_selected() override;
+
+	// toolbar
+	virtual void inkey_export() override { throw false; }
 
 	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *>   m_displaylist, m_tmp, m_sortedlist;

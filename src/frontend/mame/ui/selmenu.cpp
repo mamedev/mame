@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "ui/selmenu.h"
 
+#include "ui/datmenu.h"
 #include "ui/icorender.h"
 #include "ui/info.h"
 #include "ui/inifile.h"
@@ -137,8 +138,8 @@ char const *const menu_select_launch::s_info_titles[] = {
 // instantiate possible variants of these so derived classes don't get link errors
 template bool menu_select_launch::select_bios(game_driver const &, bool);
 template bool menu_select_launch::select_bios(ui_software_info const &, bool);
-template float menu_select_launch::draw_left_panel<machine_filter>(machine_filter::type current, std::map<machine_filter::type, machine_filter::ptr> const &filters, int focus, float x1, float y1, float x2, float y2);
-template float menu_select_launch::draw_left_panel<software_filter>(software_filter::type current, std::map<software_filter::type, software_filter::ptr> const &filters, int focus, float x1, float y1, float x2, float y2);
+template float menu_select_launch::draw_left_panel<machine_filter>(machine_filter::type current, std::map<machine_filter::type, machine_filter::ptr> const &filters, float x1, float y1, float x2, float y2);
+template float menu_select_launch::draw_left_panel<software_filter>(software_filter::type current, std::map<software_filter::type, software_filter::ptr> const &filters, float x1, float y1, float x2, float y2);
 
 
 menu_select_launch::system_flags::system_flags(machine_static_info const &info)
@@ -437,6 +438,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_prev_selected(nullptr)
 	, m_total_lines(0)
 	, m_topline_datsview(0)
+	, m_filter_highlight(0)
 	, m_ui_error(false)
 	, m_info_driver(nullptr)
 	, m_info_software(nullptr)
@@ -731,6 +733,26 @@ void menu_select_launch::inkey_navigation()
 }
 
 
+void menu_select_launch::inkey_dats()
+{
+	ui_software_info const *software;
+	game_driver const *driver;
+	get_selection(software, driver);
+	if (software)
+	{
+		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
+			menu::stack_push<menu_dats_view>(ui(), container(), software->driver);
+		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->usage.empty())
+			menu::stack_push<menu_dats_view>(ui(), container(), software);
+	}
+	else if (driver)
+	{
+		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
+			menu::stack_push<menu_dats_view>(ui(), container(), driver);
+	}
+}
+
+
 //-------------------------------------------------
 //  draw common arrows
 //-------------------------------------------------
@@ -820,7 +842,6 @@ template <typename Filter>
 float menu_select_launch::draw_left_panel(
 		typename Filter::type current,
 		std::map<typename Filter::type, typename Filter::ptr> const &filters,
-		int focus,
 		float x1, float y1, float x2, float y2)
 {
 	if ((ui_globals::panels_status != SHOW_PANELS) && (ui_globals::panels_status != HIDE_RIGHT_PANEL))
@@ -888,7 +909,7 @@ float menu_select_launch::draw_left_panel(
 		}
 
 		// draw primary highlight if keyboard focus is here
-		if ((focus == filter) && (get_focus() == focused_menu::LEFT))
+		if ((m_filter_highlight == filter) && (get_focus() == focused_menu::LEFT))
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1222,7 +1243,16 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// if we hit select, return true or pop the stack, depending on the item
 	if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 	{
-		if (is_last_selected() && m_focus == focused_menu::MAIN)
+		if (m_ui_error)
+		{
+			// dismiss error
+		}
+		else if (m_focus == focused_menu::LEFT)
+		{
+			m_prev_selected = nullptr;
+			filter_selected();
+		}
+		if (is_last_selected() && (m_focus == focused_menu::MAIN))
 		{
 			iptkey = IPT_UI_CANCEL;
 			stack_pop();
@@ -1527,12 +1557,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover == HOVER_B_EXPORT)
 				{
-					ev.iptkey = IPT_UI_EXPORT;
+					inkey_export();
 					stop = true;
 				}
 				else if (hover == HOVER_B_DATS)
 				{
-					ev.iptkey = IPT_UI_DATS;
+					inkey_dats();
 					stop = true;
 				}
 				else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
@@ -1542,7 +1572,9 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover >= HOVER_FILTER_FIRST && hover <= HOVER_FILTER_LAST)
 				{
-					ev.iptkey = IPT_OTHER;
+					m_prev_selected = nullptr;
+					m_filter_highlight = hover - HOVER_FILTER_FIRST;
+					filter_selected();
 					stop = true;
 				}
 			}

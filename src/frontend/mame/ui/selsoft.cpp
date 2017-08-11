@@ -12,7 +12,6 @@
 #include "ui/selsoft.h"
 
 #include "ui/ui.h"
-#include "ui/datmenu.h"
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
@@ -87,11 +86,10 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 {
 	reselect_last::reselect(false);
 
-	highlight = 0;
-
 	m_driver = driver;
 	build_software_list();
 	load_sw_custom_filters();
+	m_filter_highlight = m_filter_type;
 
 	ui_globals::curimage_view = SNAPSHOT_VIEW;
 	ui_globals::switch_image = true;
@@ -122,7 +120,6 @@ void menu_select_software::handle()
 	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
-	bool check_filter(false);
 	const event *menu_event = process(PROCESS_LR_REPEAT);
 	if (menu_event)
 	{
@@ -133,15 +130,8 @@ void menu_select_software::handle()
 		else switch (menu_event->iptkey)
 		{
 		case IPT_UI_SELECT:
-			if (get_focus() == focused_menu::LEFT)
-			{
-				check_filter = true;
-				m_prev_selected = nullptr;
-			}
-			else if ((get_focus() == focused_menu::MAIN) && menu_event->itemref)
-			{
+			if ((get_focus() == focused_menu::MAIN) && menu_event->itemref)
 				inkey_select(menu_event);
-			}
 			break;
 
 		case IPT_UI_LEFT:
@@ -177,51 +167,37 @@ void menu_select_software::handle()
 			break;
 
 		case IPT_UI_UP:
-			if ((get_focus() == focused_menu::LEFT) && (software_filter::FIRST < highlight))
-				--highlight;
+			if ((get_focus() == focused_menu::LEFT) && (software_filter::FIRST < m_filter_highlight))
+				--m_filter_highlight;
 			break;
 
 		case IPT_UI_DOWN:
-			if ((get_focus() == focused_menu::LEFT) && (software_filter::LAST > highlight))
-				++highlight;
+			if ((get_focus() == focused_menu::LEFT) && (software_filter::LAST > m_filter_highlight))
+				++m_filter_highlight;
 			break;
 
 		case IPT_UI_HOME:
 			if (get_focus() == focused_menu::LEFT)
-				highlight = software_filter::FIRST;
+				m_filter_highlight = software_filter::FIRST;
 			break;
 
 		case IPT_UI_END:
 			if (get_focus() == focused_menu::LEFT)
-				highlight = software_filter::LAST;
-			break;
-
-		case IPT_OTHER:
-			// this is generated when something in the left box is clicked
-			check_filter = true;
-			highlight = hover - HOVER_FILTER_FIRST;
-			assert((software_filter::FIRST <= highlight) && (software_filter::LAST >= highlight));
-			m_prev_selected = nullptr;
+				m_filter_highlight = software_filter::LAST;
 			break;
 
 		case IPT_UI_CONFIGURE:
 			inkey_navigation();
 			break;
 
+		case IPT_UI_DATS:
+			inkey_dats();
+			break;
+
 		default:
 			if (menu_event->itemref)
 			{
-				if (menu_event->iptkey == IPT_UI_DATS)
-				{
-					// handle UI_DATS
-					ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
-
-					if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
-						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-					else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
-						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
-				}
-				else if (menu_event->iptkey == IPT_UI_FAVORITES)
+				if (menu_event->iptkey == IPT_UI_FAVORITES)
 				{
 					// handle UI_FAVORITES
 					ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
@@ -248,34 +224,6 @@ void menu_select_software::handle()
 
 	// if we're in an error state, overlay an error message
 	draw_error_text();
-
-	// handle filters selection from key shortcuts
-	if (check_filter)
-	{
-		m_search.clear();
-
-		filter_map::const_iterator it(m_filters.find(software_filter::type(highlight)));
-		if (m_filters.end() == it)
-			it = m_filters.emplace(software_filter::type(highlight), software_filter::create(software_filter::type(highlight), m_filter_data)).first;
-		it->second->show_ui(
-				ui(),
-				container(),
-				[this, driver = m_driver] (software_filter &filter)
-				{
-					software_filter::type const new_type(filter.get_type());
-					if (software_filter::CUSTOM == new_type)
-					{
-						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (file.open("custom_", driver->name, "_filter.ini") == osd_file::error::NONE)
-						{
-							filter.save_ini(file, 0);
-							file.close();
-						}
-					}
-					m_filter_type = new_type;
-					reset(reset_options::SELECT_FIRST);
-				});
-	}
 }
 
 //-------------------------------------------------
@@ -583,7 +531,7 @@ void menu_select_software::find_matches(const char *str, int count)
 
 float menu_select_software::draw_left_panel(float x1, float y1, float x2, float y2)
 {
-	return menu_select_launch::draw_left_panel<software_filter>(m_filter_type, m_filters, highlight, x1, y1, x2, y2);
+	return menu_select_launch::draw_left_panel<software_filter>(m_filter_type, m_filters, x1, y1, x2, y2);
 }
 
 
@@ -593,7 +541,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 
 void menu_select_software::get_selection(ui_software_info const *&software, game_driver const *&driver) const
 {
-	software = reinterpret_cast<ui_software_info const *>(get_selection_ref());
+	software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
 	driver = software ? software->driver : nullptr;
 }
 
@@ -625,6 +573,36 @@ std::string menu_select_software::make_software_description(ui_software_info con
 {
 	// first line is long name
 	return string_format(_("%1$-.100s"), software.longname);
+}
+
+
+void menu_select_software::filter_selected()
+{
+	if ((software_filter::FIRST <= m_filter_highlight) && (software_filter::LAST >= m_filter_highlight))
+	{
+		m_search.clear();
+		filter_map::const_iterator it(m_filters.find(software_filter::type(m_filter_highlight)));
+		if (m_filters.end() == it)
+			it = m_filters.emplace(software_filter::type(m_filter_highlight), software_filter::create(software_filter::type(m_filter_highlight), m_filter_data)).first;
+		it->second->show_ui(
+				ui(),
+				container(),
+				[this, driver = m_driver] (software_filter &filter)
+				{
+					software_filter::type const new_type(filter.get_type());
+					if (software_filter::CUSTOM == new_type)
+					{
+						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+						if (file.open("custom_", driver->name, "_filter.ini") == osd_file::error::NONE)
+						{
+							filter.save_ini(file, 0);
+							file.close();
+						}
+					}
+					m_filter_type = new_type;
+					reset(reset_options::SELECT_FIRST);
+				});
+	}
 }
 
 } // namespace ui

@@ -39,7 +39,6 @@ private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	static bool first_start;
 	static int m_isabios;
-	int highlight;
 
 	static std::vector<const game_driver *> m_sortedlist;
 	std::vector<const game_driver *> m_availsortedlist;
@@ -63,6 +62,12 @@ private:
 	virtual std::string make_driver_description(game_driver const &driver) const override;
 	virtual std::string make_software_description(ui_software_info const &software) const override;
 
+	// filter navigation
+	virtual void filter_selected() override;
+
+	// toolbar
+	virtual void inkey_export() override;
+
 	// internal methods
 	void change_info_pane(int delta);
 
@@ -76,19 +81,12 @@ private:
 
 	static std::string make_error_text(bool summary, media_auditor const &auditor);
 
-	void *get_selection_ptr() const
-	{
-		void *const selected_ref(get_selection_ref());
-		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
-	}
-
 	// General info
 	virtual void general_info(const game_driver *driver, std::string &buffer) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_select_favorite(const event *menu_event);
-	void inkey_export();
 };
 
 } // namespace ui
