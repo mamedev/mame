@@ -89,6 +89,30 @@ Supported games:
                Asian region, independent of the "Difficulty" dipswitches. See the code beginning at
                1FE94 (RAM address 1002D6 contains 0 if region is an Asian region, 1 if Europe or USA)
 
+    fixeight - The same program is used for all regions, and the region can be changed just by swapping
+               EEPROMs. However, the V25 code also recognizes a secret input that rewrites the EEPROM to
+               use any one of the 14 recognized regional licenses, using the state of the player 1 and
+               player 2 button inputs held in conjunction with it as a 4-bit binary code:
+
+               Region                      Button input
+               ------------------------    ------------------------------------
+               Korea, Taito license        No buttons
+               Korea                       P1 button 1
+               Hong Kong, Taito license    P1 button 2
+               Hong Kong                   P1 buttons 1 & 2
+               Taiwan, Taito license       P2 button 1
+               Taiwan                      P1 button 1 + P2 button 1
+               SE Asia, Taito license      P1 button 2 + P2 button 1
+               Southeast Asia              P1 buttons 1 & 2 + P2 button 1
+               Europe, Taito license       P2 button 2
+               Europe                      P1 button 1 + P2 button 2
+               USA, Taito license          P1 button 2 + P2 button 2
+               USA                         P1 buttons 1 & 2 + P2 button 2
+               (Invalid)                   P2 buttons 1 & 2
+               (Invalid)                   P1 button 1 + P2 buttons 1 & 2
+               Japan                       P1 button 2 + P2 buttons 1 & 2
+               Japan, Taito license        P1 buttons 1 & 2 + P2 buttons 1 & 2
+
     grindstm - Code at 20A26 in vfive forces region to Japan. All sets have some NOPs at reset vector,
                and the NEC V25 CPU test that the other games do is skipped. Furthermore, all sets have
                a broken ROM checksum routine that reads address ranges that don't match the actual
@@ -720,33 +744,6 @@ WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 		data &= 7;
 		if (data <= 4) membank("bank1")->set_entry(data);
 	}
-}
-
-READ8_MEMBER(toaplan2_state::fixeight_region_r)
-{
-	// this must match the eeprom region!
-	// however on the real PCB any of the EEPROMs we have work without any special treatment
-	// so is there a decryption error causing this to happen, or should this be read back
-	// from somewhere else?
-
-	if (!strcmp(machine().system().name,"fixeightkt"))  return 0x00;
-	if (!strcmp(machine().system().name,"fixeightk"))   return 0x01;
-	if (!strcmp(machine().system().name,"fixeightht"))  return 0x02;
-	if (!strcmp(machine().system().name,"fixeighth"))   return 0x03;
-	if (!strcmp(machine().system().name,"fixeighttwt")) return 0x04;
-	if (!strcmp(machine().system().name,"fixeighttw"))  return 0x05;
-	if (!strcmp(machine().system().name,"fixeightat"))  return 0x06;
-	if (!strcmp(machine().system().name,"fixeighta"))   return 0x07;
-	if (!strcmp(machine().system().name,"fixeightt"))   return 0x08;
-	if (!strcmp(machine().system().name,"fixeight9"))   return 0x09;
-	if (!strcmp(machine().system().name,"fixeighta"))   return 0x0a;
-	if (!strcmp(machine().system().name,"fixeightu"))   return 0x0b;
-//  if (!strcmp(machine().system().name,"fixeightc")) return 0x0c; // invalid
-//  if (!strcmp(machine().system().name,"fixeightd")) return 0x0d; // invalid
-	if (!strcmp(machine().system().name,"fixeightj"))   return 0x0e;
-	if (!strcmp(machine().system().name,"fixeightjt"))  return 0x0f;
-
-	return 0x00;
 }
 
 
@@ -1421,7 +1418,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fixeight_v25_mem, AS_PROGRAM, 8, toaplan2_state )
-	AM_RANGE(0x00004, 0x00004) AM_READ(fixeight_region_r)
+	AM_RANGE(0x00000, 0x00000) AM_READ_PORT("IN1")
+	AM_RANGE(0x00002, 0x00002) AM_READ_PORT("IN2")
+	AM_RANGE(0x00004, 0x00004) AM_READ_PORT("IN3")
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("shared_ram")
@@ -2092,7 +2091,7 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("Region Reset")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Unknown/Unused
 
 	PORT_START("SYS")
@@ -3605,16 +3604,17 @@ static MACHINE_CONFIG_START( pipibibsbl )
 MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
+/* e = opcodes used in the EEPROM service routine */
 /* this one seems more different to the other tables */
 static const uint8_t ts001turbo_decryption_table[256] = {
 	0x90,0x05,0x57,0x5f,0xfe,0x4f,0xbd,0x36, 0x80,0x8b,0x8a,0x0a,0x89,0x90,0x47,0x80, /* 00 */
 			/*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*r*//*r*/     /*r*//*r*/
 	0x22,0x90,0x90,0x5d,0x81,0x3c,0xb5,0x83, 0x68,0xff,0x75,0x75,0x8d,0x5b,0x8a,0x38, /* 10 */
 	/*r*/          /*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/
-	0x8b,0xeb,0xd2,0x0a,0xb4,0xc7,0x46,0xd1, 0x0a,0x53,0xbd,0x90,0x22,0xff,0x1f,0x03, /* 20 */
-	/*a*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*/     /*r*//*r*//*?*//*r*/
-	0xfb,0x45,0xc3,0x02,0x90,0x0f,0x90,0x02, 0x0f,0xb7,0x90,0x24,0xc6,0xeb,0x1b,0x32, /* 30 */
-	/*r*//*r*//*r*//*r*/     /*r*/     /*r*/ /*r*//*r*/     /*r*//*r*//*r*//*r*//*r*/
+	0x8b,0xeb,0xd2,0x0a,0xb4,0xc7,0x46,0xd1, 0x0a,0x53,0xbd,0x77,0x22,0xff,0x1f,0x03, /* 20 */
+	/*a*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*e*//*r*//*r*//*?*//*r*/
+	0xfb,0x45,0xc3,0x02,0x90,0x0f,0xa3,0x02, 0x0f,0xb7,0x90,0x24,0xc6,0xeb,0x1b,0x32, /* 30 */
+	/*r*//*r*//*r*//*r*/     /*r*//*e*//*r*/ /*r*//*r*/     /*r*//*r*//*r*//*r*//*r*/
 	0x8d,0xb9,0xfe,0x08,0x88,0x90,0x8a,0x8a, 0x75,0x8a,0xbd,0x58,0xfe,0x51,0x1e,0x8b, /* 40 */
 	/*r*//*r*//*r*//*r*//*r*/     /*r*//*r*/ /*r*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/
 	0x0f,0x22,0xf6,0x90,0xc3,0x36,0x03,0x8d, 0xbb,0x16,0xbc,0x90,0x0f,0x5e,0xf9,0x2e, /* 50 */
@@ -3629,8 +3629,8 @@ static const uint8_t ts001turbo_decryption_table[256] = {
 	/*x*//*r*//*r*//*r*//*r*//*r*/           /*r*//*r*//*r*//*r*//*r*//*r*//*r*/
 	0x80,0xd3,0x89,0xe8,0x90,0x90,0x2a,0x74, 0x90,0x5f,0xf6,0x88,0x4f,0x56,0x8c,0x03, /* a0 */
 	/*r*//*a*//*r*//*r*/          /*r*//*r*/      /*r*//*r*//*r*//*r*//*r*//*r*//*r*/
-	0x47,0x90,0x88,0x90,0x03,0xfe,0x90,0xfc, 0x2a,0x90,0x33,0x07,0xb1,0x50,0x0f,0x3e, /* b0 */
-	/*r*/     /*r*/     /*r*//*r*/     /*r*/ /*r*/     /*r*//*r*//*r*//*r*//*r*//*r*/
+	0x47,0xa1,0x88,0x90,0x03,0xfe,0x90,0xfc, 0x2a,0x90,0x33,0x07,0xb1,0x50,0x0f,0x3e, /* b0 */
+	/*r*//*e*//*r*/     /*r*//*r*/     /*r*/ /*r*/     /*r*//*r*//*r*//*r*//*r*//*r*/
 	0xbd,0x4d,0xf3,0xbf,0x59,0xd2,0xea,0xc6, 0x2a,0x74,0x72,0xe2,0x3e,0x2e,0x90,0x2e, /* c0 */
 	/*r*//*r*//*r*//*r*//*r*//*a*//*x*//*r*/ /*r*//*r*//*r*//*r*//*r*//*r*/     /*r*/
 	0x2e,0x73,0x88,0x72,0x45,0x5d,0xc1,0xb9, 0x32,0x38,0x88,0xc1,0xa0,0x06,0x45,0x90, /* d0 */
