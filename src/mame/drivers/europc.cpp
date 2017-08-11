@@ -1,7 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#include "emu.h"
+// comments and BIOS versions:rfka01
+/*****************************************************************************************************
+*
+* Schneider Rundfunkwerke AG Euro PC and Euro PC II driver
+*
+* Manuals and BIOS files: ftp://ftp.cpcszene.de/pub/Computer/Schneider_PC/EuroPC_XT/
+*
+* Euro PC: Computer and floppy drive integrated into the keyboard, 8088, 512K RAM, there was an upgrade card for the ISA slot that took it to 640K, single ISA slot
+* Euro PC II: like Euro PC, 768K RAM on board, driver on Schneider DOS disk allowed the portion over 640K to be used as extended memory or ramdisk.
+* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots
+*
+* Only BIOS versions >2.06 supported so far, because of changes in the memory management, according to https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/
+* BIOS version 2.04 has been encountered, but is not available online
+*
+* To-Do: HD-20 20 MB XT-IDE harddisk
+*        FD360 external 5.25" DS DD floppy
+*       
+*
+*****************************************************************************************************/
 
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "bus/isa/aga.h"
 #include "machine/genpc.h"
@@ -506,8 +525,8 @@ static MACHINE_CONFIG_START( europc )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("256K, 640K") // Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
@@ -516,7 +535,18 @@ MACHINE_CONFIG_END
 ROM_START( europc )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
-	ROM_LOAD("50145", 0x8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
+	ROM_SYSTEM_BIOS( 0, "v2.06", "EuroPC v2.06" )
+	ROMX_LOAD("bios_2.06b.bin", 0x8000, 0x8000, CRC(0a25a2eb) SHA1(d35f2f483d56b1eff558586e1d33d82f7efed639), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v2.06b", "EuroPC v2.06b" )
+	ROMX_LOAD("bios_2.06b.bin", 0x8000, 0x8000, CRC(05d8a4c2) SHA1(52c6fd22fb739e29a1f0aa3c96ede79cdc659f72), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "v2.07", "EuroPC v2.07" )
+	ROMX_LOAD("50145", 0x8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "v2.08", "EuroPC v2.08" )
+	ROMX_LOAD("bios_2.08a.bin", 0x8000, 0x8000, CRC(a7048349) SHA1(c2a0af7276c2ff6925abe5a5edef09c5a84106f2), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS( 4, "v2.08a", "EuroPC v2.08a" )
+	ROMX_LOAD("bios_2.08a.bin", 0x8000, 0x8000, CRC(872520b7) SHA1(9c94d33c0d454fab7bcd0c4516b50f1c3c6a30b8), ROM_BIOS(5))
+	// ROM_SYSTEM_BIOS( 5, "v2.05", "EuroPC v2.05" )
+	// ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(6)) // does not work, see comment section
 ROM_END
 
 COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)
