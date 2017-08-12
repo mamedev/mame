@@ -556,5 +556,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT  CLASS       INIT  ROTATION  COMPANY    FULLNAME  FLAGS
-GAME( 1984, psi98,  0,      psi98,   psi98, kdt6_state, 0,    ROT0,     "Kontron", "PSI98",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY    FULLNAME  FLAGS
+COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -238,8 +238,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS           INIT  ROTATION  COMPANY    FULLNAME  FLAGS
-GAME( 2001, gcjp,  0,      gc,      gc,    gamecube_state, 0,    ROT0,     "Nintendo", "GameCube (Japan)",  MACHINE_IS_SKELETON )
-GAME( 2001, gcus,  gcjp,   gc,      gc,    gamecube_state, 0,    ROT0,     "Nintendo", "GameCube (USA)",    MACHINE_IS_SKELETON )
-GAME( 2002, gceu,  gcjp,   gc,      gc,    gamecube_state, 0,    ROT0,     "Nintendo", "GameCube (EUR)",    MACHINE_IS_SKELETON )
-GAME( 2002, gcbr,  gcjp,   gc,      gc,    gamecube_state, 0,    ROT0,     "Nintendo", "GameCube (Brazil)", MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS           INIT  COMPANY    FULLNAME  FLAGS
+CONS( 2001, gcjp,  0,      0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (Japan)",  MACHINE_IS_SKELETON )
+CONS( 2001, gcus,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (USA)",    MACHINE_IS_SKELETON )
+CONS( 2002, gceu,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (EUR)",    MACHINE_IS_SKELETON )
+CONS( 2002, gcbr,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (Brazil)", MACHINE_IS_SKELETON )
