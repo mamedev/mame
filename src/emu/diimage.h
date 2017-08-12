@@ -213,7 +213,7 @@ public:
 
 	const std::string &instance_name() const { return m_instance_name; }
 	const std::string &brief_instance_name() const { return m_brief_instance_name; }
-	const std::string &cannonical_instance_name() const { return m_canonical_instance_name; }
+	const char *cannonical_instance_name() const { return dynamic_cast<const device_t *>(this)->tag(); }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
@@ -333,7 +333,6 @@ private:
 
 	std::string m_instance_name;                // e.g. - "cartridge", "floppydisk2"
 	std::string m_brief_instance_name;          // e.g. - "cart", "flop2"
-	std::string m_canonical_instance_name;      // e.g. - "cartridge1", "floppydisk2" - only used internally in emuopts.cpp
 
 	// in the case of arcade cabinet with fixed carts inserted,
 	// we want to disable command line cart loading...

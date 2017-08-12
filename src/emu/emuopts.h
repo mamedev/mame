@@ -239,7 +239,7 @@ private:
 class image_option
 {
 public:
-	image_option(emu_options &host, const std::string &canonical_instance_name);
+	image_option(emu_options &host, std::string &&canonical_instance_name);
 	image_option(const image_option &that) = delete;
 	image_option(image_option &&that) = default;
 

@@ -1309,10 +1309,9 @@ void device_image_interface::update_names()
 			count++;
 	}
 
-	m_canonical_instance_name = string_format("%s%d", inst_name, index + 1);
 	if (count > 1)
 	{
-		m_instance_name = m_canonical_instance_name;
+		m_instance_name = string_format("%s%d", inst_name, index + 1);
 		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
