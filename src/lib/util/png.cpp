@@ -250,6 +250,8 @@ public:
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
 		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+		if (!pnginfo.bit_depth || (8 % pnginfo.bit_depth))
+			return PNGERR_UNSUPPORTED_FORMAT; // bit depth must be a factor of eight
 
 		// calculate the offset for each pass of the interlace on the input and output
 		unsigned const pass_count(get_pass_count());

@@ -74,6 +74,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	if (first_start)
 	{
 		reselect_last::set_driver(moptions.last_used_machine());
+		ui_globals::rpanel = std::min<int>(std::max<int>(moptions.last_right_panel(), RP_FIRST), RP_LAST);
 
 		std::string tmp(moptions.last_used_filter());
 		std::size_t const found = tmp.find_first_of(",");
@@ -153,6 +154,7 @@ menu_select_game::~menu_select_game()
 	}
 
 	ui_options &mopt = ui().options();
+	mopt.set_value(OPTION_LAST_RIGHT_PANEL, ui_globals::rpanel, OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
