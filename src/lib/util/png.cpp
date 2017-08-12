@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /*********************************************************************
 
     png.c
@@ -140,13 +140,118 @@ public:
 	{
 	}
 
+	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha) const
+	{
+		// do some basic checks for unsupported images
+		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
+		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+		if (8 != pnginfo.bit_depth)
+			return PNGERR_UNSUPPORTED_FORMAT; // only do 8bpp here - expand lower bit depth first
+
+		// everything looks sane, allocate the bitmap and deinterlace into it
+		bitmap.allocate(pnginfo.width, pnginfo.height);
+		std::uint8_t accumalpha(0xff);
+		unsigned const pass_count(get_pass_count());
+		std::uint32_t pass_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		for (unsigned pass = 0; pass_count > pass; ++pass)
+		{
+			// calculate parameters for interlace pass
+			pass_offset[pass + 1] = pass_offset[pass] + get_pass_bytes(pass);
+			unsigned const x_shift(pnginfo.interlace_method ? ADAM7_X_SHIFT[pass] : 0);
+			unsigned const y_shift(pnginfo.interlace_method ? ADAM7_Y_SHIFT[pass] : 0);
+			unsigned const x_offs(pnginfo.interlace_method ? ADAM7_X_OFFS[pass] : 0);
+			unsigned const y_offs(pnginfo.interlace_method ? ADAM7_Y_OFFS[pass] : 0);
+			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
+			std::uint8_t const *src(pnginfo.image + pass_offset[pass]);
+
+			if (3 == pnginfo.color_type)
+			{
+				// handle 8bpp palettized case
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, ++src)
+					{
+						// determine alpha and expand to 32bpp
+						std::uint8_t const alpha((*src < pnginfo.num_trans) ? pnginfo.trans[*src] : 0xff);
+						accumalpha &= alpha;
+						std::uint16_t const paloffs(std::uint16_t(*src) * 3);
+						rgb_t const pix(alpha, pnginfo.palette[paloffs], pnginfo.palette[paloffs + 1], pnginfo.palette[paloffs + 2]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+			else if (0 == pnginfo.color_type)
+			{
+				// handle 8bpp grayscale non-alpha case
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, ++src)
+					{
+						rgb_t const pix(0xff, src[0], src[0], src[0]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+			else if (4 == pnginfo.color_type)
+			{
+				// handle 8bpp grayscale alpha case
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 2)
+					{
+						accumalpha &= src[1];
+						rgb_t const pix(src[1], src[0], src[0], src[0]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+			else if (2 == pnginfo.color_type)
+			{
+				// handle 32bpp non-alpha case
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 3)
+					{
+						rgb_t const pix(0xff, src[0], src[1], src[2]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+			else
+			{
+				// handle 32bpp alpha case
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 4)
+					{
+						accumalpha &= src[3];
+						rgb_t const pix(src[3], src[0], src[1], src[2]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+		}
+
+		// set hasalpha flag and return
+		hasalpha = 0xffU != accumalpha;
+		return PNGERR_NONE;
+	}
+
 	png_error expand_buffer_8bit()
 	{
-		/* nothing to do if we're at 8 or greater already */
+		// nothing to do if we're at 8 or greater already
 		if (pnginfo.bit_depth >= 8)
 			return PNGERR_NONE;
 
-		/* calculate the offset for each pass of the interlace on the input and output */
+		// do some basic checks for unsupported images
+		if ((0 != pnginfo.color_type) && (3 != pnginfo.color_type))
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
+		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+
+		// calculate the offset for each pass of the interlace on the input and output
 		unsigned const pass_count(get_pass_count());
 		std::uint32_t inp_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		std::uint32_t outp_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -156,28 +261,46 @@ public:
 			outp_offset[pass + 1] = outp_offset[pass] + get_pass_bytes(pass, 8);
 		}
 
-		/* allocate a new buffer at 8-bit */
+		// allocate a new buffer at 8-bit
 		std::unique_ptr<std::uint8_t []> outbuf;
 		try { outbuf.reset(new std::uint8_t [outp_offset[pass_count]]); }
 		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
 
+		std::uint8_t const bytesamples(8 / pnginfo.bit_depth);
 		for (unsigned pass = 0; pass_count > pass; ++pass)
 		{
 			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
+			std::uint32_t const rowsamples(samples[pnginfo.color_type] * dimensions.first);
+			std::uint32_t const wholebytes(rowsamples / bytesamples);
+			std::uint32_t const leftover(rowsamples % bytesamples);
 			std::uint8_t const *inp(&pnginfo.image[inp_offset[pass]]);
 			std::uint8_t *outp(&outbuf[outp_offset[pass]]);
 
 			for (std::uint32_t y = 0; dimensions.second > y; ++y)
 			{
-				for (std::uint32_t i = 0; (dimensions.first / (8 / pnginfo.bit_depth)); ++i, ++inp)
+				for (std::uint32_t i = 0; wholebytes > i; ++i, ++inp)
 				{
-					for (std::int8_t j = (8 / pnginfo.bit_depth) - 1; 0 <= j; --j)
-						*outp++ = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
+					for (std::int8_t j = bytesamples - 1; 0 <= j; --j, ++outp)
+					{
+						*outp = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
+						if (!pnginfo.color_type)
+						{
+							for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
+								*outp |= *outp << k;
+						}
+					}
 				}
-				if (pnginfo.width % (8 / pnginfo.bit_depth))
+				if (leftover)
 				{
-					for (std::int8_t j = (pnginfo.width % (8 / pnginfo.bit_depth)) - 1; 0 <= j; --j)
-						*outp++ = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
+					for (std::int8_t j = leftover - 1; 0 <= j; --j,++outp)
+					{
+						*outp = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
+						if (!pnginfo.color_type)
+						{
+							for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
+								*outp |= *outp << k;
+						}
+					}
 					inp++;
 				}
 			}
@@ -191,43 +314,35 @@ public:
 
 	png_error read_file(util::core_file &fp)
 	{
-		/* initialize the data structures */
+		// initialize the data structures
 		png_error error = PNGERR_NONE;
 		std::memset(&pnginfo, 0, sizeof(pnginfo));
+		std::list<image_data_chunk> idata;
 
-		/* verify the signature at the start of the file */
+		// verify the signature at the start of the file
 		error = verify_header(fp);
-		if (error != PNGERR_NONE)
-			goto handle_error;
 
-		/* loop until we hit an IEND chunk */
-		for ( ; ; )
+		// loop until we hit an IEND chunk
+		while (PNGERR_NONE == error)
 		{
-			/* read a chunk */
+			// read a chunk
 			std::unique_ptr<std::uint8_t []> chunk_data;
 			std::uint32_t chunk_type, chunk_length;
 			error = read_chunk(fp, chunk_data, chunk_type, chunk_length);
-			if (error != PNGERR_NONE)
-				goto handle_error;
-
-			/* stop when we hit an IEND chunk */
-			if (chunk_type == PNG_CN_IEND)
-				break;
-
-			/* process the chunk */
-			error = process_chunk(std::move(chunk_data), chunk_type, chunk_length);
-			if (error != PNGERR_NONE)
-				goto handle_error;
+			if (PNGERR_NONE == error)
+			{
+				if (chunk_type == PNG_CN_IEND)
+					break; // stop when we hit an IEND chunk
+				else
+					error = process_chunk(idata, std::move(chunk_data), chunk_type, chunk_length);
+			}
 		}
 
-		/* finish processing the image */
-		error = process();
+		// finish processing the image
+		if (PNGERR_NONE == error)
+			error = process(idata);
 
-	handle_error:
-		/* no need for the intermediate data any more */
-		idata.clear();
-
-		/* if we have an error, free all the other data as well */
+		// if we have an error, free all the output data
 		if (error != PNGERR_NONE)
 		{
 			png_free(pnginfo);
@@ -239,37 +354,47 @@ public:
 	png_info &  pnginfo;
 
 private:
-	png_error process()
-	{
-		png_error error = PNGERR_NONE;
+	static constexpr unsigned ADAM7_X_BIAS[7]   = { 7, 3, 3, 1, 1, 0, 0 };
+	static constexpr unsigned ADAM7_Y_BIAS[7]   = { 7, 7, 3, 3, 1, 1, 0 };
+	static constexpr unsigned ADAM7_X_SHIFT[7]  = { 3, 3, 2, 2, 1, 1, 0 };
+	static constexpr unsigned ADAM7_Y_SHIFT[7]  = { 3, 3, 3, 2, 2, 1, 1 };
+	static constexpr unsigned ADAM7_X_OFFS[7]   = { 0, 4, 0, 2, 0, 1, 0 };
+	static constexpr unsigned ADAM7_Y_OFFS[7]   = { 0, 0, 4, 0, 2, 0, 1 };
 
-		/* calculate the offset for each pass of the interlace */
+	png_error process(std::list<image_data_chunk> const &idata)
+	{
+		// do some basic checks for unsupported images
+		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
+		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+
+		// calculate the offset for each pass of the interlace
 		unsigned const pass_count(get_pass_count());
 		std::uint32_t pass_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		for (unsigned pass = 0; pass_count > pass; ++pass)
 			pass_offset[pass + 1] = pass_offset[pass] + get_pass_bytes(pass);
 
-		/* allocate memory for the filtered image */
+		// allocate memory for the filtered image
 		try { pnginfo.image = new std::uint8_t [pass_offset[pass_count]]; }
 		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
 
-		/* decompress image data */
-		error = decompress(pass_offset[pass_count]);
+		// decompress image data
+		png_error error = PNGERR_NONE;
+		error = decompress(idata, pass_offset[pass_count]);
+		std::uint32_t const bpp(get_bytes_per_pixel());
 		for (unsigned pass = 0; (pass_count > pass) && (PNGERR_NONE == error); ++pass)
 		{
-			/* compute some basic parameters */
+			// compute some basic parameters
 			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
-			std::uint32_t const bpp(get_bytes_per_pixel());
 			std::uint32_t const rowbytes(get_row_bytes(dimensions.first));
 
-			/* we de-filter in place */
+			// we de-filter in place, stripping the filter bytes off the rows
 			uint8_t *dst = pnginfo.image + pass_offset[pass];
 			uint8_t const *src = dst;
-
-			/* iterate over rows */
 			for (std::uint32_t y = 0; (dimensions.second > y) && (PNGERR_NONE == error); ++y)
 			{
-				/* first byte of each row is the filter type */
+				// first byte of each row is the filter type
 				uint8_t const filter(*src++);
 				error = unfilter_row(filter, src, dst, y ? &dst[-rowbytes] : nullptr, bpp, rowbytes);
 				src += rowbytes;
@@ -277,7 +402,7 @@ private:
 			}
 		}
 
-		/* if we errored, free the image data */
+		// if we errored, free the image data
 		if (error != PNGERR_NONE)
 		{
 			delete[] pnginfo.image;
@@ -286,13 +411,13 @@ private:
 		return error;
 	}
 
-	png_error decompress(std::uint32_t expected)
+	png_error decompress(std::list<image_data_chunk> const &idata, std::uint32_t expected)
 	{
-		/* only deflate is permitted */
+		// only deflate is permitted
 		if (pnginfo.compression_method != 0)
 			return PNGERR_DECOMPRESS_ERROR;
 
-		/* allocate zlib stream */
+		// allocate zlib stream
 		z_stream stream;
 		int zerr;
 		std::memset(&stream, 0, sizeof(stream));
@@ -305,7 +430,7 @@ private:
 		if (Z_OK != zerr)
 			return PNGERR_DECOMPRESS_ERROR;
 
-		/* decompress IDAT blocks */
+		// decompress IDAT blocks
 		stream.next_out = pnginfo.image;
 		stream.avail_out = expected;
 		stream.avail_in = 0;
@@ -323,14 +448,14 @@ private:
 				++it;
 		}
 
-		/* it's all good if we got end-of-stream or we have with no data remaining */
+		// it's all good if we got end-of-stream or we have with no data remaining
 		if ((Z_OK == inflateEnd(&stream)) && ((Z_STREAM_END == zerr) || ((Z_OK == zerr) && (idata.end() == it) && !stream.avail_in)))
 			return PNGERR_NONE;
 		else
 			return PNGERR_DECOMPRESS_ERROR;
 	}
 
-	png_error process_chunk(std::unique_ptr<std::uint8_t []> &&data, uint32_t type, uint32_t length)
+	png_error process_chunk(std::list<image_data_chunk> &idata, std::unique_ptr<std::uint8_t []> &&data, uint32_t type, uint32_t length)
 	{
 		/* switch off of the type */
 		switch (type)
@@ -419,14 +544,10 @@ private:
 
 	std::pair<uint32_t, uint32_t> get_pass_dimensions(unsigned pass) const
 	{
-		static constexpr unsigned x_bias[7] = { 7, 3, 3, 1, 1, 0, 0 };
-		static constexpr unsigned y_bias[7] = { 7, 7, 3, 3, 1, 1, 0 };
-		static constexpr unsigned x_shift[7] = { 3, 3, 2, 2, 1, 1, 0 };
-		static constexpr unsigned y_shift[7] = { 3, 3, 3, 2, 2, 1, 1 };
 		if (0 == pnginfo.interlace_method)
 			return std::make_pair(pnginfo.width, pnginfo.height);
 		else
-			return std::make_pair((pnginfo.width + x_bias[pass]) >> x_shift[pass], (pnginfo.height + y_bias[pass]) >> y_shift[pass]);
+			return std::make_pair((pnginfo.width + ADAM7_X_BIAS[pass]) >> ADAM7_X_SHIFT[pass], (pnginfo.height + ADAM7_Y_BIAS[pass]) >> ADAM7_Y_SHIFT[pass]);
 	}
 
 	std::uint32_t get_pass_bytes(unsigned pass) const
@@ -599,9 +720,14 @@ private:
 
 		return PNGERR_NONE;
 	}
-
-	std::list<image_data_chunk> idata; // FIXME: this could really be a local
 };
+
+constexpr unsigned png_private::ADAM7_X_BIAS[7];
+constexpr unsigned png_private::ADAM7_Y_BIAS[7];
+constexpr unsigned png_private::ADAM7_X_SHIFT[7];
+constexpr unsigned png_private::ADAM7_Y_SHIFT[7];
+constexpr unsigned png_private::ADAM7_X_OFFS[7];
+constexpr unsigned png_private::ADAM7_Y_OFFS[7];
 
 } // anonymous namespace
 
@@ -627,70 +753,40 @@ png_error png_read_file(util::core_file &fp, png_info *pnginfo)
 png_error png_read_bitmap(util::core_file &fp, bitmap_argb32 &bitmap)
 {
 	png_error result;
-	png_info png;
-	uint8_t *src;
-	int x, y;
+	png_info pnginfo;
+	png_private png(pnginfo);
 
-	/* read the PNG data */
-	result = png_read_file(fp, &png);
-	if (result != PNGERR_NONE)
+	// read the PNG data
+	result = png.read_file(fp);
+	if (PNGERR_NONE != result)
 		return result;
 
-	/* verify we can handle this PNG */
-	if (png.bit_depth > 8 || png.interlace_method != 0 ||
-		(png.color_type != 0 && png.color_type != 3 && png.color_type != 2 && png.color_type != 6))
+	// resample to 8bpp if necessary
+	result = png.expand_buffer_8bit();
+	if (PNGERR_NONE != result)
 	{
-		png_free(&png);
-		return PNGERR_UNSUPPORTED_FORMAT;
+		png_free(pnginfo);
+		return result;
 	}
 
-	/* if less than 8 bits, upsample */
-	png_expand_buffer_8bit(&png);
+	// allocate a bitmap of the appropriate size and copy it
+	bool hasalpha;
+	result = png.copy_to_bitmap(bitmap, hasalpha);
 
-	/* allocate a bitmap of the appropriate size and copy it */
-	bitmap.allocate(png.width, png.height);
+	// free our temporary data and return
+	png_free(pnginfo);
+	return result;
+}
 
-	/* handle 8bpp palettized case */
-	src = png.image;
-	if (png.color_type == 3)
-	{
-		/* loop over width/height */
-		for (y = 0; y < png.height; y++)
-			for (x = 0; x < png.width; x++, src++)
-			{
-				/* determine alpha and expand to 32bpp */
-				uint8_t alpha = (*src < png.num_trans) ? png.trans[*src] : 0xff;
-				bitmap.pix32(y, x) = (alpha << 24) | (png.palette[*src * 3] << 16) | (png.palette[*src * 3 + 1] << 8) | png.palette[*src * 3 + 2];
-			}
-	}
 
-	/* handle 8bpp grayscale case */
-	else if (png.color_type == 0)
-	{
-		for (y = 0; y < png.height; y++)
-			for (x = 0; x < png.width; x++, src++)
-				bitmap.pix32(y, x) = 0xff000000 | (*src << 16) | (*src << 8) | *src;
-	}
+/*-------------------------------------------------
+    png_expand_buffer_8bit - copy PNG data into a
+    bitmap
+-------------------------------------------------*/
 
-	/* handle 32bpp non-alpha case */
-	else if (png.color_type == 2)
-	{
-		for (y = 0; y < png.height; y++)
-			for (x = 0; x < png.width; x++, src += 3)
-				bitmap.pix32(y, x) = 0xff000000 | (src[0] << 16) | (src[1] << 8) | src[2];
-	}
-
-	/* handle 32bpp alpha case */
-	else if (png.color_type == 6)
-	{
-		for (y = 0; y < png.height; y++)
-			for (x = 0; x < png.width; x++, src += 4)
-				bitmap.pix32(y, x) = (src[3] << 24) | (src[0] << 16) | (src[1] << 8) | src[2];
-	}
-
-	/* free our temporary data and return */
-	png_free(&png);
-	return PNGERR_NONE;
+png_error png_copy_to_bitmap(png_info *pnginfo, bitmap_argb32 &bitmap, bool &hasalpha)
+{
+	return png_private(*pnginfo).copy_to_bitmap(bitmap, hasalpha);
 }
 
 
