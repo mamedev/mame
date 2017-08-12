@@ -12,7 +12,10 @@
 
 #include <zlib.h>
 
+#include <algorithm>
+#include <cassert>
 #include <cstdint>
+#include <cmath>
 #include <list>
 #include <memory>
 #include <new>
@@ -20,7 +23,6 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <assert.h>
 
 
 /***************************************************************************
@@ -398,7 +400,7 @@ private:
 			{
 				// first byte of each row is the filter type
 				uint8_t const filter(*src++);
-				error = unfilter_row(filter, src, dst, y ? &dst[-rowbytes] : nullptr, bpp, rowbytes);
+				error = unfilter_row(filter, src, dst, y ? (dst - rowbytes) : nullptr, bpp, rowbytes);
 				src += rowbytes;
 				dst += rowbytes;
 			}
@@ -455,6 +457,72 @@ private:
 			return PNGERR_NONE;
 		else
 			return PNGERR_DECOMPRESS_ERROR;
+	}
+
+	png_error unfilter_row(std::uint8_t type, uint8_t const *src, uint8_t *dst, uint8_t const *dstprev, int bpp, std::uint32_t rowbytes)
+	{
+		if (0 != pnginfo.filter_method)
+			return PNGERR_UNKNOWN_FILTER;
+
+		switch (type)
+		{
+		case PNG_PF_None: // no filter, just copy
+			std::copy_n(src, rowbytes, dst);
+			return PNGERR_NONE;
+
+		case PNG_PF_Sub: // SUB = previous pixel
+			dst = std::copy_n(src, bpp, dst);
+			src += bpp;
+			for (std::uint32_t x = bpp; rowbytes > x; ++x, ++src, ++dst)
+				*dst = *src + dst[-bpp];
+			return PNGERR_NONE;
+
+		case PNG_PF_Up: // UP = pixel above
+			if (dstprev)
+			{
+				for (std::uint32_t x = 0; rowbytes > x; ++x, ++src, ++dst, ++dstprev)
+					*dst = *src + *dstprev;
+			}
+			else
+			{
+				std::copy_n(src, rowbytes, dst);
+			}
+			return PNGERR_NONE;
+
+		case PNG_PF_Average: // AVERAGE = average of pixel above and previous pixel
+			if (dstprev)
+			{
+				for (std::uint32_t x = 0; bpp > x; ++x, ++src, ++dst, ++dstprev)
+					*dst = *src + (*dstprev >> 1);
+				for (std::uint32_t x = bpp; rowbytes > x; ++x, ++src, ++dst, ++dstprev)
+					*dst = *src + ((*dstprev + dst[-bpp]) >> 1);
+			}
+			else
+			{
+				dst = std::copy_n(src, bpp, dst);
+				src += bpp;
+				for (std::uint32_t x = bpp; rowbytes > x; ++x, ++src, ++dst)
+					*dst = *src + (dst[-bpp] >> 1);
+			}
+			return PNGERR_NONE;
+
+		case PNG_PF_Paeth: // PAETH = special filter
+			for (std::uint32_t x = 0; rowbytes > x; ++x, ++src, ++dst)
+			{
+				int32_t const pa((x < bpp) ? 0 : dst[-bpp]);
+				int32_t const pc(((x < bpp) || !dstprev) ? 0 : dstprev[-bpp]);
+				int32_t const pb(!dstprev ? 0 : *dstprev++);
+				int32_t const prediction(pa + pb - pc);
+				int32_t const da(std::abs(prediction - pa));
+				int32_t const db(std::abs(prediction - pb));
+				int32_t const dc(std::abs(prediction - pc));
+				*dst = ((da <= db) && (da <= dc)) ? (*src + pa) : (db <= dc) ? (*src + pb) : (*src + pc);
+			}
+			return PNGERR_NONE;
+
+		default: // unknown filter type
+			return PNGERR_UNKNOWN_FILTER;
+		}
 	}
 
 	png_error process_chunk(std::list<image_data_chunk> &idata, std::unique_ptr<std::uint8_t []> &&data, uint32_t type, uint32_t length)
@@ -575,80 +643,7 @@ private:
 
 	std::uint32_t get_bytes_per_pixel() const
 	{
-		return (samples[pnginfo.color_type] * pnginfo.bit_depth) / 8; // FIXME: won't work for 4bpp greyscale etc.
-	}
-
-	static png_error unfilter_row(int type, uint8_t const *src, uint8_t *dst, uint8_t const *dstprev, int bpp, int rowbytes)
-	{
-		/* switch off of it */
-		switch (type)
-		{
-		/* no filter, just copy */
-		case PNG_PF_None:
-			for (int x = 0; x < rowbytes; x++)
-				*dst++ = *src++;
-			break;
-
-		/* SUB = previous pixel */
-		case PNG_PF_Sub:
-			for (int x = 0; x < bpp; x++)
-				*dst++ = *src++;
-			for (int x = bpp; x < rowbytes; x++, dst++)
-				*dst = *src++ + dst[-bpp];
-			break;
-
-		/* UP = pixel above */
-		case PNG_PF_Up:
-			if (dstprev == nullptr)
-				return unfilter_row(PNG_PF_None, src, dst, dstprev, bpp, rowbytes);
-			for (int x = 0; x < rowbytes; x++, dst++)
-				*dst = *src++ + *dstprev++;
-			break;
-
-		/* AVERAGE = average of pixel above and previous pixel */
-		case PNG_PF_Average:
-			if (dstprev == nullptr)
-			{
-				for (int x = 0; x < bpp; x++)
-					*dst++ = *src++;
-				for (int x = bpp; x < rowbytes; x++, dst++)
-					*dst = *src++ + dst[-bpp] / 2;
-			}
-			else
-			{
-				for (int x = 0; x < bpp; x++, dst++)
-					*dst = *src++ + *dstprev++ / 2;
-				for (int x = bpp; x < rowbytes; x++, dst++)
-					*dst = *src++ + (*dstprev++ + dst[-bpp]) / 2;
-			}
-			break;
-
-		/* PAETH = special filter */
-		case PNG_PF_Paeth:
-			for (int x = 0; x < rowbytes; x++)
-			{
-				int32_t pa = (x < bpp) ? 0 : dst[-bpp];
-				int32_t pc = (x < bpp || dstprev == nullptr) ? 0 : dstprev[-bpp];
-				int32_t pb = (dstprev == nullptr) ? 0 : *dstprev++;
-				int32_t prediction = pa + pb - pc;
-				int32_t da = abs(prediction - pa);
-				int32_t db = abs(prediction - pb);
-				int32_t dc = abs(prediction - pc);
-				if (da <= db && da <= dc)
-					*dst++ = *src++ + pa;
-				else if (db <= dc)
-					*dst++ = *src++ + pb;
-				else
-					*dst++ = *src++ + pc;
-			}
-			break;
-
-		/* unknown filter type */
-		default:
-			return PNGERR_UNKNOWN_FILTER;
-		}
-
-		return PNGERR_NONE;
+		return ((samples[pnginfo.color_type] * pnginfo.bit_depth) + 7) >> 3;
 	}
 
 	static png_error verify_header(util::core_file &fp)
