@@ -358,7 +358,7 @@ void debug_imgui::handle_keys()
 	{
 		switch (event.event_type)
 		{
-		case UI_EVENT_CHAR:
+			case ui_event::IME_CHAR:
 			m_key_char = event.ch;
 			if(focus_view != nullptr)
 				focus_view->view->process_char(m_key_char);

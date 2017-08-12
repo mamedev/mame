@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/utils.h
@@ -7,125 +7,26 @@
     Internal UI user interface.
 
 ***************************************************************************/
+#ifndef MAME_FRONTEND_UI_UTILS_H
+#define MAME_FRONTEND_UI_UTILS_H
 
 #pragma once
 
-#ifndef __UI_UTILS_H__
-#define __UI_UTILS_H__
-
 #include "unicode.h"
 
-#define MAX_CHAR_INFO            256
-#define MAX_CUST_FILTER          8
+#include <algorithm>
+#include <limits>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-// GLOBAL ENUMERATORS
-enum : uint16_t
-{
-	FILTER_FIRST = 0,
-	FILTER_ALL = FILTER_FIRST,
-	FILTER_AVAILABLE,
-	FILTER_UNAVAILABLE,
-	FILTER_WORKING,
-	FILTER_NOT_WORKING,
-	FILTER_MECHANICAL,
-	FILTER_NOT_MECHANICAL,
-	FILTER_CATEGORY,
-	FILTER_FAVORITE,
-	FILTER_BIOS,
-	FILTER_PARENT,
-	FILTER_CLONES,
-	FILTER_MANUFACTURER,
-	FILTER_YEAR,
-	FILTER_SAVE,
-	FILTER_NOSAVE,
-	FILTER_CHD,
-	FILTER_NOCHD,
-	FILTER_VERTICAL,
-	FILTER_HORIZONTAL,
-	FILTER_CUSTOM,
-	FILTER_LAST = FILTER_CUSTOM
-};
 
-enum
-{
-	FIRST_VIEW = 0,
-	SNAPSHOT_VIEW = FIRST_VIEW,
-	CABINETS_VIEW,
-	CPANELS_VIEW,
-	PCBS_VIEW,
-	FLYERS_VIEW,
-	TITLES_VIEW,
-	ENDS_VIEW,
-	ARTPREV_VIEW,
-	BOSSES_VIEW,
-	LOGOS_VIEW,
-	VERSUS_VIEW,
-	GAMEOVER_VIEW,
-	HOWTO_VIEW,
-	SCORES_VIEW,
-	SELECT_VIEW,
-	MARQUEES_VIEW,
-	LAST_VIEW = MARQUEES_VIEW
-};
+class mame_ui_manager;
+class render_container;
 
-enum
-{
-	RP_FIRST = 0,
-	RP_IMAGES = RP_FIRST,
-	RP_INFOS,
-	RP_LAST = RP_INFOS
-};
 
-enum
-{
-	SHOW_PANELS = 0,
-	HIDE_LEFT_PANEL,
-	HIDE_RIGHT_PANEL,
-	HIDE_BOTH
-};
-
-enum : uint16_t
-{
-	UI_SW_FIRST = 0,
-	UI_SW_ALL = UI_SW_FIRST,
-	UI_SW_AVAILABLE,
-	UI_SW_UNAVAILABLE,
-	UI_SW_PARENTS,
-	UI_SW_CLONES,
-	UI_SW_YEARS,
-	UI_SW_PUBLISHERS,
-	UI_SW_SUPPORTED,
-	UI_SW_PARTIAL_SUPPORTED,
-	UI_SW_UNSUPPORTED,
-	UI_SW_REGION,
-	UI_SW_TYPE,
-	UI_SW_LIST,
-	UI_SW_CUSTOM,
-	UI_SW_LAST = UI_SW_CUSTOM
-};
-
-enum
-{
-	HOVER_DAT_UP = -1000,
-	HOVER_DAT_DOWN,
-	HOVER_UI_LEFT,
-	HOVER_UI_RIGHT,
-	HOVER_ARROW_UP,
-	HOVER_ARROW_DOWN,
-	HOVER_B_FAV,
-	HOVER_B_EXPORT,
-	HOVER_B_DATS,
-	HOVER_RPANEL_ARROW,
-	HOVER_LPANEL_ARROW,
-	HOVER_FILTER_FIRST,
-	HOVER_FILTER_LAST = (HOVER_FILTER_FIRST) + 1 + FILTER_LAST,
-	HOVER_SW_FILTER_FIRST,
-	HOVER_SW_FILTER_LAST = (HOVER_SW_FILTER_FIRST) + 1 + UI_SW_LAST,
-	HOVER_RP_FIRST,
-	HOVER_RP_LAST = (HOVER_RP_FIRST) + 1 + RP_LAST
-};
-
-// GLOBAL STRUCTURES
+// TODO: namespace this thing
 struct ui_software_info
 {
 	ui_software_info() { }
@@ -175,23 +76,209 @@ struct ui_software_info
 	bool available = false;
 };
 
-// Manufacturers
-struct c_mnfct
+
+namespace ui {
+
+struct s_filter; // FIXME: this is declared in custmenu.h, it shouldn't be
+
+template <class Impl, typename Entry>
+class filter_base
 {
-	static void set(const char *str);
-	static std::string getname(const char *str);
-	static std::vector<std::string> ui;
-	static std::unordered_map<std::string, int> uimap;
-	static uint16_t actual;
+public:
+	typedef std::unique_ptr<Impl> ptr;
+
+	virtual ~filter_base() { }
+
+	virtual char const *config_name() const = 0;
+	virtual char const *display_name() const = 0;
+	virtual char const *filter_text() const = 0;
+
+	virtual bool apply(Entry const &info) const = 0;
+
+	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Impl &)> &&handler) = 0;
+
+	virtual bool wants_adjuster() const = 0;
+	virtual char const *adjust_text() const = 0;
+	virtual uint32_t arrow_flags() const = 0;
+	virtual bool adjust_left() = 0;
+	virtual bool adjust_right() = 0;
+
+	virtual void save_ini(emu_file &file, unsigned indent) const = 0;
+
+	template <typename InputIt, class OutputIt>
+	void apply(InputIt first, InputIt last, OutputIt dest) const
+	{
+		std::copy_if(first, last, dest, [this] (Entry const *info) { return apply(*info); });
+	}
+
+protected:
+	using entry_type = Entry;
+
+	filter_base() { }
 };
 
-// Years
-struct c_year
+
+class machine_filter : public filter_base<machine_filter, game_driver>
 {
-	static void set(const char *str);
-	static std::vector<std::string> ui;
-	static uint16_t actual;
+public:
+	enum type : uint16_t
+	{
+		ALL = 0,
+		AVAILABLE,
+		UNAVAILABLE,
+		WORKING,
+		NOT_WORKING,
+		MECHANICAL,
+		NOT_MECHANICAL,
+		CATEGORY,
+		FAVORITE,
+		BIOS,
+		PARENTS,
+		CLONES,
+		MANUFACTURER,
+		YEAR,
+		SAVE,
+		NOSAVE,
+		CHD,
+		NOCHD,
+		VERTICAL,
+		HORIZONTAL,
+		CUSTOM,
+
+		COUNT,
+		FIRST = 0,
+		LAST = COUNT - 1
+	};
+
+	virtual type get_type() const = 0;
+	virtual std::string adorned_display_name(type n) const = 0;
+
+	static ptr create(type n) { return create(n, nullptr, nullptr, 0); }
+	static ptr create(emu_file &file) { return create(file, 0); }
+	static char const *config_name(type n);
+	static char const *display_name(type n);
+
+	using filter_base<machine_filter, game_driver>::config_name;
+	using filter_base<machine_filter, game_driver>::display_name;
+
+protected:
+	machine_filter();
+
+	static ptr create(type n, char const *value, emu_file *file, unsigned indent);
+	static ptr create(emu_file &file, unsigned indent);
 };
+
+DECLARE_ENUM_INCDEC_OPERATORS(machine_filter::type)
+
+
+class software_filter : public filter_base<software_filter, ui_software_info>
+{
+public:
+	enum type : uint16_t
+	{
+		ALL = 0,
+		AVAILABLE,
+		UNAVAILABLE,
+		PARENTS,
+		CLONES,
+		YEAR,
+		PUBLISHERS,
+		SUPPORTED,
+		PARTIAL_SUPPORTED,
+		UNSUPPORTED,
+		REGION,
+		DEVICE_TYPE,
+		LIST,
+		CUSTOM,
+
+		COUNT,
+		FIRST = 0,
+		LAST = COUNT - 1
+	};
+
+	virtual type get_type() const = 0;
+	virtual std::string adorned_display_name(type n) const = 0;
+
+	static ptr create(type n, s_filter const &data) { return create(n, data, nullptr, nullptr, 0); }
+	static ptr create(emu_file &file, s_filter const &data) { return create(file, data, 0); }
+	static char const *config_name(type n);
+	static char const *display_name(type n);
+
+	using filter_base<software_filter, ui_software_info>::config_name;
+	using filter_base<software_filter, ui_software_info>::display_name;
+
+protected:
+	software_filter();
+
+	static ptr create(type n, s_filter const &data, char const *value, emu_file *file, unsigned indent);
+	static ptr create(emu_file &file, s_filter const &data, unsigned indent);
+};
+
+DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
+
+} // namespace ui
+
+#define MAX_CHAR_INFO            256
+
+enum
+{
+	FIRST_VIEW = 0,
+	SNAPSHOT_VIEW = FIRST_VIEW,
+	CABINETS_VIEW,
+	CPANELS_VIEW,
+	PCBS_VIEW,
+	FLYERS_VIEW,
+	TITLES_VIEW,
+	ENDS_VIEW,
+	ARTPREV_VIEW,
+	BOSSES_VIEW,
+	LOGOS_VIEW,
+	VERSUS_VIEW,
+	GAMEOVER_VIEW,
+	HOWTO_VIEW,
+	SCORES_VIEW,
+	SELECT_VIEW,
+	MARQUEES_VIEW,
+	LAST_VIEW = MARQUEES_VIEW
+};
+
+enum
+{
+	RP_FIRST = 0,
+	RP_IMAGES = RP_FIRST,
+	RP_INFOS,
+	RP_LAST = RP_INFOS
+};
+
+enum
+{
+	SHOW_PANELS = 0,
+	HIDE_LEFT_PANEL,
+	HIDE_RIGHT_PANEL,
+	HIDE_BOTH
+};
+
+enum
+{
+	HOVER_DAT_UP = -1000,
+	HOVER_DAT_DOWN,
+	HOVER_UI_LEFT,
+	HOVER_UI_RIGHT,
+	HOVER_ARROW_UP,
+	HOVER_ARROW_DOWN,
+	HOVER_B_FAV,
+	HOVER_B_EXPORT,
+	HOVER_B_DATS,
+	HOVER_RPANEL_ARROW,
+	HOVER_LPANEL_ARROW,
+	HOVER_FILTER_FIRST,
+	HOVER_FILTER_LAST = HOVER_FILTER_FIRST + std::max<int>(ui::machine_filter::COUNT, ui::software_filter::COUNT),
+	HOVER_RP_FIRST,
+	HOVER_RP_LAST = HOVER_RP_FIRST + 1 + RP_LAST,
+	HOVER_INFO_TEXT
+};
+
+// FIXME: this stuff shouldn't all be globals
 
 // GLOBAL CLASS
 struct ui_globals
@@ -203,39 +290,23 @@ struct ui_globals
 	static bool         has_icons;
 };
 
-#define main_struct(name) \
-struct name##_filters \
-{ \
-	static uint16_t actual; \
-	static const char *text[]; \
-	static size_t length; \
+// Manufacturers
+struct c_mnfct
+{
+	static std::string getname(const char *str);
+	static std::vector<std::string> ui;
 };
 
-main_struct(main);
-main_struct(sw);
-
-// Custom filter
-struct custfltr
+// Years
+struct c_year
 {
-	static uint16_t  main;
-	static uint16_t  numother;
-	static uint16_t  other[MAX_CUST_FILTER];
-	static uint16_t  mnfct[MAX_CUST_FILTER];
-	static uint16_t  screen[MAX_CUST_FILTER];
-	static uint16_t  year[MAX_CUST_FILTER];
+	static std::vector<std::string> ui;
 };
 
-// Software custom filter
-struct sw_custfltr
+struct main_filters
 {
-	static uint16_t  main;
-	static uint16_t  numother;
-	static uint16_t  other[MAX_CUST_FILTER];
-	static uint16_t  mnfct[MAX_CUST_FILTER];
-	static uint16_t  year[MAX_CUST_FILTER];
-	static uint16_t  region[MAX_CUST_FILTER];
-	static uint16_t  type[MAX_CUST_FILTER];
-	static uint16_t  list[MAX_CUST_FILTER];
+	static ui::machine_filter::type actual;
+	static std::map<ui::machine_filter::type, ui::machine_filter::ptr> filters;
 };
 
 // GLOBAL FUNCTIONS
@@ -295,4 +366,4 @@ bool input_character(std::string &buffer, char32_t unichar, F &&filter)
 }
 
 
-#endif /* __UI_UTILS_H__ */
+#endif // MAME_FRONTEND_UI_UTILS_H

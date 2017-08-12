@@ -88,6 +88,7 @@ Magic Sword: Heroic Fantasy (Japan 900623)                         89625B-1   MS
 
 Carrier Air Wing (World 901009)                              1990  89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 Carrier Air Wing (World 901012)                                    89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
+Carrier Air Wing (USA 901130)                                      89625B-1   CA22B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
 Carrier Air Wing (USA 901012)                                      89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 U.S. Navy (Japan 901012)                                           89625B-1   CA22B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 

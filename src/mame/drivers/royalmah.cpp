@@ -95,6 +95,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
@@ -162,13 +163,11 @@ public:
 	DECLARE_WRITE8_MEMBER(jansou_sound_w);
 
 	DECLARE_WRITE8_MEMBER(janptr96_dswsel_w);
-	DECLARE_READ8_MEMBER(janptr96_dswsel_r);
 	DECLARE_READ8_MEMBER(janptr96_dsw_r);
 	DECLARE_WRITE8_MEMBER(janptr96_rombank_w);
 	DECLARE_WRITE8_MEMBER(janptr96_rambank_w);
 	DECLARE_READ8_MEMBER(janptr96_unknown_r);
 	DECLARE_WRITE8_MEMBER(janptr96_coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(janptr96_rtc_irq);
 
 	DECLARE_WRITE8_MEMBER(mjifb_coin_counter_w);
 	DECLARE_READ8_MEMBER(mjifb_rom_io_r);
@@ -223,7 +222,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(suzume_irq);
 	INTERRUPT_GEN_MEMBER(mjtensin_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(janptr96_interrupt);
 
 protected:
 	virtual void machine_start() override;
@@ -896,11 +894,6 @@ WRITE8_MEMBER(royalmah_state::janptr96_dswsel_w)
 	m_dsw_select = data;
 }
 
-READ8_MEMBER(royalmah_state::janptr96_dswsel_r)
-{
-	return m_dsw_select;
-}
-
 READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 {
 	if (~m_dsw_select & 0x01) return ioport("DSW4")->read();
@@ -935,18 +928,15 @@ WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 }
 
 static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8, royalmah_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(janptr96_rombank_w )    // BANK ROM Select
-	AM_RANGE( 0x1e, 0x1e ) AM_READWRITE(janptr96_dswsel_r, janptr96_dswsel_w )
-	AM_RANGE( 0x1c, 0x1c ) AM_READ(janptr96_dsw_r )
-	AM_RANGE( 0x20, 0x20 ) AM_READWRITE(janptr96_unknown_r, janptr96_rambank_w )
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(mjderngr_palbank_w )
-	AM_RANGE( 0x60, 0x6f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0x81, 0x81 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x82, 0x83 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x93, 0x93 ) AM_WRITE(input_port_select_w )
-	AM_RANGE( 0xd8, 0xd8 ) AM_WRITE(janptr96_coin_counter_w )
-	AM_RANGE( 0xd9, 0xd9 ) AM_READ_PORT("SYSTEM")
+	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0xff00) AM_WRITE(janptr96_rombank_w )    // BANK ROM Select
+	AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_READWRITE(janptr96_unknown_r, janptr96_rambank_w )
+	AM_RANGE( 0x50, 0x50 ) AM_MIRROR(0xff00) AM_WRITE(mjderngr_palbank_w )
+	AM_RANGE( 0x60, 0x6f ) AM_MIRROR(0xff00) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE( 0x81, 0x81 ) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE( 0x82, 0x83 ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE( 0x93, 0x93 ) AM_MIRROR(0xff00) AM_WRITE(input_port_select_w )
+	AM_RANGE( 0xd8, 0xd8 ) AM_MIRROR(0xff00) AM_WRITE(janptr96_coin_counter_w )
+	AM_RANGE( 0xd9, 0xd9 ) AM_MIRROR(0xff00) AM_READ_PORT("SYSTEM") AM_WRITENOP // second input select?
 ADDRESS_MAP_END
 
 /****************************************************************************
@@ -3552,38 +3542,24 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 	MCFG_PALETTE_INIT_OWNER(royalmah_state,mjderngr)
 MACHINE_CONFIG_END
 
-/* It runs in IM 2, thus needs a vector on the data bus */
-TIMER_DEVICE_CALLBACK_MEMBER(royalmah_state::janptr96_interrupt)
-{
-	int scanline = param;
-
-	if(scanline == 248)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x80);   // vblank
-
-	if(scanline == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x84);   // demo
-}
-
-WRITE_LINE_MEMBER(royalmah_state::janptr96_rtc_irq)
-{
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x82);   // rtc
-}
-
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_16MHz/2)    /* 8 MHz? */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_16MHz/2)    /* 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(janptr96_map)
 	MCFG_CPU_IO_MAP(janptr96_iomap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", royalmah_state, janptr96_interrupt, "screen", 0, 1)
+	MCFG_TMPZ84C015_IN_PA_CB(READ8(royalmah_state, janptr96_dsw_r))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(royalmah_state, janptr96_dswsel_w))
+	// internal CTC channels 0 & 1 have falling edge triggers
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(royalmah_state, janptr96_rtc_irq))
-	MACHINE_CONFIG_END
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
+MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )

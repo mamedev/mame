@@ -138,10 +138,7 @@ bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 	CFIndex const count(1);
 	CGGlyph glyph;
 	if (!CTFontGetGlyphsForCharacters(m_font, &uni_char, &glyph, count))
-	{
 		osd_printf_verbose("osd_font_osd::get_bitmap: failed to get glyph for U+%04X\n", unsigned(chnum));
-		return false;
-	}
 
 	// try to get glyph metrics
 	CGRect const bounds(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, nullptr, count));

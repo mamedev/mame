@@ -7,11 +7,10 @@
     Internal menu for the slot options.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_SLOTOPT_H
 #define MAME_FRONTEND_UI_SLOTOPT_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -26,6 +25,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 	virtual void handle() override;
 
 	device_slot_option *get_current_option(device_slot_interface &slot) const;

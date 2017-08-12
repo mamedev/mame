@@ -112,6 +112,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "machine/input_merger.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -128,28 +129,12 @@
 
 void rpunch_state::machine_start()
 {
-	save_item(NAME(m_sound_data));
-	save_item(NAME(m_sound_busy));
-	save_item(NAME(m_ym2151_irq));
 	save_item(NAME(m_upd_rom_bank));
 	save_item(NAME(m_sprite_xoffs));
 	save_item(NAME(m_videoflags));
 	save_item(NAME(m_bins));
 	save_item(NAME(m_gins));
 }
-
-/*************************************
- *
- *  Interrupt handling
- *
- *************************************/
-
-WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
-{
-	m_ym2151_irq = state;
-	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 void rpunch_state::machine_reset()
 {
@@ -177,32 +162,9 @@ CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(rpunch_state::sound_command_w_callback)
-{
-	m_sound_busy = 1;
-	m_sound_data = param;
-	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE16_MEMBER(rpunch_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(rpunch_state::sound_command_w_callback),this), data & 0xff);
-}
-
-
-READ8_MEMBER(rpunch_state::sound_command_r)
-{
-	m_sound_busy = 0;
-	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
-	return m_sound_data;
-}
-
-
 READ16_MEMBER(rpunch_state::sound_busy_r)
 {
-	return m_sound_busy;
+	return m_soundlatch->pending_r();
 }
 
 
@@ -250,7 +212,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_SELECT(0x20) AM_WRITE8(rpunch_gga_w, 0x00ff)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_WRITE(sound_command_w)
+	AM_RANGE(0x0c000e, 0x0c000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0c0010, 0x0c0013) AM_WRITE(rpunch_ins_w)
 	AM_RANGE(0x0c0018, 0x0c0019) AM_READ_PORT("P1")
 	AM_RANGE(0x0c001a, 0x0c001b) AM_READ_PORT("P2")
@@ -270,7 +232,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf200, 0xf200) AM_READ(sound_command_r)
+	AM_RANGE(0xf200, 0xf200) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(upd_control_w)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(upd_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -502,6 +464,11 @@ static MACHINE_CONFIG_START( rpunch )
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -524,7 +491,7 @@ static MACHINE_CONFIG_START( rpunch )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(rpunch_state,ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -547,6 +514,11 @@ static MACHINE_CONFIG_START( svolleybl )
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -570,7 +542,7 @@ static MACHINE_CONFIG_START( svolleybl )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(rpunch_state,ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 

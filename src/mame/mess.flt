@@ -31,6 +31,7 @@ altair.cpp
 alto2.cpp
 altos5.cpp
 altos486.cpp
+altos8600.cpp
 amico2k.cpp
 amiga.cpp
 ampro.cpp
@@ -216,6 +217,7 @@ galaxy.cpp
 galeb.cpp
 gamate.cpp
 gamecom.cpp
+gamecube.cpp
 gameking.cpp
 gamepock.cpp
 gb.cpp

@@ -293,6 +293,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ram4000_w);
 	DECLARE_READ8_MEMBER(cec4000_r);
 	DECLARE_READ8_MEMBER(cec8000_r);
+	DECLARE_WRITE8_MEMBER(ram8000_w);
 	DECLARE_READ8_MEMBER(auxram0000_r);
 	DECLARE_WRITE8_MEMBER(auxram0000_w);
 	DECLARE_READ8_MEMBER(auxram0200_r);
@@ -671,45 +672,30 @@ void apple2e_state::machine_start()
 	{
 		m_lcbank->set_bank(3);
 		m_cec_ptr = m_cecbanks->base();
+		m_iscec = true;
 
-		uint8_t *cecwlrom = m_cec_ptr;
-		uint8_t c, ch;
-
-		for(int i=0; i<0x040000; i++)
+		// data is bit-order reversed (and byte interleaved, which the ROM loader takes care of)
+		// let's do that in the modern MAME way
+		for (int i=0; i<0x040000; i++)
 		{
-			ch = cecwlrom[((i&1)?0x020000:0) + (i>>1) ];
-			c = 0;
-
-			for(int j=0;j<7;j++)
-			{
-				if (ch&1)
-				{
-					c = c | 1;
-				}
-
-				ch = ch>>1;
-				c = c<<1;
-			}
-
-			if (ch&1)
-			{
-				c = c | 1;
-			}
-			m_cec_remap[i] = c;
+			m_cec_remap[i] = BITSWAP8(m_cec_ptr[i], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 
 		// remap cec gfx1 rom
 		// for ALTCHARSET
 		uint8_t *rom = m_video->m_char_ptr;
-		for(int i=0;i<0x1000;i++)
+		for(int i=0; i<0x1000; i++)
 		{
 			rom[i+0x1000] = rom[i];
 		}
-
-		for(int i=0x040*8;i<0x80*8;i++)
+		for(int i=0x040*8; i<0x80*8; i++)
 		{
 			rom[i] = rom[i+0x1000-0x040*8];
 		}
+	}
+	else
+	{
+		m_iscec = false;
 	}
 
 	// setup save states
@@ -775,6 +761,7 @@ void apple2e_state::machine_reset()
 {
 	m_page2 = false;
 	m_video->m_page2 = false;
+	m_video->m_monohgr = false;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_vbl = m_vblmask = false;
 	m_slotc3rom = false;
@@ -789,13 +776,7 @@ void apple2e_state::machine_reset()
 	m_yirq = false;
 	m_mockingboard4c = false;
 	m_intc8rom = false;
-	m_iscec = false;
 	m_cec_bank = 0;
-
-	if ((m_rom_ptr[0x7bb3] == 0x8d) || (m_rom_ptr[0x7bb3] == 0xea))
-	{
-		m_iscec = true;
-	}
 
 	// IIe prefers INTCXROM default to off, IIc has it always on
 	if (m_rom_ptr[0x3bc0] == 0x00)
@@ -1032,6 +1013,10 @@ void apple2e_state::auxbank_update()
 		{
 			m_4000bank->set_bank(4);    // read CEC bank, write normal RAM
 		}
+		else
+		{
+			m_4000bank->set_bank(0);    // read/write RAM
+		}
 	}
 }
 
@@ -1096,16 +1081,23 @@ void apple2e_state::update_slotrom_banks()
 		if (!m_intcxrom)
 		{
 			m_c100bank->set_bank(3);
-			m_c300bank->set_bank(3);
 			m_c400bank->set_bank(3);
 			m_c800bank->set_bank(3);
 		}
 		else
 		{
 			m_c100bank->set_bank(4);
-			m_c300bank->set_bank(4);
 			m_c400bank->set_bank(4);
 			m_c800bank->set_bank(4);
+		}
+
+		if ((m_intcxrom) || (!m_slotc3rom))
+		{
+			m_c300bank->set_bank(4);
+		}
+		else
+		{
+			m_c300bank->set_bank(3);
 		}
 	}
 }
@@ -1168,14 +1160,7 @@ void apple2e_state::lc_update(int offset, bool writing)
 	{
 		if (m_iscec)
 		{
-			if (m_lcram)
-			{
-				m_lcbank->set_bank(1);
-			}
-			else
-			{
-				cec_lcrom_update();
-			}
+			cec_lcrom_update();
 		}
 		else
 		{
@@ -1214,7 +1199,14 @@ void apple2e_state::cec_lcrom_update()
 	}
 	else
 	{
-		m_lcbank->set_bank(3);
+		if (m_lcram)
+		{
+			m_lcbank->set_bank(1);
+		}
+		else
+		{
+			m_lcbank->set_bank(3);
+		}
 	}
 }
 
@@ -1580,7 +1572,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 		case 0x08:  // ALTZPOFF
 			m_altzp = false;
 			auxbank_update();
-			if ((m_iscec) && (!m_lcram))
+			if (m_iscec)
 			{
 				cec_lcrom_update();
 			}
@@ -1589,7 +1581,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 		case 0x09:  // ALTZPON
 			m_altzp = true;
 			auxbank_update();
-			if ((m_iscec) && (!m_lcram))
+			if (m_iscec)
 			{
 				cec_lcrom_update();
 			}
@@ -2020,7 +2012,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 			}
 			else
 			{
-				if (m_iscec)
+				if ((m_iscec) && (slot == 3))
 				{
 					return m_cec_bank;
 				}
@@ -2055,6 +2047,15 @@ WRITE8_MEMBER(apple2e_state::c080_w)
 				if (data != m_cec_bank)
 				{
 					m_cec_bank = data;
+					if (data & 0x10)
+					{
+						m_video->m_monohgr = false;
+					}
+					else
+					{
+						m_video->m_monohgr = true;
+					}
+
 					auxbank_update();
 					update_slotrom_banks();
 				}
@@ -2534,6 +2535,7 @@ READ8_MEMBER(apple2e_state::ram2000_r)  { return m_ram_ptr[offset+0x2000]; }
 WRITE8_MEMBER(apple2e_state::ram2000_w) { m_ram_ptr[offset+0x2000] = data; }
 READ8_MEMBER(apple2e_state::ram4000_r)  { return m_ram_ptr[offset+0x4000]; }
 WRITE8_MEMBER(apple2e_state::ram4000_w) { m_ram_ptr[offset+0x4000] = data; }
+WRITE8_MEMBER(apple2e_state::ram8000_w) { m_ram_ptr[offset+0x8000] = data; }
 READ8_MEMBER(apple2e_state::cec4000_r)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
@@ -2678,7 +2680,7 @@ static ADDRESS_MAP_START( r4000bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x10000, 0x17fff) AM_READWRITE(ram4000_r, auxram4000_w)
 	AM_RANGE(0x18000, 0x1ffff) AM_READWRITE(auxram4000_r, auxram4000_w)
 	AM_RANGE(0x20000, 0x23fff) AM_READWRITE(cec4000_r, ram4000_w)
-	AM_RANGE(0x24000, 0x27fff) AM_READWRITE(cec8000_r, ram4000_w)
+	AM_RANGE(0x24000, 0x27fff) AM_READWRITE(cec8000_r, ram8000_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c100bank_map, AS_PROGRAM, 8, apple2e_state )
@@ -2793,7 +2795,7 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 		m_transchar = decode[trans];
 		m_strobe = 0x80;
 
-//      printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
+		//printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
 	}
 }
 
@@ -3071,8 +3073,9 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x2c0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_NAME("F4")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
+	PORT_BIT(0x240, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
@@ -3081,7 +3084,8 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x3c0, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("F5")
+	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X2")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
@@ -3090,8 +3094,9 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("CN")
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x300, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X3")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
@@ -3101,7 +3106,7 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
-	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X4")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
@@ -3110,17 +3115,21 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("EN")
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9) PORT_NAME("STOP")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x2c0, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X5")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11) PORT_NAME("TEST")
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("F1")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x2c4, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x280, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X6")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
@@ -3129,8 +3138,9 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_NAME("F2")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x2c0, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x280, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X7")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
@@ -3139,9 +3149,10 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_NAME("F3")
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x240, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X8")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -4351,11 +4362,11 @@ ROM_START(ceci)
 
 	ROM_SYSTEM_BIOS(2, "diag", "self test")
 	ROMX_LOAD( "u7.selftest.bin", 0x000000, 0x008000, CRC(4b045a44) SHA1(d2c716d0eb9f1c70e108d16c6a88d44b894e39fd), ROM_BIOS(3) )
-	ROMX_LOAD( "u35.alt", 0x008000, 0x008000, CRC(a4f40181) SHA1(db1ed69b2ed3280b1c90f76dbd637370d5bc11b0), ROM_BIOS(3) )
+	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(3) )
 
 	ROM_REGION(0x40000,"cecexp",0)
-	ROM_LOAD( "u33.mx231024-0059.bin", 0x000000, 0x020000, CRC(a2a59f35) SHA1(01c787e150bf1378088a9333ec9338387aae0f50) )
-	ROM_LOAD( "u34.mx231024-0060.bin", 0x020000, 0x020000, CRC(f23470ce) SHA1(dc4cbe19e202d2afb56998ff04255b3171b58e14) )
+	ROM_LOAD16_BYTE( "u33.mx231024-0059.bin", 0x000000, 0x020000, CRC(a2a59f35) SHA1(01c787e150bf1378088a9333ec9338387aae0f50) )
+	ROM_LOAD16_BYTE( "u34.mx231024-0060.bin", 0x000001, 0x020000, CRC(f23470ce) SHA1(dc4cbe19e202d2afb56998ff04255b3171b58e14) )
 
 	ROM_REGION(0x800,"keyboard",0)
 	ROM_LOAD( "u26.9433c-0201.rcl-zh-16.bin", 0x000000, 0x000800, CRC(f3190603) SHA1(7efdf6f4ee0ed01ff06341c601496a43d06afd6b) )

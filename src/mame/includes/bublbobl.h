@@ -84,7 +84,7 @@ public:
 	optional_device<ym2203_device> m_ym2203;
 	optional_device<ym3526_device> m_ym3526;
 	optional_device<input_merger_device> m_soundirq;
-	optional_device<input_merger_device> m_soundnmi;
+	required_device<input_merger_device> m_soundnmi;
 	required_device<generic_latch_8_device> m_main_to_sound;
 	required_device<generic_latch_8_device> m_sound_to_main;
 

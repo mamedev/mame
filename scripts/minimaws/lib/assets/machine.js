@@ -12,21 +12,40 @@ function get_slot_popup(name) { return document.getElementById(make_slot_popup_i
 
 function update_cmd_preview()
 {
+	var inifmt = document.getElementById('select-options-format').value == 'ini';
 	var result = '';
 	var first = true;
-	function add_option(str)
+	function add_option(flag, value)
 	{
 		if (first)
 			first = false;
+		else if (inifmt)
+			result += '\n';
 		else
 			result += ' ';
-		result += str;
+
+		if (inifmt)
+		{
+			result += flag + ' ';
+			if (flag.length < 25)
+				result += ' '.repeat(25 - flag.length);
+			result += value;
+		}
+		else
+		{
+			result += '-' + flag + ' ';
+			if (value == '')
+				result += '""';
+			else
+				result += value;
+		}
 	}
+	var elide_defaults = !document.getElementById('check-explicit-defaults').checked;
 
 	// add system BIOS if applicable
 	var sysbios = document.getElementById('select-system-bios');
-	if (sysbios && (sysbios.selectedOptions[0].getAttribute('data-isdefault') != 'yes'))
-		add_option('-bios ' + sysbios.value);
+	if (sysbios && (!elide_defaults || (sysbios.selectedOptions[0].getAttribute('data-isdefault') != 'yes')))
+		add_option('bios', sysbios.value);
 
 	var slotslist = document.getElementById('list-slot-options');
 	if (slotslist)
@@ -41,17 +60,21 @@ function update_cmd_preview()
 				var biospopup = document.getElementById(('select-slot-bios-' + slotname).replace(/:/g, '-'));
 				var defcard = selection.getAttribute('data-isdefault') == 'yes';
 				var defbios = !biospopup || (biospopup.selectedOptions[0].getAttribute('data-isdefault') == 'yes');
-				if (!defcard || !defbios)
+				if (!elide_defaults || !defcard || !defbios)
 				{
 					var card = selection.value;
-					if (card == '')
-						card = '""';
-					add_option('-' + slotname + ' ' + card + (defbios ? '' : (',bios=' + biospopup.value)));
+					add_option(slotname, card + ((biospopup && (!elide_defaults || !defbios)) ? (',bios=' + biospopup.value) : ''));
 				}
 			}
 		}
 	}
-	document.getElementById('para-cmd-preview').textContent = result;
+
+	// replace the preview with appropriate element
+	var target = document.getElementById('para-cmd-preview');
+	var replacement = document.createElement(inifmt ? 'pre' : 'p');
+	replacement.setAttribute('id', 'para-cmd-preview');
+	replacement.textContent = result;
+	target.parentNode.replaceChild(replacement, target);
 }
 
 

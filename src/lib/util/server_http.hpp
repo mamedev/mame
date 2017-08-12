@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
+#include <cctype>
 
 #ifndef CASE_INSENSITIVE_EQUALS_AND_HASH
 #define CASE_INSENSITIVE_EQUALS_AND_HASH

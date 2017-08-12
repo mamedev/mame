@@ -135,7 +135,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-
+	
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE8_MEMBER(dmapg4_w);
@@ -192,6 +192,8 @@ public:
 	DECLARE_READ8_MEMBER(pc9801rs_knjram_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_knjram_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_bank_w);
+	DECLARE_READ8_MEMBER(f0_r);
+	
 	DECLARE_READ8_MEMBER(a20_ctrl_r);
 	DECLARE_WRITE8_MEMBER(a20_ctrl_w);
 	DECLARE_READ8_MEMBER(fdc_mode_ctrl_r);

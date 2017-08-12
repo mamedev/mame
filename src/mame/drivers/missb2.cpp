@@ -441,12 +441,16 @@ MACHINE_START_MEMBER(missb2_state,missb2)
 {
 	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 
+	m_sreset_old = CLEAR_LINE;
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_sreset_old));
 }
 
 MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
+	m_oki->reset();
+	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
 static MACHINE_CONFIG_START( missb2 )
@@ -492,8 +496,11 @@ static MACHINE_CONFIG_START( missb2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
 
 	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 

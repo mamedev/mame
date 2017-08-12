@@ -1085,6 +1085,9 @@ altos5                          //
 @source:altos486.cpp
 altos486
 
+@source:altos8600.cpp
+altos8600
+
 @source:alvg.cpp
 agsoccer                        //
 dinoeggs                        //
@@ -13256,6 +13259,12 @@ gamecom                         // Tiger Game.com
 gamecst2                        // MAME based bootleg, version 2.613
 gamecstl                        // MAME based bootleg
 
+@source:gamecube.cpp
+gcjp                            // (c) 2001 Nintendo
+gcus                            // (c) 2001 Nintendo
+gceu                            // (c) 2002 Nintendo
+gcbr                            // (c) 2002 Nintendo
+
 @source:gameking.cpp
 gamekin3                        //
 gameking                        //
@@ -20356,10 +20365,11 @@ mt_wwar                         // 48
 
 @source:megazone.cpp
 megazone                        // GX319 (c) 1983
-megazonea                       // GX319 (c) 1983
-megazoneb                       // GX319 (c) 1983 + Kosuka
-megazonec                       // GX319 (c) 1983 + Kosuka
-megazonei                       // GX319 (c) 1983 + Interlogic / Kosuka
+megazonea                       // GX319 (c) 1983 + Interlogic / Kosuka
+megazoneb                       // GX319 (c) 1983
+megazoneh                       // GX319 (c) 1983 + Kosuka
+megazonei                       // GX319 (c) 1983
+megazonej                       // GX319 (c) 1983 + Interlogic / Kosuka
 
 @source:meijinsn.cpp
 meijinsn                        // (c) 1986 SNK
@@ -21015,6 +21025,7 @@ dayto2pe                        // 1998.12 Daytone USA 2 Power Edition
 daytona2                        // 1998.06 Daytona USA 2
 dirtdvls                        // 1998.10 Dirt Devils
 dirtdvlsa                       //
+dirtdvlsj                       //
 eca                             // 1999.10 Kyukyuusya Emergency Call Ambulance
 ecap                            // 1999.12 Emergency Call Ambulance - US proto or location test
 ecau                            //
@@ -30955,7 +30966,7 @@ ddp2j                           //
 ddp2k                           //
 ddp2t                           //
 ddp3							// (c) 2002 DoDonPachi Dai-Ou-Jou / DoDonPachi III
-ddpdoj                          // 
+ddpdoj                          //
 ddpdoja                         //
 ddpdojb                         //
 ddpdojblk                       //
@@ -31562,6 +31573,7 @@ popeyebl                        // bootleg
 popeyef                         // (c) 1982
 popeyeu                         // (c) 1982
 popeyej                         //
+popeyejo                        //
 skyskipr                        // (c) 1981
 
 @source:popobear.cpp
@@ -37133,12 +37145,13 @@ warfac                          // (c) 1999 Atari Games
 esckids                         // GX975 (c) 1991 (Asia)
 esckidsj                        // GX975 (c) 1991 (Japan)
 vendetta                        // GX081 (c) 1991 (World)
-vendetta2p                      // GX081 (c) 1991 (World)
 vendetta2pd                     // GX081 (c) 1991 (Asia)
 vendetta2peba                   // GX081 (c) 1991 (World)
+vendetta2pp                     // GX081 (c) 1991 (Japan)
 vendetta2pu                     // GX081 (c) 1991 (Asia)
 vendetta2pun                    // GX081 (c) 1991 (World)
-vendettaj                       // GX081 (c) 1991 (Japan)
+vendetta2pw                     // GX081 (c) 1991 (World)
+vendettan                       // GX081 (c) 1991 (Japan)
 vendettar                       // GX081 (c) 1991 (World)
 vendettaz                       // GX081 (c) 1991 (World)
 

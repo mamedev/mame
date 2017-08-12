@@ -413,7 +413,6 @@ public:
 	DECLARE_READ8_MEMBER(htengoku_coin_r);
 	DECLARE_WRITE8_MEMBER(htengoku_rombank_w);
 	DECLARE_WRITE8_MEMBER(htengoku_blit_romregion_w);
-	DECLARE_MACHINE_START(htengoku);
 	DECLARE_VIDEO_START(htengoku);
 	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
 	DECLARE_READ8_MEMBER(htengoku_dsw_r);
@@ -4123,15 +4122,6 @@ uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_in
 	return screen_update_ddenlovr(screen, bitmap, cliprect);
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,htengoku)
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
-
-	MACHINE_START_CALL_MEMBER(dynax);
-}
-
 WRITE8_MEMBER(ddenlovr_state::htengoku_select_w)
 {
 	m_input_sel = data;
@@ -4208,8 +4198,7 @@ READ8_MEMBER(ddenlovr_state::htengoku_coin_r)
 
 WRITE8_MEMBER(ddenlovr_state::htengoku_rombank_w)
 {
-	membank("bank1")->set_entry(data & 0x07);
-	m_hnoridur_bank = data;
+	m_bankdev->set_bank(data & 0x1f);
 }
 
 WRITE8_MEMBER(ddenlovr_state::htengoku_blit_romregion_w)
@@ -4262,8 +4251,12 @@ static ADDRESS_MAP_START( htengoku_mem_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0x8000, 0x81ff ) AM_WRITE(yarunara_palette_w) // Palette or RTC
+	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( htengoku_banked_map, AS_PROGRAM, 8, dynax_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x10000)
+	AM_RANGE(0x80000, 0x801ff) AM_WRITE(tenkai_palette_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( htengoku )
@@ -4275,7 +4268,13 @@ static MACHINE_CONFIG_START( htengoku )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
 	MCFG_CPU_PERIODIC_INT_DRIVER(ddenlovr_state, yarunara_clock_interrupt,  60)    // RTC
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,htengoku)
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(htengoku_banked_map)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

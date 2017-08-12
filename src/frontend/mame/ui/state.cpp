@@ -328,9 +328,7 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 
 void menu_load_save_state_base::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	extra_text_render(top, bottom, origx1, origy1, origx2, origy2,
-		m_header,
-		m_footer);
+	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, m_header, m_footer);
 }
 
 

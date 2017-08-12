@@ -520,13 +520,21 @@ READ32_MEMBER(dragngun_state::service_r)
 	return ioport("IN2")->read();
 }
 
+// TODO: improve this, Y axis not understood at all
 READ32_MEMBER(dragngun_state::lockload_gun_mirror_r)
 {
 //logerror("%08x:Read gun %d\n",space.device().safe_pc(),offset);
-//return ((machine().rand()%0xffff)<<16) | machine().rand()%0xffff;
-	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return ioport("IN4")->read() | ((machine().rand()%0xff)<<16);
-	return ioport("IN3")->read() | ioport("LIGHT0_X")->read() | (ioport("LIGHT0_X")->read()<<16) | (ioport("LIGHT0_X")->read()<<24); //((machine().rand()%0xff)<<16);
+
+	switch(offset)
+	{
+		case 0:
+			return ioport("IN3")->read() | (ioport("LIGHT0_X")->read()) | (ioport("LIGHT0_X")->read()<<11) | (ioport("LIGHT0_Y")->read()<<19);
+			
+		case 1:
+			return ioport("IN4")->read() | (ioport("LIGHT1_X")->read()) | (ioport("LIGHT1_X")->read()<<11) | (ioport("LIGHT1_Y")->read()<<19);
+	}
+
+	return ~0;
 }
 
 READ32_MEMBER(dragngun_state::lightgun_r)
@@ -2268,9 +2276,10 @@ static MACHINE_CONFIG_START( lockload )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(42*8, 32*8+22)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(42*8, 32*8+22)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(28000000/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
@@ -2332,7 +2341,7 @@ static MACHINE_CONFIG_START( lockload )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/32, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END

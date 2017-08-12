@@ -21,13 +21,12 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_READ8_MEMBER(prot1_r);
 	DECLARE_READ8_MEMBER(prot2_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(attributes_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(ressound_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(dsw_sel_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
