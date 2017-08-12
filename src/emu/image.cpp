@@ -191,30 +191,41 @@ void image_manager::options_extract()
 		//  2.  When is_reset_on_load(), and this results in a device being unmounted (unmounting is_reset_and_load()
 		//      doesn't force an unmount).
 		//
-		//      Note that as a part of #2, we cannot extract the option when the image in question is a part of an
-		//      active reset_on_load; hence the check for is_reset_and_loading() (see issue #2414)
-		if (!image.is_reset_on_load()
-			|| (!image.exists() && !image.is_reset_and_loading() && !machine().options().image_option(image.instance_name()).value().empty()))
-		{
-			// we have to assemble the image option differently for software lists and for normal images
-			std::string image_opt;
-			if (image.exists())
-			{
-				if (!image.loaded_through_softlist())
-					image_opt = image.filename();
-				else if (image.part_entry() && !image.part_entry()->name().empty())
-					image_opt = util::string_format("%s:%s:%s", image.software_list_name(), image.full_software_name(), image.part_entry()->name());
-				else
-					image_opt = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
-			}
+		//  Note that:
+		//	1.  As a part of scenario #2 above , we cannot extract the option when the image in question is a part of an
+		//		active reset_on_load; hence the check for is_reset_and_loading() (see issue #2414)
+		//
+		//	2.	We have to account for the following two scenarios:
+		//		- The image device was unmounted, in which case the option will no longer exist
+		//		- The image device is still there, but with a different name (e.g. - floppydisk vs floppydisk1), hence
+		//		  the need to use the canonical option name (which in the above example, will always be 'floppydisk1')
 
-			// and set the option; note that we have to account for the following two scenarios:
-			//  - The image device was unmounted, in which case the option will no longer exist
-			//	- The image device is still there, but with a different name (e.g. - floppydisk vs floppydisk1), hence
-			//    the need to use the canonical option name (which in the above example, will always be 'floppydisk1')
-			auto opt = machine().options().find_image_option_canonical(image.instance_name());
-			if (opt)
-				opt->specify(std::move(image_opt));
+		// The very first step in this is to find the option; if it is not there, this is all irrelevant
+		auto image_opt = machine().options().find_image_option_canonical(image.instance_name());
+		if (image_opt)
+		{
+			// We've found the image option; check for the two scenarios outlined above
+			if (!image.is_reset_on_load()
+				|| (!image.exists() && !image.is_reset_and_loading() && image_opt->value().empty()))
+			{
+				// we have to assemble the image option differently for software lists and for normal images
+				std::string new_image_opt_value;
+				if (image.exists())
+				{
+					if (!image.loaded_through_softlist())
+						new_image_opt_value = image.filename();
+					else if (image.part_entry() && !image.part_entry()->name().empty())
+						new_image_opt_value = util::string_format("%s:%s:%s", image.software_list_name(), image.full_software_name(), image.part_entry()->name());
+					else
+						new_image_opt_value = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
+				}
+
+				// and set the option; note that we have to account for the following two scenarios:
+				//  - The image device was unmounted, in which case the option will no longer exist
+				//	- The image device is still there, but with a different name (e.g. - floppydisk vs floppydisk1), hence
+				//    the need to use the canonical option name (which in the above example, will always be 'floppydisk1')
+				image_opt->specify(std::move(new_image_opt_value));
+			}
 		}
 	}
 
