@@ -39,7 +39,7 @@ static const folders_entry s_folders[] =
 	{ __("Samples"),             OPTION_SAMPLEPATH,         ADDING },
 	{ __("DATs"),                OPTION_HISTORY_PATH,       ADDING },
 	{ __("INIs"),                OPTION_INIPATH,            ADDING },
-	{ __("Extra INIs"),          OPTION_EXTRAINI_PATH,      CHANGE },
+	{ __("Category INIs"),       OPTION_CATEGORYINI_PATH,   CHANGE },
 	{ __("Icons"),               OPTION_ICONS_PATH,         ADDING },
 	{ __("Cheats"),              OPTION_CHEATPATH,          ADDING },
 	{ __("Snapshots"),           OPTION_SNAPSHOT_DIRECTORY, ADDING },

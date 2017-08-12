@@ -284,7 +284,7 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPNAME( 0x01, 0x01, "Right Slot" )                PORT_DIPLOCATION("SWD:1")
 	PORT_DIPSETTING(    0x01, "On Right (Bottom) Counter" )
 	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
-	PORT_DIPNAME( 0x02, 0x02, "Left Slot" )                 PORT_DIPLOCATION("SWD:2")
+	PORT_DIPNAME( 0x02, 0x00, "Left Slot" )                 PORT_DIPLOCATION("SWD:2")
 	PORT_DIPSETTING(    0x02, "On Right (Bottom) Counter" )
 	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
 	PORT_DIPNAME( 0x1c, 0x00, "Credits For Bonus" )         PORT_DIPLOCATION("SWD:3,4,5")
@@ -309,11 +309,16 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+#ifdef THREE_STATE_SWITCH
 	PORT_DIPNAME( 0x30, 0x30, "Self Test Switch" )          PORT_DIPLOCATION("SWT:1,2")
 	//PORT_DIPSETTING(    0x00, "?" )                       /* Not possible, 3-state switch */
 	PORT_DIPSETTING(    0x20, "Free Game" )                 /* "Puts a credit on the game without increasing the coin counter." */
 	PORT_DIPSETTING(    0x10, DEF_STR( Test ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
+#else // schematics don't make it clear exactly how this switch is supposed to work
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Free Game/Self-Test")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+#endif
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 

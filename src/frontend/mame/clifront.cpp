@@ -360,8 +360,7 @@ void cli_frontend::listfull(const std::vector<std::string> &args)
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
-		if ((drivlist.driver().flags & machine_flags::NO_STANDALONE) == 0)
-			osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
+		osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
 }
 
 

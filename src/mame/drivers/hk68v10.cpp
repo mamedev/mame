@@ -390,4 +390,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME          PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY                  FULLNAME    FLAGS */
-COMP (1985, hk68v10,      0,      0,       hk68v10, hk68v10, hk68v10_state, 0,    "Heurikon Corporation",  "HK68/V10", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1985, hk68v10,      0,      0,       hk68v10, hk68v10, hk68v10_state, 0,    "Heurikon Corporation",  "HK68/V10", MACHINE_NO_SOUND_HW )

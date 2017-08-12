@@ -192,4 +192,4 @@ ROM_END
 
 /* Drivers TODO: setup distinct miniforce machine configurations */
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY             FULLNAME      FLAGS */
-COMP (1987, miniforce,  0,      0,      miniforce,  miniforce,  miniforce_state,  0,    "Force Computers",  "miniFORCE",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER)
+COMP (1987, miniforce,  0,      0,      miniforce,  miniforce,  miniforce_state,  0,    "Force Computers",  "miniFORCE",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

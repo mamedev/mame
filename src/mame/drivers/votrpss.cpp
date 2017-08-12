@@ -7,54 +7,41 @@
 *  with help from Kevin 'kevtris' Horton
 *  Special thanks to Professor Nicholas Gessler for loaning several PSS units
 *
-*  The votrax PSS was sold from around 35th week of 1982 until october, 1990 (LONG product life)
+*  The votrax PSS was sold from around 35th week of 1982 until october, 1990
 
-<kevtris> timer0 = baud clock
-<kevtris> timer1 = pitch (duty cycle output to modify RC)
-<kevtris> timer2 = volume (duty cycle output to control trans. gate which does vol. control)
-<kevtris> portb: pin 6 through pin 13 of parallel port
-<kevtris> portc 0 = NC, 1 = GND, 2 = pin 5, 3 = /RXINTEN, 4 = pin 15, 5 = pin 14 through inverter, 6 = 8910 enable, 7 = from pin 4 through inverter (I believe that's for the parallel port)
-<kevtris> porta: pin 16 through 23 of parallel port
-<kevtris> that's the 8255
-<kevtris> on the AY-3-8910:
-<kevtris> IOA0-A5 = phoneme #
-<kevtris> IOA6 = strobe (SC-01)
-<kevtris> IOA7 = vochord control, 0 = off, 1 = on
-<kevtris> IOB0-IOB7 = dip switches
-<kevtris> there ya go, complete IO port map
-<LordNLptp> cool :)
-<kevtris> I pinned the IO to the serial port from the 8251 but I don't think it's too useful
-<LordNLptp> eh, its useful
-<kevtris> I drew out the schematic for the analog section
-<LordNLptp> oh that will be useful
-<kevtris> but I didn't draw out the digital part, just made an I/O and memory map but I can't find them
-<LordNLptp> i also see the ay is running at 2 MHz
-<kevtris> sounds about right
-<kevtris> got it
-<kevtris> I drew out the clocking section too
-<kevtris> 8MHz xtal
-<kevtris> 4MHz for the Z80
-<kevtris> 2MHz for the 8253 and '8910
-<kevtris> then the dividers also generate the system reset signals for the 8251
-<kevtris> and a periodic IRQ
-<LordNLptp> on the z80?
-<LordNLptp> ok how does that work?
-<kevtris> IRQ rate is umm
-<kevtris> 122Hz
-<kevtris> (8MHz / 65536)
-<kevtris> oh the 8251 is not reset by the counters
-<kevtris> it just takes a positive reset off an inverter that resets the counters
-<kevtris> PIT2 is gated by 8MHz / 256
-<kevtris> PIT1 is gated by 8MHz / 4096
-<kevtris> PIT0 is not gated
-<kevtris> (i.e. it always runs)
-<LordNLptp> oh boy, this is sounding more fun by the minute
-<kevtris> aaand your luck is about to run out
-<kevtris> that's all I got
-<LordNLptp> thats good enough, saved me a lot of work
-<kevtris> but that's everything you need
-<LordNLptp> yeah
+Main xtal is 8MHz
+AY-3-8910 and i8253 clock is running at 2 MHz (xtal/4)
+Z80A is runing at 4MHz (xtal/2)
+clock dividers also generate the system reset signals for the 8251 and and a periodic IRQ at 122Hz (xtal/65536)
 
+I8253:
+Timer0 = Baud Clock, not gated (constantly on)
+Timer1 = output to transistor chopper on clock input to sc-01-a to control pitch; gated by xtal/256
+Timer2 = output to transistor chopper on output of sc-01-a to control volume; gated by xtal/4096
+
+I8255 ports:
+PortA 0:7 = pins 16 thru 23 of parallel port
+PortB 0:7 = pins 6 thru 13 of parallel port
+PortC =
+	0 = NC
+	1 = GND
+	2 = pin 5 of parallel port
+	3 = /RXINTEN
+	4 = pin 15 of parallel port
+	5 = pin 14 of parallel port through inverter
+	6 = ay-3-8910 enable (which pin? BC1?)
+	7 = input from parallel port pin 4 through inverter
+
+AY-3-8910 I/O ports:
+	IOA is in output mode
+		IOA0-A5 = phoneme #
+		IOA6 = strobe (SC-01)
+		IOA7 = vochord control, 0 = off, 1 = on
+	IOB is in input mode
+		IOB0-IOB7 = dip switches
+
+I8251 UART:
+	RESET is taken from the same inverter that resets the counters
 
 Things to be looked at:
 - Serial doesn't work, so has been disabled.

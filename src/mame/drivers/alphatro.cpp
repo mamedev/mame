@@ -602,16 +602,22 @@ image_init_result alphatro_state::load_cart(device_image_interface &image, gener
 {
 	uint32_t size = slot->common_get_size("rom");
 
-	if (!image.loaded_through_softlist())
+	if ((size != 0x4000) && (size != 0x2000))
 	{
-		if (size != 0x4000)
-		{
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid size, must be 16 K" );
-		}
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid size, must be 8 or 16 K" );
+		return image_init_result::FAIL;
 	}
 
-	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
-	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
+
+	if (size == 0x4000) // 16K ROMs come in at 0xA000
+	{
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+	}
+	else    // load 8K ROMs at an offset of 8K so they end up at 0xC000
+	{
+		slot->common_load_rom(slot->get_rom_base()+0x2000, size, "rom");
+	}
 
 	return image_init_result::PASS;
 }
@@ -707,6 +713,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
@@ -730,6 +737,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("alphatro_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","alphatro_cass")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", alphatro_state, timer_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", alphatro_state, timer_p, attotime::from_hz(40000))
@@ -741,6 +749,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
 	MCFG_GENERIC_EXTENSIONS("bin")
 	MCFG_GENERIC_LOAD(alphatro_state, cart_load)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","alphatro_cart")
 
 	/* 0000 banking */
 	MCFG_DEVICE_ADD("lowbank", ADDRESS_MAP_BANK, 0)
@@ -762,9 +771,6 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 MACHINE_CONFIG_END
 
 

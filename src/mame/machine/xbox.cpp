@@ -254,7 +254,7 @@ void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string>
 	con.printf("Header.Inserted %d byte\n", cpu.read_byte(space, address + 3, true));
 	con.printf("Header.SignalState %08X dword\n", cpu.read_dword(space, address + 4, true));
 	con.printf("Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 8, true), cpu.read_dword(space, address + 12, true));
-	con.printf("%s", string_format("DueTime %I64x qword\n", (int64_t)cpu.read_qword(space, address + 16, true)).c_str());
+	con.printf("%s", string_format("DueTime %x qword\n", (int64_t)cpu.read_qword(space, address + 16, true)).c_str());
 	con.printf("TimerListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 24, true), cpu.read_dword(space, address + 28, true));
 	con.printf("Dpc %08X dword\n", cpu.read_dword(space, address + 32, true));
 	con.printf("Period %d dword\n", cpu.read_dword(space, address + 36, true));

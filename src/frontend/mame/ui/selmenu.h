@@ -107,6 +107,8 @@ protected:
 
 	// handlers
 	void inkey_navigation();
+	virtual void inkey_export() = 0;
+	void inkey_dats();
 
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
@@ -114,14 +116,27 @@ protected:
 
 	bool draw_error_text();
 
+	template <typename Filter>
+	float draw_left_panel(
+			typename Filter::type current,
+			std::map<typename Filter::type, typename Filter::ptr> const &filters,
+			float x1, float y1, float x2, float y2);
+
 	template <typename T> bool select_bios(T const &driver, bool inlist);
 	bool select_part(software_info const &info, ui_software_info const &ui_info);
 
-	int     l_hover, l_sw_hover;
-	int     visible_items;
-	void    *m_prev_selected;
-	int     m_total_lines;
-	int     m_topline_datsview;   // right box top line
+	void *get_selection_ptr() const
+	{
+		void *const selected_ref(get_selection_ref());
+		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
+	}
+
+	int         visible_items;
+	void        *m_prev_selected;
+	int         m_total_lines;
+	int         m_topline_datsview;
+	int         m_filter_highlight;
+	std::string m_search;
 
 	static char const *const s_info_titles[];
 
@@ -187,6 +202,7 @@ private:
 
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
+	float draw_collapsed_left_panel(float x1, float y1, float x2, float y2);
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);
@@ -194,6 +210,7 @@ private:
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
+	virtual bool accept_search() const { return true; }
 	void select_prev()
 	{
 		if (!m_prev_selected)
@@ -225,6 +242,9 @@ private:
 	// handle mouse
 	virtual void handle_events(uint32_t flags, event &ev) override;
 
+	// live search active?
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
+
 	// draw game list
 	virtual void draw(uint32_t flags) override;
 
@@ -242,6 +262,9 @@ private:
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
 	virtual std::string make_driver_description(game_driver const &driver) const = 0;
 	virtual std::string make_software_description(ui_software_info const &software) const = 0;
+
+	// filter navigation
+	virtual void filter_selected() = 0;
 
 	static void launch_system(mame_ui_manager &mui, game_driver const &driver, ui_software_info const *swinfo, std::string const *part, int const *bios);
 	static bool select_part(mame_ui_manager &mui, render_container &container, software_info const &info, ui_software_info const &ui_info);

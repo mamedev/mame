@@ -219,7 +219,6 @@ DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
 } // namespace ui
 
 #define MAX_CHAR_INFO            256
-#define MAX_CUST_FILTER          8
 
 enum
 {
@@ -273,11 +272,10 @@ enum
 	HOVER_RPANEL_ARROW,
 	HOVER_LPANEL_ARROW,
 	HOVER_FILTER_FIRST,
-	HOVER_FILTER_LAST = (HOVER_FILTER_FIRST) + ui::machine_filter::COUNT,
-	HOVER_SW_FILTER_FIRST,
-	HOVER_SW_FILTER_LAST = (HOVER_SW_FILTER_FIRST) + ui::software_filter::COUNT,
+	HOVER_FILTER_LAST = HOVER_FILTER_FIRST + std::max<int>(ui::machine_filter::COUNT, ui::software_filter::COUNT),
 	HOVER_RP_FIRST,
-	HOVER_RP_LAST = (HOVER_RP_FIRST) + 1 + RP_LAST
+	HOVER_RP_LAST = HOVER_RP_FIRST + 1 + RP_LAST,
+	HOVER_INFO_TEXT
 };
 
 // FIXME: this stuff shouldn't all be globals

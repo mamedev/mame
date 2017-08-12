@@ -699,6 +699,7 @@ BUSES["PC_KBD"] = true
 BUSES["PET"] = true
 BUSES["PLUS4"] = true
 BUSES["POFO"] = true
+BUSES["PSI_KEYBOARD"] = true
 BUSES["PSX_CONTROLLER"] = true
 BUSES["QL"] = true
 BUSES["RS232"] = true

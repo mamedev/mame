@@ -443,8 +443,6 @@ void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *
 	// append bios and runnable flags
 	if (driver.flags & machine_flags::IS_BIOS_ROOT)
 		fprintf(m_output, " isbios=\"yes\"");
-	if (driver.flags & machine_flags::NO_STANDALONE)
-		fprintf(m_output, " runnable=\"no\"");
 	if (driver.flags & machine_flags::MECHANICAL)
 		fprintf(m_output, " ismechanical=\"yes\"");
 

@@ -3136,3 +3136,19 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/psi_kbd/psi_kbd.h,BUSES["PSI_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["PSI_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psi_kbd/psi_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/psi_kbd/psi_kbd.h",
+		MAME_DIR .. "src/devices/bus/psi_kbd/ergoline.cpp",
+		MAME_DIR .. "src/devices/bus/psi_kbd/ergoline.h",
+		MAME_DIR .. "src/devices/bus/psi_kbd/hle.cpp",
+		MAME_DIR .. "src/devices/bus/psi_kbd/hle.h",
+	}
+end

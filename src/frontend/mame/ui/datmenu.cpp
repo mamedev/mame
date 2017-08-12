@@ -64,7 +64,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 //  ctor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, ui_software_info *swinfo, const game_driver *driver)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const game_driver *driver)
 	: menu(mui, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
@@ -149,20 +149,20 @@ void menu_dats_view::populate(float &customtop, float &custombottom)
 
 void menu_dats_view::draw(uint32_t flags)
 {
-	auto line_height = ui().get_line_height();
-	auto ud_arrow_width = line_height * machine().render().ui_aspect();
-	auto gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-	float visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
-	float visible_left = (1.0f - visible_width) * 0.5f;
+	float const line_height = ui().get_line_height();
+	float const ud_arrow_width = line_height * machine().render().ui_aspect();
+	float const gutter_width = 0.52f * line_height * machine().render().ui_aspect();
+	float const visible_width = 1.0f - (2.0f * UI_BOX_LR_BORDER);
+	float const visible_left = (1.0f - visible_width) * 0.5f;
+	float const extra_height = 2.0f * line_height;
+	float const visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
+	int const visible_items = item.size() - 2;
+
+	// determine effective positions taking into account the hilighting arrows
+	float const effective_width = visible_width - 2.0f * gutter_width;
+	float const effective_left = visible_left + gutter_width;
 
 	draw_background();
-
-	hover = item.size() + 1;
-	int visible_items = item.size() - 2;
-	float extra_height = 2.0f * line_height;
-	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
-
-	// locate mouse
 	map_mouse();
 
 	// account for extra space at the top and bottom
@@ -170,11 +170,8 @@ void menu_dats_view::draw(uint32_t flags)
 	m_visible_lines = int(std::trunc(visible_main_menu_height / line_height));
 	visible_main_menu_height = float(m_visible_lines) * line_height;
 
-	// compute top/left of inner menu area by centering
-	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
-
-	// if the menu is at the bottom of the extra, adjust
-	visible_top += get_customtop();
+	// compute top/left of inner menu area by centering, if the menu is at the bottom of the extra, adjust
+	float const visible_top = ((1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f) + get_customtop();
 
 	// compute left box size
 	float x1 = visible_left;
@@ -190,27 +187,25 @@ void menu_dats_view::draw(uint32_t flags)
 	if (top_line + m_visible_lines >= visible_items)
 		top_line = visible_items - m_visible_lines;
 
-	// determine effective positions taking into account the hilighting arrows
-	float effective_width = visible_width - 2.0f * gutter_width;
-	float effective_left = visible_left + gutter_width;
-
+	hover = item.size() + 1;
 	int const n_loop = (std::min)(visible_items, m_visible_lines);
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
-		float line_y = visible_top + (float)linenum * line_height;
-		int itemnum = top_line + linenum;
-		const menu_item &pitem = item[itemnum];
-		const char *itemtext = pitem.text.c_str();
+		float const line_y = visible_top + (float)linenum * line_height;
+		int const itemnum = top_line + linenum;
+		menu_item const &pitem = item[itemnum];
+		char const *const itemtext = pitem.text.c_str();
+		float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+		float const line_y0 = line_y;
+		float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+		float const line_y1 = line_y + line_height;
+
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
-		float line_y0 = line_y;
-		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
-		float line_y1 = line_y + line_height;
 
-		// if we're on the top line, display the up arrow
-		if (linenum == 0 && top_line != 0)
+		if (!linenum && top_line)
 		{
+			// if we're on the top line, display the up arrow
 			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
@@ -218,14 +213,14 @@ void menu_dats_view::draw(uint32_t flags)
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_UP;
 			}
-
-			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-					   0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
-
+			draw_arrow(
+					0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+					0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height,
+					fgcolor, ROT0);
 		}
-		// if we're on the bottom line, display the down arrow
-		else if (linenum == m_visible_lines - 1 && itemnum != visible_items - 1)
+		else if ((linenum == m_visible_lines - 1) && (itemnum != visible_items - 1))
 		{
+			// if we're on the bottom line, display the down arrow
 			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
@@ -233,41 +228,52 @@ void menu_dats_view::draw(uint32_t flags)
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_DOWN;
 			}
-
-			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-					   0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
+			draw_arrow(
+					0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+					0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height,
+					fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 		}
-
-		// draw dats text
 		else if (pitem.subtext.empty())
 		{
-			ui().draw_text_full(container(), itemtext, effective_left, line_y, effective_width, ui::text_layout::LEFT, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			// draw dats text
+			ui().draw_text_full(
+					container(), itemtext,
+					effective_left, line_y, effective_width,
+					ui::text_layout::LEFT, ui::text_layout::NEVER,
+					mame_ui_manager::NORMAL, fgcolor, bgcolor,
+					nullptr, nullptr);
 		}
 	}
 
 	for (size_t count = visible_items; count < item.size(); count++)
 	{
-		const menu_item &pitem = item[count];
-		const char *itemtext = pitem.text.c_str();
-		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
-		float line_y0 = line;
-		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
-		float line_y1 = line + line_height;
-		rgb_t fgcolor = UI_SELECTED_COLOR;
-		rgb_t bgcolor = UI_SELECTED_BG_COLOR;
+		menu_item const &pitem = item[count];
+		char const *const itemtext = pitem.text.c_str();
+		float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+		float const line_y0 = line;
+		float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+		float const line_y1 = line + line_height;
+		rgb_t const fgcolor = UI_SELECTED_COLOR;
+		rgb_t const bgcolor = UI_SELECTED_BG_COLOR;
 
 		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 			hover = count;
 
 		if (pitem.type == menu_item_type::SEPARATOR)
-			container().add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
-				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		{
+			container().add_line(
+					visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
+					UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		}
 		else
 		{
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
-			ui().draw_text_full(container(), itemtext, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(
+					container(), itemtext,
+					effective_left, line, effective_width,
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, fgcolor, bgcolor,
+					nullptr, nullptr);
 		}
 		line += line_height;
 	}
@@ -387,14 +393,17 @@ void menu_dats_view::get_data()
 	std::string buffer;
 	mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option, buffer);
 
+	float const line_height = ui().get_line_height();
+	float const gutter_width = 0.52f * line_height * machine().render().ui_aspect();
+	float const visible_width = 1.0f - (2.0f * UI_BOX_LR_BORDER);
+	float const effective_width = visible_width - 2.0f * gutter_width;
 
-	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, effective_width, xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		if((tempbuf[0] == '#') && !x)
-			continue;
-		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
+		if ((tempbuf[0] != '#') || x)
+			item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
 	}
 }
 

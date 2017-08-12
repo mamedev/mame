@@ -21,6 +21,7 @@
 #include "machine/upd1990a.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
+#include "bus/psi_kbd/psi_kbd.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -145,9 +146,7 @@ static ADDRESS_MAP_START( psi98_io, AS_IO, 8, kdt6_state )
 	AM_RANGE(0x18, 0x18) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(status0_w)
-#if 0
-	AM_RANGE(0x1d, 0x1d) KEYBOARD
-#endif
+	AM_RANGE(0x1d, 0x1d) AM_DEVREAD("kbd", psi_keyboard_bus_device, key_data_r)
 	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE("fdc", upd765a_device, mdma_r, mdma_w)
 	AM_RANGE(0x1f, 0x1f) AM_WRITE(fdc_tc_w)
 	AM_RANGE(0x20, 0x2f) AM_READWRITE(mapper_r, mapper_w)
@@ -484,6 +483,7 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(kdt6_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc2", z80ctc_device, trg2))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -498,16 +498,20 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(kdt6_state, io_r))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(kdt6_state, io_w))
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_9_8304MHz / 8) // jumper J3 allows selection of 16MHz / 8 instead
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 8)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_Z80SIO_ADD("sio", 0, 0, 0, 0, 0)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", psi_keyboard_bus_device, tx_w))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
@@ -515,6 +519,10 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(kdt6_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
+
+	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
+	MCFG_PSI_KEYBOARD_RX_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg1))
 
 	// 6 ECB slots
 MACHINE_CONFIG_END
@@ -532,9 +540,6 @@ ROM_START( psi98 )
 	ROM_REGION(0x1000, "gfx", 0)
 	ROM_LOAD("ch6_d-e.bin", 0x0000, 0x1000, CRC(e7bca335) SHA1(454ca3b8b8ac66464870e4bd5497050038d771c8))      // SUM16: 39b1 (file: 5f55)
 
-	ROM_REGION(0x1000, "keyboard", 0)
-	ROM_LOAD("mcg_21_1035.bin", 0x0000, 0x1000, CRC(cde2417e) SHA1(8a2e1a894fda3e92fd760b8523121ba171281206))  // SUM16: 06f0 (ok)
-
 	// PALs
 	// 1-FF5B  12L6  memory address decoder
 	// 2-0F61  12L8  i/o address decoder
@@ -551,5 +556,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT  CLASS       INIT  ROTATION  COMPANY    FULLNAME  FLAGS
-GAME( 1984, psi98,  0,      psi98,   psi98, kdt6_state, 0,    ROT0,     "Kontron", "PSI98",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY    FULLNAME  FLAGS
+COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -124,7 +124,6 @@ public:
 	uint8_t m_hopper;
 
 	/* misc */
-	int m_hnoridur_bank;
 	uint8_t m_palette_ram[16*256*2];
 	int m_palbank;
 	int m_msm5205next;
@@ -140,7 +139,6 @@ public:
 	int m_tenkai_6c;
 	int m_tenkai_70;
 	uint8_t m_gekisha_val[2];
-	uint8_t *m_hnoridur_ptr;
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
@@ -159,9 +157,12 @@ public:
 	DECLARE_WRITE8_MEMBER(cdracula_sound_rombank_w);
 	DECLARE_WRITE8_MEMBER(hnoridur_rombank_w);
 	DECLARE_WRITE8_MEMBER(hnoridur_palbank_w);
-	DECLARE_WRITE8_MEMBER(hnoridur_palette_w);
-	DECLARE_WRITE8_MEMBER(yarunara_palette_w);
-	DECLARE_WRITE8_MEMBER(nanajign_palette_w);
+	DECLARE_WRITE8_MEMBER(hnoridur_palette_lo_w);
+	DECLARE_WRITE8_MEMBER(hnoridur_palette_hi_w);
+	void hnoridur_palette_update(offs_t offset);
+	DECLARE_WRITE8_MEMBER(nanajign_palette_lo_w);
+	DECLARE_WRITE8_MEMBER(nanajign_palette_hi_w);
+	void nanajign_palette_update(offs_t offset);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(yarunara_mainlatch_w);
 	DECLARE_WRITE8_MEMBER(hjingi_bank_w);
@@ -183,7 +184,6 @@ public:
 	DECLARE_READ8_MEMBER(jantouki_soundlatch_status_r);
 	DECLARE_READ8_MEMBER(mjelctrn_keyboard_1_r);
 	DECLARE_READ8_MEMBER(mjelctrn_dsw_r);
-	DECLARE_WRITE8_MEMBER(mjelctrn_blitter_ack_w);
 	DECLARE_WRITE8_MEMBER(tenkai_ipsel_w);
 	DECLARE_WRITE8_MEMBER(tenkai_ip_w);
 	DECLARE_READ8_MEMBER(tenkai_ip_r);
@@ -266,10 +266,7 @@ public:
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
-	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
 
 	void tenkai_update_rombank();
@@ -289,7 +286,6 @@ public:
 	DECLARE_MACHINE_START(dynax);
 	DECLARE_MACHINE_START(hanamai);
 	DECLARE_VIDEO_START(hanamai);
-	DECLARE_MACHINE_START(hnoridur);
 	DECLARE_VIDEO_START(hnoridur);
 	DECLARE_PALETTE_INIT(sprtmtch);
 	DECLARE_VIDEO_START(sprtmtch);
@@ -316,7 +312,6 @@ public:
 	void sprtmtch_update_irq();
 	void jantouki_update_irq();
 	void mjelctrn_update_irq();
-	void neruton_update_irq();
 	void jantouki_sound_update_irq();
 	void tenkai_show_6c();
 };
