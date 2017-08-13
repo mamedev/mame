@@ -1039,6 +1039,14 @@ VIDEO_START_MEMBER(dynax_state,neruton)
 	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
+VIDEO_START_MEMBER(dynax_state,tenkai)
+{
+	VIDEO_START_CALL_MEMBER(hnoridur);
+
+	m_priority_table = priority_mjelctrn;
+	m_update_irq_func = &dynax_state::tenkai_update_irq;
+}
+
 /***************************************************************************
 
 

@@ -267,8 +267,6 @@ public:
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
-
 	void tenkai_update_rombank();
 
 	DECLARE_WRITE_LINE_MEMBER(sprtmtch_sound_callback);
@@ -297,6 +295,7 @@ public:
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);
 	DECLARE_VIDEO_START(neruton);
+	DECLARE_VIDEO_START(tenkai);
 
 	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
 	int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
@@ -312,6 +311,7 @@ public:
 	void sprtmtch_update_irq();
 	void jantouki_update_irq();
 	void mjelctrn_update_irq();
+	void tenkai_update_irq();
 	void jantouki_sound_update_irq();
 	void tenkai_show_6c();
 };
