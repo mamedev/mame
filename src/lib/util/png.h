@@ -17,6 +17,8 @@
 #include "corefile.h"
 #include "osdcore.h"
 
+#include <memory>
+
 
 
 /***************************************************************************
@@ -87,28 +89,43 @@ struct png_text
 };
 
 
-struct png_info
+class png_info
 {
-	uint8_t *         image;
-	uint32_t          width, height;
-	uint32_t          xres, yres;
-	rectangle       screen;
-	double          xscale, yscale;
-	double          source_gamma;
-	uint32_t          resolution_unit;
-	uint8_t           bit_depth;
-	uint8_t           color_type;
-	uint8_t           compression_method;
-	uint8_t           filter_method;
-	uint8_t           interlace_method;
+public:
+	~png_info() { free_data(); }
 
-	uint8_t *         palette;
-	uint32_t          num_palette;
+	png_error read_file(util::core_file &fp);
+	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
+	png_error expand_buffer_8bit();
 
-	uint8_t *         trans;
-	uint32_t          num_trans;
+	png_error add_text(char const *keyword, char const *text);
 
-	png_text *      textlist;
+	void free_data();
+	void reset() { free_data(); operator=(png_info()); }
+
+	std::unique_ptr<std::uint8_t []>	image;
+	std::uint32_t                       width, height;
+	std::uint32_t                       xres = 0, yres = 0;
+	rectangle                           screen;
+	double                              xscale = 0, yscale = 0;
+	double                              source_gamma = 0;
+	std::uint32_t                       resolution_unit = 0;
+	std::uint8_t                        bit_depth = 0;
+	std::uint8_t                        color_type = 0;
+	std::uint8_t                        compression_method = 0;
+	std::uint8_t                        filter_method = 0;
+	std::uint8_t                        interlace_method = 0;
+
+	std::unique_ptr<std::uint8_t []>    palette = 0;
+	std::uint32_t                       num_palette = 0;
+
+	std::unique_ptr<std::uint8_t []>    trans = 0;
+	std::uint32_t                       num_trans = 0;
+
+	png_text *                          textlist = nullptr;
+
+private:
+	png_info &operator=(png_info &&) = default;
 };
 
 
@@ -117,18 +134,12 @@ struct png_info
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void png_free(png_info *pnginfo);
-
-png_error png_read_file(util::core_file &fp, png_info *pnginfo);
 png_error png_read_bitmap(util::core_file &fp, bitmap_argb32 &bitmap);
-png_error png_copy_to_bitmap(png_info *p, bitmap_argb32 &bitmap, bool &hasalpha);
-png_error png_expand_buffer_8bit(png_info *p);
 
-png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text);
-png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette);
+png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
 
 png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate);
-png_error mng_capture_frame(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette);
+png_error mng_capture_frame(util::core_file &fp, png_info &info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
 png_error mng_capture_stop(util::core_file &fp);
 
 #endif // MAME_LIB_UTIL_PNG_H
