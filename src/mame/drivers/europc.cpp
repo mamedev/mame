@@ -20,7 +20,7 @@
 *
 * To-Do: HD-20 20 MB XT-IDE harddisk, WD BIOS is in main ROM (load debug, then g=f000:a000 to enter formatter routine)
 *        EMS on PC II and XT is not correct, device driver doesn't load, on those machines the BIOS has extra 512K+256K EMS and 640K + 128K EMS options, which are not shown in  MAME yet.
-*       
+*        correct keyboard for XT
 *
 *****************************************************************************************************/
 
@@ -542,14 +542,19 @@ MACHINE_CONFIG_END
 //Euro PC II
 static MACHINE_CONFIG_DERIVED ( europc2, europc )
 	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
+	MCFG_RAM_DEFAULT_SIZE("768K") // could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
 MACHINE_CONFIG_END
 
 //Euro XT
 static MACHINE_CONFIG_DERIVED ( euroxt, europc )
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K")
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "xtide", false)
+	MCFG_SLOT_FIXED(true)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, "lpt", false)
+	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
 ROM_START( europc )
