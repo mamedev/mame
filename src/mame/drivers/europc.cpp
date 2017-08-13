@@ -19,7 +19,7 @@
 * and the graphics adapter to Color/Graphics 80, internal graphics off
 *
 * To-Do: HD-20 20 MB XT-IDE harddisk, WD BIOS is in main ROM (load debug, then g=f000:a000 to enter formatter routine)
-*        EMS is not correct, device driver doesn't load
+*        EMS on PC II and XT is not correct, device driver doesn't load, on those machines the BIOS has extra 512K+256K EMS and 640K + 128K EMS options, which are not shown in  MAME yet.
 *       
 *
 *****************************************************************************************************/
