@@ -647,14 +647,6 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	if (result != PNGERR_NONE)
 		return false;
 
-	// verify we can handle this PNG
-	if (png.bit_depth > 8)
-	{
-		osd_printf_error("%s: Unsupported bit depth %d (8 bit max)\n", filename, png.bit_depth);
-		png_free(&png);
-		return false;
-	}
-
 	// if less than 8 bits, upsample
 	if (PNGERR_NONE != png_expand_buffer_8bit(&png))
 	{
@@ -674,6 +666,14 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	}
 	else if (png.width == bitmap.width() && png.height == bitmap.height())
 	{
+		// verify we can handle this PNG
+		if (png.bit_depth > 8)
+		{
+			osd_printf_error("%s: Unsupported bit depth %d (8 bit max)\n", filename, png.bit_depth);
+			png_free(&png);
+			return false;
+		}
+
 		// alpha case
 		hasalpha = copy_png_alpha_to_bitmap(bitmap, &png);
 	}

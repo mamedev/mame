@@ -145,16 +145,20 @@ public:
 	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha) const
 	{
 		// do some basic checks for unsupported images
+		if ((8 > pnginfo.bit_depth) || (pnginfo.bit_depth % 8))
+			return PNGERR_UNSUPPORTED_FORMAT; // only do multiples of 8bps here - expand lower bit depth first
 		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
 		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
-		if (8 != pnginfo.bit_depth)
-			return PNGERR_UNSUPPORTED_FORMAT; // only do 8bpp here - expand lower bit depth first
+		if ((3 == pnginfo.color_type) && (8 != pnginfo.bit_depth))
+			return PNGERR_UNSUPPORTED_FORMAT; // indexed colour must be exactly 8bpp
 
 		// everything looks sane, allocate the bitmap and deinterlace into it
 		bitmap.allocate(pnginfo.width, pnginfo.height);
 		std::uint8_t accumalpha(0xff);
+		uint32_t const bps(pnginfo.bit_depth >> 3);
+		uint32_t const bpp(bps * samples[pnginfo.color_type]);
 		unsigned const pass_count(get_pass_count());
 		std::uint32_t pass_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		for (unsigned pass = 0; pass_count > pass; ++pass)
@@ -173,7 +177,7 @@ public:
 				// handle 8bpp palettized case
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, ++src)
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
 						// determine alpha and expand to 32bpp
 						std::uint8_t const alpha((*src < pnginfo.num_trans) ? pnginfo.trans[*src] : 0xff);
@@ -186,10 +190,11 @@ public:
 			}
 			else if (0 == pnginfo.color_type)
 			{
-				// handle 8bpp grayscale non-alpha case
+				// handle grayscale non-alpha case
+				uint32_t const bpp(pnginfo.bit_depth >> 3);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, ++src)
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
 						rgb_t const pix(0xff, src[0], src[0], src[0]);
 						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
@@ -198,38 +203,47 @@ public:
 			}
 			else if (4 == pnginfo.color_type)
 			{
-				// handle 8bpp grayscale alpha case
+				// handle grayscale alpha case
+				uint32_t const i(0 * bps);
+				uint32_t const a(1 * bps);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 2)
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						accumalpha &= src[1];
-						rgb_t const pix(src[1], src[0], src[0], src[0]);
+						accumalpha &= src[a];
+						rgb_t const pix(src[a], src[i], src[i], src[i]);
 						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
 					}
 				}
 			}
 			else if (2 == pnginfo.color_type)
 			{
-				// handle 32bpp non-alpha case
+				// handle RGB non-alpha case
+				uint32_t const r(0 * bps);
+				uint32_t const g(1 * bps);
+				uint32_t const b(2 * bps);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 3)
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						rgb_t const pix(0xff, src[0], src[1], src[2]);
+						rgb_t const pix(0xff, src[r], src[g], src[b]);
 						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
 					}
 				}
 			}
 			else
 			{
-				// handle 32bpp alpha case
+				// handle RGB alpha case
+				uint32_t const r(0 * bps);
+				uint32_t const g(1 * bps);
+				uint32_t const b(2 * bps);
+				uint32_t const a(3 * bps);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 4)
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						accumalpha &= src[3];
-						rgb_t const pix(src[3], src[0], src[1], src[2]);
+						accumalpha &= src[a];
+						rgb_t const pix(src[a], src[r], src[g], src[b]);
 						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
 					}
 				}
@@ -248,12 +262,12 @@ public:
 			return PNGERR_NONE;
 
 		// do some basic checks for unsupported images
-		if ((0 != pnginfo.color_type) && (3 != pnginfo.color_type))
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
-		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
 		if (!pnginfo.bit_depth || (8 % pnginfo.bit_depth))
 			return PNGERR_UNSUPPORTED_FORMAT; // bit depth must be a factor of eight
+		if ((0 != pnginfo.color_type) && (3 != pnginfo.color_type))
+			return PNGERR_UNSUPPORTED_FORMAT; // only upsample monochrome and indexed colour
+		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
 
 		// calculate the offset for each pass of the interlace on the input and output
 		unsigned const pass_count(get_pass_count());
@@ -368,8 +382,8 @@ private:
 	png_error process(std::list<image_data_chunk> const &idata)
 	{
 		// do some basic checks for unsupported images
-		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
+		if (!pnginfo.bit_depth || (ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour format
 		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
 
