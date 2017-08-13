@@ -1402,7 +1402,7 @@ F-E1-16-002
 |                      | XPL84C   || XPL84C   ||
 |                      |          ||          ||
 |                      +----------++----------+|
-|              PAL                             |
+|             GAL1                             |
 | 93C46          DRAM1      ROM1 ROML00  ROMU00|
 |P1 P2   50MHz   E1-16T     ROM2 ROML01  ROMU01|
 |                                              |
@@ -1413,10 +1413,10 @@ CPU: Hyperstone E1-16T @ 50.000MHz
 
      DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
+      GAL1 - PALCE22V10H
 
 Oki M6295 rebaged as AD-65
 YM3012/YM2151 rebaged as KA12/BS901
-PALCE22V10H labeled as GAL1
 
  P1 - Setup push button
  P2 - Reset push button
