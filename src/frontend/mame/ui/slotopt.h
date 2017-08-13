@@ -29,9 +29,6 @@ private:
 	virtual void handle() override;
 
 	device_slot_option *get_current_option(device_slot_interface &slot) const;
-	int get_current_index(device_slot_interface &slot) const;
-	const char *get_next_slot(device_slot_interface &slot) const;
-	const char *get_previous_slot(device_slot_interface &slot) const;
 	void set_slot_device(device_slot_interface &slot, const char *val);
 	void record_current_options();
 	bool try_refresh_current_options();

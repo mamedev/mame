@@ -28,46 +28,71 @@ namespace {
 void *ITEMREF_RESET = ((void *)1);
 char DIVIDER[] = "------";
 
-
-//-------------------------------------------------
-//  get_slot_length
-//-------------------------------------------------
-
-int get_slot_length(const device_slot_interface &slot)
+enum class step_t
 {
-	int val = 0;
-	for (auto &option : slot.option_list())
-		if (option.second->selectable())
-			val++;
-
-	return val;
-}
-
+	NEXT,
+	PREVIOUS
+};
 
 //-------------------------------------------------
-//  get_slot_option
+//  get_adjacent_slot
 //-------------------------------------------------
 
-const char *get_slot_option(device_slot_interface &slot, int index)
+const char *get_adjacent_slot(device_slot_interface &slot, const device_slot_option *current, step_t step)
 {
-	if (index >= 0)
+	// from the current option, get the iterator
+	device_slot_interface::option_list_type::const_iterator original_iter = slot.option_list().cend();
+	if (current)
 	{
-		int val = 0;
-		for (auto &option : slot.option_list())
+		original_iter = std::find_if(
+			slot.option_list().cbegin(),
+			slot.option_list().cend(),
+			[current](const auto &ent)
 		{
-			if (val == index)
-				return option.second->name();
-
-			if (option.second->selectable())
-				val++;
-		}
+			return ent.second.get() == current;
+		});
 	}
 
-	return "";
+	// We need to advance until one of the following conditions apply
+	//   1.  We've advanced to the end (which is always selectable)
+	//   2.  We've found a selectable entry
+	//   3.  We've done a complete circle
+	auto iter = original_iter;
+	do
+	{
+		switch (step)
+		{
+		case step_t::NEXT:
+			if (iter == slot.option_list().cend())
+				iter = slot.option_list().cbegin();
+			else
+				iter++;
+			break;
+
+		case step_t::PREVIOUS:
+			if (iter == slot.option_list().cbegin())
+				iter = slot.option_list().cend();
+			else
+				iter--;
+			break;
+
+		default:
+			throw false;
+		}
+	} while (iter != slot.option_list().cend()
+		&& !iter->second->selectable()
+		&& iter != original_iter);
+
+
+	// return the actual entry
+	return iter != slot.option_list().cend()
+		? iter->second->name()
+		: "";
 }
 
-
 };
+
+
 /***************************************************************************
     SLOT MENU
 ***************************************************************************/
@@ -113,69 +138,6 @@ device_slot_option *menu_slot_devices::get_current_option(device_slot_interface 
 	}
 
 	return slot.option(current.c_str());
-}
-
-
-//-------------------------------------------------
-//  get_current_index
-//-------------------------------------------------
-
-int menu_slot_devices::get_current_index(device_slot_interface &slot) const
-{
-	const device_slot_option *current = get_current_option(slot);
-
-	if (current != nullptr)
-	{
-		int val = 0;
-		for (auto &option : slot.option_list())
-		{
-			if (option.second.get() == current)
-				return val;
-
-			if (option.second->selectable())
-				val++;
-		}
-	}
-
-	return -1;
-}
-
-
-//-------------------------------------------------
-//  get_next_slot
-//-------------------------------------------------
-
-const char *menu_slot_devices::get_next_slot(device_slot_interface &slot) const
-{
-	int idx = get_current_index(slot);
-	if (idx < 0)
-		idx = 0;
-	else
-		idx++;
-
-	if (idx >= get_slot_length(slot))
-		return "";
-
-	return get_slot_option(slot, idx);
-}
-
-
-//-------------------------------------------------
-//  get_previous_slot
-//-------------------------------------------------
-
-const char *menu_slot_devices::get_previous_slot(device_slot_interface &slot) const
-{
-	int idx = get_current_index(slot);
-	if (idx < 0)
-		idx = get_slot_length(slot) - 1;
-	else
-		idx--;
-
-	if (idx < 0)
-		return "";
-
-	return get_slot_option(slot, idx);
 }
 
 
@@ -344,7 +306,10 @@ void menu_slot_devices::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
-			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? get_previous_slot(*slot) : get_next_slot(*slot);
+			const device_slot_option *current = get_current_option(*slot);
+			const char *val = (menu_event->iptkey == IPT_UI_LEFT)
+					? get_adjacent_slot(*slot, current, step_t::PREVIOUS)
+					: get_adjacent_slot(*slot, current, step_t::NEXT);
 			set_slot_device(*slot, val);
 		}
 		else if (menu_event->iptkey == IPT_UI_SELECT)
