@@ -279,7 +279,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_reset_kludge_w);
 	DECLARE_WRITE8_MEMBER(tenkai_dswsel_w);
 	DECLARE_READ8_MEMBER(tenkai_dsw_r);
-	DECLARE_WRITE_LINE_MEMBER(tenkai_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_ack_w);
 	DECLARE_MACHINE_RESET(dynax);
 	DECLARE_MACHINE_START(dynax);
 	DECLARE_MACHINE_START(hanamai);

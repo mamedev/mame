@@ -4782,12 +4782,18 @@ MACHINE_CONFIG_END
 
 void dynax_state::tenkai_update_irq()
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
 }
 
-WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
+WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
+	m_blitter_irq_mask = state;
+
+	// this must be acknowledged somewhere else
+	if (!m_blitter_irq_mask)
+		m_blitter_irq = 0;
+
+	tenkai_update_irq();
 }
 
 
@@ -4822,7 +4828,7 @@ static MACHINE_CONFIG_START( tenkai )
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, tenkai_6c_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, tenkai_70_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)  // IRQ Ack?
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, tenkai_blitter_ack_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4851,7 +4857,7 @@ static MACHINE_CONFIG_START( tenkai )
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(dynax_state, tenkai_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
