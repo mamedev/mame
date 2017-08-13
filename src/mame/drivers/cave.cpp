@@ -31,10 +31,10 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 96 Pac-Slot               Namco         N-44 EM     038 9444WX010   013 9345E7006
 96 Poka Poka Satan        Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
 97 Tekken Card World      Namco         EMG4        038 9701WX001   013 9651EX001
-97 Tekken Battle Scratch  Namco         EMG4        038 9748WX001   013
 97 Dodonpachi             Atlus         AT-C03 D2   038 9341E7010   013 9338EX701
 98 Dangun Feveron         Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.             Atlus         ATC04       038 9841WX002   013 9838EX002
+98 Tekken Battle Scratch  Namco         EMG4        038 9748WX001   013
 98 Uo Poko                Jaleco        CV02        038 9749WX001   013 9749EX004
 99 Guwange                Atlus         ATC05       038 9919WX004   013
 99 Gaia Crusaders         Noise Factory ?           038 9838WX003   013 9918EX008
@@ -4819,7 +4819,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tekken Battle Scratch by Namco, 1997
+  Tekken Battle Scratch by Namco, 1998
   Namco EMG4 platform, PCB 8824960101 (sticker: D 0880)
 
   TMP 68HC000P-16
@@ -5351,7 +5351,7 @@ GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  RO
 GAME( 1996, ppsatan,     0,        ppsatan,  ppsatan,  cave_state, ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1997, tekkencw,    0,        tekkencw, tekkencw, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Card World",     MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tekkenbs,    0,        tekkenbs, tekkenbs, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Battle Scratch", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tekkenbs,    0,        tekkenbs, tekkenbs, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Battle Scratch", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1997, ddonpach,    0,        ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, ddonpachj,   ddonpach, ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )
