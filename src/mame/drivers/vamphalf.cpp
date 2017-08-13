@@ -1432,7 +1432,7 @@ Measured Clocks:
   YM2151  @ 3.5MHz (28MHz/8)
   M6295   @ 1.75MH (28MHz/16), Pin7 High
    H-Sync @ 15.625KHz
-   V-Sync @ 59.189KHz
+   V-Sync @ 59.189Hz
 
 */
 
