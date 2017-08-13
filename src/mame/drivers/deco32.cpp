@@ -528,10 +528,10 @@ READ32_MEMBER(dragngun_state::lockload_gun_mirror_r)
 	switch(offset)
 	{
 		case 0:
-			return ioport("IN3")->read() | (ioport("LIGHT0_X")->read()) | (ioport("LIGHT0_X")->read()<<11) | (ioport("LIGHT0_Y")->read()<<19);
+			return ioport("IN3")->read() | (ioport("LIGHT0_X")->read()) | 0xffff800;
 			
 		case 1:
-			return ioport("IN4")->read() | (ioport("LIGHT1_X")->read()) | (ioport("LIGHT1_X")->read()<<11) | (ioport("LIGHT1_Y")->read()<<19);
+			return ioport("IN4")->read() | (ioport("LIGHT1_X")->read()) | 0xffff800;
 	}
 
 	return ~0;
@@ -2241,17 +2241,18 @@ MACHINE_CONFIG_END
 TIMER_DEVICE_CALLBACK_MEMBER(dragngun_state::lockload_vbl_irq)
 {
 	int scanline = param;
-
+	
 	if(scanline == 31*8)
 	{
 		m_irq_source = 0;
-		m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
 	}
 
-	if(scanline == 0)
+	// TODO: this occurs at lightgun Y positions
+	if(scanline == 64)
 	{
 		m_irq_source = 1;
-		m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
