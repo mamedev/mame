@@ -12,6 +12,7 @@
 
     Minigame Cool Collection        (c) 1999 SemiCom
     Jumping Break                   (c) 1999 F2 System
+    Poosho Poosho                   (c) 1999 F2 System
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
@@ -1380,7 +1381,7 @@ ROM_END
 
 /*
 
-Jumping Break
+Jumping Break & Poosho Poosho
 F2 System, 1999
 
 sequel to "Die Break" from the Bestri 3 game collection (see crospang.c)
@@ -1425,6 +1426,13 @@ ROMs:
     VROM1                - AMD 27C020 2MBit DIP32 EPROM
     ROM1/2               - TMS 27C040 4MBit DIP32 EPROM
 
+Measured Clocks:
+  E1-16T  @ 50MHz
+  YM2151  @ 3.5MHz (28MHz/8)
+  M6295   @ 1.75MH (28MHz/16), Pin7 High
+   H-Sync @ 15.625KHz
+   V-Sync @ 59.189KHz
+
 */
 
 ROM_START( jmpbreak )
@@ -1442,7 +1450,7 @@ ROM_START( jmpbreak )
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
 ROM_END
 
-ROM_START( poosho )
+ROM_START( poosho ) /* Clone of or sequal to Jumping Break */
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(2072c120) SHA1(cf066cd277840fdbb7a854a052a80b2fbb582278) )
 	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(80e70d7a) SHA1(cdafce4bfe7370978414a12aaf482e07a1c89ff8) )
