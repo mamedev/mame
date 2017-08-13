@@ -239,24 +239,18 @@ An unknown device (MCU?) seems to be in charge of the timer / credits / reset to
 
 void smsbootleg_state::bootleg_set_banks()
 {
-	int offset = m_bankbase * 0x8000;
-	int page, realoffset;
+	int page;
 
-	realoffset = offset;
-	m_unpaged->set_base(m_mainrom + realoffset);
-	
+	m_unpaged->set_entry(m_bankbase<<1);
 	page = m_bankmappers[1] & 0xf;
 	page = (page & 0x7) | ((page & 0x8) << 2);
-	realoffset = (offset + 0x0400 + page * 0x4000) & 0x7fffff;
-	m_page0->set_base(m_mainrom + realoffset);
+	m_page0->set_entry(((m_bankbase<<1)+page)&0x1ff);
 	page = m_bankmappers[2] & 0xf;
 	page = (page & 0x7) | ((page & 0x8) << 2);
-	realoffset = (offset + page * 0x4000) & 0x7fffff;
-	m_page1->set_base(m_mainrom + realoffset);
+	m_page1->set_entry(((m_bankbase<<1)+page)&0x1ff);
 	page = m_bankmappers[3] & 0xf;
 	page = (page & 0x7) | ((page & 0x8) << 2);
-	realoffset = (offset + page * 0x4000) & 0x7fffff;
-	m_page2->set_base(m_mainrom + realoffset);
+	m_page2->set_entry(((m_bankbase<<1)+page)&0x1ff);
 }
 
 static ADDRESS_MAP_START( sms_supergame_map, AS_PROGRAM, 8, smsbootleg_state )
@@ -324,7 +318,6 @@ static MACHINE_CONFIG_START( sms_supergame )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
-	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -419,6 +412,20 @@ static INPUT_PORTS_START( sms_supergame )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+void smsbootleg_state::machine_reset()
+{
+	sms_state::machine_reset_sms();
+
+	m_bankbase = m_default_bankbase;
+
+	m_bankmappers[0] = 0x00;
+	m_bankmappers[1] = 0x00;
+	m_bankmappers[2] = 0x01;
+	m_bankmappers[3] = 0x02;
+
+	bootleg_set_banks();
+}
+
 void smsbootleg_state::bootleg_init_common()
 {
 	uint8_t* rom = memregion("maincpu")->base();
@@ -429,23 +436,24 @@ void smsbootleg_state::bootleg_init_common()
 		rom[i] ^= 0x80;
 	}
 
-	m_bankmappers[0] = 0x00;
-	m_bankmappers[1] = 0x00;
-	m_bankmappers[2] = 0x01;
-	m_bankmappers[3] = 0x02;
-
-	bootleg_set_banks();
+	for (int i = 0;i < 0x200;i++)
+	{
+		m_unpaged->configure_entry(i, &m_mainrom[(i & 0x1fe) * 0x4000]);
+		m_page0->configure_entry(i, &m_mainrom[0x400 + i * 0x4000]);
+		m_page1->configure_entry(i, &m_mainrom[i * 0x4000]);
+		m_page2->configure_entry(i, &m_mainrom[i * 0x4000]);
+	}
 }
 
 DRIVER_INIT_MEMBER(smsbootleg_state, sms_supergame)
 {
-	m_bankbase = 0x780000 >> 15;
+	m_default_bankbase = 0x780000 >> 15;
 	bootleg_init_common();
 }
 
 DRIVER_INIT_MEMBER(smsbootleg_state, sms_supergamea)
 {
-	m_bankbase = 0x000000;
+	m_default_bankbase = 0x000000;
 	bootleg_init_common();
 }	
 

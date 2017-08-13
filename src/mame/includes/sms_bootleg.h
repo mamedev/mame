@@ -25,11 +25,13 @@ class smsbootleg_state : public sms_state
 	DECLARE_DRIVER_INIT(sms_supergamea);
 
 private:
+	virtual void machine_reset() override;
 
 	void bootleg_set_banks();
 	void bootleg_init_common();
 
 	int m_bankbase;
+	int m_default_bankbase;
 	int m_bankmappers[0x4];
 
 	required_region_ptr<uint8_t> m_mainrom;
