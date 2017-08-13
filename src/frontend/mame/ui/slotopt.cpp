@@ -17,6 +17,8 @@
 #include "emuopts.h"
 #include "mameopts.h"
 
+#include <algorithm>
+
 
 /***************************************************************************
     UTILITY
@@ -27,68 +29,6 @@ namespace {
 // constants
 void *ITEMREF_RESET = ((void *)1);
 char DIVIDER[] = "------";
-
-enum class step_t
-{
-	NEXT,
-	PREVIOUS
-};
-
-//-------------------------------------------------
-//  get_adjacent_slot
-//-------------------------------------------------
-
-const char *get_adjacent_slot(device_slot_interface &slot, const device_slot_option *current, step_t step)
-{
-	// from the current option, get the iterator
-	device_slot_interface::option_list_type::const_iterator original_iter = slot.option_list().cend();
-	if (current)
-	{
-		original_iter = std::find_if(
-			slot.option_list().cbegin(),
-			slot.option_list().cend(),
-			[current](const auto &ent)
-		{
-			return ent.second.get() == current;
-		});
-	}
-
-	// We need to advance until one of the following conditions apply
-	//   1.  We've advanced to the end (which is always selectable)
-	//   2.  We've found a selectable entry
-	//   3.  We've done a complete circle
-	auto iter = original_iter;
-	do
-	{
-		switch (step)
-		{
-		case step_t::NEXT:
-			if (iter == slot.option_list().cend())
-				iter = slot.option_list().cbegin();
-			else
-				iter++;
-			break;
-
-		case step_t::PREVIOUS:
-			if (iter == slot.option_list().cbegin())
-				iter = slot.option_list().cend();
-			else
-				iter--;
-			break;
-
-		default:
-			throw false;
-		}
-	} while (iter != slot.option_list().cend()
-		&& !iter->second->selectable()
-		&& iter != original_iter);
-
-
-	// return the actual entry
-	return iter != slot.option_list().cend()
-		? iter->second->name()
-		: "";
-}
 
 };
 
@@ -306,11 +246,7 @@ void menu_slot_devices::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
-			const device_slot_option *current = get_current_option(*slot);
-			const char *val = (menu_event->iptkey == IPT_UI_LEFT)
-					? get_adjacent_slot(*slot, current, step_t::PREVIOUS)
-					: get_adjacent_slot(*slot, current, step_t::NEXT);
-			set_slot_device(*slot, val);
+			rotate_slot_device(*slot, menu_event->iptkey == IPT_UI_LEFT ? step_t::PREVIOUS : step_t::NEXT);
 		}
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
@@ -320,6 +256,71 @@ void menu_slot_devices::handle()
 				menu::stack_push<menu_device_config>(ui(), container(), slot, option);
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  rotate_slot_device - rotates the specified slot
+//-------------------------------------------------
+
+void menu_slot_devices::rotate_slot_device(device_slot_interface &slot, menu_slot_devices::step_t step)
+{
+	// first, we need to make sure our cache of options is up to date
+	if (m_current_option_list_slot_tag != slot.device().tag())
+	{
+		device_slot_option *current = get_current_option(slot);
+
+		// build the option list, including the blank option
+		m_current_option_list.clear();
+		m_current_option_list.emplace_back("");
+		for (const auto &ent : slot.option_list())
+		{
+			if (ent.second->selectable())
+				m_current_option_list.emplace_back(ent.second->name());
+		}
+
+		// since the order is indeterminant, we need to sort the options
+		std::sort(m_current_option_list.begin(), m_current_option_list.end());
+
+		// find the current position
+		const char *target = current ? current->name() : "";
+		m_current_option_list_iter = std::find_if(
+			m_current_option_list.begin(),
+			m_current_option_list.end(),
+			[target](const std::string &opt_value)
+			{
+				return opt_value == target;
+			});
+		
+		// we expect the above search to succeed, because if an internal
+		// option was selected, the menu item should be disabled
+		assert(m_current_option_list_iter != m_current_option_list.end());
+
+		// we've succeeded; don't do this again
+		m_current_option_list_slot_tag.assign(slot.device().tag());
+	}
+
+	// At this point, the current option list and accompanying iterator should
+	// be good; perform the rotation
+	switch (step)
+	{
+	case step_t::NEXT:
+		m_current_option_list_iter++;
+		if (m_current_option_list_iter == m_current_option_list.end())
+			m_current_option_list_iter = m_current_option_list.begin();
+		break;
+
+	case step_t::PREVIOUS:
+		if (m_current_option_list_iter == m_current_option_list.begin())
+			m_current_option_list_iter = m_current_option_list.end();
+		m_current_option_list_iter--;
+		break;
+
+	default:
+		throw false;
+	}
+
+	set_slot_device(slot, m_current_option_list_iter->c_str());
 }
 
 } // namespace ui

@@ -124,8 +124,6 @@ private:
 class device_slot_interface : public device_interface
 {
 public:
-	typedef std::map<std::string, std::unique_ptr<device_slot_option>> option_list_type;
-
 	// construction/destruction
 	device_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_slot_interface();
@@ -142,7 +140,7 @@ public:
 	bool fixed() const { return m_fixed; }
 	bool has_selectable_options() const;
 	const char *default_option() const { return m_default_option; }
-	const option_list_type &option_list() const { return m_options; }
+	const std::unordered_map<std::string, std::unique_ptr<device_slot_option>> &option_list() const { return m_options; }
 	device_slot_option *option(const char *name) const;
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const { return std::string(); }
 	device_t *get_card_device() const { return m_card_device; }
@@ -151,7 +149,7 @@ public:
 
 private:
 	// internal state
-	option_list_type m_options;
+	std::unordered_map<std::string,std::unique_ptr<device_slot_option>> m_options;
 	const char *m_default_option;
 	bool m_fixed;
 	device_t *m_card_device;
