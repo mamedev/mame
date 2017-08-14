@@ -113,12 +113,17 @@ COPY_FILES := $(addprefix $(STAGEDIR)/,$(COPIED_FILES))
 
 all: $(COPY_BINARIES) $(COPY_FILES)
 
+clean:
+	$(SILENT) rm -rf $(STAGEDIR)
+
 $(GEN_FOLDERS):
-	-$(call MKDIR,$@)
+	$(call MKDIR,$@)
 
 $(STAGEDIR)/%: $(BINDIR)/% | $(GEN_FOLDERS)
-	-$(call COPY,$<,$@)
-	strip $@
+	$(call COPY,$<,$@)
+	$(SILENT) strip $@
 
 $(STAGEDIR)/%: % | $(GEN_FOLDERS)
-	-$(call COPY,$<,$@)
+	$(call COPY,$<,$@)
+
+.PHONY: all clean
