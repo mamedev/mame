@@ -43,6 +43,7 @@ public:
 	m_boot(*this, "boot"),
 	m_palette(*this, "palette"),
 	m_gfx(*this, "gfx"),
+	m_rtc(*this, "rtc"),
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, "fdc:0"),
 	m_floppy1(*this, "fdc:1"),
@@ -94,6 +95,7 @@ private:
 	required_memory_region m_boot;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_gfx;
+	required_device<upd1990a_device> m_rtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -324,8 +326,21 @@ READ8_MEMBER( kdt6_state::page1_r )
 
 READ8_MEMBER( kdt6_state::sasi_ctrl_r )
 {
-	logerror("sasi_ctrl_r: 0xff\n");
-	return 0xff;
+	uint8_t data = 0;
+
+	// 7-------  sasi select
+	// -6------  sasi reset
+	// --5-----  sasi input/output
+	// ---4----  sasi control/data
+	// ----3---  sasi message
+	// -----2--  sasi request
+	// ------1-  sasi busy
+	// -------0  data output upd1990
+
+	data |= m_rtc->data_out_r() << 0;
+	data |= 0xfe;
+
+	return data;
 }
 
 WRITE8_MEMBER( kdt6_state::sasi_ctrl_w )
@@ -419,7 +434,8 @@ WRITE8_MEMBER( kdt6_state::status1_w )
 
 WRITE8_MEMBER( kdt6_state::status2_w )
 {
-	logerror("status2_w: %02x\n", data);
+	if (0)
+		logerror("status2_w: %02x\n", data);
 
 	// 7-------  rtc chip select
 	// -6------  rtc output enable
@@ -428,6 +444,15 @@ WRITE8_MEMBER( kdt6_state::status2_w )
 	// ----321-  rtc control 2-0
 	// -------0  rtc data
 	// ----3210  memory mapper bit 0-3
+
+	m_rtc->cs_w(BIT(data, 7));
+	m_rtc->oe_w(BIT(data, 6));
+	m_rtc->stb_w(BIT(data, 5));
+	m_rtc->clk_w(BIT(data, 4));
+	m_rtc->c2_w(BIT(data, 3));
+	m_rtc->c1_w(BIT(data, 2));
+	m_rtc->c0_w(BIT(data, 1));
+	m_rtc->data_in_w(BIT(data, 0));
 
 	m_status2 = data & 0x0f;
 }
@@ -532,6 +557,8 @@ static MACHINE_CONFIG_START( psi98 )
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_UPD1990A_ADD("rtc", XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg0))
