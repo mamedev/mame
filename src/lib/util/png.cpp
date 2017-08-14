@@ -680,12 +680,12 @@ public:
 		}
 
 		// upsample transparent pen as well
-		for (std::uint32_t i = 0; (pnginfo.num_trans >> 1) > i; ++i)
+		if ((0 == pnginfo.color_type) && pnginfo.trans)
 		{
-			std::uint16_t pen(fetch_16bit(&pnginfo.trans[i << 1]));
+			std::uint16_t pen(fetch_16bit(&pnginfo.trans[0]));
 			for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
 				pen |= pen << k;
-			put_16bit(&pnginfo.trans[i << 1], pen);
+			put_16bit(&pnginfo.trans[0], pen);
 		}
 
 		pnginfo.image = std::move(outbuf);
