@@ -29,7 +29,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_sound_nmi_mask;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(irq_clear_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
