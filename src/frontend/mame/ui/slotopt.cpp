@@ -27,10 +27,10 @@
 namespace {
 
 // constants
-void *ITEMREF_RESET = ((void *)1);
-char DIVIDER[] = "------";
+void *const ITEMREF_RESET = ((void *)1);
+constexpr char const DIVIDER[] = "------";
 
-};
+} // anonymous namespace
 
 
 /***************************************************************************
@@ -67,12 +67,12 @@ device_slot_option *menu_slot_devices::get_current_option(device_slot_interface 
 
 	if (!slot.fixed())
 	{
-		const char *slot_option_name = slot.slot_name();
+		char const *const slot_option_name = slot.slot_name();
 		current = machine().options().slot_option(slot_option_name).value();
 	}
 	else
 	{
-		if (slot.default_option() == nullptr)
+		if (!slot.default_option())
 			return nullptr;
 		current.assign(slot.default_option());
 	}
@@ -188,14 +188,14 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 		if (option)
 		{
 			opt_name = has_selectable_options
-				? option->name()
-				: string_format(_("%s [internal]"), option->name());
+					? option->name()
+					: string_format(_("%s [internal]"), option->name());
 		}
 
 		// choose item flags
-		uint32_t item_flags = has_selectable_options
-			? FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW
-			: FLAG_DISABLE;
+		uint32_t const item_flags = has_selectable_options
+				? FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW
+				: FLAG_DISABLE;
 
 		item_append(slot.slot_name(), opt_name, item_flags, (void *)&slot);
 	}
@@ -279,18 +279,18 @@ void menu_slot_devices::rotate_slot_device(device_slot_interface &slot, menu_slo
 				m_current_option_list.emplace_back(ent.second->name());
 		}
 
-		// since the order is indeterminant, we need to sort the options
+		// since the order is indeterminate, we need to sort the options
 		std::sort(m_current_option_list.begin(), m_current_option_list.end());
 
 		// find the current position
-		const char *target = current ? current->name() : "";
+		char const *const target = current ? current->name() : "";
 		m_current_option_list_iter = std::find_if(
-			m_current_option_list.begin(),
-			m_current_option_list.end(),
-			[target](const std::string &opt_value)
-			{
-				return opt_value == target;
-			});
+				m_current_option_list.begin(),
+				m_current_option_list.end(),
+				[target] (const std::string &opt_value)
+				{
+					return opt_value == target;
+				});
 		
 		// we expect the above search to succeed, because if an internal
 		// option was selected, the menu item should be disabled
