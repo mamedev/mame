@@ -1085,8 +1085,8 @@ ROM_END
 
 ROM_START( realbrko )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* TMP68301 Code */
-	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(76de5e26) SHA1(d05b48f024053198fb63b1c4e5454ecb8fe302a4) )
-	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(29e979df) SHA1(61b30b2f8f16bb92a3ec1cd7abd157930f1a3f29) )
+	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(76de5e26) SHA1(d05b48f024053198fb63b1c4e5454ecb8fe302a4) ) // sldh w/realbrkj
+	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(29e979df) SHA1(61b30b2f8f16bb92a3ec1cd7abd157930f1a3f29) ) // sldh w/realbrkj
 
 	// note, the numbering on all the roms is shifted by 1 due to the sample data being split across 2 roms
 	//  this is how the board is labeled, it is not a mistake.
@@ -1108,15 +1108,15 @@ ROM_START( realbrko )
 	ROM_LOAD( "52313.14f", 0x000000, 0x200000, CRC(2b5ba1ec) SHA1(d548ef8c96b7b868c866dedb314f56583726564d) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "52303.2e", 0x000000, 0x200000, CRC(8a8a7d42) SHA1(7108203cf5a6a1603bfcbc5bde40e71ac960fffc) )
+	ROM_LOAD( "52303.2e", 0x000000, 0x200000, CRC(8a8a7d42) SHA1(7108203cf5a6a1603bfcbc5bde40e71ac960fffc) ) // sldh w/realbrkj
 	ROM_LOAD( "52304.1e", 0x200000, 0x200000, CRC(c8c5ef57) SHA1(4f363b36191f9c647fa88f07286bf9d667005553) )
 ROM_END
 
 
 ROM_START( realbrkj )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* TMP68301 Code */
-	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) )
-	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(9cc1596e) SHA1(a598f18eaac1ed6943069e9500b07b77e263f0d0) )
+	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) ) // sldh w/realbrko 
+	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(9cc1596e) SHA1(a598f18eaac1ed6943069e9500b07b77e263f0d0) ) // sldh w/realbrko
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52310.9b", 0x0000000, 0x400000, CRC(07dfd9f5) SHA1(8722a98adc33f56df1e3b194ce923bc987e15cbe) )
@@ -1136,7 +1136,7 @@ ROM_START( realbrkj )
 	ROM_LOAD( "52312.14f", 0x000000, 0x200000, CRC(2203d7c5) SHA1(0403f02b8f2bfc6cf98ff598eb9c2e3facc7ac4c) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "52303.2e", 0x000000, 0x400000, CRC(d3005b1e) SHA1(3afd10cdbc3aa7605083a9fcf3c4b8276937c2c4) )
+	ROM_LOAD( "52303.2e", 0x000000, 0x400000, CRC(d3005b1e) SHA1(3afd10cdbc3aa7605083a9fcf3c4b8276937c2c4) ) // sldh w/realbrko
 ROM_END
 
 ROM_START( realbrkk )

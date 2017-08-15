@@ -3669,7 +3669,7 @@ ROM_START( royalmj )
 	ROM_LOAD( "6.p6", 0x5000, 0x1000, CRC(92150a0f) SHA1(5c97ba5014abdba4afc78e02e7d90e6ca4d777ac) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) ) // sldh w/tahjong
 ROM_END
 
 ROM_START( royalmah )
@@ -3708,7 +3708,7 @@ ROM_START( tahjong )
 	ROM_LOAD( "s2.bin", 0x14000, 0x4000, CRC(fed42e7c) SHA1(31136dff07bd1883dc2d107823ba83a34abf003d) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(c074c0f0) SHA1(b62519d1496ea366b0ea8ed657bd758ce93875ec) )
+	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(c074c0f0) SHA1(b62519d1496ea366b0ea8ed657bd758ce93875ec) ) // sldh w/royalmj
 ROM_END
 
 ROM_START( janputer )
