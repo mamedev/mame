@@ -543,15 +543,16 @@ public:
 				// handle grayscale non-alpha case
 				uint32_t const bpp(pnginfo.bit_depth >> 3);
 				std::uint16_t const transpen(pnginfo.trans ? fetch_16bit(pnginfo.trans.get()) : 0U);
+				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
 					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						std::uint16_t i((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src));
-						std::uint8_t const a((pnginfo.trans && (transpen == i)) ? 0x00 : 0xff);
-						i >>= (8 < pnginfo.bit_depth) ? 8 : 0;
-						accumalpha &= a;
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a, i, i, i);
+						std::uint16_t i_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src));
+						std::uint8_t const a_val((pnginfo.trans && (transpen == i_val)) ? 0x00 : 0xff);
+						i_val >>= samp_shift;
+						accumalpha &= a_val;
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, i_val, i_val, i_val);
 					}
 				}
 			}
@@ -576,12 +577,23 @@ public:
 				uint32_t const r(0 * bps);
 				uint32_t const g(1 * bps);
 				uint32_t const b(2 * bps);
+				std::uint16_t const transpen_r(pnginfo.trans ? fetch_16bit(&pnginfo.trans[0]) : 0U);
+				std::uint16_t const transpen_g(pnginfo.trans ? fetch_16bit(&pnginfo.trans[2]) : 0U);
+				std::uint16_t const transpen_b(pnginfo.trans ? fetch_16bit(&pnginfo.trans[4]) : 0U);
+				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
 					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						rgb_t const pix(0xff, src[r], src[g], src[b]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+						uint16_t r_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + r));
+						uint16_t g_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + g));
+						uint16_t b_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + b));
+						std::uint8_t const a_val((pnginfo.trans && (transpen_r == r_val) && (transpen_g == g_val) && (transpen_b == b_val)) ? 0x00 : 0xff);
+						r_val >>= samp_shift;
+						g_val >>= samp_shift;
+						b_val >>= samp_shift;
+						accumalpha &= a_val;
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, r_val, g_val, b_val);
 					}
 				}
 			}
