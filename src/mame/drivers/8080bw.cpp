@@ -5098,7 +5098,7 @@ GAME( 1979, schaserb,   schaser,  schaser,   schaser,   _8080bw_state,  0,      
 GAME( 1979, schaserc,   schaser,  schaser,   schaser,   _8080bw_state,  0,        ROT270, "Taito", "Space Chaser (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 GAME( 1979, schasercv,  schaser,  schasercv, schasercv, _8080bw_state,  0,        ROT270, "Taito", "Space Chaser (CV version - set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 GAME( 1979, schaserm,   schaser,  schaser,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Model Racing)", "Space Chaser (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE ) // on original Taito PCB, hacked to be harder?
-GAME( 1991, crashrd,    schaser,  schaser,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Centromatic)", "Crash Road (bootleg of Space Chaser)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // PCB marked 'Imbader'
+GAME( 1979, crashrd,    schaser,  schaser,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Centromatic)", "Crash Road (bootleg of Space Chaser)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // PCB marked 'Imbader'; "Taito Corporation" on title screen replaced with a Spanish phone number
 
 GAME( 1979, sflush,     0,        sflush,    sflush,    _8080bw_state,  0,        ROT270, "Taito", "Straight Flush", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL)
 
