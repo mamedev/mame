@@ -4223,6 +4223,18 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="aftdark">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>After Dark for Windows</description>
+		<year>1990</year>
+		<publisher>Berkeley Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="after dark.img" size="1474560" crc="0b6222f5" sha1="2a61d82ef15ee9fba2a738632da7626e935e5683" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aol20" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>America Online</description>
@@ -4236,14 +4248,71 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="aftdark">
-		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>After Dark for Windows</description>
+	<software name="ami">
+		<description>Amí (1.2b)</description>
 		<year>1990</year>
-		<publisher>Berkeley Systems</publisher>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.2b" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="after dark.img" size="1474560" crc="0b6222f5" sha1="2a61d82ef15ee9fba2a738632da7626e935e5683" offset="0" />
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_1.img" size="737280" crc="311ba808" sha1="393a9b6973784b1032ab3355560ab43bf2480b5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_2.img" size="737280" crc="637f4961" sha1="de0cf9b62a880f3ee4419769b9be9354c6db4386" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_3.img" size="737280" crc="a3ba8028" sha1="db324383d266ab93d8122f8aa55a3025b4dd5c4c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amia" cloneof="ami">
+		<!-- Dumped via Kryoflux, shows as good with most tracks modified -->
+		<!-- Included with Commodore PC40-III -->
+		<description>Amí (1.00B, Commodore OEM)</description>
+		<year>1989</year>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.00B" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="ami.img" size="1228800" crc="5071b3bd" sha1="1d9abc49bc1b8287e0fe3603e7bca718848551a3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amib" cloneof="ami">
+		<!-- Includes Microsoft Windows/286 version 2.1 -->
+		<description>Amí (1.0)</description>
+		<year>1988</year>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 SAE Setup, Build &amp; Displays 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk01.img" size="1228800" crc="ebe9e37b" sha1="e8040b3bbd2cf91da77c2351a44a2669c2e88ff9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 Displays 2 &amp; Utilities 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk02.img" size="1228800" crc="c9844f84" sha1="9a0d30d811fcb668639a92fd512fb0d7636535e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 Utilities 2 &amp; Fonts" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk03.img" size="1228800" crc="471a8b4c" sha1="5d7d27b3b65aacf9fecf18a11c4b9a89ee4cca85" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Amí Program Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk04.img" size="1228800" crc="6c261d8c" sha1="9160d5474af8abbdb4fd4e4e99d16250f1eab4a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8061,6 +8130,30 @@ Missing files come here
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Wing Commander [ORIGIN Systems] [1990] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="fda1f93a" sha1="9bf96166b48b63b0efe379d78de752b9df1615b1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wngcomsm">
+		<description>Wing Commander: The Secret Missions</description>
+		<year>1990</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander - The Secret Missions [ORIGIN Systems] [1990] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="85701fe1" sha1="5cfe3ab82180a7824ef3bc5aa0d7124ca649fd20" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wngcomsm2">
+		<description>Wing Commander: The Secret Missions 2</description>
+		<year>1991</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander - The Secret Missions 2 [ORIGIN Systems] [1991] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="561cc930" sha1="e2cc230566b0acf1741635c01eed071d2498ba7c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

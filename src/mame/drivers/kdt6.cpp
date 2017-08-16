@@ -19,6 +19,7 @@
 #include "machine/z80sio.h"
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
+#include "machine/clock.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
 #include "bus/psi_kbd/psi_kbd.h"
@@ -42,6 +43,7 @@ public:
 	m_boot(*this, "boot"),
 	m_palette(*this, "palette"),
 	m_gfx(*this, "gfx"),
+	m_rtc(*this, "rtc"),
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, "fdc:0"),
 	m_floppy1(*this, "fdc:1"),
@@ -56,6 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_READ8_MEMBER(page0_r);
+	DECLARE_READ8_MEMBER(page1_r);
 	DECLARE_READ8_MEMBER(mapper_r);
 	DECLARE_WRITE8_MEMBER(mapper_w);
 	DECLARE_READ8_MEMBER(sasi_ctrl_r);
@@ -66,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(status1_w);
 	DECLARE_WRITE8_MEMBER(status2_w);
 
+	DECLARE_READ8_MEMBER(video_data_r);
 	DECLARE_WRITE8_MEMBER(video_data_w);
 	DECLARE_WRITE8_MEMBER(video_data_inc_w);
 	DECLARE_WRITE8_MEMBER(video_data_dec_w);
@@ -83,8 +88,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	void map_prom();
-
 	required_device<z80_device> m_cpu;
 	required_device<z80dma_device> m_dma;
 	required_device<mc6845_device> m_crtc;
@@ -92,14 +95,14 @@ private:
 	required_memory_region m_boot;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_gfx;
+	required_device<upd1990a_device> m_rtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<uint16_t[]> m_vram; // 10-bit
-	std::unique_ptr<uint8_t[]> m_dummy_r;
-	std::unique_ptr<uint8_t[]> m_dummy_w;
+	std::unique_ptr<uint8_t[]> m_dummy_r, m_dummy_w;
 
 	bool m_sasi_dma;
 	uint8_t m_dma_map;
@@ -150,7 +153,7 @@ static ADDRESS_MAP_START( psi98_io, AS_IO, 8, kdt6_state )
 	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE("fdc", upd765a_device, mdma_r, mdma_w)
 	AM_RANGE(0x1f, 0x1f) AM_WRITE(fdc_tc_w)
 	AM_RANGE(0x20, 0x2f) AM_READWRITE(mapper_r, mapper_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(video_data_w)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(video_data_r, video_data_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(video_data_inc_w)
 	AM_RANGE(0x36, 0x36) AM_WRITE(video_data_dec_w)
 	AM_RANGE(0x37, 0x37) AM_WRITE(video_data_inc_w)
@@ -214,6 +217,11 @@ WRITE8_MEMBER( kdt6_state::video_address_latch_low_w )
 	m_video_address |= (data << 0);
 }
 
+READ8_MEMBER( kdt6_state::video_data_r )
+{
+	return m_vram[m_video_address];
+}
+
 WRITE8_MEMBER( kdt6_state::video_data_w )
 {
 	m_vram[m_video_address] = ((m_status1 & 0x0c) << 6) | data;
@@ -241,11 +249,10 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t code = m_vram[((m_status1 & 0x03) << 14) | (ma + i)];
-
 		if (BIT(m_status1, 6))
 		{
 			// text mode
+			uint16_t code = m_vram[((m_status1 & 0x03) << 14) | (ma + i)];
 			uint8_t data = m_gfx[((code & 0xff) << 4) | ra];
 
 			int inverse = BIT(code, 8) | BIT(m_status1, 5) | ((i == cursor_x) ? 1 : 0);
@@ -261,6 +268,11 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 		else
 		{
 			// gfx mode
+			uint8_t data = m_vram[(ma << 4) | (ra << 6) | i];
+
+			// draw 8 pixels of the cell
+			for (int x = 0; x < 8; x++)
+				bitmap.pix32(y, x + i*8) = pen[BIT(data, 7 - x)];
 		}
 	}
 }
@@ -296,10 +308,39 @@ WRITE8_MEMBER( kdt6_state::io_w )
 	m_cpu->space(AS_IO).write_byte(offset, data);
 }
 
+READ8_MEMBER( kdt6_state::page0_r )
+{
+	if (BIT(m_status0, 5) == 0)
+		return m_boot->as_u8(offset);
+
+	return reinterpret_cast<uint8_t *>(m_page_r[0]->base())[offset];
+}
+
+READ8_MEMBER( kdt6_state::page1_r )
+{
+	if (BIT(m_status0, 5) == 0)
+		return m_boot->as_u8(0x1000 + offset);
+
+	return reinterpret_cast<uint8_t *>(m_page_r[1]->base())[offset];
+}
+
 READ8_MEMBER( kdt6_state::sasi_ctrl_r )
 {
-	logerror("sasi_ctrl_r: 0xff\n");
-	return 0xff;
+	uint8_t data = 0;
+
+	// 7-------  sasi select
+	// -6------  sasi reset
+	// --5-----  sasi input/output
+	// ---4----  sasi control/data
+	// ----3---  sasi message
+	// -----2--  sasi request
+	// ------1-  sasi busy
+	// -------0  data output upd1990
+
+	data |= m_rtc->data_out_r() << 0;
+	data |= 0xfe;
+
+	return data;
 }
 
 WRITE8_MEMBER( kdt6_state::sasi_ctrl_w )
@@ -311,15 +352,6 @@ WRITE8_MEMBER( kdt6_state::sasi_ctrl_w )
 WRITE8_MEMBER( kdt6_state::dma_map_w )
 {
 	m_dma_map = data;
-}
-
-void kdt6_state::map_prom()
-{
-	if (BIT(m_status0, 5) == 0)
-	{
-		m_page_r[0]->set_base(m_boot->base() + 0x0000);
-		m_page_r[1]->set_base(m_boot->base() + 0x1000);
-	}
 }
 
 READ8_MEMBER( kdt6_state::mapper_r )
@@ -335,20 +367,11 @@ WRITE8_MEMBER( kdt6_state::mapper_w )
 	{
 		offs_t addr = bitswap(m_mapper[offset], 8, 9, 10, 11, 7, 6, 5, 4, 0, 1, 2, 3) << 12;
 
-		logerror("mapper: %x -> %06x\n", offset, addr);
+		m_page_r[offset]->set_base(addr < 0x40000 ? &m_ram[addr] : &m_dummy_r[0]);
+		m_page_w[offset]->set_base(addr < 0x40000 ? &m_ram[addr] : &m_dummy_w[0]);
 
-		if (addr < 0x40000)
-		{
-			m_page_r[offset]->set_base(&m_ram[addr]);
-			m_page_w[offset]->set_base(&m_ram[addr]);
-		}
-		else
-		{
-			m_page_r[offset]->set_base(&m_dummy_r[0]);
-			m_page_w[offset]->set_base(&m_dummy_w[0]);
-		}
-
-		map_prom();
+		if (0)
+			logerror("map_page: %x -> %06x\n", offset, addr);
 	}
 }
 
@@ -373,7 +396,6 @@ WRITE8_MEMBER( kdt6_state::status0_w )
 		m_floppy1->get_device()->mon_w(BIT(data, 7) ? 0 : 1);
 
 	m_status0 = data;
-	map_prom();
 }
 
 READ8_MEMBER( kdt6_state::status1_r )
@@ -395,22 +417,25 @@ WRITE8_MEMBER( kdt6_state::status1_w )
 	logerror("status1_w: %02x\n", data);
 
 	// memory mapper disabled?
-	if ((BIT(data, 7) ^ BIT(m_status1, 7)) && BIT(data, 7))
+	if (BIT(data, 7))
 	{
-		for (int i = 0; i < 16; i++)
+		for (unsigned i = 0; i < 16; i++)
 		{
 			m_page_r[i]->set_base(&m_ram[i * 0x1000]);
 			m_page_w[i]->set_base(&m_ram[i * 0x1000]);
 		}
 	}
 
+	// note that enabling the memory mapper doesn't mean that the pages are automatically mapped in
+	// it still needs a write to the mapper register to activate
+
 	m_status1 = data;
-	map_prom();
 }
 
 WRITE8_MEMBER( kdt6_state::status2_w )
 {
-	logerror("status2_w: %02x\n", data);
+	if (0)
+		logerror("status2_w: %02x\n", data);
 
 	// 7-------  rtc chip select
 	// -6------  rtc output enable
@@ -419,6 +444,15 @@ WRITE8_MEMBER( kdt6_state::status2_w )
 	// ----321-  rtc control 2-0
 	// -------0  rtc data
 	// ----3210  memory mapper bit 0-3
+
+	m_rtc->cs_w(BIT(data, 7));
+	m_rtc->oe_w(BIT(data, 6));
+	m_rtc->stb_w(BIT(data, 5));
+	m_rtc->clk_w(BIT(data, 4));
+	m_rtc->c2_w(BIT(data, 3));
+	m_rtc->c1_w(BIT(data, 2));
+	m_rtc->c0_w(BIT(data, 1));
+	m_rtc->data_in_w(BIT(data, 0));
 
 	m_status2 = data & 0x0f;
 }
@@ -430,6 +464,10 @@ void kdt6_state::machine_start()
 	m_vram = std::make_unique<uint16_t[]>(0x10000);
 	m_dummy_r = std::make_unique<uint8_t[]>(0x1000);
 	m_dummy_w = std::make_unique<uint8_t[]>(0x1000);
+
+	// override the region 0x0000 to 0x1fff here to enable prom reading
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(kdt6_state::page0_r), this));
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(kdt6_state::page1_r), this));
 
 	m_fdc->set_rate(250000);
 
@@ -498,21 +536,29 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(kdt6_state, io_r))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(kdt6_state, io_w))
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_9_8304MHz / 8) // jumper J3 allows selection of 16MHz / 8 instead
+	// jumper J3 allows selection of 16MHz / 8 instead
+	MCFG_CLOCK_ADD("uart_clk", XTAL_9_8304MHz / 8)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc1", z80ctc_device, trg2))
+
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 8)
+	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc2", z80ctc_device, trg3))
 
-	MCFG_Z80SIO_ADD("sio", 0, 0, 0, 0, 0)
+	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 4, 0, 0, 0, 0)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", psi_keyboard_bus_device, tx_w))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 8)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_UPD1990A_ADD("rtc", XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg0))

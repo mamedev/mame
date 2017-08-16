@@ -25,6 +25,7 @@
 1943bj                          // bootleg
 1943j                           // 6/1987 (c) 1987 (Japan) Rev B
 1943ja                          // 6/1987 (c) 1987 (Japan)
+1943jah                         // 6/1987 (c) 1987 (Japan) (as above with protection removed)
 1943kai                         // 6/1988 (c) 1987 (Japan)
 1943mii                         // 6/1988 (c) 1987 (US)
 1943u                           // 6/1987 (c) 1987 (US) Rev C
@@ -120,6 +121,7 @@ cosmicin                        // bootleg
 cosmicm2                        // Universal
 cosmicmo                        // Universal
 cosmo                           // TDS & Mints
+crashrd                         // bootleg (Centromatic)
 darthvdr                        // bootleg
 desterth                        // bootleg
 escmars                         // bootleg
@@ -9302,6 +9304,7 @@ sailormnot                      // (c) 1995 Banpresto (country is in EEPROM)
 sailormnou                      // (c) 1995 Banpresto (country is in EEPROM)
 sailormnt                       // (c) 1995 Banpresto (country is in EEPROM)
 sailormnu                       // (c) 1995 Banpresto (country is in EEPROM)
+tekkenbs                        // (c) 1998 Namco
 tekkencw                        // (c) 1997 Namco
 theroes                         // (c) 2001 Primetek Investments
 tjumpman                        // (c) 1999 Namco
@@ -10928,6 +10931,7 @@ stwr_102                        //
 stwr_103                        //
 stwr_104                        //
 stwr_106                        //
+stwr_106s                       //
 stwr_a14                        //
 stwr_e12                        //
 stwr_g11                        //
@@ -13164,6 +13168,7 @@ ckonggx                         //
 ckongis                         //
 ckongmc                         // 1981 bootleg
 dkongjrm                        // bootleg
+dkongjrmc                       // bootleg (Centromatic)
 drivfrcb                        // bootleg
 drivfrcg                        // [1984] Shinkai (Magic Electronics USA license)
 drivfrct                        // bootleg
@@ -20927,7 +20932,6 @@ lyon32                          // 1990 Mephisto Lyon 68020
 megaiv                          // 1989 Mephisto Mega IV Schachcomputer
 milano                          // 1989 Mephisto Milano Schachcomputer
 monteciv                        // 1990 Mephisto Monte Carlo IV LE Schachcomputer
-polgar                          // 1986 Mephisto Polgar Schachcomputer
 van16                           // 1991 Mephisto Vancouver 68000
 van32                           // 1991 Mephisto Vancouver 68020
 
@@ -28904,7 +28908,8 @@ totd                            // 2000.01 The Typing of the Dead (Rev A)
 totdo                           // 2000.01 The Typing of the Dead
 toukon4                         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)
 toyfight                        // 1999.09 Toy Fighter
-trgheart                        // 2006.05 Trigger Heart Exelica (Rev A)
+trgheart                        // 2006.06 Trigger Heart Exelica Ver.A
+trghearto                       // 2006.05 Trigger Heart Exelica
 trizeal                         // 2004.09 Trizeal
 undefeat                        // 2005.10 Under Defeat
 usagiym                         // 2003.06 Usagi Yamashiro Mahjong Hen
@@ -31526,6 +31531,12 @@ ppspeed                         // bootleg
 topracer                        // bootleg
 topracera                       // bootleg
 topracern                       // bootleg
+
+@source:polgar.cpp
+polgar                          // 1989 Mephisto Polgar
+polgar10                        // 1990 Mephisto Polgar 10MHz
+mrisc                           // 1992 Mephisto RISC 1MB
+mrisc2                          // 1994 Mephisto RISC II
 
 @source:policetr.cpp
 policetr                        // (c) 1996 P&P Marketing
@@ -37021,6 +37032,7 @@ dquizgo2                        // (c) 2000 Semicom
 dtfamily                        // (c) 2001 Semicom
 finalgdr                        // (c) 2001 Semicom
 jmpbreak                        // (c) 1999 F2 System
+poosho                          // (c) 1999 F2 System
 luplup                          // (c) 1999 Omega System
 luplup29                        // (c) 1999 Omega System
 misncrft                        // (c) 2000 Sun
@@ -38295,8 +38307,9 @@ wswan                           // Bandai WonderSwan Handheld
 wwfsstar                        // TA-0024 (c) 1989 (Europe)
 wwfsstarb                       // TA-0024 (c) 1989 (Japan)
 wwfsstarj                       // TA-0024 (c) 1989 (Japan)
-wwfsstaru                       // TA-0024 (c) 1989 (US, newer)
-wwfsstarua                      // TA-0024 (c) 1989 (US)
+wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)
+wwfsstaru6                      // TA-0024 (c) 1989 (US)
+wwfsstaru4                      // TA-0024 (c) 1989 (US)
 
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)

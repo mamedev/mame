@@ -44,6 +44,7 @@ constexpr char const *machine_filter_names[machine_filter::COUNT] = {
 		__("Category"),
 		__("Favorites"),
 		__("BIOS"),
+		__("Not BIOS"),
 		__("Parents"),
 		__("Clones"),
 		__("Manufacturer"),
@@ -635,6 +636,16 @@ public:
 };
 
 
+template <machine_filter::type Type = machine_filter::BIOS>
+class bios_machine_filter_impl : public simple_filter_impl_base<machine_filter, Type>
+{
+public:
+	bios_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
+
+	virtual bool apply(game_driver const &driver) const override { return driver.flags & machine_flags::IS_BIOS_ROOT; }
+};
+
+
 template <machine_filter::type Type = machine_filter::PARENTS>
 class parents_machine_filter_impl : public simple_filter_impl_base<machine_filter, Type>
 {
@@ -694,15 +705,6 @@ public:
 //  concrete machine filters
 //-------------------------------------------------
 
-class bios_machine_filter : public simple_filter_impl_base<machine_filter, machine_filter::BIOS>
-{
-public:
-	bios_machine_filter(char const *value, emu_file *file, unsigned indent) { }
-
-	virtual bool apply(game_driver const &driver) const override { return driver.flags & machine_flags::IS_BIOS_ROOT; }
-};
-
-
 class manufacturer_machine_filter : public choice_filter_impl_base<machine_filter, machine_filter::MANUFACTURER>
 {
 public:
@@ -752,6 +754,7 @@ public:
 
 using working_machine_filter        = working_machine_filter_impl<>;
 using mechanical_machine_filter     = mechanical_machine_filter_impl<>;
+using bios_machine_filter           = bios_machine_filter_impl<>;
 using parents_machine_filter        = parents_machine_filter_impl<>;
 using save_machine_filter           = save_machine_filter_impl<>;
 using chd_machine_filter            = chd_machine_filter_impl<>;
@@ -759,6 +762,7 @@ using vertical_machine_filter       = vertical_machine_filter_impl<>;
 
 using not_working_machine_filter    = inverted_machine_filter<working_machine_filter_impl, machine_filter::NOT_WORKING>;
 using not_mechanical_machine_filter = inverted_machine_filter<mechanical_machine_filter_impl, machine_filter::NOT_MECHANICAL>;
+using not_bios_machine_filter       = inverted_machine_filter<bios_machine_filter_impl, machine_filter::NOT_BIOS>;
 using clones_machine_filter         = inverted_machine_filter<parents_machine_filter_impl, machine_filter::CLONES>;
 using nosave_machine_filter         = inverted_machine_filter<save_machine_filter_impl, machine_filter::NOSAVE>;
 using nochd_machine_filter          = inverted_machine_filter<chd_machine_filter_impl, machine_filter::NOCHD>;
@@ -1150,6 +1154,8 @@ public:
 		case NOT_WORKING:       return WORKING == m;
 		case MECHANICAL:        return NOT_MECHANICAL == m;
 		case NOT_MECHANICAL:    return MECHANICAL == m;
+		case BIOS:              return NOT_BIOS == m;
+		case NOT_BIOS:          return BIOS == m;
 		case PARENTS:           return CLONES == m;
 		case CLONES:            return PARENTS == m;
 		case SAVE:              return NOSAVE == m;
@@ -1162,7 +1168,6 @@ public:
 		case ALL:
 		case CATEGORY:
 		case FAVORITE:
-		case BIOS:
 		case MANUFACTURER:
 		case YEAR:
 		case CUSTOM:
@@ -1433,6 +1438,8 @@ machine_filter::ptr machine_filter::create(type n, char const *value, emu_file *
 		return std::make_unique<favorite_machine_filter>(value, file, indent);
 	case BIOS:
 		return std::make_unique<bios_machine_filter>(value, file, indent);
+	case NOT_BIOS:
+		return std::make_unique<not_bios_machine_filter>(value, file, indent);
 	case PARENTS:
 		return std::make_unique<parents_machine_filter>(value, file, indent);
 	case CLONES:

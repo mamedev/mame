@@ -10,32 +10,19 @@
 
 #include "png.h"
 
+#include "unicode.h"
+
 #include <zlib.h>
 
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <cstring>
 #include <cmath>
-#include <list>
-#include <memory>
 #include <new>
-#include <utility>
 
 #include <math.h>
 #include <stdlib.h>
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct image_data_chunk
-{
-	image_data_chunk(std::uint32_t l, std::unique_ptr<std::uint8_t []> &&d) : length(l), data(std::move(d)) { }
-
-	std::uint32_t                       length = 0;
-	std::unique_ptr<std::uint8_t []>    data;
-};
 
 
 
@@ -51,44 +38,6 @@ static const int samples[] = { 1, 0, 3, 1, 2, 0, 4 };
     INLINE FUNCTIONS
 ***************************************************************************/
 
-static inline uint8_t fetch_8bit(uint8_t *v)
-{
-	return *v;
-}
-
-
-#ifdef UNUSED_FUNCTION
-static inline uint16_t fetch_16bit(uint8_t *v)
-{
-	return big_endianize_int16(*(uint16_t *)v);
-}
-#endif
-
-static inline uint32_t fetch_32bit(uint8_t *v)
-{
-	return big_endianize_int32(*(uint32_t *)v);
-}
-
-
-static inline void put_8bit(uint8_t *v, uint8_t data)
-{
-	*v = data;
-}
-
-
-#ifdef UNUSED_FUNCTION
-static inline void put_16bit(uint8_t *v, uint16_t data)
-{
-	*(uint16_t *)v = big_endianize_int16(data);
-}
-#endif
-
-static inline void put_32bit(uint8_t *v, uint32_t data)
-{
-	*(uint32_t *)v = big_endianize_int32(data);
-}
-
-
 static inline int compute_rowbytes(const png_info &pnginfo)
 {
 	return (pnginfo.width * samples[pnginfo.color_type] * pnginfo.bit_depth + 7) / 8;
@@ -101,262 +50,68 @@ static inline int compute_rowbytes(const png_info &pnginfo)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    png_free - free all memory allocated in a
+    free_data - free all memory allocated in a
     pnginfo structure
 -------------------------------------------------*/
 
-static void png_free(png_info &pnginfo)
+void png_info::free_data()
 {
-	while (pnginfo.textlist)
-	{
-		png_text *const temp = pnginfo.textlist;
-		pnginfo.textlist = temp->next;
-		if (temp->keyword)
-			delete[] (std::uint8_t *)temp->keyword;
-		free(temp);
-	}
-
-	if (pnginfo.palette)
-		delete[] pnginfo.palette;
-	pnginfo.palette = nullptr;
-
-	if (pnginfo.trans)
-		delete[] pnginfo.trans;
-	pnginfo.trans = nullptr;
-
-	if (pnginfo.image)
-		delete[] pnginfo.image;
-	pnginfo.image = nullptr;
+	textlist.clear();
+	palette.reset();
+	trans.reset();
+	image.reset();
 }
-
-void png_free(png_info *pnginfo) { png_free(*pnginfo); } // TODO: make external interface use reference
 
 
 
 namespace {
 
+#define PNG_Signature       "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"
+#define MNG_Signature       "\x8A\x4D\x4E\x47\x0D\x0A\x1A\x0A"
+
+// Chunk names
+constexpr std::uint32_t PNG_CN_IHDR     = 0x49484452L;
+constexpr std::uint32_t PNG_CN_PLTE     = 0x504C5445L;
+constexpr std::uint32_t PNG_CN_IDAT     = 0x49444154L;
+constexpr std::uint32_t PNG_CN_IEND     = 0x49454E44L;
+constexpr std::uint32_t PNG_CN_gAMA     = 0x67414D41L;
+//constexpr std::uint32_t PNG_CN_sBIT     = 0x73424954L;
+//constexpr std::uint32_t PNG_CN_cHRM     = 0x6348524DL;
+constexpr std::uint32_t PNG_CN_tRNS     = 0x74524E53L;
+//constexpr std::uint32_t PNG_CN_bKGD     = 0x624B4744L;
+//constexpr std::uint32_t PNG_CN_hIST     = 0x68495354L;
+constexpr std::uint32_t PNG_CN_tEXt     = 0x74455874L;
+//constexpr std::uint32_t PNG_CN_zTXt     = 0x7A545874L;
+constexpr std::uint32_t PNG_CN_pHYs     = 0x70485973L;
+//constexpr std::uint32_t PNG_CN_oFFs     = 0x6F464673L;
+//constexpr std::uint32_t PNG_CN_tIME     = 0x74494D45L;
+//constexpr std::uint32_t PNG_CN_sCAL     = 0x7343414CL;
+
+// MNG Chunk names
+constexpr std::uint32_t MNG_CN_MHDR     = 0x4D484452L;
+constexpr std::uint32_t MNG_CN_MEND     = 0x4D454E44L;
+//constexpr std::uint32_t MNG_CN_TERM     = 0x5445524DL;
+//constexpr std::uint32_t MNG_CN_BACK     = 0x4241434BL;
+
+// Prediction filters
+constexpr std::uint8_t  PNG_PF_None     = 0;
+constexpr std::uint8_t  PNG_PF_Sub      = 1;
+constexpr std::uint8_t  PNG_PF_Up       = 2;
+constexpr std::uint8_t  PNG_PF_Average  = 3;
+constexpr std::uint8_t  PNG_PF_Paeth    = 4;
+
+
+inline uint8_t fetch_8bit(uint8_t const *v) { return *v; }
+inline uint16_t fetch_16bit(uint8_t const *v) { return big_endianize_int16(*reinterpret_cast<uint16_t const *>(v)); }
+inline uint32_t fetch_32bit(uint8_t const *v) { return big_endianize_int32(*reinterpret_cast<uint32_t const *>(v)); }
+
+inline void put_8bit(uint8_t *v, uint8_t data) { *v = data; }
+inline void put_16bit(uint8_t *v, uint16_t data) { *reinterpret_cast<uint16_t *>(v) = big_endianize_int16(data); }
+inline void put_32bit(uint8_t *v, uint32_t data) { *reinterpret_cast<uint32_t *>(v) = big_endianize_int32(data); }
+
+
 class png_private
 {
-public:
-	png_private(png_info &info) : pnginfo(info)
-	{
-	}
-
-	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha) const
-	{
-		// do some basic checks for unsupported images
-		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
-		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
-		if (8 != pnginfo.bit_depth)
-			return PNGERR_UNSUPPORTED_FORMAT; // only do 8bpp here - expand lower bit depth first
-
-		// everything looks sane, allocate the bitmap and deinterlace into it
-		bitmap.allocate(pnginfo.width, pnginfo.height);
-		std::uint8_t accumalpha(0xff);
-		unsigned const pass_count(get_pass_count());
-		std::uint32_t pass_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		for (unsigned pass = 0; pass_count > pass; ++pass)
-		{
-			// calculate parameters for interlace pass
-			pass_offset[pass + 1] = pass_offset[pass] + get_pass_bytes(pass);
-			unsigned const x_shift(pnginfo.interlace_method ? ADAM7_X_SHIFT[pass] : 0);
-			unsigned const y_shift(pnginfo.interlace_method ? ADAM7_Y_SHIFT[pass] : 0);
-			unsigned const x_offs(pnginfo.interlace_method ? ADAM7_X_OFFS[pass] : 0);
-			unsigned const y_offs(pnginfo.interlace_method ? ADAM7_Y_OFFS[pass] : 0);
-			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
-			std::uint8_t const *src(pnginfo.image + pass_offset[pass]);
-
-			if (3 == pnginfo.color_type)
-			{
-				// handle 8bpp palettized case
-				for (std::uint32_t y = 0; dimensions.second > y; ++y)
-				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, ++src)
-					{
-						// determine alpha and expand to 32bpp
-						std::uint8_t const alpha((*src < pnginfo.num_trans) ? pnginfo.trans[*src] : 0xff);
-						accumalpha &= alpha;
-						std::uint16_t const paloffs(std::uint16_t(*src) * 3);
-						rgb_t const pix(alpha, pnginfo.palette[paloffs], pnginfo.palette[paloffs + 1], pnginfo.palette[paloffs + 2]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
-					}
-				}
-			}
-			else if (0 == pnginfo.color_type)
-			{
-				// handle 8bpp grayscale non-alpha case
-				for (std::uint32_t y = 0; dimensions.second > y; ++y)
-				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, ++src)
-					{
-						rgb_t const pix(0xff, src[0], src[0], src[0]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
-					}
-				}
-			}
-			else if (4 == pnginfo.color_type)
-			{
-				// handle 8bpp grayscale alpha case
-				for (std::uint32_t y = 0; dimensions.second > y; ++y)
-				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 2)
-					{
-						accumalpha &= src[1];
-						rgb_t const pix(src[1], src[0], src[0], src[0]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
-					}
-				}
-			}
-			else if (2 == pnginfo.color_type)
-			{
-				// handle 32bpp non-alpha case
-				for (std::uint32_t y = 0; dimensions.second > y; ++y)
-				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 3)
-					{
-						rgb_t const pix(0xff, src[0], src[1], src[2]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
-					}
-				}
-			}
-			else
-			{
-				// handle 32bpp alpha case
-				for (std::uint32_t y = 0; dimensions.second > y; ++y)
-				{
-					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += 4)
-					{
-						accumalpha &= src[3];
-						rgb_t const pix(src[3], src[0], src[1], src[2]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
-					}
-				}
-			}
-		}
-
-		// set hasalpha flag and return
-		hasalpha = 0xffU != accumalpha;
-		return PNGERR_NONE;
-	}
-
-	png_error expand_buffer_8bit()
-	{
-		// nothing to do if we're at 8 or greater already
-		if (pnginfo.bit_depth >= 8)
-			return PNGERR_NONE;
-
-		// do some basic checks for unsupported images
-		if ((0 != pnginfo.color_type) && (3 != pnginfo.color_type))
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
-		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
-		if (!pnginfo.bit_depth || (8 % pnginfo.bit_depth))
-			return PNGERR_UNSUPPORTED_FORMAT; // bit depth must be a factor of eight
-
-		// calculate the offset for each pass of the interlace on the input and output
-		unsigned const pass_count(get_pass_count());
-		std::uint32_t inp_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		std::uint32_t outp_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		for (unsigned pass = 0; pass_count > pass; ++pass)
-		{
-			inp_offset[pass + 1] = inp_offset[pass] + get_pass_bytes(pass);
-			outp_offset[pass + 1] = outp_offset[pass] + get_pass_bytes(pass, 8);
-		}
-
-		// allocate a new buffer at 8-bit
-		std::unique_ptr<std::uint8_t []> outbuf;
-		try { outbuf.reset(new std::uint8_t [outp_offset[pass_count]]); }
-		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
-
-		std::uint8_t const bytesamples(8 / pnginfo.bit_depth);
-		for (unsigned pass = 0; pass_count > pass; ++pass)
-		{
-			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
-			std::uint32_t const rowsamples(samples[pnginfo.color_type] * dimensions.first);
-			std::uint32_t const wholebytes(rowsamples / bytesamples);
-			std::uint32_t const leftover(rowsamples % bytesamples);
-			std::uint8_t const *inp(&pnginfo.image[inp_offset[pass]]);
-			std::uint8_t *outp(&outbuf[outp_offset[pass]]);
-
-			for (std::uint32_t y = 0; dimensions.second > y; ++y)
-			{
-				for (std::uint32_t i = 0; wholebytes > i; ++i, ++inp)
-				{
-					for (std::int8_t j = bytesamples - 1; 0 <= j; --j, ++outp)
-					{
-						*outp = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
-						if (!pnginfo.color_type)
-						{
-							for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
-								*outp |= *outp << k;
-						}
-					}
-				}
-				if (leftover)
-				{
-					for (std::int8_t j = leftover - 1; 0 <= j; --j,++outp)
-					{
-						*outp = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
-						if (!pnginfo.color_type)
-						{
-							for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
-								*outp |= *outp << k;
-						}
-					}
-					inp++;
-				}
-			}
-		}
-
-		delete[] pnginfo.image;
-		pnginfo.image = outbuf.release();
-		pnginfo.bit_depth = 8;
-		return PNGERR_NONE;
-	}
-
-	png_error read_file(util::core_file &fp)
-	{
-		// initialize the data structures
-		png_error error = PNGERR_NONE;
-		std::memset(&pnginfo, 0, sizeof(pnginfo));
-		std::list<image_data_chunk> idata;
-
-		// verify the signature at the start of the file
-		error = verify_header(fp);
-
-		// loop until we hit an IEND chunk
-		while (PNGERR_NONE == error)
-		{
-			// read a chunk
-			std::unique_ptr<std::uint8_t []> chunk_data;
-			std::uint32_t chunk_type, chunk_length;
-			error = read_chunk(fp, chunk_data, chunk_type, chunk_length);
-			if (PNGERR_NONE == error)
-			{
-				if (chunk_type == PNG_CN_IEND)
-					break; // stop when we hit an IEND chunk
-				else
-					error = process_chunk(idata, std::move(chunk_data), chunk_type, chunk_length);
-			}
-		}
-
-		// finish processing the image
-		if (PNGERR_NONE == error)
-			error = process(idata);
-
-		// if we have an error, free all the output data
-		if (error != PNGERR_NONE)
-		{
-			png_free(pnginfo);
-			memset(&pnginfo, 0, sizeof(pnginfo));
-		}
-		return error;
-	}
-
-	png_info &  pnginfo;
-
 private:
 	static constexpr unsigned ADAM7_X_BIAS[7]   = { 7, 3, 3, 1, 1, 0, 0 };
 	static constexpr unsigned ADAM7_Y_BIAS[7]   = { 7, 7, 3, 3, 1, 1, 0 };
@@ -365,13 +120,23 @@ private:
 	static constexpr unsigned ADAM7_X_OFFS[7]   = { 0, 4, 0, 2, 0, 1, 0 };
 	static constexpr unsigned ADAM7_Y_OFFS[7]   = { 0, 0, 4, 0, 2, 0, 1 };
 
+	struct image_data_chunk
+	{
+		image_data_chunk(std::uint32_t l, std::unique_ptr<std::uint8_t []> &&d) : length(l), data(std::move(d)) { }
+
+		std::uint32_t                       length;
+		std::unique_ptr<std::uint8_t []>    data;
+	};
+
 	png_error process(std::list<image_data_chunk> const &idata)
 	{
 		// do some basic checks for unsupported images
-		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
-			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
+		if (!pnginfo.bit_depth || (ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour format
 		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+		if ((3 == pnginfo.color_type) && (!pnginfo.num_palette || !pnginfo.palette))
+			return PNGERR_FILE_CORRUPT; // indexed colour with no palette
 
 		// calculate the offset for each pass of the interlace
 		unsigned const pass_count(get_pass_count());
@@ -380,7 +145,7 @@ private:
 			pass_offset[pass + 1] = pass_offset[pass] + get_pass_bytes(pass);
 
 		// allocate memory for the filtered image
-		try { pnginfo.image = new std::uint8_t [pass_offset[pass_count]]; }
+		try { pnginfo.image.reset(new std::uint8_t [pass_offset[pass_count]]); }
 		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
 
 		// decompress image data
@@ -394,8 +159,8 @@ private:
 			std::uint32_t const rowbytes(get_row_bytes(dimensions.first));
 
 			// we de-filter in place, stripping the filter bytes off the rows
-			uint8_t *dst = pnginfo.image + pass_offset[pass];
-			uint8_t const *src = dst;
+			uint8_t *dst(&pnginfo.image[pass_offset[pass]]);
+			uint8_t const *src(dst);
 			for (std::uint32_t y = 0; (dimensions.second > y) && (PNGERR_NONE == error); ++y)
 			{
 				// first byte of each row is the filter type
@@ -408,17 +173,15 @@ private:
 
 		// if we errored, free the image data
 		if (error != PNGERR_NONE)
-		{
-			delete[] pnginfo.image;
-			pnginfo.image = nullptr;
-		}
+			pnginfo.image.reset();
+
 		return error;
 	}
 
 	png_error decompress(std::list<image_data_chunk> const &idata, std::uint32_t expected)
 	{
 		// only deflate is permitted
-		if (pnginfo.compression_method != 0)
+		if (0 != pnginfo.compression_method)
 			return PNGERR_DECOMPRESS_ERROR;
 
 		// allocate zlib stream
@@ -435,7 +198,7 @@ private:
 			return PNGERR_DECOMPRESS_ERROR;
 
 		// decompress IDAT blocks
-		stream.next_out = pnginfo.image;
+		stream.next_out = pnginfo.image.get();
 		stream.avail_out = expected;
 		stream.avail_in = 0;
 		std::list<image_data_chunk>::const_iterator it = idata.begin();
@@ -527,11 +290,11 @@ private:
 
 	png_error process_chunk(std::list<image_data_chunk> &idata, std::unique_ptr<std::uint8_t []> &&data, uint32_t type, uint32_t length)
 	{
-		/* switch off of the type */
 		switch (type)
 		{
-		/* image header */
-		case PNG_CN_IHDR:
+		case PNG_CN_IHDR: // image header
+			if (13 > length)
+				return PNGERR_FILE_CORRUPT;
 			pnginfo.width = fetch_32bit(&data[0]);
 			pnginfo.height = fetch_32bit(&data[4]);
 			pnginfo.bit_depth = fetch_8bit(&data[8]);
@@ -541,62 +304,66 @@ private:
 			pnginfo.interlace_method = fetch_8bit(&data[12]);
 			break;
 
-		/* palette */
-		case PNG_CN_PLTE:
+		case PNG_CN_PLTE: // palette
 			pnginfo.num_palette = length / 3;
-			pnginfo.palette = data.release();
+			if ((length % 3) || ((3 == pnginfo.color_type) && ((1 << pnginfo.bit_depth) < pnginfo.num_palette)))
+				return PNGERR_FILE_CORRUPT;
+			pnginfo.palette = std::move(data);
 			break;
 
-		/* transparency information */
-		case PNG_CN_tRNS:
+		case PNG_CN_tRNS: // transparency information
+			if (((0 == pnginfo.color_type) && (2 > length)) || ((2 == pnginfo.color_type) && (6 > length)))
+				return PNGERR_FILE_CORRUPT;
 			pnginfo.num_trans = length;
-			pnginfo.trans = data.release();
+			pnginfo.trans = std::move(data);
 			break;
 
-		/* image data */
-		case PNG_CN_IDAT:
-
-			/* allocate a new image data descriptor and add it to the tail of the list */
+		case PNG_CN_IDAT: // image data
 			try { idata.emplace_back(length, std::move(data)); }
 			catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
-
 			break;
 
-		/* gamma */
-		case PNG_CN_gAMA:
+		case PNG_CN_gAMA: // gamma
+			if (4 > length)
+				return PNGERR_FILE_CORRUPT;
 			pnginfo.source_gamma = fetch_32bit(data.get()) / 100000.0;
 			break;
 
-		/* physical information */
-		case PNG_CN_pHYs:
+		case PNG_CN_pHYs: // physical information
+			if (9 > length)
+				return PNGERR_FILE_CORRUPT;
 			pnginfo.xres = fetch_32bit(&data[0]);
 			pnginfo.yres = fetch_32bit(&data[4]);
 			pnginfo.resolution_unit = fetch_8bit(&data[8]);
 			break;
 
-		/* text */
-		case PNG_CN_tEXt:
+		case PNG_CN_tEXt: // text
+			try
 			{
-				/* allocate a new text item */
-				png_text *const text = (png_text *)malloc(sizeof(*text));
-				if (!text)
-					return PNGERR_OUT_OF_MEMORY;
+				// split into keyword and string
+				std::uint8_t const *kwbegin(&data[0]);
+				std::uint8_t const *const textend(kwbegin + length);
+				std::uint8_t const *const kwend(std::find(kwbegin, textend, '\0'));
+				std::uint8_t const *textbegin(kwend + ((textend == kwend) ? 0 : 1));
 
-				/* set the elements */
-				text->keyword = (char *)data.release();
-				text->text = text->keyword + strlen(text->keyword) + 1;
-				text->next = nullptr;
+				// text is ISO-8859-1 but MAME likes UTF-8
+				std::size_t buflen(2 * std::max(kwend - kwbegin, textend - textbegin));
+				std::unique_ptr<char []> utf8buf(new char [buflen]);
+				char const *const bufend(utf8buf.get() + buflen);
+				char *dst;
+				for (dst = utf8buf.get(); kwend > kwbegin; dst += utf8_from_uchar(dst, bufend - dst, *kwbegin++)) { }
+				std::string keyword(utf8buf.get(), dst);
+				for (dst = utf8buf.get(); textend > textbegin; dst += utf8_from_uchar(dst, bufend - dst, *textbegin++)) { }
+				std::string text(utf8buf.get(), dst);
 
-				/* add to the end of the list */
-				png_text *pt, *ct;
-				for (pt = nullptr, ct = pnginfo.textlist; ct != nullptr; pt = ct, ct = ct->next) { }
-				if (pt == nullptr)
-					pnginfo.textlist = text;
-				else
-					pt->next = text;
-
-				break;
+				// allocate a new text item
+				pnginfo.textlist.emplace_back(std::move(keyword), std::move(text));
 			}
+			catch (std::bad_alloc const &)
+			{
+				return PNGERR_OUT_OF_MEMORY;
+			}
+			break;
 
 		/* anything else */
 		default:
@@ -717,6 +484,263 @@ private:
 
 		return PNGERR_NONE;
 	}
+
+	png_info &  pnginfo;
+
+public:
+	png_private(png_info &info) : pnginfo(info)
+	{
+	}
+
+	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha) const
+	{
+		// do some basic checks for unsupported images
+		if ((8 > pnginfo.bit_depth) || (pnginfo.bit_depth % 8))
+			return PNGERR_UNSUPPORTED_FORMAT; // only do multiples of 8bps here - expand lower bit depth first
+		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour sample format
+		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+		if ((3 == pnginfo.color_type) && (8 != pnginfo.bit_depth))
+			return PNGERR_UNSUPPORTED_FORMAT; // indexed colour must be exactly 8bpp
+
+		// everything looks sane, allocate the bitmap and deinterlace into it
+		bitmap.allocate(pnginfo.width, pnginfo.height);
+		std::uint8_t accumalpha(0xff);
+		uint32_t const bps(pnginfo.bit_depth >> 3);
+		uint32_t const bpp(bps * samples[pnginfo.color_type]);
+		unsigned const pass_count(get_pass_count());
+		std::uint32_t pass_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		for (unsigned pass = 0; pass_count > pass; ++pass)
+		{
+			// calculate parameters for interlace pass
+			pass_offset[pass + 1] = pass_offset[pass] + get_pass_bytes(pass);
+			unsigned const x_shift(pnginfo.interlace_method ? ADAM7_X_SHIFT[pass] : 0);
+			unsigned const y_shift(pnginfo.interlace_method ? ADAM7_Y_SHIFT[pass] : 0);
+			unsigned const x_offs(pnginfo.interlace_method ? ADAM7_X_OFFS[pass] : 0);
+			unsigned const y_offs(pnginfo.interlace_method ? ADAM7_Y_OFFS[pass] : 0);
+			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
+			std::uint8_t const *src(&pnginfo.image[pass_offset[pass]]);
+
+			if (3 == pnginfo.color_type)
+			{
+				// handle 8bpp palettized case
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
+					{
+						// determine alpha and expand to 32bpp
+						std::uint8_t const alpha((*src < pnginfo.num_trans) ? pnginfo.trans[*src] : 0xff);
+						accumalpha &= alpha;
+						std::uint16_t const paloffs(std::uint16_t(*src) * 3);
+						rgb_t const pix(alpha, pnginfo.palette[paloffs], pnginfo.palette[paloffs + 1], pnginfo.palette[paloffs + 2]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+			else if (0 == pnginfo.color_type)
+			{
+				// handle grayscale non-alpha case
+				uint32_t const bpp(pnginfo.bit_depth >> 3);
+				std::uint16_t const transpen(pnginfo.trans ? fetch_16bit(pnginfo.trans.get()) : 0U);
+				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
+					{
+						std::uint16_t i_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src));
+						std::uint8_t const a_val((pnginfo.trans && (transpen == i_val)) ? 0x00 : 0xff);
+						i_val >>= samp_shift;
+						accumalpha &= a_val;
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, i_val, i_val, i_val);
+					}
+				}
+			}
+			else if (4 == pnginfo.color_type)
+			{
+				// handle grayscale alpha case
+				uint32_t const i(0 * bps);
+				uint32_t const a(1 * bps);
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
+					{
+						accumalpha &= src[a];
+						rgb_t const pix(src[a], src[i], src[i], src[i]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+			else if (2 == pnginfo.color_type)
+			{
+				// handle RGB non-alpha case
+				uint32_t const r(0 * bps);
+				uint32_t const g(1 * bps);
+				uint32_t const b(2 * bps);
+				std::uint16_t const transpen_r(pnginfo.trans ? fetch_16bit(&pnginfo.trans[0]) : 0U);
+				std::uint16_t const transpen_g(pnginfo.trans ? fetch_16bit(&pnginfo.trans[2]) : 0U);
+				std::uint16_t const transpen_b(pnginfo.trans ? fetch_16bit(&pnginfo.trans[4]) : 0U);
+				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
+					{
+						uint16_t r_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + r));
+						uint16_t g_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + g));
+						uint16_t b_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + b));
+						std::uint8_t const a_val((pnginfo.trans && (transpen_r == r_val) && (transpen_g == g_val) && (transpen_b == b_val)) ? 0x00 : 0xff);
+						r_val >>= samp_shift;
+						g_val >>= samp_shift;
+						b_val >>= samp_shift;
+						accumalpha &= a_val;
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, r_val, g_val, b_val);
+					}
+				}
+			}
+			else
+			{
+				// handle RGB alpha case
+				uint32_t const r(0 * bps);
+				uint32_t const g(1 * bps);
+				uint32_t const b(2 * bps);
+				uint32_t const a(3 * bps);
+				for (std::uint32_t y = 0; dimensions.second > y; ++y)
+				{
+					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
+					{
+						accumalpha &= src[a];
+						rgb_t const pix(src[a], src[r], src[g], src[b]);
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+					}
+				}
+			}
+		}
+
+		// set hasalpha flag and return
+		hasalpha = 0xffU != accumalpha;
+		return PNGERR_NONE;
+	}
+
+	png_error expand_buffer_8bit()
+	{
+		// nothing to do if we're at 8 or greater already
+		if (pnginfo.bit_depth >= 8)
+			return PNGERR_NONE;
+
+		// do some basic checks for unsupported images
+		if (!pnginfo.bit_depth || (8 % pnginfo.bit_depth))
+			return PNGERR_UNSUPPORTED_FORMAT; // bit depth must be a factor of eight
+		if ((0 != pnginfo.color_type) && (3 != pnginfo.color_type))
+			return PNGERR_UNSUPPORTED_FORMAT; // only upsample monochrome and indexed colour
+		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
+			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+
+		// calculate the offset for each pass of the interlace on the input and output
+		unsigned const pass_count(get_pass_count());
+		std::uint32_t inp_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		std::uint32_t outp_offset[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		for (unsigned pass = 0; pass_count > pass; ++pass)
+		{
+			inp_offset[pass + 1] = inp_offset[pass] + get_pass_bytes(pass);
+			outp_offset[pass + 1] = outp_offset[pass] + get_pass_bytes(pass, 8);
+		}
+
+		// allocate a new buffer at 8-bit
+		std::unique_ptr<std::uint8_t []> outbuf;
+		try { outbuf.reset(new std::uint8_t [outp_offset[pass_count]]); }
+		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
+
+		// upsample bitmap
+		std::uint8_t const bytesamples(8 / pnginfo.bit_depth);
+		for (unsigned pass = 0; pass_count > pass; ++pass)
+		{
+			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
+			std::uint32_t const rowsamples(samples[pnginfo.color_type] * dimensions.first);
+			std::uint32_t const wholebytes(rowsamples / bytesamples);
+			std::uint32_t const leftover(rowsamples % bytesamples);
+			std::uint8_t const *inp(&pnginfo.image[inp_offset[pass]]);
+			std::uint8_t *outp(&outbuf[outp_offset[pass]]);
+
+			for (std::uint32_t y = 0; dimensions.second > y; ++y)
+			{
+				for (std::uint32_t i = 0; wholebytes > i; ++i, ++inp)
+				{
+					for (std::int8_t j = bytesamples - 1; 0 <= j; --j, ++outp)
+					{
+						*outp = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
+						if (!pnginfo.color_type)
+						{
+							for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
+								*outp |= *outp << k;
+						}
+					}
+				}
+				if (leftover)
+				{
+					for (std::int8_t j = leftover - 1; 0 <= j; --j,++outp)
+					{
+						*outp = (*inp >> (j * pnginfo.bit_depth)) & (0xffU >> (8 - pnginfo.bit_depth));
+						if (!pnginfo.color_type)
+						{
+							for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
+								*outp |= *outp << k;
+						}
+					}
+					inp++;
+				}
+			}
+		}
+
+		// upsample transparent pen as well
+		if ((0 == pnginfo.color_type) && pnginfo.trans)
+		{
+			std::uint16_t pen(fetch_16bit(&pnginfo.trans[0]));
+			for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
+				pen |= pen << k;
+			put_16bit(&pnginfo.trans[0], pen);
+		}
+
+		pnginfo.image = std::move(outbuf);
+		pnginfo.bit_depth = 8;
+		return PNGERR_NONE;
+	}
+
+	png_error read_file(util::core_file &fp)
+	{
+		// initialize the data structures
+		png_error error = PNGERR_NONE;
+		pnginfo.reset();
+		std::list<image_data_chunk> idata;
+
+		// verify the signature at the start of the file
+		error = verify_header(fp);
+
+		// loop until we hit an IEND chunk
+		while (PNGERR_NONE == error)
+		{
+			// read a chunk
+			std::unique_ptr<std::uint8_t []> chunk_data;
+			std::uint32_t chunk_type, chunk_length;
+			error = read_chunk(fp, chunk_data, chunk_type, chunk_length);
+			if (PNGERR_NONE == error)
+			{
+				if (chunk_type == PNG_CN_IEND)
+					break; // stop when we hit an IEND chunk
+				else
+					error = process_chunk(idata, std::move(chunk_data), chunk_type, chunk_length);
+			}
+		}
+
+		// finish processing the image
+		if (PNGERR_NONE == error)
+			error = process(idata);
+
+		// if we have an error, free all the output data
+		if (error != PNGERR_NONE)
+			pnginfo.reset();
+
+		return error;
+	}
 };
 
 constexpr unsigned png_private::ADAM7_X_BIAS[7];
@@ -732,13 +756,12 @@ constexpr unsigned png_private::ADAM7_Y_OFFS[7];
 
 
 /*-------------------------------------------------
-    png_read_file - read a PNG from a core stream
+    read_file - read a PNG from a core stream
 -------------------------------------------------*/
 
-png_error png_read_file(util::core_file &fp, png_info *pnginfo)
+png_error png_info::read_file(util::core_file &fp)
 {
-	png_private png(*pnginfo);
-	return png.read_file(fp);
+	return png_private(*this).read_file(fp);
 }
 
 
@@ -762,39 +785,35 @@ png_error png_read_bitmap(util::core_file &fp, bitmap_argb32 &bitmap)
 	result = png.expand_buffer_8bit();
 	if (PNGERR_NONE != result)
 	{
-		png_free(pnginfo);
+		pnginfo.free_data();
 		return result;
 	}
 
 	// allocate a bitmap of the appropriate size and copy it
 	bool hasalpha;
-	result = png.copy_to_bitmap(bitmap, hasalpha);
-
-	// free our temporary data and return
-	png_free(pnginfo);
-	return result;
+	return png.copy_to_bitmap(bitmap, hasalpha);
 }
 
 
 /*-------------------------------------------------
-    png_expand_buffer_8bit - copy PNG data into a
+    expand_buffer_8bit - copy PNG data into a
     bitmap
 -------------------------------------------------*/
 
-png_error png_copy_to_bitmap(png_info *pnginfo, bitmap_argb32 &bitmap, bool &hasalpha)
+png_error png_info::copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha)
 {
-	return png_private(*pnginfo).copy_to_bitmap(bitmap, hasalpha);
+	return png_private(*this).copy_to_bitmap(bitmap, hasalpha);
 }
 
 
 /*-------------------------------------------------
-    png_expand_buffer_8bit - expand a buffer from
+    expand_buffer_8bit - expand a buffer from
     sub 8-bit to 8-bit
 -------------------------------------------------*/
 
-png_error png_expand_buffer_8bit(png_info *pnginfo)
+png_error png_info::expand_buffer_8bit()
 {
-	return png_private(*pnginfo).expand_buffer_8bit();
+	return png_private(*this).expand_buffer_8bit();
 }
 
 
@@ -804,45 +823,42 @@ png_error png_expand_buffer_8bit(png_info *pnginfo)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    png_add_text - add a text entry to the png_info
+    add_text - add a text entry to the png_info
 -------------------------------------------------*/
 
-png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text)
+png_error png_info::add_text(const char *keyword, const char *text)
 {
-	png_text *newtext, *pt, *ct;
-	char *textdata;
-	int keylen;
-
-	/* allocate a new text element */
-	newtext = (png_text *)malloc(sizeof(*newtext));
-	if (newtext == nullptr)
-		return PNGERR_OUT_OF_MEMORY;
-
-	/* allocate a string long enough to hold both */
-	keylen = (int)strlen(keyword);
-	textdata = (char *)malloc(keylen + 1 + strlen(text) + 1);
-	if (textdata == nullptr)
+	// apply rules to keyword
+	char32_t prev(0);
+	std::size_t cnt(0);
+	char const *const kwend(keyword + std::strlen(keyword));
+	for (char const *ptr = keyword; kwend > ptr; )
 	{
-		free(newtext);
-		return PNGERR_OUT_OF_MEMORY;
+		char32_t ch;
+		int const len(uchar_from_utf8(&ch, ptr, kwend - ptr));
+		if ((0 >= len) || (32 > ch) || (255 < ch) || ((126 < ch) && (161 > ch)) || (((32 == prev) || (keyword == ptr)) && (32 == ch)))
+			return PNGERR_UNSUPPORTED_FORMAT;
+		prev = ch;
+		++cnt;
+		ptr += len;
+	}
+	if ((32 == prev) || (1 > cnt) || (79 < cnt))
+		return PNGERR_UNSUPPORTED_FORMAT;
+
+	// apply rules to text
+	char const *const textend(text + std::strlen(text));
+	for (char const *ptr = text; textend > ptr; )
+	{
+		char32_t ch;
+		int const len(uchar_from_utf8(&ch, ptr, textend - ptr));
+		if ((0 >= len) || (1 > ch) || (255 < ch))
+			return PNGERR_UNSUPPORTED_FORMAT;
+		ptr += len;
 	}
 
-	/* copy in the data */
-	strcpy(textdata, keyword);
-	strcpy(textdata + keylen + 1, text);
-
-	/* text follows a trailing nullptr */
-	newtext->keyword = textdata;
-	newtext->text = textdata + keylen + 1;
-	newtext->next = nullptr;
-
-	/* add us to the end of the linked list */
-	for (pt = nullptr, ct = pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) { }
-	if (pt == nullptr)
-		pnginfo->textlist = newtext;
-	else
-		pt->next = newtext;
-
+	// allocate a new text element
+	try { textlist.emplace_back(std::piecewise_construct, std::forward_as_tuple(keyword, kwend), std::forward_as_tuple(text, textend)); }
+	catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
 	return PNGERR_NONE;
 }
 
@@ -974,51 +990,53 @@ static png_error write_deflated_chunk(util::core_file &fp, uint8_t *data, uint32
     bitmap to a palettized image
 -------------------------------------------------*/
 
-static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+static png_error convert_bitmap_to_image_palette(png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	int rowbytes;
 	int x, y;
 
 	/* set the common info */
-	pnginfo->width = bitmap.width();
-	pnginfo->height = bitmap.height();
-	pnginfo->bit_depth = 8;
-	pnginfo->color_type = 3;
-	pnginfo->num_palette = 256;
-	rowbytes = pnginfo->width;
+	pnginfo.width = bitmap.width();
+	pnginfo.height = bitmap.height();
+	pnginfo.bit_depth = 8;
+	pnginfo.color_type = 3;
+	pnginfo.num_palette = 256;
+	rowbytes = pnginfo.width;
 
 	/* allocate memory for the palette */
-	pnginfo->palette = (uint8_t *)malloc(3 * 256);
-	if (pnginfo->palette == nullptr)
-		return PNGERR_OUT_OF_MEMORY;
+	try { pnginfo.palette.reset(new std::uint8_t [3 * 256]); }
+	catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
 
 	/* build the palette */
-	memset(pnginfo->palette, 0, 3 * 256);
+	std::fill_n(pnginfo.palette.get(), 3 * 256, 0);
 	for (x = 0; x < palette_length; x++)
 	{
 		rgb_t color = palette[x];
-		pnginfo->palette[3 * x + 0] = color.r();
-		pnginfo->palette[3 * x + 1] = color.g();
-		pnginfo->palette[3 * x + 2] = color.b();
+		pnginfo.palette[3 * x + 0] = color.r();
+		pnginfo.palette[3 * x + 1] = color.g();
+		pnginfo.palette[3 * x + 2] = color.b();
 	}
 
 	/* allocate memory for the image */
-	pnginfo->image = (uint8_t *)malloc(pnginfo->height * (rowbytes + 1));
-	if (pnginfo->image == nullptr)
+	try
 	{
-		free(pnginfo->palette);
+		pnginfo.image.reset(new std::uint8_t [pnginfo.height * (rowbytes + 1)]);
+	}
+	catch (std::bad_alloc const &)
+	{
+		pnginfo.palette.reset();
 		return PNGERR_OUT_OF_MEMORY;
 	}
 
 	/* copy in the pixels, specifying a nullptr filter */
-	for (y = 0; y < pnginfo->height; y++)
+	for (y = 0; y < pnginfo.height; y++)
 	{
 		uint16_t *src = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
-		uint8_t *dst = pnginfo->image + y * (rowbytes + 1);
+		uint8_t *dst = &pnginfo.image[y * (rowbytes + 1)];
 
 		/* store the filter byte, then copy the data */
 		*dst++ = 0;
-		for (x = 0; x < pnginfo->width; x++)
+		for (x = 0; x < pnginfo.width; x++)
 			*dst++ = *src++;
 	}
 
@@ -1031,28 +1049,27 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
     bitmap to an RGB image
 -------------------------------------------------*/
 
-static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	int alpha = (bitmap.format() == BITMAP_FORMAT_ARGB32);
 	int rowbytes;
 	int x, y;
 
 	/* set the common info */
-	pnginfo->width = bitmap.width();
-	pnginfo->height = bitmap.height();
-	pnginfo->bit_depth = 8;
-	pnginfo->color_type = alpha ? 6 : 2;
-	rowbytes = pnginfo->width * (alpha ? 4 : 3);
+	pnginfo.width = bitmap.width();
+	pnginfo.height = bitmap.height();
+	pnginfo.bit_depth = 8;
+	pnginfo.color_type = alpha ? 6 : 2;
+	rowbytes = pnginfo.width * (alpha ? 4 : 3);
 
 	/* allocate memory for the image */
-	pnginfo->image = (uint8_t *)malloc(pnginfo->height * (rowbytes + 1));
-	if (pnginfo->image == nullptr)
-		return PNGERR_OUT_OF_MEMORY;
+	try { pnginfo.image.reset(new std::uint8_t [pnginfo.height * (rowbytes + 1)]); }
+	catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
 
 	/* copy in the pixels, specifying a nullptr filter */
-	for (y = 0; y < pnginfo->height; y++)
+	for (y = 0; y < pnginfo.height; y++)
 	{
-		uint8_t *dst = pnginfo->image + y * (rowbytes + 1);
+		uint8_t *dst = &pnginfo.image[y * (rowbytes + 1)];
 
 		/* store the filter byte, then copy the data */
 		*dst++ = 0;
@@ -1061,7 +1078,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 		if (bitmap.format() == BITMAP_FORMAT_IND16)
 		{
 			uint16_t *src16 = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
-			for (x = 0; x < pnginfo->width; x++)
+			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t color = palette[*src16++];
 				*dst++ = color.r();
@@ -1074,7 +1091,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 		else if (bitmap.format() == BITMAP_FORMAT_RGB32)
 		{
 			uint32_t *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
-			for (x = 0; x < pnginfo->width; x++)
+			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t raw = *src32++;
 				*dst++ = raw.r();
@@ -1087,7 +1104,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 		else if (bitmap.format() == BITMAP_FORMAT_ARGB32)
 		{
 			uint32_t *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
-			for (x = 0; x < pnginfo->width; x++)
+			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t raw = *src32++;
 				*dst++ = raw.r();
@@ -1111,86 +1128,102 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
     chunks to the given file
 -------------------------------------------------*/
 
-static png_error write_png_stream(util::core_file &fp, png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+static png_error write_png_stream(util::core_file &fp, png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	uint8_t tempbuff[16];
-	png_text *text;
 	png_error error;
 
-	/* create an unfiltered image in either palette or RGB form */
+	// create an unfiltered image in either palette or RGB form
 	if (bitmap.format() == BITMAP_FORMAT_IND16 && palette_length <= 256)
 		error = convert_bitmap_to_image_palette(pnginfo, bitmap, palette_length, palette);
 	else
 		error = convert_bitmap_to_image_rgb(pnginfo, bitmap, palette_length, palette);
 	if (error != PNGERR_NONE)
-		goto handle_error;
+		return error;
 
-	/* if we wanted to get clever and do filtering, we would do it here */
+	// if we wanted to get clever and do filtering, we would do it here
 
-	/* write the IHDR chunk */
-	put_32bit(tempbuff + 0, pnginfo->width);
-	put_32bit(tempbuff + 4, pnginfo->height);
-	put_8bit(tempbuff + 8, pnginfo->bit_depth);
-	put_8bit(tempbuff + 9, pnginfo->color_type);
-	put_8bit(tempbuff + 10, pnginfo->compression_method);
-	put_8bit(tempbuff + 11, pnginfo->filter_method);
-	put_8bit(tempbuff + 12, pnginfo->interlace_method);
+	// write the IHDR chunk
+	put_32bit(tempbuff + 0, pnginfo.width);
+	put_32bit(tempbuff + 4, pnginfo.height);
+	put_8bit(tempbuff + 8, pnginfo.bit_depth);
+	put_8bit(tempbuff + 9, pnginfo.color_type);
+	put_8bit(tempbuff + 10, pnginfo.compression_method);
+	put_8bit(tempbuff + 11, pnginfo.filter_method);
+	put_8bit(tempbuff + 12, pnginfo.interlace_method);
 	error = write_chunk(fp, tempbuff, PNG_CN_IHDR, 13);
 	if (error != PNGERR_NONE)
-		goto handle_error;
+		return error;
 
-	/* write the PLTE chunk */
-	if (pnginfo->num_palette > 0)
-		error = write_chunk(fp, pnginfo->palette, PNG_CN_PLTE, pnginfo->num_palette * 3);
+	// write the PLTE chunk
+	if (pnginfo.num_palette > 0)
+		error = write_chunk(fp, pnginfo.palette.get(), PNG_CN_PLTE, pnginfo.num_palette * 3);
 	if (error != PNGERR_NONE)
-		goto handle_error;
+		return error;
 
-	/* write a single IDAT chunk */
-	error = write_deflated_chunk(fp, pnginfo->image, PNG_CN_IDAT, pnginfo->height * (compute_rowbytes(*pnginfo) + 1));
+	// write a single IDAT chunk */
+	error = write_deflated_chunk(fp, pnginfo.image.get(), PNG_CN_IDAT, pnginfo.height * (compute_rowbytes(pnginfo) + 1));
 	if (error != PNGERR_NONE)
-		goto handle_error;
+		return error;
 
-	/* write TEXT chunks */
-	for (text = pnginfo->textlist; text != nullptr; text = text->next)
+	// write TEXT chunks
+	std::vector<std::uint8_t> textbuf;
+	for (png_info::png_text const &text : pnginfo.textlist)
 	{
-		error = write_chunk(fp, (uint8_t *)text->keyword, PNG_CN_tEXt, (uint32_t)strlen(text->keyword) + 1 + (uint32_t)strlen(text->text));
+		try { textbuf.resize(text.first.length() + 1 + text.second.length()); }
+		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
+		std::uint8_t *dst(&textbuf[0]);
+
+		// convert keyword to ISO-8859-1
+		char const *const kwend(text.first.c_str() + text.first.length());
+		for (char const *src = text.first.c_str(); kwend > src; ++dst)
+		{
+			char32_t ch;
+			int const len(uchar_from_utf8(&ch, src, kwend - src));
+			if (0 >= len)
+				break;
+			*dst = std::uint8_t(ch);
+			src += len;
+		}
+
+		// NUL separator between keword and text
+		*dst++ = 0;
+
+		// convert text to ISO-8859-1
+		char const *const textend(text.second.c_str() + text.second.length());
+		for (char const *src = text.second.c_str(); textend > src; ++dst)
+		{
+			char32_t ch;
+			int const len(uchar_from_utf8(&ch, src, textend - src));
+			if (0 >= len)
+				break;
+			*dst = std::uint8_t(ch);
+			src += len;
+		}
+
+		error = write_chunk(fp, &textbuf[0], PNG_CN_tEXt, dst - &textbuf[0]);
 		if (error != PNGERR_NONE)
-			goto handle_error;
+			return error;
 	}
 
-	/* write an IEND chunk */
-	error = write_chunk(fp, nullptr, PNG_CN_IEND, 0);
-
-handle_error:
-	return error;
+	// write an IEND chunk
+	return write_chunk(fp, nullptr, PNG_CN_IEND, 0);
 }
 
 
-png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette)
 {
+	// use a dummy pnginfo if none passed to us
 	png_info pnginfo;
-	png_error error;
-
-	/* use a dummy pnginfo if none passed to us */
 	if (info == nullptr)
-	{
 		info = &pnginfo;
-		memset(&pnginfo, 0, sizeof(pnginfo));
-	}
 
-	/* write the PNG signature */
+	// write the PNG signature
 	if (fp.write(PNG_Signature, 8) != 8)
-	{
-		if (info == &pnginfo)
-			png_free(&pnginfo);
 		return PNGERR_FILE_ERROR;
-	}
 
 	/* write the rest of the PNG data */
-	error = write_png_stream(fp, info, bitmap, palette_length, palette);
-	if (info == &pnginfo)
-		png_free(&pnginfo);
-	return error;
+	return write_png_stream(fp, *info, bitmap, palette_length, palette);
 }
 
 
@@ -1216,7 +1249,6 @@ png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t &bitmap
 png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate)
 {
 	uint8_t mhdr[28];
-	png_error error;
 
 	if (fp.write(MNG_Signature, 8) != 8)
 		return PNGERR_FILE_ERROR;
@@ -1225,14 +1257,8 @@ png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate)
 	put_32bit(mhdr + 0, bitmap.width());
 	put_32bit(mhdr + 4, bitmap.height());
 	put_32bit(mhdr + 8, rate);
-	put_32bit(mhdr + 24, 0x0041); /* Simplicity profile */
-	/* frame count and play time unspecified because
-	   we don't know at this stage */
-	error = write_chunk(fp, mhdr, MNG_CN_MHDR, 28);
-	if (error != PNGERR_NONE)
-		return error;
-
-	return PNGERR_NONE;
+	put_32bit(mhdr + 24, 0x0041); // Simplicity profile - frame count and play time unspecified because we don't know at this stage
+	return write_chunk(fp, mhdr, MNG_CN_MHDR, 28);
 }
 
 /**
@@ -1249,7 +1275,7 @@ png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate)
  * @return  A png_error.
  */
 
-png_error mng_capture_frame(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+png_error mng_capture_frame(util::core_file &fp, png_info &info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette)
 {
 	return write_png_stream(fp, info, bitmap, palette_length, palette);
 }

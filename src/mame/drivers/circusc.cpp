@@ -56,6 +56,7 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
@@ -101,9 +102,14 @@ WRITE8_MEMBER(circusc_state::circusc_sh_irqtrigger_w)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(circusc_state::circusc_coin_counter_w)
+WRITE_LINE_MEMBER(circusc_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(circusc_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 WRITE8_MEMBER(circusc_state::circusc_sound_w)
@@ -139,17 +145,15 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 	}
 }
 
-WRITE8_MEMBER(circusc_state::irq_mask_w)
+WRITE_LINE_MEMBER(circusc_state::irq_mask_w)
 {
-	m_irq_mask = data & 1;
+	m_irq_mask = state;
+	if (!m_irq_mask)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x03f8) AM_WRITE(circusc_flipscreen_w)       /* FLIP */
-	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0x03f8) AM_WRITE(irq_mask_w)                 /* INTST */
-//  AM_RANGE(0x0002, 0x0002) AM_MIRROR(0x03f8) AM_WRITENOP                          /* MUT - not used /*
-	AM_RANGE(0x0003, 0x0004) AM_MIRROR(0x03f8) AM_WRITE(circusc_coin_counter_w)     /* COIN1, COIN2 */
-	AM_RANGE(0x0005, 0x0005) AM_MIRROR(0x03f8) AM_WRITEONLY AM_SHARE("spritebank") /* OBJ CHENG */
+	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x03f8) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* WDOG */
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)              /* SOUND DATA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_WRITE(circusc_sh_irqtrigger_w)    /* SOUND-ON causes interrupt on audio CPU */
@@ -333,8 +337,8 @@ DISCRETE_SOUND_END
 
 INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (m_irq_mask)
+		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( circusc )
@@ -343,6 +347,14 @@ static MACHINE_CONFIG_START( circusc )
 	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */
 	MCFG_CPU_PROGRAM_MAP(circusc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", circusc_state,  vblank_irq)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2C
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(circusc_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(circusc_state, irq_mask_w)) // INTST
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // MUT - not used
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(circusc_state, coin_counter_1_w)) // COIN1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(circusc_state, coin_counter_2_w)) // COIN2
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(circusc_state, spritebank_w)) // OBJ CHENG
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)

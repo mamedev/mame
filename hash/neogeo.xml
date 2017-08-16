@@ -6676,43 +6676,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
-				<rom loadflag="load16_word_swap" name="238-p1.p1" offset="0x000000" size="0x100000" crc="5677456f" sha1="f76169fa5c90871d65e2a16fd1bb036c90533ac8" />
-				<rom loadflag="load16_word_swap" name="238-p2.sp2" offset="0x100000" size="0x400000" crc="5b4a09c5" sha1="de04036cba2da4bb2da73d902d1822b82b4f67a9" />  <!-- TC5332205 -->
-			</dataarea>
-			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="238-s1.s1" crc="1f95cedb" sha1="adfa74868147fd260481e4c387d254d3b6de83f4" />   <!-- TC531000 -->
-			</dataarea>
-			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="238-m1.m1" crc="075b9518" sha1="ac21b88a860b9572bf24432b4cadcc96d108055d" />   <!-- TC531001 -->
-			</dataarea>
-			<dataarea name="ymsnd" size="0x600000">
-				<rom name="238-v1.v1" offset="0x000000" size="0x400000" crc="260c0bef" sha1="9c4f80ce4bb205afed11bb8b8926d20748eb5512" />   <!-- TC5332204 -->
-				<rom name="238-v2.v2" offset="0x400000" size="0x200000" crc="4ad7d59e" sha1="bfdf2684f7f38af4e75ad0068ff9463dc2601598" />   <!-- TC5316200 -->
-			</dataarea>
-			<dataarea name="sprites" size="0x2000000">
-				<rom loadflag="load16_byte" name="238-c1.c1" offset="0x000000" size="0x400000" crc="90c6a181" sha1="a381bc8449718814ff12b3a4f7fc4d1bb7ea1631" />    <!-- TC5332205 -->
-				<rom loadflag="load16_byte" name="238-c2.c2" offset="0x000001" size="0x400000" crc="888720f0" sha1="cd4d65df8d3ef0dbcca2b7f3f803f45c457f5beb" />    <!-- TC5332205 -->
-				<rom loadflag="load16_byte" name="238-c3.c3" offset="0x800000" size="0x400000" crc="2c393aa3" sha1="1cd7cebe5861a2d65f1d6615dd7752162e573a02" />    <!-- TC5332205 -->
-				<rom loadflag="load16_byte" name="238-c4.c4" offset="0x800001" size="0x400000" crc="b9e909eb" sha1="33cc9b2d13e4ed2ab6040ff582a53dc9bca402e0" />    <!-- TC5332205 -->
-				<rom loadflag="load16_byte" name="238-c5.c5" offset="0x1000000" size="0x400000" crc="c22c68eb" sha1="a4b04118b1b1909d3b76be8d9ee5d97db6120600" />   <!-- TC5332205 -->
-				<rom loadflag="load16_byte" name="238-c6.c6" offset="0x1000001" size="0x400000" crc="119323cd" sha1="05a9d4b1fb4cc963b25452ff6f81e296e0c0b2a1" />   <!-- TC5332205 -->
-				<rom loadflag="load16_byte" name="238-c7.c7" offset="0x1800000" size="0x400000" crc="a72ce7ed" sha1="05b151554bd7af09ccf554a17bc3c75a0512faaf" />   <!-- TC5332205 -->
-				<rom loadflag="load16_byte" name="238-c8.c8" offset="0x1800001" size="0x400000" crc="1c7c2efb" sha1="b055ee43cbdaf9a3cb19e4e1f9dd2c40bde69d70" />   <!-- TC5332205 -->
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shocktroa" cloneof="shocktro">
-		<description>Shock Troopers (set 2)</description>
-		<year>1997</year>
-		<publisher>Saurus</publisher>
-		<info name="serial" value="NGM-2380"/>
-		<info name="release" value="19971111"/>
-		<info name="alt_title" value="ショックトルーパーズ"/>
-		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
-		<sharedfeat name="compatibility" value="MVS,AES" />
-		<part name="cart" interface="neo_cart">
-			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="238-pg1.p1" offset="0x000000" size="0x100000" crc="efedf8dc" sha1="f638df9bf7aa7d514ee2bccfc7f2adbf39ca83fc" />  <!-- mask rom TC538200 -->
 				<rom loadflag="load16_word_swap" name="238-p2.sp2" offset="0x100000" size="0x400000" crc="5b4a09c5" sha1="de04036cba2da4bb2da73d902d1822b82b4f67a9" />  <!-- TC5332205 -->
 			</dataarea>
@@ -6738,7 +6701,43 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="shocktroa" cloneof="shocktro">
+		<description>Shock Troopers (set 2)</description>
+		<year>1997</year>
+		<publisher>Saurus</publisher>
+		<info name="serial" value="NGM-2380"/>
+		<info name="release" value="19971111"/>
+		<info name="alt_title" value="ショックトルーパーズ"/>
+		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
+				<rom loadflag="load16_word_swap" name="238-p1.p1" offset="0x000000" size="0x100000" crc="5677456f" sha1="f76169fa5c90871d65e2a16fd1bb036c90533ac8" />
+				<rom loadflag="load16_word_swap" name="238-p2.sp2" offset="0x100000" size="0x400000" crc="5b4a09c5" sha1="de04036cba2da4bb2da73d902d1822b82b4f67a9" />  <!-- TC5332205 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="238-s1.s1" crc="1f95cedb" sha1="adfa74868147fd260481e4c387d254d3b6de83f4" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="238-m1.m1" crc="075b9518" sha1="ac21b88a860b9572bf24432b4cadcc96d108055d" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x600000">
+				<rom name="238-v1.v1" offset="0x000000" size="0x400000" crc="260c0bef" sha1="9c4f80ce4bb205afed11bb8b8926d20748eb5512" />   <!-- TC5332204 -->
+				<rom name="238-v2.v2" offset="0x400000" size="0x200000" crc="4ad7d59e" sha1="bfdf2684f7f38af4e75ad0068ff9463dc2601598" />   <!-- TC5316200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="238-c1.c1" offset="0x000000" size="0x400000" crc="90c6a181" sha1="a381bc8449718814ff12b3a4f7fc4d1bb7ea1631" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="238-c2.c2" offset="0x000001" size="0x400000" crc="888720f0" sha1="cd4d65df8d3ef0dbcca2b7f3f803f45c457f5beb" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="238-c3.c3" offset="0x800000" size="0x400000" crc="2c393aa3" sha1="1cd7cebe5861a2d65f1d6615dd7752162e573a02" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="238-c4.c4" offset="0x800001" size="0x400000" crc="b9e909eb" sha1="33cc9b2d13e4ed2ab6040ff582a53dc9bca402e0" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="238-c5.c5" offset="0x1000000" size="0x400000" crc="c22c68eb" sha1="a4b04118b1b1909d3b76be8d9ee5d97db6120600" />   <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="238-c6.c6" offset="0x1000001" size="0x400000" crc="119323cd" sha1="05a9d4b1fb4cc963b25452ff6f81e296e0c0b2a1" />   <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="238-c7.c7" offset="0x1800000" size="0x400000" crc="a72ce7ed" sha1="05b151554bd7af09ccf554a17bc3c75a0512faaf" />   <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="238-c8.c8" offset="0x1800001" size="0x400000" crc="1c7c2efb" sha1="b055ee43cbdaf9a3cb19e4e1f9dd2c40bde69d70" />   <!-- TC5332205 -->
+			</dataarea>
+		</part>
+	</software>
 
 	<!--
 	ID-0239

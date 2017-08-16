@@ -20,27 +20,28 @@ Other        :  93C46 EEPROM
 -----------------------------------------------------------------------------------------
 Year + Game           License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
-94 Mazinger Z         Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
-94 Power Instinct 2   Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
-95 Gogetsuji Legends  Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
-95 Metamoqester       Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
-95 Sailor Moon        Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
-95 Donpachi           Atlus         AT-C01DP-2  038 9429WX727   013 9347E7003   NMK 112
-96 Air Gallet         Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
-96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
-96 Pac-Slot           Namco         N-44 EM     038 9444WX010   013 9345E7006
-96 Poka Poka Satan    Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
-97 Tekken Card World  Namco         EMG4        038 9701WX001   013 9651EX001
-97 Dodonpachi         Atlus         AT-C03 D2   038 9341E7010   013 9338EX701
-98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
-98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
-98 Uo Poko            Jaleco        CV02        038 9749WX001   013 9749EX004
-99 Guwange            Atlus         ATC05       038 9919WX004   013
-99 Gaia Crusaders     Noise Factory ?           038 9838WX003   013 9918EX008
-99 Koro Koro Quest    Takumi        TUG-01B     038 9838WX004   013 9838EX004
-99 Crusher Makochan   Takumi        TUG-01B     038 9838WX004   013 9838EX004
-99 Tobikose! Jumpman  Namco         EMG4        038 9919WX007   013 9934WX002
-01 Thunder Heroes     Primetek      ?           038 9838WX003   013 9918EX008
+94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
+94 Power Instinct 2       Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
+95 Gogetsuji Legends      Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
+95 Metamoqester           Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
+95 Sailor Moon            Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
+95 Donpachi               Atlus         AT-C01DP-2  038 9429WX727   013 9347E7003   NMK 112
+96 Air Gallet             Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
+96 Hotdog Storm           Marble        ASTC9501    038 9341EX702   013             Z80
+96 Pac-Slot               Namco         N-44 EM     038 9444WX010   013 9345E7006
+96 Poka Poka Satan        Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
+97 Tekken Card World      Namco         EMG4        038 9701WX001   013 9651EX001
+97 Dodonpachi             Atlus         AT-C03 D2   038 9341E7010   013 9338EX701
+98 Dangun Feveron         Nihon System  CV01        038 9808WX003   013 9807EX004
+98 ESP Ra.De.             Atlus         ATC04       038 9841WX002   013 9838EX002
+98 Tekken Battle Scratch  Namco         EMG4        038 9748WX001   013
+98 Uo Poko                Jaleco        CV02        038 9749WX001   013 9749EX004
+99 Guwange                Atlus         ATC05       038 9919WX004   013
+99 Gaia Crusaders         Noise Factory ?           038 9838WX003   013 9918EX008
+99 Koro Koro Quest        Takumi        TUG-01B     038 9838WX004   013 9838EX004
+99 Crusher Makochan       Takumi        TUG-01B     038 9838WX004   013 9838EX004
+99 Tobikose! Jumpman      Namco         EMG4        038 9919WX007   013 9934WX002
+01 Thunder Heroes         Primetek      ?           038 9838WX003   013 9918EX008
 -----------------------------------------------------------------------------------------
 
 To Do:
@@ -1028,6 +1029,29 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                          Tekken Battle Scratch
+***************************************************************************/
+
+static ADDRESS_MAP_START( tekkenbs_map, AS_PROGRAM, 16, cave_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                         // ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                       // RAM (battery)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")                                 // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                               // Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("paletteram.0")                                // Palette
+	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_SHARE("vctrl.0")                               // Layer 0 Control
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")                                            // Inputs + EEPROM + Hopper
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")                                            // Inputs
+	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                      // IRQ Cause
+	AM_RANGE(0x700068, 0x700069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)      // Watchdog
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                           // Video Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)                                      // Leds + Hopper
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)                                // EEPROM
+ADDRESS_MAP_END
+
+
+/***************************************************************************
                             Tobikose! Jumpman
 ***************************************************************************/
 
@@ -1639,8 +1663,33 @@ static INPUT_PORTS_START( tekkencw )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Action" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Action" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10)                                   // medal (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tekkenbs )
+	PORT_START("IN0")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Start" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -2351,8 +2400,6 @@ static MACHINE_CONFIG_START( korokoro )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crusherm, korokoro )
-
-	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
@@ -2769,6 +2816,11 @@ static MACHINE_CONFIG_START( tekkencw )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 chip spot and rom socket are both unpopulated
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tekkenbs, tekkencw )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END
 
 
@@ -4728,7 +4780,7 @@ ROM_END
 /***************************************************************************
 
   Tekken Card World by Namco, 1997
-  Namco EMG4 platform, PCB D0049
+  Namco EMG4 platform, PCB 8824960101 (sticker: D 0049)
 
   TMP 68HC000P-16
 
@@ -4737,7 +4789,7 @@ ROM_END
 
   OKI M6295 (the second OKI location is unpopulated)
 
-  Battery
+  3V Button Battery
   93C46 EEPROM (at U24)
 
   28MHz XTAL
@@ -4762,6 +4814,46 @@ ROM_START( tekkencw )
 	ROM_REGION( 0x117 * 2, "plds", 0 )
 	ROM_LOAD( "n44u1d.u1", 0x117*0, 0x117, NO_DUMP )   // GAL16V8D-15LP
 	ROM_LOAD( "n44u3a.u3", 0x117*1, 0x117, NO_DUMP )   // GAL16V8D-15LP
+ROM_END
+
+
+/***************************************************************************
+
+  Tekken Battle Scratch by Namco, 1998
+  Namco EMG4 platform, PCB 8824960101 (sticker: D 0880)
+
+  TMP 68HC000P-16
+
+  013 9????????
+  038 9748WX001
+
+  OKI M6295 (the second OKI location is unpopulated)
+
+  3V Button Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( tekkenbs )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "tbs1_mpr-0a.u41", 0x00000, 0x80000, CRC(625487d3) SHA1(6bdc0f0f9877eeb1041f8f5b0d44e41b83ddcc76) ) // 27c4002
+
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "tbs1_obj-0a.u52", 0x00000, 0x80000, CRC(a870481b) SHA1(644370e10b197832ee828b22e43f114d40740432) ) // 27c4001
+	ROM_LOAD16_BYTE( "tbs1_obj-1a.u53", 0x00001, 0x80000, CRC(73d8f520) SHA1(70ab5abeeaf0b3f5a263a7ece21d000a27148994) ) // ""
+
+	ROM_REGION( 0x100000, "layer0", 0 )  /* Layer 0 */
+	ROM_LOAD( "tbs1_cha-0a.u60", 0x00000, 0x80000, CRC(73e5c069) SHA1(5e4e8a0bc1fdf57e4cdf7075704dc0b60d9629e3) ) // 27c4001
+	ROM_LOAD( "tbs1_cha-1a.u61", 0x80000, 0x80000, CRC(f41d3f2f) SHA1(d44f1506110fe9b7ef74ca05874146526ddaf020) ) // ""
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* OKIM6295 #1 Samples */
+	ROM_LOAD( "tbs1_voi-0a.u27", 0x00000, 0x40000, CRC(bdccb92e) SHA1(7efcce4028fe492891e6f47b266d68a22dbe4c63) ) // 27c2001
+
+	ROM_REGION( 0x117 * 2, "plds", 0 )
+	ROM_LOAD( "n44u1e.u1", 0x117*0, 0x117, NO_DUMP )   // GAL16V8D-15LP
+	ROM_LOAD( "n44u3e.u3", 0x117*1, 0x117, NO_DUMP )   // GAL16V8D-15LP
 ROM_END
 
 
@@ -5258,7 +5350,8 @@ GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  RO
 
 GAME( 1996, ppsatan,     0,        ppsatan,  ppsatan,  cave_state, ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, tekkencw,    0,        tekkencw, tekkencw, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Card World", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tekkencw,    0,        tekkencw, tekkencw, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Card World",     MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tekkenbs,    0,        tekkenbs, tekkenbs, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Battle Scratch", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1997, ddonpach,    0,        ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, ddonpachj,   ddonpach, ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )

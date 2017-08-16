@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia, Peter Ferrie
+// copyright-holders:Manuel Abadia, Peter Ferrie, David Haywood
 /***************************************************************************
 
 Thunder Hoop II: Strikes Back (c) 1994 Gaelco
@@ -8,8 +8,9 @@ Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 updated by Peter Ferrie <peter.ferrie@gmail.com>
 
-Game crashes at first boss even with DS5002FP emulation
-maybe bad dump of DS5002FP rom, maybe CPU bugs
+There is a priority bug on the title screen (Gaelco logo is hidden by black
+borders)  It seems sprite priority is hacked around on most of the older
+Gaelco drivers.
 
 ***************************************************************************/
 
@@ -267,7 +268,7 @@ ROM_START( thoop2 )
 	ROM_LOAD16_BYTE(    "th2c22.040",   0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(67cbf579) SHA1(40a543b9d0f57d374ceccb720be20b9e42ecc91a) ) /* marked as BAD_DUMP until a 2nd board is used to verify, also because game currently crashes */
+	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, CRC(6881384d) SHA1(c1eff5558716293e1325b766e2205783286c12f9) ) /* dumped from 3 boards, reconstructed with 2/3 wins rule, all bytes verified by hand as correct */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -284,4 +285,4 @@ ROM_START( thoop2 )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 
-GAME( 1994, thoop2,  0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, thoop2,  0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -12,6 +12,7 @@
 
     Minigame Cool Collection        (c) 1999 SemiCom
     Jumping Break                   (c) 1999 F2 System
+    Poosho Poosho                   (c) 1999 F2 System
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
@@ -51,7 +52,6 @@
    Choice III: Joker's Dream (c) 2001 (likely SEMICOM-003 hardware)
  Undumped F2 System games on F-E1-16-002 hardware:
    New Cross Pang
-   Poosho Poosho (variation of Jumping Break?)
    World Adventure
 
 TODO:
@@ -149,6 +149,7 @@ public:
 	DECLARE_READ16_MEMBER(dquizgo2_speedup_r);
 	DECLARE_READ32_MEMBER(aoh_speedup_r);
 	DECLARE_READ16_MEMBER(jmpbreak_speedup_r);
+	DECLARE_READ16_MEMBER(poosho_speedup_r);
 	DECLARE_READ16_MEMBER(mrdig_speedup_r);
 	DECLARE_READ16_MEMBER(dtfamily_speedup_r);
 	DECLARE_READ16_MEMBER(toyland_speedup_r);
@@ -179,6 +180,7 @@ public:
 	DECLARE_DRIVER_INIT(mrkickera);
 	DECLARE_DRIVER_INIT(mrdig);
 	DECLARE_DRIVER_INIT(jmpbreak);
+	DECLARE_DRIVER_INIT(poosho);
 	DECLARE_DRIVER_INIT(dtfamily);
 	DECLARE_DRIVER_INIT(dquizgo2);
 	DECLARE_DRIVER_INIT(suplup);
@@ -1379,7 +1381,7 @@ ROM_END
 
 /*
 
-Jumping Break
+Jumping Break & Poosho Poosho
 F2 System, 1999
 
 sequel to "Die Break" from the Bestri 3 game collection (see crospang.c)
@@ -1400,7 +1402,7 @@ F-E1-16-002
 |                      | XPL84C   || XPL84C   ||
 |                      |          ||          ||
 |                      +----------++----------+|
-|                                              |
+|             GAL1                             |
 | 93C46          DRAM1      ROM1 ROML00  ROMU00|
 |P1 P2   50MHz   E1-16T     ROM2 ROML01  ROMU01|
 |                                              |
@@ -1411,6 +1413,7 @@ CPU: Hyperstone E1-16T @ 50.000MHz
 
      DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
+      GAL1 - PALCE22V10H
 
 Oki M6295 rebaged as AD-65
 YM3012/YM2151 rebaged as KA12/BS901
@@ -1424,9 +1427,16 @@ ROMs:
     VROM1                - AMD 27C020 2MBit DIP32 EPROM
     ROM1/2               - TMS 27C040 4MBit DIP32 EPROM
 
+Measured Clocks:
+  E1-16T  @ 50MHz
+  YM2151  @ 3.5MHz (28MHz/8)
+  M6295   @ 1.75MH (28MHz/16), Pin7 High
+   H-Sync @ 15.625KHz
+   V-Sync @ 59.189Hz
+
 */
 
-ROM_START( jmpbreak )
+ROM_START( jmpbreak ) /* Released February 1999 */
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(7e237f7d) SHA1(042e672be34644311eefc7b998bcdf6a9ea2c28a) )
 	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(c722f7be) SHA1(d8b3c6b5fd0942147e0a61169c3eb6334a3b5a40) )
@@ -1439,6 +1449,24 @@ ROM_START( jmpbreak )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
+ROM_END
+
+ROM_START( poosho ) /* Released November 1999 - Updated sequel to Jumping Break for Korean market */
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(2072c120) SHA1(cf066cd277840fdbb7a854a052a80b2fbb582278) )
+	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(80e70d7a) SHA1(cdafce4bfe7370978414a12aaf482e07a1c89ff8) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(9efb0673) SHA1(3aeae96e591a415c27942dce90fc64c11287097d) )
+	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, CRC(fe1d6a02) SHA1(4d451cfc6457f56a98bcec7998713757dbefa2b5) )
+	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(05e81ca0) SHA1(22c6b78e3a0f27195142221bd179a4ecac819684) )
+	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(fd2d02c7) SHA1(cc4fb765c6083e36a49f32f0d4e77792eb354f44) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "gal1.bin",  0x0000, 0x02e5, CRC(90352c93) SHA1(cb72e52313dcd9fc0c8b794a1745d54af76a6129) )
 ROM_END
 
 /*
@@ -2727,6 +2755,19 @@ READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
 	return m_wram[(0x00906fc / 2)+offset];
 }
 
+READ16_MEMBER(vamphalf_state::poosho_speedup_r)
+{
+	if (space.device().safe_pc() == 0xa8c6a)
+	{
+		if (irq_active(space))
+			space.device().execute().spin_until_interrupt();
+		else
+			space.device().execute().eat_cycles(50);
+	}
+
+	return m_wram[(0x0c8be0 / 2) + offset];
+}
+
 READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
 {
 	if(space.device().safe_pc() == 0x1710)
@@ -2981,6 +3022,13 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
 	m_palshift = 0;
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,poosho)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c8be0, 0x0c8be3, read16_delegate(FUNC(vamphalf_state::poosho_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
+
+	m_palshift = 0;
+}
 
 DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 {
@@ -2993,6 +3041,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 
 GAME( 1999, coolmini,  0,        coolmini,  common,   vamphalf_state, coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jmpbreak,  0,        jmpbreak,  common,   vamphalf_state, jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, poosho,    0,        jmpbreak,  common,   vamphalf_state, poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup,    suplup,   suplup,    common,   vamphalf_state, luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
