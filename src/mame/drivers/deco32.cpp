@@ -1496,13 +1496,27 @@ static INPUT_PORTS_START( dragngun )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(dragngun_state::lockload_gun_trigger)
+{
+	uint8_t player_side = (uint8_t)(uintptr_t)param;
+	const char *player_input = player_side == 1 ? "LIGHT1_Y" : "LIGHT0_Y";
+	
+	if(!newval)
+	{
+		int gun_line = ioport(player_input)->read();
+		
+		if(gun_line >= vblankout && gun_line <= vblankin)
+			m_gun_latch = gun_line/2;
+	}
+}
+
 static INPUT_PORTS_START( lockload )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire") PORT_CHANGED_MEMBER(DEVICE_SELF, dragngun_state, lockload_gun_trigger, 0)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Reload")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
@@ -1510,7 +1524,7 @@ static INPUT_PORTS_START( lockload )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire") PORT_CHANGED_MEMBER(DEVICE_SELF, dragngun_state, lockload_gun_trigger, 1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Reload")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
@@ -2256,9 +2270,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragngun_state::lockload_vblank_irq_gen)
 	
 	if(scanline == 31*8)
 		update_irq_state(VBLANK_IRQ,true);
-
+	
 	// TODO: this occurs at lightgun Y positions, also needs cleaning up.
-	if(scanline == ioport("LIGHT0_Y")->read()/2)
+	if(scanline == m_gun_latch)
 		update_irq_state(LIGHTGUN_IRQ,true);
 }
 
@@ -4026,6 +4040,7 @@ void dragngun_state::dragngun_init_common()
 	save_item(NAME(m_lightgun_port));
 	save_item(NAME(m_raster_enable));
 	save_item(NAME(m_irq_cause));
+	save_item(NAME(m_gun_latch));
 
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
 //  process_dvi_data(this,memregion("dvi")->base(),0x000000, 0x1000000);
