@@ -419,7 +419,7 @@ READ32_MEMBER(deco32_state::irq_controller_r)
 		{
 			/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
 			   that this bit is NOT set in rows 0-7. */
-			bool hvblank = m_screen->vblank() & m_screen->hblank();			
+			bool hvblank = bool(m_screen->vblank() & m_screen->hblank());
 			return 0xffffff80 | hvblank | m_screen->vblank()<<1 | (m_irq_cause);
 		}
 	}
