@@ -376,42 +376,52 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 
 /**********************************************************************************/
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(deco32_state::interrupt_gen)
+void deco32_state::update_irq_state(uint8_t irq_cause, bool assert_state)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	if(assert_state == true)
+		m_irq_cause |= irq_cause;
+	else
+		m_irq_cause &= ~irq_cause;
+
+	m_maincpu->set_input_line(ARM_IRQ_LINE, (m_irq_cause != 0) ? ASSERT_LINE : CLEAR_LINE);		
+}
+
+INTERRUPT_GEN_MEMBER(deco32_state::vblank_irq_gen)
+{
+	update_irq_state(VBLANK_IRQ,true);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(deco32_state::raster_irq_gen)
+{
+	update_irq_state(RASTER_IRQ,true);
 }
 
 READ32_MEMBER(deco32_state::irq_controller_r)
 {
-	int vblank;
-
 	switch (offset)
 	{
-	case 2: /* Raster IRQ ACK - value read is not used */
-		m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
-		return 0;
+		case 2: /* Raster IRQ ACK - value read is not used */
+			update_irq_state(RASTER_IRQ,false);
+			return 0;
 
-	case 3: /* Irq controller
+		/* Irq controller
 
-	    Bit 0:  1 = Vblank active
-	    Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
-	    Bit 2:
-	    Bit 3:
-	    Bit 4:  VBL Irq
-	    Bit 5:  Raster IRQ
-	    Bit 6:  Lightgun IRQ (on Lock N Load only)
-	    Bit 7:
-	    */
-
-		/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
-		   that this bit is NOT set in rows 0-7. */
-		vblank = m_screen->vpos() > m_screen->visible_area().max_y;
-		if (vblank)
-			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
-
-		return 0xffffff80 | vblank | ((m_irq_source) ? 0x40 : 0x20);
-//      return 0xffffff80 | vblank | (0x40); //test for lock load guns
+			Bit 0:  1 = Vblank active
+			Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
+			Bit 2:
+			Bit 3:
+			Bit 4:  VBL Irq
+			Bit 5:  Raster IRQ
+			Bit 6:  Lightgun IRQ (on Lock N Load only)
+			Bit 7:
+		*/
+		case 3: 
+		{
+			/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
+			   that this bit is NOT set in rows 0-7. */
+			bool hvblank = m_screen->vblank() & m_screen->hblank();			
+			return 0xffffff80 | hvblank | m_screen->vblank()<<1 | (m_irq_cause);
+		}
 	}
 
 	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",space.device().safe_pc(),offset,mem_mask);
@@ -429,17 +439,27 @@ WRITE32_MEMBER(deco32_state::irq_controller_w)
 		break;
 
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
+	{
 		scanline=(data&0xff);
-		if (m_raster_enable && scanline>0 && scanline<240)
-		{
+					
+		
+		//printf("%d\n",scanline);
+		if (m_raster_enable && scanline != 0)
 			m_raster_irq_timer->adjust(m_screen->time_until_pos(scanline-1, 0));
-		}
 		else
 			m_raster_irq_timer->reset();
 		break;
+	}
 	case 2: /* VBL irq ack */
+		update_irq_state(VBLANK_IRQ,false);
 		break;
 	}
+}
+
+// TODO: probably clears both player 1 and player 2
+WRITE32_MEMBER(dragngun_state::gun_irq_ack_w)
+{
+	update_irq_state(LIGHTGUN_IRQ,false);
 }
 
 WRITE32_MEMBER(deco32_state::sound_w)
@@ -1032,7 +1052,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x138008, 0x13800b) AM_WRITE(palette_dma_w)
 
 	AM_RANGE(0x170000, 0x170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
-	AM_RANGE(0x178008, 0x17800f) AM_WRITENOP /* Gun read ACK's */
+	AM_RANGE(0x178008, 0x17800f) AM_WRITE(gun_irq_ack_w) /* Gun read ACK's */
 
 	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -1799,10 +1819,6 @@ MACHINE_RESET_MEMBER(deco32_state,deco32)
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
-INTERRUPT_GEN_MEMBER(deco32_state::deco32_vbl_interrupt)
-{
-	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
-}
 
 DECOSPR_PRIORITY_CB_MEMBER(deco32_state::captaven_pri_callback)
 {
@@ -1837,19 +1853,20 @@ static MACHINE_CONFIG_START( captaven )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
 	MCFG_CPU_PROGRAM_MAP(captaven_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  vblank_irq_gen)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, raster_irq_gen)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(42*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(42*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_captaven)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1943,7 +1960,7 @@ static MACHINE_CONFIG_START( fghthist ) /* DE-0380-2 PCB */
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
 	MCFG_CPU_PROGRAM_MAP(fghthist_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  vblank_irq_gen)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1951,9 +1968,10 @@ static MACHINE_CONFIG_START( fghthist ) /* DE-0380-2 PCB */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(42*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(42*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_fghthist)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
@@ -2028,7 +2046,7 @@ static MACHINE_CONFIG_START( fghthsta ) /* DE-0395-1 PCB */
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
 	MCFG_CPU_PROGRAM_MAP(fghthsta_memmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  vblank_irq_gen)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2036,9 +2054,10 @@ static MACHINE_CONFIG_START( fghthsta ) /* DE-0395-1 PCB */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(42*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(42*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_fghthist)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
@@ -2151,7 +2170,7 @@ static MACHINE_CONFIG_START( dragngun )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
 	MCFG_CPU_PROGRAM_MAP(dragngun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  vblank_irq_gen)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2159,13 +2178,14 @@ static MACHINE_CONFIG_START( dragngun )
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, raster_irq_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(42*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(42*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	//MCFG_SCREEN_PALETTE("palette")
 
@@ -2238,22 +2258,16 @@ static MACHINE_CONFIG_START( dragngun )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dragngun_state::lockload_vbl_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(dragngun_state::lockload_vblank_irq_gen)
 {
 	int scanline = param;
 	
 	if(scanline == 31*8)
-	{
-		m_irq_source = 0;
-		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
-	}
+		update_irq_state(VBLANK_IRQ,true);
 
-	// TODO: this occurs at lightgun Y positions
-	if(scanline == 64)
-	{
-		m_irq_source = 1;
-		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
-	}
+	// TODO: this occurs at lightgun Y positions, also needs cleaning up.
+	if(scanline == ioport("LIGHT0_Y")->read()/2)
+		update_irq_state(LIGHTGUN_IRQ,true);
 }
 
 
@@ -2262,7 +2276,7 @@ static MACHINE_CONFIG_START( lockload )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
 	MCFG_CPU_PROGRAM_MAP(lockload_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dragngun_state, lockload_vbl_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dragngun_state, lockload_vblank_irq_gen, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(nslasher_sound)
@@ -2273,14 +2287,14 @@ static MACHINE_CONFIG_START( lockload )
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, raster_irq_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //	MCFG_SCREEN_REFRESH_RATE(60)
 //	MCFG_SCREEN_SIZE(42*8, 32*8+22)
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(28000000/4,442,0,40*8,274,8,31*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
@@ -2368,14 +2382,15 @@ static MACHINE_CONFIG_START( tattass )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) // unconfirmed
 	MCFG_CPU_PROGRAM_MAP(tattass_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  vblank_irq_gen)
 
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(42*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(42*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
@@ -2435,7 +2450,7 @@ static MACHINE_CONFIG_START( nslasher )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28322000/4)
 	MCFG_CPU_PROGRAM_MAP(nslasher_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  vblank_irq_gen)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 32220000/9)
 	MCFG_CPU_PROGRAM_MAP(nslasher_sound)
@@ -2446,9 +2461,10 @@ static MACHINE_CONFIG_START( nslasher )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(42*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(42*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4,442,0,40*8,274,8,31*8)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
@@ -3982,7 +3998,7 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 
 	save_item(NAME(m_raster_enable));
 	save_item(NAME(m_nslasher_sound_irq));
-	save_item(NAME(m_irq_source));
+	save_item(NAME(m_irq_cause));
 }
 
 extern void process_dvi_data(device_t *device,uint8_t* dvi_data, int offset, int regionsize);
@@ -4017,7 +4033,7 @@ void dragngun_state::dragngun_init_common()
 
 	save_item(NAME(m_lightgun_port));
 	save_item(NAME(m_raster_enable));
-	save_item(NAME(m_irq_source));
+	save_item(NAME(m_irq_cause));
 
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
 //  process_dvi_data(this,memregion("dvi")->base(),0x000000, 0x1000000);
@@ -4063,7 +4079,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 
 	save_item(NAME(m_raster_enable));
 	save_item(NAME(m_nslasher_sound_irq));
-	save_item(NAME(m_irq_source));
+	save_item(NAME(m_irq_cause));
 
 //  ROM[0x3fe3c0/4]=0xe1a00000;//  NOP test switch lock
 //  ROM[0x3fe3cc/4]=0xe1a00000;//  NOP test switch lock
