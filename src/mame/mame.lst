@@ -25,6 +25,7 @@
 1943bj                          // bootleg
 1943j                           // 6/1987 (c) 1987 (Japan) Rev B
 1943ja                          // 6/1987 (c) 1987 (Japan)
+1943jah                         // 6/1987 (c) 1987 (Japan) (as above with protection removed)
 1943kai                         // 6/1988 (c) 1987 (Japan)
 1943mii                         // 6/1988 (c) 1987 (US)
 1943u                           // 6/1987 (c) 1987 (US) Rev C
@@ -38305,8 +38306,9 @@ wswan                           // Bandai WonderSwan Handheld
 wwfsstar                        // TA-0024 (c) 1989 (Europe)
 wwfsstarb                       // TA-0024 (c) 1989 (Japan)
 wwfsstarj                       // TA-0024 (c) 1989 (Japan)
-wwfsstaru                       // TA-0024 (c) 1989 (US, newer)
-wwfsstarua                      // TA-0024 (c) 1989 (US)
+wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)
+wwfsstaru6                      // TA-0024 (c) 1989 (US)
+wwfsstaru4                      // TA-0024 (c) 1989 (US)
 
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
