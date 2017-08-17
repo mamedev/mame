@@ -26,6 +26,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "formats/pc_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/td0_dsk.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -100,6 +103,7 @@ public:
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 private:
 	uint8_t *m_ram_ptr;
@@ -679,6 +683,11 @@ WRITE_LINE_MEMBER(alphatro_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
+FLOPPY_FORMATS_MEMBER( alphatro_state::floppy_formats )
+	FLOPPY_DSK_FORMAT,
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
+
 static SLOT_INTERFACE_START( alphatro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -711,8 +720,8 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(alphatro_state, fdc_irq_w))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
@@ -782,11 +791,19 @@ MACHINE_CONFIG_END
 
 ROM_START( alphatro )
 	ROM_REGION( 0xa000, "roms", ROMREGION_ERASE00)
-	ROM_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
-	ROM_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) )
+	ROM_SYSTEM_BIOS( 0, "default", "Alphatronic with Bicom graphics" )
+	ROMX_LOAD( "0_b4-6_ic1038.bin", 0x008000, 0x002000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(1) )
+	ROMX_LOAD( "1_b4-3_ic1058.bin", 0x000000, 0x002000, CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf), ROM_BIOS(1) )
+	ROMX_LOAD( "2_b4-3_ic1046.bin", 0x002000, 0x002000, CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367), ROM_BIOS(1) )
+	ROMX_LOAD( "3_b4-3_ic1037.bin", 0x004000, 0x002000, CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 1, "orig", "Plain Alphatronic")
+	ROMX_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467), ROM_BIOS(2) )
+	ROMX_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) )
+	ROMX_LOAD( "4_b4-0_ic1067.bin", 0x000000, 0x001000, CRC(00796934) SHA1(8e70f77cfe3eb2ec2051f660518da5c9d409119a), ROM_BIOS(1) )
+	ROMX_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8), ROM_BIOS(2) )
 ROM_END
 
-COMP( 1983, alphatro,   0,       0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alphatro,   0,        0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
