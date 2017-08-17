@@ -77,24 +77,30 @@ static constexpr hti_format_t::tape_pos_t FAST_BRAKE_DIST = hti_format_t::ONE_IN
 static constexpr hti_format_t::tape_pos_t SLOW_BRAKE_DIST = hti_format_t::ONE_INCH_POS / 24;
 
 // Bits in control register
-static constexpr unsigned CTL_TRACK_NO_BIT = 0; // Track selection
-static constexpr unsigned CTL_POWER_UP_BIT = 1; // Tape controller power up
-static constexpr unsigned CTL_MOTOR_ON_BIT = 2; // Motor control
-static constexpr unsigned CTL_DIR_FWD_BIT = 3;  // Tape direction = forward
-static constexpr unsigned CTL_FAST_BIT = 4;     // Speed = fast
-static constexpr unsigned CTL_WRITE_DATA_BIT = 5;   // Write data
-static constexpr unsigned CTL_WRITE_SYNC_BIT = 6;   // Write SYNC
-static constexpr unsigned CTL_WRITE_GAP_BIT = 7;    // Write gap
+enum control_bits : unsigned
+{
+	CTL_TRACK_NO_BIT = 0,     // Track selection
+	CTL_POWER_UP_BIT = 1,     // Tape controller power up
+	CTL_MOTOR_ON_BIT = 2,     // Motor control
+	CTL_DIR_FWD_BIT = 3,      // Tape direction = forward
+	CTL_FAST_BIT = 4,         // Speed = fast
+	CTL_WRITE_DATA_BIT = 5,   // Write data
+	CTL_WRITE_SYNC_BIT = 6,   // Write SYNC
+	CTL_WRITE_GAP_BIT = 7     // Write gap
+};
 
 // Bits in status register
-static constexpr unsigned STS_CASSETTE_IN_BIT = 0;  // Cassette in
-static constexpr unsigned STS_STALL_BIT = 1;        // Tape stalled
-static constexpr unsigned STS_ILIM_BIT = 2;         // Overcurrent
-static constexpr unsigned STS_WRITE_EN_BIT = 3;     // Write enabled
-static constexpr unsigned STS_HOLE_BIT = 4;         // Hole detected
-static constexpr unsigned STS_GAP_BIT = 5;          // Gap detected
-static constexpr unsigned STS_TACH_BIT = 6;         // Tachometer tick
-static constexpr unsigned STS_READY_BIT = 7;        // Ready
+enum status_bits : unsigned
+{
+	STS_CASSETTE_IN_BIT = 0,  // Cassette in
+	STS_STALL_BIT = 1,        // Tape stalled
+	STS_ILIM_BIT = 2,         // Overcurrent
+	STS_WRITE_EN_BIT = 3,     // Write enabled
+	STS_HOLE_BIT = 4,         // Hole detected
+	STS_GAP_BIT = 5,          // Gap detected
+	STS_TACH_BIT = 6,         // Tachometer tick
+	STS_READY_BIT = 7         // Ready
+};
 
 // Timers
 enum {
