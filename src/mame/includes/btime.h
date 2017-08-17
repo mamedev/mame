@@ -74,8 +74,6 @@ public:
 	optional_memory_region m_prom_region;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(zoar_dsw1_read);
 	DECLARE_READ8_MEMBER(wtennis_reset_hack_r);
 	DECLARE_READ8_MEMBER(mmonkey_protection_r);

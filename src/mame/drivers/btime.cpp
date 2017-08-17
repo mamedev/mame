@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1") AM_WRITE(bnj_video_control_w)
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1")   /* mirror address used on high score name entry */
 													/* screen */
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0x4005, 0x4005) AM_WRITE(bnj_scroll2_w)
 	AM_RANGE(0x9000, 0xffff) AM_ROM
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x9800, 0x9803) AM_WRITEONLY AM_SHARE("zoar_scrollram")
 	AM_RANGE(0x9804, 0x9804) AM_READ_PORT("SYSTEM") AM_WRITE(bnj_scroll2_w)
 	AM_RANGE(0x9805, 0x9805) AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x9806, 0x9806) AM_WRITE(audio_command_w)
+	AM_RANGE(0x9806, 0x9806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("lnc_charbank")
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP     /* IRQ ack??? */
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xb000, 0xb1ff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("lnc_charbank")
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP /* IRQ ack??? */
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(mmonkey_protection_r, mmonkey_protection_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("P2")
 	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1")
 	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2")
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x9c00, 0x9c00) AM_READ_PORT("VBLANK") AM_WRITE(disco_video_control_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(audio_command_r)
+	AM_RANGE(0xa000, 0xbfff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(audio_nmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* ack ? */
+	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -358,18 +358,6 @@ INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-
-WRITE8_MEMBER(btime_state::audio_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER(btime_state::audio_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, offset);
-}
 
 READ8_MEMBER(btime_state::zoar_dsw1_read)
 {
@@ -1311,6 +1299,7 @@ static MACHINE_CONFIG_START( btime )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
@@ -1453,6 +1442,9 @@ static MACHINE_CONFIG_DERIVED( disco, btime )
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(disco_audio_map)
+
+	MCFG_DEVICE_MODIFY("soundlatch")
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", disco)
