@@ -9031,6 +9031,20 @@ ROM_START( vf4evo )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0024c", 0, SHA1(0509863a8ab2080abd004510b381037e1891e37b) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-0338-JPN)
+	//(sticker 253-5508-0338J)
+	ROM_LOAD("317-0338-jpn.pic", 0x00, 0x4000, CRC(b177ba7d) SHA1(f751ec43a8e944a01eeda58c01b7bc73e5df749d) )
+
+ROM_END
+
+ROM_START( vf4evob )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0024b", 0, SHA1(42fba5d95454750ad80df2ce0db2996f71307914) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
@@ -10242,8 +10256,8 @@ ROM_END
 /* 0023E */ GAME( 2001, ngdup23e, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Naomi DIMM Firmware Updater (3.17) (GDS-0023E)", GAME_FLAGS )
 // 0024  Virtua Fighter 4 Evolution (GDS-0024)
 /* 0024A */ GAME( 2002, vf4evoa,  vf4evo,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Evolution (Japan) (GDS-0024A)", GAME_FLAGS )
-/* 0024B */ GAME( 2002, vf4evo,   naomi2,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Evolution (Version B) (Japan) (GDS-0024B)", GAME_FLAGS )
-// 0024C Virtua Fighter 4 Evolution (Version B) (Japan) (GDS-0024C)
+/* 0024B */ GAME( 2002, vf4evob,  vf4evo,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Evolution (Version B) (Japan) (GDS-0024B)", GAME_FLAGS )
+/* 0024C */ GAME( 2002, vf4evo,   naomi2,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Evolution (Version B) (Japan) (GDS-0024C)", GAME_FLAGS )
 /* 0025  */ GAME( 2002, initdexpo,initdexp,naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage (Export) (GDS-0025)", GAME_FLAGS )
 /* 0025A */ GAME( 2002, initdexp, naomi2,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage (Export) (Rev A) (GDS-0025A)", GAME_FLAGS )
 /* 0026  */ GAME( 2002, initdv2jo,initdv2j,naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_FLAGS )
