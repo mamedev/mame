@@ -4729,7 +4729,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ice_bozopail.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",
-	MAME_DIR .. "src/mame/drivers/unkfr.cpp",
 	MAME_DIR .. "src/mame/drivers/unkhorse.cpp",
 	MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
 	MAME_DIR .. "src/mame/drivers/usgames.cpp",
