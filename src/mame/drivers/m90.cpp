@@ -420,6 +420,11 @@ static INPUT_PORTS_START( bbmanwj )
 	PORT_INCLUDE(bbmanw)
 
 	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Easiest ) ) // Errata corrige sheet for the Japanese version shows "Very Easy" instead of "Very Hard"
+	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" - No Game Title Change */
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
