@@ -183,8 +183,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
 	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(seibu_sound_comms_r);
-	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
 	DECLARE_DRIVER_INIT(cshootere);
 	DECLARE_DRIVER_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
@@ -237,17 +235,6 @@ WRITE8_MEMBER(airraid_state::bank_w)
 }
 
 
-READ8_MEMBER(airraid_state::seibu_sound_comms_r)
-{
-	return m_seibu_sound->main_word_r(space,offset,0x00ff);
-}
-
-WRITE8_MEMBER(airraid_state::seibu_sound_comms_w)
-{
-	m_seibu_sound->main_word_w(space,offset,data,0x00ff);
-}
-
-
 
 
 static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
@@ -272,7 +259,7 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 //  AM_RANGE(0xdc1e, 0xdc1e) AM_RAM
 //  AM_RANGE(0xdc1f, 0xdc1f) AM_RAM
 
-	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
+	AM_RANGE(0xde00, 0xde0f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_r, main_w)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 ADDRESS_MAP_END
