@@ -10,10 +10,10 @@
 
   Supported games:
 
-  4 En Raya (set 1),             1990, IDSA.
-  4 En Raya (set 2),             1990, IDSA.
-  unknown Pac-Man gambling game, 1990, Unknown.
-  unknown Galaga gambling game, 1990, Unknown (made in France)
+  4 En Raya (set 1),                      1990, IDSA.
+  4 En Raya (set 2),                      1990, IDSA.
+  unknown Pac-Man gambling game,          1990, Unknown.
+  unknown 'Space Invaders' gambling game, 1990, Unknown (made in France)
 
   TODO:
   - Video and IRQ timings;
