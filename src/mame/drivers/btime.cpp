@@ -157,7 +157,6 @@ A few notes:
 
 enum
 {
-	AUDIO_ENABLE_NONE,
 	AUDIO_ENABLE_DIRECT,        /* via direct address in memory map */
 	AUDIO_ENABLE_AY8910         /* via ay-8910 port A */
 };
@@ -169,27 +168,20 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 	   lnc and disco use bit 0 of the first AY-8910's port A instead; many other
 	   games also write there in addition to this address */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_DIRECT)
-	{
-		m_audio_nmi_enabled = data & 1;
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
-	}
+		m_audionmi->in_w<0>(BIT(data, 0));
 }
 
 WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
 {
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
-	{
-		m_audio_nmi_enabled = ~data & 1;
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
-	}
+		m_audionmi->in_w<0>(BIT(~data, 0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 {
 	int scanline = param;
-	m_audio_nmi_state = scanline & 8;
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	m_audionmi->in_w<1>((scanline & 8) >> 3);
 }
 
 static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
@@ -1243,8 +1235,6 @@ MACHINE_START_MEMBER(btime_state,btime)
 	save_item(NAME(m_bnj_scroll1));
 	save_item(NAME(m_bnj_scroll2));
 	save_item(NAME(m_btime_tilemap));
-	save_item(NAME(m_audio_nmi_enabled));
-	save_item(NAME(m_audio_nmi_state));
 }
 
 MACHINE_START_MEMBER(btime_state,mmonkey)
@@ -1260,7 +1250,8 @@ MACHINE_START_MEMBER(btime_state,mmonkey)
 MACHINE_RESET_MEMBER(btime_state,btime)
 {
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
-	m_audio_nmi_enabled = (m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
+	if (m_audionmi.found())
+		m_audionmi->in_w<0>(0);
 
 	m_btime_palette = 0;
 	m_bnj_scroll1 = 0;
@@ -1269,7 +1260,6 @@ MACHINE_RESET_MEMBER(btime_state,btime)
 	m_btime_tilemap[1] = 0;
 	m_btime_tilemap[2] = 0;
 	m_btime_tilemap[3] = 0;
-	m_audio_nmi_state = 0;
 }
 
 MACHINE_RESET_MEMBER(btime_state,lnc)
@@ -1297,7 +1287,10 @@ static MACHINE_CONFIG_START( btime )
 
 	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", btime_state, audio_nmi_gen, "screen", 0, 8)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
+
+	MCFG_INPUT_MERGER_ALL_HIGH("audionmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
