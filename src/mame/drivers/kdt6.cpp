@@ -25,6 +25,7 @@
 #include "bus/psi_kbd/psi_kbd.h"
 #include "screen.h"
 #include "speaker.h"
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -565,6 +566,8 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(kdt6_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("floppy_list", "psi98")
 
 	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
 	MCFG_PSI_KEYBOARD_RX_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
