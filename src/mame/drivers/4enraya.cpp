@@ -10,10 +10,10 @@
 
   Supported games:
 
-  4 En Raya (set 1),             1990, IDSA.
-  4 En Raya (set 2),             1990, IDSA.
-  unknown Pac-Man gambling game, 1990, Unknown.
-
+  4 En Raya (set 1),                      1990, IDSA.
+  4 En Raya (set 2),                      1990, IDSA.
+  unknown Pac-Man gambling game,          1990, Unknown.
+  unknown 'Space Invaders' gambling game, 1990, Unknown (made in France)
 
   TODO:
   - Video and IRQ timings;
@@ -115,6 +115,35 @@
   I strongly think is selectable through a switch, so I hooked one till we
   have evidence of the contrary.
 
+
+****************************************************************************
+
+  Hardware Notes: (unknown 'Space Invaders' gambling game)
+  ---------------
+
+  Based on chip manufacturing should be manufactured in 1998
+
+
+  Specs:
+  ------
+
+  1x Zilog Z0840004PSE (4MHz Z80 CPU).
+  1x GI AY-3-8910 (sound).
+  1x LM356N (Low Voltage Audio Power Amplifier).
+
+  ROMs: 2x 27C256 Program ROMs (I, II). 
+        3x 27C256 GFX ROMs (R, V, B).
+
+  RAMs: 1x KM62256ALP-10 (near prg ROMs).
+        2x CY6264-70SNC (Near GFX ROMs).
+
+  1x oscillator 18.432 MHz.
+
+  1x 8 DIP Switches bank (near ay8910).
+  1x Volume Pot (betweeen the audio amp and ay8910).
+  1x Motorola MCT1413 (High Current Darlington Transistor Array, same as ULN2003).
+
+  1x 2x28 Edge connector (pins 1-2-27-28 from component side are GND).
 
 ***************************************************************************/
 
@@ -381,6 +410,19 @@ static INPUT_PORTS_START( unkpacg )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( unkfr )
+	PORT_INCLUDE( unkpacg )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_NAME("Fire / Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("Deal / Take")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Left / Small")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right / Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Down / Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start Non-Gambling game")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+INPUT_PORTS_END
 
 /***********************************
 *     GFX Layouts & GFX decode     *
@@ -511,6 +553,33 @@ ROM_START(unkpacg)
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
 ROM_END
 
+/* all roms are 0x8000 but only the last 0x2000 of each is used */
+ROM_START( unkfr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "i.bin",  0x0000, 0x2000, CRC(902efc27) SHA1(5992cdc647acd622c73adefac1aa66e77b5ccc4f) )
+	ROM_CONTINUE(       0x0000, 0x2000)
+	ROM_CONTINUE(       0x0000, 0x2000)
+	ROM_CONTINUE(       0x0000, 0x2000) // only data here matters
+	ROM_LOAD( "ii.bin", 0x8000, 0x2000, CRC(855c1ea3) SHA1(80c89bfbdf3d0d69aed7333e9aa93db6aff7b704) )
+	ROM_CONTINUE(       0x8000, 0x2000)
+	ROM_CONTINUE(       0x8000, 0x2000)
+	ROM_CONTINUE(       0x8000, 0x2000) // only data here matters
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "r.bin", 0x0000, 0x2000, CRC(f8a358fe) SHA1(5c4051de156014a5c2400f4934e2136b38bfed8c) )
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_CONTINUE(0x0000,0x2000) // only data here matters
+	ROM_LOAD( "b.bin", 0x2000, 0x2000, CRC(56ac5874) SHA1(7ae63f930b07cb1b4989c8328fcc3627d8ff68f8) )
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_CONTINUE(0x2000,0x2000) // only data here matters
+	ROM_LOAD( "v.bin", 0x4000, 0x2000, CRC(4c5a7e43) SHA1(17e52ed73f9e8822b53bebc31c9320f5589ef70a) )
+	ROM_CONTINUE(0x4000,0x2000)
+	ROM_CONTINUE(0x4000,0x2000)
+	ROM_CONTINUE(0x4000,0x2000) // only data here matters
+ROM_END
+
 
 /***********************************
 *          Driver Init             *
@@ -533,3 +602,4 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 GAME( 1990, 4enraya,  0,       4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkfr,    0,       unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING ) // todo, inputs / dips
