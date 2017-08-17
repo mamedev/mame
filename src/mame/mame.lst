@@ -871,12 +871,12 @@ triothep                        // (c) 1989 Data East Corporation (World)
 triothepj                       // (c) 1989 Data East Corporation (Japan)
 
 @source:acvirus.cpp
-virusa							// (c) 1997 Access Gmbh
-virusb							// (c) 1999 Access Gmbh
-virusc							// (c) 2002 Access Gmbh
-virusrck						// (c) 2001 Access Gmbh
-virusrckxl						// (c) 2002 Access Gmbh
-viruscl							// (c) 2004 Access Gmbh
+virusa                          // (c) 1997 Access Gmbh
+virusb                          // (c) 1999 Access Gmbh
+virusc                          // (c) 2002 Access Gmbh
+virusrck                        // (c) 2001 Access Gmbh
+virusrckxl                      // (c) 2002 Access Gmbh
+viruscl                         // (c) 2004 Access Gmbh
 
 @source:adam.cpp
 adam                            // Coleco Adam
@@ -1276,7 +1276,7 @@ mprof3                          // Microprofessor III
 prav8c                          // Pravetz 8C
 tk3000                          // Microdigital TK3000
 spectred
-ceci							// China Education Computer-I
+ceci                            // China Education Computer-I
 
 @source:apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
@@ -10534,16 +10534,16 @@ csplayh7                        // (c) 1999
 fuudol                          // (c) 2000
 junai                           // (c) 1998
 junai2                          // (c) 1998
-konhaji							// (c) 2001
+konhaji                         // (c) 2001
 mogitate                        // (c) 1998
 mjgalpri                        // (c) 1998
 mjmania                         // (c) 1999
 nichidvd                        //
 nichisel                        // (c) 2000
-nuretemi						// (c) 2000
+nuretemi                        // (c) 2000
 pokoachu                        // (c) 1999
 renaimj                         // (c) 1999
-sengomjk						// (c) 1998
+sengomjk                        // (c) 1998
 thenanpa                        // (c) 1999
 tsuwaku                         // (c) 2000
 
@@ -12061,8 +12061,8 @@ btm2105                         // 1985 BT Merlin M2105
 elekscmp                        //
 
 @source:elektronmono.cpp
-monomach						// MK2 (c) 2004 Elektron
-machdrum						// MK2 (c) 2007 Elektron
+monomach                        // MK2 (c) 2004 Elektron
+machdrum                        // MK2 (c) 2007 Elektron
 
 @source:elf.cpp
 elf2                            //
@@ -17083,7 +17083,7 @@ kchampvs                        // (c) 1984 Data East USA (US)
 kchampvs2                       // (c) 1984 Data East USA (US)
 
 @source:kdt6.cpp
-psi98							// (c) 1984 Kontron
+psi98                           // (c) 1984 Kontron
 
 @source:kenseim.cpp
 kenseim                         // 18/04/1994 (c) 1994 Togo/Sigma (Japan) not listed on Capcom's site
@@ -17253,7 +17253,7 @@ kramermc                        // 1987 Kramer MC
 kron180                         // 1995 Kron Ltd, Ukraine
 
 @source:krz2000.cpp
-k2000							// (c) 1990 Kurzweil Music Systems
+k2000                           // (c) 1990 Kurzweil Music Systems
 
 @source:ksayakyu.cpp
 ksayakyu                        // ??? (c) 1985 Taito Corporation
@@ -30971,7 +30971,7 @@ ddp2hk                          //
 ddp2j                           //
 ddp2k                           //
 ddp2t                           //
-ddp3							// (c) 2002 DoDonPachi Dai-Ou-Jou / DoDonPachi III
+ddp3                            // (c) 2002 DoDonPachi Dai-Ou-Jou / DoDonPachi III
 ddpdoj                          //
 ddpdoja                         //
 ddpdojb                         //
@@ -34430,9 +34430,9 @@ nibbler                         // (c) 1982 Rock-ola (version 9)
 nibbler6                        // (c) 1982 Rock-ola (version 6)
 nibbler7                        // (c) 1982 Rock-ola (version 7)
 nibbler8                        // (c) 1982 Rock-ola (version 8)
-nibblera                        // (c) 1982 Rock-ola (version ?)
+nibblera                        // (c) 1982 Rock-ola (version 9 alt)
 nibblero                        // (c) 1983 Olympia/Rock-Ola (version 8)
-nibblerp                        // (c) 1982 Rock-ola (pballoon conversion)
+nibblerp                        // (c) 1982 Rock-ola (pballoon conversion, version 6)
 pballoon                        // (c) 1982 SNK
 pballoonr                       // (c) 1982 SNK (Rock-Ola license)
 sasuke                          // [1980] Shin Nihon Kikaku (SNK)
