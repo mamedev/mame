@@ -14733,12 +14733,12 @@ tour4000                        // (c) 2000 High Video
 tour4010                        // (c) 2000 High Video
 
 @source:hikaru.cpp
-airtrix                         // 2001.02 Air Trix (Rev A)
-airtrixo                        // 2001.02 Air Trix (original)
+airtrix                         // 2001.02? Air Trix (Rev A)
+airtrixo                        // 2000.10 Air Trix (original)
 braveff                         // 1999.06 Syouboushi Brave Fire Fighters
 hikaru                          // 2000.?? Hikaru BIOS
 pharrier                        // 2000.12 Planet Harriers (Rev A)
-podrace                         // 2000.06 Star Wars: Racer Arcade
+swracer                         // 2000.06 Star Wars: Racer Arcade
 sgnascar                        // 2000.10 Nascar Arcade (Rev A)
 sgnascaro                       // 2000.09 Nascar Arcade (original)
 
