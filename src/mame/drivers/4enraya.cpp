@@ -118,7 +118,7 @@
 
 ****************************************************************************
 
-  Hardware Notes: (unknown Galaga gambling game)
+  Hardware Notes: (unknown 'Space Invaders' gambling game)
   ---------------
 
   Based on chip manufacturing should be manufactured in 1998
