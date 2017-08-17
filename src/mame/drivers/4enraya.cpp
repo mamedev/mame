@@ -410,6 +410,19 @@ static INPUT_PORTS_START( unkpacg )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( unkfr )
+	PORT_INCLUDE( unkpacg )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_NAME("Fire / Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("Deal / Take")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Left / Small")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right / Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Down / Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start Non-Gambling game")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+INPUT_PORTS_END
 
 /***********************************
 *     GFX Layouts & GFX decode     *
@@ -589,4 +602,4 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 GAME( 1990, 4enraya,  0,       4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkfr,    0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING ) // todo, inputs / dips
+GAME( 199?, unkfr,    0,       unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING ) // todo, inputs / dips
