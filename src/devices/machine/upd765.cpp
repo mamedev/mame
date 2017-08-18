@@ -1473,13 +1473,20 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 				break;
 			}
 			if(done) {
-				fi.st0 |= ST0_SE | fi.id;
-				command_end(fi, false);
+				fi.sub_state = SEEK_WAIT_DONE;
+				// recalibrate takes some time, even if we are already at track 0
+				fi.tm->adjust(attotime::from_nsec((fi.main_state == RECALIBRATE) ? 20000 : 0));
 				return;
 			}
 			fi.sub_state = SEEK_MOVE;
 			break;
 		}
+
+		case SEEK_WAIT_DONE:
+			fi.st0 |= ST0_SE | fi.id;
+			command_end(fi, false);
+			return;
+
 		}
 	}
 }
