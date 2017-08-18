@@ -733,9 +733,6 @@ void nycaptor_state::machine_start()
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_gfxctrl));
-
-	// hack to put input_merger in correct initial state
-	m_soundnmi->in_w<0>(0);
 }
 
 void nycaptor_state::machine_reset()
