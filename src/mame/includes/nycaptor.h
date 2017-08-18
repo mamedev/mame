@@ -42,7 +42,6 @@ public:
 
 	/* misc */
 	int m_generic_control_reg;
-	uint8_t m_snd_data;
 	int m_vol_ctrl[16];
 	int  m_gametype;
 	int m_mask;

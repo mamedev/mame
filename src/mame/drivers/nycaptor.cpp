@@ -728,7 +728,6 @@ void nycaptor_state::machine_start()
 		membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_generic_control_reg));
-	save_item(NAME(m_snd_data));
 	save_item(NAME(m_vol_ctrl));
 
 	save_item(NAME(m_char_bank));
@@ -744,7 +743,6 @@ void nycaptor_state::machine_reset()
 	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	m_generic_control_reg = 0;
-	m_snd_data = 0;
 
 	m_char_bank = 0;
 	m_palette_bank = 0;
