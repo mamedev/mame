@@ -11,14 +11,13 @@
 #include "emu.h"
 #include "ui/selgame.h"
 
-#include "ui/ui.h"
-#include "ui/miscmenu.h"
+#include "ui/auditmenu.h"
 #include "ui/inifile.h"
+#include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
 #include "ui/selector.h"
 #include "ui/selsoft.h"
-#include "ui/custmenu.h"
-#include "ui/auditmenu.h"
+#include "ui/ui.h"
 
 #include "../info.h"
 

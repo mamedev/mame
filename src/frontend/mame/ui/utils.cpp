@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "ui/utils.h"
 
-#include "ui/custmenu.h" // FIXME: get s_filter out of here
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
@@ -33,7 +32,28 @@ namespace ui {
 
 namespace {
 
-constexpr char const *machine_filter_names[machine_filter::COUNT] = {
+constexpr char const *SOFTWARE_REGIONS[] = {
+		"arab", "arg", "asia", "aus", "aut",
+		"bel", "blr", "bra",
+		"can", "chi", "chn", "cze",
+		"den",
+		"ecu", "esp", "euro",
+		"fin", "fra",
+		"gbr", "ger", "gre",
+		"hkg", "hun",
+		"irl", "isr", "isv", "ita",
+		"jpn",
+		"kaz", "kor",
+		"lat", "lux",
+		"mex",
+		"ned", "nld", "nor", "nzl",
+		"pol",
+		"rus",
+		"slo", "spa", "sui", "swe",
+		"tha", "tpe", "tw",
+		"uk", "ukr", "usa" };
+
+constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
 		__("Unfiltered"),
 		__("Available"),
 		__("Unavailable"),
@@ -57,7 +77,7 @@ constexpr char const *machine_filter_names[machine_filter::COUNT] = {
 		__("Horizontal Screen"),
 		__("Custom Filter") };
 
-constexpr char const *software_filter_names[software_filter::COUNT] = {
+constexpr char const *SOFTWARE_FILTER_NAMES[software_filter::COUNT] = {
 		__("Unfiltered"),
 		__("Available"),
 		__("Unavailable"),
@@ -200,6 +220,7 @@ protected:
 
 	bool have_choices() const { return !m_choices.empty(); }
 	bool selection_valid() const { return m_choices.size() > m_selection; }
+	unsigned selection_index() const { return m_selection; }
 	std::string const &selection_text() const { return m_choices[m_selection]; }
 
 private:
@@ -1192,7 +1213,7 @@ public:
 class all_software_filter : public simple_filter_impl_base<software_filter, software_filter::ALL>
 {
 public:
-	all_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	all_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return true; }
 };
@@ -1201,7 +1222,7 @@ public:
 class available_software_filter : public simple_filter_impl_base<software_filter, software_filter::AVAILABLE>
 {
 public:
-	available_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	available_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return info.available; }
 };
@@ -1210,7 +1231,7 @@ public:
 class unavailable_software_filter : public simple_filter_impl_base<software_filter, software_filter::UNAVAILABLE>
 {
 public:
-	unavailable_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	unavailable_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return !info.available; }
 };
@@ -1219,7 +1240,7 @@ public:
 class parents_software_filter : public simple_filter_impl_base<software_filter, software_filter::PARENTS>
 {
 public:
-	parents_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	parents_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return info.parentname.empty(); }
 };
@@ -1228,7 +1249,7 @@ public:
 class clones_software_filter : public simple_filter_impl_base<software_filter, software_filter::CLONES>
 {
 public:
-	clones_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	clones_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return !info.parentname.empty(); }
 };
@@ -1237,8 +1258,8 @@ public:
 class years_software_filter : public choice_filter_impl_base<software_filter, software_filter::YEAR>
 {
 public:
-	years_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent)
-		: choice_filter_impl_base<software_filter, software_filter::YEAR>(data.year.ui, value)
+	years_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: choice_filter_impl_base<software_filter, software_filter::YEAR>(data.years(), value)
 	{
 	}
 
@@ -1249,9 +1270,8 @@ public:
 class publishers_software_filter : public choice_filter_impl_base<software_filter, software_filter::PUBLISHERS>
 {
 public:
-	publishers_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent)
-		: choice_filter_impl_base<software_filter, software_filter::PUBLISHERS>(data.publisher.ui, value)
-		, m_publishers(data.publisher)
+	publishers_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: choice_filter_impl_base<software_filter, software_filter::PUBLISHERS>(data.publishers(), value)
 	{
 	}
 
@@ -1262,19 +1282,16 @@ public:
 		else if (!selection_valid())
 			return false;
 
-		std::string const name(m_publishers.getname(info.publisher));
+		std::string const name(software_filter_data::extract_publisher(info.publisher));
 		return !name.empty() && (selection_text() == name);
 	}
-
-private:
-	c_sw_publisher const &m_publishers;
 };
 
 
 class supported_software_filter : public simple_filter_impl_base<software_filter, software_filter::SUPPORTED>
 {
 public:
-	supported_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	supported_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return SOFTWARE_SUPPORTED_YES == info.supported; }
 };
@@ -1284,7 +1301,7 @@ public:
 class partial_supported_software_filter : public simple_filter_impl_base<software_filter, software_filter::PARTIAL_SUPPORTED>
 {
 public:
-	partial_supported_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	partial_supported_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return SOFTWARE_SUPPORTED_PARTIAL == info.supported; }
 };
@@ -1293,7 +1310,7 @@ public:
 class unsupported_software_filter : public simple_filter_impl_base<software_filter, software_filter::UNSUPPORTED>
 {
 public:
-	unsupported_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent) { }
+	unsupported_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
 	virtual bool apply(ui_software_info const &info) const override { return SOFTWARE_SUPPORTED_NO == info.supported; }
 };
@@ -1302,9 +1319,8 @@ public:
 class region_software_filter : public choice_filter_impl_base<software_filter, software_filter::REGION>
 {
 public:
-	region_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent)
-		: choice_filter_impl_base<software_filter, software_filter::REGION>(data.region.ui, value)
-		, m_regions(data.region)
+	region_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: choice_filter_impl_base<software_filter, software_filter::REGION>(data.regions(), value)
 	{
 	}
 
@@ -1315,20 +1331,17 @@ public:
 		else if (!selection_valid())
 			return false;
 
-		std::string const name(m_regions.getname(info.longname));
+		std::string const name(software_filter_data::extract_region(info.longname));
 		return !name.empty() && (selection_text() == name);
 	}
-
-private:
-	c_sw_region const &m_regions;
 };
 
 
 class device_type_software_filter : public choice_filter_impl_base<software_filter, software_filter::DEVICE_TYPE>
 {
 public:
-	device_type_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent)
-		: choice_filter_impl_base<software_filter, software_filter::DEVICE_TYPE>(data.type.ui, value)
+	device_type_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: choice_filter_impl_base<software_filter, software_filter::DEVICE_TYPE>(data.device_types(), value)
 	{
 	}
 
@@ -1339,12 +1352,19 @@ public:
 class list_software_filter : public choice_filter_impl_base<software_filter, software_filter::LIST>
 {
 public:
-	list_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent)
-		: choice_filter_impl_base<software_filter, software_filter::LIST>(data.swlist.name, value)
+	list_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: choice_filter_impl_base<software_filter, software_filter::LIST>(data.list_descriptions(), value)
+		, m_data(data)
 	{
 	}
 
-	virtual bool apply(ui_software_info const &info) const override { return !have_choices() || (selection_valid() && (selection_text() == info.listname)); }
+	virtual bool apply(ui_software_info const &info) const override
+	{
+		return !have_choices() || (selection_valid() && (m_data.list_names()[selection_index()] == info.listname));
+	}
+
+private:
+	software_filter_data const &m_data;
 };
 
 
@@ -1356,7 +1376,7 @@ public:
 class custom_software_filter : public composite_filter_impl_base<custom_software_filter, software_filter, software_filter::CUSTOM>
 {
 public:
-	custom_software_filter(s_filter const &data, char const *value, emu_file *file, unsigned indent)
+	custom_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
 		: composite_filter_impl_base<custom_software_filter, software_filter, software_filter::CUSTOM>()
 		, m_data(data)
 	{
@@ -1402,10 +1422,85 @@ public:
 	}
 
 private:
-	s_filter const &m_data;
+	software_filter_data const &m_data;
 };
 
 } // anonymous namespace
+
+
+
+//-------------------------------------------------
+//  static data for software filters
+//-------------------------------------------------
+
+void software_filter_data::add_region(std::string const &str)
+{
+	std::string name(extract_region(str));
+	std::vector<std::string>::iterator const pos(std::lower_bound(m_regions.begin(), m_regions.end(), name));
+	if ((m_regions.end() == pos) || (*pos != str))
+		m_regions.emplace(pos, std::move(name));
+}
+
+void software_filter_data::add_publisher(std::string const &str)
+{
+	std::string name(extract_publisher(str));
+	std::vector<std::string>::iterator const pos(std::lower_bound(m_publishers.begin(), m_publishers.end(), name));
+	if ((m_publishers.end() == pos) || (*pos != name))
+		m_publishers.emplace(pos, std::move(name));
+}
+
+void software_filter_data::add_year(std::string const &year)
+{
+	std::vector<std::string>::iterator const pos(std::lower_bound(m_years.begin(), m_years.end(), year));
+	if ((m_years.end() == pos) || (*pos != year))
+		m_years.emplace(pos, year);
+}
+
+void software_filter_data::add_device_type(std::string const &device_type)
+{
+	std::vector<std::string>::iterator const pos(std::lower_bound(m_device_types.begin(), m_device_types.end(), device_type));
+	if ((m_device_types.end() == pos) || (*pos != device_type))
+		m_device_types.emplace(pos, device_type);
+}
+
+void software_filter_data::add_list(std::string const &name, std::string const &description)
+{
+	m_list_names.emplace_back(name);
+	m_list_descriptions.emplace_back(description);
+}
+
+void software_filter_data::finalise()
+{
+	std::stable_sort(m_regions.begin(), m_regions.end());
+	std::stable_sort(m_publishers.begin(), m_publishers.end());
+	std::stable_sort(m_years.begin(), m_years.end());
+	std::stable_sort(m_device_types.begin(), m_device_types.end());
+}
+
+std::string software_filter_data::extract_region(std::string const &longname)
+{
+	std::string fullname(longname);
+	strmakelower(fullname);
+	std::string::size_type const found(fullname.find('('));
+	if (found != std::string::npos)
+	{
+		std::string::size_type const ends(fullname.find_first_not_of("abcdefghijklmnopqrstuvwxyz", found + 1));
+		std::string const temp(fullname.substr(found + 1, ends - found - 1));
+		auto const match(std::find_if(
+				std::begin(SOFTWARE_REGIONS),
+				std::end(SOFTWARE_REGIONS),
+				[&temp] (char const *elem) { return temp == elem; }));
+		if (std::end(SOFTWARE_REGIONS) != match)
+			return longname.substr(found + 1, (std::string::npos != ends) ? (ends - found - 1) : ends);
+	}
+	return "<none>";
+}
+
+std::string software_filter_data::extract_publisher(std::string const &publisher)
+{
+	std::string::size_type const found(publisher.find('('));
+	return publisher.substr(0, found - ((found && (std::string::npos != found)) ? 1 : 0));
+}
 
 
 
@@ -1501,13 +1596,13 @@ machine_filter::ptr machine_filter::create(emu_file &file, unsigned indent)
 char const *machine_filter::config_name(type n)
 {
 	assert(COUNT > n);
-	return machine_filter_names[n];
+	return MACHINE_FILTER_NAMES[n];
 }
 
 char const *machine_filter::display_name(type n)
 {
 	assert(COUNT > n);
-	return _(machine_filter_names[n]);
+	return _(MACHINE_FILTER_NAMES[n]);
 }
 
 machine_filter::machine_filter()
@@ -1522,20 +1617,20 @@ machine_filter::machine_filter()
 char const *software_filter::config_name(type n)
 {
 	assert(COUNT > n);
-	return software_filter_names[n];
+	return SOFTWARE_FILTER_NAMES[n];
 }
 
 char const *software_filter::display_name(type n)
 {
 	assert(COUNT > n);
-	return _(software_filter_names[n]);
+	return _(SOFTWARE_FILTER_NAMES[n]);
 }
 
 software_filter::software_filter()
 {
 }
 
-software_filter::ptr software_filter::create(type n, s_filter const &data, char const *value, emu_file *file, unsigned indent)
+software_filter::ptr software_filter::create(type n, software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
 {
 	assert(COUNT > n);
 	switch (n)
@@ -1574,7 +1669,7 @@ software_filter::ptr software_filter::create(type n, s_filter const &data, char 
 	return nullptr;
 }
 
-software_filter::ptr software_filter::create(emu_file &file, s_filter const &data, unsigned indent)
+software_filter::ptr software_filter::create(emu_file &file, software_filter_data const &data, unsigned indent)
 {
 	char buffer[MAX_CHAR_INFO];
 	if (!file.gets(buffer, ARRAY_LENGTH(buffer)))
