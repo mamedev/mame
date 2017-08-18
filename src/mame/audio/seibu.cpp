@@ -255,7 +255,7 @@ READ8_MEMBER( seibu_sound_device::main_r )
 			return m_main2sub_pending ? 1 : 0;
 		default:
 			//logerror("%06x: seibu_main_r(%x)\n",space.device().safe_pc(),offset);
-			return 0xffff;
+			return 0xff;
 	}
 }
 
