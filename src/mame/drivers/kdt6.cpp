@@ -22,6 +22,7 @@
 #include "machine/clock.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
+#include "sound/spkrdev.h"
 #include "bus/psi_kbd/psi_kbd.h"
 #include "screen.h"
 #include "speaker.h"
@@ -48,6 +49,8 @@ public:
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, "fdc:0"),
 	m_floppy1(*this, "fdc:1"),
+	m_beeper(*this, "beeper"),
+	m_beep_timer(*this, "beep_timer"),
 	m_sasi_dma(false),
 	m_dma_map(0),
 	m_status0(0), m_status1(0), m_status2(0),
@@ -78,6 +81,8 @@ public:
 	DECLARE_WRITE8_MEMBER(video_address_latch_high_w);
 	DECLARE_WRITE8_MEMBER(video_address_latch_low_w);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
+
 	DECLARE_WRITE8_MEMBER(fdc_tc_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
@@ -100,6 +105,8 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_device<beep_device> m_beeper;
+	required_device<timer_device> m_beep_timer;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<uint16_t[]> m_vram; // 10-bit
@@ -280,6 +287,16 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 
 
 //**************************************************************************
+//  SOUND
+//**************************************************************************
+
+TIMER_DEVICE_CALLBACK_MEMBER( kdt6_state::beeper_off )
+{
+	m_beeper->set_state(0);
+}
+
+
+//**************************************************************************
 //  MACHINE
 //**************************************************************************
 
@@ -391,6 +408,12 @@ WRITE8_MEMBER( kdt6_state::status0_w )
 
 	m_cpu->set_unscaled_clock((XTAL_16MHz / 4) * (BIT(data, 1) ? 1 : 0.5));
 
+	if ((BIT(m_status0, 2) ^ BIT(data, 2)) && BIT(data, 2))
+	{
+		m_beeper->set_state(1);
+		m_beep_timer->adjust(attotime::from_msec(250)); // timing unknown
+	}
+
 	if (m_floppy0->get_device())
 		m_floppy0->get_device()->mon_w(BIT(data, 7) ? 0 : 1);
 	if (m_floppy1->get_device())
@@ -480,7 +503,7 @@ void kdt6_state::machine_start()
 	save_item(NAME(m_status0));
 	save_item(NAME(m_status1));
 	save_item(NAME(m_status2));
-	save_item(NAME(m_mapper));
+	save_pointer(NAME(m_mapper), 16);
 	save_item(NAME(m_video_address));
 }
 
@@ -527,7 +550,11 @@ static MACHINE_CONFIG_START( psi98 )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 1000) // frequency unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
 
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(kdt6_state, busreq_w))
@@ -550,6 +577,7 @@ static MACHINE_CONFIG_START( psi98 )
 
 	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc2", z80ctc_device, trg3))
 
 	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 4, 0, 0, 0, 0)
@@ -606,4 +634,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY    FULLNAME  FLAGS
-COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  MACHINE_NOT_WORKING )
