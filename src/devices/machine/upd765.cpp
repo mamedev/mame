@@ -5,7 +5,7 @@
 #include "upd765.h"
 #include "debugger.h"
 
-#define LOG 1
+#define LOG 0
 
 DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC uPD765A FDC")
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
