@@ -71,6 +71,8 @@ public:
 	optional_device<tecmo_mix_device> m_mixer;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(drgnbowl_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(gaiden_sound_command_w);
 	DECLARE_WRITE16_MEMBER(drgnbowl_sound_command_w);
 	DECLARE_WRITE16_MEMBER(wildfang_protection_w);
