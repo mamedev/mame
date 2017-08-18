@@ -23,51 +23,19 @@
 #include "speaker.h"
 
 
-READ8_MEMBER(flstory_state::from_snd_r)
-{
-	m_snd_flag = 0;
-	return m_snd_data;
-}
-
 READ8_MEMBER(flstory_state::snd_flag_r)
 {
-	return m_snd_flag | 0xfd;
+	return (m_soundlatch2->pending_r() ? 2 : 0) | 0xfd;
 }
-
-WRITE8_MEMBER(flstory_state::to_main_w)
-{
-	m_snd_data = data;
-	m_snd_flag = 2;
-}
-
-TIMER_CALLBACK_MEMBER(flstory_state::nmi_callback)
-{
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		m_pending_nmi = 1;
-}
-
-WRITE8_MEMBER(flstory_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(flstory_state::nmi_callback),this), data);
-}
-
 
 WRITE8_MEMBER(flstory_state::nmi_disable_w)
 {
-	m_sound_nmi_enable = 0;
+	m_soundnmi->in_w<1>(0);
 }
 
 WRITE8_MEMBER(flstory_state::nmi_enable_w)
 {
-	m_sound_nmi_enable = 1;
-	if (m_pending_nmi)
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
+	m_soundnmi->in_w<1>(1);
 }
 
 static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
@@ -77,7 +45,8 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
@@ -103,7 +72,8 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 //  AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
@@ -142,7 +112,8 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
@@ -169,7 +140,8 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
 //  AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 //  AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
@@ -264,8 +236,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
-	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w)          /* unknown read*/
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0xda00, 0xda00) AM_READWRITE(snd_flag_r, nmi_enable_w)
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM                                         /* space for diagnostics ROM */
@@ -789,10 +762,6 @@ void flstory_state::machine_start()
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));
 	/* sound */
-	save_item(NAME(m_snd_data));
-	save_item(NAME(m_snd_flag));
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_vol_ctrl));
 	save_item(NAME(m_snd_ctrl0));
 	save_item(NAME(m_snd_ctrl1));
@@ -814,10 +783,6 @@ MACHINE_RESET_MEMBER(flstory_state,flstory)
 	m_char_bank = 0;
 	m_palette_bank = 0;
 	/* sound */
-	m_snd_data = 0;
-	m_snd_flag = 0;
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
 	m_snd_ctrl0 = 0;
 	m_snd_ctrl1 = 0;
 	m_snd_ctrl2 = 0;
@@ -864,6 +829,12 @@ static MACHINE_CONFIG_START( flstory )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
@@ -924,6 +895,12 @@ static MACHINE_CONFIG_START( onna34ro )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
@@ -994,6 +971,12 @@ static MACHINE_CONFIG_START( victnine )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
@@ -1058,6 +1041,12 @@ static MACHINE_CONFIG_START( rumba )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
