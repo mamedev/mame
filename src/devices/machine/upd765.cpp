@@ -5,7 +5,7 @@
 #include "upd765.h"
 #include "debugger.h"
 
-#define LOG 0
+#define LOG 1
 
 DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC uPD765A FDC")
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
@@ -1474,8 +1474,8 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 			}
 			if(done) {
 				fi.sub_state = SEEK_WAIT_DONE;
-				// recalibrate takes some time, even if we are already at track 0
-				fi.tm->adjust(attotime::from_nsec((fi.main_state == RECALIBRATE) ? 20000 : 0));
+				// recalibrate and seek takes some time, even if we don't move
+				fi.tm->adjust(attotime::from_nsec((fi.main_state == RECALIBRATE) ? 20000 : 10000));
 				return;
 			}
 			fi.sub_state = SEEK_MOVE;
