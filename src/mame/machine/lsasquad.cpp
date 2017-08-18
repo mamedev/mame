@@ -10,80 +10,29 @@
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(lsasquad_state::nmi_callback)
-{
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		m_pending_nmi = 1;
-}
-
 WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_disable_w)
 {
-	m_sound_nmi_enable = 0;
+	m_soundnmi->in_w<1>(0);
 }
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_enable_w)
 {
-	m_sound_nmi_enable = 1;
-	if (m_pending_nmi)
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
-}
-
-WRITE8_MEMBER(lsasquad_state::lsasquad_sound_command_w)
-{
-	m_sound_pending |= 0x01;
-	m_sound_cmd = data;
-
-	//logerror("%04x: sound cmd %02x\n", space.device().safe_pc(), data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(lsasquad_state::nmi_callback),this), data);
-}
-
-READ8_MEMBER(lsasquad_state::lsasquad_sh_sound_command_r)
-{
-	m_sound_pending &= ~0x01;
-	//logerror("%04x: read sound cmd %02x\n", space.device().safe_pc(), m_sound_cmd);
-	return m_sound_cmd;
-}
-
-WRITE8_MEMBER(lsasquad_state::lsasquad_sh_result_w)
-{
-	m_sound_pending |= 0x02;
-	//logerror("%04x: sound res %02x\n", space.device().safe_pc(), data);
-	m_sound_result = data;
-}
-
-READ8_MEMBER(lsasquad_state::lsasquad_sound_result_r)
-{
-	m_sound_pending &= ~0x02;
-	//logerror("%04x: read sound res %02x\n", space.device().safe_pc(), m_sound_result);
-	return m_sound_result;
+	m_soundnmi->in_w<1>(1);
 }
 
 READ8_MEMBER(lsasquad_state::lsasquad_sound_status_r)
 {
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
-	return m_sound_pending;
+	return (m_soundlatch->pending_r() ? 1 : 0) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
-
-READ8_MEMBER(lsasquad_state::daikaiju_sh_sound_command_r)
-{
-	m_sound_pending &= ~0x01;
-	m_sound_pending |= 0x02;
-	//logerror("%04x: read sound cmd %02x\n", space.device().safe_pc(), m_sound_cmd);
-	return m_sound_cmd;
-}
 
 READ8_MEMBER(lsasquad_state::daikaiju_sound_status_r)
 {
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
-	return m_sound_pending ^ 3;
+	return (m_soundlatch->pending_r() ? 2 : 1);
 }
 
 READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
@@ -119,7 +68,6 @@ READ8_MEMBER(lsasquad_state::daikaiju_mcu_status_r)
 			res |= 0x02;
 	}
 
-	res |= ((m_sound_pending & 0x02) ^ 2) << 3; //inverted flag
-	m_sound_pending &= ~0x02;
+	res |= ((m_soundlatch->pending_r() & 0x02) ^ 2) << 3; //inverted flag
 	return res;
 }
