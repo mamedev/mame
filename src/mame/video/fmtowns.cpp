@@ -15,8 +15,8 @@
  *  0:  HSync width 1
  *  1:  HSync width 2
  *  4:  HSync total
- *  5:  VSync width 1
- *  6:  VSync width 2
+ *  5:  VSync period 1
+ *  6:  VSync period 2
  *  7:  Equalising pulse accountable time (what?)
  *  8:  VSync total
  *
@@ -30,17 +30,17 @@
  *  15:
  *  16: Graphic layer 1 vertical start/end
  *
- *  17: Graphic layer 0 initial address?
+ *  17: Graphic layer 0 frame start address
  *  18: Graphic layer 0 horizontal adjust
  *  19: Graphic layer 0 field indirect address offset
  *  20: Graphic layer 0 line indirect address offset
  *
  *  21-24: As above, but for Graphic layer 1
  *
- *  27: Layer zoom.     bit 0 = x2 horizontal zoom layer 0
- *  to be confirmed     bit 5 = x2 vertical zoom layer 0
- *                      bit 9 = x2 horizontal zoom layer 1
- *                      bit 13 = x2 vertical zoom layer 1
+ *  27: Layer zoom.     bits 0-3 = horizontal zoom layer 0
+ *  (0 = x1, 1 = x2,    bits 4-7 = vertical zoom layer 0
+ *    2 = x3...)        bits 8-11 = horizontal zoom layer 1
+ *                      bits 12-15 = vertical zoom layer 1
  *
  *  28: Control register 0
  *      VSync enable (bit 15) (blank display?)
@@ -1431,49 +1431,51 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 	int line;
 	int scanline;
 	int height;
+	uint8_t zoom;
+	uint8_t count;
 
 	if(layer == 0)
 	{
 		scanline = rect->min_y;
 		height = (rect->max_y - rect->min_y);
-		if(m_video.towns_crtc_reg[27] & 0x0010)
-			height /= 2;
+		zoom = ((m_video.towns_crtc_reg[27] & 0x00f0) >> 4) + 1;
+		height /= zoom;
 		switch(m_video.towns_video_reg[0] & 0x03)
 		{
 			case 0x01:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
-					scanline++;
-					if(m_video.towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					count = 0;
+					do
 					{
 						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
 						scanline++;
-					}
+						count++;
+					} while(count < zoom);
 				}
 				break;
 			case 0x02:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
-					scanline++;
-					if(m_video.towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					count = 0;
+					do
 					{
 						towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
 						scanline++;
-					}
+						count++;
+					} while(count < zoom);
 				}
 				break;
 			case 0x03:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
-					scanline++;
-					if(m_video.towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					count = 0;
+					do
 					{
 						towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
 						scanline++;
-					}
+						count++;
+					} while(count < zoom);
 				}
 				break;
 		}
@@ -1482,44 +1484,44 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 	{
 		scanline = rect->min_y;
 		height = (rect->max_y - rect->min_y);
-		if(m_video.towns_crtc_reg[27] & 0x1000)
-			height /= 2;
+		zoom = ((m_video.towns_crtc_reg[27] & 0xf000) >> 12) + 1;
+		height /= zoom;
 		switch(m_video.towns_video_reg[0] & 0x0c)
 		{
 			case 0x04:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
-					scanline++;
-					if(m_video.towns_crtc_reg[27] & 0x1000)  // vertical zoom
+					count = 0;
+					do
 					{
 						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
 						scanline++;
-					}
+						count++;
+					} while(count < zoom);
 				}
 				break;
 			case 0x08:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
-					scanline++;
-					if(m_video.towns_crtc_reg[27] & 0x1000)  // vertical zoom
+					count = 0;
+					do
 					{
 						towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
 						scanline++;
-					}
+						count++;
+					} while(count < zoom);
 				}
 				break;
 			case 0x0c:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
-					scanline++;
-					if(m_video.towns_crtc_reg[27] & 0x1000)  // vertical zoom
+					count = 0;
+					do
 					{
 						towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
 						scanline++;
-					}
+						count++;
+					} while(count < zoom);
 				}
 				break;
 		}
