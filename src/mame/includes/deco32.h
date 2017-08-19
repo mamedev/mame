@@ -80,7 +80,6 @@ public:
 	int m_raster_enable; // captaven, dragongun and lockload
 	timer_device *m_raster_irq_timer; // captaven, dragongun and lockload
 	uint8_t m_nslasher_sound_irq; // nslasher and lockload
-	uint8_t m_irq_source; // captaven, dragongun and lockload
 	int m_tattass_eprom_bit; // tattass
 	int m_lastClock; // tattass
 	char m_buffer[32]; // tattass
@@ -168,8 +167,8 @@ public:
 	DECLARE_VIDEO_START(fghthist);
 	DECLARE_VIDEO_START(nslasher);
 
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
+	INTERRUPT_GEN_MEMBER(vblank_irq_gen);
+	TIMER_DEVICE_CALLBACK_MEMBER(raster_irq_gen);
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -187,6 +186,14 @@ public:
 	uint16_t port_b_tattass(int unused);
 	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 	void deco32_set_audio_output(uint8_t raw_data);
+	void update_irq_state(uint8_t irq_cause, bool assert_state);
+	uint8_t m_irq_cause;
+	static const uint8_t VBLANK_IRQ = 0x10;
+	static const uint8_t RASTER_IRQ = 0x20;
+	static const uint8_t LIGHTGUN_IRQ = 0x40;
+	static const int vblankout = 8;
+	static const int vblankin = 248;
+	//uint8_t m_irq_source; // captaven, dragongun and lockload
 
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
@@ -212,12 +219,14 @@ public:
 
 	uint32_t m_sprite_ctrl;
 	int m_lightgun_port;
+	int m_gun_latch;
 	bitmap_rgb32 m_temp_render_bitmap;
 
 	DECLARE_READ32_MEMBER(lightgun_r);
 	DECLARE_WRITE32_MEMBER(lightgun_w);
 	DECLARE_WRITE32_MEMBER(sprite_control_w);
 	DECLARE_WRITE32_MEMBER(spriteram_dma_w);
+	DECLARE_WRITE32_MEMBER(gun_irq_ack_w);
 	DECLARE_READ32_MEMBER(unk_video_r);
 	DECLARE_READ32_MEMBER(service_r);
 	DECLARE_READ32_MEMBER(eeprom_r);
@@ -231,8 +240,9 @@ public:
 	DECLARE_VIDEO_START(dragngun);
 	DECLARE_VIDEO_START(lockload);
 	void dragngun_init_common();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vblank_irq_gen);
 
 	uint32_t screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

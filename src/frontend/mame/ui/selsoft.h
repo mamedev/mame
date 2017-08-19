@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include "ui/custmenu.h"
 #include "ui/selmenu.h"
 #include "ui/utils.h"
 
@@ -33,7 +32,7 @@ private:
 
 	const game_driver       *m_driver;
 	bool                    m_has_empty_start;
-	s_filter                m_filter_data;
+	software_filter_data    m_filter_data;
 	filter_map              m_filters;
 	software_filter::type   m_filter_type;
 

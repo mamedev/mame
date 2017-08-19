@@ -83,8 +83,8 @@ public:
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_1_w );
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_2_w );
 
-	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
-	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
+	DECLARE_READ8_MEMBER( sound_comms_r );
+	DECLARE_WRITE8_MEMBER( sound_comms_w );
 
 	void common_reset();
 

@@ -353,15 +353,16 @@ const menu_load_save_state_base::file_entry &menu_load_save_state_base::file_ent
 
 
 //-------------------------------------------------
-//  is_present
+//  state_name
 //-------------------------------------------------
 
 std::string menu_load_save_state_base::state_directory() const
 {
+	const char *stateopt = machine().options().state_name();
 	return util::string_format("%s%s%s",
 		machine().options().state_directory(),
 		PATH_SEPARATOR,
-		machine().system().name);
+		machine().get_statename(stateopt));
 }
 
 

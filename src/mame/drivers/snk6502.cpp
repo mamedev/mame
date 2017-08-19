@@ -1601,8 +1601,8 @@ ROM_START( nibblera ) /* revision 9 - alternate? */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )  /* sound ROMs */
-	ROM_LOAD( "2732.ic52", 0x0800, 0x0800, CRC(cabe6c34) SHA1(664ab47555d4c05189d797836f34045f00ac119e) )
-	ROM_LOAD( "2732.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) ) // missing in set
+	ROM_LOAD( "2716.ic52", 0x0800, 0x0800, CRC(cabe6c34) SHA1(664ab47555d4c05189d797836f34045f00ac119e) )
+	ROM_LOAD( "2716.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) ) // missing in set
 ROM_END
 
 ROM_START( nibblerp ) /* revision 6 + extra soundrom */
@@ -1679,9 +1679,9 @@ GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, 0, ROT90, 
 GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, 0, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler,     0,        nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev ?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )

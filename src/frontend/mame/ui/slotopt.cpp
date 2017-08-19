@@ -17,6 +17,8 @@
 #include "emuopts.h"
 #include "mameopts.h"
 
+#include <algorithm>
+
 
 /***************************************************************************
     UTILITY
@@ -25,49 +27,12 @@
 namespace {
 
 // constants
-void *ITEMREF_RESET = ((void *)1);
-char DIVIDER[] = "------";
+void *const ITEMREF_RESET = ((void *)1);
+constexpr char const DIVIDER[] = "------";
+
+} // anonymous namespace
 
 
-//-------------------------------------------------
-//  get_slot_length
-//-------------------------------------------------
-
-int get_slot_length(const device_slot_interface &slot)
-{
-	int val = 0;
-	for (auto &option : slot.option_list())
-		if (option.second->selectable())
-			val++;
-
-	return val;
-}
-
-
-//-------------------------------------------------
-//  get_slot_option
-//-------------------------------------------------
-
-const char *get_slot_option(device_slot_interface &slot, int index)
-{
-	if (index >= 0)
-	{
-		int val = 0;
-		for (auto &option : slot.option_list())
-		{
-			if (val == index)
-				return option.second->name();
-
-			if (option.second->selectable())
-				val++;
-		}
-	}
-
-	return "";
-}
-
-
-};
 /***************************************************************************
     SLOT MENU
 ***************************************************************************/
@@ -102,80 +67,17 @@ device_slot_option *menu_slot_devices::get_current_option(device_slot_interface 
 
 	if (!slot.fixed())
 	{
-		const char *slot_option_name = slot.slot_name();
+		char const *const slot_option_name = slot.slot_name();
 		current = machine().options().slot_option(slot_option_name).value();
 	}
 	else
 	{
-		if (slot.default_option() == nullptr)
+		if (!slot.default_option())
 			return nullptr;
 		current.assign(slot.default_option());
 	}
 
 	return slot.option(current.c_str());
-}
-
-
-//-------------------------------------------------
-//  get_current_index
-//-------------------------------------------------
-
-int menu_slot_devices::get_current_index(device_slot_interface &slot) const
-{
-	const device_slot_option *current = get_current_option(slot);
-
-	if (current != nullptr)
-	{
-		int val = 0;
-		for (auto &option : slot.option_list())
-		{
-			if (option.second.get() == current)
-				return val;
-
-			if (option.second->selectable())
-				val++;
-		}
-	}
-
-	return -1;
-}
-
-
-//-------------------------------------------------
-//  get_next_slot
-//-------------------------------------------------
-
-const char *menu_slot_devices::get_next_slot(device_slot_interface &slot) const
-{
-	int idx = get_current_index(slot);
-	if (idx < 0)
-		idx = 0;
-	else
-		idx++;
-
-	if (idx >= get_slot_length(slot))
-		return "";
-
-	return get_slot_option(slot, idx);
-}
-
-
-//-------------------------------------------------
-//  get_previous_slot
-//-------------------------------------------------
-
-const char *menu_slot_devices::get_previous_slot(device_slot_interface &slot) const
-{
-	int idx = get_current_index(slot);
-	if (idx < 0)
-		idx = get_slot_length(slot) - 1;
-	else
-		idx--;
-
-	if (idx < 0)
-		return "";
-
-	return get_slot_option(slot, idx);
 }
 
 
@@ -286,14 +188,14 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 		if (option)
 		{
 			opt_name = has_selectable_options
-				? option->name()
-				: string_format(_("%s [internal]"), option->name());
+					? option->name()
+					: string_format(_("%s [internal]"), option->name());
 		}
 
 		// choose item flags
-		uint32_t item_flags = has_selectable_options
-			? FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW
-			: FLAG_DISABLE;
+		uint32_t const item_flags = has_selectable_options
+				? FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW
+				: FLAG_DISABLE;
 
 		item_append(slot.slot_name(), opt_name, item_flags, (void *)&slot);
 	}
@@ -344,8 +246,7 @@ void menu_slot_devices::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
-			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? get_previous_slot(*slot) : get_next_slot(*slot);
-			set_slot_device(*slot, val);
+			rotate_slot_device(*slot, menu_event->iptkey == IPT_UI_LEFT ? step_t::PREVIOUS : step_t::NEXT);
 		}
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
@@ -355,6 +256,71 @@ void menu_slot_devices::handle()
 				menu::stack_push<menu_device_config>(ui(), container(), slot, option);
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  rotate_slot_device - rotates the specified slot
+//-------------------------------------------------
+
+void menu_slot_devices::rotate_slot_device(device_slot_interface &slot, menu_slot_devices::step_t step)
+{
+	// first, we need to make sure our cache of options is up to date
+	if (m_current_option_list_slot_tag != slot.device().tag())
+	{
+		device_slot_option *current = get_current_option(slot);
+
+		// build the option list, including the blank option
+		m_current_option_list.clear();
+		m_current_option_list.emplace_back("");
+		for (const auto &ent : slot.option_list())
+		{
+			if (ent.second->selectable())
+				m_current_option_list.emplace_back(ent.second->name());
+		}
+
+		// since the order is indeterminate, we need to sort the options
+		std::sort(m_current_option_list.begin(), m_current_option_list.end());
+
+		// find the current position
+		char const *const target = current ? current->name() : "";
+		m_current_option_list_iter = std::find_if(
+				m_current_option_list.begin(),
+				m_current_option_list.end(),
+				[target] (const std::string &opt_value)
+				{
+					return opt_value == target;
+				});
+		
+		// we expect the above search to succeed, because if an internal
+		// option was selected, the menu item should be disabled
+		assert(m_current_option_list_iter != m_current_option_list.end());
+
+		// we've succeeded; don't do this again
+		m_current_option_list_slot_tag.assign(slot.device().tag());
+	}
+
+	// At this point, the current option list and accompanying iterator should
+	// be good; perform the rotation
+	switch (step)
+	{
+	case step_t::NEXT:
+		m_current_option_list_iter++;
+		if (m_current_option_list_iter == m_current_option_list.end())
+			m_current_option_list_iter = m_current_option_list.begin();
+		break;
+
+	case step_t::PREVIOUS:
+		if (m_current_option_list_iter == m_current_option_list.begin())
+			m_current_option_list_iter = m_current_option_list.end();
+		m_current_option_list_iter--;
+		break;
+
+	default:
+		throw false;
+	}
+
+	set_slot_device(slot, m_current_option_list_iter->c_str());
 }
 
 } // namespace ui

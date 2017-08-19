@@ -142,6 +142,16 @@ Notes:
 #include "speaker.h"
 
 
+WRITE16_MEMBER(gaiden_state::irq_ack_w)
+{
+	m_maincpu->set_input_line(5, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(gaiden_state::drgnbowl_irq_ack_w)
+{
+	m_maincpu->set_input_line(5, CLEAR_LINE);
+}
+
 WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -406,7 +416,7 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
-	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
+	AM_RANGE(0x07a806, 0x07a807) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
@@ -422,7 +432,7 @@ static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
 	AM_RANGE(0x07a00e, 0x07a00f) AM_WRITE(drgnbowl_sound_command_w)
-	AM_RANGE(0x07e000, 0x07e001) AM_WRITENOP
+	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
 	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
@@ -747,7 +757,7 @@ static MACHINE_CONFIG_START( shadoww )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
 	MCFG_CPU_PROGRAM_MAP(gaiden_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -819,7 +829,7 @@ static MACHINE_CONFIG_START( drgnbowl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_sound_map)
@@ -905,11 +915,13 @@ Others
 
 static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_device, write)
-//  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//  AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // ?
+	AM_RANGE(0xd400, 0xd400) AM_WRITENOP // ?
+	AM_RANGE(0xd800, 0xd800) AM_WRITENOP // ?
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
@@ -931,9 +943,10 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x07e000, 0x07e001) AM_WRITE(gaiden_sound_command_w)
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+	AM_RANGE(0x07a00e, 0x07a00f) AM_WRITE(drgnbowl_sound_command_w)
+	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( mastninj )
@@ -941,7 +954,7 @@ static MACHINE_CONFIG_START( mastninj )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mastninj_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)
@@ -975,7 +988,6 @@ static MACHINE_CONFIG_START( mastninj )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000) /* ?? MHz */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -987,7 +999,7 @@ static MACHINE_CONFIG_START( mastninj )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	/* no OKI on the bootleg */
+	/* no 6295 on the bootleg - does this use a pair of 5205 instead? */
 //  MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END

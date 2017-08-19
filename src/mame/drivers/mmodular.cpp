@@ -1407,12 +1407,6 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 
 
-
-ROM_START(polgar)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("polgar.bin", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913))
-ROM_END
-
 ROM_START( alm16 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000,CRC(EE5B6EC4) SHA1(30920C1B9E16FFAE576DA5AFA0B56DA59ADA3DBB))
@@ -1509,12 +1503,11 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 }
 
 /*         YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     STATE          INIT     COMPANY                      FULLNAME                           FLAGS */
-	CONS(  1986, polgar,   0,       0,      polgar,    polgar,   polgar_state,  polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer",  MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK)
 	CONS(  1988, alm16,    van16,   0,      alm16,     van16,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000",          MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1988, alm32,    van16,   0,      alm32,     van32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020",          MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, academy,  0,       0,      academy,   academy,  polgar_state,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv,   polgar_state,  0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, milano,   polgar,  0,      milano,    polgar,   polgar_state,  polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer",  MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1989, milano,   0,       0,      milano,    polgar,   polgar_state,  polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer",  MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 //  CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, polgar_state,  0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV",         MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, lyon16,   van16,   0,      alm16,     van16,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000",             MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, lyon32,   van16,   0,      alm32,     van32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020",             MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

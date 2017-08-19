@@ -73,6 +73,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 			code + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16)+(attr & 7),
 			0);
+	tileinfo.category = (attr & 0x40) >> 6;
 }
 
 TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
@@ -161,7 +162,7 @@ uint32_t labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_in
 	address_space &space = machine().dummy_space();
 	uint8_t ctrl_0 = m_k007121->ctrlram_r(space, 0);
 	rectangle finalclip0, finalclip1;
-
+	
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -187,8 +188,9 @@ uint32_t labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_in
 				m_layer0->set_scrolly((i + 2) & 0x1f, m_k007121->ctrlram_r(space, 2));
 		}
 
-		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
+		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
 		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		m_layer1->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -250,15 +252,20 @@ uint32_t labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_in
 		m_layer0->set_scrollx(0, ctrl_0 - 40);
 		m_layer1->set_scrollx(0, ctrl_0 - 40);
 
-		m_layer0->draw(screen, bitmap, finalclip0, 0, 1);
+		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(0), 0);
 		if(use_clip3[0])
-			m_layer0->draw(screen, bitmap, finalclip3, 0, 1);
-
-		m_layer1->draw(screen, bitmap, finalclip1, 0, 1);
-		if(use_clip3[1])
-			m_layer1->draw(screen, bitmap, finalclip3, 0, 1);
+			m_layer0->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(0), 0);
 
 		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+
+		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(1), 0);
+		if(use_clip3[0])
+			m_layer0->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(1), 0);
+		
+		m_layer1->draw(screen, bitmap, finalclip1, 0, 0);
+		if(use_clip3[1])
+			m_layer1->draw(screen, bitmap, finalclip3, 0, 0);
+
 	}
 	return 0;
 }

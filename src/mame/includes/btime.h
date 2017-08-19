@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "screen.h"
 
 class btime_state : public driver_device
@@ -25,6 +26,7 @@ public:
 		, m_audio_rambase(*this, "audio_rambase")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
+		, m_audionmi(*this, "audionmi")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -54,8 +56,6 @@ public:
 
 	/* audio-related */
 	uint8_t    m_audio_nmi_enable_type;
-	uint8_t    m_audio_nmi_enabled;
-	uint8_t    m_audio_nmi_state;
 
 	/* protection-related (for mmonkey) */
 	int      m_protection_command;
@@ -66,6 +66,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<input_merger_device> m_audionmi;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -73,8 +74,6 @@ public:
 	optional_memory_region m_prom_region;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(zoar_dsw1_read);
 	DECLARE_READ8_MEMBER(wtennis_reset_hack_r);
 	DECLARE_READ8_MEMBER(mmonkey_protection_r);

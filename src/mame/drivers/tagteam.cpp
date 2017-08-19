@@ -42,12 +42,6 @@ void tagteam_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-WRITE8_MEMBER(tagteam_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-}
-
 WRITE8_MEMBER(tagteam_state::irq_clear_w)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
@@ -57,7 +51,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(control_w)
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_WRITE(sound_command_w)
+	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2") AM_WRITE(irq_clear_w)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
 	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
@@ -241,6 +235,7 @@ static MACHINE_CONFIG_START( tagteam )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)

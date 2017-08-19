@@ -148,8 +148,8 @@ ROM_START( dpatrol )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0CA0, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "bd1.d2", 0x0000, 0x0400, CRC(e4c8e4ab) SHA1(0b989ca9369139f212dcea1d1461998f20057db8)) // Computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics
-	ROM_LOAD( "bd1.e2", 0x0400, 0x0400, CRC(256b3320) SHA1(712573e3d9625a84c54bbe2e3edafb8879a14b2e)) // Computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics
+	ROM_LOAD( "bd1.d2", 0x0000, 0x0400, CRC(e4c8e4ab) SHA1(0b989ca9369139f212dcea1d1461998f20057db8)) // Computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics - sldh w/dpatrola
+	ROM_LOAD( "bd1.e2", 0x0400, 0x0400, CRC(256b3320) SHA1(712573e3d9625a84c54bbe2e3edafb8879a14b2e)) // Computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics - sldh w/dpatrola
 
 	ROM_LOAD( "bd2.l4", 0x0800, 0x0200, CRC(bc87c648) SHA1(c4709d155aa50cc87146abd152a11de618cfd64c)) // PROM 1 contains aircraft target images and explosion image. PCB has 82S141; schematics show 6341-1
 	ROM_LOAD( "bd2.l1", 0x0A00, 0x0200, CRC(4ddcc237) SHA1(6bfad6a8bf8387e93c0bb1a04b647690b3701d54)) // PROM 2 contains parachute and man, falling man. PCB has 82S141; schematics show 6341-1 (from dpatrola, but expected to match)
@@ -163,8 +163,8 @@ ROM_START( dpatrola )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0900, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "bd1.d2", 0x0000, 0x0200, CRC(dd30f565) SHA1(04676adf9fe172c5332bdc9d235a899c7dbe90b5)) // Computer program game code. PCB has SN74S474; schematics show 6341-1 or 82S181
-	ROM_LOAD( "bd1.e2", 0x0200, 0x0200, CRC(e1f0941b) SHA1(57f51e9a74838708c3017c5a00e8ec33c6445e47)) // Computer program game code. PCB has SN74S474; schematics show 6341-1 or 82S181
+	ROM_LOAD( "bd1.d2", 0x0000, 0x0200, CRC(dd30f565) SHA1(04676adf9fe172c5332bdc9d235a899c7dbe90b5)) // Computer program game code. PCB has SN74S474; schematics show 6341-1 or 82S181 - sldh w/dpatrol
+	ROM_LOAD( "bd1.e2", 0x0200, 0x0200, CRC(e1f0941b) SHA1(57f51e9a74838708c3017c5a00e8ec33c6445e47)) // Computer program game code. PCB has SN74S474; schematics show 6341-1 or 82S181 - sldh w/dpatrol
 
 	ROM_LOAD( "bd2.l4", 0x0400, 0x0200, CRC(bc87c648) SHA1(c4709d155aa50cc87146abd152a11de618cfd64c)) // PROM 1 contains aircraft target images and explosion image. PCB has SN74S474; schematics show 6341-1
 	ROM_LOAD( "bd2.l1", 0x0600, 0x0200, CRC(4ddcc237) SHA1(6bfad6a8bf8387e93c0bb1a04b647690b3701d54)) // PROM 2 contains parachute and man, falling man. PCB has SN74S474; schematics show 6341-1

@@ -88,7 +88,8 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 {
-	m_seibu_sound->main_word_w(space,4,data,mem_mask);
+	if (ACCESSING_BITS_0_7)
+		m_seibu_sound->main_w(space, 4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	space.device().execute().spin_until_time(attotime::from_usec(50));
@@ -116,7 +117,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
-	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 ADDRESS_MAP_END
 
 

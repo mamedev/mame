@@ -255,12 +255,9 @@ WRITE_LINE_MEMBER(msm5205_device::vclk_w)
 		logerror("Error: vclk_w() called but VCK selected master mode\n");
 	else
 	{
-		if (m_vck != state)
-		{
-			m_vck = state;
-			if (!state)
-				update_adpcm();
-		}
+		if (m_vck && !state)
+			m_capture_timer->adjust(attotime::from_nsec(15600));
+		m_vck = state;
 	}
 }
 

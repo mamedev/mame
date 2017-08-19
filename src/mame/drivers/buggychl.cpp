@@ -75,6 +75,16 @@ dcxx = /SPOSI (S36)
 2008-07
 Dip locations and factory settings verified from dip listing
 
+Clock information:
+Xtal = 48mhz
+QA output = "24M" = 24mhz
+QB output = "1/2CLK" = 12mhz
+QC output = "CLK" = 6mhz
+"1/2phi" = 24M / 3 = 8mhz
+
+The z80B main cpu is clocked by (depending on a jumper) either "1/2CLK"/2 OR "1/2PHI"/2, so either 6mhz or 4mhz.
+Schematics show the jumper set to the 6mhz setting.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -94,33 +104,14 @@ WRITE8_MEMBER(buggychl_state::bankswitch_w)
 	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 < # banks?
 }
 
-TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
-{
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		m_pending_nmi = 1;
-}
-
-WRITE8_MEMBER(buggychl_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(buggychl_state::nmi_callback),this), data);
-}
-
 WRITE8_MEMBER(buggychl_state::nmi_disable_w)
 {
-	m_sound_nmi_enable = 0;
+	m_soundnmi->in_w<1>(0);
 }
 
 WRITE8_MEMBER(buggychl_state::nmi_enable_w)
 {
-	m_sound_nmi_enable = 1;
-	if (m_pending_nmi)
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
+	m_soundnmi->in_w<1>(1);
 }
 
 WRITE8_MEMBER(buggychl_state::sound_enable_w)
@@ -135,6 +126,24 @@ READ8_MEMBER(buggychl_state::mcu_status_r)
 	return
 		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
 		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
+// the schematics show that the two sound semaphore latch bits are actually flipped backwards when read by the sound cpu
+//   vs when read by the main cpu.
+//   Given the other schematic errors, is this even correct?
+// a cpu write to soundlatch sets ic12.2 so /Q is low, so cpu bit 1 and sound bit 0 read as clear
+// a sound write to soundlatch2 clears ic12.1 so /Q is high, so cpu bit 0 and sound bit 1 read as set
+// a cpu read of soundlatch2 sets ic12.1 so /Q is low, so cpu bit 0 and sound bit 1 read as clear
+// a sound read of soundlatch clears ic12.2 so /Q is high, so cpu bit 1 and sound bit 0 read as set
+// ic12.1 is set and ic12.2 is cleared by /SRESET
+READ8_MEMBER(buggychl_state::sound_status_main_r)
+{
+	return (m_soundlatch2->pending_r() ? 1 : 0) | (m_soundlatch->pending_r() ? 0 : 2);
+}
+
+READ8_MEMBER(buggychl_state::sound_status_sound_r)
+{
+	return (m_soundlatch2->pending_r() ? 2 : 0) | (m_soundlatch->pending_r() ? 0 : 1);
 }
 
 
@@ -161,7 +170,9 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xd609, 0xd609) AM_READ_PORT("IN1")    /* coin + accelerator */
 //  AM_RANGE(0xd60a, 0xd60a) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
-	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
+	AM_RANGE(0xd610, 0xd610) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xd611, 0xd611) AM_READ(sound_status_main_r)
+//	AM_RANGE(0xd613, 0xd613) AM_WRITE(sound_reset_w)
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP    /* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_SHARE("scrollv")
@@ -178,11 +189,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0x4820, 0x4820) AM_RAM /* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output  */
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-//  AM_RANGE(0x5001, 0x5001) AM_READNOP /* is command pending? */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0x5001, 0x5001) AM_READ(sound_status_sound_r) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w)
+	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w) // this actually controls the irq generation for the sound cpu as well as a few other things
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostics ROM */
 ADDRESS_MAP_END
 
@@ -345,8 +355,6 @@ void buggychl_state::machine_start()
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x2000);
 
 
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_sprite_lookup));
 	save_item(NAME(m_sl_bank));
 	save_item(NAME(m_bg_on));
@@ -357,8 +365,6 @@ void buggychl_state::machine_start()
 
 void buggychl_state::machine_reset()
 {
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
 	m_sl_bank = 0;
 	m_bg_on = 0;
 	m_sky_on = 0;
@@ -369,19 +375,22 @@ void buggychl_state::machine_reset()
 static MACHINE_CONFIG_START( buggychl )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_48MHz/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
 	MCFG_CPU_PROGRAM_MAP(buggychl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* 4 MHz according to schematics */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 60*60) /* irq is timed, tied to the cpu clock and not to vblank */
-							/* nmi is caused by the main cpu */
+	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
+
+	// schematics show a secondary sound z80 cpu as well, running at the same speed as the audiocpu; unclear if actually populated, or if it only existed on a certain hardware release (cocktail deluxe version?)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,8000000/2)  /* 4 MHz */
 
 
 	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // typical Taito 74ls392
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -402,13 +411,19 @@ static MACHINE_CONFIG_START( buggychl )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
 
-	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_SOUND_ADD("ay1", YM2149, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_0_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 8000000/4)
+	MCFG_SOUND_ADD("ay2", YM2149, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

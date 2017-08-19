@@ -2477,12 +2477,12 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	int total;
 	get_selection(software, driver);
 
-	if (software && ((software->startempty != 1) || !driver))
+	if (software && (!software->startempty || !driver))
 	{
 		m_info_driver = nullptr;
-		first = "Usage";
+		first = __("Usage");
 
-		if (m_info_software != software || m_info_view != ui_globals::cur_sw_dats_view)
+		if ((m_info_software != software) || (m_info_view != ui_globals::cur_sw_dats_view))
 		{
 			m_info_buffer.clear();
 			if (software == m_info_software)
@@ -2501,10 +2501,12 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 			}
 
 			if (m_info_view == 0)
+			{
 				m_info_buffer = software->usage;
+			}
 			else
 			{
-				m_info_buffer = "";
+				m_info_buffer.clear();
 				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
 			}
 		}
@@ -2544,32 +2546,29 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		total = ui_globals::curdats_total;
 	}
 	else
+	{
 		return;
+	}
 
 	origy1 += UI_BOX_TB_BORDER;
 	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float oy1 = origy1 + line_height;
 
-	std::string snaptext;
-	if (m_info_view)
-		snaptext = _(m_items_list[m_info_view - 1].c_str());
-	else
-		snaptext = _(first);
+	char const *const snaptext(m_info_view ? _(m_items_list[m_info_view - 1].c_str()) : _(first));
 
-	// apply title to right panel
-	float title_size = 0.0f;
-	float txt_length = 0.0f;
-
-	for (int x = 0; x < ui_globals::curdats_total; ++x)
+	// get width of widest title
+	float title_size(0.0f);
+	for (std::size_t x = 0; total > x; ++x)
 	{
-		const char *name;
-		if(!x)
-			name = first;
-		else
-			name = m_items_list[x - 1].c_str();
-		ui().draw_text_full(container(), _(name), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
-				ui::text_layout::NEVER, mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
+		char const *const name(x ? m_items_list[x - 1].c_str() : first);
+		float txt_length(0.0f);
+		ui().draw_text_full(
+				container(), _(name),
+				origx1, origy1, origx2 - origx1,
+				ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+				&txt_length, nullptr);
 		txt_length += 0.01f;
 		title_size = (std::max)(txt_length, title_size);
 	}
@@ -2595,7 +2594,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
-	ui().draw_text_full(container(), snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
+	ui().draw_text_full(container(), snaptext, origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
 			ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 	char justify = 'l'; // left justify

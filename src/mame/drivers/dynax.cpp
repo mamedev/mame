@@ -74,6 +74,9 @@ TODO:
 
 - neruton / majxtal7: girls are behind the background in demo mode.
 
+- tenkai: Interrupts are not quite right; "RAM ERROR" at startup and music slows
+  down while dealing tiles in attract mode.
+
 *********************************************************************************************************************/
 
 #include "emu.h"
@@ -4777,20 +4780,20 @@ MACHINE_CONFIG_END
                                Mahjong Tenkaigen
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::tenkai_interrupt)
+void dynax_state::tenkai_update_irq()
 {
-	int scanline = param;
-
-	if(scanline == 256)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
-
-	if(scanline == 0)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
 }
 
-WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
+WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
+	m_blitter_irq_mask = state;
+
+	// this must be acknowledged somewhere else
+	if (!m_blitter_irq_mask)
+		m_blitter_irq = 0;
+
+	tenkai_update_irq();
 }
 
 
@@ -4807,7 +4810,6 @@ static MACHINE_CONFIG_START( tenkai )
 	MCFG_TLCS90_PORT_P7_WRITE_CB(WRITE8(dynax_state, tenkai_p7_w))
 	MCFG_TLCS90_PORT_P8_READ_CB(READ8(dynax_state, tenkai_p8_r))
 	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(dynax_state, tenkai_p8_w))
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dynax_state, tenkai_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(tenkai_banked_map)
@@ -4826,7 +4828,7 @@ static MACHINE_CONFIG_START( tenkai )
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(dynax_state, tenkai_6c_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, tenkai_70_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)  // IRQ Ack?
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, tenkai_blitter_ack_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4836,10 +4838,11 @@ static MACHINE_CONFIG_START( tenkai )
 	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)  // hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
-	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,tenkai)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4854,7 +4857,7 @@ static MACHINE_CONFIG_START( tenkai )
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(dynax_state, tenkai_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )

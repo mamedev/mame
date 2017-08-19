@@ -39,29 +39,29 @@
     TODO: (PC-9821AP)
     - No way to exit the initial loop. Code looks broken/bad dump?
 
-    floppy issues TODO (* denotes actually fixed)
-    - 46 Okunen Monogatari - The Shinkaron
-    - AD&D Champions of Krynn
-    - AI Shougi (asserts upon loading, 3'5 image?)
-    - Aki no Tsukasa no Fushigi no Kabe (works in PC-9801RS only)
-    - alice
-    - Aoki Ookami no Shiroki Mejika - Gengis Khan
-    - Arcshu
-    - Arcus 2
-    - Art Jigsaw
-    - Atlantia (disk swap?)
-    - Azusa 108 Jimusho
-    - Bacta 2
-    - BattleTech (disk swap?)
-    - Bay City Elegy (disk swap?)
-    - Beast (keeps reading command sense)
-    - Beast 2
-    - Bells Avenue (disk swap?)
-    - Bible Master 2 (at new game loading)
-    - Birdy World
+    floppy issues TODO (* denotes actually fixed, to be moved into specific sheet)
+    - 46okunen (DOS not booting / disk swap);
+    * ckrynn
+    - aishogi: (asserts upon loading, 3'5 image?)
+    - akitsuka: (works in PC-9801RS only)
+    * alice
+    * genghis
+    * arcshu
+    * arcus2
+    * artjigs1 / artjigs2 / artjigs3
+    * Atlantia (disk swap?)
+    - azusa108 (disk i/o error)
+    * bacta2
+    - btech (disk swap?)
+    - baycity
+    - beast (keeps reading command sense)
+    * beast2
+    * bellsave (disk swap? select B on config menu)
+    * biblems2 (at new game loading)
+    * birdywld
 
     * Bokosuka Wars
-    - Jangou 2: floppy fails to load after the title screen;
+    * jangou2: floppy fails to load after the title screen;
     - runners (size assert)
     - Sorcerian (2dd image)
     - Twilight Zone 3 (2dd image)
@@ -74,16 +74,20 @@
     - alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
     - applecl1: can't pass hands apparently;
     - arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
+	- arcus2: has intro glitches; 
+	- artjigs*: some text doesn't appear? Namely under the puzzles and when you clear one;
     - atragon: HDD install disk swap doesn't work?
     - asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
     - arquelph: beeps out at initial sound check,  no voice samples, extra sound board tested;
+	- akitsuka: could not setup "initial data" (regression);
     - bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
+    - biblems2: initial GLODIA logo uses raster effects?
     - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
     - bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
 
     - deflektr: no sound, moans about a DIP-SW setting during loading, has timing issues (keyboard being too fast on PC-9801RS);
     - edge: has gfx glitch when intro scrolls to top-left;
-    - edge: user disk creation is offset?
+    - edge: user disk creation screen is offset?
     - idolsaga: Moans with a "(program) ended. remove the floppy disk and turn off the power."
     - karateka: no sound;
     - lovelyho: Doesn't show kanjis in PC-9801F version (tries to read them thru the 0xa9 port);
