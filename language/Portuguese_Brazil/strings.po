@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-19 17:34+1000\n"
-"PO-Revision-Date: 2017-07-28 10:11+0100\n"
+"PO-Revision-Date: 2017-08-19 12:55+0100\n"
 "Last-Translator: Ashura-X\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -63,15 +63,15 @@ msgstr "Ler esta imagem, escrever para diff"
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
-msgstr ""
+msgstr "Não Filtrado"
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
-msgstr ""
+msgstr "Disponível"
 
 #: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
 msgid "Unavailable"
-msgstr ""
+msgstr "Não Disponível"
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
@@ -83,11 +83,11 @@ msgstr "Não Funcionando"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
-msgstr ""
+msgstr "Mecânico"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Not Mechanical"
-msgstr ""
+msgstr "Não Mecânico"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
@@ -99,19 +99,19 @@ msgstr "Favoritos"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "Sem BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
-msgstr ""
+msgstr "Pai"
 
 #: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
 msgid "Clones"
-msgstr ""
+msgstr "Clones"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
@@ -123,31 +123,31 @@ msgstr "Ano"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "Salvar Suportado"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "Salvar Não Suportado"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "Requer CHD"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "Não Requer CHD"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Tela Vertical"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Tela Horizontal"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
-msgstr ""
+msgstr "Filtro Customizável"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
@@ -155,19 +155,19 @@ msgstr "Editor"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "Suportado"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
-msgstr ""
+msgstr "Parcialmente Suportado"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "Não Suportado"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
-msgstr ""
+msgstr "Região do Lançamento"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
@@ -179,7 +179,7 @@ msgstr "Lista de Programas"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
-msgstr ""
+msgstr "<Configurar Filtros>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
@@ -188,7 +188,7 @@ msgstr "Selecionar filtros customizáveis:"
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "Filtro %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
@@ -200,35 +200,35 @@ msgstr "Adicionar filtro"
 
 #: src/frontend/mame/ui/utils.cpp:950
 msgid "Select category:"
-msgstr ""
+msgstr "Selecione a categoria"
 
 #: src/frontend/mame/ui/utils.cpp:981
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[arquivos INI sem categorias]"
 
 #: src/frontend/mame/ui/utils.cpp:989
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[sem grupos no arquivo INI]"
 
 #: src/frontend/mame/ui/utils.cpp:1023
 msgid "No category INI files found"
-msgstr ""
+msgstr "arquivos INI sem categoria encontrada"
 
 #: src/frontend/mame/ui/utils.cpp:1028
 msgid "File"
-msgstr ""
+msgstr "Arquivo"
 
 #: src/frontend/mame/ui/utils.cpp:1032
 msgid "No groups found in category file"
-msgstr ""
+msgstr "Sem grupos encontrados no arquivo de categoria"
 
 #: src/frontend/mame/ui/utils.cpp:1037
 msgid "Group"
-msgstr ""
+msgstr "Grupo"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "Include clones"
-msgstr ""
+msgstr "Inclui clones"
 
 #: src/frontend/mame/ui/utils.cpp:1038 src/frontend/mame/ui/filecreate.cpp:82
 #: src/frontend/mame/ui/selgame.cpp:968 src/frontend/mame/ui/selgame.cpp:969
@@ -782,11 +782,11 @@ msgstr "Driver é Pai\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:887
 msgid "Analog Controls\tYes\n"
-msgstr ""
+msgstr "Controles Analógicos\tYes\n"
 
 #: src/frontend/mame/ui/selgame.cpp:889
 msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "Entradas do Teclado\tYes\n"
 
 #: src/frontend/mame/ui/selgame.cpp:892
 msgid "Overall\tNOT WORKING\n"
@@ -906,11 +906,11 @@ msgstr "WAN\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:964
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "Temporizador\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:966
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "Temporizador\tImperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:968
 #, c-format
@@ -935,7 +935,7 @@ msgstr "Suporte para Cocktail\t%1$s\n"
 #: src/frontend/mame/ui/selgame.cpp:972
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "Driver é BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:973
 #, c-format
@@ -1053,7 +1053,7 @@ msgstr "INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "Categoria INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
@@ -1274,7 +1274,7 @@ msgstr "Driver"
 
 #: src/frontend/mame/ui/miscmenu.cpp:769
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "Esta máquina não possue BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:778 src/frontend/mame/ui/mainmenu.cpp:145
 msgid "Add To Favorites"
@@ -1370,7 +1370,7 @@ msgstr "WAN"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr ""
+msgstr "temporizador"
 
 #: src/frontend/mame/ui/info.cpp:177
 msgid ""
@@ -1599,7 +1599,7 @@ msgstr "Controle da Fita"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "Seleção da BIOS"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1715,7 +1715,7 @@ msgstr "Gameinit"
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "High Scores"
-msgstr ""
+msgstr "High Scores"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "History"
@@ -1727,7 +1727,7 @@ msgstr "MAMEinfo"
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MARPScore"
-msgstr ""
+msgstr "MARPScore"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "MESSinfo"
@@ -1747,7 +1747,7 @@ msgstr "Seleção por parte de Programa"
 
 #: src/frontend/mame/ui/selmenu.cpp:358
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Seleção da BIOS"
 
 #: src/frontend/mame/ui/selmenu.cpp:585 src/frontend/mame/ui/selmenu.cpp:621
 #: src/frontend/mame/ui/simpleselgame.cpp:311
@@ -1848,11 +1848,11 @@ msgstr "Informações"
 
 #: src/frontend/mame/ui/selmenu.cpp:2483
 msgid "Usage"
-msgstr ""
+msgstr "Uso"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
-msgstr "Información general"
+msgstr "Informação Geral"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
@@ -1888,7 +1888,7 @@ msgstr "Usar imagem como plano de fundo"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "Pular o menu de seleção da BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
