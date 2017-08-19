@@ -213,7 +213,6 @@ public:
 
 	const std::string &instance_name() const { return m_instance_name; }
 	const std::string &brief_instance_name() const { return m_brief_instance_name; }
-	const char *cannonical_instance_name() const { return dynamic_cast<const device_t *>(this)->tag(); }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 

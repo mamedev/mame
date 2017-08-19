@@ -624,7 +624,7 @@ bool emu_options::add_and_remove_image_options()
 	// "cartridge" starting out, but become "cartridge1" when another cartridge device is added.
 	//
 	// To get around this behavior, our internal data structures work in terms of what is
-	// returned by cannonical_instance_name(), which will be something like ":cartridge" both
+	// returned by device().tag(), which will be something like ":cartridge" both
 	// for a singular cartridge device and the first cartridge in a multi cartridge system.
 	//
 	// The need for this behavior was identified by Tafoid when the following command line
@@ -655,18 +655,18 @@ bool emu_options::add_and_remove_image_options()
 		// iterate through all image devices
 		for (device_image_interface &image : image_interface_iterator(config.root_device()))
 		{
-			const char *cannonical_name = image.cannonical_instance_name();
+			const char *canonical_name = image.device().tag();
 
 			// erase this option from existing (so we don't purge it later)
-			existing.remove(cannonical_name);
+			existing.remove(canonical_name);
 
 			// do we need to add this option?
-			auto iter = m_image_options_cannonical.find(cannonical_name);
+			auto iter = m_image_options_cannonical.find(canonical_name);
 			::image_option *this_option = iter != m_image_options_cannonical.end() ? &iter->second : nullptr;
 			if (!this_option)
 			{
 				// we do - add it to both m_image_options_cannonical and m_image_options
-				auto pair = std::make_pair(cannonical_name, ::image_option(*this, image.cannonical_instance_name()));
+				auto pair = std::make_pair(canonical_name, ::image_option(*this, canonical_name));
 				this_option = &m_image_options_cannonical.emplace(std::move(pair)).first->second;
 				changed = true;
 

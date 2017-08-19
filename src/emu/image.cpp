@@ -201,7 +201,7 @@ void image_manager::options_extract()
 		//		  the need to use the canonical option name (which in the above example, will always be 'floppydisk1')
 
 		// The very first step in this is to find the option; if it is not there, this is all irrelevant
-		auto image_opt = machine().options().find_image_option_canonical(image.cannonical_instance_name());
+		auto image_opt = machine().options().find_image_option_canonical(image.device().tag());
 		if (image_opt)
 		{
 			// We've found the image option; check for the two scenarios outlined above
