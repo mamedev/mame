@@ -25,7 +25,7 @@
 
 READ8_MEMBER(flstory_state::snd_flag_r)
 {
-	return (m_soundlatch2->pending_r() ? 2 : 0) | 0xfd;
+	return (m_soundlatch->pending_r() ? 0 : 1) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
 WRITE8_MEMBER(flstory_state::nmi_disable_w)
