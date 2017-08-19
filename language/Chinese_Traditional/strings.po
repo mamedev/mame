@@ -90,7 +90,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "類別"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
@@ -1833,7 +1833,7 @@ msgstr "資訊"
 
 #: src/frontend/mame/ui/selmenu.cpp:2483
 msgid "Usage"
-msgstr ""
+msgstr "用法"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
@@ -2467,9 +2467,6 @@ msgstr "儲存設定"
 #: src/frontend/mame/ui/optsmenu.cpp:228
 msgid "Settings"
 msgstr "設定"
-
-#~ msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-#~ msgstr "%1$s (%2$s - %3$s) - 搜尋： %4$s_"
 
 #~ msgid "Extra INIs"
 #~ msgstr "額外的 INI"

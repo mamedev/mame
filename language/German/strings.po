@@ -92,7 +92,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "Kategorie"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
@@ -2486,17 +2486,11 @@ msgstr "Konfiguration speichern"
 msgid "Settings"
 msgstr "Einstellungen"
 
-#~ msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-#~ msgstr "%1$s (%2$s - %3$s) - Suche: %4$s_"
-
 #~ msgid "Extra INIs"
 #~ msgstr "Zusätzliche INIs"
 
 #~ msgid " ^!File"
 #~ msgstr " ^!Datei"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!Kategorie"
 
 #~ msgid "Main filter"
 #~ msgstr "Hauptfilter"

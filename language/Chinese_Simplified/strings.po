@@ -90,7 +90,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "类别"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
@@ -1833,7 +1833,7 @@ msgstr "信息"
 
 #: src/frontend/mame/ui/selmenu.cpp:2483
 msgid "Usage"
-msgstr ""
+msgstr "用法"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
@@ -2468,17 +2468,11 @@ msgstr "保存设定"
 msgid "Settings"
 msgstr "设定"
 
-#~ msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-#~ msgstr "%1$s (%2$s - %3$s) - 搜寻： %4$s_"
-
 #~ msgid "Extra INIs"
 #~ msgstr "额外的 INI"
 
 #~ msgid " ^!File"
 #~ msgstr " ^!文件"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!类别"
 
 #~ msgid "Main filter"
 #~ msgstr "主要过滤器"

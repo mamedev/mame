@@ -90,7 +90,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "Κατηγορία"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
@@ -1853,7 +1853,7 @@ msgstr "Πληροφορίες"
 
 #: src/frontend/mame/ui/selmenu.cpp:2483
 msgid "Usage"
-msgstr ""
+msgstr "Χρήση"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
@@ -2494,17 +2494,11 @@ msgstr "Αποθήκευση Ρυθμίσεων"
 msgid "Settings"
 msgstr "Ρυθμίσεις"
 
-#~ msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-#~ msgstr "%1$s (%2$s - %3$s) - Αναζήτηση: %4$s_"
-
 #~ msgid "Extra INIs"
 #~ msgstr "Επιπλέον INIs"
 
 #~ msgid " ^!File"
 #~ msgstr " ^!Αρχείο"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!Κατηγορία"
 
 #~ msgid "Main filter"
 #~ msgstr "Κύριο φίλτρο"

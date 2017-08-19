@@ -1855,7 +1855,7 @@ msgstr "Informaciones"
 
 #: src/frontend/mame/ui/selmenu.cpp:2483
 msgid "Usage"
-msgstr ""
+msgstr "Utilización"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
@@ -2496,17 +2496,11 @@ msgstr "Guardar configuración"
 msgid "Settings"
 msgstr "Ajustes"
 
-#~ msgid "%1$s (%2$s - %3$s) - Search: %4$s_"
-#~ msgstr "%1$s (%2$s - %3$s) - Buscar: %4$s_"
-
 #~ msgid "Extra INIs"
 #~ msgstr "INIs adicionales"
 
 #~ msgid " ^!File"
 #~ msgstr " ^!Archivo"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!Categoría"
 
 #~ msgid "Main filter"
 #~ msgstr "Filtro principal"
