@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-19 17:34+1000\n"
-"PO-Revision-Date: 2017-08-06 17:35+0300\n"
+"PO-Revision-Date: 2017-08-20 17:39+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -62,31 +62,31 @@ msgstr "Ανάγνωση αυτής της εικόνας, εγγραφή σε �
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
-msgstr ""
+msgstr "Αφιλτράριστα"
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
-msgstr ""
+msgstr "Διαθέσιμα"
 
 #: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
 msgid "Unavailable"
-msgstr ""
+msgstr "Μη Διαθέσιμα"
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
-msgstr "Λειτουργεί"
+msgstr "Λειτουργούν"
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Not Working"
-msgstr "Δεν Λειτουργεί"
+msgstr "Δεν Λειτουργούν"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
-msgstr ""
+msgstr "Μηχανικά"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Not Mechanical"
-msgstr ""
+msgstr "Μη Μηχανικά"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
@@ -94,7 +94,7 @@ msgstr "Κατηγορία"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "Αγαπημένα"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
@@ -102,15 +102,15 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "Μη BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
-msgstr ""
+msgstr "Γονικά"
 
 #: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
 msgid "Clones"
-msgstr ""
+msgstr "Κλώνοι"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
@@ -122,31 +122,31 @@ msgstr "Έτος"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "Υποστήριξη Αποθήκευσης"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "Χωρίς Υποστήριξη Αποθήκευσης"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "Απαιτείται CHD"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "Δεν Απαιτείται CHD"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Κάθετη οθόνη"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Οριζόντια οθόνη"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
-msgstr ""
+msgstr "Προσαρμοσμένο Φίλτρο"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
@@ -154,19 +154,19 @@ msgstr "Εκδότης"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "Υποστηρίζεται"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
-msgstr ""
+msgstr "Υποστηρίζεται Μερικώς"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "Δεν Υποστηρίζεται"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
-msgstr ""
+msgstr "Περιοχή Κυκλοφορίας"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
@@ -178,7 +178,7 @@ msgstr "Λίστα Λογισμικού"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
-msgstr ""
+msgstr "<ρύθμιση φίλτρων>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
@@ -187,7 +187,7 @@ msgstr "Επιλογή προσαρμοσμένων φίλτρων:"
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "Φίλτρο %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
@@ -199,35 +199,35 @@ msgstr "Προσθήκη φίλτρου"
 
 #: src/frontend/mame/ui/utils.cpp:950
 msgid "Select category:"
-msgstr ""
+msgstr "Επιλογή κατηγορίας:"
 
 #: src/frontend/mame/ui/utils.cpp:981
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[χωρίς αρχεία INI κατηγοριών]"
 
 #: src/frontend/mame/ui/utils.cpp:989
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[χωρίς ομάδες στο αρχείο INI]"
 
 #: src/frontend/mame/ui/utils.cpp:1023
 msgid "No category INI files found"
-msgstr ""
+msgstr "Δεν βρέθηκαν αρχεία INI κατηγοριών"
 
 #: src/frontend/mame/ui/utils.cpp:1028
 msgid "File"
-msgstr ""
+msgstr "Αρχείο"
 
 #: src/frontend/mame/ui/utils.cpp:1032
 msgid "No groups found in category file"
-msgstr ""
+msgstr "Δεν βρέθηκαν ομάδες στο αρχείο κατηγορίας"
 
 #: src/frontend/mame/ui/utils.cpp:1037
 msgid "Group"
-msgstr ""
+msgstr "Ομάδα"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "Include clones"
-msgstr ""
+msgstr "Περιλαμβάνονται κλώνοι"
 
 #: src/frontend/mame/ui/utils.cpp:1038 src/frontend/mame/ui/filecreate.cpp:82
 #: src/frontend/mame/ui/selgame.cpp:968 src/frontend/mame/ui/selgame.cpp:969
@@ -718,7 +718,7 @@ msgstr "Βιολετί"
 
 #: src/frontend/mame/ui/selector.cpp:116
 msgid "Selection List - Search: "
-msgstr "Λίστα Επιλογής- Αναζήτηση: "
+msgstr "Λίστα Επιλογής - Αναζήτηση: "
 
 #: src/frontend/mame/ui/selector.cpp:124
 #, c-format
@@ -1054,7 +1054,7 @@ msgstr "INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "INIs Κατηγοριών"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
