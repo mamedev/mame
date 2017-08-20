@@ -106,7 +106,7 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "No BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
@@ -191,7 +191,7 @@ msgstr "Seleccionar filtros personalizados:"
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "Filtro %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
@@ -203,35 +203,35 @@ msgstr "Añadir filtro"
 
 #: src/frontend/mame/ui/utils.cpp:950
 msgid "Select category:"
-msgstr ""
+msgstr "Selecciona categoria:"
 
 #: src/frontend/mame/ui/utils.cpp:981
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[Sin ficheros INI de categorías]"
 
 #: src/frontend/mame/ui/utils.cpp:989
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[No hay grupos en el fichero INI]"
 
 #: src/frontend/mame/ui/utils.cpp:1023
 msgid "No category INI files found"
-msgstr ""
+msgstr "No se han encontrado ficheros INI de categorías"
 
 #: src/frontend/mame/ui/utils.cpp:1028
 msgid "File"
-msgstr ""
+msgstr "Fichero"
 
 #: src/frontend/mame/ui/utils.cpp:1032
 msgid "No groups found in category file"
-msgstr ""
+msgstr "No se han encontrado grupos en el fichero de categorías"
 
 #: src/frontend/mame/ui/utils.cpp:1037
 msgid "Group"
-msgstr ""
+msgstr "Grupo"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "Include clones"
-msgstr ""
+msgstr "Incluir clones"
 
 #: src/frontend/mame/ui/utils.cpp:1038 src/frontend/mame/ui/filecreate.cpp:82
 #: src/frontend/mame/ui/selgame.cpp:968 src/frontend/mame/ui/selgame.cpp:969
@@ -1058,7 +1058,7 @@ msgstr "INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "INIs de categorías"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
