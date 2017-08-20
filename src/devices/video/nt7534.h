@@ -67,15 +67,21 @@ private:
 
 	pixel_update_delegate m_pixel_update_cb; // pixel update callback
 
-	bool        m_busy_flag;      // busy flag
-	uint8_t     m_ddram[9*132];    // internal display data RAM
-	uint8_t     m_page;             // page address
-	uint16_t    m_column;             // column address
-	uint8_t     m_dr;             // data register
-	uint8_t     m_ir;             // instruction register
-	bool        m_display_on;     // display on/off
-	int         m_direction;      // auto increment/decrement (-1 or +1)
-	uint8_t     m_data_len;       // interface data length 4 or 8 bit
+	bool        m_busy_flag;
+	uint8_t     m_ddram[9*132];        // internal display data RAM
+	uint8_t     m_page;                // page address
+	uint16_t    m_column;              // column address
+	uint16_t    m_backup_column;       // column address
+	uint8_t     m_display_start_line;
+	uint8_t     m_dr;                  // data register
+	uint8_t     m_ir;                  // instruction register
+	bool        m_display_on;          // display on/off
+	bool        m_entire_display_on;
+	bool        m_reverse;             // Reverse display
+	bool        m_read_modify_write;
+	bool        m_adc;
+	int         m_direction;           // auto increment/decrement (-1 or +1)
+	uint8_t     m_data_len;            // interface data length 4 or 8 bit
 	int         m_rs_state;
 	int         m_rw_state;
 	bool        m_nibble;

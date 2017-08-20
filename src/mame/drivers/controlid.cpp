@@ -50,7 +50,7 @@ WRITE8_MEMBER( controlidx628_state::p0_w )
 WRITE8_MEMBER( controlidx628_state::p1_w )
 {
 	if ((BIT(p1_data, 6) == 0) && (BIT(data, 6) == 1)){
-		m_lcdc->write(space, BIT(data, 4), p0_data);
+		m_lcdc->write(space, BIT(data, 7), p0_data);
 	}
 	p1_data = data;
 }
@@ -82,8 +82,8 @@ static MACHINE_CONFIG_START( controlidx628 )
         MCFG_SCREEN_ADD("screen", LCD)
         MCFG_SCREEN_REFRESH_RATE(50)
         MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-        MCFG_SCREEN_SIZE(128, 64)
-        MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
+        MCFG_SCREEN_SIZE(132, 65)
+        MCFG_SCREEN_VISIBLE_AREA(4 + 0, 4 + 127, 0, 63)
 //        MCFG_DEFAULT_LAYOUT(layout_lcd)
         MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
         MCFG_SCREEN_PALETTE("palette")
