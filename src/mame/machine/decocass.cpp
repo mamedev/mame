@@ -1086,8 +1086,9 @@ WRITE8_MEMBER(decocass_widel_state::decocass_widel_w)
 		{
 			// BIOS follows writes to here by counting out a lot of dummy reads from the
 			// same location, probably to advance a 74HC4040 or similar counter.
-			// Counterintuitive though it may seem, the value written is probably just ignored.
-			m_widel_ctrs &= 0xff;
+			// Counterintuitive though it may seem, the value written is probably just ignored.
+			// Treasure Island depends on this clearing the lower bits as well.
+			m_widel_ctrs = 0;
 			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, m_widel_ctrs));
 			return;
 		}
@@ -1101,7 +1102,7 @@ WRITE8_MEMBER(decocass_widel_state::decocass_widel_w)
 	{
 		if (m_widel_latch)
 		{
-			m_widel_ctrs = (m_widel_ctrs & 0xfff00) | data; // clears upper bits
+			m_widel_ctrs = (m_widel_ctrs & 0xfff00) | data;
 			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, m_widel_ctrs));
 			return;
 		}
