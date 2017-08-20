@@ -1318,6 +1318,38 @@ ROM_START( cclimber )
 	ROM_LOAD( "cc12",         0x1000, 0x1000, CRC(5da13aaa) SHA1(b2d41e69435d09c456648a10e33f5e1fbb0bc64c) )
 ROM_END
 
+ROM_START( cclimbera )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "cc11",         0x0000, 0x1000, CRC(217ec4ff) SHA1(334604c3a051d57440a9d0bfc34b809418ef1d2d) )
+	ROM_LOAD( "10",           0x1000, 0x1000, CRC(983d0bab) SHA1(1d86befb3256ec49efad4c1bbe5a71e440f63642) )
+	ROM_LOAD( "cc9",          0x2000, 0x1000, CRC(6db0879c) SHA1(c0ba1976c1dcd6edadd78073173a26851ae8dd4f) )
+	ROM_LOAD( "cc8",          0x3000, 0x1000, CRC(f48c5fe3) SHA1(79072bbbf37387998ffd031afe8eb569a16fa9bd) )
+	ROM_LOAD( "7",            0x4000, 0x1000, CRC(c2e06606) SHA1(2a8c4b6691ef3661cd52b9a21adfb827dc842c74) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "cc6",          0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "cc5",          0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "cc4",          0x2000, 0x0800, CRC(332347cb) SHA1(4115ca32af73f1791635b7d9e093bf77088a8222) )
+	/* 0x2800-0x2fff - empty */
+	ROM_LOAD( "cc3",          0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
+	/* 0x3800-0x3fff - empty */
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "cc2",          0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
+	ROM_LOAD( "cc1",          0x0800, 0x0800, CRC(21c0f9fb) SHA1(44fad56d302a439257216ddac9fd62b3666589f1) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
+	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
+	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
+
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_LOAD( "cc13",         0x0000, 0x1000, CRC(e0042f75) SHA1(86cb31b110742a0f7ae33052c88f42d00deb5468) )
+	ROM_LOAD( "cc12",         0x1000, 0x1000, CRC(5da13aaa) SHA1(b2d41e69435d09c456648a10e33f5e1fbb0bc64c) )
+ROM_END
+
 ROM_START( cclimberj )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "cc11j.bin",    0x0000, 0x1000, CRC(89783959) SHA1(948fa88fcb9e3797b9c10934d36cf6a55cb590fe) )
@@ -2645,8 +2677,9 @@ DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
 }
 
 
-GAME( 1980, cclimber,    0,        cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimber,    0,        cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbera,   cclimber, cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj,cclimber_state, cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, ccboot,      cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
