@@ -94,7 +94,7 @@
 #include "screen.h"
 
 
-#define CRTC_REG_DISP 1
+//#define CRTC_REG_DISP 1
 //#define SPR_DEBUG 1
 #define LAYER_DISABLE 0  // for debugging, allow the Q and W keys to be used for disabling graphic layers
 #define LOG_VID 0
