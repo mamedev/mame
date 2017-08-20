@@ -64,8 +64,10 @@ WRITE8_MEMBER( controlidx628_state::p1_w )
 
 PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 {
-        palette.set_pen_color(0, rgb_t(0xCA, 0xE7, 0xEB));
-        palette.set_pen_color(1, rgb_t(0x78, 0xAB, 0xA8));
+	// These colors were selected from a photo of the display
+	// using the color-picker in Inkscape:
+        palette.set_pen_color(0, rgb_t(0x06, 0x61, 0xEE));
+        palette.set_pen_color(1, rgb_t(0x00, 0x23, 0x84));
 }
 
 /*************************
