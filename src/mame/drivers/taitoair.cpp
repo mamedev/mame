@@ -300,28 +300,24 @@ WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
                 INPUTS
 ***********************************************************/
 
-#define STICK1_PORT_TAG  "STICK1"
-#define STICK2_PORT_TAG  "STICK2"
-#define STICK3_PORT_TAG  "STICK3"
-
 READ16_MEMBER(taitoair_state::stick_input_r)
 {
 	switch( offset )
 	{
 		case 0x00:  /* "counter 1" lo */
-			return ioport(STICK1_PORT_TAG)->read();
+			return m_yoke->throttle_r(space,0) & 0xff; //ioport(STICK1_PORT_TAG)->read();
 
 		case 0x01:  /* "counter 2" lo */
-			return ioport(STICK2_PORT_TAG)->read();
+			return m_yoke->stickx_r(space,0) & 0xff;
 
 		case 0x02:  /* "counter 1" hi */
-			if(ioport(STICK1_PORT_TAG)->read() & 0x80)
+			if(m_yoke->throttle_r(space,0) & 0x80)
 				return 0xff;
 
 			return 0;
 
 		case 0x03:  /* "counter 2" hi */
-			return (ioport(STICK2_PORT_TAG)->read() & 0xff00) >> 8;
+			return (m_yoke->stickx_r(space,0) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -332,10 +328,10 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 	switch( offset )
 	{
 		case 0x00:  /* "counter 3" lo */
-			return ioport(STICK3_PORT_TAG)->read();
+			return m_yoke->sticky_r(space,0);
 
 		case 0x02:  /* "counter 3" hi */
-			return (ioport(STICK3_PORT_TAG)->read() & 0xff00) >> 8;
+			return (m_yoke->sticky_r(space,0) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -578,29 +574,20 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)    /* "door" (!) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Door Switch")   /* "door" (!) */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)    /* slot down */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)    /* slot up */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)    /* handle */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // DMA status flag
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
-
-	PORT_START(STICK1_PORT_TAG)
-	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ainferno )
@@ -641,6 +628,7 @@ static INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
 	PORT_START("IN1")
+	// TODO: understand these
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)    /* lever */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)    /* handle x */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)    /* handle y */
@@ -652,15 +640,6 @@ static INPUT_PORTS_START( ainferno )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
-
-	PORT_START(STICK1_PORT_TAG)
-	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -745,6 +724,8 @@ static MACHINE_CONFIG_START( airsys )
 	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoair_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
+	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
