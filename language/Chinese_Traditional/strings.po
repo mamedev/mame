@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-19 17:34+1000\n"
-"PO-Revision-Date: 2017-08-07 21:30+0800\n"
+"PO-Revision-Date: 2017-08-20 08:30+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -30,15 +30,15 @@ msgstr "重設"
 #: src/frontend/mame/ui/slotopt.cpp:220 src/frontend/mame/ui/filesel.cpp:257
 #: src/frontend/mame/ui/swlist.cpp:83
 msgid "[empty slot]"
-msgstr "[ 空插槽 ]"
+msgstr "[空插槽]"
 
 #: src/frontend/mame/ui/filesel.cpp:261
 msgid "[create]"
-msgstr "[ 建立 ]"
+msgstr "[建立]"
 
 #: src/frontend/mame/ui/filesel.cpp:265 src/frontend/mame/ui/swlist.cpp:94
 msgid "[software list]"
-msgstr "[ 軟體清單 ]"
+msgstr "[軟體清單]"
 
 #: src/frontend/mame/ui/filesel.cpp:525
 msgid "Select access mode"
@@ -62,15 +62,15 @@ msgstr "讀取此映像檔，寫入差異檔"
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
-msgstr ""
+msgstr "未篩選"
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
-msgstr ""
+msgstr "可用"
 
 #: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
 msgid "Unavailable"
-msgstr ""
+msgstr "不可用"
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
@@ -82,11 +82,11 @@ msgstr "不可執行"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
-msgstr ""
+msgstr "機械式"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Not Mechanical"
-msgstr ""
+msgstr "非機械式"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
@@ -94,7 +94,7 @@ msgstr "類別"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "最愛"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
@@ -102,15 +102,15 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "非 BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
-msgstr ""
+msgstr "母檔"
 
 #: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
 msgid "Clones"
-msgstr ""
+msgstr "仿製版"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
@@ -122,31 +122,31 @@ msgstr "年代"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "已支援即時存檔"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "未支援即時存檔"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "需要 CHD"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "不需要 CHD"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "垂直螢幕"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "水平螢幕"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
-msgstr ""
+msgstr "自訂篩選"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
@@ -154,19 +154,19 @@ msgstr "出版商"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "已支援"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
-msgstr ""
+msgstr "部分支援"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "不支援"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
-msgstr ""
+msgstr "釋出區域"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
@@ -187,7 +187,7 @@ msgstr "選擇自訂篩選："
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "篩選 %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
@@ -199,35 +199,35 @@ msgstr "新增篩選"
 
 #: src/frontend/mame/ui/utils.cpp:950
 msgid "Select category:"
-msgstr ""
+msgstr "選擇類別："
 
 #: src/frontend/mame/ui/utils.cpp:981
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[沒有類別 INI 檔案]"
 
 #: src/frontend/mame/ui/utils.cpp:989
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[INI 檔案中無群組]"
 
 #: src/frontend/mame/ui/utils.cpp:1023
 msgid "No category INI files found"
-msgstr ""
+msgstr "沒有找到類別 INI 檔案"
 
 #: src/frontend/mame/ui/utils.cpp:1028
 msgid "File"
-msgstr ""
+msgstr "檔案"
 
 #: src/frontend/mame/ui/utils.cpp:1032
 msgid "No groups found in category file"
-msgstr ""
+msgstr "類別檔案中沒有找到群組"
 
 #: src/frontend/mame/ui/utils.cpp:1037
 msgid "Group"
-msgstr ""
+msgstr "群組"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "Include clones"
-msgstr ""
+msgstr "包含仿製版"
 
 #: src/frontend/mame/ui/utils.cpp:1038 src/frontend/mame/ui/filecreate.cpp:82
 #: src/frontend/mame/ui/selgame.cpp:968 src/frontend/mame/ui/selgame.cpp:969
@@ -685,7 +685,7 @@ msgstr "從色盤選擇"
 
 #: src/frontend/mame/ui/custui.cpp:813
 msgid "Color preview ="
-msgstr "顏色預覽＝"
+msgstr "顏色預覽 ="
 
 #: src/frontend/mame/ui/custui.cpp:894
 msgid "White"
@@ -2468,26 +2468,3 @@ msgstr "儲存設定"
 msgid "Settings"
 msgstr "設定"
 
-#~ msgid "Extra INIs"
-#~ msgstr "額外的 INI"
-
-#~ msgid " ^!File"
-#~ msgstr " ^!檔案"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!類別"
-
-#~ msgid "Main filter"
-#~ msgstr "主要篩選"
-
-#~ msgid "Other filter"
-#~ msgstr "其他篩選"
-
-#~ msgid "^!Region"
-#~ msgstr "^!區域"
-
-#~ msgid "^!Setup custom filter"
-#~ msgstr "^!設定自訂篩選"
-
-#~ msgid "Region: %1$s -"
-#~ msgstr "區域： %1$s -"
