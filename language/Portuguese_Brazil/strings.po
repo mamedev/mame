@@ -123,11 +123,11 @@ msgstr "Ano"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr "Salvar Suportado"
+msgstr "Salvamento Suportado"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr "Salvar Não Suportado"
+msgstr "Salvamento Não Suportado"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
@@ -147,7 +147,7 @@ msgstr "Tela Horizontal"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
-msgstr "Filtro Customizável"
+msgstr "Filtro Customizado"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
@@ -204,7 +204,7 @@ msgstr "Selecione a categoria"
 
 #: src/frontend/mame/ui/utils.cpp:981
 msgid "[no category INI files]"
-msgstr "[arquivos INI sem categorias]"
+msgstr "[arquivos INI sem categoria]"
 
 #: src/frontend/mame/ui/utils.cpp:989
 msgid "[no groups in INI file]"
@@ -220,7 +220,7 @@ msgstr "Arquivo"
 
 #: src/frontend/mame/ui/utils.cpp:1032
 msgid "No groups found in category file"
-msgstr "Sem grupos encontrados no arquivo de categoria"
+msgstr "Nenhum grupo encontrado no arquivo de categoria"
 
 #: src/frontend/mame/ui/utils.cpp:1037
 msgid "Group"
@@ -228,7 +228,7 @@ msgstr "Grupo"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "Include clones"
-msgstr "Inclui clones"
+msgstr "Incluir clones"
 
 #: src/frontend/mame/ui/utils.cpp:1038 src/frontend/mame/ui/filecreate.cpp:82
 #: src/frontend/mame/ui/selgame.cpp:968 src/frontend/mame/ui/selgame.cpp:969
@@ -782,11 +782,11 @@ msgstr "Driver é Pai\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:887
 msgid "Analog Controls\tYes\n"
-msgstr "Controles Analógicos\tYes\n"
+msgstr "Controles Analógicos\tSim\n"
 
 #: src/frontend/mame/ui/selgame.cpp:889
 msgid "Keyboard Inputs\tYes\n"
-msgstr "Entradas do Teclado\tYes\n"
+msgstr "Entradas do Teclado\tSim\n"
 
 #: src/frontend/mame/ui/selgame.cpp:892
 msgid "Overall\tNOT WORKING\n"
@@ -906,11 +906,11 @@ msgstr "WAN\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:964
 msgid "Timing\tUnimplemented\n"
-msgstr "Temporizador\tNão Implementado\n"
+msgstr "Temporazação\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:966
 msgid "Timing\tImperfect\n"
-msgstr "Temporizador\tImperfeito\n"
+msgstr "Temporazação\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:968
 #, c-format
@@ -1274,7 +1274,7 @@ msgstr "Driver"
 
 #: src/frontend/mame/ui/miscmenu.cpp:769
 msgid "This machine has no BIOS."
-msgstr "Esta máquina não possue BIOS"
+msgstr "Esta máquina não possui BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:778 src/frontend/mame/ui/mainmenu.cpp:145
 msgid "Add To Favorites"
@@ -1370,7 +1370,7 @@ msgstr "WAN"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr "temporizador"
+msgstr "temporização"
 
 #: src/frontend/mame/ui/info.cpp:177
 msgid ""
@@ -1599,7 +1599,7 @@ msgstr "Controle da Fita"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr "Seleção da BIOS"
+msgstr "Seleção de BIOS"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1715,7 +1715,7 @@ msgstr "Gameinit"
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "High Scores"
-msgstr "High Scores"
+msgstr "Recordes"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "History"
@@ -1747,7 +1747,7 @@ msgstr "Seleção por parte de Programa"
 
 #: src/frontend/mame/ui/selmenu.cpp:358
 msgid "BIOS selection:"
-msgstr "Seleção da BIOS"
+msgstr "Seleção de BIOS:"
 
 #: src/frontend/mame/ui/selmenu.cpp:585 src/frontend/mame/ui/selmenu.cpp:621
 #: src/frontend/mame/ui/simpleselgame.cpp:311
@@ -1852,7 +1852,7 @@ msgstr "Uso"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
-msgstr "Informação Geral"
+msgstr "Informações Gerais"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
@@ -1888,7 +1888,7 @@ msgstr "Usar imagem como plano de fundo"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr "Pular o menu de seleção da BIOS"
+msgstr "Pular o menu de seleção de BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
