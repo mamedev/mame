@@ -2535,7 +2535,7 @@ MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
 	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segas32_cd_state, lamps2_w))
-	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff))
+	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff)) // Ports C-E used for IEEE-488 printer interface
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
