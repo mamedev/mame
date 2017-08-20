@@ -3537,6 +3537,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/swyft.cpp",
 	MAME_DIR .. "src/mame/drivers/symbolics.cpp",
 	MAME_DIR .. "src/mame/drivers/sys2900.cpp",
+	MAME_DIR .. "src/mame/drivers/sys9002.cpp",
 	MAME_DIR .. "src/mame/drivers/systec.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",

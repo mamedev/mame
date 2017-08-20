@@ -35336,6 +35336,9 @@ s3670                           //
 @source:sys2900.cpp
 sys2900                         //
 
+@source:sys9002.cpp
+sys9002                         //
+
 @source:systec.cpp
 systec                          //
 

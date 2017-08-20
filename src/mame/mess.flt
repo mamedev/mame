@@ -612,6 +612,7 @@ swyft.cpp
 sym1.cpp
 symbolics.cpp
 sys2900.cpp
+sys9002.cpp
 systec.cpp
 tamag1.cpp
 tandy1t.cpp
