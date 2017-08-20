@@ -163,6 +163,9 @@ const options_entry sdl_options::s_option_entries[] =
 sdl_options::sdl_options()
 : osd_options()
 {
+#if defined (SDLMAME_ANDROID)
+	chdir (SDL_AndroidGetExternalStoragePath());
+#endif
 	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
 	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
