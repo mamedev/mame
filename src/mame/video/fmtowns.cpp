@@ -94,7 +94,7 @@
 #include "screen.h"
 
 
-//#define CRTC_REG_DISP 1
+#define CRTC_REG_DISP 1
 //#define SPR_DEBUG 1
 #define LAYER_DISABLE 0  // for debugging, allow the Q and W keys to be used for disabling graphic layers
 #define LOG_VID 0
@@ -103,25 +103,19 @@
 
 void towns_state::towns_crtc_refresh_mode()
 {
-	unsigned int width,height;
-
-	rectangle scr(0, m_video.towns_crtc_reg[4], 0, m_video.towns_crtc_reg[8] / 2);
+	rectangle scr(0, m_video.towns_crtc_reg[4] - m_video.towns_crtc_reg[0], 0, m_video.towns_crtc_reg[8] / 2);
 
 	// layer 0
-	width = m_video.towns_crtc_reg[10] - m_video.towns_crtc_reg[9];
-	height = (m_video.towns_crtc_reg[14] - m_video.towns_crtc_reg[13]) / 2;
-	m_video.towns_crtc_layerscr[0].min_x = scr.xcenter() - (width / 2);
-	m_video.towns_crtc_layerscr[0].min_y = scr.ycenter() - (height / 2);
-	m_video.towns_crtc_layerscr[0].max_x = scr.xcenter() + (width / 2);
-	m_video.towns_crtc_layerscr[0].max_y = scr.ycenter() + (height / 2);
+	m_video.towns_crtc_layerscr[0].min_x = m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[0];
+	m_video.towns_crtc_layerscr[0].min_y = m_video.towns_crtc_reg[13] / 2;
+	m_video.towns_crtc_layerscr[0].max_x = m_video.towns_crtc_reg[10] - m_video.towns_crtc_reg[0];
+	m_video.towns_crtc_layerscr[0].max_y = m_video.towns_crtc_reg[14] / 2;
 
 	// layer 1
-	width = m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11];
-	height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / 2;
-	m_video.towns_crtc_layerscr[1].min_x = scr.xcenter() - (width / 2);
-	m_video.towns_crtc_layerscr[1].min_y = scr.ycenter() - (height / 2);
-	m_video.towns_crtc_layerscr[1].max_x = scr.xcenter() + (width / 2);
-	m_video.towns_crtc_layerscr[1].max_y = scr.ycenter() + (height / 2);
+	m_video.towns_crtc_layerscr[1].min_x = m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[0];
+	m_video.towns_crtc_layerscr[1].min_y = m_video.towns_crtc_reg[15] / 2;
+	m_video.towns_crtc_layerscr[1].max_x = m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[0];
+	m_video.towns_crtc_layerscr[1].max_y = m_video.towns_crtc_reg[16] / 2;
 
 	// sanity checks
 	if(scr.max_x == 0 || scr.max_y == 0)
