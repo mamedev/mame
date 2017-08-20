@@ -450,6 +450,8 @@ WRITE16_MEMBER(mlanding_state::output_w)
 	*/
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	m_mechacpu->set_input_line(INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	machine().bookkeeping().coin_counter_w(0, data & 4);
+	machine().bookkeeping().coin_counter_w(1, data & 8);
 }
 
 
