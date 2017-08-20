@@ -122,6 +122,16 @@ WRITE8_MEMBER(shangkid_state::nmiq_2_w)
 		m_bbx->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
+WRITE_LINE_MEMBER(shangkid_state::coin_counter_1_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(shangkid_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
 WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
 {
 	if (BIT(data, 0))
@@ -131,7 +141,6 @@ WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
 
 WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
 {
-	logerror("Writing %02X to port A\n");
 	if (BIT(data, 0))
 		/* 0->1 transition triggers interrupt on Sound CPU */
 		m_audiocpu->set_input_line(0, HOLD_LINE );
@@ -379,7 +388,8 @@ static MACHINE_CONFIG_START( chinhero )
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(shangkid_state, int_enable_2_w)) // INTE2
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(shangkid_state, nmi_enable_1_w)) // NMIE1
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(shangkid_state, nmi_enable_2_w)) // NMIE2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)        /* coin counter */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(shangkid_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(shangkid_state, coin_counter_2_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
