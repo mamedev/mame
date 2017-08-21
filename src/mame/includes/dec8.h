@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
 #include "video/decbac06.h"
@@ -23,6 +24,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
+		m_nmigate(*this, "nmigate"),
 		m_spriteram(*this, "spriteram") ,
 		m_msm(*this, "msm"),
 		m_tilegen(*this, "tilegen%u", 1),
@@ -42,6 +44,7 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
+	optional_device<input_merger_device> m_nmigate;
 	required_device<buffered_spriteram8_device> m_spriteram;
 	optional_device<msm5205_device> m_msm;
 	optional_device_array<deco_bac06_device, 2> m_tilegen;
@@ -74,9 +77,11 @@ public:
 	int      m_game_uses_priority;
 
 	/* misc */
+	bool     m_secclr;
+	bool     m_nmi_enable;
+	uint8_t  m_i8751_p2;
 	int      m_i8751_port0;
 	int      m_i8751_port1;
-	int      m_nmi_enable;
 	int      m_i8751_return;
 	int      m_i8751_value;
 	int      m_coinage_id;
@@ -107,6 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(ghostb_nmi_w);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
 	DECLARE_WRITE8_MEMBER(dec8_sound_w);
 	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);
@@ -164,7 +170,6 @@ public:
 	uint32_t screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dec8);
-	INTERRUPT_GEN_MEMBER(gondo_interrupt);
 	INTERRUPT_GEN_MEMBER(oscar_interrupt);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);

@@ -162,7 +162,7 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
 		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-		m_i8751_timer->adjust(m_mcu->clocks_to_attotime(64)); // 64 clocks not confirmed
+		m_i8751_timer->adjust(m_mcu->clocks_to_attotime(3)); // 3 clocks not confirmed
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;
@@ -363,9 +363,27 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 
 	m_mainbank->set_entry(data >> 4);
 
-	if ((data&1)==0) m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	m_nmi_enable = (data & 2) >> 1;
-	flip_screen_set(data & 0x08);
+	m_secclr = BIT(data, 0);
+	if (!m_secclr)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+
+	if (m_nmigate.found())
+		m_nmigate->in_w<0>(BIT(data, 1));
+	else
+	{
+		// Ghostbusters needs to acknowledge/disable NMIs in a different way
+		m_nmi_enable = BIT(data, 1);
+		if (!m_nmi_enable)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+
+	flip_screen_set(BIT(data, 3));
+}
+
+WRITE_LINE_MEMBER(dec8_state::ghostb_nmi_w)
+{
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(dec8_state::csilver_control_w)
@@ -854,8 +872,9 @@ WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 
 	// P2 - IRQ to main CPU
-	if ((data&4)==0)
+	if (BIT(data, 2) && !BIT(m_i8751_p2, 2) && m_secclr)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_i8751_p2 = data;
 }
 
 /*
@@ -1853,12 +1872,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(dec8_state::gondo_interrupt)
-{
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); /* VBL */
-}
-
 /* Coins generate NMI's */
 INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
 {
@@ -1877,9 +1890,11 @@ void dec8_state::machine_start()
 {
 	m_i8751_timer = timer_alloc(TIMER_DEC8_I8751);
 	m_m6502_timer = timer_alloc(TIMER_DEC8_M6502);
+	m_i8751_p2 = 0xff;
 
+	save_item(NAME(m_secclr));
+	save_item(NAME(m_i8751_p2));
 	save_item(NAME(m_latch));
-	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_i8751_port0));
 	save_item(NAME(m_i8751_port1));
 	save_item(NAME(m_i8751_return));
@@ -1905,7 +1920,7 @@ void dec8_state::machine_reset()
 {
 	int i;
 
-	m_nmi_enable = m_i8751_port0 = m_i8751_port1 = 0;
+	m_i8751_port0 = m_i8751_port1 = 0;
 	m_i8751_return = m_i8751_value = 0;
 	m_coinage_id = 0;
 	m_coin1 = m_coin2 = m_credits = m_snd = 0;
@@ -1919,6 +1934,10 @@ void dec8_state::machine_reset()
 		m_bg_control[i] = 0;
 		m_pf1_control[i] = 0;
 	}
+
+	// reset clears LS273 latch, which disables NMI
+	if (m_nmigate.found())
+		ghostb_bank_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -2039,7 +2058,6 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E,3000000) /* HD63C09EP */
 	MCFG_CPU_PROGRAM_MAP(gondo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  gondo_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
@@ -2068,7 +2086,11 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("nmigate", input_merger_device, in_w<1>))
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2097,7 +2119,6 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E,3000000) /* HD63C09EP */
 	MCFG_CPU_PROGRAM_MAP(garyoret_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  gondo_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
@@ -2126,7 +2147,11 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("nmigate", input_merger_device, in_w<1>))
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2155,7 +2180,6 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, 3000000)  /* HD63C09EP */
 	MCFG_CPU_PROGRAM_MAP(meikyuh_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  gondo_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
@@ -2188,6 +2212,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(dec8_state, ghostb_nmi_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)

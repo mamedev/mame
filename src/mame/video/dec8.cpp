@@ -280,6 +280,9 @@ VIDEO_START_MEMBER(dec8_state,ghostb)
 
 	m_game_uses_priority = 0;
 	m_tilegen[0]->set_colmask(0xf);
+
+	m_nmi_enable = false;
+	save_item(NAME(m_nmi_enable));
 }
 
 /******************************************************************************/
