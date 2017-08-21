@@ -74,7 +74,7 @@ public:
 		m_outlatch(*this, "outlatch"),
 		m_paletteram16(*this, "paletteram"),
 		m_paletteram32(*this, "paletteram"),
-		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
+		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5" })
 		{ }
 
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
@@ -92,12 +92,15 @@ public:
 	required_device<ls259_device> m_outlatch;
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
-	optional_ioport_array<4> m_analog;
+	optional_ioport_array<6> m_analog;
 
 	uint16_t m_sound_data;
 	uint8_t m_sound_status;
 	offs_t m_tms_offset_xor;
 	uint8_t m_analog_ports[4];
+	uint32_t m_fp_analog_ports[2];
+	uint8_t m_fp_clock;
+	uint8_t m_fp_state;
 	uint8_t m_framenum;
 	timer_device *m_adsp_autobuffer_timer;
 	uint8_t m_adsp_ireg;
@@ -152,4 +155,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
 	DECLARE_WRITE32_MEMBER(adsp_tx_callback);
+	DECLARE_WRITE_LINE_MEMBER(fp_analog_clock_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(fp_analog_bit_r);
 };

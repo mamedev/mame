@@ -184,6 +184,9 @@ void gaelco3d_state::machine_start()
 	save_item(NAME(m_adsp_ireg_base));
 	save_item(NAME(m_adsp_incs));
 	save_item(NAME(m_adsp_size));
+	save_item(NAME(m_fp_clock));
+	save_item(NAME(m_fp_state));
+	save_item(NAME(m_fp_analog_ports));
 }
 
 
@@ -231,6 +234,8 @@ MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
 {
 	MACHINE_RESET_CALL_MEMBER( common );
 	m_tms_offset_xor = BYTE_XOR_BE(0);
+	m_fp_clock = 27;
+	m_fp_state = 0;
 }
 
 
@@ -372,6 +377,38 @@ WRITE_LINE_MEMBER(gaelco3d_state::analog_port_latch_w)
 	}
 }
 
+CUSTOM_INPUT_MEMBER(gaelco3d_state::fp_analog_bit_r)
+{
+	int which = (uintptr_t)param;
+	return (m_fp_analog_ports[which] >> m_fp_clock) & 1;
+}
+
+WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
+{
+	if (state != m_fp_state)
+	{
+		m_fp_state = state;
+		m_fp_clock++;
+		if (m_fp_clock == 28)
+		{
+			m_fp_clock = 0;
+
+			for (auto i = 0; i < 6; i++)
+			{
+				u8 shift = (i % 3) * 8 + 2;
+				u8 newval = m_analog[i].read_safe(0);
+				u8 oldval = m_fp_analog_ports[i / 3] >> shift;
+				m_fp_analog_ports[i / 3] &= ~(0xff << shift);
+				m_fp_analog_ports[i / 3] |= newval << shift;
+
+				if (newval > oldval)
+					m_fp_analog_ports[i / 3] &= ~2;
+				else if (newval < oldval)
+					m_fp_analog_ports[i / 3] |= 2;
+			}
+		}
+	}
+}
 
 
 /*************************************
@@ -865,7 +902,7 @@ static INPUT_PORTS_START( footbpow )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "P1 Dribbling" )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "P1 Defense" )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -877,7 +914,7 @@ static INPUT_PORTS_START( footbpow )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME( "P2 Dribbling" )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME( "P2 Defense" )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -888,17 +925,22 @@ static INPUT_PORTS_START( footbpow )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x08000000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,fp_analog_bit_r, (void *)1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,fp_analog_bit_r, (void *)0)
+	PORT_BIT( 0xc0000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ANALOG0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100)
+
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100)
+
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100)
 INPUT_PORTS_END
 
 
@@ -995,6 +1037,10 @@ static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( footbpow, gaelco3d2 )
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, fp_analog_clock_w))
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -1247,13 +1293,13 @@ DRIVER_INIT_MEMBER(gaelco3d_state,gaelco3d)
  *
  *************************************/
 
-GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, gaelco3d, ROT0, "Gaelco", "Speed Up (Version 1.20)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, gaelco3d, ROT0, "Gaelco", "Speed Up (Version 1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Speed Up (Version 1.20)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Speed Up (Version 1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, gaelco3d, ROT0, "Gaelco", "Surf Planet (Version 4.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, gaelco3d, ROT0, "Gaelco", "Surf Planet (Version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 2000, footbpow,   0,        gaelco3d2, footbpow, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Football Power",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Football Power", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
