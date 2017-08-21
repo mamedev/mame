@@ -1,5 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holder:FelipeSanches
+//
+// Control ID x628
+//
+// This is a fingerprint reader device
+//
+// TODO: Emulate the other CPU board (supposedly runs the Linux kernel on
+//       a dedicated SoC targeting image-processing typically used on
+//       fingerprint readers). The SoC is labelled ZKSoftware ZK6001
+//       and someone online suggested it may be a rebranded device from
+//       Ingenic, so likely a MIPS32 or MIPS64.
+//
+//       It has a 32Mb flash-rom and an ethernet controller
+//       (model is Realtek RTL8201BL)
+//
+//       While the 8051 board has a tiny buzzer (and a battery-backed RAM)
+//       the other PCB interfaces with an audio speaker.
+//
+//       There's also an RJ45 connector (ethernet port) as well as a
+//       DB9 connector which seems to be used for a serial interface.
+//
+//       Finally, there are 2 LEDs, a 128x64 LCD with blueish backlight
+//       and a keypad with the following layout:
+//
+//       1  2  3   ESC
+//       4  5  6   MENU
+//       7  8  9   UP-ARROW
+//       .  0  OK  DOWN-ARROW
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
@@ -85,7 +112,7 @@ static MACHINE_CONFIG_START( controlidx628 )
         MCFG_SCREEN_REFRESH_RATE(50)
         MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
         MCFG_SCREEN_SIZE(132, 65)
-        MCFG_SCREEN_VISIBLE_AREA(4 + 0, 4 + 127, 0, 63)
+        MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
 //        MCFG_DEFAULT_LAYOUT(layout_lcd)
         MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
         MCFG_SCREEN_PALETTE("palette")
