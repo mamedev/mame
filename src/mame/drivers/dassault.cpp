@@ -211,6 +211,7 @@ Dip locations verified with US conversion kit manual.
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
+#include "machine/mb8421.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "screen.h"
@@ -254,38 +255,6 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 	return ioport("VBLANK1")->read();
 }
 
-/* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
-READ16_MEMBER(dassault_state::dassault_irq_r)
-{
-	switch (offset)
-	{
-	case 0: m_maincpu->set_input_line(5, CLEAR_LINE); break;
-	case 1: m_subcpu->set_input_line(6, CLEAR_LINE); break;
-	}
-	return m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
-}
-
-WRITE16_MEMBER(dassault_state::dassault_irq_w)
-{
-	switch (offset)
-	{
-	case 0: m_maincpu->set_input_line(5, ASSERT_LINE); break;
-	case 1: m_subcpu->set_input_line(6, ASSERT_LINE); break;
-	}
-
-	COMBINE_DATA(&m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
-}
-
-WRITE16_MEMBER(dassault_state::shared_ram_w)
-{
-	COMBINE_DATA(&m_shared_ram[offset]);
-}
-
-READ16_MEMBER(dassault_state::shared_ram_r)
-{
-	return m_shared_ram[offset];
-}
-
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
@@ -313,8 +282,7 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram") /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
-	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_SHARE("shared_ram") /* Shared ram */
+	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, left_r, left_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
@@ -326,8 +294,7 @@ static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram2") /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
-	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, right_r, right_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -547,6 +514,10 @@ static MACHINE_CONFIG_START( dassault )
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
+
+	MCFG_DEVICE_ADD("sharedram", MB8421_MB8431_16BIT, 0)
+	MCFG_MB8421_INTL_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	MCFG_MB8421_INTR_HANDLER(INPUTLINE("sub", M68K_IRQ_6))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
