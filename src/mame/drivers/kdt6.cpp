@@ -23,6 +23,7 @@
 #include "video/mc6845.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/psi_kbd/psi_kbd.h"
 #include "screen.h"
 #include "speaker.h"
@@ -51,6 +52,7 @@ public:
 	m_floppy1(*this, "fdc:1"),
 	m_beeper(*this, "beeper"),
 	m_beep_timer(*this, "beep_timer"),
+	m_centronics(*this, "centronics"),
 	m_sasi_dma(false),
 	m_dma_map(0),
 	m_status0(0), m_status1(0), m_status2(0),
@@ -89,6 +91,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_WRITE8_MEMBER(pio_porta_w);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -107,6 +111,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
+	required_device<centronics_device> m_centronics;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<uint16_t[]> m_vram; // 10-bit
@@ -293,6 +298,17 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 TIMER_DEVICE_CALLBACK_MEMBER( kdt6_state::beeper_off )
 {
 	m_beeper->set_state(0);
+}
+
+
+//**************************************************************************
+//  EXTERNAL I/O
+//**************************************************************************
+
+WRITE8_MEMBER( kdt6_state::pio_porta_w )
+{
+	m_centronics->write_strobe(BIT(data, 0));
+	m_centronics->write_init(BIT(data, 1));
 }
 
 
@@ -586,6 +602,19 @@ static MACHINE_CONFIG_START( psi98 )
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kdt6_state, pio_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa2_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("pio", z80pio_device, pa3_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("pio", z80pio_device, pa4_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa5_w))
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_UPD1990A_ADD("rtc", XTAL_32_768kHz, NOOP, NOOP)
 
