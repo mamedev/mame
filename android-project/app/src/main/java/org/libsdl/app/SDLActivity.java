@@ -31,6 +31,7 @@ import android.hardware.*;
 import android.content.pm.ActivityInfo;
 import java.io.*;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 
 /**
     SDL Activity
@@ -117,28 +118,6 @@ public class SDLActivity extends Activity {
         mHasFocus = true;
     }
 	
-/*	
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-	 
-		if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) // 세로 전환시
-		{ 
-			setContentView(R.id.port_activity);
-			mWidth = findViewById(R.id.scrollview).getWidth();
-			mheight = findViewById(R.id.scrollview).getHeigth();
-			onNativeResize(mWidth, mHeight, mSdlFormat, mDisplay.getRefreshRate());
-		} 
-		else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)// 가로 전환시
-		{ 
-			setContentView(R.id.land_activity);
-			mWidth = findViewById(R.id.scrollview).getWidth();
-			mheight = findViewById(R.id.scrollview).getHeigth();
-			onNativeResize(mWidth, mHeight, mSdlFormat, mDisplay.getRefreshRate());
-		}
-	}
-*/
-
     // Setup
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1135,6 +1114,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     public Surface getNativeSurface() {
+		Log.v("SDL", "getNativeSurface()");
         return getHolder().getSurface();
     }
 
@@ -1154,7 +1134,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         SDLActivity.mIsSurfaceReady = false;
         SDLActivity.onNativeSurfaceDestroyed();
     }
-
+	
     // Called when the surface is resized
     @Override
     public void surfaceChanged(SurfaceHolder holder,
@@ -1248,7 +1228,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
         // Set mIsSurfaceReady to 'true' *before* making a call to handleResume
         SDLActivity.mIsSurfaceReady = true;
-        //SDLActivity.onNativeSurfaceChanged();
+        SDLActivity.onNativeSurfaceChanged();
 
 
         if (SDLActivity.mSDLThread == null) {
@@ -1510,8 +1490,7 @@ class DummyEdit extends View implements View.OnKeyListener {
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
             SDLActivity.onNativeKeyUp(keyCode);
             return true;
-        }
-
+		}
         return false;
     }
 
