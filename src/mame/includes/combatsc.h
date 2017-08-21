@@ -22,7 +22,7 @@ public:
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
 		m_upd7759(*this, "upd"),
-		m_msm5205(*this, "msm5205"),
+		m_msm(*this, "msm%u", 1),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -64,7 +64,7 @@ public:
 	optional_device<k007121_device> m_k007121_1;
 	optional_device<k007121_device> m_k007121_2;
 	optional_device<upd7759_device> m_upd7759;
-	optional_device<msm5205_device> m_msm5205;
+	optional_device_array<msm5205_device, 2> m_msm;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -73,7 +73,6 @@ public:
 	optional_ioport_array<4> m_track_ports;
 
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
-	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(combatscb_io_r);
 	DECLARE_WRITE8_MEMBER(combatscb_priority_w);
 	DECLARE_WRITE8_MEMBER(combatsc_bankselect_w);
@@ -95,7 +94,9 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_play_w);
 	DECLARE_WRITE8_MEMBER(combatsc_voice_reset_w);
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
-	DECLARE_WRITE8_MEMBER(combatscb_dac_w);
+	DECLARE_WRITE8_MEMBER(combatscb_msm1_w);
+	DECLARE_WRITE8_MEMBER(combatscb_msm2_w);
+	IRQ_CALLBACK_MEMBER(combatscb_sound_irq_ack);
 	DECLARE_DRIVER_INIT(combatsc);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
