@@ -254,12 +254,6 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 	return ioport("VBLANK1")->read();
 }
 
-WRITE16_MEMBER(dassault_state::dassault_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(0, HOLD_LINE); /* IRQ1 */
-}
-
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
 READ16_MEMBER(dassault_state::dassault_irq_r)
 {
@@ -300,7 +294,7 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
-	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
+	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
 	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
@@ -617,6 +611,7 @@ static MACHINE_CONFIG_START( dassault )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // IRQ1
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)

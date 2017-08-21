@@ -64,7 +64,6 @@ public:
 	DECLARE_READ16_MEMBER(dassault_control_r);
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
 	DECLARE_READ16_MEMBER(dassault_sub_control_r);
-	DECLARE_WRITE16_MEMBER(dassault_sound_w);
 	DECLARE_READ16_MEMBER(dassault_irq_r);
 	DECLARE_WRITE16_MEMBER(dassault_irq_w);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
