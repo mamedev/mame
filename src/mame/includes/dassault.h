@@ -59,6 +59,8 @@ public:
 	required_shared_ptr<uint16_t> m_ram;
 	required_shared_ptr<uint16_t> m_ram2;
 
+	DECLARE_WRITE16_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(sub_irq_ack_w);
 	DECLARE_READ16_MEMBER(dassault_control_r);
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
 	DECLARE_READ16_MEMBER(dassault_sub_control_r);

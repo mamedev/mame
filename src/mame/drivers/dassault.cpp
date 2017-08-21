@@ -220,6 +220,16 @@ Dip locations verified with US conversion kit manual.
 
 /**********************************************************************************/
 
+WRITE16_MEMBER(dassault_state::main_irq_ack_w)
+{
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+}
+
+WRITE16_MEMBER(dassault_state::sub_irq_ack_w)
+{
+	m_subcpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+}
+
 READ16_MEMBER(dassault_state::dassault_control_r)
 {
 	switch (offset << 1)
@@ -262,7 +272,9 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
+	AM_RANGE(0x140004, 0x140005) AM_WRITE(main_irq_ack_w)
+	AM_RANGE(0x140006, 0x140007) AM_WRITENOP /* ? */
+
 	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
@@ -289,7 +301,8 @@ static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
+	AM_RANGE(0x100002, 0x100003) AM_WRITE(sub_irq_ack_w)
+	AM_RANGE(0x100004, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram2") /* Sub cpu ram */
@@ -503,11 +516,11 @@ static MACHINE_CONFIG_START( dassault )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/8)    /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
