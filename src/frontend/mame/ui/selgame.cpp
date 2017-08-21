@@ -30,6 +30,9 @@
 #include "uiinput.h"
 #include "luaengine.h"
 
+#include <cstring>
+#include <iterator>
+
 
 extern const char UI_VERSION_TAG[];
 
@@ -326,12 +329,12 @@ void menu_select_game::handle()
 					break;
 
 				case IPT_UI_AUDIT_FAST:
-					if (!m_unavailsortedlist.empty())
-						menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, m_unavailsortedlist, 1);
+					if (std::find_if(m_availsortedlist.begin(), m_availsortedlist.end(), [] (ui_system_info const &info) { return !info.available; }) != m_availsortedlist.end())
+						menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, menu_audit::mode::FAST);
 					break;
 
 				case IPT_UI_AUDIT_ALL:
-					menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, m_unavailsortedlist, 2);
+					menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, menu_audit::mode::ALL);
 					break;
 				}
 			}
@@ -367,44 +370,25 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 			m_displaylist.clear();
 
 			// if filter is set on category, build category list
-			switch (main_filters::actual)
-			{
-			case machine_filter::ALL:
-				m_displaylist = m_sortedlist;
-				break;
-			case machine_filter::AVAILABLE:
-				m_displaylist = m_availsortedlist;
-				break;
-			case machine_filter::UNAVAILABLE:
-				m_displaylist = m_unavailsortedlist;
-				break;
-			default:
-				{
-					auto const it(main_filters::filters.find(main_filters::actual));
-					std::copy_if(
-							m_sortedlist.begin(),
-							m_sortedlist.end(),
-							std::back_inserter(m_displaylist),
-							[&flt = *it->second] (game_driver const *drv) { return flt.apply(*drv); });
-				}
-			}
+			auto const it(main_filters::filters.find(main_filters::actual));
+			it->second->apply(m_availsortedlist.begin(), m_availsortedlist.end(), std::back_inserter(m_displaylist));
 
 			// iterate over entries
 			int curitem = 0;
-			for (auto & elem : m_displaylist)
+			for (ui_system_info const &elem : m_displaylist)
 			{
-				if (old_item_selected == -1 && elem->name == reselect_last::driver())
+				if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
 					old_item_selected = curitem;
 
-				bool cloneof = strcmp(elem->parent, "0");
+				bool cloneof = strcmp(elem.driver->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(elem->parent);
+					int cx = driver_list::find(elem.driver->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
-				item_append(elem->type.fullname(), "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem);
+				item_append(elem.driver->type.fullname(), "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem.driver);
 				curitem++;
 			}
 		}
@@ -490,19 +474,16 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 
 void menu_select_game::build_available_list()
 {
-	int m_total = driver_list::total();
-	std::vector<bool> m_included(m_total, false);
+	std::size_t const total = driver_list::total();
+	std::vector<bool> included(total, false);
 
-	// open a path to the ROMs and find them in the array
+	// iterate over ROM directories and look for potential ROMs
 	file_enumerator path(machine().options().media_path());
-	const osd::directory::entry *dir;
-
-	// iterate while we get new objects
-	while ((dir = path.next()) != nullptr)
+	for (osd::directory::entry const *dir = path.next(); dir; dir = path.next())
 	{
 		char drivername[50];
 		char *dst = drivername;
-		const char *src;
+		char const *src;
 
 		// build a name for it
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; ++src)
@@ -510,67 +491,63 @@ void menu_select_game::build_available_list()
 
 		*dst = 0;
 		int drivnum = driver_list::find(drivername);
-		if (drivnum != -1 && !m_included[drivnum])
-		{
-			m_availsortedlist.push_back(&driver_list::driver(drivnum));
-			m_included[drivnum] = true;
-		}
+		if (drivnum != -1 && !included[drivnum])
+			included[drivnum] = true;
 	}
 
 	// now check and include NONE_NEEDED
 	if (!ui().options().hide_romless())
 	{
-		for (int x = 0; x < m_total; ++x)
+		// FIXME: can't use the convenience macros tiny ROM entries
+		auto const is_required_rom =
+				[] (tiny_rom_entry const &rom)
+				{
+					return ((rom.flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_ROM) && ((rom.flags & ROM_OPTIONALMASK) != ROM_OPTIONAL) && !std::strchr(rom.hashdata, '!');
+				};
+		for (std::size_t x = 0; total > x; ++x)
 		{
-			auto driver = &driver_list::driver(x);
-			if (!m_included[x] && driver != &GAME_NAME(___empty))
+			game_driver const &driver(driver_list::driver(x));
+			if (!included[x] && (&GAME_NAME(___empty) != &driver))
 			{
-				auto entries = rom_build_entries(driver->rom);
-				const rom_entry *rom = entries.data();
-				bool noroms = true;
-
-				// check NO-DUMP
-				for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
-					if (ROMENTRY_ISFILE(rom))
+				bool noroms(true);
+				tiny_rom_entry const *rom;
+				for (rom = driver.rom; (rom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END; ++rom)
+				{
+					// check optional and NO_DUMP
+					if (is_required_rom(*rom))
 					{
-						util::hash_collection hashes(ROM_GETHASHDATA(rom));
-						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
-							noroms = false;
+						noroms = false;
+						break; // break before incrementing, or it will subtly break the check for all ROMs belonging to parent
 					}
+				}
 
 				if (!noroms)
 				{
 					// check if clone == parent
-					auto cx = driver_list::clone(*driver);
-					if (cx != -1 && m_included[cx])
+					auto const cx(driver_list::clone(driver));
+					if ((0 <= cx) && included[cx])
 					{
-						auto drv = &driver_list::driver(cx);
-						if (driver->rom == drv->rom)
-							noroms = true;
-
-						// check if clone < parent
-						if (!noroms)
+						game_driver const &parent(driver_list::driver(cx));
+						if (driver.rom == parent.rom)
 						{
 							noroms = true;
-							for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
+						}
+						else
+						{
+							// check if clone < parent
+							noroms = true;
+							for ( ; noroms && rom && ((rom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END); ++rom)
 							{
-								if (ROMENTRY_ISFILE(rom))
+								if (is_required_rom(*rom))
 								{
-									util::hash_collection hashes(ROM_GETHASHDATA(rom));
-									if (hashes.flag(util::hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
-										continue;
+									util::hash_collection const hashes(rom->hashdata);
 
-									uint64_t lenght = ROM_GETLENGTH(rom);
-									auto found = false;
-									auto parent_entries = rom_build_entries(drv->rom);
-									for (auto parentrom = parent_entries.data(); !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
+									bool found(false);
+									for (tiny_rom_entry const *parentrom = parent.rom; !found && ((parentrom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END); ++parentrom)
 									{
-										if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
+										if (is_required_rom(*parentrom) && (rom->length == parentrom->length))
 										{
-											util::hash_collection parenthashes(ROM_GETHASHDATA(parentrom));
-											if (parenthashes.flag(util::hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(parentrom))
-												continue;
-
+											util::hash_collection const parenthashes(parentrom->hashdata);
 											if (hashes == parenthashes)
 												found = true;
 										}
@@ -583,23 +560,23 @@ void menu_select_game::build_available_list()
 				}
 
 				if (noroms)
-				{
-					m_availsortedlist.push_back(&driver_list::driver(x));
-					m_included[x] = true;
-				}
+					included[x] = true;
 			}
 		}
 	}
-	// sort
-	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sorted_game_list);
-
-	// now build the unavailable list
-	for (int x = 0; x < m_total; ++x)
-		if (!m_included[x] && &driver_list::driver(x) != &GAME_NAME(___empty))
-			m_unavailsortedlist.push_back(&driver_list::driver(x));
 
 	// sort
-	std::stable_sort(m_unavailsortedlist.begin(), m_unavailsortedlist.end(), sorted_game_list);
+	m_availsortedlist.reserve(total);
+	for (std::size_t x = 0; total > x; ++x)
+	{
+		game_driver const &driver(driver_list::driver(x));
+		if (&driver != &GAME_NAME(___empty))
+			m_availsortedlist.emplace_back(driver, included[x]);
+	}
+	std::stable_sort(
+			m_availsortedlist.begin(),
+			m_availsortedlist.end(),
+			[] (ui_system_info const &a, ui_system_info const &b) { return sorted_game_list(a.driver, b.driver); });
 }
 
 
@@ -823,8 +800,8 @@ void menu_select_game::populate_search()
 	for (; index < m_displaylist.size(); ++index)
 	{
 		// pick the best match between driver name and description
-		int curpenalty = fuzzy_substring(m_search, m_displaylist[index]->type.fullname());
-		int tmp = fuzzy_substring(m_search, m_displaylist[index]->name);
+		int curpenalty = fuzzy_substring(m_search, m_displaylist[index].driver->type.fullname());
+		int tmp = fuzzy_substring(m_search, m_displaylist[index].driver->name);
 		curpenalty = std::min(curpenalty, tmp);
 
 		// insert into the sorted table of matches
@@ -841,7 +818,7 @@ void menu_select_game::populate_search()
 				m_searchlist[matchnum + 1] = m_searchlist[matchnum];
 			}
 
-			m_searchlist[matchnum] = m_displaylist[index];
+			m_searchlist[matchnum] = m_displaylist[index].driver;
 			penalty[matchnum] = curpenalty;
 		}
 	}
@@ -1033,7 +1010,9 @@ void menu_select_game::inkey_export()
 		}
 		else
 		{
-			list = m_displaylist;
+			list.reserve(m_displaylist.size());
+			for (ui_system_info const &info : m_displaylist)
+				list.emplace_back(info.driver);
 		}
 	}
 
@@ -1086,8 +1065,8 @@ bool menu_select_game::load_available_machines()
 	if (file.open(emulator_info::get_configname(), "_avail.ini") != osd_file::error::NONE)
 		return false;
 
-	std::string readbuf;
 	char rbuf[MAX_CHAR_INFO];
+	std::string readbuf;
 	file.gets(rbuf, MAX_CHAR_INFO);
 	file.gets(rbuf, MAX_CHAR_INFO);
 	readbuf = chartrimcarriage(rbuf);
@@ -1100,28 +1079,40 @@ bool menu_select_game::load_available_machines()
 		return false;
 	}
 
-	file.gets(rbuf, MAX_CHAR_INFO);
-	file.gets(rbuf, MAX_CHAR_INFO);
-	file.gets(rbuf, MAX_CHAR_INFO);
-	auto avsize = atoi(rbuf);
-	file.gets(rbuf, MAX_CHAR_INFO);
-	auto unavsize = atoi(rbuf);
-
 	// load available list
-	for (int x = 0; x < avsize; ++x)
+	std::unordered_set<std::string> available;
+	while (file.gets(rbuf, MAX_CHAR_INFO))
 	{
-		file.gets(rbuf, MAX_CHAR_INFO);
-		int find = atoi(rbuf);
-		m_availsortedlist.push_back(&driver_list::driver(find));
+		readbuf = rbuf;
+		strtrimspace(readbuf);
+
+		if (readbuf.empty() || ('#' == readbuf[0])) // ignore empty lines and line comments
+			;
+		else if ('[' == readbuf[0]) // throw out the rest of the file if we find a section heading
+			break;
+		else
+			available.emplace(std::move(readbuf));
 	}
 
-	// load unavailable list
-	for (int x = 0; x < unavsize; ++x)
+	// turn it into the sorted system list we all love
+	m_availsortedlist.reserve(driver_list::total());
+	for (std::size_t x = 0; driver_list::total() > x; ++x)
 	{
-		file.gets(rbuf, MAX_CHAR_INFO);
-		int find = atoi(rbuf);
-		m_unavailsortedlist.push_back(&driver_list::driver(find));
+		game_driver const &driver(driver_list::driver(x));
+		if (&driver != &GAME_NAME(___empty))
+		{
+			std::unordered_set<std::string>::iterator const it(available.find(&driver.name[0]));
+			bool const found(available.end() != it);
+			m_availsortedlist.emplace_back(driver, found);
+			if (found)
+				available.erase(it);
+		}
 	}
+	std::stable_sort(
+			m_availsortedlist.begin(),
+			m_availsortedlist.end(),
+			[] (ui_system_info const &a, ui_system_info const &b) { return sorted_game_list(a.driver, b.driver); });
+
 	file.close();
 	return true;
 }

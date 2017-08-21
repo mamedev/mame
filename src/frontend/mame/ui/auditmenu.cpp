@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /*********************************************************************
 
     ui/auditmenu.cpp
@@ -9,39 +9,31 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
-#include "audit.h"
 #include "ui/auditmenu.h"
+
+#include "ui/ui.h"
+
+#include "audit.h"
 #include "drivenum.h"
+
+#include <numeric>
+
 
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
-//-------------------------------------------------
-//  sort
-//-------------------------------------------------
 
-inline int cs_stricmp(const char *s1, const char *s2)
-{
-	for (;;)
-	{
-		int c1 = tolower(*s1++);
-		int c2 = tolower(*s2++);
-		if (c1 == 0 || c1 != c2)
-			return c1 - c2;
-	}
-}
+namespace {
+
+void *const ITEMREF_START = reinterpret_cast<void *>(std::uintptr_t(1));
+
+} // anonymous namespace
+
 
 bool sorted_game_list(const game_driver *x, const game_driver *y)
 {
-	bool clonex = (x->parent[0] != '0');
-	bool cloney = (y->parent[0] != '0');
-
-	if (!clonex && !cloney)
-		return (cs_stricmp(x->type.fullname(), y->type.fullname()) < 0);
-
-	int cx = -1, cy = -1;
+	bool clonex = (x->parent[0] != '0') || x->parent[1];
+	int cx = -1;
 	if (clonex)
 	{
 		cx = driver_list::find(x->parent);
@@ -49,6 +41,8 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 			clonex = false;
 	}
 
+	bool cloney = (y->parent[0] != '0') || y->parent[1];
+	int cy = -1;
 	if (cloney)
 	{
 		cy = driver_list::find(y->parent);
@@ -57,123 +51,181 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 	}
 
 	if (!clonex && !cloney)
-		return (cs_stricmp(x->type.fullname(), y->type.fullname()) < 0);
+	{
+		return (core_stricmp(x->type.fullname(), y->type.fullname()) < 0);
+	}
 	else if (clonex && cloney)
 	{
-		if (!cs_stricmp(x->parent, y->parent))
-			return (cs_stricmp(x->type.fullname(), y->type.fullname()) < 0);
+		if (!core_stricmp(x->parent, y->parent))
+			return (core_stricmp(x->type.fullname(), y->type.fullname()) < 0);
 		else
-			return (cs_stricmp(driver_list::driver(cx).type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
+			return (core_stricmp(driver_list::driver(cx).type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
 	}
 	else if (!clonex && cloney)
 	{
-		if (!cs_stricmp(x->name, y->parent))
+		if (!core_stricmp(x->name, y->parent))
 			return true;
 		else
-			return (cs_stricmp(x->type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
+			return (core_stricmp(x->type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
 	}
 	else
 	{
-		if (!cs_stricmp(x->parent, y->name))
+		if (!core_stricmp(x->parent, y->name))
 			return false;
 		else
-			return (cs_stricmp(driver_list::driver(cx).type.fullname(), y->type.fullname()) < 0);
+			return (core_stricmp(driver_list::driver(cx).type.fullname(), y->type.fullname()) < 0);
 	}
 }
 
-//-------------------------------------------------
-//  ctor / dtor
-//-------------------------------------------------
 
-menu_audit::menu_audit(mame_ui_manager &mui, render_container &container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
+menu_audit::menu_audit(mame_ui_manager &mui, render_container &container, std::vector<ui_system_info> &availablesorted, mode audit_mode)
 	: menu(mui, container)
+	, m_worker_thread()
+	, m_audit_mode(audit_mode)
+	, m_total((mode::FAST == audit_mode)
+			? std::accumulate(availablesorted.begin(), availablesorted.end(), std::size_t(0), [] (std::size_t n, ui_system_info const &info) { return n + (info.available ? 0 : 1);  })
+			: availablesorted.size())
 	, m_availablesorted(availablesorted)
-	, m_unavailablesorted(unavailablesorted)
-	, m_audit_mode(_audit_mode)
-	, m_first(true)
+	, m_audited(0)
+	, m_current(nullptr)
+	, m_phase(phase::CONSENT)
 {
-	if (m_audit_mode == 2)
+	switch (m_audit_mode)
 	{
-		m_availablesorted.clear();
-		m_unavailablesorted.clear();
+	case mode::FAST:
+		m_prompt[0] = util::string_format(_("Audit ROMs for %1$u machines marked unavailable?"), m_total);
+		break;
+	case mode::ALL:
+		m_prompt[0] = util::string_format(_("Audit ROMs for all %1$u machines?"), m_total);
+		break;
 	}
+	std::string filename(emulator_info::get_configname());
+	filename += "_avail.ini";
+	m_prompt[1] = util::string_format(_("(results will be saved to %1$s)"), filename);
 }
 
 menu_audit::~menu_audit()
 {
 }
 
-//-------------------------------------------------
-//  handle
-//-------------------------------------------------
-
-void menu_audit::handle()
+void menu_audit::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
-	process(PROCESS_CUSTOM_ONLY);
-
-	if (m_first)
+	switch (m_phase)
 	{
-		ui().draw_text_box(container(), _("Audit in progress..."), ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
-		m_first = false;
-		return;
-	}
+	case phase::CONSENT:
+		draw_text_box(
+				std::begin(m_prompt), std::end(m_prompt),
+				x, x2, y - top, y - UI_BOX_TB_BORDER,
+				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+				UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+		break;
 
-	if (m_audit_mode == 1)
-	{
-		vptr_game::iterator iter = m_unavailablesorted.begin();
-		while (iter != m_unavailablesorted.end())
+	case phase::AUDIT:
 		{
-			driver_enumerator enumerator(machine().options(), (*iter)->name);
-			enumerator.next();
-			media_auditor auditor(enumerator);
-			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-
-			// if everything looks good, include the driver
-			if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-			{
-				m_availablesorted.push_back((*iter));
-				iter = m_unavailablesorted.erase(iter);
-			}
-			else
-				++iter;
+			// there's a race here between the total audited being updated and the next driver pointer being loaded
+			// it doesn't matter because we redraw on every frame anyway so it sorts itself out very quickly
+			game_driver const *const driver(m_current.load());
+			std::size_t const audited(m_audited.load());
+			std::string const text(util::string_format(
+						_("Auditing ROMs for machine %2$u of %3$u...\n%1$s"),
+						driver ? driver->type.fullname() : "",
+						audited + 1,
+						m_total));
+			ui().draw_text_box(container(), text.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 		}
+		break;
 	}
-	else
-	{
-		driver_enumerator enumerator(machine().options());
-		media_auditor auditor(enumerator);
-		while (enumerator.next())
-		{
-			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-
-			// if everything looks good, include the driver
-			if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-				m_availablesorted.push_back(&enumerator.driver());
-			else
-				m_unavailablesorted.push_back(&enumerator.driver());
-		}
-	}
-
-	// sort
-	std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
-	std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
-	save_available_machines();
-	reset_parent(reset_options::SELECT_FIRST);
-	stack_pop();
 }
-
-//-------------------------------------------------
-//  populate
-//-------------------------------------------------
 
 void menu_audit::populate(float &customtop, float &custombottom)
 {
-	item_append("Dummy", "", 0, (void *)(uintptr_t)1);
+	item_append(_("Start Audit"), "", 0, ITEMREF_START);
+	customtop = (ui().get_line_height() * 2.0f) + (UI_BOX_TB_BORDER * 3.0f);
 }
 
-//-------------------------------------------------
-//  save drivers infos to file
-//-------------------------------------------------
+void menu_audit::handle()
+{
+	switch (m_phase)
+	{
+	case phase::CONSENT:
+		{
+			event const *const menu_event(process(0));
+			if (menu_event && (ITEMREF_START == menu_event->itemref) && (IPT_UI_SELECT == menu_event->iptkey))
+			{
+				m_phase = phase::AUDIT;
+				m_worker_thread = std::thread(
+						[this] ()
+						{
+							switch (m_audit_mode)
+							{
+							case mode::FAST:
+								audit_fast();
+								return;
+							case mode::ALL:
+								audit_all();
+								return;
+							}
+							throw false;
+						});
+			}
+		}
+		break;
+
+	case phase::AUDIT:
+		process(PROCESS_CUSTOM_ONLY | PROCESS_NOINPUT);
+
+		if (m_audited.load() >= m_total)
+		{
+			m_worker_thread.join();
+			save_available_machines();
+			reset_parent(reset_options::SELECT_FIRST);
+			stack_pop();
+		}
+		break;
+	}
+}
+
+void menu_audit::audit_fast()
+{
+	for (ui_system_info &info : m_availablesorted)
+	{
+		if (!info.available)
+		{
+			m_current.store(info.driver);
+			driver_enumerator enumerator(machine().options(), info.driver->name);
+			enumerator.next();
+			media_auditor auditor(enumerator);
+			media_auditor::summary const summary(auditor.audit_media(AUDIT_VALIDATE_FAST));
+			info.available = (summary == media_auditor::CORRECT) || (summary == media_auditor::BEST_AVAILABLE) || (summary == media_auditor::NONE_NEEDED);
+
+			// if everything looks good, include the driver
+			info.available = (summary == media_auditor::CORRECT) || (summary == media_auditor::BEST_AVAILABLE) || (summary == media_auditor::NONE_NEEDED);
+			++m_audited;
+		}
+	}
+}
+
+void menu_audit::audit_all()
+{
+	m_availablesorted.clear();
+	driver_enumerator enumerator(machine().options());
+	media_auditor auditor(enumerator);
+	while (enumerator.next())
+	{
+		m_current.store(&enumerator.driver());
+		media_auditor::summary const summary(auditor.audit_media(AUDIT_VALIDATE_FAST));
+
+		// if everything looks good, include the driver
+		m_availablesorted.emplace_back(enumerator.driver(), (summary == media_auditor::CORRECT) || (summary == media_auditor::BEST_AVAILABLE) || (summary == media_auditor::NONE_NEEDED));
+		++m_audited;
+	}
+
+	// sort
+	std::stable_sort(
+			m_availablesorted.begin(),
+			m_availablesorted.end(),
+			[] (ui_system_info const &a, ui_system_info const &b) { return sorted_game_list(a.driver, b.driver); });
+}
 
 void menu_audit::save_available_machines()
 {
@@ -182,25 +234,15 @@ void menu_audit::save_available_machines()
 	if (file.open(emulator_info::get_configname(), "_avail.ini") == osd_file::error::NONE)
 	{
 		// generate header
-		std::ostringstream buffer;
-		buffer << "#\n" << UI_VERSION_TAG << emulator_info::get_bare_build_version() << "\n#\n\n";
-		util::stream_format(buffer, "%d\n", m_availablesorted.size());
-		util::stream_format(buffer, "%d\n", m_unavailablesorted.size());
+		file.printf("#\n%s%s\n#\n\n", UI_VERSION_TAG, emulator_info::get_bare_build_version());
 
 		// generate available list
-		for (size_t x = 0; x < m_availablesorted.size(); ++x)
+		for (ui_system_info const &info : m_availablesorted)
 		{
-			int find = driver_list::find(m_availablesorted[x]->name);
-			util::stream_format(buffer, "%d\n", find);
+			if (info.available)
+				file.printf("%s\n", info.driver->name);
 		}
 
-		// generate unavailable list
-		for (size_t x = 0; x < m_unavailablesorted.size(); ++x)
-		{
-			int find = driver_list::find(m_unavailablesorted[x]->name);
-			util::stream_format(buffer, "%d\n", find);
-		}
-		file.puts(buffer.str().c_str());
 		file.close();
 	}
 }

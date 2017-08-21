@@ -291,7 +291,7 @@ void menu_slot_devices::rotate_slot_device(device_slot_interface &slot, menu_slo
 				{
 					return opt_value == target;
 				});
-		
+
 		// we expect the above search to succeed, because if an internal
 		// option was selected, the menu item should be disabled
 		assert(m_current_option_list_iter != m_current_option_list.end());

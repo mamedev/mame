@@ -43,9 +43,9 @@ private:
 	// variables
 	std::unique_ptr<machine_config>                 m_config;
 	std::unordered_map<std::string, std::string>    m_slot_options;
-	std::string										m_current_option_list_slot_tag;
-	std::vector<std::string>						m_current_option_list;
-	std::vector<std::string>::const_iterator		m_current_option_list_iter;
+	std::string                                     m_current_option_list_slot_tag;
+	std::vector<std::string>                        m_current_option_list;
+	std::vector<std::string>::const_iterator        m_current_option_list_iter;
 };
 
 } // namespace ui
