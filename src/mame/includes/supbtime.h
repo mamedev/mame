@@ -38,7 +38,6 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ16_MEMBER(supbtime_controls_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
 	virtual void machine_start() override;
 	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
