@@ -397,27 +397,17 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 intercepted */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(combatsc_state::combatscb_msm1_w)
+WRITE8_MEMBER(combatsc_state::combatscb_msm_w)
 {
-	if(data & 0x60)
-		printf("%02x\n",data);
+	membank("bl_abank")->set_entry(BIT(data, 7));
 
-	membank("bl_abank")->set_entry((data & 0x80) >> 7);
-
-	m_msm[0]->reset_w(BIT(data, 4));
-	m_msm[0]->data_w(data & 0x0f);
+	m_msm->reset_w(BIT(data, 4));
+	m_msm->data_w(data & 0x0f);
 }
 
-WRITE8_MEMBER(combatsc_state::combatscb_msm2_w)
-{
-	m_msm[1]->reset_w(BIT(data, 4));
-	m_msm[1]->data_w(data & 0x0f);
-}
-
-IRQ_CALLBACK_MEMBER(combatsc_state::combatscb_sound_irq_ack)
+WRITE8_MEMBER(combatsc_state::combatscb_sound_irq_ack)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return 0xff;
 }
 
 static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
@@ -425,9 +415,9 @@ static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 */
 	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ymsnd", ym2203_device, read)               /* ??? */
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(combatscb_msm1_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(combatscb_msm_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* soundlatch read? */
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(combatscb_msm2_w)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE(combatscb_sound_irq_ack)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bl_abank")
 ADDRESS_MAP_END
 
@@ -765,7 +755,6 @@ static MACHINE_CONFIG_START( combatscb )
 
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(combatscb_sound_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(combatsc_state, combatscb_sound_irq_ack)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -796,15 +785,10 @@ static MACHINE_CONFIG_START( combatscb )
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_MSM5205_VCK_CALLBACK(ASSERTLINE("audiocpu", 0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("msm2", msm5205_device, vclk_w))
-
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 

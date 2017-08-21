@@ -22,7 +22,7 @@ public:
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
 		m_upd7759(*this, "upd"),
-		m_msm(*this, "msm%u", 1),
+		m_msm(*this, "msm"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -64,7 +64,7 @@ public:
 	optional_device<k007121_device> m_k007121_1;
 	optional_device<k007121_device> m_k007121_2;
 	optional_device<upd7759_device> m_upd7759;
-	optional_device_array<msm5205_device, 2> m_msm;
+	optional_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -94,9 +94,8 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_play_w);
 	DECLARE_WRITE8_MEMBER(combatsc_voice_reset_w);
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
-	DECLARE_WRITE8_MEMBER(combatscb_msm1_w);
-	DECLARE_WRITE8_MEMBER(combatscb_msm2_w);
-	IRQ_CALLBACK_MEMBER(combatscb_sound_irq_ack);
+	DECLARE_WRITE8_MEMBER(combatscb_msm_w);
+	DECLARE_WRITE8_MEMBER(combatscb_sound_irq_ack);
 	DECLARE_DRIVER_INIT(combatsc);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
