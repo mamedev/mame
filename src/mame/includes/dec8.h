@@ -13,7 +13,8 @@ class dec8_state : public driver_device
 public:
 	enum
 	{
-		TIMER_DEC8_I8751
+		TIMER_DEC8_I8751,
+		TIMER_DEC8_M6502
 	};
 
 	dec8_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -86,6 +87,9 @@ public:
 	int      m_snd;
 	int      m_msm5205next;
 	int      m_toggle;
+
+	emu_timer *m_i8751_timer;
+	emu_timer *m_m6502_timer;
 
 	DECLARE_WRITE8_MEMBER(dec8_mxc06_karn_buffer_spriteram_w);
 	DECLARE_READ8_MEMBER(i8751_h_r);
