@@ -152,12 +152,6 @@ static const uint8_t sidepcktj_prot_table_2[0x10]={0x8e,0x42,0xb2,0x58,0xec,0x85
 static const uint8_t sidepcktj_prot_table_3[0x10]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 
 
-WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 READ8_MEMBER(sidepckt_state::i8751_r)
 {
 	return m_i8751_return;
@@ -213,7 +207,7 @@ static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
+	AM_RANGE(0x3004, 0x3004) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x300c, 0x300c) AM_READWRITE(scroll_y_r, scroll_y_w)
 	AM_RANGE(0x3014, 0x3014) AM_READ(i8751_r)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(i8751_w)
@@ -399,6 +393,7 @@ static MACHINE_CONFIG_START( sidepckt )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
