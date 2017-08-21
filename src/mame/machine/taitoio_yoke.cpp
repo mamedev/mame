@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(TAITOIO_YOKE, taitoio_yoke_device, "namcoio_gearbox", "Namco I/O Gearbox")
+DEFINE_DEVICE_TYPE(TAITOIO_YOKE, taitoio_yoke_device, "taitoio_gearbox", "Taito I/O Yoke")
 
 
 //**************************************************************************
