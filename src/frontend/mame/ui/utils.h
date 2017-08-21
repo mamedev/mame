@@ -148,7 +148,7 @@ public:
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const
 	{
-		std::copy_if(first, last, dest, [this] (auto const &info) { return apply(info); });
+		std::copy_if(first, last, dest, [this] (auto const &info) { return this->apply(info); });
 	}
 
 protected:
