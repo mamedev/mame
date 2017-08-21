@@ -7,6 +7,8 @@ import android.content.res.AssetManager;
 import android.util.Log;
 import org.libsdl.app.SDLActivity;
 import android.view.*;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 /**
     SDL Activity
 */
@@ -68,5 +70,15 @@ public class MAME extends SDLActivity {
 			e.printStackTrace();
 		}
 	}
+	
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
 
-}
+        int keyCode = event.getKeyCode();
+        // Ignore certain special keys so they're handled by Android
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+			android.os.Process.killProcess(android.os.Process.myPid());
+        }
+        return super.dispatchKeyEvent(event);
+    }
+	}
