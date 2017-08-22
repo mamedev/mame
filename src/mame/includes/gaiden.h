@@ -8,6 +8,8 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/74157.h"
+#include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 #include "screen.h"
@@ -21,6 +23,7 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
+		m_adpcm_bank(*this, "adpcm_bank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -28,7 +31,9 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_mixer(*this, "mixer"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_msm(*this, "msm%u", 1),
+		m_adpcm_select(*this, "adpcm_select%u", 1)
 		{ }
 
 	/* memory pointers */
@@ -36,6 +41,7 @@ public:
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_videoram3;
 	required_shared_ptr<uint16_t> m_spriteram;
+	optional_memory_bank m_adpcm_bank;
 
 	/* video-related */
 	tilemap_t   *m_text_layer;
@@ -60,6 +66,7 @@ public:
 	int         m_prot;
 	int         m_jumpcode;
 	const int   *m_raiga_jumppoints;
+	bool        m_adpcm_toggle;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -70,11 +77,16 @@ public:
 	optional_device<tecmo_spr_device> m_sprgen;
 	optional_device<tecmo_mix_device> m_mixer;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device_array<msm5205_device, 2> m_msm;
+	optional_device_array<ls157_device, 2> m_adpcm_select;
+
+	// mastninja ADPCM control
+	DECLARE_WRITE_LINE_MEMBER(vck_flipflop_w);
+	DECLARE_WRITE8_MEMBER(adpcm_bankswitch_w);
 
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(drgnbowl_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(gaiden_sound_command_w);
-	DECLARE_WRITE16_MEMBER(drgnbowl_sound_command_w);
 	DECLARE_WRITE16_MEMBER(wildfang_protection_w);
 	DECLARE_READ16_MEMBER(wildfang_protection_r);
 	DECLARE_WRITE16_MEMBER(raiga_protection_w);
@@ -104,6 +116,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_START(raiga);
+	DECLARE_MACHINE_START(mastninj);
 	DECLARE_MACHINE_RESET(raiga);
 	DECLARE_VIDEO_START(gaiden);
 	DECLARE_VIDEO_START(drgnbowl);
