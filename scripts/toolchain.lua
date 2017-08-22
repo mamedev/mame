@@ -856,7 +856,6 @@ function toolchain(_buildDir, _subDir)
 			"c++abi",
 			"android_support",
 			"stdc++",
-			"unwind",
 			"gcc",
 		}
 		buildoptions {
@@ -897,6 +896,9 @@ function toolchain(_buildDir, _subDir)
 				"-mfloat-abi=softfp",
 				"-mfpu=vfpv3-d16",
 				"-mthumb",
+			}
+			links {
+				"unwind",
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
