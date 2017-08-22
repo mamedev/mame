@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-21 22:23+1000\n"
-"PO-Revision-Date: 2017-08-20 08:30+0800\n"
+"PO-Revision-Date: 2017-08-22 01:50+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -178,7 +178,7 @@ msgstr "軟體清單"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
-msgstr ""
+msgstr "<設定篩選>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
@@ -1657,17 +1657,17 @@ msgstr " PENS"
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr ""
+msgstr "驗證標記為不可用的 %1$u 機台 ROM 檔？"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "驗證所有 %1$u 機台的 ROM 檔？"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(結果將儲存至 %1$s)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -1675,10 +1675,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"正在驗證供機台 %2$u 的 %3$u ROM 檔...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "開始驗證"
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
@@ -2490,5 +2492,3 @@ msgstr "儲存設定"
 msgid "Settings"
 msgstr "設定"
 
-#~ msgid "Audit in progress..."
-#~ msgstr "驗證中..."

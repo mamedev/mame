@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-21 22:23+1000\n"
-"PO-Revision-Date: 2017-08-20 13:50+0800\n"
+"PO-Revision-Date: 2017-08-22 01:55+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -178,7 +178,7 @@ msgstr "软件清单"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
-msgstr "设定过滤"
+msgstr "<设定过滤>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
@@ -882,11 +882,11 @@ msgstr "磁碟\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:926
 msgid "Printer\tUnimplemented\n"
-msgstr "印表机\t无法执行\n"
+msgstr "打印机\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:928
 msgid "Printer\tImperfect\n"
-msgstr "印表机\t不完美\n"
+msgstr "打印机\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:931
 msgid "LAN\tUnimplemented\n"
@@ -962,31 +962,31 @@ msgstr "需要 CHD\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:973
 msgid "Roms Audit Pass\tOK\n"
-msgstr "ROM 验证通过\tOK\n"
+msgstr "ROM 校验通过\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:975
 msgid "Roms Audit Pass\tBAD\n"
-msgstr "ROM 验证通过\t错误\n"
+msgstr "ROM 校验通过\t错误\n"
 
 #: src/frontend/mame/ui/selgame.cpp:978
 msgid "Samples Audit Pass\tNone Needed\n"
-msgstr "样本档验证通过\t不需要\n"
+msgstr "样本档校验通过\t不需要\n"
 
 #: src/frontend/mame/ui/selgame.cpp:980
 msgid "Samples Audit Pass\tOK\n"
-msgstr "样本档验证通过\tOK\n"
+msgstr "样本档校验通过\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:982
 msgid "Samples Audit Pass\tBAD\n"
-msgstr "样本档验证通过\t错误\n"
+msgstr "样本档校验通过\t错误\n"
 
 #: src/frontend/mame/ui/selgame.cpp:985
 msgid ""
 "Roms Audit Pass\tDisabled\n"
 "Samples Audit Pass\tDisabled\n"
 msgstr ""
-"ROM 验证通过\t已停用\n"
-"样本档验证通过\t已停用\n"
+"ROM 校验通过\t已停用\n"
+"样本档校验通过\t已停用\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1168
 #, c-format
@@ -1657,17 +1657,17 @@ msgstr " PENS"
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr ""
+msgstr "校验标记为不可用的 %1$u 机台的 ROM 档案？"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "校验所有 %1$u 机台的 ROM 档案？"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(结果将保存在 %1$s)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -1675,10 +1675,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"正在校验供机台 %2$u 的 %3$u ROM 档案...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "开始校验"
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
@@ -1903,7 +1905,7 @@ msgstr "略过软件部分选择菜单"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
-msgstr "信息自动验证"
+msgstr "信息自动校验"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Hide romless machine from available list"
@@ -2490,5 +2492,3 @@ msgstr "保存设定"
 msgid "Settings"
 msgstr "设定"
 
-#~ msgid "Audit in progress..."
-#~ msgstr "校验中..."
