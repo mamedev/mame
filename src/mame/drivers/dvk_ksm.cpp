@@ -133,9 +133,14 @@ private:
 		uint16_t ptr;
 	} m_video;
 
-	bool brga, brgb, brg_state;
-	int brgc;
-	emu_timer *m_brg;
+	enum
+	{
+		TIMER_ID_BRG = 0
+	};
+
+	bool brg_state;
+	int brga, brgb, brgc;
+	emu_timer *m_brg = nullptr;
 
 	void update_brg(bool a, bool b, int c);
 
@@ -211,9 +216,12 @@ INPUT_PORTS_END
 
 void ksm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	brg_state = !brg_state;
-	m_i8251line->write_txc(brg_state);
-	m_i8251line->write_rxc(brg_state);
+	if (id == TIMER_ID_BRG)
+	{
+		brg_state = !brg_state;
+		m_i8251line->write_txc(brg_state);
+		m_i8251line->write_rxc(brg_state);
+	}
 }
 
 void ksm_state::machine_reset()
@@ -230,7 +238,7 @@ void ksm_state::video_start()
 	m_tmpclip = rectangle(0, KSM_DISP_HORZ - 1, 0, KSM_DISP_VERT - 1);
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 
-	m_brg = timer_alloc(0);
+	m_brg = timer_alloc(TIMER_ID_BRG);
 }
 
 WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
