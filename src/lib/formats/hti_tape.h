@@ -57,7 +57,7 @@ public:
 	static tape_pos_t next_hole(tape_pos_t pos , bool forward);
 
 	// Write a data word on tape
-	void write_word(unsigned track_no , tape_pos_t start , tape_word_t word , tape_pos_t& length);
+	void write_word(unsigned track_no , tape_pos_t start , tape_word_t word , tape_pos_t& length , bool forward = true);
 	// Write a gap on tape
 	void write_gap(unsigned track_no , tape_pos_t a , tape_pos_t b);
 

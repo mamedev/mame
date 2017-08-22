@@ -171,7 +171,7 @@ hti_format_t::tape_pos_t hti_format_t::next_hole(tape_pos_t pos , bool forward)
 	}
 }
 
-void hti_format_t::write_word(unsigned track_no , tape_pos_t start , tape_word_t word , tape_pos_t& length)
+void hti_format_t::write_word(unsigned track_no , tape_pos_t start , tape_word_t word , tape_pos_t& length , bool forward)
 {
 	tape_track_t& track = m_tracks[ track_no ];
 	track_iterator_t it_low = track.lower_bound(start);
@@ -181,6 +181,16 @@ void hti_format_t::write_word(unsigned track_no , tape_pos_t start , tape_word_t
 	track_iterator_t it_high = track.lower_bound(end_pos);
 
 	track.erase(it_low , it_high);
+
+	// A 0 word is inserted after the word being written, if space allows.
+	// This is meant to avoid fragmentation of the slack space at the end of a record
+	// as the record expands & contracts when re-written with different content.
+	// Without this fix, a gap could form in the slack big enough to cause
+	// false gap detections.
+	if (forward && it_high != track.end() && (it_high->first - end_pos) >= (ZERO_BIT_LEN * 16 + ONE_BIT_LEN)) {
+		track.insert(it_high, std::make_pair(end_pos, 0));
+		it_high--;
+	}
 
 	track.insert(it_high , std::make_pair(start, word));
 }
