@@ -76,7 +76,7 @@ public class MAME extends SDLActivity {
 
         int keyCode = event.getKeyCode();
         // Ignore certain special keys so they're handled by Android
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        if (((event.getSource() & InputDevice.SOURCE_CLASS_BUTTON) != 0) && (keyCode == KeyEvent.KEYCODE_BACK)) {
 			android.os.Process.killProcess(android.os.Process.myPid());
         }
         return super.dispatchKeyEvent(event);
