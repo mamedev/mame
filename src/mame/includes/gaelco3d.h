@@ -74,7 +74,7 @@ public:
 		m_outlatch(*this, "outlatch"),
 		m_paletteram16(*this, "paletteram"),
 		m_paletteram32(*this, "paletteram"),
-		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5" })
+		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
 		{ }
 
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
@@ -92,13 +92,14 @@ public:
 	required_device<ls259_device> m_outlatch;
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
-	optional_ioport_array<6> m_analog;
+	optional_ioport_array<4> m_analog;
 
 	uint16_t m_sound_data;
 	uint8_t m_sound_status;
 	offs_t m_tms_offset_xor;
 	uint8_t m_analog_ports[4];
 	uint32_t m_fp_analog_ports[2];
+	uint32_t m_fp_lenght[2];
 	uint8_t m_fp_clock;
 	uint8_t m_fp_state;
 	uint8_t m_framenum;

@@ -187,6 +187,7 @@ void gaelco3d_state::machine_start()
 	save_item(NAME(m_fp_clock));
 	save_item(NAME(m_fp_state));
 	save_item(NAME(m_fp_analog_ports));
+	save_item(NAME(m_fp_lenght));
 }
 
 
@@ -392,19 +393,17 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 		if (m_fp_clock == 28)
 		{
 			m_fp_clock = 0;
-
-			for (auto i = 0; i < 6; i++)
+			for (auto i = 0; i < 2; i++)
 			{
-				u8 shift = (i % 3) * 8 + 2;
-				u8 newval = m_analog[i].read_safe(0);
-				u8 oldval = m_fp_analog_ports[i / 3] >> shift;
-				m_fp_analog_ports[i / 3] &= ~(0xff << shift);
-				m_fp_analog_ports[i / 3] |= newval << shift;
-
-				if (newval > oldval)
-					m_fp_analog_ports[i / 3] &= ~2;
-				else if (newval < oldval)
-					m_fp_analog_ports[i / 3] |= 2;
+				u32 ay = m_analog[i * 2].read_safe(0);
+				u32 ax = m_analog[i * 2 + 1].read_safe(0);
+				m_fp_analog_ports[i] = (ax << 18) | ((ax ^ 0xff) << 10) | (ay << 2) | 1;
+				s32 aay = ay - 0x80;
+				s32 aax = ax - 0x80;
+				u32 len = aay * aay + aax * aax;
+				if (len <= m_fp_lenght[i])
+					m_fp_analog_ports[i] |= 2;
+				m_fp_lenght[i] = len;
 			}
 		}
 	}
@@ -934,13 +933,16 @@ static INPUT_PORTS_START( footbpow )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ANALOG0")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff) PORT_REVERSE PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("ANALOG1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("ANALOG2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff) PORT_PLAYER(2) PORT_REVERSE PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+
+	PORT_START("ANALOG3")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_PLAYER(2) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 INPUT_PORTS_END
 
 
@@ -1302,4 +1304,4 @@ GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, gaelco3d,
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Football Power", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Football Power", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
