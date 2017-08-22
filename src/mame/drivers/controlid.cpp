@@ -76,7 +76,8 @@ WRITE8_MEMBER( controlidx628_state::p0_w )
 
 WRITE8_MEMBER( controlidx628_state::p1_w )
 {
-	if ((BIT(p1_data, 6) == 0) && (BIT(data, 6) == 1)){
+	if ((BIT(p1_data, 6) == 0) && (BIT(data, 6) == 1)) // on raising-edge of bit 6
+	{
 		m_lcdc->write(space, BIT(data, 7), p0_data);
 	}
 	p1_data = data;
@@ -113,7 +114,6 @@ static MACHINE_CONFIG_START( controlidx628 )
         MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
         MCFG_SCREEN_SIZE(132, 65)
         MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
-//        MCFG_DEFAULT_LAYOUT(layout_lcd)
         MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
         MCFG_SCREEN_PALETTE("palette")
 

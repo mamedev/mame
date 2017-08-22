@@ -2648,11 +2648,6 @@ files {
 	MAME_DIR .. "src/mame/machine/psion_pack.h",
 }
 
-createMESSProjects(_target, _subtarget, "controlid")
-files {
-	MAME_DIR .. "src/mame/drivers/controlid.cpp",
-}
-
 createMESSProjects(_target, _subtarget, "radio")
 files {
 	MAME_DIR .. "src/mame/drivers/apogee.cpp",
@@ -3416,6 +3411,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/codata.cpp",
+	MAME_DIR .. "src/mame/drivers/controlid.cpp",
 	MAME_DIR .. "src/mame/drivers/cortex.cpp",
 	MAME_DIR .. "src/mame/drivers/cosmicos.cpp",
 	MAME_DIR .. "src/mame/includes/cosmicos.h",
