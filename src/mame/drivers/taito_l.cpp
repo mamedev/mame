@@ -474,11 +474,6 @@ WRITE8_MEMBER(champwr_state::msm5205_volume_w)
 	m_msm->set_output_gain(0, data / 255.0);
 }
 
-READ8_MEMBER(horshoes_state::trackball_r)
-{
-	return m_upd4701->read_xy(space, offset >> 2);
-}
-
 
 static ADDRESS_MAP_START( common_banks_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
@@ -662,7 +657,7 @@ static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_READ(trackball_r)
+	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_DEVREAD_RSHIFT("upd4701", upd4701_device, read_xy, 2)
 	AM_RANGE(0xa802, 0xa802) AM_DEVREAD("upd4701", upd4701_device, reset_x)
 	AM_RANGE(0xa803, 0xa803) AM_DEVREAD("upd4701", upd4701_device, reset_y)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP // Watchdog or interrupt ack

@@ -364,6 +364,7 @@ D                                                                               
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -605,12 +606,6 @@ READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 		return m_spriteram[0];
 }
 
-WRITE8_MEMBER(equites_state::mainlatch_w)
-{
-	// data bit is A17; address bits are A16(?)-A14 (offset is shifted by 1 here)
-	m_mainlatch->write_bit((offset & 0xe000) >> 13, BIT(offset, 16));
-}
-
 READ8_MEMBER(equites_state::mcu_ram_r)
 {
 	if (m_fakemcu == nullptr)
@@ -657,7 +652,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x180000, 0x180001) AM_SELECT(0x03c000) AM_WRITE8(mainlatch_w, 0xff00)
+	AM_RANGE(0x180000, 0x180001) AM_SELECT(0x03c000) AM_DEVWRITE8_RSHIFT("mainlatch", ls259_device, write_a3, 0xff00, 13)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
 	AM_RANGE(0x780000, 0x780001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -676,8 +671,8 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00) // note: addressmask does not apply here
-	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x03c000) AM_WRITE8(mainlatch_w, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x03c000) AM_DEVWRITE8_RSHIFT("mainlatch", ls259_device, write_a3, 0x00ff, 13)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)

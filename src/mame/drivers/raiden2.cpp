@@ -792,16 +792,6 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 	sprcpt_init();
 }
 
-READ8_MEMBER(raiden2_state::sound_comms_r)
-{
-	return m_seibu_sound->main_r(space, (offset >> 1) & 7);
-}
-
-WRITE8_MEMBER(raiden2_state::sound_comms_w)
-{
-	m_seibu_sound->main_w(space, (offset >> 1) & 7, data);
-}
-
 WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 {
 	if(ACCESSING_BITS_8_15) {
@@ -977,7 +967,7 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
-	AM_RANGE(0x00700, 0x0071f) AM_READWRITE8(sound_comms_r, sound_comms_w, 0x00ff)
+	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_RSHIFT("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff, 1)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
@@ -1018,7 +1008,7 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
-	AM_RANGE(0x00700, 0x0071f) AM_READWRITE8(sound_comms_r, sound_comms_w, 0x00ff)
+	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_RSHIFT("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff, 1)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
@@ -1049,7 +1039,7 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
-	AM_RANGE(0x00700, 0x0071f) AM_READWRITE8(sound_comms_r, sound_comms_w, 0x00ff)
+	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_RSHIFT("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff, 1)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")

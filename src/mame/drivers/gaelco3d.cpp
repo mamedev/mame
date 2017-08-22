@@ -150,7 +150,7 @@ REF. 970429
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32031/tms32031.h"
-#include "machine/eepromser.h"
+#include "machine/74259.h"
 
 #include "speaker.h"
 
@@ -696,16 +696,6 @@ WRITE_LINE_MEMBER(gaelco3d_state::unknown_13a_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gaelco3d_state::mainlatch_68000_w)
-{
-	m_mainlatch->write_bit(offset >> 2, BIT(data, 0));
-}
-
-WRITE8_MEMBER(gaelco3d_state::outlatch_68000_w)
-{
-	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
-}
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -718,23 +708,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	AM_RANGE(0x510042, 0x510043) AM_READ(sound_status_r)
 	AM_RANGE(0x510100, 0x510101) AM_READWRITE(eeprom_data_r, irq_ack_w)
 	AM_RANGE(0x510102, 0x510103) AM_DEVREAD8("serial", gaelco_serial_device, data_r, 0x00ff)
-	AM_RANGE(0x510102, 0x510103) AM_SELECT(0x000038) AM_WRITE8(mainlatch_68000_w, 0x00ff)
+	AM_RANGE(0x510102, 0x510103) AM_SELECT(0x000038) AM_DEVWRITE8_RSHIFT("mainlatch", ls259_device, write_d0, 0x00ff, 2)
 	AM_RANGE(0x510104, 0x510105) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff)
-	AM_RANGE(0x510106, 0x510107) AM_SELECT(0x000070) AM_WRITE8(outlatch_68000_w, 0x00ff)
+	AM_RANGE(0x510106, 0x510107) AM_SELECT(0x000070) AM_DEVWRITE8_RSHIFT("outlatch", ls259_device, write_d0, 0x00ff, 3)
 	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER(gaelco3d_state::mainlatch_68020_w)
-{
-	m_mainlatch->write_bit(offset >> 1, BIT(data, 0));
-}
-
-WRITE8_MEMBER(gaelco3d_state::outlatch_68020_w)
-{
-	m_outlatch->write_bit(offset >> 2, BIT(data, 0));
-}
 
 static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -747,9 +727,9 @@ static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x510040, 0x510043) AM_WRITE16(sound_data_w, 0xffff0000)
 	AM_RANGE(0x510100, 0x510103) AM_READWRITE16(eeprom_data_r, irq_ack_w, 0xffff0000)
 	AM_RANGE(0x510100, 0x510103) AM_DEVREAD8("serial", gaelco_serial_device, data_r, 0x000000ff)
-	AM_RANGE(0x510100, 0x510103) AM_SELECT(0x000038) AM_WRITE8(mainlatch_68020_w, 0x000000ff)
+	AM_RANGE(0x510100, 0x510103) AM_SELECT(0x000038) AM_DEVWRITE8_RSHIFT("mainlatch", ls259_device, write_d0, 0x000000ff, 1)
 	AM_RANGE(0x510104, 0x510107) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff0000)
-	AM_RANGE(0x510104, 0x510107) AM_SELECT(0x000070) AM_WRITE8(outlatch_68020_w, 0x000000ff)
+	AM_RANGE(0x510104, 0x510107) AM_SELECT(0x000070) AM_DEVWRITE8_RSHIFT("outlatch", ls259_device, write_d0, 0x000000ff, 2)
 	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
 ADDRESS_MAP_END

@@ -236,6 +236,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
+	typedef u##_bits native_type ATTR_UNUSED; \
 	map.configure(_space, _bits); \
 	typedef _class drivdata_class ATTR_UNUSED
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
@@ -243,6 +244,7 @@ void _class :: _name(::address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
+	typedef u##_bits native_type ATTR_UNUSED; \
 	map.configure(AS_PROGRAM, _bits);  \
 	typedef _class drivdata_class ATTR_UNUSED
 #define ADDRESS_MAP_END \
@@ -347,6 +349,36 @@ void _class :: _name(::address_map &map) \
 	.set_handler(read16_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write16_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREADWRITE32(_tag, _class, _rhandler, _whandler, _unitmask) \
 	.set_handler(read32_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write32_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+
+// device reads with address shift
+#define AM_DEVREAD_RSHIFT(_tag, _class, _handler, _rshift) \
+	.set_handler(read_delegate([](_class &device, address_space &space, offs_t offset, native_type mem_mask)->native_type { return device._handler(space, offset >> _rshift, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr))
+#define AM_DEVREAD8_RSHIFT(_tag, _class, _handler, _unitmask, _rshift) \
+	.set_handler(read8_delegate([](_class &device, address_space &space, offs_t offset, u8 mem_mask)->u8 { return device._handler(space, offset >> _rshift, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+#define AM_DEVREAD16_RSHIFT(_tag, _class, _handler, _unitmask, _rshift) \
+	.set_handler(read16_delegate([](_class &device, address_space &space, offs_t offset, u16 mem_mask)->u16 { return device._handler(space, offset >> _rshift, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+#define AM_DEVREAD32_RSHIFT(_tag, _class, _handler, _unitmask, _rshift) \
+	.set_handler(read32_delegate([](_class &device, address_space &space, offs_t offset, u32 mem_mask)->u32 { return device._handler(space, offset >> _rshift, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+
+// device writes with address shift
+#define AM_DEVWRITE_RSHIFT(_tag, _class, _handler, _rshift) \
+	.set_handler(write_delegate([](_class &device, address_space &space, offs_t offset, native_type data, native_type mem_mask) { device._handler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr))
+#define AM_DEVWRITE8_RSHIFT(_tag, _class, _handler, _unitmask, _rshift) \
+	.set_handler(write8_delegate([](_class &device, address_space &space, offs_t offset, u8 data, u8 mem_mask) { device._handler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+#define AM_DEVWRITE16_RSHIFT(_tag, _class, _handler, _unitmask, _rshift) \
+	.set_handler(write16_delegate([](_class &device, address_space &space, offs_t offset, u16 data, u16 mem_mask) { device._handler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+#define AM_DEVWRITE32_RSHIFT(_tag, _class, _handler, _unitmask, _rshift) \
+	.set_handler(write32_delegate([](_class &device, address_space &space, offs_t offset, u32 data, u32 mem_mask) { device._handler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+
+// device reads/writes with address shift
+#define AM_DEVREADWRITE_RSHIFT(_tag, _class, _rhandler, _whandler, _rshift) \
+	.set_handler(read_delegate([](_class &device, address_space &space, offs_t offset, native_type mem_mask)->native_type { return device._rhandler(space, offset >> _rshift, mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write_delegate([](_class &device, address_space &space, offs_t offset, native_type data, native_type mem_mask) { device._whandler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr))
+#define AM_DEVREADWRITE8_RSHIFT(_tag, _class, _rhandler, _whandler, _unitmask, _rshift) \
+	.set_handler(read8_delegate([](_class &device, address_space &space, offs_t offset, u8 mem_mask)->u8 { return device._rhandler(space, offset >> _rshift, mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write8_delegate([](_class &device, address_space &space, offs_t offset, u8 data, u8 mem_mask) { device._whandler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+#define AM_DEVREADWRITE16_RSHIFT(_tag, _class, _rhandler, _whandler, _unitmask, _rshift) \
+	.set_handler(read16_delegate([](_class &device, address_space &space, offs_t offset, u16 mem_mask)->u16 { return device._rhandler(space, offset >> _rshift, mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write16_delegate([](_class &device, address_space &space, offs_t offset, u16 data, u16 mem_mask) { device._whandler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+#define AM_DEVREADWRITE32_RSHIFT(_tag, _class, _rhandler, _whandler, _unitmask, _rshift) \
+	.set_handler(read32_delegate([](_class &device, address_space &space, offs_t offset, u32 mem_mask)->u32 { return device._rhandler(space, offset >> _rshift, mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write32_delegate([](_class &device, address_space &space, offs_t offset, u32 data, u32 mem_mask) { device._whandler(space, offset >> _rshift, data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 
 // device set offset
 #define AM_DEVSETOFFSET(_tag, _class, _handler) \
