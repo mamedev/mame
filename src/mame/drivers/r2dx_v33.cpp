@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 //  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
-	AM_RANGE(0x00780, 0x0079f) AM_READWRITE8(sound_comms_r, sound_comms_w, 0x00ff)
+	AM_RANGE(0x00780, 0x0079f) AM_DEVREADWRITE8_RSHIFT("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff, 1)
 
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM

@@ -25,6 +25,7 @@ Year   Game                PCB            NOTES
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -42,11 +43,6 @@ WRITE8_MEMBER(gaelco_state::bigkarnk_sound_command_w)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
-}
-
-WRITE8_MEMBER(gaelco_state::output_latch_w)
-{
-	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
 }
 
 WRITE_LINE_MEMBER(gaelco_state::coin1_lockout_w)
@@ -130,7 +126,7 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE8(output_latch_w, 0x00ff)                       /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_RSHIFT("outlatch", ls259_device, write_d0, 0x00ff, 3)
 	AM_RANGE(0x70000e, 0x70000f) AM_WRITE8(bigkarnk_sound_command_w, 0x00ff)                                     /* Triggers a FIRQ on the sound CPU */
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
@@ -173,7 +169,7 @@ static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE8(output_latch_w, 0x00ff)
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_RSHIFT("outlatch", ls259_device, write_d0, 0x00ff, 3)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
@@ -191,7 +187,7 @@ static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE8(output_latch_w, 0x00ff)
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_RSHIFT("outlatch", ls259_device, write_d0, 0x00ff, 3)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
