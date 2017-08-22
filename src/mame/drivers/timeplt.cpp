@@ -53,6 +53,7 @@
 #include "audio/timeplt.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -86,11 +87,6 @@ WRITE_LINE_MEMBER(timeplt_state::nmi_enable_w)
  *  I/O
  *
  *************************************/
-
-WRITE8_MEMBER(timeplt_state::mainlatch_w)
-{
-	m_mainlatch->write_d0(space, offset >> 1, data);
-}
 
 WRITE_LINE_MEMBER(timeplt_state::coin_counter_1_w)
 {
@@ -146,7 +142,7 @@ static ADDRESS_MAP_START( timeplt_main_map, AS_PROGRAM, 8, timeplt_state )
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(scanline_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
-	AM_RANGE(0xc300, 0xc30f) AM_MIRROR(0x0cf0) AM_WRITE(mainlatch_w) // handler ignores low bit of offset
+	AM_RANGE(0xc300, 0xc30f) AM_MIRROR(0x0cf0) AM_DEVWRITE_RSHIFT("mainlatch", ls259_device, write_d0, 1)
 	AM_RANGE(0xc320, 0xc320) AM_MIRROR(0x0c9f) AM_READ_PORT("IN1")
 	AM_RANGE(0xc340, 0xc340) AM_MIRROR(0x0c9f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")

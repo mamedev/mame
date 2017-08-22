@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 
 class gaelco_state : public driver_device
@@ -19,7 +18,6 @@ public:
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
-		m_outlatch(*this, "outlatch"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
@@ -31,7 +29,6 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<ls259_device> m_outlatch;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;

@@ -42,14 +42,10 @@ public:
 	bbcbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_pio(*this, "z80pio"),
-		m_cart(*this, "cartslot"),
 		m_buttons(*this, "BUTTONS.%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<z80pio_device> m_pio;
-	required_device<generic_slot_device> m_cart;
 	required_ioport_array<3> m_buttons;
 
 	uint8_t m_input_select;
@@ -57,8 +53,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(pio_r);
-	DECLARE_WRITE8_MEMBER(pio_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(input_select_w);
 };
@@ -66,16 +60,6 @@ public:
 
 #define MAIN_CLOCK XTAL_4_433619MHz
 
-
-READ8_MEMBER(bbcbc_state::pio_r)
-{
-	return m_pio->read(space, offset >> 5, mem_mask);
-}
-
-WRITE8_MEMBER(bbcbc_state::pio_w)
-{
-	m_pio->write(space, offset >> 5, data, mem_mask);
-}
 
 static ADDRESS_MAP_START( bbcbc_prg, AS_PROGRAM, 8, bbcbc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -85,7 +69,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbcbc_io, AS_IO, 8, bbcbc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_READWRITE(pio_r, pio_w) // actually only $00, $20, $40, $60
+	AM_RANGE(0x00, 0x7f) AM_DEVREADWRITE_RSHIFT("z80pio", z80pio_device, read, write, 5)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("tms9129", tms9129_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("tms9129", tms9129_device, register_read, register_write)
 ADDRESS_MAP_END

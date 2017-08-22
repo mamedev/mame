@@ -46,11 +46,6 @@ WRITE16_MEMBER(wrally_state::vram_w)
 	m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 }
 
-WRITE8_MEMBER(wrally_state::latch_w)
-{
-	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
-}
-
 WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
 {
 	flip_screen_set(state);

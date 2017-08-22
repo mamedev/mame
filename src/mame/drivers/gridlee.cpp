@@ -83,6 +83,7 @@
 #include "includes/gridlee.h"
 
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -270,12 +271,6 @@ READ8_MEMBER(gridlee_state::random_num_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gridlee_state::latch_w)
-{
-	m_latch->write_bit(offset >> 4, data);
-}
-
-
 WRITE_LINE_MEMBER(gridlee_state::led_0_w)
 {
 	output().set_led_value(0, state);
@@ -308,7 +303,7 @@ WRITE_LINE_MEMBER(gridlee_state::coin_counter_w)
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gridlee_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9000) AM_SELECT(0x0070) AM_WRITE(latch_w)
+	AM_RANGE(0x9000, 0x9000) AM_SELECT(0x0070) AM_DEVWRITE_RSHIFT("latch", ls259_device, write_d0, 4)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
 	AM_RANGE(0x9380, 0x9380) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)

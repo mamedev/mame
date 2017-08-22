@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 
-#include "machine/74259.h"
 #include "sound/tc8830f.h"
 #include "screen.h"
 
@@ -20,7 +19,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_mainlatch(*this, "mainlatch"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -32,7 +30,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<ls259_device> m_mainlatch;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_colorram;
