@@ -3030,6 +3030,11 @@ files {
 	MAME_DIR .. "src/mame/includes/tmc2000e.h",
 }
 
+createMESSProjects(_target, _subtarget, "teletype")
+files {
+	MAME_DIR .. "src/mame/drivers/att4425.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "televideo")
 files {
 	MAME_DIR .. "src/mame/drivers/ts802.cpp",
