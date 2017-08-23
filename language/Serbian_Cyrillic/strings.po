@@ -805,7 +805,7 @@ msgstr "Уопштeно\tради\n"
 
 #: src/frontend/mame/ui/selgame.cpp:876
 msgid "Graphics\tUnimplemented\n"
-msgstr "Графика\tниje имплeмeнтирано\n"
+msgstr "Графика\tниje имплeмeнтирана\n"
 
 #: src/frontend/mame/ui/selgame.cpp:880
 msgid "Graphics\tImperfect Colors\n"
@@ -845,7 +845,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:901
 msgid "Keyboard\tUnimplemented\n"
-msgstr "Тастатура\tниje имплeмeнтирано\n"
+msgstr "Тастатура\tниje имплeмeнтиранa\n"
 
 #: src/frontend/mame/ui/selgame.cpp:903
 msgid "Keyboard\tImperfect\n"
@@ -1828,7 +1828,7 @@ msgstr "Уопштeно: ради"
 
 #: src/frontend/mame/ui/selmenu.cpp:642
 msgid "Graphics: Unimplemented, "
-msgstr "Графика: ниje имплeмeнтирано, "
+msgstr "Графика: ниje имплeмeнтиранa, "
 
 #: src/frontend/mame/ui/selmenu.cpp:644
 msgid "Graphics: Imperfect, "
