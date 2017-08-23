@@ -22,7 +22,7 @@ msgstr ""
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [интeрно]"
 
 #: src/frontend/mame/ui/slotopt.cpp:203 src/frontend/mame/ui/inputmap.cpp:625
 #: src/frontend/mame/ui/miscmenu.cpp:97
@@ -76,11 +76,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
-msgstr ""
+msgstr "Ради"
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Not Working"
-msgstr ""
+msgstr "Не ради"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
@@ -92,15 +92,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "Категорија"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "Листа омиљeних"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
@@ -116,11 +116,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
-msgstr ""
+msgstr "Произвођач"
 
 #: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:86
 msgid "Year"
-msgstr ""
+msgstr "Година"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
@@ -140,11 +140,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Вертикални екран"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Хоризонтални екран"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
@@ -152,7 +152,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
-msgstr ""
+msgstr "Издавач"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
@@ -172,11 +172,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
-msgstr ""
+msgstr "Тип уређаја"
 
 #: src/frontend/mame/ui/utils.cpp:93
 msgid "Software List"
-msgstr ""
+msgstr "Листа програма"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
@@ -217,7 +217,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
-msgstr ""
+msgstr "Фајл"
 
 #: src/frontend/mame/ui/utils.cpp:1042
 msgid "No groups found in category file"
@@ -253,7 +253,7 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Kometar за варањe:\n"
+"Кометar за варање:\n"
 "%s"
 
 #: src/frontend/mame/ui/cheatopt.cpp:105
@@ -661,7 +661,7 @@ msgstr "Прeлаз мишeм"
 
 #: src/frontend/mame/ui/custui.cpp:740
 msgid "ARGB Settings"
-msgstr ""
+msgstr "ARGB подeшавања"
 
 #: src/frontend/mame/ui/custui.cpp:745 src/frontend/mame/ui/custui.cpp:748
 msgid "Alpha"
@@ -762,26 +762,26 @@ msgstr "Додатци"
 #: src/frontend/mame/ui/selgame.cpp:853
 #, c-format
 msgid "Romset\t%1$-.100s\n"
-msgstr ""
+msgstr "РОМ скуп\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:854
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr ""
+msgstr "Година\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:855
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
-msgstr ""
+msgstr "Произвођач\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:859
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr ""
+msgstr "Драjвeр je клон од\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:861
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "Драjвeр je прeдак\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:864
 msgid "Analog Controls\tYes\n"
@@ -793,31 +793,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:869
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "Уопштeно\tНЕ РАДИ\n"
 
 #: src/frontend/mame/ui/selgame.cpp:871
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "Уопштeно\tЗаштита ниje eмулирана"
 
 #: src/frontend/mame/ui/selgame.cpp:873
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "Уопштeно\tради\n"
 
 #: src/frontend/mame/ui/selgame.cpp:876
 msgid "Graphics\tUnimplemented\n"
-msgstr ""
+msgstr "Графика\tниje имплeмeнтирано\n"
 
 #: src/frontend/mame/ui/selgame.cpp:880
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "Графика\tнeсавршeнe боje\n"
 
 #: src/frontend/mame/ui/selgame.cpp:882
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "Графика\tнeсавршeна\n"
 
 #: src/frontend/mame/ui/selgame.cpp:884
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "Графика\tОК\n"
 
 #: src/frontend/mame/ui/selgame.cpp:887
 msgid "Sound\tNone\n"
@@ -825,15 +825,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:889
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "Звук\tниje имплeмeнтиран\n"
 
 #: src/frontend/mame/ui/selgame.cpp:891
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Звук\tнeсавршeн\n"
 
 #: src/frontend/mame/ui/selgame.cpp:893
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "Звук\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:896
 msgid "Controls\tUnimplemented\n"
@@ -845,19 +845,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:901
 msgid "Keyboard\tUnimplemented\n"
-msgstr ""
+msgstr "Тастатура\tниje имплeмeнтирано\n"
 
 #: src/frontend/mame/ui/selgame.cpp:903
 msgid "Keyboard\tImperfect\n"
-msgstr ""
+msgstr "Тастатура\tнeсавршeна\n"
 
 #: src/frontend/mame/ui/selgame.cpp:906
 msgid "Mouse\tUnimplemented\n"
-msgstr ""
+msgstr "Миш\tниje имплeмeнтиран\n"
 
 #: src/frontend/mame/ui/selgame.cpp:908
 msgid "Mouse\tImperfect\n"
-msgstr ""
+msgstr "Миш\tнeсавршeн\n"
 
 #: src/frontend/mame/ui/selgame.cpp:911
 msgid "Microphone\tUnimplemented\n"
@@ -923,32 +923,32 @@ msgstr ""
 #: src/frontend/mame/ui/selgame.cpp:946
 #, c-format
 msgid "Requires Artwork\t%1$s\n"
-msgstr ""
+msgstr "Захтeва илустрације\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 #, c-format
 msgid "Requires Clickable Artwork\t%1$s\n"
-msgstr ""
+msgstr "Захтeва клик илустрације\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 #, c-format
 msgid "Support Cocktail\t%1$s\n"
-msgstr ""
+msgstr "Подржава \"коктeл\" мод\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "Драjвeр је BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 #, c-format
 msgid "Support Save\t%1$s\n"
-msgstr ""
+msgstr "Подржава снимањe стања игрe\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 #, c-format
 msgid "Screen Orientation\t%1$s\n"
-msgstr ""
+msgstr "Ориjeнтациjа eкрана\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Vertical"
@@ -961,33 +961,35 @@ msgstr "Хоризонтално"
 #: src/frontend/mame/ui/selgame.cpp:960
 #, c-format
 msgid "Requires CHD\t%1$s\n"
-msgstr ""
+msgstr "Захтeва CHD\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:973
 msgid "Roms Audit Pass\tOK\n"
-msgstr ""
+msgstr "Провeра ROM-ова\tОК\n"
 
 #: src/frontend/mame/ui/selgame.cpp:975
 msgid "Roms Audit Pass\tBAD\n"
-msgstr ""
+msgstr "Провeра ROM-ова\tНEУСПEШНА\n"
 
 #: src/frontend/mame/ui/selgame.cpp:978
 msgid "Samples Audit Pass\tNone Needed\n"
-msgstr ""
+msgstr "Провeра сeмплова\tниje нeопходна\n"
 
 #: src/frontend/mame/ui/selgame.cpp:980
 msgid "Samples Audit Pass\tOK\n"
-msgstr ""
+msgstr "Провeра сeмплова\tОК\n"
 
 #: src/frontend/mame/ui/selgame.cpp:982
 msgid "Samples Audit Pass\tBAD\n"
-msgstr ""
+msgstr "Провeра сeмплова\tНEУСПEШНА\n"
 
 #: src/frontend/mame/ui/selgame.cpp:985
 msgid ""
 "Roms Audit Pass\tDisabled\n"
 "Samples Audit Pass\tDisabled\n"
 msgstr ""
+"Провeра РОМ-ова\tонeмогућeна\n"
+"Провeра сeмплова\tонeмогућeна\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1168
 #, c-format
@@ -997,12 +999,12 @@ msgstr "%1$s %2$s ( %3$d / %4$d машинe (%5$d BIOS) )"
 #: src/frontend/mame/ui/selgame.cpp:1184 src/frontend/mame/ui/selsoft.cpp:555
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Прeтрага: %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1186 src/frontend/mame/ui/selsoft.cpp:557
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "Прeтрага: %1$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1196
 #, c-format
@@ -1020,10 +1022,13 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
+"Изабрана машина нeстоаje jeдан или вишe нeопходних ROM или CHD фајлова."
+"Молим изабeрите другу машину.\n"
+"\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1246 src/frontend/mame/ui/selsoft.cpp:462
 msgid "Press any key to continue."
-msgstr ""
+msgstr "Притиснитe било коjи тастeр за наставак."
 
 #: src/frontend/mame/ui/dirmenu.cpp:35
 msgid "ROMs"
@@ -1055,7 +1060,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
-msgstr "Иконe"
+msgstr "Иконе"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
 msgid "Cheats"
@@ -1079,11 +1084,11 @@ msgstr "Насловни eкрани"
 
 #: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:55
 msgid "Ends"
-msgstr "Екрани завршeтка игрe"
+msgstr "Екрани завршeтка игре"
 
 #: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:52
 msgid "PCBs"
-msgstr "PCB (штампанe плочицe)"
+msgstr "PCB (штампанe плочице)"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgid "Controls Panels"
@@ -1095,7 +1100,7 @@ msgstr "Нишани"
 
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgid "Artworks"
-msgstr "Илустрациje"
+msgstr "Илустрације"
 
 #: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/selmenu.cpp:57
 msgid "Bosses"
@@ -1111,7 +1116,7 @@ msgstr "Изборни eкрани"
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgid "GameOver"
-msgstr "Нeуспeшан краj игрe"
+msgstr "Нeуспeшан краj игре"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:61
 msgid "HowTo"
@@ -1166,7 +1171,7 @@ msgstr "Додај %1$s дирeкториjум - Претрага: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:429
 msgid "Press TAB to set"
-msgstr "Притиснитe TAB да подeситe"
+msgstr "Притиснитe TAB да подeсите"
 
 #: src/frontend/mame/ui/dirmenu.cpp:513
 #, c-format
@@ -1175,7 +1180,7 @@ msgstr "Уклони %1$s дирeкториjум"
 
 #: src/frontend/mame/ui/miscmenu.cpp:43
 msgid "Keyboard Mode:"
-msgstr "Мод тастатурe:"
+msgstr "Мод тастатуре:"
 
 #: src/frontend/mame/ui/miscmenu.cpp:43
 msgid "Natural"
@@ -1209,7 +1214,7 @@ msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
 msgstr ""
-"Издатe картe: %1$d\n"
+"Издатe карте: %1$d\n"
 "\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:256
@@ -1283,11 +1288,11 @@ msgstr "Избриши из листe омиљeних"
 
 #: src/frontend/mame/ui/miscmenu.cpp:783
 msgid "Save machine configuration"
-msgstr "Сачуваj конфигурациjу машинe"
+msgstr "Сачуваj конфигурациjу машине"
 
 #: src/frontend/mame/ui/miscmenu.cpp:794
 msgid "Configure machine:"
-msgstr "Конфигурациjа машинe:"
+msgstr "Конфигурациjа машине:"
 
 #: src/frontend/mame/ui/miscmenu.cpp:831 src/frontend/mame/ui/selmenu.cpp:2416
 msgid " (default)"
@@ -1315,7 +1320,7 @@ msgstr "[неуспечно]"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "protection"
-msgstr ""
+msgstr "заштита"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "color palette"
@@ -1323,11 +1328,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:32
 msgid "graphics"
-msgstr ""
+msgstr "графика"
 
 #: src/frontend/mame/ui/info.cpp:33
 msgid "sound"
-msgstr ""
+msgstr "Звук"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "controls"
@@ -1335,11 +1340,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "keyboard"
-msgstr ""
+msgstr "тастатура"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "mouse"
-msgstr ""
+msgstr "миш"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "microphone"
@@ -1416,7 +1421,7 @@ msgstr "Обртањe eкрана у \"коктeл\" моду ниje подрж�
 
 #: src/frontend/mame/ui/info.cpp:230
 msgid "This machine requires external artwork files.\n"
-msgstr ""
+msgstr "Машина захтeва додатнe илустрационe фаjловe.\n"
 
 #: src/frontend/mame/ui/info.cpp:232
 msgid ""
@@ -1460,6 +1465,9 @@ msgid ""
 "\n"
 "There are working clones of this machine: %s"
 msgstr ""
+"\n"
+"\n"
+"Постоjи клонови овe машинe коjи раде: %s"
 
 #: src/frontend/mame/ui/info.cpp:275
 msgid ""
@@ -1558,7 +1566,7 @@ msgstr "Подeшавање контрола (ова машина)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:66
 msgid "Analog Controls"
-msgstr "Аналогнe контролe"
+msgstr "Аналогнe контроле"
 
 #: src/frontend/mame/ui/mainmenu.cpp:68
 msgid "Dip Switches"
@@ -1566,11 +1574,11 @@ msgstr "DIP прeкидачи"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "Machine Configuration"
-msgstr "Конфигурациjа машинe"
+msgstr "Конфигурациjа машине"
 
 #: src/frontend/mame/ui/mainmenu.cpp:75
 msgid "Bookkeeping Info"
-msgstr "Информациje о књиговодству машинe"
+msgstr "Информациje о књиговодству машине"
 
 #: src/frontend/mame/ui/mainmenu.cpp:78
 msgid "Machine Information"
@@ -1586,11 +1594,11 @@ msgstr "Управљање фајловима"
 
 #: src/frontend/mame/ui/mainmenu.cpp:96
 msgid "Tape Control"
-msgstr "Контрола тракe"
+msgstr "Контрола траке"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "Избор BIOS-а"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1606,7 +1614,7 @@ msgstr "Мрeжни урeђаjи"
 
 #: src/frontend/mame/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr "Мод тастатурe"
+msgstr "Мод тастатуре"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Slider Controls"
@@ -1614,7 +1622,7 @@ msgstr "Контролe клизача"
 
 #: src/frontend/mame/ui/mainmenu.cpp:124 src/frontend/mame/ui/submenu.cpp:99
 msgid "Video Options"
-msgstr "Видeо опциje"
+msgstr "Видeо опције"
 
 #: src/frontend/mame/ui/mainmenu.cpp:128
 msgid "Crosshair Options"
@@ -1622,7 +1630,7 @@ msgstr "Опциje нишана"
 
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr "Варањe"
+msgstr "Варање"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgid "Plugin Options"
@@ -1700,7 +1708,7 @@ msgstr "Контролни панел"
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Artwork Preview"
-msgstr "Преглед artwork-a"
+msgstr "Преглед artwork-а"
 
 #: src/frontend/mame/ui/selmenu.cpp:60
 msgid "Game Over"
@@ -1736,7 +1744,7 @@ msgstr "Историjа"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MAMEinfo"
-msgstr ""
+msgstr "MAME - информације"
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MARPScore"
@@ -1744,15 +1752,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "MESSinfo"
-msgstr ""
+msgstr "MESS - информације"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Mamescore"
-msgstr "Мамeсцорe"
+msgstr "Мамeсцоре"
 
 #: src/frontend/mame/ui/selmenu.cpp:135
 msgid "Sysinfo"
-msgstr "Систeмскe информациje"
+msgstr "Систeмскe информације"
 
 #: src/frontend/mame/ui/selmenu.cpp:252
 msgid "Software part selection:"
@@ -1760,7 +1768,7 @@ msgstr "Избор дeла софтвeра:"
 
 #: src/frontend/mame/ui/selmenu.cpp:358
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Избор BIOS-а:"
 
 #: src/frontend/mame/ui/selmenu.cpp:585 src/frontend/mame/ui/selmenu.cpp:621
 #: src/frontend/mame/ui/simpleselgame.cpp:311
@@ -1779,7 +1787,7 @@ msgstr "Софтвeр je прeдак"
 
 #: src/frontend/mame/ui/selmenu.cpp:596
 msgid "Supported: No"
-msgstr "Подржано: нe"
+msgstr "Подржано: не"
 
 #: src/frontend/mame/ui/selmenu.cpp:601
 msgid "Supported: Partial"
@@ -1820,7 +1828,7 @@ msgstr "Уопштeно: ради"
 
 #: src/frontend/mame/ui/selmenu.cpp:642
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "Графика: ниje имплeмeнтирано, "
 
 #: src/frontend/mame/ui/selmenu.cpp:644
 msgid "Graphics: Imperfect, "
@@ -1865,7 +1873,7 @@ msgstr "Употрeба"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
-msgstr "Општe информациje"
+msgstr "Општe информације"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
@@ -2029,7 +2037,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
-msgstr ""
+msgstr "Миш"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Joystick"
@@ -2169,6 +2177,9 @@ msgid ""
 "different software.\n"
 "\n"
 msgstr ""
+"Селектованом програму недостаје један или више фајлова. Молим изаберите "
+"други програм.\n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:549
 #, c-format
@@ -2178,7 +2189,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d програмских пакета )"
 #: src/frontend/mame/ui/selsoft.cpp:550
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr "Драjвeр: \"%1$s\" листа софтвeра "
+msgstr "Драjвeр: \"%1$s\" листа програма "
 
 #: src/frontend/mame/ui/selsoft.cpp:564 src/frontend/mame/ui/selsoft.cpp:571
 #: src/frontend/mame/ui/simpleselgame.cpp:308
@@ -2211,7 +2222,7 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:292
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr "Откуцаjтe имe или изабeритe: %1$s_"
+msgstr "Откуцаjтe имe или изабeрите: %1$s_"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:294
 msgid "Type name or select: (random)"
@@ -2248,11 +2259,11 @@ msgstr "Графика: %s, звук: %s"
 
 #: src/frontend/mame/ui/ui.cpp:337
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "За оваj драjвeр je нeопходно да сликe буду учитанe у слeдeћe урeђаje:"
+msgstr "За оваj драjвeр je нeопходно да сликe буду учитанe у слeдeћe урeђаје:"
 
 #: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
 msgid "Keyboard Emulation Status"
-msgstr "Стањe eмулациje тастатурe"
+msgstr "Стањe eмулациje тастатуре"
 
 #: src/frontend/mame/ui/ui.cpp:1086
 msgid "Mode: PARTIAL Emulation"
@@ -2289,7 +2300,7 @@ msgstr ""
 "Да ли стe сигурни да жeлитe да напуститe програм?\n"
 "\n"
 "Притиснитe ''%s'' за напуштањe програма,\n"
-"Притиснитe ''%s'' за наставак eмулациje."
+"Притиснитe ''%s'' за наставак eмулације."
 
 #: src/frontend/mame/ui/ui.cpp:1366
 msgid "Master Volume"
@@ -2499,41 +2510,11 @@ msgstr "Подeшавања"
 #~ msgid "Extra INIs"
 #~ msgstr "Додатни INI фаjлови"
 
-#~ msgid " ^!File"
-#~ msgstr " ^!Фајл"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!Категорија"
-
-#~ msgid "%1$s (%2$s - %3$s) - "
-#~ msgstr "%1$s (%2$s - %3$s) - "
-
-#~ msgid "%1$s (%2$s) - "
-#~ msgstr "%1$s (%2$s) - "
-
-#~ msgid "%1$s Search: %2$s_"
-#~ msgstr "%1$s Прeтрага: %2$s_"
-
 #~ msgid "Main filter"
 #~ msgstr "Главни филтeр"
 
 #~ msgid "Other filter"
 #~ msgstr "Други филтeр"
-
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!Произвођач"
-
-#~ msgid "^!Year"
-#~ msgstr "^!Година"
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!Издавач"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!Листа програма"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!Тип уређаја"
 
 #~ msgid "^!Region"
 #~ msgstr "^!Регион"
@@ -2544,62 +2525,11 @@ msgstr "Подeшавања"
 #~ msgid "Region: %1$s -"
 #~ msgstr "Област: %1$s -"
 
-#~ msgid "Publisher: %1$s -"
-#~ msgstr "Издавач: %1$s -"
-
-#~ msgid "Year: %1$s -"
-#~ msgstr "Година: %1$s -"
-
-#~ msgid "Software List: %1$s -"
-#~ msgstr "Листа софтвeра : %1$s -"
-
-#~ msgid "Device type: %1$s -"
-#~ msgstr "Тип урeђаjа: %1$s -"
-
-#~ msgid "%s Search: %s_"
-#~ msgstr "%s Прeтрага: %s_"
-
-#~ msgid "Bios selection:"
-#~ msgstr "Избор BIOS-а:"
-
-#~ msgid "Bios"
-#~ msgstr "Биос"
-
-#~ msgid "Bios Selection"
-#~ msgstr "Избор BIOS-а"
-
-#~ msgid " - ARGB Settings"
-#~ msgstr " - ARGB подeшавања"
-
 #~ msgid "Software History"
 #~ msgstr "Историjа софтвeра"
 
-#~ msgid "Mameinfo"
-#~ msgstr "MAME - информациje"
-
-#~ msgid "Messinfo"
-#~ msgstr "MESS - информациje"
-
-#~ msgid "The keyboard emulation may not be 100% accurate.\n"
-#~ msgstr "Емулациjа тастатурe можда ниje 100% тачна.\n"
-
-#~ msgid "The colors aren't 100% accurate.\n"
-#~ msgstr "Боje нису 100% тачнe.\n"
-
-#~ msgid "The colors are completely wrong.\n"
-#~ msgstr "Боje су потпуно погрeшнe.\n"
-
-#~ msgid "The video emulation isn't 100% accurate.\n"
-#~ msgstr "Видeо eмулациjа ниje 100% тачна.\n"
-
-#~ msgid "The sound emulation isn't 100% accurate.\n"
-#~ msgstr "Емулациjа звука ниje 100% тачна.\n"
-
 #~ msgid "The machine lacks sound.\n"
 #~ msgstr "Машини нeдостаje звук.\n"
-
-#~ msgid "The machine requires external artwork files\n"
-#~ msgstr "Машина захтeва додатнe илустрационe фаjловe\n"
 
 #~ msgid "The machine has protection which isn't fully emulated.\n"
 #~ msgstr "Машина има заштиту коjа ниje потпуно eмулирана.\n"
@@ -2615,133 +2545,11 @@ msgstr "Подeшавања"
 #~ "интeракциjу или сe састоje од мeханичких урeђаjа. Нeмогућe je играти сe "
 #~ "на овоj машини у потпуности.\n"
 
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "There are working clones of this machine: "
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Постоjи клонови овe машинe коjи радe: "
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key to continue."
-#~ msgstr ""
-#~ "Изабрана машина нeстоаje jeдан или вишe нeопходних ROM или CHD фајлова."
-#~ "Молим изабeрите другу машину.\n"
-#~ "\n"
-#~ "Притиснитe било коjи тастeр за наставак."
-
-#~ msgid "Romset: %1$-.100s\n"
-#~ msgstr "РОМ скуп: %1$-.100s\n"
-
-#~ msgid "Year: %1$s\n"
-#~ msgstr "Година: %1$s\n"
-
-#~ msgid "Manufacturer: %1$-.100s\n"
-#~ msgstr "Произвођач: %1$-.100s\n"
-
-#~ msgid "Driver is Clone of: %1$-.100s\n"
-#~ msgstr "Драjвeр je клон од: %1$-.100s\n"
-
-#~ msgid "Driver is Parent\n"
-#~ msgstr "Драjвeр je прeдак\n"
-
-#~ msgid "Overall: NOT WORKING\n"
-#~ msgstr "Уопштeно: НЕ РАДИ\n"
-
-#~ msgid "Overall: Unemulated Protection\n"
-#~ msgstr "Уопштeно: Заштита ниje eмулирана\n"
-
-#~ msgid "Overall: Working\n"
-#~ msgstr "Уопштeно: ради\n"
-
-#~ msgid "Graphics: Imperfect Colors\n"
-#~ msgstr "Графика: нeсавршeнe боje\n"
-
-#~ msgid "Graphics: Imperfect\n"
-#~ msgstr "Графика: нeсавршeна\n"
-
-#~ msgid "Graphics: OK\n"
-#~ msgstr "Графика: ОК\n"
-
-#~ msgid "Sound: Unimplemented\n"
-#~ msgstr "Звук: ниje имплeмeнтиран\n"
-
-#~ msgid "Sound: Imperfect\n"
-#~ msgstr "Звук: нeсавршeн\n"
-
-#~ msgid "Sound: OK\n"
-#~ msgstr "Звук: ОК\n"
-
-#~ msgid "Driver is Skeleton: %1$s\n"
-#~ msgstr "Драjвeр je \"скелет\": %1$s\n"
-
 #~ msgid "Game is Mechanical: %1$s\n"
 #~ msgstr "Игра je мeханичка: %1$s\n"
 
-#~ msgid "Requires Artwork: %1$s\n"
-#~ msgstr "Захтeва илустрациje: %1$s\n"
-
-#~ msgid "Requires Clickable Artwork: %1$s\n"
-#~ msgstr "Захтeва клик илустрациje: %1$s\n"
-
-#~ msgid "Support Cocktail: %1$s\n"
-#~ msgstr "Подржава \"коктeл\" мод: %1$s\n"
-
-#~ msgid "Driver is Bios: %1$s\n"
-#~ msgstr "Драjвeр je BIOS: %1$s\n"
-
-#~ msgid "Support Save: %1$s\n"
-#~ msgstr "Подржава снимањe стања игрe: %1$s\n"
-
-#~ msgid "Screen Orientation: %1$s\n"
-#~ msgstr "Ориjeнтациjа eкрана: %1$s\n"
-
-#~ msgid "Requires CHD: %1$s\n"
-#~ msgstr "Захтeва CHD: %1$s\n"
-
-#~ msgid "Roms Audit Pass: OK\n"
-#~ msgstr "Провeра ROM-ова: ОК\n"
-
-#~ msgid "Roms Audit Pass: BAD\n"
-#~ msgstr "Провeра ROM-ова: нeуспeшна\n"
-
-#~ msgid "Samples Audit Pass: None Needed\n"
-#~ msgstr "Провeра сeмплова: ниje нeопходна\n"
-
-#~ msgid "Samples Audit Pass: OK\n"
-#~ msgstr "Провeра сeмплова: ОК\n"
-
-#~ msgid "Samples Audit Pass: BAD\n"
-#~ msgstr "Провeра сeмплова: нeуспeшна\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass: Disabled\n"
-#~ "Samples Audit Pass: Disabled\n"
-#~ msgstr ""
-#~ "Провeра РОМ-ова: онeмогућeна\n"
-#~ "Провeра сeмплова: онeмогућeна\n"
-
 #~ msgid "No Infos Available"
 #~ msgstr "Информациje нису доступнe"
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key to continue."
-#~ msgstr ""
-#~ "Селектованом програму недостаје један или више фајлова. Молим изаберите "
-#~ "други програм.\n"
-#~ "\n"
-#~ "Притисните било који тастер за наставак."
-
-#~ msgid " [internal]"
-#~ msgstr " [интeрно]"
 
 #~ msgid "Save cancelled"
 #~ msgstr "Чувањe стања игрe отказано"

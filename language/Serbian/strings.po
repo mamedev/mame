@@ -22,7 +22,7 @@ msgstr ""
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [interno]"
 
 #: src/frontend/mame/ui/slotopt.cpp:203 src/frontend/mame/ui/inputmap.cpp:625
 #: src/frontend/mame/ui/miscmenu.cpp:97
@@ -76,11 +76,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
-msgstr ""
+msgstr "Radi"
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Not Working"
-msgstr ""
+msgstr "Ne radi"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
@@ -92,15 +92,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "Kategorija"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "Lista omiljenih"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
@@ -116,11 +116,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
-msgstr ""
+msgstr "Proizvođač"
 
 #: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:86
 msgid "Year"
-msgstr ""
+msgstr "Godina"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
@@ -140,11 +140,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Vertikalni ekran"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Horizontalni ekran"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
@@ -152,7 +152,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
-msgstr ""
+msgstr "Izdavač"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
@@ -172,11 +172,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
-msgstr ""
+msgstr "Tip uredjaja"
 
 #: src/frontend/mame/ui/utils.cpp:93
 msgid "Software List"
-msgstr ""
+msgstr "Lista programa"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
@@ -217,7 +217,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
-msgstr ""
+msgstr "Fajl"
 
 #: src/frontend/mame/ui/utils.cpp:1042
 msgid "No groups found in category file"
@@ -661,7 +661,7 @@ msgstr "Prelay mišem"
 
 #: src/frontend/mame/ui/custui.cpp:740
 msgid "ARGB Settings"
-msgstr ""
+msgstr "ARGB podešavanja"
 
 #: src/frontend/mame/ui/custui.cpp:745 src/frontend/mame/ui/custui.cpp:748
 msgid "Alpha"
@@ -762,26 +762,26 @@ msgstr "Dodatci"
 #: src/frontend/mame/ui/selgame.cpp:853
 #, c-format
 msgid "Romset\t%1$-.100s\n"
-msgstr ""
+msgstr "ROM skup\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:854
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr ""
+msgstr "Godina\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:855
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
-msgstr ""
+msgstr "Proizvođač\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:859
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr ""
+msgstr "Drajver je klon od\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:861
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "Drajver je predak\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:864
 msgid "Analog Controls\tYes\n"
@@ -793,31 +793,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:869
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "Uopšteno\tNE RADI\n"
 
 #: src/frontend/mame/ui/selgame.cpp:871
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "Uopšteno\tZaštita nije emulirana\n"
 
 #: src/frontend/mame/ui/selgame.cpp:873
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "Uopšteno\tradi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:876
 msgid "Graphics\tUnimplemented\n"
-msgstr ""
+msgstr "Grafika\tnije implementirano\n"
 
 #: src/frontend/mame/ui/selgame.cpp:880
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "Grafika\tnesavršene boje\n"
 
 #: src/frontend/mame/ui/selgame.cpp:882
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "Grafika\tnesavršena\n"
 
 #: src/frontend/mame/ui/selgame.cpp:884
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "Grafika\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:887
 msgid "Sound\tNone\n"
@@ -825,15 +825,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:889
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "Zvuk\tnije implementiran\n"
 
 #: src/frontend/mame/ui/selgame.cpp:891
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Zvuk\tnesavršen\n"
 
 #: src/frontend/mame/ui/selgame.cpp:893
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "Zvuk\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:896
 msgid "Controls\tUnimplemented\n"
@@ -845,19 +845,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:901
 msgid "Keyboard\tUnimplemented\n"
-msgstr ""
+msgstr "Tastatura\tnije implementirano\n"
 
 #: src/frontend/mame/ui/selgame.cpp:903
 msgid "Keyboard\tImperfect\n"
-msgstr ""
+msgstr "Tastatura\tnesavršena\n"
 
 #: src/frontend/mame/ui/selgame.cpp:906
 msgid "Mouse\tUnimplemented\n"
-msgstr ""
+msgstr "Miš\tnije implementiran\n"
 
 #: src/frontend/mame/ui/selgame.cpp:908
 msgid "Mouse\tImperfect\n"
-msgstr ""
+msgstr "Miš\tnesavršen\n"
 
 #: src/frontend/mame/ui/selgame.cpp:911
 msgid "Microphone\tUnimplemented\n"
@@ -923,32 +923,32 @@ msgstr ""
 #: src/frontend/mame/ui/selgame.cpp:946
 #, c-format
 msgid "Requires Artwork\t%1$s\n"
-msgstr ""
+msgstr "Zahteva ilustracije\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 #, c-format
 msgid "Requires Clickable Artwork\t%1$s\n"
-msgstr ""
+msgstr "Zahteva klik ilustracije\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 #, c-format
 msgid "Support Cocktail\t%1$s\n"
-msgstr ""
+msgstr "Podržava \"koktel\" mod\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 #, c-format
 msgid "Driver is BIOS\t%1$s\n"
-msgstr ""
+msgstr "Drajver je BIOS\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 #, c-format
 msgid "Support Save\t%1$s\n"
-msgstr ""
+msgstr "Podržava snimanje stanja igre\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 #, c-format
 msgid "Screen Orientation\t%1$s\n"
-msgstr ""
+msgstr "Orijentacija ekrana\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Vertical"
@@ -961,33 +961,35 @@ msgstr "Horizontalno"
 #: src/frontend/mame/ui/selgame.cpp:960
 #, c-format
 msgid "Requires CHD\t%1$s\n"
-msgstr ""
+msgstr "Zahteva CHD\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:973
 msgid "Roms Audit Pass\tOK\n"
-msgstr ""
+msgstr "Provera ROM-ova\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:975
 msgid "Roms Audit Pass\tBAD\n"
-msgstr ""
+msgstr "Provera ROM-ova\tNEUSPEŠNA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:978
 msgid "Samples Audit Pass\tNone Needed\n"
-msgstr ""
+msgstr "Provera semplova\tnije neophodna\n"
 
 #: src/frontend/mame/ui/selgame.cpp:980
 msgid "Samples Audit Pass\tOK\n"
-msgstr ""
+msgstr "Provera semplova\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:982
 msgid "Samples Audit Pass\tBAD\n"
-msgstr ""
+msgstr "Provera semplova\tNEUSPEŠNA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:985
 msgid ""
 "Roms Audit Pass\tDisabled\n"
 "Samples Audit Pass\tDisabled\n"
 msgstr ""
+"Provera ROM-ova\tonemogućena\n"
+"Provera semplova\tonemogućena\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1168
 #, c-format
@@ -997,12 +999,12 @@ msgstr "%1$s %2$s ( %3$d / %4$d mašine (%5$d BIOS) )"
 #: src/frontend/mame/ui/selgame.cpp:1184 src/frontend/mame/ui/selsoft.cpp:555
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Pretraga: %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1186 src/frontend/mame/ui/selsoft.cpp:557
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "Pretraga: %1$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1196
 #, c-format
@@ -1020,10 +1022,13 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
+"Selektovanoj mašini nedostaje jedan ili više ROM ili CHD fajlova. Molim "
+"izaberite drugu mašinu.\n"
+"\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1246 src/frontend/mame/ui/selsoft.cpp:462
 msgid "Press any key to continue."
-msgstr ""
+msgstr "Pritisnite bilo koji taster za nastavak."
 
 #: src/frontend/mame/ui/dirmenu.cpp:35
 msgid "ROMs"
@@ -1315,7 +1320,7 @@ msgstr "[neuspešno]"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "protection"
-msgstr ""
+msgstr "zaštita"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "color palette"
@@ -1323,11 +1328,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:32
 msgid "graphics"
-msgstr ""
+msgstr "grafika"
 
 #: src/frontend/mame/ui/info.cpp:33
 msgid "sound"
-msgstr ""
+msgstr "zvuk"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "controls"
@@ -1335,11 +1340,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "keyboard"
-msgstr ""
+msgstr "tastatura"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "mouse"
-msgstr ""
+msgstr "miš"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "microphone"
@@ -1460,6 +1465,9 @@ msgid ""
 "\n"
 "There are working clones of this machine: %s"
 msgstr ""
+"\n"
+"\n"
+"Postoji klonovi ove mašine koji rade: %s"
 
 #: src/frontend/mame/ui/info.cpp:275
 msgid ""
@@ -1512,9 +1520,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:371
 msgid "None\n"
-msgstr ""
-"Nijedan\n"
-"\n"
+msgstr "Nijedan\n"
 
 #: src/frontend/mame/ui/info.cpp:378
 msgid "Vector"
@@ -1592,7 +1598,7 @@ msgstr "Kontrola trake"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "Izbor BIOS-a"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1738,7 +1744,7 @@ msgstr "Istorija"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MAMEinfo"
-msgstr ""
+msgstr "МАМЕ - informacije"
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MARPScore"
@@ -1746,7 +1752,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "MESSinfo"
-msgstr ""
+msgstr "МESS - informacije"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Mamescore"
@@ -1762,7 +1768,7 @@ msgstr "Izbor dela softvera:"
 
 #: src/frontend/mame/ui/selmenu.cpp:358
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Izbor BIOS-a:"
 
 #: src/frontend/mame/ui/selmenu.cpp:585 src/frontend/mame/ui/selmenu.cpp:621
 #: src/frontend/mame/ui/simpleselgame.cpp:311
@@ -1822,7 +1828,7 @@ msgstr "Uopšteno: radi"
 
 #: src/frontend/mame/ui/selmenu.cpp:642
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "Grafika: nije implementirano, "
 
 #: src/frontend/mame/ui/selmenu.cpp:644
 msgid "Graphics: Imperfect, "
@@ -2031,7 +2037,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
-msgstr ""
+msgstr "Miš"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Joystick"
@@ -2171,6 +2177,9 @@ msgid ""
 "different software.\n"
 "\n"
 msgstr ""
+"Selektovanom programu nedostaje jedan ili više fajlova. Molim selektujte "
+"drugi program.\n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:549
 #, c-format
@@ -2180,7 +2189,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d programskih paketa )"
 #: src/frontend/mame/ui/selsoft.cpp:550
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr "Drajver: \"%1$s\" lista softvera "
+msgstr "Drajver: \"%1$s\" lista programa "
 
 #: src/frontend/mame/ui/selsoft.cpp:564 src/frontend/mame/ui/selsoft.cpp:571
 #: src/frontend/mame/ui/simpleselgame.cpp:308
@@ -2501,41 +2510,11 @@ msgstr "Podešavanja"
 #~ msgid "Extra INIs"
 #~ msgstr "Dodatni INI fajlovi"
 
-#~ msgid " ^!File"
-#~ msgstr " ^!Fajl"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!Kategorija"
-
-#~ msgid "%1$s (%2$s - %3$s) - "
-#~ msgstr "%1$s (%2$s - %3$s) - "
-
-#~ msgid "%1$s (%2$s) - "
-#~ msgstr "%1$s (%2$s) - "
-
-#~ msgid "%1$s Search: %2$s_"
-#~ msgstr "%1$s Pretraga: %2$s_"
-
 #~ msgid "Main filter"
 #~ msgstr "Glavni filter"
 
 #~ msgid "Other filter"
 #~ msgstr "Drugi filter"
-
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!Proizvođač"
-
-#~ msgid "^!Year"
-#~ msgstr "^!Godina"
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!Izdavač"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!Lista programa"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!Tip uredjaja"
 
 #~ msgid "^!Region"
 #~ msgstr "^!Region"
@@ -2546,62 +2525,11 @@ msgstr "Podešavanja"
 #~ msgid "Region: %1$s -"
 #~ msgstr "Oblast: %1$s -"
 
-#~ msgid "Publisher: %1$s -"
-#~ msgstr "Izdavač: %1$s -"
-
-#~ msgid "Year: %1$s -"
-#~ msgstr "Godina: %1$s -"
-
-#~ msgid "Software List: %1$s -"
-#~ msgstr "Lista softvera : %1$s -"
-
-#~ msgid "Device type: %1$s -"
-#~ msgstr "Tip uređaja: %1$s -"
-
-#~ msgid "%s Search: %s_"
-#~ msgstr "%s Pretraga: %s_"
-
-#~ msgid "Bios selection:"
-#~ msgstr "Izbor BIOS-a:"
-
-#~ msgid "Bios"
-#~ msgstr "Bios"
-
-#~ msgid "Bios Selection"
-#~ msgstr "Izbor BIOS-a"
-
-#~ msgid " - ARGB Settings"
-#~ msgstr " - ARGB podešavanja"
-
 #~ msgid "Software History"
 #~ msgstr "Istorija softvera"
 
-#~ msgid "Mameinfo"
-#~ msgstr "МАМЕ - informacije"
-
-#~ msgid "Messinfo"
-#~ msgstr "МESS - informacije"
-
-#~ msgid "The keyboard emulation may not be 100% accurate.\n"
-#~ msgstr "Emulacija tastature možda nije 100% tačna.\n"
-
-#~ msgid "The colors aren't 100% accurate.\n"
-#~ msgstr "Boje nisu 100% tačne.\n"
-
-#~ msgid "The colors are completely wrong.\n"
-#~ msgstr "Boje su potpuno pogrešne.\n"
-
-#~ msgid "The video emulation isn't 100% accurate.\n"
-#~ msgstr "Video emulacija nije 100% tačna.\n"
-
-#~ msgid "The sound emulation isn't 100% accurate.\n"
-#~ msgstr "Emulacija zvuka nije 100% tačna.\n"
-
 #~ msgid "The machine lacks sound.\n"
 #~ msgstr "Mašini nedostaje zvuk.\n"
-
-#~ msgid "The machine requires external artwork files\n"
-#~ msgstr "Mašina zahteva dodatne ilustracione fajlove\n"
 
 #~ msgid "The machine has protection which isn't fully emulated.\n"
 #~ msgstr "Mašina ima zaštitu koja nije potpuno emulirana.\n"
@@ -2617,133 +2545,11 @@ msgstr "Podešavanja"
 #~ "interakciju ili se sastoje od mehaničkih uređaja. Nemoguće je igrati se "
 #~ "na ovoj mašini u potpunosti.\n"
 
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "There are working clones of this machine: "
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Postoji klonovi ove mašine koji rade: "
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key to continue."
-#~ msgstr ""
-#~ "Selektovanoj mašini nedostaje jedan ili više ROM ili CHD fajlova. Molim "
-#~ "izaberite drugu mašinu.\n"
-#~ "\n"
-#~ "Pritisnite bilo koji taster za nastavak."
-
-#~ msgid "Romset: %1$-.100s\n"
-#~ msgstr "ROM skup: %1$-.100s\n"
-
-#~ msgid "Year: %1$s\n"
-#~ msgstr "Godina: %1$s\n"
-
-#~ msgid "Manufacturer: %1$-.100s\n"
-#~ msgstr "Proizvođač: %1$-.100s\n"
-
-#~ msgid "Driver is Clone of: %1$-.100s\n"
-#~ msgstr "Drajver je klon od: %1$-.100s\n"
-
-#~ msgid "Driver is Parent\n"
-#~ msgstr "Drajver je predak\n"
-
-#~ msgid "Overall: NOT WORKING\n"
-#~ msgstr "Uopšteno: NE RADI\n"
-
-#~ msgid "Overall: Unemulated Protection\n"
-#~ msgstr "Uopšteno: Zaštita nije emulirana\n"
-
-#~ msgid "Overall: Working\n"
-#~ msgstr "Uopšteno: radi\n"
-
-#~ msgid "Graphics: Imperfect Colors\n"
-#~ msgstr "Grafika: nesavršene boje\n"
-
-#~ msgid "Graphics: Imperfect\n"
-#~ msgstr "Grafika: nesavršena\n"
-
-#~ msgid "Graphics: OK\n"
-#~ msgstr "Grafika: OK\n"
-
-#~ msgid "Sound: Unimplemented\n"
-#~ msgstr "Zvuk: nije implementiran\n"
-
-#~ msgid "Sound: Imperfect\n"
-#~ msgstr "Zvuk: nesavršen\n"
-
-#~ msgid "Sound: OK\n"
-#~ msgstr "Zvuk: OK\n"
-
-#~ msgid "Driver is Skeleton: %1$s\n"
-#~ msgstr "Drajver je \"skelet\": %s\n"
-
 #~ msgid "Game is Mechanical: %1$s\n"
 #~ msgstr "Igra je mehanička: %1$s\n"
 
-#~ msgid "Requires Artwork: %1$s\n"
-#~ msgstr "Zahteva ilustracije: %1$s\n"
-
-#~ msgid "Requires Clickable Artwork: %1$s\n"
-#~ msgstr "Zahteva klik ilustracije: %1$s\n"
-
-#~ msgid "Support Cocktail: %1$s\n"
-#~ msgstr "Podržava \"koktel\" mod: %1$s\n"
-
-#~ msgid "Driver is Bios: %1$s\n"
-#~ msgstr "Drajver je BIOS: %1$s\n"
-
-#~ msgid "Support Save: %1$s\n"
-#~ msgstr "Podržava snimanje stanja igre: %1$s\n"
-
-#~ msgid "Screen Orientation: %1$s\n"
-#~ msgstr "Orijentacija ekrana: %1$s\n"
-
-#~ msgid "Requires CHD: %1$s\n"
-#~ msgstr "Zahteva CHD: %1$s\n"
-
-#~ msgid "Roms Audit Pass: OK\n"
-#~ msgstr "Provera ROM-ova: OK\n"
-
-#~ msgid "Roms Audit Pass: BAD\n"
-#~ msgstr "Provera ROM-ova: neuspešna\n"
-
-#~ msgid "Samples Audit Pass: None Needed\n"
-#~ msgstr "Provera semplova: nije neophodna\n"
-
-#~ msgid "Samples Audit Pass: OK\n"
-#~ msgstr "Provera semplova: OK\n"
-
-#~ msgid "Samples Audit Pass: BAD\n"
-#~ msgstr "Provera semplova: neuspešna\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass: Disabled\n"
-#~ "Samples Audit Pass: Disabled\n"
-#~ msgstr ""
-#~ "Provera ROM-ova: onemogućena\n"
-#~ "Provera semplova: onemogućena\n"
-
 #~ msgid "No Infos Available"
 #~ msgstr "Informacije nisu dostupne"
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key to continue."
-#~ msgstr ""
-#~ "Selektovanom programu nedostaje jedan ili više fajlova. Molim selektujte "
-#~ "drugi program.\n"
-#~ "\n"
-#~ "Pritisnite bilo koji taster za nastavak."
-
-#~ msgid " [internal]"
-#~ msgstr " [interno]"
 
 #~ msgid "Save cancelled"
 #~ msgstr "Čuvanje stanja igre otkazano"
