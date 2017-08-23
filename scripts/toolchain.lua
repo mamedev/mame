@@ -836,6 +836,7 @@ function toolchain(_buildDir, _subDir)
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
@@ -852,6 +853,9 @@ function toolchain(_buildDir, _subDir)
 			"android",
 			"log",
 			"c++_static",
+			"c++abi",
+			"android_support",
+			"stdc++",
 			"gcc",
 		}
 		buildoptions {
@@ -879,6 +883,7 @@ function toolchain(_buildDir, _subDir)
 	configuration { "android-arm" }
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
+				"$(ANDROID_NDK_ARM)/lib/gcc/arm-linux-androideabi/4.9.x/armv7-a",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
 			}
 			includedirs {
@@ -891,6 +896,9 @@ function toolchain(_buildDir, _subDir)
 				"-mfloat-abi=softfp",
 				"-mfpu=vfpv3-d16",
 				"-mthumb",
+			}
+			links {
+				"unwind",
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
