@@ -294,6 +294,7 @@ VIDEOS["EF9365"] = true
 VIDEOS["GF4500"] = true
 --VIDEOS+= EPIC12"] = true
 --VIDEOS+= FIXFREQ"] = true
+VIDEOS["NT7534"] = true
 VIDEOS["HD44102"] = true
 VIDEOS["HD44352"] = true
 VIDEOS["HD44780"] = true
@@ -3411,6 +3412,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/codata.cpp",
+	MAME_DIR .. "src/mame/drivers/controlid.cpp",
 	MAME_DIR .. "src/mame/drivers/cortex.cpp",
 	MAME_DIR .. "src/mame/drivers/cosmicos.cpp",
 	MAME_DIR .. "src/mame/includes/cosmicos.h",
