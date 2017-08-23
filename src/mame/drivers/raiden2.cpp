@@ -967,7 +967,7 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_RSHIFT("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff, 1)
+	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
@@ -1008,7 +1008,7 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_RSHIFT("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff, 1)
+	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
@@ -1039,7 +1039,7 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_RSHIFT("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff, 1)
+	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")

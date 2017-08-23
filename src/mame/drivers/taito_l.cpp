@@ -657,7 +657,7 @@ static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_DEVREAD_RSHIFT("upd4701", upd4701_device, read_xy, 2)
+	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_DEVREAD_MOD("upd4701", upd4701_device, read_xy, rshift<2>)
 	AM_RANGE(0xa802, 0xa802) AM_DEVREAD("upd4701", upd4701_device, reset_x)
 	AM_RANGE(0xa803, 0xa803) AM_DEVREAD("upd4701", upd4701_device, reset_y)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP // Watchdog or interrupt ack
