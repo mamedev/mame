@@ -918,7 +918,7 @@ msgstr ""
 #: src/frontend/mame/ui/selgame.cpp:945
 #, c-format
 msgid "Mechanical Machine\t%1$s\n"
-msgstr ""
+msgstr "Mehanička mašina\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 #, c-format
@@ -2544,9 +2544,6 @@ msgstr "Podešavanja"
 #~ "Pojedini elementi ove mašine se ne mogu emulirati jer zahtevaju fizičku "
 #~ "interakciju ili se sastoje od mehaničkih uređaja. Nemoguće je igrati se "
 #~ "na ovoj mašini u potpunosti.\n"
-
-#~ msgid "Game is Mechanical: %1$s\n"
-#~ msgstr "Igra je mehanička: %1$s\n"
 
 #~ msgid "No Infos Available"
 #~ msgstr "Informacije nisu dostupne"

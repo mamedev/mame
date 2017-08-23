@@ -875,7 +875,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	if (flags.unemulated_features() & device_t::feature::GRAPHICS)
 		str << _("Graphics\tUnimplemented\n");
 	else if (flags.unemulated_features() & device_t::feature::PALETTE)
-		str << ("Graphics\tWrong Colors\n");
+		str << _("Graphics\tWrong Colors\n");
 	else if (flags.imperfect_features() & device_t::feature::PALETTE)
 		str << _("Graphics\tImperfect Colors\n");
 	else if (flags.imperfect_features() & device_t::feature::GRAPHICS)
