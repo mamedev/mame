@@ -67,19 +67,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
-msgstr ""
+msgstr "Disponibile"
 
 #: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
 msgid "Unavailable"
-msgstr ""
+msgstr "Non disponibile"
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
-msgstr ""
+msgstr "Funziona"
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Not Working"
-msgstr ""
+msgstr "Non funziona"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
@@ -91,19 +91,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "Categoria"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "Preferiti"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "Nessun BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
@@ -119,43 +119,43 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:86
 msgid "Year"
-msgstr ""
+msgstr "Anno"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "Salvataggio Supportato"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "Salvataggio non supportato"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "CHD Richiesto"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "Nessun CHD Richiesto"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Schermata Verticale"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Schermata orizzontale"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
-msgstr ""
+msgstr "Filtro personalizzato"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
-msgstr ""
+msgstr "Editore"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "Supportato"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
@@ -163,7 +163,7 @@ msgstr "Parzialmente Supportato"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "Non supportato"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
@@ -200,11 +200,11 @@ msgstr "Aggiungi filtro"
 
 #: src/frontend/mame/ui/utils.cpp:960
 msgid "Select category:"
-msgstr ""
+msgstr "Seleziona categoria:"
 
 #: src/frontend/mame/ui/utils.cpp:991
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[nessun file INI di categoria]"
 
 #: src/frontend/mame/ui/utils.cpp:999
 msgid "[no groups in INI file]"
@@ -216,19 +216,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
-msgstr ""
+msgstr "File"
 
 #: src/frontend/mame/ui/utils.cpp:1042
 msgid "No groups found in category file"
-msgstr ""
+msgstr "Nessun gruppo trovato nel file di categoria"
 
 #: src/frontend/mame/ui/utils.cpp:1047
 msgid "Group"
-msgstr ""
+msgstr "Gruppo"
 
 #: src/frontend/mame/ui/utils.cpp:1048
 msgid "Include clones"
-msgstr ""
+msgstr "Cloni inclusi"
 
 #: src/frontend/mame/ui/utils.cpp:1048 src/frontend/mame/ui/filecreate.cpp:82
 #: src/frontend/mame/ui/selgame.cpp:945 src/frontend/mame/ui/selgame.cpp:946
@@ -244,7 +244,7 @@ msgstr "Si"
 #: src/frontend/mame/ui/selgame.cpp:949 src/frontend/mame/ui/selgame.cpp:950
 #: src/frontend/mame/ui/selgame.cpp:960
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: src/frontend/mame/ui/cheatopt.cpp:92
 #, c-format
@@ -466,7 +466,7 @@ msgstr "Seleziona formato immagine"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Load State"
-msgstr ""
+msgstr "Carica Stato"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Select position to load from"
@@ -474,7 +474,7 @@ msgstr "Seleziona la posizione da cui caricare"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Save State"
-msgstr ""
+msgstr "Salva Stato"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Select position to save to"
@@ -1895,7 +1895,7 @@ msgstr "Usa immagine come sfondo"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "Salta il menu di selezione del BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -1911,7 +1911,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Advanced Options"
-msgstr ""
+msgstr "Opzioni avanzate"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
@@ -1923,7 +1923,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr ""
+msgstr "Salta fotogramma"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
@@ -1935,7 +1935,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Speed"
-msgstr ""
+msgstr "Velocità"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Refresh speed"
@@ -2003,7 +2003,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "Salvataggio e ripristino automatico"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Bilinear snapshot"
