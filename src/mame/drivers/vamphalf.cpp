@@ -16,8 +16,7 @@
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
-    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version 1.1.0908)
-    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version 1.0.0903)
+    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version 1.1.0908 and 1.0.0903)
     Vamp 1/2                        (c) 1999 Danbi & F2 System  (Korea version 1.1.0908)
     Date Quiz Go Go Episode 2       (c) 2000 SemiCom
     Mission Craft                   (c) 2000 Sun                (version 2.7 and 2.4)
