@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-21 22:23+1000\n"
-"PO-Revision-Date: 2016-11-01 10:38+0100\n"
+"PO-Revision-Date: 2017-08-23 12:01+0200\n"
 "Last-Translator: Lothar Serra Mari <rootfather@scummvm.org>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 2.0.3\n"
 
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
@@ -64,15 +64,15 @@ msgstr "Lesen von diesem Image, Schreiben in diff"
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
-msgstr ""
+msgstr "Ungefiltert"
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
-msgstr ""
+msgstr "Verfügbar"
 
 #: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
 msgid "Unavailable"
-msgstr ""
+msgstr "Nicht verfügbar"
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
@@ -80,15 +80,15 @@ msgstr "Funktioniert"
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Not Working"
-msgstr "Funktioniert Nicht"
+msgstr "Funktioniert nicht"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
-msgstr ""
+msgstr "Mechanisch"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Not Mechanical"
-msgstr ""
+msgstr "Nicht mechanisch"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
@@ -96,7 +96,7 @@ msgstr "Kategorie"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "Favoriten"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
@@ -104,15 +104,15 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "Nicht BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
-msgstr ""
+msgstr "Eltern"
 
 #: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
 msgid "Clones"
-msgstr ""
+msgstr "Klone"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
@@ -124,31 +124,31 @@ msgstr "Jahr"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "Speichern unterstützt"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "Speichern nicht unterstützt"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "CHD benötigt"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "Keine CHD benötigt"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Vertikaler Bildschirm"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Horizontaler Bildschirm"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
-msgstr ""
+msgstr "Benutzerdefinierter Filter"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
@@ -156,19 +156,19 @@ msgstr "Herausgeber"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "Unterstützt"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
-msgstr ""
+msgstr "Teilweise unterstützt"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "Nicht unterstützt"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
-msgstr ""
+msgstr "Veröffentlichungsregion"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
@@ -180,16 +180,16 @@ msgstr "Softwareliste"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
-msgstr ""
+msgstr "<Filter erstellen>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
-msgstr "Filter auswählen"
+msgstr "Filter auswählen:"
 
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "Filter %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
@@ -201,35 +201,35 @@ msgstr "Filter hinzufügen"
 
 #: src/frontend/mame/ui/utils.cpp:960
 msgid "Select category:"
-msgstr ""
+msgstr "Kategorie auswählen:"
 
 #: src/frontend/mame/ui/utils.cpp:991
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[Keine Kategorie INI Dateien]"
 
 #: src/frontend/mame/ui/utils.cpp:999
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[Keine Gruppen in INI Datei]"
 
 #: src/frontend/mame/ui/utils.cpp:1033
 msgid "No category INI files found"
-msgstr ""
+msgstr "Keine Kategorie INI Dateien gefunden"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
-msgstr ""
+msgstr "Datei"
 
 #: src/frontend/mame/ui/utils.cpp:1042
 msgid "No groups found in category file"
-msgstr ""
+msgstr "Keine Gruppen in Kategorie Datei gefunden"
 
 #: src/frontend/mame/ui/utils.cpp:1047
 msgid "Group"
-msgstr ""
+msgstr "Gruppe"
 
 #: src/frontend/mame/ui/utils.cpp:1048
 msgid "Include clones"
-msgstr ""
+msgstr "Klone einschließen"
 
 #: src/frontend/mame/ui/utils.cpp:1048 src/frontend/mame/ui/filecreate.cpp:82
 #: src/frontend/mame/ui/selgame.cpp:945 src/frontend/mame/ui/selgame.cpp:946
@@ -451,7 +451,7 @@ msgstr "Neuer Image-Name:"
 
 #: src/frontend/mame/ui/filecreate.cpp:177
 msgid "Image Format:"
-msgstr "Image-Format"
+msgstr "Image-Format:"
 
 #: src/frontend/mame/ui/filecreate.cpp:183
 msgid "Create"
@@ -467,7 +467,7 @@ msgstr "Image-Format auswählen"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Load State"
-msgstr ""
+msgstr "Lade Status"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Select position to load from"
@@ -475,7 +475,7 @@ msgstr "Ladeposition wählen"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Save State"
-msgstr ""
+msgstr "Speichere Status"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Select position to save to"
@@ -785,11 +785,11 @@ msgstr "Treiber ist Ursprungs-Treiber\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:864
 msgid "Analog Controls\tYes\n"
-msgstr ""
+msgstr "Analoge Bedienelemente\tVorhanden\n"
 
 #: src/frontend/mame/ui/selgame.cpp:866
 msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "Tastatureingaben\tVorhanden\n"
 
 #: src/frontend/mame/ui/selgame.cpp:869
 msgid "Overall\tNOT WORKING\n"
@@ -837,88 +837,88 @@ msgstr "Sound\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:896
 msgid "Controls\tUnimplemented\n"
-msgstr ""
+msgstr "Bedienelemente\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:898
 msgid "Controls\tImperfect\n"
-msgstr ""
+msgstr "Bedienelemente\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:901
 msgid "Keyboard\tUnimplemented\n"
-msgstr ""
+msgstr "Tastatur\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:903
 msgid "Keyboard\tImperfect\n"
-msgstr ""
+msgstr "Tastatur\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:906
 msgid "Mouse\tUnimplemented\n"
-msgstr ""
+msgstr "Maus\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:908
 msgid "Mouse\tImperfect\n"
-msgstr ""
+msgstr "Maus\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:911
 msgid "Microphone\tUnimplemented\n"
-msgstr ""
+msgstr "Mikrofon\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:913
 msgid "Microphone\tImperfect\n"
-msgstr ""
+msgstr "Mikrofon\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:916
 msgid "Camera\tUnimplemented\n"
-msgstr ""
+msgstr "Kamera\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:918
 msgid "Camera\tImperfect\n"
-msgstr ""
+msgstr "Kamera\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:921
 msgid "Disk\tUnimplemented\n"
-msgstr ""
+msgstr "Festplatte\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:923
 msgid "Disk\tImperfect\n"
-msgstr ""
+msgstr "Festplatte\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:926
 msgid "Printer\tUnimplemented\n"
-msgstr ""
+msgstr "Drucker\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:928
 msgid "Printer\tImperfect\n"
-msgstr ""
+msgstr "Drucker\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:931
 msgid "LAN\tUnimplemented\n"
-msgstr ""
+msgstr "LAN\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:933
 msgid "LAN\tImperfect\n"
-msgstr ""
+msgstr "LAN\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:936
 msgid "WAN\tUnimplemented\n"
-msgstr ""
+msgstr "WAN\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:938
 msgid "WAN\tImperfect\n"
-msgstr ""
+msgstr "WAN\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:941
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "Zeitlicher Ablauf\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:943
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "Zeitlicher Ablauf\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 #, c-format
 msgid "Mechanical Machine\t%1$s\n"
-msgstr ""
+msgstr "Maschine ist mechanisch\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 #, c-format
@@ -1009,12 +1009,12 @@ msgstr "Suche: %1$s_"
 #: src/frontend/mame/ui/selgame.cpp:1196
 #, c-format
 msgid "Romset: %1$-.100s"
-msgstr "ROM-Satz: %1$-.100s\n"
+msgstr "ROM-Satz: %1$-.100s"
 
 #: src/frontend/mame/ui/selgame.cpp:1203
 #, c-format
 msgid "System: %1$-.100s"
-msgstr "System: %1$-.100s\n"
+msgstr "System: %1$-.100s"
 
 #: src/frontend/mame/ui/selgame.cpp:1240
 msgid ""
@@ -1036,7 +1036,7 @@ msgstr "ROMs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
-msgstr ""
+msgstr "Software-Medien"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
@@ -1056,7 +1056,7 @@ msgstr "INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "Kategorie INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
@@ -1321,59 +1321,59 @@ msgstr "[fehlgeschlagen]"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "protection"
-msgstr ""
+msgstr "Kopierschutz"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "color palette"
-msgstr ""
+msgstr "Farbpalette"
 
 #: src/frontend/mame/ui/info.cpp:32
 msgid "graphics"
-msgstr ""
+msgstr "Grafik"
 
 #: src/frontend/mame/ui/info.cpp:33
 msgid "sound"
-msgstr ""
+msgstr "Sound"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "controls"
-msgstr ""
+msgstr "Bedienelemente"
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "keyboard"
-msgstr ""
+msgstr "Tastatur"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "mouse"
-msgstr ""
+msgstr "Maus"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "microphone"
-msgstr ""
+msgstr "Mikrofon"
 
 #: src/frontend/mame/ui/info.cpp:38
 msgid "camera"
-msgstr ""
+msgstr "Kamera"
 
 #: src/frontend/mame/ui/info.cpp:39
 msgid "disk"
-msgstr ""
+msgstr "Festplatte"
 
 #: src/frontend/mame/ui/info.cpp:40
 msgid "printer"
-msgstr ""
+msgstr "Drucker"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgid "LAN"
-msgstr ""
+msgstr "LAN"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "WAN"
-msgstr ""
+msgstr "WAN"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr ""
+msgstr "Zeitlicher Ablauf"
 
 #: src/frontend/mame/ui/info.cpp:177
 msgid ""
@@ -1399,7 +1399,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:197
 msgid "Completely unemulated features: "
-msgstr ""
+msgstr "Komplett unemulierte Funktionen: "
 
 #: src/frontend/mame/ui/info.cpp:203 src/frontend/mame/ui/info.cpp:219
 #, c-format
@@ -1414,7 +1414,7 @@ msgstr ", %s"
 
 #: src/frontend/mame/ui/info.cpp:213
 msgid "Imperfectly emulated features: "
-msgstr ""
+msgstr "Nicht perfekt emulierte Funktionen: "
 
 #: src/frontend/mame/ui/info.cpp:228
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -1460,6 +1460,10 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"Verschiedene Elemente dieser Maschine können nicht emuliert werden, da sie "
+"echte physische Interaktion voraussetzen oder mechanische Komponenten "
+"beinhalten. Es ist nicht möglich, diese Maschine vollständig zu verwenden.\n"
 
 #: src/frontend/mame/ui/info.cpp:262
 #, c-format
@@ -1480,7 +1484,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Drücken Sie eine beliebige Taste zum Fortfahren."
+"Drücken Sie eine beliebige Taste zum Fortfahren"
 
 #: src/frontend/mame/ui/info.cpp:290
 #, c-format
@@ -1675,16 +1679,17 @@ msgstr " STIFTE"
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
 msgstr ""
+"ROMs für alle %1$u als nicht verfügbar gekennzeichneten Maschinen prüfen?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "ROMs für alle %1$u Maschinen prüfen?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(Ergebnisse werden unter %1$s gespeichert)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -1692,10 +1697,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Prüfe ROMs für Maschine %2$u von %3$u...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "Audit starten"
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
@@ -1739,7 +1746,7 @@ msgstr "Gameinit"
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "High Scores"
-msgstr ""
+msgstr "Rekordpunktzahlen"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "History"
@@ -1747,15 +1754,15 @@ msgstr "Geschichte"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MAMEinfo"
-msgstr ""
+msgstr "MAME-Info"
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MARPScore"
-msgstr ""
+msgstr "MARP-Spielstand"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "MESSinfo"
-msgstr ""
+msgstr "MESS-Info"
 
 #: src/frontend/mame/ui/selmenu.cpp:134
 msgid "Mamescore"
@@ -1782,7 +1789,7 @@ msgstr "%1$s, %2$-.100s"
 #: src/frontend/mame/ui/selmenu.cpp:589
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "Programm ist ein Klon von: %1$-.100s\n"
+msgstr "Programm ist ein Klon von: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:591
 msgid "Software is parent"
@@ -1803,12 +1810,12 @@ msgstr "Unterstützt: Ja"
 #: src/frontend/mame/ui/selmenu.cpp:611
 #, c-format
 msgid "romset: %1$-.100s"
-msgstr "ROM-Satz: %1$-.100s\n"
+msgstr "ROM-Satz: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:627
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
-msgstr "Treiber ist ein Klon von: %1$-.100s\n"
+msgstr "Treiber ist ein Klon von: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:629
 msgid "Driver is parent"
@@ -1822,12 +1829,12 @@ msgstr "Insgesamt: FUNKTIONIERT NICHT"
 #: src/frontend/mame/ui/selmenu.cpp:636
 #: src/frontend/mame/ui/simpleselgame.cpp:332
 msgid "Overall: Unemulated Protection"
-msgstr "Insgesamt: Nicht emulierter Kopierschutz\n"
+msgstr "Insgesamt: Nicht emulierter Kopierschutz"
 
 #: src/frontend/mame/ui/selmenu.cpp:638
 #: src/frontend/mame/ui/simpleselgame.cpp:334
 msgid "Overall: Working"
-msgstr "Insgesamt: Funktioniert\n"
+msgstr "Insgesamt: Funktioniert"
 
 #: src/frontend/mame/ui/selmenu.cpp:642
 msgid "Graphics: Unimplemented, "
@@ -2207,6 +2214,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Der gewählten Maschine fehlen ein oder mehrere benötigte ROM- oder CHD-"
+"Abbilder. Bitte wählen Sie eine andere Maschine aus.\n"
+"\n"
+"Drücken Sie eine beliebige Taste, um fortzufahren."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:241
 #, c-format
@@ -2234,7 +2245,7 @@ msgstr "Geben Sie den Namen ein oder wählen Sie: (zufällige Auswahl)"
 #: src/frontend/mame/ui/simpleselgame.cpp:314
 #, c-format
 msgid "Driver: %1$-.100s"
-msgstr "Treiber: %1$-.100s\n"
+msgstr "Treiber: %1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:339
 #: src/frontend/mame/ui/simpleselgame.cpp:349
@@ -2263,7 +2274,8 @@ msgstr "Grafik: %s, Sound: %s"
 #: src/frontend/mame/ui/ui.cpp:337
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
-"Für diese Maschine müssen Abbilder in die folgenden Geräte eingehängt werden:"
+"Für diese Maschine müssen Abbilder in die folgenden Geräte eingehängt "
+"werden: "
 
 #: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
 msgid "Keyboard Emulation Status"
