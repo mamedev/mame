@@ -2881,7 +2881,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
 
 DRIVER_INIT_MEMBER(vamphalf_state,vamphalfr1)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a4f0, 0x0004a4f3, read16_delegate(FUNC(vamphalf_state::vamphalf_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a4f0, 0x0004a4f3, read16_delegate(FUNC(vamphalf_state::vamphalfr1_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 0x80;
