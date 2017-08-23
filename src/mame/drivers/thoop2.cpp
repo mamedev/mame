@@ -12,6 +12,44 @@ There is a priority bug on the title screen (Gaelco logo is hidden by black
 borders)  It seems sprite priority is hacked around on most of the older
 Gaelco drivers.
 
+
+REF.9409411
++-------------------------------------------------+
+|       C1                                  6116  |
+|  VOL  C2*                                 6116  |
+|          30MHz                            6116  |
+|    M6295                    +----------+  6116  |
+|     1MHz                    |TMS       |        |
+|       6116                  |TPC1020AFN|        |
+|J      6116                  |   -084C  |    H8  |
+|A     +------------+         +----------+        |
+|M     |DS5002FP Box|         +----------+        |
+|M     +------------+         |TMS       |    H12 |
+|A             65756          |TPC1020AFN|        |
+|              65756          |   -084C  |        |
+|                             +----------+        |
+|SW1                                   PAL   65764|
+|     24MHz    MC68000P12                    65764|
+|SW2           C22                    6116        |
+|      PAL     C23                    6116        |
++-------------------------------------------------+
+
+  CPU: MC68000P12 & DS5002FP (used for protection)
+Sound: OKI M6295
+  OSC: 30MHz, 24MHz & 1MHz resonator
+  RAM: MHS HM3-65756K-5  32K x 8 SRAM (x2)
+       MHS HM3-65764E-5  8K x 8 SRAM (x2)
+       UM6116BK-35  2K x 8 SRAM (x8)
+  PAL: TI F20L8-25CNT DIP24 (x2)
+  VOL: Volume pot
+   SW: Two 8 switch dipswitches
+
+DS5002FP Box contains:
+  Dallas DS5002SP @ 12MHz
+  KM62256BLG-7L - 32Kx8 Low Power CMOS SRAM
+  3.6v Battery
+  JP1 - 5 pin port to program SRAM
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -251,7 +289,7 @@ static MACHINE_CONFIG_START( thoop2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // 1MHz resonator - pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
