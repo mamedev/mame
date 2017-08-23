@@ -13,7 +13,7 @@ borders)  It seems sprite priority is hacked around on most of the older
 Gaelco drivers.
 
 
-REF.9409411
+REF.940411
 +-------------------------------------------------+
 |       C1                                  6116  |
 |  VOL  C2*                                 6116  |
