@@ -212,7 +212,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:1033
 msgid "No category INI files found"
-msgstr "Nessun file INI de categoria trovata"
+msgstr "Nessun file INI della categoria trovata"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
@@ -1091,7 +1091,7 @@ msgstr "PCB"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgid "Controls Panels"
-msgstr ""
+msgstr "Pannelli di controllo"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgid "Crosshairs"
@@ -1127,7 +1127,7 @@ msgstr "Logo"
 
 #: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/selmenu.cpp:62
 msgid "Scores"
-msgstr ""
+msgstr "Punteggi"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:59
 msgid "Versus"
@@ -1319,7 +1319,7 @@ msgstr "[fallito]"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "protection"
-msgstr ""
+msgstr "protezione"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "color palette"
@@ -1335,7 +1335,7 @@ msgstr "audio"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "controls"
-msgstr ""
+msgstr "controlli"
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "keyboard"
@@ -1347,7 +1347,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "microphone"
-msgstr ""
+msgstr "microfono"
 
 #: src/frontend/mame/ui/info.cpp:38
 msgid "camera"
@@ -1355,7 +1355,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:39
 msgid "disk"
-msgstr ""
+msgstr "disco"
 
 #: src/frontend/mame/ui/info.cpp:40
 msgid "printer"
@@ -1675,7 +1675,7 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(i risultati verranno salvati su %1$s)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -1698,11 +1698,11 @@ msgstr "Revisione: "
 
 #: src/frontend/mame/ui/selmenu.cpp:51
 msgid "Control Panels"
-msgstr ""
+msgstr "Pannelli di controllo"
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Artwork Preview"
-msgstr ""
+msgstr "Anteprima Artwork"
 
 #: src/frontend/mame/ui/selmenu.cpp:60
 msgid "Game Over"
@@ -1891,7 +1891,7 @@ msgstr "Confermi l'uscita"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
-msgstr ""
+msgstr "Salta la schermata delle informazioni all'avvio"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
@@ -1923,7 +1923,7 @@ msgstr "Opzioni avanzate"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
-msgstr ""
+msgstr "Opzioni prestazioni"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
@@ -1951,15 +1951,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:47
 msgid "Rotation Options"
-msgstr ""
+msgstr "Opzioni di rotazione"
 
 #: src/frontend/mame/ui/submenu.cpp:49
 msgid "Rotate right"
-msgstr ""
+msgstr "Ruota a destra"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate left"
-msgstr ""
+msgstr "Ruota a sinistra"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
@@ -1999,7 +1999,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Use Control Panels"
-msgstr ""
+msgstr "Utilizza i pannelli di controllo"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Marquees"
@@ -2023,7 +2023,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Input Options"
-msgstr ""
+msgstr "Opzioni di input"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Coin lockout"
