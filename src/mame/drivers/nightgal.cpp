@@ -320,6 +320,19 @@ WRITE8_MEMBER(nightgal_state::output_w)
 *
 ********************************************/
 
+
+/********************************
+* Common
+********************************/
+
+static ADDRESS_MAP_START( common_nsc_map, AS_PROGRAM, 8, nightgal_state )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
+	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w)
+ADDRESS_MAP_END
+
 /********************************
 * Sexy Gal
 ********************************/
@@ -331,9 +344,8 @@ static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
+static ADDRESS_MAP_START( common_sexygal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWA") AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSTEM") AM_WRITE(mux_w)
 	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_0_w)
@@ -341,26 +353,31 @@ static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
 	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
-	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w)
+static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
+	AM_IMPORT_FROM( common_sexygal_io )
 
+	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sgaltrop_io, AS_IO, 8, nightgal_state )
+	AM_IMPORT_FROM( common_sexygal_io )
+
+	AM_RANGE(0x01,0x01) AM_DEVREAD("ymsnd", ym2203_device, data_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("ymsnd", ym2203_device, data_address_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
+	AM_IMPORT_FROM( common_nsc_map )
+
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgaltrop_nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
-	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w)
+	AM_IMPORT_FROM( common_nsc_map )
 
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
@@ -392,14 +409,10 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
-	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, process_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w)
+	AM_IMPORT_FROM( common_nsc_map )
 
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, process_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
 	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
@@ -720,12 +733,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(royalqn_map)
-	MCFG_CPU_IO_MAP(royalqn_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sgaltrop, sexygal )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(sgaltrop_io)
+
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sgaltrop_nsc_map)
 MACHINE_CONFIG_END
