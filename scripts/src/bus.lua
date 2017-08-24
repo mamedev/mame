@@ -277,6 +277,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
 	}
@@ -3129,7 +3131,7 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.h",	
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.h",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",

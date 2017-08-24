@@ -1964,7 +1964,7 @@ void validity_checker::validate_device_types()
 			// check for description conflicts
 			auto const drvdesc(m_descriptions_map.find(dev->name()));
 			auto const devdesc(device_name_map.emplace(dev->name(), &type));
-			if (m_names_map.end() != drvdesc)
+			if (m_descriptions_map.end() != drvdesc)
 			{
 				game_driver const &dup(*drvdesc->second);
 				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);

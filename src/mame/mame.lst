@@ -2727,7 +2727,9 @@ bbcmc                           // 1986 BBC Master Compact
 bbcmc_ar                        // 1986 BBC Master Compact (Arabic)
 bbcmet                          // 1986 BBC Master ET
 bbcmt                           // 1986 BBC Master Turbo
+cfa3000                         // 1989 Henson CFA 3000
 discmate                        // 1988 Arbiter Discmate
+econx25                         // 1986 Econet X25 Gateway
 ltmpbp                          // 1985 LTM Portable (B+)
 ltmpm                           // 1986 LTM Portable (Master)
 pro128s                         // 1987 Olivetti Prodest PC 128S
