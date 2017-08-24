@@ -353,6 +353,18 @@ static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sgaltrop_nsc_map, AS_PROGRAM, 8, nightgal_state )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
+	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w)
+
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("subrom", 0)
+ADDRESS_MAP_END
+
 /********************************
 * Royal Queen
 ********************************/
@@ -713,6 +725,11 @@ static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
 	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sgaltrop, sexygal )
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_PROGRAM_MAP(sgaltrop_nsc_map)
+MACHINE_CONFIG_END
+
 /*
 Night Gal
 (c)1984 NihonBussan Co.,Ltd.
@@ -1014,6 +1031,66 @@ ROM_START( ngalsumr )
 	ROM_LOAD( "ng2.6u", 0x00, 0x20, CRC(0162a24a) SHA1(f7e1623c5bca3725f2e59ae2096b9bc42e0363bf) )
 ROM_END
 
+/*
+
+Sexy Gal Tropical
+(c)1985 Nihon Bussan
+
+XGトロピカル (main board)
+
+Chips/hybrid modules (all Nichibutsu silkscreen):
+    2P  GF 136027 (40-pin CPU?)
+    4C  XG 1985-05 (40-pin)
+    4P  XGZ 60-04 (40-pin)
+    5D  NB 1984-06 (28-pin)
+
+Program:
+    3A  27128       1   NSC8105 program
+    3B  27128       2
+    3C  27128       3
+    3E  27256       4
+    3F  27256       5
+    3H  27256       6
+    3J  [empty socket]
+    3K  27256       7
+    3M  [empty socket]
+    3N  27256       8
+    3P  [empty socket]
+    3R  27128       9   Z80 program
+    3S  27128       10  Z80 program
+    5A  20-pin PAL  GT  no dump
+    7F  82S123      GT
+
+RAM:
+    3T  6116LP-3
+
+ROM loading is mostly guessed just to get dumps in
+
+*/
+
+ROM_START(sgaltrop)
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "10.3s", 0x0000, 0x4000, CRC(f252d959) SHA1(a1747d1f0c248ae8d9e304ee017b8195fff9c4a2) )
+	ROM_LOAD( "9.3r",  0x4000, 0x4000, CRC(834b62b6) SHA1(43fb7733d734158082126ee4f15c022c8bd53106) )
+
+	ROM_REGION( 0x4000, "subrom", 0 )
+	ROM_LOAD( "1.3a",  0x0000, 0x4000, CRC(bf096542) SHA1(8c20e70114b7e3369c15b4d8efacd55a16b2252c) )
+
+	ROM_REGION( 0xc000, "samples", 0 )
+	ROM_LOAD( "2.3b",  0x4000, 0x4000, CRC(1723d18d) SHA1(8447c8838941559e5496d2e0834884c27a46375c) )
+	ROM_LOAD( "3.3c",  0x8000, 0x4000, CRC(cdb2057b) SHA1(e60b46813e082ede0694f28f0c2c7a7fdf323ac9) )
+
+	ROM_REGION( 0x40000, "gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "4.3e",  0x00000, 0x08000, CRC(e10a3c91) SHA1(f77f85527afd59d57cd9cf1deb68c22e35722c78) )
+	ROM_LOAD( "5.3f",  0x08000, 0x08000, CRC(ec482f8e) SHA1(d4d6f618400949141a84ac981ad548ded105bfef) )
+	ROM_LOAD( "6.3h",  0x10000, 0x08000, CRC(571e5f93) SHA1(ef9e27a2121a0d63ac9aa5e4168c73c39d06c60a) )
+	ROM_LOAD( "7.3k",  0x20000, 0x08000, CRC(bd76eb88) SHA1(43cc8269a539153601619381c5dd0c50dd8d6a00) )
+	ROM_LOAD( "8.3n",  0x30000, 0x08000, CRC(5029a16f) SHA1(a89ac8283b3e487d9be5f1a8a1e37ba0bf0cd654) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "gt.7f", 0x00, 0x20, CRC(59e36d6e) SHA1(2e0f3d4809ec727518e6ec883f67ede8831681bf) )
+ROM_END
+
 DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 {
 	uint8_t *ROM = memregion("subrom")->base();
@@ -1044,3 +1121,5 @@ GAME( 1985, sexygal,  0,        sexygal, sexygal, nightgal_state, 0,        ROT0
 GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
 GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state, ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/* Type 4 HW */
+GAME( 1985, sgaltrop, 0,        sgaltrop,sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sexy Gal Tropical [BET] (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

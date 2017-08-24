@@ -8,8 +8,10 @@
 
     TODO:
     - Custom part #;
-	- Air Inferno uses different limit types (helicopter inputs?)
-
+	- Air Inferno uses different limit types (helicopter inputs?), might be 
+	  worth doing a subclass of this;
+	- Get dead zones from actual HW (currently hardlocked to 0x20);
+	  
 ***************************************************************************/
 
 #include "emu.h"
@@ -59,14 +61,14 @@ void taitoio_yoke_device::device_reset()
 }
 
 static INPUT_PORTS_START( yoke_inputs )
-	PORT_START("THROTTLE")
-	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_REVERSE
-
 	PORT_START("STICK_X")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) 
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke X")
 
 	PORT_START("STICK_Y")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke Y")
+
+	PORT_START("THROTTLE")
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_NAME("Throttle Lever")
 INPUT_PORTS_END
 
 ioport_constructor taitoio_yoke_device::device_input_ports() const
@@ -97,41 +99,41 @@ READ16_MEMBER( taitoio_yoke_device::throttle_r )
 READ_LINE_MEMBER( taitoio_yoke_device::slot_down_r )
 {
 	uint16_t throttle = ioport("THROTTLE")->read();
-
-	return (throttle != 0) && (throttle & 0x80) == 0x00;
+	
+	return (throttle & 0xe00) == 0x600;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::slot_up_r )
 {
 	uint16_t throttle = ioport("THROTTLE")->read();
 
-	return (throttle & 0x80) == 0x80;
+	return (throttle & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_left_r )
 {
 	uint16_t x = ioport("STICK_X")->read();
 
-	return (x & 0x800) == 0x800;
+	return (x & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_right_r )
 {
 	uint16_t x = ioport("STICK_X")->read();
 
-	return (x != 0) && (!(x & 0x800));
+	return (x & 0xe00) == 0x600;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_up_r )
 {
 	uint16_t y = ioport("STICK_Y")->read();
-		
-	return (y & 0x800) == 0x800;
+	
+	return (y & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_down_r )
 {
 	uint16_t y = ioport("STICK_Y")->read();
 	
-	return (y != 0) && (!(y & 0x800));
+	return (y & 0xe00) == 0x600;
 }

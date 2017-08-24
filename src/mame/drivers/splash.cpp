@@ -54,27 +54,6 @@ More notes about Funny Strip protection issues at the bottom of source file (DRI
 #include "screen.h"
 #include "speaker.h"
 
-WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-}
-
-WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-
-	// give the z80 time to see it
-	space.device().execute().spin_until_time(attotime::from_usec(40));
-}
-
 WRITE_LINE_MEMBER(splash_state::coin1_lockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
@@ -102,8 +81,8 @@ static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	AM_RANGE(0x84000a, 0x84000b) AM_SELECT(0x000070) AM_DEVWRITE8_RSHIFT("outlatch", ls259_device, write_d0, 0xff00, 3)
-	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)                       /* Sound command */
+	AM_RANGE(0x84000a, 0x84000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0xff00)
+	AM_RANGE(0x84000e, 0x84000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
@@ -117,6 +96,11 @@ WRITE8_MEMBER(splash_state::splash_adpcm_data_w)
 	m_adpcm_data = data;
 }
 
+WRITE8_MEMBER(splash_state::splash_adpcm_control_w)
+{
+	m_msm->reset_w(!BIT(data, 0));
+}
+
 WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
@@ -126,7 +110,7 @@ WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
 static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM                                     /* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)              /* ADPCM data for the MSM5205 chip */
-//  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                                /* ??? */
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(splash_adpcm_control_w)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)  /* Sound latch */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write) /* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_RAM                                     /* RAM */
@@ -175,8 +159,8 @@ static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	AM_RANGE(0x84000a, 0x84000b) AM_SELECT(0x000070) AM_DEVWRITE8_RSHIFT("outlatch", ls259_device, write_d0, 0xff00, 3)
-	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(roldf_sh_irqtrigger_w)                        /* Sound command */
+	AM_RANGE(0x84000a, 0x84000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0xff00)
+	AM_RANGE(0x84000e, 0x84000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
@@ -221,12 +205,6 @@ WRITE16_MEMBER(funystrp_state::spr_write)
 	m_spriteram[offset]|=0xff00; /* 8 bit, expected 0xffnn when read as 16 bit */
 }
 
-WRITE16_MEMBER(funystrp_state::sh_irqtrigger_w)
-{
-	m_soundlatch->write(space, 0, data>>8);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 WRITE8_MEMBER(funystrp_state::eeprom_w)
 {
 	m_eeprom->cs_write(BIT(data, 4));
@@ -244,7 +222,7 @@ static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, funystrp_state )
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x840008, 0x840009) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x84000a, 0x84000b) AM_WRITE8(eeprom_w, 0xff00) AM_READNOP
-	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(sh_irqtrigger_w)                       /* Sound command */
+	AM_RANGE(0x84000e, 0x84000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM
@@ -530,6 +508,7 @@ static MACHINE_CONFIG_START( splash )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_30MHz/8)       /* 3.75MHz (30/8) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -592,6 +571,7 @@ static MACHINE_CONFIG_START( roldfrog )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(splash_state, ym_irq))
@@ -676,6 +656,7 @@ static MACHINE_CONFIG_START( funystrp )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_400kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(funystrp_state, adpcm_int1))         /* interrupt function */

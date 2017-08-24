@@ -44,6 +44,12 @@ Sound: OKI M6295
   JP4: 5 pin header for light gun player 2
   JP5: 5 pin header for light gun player 1
 
+DS5002FP Box contains:
+  Dallas DS5002SP @ 12MHz
+  KM62256BLG-7L - 32Kx8 Low Power CMOS SRAM
+  3.6v Battery
+  JP1 - 5 pin port to program SRAM
+
 * NOTE: PCB can use four 27C040 eproms at I7, I9, I11 & I13 or two 8Meg MASK
         roms at H8 & H12.  Same set up as used on the World Rally PCBs
 

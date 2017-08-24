@@ -28,16 +28,6 @@ READ8_MEMBER(flstory_state::snd_flag_r)
 	return (m_soundlatch->pending_r() ? 0 : 1) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
-WRITE8_MEMBER(flstory_state::nmi_disable_w)
-{
-	m_soundnmi->in_w<1>(0);
-}
-
-WRITE8_MEMBER(flstory_state::nmi_enable_w)
-{
-	m_soundnmi->in_w<1>(1);
-}
-
 static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
@@ -238,8 +228,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xda00, 0xda00) AM_READWRITE(snd_flag_r, nmi_enable_w)
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
+	AM_RANGE(0xda00, 0xda00) AM_READ(snd_flag_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>)
+	AM_RANGE(0xdc00, 0xdc00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<1>)
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM                                         /* space for diagnostics ROM */
 ADDRESS_MAP_END

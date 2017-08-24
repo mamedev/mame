@@ -74,6 +74,7 @@
  * 0x0600 RW: Keyboard data port (8042)
  * 0x0602   : Keyboard control port (8042)
  * 0x0604   : (8042)
+ * 0x0a00-08: RS-232C interface (i8251)
  * 0x3000 - 0x3fff : CMOS RAM
  * 0xfd90-a0: CRTC / Video
  * 0xff81: CRTC / Video - returns value in RAM location 0xcff81?
@@ -2593,7 +2594,10 @@ void towns_state::driver_start()
 	m_towns_status_timer = timer_alloc(TIMER_CDSTATUS);
 	m_towns_cdda_timer = timer_alloc(TIMER_CDDA);
 
-	// CD-ROM init
+	memset(&m_video,0,sizeof(struct towns_video_controller));
+	memset(&m_towns_cd,0,sizeof(struct towns_cdrom_controller));
+	m_towns_cd.status = 0x01;  // CDROM controller ready
+	m_towns_cd.buffer_ptr = -1;
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
 	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
@@ -2632,8 +2636,6 @@ void towns_state::machine_reset()
 	m_towns_kb_irq1_enable = 0;
 	m_towns_pad_mask = 0x7f;
 	m_towns_mouse_output = MOUSE_START;
-	m_towns_cd.status = 0x01;  // CDROM controller ready
-	m_towns_cd.buffer_ptr = -1;
 	m_towns_volume_select = 0;
 	m_intervaltimer2_period = 0;
 	m_intervaltimer2_timeout_flag = 0;
