@@ -18094,6 +18094,9 @@ magmax                          // (c) 1985
 @source:magnum.cpp
 magnum                          //
 
+@source:magreel.cpp
+magreel                         //
+
 @source:magtouch.cpp
 magtouch                        // (c) 1995
 

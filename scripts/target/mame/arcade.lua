@@ -4593,6 +4593,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/magicard.cpp",
 	MAME_DIR .. "src/mame/drivers/magicfly.cpp",
 	MAME_DIR .. "src/mame/drivers/magictg.cpp",
+	MAME_DIR .. "src/mame/drivers/magreel.cpp",
 	MAME_DIR .. "src/mame/drivers/magtouch.cpp",
 	MAME_DIR .. "src/mame/drivers/majorpkr.cpp",
 	MAME_DIR .. "src/mame/drivers/malzak.cpp",
