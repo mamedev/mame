@@ -2511,6 +2511,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tube.h,MACHINES["TUBE"] = true
+---------------------------------------------------
+
+if (MACHINES["TUBE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tube.cpp",
+		MAME_DIR .. "src/devices/machine/tube.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upd1990a.h,MACHINES["UPD1990A"] = true
 ---------------------------------------------------
 
