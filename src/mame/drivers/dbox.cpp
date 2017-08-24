@@ -111,18 +111,33 @@
  *  SIM40 + 0x0040: 0x003FFFF5 CS0 mask 1 - block size = 4194304 (4MB)
  *  SIM40 + 0x0044: 0x00000003 CS0 base 1 - base addr = 0x000000
  *  SIM40 + 0x0048: 0x003FFFF5 CS1 mask 1 - block size = 4194304 (4MB)
- *  SIM40 + 0x004C: 0x00800003 CS1 base 1 - base addr = 0x
+ *  SIM40 + 0x004C: 0x00800003 CS1 base 1 - base addr = 0x800000
  *  SIM40 + 0x0050: 0x00007FFF CS2 mask 1 - block size = 65536 (64KB)
  *  SIM40 + 0x0054: 0x00700003 CS2 base 1
  *  SIM40 + 0x0058: 0x000007F2 CS3 mask 1 - block size = 2048 (2KB)
  *  SIM40 + 0x005C: 0x00780003 CS3 base 1
  *  SIM40 + 0x001F: 0x40       PBARB Port B Pin Assignment
  *
+- 0000007a void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000040, 003ffff5 (ffffffff) - not implemented
+- 00000082 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000044, 00000003 (ffffffff) - not implemented
+- 0000008a void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000048, 003ffff5 (ffffffff) - not implemented
+- 00000092 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 0000004c, 00800003 (ffffffff) - not implemented
+- 0000009a void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000050, 00007fff (ffffffff) - not implemented
+- 000000a2 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000054, 00700003 (ffffffff) - not implemented
+- 000000aa void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000058, 000007f2 (ffffffff) - not implemented
+- 000000b2 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 0000005c, 00780003 (ffffffff) - not implemented
+...
+- 008004d8 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000044, 00000053 (ffffffff) - not implemented
+- 008004e2 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000040, 003fff05 (ffffffff) - not implemented
+- 008004ee void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000040, 003ffff5 (ffffffff) - not implemented
+- 008004f8 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000044, 0000005b (ffffffff) - not implemented
+
+
  *  -------------------------------------------------------------
  *  The bootstrap copies the firmware to RAM and jumps to it
  *  -------------------------------------------------------------
  *
- *  --- PC > 0x700000 so probably init of the RTXC tick timer setup?!
+ *  --- PC > 0x700000 
  *  SIM40 + 0x0022: 0x0140     PICR Periodic Interrupt Control Register
  *  SIM40 + 0x0024: 0x0029     PICR Periodic Interrupt Timer Register
  *
@@ -273,6 +288,13 @@
  * ------------
  *  SIM40 + 0x0640: 0x03     MCR Timer 2
  *  tbc...
+ *
+ * // Tricks with the CS0 and the GAL:s
+ * 008004d8 SIM40 + 0x0044: 0x00000053 CS0 base 1 - base addr = 0x000000, Supervisor Data Space, No CPU Space, Valid CS 
+ * 008004e2 SIM40 + 0x0040: 0x003FFF05 CS0 mask 1 - block size = 4194304 (4MB), 
+ * ... strange series of operations between 800834 and 8008D4, suspecting GAL:s to be involved in some magic here
+ * 008004ee SIM40 + 0x0040: 0x003FFFF5 CS0 mask 1 - block size = 4194304 (4MB), Mask all accesses
+ * 008004f8 SIM40 + 0x0044: 0x0000005b CS0 base 1 - base addr = 0x000000, Supervisor Data Space, Write Protect, No CPU Space, Valid CS
  *
  *  LED Dot Matrix Display hookup
  *  -------------------------------------
@@ -306,6 +328,31 @@
  *  14   Enable*  Q1 74138 pin  14 IP12
  *  15   Clear*   System reset
  *
+ *  Address map decoding
+ *  --------------------
+ *  IP06 GAL16V8 - DRAM
+ *  pin signal   connected to
+ *   1   Q       V-FIFO-CLK inverted SCSI_CLK, origin to be found
+ *   2   I1      SCSI_CLK
+ *   3   I2      A0   68340 pin 113 IP01
+ *   4   I3      CS1  68340 pin   2 IP01
+ *   5   I4      A19  68340 pin  62 IP01
+ *   6   I5      A21  68340 pin  64 IP01
+ *   7   I6      BG   68340 pin 101 IP01
+ *   8   I7      SIZ0 68340 pin 105 IP01
+ *   9   I8      R/W  68340 pin 107 IP01
+ *  11   I9/OE*  GND  68340 pin 107 IP01 via an 100R resistor
+ *  19   O0      FC2  68340 pin  71 IP01
+ *  18   O1      I8   GAL168V pin 9 IP07 SCSI GAL
+ *  17   O2      nc
+ *  16   O3      RAS1 514260 pin 14 IP10-11 512KB DRAM each (IP11 is empty socket)
+ *  15   O4      LCAS 514260 pin 29 IP09-11 512KB DRAM each (IP11 is empty socket)
+ *  14   O5      UCAS 514260 pin 28 IP09-11 512KB DRAM each (IP11 is empty socket)
+ *  13   O6      RAS0 514260 pin 14 IP09    512KB DRAM
+ *  12   O7      I2 GAL16V8 pin 3 IP07 SCSI GAL (ANDed with !CS1) DMA_REQ
+ *               I1 GAL16V8 pin 2 IP08 LOGC GAL (ANDed with !CS1) DMA_REQ
+ *               G1 74257 pin 1 IP04-05 MUXes
+ *
  *  Identified low level drivers in firmware
  *  ----------------------------------------
  *  800420..80046C : Some PORT A serialisation routine for the
@@ -316,9 +363,11 @@
  * Description               Device  Lvl  IRQ
  *                           /Board      Vector
  * ----------------------------------------------------------
- * On board Sources
+ *  IRQ7 CTRL20 IP19 circuit
+ *  IRQ6 SCSI/DEMUX INT
+ *  IRQ5 CAM module INT
+ *  IRQ3 Audio/Video INT
  *
- * Off board Sources (other boards)
  * ----------------------------------------------------------
  *
  * DMAC Channel Assignments
@@ -328,6 +377,7 @@
  * ----------------------------------------------------------
  *
  *  TODO:
+ *  - Dump/understand the address decoder GAL:s IP06-IP08 (3 x 16V8)
  *  - Setup a working address map
  *  - Fix debug terminal
  *  - TBC
@@ -388,6 +438,7 @@ class dbox_state : public driver_device
 void dbox_state::machine_reset()
 {
 	LOG("%s\n", FUNCNAME);
+	m_maincpu->tgate2_w(ASSERT_LINE); // Pulled high by resistor when not used as Rx from descrambler device
 }
 
 // TODO: Hookup the reset latch correctly
@@ -421,9 +472,14 @@ static INPUT_PORTS_START( dbox )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( dbox )
-	MCFG_CPU_ADD("maincpu", M68340, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68340, 0)       // The 68340 has an internal VCO as clock source, hence need no CPU clock
+	MCFG_MC68340_ADD_CRYSTAL(XTAL_32_768kHz) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
 	MCFG_CPU_PROGRAM_MAP(dbox_map)
 	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(dbox_state, write_pa))
+
+	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler  module */
+	//MCFG_MC68340_TOUT2_OUTPUT_CB(DEVWRITELINE("dcs", descrambler_device,  txd_receiver))
+	//MCFG_MC68340_TGATE2_INPUT_CB(DEVREADLINE("dsc", descrambler_device,  rxd_receiver))
 
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
@@ -431,7 +487,6 @@ static MACHINE_CONFIG_START( dbox )
 	/* IP16 74256 8 bit latch */
 	MCFG_LATCH8_ADD("hct259.ip16")
 	MCFG_LATCH8_WRITE_4(DEVWRITELINE("display", sda5708_device, reset_w))
-
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(dbox_state, dbox)
