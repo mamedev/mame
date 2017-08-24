@@ -305,16 +305,13 @@ READ16_MEMBER(taitoair_state::stick_input_r)
 	switch( offset )
 	{
 		case 0x00:  /* "counter 1" lo */
-			return m_yoke->throttle_r(space,0) & 0xff; //ioport(STICK1_PORT_TAG)->read();
+			return m_yoke->throttle_r(space,0) & 0xff;
 
 		case 0x01:  /* "counter 2" lo */
 			return m_yoke->stickx_r(space,0) & 0xff;
 
 		case 0x02:  /* "counter 1" hi */
-			if(m_yoke->throttle_r(space,0) & 0x80)
-				return 0xff;
-
-			return 0;
+			return (m_yoke->throttle_r(space,0) & 0xff00) >> 8;
 
 		case 0x03:  /* "counter 2" hi */
 			return (m_yoke->stickx_r(space,0) & 0xff00) >> 8;

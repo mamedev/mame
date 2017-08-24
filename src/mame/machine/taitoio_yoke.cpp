@@ -68,7 +68,7 @@ static INPUT_PORTS_START( yoke_inputs )
 	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke Y")
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_NAME("Throttle Lever")
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_NAME("Throttle Lever")
 INPUT_PORTS_END
 
 ioport_constructor taitoio_yoke_device::device_input_ports() const
@@ -100,14 +100,14 @@ READ_LINE_MEMBER( taitoio_yoke_device::slot_down_r )
 {
 	uint16_t throttle = ioport("THROTTLE")->read();
 	
-	return (throttle & 0xe0) == 0x60;
+	return (throttle & 0xe00) == 0x600;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::slot_up_r )
 {
 	uint16_t throttle = ioport("THROTTLE")->read();
 
-	return (throttle & 0xe0) == 0x80;
+	return (throttle & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_left_r )
