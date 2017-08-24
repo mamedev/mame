@@ -61,11 +61,10 @@ public:
 
 	// splash specific
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
-	DECLARE_WRITE16_MEMBER(splash_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(splash_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(splash_adpcm_control_w);
 
 	// roldfrog specific
-	DECLARE_WRITE16_MEMBER(roldf_sh_irqtrigger_w);
 	DECLARE_READ16_MEMBER(roldfrog_bombs_r);
 	DECLARE_WRITE8_MEMBER(roldfrog_vblank_ack_w);
 	DECLARE_READ8_MEMBER(roldfrog_unk_r);
@@ -118,7 +117,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	DECLARE_DRIVER_INIT(funystrp);
