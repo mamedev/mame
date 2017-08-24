@@ -302,6 +302,7 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 		if (m_rtc) m_rtc->reset();
 		if (m_fdc) m_fdc->reset();
 		if (m_i8271) m_i8271->reset();
+		if (m_1mhzbus) m_1mhzbus->reset();
 	}
 }
 
@@ -984,7 +985,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
 
 	/* 1mhz bus port */
-	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbcb_1mhzbus_devices, nullptr)
+	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
 	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<3>))
 	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(bbc_state, bus_nmi_w))
 
@@ -1447,7 +1448,7 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
 
 	/* 1mhz bus port */
-	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbcm_1mhzbus_devices, nullptr)
+	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
 	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<3>))
 	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(bbc_state, bus_nmi_w))
 
