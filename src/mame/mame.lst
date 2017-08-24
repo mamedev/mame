@@ -1474,7 +1474,7 @@ goldpyr                         // (c) 1997
 goldpyra                        // (c) 1997
 goldpyrb                        // (c) 1998
 goldenra                        // (c) 2000
-honeypot						// (c) 2000
+honeypot                        // (c) 2000
 incasun                         // (c) 1999
 incasunsp                       // (c) 1999
 incasunnz                       // (c) 2000
@@ -1590,7 +1590,7 @@ unicornd                        // (c) 1998
 unicornda                       // (c) 1998
 unicorndnz                      // (c) 2000
 unicorndu                       // (c) 2001
-venicea5						// (c) 2002
+venicea5                        // (c) 2002
 wamazon                         // (c) 1996
 wamazona                        // (c) 1996
 wamazonv                        // (c) 1996
@@ -29543,6 +29543,7 @@ nightgal                        // (c) 1984
 royalngt                        // (c) 1984 Royal Denshi
 royalqn                         //
 sexygal                         // (c) 1985
+sgaltrop                        // (c) 1985
 sweetgal                        // (c) 1985
 
 @source:ninjakd2.cpp
@@ -33112,7 +33113,7 @@ ichirjbl                        // bootleg
 ichirk                          // (c) 1994 Sega
 pclubj                          //
 pclubjv2                        //
-pclub							//
+pclub                           //
 pclubjv4                        //
 pclubjv5                        //
 potopoto                        // (c) 1994 Sega
