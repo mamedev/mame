@@ -67,6 +67,7 @@ public:
 	uint8_t m_nsc_latch;
 	uint8_t m_z80_latch;
 	uint8_t m_mux_data;
+	uint8_t m_pal_bank;
 	emu_timer *m_z80_wait_ack_timer;
 
 	required_shared_ptr<uint8_t> m_comms_ram;
@@ -140,13 +141,12 @@ uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_in
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			uint32_t srcpix = *src++;
-			*dst++ = m_palette->pen(srcpix & 0xf);
-			*dst++ = m_palette->pen((srcpix >> 4) & 0xf);
+			*dst++ = m_palette->pen((srcpix & 0xf) | m_pal_bank);
+			*dst++ = m_palette->pen(((srcpix >> 4) & 0xf) | m_pal_bank);
 		}
 	}
 
 	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
-
 	return 0;
 }
 
@@ -307,11 +307,13 @@ WRITE8_MEMBER(nightgal_state::output_w)
 	/*
 	Doesn't match Charles notes?
 	--x- ---- unknown, set by Royal Queen on gameplay
+	---- x--- color bank, used by Sexy Gal Tropical
 	---- -x-- flip screen
 	---- ---x out counter
 	*/
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	flip_screen_set((data & 0x04) == 0);
+	m_pal_bank = (data & 0x08) << 1;
 }
 
 /********************************************
@@ -698,7 +700,7 @@ static MACHINE_CONFIG_START( royalqn )
 	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x10)
+	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(nightgal_state, nightgal)
 
 	/* sound hardware */
