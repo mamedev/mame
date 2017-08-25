@@ -457,7 +457,6 @@ static ADDRESS_MAP_START( kickball_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( oki_map, 0, 8, aerofgt_state ) //only for aerfboot for now
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
@@ -1287,8 +1286,6 @@ static const gfx_layout kickball_spritelayout =
 	32*8
 };
 
-
-
 static GFXDECODE_START( pspikes )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
@@ -1559,8 +1556,6 @@ static MACHINE_CONFIG_START( kickball )
 	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_LOW) // AD-65 (M6295) clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-
 
 static MACHINE_CONFIG_START( pspikesc )
 
