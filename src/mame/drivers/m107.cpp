@@ -41,7 +41,6 @@ confirmed for m107 games as well.
 
 void m107_state::machine_start()
 {
-	save_item(NAME(m_sound_status));
 }
 
 /*****************************************************************************/
@@ -77,35 +76,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::coincounter_w)
+WRITE8_MEMBER(m107_state::coincounter_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
-	}
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE16_MEMBER(m107_state::bankswitch_w)
+WRITE8_MEMBER(m107_state::bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		membank("bank1")->set_entry((data & 0x06) >> 1);
-		if (data & 0xf9)
-			logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
-	}
-}
-
-READ16_MEMBER(m107_state::sound_status_r)
-{
-	m_upd71059c->ir3_w(0);
-	return m_sound_status;
-}
-
-WRITE16_MEMBER(m107_state::sound_status_w)
-{
-	COMBINE_DATA(&m_sound_status);
-	m_upd71059c->ir3_w(1);
+	membank("bank1")->set_entry((data & 0x06) >> 1);
+	if (data & 0xf9)
+		logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
 }
 
 WRITE16_MEMBER(m107_state::sound_reset_w)
@@ -130,9 +111,9 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ(sound_status_r)   /* answer from sound CPU */
+	AM_RANGE(0x08, 0x09) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)   // answer from sound CPU
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE(coincounter_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(coincounter_w, 0x00ff)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(control_w)
@@ -140,6 +121,11 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0xb0, 0xb1) AM_WRITE(spritebuffer_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(sound_reset_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dsoccr94_io_map, AS_IO, 16, m107_state )
+	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
+	AM_IMPORT_FROM(main_portmap)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
@@ -175,7 +161,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0xa8044, 0xa8045) AM_DEVREADWRITE8("soundlatch", generic_latch_8_device, read, acknowledge_w, 0x00ff)
-	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(sound_status_w)
+	AM_RANGE(0xa8046, 0xa8047) AM_DEVWRITE8("soundlatch2", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
 ADDRESS_MAP_END
 
@@ -762,6 +748,9 @@ static MACHINE_CONFIG_START( firebarr )
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
@@ -777,6 +766,7 @@ static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
+	MCFG_CPU_IO_MAP(dsoccr94_io_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
@@ -1001,7 +991,6 @@ DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::bankswitch_w),this));
 
 	m_spritesystem = 0;
 }
