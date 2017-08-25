@@ -200,7 +200,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kickball_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* work RAM */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("spriteram1")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("spriteram1")
 	AM_RANGE(0xff8000, 0xff8fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_SHARE("bg1videoram")
 	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITEONLY AM_SHARE("spriteram3")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_SHARE("rasterram")   /* bg1 scroll registers */
@@ -468,13 +468,17 @@ static ADDRESS_MAP_START( karatblzbl_sound_portmap, AS_IO, 8, aerofgt_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kickball_sound_map, AS_PROGRAM, 8, aerofgt_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("soundbank")
+	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kickball_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
+	AM_RANGE(0x40, 0x40) AM_WRITENOP // oki?
+	AM_RANGE(0xc0, 0xc0) AM_WRITENOP // oki?
 ADDRESS_MAP_END
 
 
@@ -1524,8 +1528,7 @@ MACHINE_CONFIG_END
 	Kick Ball
 
 	cloned bootleg-style Korean hardware, no original VSYSTEM parts
-	sprite system, tile banking and sound system are different like
-	many of the bootlegs
+	tile banking and sound system are different like many of the bootlegs
 */
 
 static MACHINE_CONFIG_START( kickball )
@@ -1539,8 +1542,8 @@ static MACHINE_CONFIG_START( kickball )
 	MCFG_CPU_PROGRAM_MAP(kickball_sound_map)
 	MCFG_CPU_IO_MAP(kickball_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
