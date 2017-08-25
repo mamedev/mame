@@ -37,35 +37,6 @@ confirmed for m107 games as well.
 #include "speaker.h"
 
 
-// this is the hacky code from m92.c, but better than per-game irq vector hacks.
-#define USE_HACKED_IRQS
-
-#ifdef USE_HACKED_IRQS
-
-#define M107_TRIGGER_IRQ0 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+0 ); /* VBL interrupt */
-#define M107_TRIGGER_IRQ1 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+1 ); /* Sprite buffer complete interrupt */
-#define M107_TRIGGER_IRQ2 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+2 ); /* Raster interrupt */
-#define M107_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
-// not used due to HOLD LINE logic
-#define M107_CLEAR_IRQ0 ;
-#define M107_CLEAR_IRQ1 ;
-#define M107_CLEAR_IRQ2 ;
-#define M107_CLEAR_IRQ3 ;
-
-#else
-
-#define M107_TRIGGER_IRQ0 m_upd71059c->ir0_w(1);
-#define M107_TRIGGER_IRQ1 m_upd71059c->ir1_w(1);
-#define M107_TRIGGER_IRQ2 m_upd71059c->ir2_w(1);
-#define M107_TRIGGER_IRQ3 m_upd71059c->ir3_w(1);
-// not sure when these should happen, probably the source of our issues
-#define M107_CLEAR_IRQ0 m_upd71059c->ir0_w(0);
-#define M107_CLEAR_IRQ1 m_upd71059c->ir1_w(0);
-#define M107_CLEAR_IRQ2 m_upd71059c->ir2_w(0);
-#define M107_CLEAR_IRQ3 m_upd71059c->ir3_w(0);
-
-#endif
-
 /*****************************************************************************/
 
 void m107_state::machine_start()
@@ -83,21 +54,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 	if (scanline == m_raster_irq_position)
 	{
 		m_screen->update_partial(scanline);
-		M107_TRIGGER_IRQ2
+		m_upd71059c->ir2_w(1);
 	}
 	else
 	{
-		M107_CLEAR_IRQ2
-
 		/* VBLANK interrupt */
 		if (scanline == m_screen->visible_area().max_y + 1)
 		{
 			m_screen->update_partial(scanline);
-			M107_TRIGGER_IRQ0
+			m_upd71059c->ir0_w(1);
+			m_upd71059c->ir2_w(0);
 		}
 		else
 		{
-			M107_CLEAR_IRQ0
+			m_upd71059c->ir0_w(0);
 		}
 
 	}
@@ -128,13 +98,14 @@ WRITE16_MEMBER(m107_state::bankswitch_w)
 
 READ16_MEMBER(m107_state::sound_status_r)
 {
+	m_upd71059c->ir3_w(0);
 	return m_sound_status;
 }
 
 WRITE16_MEMBER(m107_state::sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
-	M107_TRIGGER_IRQ3
+	m_upd71059c->ir3_w(1);
 }
 
 WRITE16_MEMBER(m107_state::sound_reset_w)
@@ -760,9 +731,7 @@ static MACHINE_CONFIG_START( firebarr )
 	MCFG_CPU_ADD("maincpu", V33, XTAL_28MHz/2)    /* NEC V33, 28MHz clock */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-#ifndef USE_HACKED_IRQS
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-#endif
 
 	MCFG_CPU_ADD("soundcpu", V35, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
