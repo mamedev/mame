@@ -368,8 +368,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_IMPORT_FROM( common_nsc_map )
-
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
+	AM_RANGE(0x0080, 0x0086) AM_DEVICE("blitter",jangou_blitter_device, blit_v2_regs)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
@@ -377,7 +376,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sgaltrop_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_IMPORT_FROM( common_nsc_map )
 
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
+	AM_RANGE(0x0080, 0x0086) AM_DEVICE("blitter",jangou_blitter_device, blit_v2_regs)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
@@ -411,7 +410,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_IMPORT_FROM( common_nsc_map )
 
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, process_w)
+	AM_RANGE(0x0080, 0x0086) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
 	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check
