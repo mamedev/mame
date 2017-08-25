@@ -10,8 +10,8 @@ driver by David Haywood & Angelo Salese
 many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
- - extra protection for Night Gal Summer (ports 0x6000-3 for z80);
- - Fix Sweet Gal/Sexy Gal layer clearances;
+ - Fix Sweet Gal/Sexy Gal/Sexy Gal Tropical layer clearances (more protection?);
+ - Understand why Night Gal Summer title screen gets wiped out (protection issue);
  - NMI origin for Sexy Gal / Night Gal Summer
  - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
 
@@ -90,7 +90,8 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
-	DECLARE_WRITE8_MEMBER(ngalsumr_unk_w);
+	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
+	DECLARE_READ8_MEMBER(ngalsumr_prot_value_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -242,12 +243,15 @@ void nightgal_state::z80_wait_assert_cb()
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
 {
 	z80_wait_assert_cb();
+	machine().scheduler().synchronize(); // force resync
+
 	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
 WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 {
 	z80_wait_assert_cb();
+	machine().scheduler().synchronize(); // force resync
 	m_comms_ram[offset] = data & 0x80;
 }
 
@@ -1137,14 +1141,61 @@ DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 	ROM[0x027f] = 0x02;
 }
 
-WRITE8_MEMBER(nightgal_state::ngalsumr_unk_w)
+// Night Gal Summer uses a protection latch device to get some layer clearances width/height values.
+WRITE8_MEMBER(nightgal_state::ngalsumr_prot_latch_w)
 {
-	//m_z80_latch = data;
+	m_z80_latch = data;
+}
+
+READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
+{	
+	switch(m_z80_latch)
+	{	
+		case 0:
+			return 0;
+		case 1:
+			return 0x14;
+	
+		case 0x4: // cpu hand height on winning
+			return 62;
+		
+		case 0x3: // game over msg height
+			return 12;
+		case 0xf: // game over msg width
+			return 255;
+			
+		case 0xa: // girl width (title screen)
+			return 0x40;
+		case 0xb: // girl height (title screen)
+			return 0x60;
+			
+		case 0xc: // score table blink width
+			return 80;
+		case 0x2: // score table blink height
+			return 8;
+		
+		case 0x6: // player hand height on losing
+			return 28;
+		case 0x7: // player discards height on losing
+			return 38;
+		
+		case 0xd: // player discards width on losing
+			return 142;
+		case 0xe: // player hand width on losing
+			return 200;
+		case 0xff:
+			return 0;
+	}
+		
+	printf("%02x\n",m_z80_latch);
+
+	return 0;
 }
 
 DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_unk_w), this) );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_prot_latch_w), this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(FUNC(nightgal_state::ngalsumr_prot_value_r), this) );
 	// 0x6003 some kind of f/f state
 }
 
@@ -1157,6 +1208,6 @@ GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn,  ROT0
 GAME( 1985, sexygal,  0,        sexygal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state, ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state, ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // protection
 /* Type 4 HW */
 GAME( 1985, sgaltrop, 0,        sgaltrop,sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sexy Gal Tropical [BET] (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
