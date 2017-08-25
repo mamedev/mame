@@ -1044,6 +1044,12 @@ ROM_START( ngalsumr )
 	ROM_RELOAD(        0x24000, 0x04000 )
 	ROM_LOAD( "6.3l",  0x18000, 0x04000, CRC(de9e05f8) SHA1(724468eade222b513b7f39f0a24515f343428130) )
 	ROM_RELOAD(        0x28000, 0x04000 )
+	ROM_RELOAD(        0x0c000, 0x04000 ) // gameplay elements
+	// debug code
+	ROM_FILL(          0x1c000, 0x04000, 0x22 )
+	ROM_FILL(          0x2c000, 0x04000, 0x33 )
+	ROM_FILL(          0x30000, 0x10000, 0x44 )
+
 	
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "ng2.6u", 0x00, 0x20, CRC(0162a24a) SHA1(f7e1623c5bca3725f2e59ae2096b9bc42e0363bf) )

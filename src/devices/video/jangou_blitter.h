@@ -34,7 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER( vregs_w );
 	DECLARE_WRITE8_MEMBER( bltflip_w );
 	DECLARE_READ_LINE_MEMBER( status_r );
-
+	
 	// blitter write accessors
 	DECLARE_WRITE8_MEMBER( x_w );
 	DECLARE_WRITE8_MEMBER( y_w );
