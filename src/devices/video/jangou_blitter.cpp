@@ -149,12 +149,14 @@ void jangou_blitter_device::trigger_write(void)
 	x = (m_x & 0xff);
 	y = (m_y & 0xff);
 
+	#if 0
 	// bail out if parameters are blantantly invalid (timing bug?)
 	if((x + w) > 256 || (y + h) > 256)
 	{
 		printf("%d %d %d %d %08x\n",x,y,w,h,src);
 //		return;
 	}
+	#endif
 	
 	// lowest bit of src controls flipping / draw direction?
 	flipx = (m_src_addr & 1);
