@@ -150,7 +150,7 @@ void jangou_blitter_device::trigger_write(void)
 	y = (m_y & 0xff);
 
 	#if 0
-	// bail out if parameters are blantantly invalid (timing bug?)
+	// bail out if parameters are blantantly invalid (an indication that the host is using protection tho)
 	if((x + w) > 256 || (y + h) > 256)
 	{
 		printf("%d %d %d %d %08x\n",x,y,w,h,src);
