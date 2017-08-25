@@ -3003,13 +3003,13 @@ ROM_START( kickball )
 	ROM_LOAD( "kickball.10", 0x080000, 0x080000, CRC(e3b4f894) SHA1(44b107b87cf9e94f67cfac98b67abed874d534c0) )
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD( "kickball.5", 0x000000, 0x080000, BAD_DUMP CRC(050b6387) SHA1(59aa685014a6f138e14dbfe858c6ecc6514e44f6) ) // random stuck data lines
+	ROM_LOAD( "kickball.5", 0x000000, 0x080000, CRC(050b6387) SHA1(59aa685014a6f138e14dbfe858c6ecc6514e44f6) )
 	ROM_LOAD( "kickball.6", 0x080000, 0x080000, CRC(1e55252f) SHA1(ce1604921af26e8da2fa4cf4a49c67f3b7d4222d) )
 	ROM_LOAD( "kickball.7", 0x100000, 0x080000, CRC(b2ee5218) SHA1(65e240b3ddb673b593404525aa2775c342228130) )
 	ROM_LOAD( "kickball.8", 0x180000, 0x080000, CRC(5f1b07f8) SHA1(add1f66fe09684ce65a54752cc90d7f0a05efc4f) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "kickball.3", 0x000000, 0x040000, BAD_DUMP CRC(2f3ed4c1) SHA1(4688df5d420343a935d066f3b46580b77ee77b0e) ) // might be ok, but seem to be random bytes in the rom that look out of place
+	ROM_LOAD( "kickball.3", 0x000000, 0x040000, CRC(2f3ed4c1) SHA1(4688df5d420343a935d066f3b46580b77ee77b0e) )
 ROM_END
 
 DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
@@ -3017,6 +3017,16 @@ DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
 	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }
 
+
+DRIVER_INIT_MEMBER(aerofgt_state, kickball)
+{
+	// 2 lines on 1 gfx rom are swapped, why?
+	uint8_t *src = memregion( "gfx2" )->base();
+	for (int i = 0;i < 0x80000;i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 5, 6, 4, 3, 2, 1, 0);
+	}
+}
 
 GAME( 1990, spinlbrk,  0,        spinlbrk, spinlbrk,  aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1990, spinlbrku, spinlbrk, spinlbrk, spinlbrku, aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
@@ -3050,4 +3060,4 @@ GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          R
 GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, aerofgt_state, banked_oki, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, aerofgt_state, 0,          ROT270, "bootleg",          "Aero Fighters (bootleg set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1998, kickball,  0,       kickball, pspikesb, aerofgt_state, 0, ROT0,   "Seoung Youn",            "Kick Ball", MACHINE_NOT_WORKING )
+GAME( 1998, kickball,  0,       kickball, pspikesb, aerofgt_state, kickball,   ROT0,   "Seoung Youn",            "Kick Ball", MACHINE_NOT_WORKING )
