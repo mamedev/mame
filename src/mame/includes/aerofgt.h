@@ -91,6 +91,7 @@ public:
 	DECLARE_WRITE16_MEMBER(spikes91_lookup_w);
 	DECLARE_WRITE8_MEMBER(karatblz_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(spinlbrk_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(kickball_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(turbofrc_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1scrollx_w);
