@@ -22,7 +22,7 @@ msgstr ""
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [внутренний]"
 
 #: src/frontend/mame/ui/slotopt.cpp:203 src/frontend/mame/ui/inputmap.cpp:625
 #: src/frontend/mame/ui/miscmenu.cpp:97
@@ -92,7 +92,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "Категория"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
@@ -116,11 +116,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
-msgstr ""
+msgstr "Производитель"
 
 #: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:86
 msgid "Year"
-msgstr ""
+msgstr "Год"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
@@ -152,7 +152,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
-msgstr ""
+msgstr "Издатель"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
@@ -172,11 +172,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
-msgstr ""
+msgstr "Тип устройства"
 
 #: src/frontend/mame/ui/utils.cpp:93
 msgid "Software List"
-msgstr ""
+msgstr "Список ПО"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
@@ -217,7 +217,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
-msgstr ""
+msgstr "Файл"
 
 #: src/frontend/mame/ui/utils.cpp:1042
 msgid "No groups found in category file"
@@ -660,7 +660,7 @@ msgstr "Под мышью"
 
 #: src/frontend/mame/ui/custui.cpp:740
 msgid "ARGB Settings"
-msgstr ""
+msgstr "Настройки ARGB"
 
 #: src/frontend/mame/ui/custui.cpp:745 src/frontend/mame/ui/custui.cpp:748
 msgid "Alpha"
@@ -792,15 +792,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:869
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "В целом\tНЕ РАБОТАЕТ\n"
 
 #: src/frontend/mame/ui/selgame.cpp:871
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "В целом\tНе эмулируется защита\n"
 
 #: src/frontend/mame/ui/selgame.cpp:873
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "В целом\tРаботает\n"
 
 #: src/frontend/mame/ui/selgame.cpp:876
 msgid "Graphics\tUnimplemented\n"
@@ -808,15 +808,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:880
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "Графика\tНе точные цвета"
 
 #: src/frontend/mame/ui/selgame.cpp:882
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "Графика\tНе идеально\n"
 
 #: src/frontend/mame/ui/selgame.cpp:884
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "Графика\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:887
 msgid "Sound\tNone\n"
@@ -824,15 +824,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:889
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "Звук\tНе реализован\n"
 
 #: src/frontend/mame/ui/selgame.cpp:891
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Звук\tНе идеально\n"
 
 #: src/frontend/mame/ui/selgame.cpp:893
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "Звук\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:896
 msgid "Controls\tUnimplemented\n"
@@ -1314,11 +1314,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:32
 msgid "graphics"
-msgstr ""
+msgstr "графика"
 
 #: src/frontend/mame/ui/info.cpp:33
 msgid "sound"
-msgstr ""
+msgstr "звук"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "controls"
@@ -1450,6 +1450,9 @@ msgid ""
 "\n"
 "There are working clones of this machine: %s"
 msgstr ""
+"\n"
+"\n"
+"Известные работающие клоны этой системы: %s"
 
 #: src/frontend/mame/ui/info.cpp:275
 msgid ""
@@ -1575,7 +1578,7 @@ msgstr "Управление лентой"
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "Выбор BIOS"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1745,7 +1748,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:358
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Выбор BIOS:"
 
 #: src/frontend/mame/ui/selmenu.cpp:585 src/frontend/mame/ui/selmenu.cpp:621
 #: src/frontend/mame/ui/simpleselgame.cpp:311
@@ -1886,7 +1889,7 @@ msgstr "Использовать изображение как задний фо
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "Пропускать меню выбора BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -2475,50 +2478,17 @@ msgstr "Настройки"
 #~ msgid "Extra INIs"
 #~ msgstr "Дополнительные INI-файлы"
 
-#~ msgid " ^!File"
-#~ msgstr " ^!Файл"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!Категория"
-
 #~ msgid "Main filter"
 #~ msgstr "Основной фильтр"
 
 #~ msgid "Other filter"
 #~ msgstr "Дополнительные фильтры"
 
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!Производитель"
-
-#~ msgid "^!Year"
-#~ msgstr "^!Год"
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!Издатель"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!Список ПО"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!Тип устройства"
-
 #~ msgid "^!Region"
 #~ msgstr "^!Регион"
 
 #~ msgid "^!Setup custom filter"
 #~ msgstr "^!Задать свой фильтр"
-
-#~ msgid "Bios selection:"
-#~ msgstr "Выбор BIOS:"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Пропускать меню выбора BIOS"
-
-#~ msgid "Bios Selection"
-#~ msgstr "Выбор BIOS"
-
-#~ msgid " - ARGB Settings"
-#~ msgstr "- Настройки ARGB"
 
 #~ msgid "Software History"
 #~ msgstr "История ПО"
@@ -2547,47 +2517,8 @@ msgstr "Настройки"
 #~ msgid "The machine has protection which isn't fully emulated.\n"
 #~ msgstr "Защита этой системы эмулируется не полностью.\n"
 
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "There are working clones of this machine: "
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Известные работающие клоны этой системы: "
-
-#~ msgid "Overall: NOT WORKING\n"
-#~ msgstr "В целом: НЕ РАБОТАЕТ\n"
-
-#~ msgid "Overall: Unemulated Protection\n"
-#~ msgstr "В целом: Не эмулируется защита\n"
-
-#~ msgid "Overall: Working\n"
-#~ msgstr "В целом: Работает\n"
-
-#~ msgid "Graphics: Imperfect Colors\n"
-#~ msgstr "Графика: Не точные цвета"
-
-#~ msgid "Graphics: Imperfect\n"
-#~ msgstr "Графика: Не идеально\n"
-
-#~ msgid "Graphics: OK\n"
-#~ msgstr "Графика: OK\n"
-
-#~ msgid "Sound: Unimplemented\n"
-#~ msgstr "Звук: Не реализован\n"
-
-#~ msgid "Sound: Imperfect\n"
-#~ msgstr "Звук: Не идеально\n"
-
-#~ msgid "Sound: OK\n"
-#~ msgstr "Звук: OK\n"
-
 #~ msgid "No Infos Available"
 #~ msgstr "Нет информации"
-
-#~ msgid " [internal]"
-#~ msgstr " [внутренний]"
 
 #~ msgid "Save cancelled"
 #~ msgstr "Сохранение отменено"

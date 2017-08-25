@@ -371,7 +371,10 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 
 			// if filter is set on category, build category list
 			auto const it(main_filters::filters.find(main_filters::actual));
-			it->second->apply(m_availsortedlist.begin(), m_availsortedlist.end(), std::back_inserter(m_displaylist));
+			if (main_filters::filters.end() == it)
+				m_displaylist = m_availsortedlist;
+			else
+				it->second->apply(m_availsortedlist.begin(), m_availsortedlist.end(), std::back_inserter(m_displaylist));
 
 			// iterate over entries
 			int curitem = 0;
