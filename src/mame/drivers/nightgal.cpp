@@ -309,7 +309,7 @@ WRITE8_MEMBER(nightgal_state::output_w)
 	--x- ---- unknown, set by Royal Queen on gameplay
 	---- x--- color bank, used by Sexy Gal Tropical
 	---- -x-- flip screen
-	---- ---x out counter
+	---- --x- out counter
 	*/
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	flip_screen_set((data & 0x04) == 0);
@@ -656,7 +656,6 @@ static INPUT_PORTS_START( sexygal )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
-
 INPUT_PORTS_END
 
 void nightgal_state::machine_start()
@@ -666,7 +665,7 @@ void nightgal_state::machine_start()
 	save_item(NAME(m_nsc_latch));
 	save_item(NAME(m_z80_latch));
 	save_item(NAME(m_mux_data));
-
+	save_item(NAME(m_pal_bank));
 	save_item(NAME(m_blit_raw_data));
 }
 
@@ -1106,6 +1105,13 @@ ROM_START(sgaltrop)
 	// next two are unconfirmed
 	ROM_LOAD( "6.3h",  0x30000, 0x08000, CRC(571e5f93) SHA1(ef9e27a2121a0d63ac9aa5e4168c73c39d06c60a) )
 	ROM_LOAD( "8.3n",  0x40000, 0x08000, CRC(5029a16f) SHA1(a89ac8283b3e487d9be5f1a8a1e37ba0bf0cd654) )
+	ROM_RELOAD(        0x18000, 0x08000 ) // gal select
+	// debug code, to be removed at some point
+	ROM_FILL(          0x08000, 0x08000, 0x11 )
+	ROM_FILL(          0x28000, 0x08000, 0x33 )
+	ROM_FILL(          0x38000, 0x08000, 0x44 )
+	ROM_FILL(          0x48000, 0x08000, 0x55 )
+	ROM_FILL(          0x50000, 0x30000, 0x66 )
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "gt.7f", 0x00, 0x20, CRC(59e36d6e) SHA1(2e0f3d4809ec727518e6ec883f67ede8831681bf) )
