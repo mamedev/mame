@@ -505,7 +505,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
-		if ((myo>=0xe0) && (myo<=0xff))                   return 0xff;
+		if ((myo>=0xe0) && (myo<=0xff))                   return m_intube ? m_intube->host_r(space, myo-0xe0) : 0xff;
 	}
 	return 0xfe;
 }
@@ -536,7 +536,7 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		//if ((myo>=0x80) && (myo<=0x9f))
 		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
-		//if ((myo>=0xe0) && (myo<=0xff))
+		if ((myo>=0xe0) && (myo<=0xff) && (m_intube))     m_intube->host_w(space, myo-0xe0, data);
 	}
 }
 
@@ -1441,6 +1441,8 @@ WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
 
 	// bit 3: density
 	m_wd1770->dden_w(BIT(data, 3));
+
+	// bit 4: interrupt enable
 
 	// bit 5: reset
 	if (!BIT(data, 5)) m_wd1770->soft_reset();
