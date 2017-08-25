@@ -126,27 +126,9 @@ WRITE16_MEMBER(m107_state::bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(m107_state::soundlatch_w)
-{
-	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
-	m_soundlatch->write(space, 0, data & 0xff);
-//      logerror("m_soundlatch->write %02x\n",data);
-}
-
 READ16_MEMBER(m107_state::sound_status_r)
 {
 	return m_sound_status;
-}
-
-READ16_MEMBER(m107_state::soundlatch_r)
-{
-	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-	return m_soundlatch->read(space, offset) | 0xff00;
-}
-
-WRITE16_MEMBER(m107_state::sound_irq_ack_w)
-{
-	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(m107_state::sound_status_w)
@@ -178,7 +160,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x08, 0x09) AM_READ(sound_status_r)   /* answer from sound CPU */
-	AM_RANGE(0x00, 0x01) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(coincounter_w)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
@@ -221,7 +203,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(soundlatch_r, sound_irq_ack_w)
+	AM_RANGE(0xa8044, 0xa8045) AM_DEVREADWRITE8("soundlatch", generic_latch_8_device, read, acknowledge_w, 0x00ff)
 	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(sound_status_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
 ADDRESS_MAP_END
@@ -775,14 +757,14 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( firebarr )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, 28000000/2)    /* NEC V33, 28MHz clock */
+	MCFG_CPU_ADD("maincpu", V33, XTAL_28MHz/2)    /* NEC V33, 28MHz clock */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 #ifndef USE_HACKED_IRQS
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 #endif
 
-	MCFG_CPU_ADD("soundcpu", V35, 14318000)
+	MCFG_CPU_ADD("soundcpu", V35, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
@@ -808,13 +790,15 @@ static MACHINE_CONFIG_START( firebarr )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_IREMGA20_ADD("irem", 14318180/4)
+	MCFG_IREMGA20_ADD("irem", XTAL_14_31818MHz/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

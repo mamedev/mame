@@ -58,10 +58,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(coincounter_w);
 	DECLARE_WRITE16_MEMBER(bankswitch_w);
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_READ16_MEMBER(soundlatch_r);
-	DECLARE_WRITE16_MEMBER(sound_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(sound_status_w);
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	DECLARE_WRITE16_MEMBER(wpksoc_output_w);
