@@ -2814,7 +2814,7 @@ but this time from a Ejihon Tantei Jimusyo cart.
 
 ROM_START( tatacot ) /* Must use Japan or Asia BIOS */
 	STV_BIOS
-	ROM_DEFAULT_BIOS( "japan" )
+	ROM_DEFAULT_BIOS( "jp" )
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr-18790.ic13",  0x0000001, 0x0080000, CRC(d95155dc) SHA1(b08b75d15aad073eecf8b04fd2d718366bb6f6bb) )
