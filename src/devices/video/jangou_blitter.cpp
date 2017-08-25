@@ -17,6 +17,7 @@
 #include "jangou_blitter.h"
 
 
+#define DEBUG_OUT_OF_MASK 0
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -125,12 +126,25 @@ void jangou_blitter_device::trigger_write(void)
 	int src, x, y, h, w, flipx;
 	int count = 0;
 	int xcount, ycount;
-
+#if DEBUG_OUT_OF_MASK
+	bool debug_flag;
+#endif
+	
 	w = (m_width & 0xff) + 1;
 	h = (m_height & 0xff) + 1;
 	src = m_src_addr & m_gfxrommask;
 	if(m_src_addr & ~m_gfxrommask)
+	{
 		logerror("%s: Warning blit src address = %08x above ROM mask %08x\n",this->tag(),m_src_addr,m_gfxrommask);
+#if DEBUG_OUT_OF_MASK
+		debug_flag = true;
+#endif
+	}
+#if DEBUG_OUT_OF_MASK
+	else
+		debug_flag = false;
+#endif
+
 	x = (m_x & 0xff);
 	y = (m_y & 0xff);
 
@@ -150,6 +164,10 @@ void jangou_blitter_device::trigger_write(void)
 			int drawy = (y + ycount) & 0xff;
 			uint8_t dat = gfx_nibble(src + count);
 			uint8_t cur_pen = m_pen_data[dat & 0x0f];
+#if DEBUG_OUT_OF_MASK
+			if(debug_flag == true)
+				cur_pen = machine().rand() & 0xf;
+#endif
 			//dat = cur_pen_lo | (cur_pen_hi << 4);
 
 			if ((cur_pen & 0xff) != 0)
@@ -202,20 +220,24 @@ WRITE8_MEMBER( jangou_blitter_device::src_lo_address_w )
 	m_src_addr &= ~0xff;
 	m_src_addr |= data & 0xff;
 }
+
 WRITE8_MEMBER( jangou_blitter_device::src_md_address_w )
 {
 	m_src_addr &= ~0xff00;
 	m_src_addr |= data << 8;
 }
+
 WRITE8_MEMBER( jangou_blitter_device::src_hi_address_w )
 {
 	m_src_addr &= ~0xff0000;
 	m_src_addr |= data << 16;
 }
+
 WRITE8_MEMBER( jangou_blitter_device::width_w )
 {
 	m_width = data;
 }
+
 WRITE8_MEMBER( jangou_blitter_device::height_and_trigger_w )
 {
 	m_height = data;
