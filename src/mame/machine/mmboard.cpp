@@ -16,6 +16,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(MEPHISTO_SENSORS_BOARD, mephisto_sensors_board_device, "msboard", "Mephisto Sensors Board")
+DEFINE_DEVICE_TYPE(MEPHISTO_BUTTONS_BOARD, mephisto_buttons_board_device, "mbboard", "Mephisto Buttons Board")
 DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODUL, mephisto_display_modul_device, "mdisplay_modul",  "Mephisto Display Modul")
 
 
@@ -98,6 +99,81 @@ static INPUT_PORTS_START( mephisto_sensors_board )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)	PORT_TOGGLE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mephisto_buttons_board )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("IN.3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("IN.5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("IN.6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("IN.7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
+INPUT_PORTS_END
+
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -106,6 +182,15 @@ INPUT_PORTS_END
 ioport_constructor mephisto_sensors_board_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( mephisto_sensors_board );
+}
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor mephisto_buttons_board_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( mephisto_buttons_board );
 }
 
 //**************************************************************************
@@ -119,7 +204,7 @@ ioport_constructor mephisto_sensors_board_device::device_input_ports() const
 mephisto_board_device::mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_sensors(*this, "IN.%u", 0)
-	, m_upd_all_leds(true)
+	, m_disable_leds(false)
 {
 }
 
@@ -131,6 +216,14 @@ mephisto_sensors_board_device::mephisto_sensors_board_device(const machine_confi
 	: mephisto_board_device(mconfig, MEPHISTO_SENSORS_BOARD, tag, owner, clock)
 {
 }
+//-------------------------------------------------
+//  mephisto_buttons_board_device - constructor
+//-------------------------------------------------
+
+mephisto_buttons_board_device::mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mephisto_board_device(mconfig, MEPHISTO_BUTTONS_BOARD, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -138,8 +231,14 @@ mephisto_sensors_board_device::mephisto_sensors_board_device(const machine_confi
 
 void mephisto_board_device::device_start()
 {
+	m_leds_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_board_device::leds_update_callback), this));
+	m_leds_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_board_device::leds_refresh_callback), this));
+	m_leds_update_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_leds_refresh_timer->adjust(attotime::from_hz(5), 0, attotime::from_hz(5));
+
 	save_item(NAME(m_mux));
 	save_item(NAME(m_leds));
+	save_item(NAME(m_leds_state));
 }
 
 //-------------------------------------------------
@@ -150,15 +249,30 @@ void mephisto_board_device::device_reset()
 {
 	m_mux = 0x00;
 	m_leds = 0x00;
+	memset(m_leds_state, 0, sizeof(m_leds_state));
 }
 
-void mephisto_board_device::update_leds()
+TIMER_CALLBACK_MEMBER(mephisto_board_device::leds_update_callback)
 {
 	for (int i=0; i<8; i++)
-		if (m_upd_all_leds || !BIT(m_mux, i))
-			for (int j=0; j<8; j++)
-				machine().output().set_led_value(i*8 + j, !BIT(m_mux, i) ? BIT(m_leds, j) : 0);
+		for (int j=0; j<8; j++)
+		{
+			if (!m_leds_state[i*8 + j] && !BIT(m_mux, i) && BIT(m_leds, j))
+				m_leds_state[i*8 + j] = 2;
+		}
+}
 
+TIMER_CALLBACK_MEMBER(mephisto_board_device::leds_refresh_callback)
+{
+	for (int i=0; i<8; i++)
+		for (int j=0; j<8; j++)
+		{
+			if (!m_disable_leds)
+				machine().output().set_led_value(i*8 + j, (m_leds_state[i*8 + j] > 1) ? 1 : 0);
+
+			if (m_leds_state[i*8 + j])
+				m_leds_state[i*8 + j]--;
+		}
 }
 
 READ8_MEMBER( mephisto_board_device::input_r )
@@ -185,18 +299,6 @@ WRITE8_MEMBER( mephisto_board_device::mux_w )
 WRITE8_MEMBER( mephisto_board_device::led_w )
 {
 	m_leds = data;
-}
-
-WRITE8_MEMBER( mephisto_board_device::mux_upd_w )
-{
-	m_mux = data;
-	update_leds();
-}
-
-WRITE8_MEMBER( mephisto_board_device::led_upd_w )
-{
-	m_leds = data;
-	update_leds();
 }
 
 

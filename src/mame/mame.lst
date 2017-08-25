@@ -20937,22 +20937,19 @@ mmd2                            //
 mmm_ldip                        // Lucky Dip
 
 @source:mmodular.cpp
-academy                         // 1989 Mephisto Academy Schachcomputer
 alm16                           // 1988 Mephisto Almeria 68000
-alm32                           // 1988 Mephisto Alimera 68020
-berlinp                         // 1994 Mephisto Berlin Pro 68020
-bpl32                           // 1996 Mephisto Berlin Pro London Upgrade V5.00
-gen32                           // 1993 Mephisto Genius030 V4.00
-gen32_41                        // 1993 Mephisto Genius030 V4.01
-lond020                         // 1996 Mephisto London 68020 32 Bit
-lond030                         // 1996 Mephisto Genius030 London Upgrade V5.00
+alm32                           // 1988 Mephisto Almeria 68020
+port16                          // 1989 Mephisto Portorose 68000
+port32                          // 1989 Mephisto Portorose 68020
 lyon16                          // 1990 Mephisto Lyon 68000
 lyon32                          // 1990 Mephisto Lyon 68020
-megaiv                          // 1989 Mephisto Mega IV Schachcomputer
-milano                          // 1989 Mephisto Milano Schachcomputer
-monteciv                        // 1990 Mephisto Monte Carlo IV LE Schachcomputer
 van16                           // 1991 Mephisto Vancouver 68000
 van32                           // 1991 Mephisto Vancouver 68020
+gen32                           // 1993 Mephisto Genius 68030
+lond020                         // 1996 Mephisto London 68020
+lond030                         // 1996 Mephisto Genius 68030 London Upgrade
+berlinp                         // 1994 Mephisto Berlin Pro 68020
+bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mod8.cpp
 mod8                            //
@@ -31558,6 +31555,11 @@ polgar                          // 1989 Mephisto Polgar
 polgar10                        // 1990 Mephisto Polgar 10MHz
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
+academy                         // 1989 Mephisto Academy
+milano                          // 1991 Mephisto Milano
+nshort                          // 1993 Mephisto Nigel Short
+megaiv                          // 1989 Mephisto Mega IV
+monteciv                        // 1990 Mephisto Monte Carlo IV LE
 
 @source:policetr.cpp
 policetr                        // (c) 1996 P&P Marketing
