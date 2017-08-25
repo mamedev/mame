@@ -56,7 +56,7 @@ Mouse ( port08_w 13 )
 list reordered based on ROMs and banking  (the low 4 bits are the ROM select, the upper 4 bits are the bank select)
 you can clearly see
 
-ROM K2.bin / ROM K1.bin 
+ROM K2.bin / ROM K1.bin
 Super Bubble     ( port08_w 00 ) (8 banks - 2 roms)
 
 ROM K3.bin
@@ -412,80 +412,23 @@ ROM_END
 
 
 ROM_START( smssgamea )
-	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD( "02.K2",   0x000000, 0x10000, CRC(66ed320e) SHA1(e838cb98fbd295259707f8f7ce433b28baa846e3) ) // menu is here on this one
-	ROM_RELOAD(          0x010000, 0x10000)
-	ROM_RELOAD(          0x020000, 0x10000)
-	ROM_RELOAD(          0x030000, 0x10000)
-	ROM_RELOAD(          0x040000, 0x10000)
-	ROM_RELOAD(          0x050000, 0x10000)
-	ROM_RELOAD(          0x060000, 0x10000)
-	ROM_RELOAD(          0x070000, 0x10000)
-	ROM_LOAD( "01.K1",   0x080000, 0x20000, CRC(18fd8607) SHA1(f24fbe863e19b513369858bf1260355e92444071) ) // Tri-Formation
-	ROM_RELOAD(          0x0a0000, 0x20000)
-	ROM_RELOAD(          0x0c0000, 0x20000)
-	ROM_RELOAD(          0x0e0000, 0x20000)
-	ROM_LOAD( "03.K3",   0x100000, 0x20000, CRC(9bb92096) SHA1(3ca17b7a9aa20b97cac1f78ba13f70bed1b37463) ) // Solomon's Key
-	ROM_RELOAD(          0x120000, 0x20000)
-	ROM_RELOAD(          0x140000, 0x20000)
-	ROM_RELOAD(          0x160000, 0x20000)
-	ROM_LOAD( "04.K4",   0x180000, 0x20000, CRC(28f6f4a9) SHA1(87809d93b8393b3186672c217fa1dec8b152af16) ) // Maisc Tree, Mouse, Invaders, Astro
-	ROM_RELOAD(          0x1a0000, 0x20000)
-	ROM_RELOAD(          0x1c0000, 0x20000)
-	ROM_RELOAD(          0x1e0000, 0x20000)
-	ROM_LOAD( "05.K5",   0x200000, 0x20000, CRC(350591a4) SHA1(ceb3c4a0fc85c5fbc5a045e9c83c3e7ec4d535cc) ) // Congo Bongo, Circus, Super Mario, Ghost House
-	ROM_RELOAD(          0x220000, 0x20000)
-	ROM_RELOAD(          0x240000, 0x20000)
-	ROM_RELOAD(          0x260000, 0x20000)
-	ROM_LOAD( "06.K6",   0x280000, 0x20000, CRC(9c5e7cc7) SHA1(4613928e30b7faaa41d550fa41906e13a6059513) ) // Flicky, Galaxian, Bomb Jack, Galaga
-	ROM_RELOAD(          0x2a0000, 0x20000)
-	ROM_RELOAD(          0x2c0000, 0x20000)
-	ROM_RELOAD(          0x2e0000, 0x20000)
-	ROM_LOAD( "07.K7",   0x300000, 0x20000, CRC(8046a2c0) SHA1(c80298dd56db8c09cac5263e4c01a627ab1a4cda) ) // Kings Vally, Pippols, Goonies, Road Runner I
-	ROM_RELOAD(          0x320000, 0x20000)
-	ROM_RELOAD(          0x340000, 0x20000)
-	ROM_RELOAD(          0x360000, 0x20000)
-	ROM_LOAD( "08.K8",   0x380000, 0x20000, CRC(ee366e0f) SHA1(3770aa71372e7dbdfd357b239a0fbdf8880dc135) ) // Dragon Story, Spy Vs Spy, Road Fighter
-	ROM_RELOAD(          0x3a0000, 0x20000)
-	ROM_RELOAD(          0x3c0000, 0x20000)
-	ROM_RELOAD(          0x3e0000, 0x20000)
-	ROM_LOAD( "09.K9",   0x400000, 0x20000, CRC(50a66ef6) SHA1(8eb8d1a7ecca99d1722534be269a6264d49b9dd4) ) // Tetris, Teddy Boy, Pitfall 2
-	ROM_RELOAD(          0x420000, 0x20000)
-	ROM_RELOAD(          0x440000, 0x20000)
-	ROM_RELOAD(          0x460000, 0x20000)
-	ROM_LOAD( "10.K10",  0x480000, 0x10000, CRC(ca7ab2df) SHA1(11a85f03ec21d481c5cdfcfb749da20b8569d09a) ) // Drol, Pit Pot
-	ROM_RELOAD(          0x490000, 0x10000)
-	ROM_RELOAD(          0x4a0000, 0x10000)
-	ROM_RELOAD(          0x4b0000, 0x10000)
-	ROM_RELOAD(          0x4c0000, 0x10000)
-	ROM_RELOAD(          0x4d0000, 0x10000)
-	ROM_RELOAD(          0x4e0000, 0x10000)
-	ROM_RELOAD(          0x4f0000, 0x10000)
-	ROM_LOAD( "11.K11",  0x500000, 0x10000, CRC(b03b612f) SHA1(537b7d72e1e06e17db6206a37f2480c14f46b9fc) ) // Hyper Sports, Super Tank
-	ROM_RELOAD(          0x510000, 0x10000)
-	ROM_RELOAD(          0x520000, 0x10000)
-	ROM_RELOAD(          0x530000, 0x10000)
-	ROM_RELOAD(          0x540000, 0x10000)
-	ROM_RELOAD(          0x550000, 0x10000)
-	ROM_RELOAD(          0x560000, 0x10000)
-	ROM_RELOAD(          0x570000, 0x10000)
-	ROM_LOAD( "12.K12",  0x580000, 0x20000, CRC(eb1e8693) SHA1(3283cdcfc25f34a43f317093cd39e10a52bc3ae7) ) // Alex Kidd
-	ROM_RELOAD(          0x5a0000, 0x20000)
-	ROM_RELOAD(          0x5c0000, 0x20000)
-	ROM_RELOAD(          0x5e0000, 0x20000)
-	ROM_LOAD( "13.ROM4", 0x600000, 0x20000, CRC(8767f1c9) SHA1(683cedb001e859c2c7ccde2571104f1eb9f09c2f) ) // Wonderboy
-	ROM_RELOAD(          0x620000, 0x20000)
-	ROM_RELOAD(          0x640000, 0x20000)
-	ROM_RELOAD(          0x660000, 0x20000)
-	ROM_LOAD( "14.ROM3", 0x680000, 0x20000, CRC(889bb269) SHA1(0a92b339c19240bfea29ee24fee3e7d780b0cd5c) ) // Hello Kang Si
-	ROM_RELOAD(          0x6a0000, 0x20000)
-	ROM_RELOAD(          0x6c0000, 0x20000)
-	ROM_RELOAD(          0x6e0000, 0x20000)
-	ROM_LOAD( "15.ROM2", 0x700000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Gun
-	ROM_RELOAD(          0x720000, 0x20000)
-	ROM_RELOAD(          0x740000, 0x20000)
-	ROM_RELOAD(          0x760000, 0x20000)
-	ROM_FILL(            0x780000, 0x80000, 0xff) // ROM1 position not populated
+	ROM_LOAD( "01.K1",   0x020000, 0x20000, CRC(18fd8607) SHA1(f24fbe863e19b513369858bf1260355e92444071) ) // Tri-Formation
+	ROM_LOAD( "03.K3",   0x040000, 0x20000, CRC(9bb92096) SHA1(3ca17b7a9aa20b97cac1f78ba13f70bed1b37463) ) // Solomon's Key
+	ROM_LOAD( "04.K4",   0x060000, 0x20000, CRC(28f6f4a9) SHA1(87809d93b8393b3186672c217fa1dec8b152af16) ) // Maisc Tree, Mouse, Invaders, Astro
+	ROM_LOAD( "05.K5",   0x080000, 0x20000, CRC(350591a4) SHA1(ceb3c4a0fc85c5fbc5a045e9c83c3e7ec4d535cc) ) // Congo Bongo, Circus, Super Mario, Ghost House
+	ROM_LOAD( "06.K6",   0x0a0000, 0x20000, CRC(9c5e7cc7) SHA1(4613928e30b7faaa41d550fa41906e13a6059513) ) // Flicky, Galaxian, Bomb Jack, Galaga
+	ROM_LOAD( "07.K7",   0x0c0000, 0x20000, CRC(8046a2c0) SHA1(c80298dd56db8c09cac5263e4c01a627ab1a4cda) ) // Kings Vally, Pippols, Goonies, Road Runner I
+	ROM_LOAD( "08.K8",   0x0e0000, 0x20000, CRC(ee366e0f) SHA1(3770aa71372e7dbdfd357b239a0fbdf8880dc135) ) // Dragon Story, Spy Vs Spy, Road Fighter
+	ROM_LOAD( "09.K9",   0x100000, 0x20000, CRC(50a66ef6) SHA1(8eb8d1a7ecca99d1722534be269a6264d49b9dd4) ) // Tetris, Teddy Boy, Pitfall 2
+	ROM_LOAD( "10.K10",  0x120000, 0x10000, CRC(ca7ab2df) SHA1(11a85f03ec21d481c5cdfcfb749da20b8569d09a) ) // Drol, Pit Pot
+	ROM_LOAD( "11.K11",  0x140000, 0x10000, CRC(b03b612f) SHA1(537b7d72e1e06e17db6206a37f2480c14f46b9fc) ) // Hyper Sports, Super Tank
+	ROM_LOAD( "12.K12",  0x160000, 0x20000, CRC(eb1e8693) SHA1(3283cdcfc25f34a43f317093cd39e10a52bc3ae7) ) // Alex Kidd
+	ROM_LOAD( "13.ROM4", 0x180000, 0x20000, CRC(8767f1c9) SHA1(683cedb001e859c2c7ccde2571104f1eb9f09c2f) ) // Wonderboy
+	ROM_LOAD( "14.ROM3", 0x1a0000, 0x20000, CRC(889bb269) SHA1(0a92b339c19240bfea29ee24fee3e7d780b0cd5c) ) // Hello Kang Si
+	ROM_LOAD( "15.ROM2", 0x1c0000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Gun
+	ROM_FILL(            0x200000, 0x80000, 0xff) // ROM1 position not populated
 
 	// there seems to be some kind of MCU for the timer?
 ROM_END
