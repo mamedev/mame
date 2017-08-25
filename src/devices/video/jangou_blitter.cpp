@@ -164,7 +164,7 @@ void jangou_blitter_device::trigger_write(void)
 			int drawy = (y + ycount) & 0xff;
 			uint8_t dat = gfx_nibble(src + count);
 			uint8_t cur_pen = m_pen_data[dat & 0x0f];
-			
+
 #if DEBUG_OUT_OF_MASK
 			if(debug_flag == true)
 				cur_pen = machine().rand() & 0xf;

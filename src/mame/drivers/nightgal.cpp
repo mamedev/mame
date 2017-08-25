@@ -1104,10 +1104,10 @@ ROM_START(sgaltrop)
 	ROM_LOAD( "5.3f",  0x20000, 0x08000, CRC(ec482f8e) SHA1(d4d6f618400949141a84ac981ad548ded105bfef) )
 	// next two are unconfirmed
 	ROM_LOAD( "6.3h",  0x30000, 0x08000, CRC(571e5f93) SHA1(ef9e27a2121a0d63ac9aa5e4168c73c39d06c60a) )
+	ROM_RELOAD(        0x08000, 0x08000 ) // attract mode, after a demo match
 	ROM_LOAD( "8.3n",  0x40000, 0x08000, CRC(5029a16f) SHA1(a89ac8283b3e487d9be5f1a8a1e37ba0bf0cd654) )
 	ROM_RELOAD(        0x18000, 0x08000 ) // gal select
 	// debug code, to be removed at some point
-	ROM_FILL(          0x08000, 0x08000, 0x11 )
 	ROM_FILL(          0x28000, 0x08000, 0x33 )
 	ROM_FILL(          0x38000, 0x08000, 0x44 )
 	ROM_FILL(          0x48000, 0x08000, 0x55 )
