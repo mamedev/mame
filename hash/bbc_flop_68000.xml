@@ -8,14 +8,14 @@
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_68000" description="68000 Co-Processor Discs">
+<softwarelist name="bbc_flop_68000" description="Casper 68000 2nd Processor Discs">
 
-	<software name="casper" supported="no">
+	<software name="casper">
 		<description>Casper Support Discs</description>
 		<year>1986</year>
 		<publisher>Crombie Anderson Associates</publisher>
 		<info name="format" value="DFS" />
-		<info name="compatibility" value="68000 co-processor" />
+		<info name="usage" value="Requires Casper 68000 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Casper Control C Version 0_1"/>
 			<dataarea name="flop" size="204800">
