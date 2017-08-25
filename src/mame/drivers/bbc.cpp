@@ -2029,7 +2029,7 @@ ROM_START(econx25)
 	ROM_LOAD("2201,248_03_anfs.rom",  0x1c000, 0x4000, CRC(744a60a7) SHA1(c733b108d74cf3b1c5de395335236800a7c9c0d8))
 	ROM_LOAD("0201,241_01_bpos2.rom", 0x20000, 0x8000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))
 	/* X25 TSI is in IC37 which is supposed to take a speech PHROM, so not sure where this is mapped */
-	ROM_LOAD("0246,215_02_x25tsi_v0.51.rom", 0x30000, 0x8000, CRC(71dd84e4) SHA1(bbfa892fdcc6f753dda5134ecb97cc7c42b959c2))
+	ROM_LOAD("0246,215_02_x25tsi_v0.51.rom", 0x30000, 0x4000, CRC(71dd84e4) SHA1(bbfa892fdcc6f753dda5134ecb97cc7c42b959c2))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
