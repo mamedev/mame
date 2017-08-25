@@ -197,6 +197,21 @@ static ADDRESS_MAP_START( pspikesc_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff400, 0xfff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( kickball_map, AS_PROGRAM, 16, aerofgt_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* work RAM */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("spriteram1")
+	AM_RANGE(0xff8000, 0xff8fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_SHARE("bg1videoram")
+	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITEONLY AM_SHARE("spriteram3")
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_SHARE("rasterram")   /* bg1 scroll registers */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(pspikes_palette_bank_w, 0x00ff)
+	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE8(pspikes_gfxbank_w, 0x00ff)
+	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrolly_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READ8(pending_command_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0xfff400, 0xfff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -454,8 +469,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kickball_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
+	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("soundbank")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kickball_sound_portmap, AS_IO, 8, aerofgt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( oki_map, 0, 8, aerofgt_state ) //only for aerfboot for now
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
@@ -1281,7 +1302,7 @@ static const gfx_layout kickball_spritelayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 9,8, 11,10, 13,12, 15,14, 1, 0, 3, 2, 5, 4, 7, 6 },
+	{ 6,7, 5,6, 2,3, 0, 1, 14, 15, 12, 13, 10, 11, 8, 9 },
 	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8, 16*8, 18*8, 20*8, 22*8, 24*8, 26*8 ,28*8, 30*8 },
 	32*8
 };
@@ -1511,11 +1532,12 @@ static MACHINE_CONFIG_START( kickball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_10MHz) // 10Mhz XTAL near 10Mhz rated CPU
-	MCFG_CPU_PROGRAM_MAP(pspikes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_CPU_PROGRAM_MAP(kickball_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* only IRQ1 is valid */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL_4MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(kickball_sound_map)
+	MCFG_CPU_IO_MAP(kickball_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
@@ -2977,7 +2999,7 @@ ROM_START( kickball )
 	ROM_LOAD( "kickball.4", 0x00000, 0x10000, CRC(ef10c2bf) SHA1(44fd03a28221dffe9c4281ef920fe975bbfb67f0) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD( "kickball.9",  0x000000, 0x080000, CRC(19be87f3) SHA1(661966683f74b4fbfd77eab4477fb0d75e87230e) )
+	ROM_LOAD( "kickball.9",  0x080000, 0x080000, CRC(19be87f3) SHA1(661966683f74b4fbfd77eab4477fb0d75e87230e) )
 	ROM_LOAD( "kickball.10", 0x080000, 0x080000, CRC(e3b4f894) SHA1(44b107b87cf9e94f67cfac98b67abed874d534c0) )
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )
