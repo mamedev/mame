@@ -520,9 +520,12 @@ void napple2_state::do_io(address_space &space, int offset)
 
 WRITE_LINE_MEMBER(napple2_state::txt_w)
 {
-	// select graphics or text mode
-	machine().first_screen()->update_now();
-	m_video->m_graphics = !state;
+	if (m_video->m_graphics == state) // avoid flickering from II+ refresh polling
+	{
+		// select graphics or text mode
+		machine().first_screen()->update_now();
+		m_video->m_graphics = !state;
+	}
 }
 
 WRITE_LINE_MEMBER(napple2_state::mix_w)

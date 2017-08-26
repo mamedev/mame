@@ -85,9 +85,12 @@ TODO:
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "machine/74259.h"
+#include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
+#include "sound/ym2413.h"
 #include "sound/3812intf.h"
 
 #include "rendlay.h"
@@ -724,11 +727,6 @@ WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
 	m_bankdev->set_bank(data & 0x3f);
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_mainlatch_w)
-{
-	m_mainlatch->write_bit(offset, BIT(data, 1));
-}
-
 WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
 {
 	switch(data)
@@ -758,7 +756,7 @@ static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x4b, 0x4b ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
 	AM_RANGE( 0x4c, 0x4c ) AM_READ_PORT("DSW0")         // DSW 1
 	AM_RANGE( 0x4f, 0x4f ) AM_READ_PORT("DSW1")         // DSW 2
-	AM_RANGE( 0x50, 0x57 ) AM_WRITE(yarunara_mainlatch_w)
+	AM_RANGE( 0x50, 0x57 ) AM_DEVWRITE("mainlatch", ls259_device, write_d1)
 	AM_RANGE( 0x68, 0x68 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x69, 0x69 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
 	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
@@ -1259,11 +1257,6 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_mainlatch_w)
-{
-	m_mainlatch->write_bit(offset >> 2, BIT(data, 1));
-}
-
 static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
@@ -1280,7 +1273,7 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x10050, 0x10050 ) AM_WRITE(tenkai_priority_w)        // layer priority and enable
 	AM_RANGE( 0x10054, 0x10054 ) AM_WRITE(dynax_blit_backpen_w)     // Background Color
 	AM_RANGE( 0x10058, 0x10058 ) AM_WRITE(tenkai_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0x10060, 0x1007f ) AM_WRITE(tenkai_mainlatch_w)
+	AM_RANGE( 0x10060, 0x1007f ) AM_DEVWRITE_MOD("mainlatch", ls259_device, write_d1, rshift<2>)
 	AM_RANGE( 0x100c0, 0x100c0 ) AM_WRITE(tenkai_ipsel_w)
 	AM_RANGE( 0x100c1, 0x100c1 ) AM_WRITE(tenkai_ip_w)
 	AM_RANGE( 0x100c2, 0x100c3 ) AM_READ(tenkai_ip_r)

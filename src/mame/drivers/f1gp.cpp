@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
 	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
-	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
+	AM_RANGE(0xfff020, 0xfff023) AM_WRITENOP // GGA access
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_SHARE("rozregs")
 ADDRESS_MAP_END
@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( f1gp )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_START( f1gpb )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 

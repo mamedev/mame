@@ -838,7 +838,7 @@ ROM_START( aligator )
 	ROM_LOAD16_BYTE(    "u44",  0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "aligator_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -873,7 +873,21 @@ ROM_START( aligatorun )
 	ROM_LOAD( "u49",        0x0c00000, 0x0400000, CRC(70a4ee0b) SHA1(07b09916f0366d0c6eed94a905ec0b9d6ac9e7e1) )    /* GFX + Sound */
 ROM_END
 
+ROM_START( aligatoruna )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE(    "STM27C4001.45", 0x000000, 0x080000, CRC(a70301b8) SHA1(b6ffb7339a42ec81c3ec7a0681dfea878f11a538) )
+	ROM_LOAD16_BYTE(    "AM27C040.44",   0x000001, 0x080000, CRC(d45a26ed) SHA1(bb261e7061aba35aa6af6567a8386d9704a9db83) )
 
+	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
+	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
+
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
+	ROM_LOAD( "u48",        0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )    /* GFX only */
+	ROM_LOAD( "u47",        0x0400000, 0x0400000, CRC(74a5a29f) SHA1(8ea2aa1f8a80c5b88ca9222c5ecc3c4794e0a160) )    /* GFX + Sound */
+	ROM_LOAD( "u50",        0x0800000, 0x0400000, CRC(85daecf9) SHA1(824f6d2491075b1ef96ecd6667c5510409338a2f) )    /* GFX only */
+	ROM_LOAD( "u49",        0x0c00000, 0x0400000, CRC(70a4ee0b) SHA1(07b09916f0366d0c6eed94a905ec0b9d6ac9e7e1) )    /* GFX + Sound */
+ROM_END
 
 
 /*============================================================================
@@ -1712,8 +1726,9 @@ ROM_END
 
 
 
-GAME( 1994, aligator,  0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1994, aligatorun,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
+GAME( 1994, aligator,   0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1994, aligatorun, aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
+GAME( 1994, aligatoruna,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 
 GAME( 1995, touchgo,  0,        touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
 GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )

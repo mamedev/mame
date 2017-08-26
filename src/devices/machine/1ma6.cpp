@@ -25,6 +25,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "1ma6.h"
 
 // Debugging
@@ -141,7 +142,7 @@ READ8_MEMBER(hp_1ma6_device::reg_r)
 	case 0:
 		// Status register
 		update_tape_pos();
-		if (m_cmd_state == CMD_IDLE || !m_cartridge_in) {
+		if (m_cmd_state == CMD_IDLE) {
 			BIT_SET(m_status_reg , STS_READY_BIT);
 		} else if (m_cmd_state == CMD_STOPPING ||
 				   m_cmd_state == CMD_FAST_FWD_REV ||
@@ -290,7 +291,7 @@ void hp_1ma6_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					}
 					LOG("WR T%u @ %d = %04x\n" , current_track() , m_rw_pos , m_next_word);
 					if (m_cartridge_in) {
-						m_image.write_word(current_track() , m_rw_pos , m_next_word , length);
+						m_image.write_word(current_track() , m_rw_pos , m_next_word , length , is_moving_fwd());
 						m_image_dirty = true;
 					}
 					if (is_moving_fwd()) {

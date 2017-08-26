@@ -637,13 +637,23 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle()
 //  invertable machine filters
 //-------------------------------------------------
 
+template <machine_filter::type Type = machine_filter::AVAILABLE>
+class available_machine_filter_impl : public simple_filter_impl_base<machine_filter, Type>
+{
+public:
+	available_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
+
+	virtual bool apply(ui_system_info const &system) const override { return system.available; }
+};
+
+
 template <machine_filter::type Type = machine_filter::WORKING>
 class working_machine_filter_impl : public simple_filter_impl_base<machine_filter, Type>
 {
 public:
 	working_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &driver) const override { return !(driver.flags & machine_flags::NOT_WORKING); }
+	virtual bool apply(ui_system_info const &system) const override { return !(system.driver->flags & machine_flags::NOT_WORKING); }
 };
 
 
@@ -653,7 +663,7 @@ class mechanical_machine_filter_impl : public simple_filter_impl_base<machine_fi
 public:
 	mechanical_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &driver) const override { return driver.flags & machine_flags::MECHANICAL; }
+	virtual bool apply(ui_system_info const &system) const override { return system.driver->flags & machine_flags::MECHANICAL; }
 };
 
 
@@ -663,7 +673,7 @@ class bios_machine_filter_impl : public simple_filter_impl_base<machine_filter, 
 public:
 	bios_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &driver) const override { return driver.flags & machine_flags::IS_BIOS_ROOT; }
+	virtual bool apply(ui_system_info const &system) const override { return system.driver->flags & machine_flags::IS_BIOS_ROOT; }
 };
 
 
@@ -673,10 +683,10 @@ class parents_machine_filter_impl : public simple_filter_impl_base<machine_filte
 public:
 	parents_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &driver) const override
+	virtual bool apply(ui_system_info const &system) const override
 	{
-		bool const have_parent(strcmp(driver.parent, "0"));
-		auto const parent_idx(have_parent ? driver_list::find(driver.parent) : -1);
+		bool const have_parent(strcmp(system.driver->parent, "0"));
+		auto const parent_idx(have_parent ? driver_list::find(system.driver->parent) : -1);
 		return !have_parent || (0 > parent_idx) || (driver_list::driver(parent_idx).flags & machine_flags::IS_BIOS_ROOT);
 	}
 };
@@ -688,9 +698,9 @@ class chd_machine_filter_impl : public simple_filter_impl_base<machine_filter, T
 public:
 	chd_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &driver) const override
+	virtual bool apply(ui_system_info const &system) const override
 	{
-		for (tiny_rom_entry const *rom = driver.rom; rom && rom->name; ++rom)
+		for (tiny_rom_entry const *rom = system.driver->rom; ((rom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END) && rom->name; ++rom)
 		{
 			// FIXME: can't use the convenience macros tiny ROM entries
 			if ((ROMENTRYTYPE_REGION == (rom->flags & ROMENTRY_TYPEMASK)) && (ROMREGION_DATATYPEDISK == (rom->flags & ROMREGION_DATATYPEMASK)))
@@ -707,7 +717,7 @@ class save_machine_filter_impl : public simple_filter_impl_base<machine_filter, 
 public:
 	save_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &driver) const override { return driver.flags & machine_flags::SUPPORTS_SAVE; }
+	virtual bool apply(ui_system_info const &system) const override { return system.driver->flags & machine_flags::SUPPORTS_SAVE; }
 };
 
 
@@ -717,7 +727,7 @@ class vertical_machine_filter_impl : public simple_filter_impl_base<machine_filt
 public:
 	vertical_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &driver) const override { return driver.flags & machine_flags::SWAP_XY; }
+	virtual bool apply(ui_system_info const &system) const override { return system.driver->flags & machine_flags::SWAP_XY; }
 };
 
 
@@ -734,14 +744,14 @@ public:
 	{
 	}
 
-	virtual bool apply(game_driver const &driver) const override
+	virtual bool apply(ui_system_info const &system) const override
 	{
 		if (!have_choices())
 			return true;
 		else if (!selection_valid())
 			return false;
 
-		std::string const name(c_mnfct::getname(driver.manufacturer));
+		std::string const name(c_mnfct::getname(system.driver->manufacturer));
 		return !name.empty() && (selection_text() == name);
 	}
 };
@@ -755,7 +765,7 @@ public:
 	{
 	}
 
-	virtual bool apply(game_driver const &driver) const override { return !have_choices() || (selection_valid() && (selection_text() == driver.year)); }
+	virtual bool apply(ui_system_info const &system) const override { return !have_choices() || (selection_valid() && (selection_text() == system.driver->year)); }
 };
 
 
@@ -770,9 +780,10 @@ class inverted_machine_filter : public Base<Type>
 public:
 	inverted_machine_filter(char const *value, emu_file *file, unsigned indent) : Base<Type>(value, file, indent) { }
 
-	virtual bool apply(game_driver const &driver) const override { return !Base<Type>::apply(driver); }
+	virtual bool apply(ui_system_info const &system) const override { return !Base<Type>::apply(system); }
 };
 
+using available_machine_filter      = available_machine_filter_impl<>;
 using working_machine_filter        = working_machine_filter_impl<>;
 using mechanical_machine_filter     = mechanical_machine_filter_impl<>;
 using bios_machine_filter           = bios_machine_filter_impl<>;
@@ -781,6 +792,7 @@ using save_machine_filter           = save_machine_filter_impl<>;
 using chd_machine_filter            = chd_machine_filter_impl<>;
 using vertical_machine_filter       = vertical_machine_filter_impl<>;
 
+using unavailable_machine_filter    = inverted_machine_filter<available_machine_filter_impl, machine_filter::UNAVAILABLE>;
 using not_working_machine_filter    = inverted_machine_filter<working_machine_filter_impl, machine_filter::NOT_WORKING>;
 using not_mechanical_machine_filter = inverted_machine_filter<mechanical_machine_filter_impl, machine_filter::NOT_MECHANICAL>;
 using not_bios_machine_filter       = inverted_machine_filter<bios_machine_filter_impl, machine_filter::NOT_BIOS>;
@@ -801,12 +813,10 @@ class inclusive_machine_filter_impl : public simple_filter_impl_base<machine_fil
 public:
 	inclusive_machine_filter_impl(char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(game_driver const &drv) const override { return true; }
+	virtual bool apply(ui_system_info const &system) const override { return true; }
 };
 
 using all_machine_filter            = inclusive_machine_filter_impl<machine_filter::ALL>;
-using available_machine_filter      = inclusive_machine_filter_impl<machine_filter::AVAILABLE>;
-using unavailable_machine_filter    = inclusive_machine_filter_impl<machine_filter::UNAVAILABLE>;
 using favorite_machine_filter       = inclusive_machine_filter_impl<machine_filter::FAVORITE>;
 
 
@@ -881,7 +891,7 @@ public:
 		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "").c_str());
 	}
 
-	virtual bool apply(game_driver const &drv) const override
+	virtual bool apply(ui_system_info const &system) const override
 	{
 		inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 		if (!mgr.get_file_count())
@@ -893,12 +903,12 @@ public:
 			mame_machine_manager::instance()->inifile().load_ini_category(m_ini, m_group, m_cache);
 		m_cache_valid = true;
 
-		if (m_cache.end() != m_cache.find(&drv))
+		if (m_cache.end() != m_cache.find(system.driver))
 			return true;
 
 		if (m_include_clones)
 		{
-			int const found(driver_list::find(drv.parent));
+			int const found(driver_list::find(system.driver->parent));
 			return m_cache.end() != m_cache.find(&driver_list::driver(found));
 		}
 
@@ -1162,7 +1172,7 @@ public:
 
 	static bool type_allowed(unsigned pos, type n)
 	{
-		return (FIRST <= n) && (LAST >= n) && (ALL != n) && (AVAILABLE != n) && (UNAVAILABLE != n) && (FAVORITE != n) && (CUSTOM != n);
+		return (FIRST <= n) && (LAST >= n) && (ALL != n) && (FAVORITE != n) && (CUSTOM != n);
 	}
 
 	static bool types_contradictory(type n, type m)

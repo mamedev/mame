@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goodejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8000, 0x807f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_xor, write_xor)
+	AM_RANGE(0x8000, 0x807f) AM_DEVREADWRITE_MOD("crtc", seibu_crtc_device, read, write, xor<0x20>)
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 

@@ -23,7 +23,9 @@
 #include "video/mc6845.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/psi_kbd/psi_kbd.h"
+#include "bus/rs232/rs232.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
@@ -40,6 +42,7 @@ public:
 	driver_device(mconfig, type, tag),
 	m_cpu(*this, "maincpu"),
 	m_dma(*this, "dma"),
+	m_sio(*this, "sio"),
 	m_crtc(*this, "crtc"),
 	m_page_r(*this, "page%x_r", 0), m_page_w(*this, "page%x_w", 0),
 	m_boot(*this, "boot"),
@@ -51,6 +54,10 @@ public:
 	m_floppy1(*this, "fdc:1"),
 	m_beeper(*this, "beeper"),
 	m_beep_timer(*this, "beep_timer"),
+	m_centronics(*this, "centronics"),
+	m_dip_s2(*this, "S2"),
+	m_keyboard(*this, "kbd"),
+	m_rs232b(*this, "rs232b"),
 	m_sasi_dma(false),
 	m_dma_map(0),
 	m_status0(0), m_status1(0), m_status2(0),
@@ -89,6 +96,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_WRITE8_MEMBER(pio_porta_w);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232b_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -96,6 +108,7 @@ protected:
 private:
 	required_device<z80_device> m_cpu;
 	required_device<z80dma_device> m_dma;
+	required_device<z80sio_device> m_sio;
 	required_device<mc6845_device> m_crtc;
 	required_memory_bank_array<16> m_page_r, m_page_w;
 	required_memory_region m_boot;
@@ -107,6 +120,10 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
+	required_device<centronics_device> m_centronics;
+	required_ioport m_dip_s2;
+	required_device<psi_keyboard_bus_device> m_keyboard;
+	required_device<rs232_port_device> m_rs232b;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<uint16_t[]> m_vram; // 10-bit
@@ -185,6 +202,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 INPUT_PORTS_START( psi98 )
+	PORT_START("S2")
+	PORT_DIPNAME(0x01, 0x01, "SIO B") PORT_DIPLOCATION("S2:1")
+	PORT_DIPSETTING(0x00, "RS232")
+	PORT_DIPSETTING(0x01, "Keyboard")
 INPUT_PORTS_END
 
 
@@ -293,6 +314,46 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 TIMER_DEVICE_CALLBACK_MEMBER( kdt6_state::beeper_off )
 {
 	m_beeper->set_state(0);
+}
+
+
+//**************************************************************************
+//  EXTERNAL I/O
+//**************************************************************************
+
+WRITE8_MEMBER( kdt6_state::pio_porta_w )
+{
+	m_centronics->write_strobe(BIT(data, 0));
+	m_centronics->write_init(BIT(data, 1));
+}
+
+WRITE_LINE_MEMBER( kdt6_state::keyboard_rx_w )
+{
+	if (machine().phase() >= machine_phase::RESET)
+	{
+		if ((m_dip_s2->read() & 0x01) == 0x01)
+			m_sio->rxb_w(state);
+	}
+}
+
+WRITE_LINE_MEMBER( kdt6_state::rs232b_rx_w )
+{
+	if (machine().phase() >= machine_phase::RESET)
+	{
+		if ((m_dip_s2->read() & 0x01) == 0x00)
+			m_sio->rxb_w(state);
+	}
+}
+
+WRITE_LINE_MEMBER( kdt6_state::siob_tx_w )
+{
+	if (machine().phase() >= machine_phase::RESET)
+	{
+		if ((m_dip_s2->read() & 0x01) == 0x01)
+			m_keyboard->tx_w(state);
+		else
+			m_rs232b->write_txd(state);
+	}
 }
 
 
@@ -582,10 +643,40 @@ static MACHINE_CONFIG_START( psi98 )
 
 	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 4, 0, 0, 0, 0)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", psi_keyboard_bus_device, tx_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(kdt6_state, siob_tx_w))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("sio", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))  MCFG_DEVCB_XOR(1)
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(kdt6_state, rs232b_rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("sio", z80sio_device, syncb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))  MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kdt6_state, pio_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa2_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("pio", z80pio_device, pa3_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("pio", z80pio_device, pa4_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa5_w))
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_UPD1990A_ADD("rtc", XTAL_32_768kHz, NOOP, NOOP)
 
@@ -598,7 +689,7 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "psi98")
 
 	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
-	MCFG_PSI_KEYBOARD_RX_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(kdt6_state, keyboard_rx_w))
 	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg1))
 
 	// 6 ECB slots
@@ -634,4 +725,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY    FULLNAME  FLAGS
-COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  MACHINE_NOT_WORKING )
+COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  0 )

@@ -240,6 +240,7 @@ void vrc5074_device::device_start()
 	save_item(NAME(m_cpu_regs));
 	save_item(NAME(m_nile_irq_state));
 	save_item(NAME(m_sdram_addr));
+	save_item(NAME(m_uart_irq));
 	machine().save().register_postload(save_prepost_delegate(FUNC(vrc5074_device::postload), this));
 }
 
@@ -259,7 +260,7 @@ void vrc5074_device::device_reset()
 	m_dma_timer->adjust(attotime::never);
 	m_sdram_addr[0] = 0;
 	m_sdram_addr[1] = 0;
-
+	m_uart_irq = 0;
 }
 
 void vrc5074_device::map_cpu_space()
@@ -679,6 +680,12 @@ void vrc5074_device::update_nile_irqs()
 	uint8_t irq[6];
 	int i;
 
+	/* check for UART transmit IRQ enable and synthsize one */
+	if (m_uart_irq)
+		m_nile_irq_state |= 0x0010;
+	else
+		m_nile_irq_state &= ~0x0010;
+
 	irq[0] = irq[1] = irq[2] = irq[3] = irq[4] = irq[5] = 0;
 	m_cpu_regs[NREG_INTSTAT0 + 0] = 0;
 	m_cpu_regs[NREG_INTSTAT0 + 1] = 0;
@@ -1018,11 +1025,8 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 
 WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
 {
-	if (state ^ ((m_nile_irq_state >> 4) & 0x1)) {
-		if (state)
-			m_nile_irq_state |= 1 << 4;
-		else
-			m_nile_irq_state &= ~(1 << 4);
+	if (state ^ m_uart_irq) {
+		m_uart_irq = state;
 		update_nile_irqs();
 		if (LOG_NILE)
 			logerror("uart_irq_callback: state = %d\n", state);
@@ -1034,13 +1038,15 @@ READ32_MEMBER(vrc5074_device::serial_r)
 	uint32_t result = m_uart->ins8250_r(space, offset>>1);
 
 	if (LOG_NILE)
-		logerror("%06X:serial_r offset %03X = %08X\n", m_cpu_space->device().safe_pc(), offset>>1, result);
+		logerror("%06X:serial_r offset %03X = %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, result, offset*4);
 	return result;
 }
 
 WRITE32_MEMBER(vrc5074_device::serial_w)
 {
 	m_uart->ins8250_w(space, offset>>1, data);
+	if (PRINTF_SERIAL && offset == NREG_UARTTHR)
+		printf("%c", data);
 	if (LOG_NILE)
-		logerror("%06X:serial_w offset %03X = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset>>1, data, mem_mask);
+		logerror("%06X:serial_w offset %03X = %08X & %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, data, mem_mask, offset*4);
 }

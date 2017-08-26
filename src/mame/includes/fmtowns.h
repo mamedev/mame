@@ -16,6 +16,7 @@
 #include "machine/ram.h"
 #include "machine/upd71071.h"
 #include "machine/wd_fdc.h"
+#include "machine/i8251.h"
 #include "sound/2612intf.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
@@ -23,6 +24,7 @@
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 
 #include "formats/fmtowns_dsk.h"
 
@@ -99,6 +101,8 @@ class towns_state : public driver_device
 			m_flop0(*this, "fdc:0"),
 			m_flop1(*this, "fdc:1"),
 			m_icmemcard(*this, "icmemcard"),
+			m_i8251(*this, "i8251"),
+			m_rs232(*this, "rs232c"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
@@ -132,6 +136,8 @@ class towns_state : public driver_device
 	required_device<floppy_connector> m_flop0;
 	required_device<floppy_connector> m_flop1;
 	required_device<fmt_icmem_device> m_icmemcard;
+	required_device<i8251_device> m_i8251;
+	required_device<rs232_port_device> m_rs232;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;
@@ -190,7 +196,22 @@ class towns_state : public driver_device
 	uint8_t m_pit_out2;
 	uint8_t m_timer0;
 	uint8_t m_timer1;
+	
+	uint8_t m_serial_irq_source;
+	uint8_t m_serial_irq_enable;  // RS232 interrupt control
 
+	enum
+	{
+		TXC_EXTERNAL      = 0x80,
+		RXC_EXTERNAL      = 0x40,
+		ER_CONTROL        = 0x20,
+		CI_IRQ_ENABLE     = 0x10,
+		CS_IRQ_ENABLE     = 0x08,
+		SYNDET_IRQ_ENABLE = 0x04,
+		RXRDY_IRQ_ENABLE  = 0x02,
+		TXRDY_IRQ_ENABLE  = 0x01
+	};
+	
 	emu_timer* m_towns_wait_timer;
 	emu_timer* m_towns_status_timer;
 	emu_timer* m_towns_cdda_timer;
@@ -276,6 +297,13 @@ class towns_state : public driver_device
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	
+	DECLARE_WRITE_LINE_MEMBER(towns_serial_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_rxrdy_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_txrdy_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_syndet_irq);
+	DECLARE_READ8_MEMBER(towns_serial_r);
+	DECLARE_WRITE8_MEMBER(towns_serial_w);
 
 	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
 
@@ -333,6 +361,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);

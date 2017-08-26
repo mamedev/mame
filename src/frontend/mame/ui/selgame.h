@@ -7,13 +7,14 @@
     Main UI menu.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_SELGAME_H
 #define MAME_FRONTEND_UI_SELGAME_H
 
+#pragma once
+
 #include "ui/selmenu.h"
+#include "ui/utils.h"
+
 
 class media_auditor;
 
@@ -41,9 +42,8 @@ private:
 	static int m_isabios;
 
 	static std::vector<const game_driver *> m_sortedlist;
-	std::vector<const game_driver *> m_availsortedlist;
-	std::vector<const game_driver *> m_unavailsortedlist;
-	std::vector<const game_driver *> m_displaylist;
+	std::vector<ui_system_info> m_availsortedlist;
+	std::vector<ui_system_info> m_displaylist;
 
 	const game_driver *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 

@@ -294,6 +294,7 @@ VIDEOS["EF9365"] = true
 VIDEOS["GF4500"] = true
 --VIDEOS+= EPIC12"] = true
 --VIDEOS+= FIXFREQ"] = true
+VIDEOS["NT7534"] = true
 VIDEOS["HD44102"] = true
 VIDEOS["HD44352"] = true
 VIDEOS["HD44780"] = true
@@ -563,6 +564,7 @@ MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL74259"] = true
 MACHINES["TTL7474"] = true
+MACHINES["TUBE"] = true
 MACHINES["UPD1990A"] = true
 --MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
@@ -3391,6 +3393,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/anzterm.cpp",
 	MAME_DIR .. "src/mame/drivers/applix.cpp",
 	MAME_DIR .. "src/mame/drivers/argox.cpp",
+	MAME_DIR .. "src/mame/drivers/att4425.cpp",
 	MAME_DIR .. "src/mame/drivers/attache.cpp",
 	MAME_DIR .. "src/mame/drivers/aussiebyte.cpp",
 	MAME_DIR .. "src/mame/includes/aussiebyte.h",
@@ -3410,6 +3413,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/codata.cpp",
+	MAME_DIR .. "src/mame/drivers/controlid.cpp",
 	MAME_DIR .. "src/mame/drivers/cortex.cpp",
 	MAME_DIR .. "src/mame/drivers/cosmicos.cpp",
 	MAME_DIR .. "src/mame/includes/cosmicos.h",
@@ -3471,6 +3475,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/konin.cpp",
 	MAME_DIR .. "src/mame/drivers/kron.cpp",
 	MAME_DIR .. "src/mame/drivers/leapster.cpp",
+	MAME_DIR .. "src/mame/drivers/learnwin.cpp",
 	MAME_DIR .. "src/mame/drivers/lft.cpp",
 	MAME_DIR .. "src/mame/drivers/lg-dvd.cpp",
 	MAME_DIR .. "src/mame/drivers/lola8a.cpp",
@@ -3536,6 +3541,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/swyft.cpp",
 	MAME_DIR .. "src/mame/drivers/symbolics.cpp",
 	MAME_DIR .. "src/mame/drivers/sys2900.cpp",
+	MAME_DIR .. "src/mame/drivers/sys9002.cpp",
 	MAME_DIR .. "src/mame/drivers/systec.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",

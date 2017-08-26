@@ -46,18 +46,14 @@ READ16_MEMBER(supbtime_state::supbtime_controls_r)
 		case 8:
 			return ioport("COIN")->read();
 		case 10: /* ?  Not used for anything */
+			return 0;
 		case 12:
+			m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 			return 0;
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", space.device().safe_pc(), offset);
 	return ~0;
-}
-
-WRITE16_MEMBER(supbtime_state::sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -71,7 +67,7 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w)
+	AM_RANGE(0x1a0000, 0x1a0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_r, pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
@@ -81,7 +77,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(sound_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
@@ -321,7 +317,7 @@ static MACHINE_CONFIG_START( supbtime )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(supbtime_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supbtime_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supbtime_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8) /* Custom chip 45, audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -362,6 +358,7 @@ static MACHINE_CONFIG_START( supbtime )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
@@ -378,7 +375,7 @@ static MACHINE_CONFIG_START( chinatwn )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supbtime_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supbtime_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8) /* Custom chip 45, audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -418,6 +415,7 @@ static MACHINE_CONFIG_START( chinatwn )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */

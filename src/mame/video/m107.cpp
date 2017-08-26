@@ -113,6 +113,7 @@ WRITE16_MEMBER(m107_state::control_w)
 
 		case 0x1e:
 			m_raster_irq_position = m_control[offset] - 128;
+			m_upd71059c->ir2_w(0);
 			break;
 	}
 }

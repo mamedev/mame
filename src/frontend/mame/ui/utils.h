@@ -26,7 +26,17 @@ class mame_ui_manager;
 class render_container;
 
 
-// TODO: namespace this thing
+// TODO: namespace these things
+
+struct ui_system_info
+{
+	ui_system_info() { }
+	ui_system_info(game_driver const &d, bool a) : driver(&d), available(a) { }
+
+	game_driver const *driver = nullptr;
+	bool available = false;
+};
+
 struct ui_software_info
 {
 	ui_software_info() { }
@@ -49,8 +59,9 @@ struct ui_software_info
 	ui_software_info &operator=(ui_software_info const &) = default;
 	ui_software_info &operator=(ui_software_info &&) = default;
 
-	bool operator==(ui_software_info const &r)
+	bool operator==(ui_software_info const &r) const
 	{
+		// compares all fields except available
 		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
 			   && year == r.year && publisher == r.publisher && supported == r.supported
 			   && part == r.part && driver == r.driver && listname == r.listname
@@ -65,7 +76,7 @@ struct ui_software_info
 	std::string publisher;
 	uint8_t supported = 0;
 	std::string part;
-	const game_driver *driver = nullptr;
+	game_driver const *driver = nullptr;
 	std::string listname;
 	std::string interface;
 	std::string instance;
@@ -137,17 +148,19 @@ public:
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const
 	{
-		std::copy_if(first, last, dest, [this] (Entry const *info) { return apply(*info); });
+		std::copy_if(first, last, dest, [this] (auto const &info) { return this->apply(info); });
 	}
 
 protected:
 	using entry_type = Entry;
 
 	filter_base() { }
+
+	bool apply(Entry const *info) const { return apply(*info); }
 };
 
 
-class machine_filter : public filter_base<machine_filter, game_driver>
+class machine_filter : public filter_base<machine_filter, ui_system_info>
 {
 public:
 	enum type : uint16_t
@@ -188,8 +201,8 @@ public:
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
-	using filter_base<machine_filter, game_driver>::config_name;
-	using filter_base<machine_filter, game_driver>::display_name;
+	using filter_base<machine_filter, ui_system_info>::config_name;
+	using filter_base<machine_filter, ui_system_info>::display_name;
 
 protected:
 	machine_filter();

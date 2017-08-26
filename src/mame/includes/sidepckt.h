@@ -42,7 +42,6 @@ public:
 	uint8_t m_math_param;
 	uint8_t m_scroll_y;
 
-	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_READ8_MEMBER(i8751_r);
 	DECLARE_WRITE8_MEMBER(i8751_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);

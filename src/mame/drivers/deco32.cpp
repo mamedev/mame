@@ -400,27 +400,27 @@ READ32_MEMBER(deco32_state::irq_controller_r)
 {
 	switch (offset)
 	{
-		case 2: /* Raster IRQ ACK - value read is not used */
-			update_irq_state(RASTER_IRQ,false);
-			return 0;
+	case 2: /* Raster IRQ ACK - value read is not used */
+		update_irq_state(RASTER_IRQ,false);
+		return 0;
 
-		/* Irq controller
+	/* Irq controller
 
-			Bit 0:  1 = Vblank active
-			Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
-			Bit 2:
-			Bit 3:
-			Bit 4:  VBL Irq
-			Bit 5:  Raster IRQ
-			Bit 6:  Lightgun IRQ (on Lock N Load only)
-			Bit 7:
-		*/
-		case 3: 
+		Bit 0:  1 = Vblank active
+		Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
+		Bit 2:
+		Bit 3:
+		Bit 4:  VBL Irq
+		Bit 5:  Raster IRQ
+		Bit 6:  Lightgun IRQ (on Lock N Load only)
+		Bit 7:
+	*/
+	case 3:
 		{
 			/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
 			   that this bit is NOT set in rows 0-7. */
-			bool hvblank = bool(m_screen->vblank() & m_screen->hblank());
-			return 0xffffff80 | hvblank | m_screen->vblank()<<1 | (m_irq_cause);
+			bool const hvblank(m_screen->vblank() && m_screen->hblank());
+			return 0xffffff80 | (hvblank ? 1 : 0) | (m_screen->vblank() ? 2 : 0) | m_irq_cause;
 		}
 	}
 

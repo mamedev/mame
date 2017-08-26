@@ -12,6 +12,7 @@
 #pragma once
 
 #include "psi_kbd.h"
+#include "machine/keyboard.h"
 
 
 //**************************************************************************
@@ -20,7 +21,9 @@
 
 // ======================> psi_hle_keyboard_device
 
-class psi_hle_keyboard_device : public device_t, public device_psi_keyboard_interface
+class psi_hle_keyboard_device : public device_t,
+                                public device_psi_keyboard_interface,
+								protected device_matrix_keyboard_interface<7>
 {
 public:
 	// construction/destruction
@@ -28,11 +31,19 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_matrix_keyboard_interface overrides
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_break(uint8_t row, uint8_t column) override;
+	virtual void key_repeat(uint8_t row, uint8_t column) override;
 
 private:
-	void kbd_put(uint8_t data);
+	uint8_t translate(uint8_t row, uint8_t column);
+	void send_key(uint8_t code);
+	required_ioport m_modifiers;
 };
 
 

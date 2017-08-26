@@ -410,7 +410,6 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 void toaplan2_state::machine_start()
 {
-	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_old_p1_paddle_h));
 	save_item(NAME(m_old_p2_paddle_h));
 	save_item(NAME(m_z80_busreq));
@@ -426,8 +425,6 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 
 MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 {
-	m_mcu_data = 0x00;
-
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
 	// This is important for games with common RAM; the RAM test will fail
 	// when leaving service mode if the sound CPU is not reset.
@@ -668,27 +665,13 @@ WRITE16_MEMBER(toaplan2_state::shared_ram_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
-{
-	// Command sent to secondary CPU. Support for HD647180 will be
-	// required when a ROM dump becomes available for this hardware
-
-	if (ACCESSING_BITS_0_7)
-	{
-		m_mcu_data = data & 0xff;
-		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", space.device().safe_pcbase(), m_mcu_data);
-	}
-}
-
-
 CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
 	// bit 5 is tested low before V-Blank bit ???
-	//m_mcu_data = 0xff;
 
-	return (m_cmdavailable) ? 0x00 : 0x01;
+	return m_soundlatch->pending_r() ? 0x00 : 0x01;
 }
 
 
@@ -902,7 +885,7 @@ static ADDRESS_MAP_START( tekipaki_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x180050, 0x180051) AM_READ_PORT("IN1")
 	AM_RANGE(0x180060, 0x180061) AM_READ_PORT("IN2")
-	AM_RANGE(0x180070, 0x180071) AM_WRITE(tekipaki_mcu_w)
+	AM_RANGE(0x180070, 0x180071) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1444,24 +1427,9 @@ ADDRESS_MAP_END
 
 
 
-WRITE16_MEMBER(toaplan2_state::tekipaki_mcu_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_mcu_data = data & 0xff;
-		m_cmdavailable = 1;
-	}
-};
-
-READ8_MEMBER(toaplan2_state::tekipaki_soundlatch_r)
-{
-	m_cmdavailable = 0;
-	return m_mcu_data;
-};
-
 READ8_MEMBER(toaplan2_state::tekipaki_cmdavailable_r)
 {
-	if (m_cmdavailable) return 0xff;
+	if (m_soundlatch->pending_r()) return 0xff;
 	else return 0x00;
 };
 
@@ -1474,7 +1442,7 @@ static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x60, 0x60) AM_READ(tekipaki_cmdavailable_r)
-	AM_RANGE(0x84, 0x84) AM_READ(tekipaki_soundlatch_r)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
 	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x83, 0x83) AM_DEVREADWRITE("ymsnd", ym3812_device, read_port_r, write_port_w)
@@ -3248,6 +3216,8 @@ static MACHINE_CONFIG_START( tekipaki )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

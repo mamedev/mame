@@ -218,7 +218,7 @@ ROM_START( xtide )
 	ROM_SYSTEM_BIOS( 13, "xub115xt", "XTIDE_Universal_BIOS_v1.1.5 (XT)" )
 	ROMX_LOAD( "ide_xt.bin(v1.1.5)", 0x000000, 0x002000, CRC(33a7e0ee) SHA1(b610fd8ea31f5b0568b8b3f2c3ef682be4897a3d), ROM_BIOS(14) )
 
-	ROM_SYSTEM_BIOS( 14, "xub115xtp", "XTIDE_Universal_BIOS_v1.1.3 (XT 80186+)" )
+	ROM_SYSTEM_BIOS( 14, "xub115xtp", "XTIDE_Universal_BIOS_v1.1.5 (XT 80186+)" )
 	ROMX_LOAD( "ide_xtp.bin(v1.1.5)", 0x000000, 0x002000, CRC(44ad9ee9) SHA1(9cd275469703cadb85b6654c56e421a151324ac0), ROM_BIOS(15) )
 
 	ROM_SYSTEM_BIOS( 15, "xub115at", "XTIDE_Universal_BIOS_v1.1.5 (AT)" )

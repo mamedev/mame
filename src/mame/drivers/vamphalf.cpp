@@ -16,7 +16,7 @@
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
-    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version 1.1.0908)
+    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version 1.1.0908 and 1.0.0903)
     Vamp 1/2                        (c) 1999 Danbi & F2 System  (Korea version 1.1.0908)
     Date Quiz Go Go Episode 2       (c) 2000 SemiCom
     Mission Craft                   (c) 2000 Sun                (version 2.7 and 2.4)
@@ -131,6 +131,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
 
 	DECLARE_READ16_MEMBER(vamphalf_speedup_r);
+	DECLARE_READ16_MEMBER(vamphalfr1_speedup_r);
 	DECLARE_READ16_MEMBER(vamphafk_speedup_r);
 	DECLARE_READ16_MEMBER(misncrft_speedup_r);
 	DECLARE_READ16_MEMBER(misncrfta_speedup_r);
@@ -175,6 +176,7 @@ public:
 
 	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(vamphalf);
+	DECLARE_DRIVER_INIT(vamphalfr1);
 	DECLARE_DRIVER_INIT(vamphafk);
 	DECLARE_DRIVER_INIT(coolmini);
 	DECLARE_DRIVER_INIT(mrkickera);
@@ -1184,41 +1186,74 @@ MACHINE_CONFIG_END
 Vamp 1/2 (Semi Vamp)
 Danbi, 1999
 
+Later DANBI PCB:
++-----------------------------------------------+
+|     VR1         KA12    VROM1                 |
+|                                               |
+|                 BS901  AD-65   ROML01  ROMU01 |
+|                                ROML00  ROMU00 |
+|                     62256                     |
+|J                    62256         +----------+|
+|A            +------+              |Quicklogic||
+|M    DRAM1   |E1-16T|   ROM1       | QL2003   ||
+|M            +------+              | XPL84C   ||
+|A                    62256         +----------+|
+|          GAL1       62256                     |
+|      93C46     +----------+     62256         |
+|                |Quicklogic|     62256         |
+|                | QL2003   |     62256         |
+|      50.000MHz | XPL84C   |     62256         |
+|B1 B2 B3        +----------+ 28.000MHz         |
++-----------------------------------------------+
 
-PCB Layout
-----------
-             KA12    VROM1.
-
-             BS901   AD-65    ROML01.   ROMU01.
-                              ROML00.   ROMU00.
-                 62256
-                 62256
-
-T2316162A  E1-16T  PROM1.          QL2003-XPL84C
-
-                 62256
-                 62256       62256
-                             62256
-    93C46.IC3                62256
-                             62256
-    50.000MHz  QL2003-XPL84C
-B1 B2 B3                     28.000MHz
+     CPU: Hyperstone E1-16T
+Graphics: QuickLogic QL2003-XPL84
+   Sound: Oki M6295 rebaged as AD-65
+          YM3012/YM2151 rebaged as KA12/BS901
+    ROMs: ROML00/01, ROMU00/01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+   DRAM1: TM T2316162A 1M x16 EDO DRAM (SOJ44)
 
 
+Ealier DANBI PCB:
++-----------------------------------------------+
+|     VR1          KA3002    VROM1              |
+|                                               |
+|                  KA51   U6295  ELC     EVI    |
+|                                ROML00* ROMU00*|
+|                    62256                      |
+|                    62256                      |
+|J        +----------+              +---------+ |
+|A  DRAM1 |GMS30C2116|  ROM1        |  Actel  | |
+|M        +----------+              |A40MX04-F| |
+|M                   62256          |  PL84   | |
+|A          GAL1     62256          +---------+ |
+|       93C46                                   |
+|                 +---------+    62256          |
+|                 |  Actel  |    62256          |
+|                 |A40MX04-F|    62256          |
+|       50.000MHz |  PL84   |    62256          |
+|B1 B2 B3         +---------+ 28.000MHz         |
++-----------------------------------------------+
 
-Notes
------
-B1 B2 B3:      Push buttons for SERV, RESET, TEST
-T2316162A:     Main program RAM
-E1-16T:        Hyperstone E1-16T CPU
-QL2003-XPL84C: QuickLogic PLCC84 PLD
-AD-65:         Compatible to OKI M6295
-KA12:          Compatible to Y3012
-BS901          Compatible to YM2151
-PROM1:         Main program
-VROM1:         OKI samples
-ROML* / U*:    Graphics, device is MX29F1610ML (surface mounted SOP44 MASK ROM)
+     CPU: HYUNDAI GMS30C2116
+Graphics: Actel A40MX04-F PL84
+   Sound: Oki M6295 rebaged as U6295
+          YM3012/YM2151 rebaged as KA3002/KA51
+    ROMs: ROML01, ROMU01 - SOP44 32MBit MASK ROM for ELC & EVI
+          ROML00, ROMU00 - unpopulated
+   DRAM1: LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 
+   
+
+Both PCBs:
+   VROM1: Macronix MX27C2000 2MBit DIP32 EPROM
+    ROM1: ST M27C4001 4MBit DIP32 EPROM
+
+    RAMs: MEMx/CRAMx - HMC HM2H256AJ-15 32K x8 SRAM (SOJ28)
+    GAL1: PALCE22V10H
+
+B1 B2 B3: Push buttons for SERV, RESET, TEST
+     VR1: Volume adjust pot
 */
 
 ROM_START( vamphalf )
@@ -1234,6 +1269,19 @@ ROM_START( vamphalf )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "snd.vrom1", 0x00000, 0x40000, CRC(ee9e371e) SHA1(3ead5333121a77d76e4e40a0e0bf0dbc75f261eb) )
+ROM_END
+
+ROM_START( vamphalfr1 )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	/* 0 - 0x80000 empty */
+	ROM_LOAD( "ws1-01201.rom1", 0x80000, 0x80000, CRC(afa75c19) SHA1(5dac104d1b3c026b6fce4d1f9126c048ebb557ef) ) /* at 0x162B8: Europe Version 1.0.0903 */
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "elc.roml01", 0x000000, 0x400000, CRC(19df4056) SHA1(8b05769d8e245f8b25bf92013b98c9d7e5ab4548) ) /* only 2 roms, though twice as big as other sets */
+	ROM_LOAD32_WORD( "evi.romu01", 0x000002, 0x400000, CRC(f9803923) SHA1(adc1d4fa2c6283bc24829f924b58fbd9d1bacdd2) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "ws1-01202.vrom1", 0x00000, 0x40000, CRC(ee9e371e) SHA1(3ead5333121a77d76e4e40a0e0bf0dbc75f261eb) ) /* same data as other sets */
 ROM_END
 
 
@@ -2517,6 +2565,18 @@ READ16_MEMBER(vamphalf_state::vamphalf_speedup_r)
 
 	return m_wram[(0x4a840/2)+offset];
 }
+READ16_MEMBER(vamphalf_state::vamphalfr1_speedup_r)
+{
+	if(space.device().safe_pc() == 0x82de)
+	{
+		if(irq_active(space))
+			space.device().execute().spin_until_interrupt();
+		else
+			space.device().execute().eat_cycles(50);
+	}
+
+	return m_wram[(0x4a4f0/2)+offset];
+}
 
 READ16_MEMBER(vamphalf_state::vamphafk_speedup_r)
 {
@@ -2818,6 +2878,14 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
 	m_flip_bit = 0x80;
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,vamphalfr1)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a4f0, 0x0004a4f3, read16_delegate(FUNC(vamphalf_state::vamphalfr1_speedup_r), this));
+
+	m_palshift = 0;
+	m_flip_bit = 0x80;
+}
+
 DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a6d0, 0x0004a6d3, read16_delegate(FUNC(vamphalf_state::vamphafk_speedup_r), this));
@@ -3048,6 +3116,7 @@ GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, luplup29, 
 GAME( 1999, puzlbang,  suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, puzlbanga, suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, vamphalf,  0,        vamphalf,  common,   vamphalf_state, vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfr1,vamphalf, vamphalf,  common,   vamphalf_state, vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, vamphalfk, vamphalf, vamphalf,  common,   vamphalf_state, vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, dquizgo2,  0,        coolmini,  common,   vamphalf_state, dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
 GAME( 2000, misncrft,  0,        misncrft,  common,   vamphalf_state, misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

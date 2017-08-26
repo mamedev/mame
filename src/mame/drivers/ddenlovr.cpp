@@ -118,6 +118,8 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "sound/ym2413.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
@@ -4240,7 +4242,7 @@ static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, ddenlovr_state )
 	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0xc5, 0xc5 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
 	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(htengoku_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0xe0, 0xe7 ) AM_WRITE(yarunara_mainlatch_w)
+	AM_RANGE( 0xe0, 0xe7 ) AM_DEVWRITE("mainlatch", ls259_device, write_d1)
 ADDRESS_MAP_END
 
 /***************************************************************************

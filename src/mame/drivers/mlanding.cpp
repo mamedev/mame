@@ -51,6 +51,7 @@
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
+#include "machine/taitoio_yoke.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
 
@@ -82,6 +83,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mechacpu(*this, "mechacpu"),
+		m_yoke(*this, "yokectrl"),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_ctc(*this, "ctc"),
@@ -100,6 +102,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mechacpu;
+	required_device<taitoio_yoke_device> m_yoke;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
 	required_device<z80ctc_device> m_ctc;
@@ -450,6 +453,8 @@ WRITE16_MEMBER(mlanding_state::output_w)
 	*/
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	m_mechacpu->set_input_line(INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	machine().bookkeeping().coin_counter_w(0, data & 4);
+	machine().bookkeeping().coin_counter_w(1, data & 8);
 }
 
 
@@ -462,19 +467,19 @@ WRITE16_MEMBER(mlanding_state::output_w)
 
 READ16_MEMBER(mlanding_state::analog1_msb_r)
 {
-	return (ioport("THROTTLE")->read() >> 4) & 0xff;
+	return (m_yoke->throttle_r(space,0) >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog2_msb_r)
 {
-	return (ioport("STICK_X")->read() >> 4) & 0xff;
+	return (m_yoke->stickx_r(space,0) >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog3_msb_r)
 {
-	return (ioport("STICK_Y")->read() >> 4) & 0xff;
+	return (m_yoke->sticky_r(space,0) >> 4) & 0xff;
 }
 
 
@@ -483,22 +488,12 @@ READ16_MEMBER(mlanding_state::analog1_lsb_r)
 	/*
 	    76543210
 	    ....xxxx    Counter 1 bits 3-0
-	    ...x....    Handle left
-	    ..x.....    Slot down
-	    .x......    Slot up
+	    ...x....    Handle right
+	    ..x.....    Slot up
+	    .x......    Slot down
 	*/
-	uint16_t throttle = ioport("THROTTLE")->read();
-	uint16_t x = ioport("STICK_X")->read();
 
-	uint8_t res = 0x70 | (throttle & 0x0f);
-
-	if (throttle & 0x800)
-		res ^= 0x20;
-	else if (throttle > 0)
-		res ^= 0x40;
-
-	if (!(x & 0x800) && x > 0)
-		res ^= 0x10;
+	uint8_t res = (ioport("LIMIT0")->read() & 0x70) | (m_yoke->throttle_r(space,0) & 0xf);
 
 	return res;
 }
@@ -510,7 +505,7 @@ READ16_MEMBER(mlanding_state::analog2_lsb_r)
 	    76543210
 	    ....xxxx    Counter 2 bits 3-0
 	*/
-	return ioport("STICK_X")->read() & 0x0f;
+	return m_yoke->stickx_r(space,0) & 0x0f;
 }
 
 
@@ -519,22 +514,11 @@ READ16_MEMBER(mlanding_state::analog3_lsb_r)
 	/*
 	    76543210
 	    ....xxxx    Counter 3 bits 3-0
-	    ...x....    Handle up
-	    ..x.....    Handle right
-	    .x......    Handle down
+	    ...x....    Handle down
+	    ..x.....    Handle left
+	    .x......    Handle up
 	*/
-	uint16_t x = ioport("STICK_X")->read();
-	uint16_t y = ioport("STICK_Y")->read();
-
-	uint8_t res = 0x70 | (y & 0x0f);
-
-	if (y & 0x800)
-		res ^= 0x40;
-	else if (y > 0)
-		res ^= 0x10;
-
-	if (x & 0x800)
-		res ^= 0x20;
+	uint8_t res = (ioport("LIMIT1")->read() & 0x70) | (m_yoke->sticky_r(space,0) & 0xf);
 
 	return res;
 }
@@ -905,14 +889,16 @@ static INPUT_PORTS_START( mlanding )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("THROTTLE")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START("STICK_X")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START("STICK_Y")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	// despite what the service mode claims limits are really active low.
+	PORT_START("LIMIT0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
+	
+	PORT_START("LIMIT1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
 INPUT_PORTS_END
 
 
@@ -952,9 +938,11 @@ static MACHINE_CONFIG_START( mlanding )
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-
+	
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 

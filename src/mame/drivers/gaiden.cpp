@@ -161,15 +161,6 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(space, 0, data >> 8);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-}
-
 
 
 /* Wild Fang / Tecmo Knight has a simple protection. It writes codes to 0x07a804, */
@@ -431,7 +422,7 @@ static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x07a00e, 0x07a00f) AM_WRITE(drgnbowl_sound_command_w)
+	AM_RANGE(0x07a00e, 0x07a00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
 	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
@@ -859,6 +850,7 @@ static MACHINE_CONFIG_START( drgnbowl )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -914,15 +906,45 @@ Others
 */
 
 static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_device, write)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("adpcm_bank")
+	AM_RANGE(0xc400, 0xc401) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // ?
-	AM_RANGE(0xd400, 0xd400) AM_WRITENOP // ?
-	AM_RANGE(0xd800, 0xd800) AM_WRITENOP // ?
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("adpcm_select2", ls157_device, ba_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(adpcm_bankswitch_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
+
+WRITE_LINE_MEMBER(gaiden_state::vck_flipflop_w)
+{
+	if (!state)
+		return;
+
+	m_adpcm_toggle = !m_adpcm_toggle;
+	m_adpcm_select[0]->select_w(m_adpcm_toggle);
+	m_adpcm_select[1]->select_w(m_adpcm_toggle);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle);
+}
+
+WRITE8_MEMBER(gaiden_state::adpcm_bankswitch_w)
+{
+	m_msm[0]->reset_w(BIT(data, 3));
+	m_msm[1]->reset_w(BIT(data, 4));
+	m_adpcm_bank->set_entry(data & 7);
+}
+
+MACHINE_START_MEMBER(gaiden_state,mastninj)
+{
+	MACHINE_START_CALL_MEMBER(raiga);
+
+	m_adpcm_bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_adpcm_bank->set_entry(0);
+
+	m_adpcm_toggle = 0;
+	save_item(NAME(m_adpcm_toggle));
+}
 
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -945,7 +967,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
-	AM_RANGE(0x07a00e, 0x07a00f) AM_WRITE(drgnbowl_sound_command_w)
+	AM_RANGE(0x07a00e, 0x07a00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 ADDRESS_MAP_END
 
@@ -958,9 +980,8 @@ static MACHINE_CONFIG_START( mastninj )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)
-								/* IRQs are triggered by the YM2203 */
 
-	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
+	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -986,22 +1007,36 @@ static MACHINE_CONFIG_START( mastninj )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000) /* ?? MHz */
+	// YM2203 clocks chosen by analogy with Automat; actual rate unknown, but 4 MHz is obviously too fast
+	MCFG_SOUND_ADD("ym1", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000) /* ?? MHz */
+	MCFG_SOUND_ADD("ym2", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	/* no 6295 on the bootleg - does this use a pair of 5205 instead? */
-//  MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+
+	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("msm2", msm5205_device, vclk_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gaiden_state, vck_flipflop_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1226,7 +1261,7 @@ ROM_START( mastninj )
 	ROM_LOAD16_BYTE( "4.ic26",    0x20000, 0x10000, CRC(d375c5f6) SHA1(925e84d79f35595a344a417125d74dc46ebec310) ) // 1ST AND 2ND HALF IDENTICAL (but correct?)
 	ROM_LOAD16_BYTE( "2.ic29",    0x20001, 0x10000, CRC(6b53b8b1) SHA1(68bffc992fecae5e113592a9481c0cee80925135) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "5.ic35",       0x000000, 0x10000, CRC(ba528424) SHA1(5ab93059e26483a756d80b8c18d9669d2a3416de) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )

@@ -119,6 +119,7 @@ DEFINE_DEVICE_TYPE(IBM_6360, ibm_6360, "ibm_6360", "IBM 6360 8\" single-sided si
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_DFI_FORMAT,
+	FLOPPY_HFE_FORMAT,
 	FLOPPY_IMD_FORMAT,
 	FLOPPY_IPF_FORMAT,
 	FLOPPY_MFI_FORMAT,

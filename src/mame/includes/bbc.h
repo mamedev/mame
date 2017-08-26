@@ -82,6 +82,10 @@ public:
 		m_upd7002(*this, "upd7002"),
 		m_analog(*this, "analogue"),
 		m_joyport(*this, "joyport"),
+		m_tube(*this, "tube"),
+		m_intube(*this, "intube"),
+		m_extube(*this, "extube"),
+		m_1mhzbus(*this, "1mhzbus"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
@@ -228,6 +232,10 @@ public: // HACK FOR MC6845
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<bbc_analogue_slot_device> m_analog;
 	optional_device<bbc_joyport_slot_device> m_joyport;
+	optional_device<bbc_tube_slot_device> m_tube;
+	optional_device<bbc_tube_slot_device> m_intube;
+	optional_device<bbc_tube_slot_device> m_extube;
+	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;

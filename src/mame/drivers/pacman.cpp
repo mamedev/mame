@@ -6056,8 +6056,8 @@ ROM_END
 
 ROM_START( eeekk ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 2 roms + 2 BPROMs
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "u_2_eeekk_pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) // encrypted
-	ROM_LOAD( "u_3_eeekk_pg03094.u3",   0x2000, 0x2000, CRC(bcf524ae) SHA1(be2a1a2984ea1439c63d8c353e4ae85bf42c8a55) ) // encrypted
+	ROM_LOAD( "u_2_eeekk_pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) // encrypted  - located on daughtercard 
+	ROM_LOAD( "u_3_eeekk_pg03094.u3",   0x2000, 0x2000, CRC(bcf524ae) SHA1(be2a1a2984ea1439c63d8c353e4ae85bf42c8a55) ) // encrypted  - located on daughtercard 
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5_e_eeekk_pg03094.5e",   0x0000, 0x1000, CRC(780183a8) SHA1(8466d75d79b3c87db143f5c2e8b58dad1d2e501c) )
@@ -6288,18 +6288,18 @@ ROM_START( acitya )
 	ROM_LOAD( "82s126.3m"  ,  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */
 ROM_END
 
-ROM_START( bwcasino )
+ROM_START( bwcasino ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 1 rom + 2 BPROMs
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "bwc_u2.bin",   0x0000, 0x2000, CRC(e2eea868) SHA1(9e9dae02ab746ef48981f42a75c192c5aae0ffee) )
-	ROM_LOAD( "bwc_u3.bin",   0x2000, 0x2000, CRC(a935571e) SHA1(ab4f53be2544593fc8eb4c4bcccdec4191c0c626) )
+	ROM_LOAD( "u_2_boardwalk_casino_pp09144.u2",   0x0000, 0x2000, CRC(e2eea868) SHA1(9e9dae02ab746ef48981f42a75c192c5aae0ffee) ) // labeled U 2 BOARDWALK CASINO PP09144  - located on daughtercard
+	ROM_LOAD( "u_3_boardwalk_casino_pp09144.u3",   0x2000, 0x2000, CRC(a935571e) SHA1(ab4f53be2544593fc8eb4c4bcccdec4191c0c626) ) // labeled U 3 BOARDWALK CASINO PP09144  - located on daughtercard
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "bwc_5e.bin",   0x0000, 0x1000, CRC(e334c01e) SHA1(cc6e50e3cf51eb8b7b27aa7351733954da8128ff) )
+	ROM_LOAD( "5_e_boardwalk_casino_pp09144.5e",   0x0000, 0x1000, CRC(e334c01e) SHA1(cc6e50e3cf51eb8b7b27aa7351733954da8128ff) ) // labeled 5 E BOARDWALK CASINO PP09144
 	ROM_RELOAD( 0x1000, 0x1000 ) /* Not Used?? */
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "aca_7f.bin",   0x0000, 0x0020, CRC(133bb744) SHA1(da4074f3ea30202973f0b6c9ad05a992bb44eafd) )
-	ROM_LOAD( "aca_4a.bin",   0x0020, 0x0100, CRC(8e29208f) SHA1(a30a405fbd43d27a8d403f6c3545178564dede5d) )
+	ROM_LOAD( "7_f_b.w.c.7f",   0x0000, 0x0020, CRC(133bb744) SHA1(da4074f3ea30202973f0b6c9ad05a992bb44eafd) ) // labeled 7 F B.W.C. with sinlge red dot
+	ROM_LOAD( "4_a_b.w.c.4a",   0x0020, 0x0100, CRC(8e29208f) SHA1(a30a405fbd43d27a8d403f6c3545178564dede5d) ) // labeled 4 A B.W.C. with sinlge red dot
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )

@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( rpunch )
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)

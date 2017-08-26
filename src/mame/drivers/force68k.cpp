@@ -637,12 +637,13 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 ROM_START (fccpu1)
 ROM_REGION (0x1000000, "maincpu", 0)
+ROM_DEFAULT_BIOS("forcemon-1.0l")
 
-ROM_SYSTEM_BIOS(0, "Force Monitor 1.0L", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
+ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
 ROMX_LOAD ("fccpu1V1.0L.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(1))
 ROMX_LOAD ("fccpu1V1.0L.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90dc44d9c25d28428233e6846da6edce2d69e440), ROM_SKIP(1) | ROM_BIOS(1))
 
-ROM_SYSTEM_BIOS(1, "Force Debugger 1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
+ROM_SYSTEM_BIOS(1, "forcebug-1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
 ROMX_LOAD ("fccpu1V1.1.j8.bin", 0x080001, 0x4000, CRC (116dcbf0) SHA1 (6870b71606933f84afe27ad031c651d201b93f99), ROM_SKIP(1) | ROM_BIOS(2))
 ROMX_LOAD ("fccpu1V1.1.j9.bin", 0x080000, 0x4000, CRC (aefd5b0b) SHA1 (1e24530a6d5dc4fb77fde67acae08d371e59fc0f), ROM_SKIP(1) | ROM_BIOS(2))
 

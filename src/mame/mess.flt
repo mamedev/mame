@@ -65,6 +65,7 @@ atarist.cpp
 atm.cpp
 atom.cpp
 atpci.cpp
+att4425.cpp
 attache.cpp
 aussiebyte.cpp
 avigo.cpp
@@ -323,6 +324,7 @@ lb186.cpp
 lc80.cpp
 lcmate2.cpp
 leapster.cpp
+learnwin.cpp
 lft.cpp
 lg-dvd.cpp
 lisa.cpp
@@ -611,6 +613,7 @@ swyft.cpp
 sym1.cpp
 symbolics.cpp
 sys2900.cpp
+sys9002.cpp
 systec.cpp
 tamag1.cpp
 tandy1t.cpp

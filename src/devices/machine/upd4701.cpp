@@ -148,6 +148,16 @@ WRITE_LINE_MEMBER(upd4701_device::resety_w)
 //  reset_x - pulse the X counter reset line
 //-------------------------------------------------
 
+READ8_MEMBER(upd4701_device::reset_x)
+{
+	if (!machine().side_effect_disabled())
+	{
+		resetx_w(1);
+		resetx_w(0);
+	}
+	return space.unmap();
+}
+
 WRITE8_MEMBER(upd4701_device::reset_x)
 {
 	resetx_w(1);
@@ -157,6 +167,16 @@ WRITE8_MEMBER(upd4701_device::reset_x)
 //-------------------------------------------------
 //  reset_y - pulse the Y counter reset line
 //-------------------------------------------------
+
+READ8_MEMBER(upd4701_device::reset_y)
+{
+	if (!machine().side_effect_disabled())
+	{
+		resety_w(1);
+		resety_w(0);
+	}
+	return space.unmap();
+}
 
 WRITE8_MEMBER(upd4701_device::reset_y)
 {

@@ -137,5 +137,16 @@
 		</part>
 	</software>
 
+	<software name="shado">
+		<description>Shado BBC Emulator Software</description>
+		<year>1985</year>
+		<publisher>Aztec Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1025435">
+				<rom name="shado.tap" size="1025435" crc="696f1803" sha1="963df883bcf76c7d398f44be04e4980c2c92bdfa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

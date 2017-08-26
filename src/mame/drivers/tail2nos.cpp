@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( tail2nos )
 	MCFG_K051316_WRAP(1)
 	MCFG_K051316_CB(tail2nos_state, zoom_callback)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

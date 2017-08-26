@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16, m90_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")

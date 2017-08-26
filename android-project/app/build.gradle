@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 18
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "org.mamedev.mame"
-        minSdkVersion 18
-        targetSdkVersion 18
+        minSdkVersion 21
+        targetSdkVersion 21
 
         ndk {
             moduleName 'main'

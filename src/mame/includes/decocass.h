@@ -398,11 +398,9 @@ private:
 
 	DECLARE_READ8_MEMBER(decocass_widel_r);
 	DECLARE_WRITE8_MEMBER(decocass_widel_w);
-	DECLARE_READ8_MEMBER(decocass_fbc2_r);
 
 	/* dongle type widel: status */
 	int32_t     m_widel_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
 	int32_t     m_widel_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
-	uint8_t     m_decomult_bank;
 };
 

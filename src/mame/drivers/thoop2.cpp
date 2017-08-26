@@ -12,6 +12,44 @@ There is a priority bug on the title screen (Gaelco logo is hidden by black
 borders)  It seems sprite priority is hacked around on most of the older
 Gaelco drivers.
 
+
+REF.940411
++-------------------------------------------------+
+|       C1                                  6116  |
+|  VOL  C2*                                 6116  |
+|          30MHz                            6116  |
+|    M6295                    +----------+  6116  |
+|     1MHz                    |TMS       |        |
+|       6116                  |TPC1020AFN|        |
+|J      6116                  |   -084C  |    H8  |
+|A     +------------+         +----------+        |
+|M     |DS5002FP Box|         +----------+        |
+|M     +------------+         |TMS       |    H12 |
+|A             65756          |TPC1020AFN|        |
+|              65756          |   -084C  |        |
+|                             +----------+        |
+|SW1                                   PAL   65764|
+|     24MHz    MC68000P12                    65764|
+|SW2           C22                    6116        |
+|      PAL     C23                    6116        |
++-------------------------------------------------+
+
+  CPU: MC68000P12 & DS5002FP (used for protection)
+Sound: OKI M6295
+  OSC: 30MHz, 24MHz & 1MHz resonator
+  RAM: MHS HM3-65756K-5  32K x 8 SRAM (x2)
+       MHS HM3-65764E-5  8K x 8 SRAM (x2)
+       UM6116BK-35  2K x 8 SRAM (x8)
+  PAL: TI F20L8-25CNT DIP24 (x2)
+  VOL: Volume pot
+   SW: Two 8 switch dipswitches
+
+DS5002FP Box contains:
+  Dallas DS5002SP @ 12MHz
+  KM62256BLG-7L - 32Kx8 Low Power CMOS SRAM
+  3.6v Battery
+  JP1 - 5 pin port to program SRAM
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -21,6 +59,7 @@ Gaelco drivers.
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 
@@ -36,11 +75,6 @@ void thoop2_state::machine_start()
 WRITE8_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
 {
 	membank("okibank")->set_entry(data & 0x0f);
-}
-
-WRITE8_MEMBER(thoop2_state::coin_w)
-{
-	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
 }
 
 WRITE_LINE_MEMBER(thoop2_state::coin1_lockout_w)
@@ -93,7 +127,7 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE8(coin_w, 0x00ff)          /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)               /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                  /* OKI6295 data register */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
@@ -255,7 +289,7 @@ static MACHINE_CONFIG_START( thoop2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // 1MHz resonator - pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

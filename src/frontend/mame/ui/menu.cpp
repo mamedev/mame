@@ -453,7 +453,10 @@ const menu::event *menu::process(uint32_t flags, float x0, float y0)
 		m_event.type = item[selected].type;
 		return &m_event;
 	}
-	return nullptr;
+	else
+	{
+		return nullptr;
+	}
 }
 
 
