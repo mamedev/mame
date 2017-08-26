@@ -381,12 +381,16 @@ WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
 }
 
 
-static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
+static ADDRESS_MAP_START( sweetgal_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM AM_SHARE("sound_ram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sexygal_audioff_w)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sexygal_audioff_w)
+	AM_IMPORT_FROM(sweetgal_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_sexygal_io, AS_IO, 8, nightgal_state )
@@ -788,7 +792,10 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sweetgal, sexygal )
-	// doesn't have the extra CPU (and no access to the extra ports)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sweetgal_map)
+
+	// doesn't have the extra NSC8105 (so how does this play samples?)
 	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
