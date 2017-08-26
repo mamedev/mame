@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-25 23:38+1000\n"
-"PO-Revision-Date: 2017-08-22 01:50+0800\n"
+"PO-Revision-Date: 2017-08-25 07:00+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -94,7 +94,7 @@ msgstr "ROM"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
-msgstr ""
+msgstr "軟體媒體"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
@@ -118,7 +118,7 @@ msgstr "INI"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "類別 INI"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
@@ -299,7 +299,7 @@ msgstr "外部網路"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr ""
+msgstr "計時"
 
 #: src/frontend/mame/ui/info.cpp:177
 msgid ""
@@ -922,7 +922,7 @@ msgstr "圖形\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:881
 msgid "Graphics\tWrong Colors\n"
-msgstr ""
+msgstr "圖形\t色彩錯誤\n"
 
 #: src/frontend/mame/ui/selgame.cpp:883
 msgid "Graphics\tImperfect Colors\n"
