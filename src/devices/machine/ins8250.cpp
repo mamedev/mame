@@ -144,6 +144,14 @@ void pc16552_device::device_start()
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 #define COM_INT_PENDING_CHAR_TIMEOUT 0x0011
 
+static constexpr uint8_t INS8250_LSR_TSRE = 0x40;
+static constexpr uint8_t INS8250_LSR_THRE = 0x20;
+static constexpr uint8_t INS8250_LSR_BI = 0x10;
+static constexpr uint8_t INS8250_LSR_FE = 0x08;
+static constexpr uint8_t INS8250_LSR_PE = 0x04;
+static constexpr uint8_t INS8250_LSR_OE = 0x02;
+static constexpr uint8_t INS8250_LSR_DR = 0x01;
+
 /* ints will continue to be set for as long as there are ints pending */
 void ins8250_uart_device::update_interrupt()
 {
@@ -218,11 +226,11 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			else
 			{
 				m_regs.thr = data;
-				m_regs.lsr &= ~0x20;
+				m_regs.lsr &= ~INS8250_LSR_THRE;
 				if((m_device_type >= dev_type::NS16550) && (m_regs.fcr & 1))
 					push_tx(data);
 				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
-				if(m_regs.lsr & 0x40)
+				if(m_regs.lsr & INS8250_LSR_TSRE)
 					tra_complete();
 			}
 			break;
@@ -234,7 +242,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			}
 			else
 			{
-				if ((m_regs.lsr & 0x20) && (data & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY))
+				if ((m_regs.lsr & INS8250_LSR_THRE) && (data & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY))
 					trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 				m_regs.ier = data;
 				update_interrupt();
@@ -317,12 +325,12 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			  bits 5 - 0, you could cause an interrupt if the appropriate IER bit
 			  is set.
 			*/
-			m_regs.lsr = (m_regs.lsr & 0x60) | (data & ~0x60);
+			m_regs.lsr = (m_regs.lsr & (INS8250_LSR_TSRE|INS8250_LSR_THRE)) | (data & ~(INS8250_LSR_TSRE|INS8250_LSR_THRE));
 
 			tmp = 0;
-			tmp |= ( m_regs.lsr & 0x01 ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
+			tmp |= ( m_regs.lsr & INS8250_LSR_DR ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
 			tmp |= ( m_regs.lsr & 0x1e ) ? COM_INT_PENDING_RECEIVER_LINE_STATUS : 0;
-			tmp |= ( m_regs.lsr & 0x20 ) ? COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY : 0;
+			tmp |= ( m_regs.lsr & INS8250_LSR_THRE ) ? COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY : 0;
 			trigger_int(tmp);
 
 			break;
@@ -359,8 +367,8 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 				else
 				{
 					clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
-					if( m_regs.lsr & 0x01 )
-						m_regs.lsr &= ~0x01;
+					if( m_regs.lsr & INS8250_LSR_DR )
+						m_regs.lsr &= ~INS8250_LSR_DR;
 				}
 				data = m_regs.rbr;
 			}
@@ -416,12 +424,12 @@ void ns16550_device::rcv_complete()
 
 	if(m_rnum == 16)
 	{
-		m_regs.lsr |= 0x02; //overrun
+		m_regs.lsr |= INS8250_LSR_OE; //overrun
 		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
 		return;
 	}
 
-	m_regs.lsr |= 0x01;
+	m_regs.lsr |= INS8250_LSR_DR;
 	m_rfifo[m_rhead] = get_received_char();
 	++m_rhead &= 0x0f;
 	m_rnum++;
@@ -439,10 +447,10 @@ void ns16550_device::tra_complete()
 	{
 		transmit_register_setup(m_tfifo[m_ttail]);
 		++m_ttail &= 0x0f;
-		m_regs.lsr &= ~0x40;
+		m_regs.lsr &= ~INS8250_LSR_TSRE;
 		if(m_ttail == m_thead)
 		{
-			m_regs.lsr |= 0x20;
+			m_regs.lsr |= INS8250_LSR_THRE;
 			trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 		}
 	}
@@ -452,15 +460,15 @@ void ns16550_device::tra_complete()
 
 void ins8250_uart_device::rcv_complete()
 {
-	if(m_regs.lsr & 0x01)
+	if(m_regs.lsr & INS8250_LSR_DR)
 	{
-		m_regs.lsr |= 0x02; //overrun
+		m_regs.lsr |= INS8250_LSR_OE; //overrun
 		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
 		receive_register_reset();
 	}
 	else
 	{
-		m_regs.lsr |= 0x01;
+		m_regs.lsr |= INS8250_LSR_DR;
 		receive_register_extract();
 		m_regs.rbr = get_received_char();
 		trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
@@ -469,15 +477,15 @@ void ins8250_uart_device::rcv_complete()
 
 void ins8250_uart_device::tra_complete()
 {
-	if(!(m_regs.lsr & 0x20))
+	if(!(m_regs.lsr & INS8250_LSR_THRE))
 	{
 		transmit_register_setup(m_regs.thr);
-		m_regs.lsr &= ~0x40;
-		m_regs.lsr |= 0x20;
+		m_regs.lsr &= ~INS8250_LSR_TSRE;
+		m_regs.lsr |= INS8250_LSR_THRE;
 		trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 	}
 	else
-		m_regs.lsr |= 0x40;
+		m_regs.lsr |= INS8250_LSR_TSRE;
 }
 
 void ins8250_uart_device::tra_callback()
@@ -586,7 +594,7 @@ void ins8250_uart_device::device_reset()
 	m_regs.iir = 1;
 	m_regs.lcr = 0;
 	m_regs.mcr = 0;
-	m_regs.lsr = (1<<5) | (1<<6);
+	m_regs.lsr = INS8250_LSR_THRE | INS8250_LSR_TSRE;
 	update_msr();
 	m_regs.msr &= 0xf0;
 	m_int_pending = 0;
@@ -661,7 +669,7 @@ uint8_t ns16550_device::pop_rx()
 	else
 	{
 		m_timeout->adjust(attotime::never);
-		m_regs.lsr &= ~1;
+		m_regs.lsr &= ~INS8250_LSR_DR;
 	}
 
 	return data;
@@ -689,7 +697,7 @@ void ns16550_device::set_fcr(uint8_t data)
 	{
 		memset(&m_tfifo, '\0', sizeof(m_tfifo));
 		m_thead = m_ttail = 0;
-		m_regs.lsr |= 0x20;
+		m_regs.lsr |= INS8250_LSR_THRE;
 		trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 	}
 	m_rintlvl = bytes_per_int[(data>>6)&3];
