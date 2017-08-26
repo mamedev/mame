@@ -20,17 +20,17 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr ""
+msgstr "Granskning av ROMs för %1$u maskiner markerade som ej tillgängliga?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "Granskning av ROMs för alla %1$u maskiner?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(resultat kommer att sparas som %1$s)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -38,10 +38,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Granskning av ROMs för maskin %2$u av %3$u...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "Starta Granskning"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:116
 msgid "Cannot save over directory"
@@ -118,7 +120,7 @@ msgstr "INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "Kategori INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
@@ -504,7 +506,7 @@ msgstr "Konfigurera Kataloger"
 
 #: src/frontend/mame/ui/optsmenu.cpp:210 src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Sound Options"
-msgstr "Ljud alternativ"
+msgstr "Ljudalternativ"
 
 #: src/frontend/mame/ui/optsmenu.cpp:213
 msgid "General Inputs"
@@ -636,15 +638,15 @@ msgstr "Återställ"
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
-msgstr ""
+msgstr "Ofilrerat"
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
-msgstr ""
+msgstr "Tillgängliga"
 
 #: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
 msgid "Unavailable"
-msgstr ""
+msgstr "Ej tillgängliga"
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
@@ -656,11 +658,11 @@ msgstr "Fungerar ej"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
-msgstr ""
+msgstr "Mekaniska"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Not Mechanical"
-msgstr ""
+msgstr "Ej Mekaniska"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
@@ -668,7 +670,7 @@ msgstr "Kategori"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "Favoriter"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
@@ -676,15 +678,15 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "Ej BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
-msgstr ""
+msgstr "Har Kloner"
 
 #: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
 msgid "Clones"
-msgstr ""
+msgstr "Är Kloner"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
@@ -696,19 +698,19 @@ msgstr "År"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "Spara Stödda"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "Spara Ej Stödda"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "CHD avbildning krävs"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "Ingen CHD avbildning krävs"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
@@ -728,19 +730,19 @@ msgstr "Utgivare"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "Stödd"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
-msgstr ""
+msgstr "Partiellt Stöd"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "Ej Stödda"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
-msgstr ""
+msgstr "Utgivningsområde"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
@@ -752,7 +754,7 @@ msgstr "Mjukvarulista"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
-msgstr ""
+msgstr "<skapa filter>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
@@ -761,7 +763,7 @@ msgstr "Välj eget filter"
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "Filter %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
@@ -773,19 +775,19 @@ msgstr "Lägg till filter"
 
 #: src/frontend/mame/ui/utils.cpp:960
 msgid "Select category:"
-msgstr ""
+msgstr "Välj kategori:"
 
 #: src/frontend/mame/ui/utils.cpp:991
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[ingen kategori INI filer]"
 
 #: src/frontend/mame/ui/utils.cpp:999
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[inga grupper i INI fil]"
 
 #: src/frontend/mame/ui/utils.cpp:1033
 msgid "No category INI files found"
-msgstr ""
+msgstr "Inga kategorier INI filer funna"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
@@ -793,15 +795,15 @@ msgstr "Fil"
 
 #: src/frontend/mame/ui/utils.cpp:1042
 msgid "No groups found in category file"
-msgstr ""
+msgstr "Inga grupper funna i kategorifil"
 
 #: src/frontend/mame/ui/utils.cpp:1047
 msgid "Group"
-msgstr ""
+msgstr "Grupp"
 
 #: src/frontend/mame/ui/utils.cpp:1048
 msgid "Include clones"
-msgstr ""
+msgstr "Inkludera kloner"
 
 #: src/frontend/mame/ui/utils.cpp:1048 src/frontend/mame/ui/selgame.cpp:948
 #: src/frontend/mame/ui/selgame.cpp:949 src/frontend/mame/ui/selgame.cpp:950
@@ -935,7 +937,7 @@ msgstr "Grafik\tEj implementerad\n"
 
 #: src/frontend/mame/ui/selgame.cpp:881
 msgid "Graphics\tWrong Colors\n"
-msgstr ""
+msgstr "Grafik\tFel Färger\n"
 
 #: src/frontend/mame/ui/selgame.cpp:883
 msgid "Graphics\tImperfect Colors\n"
@@ -1841,7 +1843,7 @@ msgstr " (standard)"
 
 #: src/frontend/mame/ui/selmenu.cpp:2483
 msgid "Usage"
-msgstr ""
+msgstr "Användning"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
@@ -2434,7 +2436,7 @@ msgstr "Mynt impuls"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Device Mapping"
-msgstr "Enhets mappning"
+msgstr "Enhetsmappning"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Lightgun Device Assignment"
@@ -2478,7 +2480,7 @@ msgstr "Antal skärmar"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Triple Buffering"
-msgstr "Tripple buffrande"
+msgstr "Tripplebuffrande"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "HLSL"
