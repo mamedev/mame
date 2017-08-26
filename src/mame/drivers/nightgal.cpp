@@ -1268,7 +1268,7 @@ GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, nightgal_state, 0,        ROT0
 GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn,  ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
 GAME( 1985, sexygal,  0,        sexygal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, 0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
 GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state, ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // protection
 /* Type 4 HW */
