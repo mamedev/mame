@@ -197,6 +197,21 @@ static ADDRESS_MAP_START( pspikesc_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff400, 0xfff403) AM_WRITENOP // GGA access
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( kickball_map, AS_PROGRAM, 16, aerofgt_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* work RAM */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("spriteram1")
+	AM_RANGE(0xff8000, 0xff8fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_SHARE("bg1videoram")
+	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITEONLY AM_SHARE("spriteram3")
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_SHARE("rasterram")   /* bg1 scroll registers */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(pspikes_palette_bank_w, 0x00ff)
+	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE8(kickball_gfxbank_w, 0x00ff)
+	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrolly_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READ8(pending_command_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0xfff400, 0xfff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -451,6 +466,21 @@ static ADDRESS_MAP_START( karatblzbl_sound_portmap, AS_IO, 8, aerofgt_state )
 	AM_RANGE(0x40, 0x40) AM_WRITE(karatblzbl_d7759_write_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(karatblzbl_d7759_reset_w)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kickball_sound_map, AS_PROGRAM, 8, aerofgt_state )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kickball_sound_portmap, AS_IO, 8, aerofgt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
+	AM_RANGE(0x40, 0x40) AM_WRITENOP // oki?
+	AM_RANGE(0xc0, 0xc0) AM_WRITENOP // oki?
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( oki_map, 0, 8, aerofgt_state ) //only for aerfboot for now
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
@@ -1270,6 +1300,17 @@ static const gfx_layout wbbc97_spritelayout =
 	8*32
 };
 
+static const gfx_layout kickball_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 6,7, 4,5, 2,3, 0, 1, 14, 15, 12, 13, 10, 11, 8, 9 },
+	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8, 16*8, 18*8, 20*8, 22*8, 24*8, 26*8 ,28*8, 30*8 },
+	32*8
+};
+
 static GFXDECODE_START( pspikes )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
@@ -1285,6 +1326,10 @@ static GFXDECODE_START( spikes91 )
 	GFXDECODE_ENTRY( "gfx2", 0, spikes91_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
+static GFXDECODE_START( kickball )
+	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( "gfx2", 0, kickball_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
+GFXDECODE_END
 
 static GFXDECODE_START( turbofrc )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,     0, 16 )
@@ -1476,6 +1521,64 @@ static MACHINE_CONFIG_START( pspikesb )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified, pin high causes sound pitch to be too high
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+/*
+	Kick Ball
+
+	cloned bootleg-style Korean hardware, no original VSYSTEM parts
+	tile banking and sound system are different like many of the bootlegs
+*/
+
+static MACHINE_CONFIG_START( kickball )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL_10MHz) // 10Mhz XTAL near 10Mhz rated CPU
+	MCFG_CPU_PROGRAM_MAP(kickball_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* only IRQ1 is valid */
+
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(kickball_sound_map)
+	MCFG_CPU_IO_MAP(kickball_sound_portmap)
+
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(61.31)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kickball)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
+	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0) // still accessed as if it exists, in clone hardware?
+
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) // K-666 (YM3812)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_LOW) // AD-65 (M6295) clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2890,12 +2993,43 @@ ROM_START( wbbc97 )
 	ROM_LOAD( "82s147a.rom",  0x000000, 0x200, CRC(72cec9d2) SHA1(1c6fe6b47fe24bdbebb51d6bef56bf71c9029e72) )
 ROM_END
 
+ROM_START( kickball )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "kickball.1", 0x000000, 0x040000, CRC(f0fd971d) SHA1(b887196d9ff62403fd27e41ebda0a1d13215a456) )
+	ROM_LOAD16_BYTE( "kickball.2", 0x000001, 0x040000, CRC(7dab432d) SHA1(e077ea552e9aba4ecc82abd07ea5e94f0f09303f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "kickball.4", 0x00000, 0x10000, CRC(ef10c2bf) SHA1(44fd03a28221dffe9c4281ef920fe975bbfb67f0) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "kickball.9",  0x000000, 0x080000, CRC(19be87f3) SHA1(661966683f74b4fbfd77eab4477fb0d75e87230e) )
+	ROM_LOAD( "kickball.10", 0x080000, 0x080000, CRC(e3b4f894) SHA1(44b107b87cf9e94f67cfac98b67abed874d534c0) )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )
+	ROM_LOAD( "kickball.5", 0x000000, 0x080000, CRC(050b6387) SHA1(59aa685014a6f138e14dbfe858c6ecc6514e44f6) )
+	ROM_LOAD( "kickball.6", 0x080000, 0x080000, CRC(1e55252f) SHA1(ce1604921af26e8da2fa4cf4a49c67f3b7d4222d) )
+	ROM_LOAD( "kickball.7", 0x100000, 0x080000, CRC(b2ee5218) SHA1(65e240b3ddb673b593404525aa2775c342228130) )
+	ROM_LOAD( "kickball.8", 0x180000, 0x080000, CRC(5f1b07f8) SHA1(add1f66fe09684ce65a54752cc90d7f0a05efc4f) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "kickball.3", 0x000000, 0x040000, CRC(2f3ed4c1) SHA1(4688df5d420343a935d066f3b46580b77ee77b0e) )
+ROM_END
 
 DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
 {
 	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }
 
+
+DRIVER_INIT_MEMBER(aerofgt_state, kickball)
+{
+	// 2 lines on 1 gfx rom are swapped, why?
+	uint8_t *src = memregion( "gfx2" )->base();
+	for (int i = 0;i < 0x80000;i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 5, 6, 4, 3, 2, 1, 0);
+	}
+}
 
 GAME( 1990, spinlbrk,  0,        spinlbrk, spinlbrk,  aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1990, spinlbrku, spinlbrk, spinlbrk, spinlbrku, aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
@@ -2928,3 +3062,5 @@ GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          R
 GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, aerofgt_state, banked_oki, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, aerofgt_state, 0,          ROT270, "bootleg",          "Aero Fighters (bootleg set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+
+GAME( 1998, kickball,  0,       kickball, pspikes, aerofgt_state, kickball,   ROT0,   "Seoung Youn",            "Kick Ball", MACHINE_NOT_WORKING )

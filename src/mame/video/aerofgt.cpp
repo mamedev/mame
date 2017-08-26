@@ -236,6 +236,13 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
 	setbank(tmap, 2 * offset + 1, (data >> 0) & 0xff);
 }
 
+WRITE8_MEMBER(aerofgt_state::kickball_gfxbank_w)
+{
+	// I strongly doubt this logic is correct
+	setbank(m_bg1_tilemap, 0, (data & 0x0f)&~0x01);
+	setbank(m_bg1_tilemap, 1, (data & 0x0f));
+}
+
 WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrollx_w)
 {
 	COMBINE_DATA(&m_bg1scrollx);
