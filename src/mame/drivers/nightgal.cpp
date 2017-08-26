@@ -11,11 +11,17 @@ many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
  - Fix Sweet Gal/Sexy Gal/Sexy Gal Tropical layer clearances (more protection?);
- - Understand why Night Gal Summer title screen gets wiped out (protection issue);
- - NMI origin for Sexy Gal / Night Gal Summer
- - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
+ - Sexy Gal uses an additional NCS for a sample player, understand how to make it play anything (tries to read port $00 but it's always zero);
+ - Sweet Gal hangs after winning a round;
+ - Other games in the driver also have sample ROMs, it is unknown how they are supposed to playback tho;
+ - Understand why Night Gal Summer title screen gets wiped out and why it doesn't get displayed at all during attract mode (protection issue?);
+ - NMI origin for Sweet Gal / Night Gal Summer;
+ - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM;
 
-*******************************************************************************************/
+ Notes:
+ - Night Gal Summer player hand is at $f801 onward
+ 
+ *******************************************************************************************/
 
 #include "emu.h"
 
@@ -39,6 +45,7 @@ public:
 		m_comms_ram(*this, "comms_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
+		m_audiocpu(*this, "audiocpu"),
 		m_io_cr_clear(*this, "CR_CLEAR"),
 		m_io_coins(*this, "COINS"),
 		m_io_pl1_1(*this, "PL1_1"),
@@ -60,14 +67,7 @@ public:
 		m_palette(*this, "palette"),
 		m_blitter(*this, "blitter") { }
 
-	/* video-related */
-	uint8_t m_blit_raw_data[3];
 
-	/* misc */
-	uint8_t m_nsc_latch;
-	uint8_t m_z80_latch;
-	uint8_t m_mux_data;
-	uint8_t m_pal_bank;
 	emu_timer *m_z80_wait_ack_timer;
 
 	required_shared_ptr<uint8_t> m_comms_ram;
@@ -75,6 +75,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_audiocpu;
 
 	/* memory */
 	//DECLARE_WRITE8_MEMBER(sexygal_nsc_true_blitter_w);
@@ -88,6 +89,9 @@ public:
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
 	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
+	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);	
+	
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
 	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
@@ -123,6 +127,18 @@ protected:
 	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
+	
+private:
+	/* video-related */
+	uint8_t m_blit_raw_data[3];
+
+	/* misc */
+	uint8_t m_nsc_latch;
+	uint8_t m_z80_latch;
+	uint8_t m_mux_data;
+	uint8_t m_pal_bank;
+	
+	uint8_t m_sexygal_audioff;
 };
 
 void nightgal_state::video_start()
@@ -343,9 +359,32 @@ ADDRESS_MAP_END
 * Sexy Gal
 ********************************/
 
+// flip flop from main to audio CPU
+WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
+{
+	// causes an irq
+	if(m_sexygal_audioff & 0x40 && (data & 0x40) == 0)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+
+	// NMI, correct?
+	if(m_sexygal_audioff & 0x20 && (data & 0x20) == 0)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+
+	// bit 4 used, audio cpu reset line?
+	
+	m_sexygal_audioff = data;
+}
+
+WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+}
+
+
 static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM //???
+	AM_RANGE(0x8000, 0x807f) AM_RAM AM_SHARE("sound_ram")
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sexygal_audioff_w)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -385,6 +424,16 @@ static ADDRESS_MAP_START( sgaltrop_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0080, 0x0086) AM_DEVICE("blitter",jangou_blitter_device, blit_v2_regs)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("subrom", 0)
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( sexygal_audio_map, AS_PROGRAM, 8, nightgal_state )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	
+	AM_RANGE(0x2000, 0x207f) AM_RAM AM_SHARE("sound_ram")
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(sexygal_audionmi_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audiorom", 0)
 ADDRESS_MAP_END
 
 /********************************
@@ -721,12 +770,15 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sexygal_map)
 	MCFG_CPU_IO_MAP(sexygal_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
+	//MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sexygal_nsc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
 
+	MCFG_CPU_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(sexygal_audio_map)
+	
 	MCFG_DEVICE_REMOVE("aysnd")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
@@ -737,7 +789,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
+	// TODO: happens from protection device
+	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)
 
 MACHINE_CONFIG_END
 
@@ -747,6 +800,8 @@ static MACHINE_CONFIG_DERIVED( sgaltrop, sexygal )
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sgaltrop_nsc_map)
+	
+	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
 /*
@@ -940,9 +995,11 @@ ROM_START( sexygal )
 	ROM_REGION( 0x4000, "subrom", 0 )
 	ROM_LOAD( "1.3a",   0x00000, 0x04000, CRC(f814cf27) SHA1(ceba1f14a202d926380039d7cb4669eb8be58539) ) // has a big (16 byte wide) ASCII 'Y.M' art, written in YMs (!)
 
-	ROM_REGION( 0xc000, "samples", 0 )
-	ROM_LOAD( "13.s7b",  0x04000, 0x04000, CRC(5eb75f56) SHA1(b7d81d786d1ac8d65a6a122140954eb89d76e8b4) )
-	ROM_LOAD( "14.s6b",  0x08000, 0x04000, CRC(b4a2497b) SHA1(7231f57b4548899c886625e883b9972c0f30e9f2) )
+	ROM_REGION( 0x4000, "audiorom", 0)
+	ROM_LOAD( "14.s6b",  0x00000, 0x04000, CRC(b4a2497b) SHA1(7231f57b4548899c886625e883b9972c0f30e9f2) )
+	
+	ROM_REGION( 0x4000, "samples", 0 )
+	ROM_LOAD( "13.s7b",  0x00000, 0x04000, CRC(5eb75f56) SHA1(b7d81d786d1ac8d65a6a122140954eb89d76e8b4) )
 
 	ROM_REGION( 0x40000, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "2.3c",  0x00000, 0x04000, CRC(f719e09d) SHA1(c78411b4f974b3dd261d51e522e086fc30a96fcb) )
@@ -969,6 +1026,10 @@ ROM_START( sweetgal )
 
 	ROM_REGION( 0x2000, "subrom", 0 )
 	ROM_LOAD( "1.3a",  0x0000, 0x2000, CRC(5342c757) SHA1(b4ff84c45bd2c6a6a468f1d0daaf5b19c4dbf8fe) ) // sldh
+
+	ROM_REGION( 0x4000, "audiorom", 0)
+	// taken from sexygal, none of the samples ROMs has code, maybe it doesn't have the extra CPU as well (no access to the extra ports)
+	ROM_LOAD( "14.s6b",  0x00000, 0x04000, BAD_DUMP CRC(b4a2497b) SHA1(7231f57b4548899c886625e883b9972c0f30e9f2) )
 
 	ROM_REGION( 0xc000, "samples", 0 ) // sound samples
 	ROM_LOAD( "v2_12.bin",  0x00000, 0x04000, CRC(66a35be2) SHA1(4f0d73d753387acacc5ccc90e91d848a5ecce55e) )
@@ -1170,7 +1231,7 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 			return 0x60;
 			
 		case 0xc: // score table blink width
-			return 80;
+			return 120;
 		case 0x2: // score table blink height
 			return 8;
 		
@@ -1187,7 +1248,7 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 			return 0;
 	}
 		
-	printf("%02x\n",m_z80_latch);
+	logerror("ngalsumr protection device unemulated value latched = %02x\n",m_z80_latch);
 
 	return 0;
 }
