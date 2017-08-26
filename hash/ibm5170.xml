@@ -8171,6 +8171,130 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="wingcom2">
+		<description>Wing Commander II - Vengeance of the Kilrathi (3.5")</description>
+		<year>1991</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 1 of 14].img" size="737280" crc="7b8c391d" sha1="d1d3ca158f3098bc6d127bbd2341b6e19d9dd917" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 2 of 14].img" size="737280" crc="fdec2a70" sha1="708dde30c4d9c37f49593388ebffa80cf665bb7d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 3 of 14].img" size="737280" crc="a82860de" sha1="038f2d158422713d7167b4f68085b6222f16880b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 4 of 14].img" size="737280" crc="61835992" sha1="27dc0c2e350d0c8bbd4a244b851b2fde12c7d3ce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 5 of 14].img" size="737280" crc="c179992a" sha1="22929e6f4800698c6af6f551cd2b49f8a2dd27cd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 6 of 14].img" size="737280" crc="27b67d04" sha1="ed4c778e4bd86f6d08d021e439740ae69d8a8153" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 7 of 14].img" size="737280" crc="943c53e5" sha1="66f7b6c524f89226741405ef14f86eb2360a8942" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 8 of 14].img" size="737280" crc="17fbd59f" sha1="4ecf8b78f7bf3fbebb060a9214740a461c1d2f5c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 9 of 14].img" size="737280" crc="c568c3bd" sha1="c2d33dd6178a8b6c96c8ad8a1616607d0bca2577" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 10 of 14].img" size="737280" crc="76bc16a8" sha1="25be0e9bb2b3dbb09be61745d62d38200065748a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 11 of 14].img" size="737280" crc="66143d27" sha1="f6e3642da6172642fdb1bdb50cd838df2919d41b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 12 of 14].img" size="737280" crc="23f9b40f" sha1="60d0ebf34b2fa15b80d8fbafca5d76b6e588e85a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 13 of 14].img" size="737280" crc="4204f4c9" sha1="46602f8dbffb481d47f0991dc2a5361f5a488be3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 14 of 14].img" size="737280" crc="84a8cae6" sha1="063ec4ca40096643515dd170c8e9aabfc43f2176" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingcom2_525" cloneof="wingcom2">
+		<description>Wing Commander II - Vengeance of the Kilrathi (5.25")</description>
+		<year>1991</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 1 of 8].img" size="1228800" crc="77240a47" sha1="bf6579efed01c1cb4b78e835dead2f5ea0ad74c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 2 of 8].img" size="1228800" crc="d97df920" sha1="009bb62522739248badbe6df9fbb45e09b577446" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 3 of 8].img" size="1228800" crc="3b712dca" sha1="a71e63a2416ebf4c4b35a17a0841000720d9e37b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 4 of 8].img" size="1228800" crc="f30daca2" sha1="4f8f4049c8c2f2015d3c9c73d7be9cff8be67f97" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 5 of 8].img" size="1228800" crc="b6f46b70" sha1="3a42eb9a90680c8123173a7a981b1c4100d70135" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 6 of 8].img" size="1228800" crc="cecac616" sha1="e3c932008eda8d2c3dbc9bdf5116df9f934cbd5a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 7 of 8].img" size="1228800" crc="af966d7b" sha1="1bcae647fe8f6efc6f518e86e8b931a59d4414c7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 8 of 8].img" size="1228800" crc="d33c2714" sha1="0a1418d27509eae929fd2b5f22946b945df6d9c2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wordresc">
 		<description>Word Rescue</description>
 		<year>1992</year>
