@@ -158,6 +158,14 @@ static constexpr uint8_t INS8250_MCR_OUT1 = 0x04;
 static constexpr uint8_t INS8250_MCR_OUT2 = 0x08;
 static constexpr uint8_t INS8250_MCR_LOOPBACK = 0x10;
 
+static constexpr uint8_t INS8250_LCR_BITCOUNT_MASK= 0x03;
+static constexpr uint8_t INS8250_LCR_2STOP_BITS = 0x04;
+static constexpr uint8_t INS8250_LCR_PEN = 0x08;
+static constexpr uint8_t INS8250_LCR_EVEN_PAR = 0x10;
+static constexpr uint8_t INS8250_LCR_PARITY = 0x20;
+static constexpr uint8_t INS8250_LCR_BREAK = 0x40;
+static constexpr uint8_t INS8250_LCR_DLAB = 0x80;
+
 /* ints will continue to be set for as long as there are ints pending */
 void ins8250_uart_device::update_interrupt()
 {
@@ -224,7 +232,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 	switch (offset)
 	{
 		case 0:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff00) | data;
 				set_rate(clock(), m_regs.dl*16);
@@ -241,7 +249,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			}
 			break;
 		case 1:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff) | (data << 8);
 				set_rate(clock(), m_regs.dl*16);
@@ -261,7 +269,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			m_regs.lcr = data;
 
 			{
-			int data_bit_count = (m_regs.lcr & 3) + 5;
+			int data_bit_count = (m_regs.lcr & INS8250_LCR_BITCOUNT_MASK) + 5;
 			parity_t parity;
 			stop_bits_t stop_bits;
 
@@ -288,7 +296,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				break;
 			}
 
-			if (!(m_regs.lcr & 4))
+			if (!(m_regs.lcr & INS8250_LCR_2STOP_BITS))
 				stop_bits = STOP_BITS_1;
 			else if (data_bit_count == 5)
 				stop_bits = STOP_BITS_1_5;
@@ -364,7 +372,7 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 	switch (offset)
 	{
 		case 0:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 				data = (m_regs.dl & 0xff);
 			else
 			{
@@ -380,7 +388,7 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 			}
 			break;
 		case 1:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 				data = (m_regs.dl >> 8);
 			else
 				data = m_regs.ier & 0x0f;
