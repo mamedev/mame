@@ -18,8 +18,9 @@
 #define LOG_DATA    (1U <<  6)
 #define LOG_INT     (1U <<  7)
 #define LOG_PIT     (1U <<  8)
+#define LOG_CS      (1U <<  9)
 
-//#define VERBOSE  (LOG_SETUP)
+//#define VERBOSE  (LOG_CS)
 #define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
 
 #include "logmacro.h"
@@ -33,6 +34,7 @@
 #define LOGDATA(...)  LOGMASKED(LOG_DATA,  __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 #define LOGPIT(...)   LOGMASKED(LOG_PIT,   __VA_ARGS__)
+#define LOGCS(...)    LOGMASKED(LOG_CS,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -376,14 +378,24 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_w )
 {
 	LOG("%s\n", FUNCNAME);
 	offset += m68340_sim::REG_AM_CS0>>2;
-	LOGSETUP("- %08x %s %08x, %08x (%08x) - not implemented\n", pc, FUNCNAME, offset*4,data,mem_mask);
+
+	if (offset & 1)
+	{
+	  LOGCS("%08x Base address CS%d %08x, %08x (%08x) ", pc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
+	  LOGCS("- Base: %08x BFC:%02x WP:%d FTE:%d NCS:%d Valid: %s\n", data & 0xffffff00, (data & 0xf0) >> 4, data & 0x08 ? 1 : 0, data & 0x04 ? 1 : 0, data & 0x02 ? 1 : 0, data & 0x01 ? "Yes" : "No");
+	}
+	else
+	{
+	  LOGCS("%08x Address mask CS%d %08x, %08x (%08x) ", pc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
+	  LOGCS("- Mask: %08x FCM:%02x DD:%d PS: %s\n", data & 0xffffff00, (data & 0xf0) >> 4, (data >> 2) & 0x03, std::array<char const *, 4>{{"Reserved", "16-Bit", "8-bit", "External DSACK response"}}[data & 0x03]);
+	}
 
 	assert(m68340SIM);
 	m68340_sim &sim = *m68340SIM;
 
 	int pc = space.device().safe_pc();
 
-	switch (offset<<2)
+	switch (offset << 2)
 	{
 		case m68340_sim::REG_AM_CS0:
 			COMBINE_DATA(&sim.m_am[0]);
