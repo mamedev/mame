@@ -324,7 +324,7 @@ msgstr "Один или несколько ROM/CHD этой системы не 
 
 #: src/frontend/mame/ui/info.cpp:197
 msgid "Completely unemulated features: "
-msgstr "Полностью не эмулируются возможности:"
+msgstr "Полностью не эмулируются возможности: "
 
 #: src/frontend/mame/ui/info.cpp:203 src/frontend/mame/ui/info.cpp:219
 #, c-format
@@ -339,7 +339,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:213
 msgid "Imperfectly emulated features: "
-msgstr "Несовершенно эмулируемые возможности:"
+msgstr "Несовершенно эмулируемые возможности: "
 
 #: src/frontend/mame/ui/info.cpp:228
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -943,7 +943,7 @@ msgstr "Графика\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:890
 msgid "Sound\tNone\n"
-msgstr "Звук\tНет\n"
+msgstr "Звук\tОтсутствует\n"
 
 #: src/frontend/mame/ui/selgame.cpp:892
 msgid "Sound\tUnimplemented\n"
