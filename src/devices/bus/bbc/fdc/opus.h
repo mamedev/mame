@@ -49,8 +49,6 @@ private:
 	required_device<i8272a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
-
-	int m_drive_control;
 };
 
 

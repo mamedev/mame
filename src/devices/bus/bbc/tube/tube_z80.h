@@ -58,7 +58,7 @@ private:
 	required_memory_region m_rom;
 
 	bool m_rom_enabled;
-	int m_nmiserv;
+	//int m_nmiserv;
 };
 
 
