@@ -74,7 +74,7 @@
  * 0x0600 RW: Keyboard data port (8042)
  * 0x0602   : Keyboard control port (8042)
  * 0x0604   : (8042)
- * 0x0a00-08: RS-232C interface (i8251)
+ * 0x0a00-0a: RS-232C interface (i8251)
  * 0x3000 - 0x3fff : CMOS RAM
  * 0xfd90-a0: CRTC / Video
  * 0xff81: CRTC / Video - returns value in RAM location 0xcff81?
@@ -2133,6 +2133,72 @@ WRITE_LINE_MEMBER( towns_state::pit_out2_changed )
 	m_speaker->level_w(speaker_get_spk());
 }
 
+WRITE_LINE_MEMBER( towns_state::pit2_out1_changed )
+{
+	m_i8251->write_rxc(state);
+	m_i8251->write_txc(state);
+}
+
+WRITE8_MEMBER( towns_state::towns_serial_w )
+{
+	switch(offset)
+	{
+		case 0:
+			m_i8251->data_w(space,0,data);
+			break;
+		case 1:
+			m_i8251->control_w(space,0,data);
+			break;
+		case 4:
+			m_serial_irq_enable = data;
+			break;
+		default:
+			logerror("Invalid or unimplemented serial port write [offset=%02x, data=%02x]\n",offset,data);
+	}
+}
+
+READ8_MEMBER( towns_state::towns_serial_r )
+{
+	switch(offset)
+	{
+		case 0:
+			return m_i8251->data_r(space,0);
+		case 1:
+			return m_i8251->status_r(space,0);
+		case 3:
+			return m_serial_irq_source;
+		default:
+			logerror("Invalid or unimplemented serial port read [offset=%02x]\n",offset);
+			return 0xff;
+	}
+}
+
+WRITE_LINE_MEMBER( towns_state::towns_serial_irq )
+{
+	m_serial_irq_source = state ? 0x01 : 0x00;
+	m_pic_master->ir2_w(state);
+	popmessage("Serial IRQ state: %i\n",state);
+}
+
+WRITE_LINE_MEMBER( towns_state::towns_rxrdy_irq )
+{
+	if(m_serial_irq_enable & RXRDY_IRQ_ENABLE)
+		towns_serial_irq(state);
+}
+
+WRITE_LINE_MEMBER( towns_state::towns_txrdy_irq )
+{
+	if(m_serial_irq_enable & TXRDY_IRQ_ENABLE)
+		towns_serial_irq(state);
+}
+
+WRITE_LINE_MEMBER( towns_state::towns_syndet_irq )
+{
+	if(m_serial_irq_enable & SYNDET_IRQ_ENABLE)
+		towns_serial_irq(state);
+}
+
+
 static ADDRESS_MAP_START(towns_mem, AS_PROGRAM, 32, towns_state)
 	// memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
 	// may not be (and probably is not) correct
@@ -2255,6 +2321,8 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	AM_RANGE(0x05e8,0x05ef) AM_READWRITE8(towns_sys5e8_r, towns_sys5e8_w, 0x00ff00ff)
 	// Keyboard (8042 MCU)
 	AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
+	// RS-232C interface
+	AM_RANGE(0x0a00,0x0a0b) AM_READWRITE8(towns_serial_r, towns_serial_w, 0x00ff00ff)
 	// SCSI controller
 	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("fmscsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
 	// CMOS
@@ -2310,6 +2378,8 @@ static ADDRESS_MAP_START( towns16_io , AS_IO, 16, towns_state)  // for the 386SX
 	AM_RANGE(0x05e8,0x05ef) AM_READWRITE8(towns_sys5e8_r, towns_sys5e8_w, 0x00ff)
 	// Keyboard (8042 MCU)
 	AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff)
+	// RS-232C interface
+	AM_RANGE(0x0a00,0x0a0b) AM_READWRITE8(towns_serial_r, towns_serial_w, 0x00ff)
 	// SCSI controller
 	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("fmscsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff)
 	// CMOS
@@ -2644,6 +2714,7 @@ void towns_state::machine_reset()
 	m_towns_rtc_timer->adjust(attotime::zero,0,attotime::from_hz(1));
 	m_towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
+	m_serial_irq_source = 0;
 }
 
 READ8_MEMBER(towns_state::get_slave_ack)
@@ -2733,7 +2804,8 @@ static MACHINE_CONFIG_START( towns_base )
 
 	MCFG_DEVICE_ADD("pit2", PIT8253, 0)
 	MCFG_PIT8253_CLK0(307200) // reserved
-	MCFG_PIT8253_CLK1(307200) // RS-232
+	MCFG_PIT8253_CLK1(1228800) // RS-232
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(towns_state, pit2_out1_changed))
 	MCFG_PIT8253_CLK2(307200) // reserved
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(towns_state,get_slave_ack))
@@ -2781,6 +2853,18 @@ static MACHINE_CONFIG_START( towns_base )
 	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
+	
+	MCFG_DEVICE_ADD("i8251", I8251, 0)
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(towns_state, towns_rxrdy_irq))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(towns_state, towns_txrdy_irq))
+	MCFG_I8251_SYNDET_HANDLER(WRITELINE(towns_state, towns_syndet_irq))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232c", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232c", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232c", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232c", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251",i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251",i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251",i8251_device, write_cts))
 
 	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
 
