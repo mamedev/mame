@@ -152,6 +152,12 @@ static constexpr uint8_t INS8250_LSR_PE = 0x04;
 static constexpr uint8_t INS8250_LSR_OE = 0x02;
 static constexpr uint8_t INS8250_LSR_DR = 0x01;
 
+static constexpr uint8_t INS8250_MCR_DTR = 0x01;
+static constexpr uint8_t INS8250_MCR_RTS = 0x02;
+static constexpr uint8_t INS8250_MCR_OUT1 = 0x04;
+static constexpr uint8_t INS8250_MCR_OUT2 = 0x08;
+static constexpr uint8_t INS8250_MCR_LOOPBACK = 0x10;
+
 /* ints will continue to be set for as long as there are ints pending */
 void ins8250_uart_device::update_interrupt()
 {
@@ -299,7 +305,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 
 				update_msr();
 
-				if (m_regs.mcr & 0x10)        /* loopback test */
+				if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 				{
 					m_out_tx_cb(1);
 					device_serial_interface::rx_w(m_txd);
@@ -312,10 +318,10 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				{
 					m_out_tx_cb(m_txd);
 					device_serial_interface::rx_w(m_rxd);
-					m_out_dtr_cb((m_regs.mcr & 1) ? 0 : 1);
-					m_out_rts_cb((m_regs.mcr & 2) ? 0 : 1);
-					m_out_out1_cb((m_regs.mcr & 4) ? 0 : 1);
-					m_out_out2_cb((m_regs.mcr & 8) ? 0 : 1);
+					m_out_dtr_cb((m_regs.mcr & INS8250_MCR_DTR) ? 0 : 1);
+					m_out_rts_cb((m_regs.mcr & INS8250_MCR_RTS) ? 0 : 1);
+					m_out_out1_cb((m_regs.mcr & INS8250_MCR_OUT1) ? 0 : 1);
+					m_out_out2_cb((m_regs.mcr & INS8250_MCR_OUT2) ? 0 : 1);
 				}
 			}
 			break;
@@ -491,7 +497,7 @@ void ins8250_uart_device::tra_complete()
 void ins8250_uart_device::tra_callback()
 {
 	m_txd = transmit_register_get_data_bit();
-	if (m_regs.mcr & 0x10)
+	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
 		device_serial_interface::rx_w(m_txd);
 	}
@@ -506,9 +512,10 @@ void ins8250_uart_device::update_msr()
 	uint8_t data;
 	int change;
 
-	if (m_regs.mcr & 0x10)
+	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
-		data = (((m_regs.mcr & 0x0c) << 4) | ((m_regs.mcr & 0x01) << 5) | ((m_regs.mcr & 0x02) << 3));
+		data = ((m_regs.mcr & (INS8250_MCR_OUT1|INS8250_MCR_OUT2) << 4) | \
+			((m_regs.mcr & INS8250_MCR_DTR) << 5) | ((m_regs.mcr & INS8250_MCR_RTS) << 3));
 		change = (m_regs.msr ^ data) >> 4;
 		if(!(m_regs.msr & 0x40) && (data & 0x40))
 			change &= ~4;
@@ -553,7 +560,7 @@ WRITE_LINE_MEMBER(ins8250_uart_device::rx_w)
 {
 	m_rxd = state;
 
-	if (!(m_regs.mcr & 0x10))
+	if (!(m_regs.mcr & INS8250_MCR_LOOPBACK))
 		device_serial_interface::rx_w(m_rxd);
 }
 
