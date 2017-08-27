@@ -132,6 +132,7 @@ compucolor.cpp
 comquest.cpp
 comx35.cpp
 concept.cpp
+controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp

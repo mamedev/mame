@@ -201,8 +201,8 @@ ROM_START( spielmast )
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 1986, learnwin,  0,        learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (Rev 3)", MACHINE_IS_SKELETON )
-GAME( 1986, learnwin2, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (Rev 2)", MACHINE_IS_SKELETON )
-GAME( 1986, learnwin1, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (Rev 1)", MACHINE_IS_SKELETON )
-GAME( 1986, learnwinf, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
-GAME( 1986, spielmast, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "Yuvo",   "Spiel Master (German)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin,  0,        0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 3)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin2, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 2)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin1, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 1)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwinf, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
+COMP( 1986, spielmast, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "Yuvo",   "Spiel Master (German)", MACHINE_IS_SKELETON )
