@@ -1037,6 +1037,8 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
+			if (m_widel_latch && !machine().side_effect_disabled())
+				m_widel_ctrs = (m_widel_ctrs + 0x100) & 0xfffff;
 			data = m_mcu->upi41_master_r(space,1);
 			LOG(4,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
@@ -1052,15 +1054,11 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 		{
 			uint8_t *prom = space.machine().root_device().memregion("dongle")->base();
 
-			data = prom[m_widel_ctrs | (m_decomult_bank << 16)];
+			data = prom[m_widel_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x '%c' <- PROM[%04x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.', m_widel_ctrs));
 
-			m_widel_ctrs = (m_widel_ctrs + 1) & 0xffff;
-			if (m_widel_ctrs == 0)
-			{
-				m_decomult_bank++;
-			}
-
+			if (!machine().side_effect_disabled())
+				m_widel_ctrs = (m_widel_ctrs + 1) & 0xfffff;
 		}
 		else
 		{
@@ -1086,7 +1084,11 @@ WRITE8_MEMBER(decocass_widel_state::decocass_widel_w)
 	{
 		if (1 == m_widel_latch)
 		{
-			m_widel_ctrs = data << 8; // clears lower bits
+			// BIOS follows writes to here by counting out a lot of dummy reads from the
+			// same location, probably to advance a 74HC4040 or similar counter.
+			// Counterintuitive though it may seem, the value written is probably just ignored.
+			// Treasure Island depends on this clearing the lower bits as well.
+			m_widel_ctrs = 0;
 			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, m_widel_ctrs));
 			return;
 		}
@@ -1100,7 +1102,7 @@ WRITE8_MEMBER(decocass_widel_state::decocass_widel_w)
 	{
 		if (m_widel_latch)
 		{
-			m_widel_ctrs = data; // clears upper bits
+			m_widel_ctrs = (m_widel_ctrs & 0xfff00) | data;
 			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, m_widel_ctrs));
 			return;
 		}
@@ -1608,18 +1610,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cfghtice)
 
 
 
-// Note, this is a hack, I can't see where the bank bits actually get written out
-// and the MAME disassembly is currently a mess.
-READ8_MEMBER(decocass_widel_state::decocass_fbc2_r)
-{
-	if (!machine().side_effect_disabled())
-	{
-		uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(0xb3);
-		m_decomult_bank = data;
-	}
-	return 0xa8;
-}
-
 void decocass_widel_state::machine_start()
 {
 	decocass_state::machine_start();
@@ -1635,8 +1625,6 @@ void decocass_widel_state::machine_reset()
 	m_dongle_r = read8_delegate(FUNC(decocass_widel_state::decocass_widel_r),this);
 	m_dongle_w = write8_delegate(FUNC(decocass_widel_state::decocass_widel_w),this);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfbc2, 0xfbc2, read8_delegate(FUNC(decocass_widel_state::decocass_fbc2_r),this));
-	m_decomult_bank = 0;
 	m_widel_ctrs = 0;
 	m_widel_latch = 0;
 }

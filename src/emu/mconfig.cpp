@@ -39,7 +39,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		const char *slot_option_name = owner.tag() + 1;
 
 		// figure out which device goes into this slot
-		bool has_option = options.has_slot_option(slot_option_name);
+		bool const has_option = options.has_slot_option(slot_option_name);
 		const char *selval;
 		bool is_default;
 		if (!has_option)
@@ -59,15 +59,14 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 		if (selval && *selval)
 		{
-			const device_slot_option *option = slot.option(selval);
-
+			device_slot_option const *const option = slot.option(selval);
 			if (option && (is_default || option->selectable()))
 			{
 				// create the device
 				device_t *new_dev = device_add(&owner, option->name(), option->devtype(), option->clock());
 				slot.set_card_device(new_dev);
 
-				const char *default_bios = option->default_bios();
+				char const *const default_bios = option->default_bios();
 				if (default_bios != nullptr)
 					device_t::static_set_default_bios_tag(*new_dev, default_bios);
 
@@ -75,7 +74,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				if (additions != nullptr)
 					(*additions)(*this, new_dev, new_dev);
 
-				const input_device_default *input_device_defaults = option->input_device_defaults();
+				input_device_default const *const input_device_defaults = option->input_device_defaults();
 				if (input_device_defaults)
 					device_t::static_set_input_default(*new_dev, input_device_defaults);
 			}

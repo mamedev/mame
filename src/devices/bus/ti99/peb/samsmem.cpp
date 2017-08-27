@@ -36,6 +36,7 @@ sams_memory_expansion_device::sams_memory_expansion_device(const machine_config 
 	device_t(mconfig, TI99_SAMSMEM, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAM_TAG),
+	m_crulatch(*this, "crulatch"),
 	m_map_mode(false), m_access_mapper(false)
 {
 }
@@ -106,16 +107,27 @@ READ8Z_MEMBER(sams_memory_expansion_device::crureadz)
 WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
 {
 	if ((offset & 0xff00)==SAMS_CRU_BASE)
-	{
-		if ((offset & 0x000e)==0) m_access_mapper = (data!=0);
-		if ((offset & 0x000e)==2) m_map_mode = (data!=0);
-	}
+		m_crulatch->write_bit((offset & 0x000e) >> 1, data);
+}
+
+WRITE_LINE_MEMBER(sams_memory_expansion_device::access_mapper_w)
+{
+	m_access_mapper = state;
+}
+
+WRITE_LINE_MEMBER(sams_memory_expansion_device::map_mode_w)
+{
+	m_map_mode = state;
 }
 
 MACHINE_CONFIG_MEMBER( sams_memory_expansion_device::device_add_mconfig )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
+
+	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sams_memory_expansion_device, access_mapper_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sams_memory_expansion_device, map_mode_w))
 MACHINE_CONFIG_END
 
 void sams_memory_expansion_device::device_start()
@@ -128,8 +140,6 @@ void sams_memory_expansion_device::device_start()
 void sams_memory_expansion_device::device_reset()
 {
 	// Resetting values
-	m_map_mode = false;
-	m_access_mapper = false;
 	for (auto & elem : m_mapper) elem = 0;
 }
 

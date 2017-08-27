@@ -580,7 +580,7 @@ imgtool::partition::partition(imgtool::image &image, const imgtool_class &imgcla
 	m_read_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
 	m_write_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
 	m_delete_file = (imgtoolerr_t(*)(imgtool::partition &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_FILE);
-	m_list_forks = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_forkent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_FORKS);
+	m_list_forks = (imgtoolerr_t(*)(imgtool::partition &, const char *, std::vector<imgtool::fork_entry> &forks)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_FORKS);
 	m_create_dir = (imgtoolerr_t(*)(imgtool::partition &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_DIR);
 	m_delete_dir = (imgtoolerr_t(*)(imgtool::partition &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_DIR);
 	m_list_attrs = (imgtoolerr_t(*)(imgtool::partition &, const char *, uint32_t *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_ATTRS);
@@ -1750,7 +1750,6 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 {
 	imgtoolerr_t err;
 	imgtool::stream::ptr f;
-	char *new_fname = nullptr;
 	char *alloc_dest = nullptr;
 	const char *filter_extension = nullptr;
 
@@ -1785,15 +1784,11 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 		goto done;
 	}
 
-	err = read_file(new_fname, fork, *f, filter);
-	if (err)
-		goto done;
+	err = read_file(filename, fork, *f, filter);
 
 done:
 	if (alloc_dest != nullptr)
 		free(alloc_dest);
-	if (new_fname != nullptr)
-		free(new_fname);
 	return err;
 }
 
@@ -1873,7 +1868,7 @@ imgtoolerr_t imgtool::partition::delete_file(const char *fname)
 //  forks on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::list_file_forks(const char *path, imgtool_forkent *ents, size_t len)
+imgtoolerr_t imgtool::partition::list_file_forks(const char *path, std::vector<imgtool::fork_entry> &forks)
 {
 	imgtoolerr_t err;
 	if (!m_list_forks)
@@ -1885,7 +1880,9 @@ imgtoolerr_t imgtool::partition::list_file_forks(const char *path, imgtool_forke
 	if (err)
 		return err;
 
-	err = m_list_forks(*this, cannonical_path.c_str(), ents, len);
+	// call the callback
+	forks.clear();
+	err = m_list_forks(*this, cannonical_path.c_str(), forks);
 	if (err)
 		return err;
 
@@ -2033,6 +2030,8 @@ imgtool_partition_features imgtool::partition::get_features() const
 		features.supports_creation_time = 1;
 	if (m_supports_lastmodified_time)
 		features.supports_lastmodified_time = 1;
+	if (m_get_iconinfo)
+		features.supports_geticoninfo = 1;
 	if (!features.supports_writing && !features.supports_createdir && !features.supports_deletefile && !features.supports_deletedir)
 		features.is_read_only = 1;
 	return features;
@@ -2212,9 +2211,8 @@ imgtool::directory::directory(imgtool::partition &partition)
 //  enumerating files on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const std::string &path_string, imgtool::directory::ptr &outenum)
+imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const std::string &path, imgtool::directory::ptr &outenum)
 {
-	const char *path = path_string.c_str();
 	imgtoolerr_t err = imgtoolerr_t(IMGTOOLERR_SUCCESS);
 	imgtool::directory::ptr enumeration;
 
@@ -2224,7 +2222,7 @@ imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const std::
 		return imgtoolerr_t(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
 	std::string cannonical_path;
-	err = partition.cannonicalize_path(PATH_MUSTBEDIR, path, cannonical_path);
+	err = partition.cannonicalize_path(PATH_MUSTBEDIR, path.c_str(), cannonical_path);
 	if (err)
 		return err;
 

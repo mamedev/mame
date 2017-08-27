@@ -1117,6 +1117,26 @@ ROM_START( portman )
 	ROM_LOAD( "mb7051.3",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) )
 ROM_END
 
+ROM_START( portmanj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pa1.ic19",     0x0000, 0x1000, CRC(a5cf6083) SHA1(0daa5ff2931c56241fdeb4c48511b9508440554f) )
+	ROM_LOAD( "pa2.ic18",     0x1000, 0x1000, CRC(bc48d16b) SHA1(0e0cb8ab47cbd06371d15e5ac5d7b5a5a3bd3af0) )
+	ROM_LOAD( "pa3.ic17",     0x2000, 0x1000, CRC(1c923057) SHA1(031c6aff47f2337ddc10e74d3de80105e854258d) )
+	ROM_LOAD( "pa4,ic16",     0x3000, 0x1000, CRC(555c71ef) SHA1(7c99e08b9c253744d73ed908fcb1cb047a687f7a) )
+	ROM_LOAD( "pa5.ic15",     0x4000, 0x1000, CRC(0a48ff6c) SHA1(9d9400c8e7dcf5749467b063c59bfbdf63df64d1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "pa7.ic22",     0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
+	ROM_LOAD( "pa6.ic23",     0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
+	ROM_LOAD( "pa9.ic9",      0x0000, 0x1000, CRC(4d8c2974) SHA1(417b8af3011ff1c4c92d680814cd8f0d902f2b1e) )
+	ROM_LOAD( "pa8.ic8",      0x1000, 0x1000, CRC(4e4ea162) SHA1(42ad2c82ce6a6eaae52efb75607552ca98e72a2a) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.3",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) )
+ROM_END
+
 ROM_START( suprmous )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sm.1",         0x0000, 0x1000, CRC(9db2b786) SHA1(ece6c267e45e0bfd430b94539737a7f8498273ea) )
@@ -1287,6 +1307,7 @@ GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, 0,     ROT90
 
 GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, 0,     ROT90, "Taito Corporation",                           "Dock Man", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, 0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, 0,     ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, suprmous,   0,        suprmous, suprmous, thepit_state, 0,     ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, funnymou,   suprmous, suprmous, suprmous, thepit_state, 0,     ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB

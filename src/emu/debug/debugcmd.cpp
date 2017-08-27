@@ -1779,7 +1779,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	}
 	if (rowsize == 0 || (rowsize % width) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)", width);
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
 		return;
 	}
 

@@ -20,6 +20,7 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
+#include "machine/74259.h"
 #include "machine/terminal.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -44,6 +45,7 @@ public:
 		m_pic_1(*this, "pic_1"),
 		m_centronics(*this, "centronics"),
 		m_cent_status_in(*this, "cent_status_in"),
+		m_statuslatch(*this, "statuslatch"),
 		m_bios(*this, "user1"),
 		m_biosram(*this, "biosram")
 	{
@@ -57,6 +59,7 @@ public:
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
 	optional_device<input_buffer_device> m_cent_status_in;
+	optional_device<ls259_device> m_statuslatch;
 	optional_memory_region m_bios;
 	optional_shared_ptr<u16> m_biosram;
 
@@ -70,10 +73,24 @@ public:
 	DECLARE_WRITE8_MEMBER(upperen_w);
 	DECLARE_READ16_MEMBER(bioslo_r);
 	DECLARE_WRITE16_MEMBER(bioslo_w);
+
+	DECLARE_WRITE8_MEMBER(edge_intr_clear_w);
+	DECLARE_WRITE8_MEMBER(status_register_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(override_w);
+	DECLARE_WRITE_LINE_MEMBER(bus_intr_out1_w);
+	DECLARE_WRITE_LINE_MEMBER(bus_intr_out2_w);
+	DECLARE_WRITE_LINE_MEMBER(led_ds1_w);
+	DECLARE_WRITE_LINE_MEMBER(led_ds3_w);
+	DECLARE_WRITE_LINE_MEMBER(megabyte_select_w);
 protected:
 	void machine_reset() override;
 private:
 	bool m_upperen;
+	offs_t m_megabyte_page;
+	bool m_nmi_enable;
+	bool m_override;
+	bool m_megabyte_enable;
 };
 
 void isbc_state::machine_reset()
@@ -86,6 +103,7 @@ void isbc_state::machine_reset()
 	if(m_uart8251)
 		m_uart8251->write_cts(0);
 	m_upperen = false;
+	m_megabyte_page = 0;
 }
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -116,6 +134,8 @@ static ADDRESS_MAP_START(isbc8605_io, AS_IO, 16, isbc_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc8630_io, AS_IO, 16, isbc_state)
+	AM_RANGE(0x00c0, 0x00c7) AM_WRITE8(edge_intr_clear_w, 0xff00)
+	AM_RANGE(0x00c8, 0x00df) AM_WRITE8(status_register_w, 0xff00)
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
 	AM_IMPORT_FROM(rpc86_io)
 ADDRESS_MAP_END
@@ -258,6 +278,54 @@ WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 }
 #endif
 
+WRITE8_MEMBER(isbc_state::edge_intr_clear_w)
+{
+	// reset U32 flipflop
+}
+
+WRITE8_MEMBER(isbc_state::status_register_w)
+{
+	m_megabyte_page = (data & 0xf0) << 16;
+	m_statuslatch->write_bit(data & 0x07, BIT(data, 3));
+}
+
+WRITE_LINE_MEMBER(isbc_state::nmi_mask_w)
+{
+	// combined with NMI input by 74LS08 AND gate at U12
+	m_nmi_enable = state;
+}
+
+WRITE_LINE_MEMBER(isbc_state::override_w)
+{
+	// 1 = access onboard dual-port RAM
+	m_override = state;
+}
+
+WRITE_LINE_MEMBER(isbc_state::bus_intr_out1_w)
+{
+	// Multibus interrupt request (active high)
+}
+
+WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
+{
+	// Multibus interrupt request (active high)
+}
+
+WRITE_LINE_MEMBER(isbc_state::led_ds1_w)
+{
+	machine().output().set_led_value(0, !state);
+}
+
+WRITE_LINE_MEMBER(isbc_state::led_ds3_w)
+{
+	machine().output().set_led_value(1, !state);
+}
+
+WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)
+{
+	m_megabyte_enable = !state;
+}
+
 static MACHINE_CONFIG_START( isbc86 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
@@ -345,6 +413,17 @@ static MACHINE_CONFIG_DERIVED( isbc8630, rpc86 )
 
 	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+
+	MCFG_DEVICE_ADD("statuslatch", LS259, 0) // U14
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate0))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate1))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(isbc_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(isbc_state, override_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(isbc_state, bus_intr_out1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(isbc_state, bus_intr_out2_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(isbc_state, led_ds1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(isbc_state, led_ds3_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(isbc_state, megabyte_select_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( isbc286 )

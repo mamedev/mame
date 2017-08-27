@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - 6502 Co-Processor Discs -->
+<!-- BBC Micro - 6502 2nd Processor Discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_6502" description="6502 Co-Processor Discs">
+<softwarelist name="bbc_flop_6502" description="6502 2nd Processor Discs">
 
-	<software name="6502dev" supported="no">
+	<software name="6502dev">
 		<description>6502 Development Package</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SNL05" />
-		<info name="compatibility" value="6502 co-processor" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="53760">
 				<rom name="6502development.ssd" size="53760" crc="219eefd1" sha1="d408d6d14d442c9e77be78fecef4b223e0c2404f" offset="0" />
@@ -23,12 +23,12 @@
 		</part>
 	</software>
 
-	<software name="bitstik1" supported="no">
+	<software name="bitstik1">
 		<description>Bitstik Graphics System</description>
 		<year>1984</year>
 		<publisher>Acorn</publisher>
 		<info name="release" value="ANF04" />
-		<info name="compatibility" value="6502 co-processor" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Master Disc"/>
 			<dataarea name="flop" size="204800">
@@ -49,11 +49,11 @@
 		</part>
 	</software>
 
-	<software name="bitstik2" supported="no">
+	<software name="bitstik2">
 		<description>Bitstik 2</description>
 		<year>1985</year>
 		<publisher>Robo Systems</publisher>
-		<info name="compatibility" value="6502 co-processor" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Introductory Library Disc Vol.1"/>
 			<dataarea name="flop" size="204800">
@@ -68,11 +68,11 @@
 		</part>
 	</software>
 
-	<software name="hisheet" supported="no">
+	<software name="hisheet">
 		<description>Hi-InterSheet</description>
 		<year>1986</year>
 		<publisher>Computer Concepts</publisher>
-		<info name="compatibility" value="6502 co-processor" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="25600">
 				<rom name="Hi-InterSheet.ssd" size="25600" crc="276aa20f" sha1="46d80cf02a649d3f43d6ef718b4d7ad03cc95646" offset="0" />
@@ -80,12 +80,12 @@
 		</part>
 	</software>
 
-	<software name="hiview" supported="no">
+	<software name="hiview">
 		<description>Hi-View</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SNB15" />
-		<info name="compatibility" value="6502 co-processor" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="Hi-View.ssd" size="102400" crc="f9e79e46" sha1="5b5653c890efc74c3d35d1ab82e51ba43d797346" offset="0" />
@@ -93,11 +93,11 @@
 		</part>
 	</software>
 
-	<software name="hiwwplus" supported="no">
+	<software name="hiwwplus">
 		<description>Hi-Wordwise Plus</description>
 		<year>1985</year>
 		<publisher>Computer Concepts</publisher>
-		<info name="compatibility" value="6502 co-processor" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="33280">
 				<rom name="Hi-WordWisePlus.ssd" size="33280" crc="e0c88da9" sha1="eeb95137ba5b8428795c552f484b07bf12f2e878" offset="0" />
@@ -105,12 +105,12 @@
 		</part>
 	</software>
 
-	<software name="l2fsutil" supported="no">
+	<software name="l2fsutil">
 		<description>Econet Level 2 Fileserver Software</description>
 		<year>1985</year>
 		<publisher>Acorn</publisher>
 		<info name="release" value="AES21" />
-		<info name="compatibility" value="6502 co-processor" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="econet_level_2_utils.ssd" size="204800" crc="c7039167" sha1="37a52b17138c1d84301ed23a04456939810f103c" offset="0" />

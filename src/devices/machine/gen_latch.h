@@ -67,6 +67,8 @@ protected:
 	void set_latch_written(bool latch_written);
 
 private:
+	void init_callback(void *ptr, s32 param);
+
 	bool                    m_separate_acknowledge;
 	bool                    m_latch_written;
 	devcb_write_line        m_data_pending_cb;

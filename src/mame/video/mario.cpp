@@ -84,22 +84,16 @@ WRITE8_MEMBER(mario_state::mario_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mario_state::mario_gfxbank_w)
+WRITE_LINE_MEMBER(mario_state::gfx_bank_w)
 {
-	if (m_gfx_bank != (data & 0x01))
-	{
-		m_gfx_bank = data & 0x01;
-		machine().tilemap().mark_all_dirty();
-	}
+	m_gfx_bank = state;
+	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(mario_state::mario_palettebank_w)
+WRITE_LINE_MEMBER(mario_state::palette_bank_w)
 {
-	if (m_palette_bank != (data & 0x01))
-	{
-		m_palette_bank = data & 0x01;
-		machine().tilemap().mark_all_dirty();
-	}
+	m_palette_bank = state;
+	machine().tilemap().mark_all_dirty();
 }
 
 WRITE8_MEMBER(mario_state::mario_scroll_w)
@@ -107,17 +101,14 @@ WRITE8_MEMBER(mario_state::mario_scroll_w)
 	m_gfx_scroll = data + 17;
 }
 
-WRITE8_MEMBER(mario_state::mario_flip_w)
+WRITE_LINE_MEMBER(mario_state::flip_w)
 {
-	if (m_flip != (data & 0x01))
-	{
-		m_flip = data & 0x01;
-		if (m_flip)
-			machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
-		else
-			machine().tilemap().set_flip_all(0);
-		machine().tilemap().mark_all_dirty();
-	}
+	m_flip = state;
+	if (m_flip)
+		machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
+	else
+		machine().tilemap().set_flip_all(0);
+	machine().tilemap().mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)

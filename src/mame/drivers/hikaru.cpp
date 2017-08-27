@@ -645,7 +645,7 @@ ROM_START( pharrier )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2912c68a" )
 ROM_END
 
-ROM_START( podrace )
+ROM_START( swracer )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
@@ -807,10 +807,10 @@ ROM_START( sgnascaro )
 ROM_END
 
 GAME( 2000, hikaru,   0,        hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Hikaru Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
-GAME( 1999, braveff,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Brave Fire Fighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 1999, braveff,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, airtrix,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, airtrixo, airtrix,  hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, sgnascar, hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega / Electronic Arts", "NASCAR Racing (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, sgnascaro,sgnascar, hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega / Electronic Arts", "NASCAR Racing (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2001, pharrier, hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2001, podrace,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Star Wars Pod Racer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, pharrier, hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, swracer,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

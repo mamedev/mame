@@ -41,6 +41,20 @@ debug_view_textbuf::~debug_view_textbuf()
 
 
 //-------------------------------------------------
+//  clear - clear the contents
+//-------------------------------------------------
+
+void debug_view_textbuf::clear()
+{
+	begin_update();
+	text_buffer_clear(&m_textbuf);
+	m_at_bottom = true;
+	m_topseq = 0;
+	end_update();
+}
+
+
+//-------------------------------------------------
 //  view_update - update a text buffer-based view
 //-------------------------------------------------
 

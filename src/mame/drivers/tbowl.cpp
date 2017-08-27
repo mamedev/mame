@@ -46,17 +46,6 @@ WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
 	membank("subbank")->set_entry(data >> 3);
 }
 
-/*** Shared Ram Handlers
-
-***/
-
-WRITE8_MEMBER(tbowl_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 /*** Memory Structures
 
     Board B is the main board, reading inputs, and in control of the 2 bg layers & text layer etc.
@@ -91,7 +80,7 @@ static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xfc09, 0xfc09) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc0a, 0xfc0a) AM_READ_PORT("DSW3")
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
-	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(sound_command_w) /* not sure, used quite a bit */
+	AM_RANGE(0xfc0d, 0xfc0d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(bg2xscroll_lo)
 	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(bg2xscroll_hi)
 	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(bg2yscroll_lo)
@@ -181,8 +170,8 @@ static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITENOP
-	AM_RANGE(0xe007, 0xe007) AM_WRITENOP    /* NMI acknowledge */
+	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
+	AM_RANGE(0xe007, 0xe007) AM_WRITENOP // sound watchdog
 	AM_RANGE(0xe010, 0xe010) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -435,6 +424,7 @@ void tbowl_state::machine_reset()
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
+	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
 static MACHINE_CONFIG_START( tbowl )
@@ -485,6 +475,8 @@ static MACHINE_CONFIG_START( tbowl )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -353,15 +353,14 @@ void cli_frontend::listfull(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// print the header
 	osd_printf_info("Name:             Description:\n");
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
-		if ((drivlist.driver().flags & machine_flags::NO_STANDALONE) == 0)
-			osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
+		osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
 }
 
 
@@ -377,7 +376,7 @@ void cli_frontend::listsource(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
@@ -396,13 +395,13 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 
 	// start with a filtered list of drivers
 	driver_enumerator drivlist(m_options, gamename);
-	int original_count = drivlist.count();
+	int const original_count = drivlist.count();
 
 	// iterate through the remaining ones to see if their parent matches
 	while (drivlist.next_excluded())
 	{
 		// if we have a non-bios clone and it matches, keep it
-		int clone_of = drivlist.clone();
+		int const clone_of = drivlist.clone();
 		if ((clone_of >= 0) && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
 				drivlist.include();
@@ -413,9 +412,9 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	{
 		// see if we match but just weren't a clone
 		if (original_count == 0)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 		else
-			osd_printf_info("Found %lu matches for '%s' but none were clones\n", (unsigned long)drivlist.count(), gamename);
+			osd_printf_info("Found %lu match(es) for '%s' but none were clones\n", (unsigned long)drivlist.count(), gamename); // FIXME: this never gets hit
 		return;
 	}
 
@@ -446,7 +445,7 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	// start with a filtered list of drivers; return an error if none found
 	driver_enumerator initial_drivlist(m_options, gamename);
 	if (initial_drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// for the final list, start with an empty driver list
 	driver_enumerator drivlist(m_options);

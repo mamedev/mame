@@ -419,12 +419,15 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 	{
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 1);
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 2);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 1, 4);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
+		// drill sergeant ribbons goes here, MT #06259
 		draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 1, screen.priority(), 0x0f00);
+		// guess: move the face as well (should go behind hands but it isn't tested)
 		draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0, screen.priority(), 0x4444);
+
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 1, 4);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);
 	}
 
 	//if (m_k007121_1->ctrlram_r(space, 1) & 0x08)

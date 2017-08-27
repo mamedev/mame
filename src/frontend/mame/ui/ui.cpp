@@ -821,7 +821,7 @@ void mame_ui_manager::process_natural_keyboard()
 	while (machine().ui_input().pop_event(&event))
 	{
 		// if this was a UI_EVENT_CHAR event, post it
-		if (event.event_type == UI_EVENT_CHAR)
+		if (event.event_type == ui_event::IME_CHAR)
 			machine().ioport().natkeyboard().post(event.ch);
 	}
 

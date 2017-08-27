@@ -95,6 +95,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
@@ -162,13 +163,11 @@ public:
 	DECLARE_WRITE8_MEMBER(jansou_sound_w);
 
 	DECLARE_WRITE8_MEMBER(janptr96_dswsel_w);
-	DECLARE_READ8_MEMBER(janptr96_dswsel_r);
 	DECLARE_READ8_MEMBER(janptr96_dsw_r);
 	DECLARE_WRITE8_MEMBER(janptr96_rombank_w);
 	DECLARE_WRITE8_MEMBER(janptr96_rambank_w);
 	DECLARE_READ8_MEMBER(janptr96_unknown_r);
 	DECLARE_WRITE8_MEMBER(janptr96_coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(janptr96_rtc_irq);
 
 	DECLARE_WRITE8_MEMBER(mjifb_coin_counter_w);
 	DECLARE_READ8_MEMBER(mjifb_rom_io_r);
@@ -206,8 +205,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mjvegasa_12400_w);
 	DECLARE_READ8_MEMBER(mjvegasa_12500_r);
 
-	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
-
 	DECLARE_DRIVER_INIT(tahjong);
 	DECLARE_DRIVER_INIT(dynax);
 	DECLARE_DRIVER_INIT(jansou);
@@ -222,8 +219,6 @@ public:
 	uint32_t screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(suzume_irq);
-	INTERRUPT_GEN_MEMBER(mjtensin_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(janptr96_interrupt);
 
 protected:
 	virtual void machine_start() override;
@@ -896,11 +891,6 @@ WRITE8_MEMBER(royalmah_state::janptr96_dswsel_w)
 	m_dsw_select = data;
 }
 
-READ8_MEMBER(royalmah_state::janptr96_dswsel_r)
-{
-	return m_dsw_select;
-}
-
 READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 {
 	if (~m_dsw_select & 0x01) return ioport("DSW4")->read();
@@ -935,18 +925,15 @@ WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 }
 
 static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8, royalmah_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(janptr96_rombank_w )    // BANK ROM Select
-	AM_RANGE( 0x1e, 0x1e ) AM_READWRITE(janptr96_dswsel_r, janptr96_dswsel_w )
-	AM_RANGE( 0x1c, 0x1c ) AM_READ(janptr96_dsw_r )
-	AM_RANGE( 0x20, 0x20 ) AM_READWRITE(janptr96_unknown_r, janptr96_rambank_w )
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(mjderngr_palbank_w )
-	AM_RANGE( 0x60, 0x6f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0x81, 0x81 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x82, 0x83 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x93, 0x93 ) AM_WRITE(input_port_select_w )
-	AM_RANGE( 0xd8, 0xd8 ) AM_WRITE(janptr96_coin_counter_w )
-	AM_RANGE( 0xd9, 0xd9 ) AM_READ_PORT("SYSTEM")
+	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0xff00) AM_WRITE(janptr96_rombank_w )    // BANK ROM Select
+	AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_READWRITE(janptr96_unknown_r, janptr96_rambank_w )
+	AM_RANGE( 0x50, 0x50 ) AM_MIRROR(0xff00) AM_WRITE(mjderngr_palbank_w )
+	AM_RANGE( 0x60, 0x6f ) AM_MIRROR(0xff00) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE( 0x81, 0x81 ) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE( 0x82, 0x83 ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE( 0x93, 0x93 ) AM_MIRROR(0xff00) AM_WRITE(input_port_select_w )
+	AM_RANGE( 0xd8, 0xd8 ) AM_MIRROR(0xff00) AM_WRITE(janptr96_coin_counter_w )
+	AM_RANGE( 0xd9, 0xd9 ) AM_MIRROR(0xff00) AM_READ_PORT("SYSTEM") AM_WRITENOP // second input select?
 ADDRESS_MAP_END
 
 /****************************************************************************
@@ -2604,8 +2591,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjifb )
 	PORT_INCLUDE( mjctrl2 )
 
+	// Default dip-switch settings taken from manual for "single type" cabinet
+	// When they differ for "corner type" cabinet, it's noted in a comment near the dip-switch
+
 	PORT_START("PORT3_5")   // IN10 - DSW1 (P3 & P5)
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" ) PORT_DIPLOCATION("DSW1:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "96%" )
 	PORT_DIPSETTING(    0x0e, "93%" )
 	PORT_DIPSETTING(    0x0d, "90%" )
@@ -2615,98 +2605,98 @@ static INPUT_PORTS_START( mjifb )
 	PORT_DIPSETTING(    0x09, "78%" )
 	PORT_DIPSETTING(    0x08, "75%" )
 	PORT_DIPSETTING(    0x07, "71%" )
-	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x06, "68%" ) // default for "corner type" cabinet
 	PORT_DIPSETTING(    0x05, "65%" )
 	PORT_DIPSETTING(    0x04, "62%" )
 	PORT_DIPSETTING(    0x03, "59%" )
 	PORT_DIPSETTING(    0x02, "56%" )
 	PORT_DIPSETTING(    0x01, "53%" )
 	PORT_DIPSETTING(    0x00, "50%" )
-	PORT_DIPNAME( 0x30, 0x00, "Maximum Bet" )
+	PORT_DIPNAME( 0x30, 0x10, "Maximum Bet" ) PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Rate to Play" ) PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 
 	PORT_START("PORT6_7")   // IN11 - DSW2 (P6 & P7)
-	PORT_DIPNAME( 0x03, 0x03, "Winnings" )
+	PORT_DIPNAME( 0x03, 0x00, "Winnings" ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, "32 24 16 12 8 4 2 1" )
 	PORT_DIPSETTING(    0x00, "50 30 15 8 5 3 2 1" )
 	PORT_DIPSETTING(    0x01, "100 50 25 10 5 3 2 1" )
 	PORT_DIPSETTING(    0x02, "200 100 50 10 5 3 2 1" )
-	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )
+	PORT_DIPNAME( 0x04, 0x00, "Credits Per Note" ) PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x38, 0x38, "YAKUMAN Bonus" )
-	PORT_DIPSETTING(    0x38, "Cut" )
-	PORT_DIPSETTING(    0x30, "1 T" )
-	PORT_DIPSETTING(    0x28, "300" )
-	PORT_DIPSETTING(    0x20, "500" )
-	PORT_DIPSETTING(    0x18, "700" )
-	PORT_DIPSETTING(    0x10, "1000" )
-//  PORT_DIPSETTING(    0x08, "1000?" )
-//  PORT_DIPSETTING(    0x00, "1000?" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, "1/4" )
-	PORT_DIPSETTING(    0x80, "2/4" )
+	PORT_DIPNAME( 0x38, 0x20, "YAKUMAN Bonus" ) PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPSETTING(    0x38, "None" ) // default for "corner type" cabinet
+	PORT_DIPSETTING(    0x30, "Once at start" )
+	PORT_DIPSETTING(    0x28, "Every 300 coins" )
+	PORT_DIPSETTING(    0x20, "Every 500 coins" )
+	PORT_DIPSETTING(    0x18, "Every 700 coins" )
+	PORT_DIPSETTING(    0x10, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x08, "Every 1000 coins?" )
+//  PORT_DIPSETTING(    0x00, "Every 1000 coins?" )
+	PORT_DIPNAME( 0x40, 0x40, "YAKUMAN Bonus Frequency" ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x00, "Once" )
+	PORT_DIPSETTING(    0x40, "Twice" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 
 	PORT_START("DSW3")  // IN13 - DSW3 ($8200)
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 3-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x00, "Automatic Rate Change" ) PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) // default for "corner type" cabinet
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x00, "Service Count" ) PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) // default for "corner type" cabinet
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "F-Rate" )
+	PORT_DIPNAME( 0x04, 0x00, "Renchan Rate" ) PORT_DIPLOCATION("DSW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-3" )
+	PORT_DIPNAME( 0x08, 0x00, "W-Bet" ) PORT_DIPLOCATION("DSW3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Bye-Byte Bonus" )
+	PORT_DIPNAME( 0x10, 0x00, "Bye-Bye Bonus" ) PORT_DIPLOCATION("DSW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Auto-Mode After Reached" )
+	PORT_DIPNAME( 0x20, 0x00, "Last Chance" ) PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPSETTING(    0x20, "Free" )
+	PORT_DIPSETTING(    0x00, "Charge" )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Tsumo" ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Background Color" )
+	PORT_DIPNAME( 0x80, 0x00, "Background Color" ) PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, "Black" )
-	PORT_DIPSETTING(    0x00, "Blue" )
+	PORT_DIPSETTING(    0x00, "Blue" ) // gray according to manual?!?!
 
 	PORT_START("DSW4")  // IN14 - DSW4 ($8000)
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 4-0" )
+	PORT_DIPNAME( 0x01, 0x00, "Double-tile exchange" ) PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 4-1" )
+	PORT_DIPNAME( 0x02, 0x00, "Double hand-tile game" ) PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 4-2" )
+	PORT_DIPNAME( 0x04, 0x00, "Blind-tile game" ) PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Flip-Flop" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x00, "Don Den Button" ) PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(    0x08, "F/F Button" )
+	PORT_DIPSETTING(    0x00, "A Button" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) // default for "corner type" cabinet
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Animation" )
+	PORT_DIPNAME( 0x40, 0x40, "Animation" )  PORT_DIPLOCATION("DSW4:7") // marked as "unused" in manual
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Full Tests" )
+	PORT_DIPNAME( 0x80, 0x80, "Full Tests" ) PORT_DIPLOCATION("DSW4:8") // marked as "unused" in manual
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3549,38 +3539,24 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 	MCFG_PALETTE_INIT_OWNER(royalmah_state,mjderngr)
 MACHINE_CONFIG_END
 
-/* It runs in IM 2, thus needs a vector on the data bus */
-TIMER_DEVICE_CALLBACK_MEMBER(royalmah_state::janptr96_interrupt)
-{
-	int scanline = param;
-
-	if(scanline == 248)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x80);   // vblank
-
-	if(scanline == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x84);   // demo
-}
-
-WRITE_LINE_MEMBER(royalmah_state::janptr96_rtc_irq)
-{
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x82);   // rtc
-}
-
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_16MHz/2)    /* 8 MHz? */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_16MHz/2)    /* 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(janptr96_map)
 	MCFG_CPU_IO_MAP(janptr96_iomap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", royalmah_state, janptr96_interrupt, "screen", 0, 1)
+	MCFG_TMPZ84C015_IN_PA_CB(READ8(royalmah_state, janptr96_dsw_r))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(royalmah_state, janptr96_dswsel_w))
+	// internal CTC channels 0 & 1 have falling edge triggers
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(royalmah_state, janptr96_rtc_irq))
-	MACHINE_CONFIG_END
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
+MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
@@ -3594,10 +3570,10 @@ static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
 	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
 	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
 	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 
@@ -3612,22 +3588,11 @@ static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
 	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
 	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
-
-
-INTERRUPT_GEN_MEMBER(royalmah_state::mjtensin_interrupt)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);  // vblank
-}
-
-WRITE_LINE_MEMBER(royalmah_state::mjtensin_rtc_irq)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);  // rtc
-}
 
 
 static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
@@ -3635,14 +3600,14 @@ static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
 	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjtensin_p4_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(royalmah_state, mjtensin_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
@@ -3650,14 +3615,14 @@ static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_CPU_PROGRAM_MAP(cafetime_map)
 	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, cafetime_p3_w))
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, cafetime_p4_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(royalmah_state, mjtensin_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
@@ -3666,14 +3631,14 @@ static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
 	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p3_w))
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p4_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(royalmah_state, mjtensin_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
 MACHINE_CONFIG_END
 
 
@@ -3704,7 +3669,7 @@ ROM_START( royalmj )
 	ROM_LOAD( "6.p6", 0x5000, 0x1000, CRC(92150a0f) SHA1(5c97ba5014abdba4afc78e02e7d90e6ca4d777ac) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) ) // sldh w/tahjong
 ROM_END
 
 ROM_START( royalmah )
@@ -3743,7 +3708,7 @@ ROM_START( tahjong )
 	ROM_LOAD( "s2.bin", 0x14000, 0x4000, CRC(fed42e7c) SHA1(31136dff07bd1883dc2d107823ba83a34abf003d) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(c074c0f0) SHA1(b62519d1496ea366b0ea8ed657bd758ce93875ec) )
+	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(c074c0f0) SHA1(b62519d1496ea366b0ea8ed657bd758ce93875ec) ) // sldh w/royalmj
 ROM_END
 
 ROM_START( janputer )

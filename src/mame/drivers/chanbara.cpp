@@ -183,7 +183,7 @@ void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			int attr = m_spriteram[offs + 0];
 			int code = m_spriteram[offs + 1];
 			int color = m_spriteram[offs + 0x80] & 0x1f;
-			int flipx = 0;
+			int flipx = attr & 4;
 			int flipy = attr & 2;
 			int sx = 240 - m_spriteram[offs + 3];
 			int sy = 232 - m_spriteram[offs + 2];

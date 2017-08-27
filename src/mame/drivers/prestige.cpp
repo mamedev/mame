@@ -806,6 +806,12 @@ static MACHINE_CONFIG_DERIVED( gjmovie, prestige_base )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( princ, prestige_base )
+	MCFG_DEVICE_REMOVE("cartslot")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( gl6000sl )
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -940,4 +946,4 @@ COMP( 1999, gl6600cx, 0,       0,      prestige,   prestige, prestige_state, 0, 
 
 // TODO: move into a separate driver
 // Prin-C use a Fujitsu MB90611A MCU (F2MC-16L)
-COMP( ????, princ,    0,       0,      prestige ,  prestige, prestige_state, 0,    "Tomy",   "Prin-C",                               MACHINE_IS_SKELETON )
+COMP( ????, princ,    0,       0,      princ,      prestige, prestige_state, 0,    "Tomy",   "Prin-C",                               MACHINE_IS_SKELETON )

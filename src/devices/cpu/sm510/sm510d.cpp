@@ -122,31 +122,10 @@ static const u32 s_flags[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OVER
 };
 
-// next program counter in sequence (relative)
-static const s8 s_next_pc_6[0x40] =
-{
-	32, -1 /* rollback */, -1, 30, 30, -3, -3, 28, 28, -5, -5, 26, 26, -7, -7, 24,
-	24, -9, -9, 22, 22, -11, -11, 20, 20, -13, -13, 18, 18, -15, -15, 16,
-	16, -17, -17, 14, 14, -19, -19, 12, 12, -21, -21, 10, 10, -23, -23, 8,
-	8, -25, -25, 6, 6, -27, -27, 4, 4, -29, -29, 2, 2, -31, -31, 0 /* gets stuck here */
-};
-
-static const s8 s_next_pc_7[0x80] =
-{
-	64, -1 /* rollback */, -1, 62, 62, -3, -3, 60, 60, -5, -5, 58, 58, -7, -7, 56,
-	56, -9, -9, 54, 54, -11, -11, 52, 52, -13, -13, 50, 50, -15, -15, 48,
-	48, -17, -17, 46, 46, -19, -19, 44, 44, -21, -21, 42, 42, -23, -23, 40,
-	40, -25, -25, 38, 38, -27, -27, 36, 36, -29, -29, 34, 34, -31, -31, 32,
-	32, -33, -33, 30, 30, -35, -35, 28, 28, -37, -37, 26, 26, -39, -39, 24,
-	24, -41, -41, 22, 22, -43, -43, 20, 20, -45, -45, 18, 18, -47, -47, 16,
-	16, -49, -49, 14, 14, -51, -51, 12, 12, -53, -53, 10, 10, -55, -55, 8,
-	8, -57, -57, 6, 6, -59, -59, 4, 4, -61, -61, 2, 2, -63, -63, 0 /* gets stuck here */
-};
-
 
 // common disasm
 
-static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, const u8 pclen)
+static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram)
 {
 	// get raw opcode
 	u8 op = oprom[0];
@@ -158,7 +137,6 @@ static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended
 	u16 param = mask;
 	if (bits >= 8)
 	{
-		// note: doesn't work with lfsr pc
 		param = oprom[1];
 		len++;
 	}
@@ -188,13 +166,6 @@ static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended
 		{
 			u16 address = (param << 4 & 0xc00) | (mask << 6 & 0x3c0) | (param & 0x03f);
 			util::stream_format(stream, "$%03X", address);
-		}
-
-		// show param offset
-		if (bits >= 8)
-		{
-			s8 next_pc_delta = ((pclen == 6) ? s_next_pc_6[pc & 0x3f] : s_next_pc_7[pc & 0x7f]);
-			util::stream_format(stream, " [$%03X]", pc + next_pc_delta);
 		}
 	}
 
@@ -230,7 +201,7 @@ static const u8 sm510_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(sm510)
 {
-	return sm510_common_disasm(sm510_mnemonic, nullptr, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm510_mnemonic, nullptr, stream, pc, oprom, opram);
 }
 
 
@@ -272,7 +243,7 @@ CPU_DISASSEMBLE(sm511)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x30, sm511_extended, 0x10);
 
-	return sm510_common_disasm(sm511_mnemonic, ext, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm511_mnemonic, ext, stream, pc, oprom, opram);
 }
 
 
@@ -314,7 +285,7 @@ CPU_DISASSEMBLE(sm500)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm500_extended, 0x10);
 
-	return sm510_common_disasm(sm500_mnemonic, ext, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm500_mnemonic, ext, stream, pc, oprom, opram);
 }
 
 
@@ -356,7 +327,7 @@ CPU_DISASSEMBLE(sm5a)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm5a_extended, 0x10);
 
-	return sm510_common_disasm(sm5a_mnemonic, ext, stream, pc, oprom, opram, 6);
+	return sm510_common_disasm(sm5a_mnemonic, ext, stream, pc, oprom, opram);
 }
 
 
@@ -389,5 +360,5 @@ static const u8 sm590_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(sm590)
 {
-	return sm510_common_disasm(sm590_mnemonic, nullptr, stream, pc, oprom, opram, 7);
+	return sm510_common_disasm(sm590_mnemonic, nullptr, stream, pc, oprom, opram);
 }

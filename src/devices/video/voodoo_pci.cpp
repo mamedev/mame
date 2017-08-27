@@ -104,7 +104,6 @@ void voodoo_pci_device::device_start()
 		bank_infos[1].adr = 0xf8000008;
 		bank_infos[2].adr = 0xfffffff0;
 	}
-
 	save_item(NAME(m_pcictrl_reg));
 	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_pci_device::postload), this));
 }
@@ -146,11 +145,13 @@ READ32_MEMBER (voodoo_pci_device::pcictrl_r)
 	// The address map starts at 0x40
 	switch (offset + 0x40 / 4) {
 	case 0x40/4:
+		// V2: Init Enable: 19:16=Fab ID, 15:12=Graphics Rev
 		// Vegas driver needs this value at PCI 0x40
-		result = 0x00044000; // FAB ID
+		result = 0x00044000;
 		break;
 	case 0x54/4:
-		// AGP Capability Register: 8 bit 0, 4 bit AGP Major, 4 bit AGP Minor, 8 bit Next Ptr, 8 bit Capability ID
+		// V2: SiProcess Register: Osc Force On, Osc Ring Sel, Osc Count Reset, 12 bit PCI Counter, 16 bit Oscillator Counter
+		// V3: AGP Capability Register: 8 bit 0, 4 bit AGP Major, 4 bit AGP Minor, 8 bit Next Ptr, 8 bit Capability ID
 		// Tenthdeg (vegas) checks this
 		result = 0x00006002;
 		break;

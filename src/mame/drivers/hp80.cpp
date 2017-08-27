@@ -14,6 +14,7 @@
 #include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "machine/1ma6.h"
 
 // Debugging
 #define VERBOSE 1
@@ -1017,6 +1018,7 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0xff02 , 0xff02) AM_READWRITE(keysts_r , keysts_w)
 	AM_RANGE(0xff03 , 0xff03) AM_READWRITE(keycod_r , keycod_w)
 	AM_RANGE(0xff04 , 0xff07) AM_READWRITE(crtc_r , crtc_w)
+	AM_RANGE(0xff08 , 0xff09) AM_DEVREADWRITE("tape" , hp_1ma6_device , reg_r , reg_w)
 	AM_RANGE(0xff0a , 0xff0a) AM_READWRITE(clksts_r , clksts_w)
 	AM_RANGE(0xff0b , 0xff0b) AM_READWRITE(clkdat_r , clkdat_w)
 	AM_RANGE(0xff18 , 0xff18) AM_WRITE(rselec_w)
@@ -1051,6 +1053,8 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_SOUND_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
 
+	// Tape drive
+	MCFG_DEVICE_ADD("tape" , HP_1MA6 , 0)
 MACHINE_CONFIG_END
 
 ROM_START(hp85)

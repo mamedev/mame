@@ -65,13 +65,15 @@ uint32_t kaneko16_state::screen_update_common(screen_device &screen, _BitmapClas
 
 	screen.priority().fill(0, cliprect);
 
-	if (m_view2_0) m_view2_0->kaneko16_prepare(bitmap, cliprect);
-	if (m_view2_1) m_view2_1->kaneko16_prepare(bitmap, cliprect);
+	if (m_view2[0].found()) m_view2[0]->kaneko16_prepare(bitmap, cliprect);
+	if (m_view2[1].found()) m_view2[1]->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		if (m_view2_0) m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
-		if (m_view2_1) m_view2_1->render_tilemap_chip_alt(screen,bitmap,cliprect,i, m_VIEW2_2_pri);
+		if (m_view2[0].found())
+			m_view2[0]->render_tilemap_chip(screen,bitmap,cliprect,i);
+		if (m_view2[1].found())
+			m_view2[1]->render_tilemap_chip_alt(screen,bitmap,cliprect,i, m_VIEW2_2_pri);
 	}
 
 	return 0;

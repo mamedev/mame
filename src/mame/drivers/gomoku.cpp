@@ -28,6 +28,7 @@ todo:
 #include "audio/gomoku.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "speaker.h"
 
 
@@ -44,12 +45,6 @@ READ8_MEMBER(gomoku_state::input_port_r)
 }
 
 
-WRITE8_MEMBER(gomoku_state::gomoku_latch_w)
-{
-	m_latch->write_bit(offset, BIT(data, 1));
-}
-
-
 static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
 	AM_RANGE(0x0000, 0x47ff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM
@@ -58,7 +53,7 @@ static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
 	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE("gomoku", gomoku_sound_device, sound1_w)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("gomoku", gomoku_sound_device, sound2_w)
-	AM_RANGE(0x7000, 0x7007) AM_WRITE(gomoku_latch_w)
+	AM_RANGE(0x7000, 0x7007) AM_DEVWRITE("latch", ls259_device, write_d1)
 	AM_RANGE(0x7800, 0x7807) AM_READ(input_port_r)
 	AM_RANGE(0x7800, 0x7800) AM_WRITENOP
 ADDRESS_MAP_END

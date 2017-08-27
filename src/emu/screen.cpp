@@ -1719,21 +1719,17 @@ void screen_device::finalize_burnin()
 	osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "burnin-", this->tag()+1, ".png") ;
 	if (filerr == osd_file::error::NONE)
 	{
-		png_info pnginfo = { nullptr };
-//      png_error pngerr;
+		png_info pnginfo;
 		char text[256];
 
 		// add two text entries describing the image
 		sprintf(text,"%s %s", emulator_info::get_appname(), emulator_info::get_build_version());
-		png_add_text(&pnginfo, "Software", text);
+		pnginfo.add_text("Software", text);
 		sprintf(text, "%s %s", machine().system().manufacturer, machine().system().type.fullname());
-		png_add_text(&pnginfo, "System", text);
+		pnginfo.add_text("System", text);
 
 		// now do the actual work
 		png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);
-
-		// free any data allocated
-		png_free(&pnginfo);
 	}
 }
 

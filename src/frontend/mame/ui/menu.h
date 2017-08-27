@@ -132,8 +132,6 @@ protected:
 	std::vector<menu_item>  item;         // array of items
 
 	int top_line;           // main box top line
-	int l_sw_hover;
-	int l_hover;
 	int skip_main_items;
 	int selected;           // which item is selected
 
@@ -204,9 +202,60 @@ protected:
 	void extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
 		int direction, float &x1, float &y1, float &x2, float &y2);
 
+	// draw a box of text - used for the custom boxes above/below menus
+	template <typename Iter>
+	float draw_text_box(
+			Iter begin, Iter end,
+			float origx1, float origx2, float y1, float y2,
+			ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, bool scale,
+			rgb_t fgcolor, rgb_t bgcolor, float text_size)
+	{
+		// size up the text
+		float maxwidth(origx2 - origx1);
+		for (Iter it = begin; it != end; ++it)
+		{
+			float width;
+			ui().draw_text_full(
+					container(), get_c_str(*it),
+					0.0f, 0.0f, 1.0f, justify, wrap,
+					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
+					&width, nullptr, text_size);
+			width += 2.0f * UI_BOX_LR_BORDER;
+			maxwidth = (std::max)(maxwidth, width);
+		}
+		if (scale && ((origx2 - origx1) < maxwidth))
+		{
+			text_size *= ((origx2 - origx1) / maxwidth);
+			maxwidth = origx2 - origx1;
+		}
+
+		// draw containing box
+		float x1(0.5f * (1.0f - maxwidth));
+		float x2(x1 + maxwidth);
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, bgcolor);
+
+		// inset box and draw content
+		x1 += UI_BOX_LR_BORDER;
+		x2 -= UI_BOX_LR_BORDER;
+		y1 += UI_BOX_TB_BORDER;
+		y2 -= UI_BOX_TB_BORDER;
+		for (Iter it = begin; it != end; ++it)
+		{
+			ui().draw_text_full(
+					container(), get_c_str(*it),
+					x1, y1, x2 - x1, justify, wrap,
+					mame_ui_manager::NORMAL, fgcolor, UI_TEXT_BG_COLOR,
+					nullptr, nullptr, text_size);
+			y1 += ui().get_line_height();
+		}
+
+		// in case you want another box of similar width
+		return maxwidth;
+	}
+
 	void draw_background();
 
-	// configure the menu for custom rendering
+	// draw additional menu content
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 	// map mouse to menu coordinates
@@ -312,6 +361,9 @@ private:
 
 	static void exit(running_machine &machine);
 	static global_state_ptr get_global_state(running_machine &machine);
+
+	static char const *get_c_str(std::string const &str) { return str.c_str(); }
+	static char const *get_c_str(char const *str) { return str; }
 
 	global_state_ptr const  m_global_state;
 	bool                    m_special_main_menu;

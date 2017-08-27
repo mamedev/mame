@@ -520,9 +520,12 @@ void napple2_state::do_io(address_space &space, int offset)
 
 WRITE_LINE_MEMBER(napple2_state::txt_w)
 {
-	// select graphics or text mode
-	machine().first_screen()->update_now();
-	m_video->m_graphics = !state;
+	if (m_video->m_graphics == state) // avoid flickering from II+ refresh polling
+	{
+		// select graphics or text mode
+		machine().first_screen()->update_now();
+		m_video->m_graphics = !state;
+	}
 }
 
 WRITE_LINE_MEMBER(napple2_state::mix_w)
@@ -1304,7 +1307,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("aesms", A2BUS_AESMS)    /* Applied Engineering Super Music Synthesizer */
 	SLOT_INTERFACE("ultraterm", A2BUS_ULTRATERM)    /* Videx UltraTerm (original) */
 	SLOT_INTERFACE("ultratermenh", A2BUS_ULTRATERMENH)    /* Videx UltraTerm (enhanced //e) */
-	SLOT_INTERFACE("aevm80", A2BUS_VTC2)    /* Applied Engineering ViewMaster 80 */
+	SLOT_INTERFACE("aevm80", A2BUS_AEVIEWMASTER80)    /* Applied Engineering ViewMaster 80 */
 	SLOT_INTERFACE("parallel", A2BUS_PIC)   /* Apple Parallel Interface Card */
 	SLOT_INTERFACE("corvus", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	SLOT_INTERFACE("mcms1", A2BUS_MCMS1)  /* Mountain Computer Music System, card 1 of 2 */

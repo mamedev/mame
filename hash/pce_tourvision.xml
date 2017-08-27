@@ -196,6 +196,20 @@
 	</software>
 
 
+	<!--Bomberman 93 -->
+	<software name="bombmn93">
+		<description>Bomberman 93 (Tourvision PCE bootleg)</description>
+		<year>1992</year>
+		<publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x80000 matches PCE bombmn93 -->
+				<rom name="bomberman_93.tv" size="1048576" crc="6772c687" sha1="2ff79046baa19ea0bf1fd362b81f487c1e1d7382" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!--Burning Angels -->
 	<software name="burnangl">
 		<description>Burning Angels (Tourvision PCE bootleg)</description>
@@ -336,6 +350,20 @@
 	</software>
 
 
+	<!--Die Hard -->
+	<software name="diehard">
+		<description>Die Hard (Tourvision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (Tourvision) / Pack In Video / Nihon Busson Co.,Ltd</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x80000 matches PCE diehard -->
+				<rom name="die_hard.tv" size="1048576" crc="5cd0556e" sha1="605a963d024aca1f51f343349948d15fc3ef9954" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	
 	<!--Dodge Ball -->
 	<software name="nekdodge">
 		<description>Dodge Ball (Tourvision PCE bootleg)</description>
@@ -578,6 +606,20 @@ Notes:
 	</software>
 
 
+	<!--Hit The Ice -->
+	<software name="hitice">
+		<description>Hit The Ice (Tourvision PCE bootleg)</description>
+		<year>1991</year>
+		<publisher>bootleg (Tourvision) / Williams / Taito Corporation</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x40000 matches PCE hitice -->
+				<rom name="hit_the_ice.tv" size="1048576" crc="a0929d2b" sha1="26607a76cade818bd0d1daf2d0bfddfecd18f187" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	
 	<!--Image Fight -->
 	<software name="imagefgt">
 		<description>Image Fight (Tourvision PCE bootleg)</description>
@@ -648,6 +690,20 @@ Notes:
 	</software>
 
 
+	<!--Knight Rider Special -->
+	<software name="knightrs">
+		<description>Knight Rider Special (Tourvision PCE bootleg)</description>
+		<year>1994</year>
+		<publisher>bootleg (Tourvision) / Pack In Video</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x40000 matches PCE knightrs -->
+				<rom name="knight_rider.tv" size="1048576" crc="dc926ef5" sha1="c0d9452e3468c46e6f45c40d634ae448f21531d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	
 	<!--Ledgnd of Hero Tonma -->
 	<software name="loht">
 		<description>Legend of Hero Tonma (Tourvision PCE bootleg)</description>

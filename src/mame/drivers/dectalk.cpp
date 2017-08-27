@@ -337,8 +337,8 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_irq_handler)
 READ8_MEMBER(dectalk_state::dectalk_duart_input)
 {
 	uint8_t data = 0;
-	data |= m_duart_inport&0xF;
-	data |= (ioport("duart_in")->read()&0xF0);
+	data |= m_duart_inport&0xf;
+	data |= (ioport("duart_in")->read()&0xf0);
 	if ((m_hack_self_test == 1) && (ioport("hacks")->read()&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
 		m_hack_self_test = 1;
 	return data;
@@ -405,7 +405,7 @@ void dectalk_state::dectalk_semaphore_w ( uint16_t data )
 // read the output fifo and set the interrupt line active on the dsp
 uint16_t dectalk_state::dectalk_outfifo_r (  )
 {
-	uint16_t data = 0xFFFF;
+	uint16_t data = 0xffff;
 #ifdef USE_LOOSE_TIMING_OUTPUT
 	// if outfifo count is less than two, boost the interleave to prevent running the fifo out
 	if (m_outfifo_count < 2)
@@ -421,7 +421,7 @@ uint16_t dectalk_state::dectalk_outfifo_r (  )
 		m_outfifo_tail_ptr++;
 		m_outfifo_count--;
 	}
-	m_outfifo_tail_ptr&=0xF;
+	m_outfifo_tail_ptr&=0xf;
 	dectalk_outfifo_check();
 	return ((data&0xfff0)^0x8000); // yes this is right, top bit is inverted and bottom 4 are ignored
 	//return data; // not right but want to get it working first
@@ -446,7 +446,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 	m_tlc_tonedetect = 0; // TODO, needed for selftest pass
 	m_tlc_ringdetect = 0; // TODO
 	m_tlc_dtmf = 0; // TODO
-	m_duart_inport = 0xF;
+	m_duart_inport = 0xf;
 	m_duart_outport = 0;
 }
 
@@ -493,14 +493,14 @@ READ8_MEMBER(dectalk_state::nvram_recall)// recall from x2212 nvram chip
 	m_nvram->recall(0);
 	m_nvram->recall(1);
 	m_nvram->recall(0);
-	return 0xFF;
+	return 0xff;
 }
 
 WRITE8_MEMBER(dectalk_state::led_write)
 {
-	popmessage("LED status: %02X\n", data&0xFF);
+	popmessage("LED status: %02X\n", data&0xff);
 #ifdef VERBOSE
-	logerror("m68k: LED status: %02X\n", data&0xFF);
+	logerror("m68k: LED status: %02X\n", data&0xff);
 #endif
 	//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
@@ -534,7 +534,7 @@ WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fif
 	m_infifo[m_infifo_head_ptr] = data;
 	m_infifo_head_ptr++;
 	m_infifo_count++;
-	m_infifo_head_ptr&=0x1F;
+	m_infifo_head_ptr&=0x1f;
 }
 
 READ16_MEMBER(dectalk_state::m68k_spcflags_r)// 68k read from the speech flags
@@ -685,8 +685,8 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 READ16_MEMBER(dectalk_state::m68k_tlc_dtmf_r)// dtmf chip read
 {
 #ifdef TLC_LOG
-	uint16_t data = 0xFFFF;
-	data = m_tlc_dtmf&0xF;
+	uint16_t data = 0xffff;
+	data = m_tlc_dtmf&0xf;
 	logerror("m68k: TLC dtmf detector read, returning data = %02X", data);
 #endif
 	return 0;
@@ -708,7 +708,7 @@ WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E6
 
 READ16_MEMBER(dectalk_state::spc_infifo_data_r)
 {
-	uint16_t data = 0xFFFF;
+	uint16_t data = 0xffff;
 	data = m_infifo[m_infifo_tail_ptr];
 #ifdef SPC_LOG_DSP
 	logerror("dsp: SPC infifo read with data = %04X, fifo head: %02X; fifo tail was: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
@@ -719,7 +719,7 @@ READ16_MEMBER(dectalk_state::spc_infifo_data_r)
 		m_infifo_tail_ptr++;
 		m_infifo_count--;
 	}
-	m_infifo_tail_ptr&=0x1F;
+	m_infifo_tail_ptr&=0x1f;
 	return data;
 }
 
@@ -741,7 +741,7 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 	m_outfifo[m_outfifo_head_ptr] = data;
 	m_outfifo_head_ptr++;
 	m_outfifo_count++;
-	m_outfifo_head_ptr&=0xF;
+	m_outfifo_head_ptr&=0xf;
 	//dectalk_outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
 }
 
@@ -760,7 +760,7 @@ READ_LINE_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls7
  Address Maps
 ******************************************************************************/
 /*
-Address maps (x = ignored; * = selects address within this range)
+Address maps (x = ignored; * = selects address within this range; a = see description at right of row)
 68k address map:
 a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
 0   x   x   x   0   x   0   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a       R   ROM a=0:E8, a=1:E22
@@ -790,16 +790,16 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 
 static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
-	AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
-	AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
-	AM_RANGE(0x094000, 0x0941ff) AM_DEVREADWRITE8("x2212", x2212_device, read, write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x094200, 0x0943ff) AM_READWRITE8(nvram_recall, nvram_store, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) AM_MIRROR(0x763FE0) /* DUART */
-	AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
-	AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
-	AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
-	AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x740000) AM_ROM /* ROM */
+	AM_RANGE(0x080000, 0x093fff) AM_MIRROR(0x760000) AM_RAM /* RAM */
+	AM_RANGE(0x094000, 0x0943ff) AM_MIRROR(0x763c00) AM_WRITE8(led_write, 0x00ff)  /* LED array */
+	AM_RANGE(0x094000, 0x0941ff) AM_MIRROR(0x763c00) AM_DEVREADWRITE8("x2212", x2212_device, read, write, 0xff00) /* Xicor X2212 NVRAM */
+	AM_RANGE(0x094200, 0x0943ff) AM_MIRROR(0x763c00) AM_READWRITE8(nvram_recall, nvram_store, 0xff00) /* Xicor X2212 NVRAM */
+	AM_RANGE(0x098000, 0x09801f) AM_MIRROR(0x763fe0) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) /* DUART */
+	AM_RANGE(0x09c000, 0x09c001) AM_MIRROR(0x763ff8) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) /* SPC flags reg */
+	AM_RANGE(0x09c002, 0x09c003) AM_MIRROR(0x763ff8) AM_WRITE(m68k_infifo_w) /* SPC fifo reg */
+	AM_RANGE(0x09c004, 0x09c005) AM_MIRROR(0x763ff8) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) /* telephone status flags */
+	AM_RANGE(0x09c006, 0x09c007) AM_MIRROR(0x763ff8) AM_READ(m68k_tlc_dtmf_r) /* telephone dtmf read */
 ADDRESS_MAP_END
 
 // do we even need this below?
@@ -971,18 +971,18 @@ ROM_START( dectalk )
 	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(2))
 
 	ROM_REGION(0x2000,"dsp", 0)
-	// Final? firmware from 2.0 dectalk firmware units; this firmware clips with the 1.8 dectalk firmware
+	// older dsp firmware from earlier dectalk firmware 2.0 units, both proms are 82s191 equivalent; this dsp firmware clips with the 1.8 dectalk firmware. this lacks the debug code?
+	ROMX_LOAD("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "LM8506205F4 // M1-76161-5" @ E70
+	ROMX_LOAD("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "LM8504204F4 // 78S191" @ E69
+	// Final? firmware from 2.0 dectalk firmware units; this dsp firmware clips with the 1.8 dectalk firmware
 	// this firmware seems to have some leftover test garbage mapped into its space, which is not present on the dtc-01 board
 	// it writes 0x0000 to 0x90 on start, and it writes a sequence of values to 0xFF down to 0xE9
 	// it also wants something readable mapped at 0x08 (for debug purposes?) or else it waits for an interrupt (as the older firmware always does)
-	ROM_LOAD16_BYTE("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18))
-	ROM_LOAD16_BYTE("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43))
-	// older dsp firmware from earlier dectalk firmware 2.0 units, both proms are 82s191 equivalent; this firmware clips with the 1.8 dectalk firmware
-	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
-	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
-	// older dsp firmware from dectalk firmware 1.8 units; while this firmware works with 2.0 dectalk firmware, its a bit quieter than the proper one.
-	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
-	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
+	ROMX_LOAD("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43), ROM_SKIP(1) | ROM_BIOS(1))
+	// older dsp firmware from dectalk firmware 1.8 units; while this dsp firmware works with 2.0 dectalk firmware, its a bit quieter than the proper one.
+	ROMX_LOAD("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3), ROM_SKIP(1) | ROM_BIOS(2)) // HM1-76161-5
+	ROMX_LOAD("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c), ROM_SKIP(1) | ROM_BIOS(2)) // HM1-76161-5
 
 	// TODO: load this as default if the nvram file is missing, OR get the setup page working enough that it can be saved properly to the chip from an NVR FAULT state!
 	// NOTE: this nvram image is ONLY VALID for v2.0; v1.8 expects a different image.
@@ -991,19 +991,19 @@ ROM_START( dectalk )
 	ROM_FILL(0x00, 0x01, 0x05)
 	ROM_FILL(0x04, 0x01, 0x00)
 	ROM_FILL(0x08, 0x01, 0x06)
-	ROM_FILL(0x0C, 0x01, 0x01)
+	ROM_FILL(0x0c, 0x01, 0x01)
 	ROM_FILL(0x10, 0x01, 0x06)
-	ROM_FILL(0x14, 0x01, 0x0B)
+	ROM_FILL(0x14, 0x01, 0x0b)
 	ROM_FILL(0x18, 0x01, 0x02)
-	ROM_FILL(0x1C, 0x01, 0x02)
+	ROM_FILL(0x1c, 0x01, 0x02)
 	ROM_FILL(0x20, 0x01, 0x01)
 	ROM_FILL(0x24, 0x01, 0x01)
 	ROM_FILL(0x28, 0x01, 0x00)
-	ROM_FILL(0x2C, 0x01, 0x01)
-	ROM_FILL(0xFC, 0x01, 0x0D) // checksum, calculated some weird way which I haven't figured out yet
-	ROM_FILL(0xFD, 0x01, 0x02) // "
-	ROM_FILL(0xFE, 0x01, 0x05) // "
-	ROM_FILL(0xFF, 0x01, 0x0B) // "
+	ROM_FILL(0x2c, 0x01, 0x01)
+	ROM_FILL(0xfc, 0x01, 0x0d) // checksum, calculated some weird way which I haven't figured out yet
+	ROM_FILL(0xfd, 0x01, 0x02) // "
+	ROM_FILL(0xfe, 0x01, 0x05) // "
+	ROM_FILL(0xff, 0x01, 0x0b) // "
 
 ROM_END
 
