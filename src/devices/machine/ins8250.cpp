@@ -146,9 +146,9 @@ void pc16552_device::device_start()
 
 static constexpr uint8_t INS8250_LSR_TSRE = 0x40;
 static constexpr uint8_t INS8250_LSR_THRE = 0x20;
-static constexpr uint8_t INS8250_LSR_BI = 0x10;
-static constexpr uint8_t INS8250_LSR_FE = 0x08;
-static constexpr uint8_t INS8250_LSR_PE = 0x04;
+//static constexpr uint8_t INS8250_LSR_BI = 0x10;
+//static constexpr uint8_t INS8250_LSR_FE = 0x08;
+//static constexpr uint8_t INS8250_LSR_PE = 0x04;
 static constexpr uint8_t INS8250_LSR_OE = 0x02;
 static constexpr uint8_t INS8250_LSR_DR = 0x01;
 
@@ -160,10 +160,10 @@ static constexpr uint8_t INS8250_MCR_LOOPBACK = 0x10;
 
 static constexpr uint8_t INS8250_LCR_BITCOUNT_MASK= 0x03;
 static constexpr uint8_t INS8250_LCR_2STOP_BITS = 0x04;
-static constexpr uint8_t INS8250_LCR_PEN = 0x08;
-static constexpr uint8_t INS8250_LCR_EVEN_PAR = 0x10;
-static constexpr uint8_t INS8250_LCR_PARITY = 0x20;
-static constexpr uint8_t INS8250_LCR_BREAK = 0x40;
+//static constexpr uint8_t INS8250_LCR_PEN = 0x08;
+//static constexpr uint8_t INS8250_LCR_EVEN_PAR = 0x10;
+//static constexpr uint8_t INS8250_LCR_PARITY = 0x20;
+//static constexpr uint8_t INS8250_LCR_BREAK = 0x40;
 static constexpr uint8_t INS8250_LCR_DLAB = 0x80;
 
 /* ints will continue to be set for as long as there are ints pending */
