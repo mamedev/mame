@@ -2853,7 +2853,7 @@ static MACHINE_CONFIG_START( towns_base )
 	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
-	
+
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(towns_state, towns_rxrdy_irq))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(towns_state, towns_txrdy_irq))

@@ -4,10 +4,10 @@
 
     Kontron KDT6
 
-	This is the base board for various machines, it needs to be combined
-	with an I/O board and a bus board. This gives us
-	- KDT6 + 9xx/IOC + 9xx/BUS: PSI908/PSI9C
-	- KDT6 + 98/IOC + 98/BUS: PSI98
+    This is the base board for various machines, it needs to be combined
+    with an I/O board and a bus board. This gives us
+    - KDT6 + 9xx/IOC + 9xx/BUS: PSI908/PSI9C
+    - KDT6 + 98/IOC + 98/BUS: PSI98
 
 ***************************************************************************/
 

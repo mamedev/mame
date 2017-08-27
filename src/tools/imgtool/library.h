@@ -129,9 +129,9 @@ namespace imgtool
 			}
 		}
 
-		uint64_t	m_size;
-		type_t		m_type;
-		std::string	m_name;
+		uint64_t    m_size;
+		type_t      m_type;
+		std::string m_name;
 	};
 }
 

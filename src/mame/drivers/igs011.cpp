@@ -1677,10 +1677,10 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 
 		case 0x48:
 			m_igs003_prot_x = 0;
-			if((m_igs003_prot_h2 & 0x0a) != 0x0a)	m_igs003_prot_x |= 0x08; // $100de6 (always 0 in lhb2)
-			if((m_igs003_prot_h2 & 0x90) != 0x90)	m_igs003_prot_x |= 0x04; // $100de7 (always 0 in lhb2)
-			if((m_igs003_prot_h1 & 0x06) != 0x06)	m_igs003_prot_x |= 0x02; // $100de8
-			if((m_igs003_prot_h1 & 0x90) != 0x90)	m_igs003_prot_x |= 0x01; // $100de9
+			if((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08; // $100de6 (always 0 in lhb2)
+			if((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04; // $100de7 (always 0 in lhb2)
+			if((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02; // $100de8
+			if((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01; // $100de9
 			break;
 
 		case 0x50: // reset?
@@ -1953,10 +1953,10 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 
 		case 0x48:
 			m_igs003_prot_x = 0;
-			if((m_igs003_prot_h2 & 0x0a) != 0x0a)	m_igs003_prot_x |= 0x08;
-			if((m_igs003_prot_h2 & 0x90) != 0x90)	m_igs003_prot_x |= 0x04;
-			if((m_igs003_prot_h1 & 0x06) != 0x06)	m_igs003_prot_x |= 0x02;
-			if((m_igs003_prot_h1 & 0x90) != 0x90)	m_igs003_prot_x |= 0x01;
+			if((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08;
+			if((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04;
+			if((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02;
+			if((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01;
 			break;
 
 		case 0x50: // reset?
@@ -2079,10 +2079,10 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 
 		case 0x48:
 			m_igs003_prot_x = 0;
-			if((m_igs003_prot_h2 & 0x0a) != 0x0a)	m_igs003_prot_x |= 0x08;
-			if((m_igs003_prot_h2 & 0x90) != 0x90)	m_igs003_prot_x |= 0x04;
-			if((m_igs003_prot_h1 & 0x06) != 0x06)	m_igs003_prot_x |= 0x02;
-			if((m_igs003_prot_h1 & 0x90) != 0x90)	m_igs003_prot_x |= 0x01;
+			if((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08;
+			if((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04;
+			if((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02;
+			if((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01;
 			break;
 
 		case 0x50: // reset?

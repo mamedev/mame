@@ -346,14 +346,14 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Notes: fan made release, which runs in original system and was also released and distributed as physical copy. More info: https://youtu.be/6ntwR94J6iM https://goo.gl/9efrGv-->
 	<software name="alexkidd2">
 		<description>Alex Kidd in Miracle World 2 (World, hack)</description>
 		<year>2017</year>
 		<publisher>Ian Wall</publisher>
 		<part name="cart" interface="sms_cart">
- 			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288">
 				<rom name="alex kidd in miracle world 2.sms" size="524288" crc="7de172ff" sha1="d85aba7a276d751302f6a076ab2beb32cd654497" offset="000000"/>
 			</dataarea>
 		</part>

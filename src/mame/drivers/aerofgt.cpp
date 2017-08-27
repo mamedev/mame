@@ -1525,10 +1525,10 @@ static MACHINE_CONFIG_START( pspikesb )
 MACHINE_CONFIG_END
 
 /*
-	Kick Ball
+    Kick Ball
 
-	cloned bootleg-style Korean hardware, no original VSYSTEM parts
-	tile banking and sound system are different like many of the bootlegs
+    cloned bootleg-style Korean hardware, no original VSYSTEM parts
+    tile banking and sound system are different like many of the bootlegs
 */
 
 static MACHINE_CONFIG_START( kickball )

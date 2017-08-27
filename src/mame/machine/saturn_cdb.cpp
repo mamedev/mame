@@ -8,7 +8,7 @@ YGR019B - Hitachi YGR019B CD-Subsystem LSI. Earlier revision is YGR019A. Later r
         Another of it's functions is to prevent copied CDs from being played
 
 Attempts to use SCI, tight loops checking bit 2 of 0x5ffffc2 (TEIE)
-		
+
 */
 
 #include "emu.h"

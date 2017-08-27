@@ -30,11 +30,11 @@ public:
 	// I/O operations
 	DECLARE_ADDRESS_MAP(blit_v1_regs, 8);
 	DECLARE_ADDRESS_MAP(blit_v2_regs, 8);
-	
+
 	DECLARE_WRITE8_MEMBER( vregs_w );
 	DECLARE_WRITE8_MEMBER( bltflip_w );
 	DECLARE_READ_LINE_MEMBER( status_r );
-	
+
 	// blitter write accessors
 	DECLARE_WRITE8_MEMBER( x_w );
 	DECLARE_WRITE8_MEMBER( y_w );
@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER( src_lo_address_w );
 	DECLARE_WRITE8_MEMBER( src_md_address_w );
 	DECLARE_WRITE8_MEMBER( src_hi_address_w );
-	
+
 	const uint8_t &blit_buffer(unsigned y, unsigned x) const { return m_blit_buffer[(256 * y) + x]; }
 
 protected:

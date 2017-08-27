@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco
 /**************************************************************************************************
 
-	Mephisto Polgar and RISC
+    Mephisto Polgar and RISC
 
 **************************************************************************************************/
 
@@ -64,7 +64,7 @@ private:
 
 	// ARM bootstrap HLE
 	void arm_bootstrap(uint8_t data);
-	TIMER_CALLBACK_MEMBER(clean_com_flag)	{ m_com_latch0 &= ~0x01; }
+	TIMER_CALLBACK_MEMBER(clean_com_flag)   { m_com_latch0 &= ~0x01; }
 
 	emu_timer* m_arm_bootstrap_timer;
 	uint16_t m_com_offset;
@@ -143,10 +143,10 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(mephisto_risc_state::bank_w)
 {
-	if      (offset == 0 &&  (data & 0x01))	m_bank &= ~0x01;
-	else if (offset == 0 && !(data & 0x01))	m_bank |= 0x01;
-	else if (offset == 1 &&  (data & 0x01))	m_bank |= 0x02;
-	else if (offset == 1 && !(data & 0x01))	m_bank &= ~0x02;
+	if      (offset == 0 &&  (data & 0x01)) m_bank &= ~0x01;
+	else if (offset == 0 && !(data & 0x01)) m_bank |= 0x01;
+	else if (offset == 1 &&  (data & 0x01)) m_bank |= 0x02;
+	else if (offset == 1 && !(data & 0x01)) m_bank &= ~0x02;
 
 	m_rombank->set_entry(m_bank);
 }
@@ -170,7 +170,7 @@ void mephisto_risc_state::arm_bootstrap(uint8_t data)
 			m_com_bits = 0;
 			m_com_data = 0;
 			m_com_offset++;
-			
+
 			if (m_com_offset == 0x100)
 				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
@@ -254,7 +254,7 @@ WRITE8_MEMBER(mephisto_milano_state::milano_io_w)
 		for(int i=0; i<16; i++)
 			output().set_led_value(i, 0);
 	}
-	
+
 	m_display->io_w(space, offset, data & 0x0f);
 }
 
@@ -335,14 +335,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( polgar )
 	PORT_START("KEY")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("Trn")    PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("Info")   PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("Mem")    PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("Pos")    PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("LEV")    PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("FCT")    PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)	  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Trn")    PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Info")   PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Mem")    PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Pos")    PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("LEV")    PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("FCT")    PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( monteciv )
@@ -422,11 +422,11 @@ static MACHINE_CONFIG_DERIVED( polgar10, polgar )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mrisc )
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz / 4)		// G65SC02
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz / 4)     // G65SC02
 	MCFG_CPU_PROGRAM_MAP(mrisc_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, (double)XTAL_10MHz / (1 << 14))
 
-	MCFG_CPU_ADD("subcpu", ARM, XTAL_14MHz)      		// VY86C010
+	MCFG_CPU_ADD("subcpu", ARM, XTAL_14MHz)             // VY86C010
 	MCFG_CPU_PROGRAM_MAP(mrisc_arm_mem)
 	MCFG_ARM_COPRO(VL86C020)
 
@@ -475,7 +475,7 @@ MACHINE_CONFIG_END
 ROM_START(polgar)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("polgar.bin", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913))
-ROM_END	
+ROM_END
 
 ROM_START(polgar10)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -483,7 +483,7 @@ ROM_START(polgar10)
 	ROMX_LOAD("polg_101.bin", 0x00000, 0x10000, CRC(8fb6afa4) SHA1(d1cf868302a665ff351686b26a149ced0045fc81), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v100", "V10.0" )
 	ROMX_LOAD("polgar10.bin", 0x00000, 0x10000, CRC(7c1960d4) SHA1(4d15b51f9e6f7943815945cd56078ca512a964d4), ROM_BIOS(2))
-ROM_END	
+ROM_END
 
 ROM_START(mrisc)
 	ROM_REGION(0x20000, "maincpu", 0)
@@ -494,7 +494,7 @@ ROM_START(mrisc)
 	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, NO_DUMP )
 	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, NO_DUMP )
 	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, NO_DUMP )
-ROM_END	
+ROM_END
 
 ROM_START(mrisc2)
 	ROM_REGION(0x20000, "maincpu", 0)
@@ -505,7 +505,7 @@ ROM_START(mrisc2)
 	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, NO_DUMP )
 	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, NO_DUMP )
 	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, NO_DUMP )
-ROM_END	
+ROM_END
 
 ROM_START(academy)
 	ROM_REGION(0x10000, "maincpu", 0)

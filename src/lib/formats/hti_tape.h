@@ -2,10 +2,10 @@
 // copyright-holders:F. Ulivi
 /*********************************************************************
 
-	"HTI" format
+    "HTI" format
 
-	Format of images of DC-100 tape cassettes as used in HP 9845
-	and HP 85 systems.
+    Format of images of DC-100 tape cassettes as used in HP 9845
+    and HP 85 systems.
 
 *********************************************************************/
 

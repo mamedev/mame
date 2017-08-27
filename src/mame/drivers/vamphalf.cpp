@@ -1243,7 +1243,7 @@ Graphics: Actel A40MX04-F PL84
           ROML00, ROMU00 - unpopulated
    DRAM1: LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 
-   
+
 
 Both PCBs:
    VROM1: Macronix MX27C2000 2MBit DIP32 EPROM

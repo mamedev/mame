@@ -34,7 +34,7 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 /*************************************************
  *
- * UPD7220 (GDC2) bitmap layer 
+ * UPD7220 (GDC2) bitmap layer
  *
  ************************************************/
 

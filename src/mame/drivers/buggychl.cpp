@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 //  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
 	AM_RANGE(0xd610, 0xd610) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd611, 0xd611) AM_READ(sound_status_main_r)
-//	AM_RANGE(0xd613, 0xd613) AM_WRITE(sound_reset_w)
+//  AM_RANGE(0xd613, 0xd613) AM_WRITE(sound_reset_w)
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP    /* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_SHARE("scrollv")

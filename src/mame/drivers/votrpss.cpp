@@ -23,25 +23,25 @@ I8255 ports:
 PortA 0:7 = pins 16 thru 23 of parallel port
 PortB 0:7 = pins 6 thru 13 of parallel port
 PortC =
-	0 = NC
-	1 = GND
-	2 = pin 5 of parallel port
-	3 = /RXINTEN
-	4 = pin 15 of parallel port
-	5 = pin 14 of parallel port through inverter
-	6 = ay-3-8910 enable (which pin? BC1?)
-	7 = input from parallel port pin 4 through inverter
+    0 = NC
+    1 = GND
+    2 = pin 5 of parallel port
+    3 = /RXINTEN
+    4 = pin 15 of parallel port
+    5 = pin 14 of parallel port through inverter
+    6 = ay-3-8910 enable (which pin? BC1?)
+    7 = input from parallel port pin 4 through inverter
 
 AY-3-8910 I/O ports:
-	IOA is in output mode
-		IOA0-A5 = phoneme #
-		IOA6 = strobe (SC-01)
-		IOA7 = vochord control, 0 = off, 1 = on
-	IOB is in input mode
-		IOB0-IOB7 = dip switches
+    IOA is in output mode
+        IOA0-A5 = phoneme #
+        IOA6 = strobe (SC-01)
+        IOA7 = vochord control, 0 = off, 1 = on
+    IOB is in input mode
+        IOB0-IOB7 = dip switches
 
 I8251 UART:
-	RESET is taken from the same inverter that resets the counters
+    RESET is taken from the same inverter that resets the counters
 
 Things to be looked at:
 - Serial doesn't work, so has been disabled.

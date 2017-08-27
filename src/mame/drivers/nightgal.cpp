@@ -20,7 +20,7 @@ TODO:
 
  Notes:
  - Night Gal Summer player hand is at $f801 onward
- 
+
  *******************************************************************************************/
 
 #include "emu.h"
@@ -90,8 +90,8 @@ public:
 	DECLARE_READ8_MEMBER(input_2p_r);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
-	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);	
-	
+	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
+
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
 	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
@@ -127,7 +127,7 @@ protected:
 	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
-	
+
 private:
 	/* video-related */
 	uint8_t m_blit_raw_data[3];
@@ -137,7 +137,7 @@ private:
 	uint8_t m_z80_latch;
 	uint8_t m_mux_data;
 	uint8_t m_pal_bank;
-	
+
 	uint8_t m_sexygal_audioff;
 };
 
@@ -371,7 +371,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	// bit 4 used, audio cpu reset line?
-	
+
 	m_sexygal_audioff = data;
 }
 
@@ -434,7 +434,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_audio_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	
+
 	AM_RANGE(0x2000, 0x207f) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(sexygal_audionmi_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audiorom", 0)
@@ -782,7 +782,7 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 
 	MCFG_CPU_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sexygal_audio_map)
-	
+
 	MCFG_DEVICE_REMOVE("aysnd")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_DERIVED( sgaltrop, sexygal )
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sgaltrop_nsc_map)
-	
+
 	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
@@ -1009,7 +1009,7 @@ ROM_START( sexygal )
 
 	ROM_REGION( 0x4000, "audiorom", 0)
 	ROM_LOAD( "14.s6b",  0x00000, 0x04000, CRC(b4a2497b) SHA1(7231f57b4548899c886625e883b9972c0f30e9f2) )
-	
+
 	ROM_REGION( 0x4000, "samples", 0 )
 	ROM_LOAD( "13.s7b",  0x00000, 0x04000, CRC(5eb75f56) SHA1(b7d81d786d1ac8d65a6a122140954eb89d76e8b4) )
 
@@ -1128,7 +1128,7 @@ ROM_START( ngalsumr )
 	ROM_FILL(          0x2c000, 0x04000, 0x33 )
 	ROM_FILL(          0x30000, 0x10000, 0x44 )
 
-	
+
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "ng2.6u", 0x00, 0x20, CRC(0162a24a) SHA1(f7e1623c5bca3725f2e59ae2096b9bc42e0363bf) )
 ROM_END
@@ -1217,37 +1217,37 @@ WRITE8_MEMBER(nightgal_state::ngalsumr_prot_latch_w)
 }
 
 READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
-{	
+{
 	switch(m_z80_latch)
-	{	
+	{
 		case 0:
 			return 0;
 		case 1:
 			return 0x14;
-	
+
 		case 0x4: // cpu hand height on winning
 			return 62;
-		
+
 		case 0x3: // game over msg height
 			return 12;
 		case 0xf: // game over msg width
 			return 255;
-			
+
 		case 0xa: // girl width (title screen)
 			return 0x40;
 		case 0xb: // girl height (title screen)
 			return 0x60;
-			
+
 		case 0xc: // score table blink width
 			return 120;
 		case 0x2: // score table blink height
 			return 8;
-		
+
 		case 0x6: // player hand height on losing
 			return 28;
 		case 0x7: // player discards height on losing
 			return 38;
-		
+
 		case 0xd: // player discards width on losing
 			return 142;
 		case 0xe: // player hand width on losing
@@ -1255,7 +1255,7 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 		case 0xff:
 			return 0;
 	}
-		
+
 	logerror("ngalsumr protection device unemulated value latched = %02x\n",m_z80_latch);
 
 	return 0;

@@ -1,7 +1,7 @@
 -- get marp high score file from http://replay.marpirc.net/txt/scores3.htm
 local dat = {}
 local db, sql = require("data/database")()
-local ver, info 
+local ver, info
 
 local function init()
 	local filepath
@@ -27,7 +27,7 @@ local function init()
 	if not fh and dbver then
 		-- data in database but missing file, just use what we have
 		ver = dbver
-		return	
+		return
 	elseif not fh then
 		return
 	elseif not dbver then

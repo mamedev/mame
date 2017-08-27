@@ -1281,7 +1281,7 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenkai_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_REGION("maincpu", 0x10000) 
+	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE( 0x80000, 0x8000f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE( 0x90000, 0x97fff ) AM_READWRITE(tenkai_palette_r, tenkai_palette_w)
 ADDRESS_MAP_END

@@ -6076,7 +6076,7 @@ static bool load_icon(uint32_t *dest, const void *resource_fork, uint64_t resour
 				uint8_t color = get_pixel(src, width, height, bpp, x, y);
 
 				// then check the mask
-				bool is_masked = has_mask 
+				bool is_masked = has_mask
 					? get_pixel(src + frame_length, width, height, bpp, x, y) != 0
 					: dest[y * width + x] >= 0x80000000;
 

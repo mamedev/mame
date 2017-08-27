@@ -4,7 +4,7 @@
 
     KSM (Kontroller Simvolnogo Monitora = Character Display Controller),
     a single-board replacement for standalone 15IE-00-013 terminal (ie15.c
-	driver in MAME) in later-model DVK desktops.
+    driver in MAME) in later-model DVK desktops.
 
     MPI (Q-Bus clone) board, consumes only power from the bus.
     Interfaces with MS7004 (DEC LK201 workalike) keyboard and monochrome CRT.

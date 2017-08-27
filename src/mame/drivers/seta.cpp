@@ -3155,11 +3155,11 @@ READ16_MEMBER(jockeyc_state::mux_r)
 {
 	switch ( m_mux & 0xf8 )
 	{
-		case 0x08:	return (m_key2[0]->read() << 8) | m_key1[0]->read();
-		case 0x10:	return (m_key2[1]->read() << 8) | m_key1[1]->read();
-		case 0x20:	return (m_key2[2]->read() << 8) | m_key1[2]->read();
-		case 0x40:	return (m_key2[3]->read() << 8) | m_key1[3]->read();
-		case 0x80:	return (m_key2[4]->read() << 8) | m_key1[4]->read();
+		case 0x08:  return (m_key2[0]->read() << 8) | m_key1[0]->read();
+		case 0x10:  return (m_key2[1]->read() << 8) | m_key1[1]->read();
+		case 0x20:  return (m_key2[2]->read() << 8) | m_key1[2]->read();
+		case 0x40:  return (m_key2[3]->read() << 8) | m_key1[3]->read();
+		case 0x80:  return (m_key2[4]->read() << 8) | m_key1[4]->read();
 	}
 	logerror("%06X: unknown key read, mux = %04x\n", space.device().safe_pc(), m_mux);
 	return 0xffff;

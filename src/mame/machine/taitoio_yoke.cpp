@@ -4,14 +4,14 @@
 
     Taito Yoke + Throttle Flight device
 
-	Used in Midnight Landing, Top Landing and Air Inferno
+    Used in Midnight Landing, Top Landing and Air Inferno
 
     TODO:
     - Custom part #;
-	- Air Inferno uses different limit types (helicopter inputs?), might be 
-	  worth doing a subclass of this;
-	- Get dead zones from actual HW (currently hardlocked to 0x20);
-	  
+    - Air Inferno uses different limit types (helicopter inputs?), might be
+      worth doing a subclass of this;
+    - Get dead zones from actual HW (currently hardlocked to 0x20);
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -99,7 +99,7 @@ READ16_MEMBER( taitoio_yoke_device::throttle_r )
 READ_LINE_MEMBER( taitoio_yoke_device::slot_down_r )
 {
 	uint16_t throttle = ioport("THROTTLE")->read();
-	
+
 	return (throttle & 0xe00) == 0x600;
 }
 
@@ -127,13 +127,13 @@ READ_LINE_MEMBER( taitoio_yoke_device::handle_right_r )
 READ_LINE_MEMBER( taitoio_yoke_device::handle_up_r )
 {
 	uint16_t y = ioport("STICK_Y")->read();
-	
+
 	return (y & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_down_r )
 {
 	uint16_t y = ioport("STICK_Y")->read();
-	
+
 	return (y & 0xe00) == 0x600;
 }

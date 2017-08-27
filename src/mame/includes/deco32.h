@@ -241,7 +241,7 @@ public:
 	DECLARE_VIDEO_START(lockload);
 	void dragngun_init_common();
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vblank_irq_gen);
 
 	uint32_t screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

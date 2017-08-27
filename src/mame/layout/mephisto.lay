@@ -308,7 +308,7 @@
 			<bounds x="48" y="95" width="1.5" height="1.5" />
 		</bezel>
 	</view>
-	
+
 	<view name="Display">
 		<bezel name="digit0" element="digit">
 			<bounds x="33" y="0" width="4" height="5" />

@@ -131,7 +131,7 @@
   1x GI AY-3-8910 (sound).
   1x LM356N (Low Voltage Audio Power Amplifier).
 
-  ROMs: 2x 27C256 Program ROMs (I, II). 
+  ROMs: 2x 27C256 Program ROMs (I, II).
         3x 27C256 GFX ROMs (R, V, B).
 
   RAMs: 1x KM62256ALP-10 (near prg ROMs).
@@ -418,10 +418,10 @@ static INPUT_PORTS_START( unkfr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("Deal / Take")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Left / Small")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right / Big")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Down / Double-Up")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start Non-Gambling game")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***********************************

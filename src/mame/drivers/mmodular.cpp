@@ -44,7 +44,7 @@
 #include "mmodular.lh"
 
 
-class mmodular_state : public driver_device 
+class mmodular_state : public driver_device
 {
 public:
 	mmodular_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -91,9 +91,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, mmodular_state)
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
 
-//	AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )	// Bavaria sensors
-//	AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )		// Bavaria sensors
-//	AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )		// Bavaria sensors
+//  AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )   // Bavaria sensors
+//  AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )     // Bavaria sensors
+//  AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )     // Bavaria sensors
 
 	AM_IMPORT_FROM(alm16_mem)
 ADDRESS_MAP_END
@@ -118,9 +118,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, mmodular_state)
 	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
 
-//	AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )	// Bavaria sensors
-//	AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 )	// Bavaria sensors
-//	AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 )	// Bavaria sensors
+//  AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
+//  AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
+//  AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
 
 	AM_IMPORT_FROM(alm32_mem)
 ADDRESS_MAP_END
@@ -137,9 +137,9 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, mmodular_state)
 	AM_RANGE( 0xe0000000, 0xe0000003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff000000)
 	AM_RANGE( 0xe0000010, 0xe0000013 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff000000)
 
-//	AM_RANGE( 0xd8000008, 0xd800000b )  AM_WRITE(write_unknown2 )	// Bavaria sensors
-//	AM_RANGE( 0xd8000004, 0xd8000007 )  AM_READ(read_unknown1 )	// Bavaria sensors
-//	AM_RANGE( 0xd800000c, 0xd800000f )  AM_READ(read_unknown3 )	// Bavaria sensors
+//  AM_RANGE( 0xd8000008, 0xd800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
+//  AM_RANGE( 0xd8000004, 0xd8000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
+//  AM_RANGE( 0xd800000c, 0xd800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
 
 	AM_RANGE( 0x40000000, 0x4007ffff ) AM_RAM
 	AM_RANGE( 0x80000000, 0x8003ffff ) AM_RAM
@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( gen32 )
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")

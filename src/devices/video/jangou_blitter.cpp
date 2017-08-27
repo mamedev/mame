@@ -129,7 +129,7 @@ void jangou_blitter_device::trigger_write(void)
 #if DEBUG_OUT_OF_MASK
 	bool debug_flag;
 #endif
-	
+
 	w = (m_width & 0xff) + 1;
 	h = (m_height & 0xff) + 1;
 
@@ -154,10 +154,10 @@ void jangou_blitter_device::trigger_write(void)
 	if((x + w) > 256 || (y + h) > 256)
 	{
 		printf("%d %d %d %d %08x\n",x,y,w,h,src);
-//		return;
+//      return;
 	}
 	#endif
-	
+
 	// lowest bit of src controls flipping / draw direction?
 	flipx = (m_src_addr & 1);
 
@@ -174,7 +174,7 @@ void jangou_blitter_device::trigger_write(void)
 			int drawy = (y + ycount) & 0xff;
 			uint8_t dat = gfx_nibble(src + count);
 			uint8_t cur_pen = m_pen_data[dat & 0x0f];
-			
+
 #if DEBUG_OUT_OF_MASK
 			if(debug_flag == true)
 				cur_pen = machine().rand() & 0xf;

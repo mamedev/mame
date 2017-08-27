@@ -4,26 +4,26 @@
 
     System Sacom AMD-98 (AmuseMent boarD)
 
-	3 PSG chips, one of the first sound boards released for PC98
-	Superseded by later NEC in-house sound boards
-	
-	TODO:
-	- not sure if it's AY8910 or YM2203, from a PCB pic it looks with stock AY logos?
-	- Third AY (uses port B from BOTH AYs);
-	- PIT control;
-	- PCM section;
-	
+    3 PSG chips, one of the first sound boards released for PC98
+    Superseded by later NEC in-house sound boards
+
+    TODO:
+    - not sure if it's AY8910 or YM2203, from a PCB pic it looks with stock AY logos?
+    - Third AY (uses port B from BOTH AYs);
+    - PIT control;
+    - PCM section;
+
 =============================================================================
-	
+
 - Known games with AMD-98 support
-	Brown's Run (System Sacom)
-	Dome (System Sacom)
-	Highway Star (System Sacom)
-	Marchen Veil I (System Sacom)
-	Marchen Veil II (System Sacom)
-	Zone (System Sacom)
-	Relics (Bothtec)
-	Thexder (Game Arts)
+    Brown's Run (System Sacom)
+    Dome (System Sacom)
+    Highway Star (System Sacom)
+    Marchen Veil I (System Sacom)
+    Marchen Veil II (System Sacom)
+    Zone (System Sacom)
+    Relics (Bothtec)
+    Thexder (Game Arts)
 
 ***************************************************************************/
 
@@ -173,7 +173,7 @@ READ8_MEMBER(pc9801_amd98_device::read)
 		case 3:
 			return m_ay2->data_r(space,0);
 	}
-	
+
 	printf("%02x\n",offset);
 
 	return 0xff;
@@ -210,13 +210,13 @@ WRITE8_MEMBER(pc9801_amd98_device::ay3_data_latch_w)
 	// TODO: this actually uses a flip flop mechanism, not quite sure about how it works yet
 	switch(data)
 	{
-		case 0x47: 
+		case 0x47:
 			//printf("%02x addr\n",m_ay3_latch);
-			m_ay3->address_w(space,0,m_ay3_latch); 
+			m_ay3->address_w(space,0,m_ay3_latch);
 			break;
-		case 0x43: 
+		case 0x43:
 			//printf("%02x data\n",m_ay3_latch);
-			m_ay3->data_w(space,0,m_ay3_latch); 
+			m_ay3->data_w(space,0,m_ay3_latch);
 			break;
 	}
 }

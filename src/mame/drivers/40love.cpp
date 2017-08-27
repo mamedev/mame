@@ -16,7 +16,7 @@
     - sprite memory needs to be buffered ?
 
     - inputs labels for Field Day, also fix the p3 / p4 controls (actually routes to p1 / p2)
-	
+
     - pixel layer needs priority ?
 */
 

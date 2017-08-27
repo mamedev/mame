@@ -384,7 +384,7 @@ namespace esqpanel {
 		std::function<bool(std::ostream&)> m_content_provider;
 		std::map<const std::string, const std::string> m_template_values;
 	};
-	
+
 }  // namespace esqpanel
 
 //**************************************************************************

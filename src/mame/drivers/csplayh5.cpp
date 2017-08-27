@@ -281,7 +281,7 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_DIPSETTING(      0x0040, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SWA:8" )
- 
+
 	// A note indicates inoshikachou, shichigosan, hanami de ippai, tsukimi de ippai to be used, which are Koi Koi rulesets
 	PORT_DIPNAME( 0x0100, 0x0100, "Use Koi Koi local ruleset" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_DIPUNUSED_DIPLOC( 0x0400, IP_ACTIVE_LOW, "SWB:3" )
 	// TODO: duplicate of SWA:5? Maybe applies to nudity, will see once the DVD part works.
 	PORT_DIPNAME( 0x1800, 0x1800, "Background type" ) PORT_DIPLOCATION("SWB:4,5")
-//	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0800, "Color in-game and attract" )
 	PORT_DIPSETTING(      0x1000, "Girls in-game, color in attract" )
 	PORT_DIPSETTING(      0x1800, "Girls in-game and attract" )
@@ -505,23 +505,23 @@ ROM_END
 
 ROM_START( sengomjk )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(a202bf13) SHA1(01e15e7577f6ac6a90b7ab30f402def211360d4d) )
-    ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(98d4979a) SHA1(477361ec183674220e282fed8bfce098b0f75873) )
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(a202bf13) SHA1(01e15e7577f6ac6a90b7ab30f402def211360d4d) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(98d4979a) SHA1(477361ec183674220e282fed8bfce098b0f75873) )
 
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
-    ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(c0bf69c6) SHA1(dd06ec9b3232f025de2c87765b88cb101eab47f5) )
-	
+	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(c0bf69c6) SHA1(dd06ec9b3232f025de2c87765b88cb101eab47f5) )
+
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
-    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(20791a5a) SHA1(03c38e9b8e60b0dded7504b2725210df5405110c) )
-    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(1ed72387) SHA1(7e2b8ce49561d6fd79dcf0d427569e5f6ef8dc67) )
-	
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(20791a5a) SHA1(03c38e9b8e60b0dded7504b2725210df5405110c) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(1ed72387) SHA1(7e2b8ce49561d6fd79dcf0d427569e5f6ef8dc67) )
+
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8002", 0, SHA1(d3502496526e62a877f12dccc27b32ae33d3704d) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
-    ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
+	ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
 ROM_END
 
 ROM_START( junai )
@@ -797,24 +797,24 @@ ROM_END
 
 ROM_START( nuretemi )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-    ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(da303352) SHA1(91c8752c93ca4022e978744bf42261d1a0e899a1) )
-    ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(53ef6360) SHA1(ec90f01e4e78821511a6dba885c0d38f594a3a86) )
+	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(da303352) SHA1(91c8752c93ca4022e978744bf42261d1a0e899a1) )
+	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(53ef6360) SHA1(ec90f01e4e78821511a6dba885c0d38f594a3a86) )
 
 	DVD_BIOS
 
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	// identical to vol. 19, probably an attempt to fix a dead board.
-    ROM_LOAD( "11.ic51", 0x000000, 0x020000, BAD_DUMP CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
+	ROM_LOAD( "11.ic51", 0x000000, 0x020000, BAD_DUMP CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
-    ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
-    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
+	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
-    ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000369, CRC(39f3edc7) SHA1(be07e8133cf2afa4f806d902d8d971d523326dd5) )
+	ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000369, CRC(39f3edc7) SHA1(be07e8133cf2afa4f806d902d8d971d523326dd5) )
 ROM_END
 
 ROM_START( tsuwaku )
@@ -861,30 +861,30 @@ ROM_END
 
 ROM_START( konhaji )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
-    ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(f16c88db) SHA1(bd8b4619817bd95fffe3e7e6ca57cc2223f372fa) )
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(f16c88db) SHA1(bd8b4619817bd95fffe3e7e6ca57cc2223f372fa) )
 	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(9360eabe) SHA1(ecae0c8090f5cadd87fb544190112b53193f54ee) )
 
 	DVD_BIOS
-	
+
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
-	
+
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
-    ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(88f31da7) SHA1(dc76532fa3261b3b238a42e2ca8f270f2b2ea1fa) )
-    ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(35893109) SHA1(6a55bd147a75913af59bc355abf010e1b75063bf) )
-    
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(88f31da7) SHA1(dc76532fa3261b3b238a42e2ca8f270f2b2ea1fa) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(35893109) SHA1(6a55bd147a75913af59bc355abf010e1b75063bf) )
+
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8019", 0, SHA1(f59ac1587009d7d15618549dc60cbd24c263a95f) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
-    ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
+	ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
 ROM_END
 
 
 
 /***************************************************************************
 
-	Game metadatas
+    Game metadatas
 
 ***************************************************************************/
 
@@ -913,11 +913,11 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 
 // 2000
 /* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
-/* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING ) 
+/* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
 // 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
 /* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
-/* 19 */ GAME( 2001, konhaji,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  konhaji,   ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING ) 
+/* 19 */ GAME( 2001, konhaji,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  konhaji,   ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )
 // 20 : Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic

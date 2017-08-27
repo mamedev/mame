@@ -58,7 +58,7 @@ public:
 	template <class Object> static devcb_base &set_pa_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pa_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_pb_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_pb_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
-	
+
 	template <class Object> static devcb_base &set_tout1_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_tout1_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_tin1_in_callback (device_t &device, Object &&cb)  { return downcast<m68340_cpu_device &>(device).m_tin1_in_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_tgate1_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_tgate1_in_cb.set_callback (std::forward<Object>(cb)); }
