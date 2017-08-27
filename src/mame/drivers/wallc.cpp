@@ -78,6 +78,7 @@ public:
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
 	DECLARE_DRIVER_INIT(sidam);
+	DECLARE_DRIVER_INIT(unkitpkr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wallc);
@@ -488,8 +489,35 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 		c = ROM[ i ] ^ 0x0f;
 		ROM[ i ] = c;
 	}
+}
 
+ROM_START( unkitpkr )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "1", 0x0000, 0x2000, CRC(82dacf83) SHA1(d2bd4664737aeb968e9e34da74c2654e556c8567) )
 
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "2", 0x0000, 0x1000, CRC(a359b7aa) SHA1(832a0dfd0689f76381f34d2d8419a7f09a6c403a) )
+	ROM_CONTINUE(  0x0000, 0x1000 ) // first half is empty
+	ROM_LOAD( "3", 0x1000, 0x1000, CRC(f7d7d48b) SHA1(d9787dcbbfdb5f8f8434d8e688c1ee1e0566969d) )
+	ROM_CONTINUE(  0x1000, 0x1000 ) // first half is empty
+	ROM_LOAD( "5", 0x2000, 0x1000, CRC(b3084b49) SHA1(21b2fa41492faf95e66c5765acfdae1685ee8784) )
+	ROM_CONTINUE(  0x2000, 0x1000 ) // first half is empty
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) BAD_DUMP ) // from wallc; not dumped yet
+ROM_END
+
+DRIVER_INIT_MEMBER(wallc_state,unkitpkr)
+{
+	// annoying line swapping
+	uint8_t buffer[0x400];
+	for (int b = 0; b < 0x3000; b += 0x400)
+	{
+		uint8_t *gfxrom = memregion("gfx1")->base() + b;
+		for (int a = 0; a < 0x400; a++)
+			buffer[a] = gfxrom[(a & 0x03f) | (a & 0x280) >> 1 | (a & 0x140) << 1];
+		memcpy(gfxrom, &buffer[0], 0x400);
+	}
 }
 
 GAME( 1984, wallc,    0,     wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin",          "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -497,3 +525,4 @@ GAME( 1984, wallca,   wallc, wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin"
 GAME( 1984, brkblast, wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
 GAME( 1984, sidampkr, 0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam",          "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, unkitpkr, 0,     wallc,  wallc, wallc_state, unkitpkr, ROT0, "<unknown>",      "unknown Italian poker game", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
