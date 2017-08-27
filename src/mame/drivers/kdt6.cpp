@@ -92,6 +92,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(fdc_tc_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void drive0_led_cb(floppy_image_device *floppy, int state);
+	void drive1_led_cb(floppy_image_device *floppy, int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -214,7 +216,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 static SLOT_INTERFACE_START( kdt6_floppies )
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+	SLOT_INTERFACE("fd55f", TEAC_FD_55F)
 SLOT_INTERFACE_END
 
 WRITE8_MEMBER( kdt6_state::fdc_tc_w )
@@ -227,6 +229,16 @@ WRITE_LINE_MEMBER( kdt6_state::fdc_drq_w )
 {
 	if (!m_sasi_dma && BIT(m_status0, 4) == 0)
 		m_dma->rdy_w(state);
+}
+
+void kdt6_state::drive0_led_cb(floppy_image_device *floppy, int state)
+{
+	machine().output().set_value("drive0_led", state);
+}
+
+void kdt6_state::drive1_led_cb(floppy_image_device *floppy, int state)
+{
+	machine().output().set_value("drive1_led", state);
 }
 
 
@@ -556,6 +568,11 @@ void kdt6_state::machine_start()
 
 	m_fdc->set_rate(250000);
 
+	if (m_floppy0->get_device())
+		m_floppy0->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive0_led_cb, this));
+	if (m_floppy1->get_device())
+		m_floppy1->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive1_led_cb, this));
+
 	// register for save states
 	save_pointer(NAME(m_ram.get()), 0x40000);
 	save_pointer(NAME(m_vram.get()), 0x10000);
@@ -683,8 +700,8 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg0))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(kdt6_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "psi98")
 

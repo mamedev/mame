@@ -261,6 +261,16 @@ bool upd765_family_device::get_ready(int fid)
 	return !external_ready;
 }
 
+void upd765_family_device::set_ds(int state)
+{
+	for(int i = 0; i < 4; i++)
+	{
+		floppy_info &fi = flopi[i];
+		if (fi.dev)
+			fi.dev->ds_w(state);
+	}
+}
+
 void upd765_family_device::set_floppy(floppy_image_device *flop)
 {
 	for(auto & elem : flopi) {
@@ -1518,6 +1528,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 	st1 = ST1_MA;
 	st2 = 0x00;
 	hdl_cb(1);
+	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
 	if(!fi.ready)
@@ -1563,6 +1574,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 	st2 = 0x00;
 	scan_done = false;
 	hdl_cb(1);
+	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
 	if(!fi.ready)
@@ -1752,6 +1764,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 	st1 = ST1_MA;
 	st2 = 0x00;
 	hdl_cb(1);
+	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
 	if(!fi.ready)
@@ -1873,6 +1886,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 	st1 = ST1_MA;
 	st2 = 0x00;
 	hdl_cb(1);
+	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
 	if(!fi.ready)
@@ -2034,6 +2048,7 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 				command[1], command[2], command[3], command[4], command[5]);
 
 	hdl_cb(1);
+	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
 	if(!fi.ready)
@@ -2111,6 +2126,7 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 		cur_live.idbuf[i] = 0x00;
 
 	hdl_cb(1);
+	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
 	if(!fi.ready)
