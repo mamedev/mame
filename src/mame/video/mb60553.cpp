@@ -261,7 +261,7 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 	clip.min_x = screen.visible_area().min_x;
 	clip.max_x = screen.visible_area().max_x;
 
-	for (line = 0; line < 224;line++)
+	for (line = screen.visible_area().min_y; line < screen.visible_area().max_y;line++)
 	{
 //      int scrollx;
 //      int scrolly;
