@@ -11,12 +11,15 @@ class m68340_serial : public device_t
 {
 public:
 	m68340_serial(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	//	void reset();
+	READ8_MEMBER( read );
+	WRITE8_MEMBER( write );	
+
 	//protected:
 	required_device<m68340_serial_device> m_duart;
 };

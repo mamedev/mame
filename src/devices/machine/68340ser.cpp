@@ -28,14 +28,13 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-READ8_MEMBER( m68340_cpu_device::m68340_internal_serial_r )
-{	LOG("%s\n", FUNCNAME);
-  //	assert(m68340SERIAL);
-	//m68340_serial &serial = *m68340SERIAL;
+//READ8_MEMBER( m68340_cpu_device::m68340_internal_serial_r )
+READ8_MEMBER( m68340_serial::read )
+{
+	LOG("%s\n", FUNCNAME);
 	int val = 0;
-	//int pc = space.device().safe_pc();
-	
-	//LOGSETUP("%08x m68340_internal_serial_r %08x, (%08x)\n", pc, offset, mem_mask);
+
+	LOGR("%08x m68340_internal_serial_r %08x, (%08x)\n", space.device().safe_pc(), offset, mem_mask);
 
 	LOGR(" * Reg %02x -> %02x - %s\n", offset, val,
 		(offset > 0x21) ? "Error - should not happen" :
@@ -47,10 +46,11 @@ READ8_MEMBER( m68340_cpu_device::m68340_internal_serial_r )
 		 "MR1B", "SRB",  "n/a",  "RBB",  "n/a",  "IP",   "n/a",  "n/a",  // 0x18 - 0x1f
 		 "MR2A", "MR2B" }}[offset]);                                     // 0x20 - 0x21
 
-	return offset >= 0x10 && offset < 0x20 ? m_serial->m_duart->read(space, offset - 0x10, mem_mask) : 0;
+	return offset >= 0x10 && offset < 0x20 ? m_duart->read(space, offset - 0x10, mem_mask) : val;
 }
 
-WRITE8_MEMBER( m68340_cpu_device::m68340_internal_serial_w )
+//WRITE8_MEMBER( m68340_cpu_device::m68340_internal_serial_w )
+WRITE8_MEMBER( m68340_serial::write )
 {
 	LOG("\n%s\n", FUNCNAME);
 	LOGSETUP(" * Reg %02x <- %02x - %s\n", offset, data,
@@ -63,13 +63,8 @@ WRITE8_MEMBER( m68340_cpu_device::m68340_internal_serial_w )
 		     "MR1B", "CSRB", "CRB",  "TBB",  "n/a",  "OPCR", "OPS",  "OPR",  // 0x18 - 0x1f
 		     "MR2A", "MR2B" }}[offset]);                                     // 0x20 - 0x21
 
-	if (offset >= 0x10 && offset < 0x20) m_serial->m_duart->write(space, offset - 0x10, data, mem_mask);
-
-	//	assert(m68340SERIAL);
-	//m68340_serial &serial = *m68340SERIAL;
-
-	//int pc = space.device().safe_pc();
-	//LOGSETUP("%08x m68340_internal_serial_w %08x, %08x (%08x)\n", pc, offset, data, mem_mask);
+//	if (offset >= 0x10 && offset < 0x20) m_serial->m_duart->write(space, offset - 0x10, data, mem_mask);
+	if (offset >= 0x10 && offset < 0x20) m_duart->write(space, offset - 0x10, data, mem_mask);
 }
 
 //-------------------------------------------------
@@ -88,8 +83,6 @@ m68340_serial::m68340_serial(const machine_config &mconfig, const char *tag, dev
 void m68340_serial::device_start()
 {
 	LOGSETUP("%s\n", FUNCNAME);
-	// state saving
-	//	save_item(NAME(m_duart));
 }
 
 void m68340_serial::device_reset()

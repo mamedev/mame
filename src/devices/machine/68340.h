@@ -80,8 +80,8 @@ public:
 	WRITE32_MEMBER( m68340_internal_base_w );
 	READ32_MEMBER( m68340_internal_dma_r );
 	WRITE32_MEMBER( m68340_internal_dma_w );
-	READ8_MEMBER( m68340_internal_serial_r );
-	WRITE8_MEMBER( m68340_internal_serial_w );
+	//READ8_MEMBER( m68340_internal_serial_r );
+	//WRITE8_MEMBER( m68340_internal_serial_w );
 	READ16_MEMBER( m68340_internal_sim_r );
 	READ8_MEMBER( m68340_internal_sim_ports_r );
 	READ32_MEMBER( m68340_internal_sim_cs_r );
