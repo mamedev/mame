@@ -14134,8 +14134,8 @@ x2222o                          // (c) 2000, Oriental Soft
 gstriker                        // (c) [1993] Human
 gstrikera                       // (c) [1993] Human
 gstrikerj                       // (c) [1993] Human
-twrldc94                        // (c) 1994 Tecmo
-twrldc94a                       // (c) 1994 Tecmo
+twcup94                         // (c) 1994 Tecmo
+twcup94a                        // (c) 1994 Tecmo
 vgoalsca                        // (c) 199? Tecmo
 vgoalsoc                        // (c) 199? Tecmo
 
@@ -20292,7 +20292,7 @@ mp_shnb3                        // 09
 mp_soni2                        // 07
 mp_sonic                        // 01
 mp_sor2                         // 05
-mp_twc                          // 04
+mp_twcup                        // 04
 
 @source:megasys1.cpp
 64street                        // (c) 1991
@@ -29418,7 +29418,7 @@ tpgolf                          // 0003 (c) 1990 SNK
 trally                          // 0038 (c) 1991 Alpha Denshi Co.
 turfmast                        // 0200 (c) 1996 Nazca
 twinspri                        // 0224 (c) 1996 ADK
-tws96                           // 0086 (c) 1996 Tecmo
+twsoc96                         // 0086 (c) 1996 Tecmo
 viewpoin                        // 0051 (c) 1992 Sammy
 vliner                          //
 vlinero                         //
@@ -37564,15 +37564,15 @@ warriorb                        // D24 (c) 1991 Taito Corporation (Japan)
 
 @source:wc90.cpp
 pac90                           // bootleg
-wc90                            // (c) 1989 Tecmo
-wc90a                           // (c) 1989 Tecmo
-wc90b                           // (c) 1989 Tecmo
-wc90t                           // (c) 1989 Tecmo
+twcup90                            // (c) 1989 Tecmo
+twcup90a                           // (c) 1989 Tecmo
+twcup90b                           // (c) 1989 Tecmo
+twcup90t                           // (c) 1989 Tecmo
 
 @source:wc90b.cpp
-wc90b1                          // bootleg
-wc90b2                          // bootleg
-wc90ba                          // bootleg
+twcup90b1                          // bootleg
+twcup90b2                          // bootleg
+twcup90ba                          // bootleg
 
 @source:wecleman.cpp
 hotchase                        // GX763 (c) 1988
@@ -38703,7 +38703,7 @@ strider2a                       // Strider 2 (ASIA 991213)
 tblkkuzu                        // The Block Kuzushi (JAPAN)
 techromn                        // Tech Romancer (EURO 980914)
 techromnu                       // Tech Romancer (USA 980914)
-tecmowcm                        // Tecmo World Cup Millennium (JAPAN)
+twcupmil                        // Tecmo World Cup Millennium (JAPAN)
 tgmj                            // Tetris The Grand Master (JAPAN 980710)
 tondemo                         // Tondemo Crisis (JAPAN)
 ts2                             // Battle Arena Toshinden 2 (USA 951124)
