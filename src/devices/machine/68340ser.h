@@ -5,11 +5,22 @@
 
 #pragma once
 
+#include "machine/mc68681.h"
 
-class m68340_serial
+class m68340_serial : public device_t
 {
 public:
-	void reset();
+	m68340_serial(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	//	void reset();
+	//protected:
+	required_device<m68340_serial_device> m_duart;
 };
+
+DECLARE_DEVICE_TYPE(M68340_SERIAL_MODULE, m68340_serial)
 
 #endif // MAME_MACHINE_68340SER_H

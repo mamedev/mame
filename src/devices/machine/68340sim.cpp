@@ -47,7 +47,7 @@ READ16_MEMBER( m68340_cpu_device::m68340_internal_sim_r )
 	LOGR("%s\n", FUNCNAME);
 	assert(m68340SIM);
 	m68340_sim &sim = *m68340SIM;
-	int val = space.machine().rand();
+	int val = 0;
 	int pc = space.device().safe_pc();
 
 	switch (offset * 2)
@@ -88,14 +88,15 @@ READ16_MEMBER( m68340_cpu_device::m68340_internal_sim_r )
 			break;
 
 		default:
-			LOGSIM("- %08x %s %04x, (%04x)\n", pc, FUNCNAME, offset * 2, mem_mask);
+			logerror("- %08x %s %04x, (%04x) (unsupported register)\n", pc, FUNCNAME, offset * 2, mem_mask);
+			LOGSIM("- %08x %s %04x, (%04x) (unsupported register)\n", pc, FUNCNAME, offset * 2, mem_mask);
 	}
 
 	LOGR(" * Reg %02x -> %02x - %s\n", offset * 2, val,
 		 ((offset * 2) >= 0x10 && (offset * 2) < 0x20) || (offset * 2) >= 0x60 ? "Error - should not happen" :
 		 std::array<char const *, 8> {{"MCR", "reserved", "SYNCR", "AVR/RSR", "SWIV/SYPCR", "PICR", "PITR", "SWSR"}}[(offset * 2) <= m68340_sim::REG_AVR_RSR ? offset : offset - 0x10 + 0x04]);
 
-	return 0x0000;
+	return val;
 }
 
 WRITE16_MEMBER( m68340_cpu_device::m68340_internal_sim_w )

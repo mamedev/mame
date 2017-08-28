@@ -4,17 +4,20 @@
     2681 DUART
     68681 DUART
     28C94 QUART
+    68340 serial module
 
     Written by Mariusz Wojcieszek
     Updated by Jonathan Gevaryahu AKA Lord Nightmare
     Improved interrupt handling by R. Belmont
     Rewrite and modernization in progress by R. Belmont
+    Addition of 68340 serial module support by Edstrom
 */
 
 #include "emu.h"
 #include "mc68681.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
+#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
 
@@ -59,6 +62,7 @@ static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 
 // device type definition
 DEFINE_DEVICE_TYPE(MC68681, mc68681_device, "mc68681", "MC68681 DUART")
 DEFINE_DEVICE_TYPE(SC28C94, sc28c94_device, "sc28c94", "SC28C94 QUART")
+DEFINE_DEVICE_TYPE(M68340SERIAL, m68340_serial_device, "m68340ser", "M68340 SERIAL MODULE")
 DEFINE_DEVICE_TYPE(MC68681_CHANNEL, mc68681_channel, "mc68681_channel", "MC68681 DUART channel")
 
 
@@ -96,6 +100,11 @@ mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, d
 
 sc28c94_device::sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc68681_base_device(mconfig, SC28C94, tag, owner, clock)
+{
+}
+
+m68340_serial_device::m68340_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+  : mc68681_base_device(mconfig, M68340SERIAL, tag, owner, clock)
 {
 }
 
@@ -169,6 +178,11 @@ MACHINE_CONFIG_MEMBER( sc28c94_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(CHANB_TAG, MC68681_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANC_TAG, MC68681_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHAND_TAG, MC68681_CHANNEL, 0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_MEMBER( m68340_serial_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(CHANA_TAG, MC68681_CHANNEL, 0)
+	MCFG_DEVICE_ADD(CHANB_TAG, MC68681_CHANNEL, 0)
 MACHINE_CONFIG_END
 
 void mc68681_base_device::update_interrupts()
@@ -345,6 +359,34 @@ TIMER_CALLBACK_MEMBER( mc68681_base_device::duart_timer_callback )
 
 }
 
+READ8_MEMBER( m68340_serial_device::read )
+{
+	uint8_t r = 0;
+	offset &= 0x1f;
+
+	if (offset < 0x10)
+	{
+		return mc68681_base_device::read(space, offset, mem_mask);
+	}
+
+	switch (offset)
+	{
+		case 0x10: /* MR1A/MR2C */
+		case 0x11: /* SRC */
+		case 0x13: /* Rx Holding Register C */
+			r = m_chanC->read_chan_reg(offset & 3);
+			break;
+
+		case 0x18: /* MR1D/MR2D */
+		case 0x19: /* SRD */
+		case 0x1b: /* RHRD */
+			r = m_chanD->read_chan_reg(offset & 3);
+			break;
+	}
+
+	return r;
+}
+
 READ8_MEMBER( sc28c94_device::read )
 {
 	uint8_t r = 0;
@@ -475,6 +517,35 @@ READ8_MEMBER( mc68681_base_device::read )
 	LOG("returned %02x\n", r);
 
 	return r;
+}
+
+WRITE8_MEMBER( m68340_serial_device::write )
+{
+  printf("Duart write %02x -> %02x\n", data, offset);
+  
+	offset &= 0x1f;
+
+	if (offset < 0x10)
+	{
+		mc68681_base_device::write(space, offset, data, mem_mask);
+	}
+
+	switch(offset)
+	{
+		case 0x10: /* MRC */
+		case 0x11: /* CSRC */
+		case 0x12: /* CRC */
+		case 0x13: /* THRC */
+			m_chanC->write_chan_reg(offset&3, data);
+			break;
+
+		case 0x18: /* MRC */
+		case 0x19: /* CSRC */
+		case 0x1a: /* CRC */
+		case 0x1b: /* THRC */
+			m_chanD->write_chan_reg(offset&3, data);
+			break;
+	}
 }
 
 WRITE8_MEMBER( sc28c94_device::write )
