@@ -68,12 +68,16 @@ public:
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out0_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(wallc);
+	DECLARE_VIDEO_START(unkitpkr);
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
 	DECLARE_DRIVER_INIT(sidam);
@@ -163,12 +167,28 @@ WRITE8_MEMBER(wallc_state::videoram_w)
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] + 0x100, 1, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] + ((tile_index & 0x1f) >= 0x08 && (tile_index & 0x1f) < 0x10 ? 0 : 0x100), 1, 0);
+}
+
+TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
+{
+	int code = m_videoram[tile_index];
+
+	// hack to display cards
+	if ((tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
+		code |= 0x100;
+
+	SET_TILE_INFO_MEMBER(0, code, 1, 0);
 }
 
 void wallc_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+}
+
+VIDEO_START_MEMBER(wallc_state, unkitpkr)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
 uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -182,9 +202,17 @@ WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, data & 2);
 }
 
-WRITE8_MEMBER(wallc_state::unkitpkr_coin_counter_w)
+WRITE8_MEMBER(wallc_state::unkitpkr_out0_w)
+{
+}
+
+WRITE8_MEMBER(wallc_state::unkitpkr_out1_w)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+}
+
+WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
+{
 }
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
@@ -216,9 +244,9 @@ static ADDRESS_MAP_START( unkitpkr_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0xb500, 0xb5ff) AM_READNOP // read by memory test routine left over from some other game
 	AM_RANGE(0xb600, 0xb600) AM_READ_PORT("DSW")
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP
-	AM_RANGE(0xb100, 0xb100) AM_WRITE(unkitpkr_coin_counter_w)
-	AM_RANGE(0xb200, 0xb200) AM_WRITENOP
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(unkitpkr_out0_w)
+	AM_RANGE(0xb100, 0xb100) AM_WRITE(unkitpkr_out1_w)
+	AM_RANGE(0xb200, 0xb200) AM_WRITE(unkitpkr_out2_w)
 	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8912_device, address_w)
 	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
@@ -426,6 +454,8 @@ static MACHINE_CONFIG_DERIVED( unkitpkr, wallc )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unkitpkr_map)
+
+	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
 MACHINE_CONFIG_END
 /***************************************************************************
 
