@@ -50,6 +50,11 @@ public:
 	required_shared_ptr<uint16_t> m_mixerregs1;
 	required_shared_ptr<uint16_t> m_mixerregs2;
 
+	enum {
+		TECMO_WCUP94_MCU = 1,
+		TECMO_WCUP94A_MCU,
+		VGOAL_SOCCER_MCU
+	}m_mcutype;
 	int m_gametype;
 	uint16_t m_mcu_data;
 	uint16_t m_prot_reg[2];

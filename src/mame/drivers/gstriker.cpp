@@ -800,16 +800,16 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 	// Command byte is also written to VS9209 port F, which is set for input only.
 	// Does the MCU somehow strobe it out of there?
 	uint8_t mcu_data = m_work_ram[0x00f/2] & 0x00ff;
-
+	
 	if( ((m_prot_reg[1] & 4) == 0) && ((m_prot_reg[0] & 4) == 4) )
 	{
 		switch( m_gametype )
 		{
-			case 1:
+			case TECMO_WCUP94_MCU:
 				switch (mcu_data)
 				{
 					#define NULL_SUB 0x0000828E
-					case 0x53: PC(0x0000a4c); break; // boot -> main loop
+					case 0x53: PC(0x00000A4C); break; // boot -> main loop
 
 					/*
 					    68 and 62 could be sprite or sound changes, or ?
@@ -824,12 +824,12 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					    }
 					*/
 					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x0003AF4); break; // after time up, pk shootout???
-					case 0x65: PC(0x0003F26); break;
+					case 0x61: PC(0x00003AF4); break; // after time up, pk shootout???
+					case 0x65: PC(0x00003F26); break;
 
 					// 62->72
 					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
-					case 0x72: PC(0x000409E); break; // game over
+					case 0x72: PC(0x0000409E); break; // game over
 
 					/*
 					    Attract mode is pre programmed loop called from main
@@ -851,9 +851,9 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					    0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
 
 					*/
-					case 0x6e: PC(0x0010E28); break; // loop
-					case 0x6b: PC(0x0010EEC); break; // attract even
-					case 0x69: PC(0x001120A); break; // attract odd
+					case 0x6e: PC(0x00010E28); break; // loop
+					case 0x6b: PC(0x00010EEC); break; // attract even
+					case 0x69: PC(0x0001120A); break; // attract odd
 
 					// In "continue" screen
 					// if( w@FFE078 & 80) 75
@@ -866,26 +866,44 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					case 0x6f: PC(NULL_SUB); break;
 
 					default:
-						popmessage("Unknown MCU CMD %04x",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",m_mcu_data);
 						PC(NULL_SUB);
 						break;
+						
+					#undef NULL_SUB
 				}
 				break;
-
-			case 2:
+			
+			// same as above but with +0x10 displacement offsets
+			case TECMO_WCUP94A_MCU:
 				switch (mcu_data)
 				{
-					case 0x53: PC(0x00000a5c); break; // POST
+					#define NULL_SUB 0x0000829E
+					case 0x53: PC(0x00000A5C); break; // POST
 
+					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
+					case 0x61: PC(0x00003B04); break; // after time up, pk shootout???
+					case 0x65: PC(0x00003F36); break;
+
+					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
+					case 0x72: PC(0x000040AE); break; // game over
+					
+					// attract mode
+					case 0x6e: PC(0x00010E38); break; // loop
+					case 0x6b: PC(0x00010EFC); break; // attract even
+					case 0x69: PC(0x0001121A); break; // attract odd
+					
 					default:
-						popmessage("Unknown MCU CMD %04x",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",m_mcu_data);
 						PC(NULL_SUB);
 						break;
+					
+					#undef NULL_SUB
 				}
 				break;
 
 
-			case 3:
+			case VGOAL_SOCCER_MCU:
 				switch (mcu_data)
 				{
 					case 0x33: PC(0x00063416); break; // *after game over, is this right?
@@ -899,7 +917,7 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					case 0x79: PC(0x0006072E); break; // after select, start match
 
 					default:
-						popmessage("Unknown MCU CMD %04x",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",m_mcu_data);
 						PC(0x00000586); // rts
 						break;
 				}
@@ -967,19 +985,19 @@ void gstriker_state::mcu_init()
 
 DRIVER_INIT_MEMBER(gstriker_state,twrldc94)
 {
-	m_gametype = 1;
+	m_gametype = TECMO_WCUP94_MCU;
 	mcu_init();
 }
 
 DRIVER_INIT_MEMBER(gstriker_state,twrldc94a)
 {
-	m_gametype = 2;
+	m_gametype = TECMO_WCUP94A_MCU;
 	mcu_init();
 }
 
 DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 {
-	m_gametype = 3;
+	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16_delegate(FUNC(gstriker_state::vbl_toggle_w),this)); // vblank toggle
