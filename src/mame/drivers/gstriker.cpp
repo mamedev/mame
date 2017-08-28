@@ -1015,7 +1015,7 @@ DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker, 0,         gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstriker, 0,         gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Europe, Oceania)",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Americas)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Japan)",    MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

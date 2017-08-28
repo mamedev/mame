@@ -270,12 +270,13 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 
 		uint32_t incxx,incyy;
 
-		startx = m_regs[0];
+		// x origin is offset by 384
+		startx = m_regs[0] + 384;
 		starty = m_regs[1];
 
-		startx += (24<<4); // maybe not..
+//		startx += (24<<4); // maybe not..
 
-		startx -=  m_lineram[(line)*8+7]/2;
+//		startx -=  m_lineram[(line)*8+7]/2;
 
 		incxx = m_lineram[(line)*8+0]<<4;
 		incyy = m_lineram[(line)*8+3]<<4;
