@@ -15,6 +15,8 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "machine/1ma6.h"
+#include "bus/hp80_optroms/hp80_optrom.h"
+#include "softlist.h"
 
 // Debugging
 #define VERBOSE 1
@@ -120,6 +122,7 @@ protected:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_modkeys;
+	required_device<hp80_optrom_slot_device> m_rom_drawers[ 6 ];
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
@@ -189,6 +192,8 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 	  m_io_key1(*this , "KEY1"),
 	  m_io_key2(*this , "KEY2"),
 	  m_io_modkeys(*this, "MODKEYS"),
+	  m_rom_drawers{ {*this , "drawer1"} , {*this , "drawer2"} , {*this , "drawer3"} ,
+					 {*this , "drawer4"} , {*this , "drawer5"} , {*this , "drawer6"} },
 	  m_chargen(*this , "chargen")
 {
 }
@@ -202,9 +207,6 @@ void hp85_state::machine_start()
 	m_rombank->configure_entry(0 , m_rom00);
 
 	memset(&m_empty_bank[ 0 ] , 0xff , sizeof(m_empty_bank));
-
-	// All other entries in rombank (01-FF) not present for now
-	m_rombank->configure_entries(1 , 255 , m_empty_bank , 0);
 }
 
 void hp85_state::machine_reset()
@@ -215,9 +217,6 @@ void hp85_state::machine_reset()
 	m_crt_ctl = BIT_MASK(CRT_CTL_POWERDN_BIT) | BIT_MASK(CRT_CTL_WIPEOUT_BIT);
 	m_crt_read_byte = 0;
 	m_crt_write_byte = 0;
-	// Clear RSELEC
-	m_rombank->set_entry(0xff);
-
 	m_int_req = 0;
 	m_int_serv = 0;
 	m_top_pending = NO_IRQ;
@@ -243,6 +242,20 @@ void hp85_state::machine_reset()
 	m_timer_idx = 0;
 	m_clk_busy = false;
 	update_irl();
+
+	// Load optional ROMs (if any)
+	// All entries in rombank (01-FF) initially not present
+	m_rombank->configure_entries(1 , 255 , m_empty_bank , 0);
+	for (auto& draw : m_rom_drawers) {
+		uint8_t sc;
+		uint8_t *region = draw->get_rom_image(sc);
+		if (region != nullptr) {
+			LOG("Loading opt ROM in drawer %s SC=0x%02x [%02x %02x]\n" , draw->tag() , sc , region[ 0 ] , region[ 1 ]);
+			m_rombank->configure_entry(sc , region);
+		}
+	}
+	// Clear RSELEC
+	m_rombank->set_entry(0xff);
 }
 
 uint32_t hp85_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1055,6 +1068,22 @@ static MACHINE_CONFIG_START(hp85)
 
 	// Tape drive
 	MCFG_DEVICE_ADD("tape" , HP_1MA6 , 0)
+
+	// Optional ROMs
+	MCFG_DEVICE_ADD("drawer1", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer2", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer3", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer4", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer5", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer6", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+
+	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
 MACHINE_CONFIG_END
 
 ROM_START(hp85)
