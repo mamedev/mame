@@ -147,7 +147,7 @@ X3: 14.31818
 
 Note: Same hardware as Tecmo World Cup '94, minus one VS9209 chip.
 
-*** ROMSET: twrldc94
+*** ROMSET: twcup94
 
 Tecmo World Cup 94
 Tecmo 1994
@@ -229,7 +229,6 @@ static GFXDECODE_START( gstriker )
 	GFXDECODE_ENTRY( "gfx1", 0, gs_8x8x4_layout,     0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,   0, 256 )
-
 GFXDECODE_END
 
 
@@ -354,9 +353,19 @@ static INPUT_PORTS_START( gstriker )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                   // "Self Test Mode"
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( twrldc94 )
+static INPUT_PORTS_START( twcup94 )
 	PORT_INCLUDE( gstriker_generic )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -535,7 +544,7 @@ static MACHINE_CONFIG_DERIVED( twc94, gstriker )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, twrldc94_prot_reg_w))
+	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, twcup94_prot_reg_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
 MACHINE_CONFIG_END
 
@@ -792,7 +801,7 @@ m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
 m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
-WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
+WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 {
 	m_prot_reg[1] = m_prot_reg[0];
 	m_prot_reg[0] = data;
@@ -983,13 +992,13 @@ void gstriker_state::mcu_init()
 	save_item(NAME(m_prot_reg));
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twrldc94)
+DRIVER_INIT_MEMBER(gstriker_state,twcup94)
 {
 	m_gametype = TECMO_WCUP94_MCU;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twrldc94a)
+DRIVER_INIT_MEMBER(gstriker_state,twcup94a)
 {
 	m_gametype = TECMO_WCUP94A_MCU;
 	mcu_init();
@@ -1014,5 +1023,5 @@ GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, 0,        R
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
 GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
 GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
-GAME( 1994, twcup94, 0,        twc94,    twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94a,twcup94, twc94,    twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94, 0,        twc94,    twcup94, gstriker_state, twcup94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94a,twcup94,  twc94,    twcup94, gstriker_state, twcup94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
