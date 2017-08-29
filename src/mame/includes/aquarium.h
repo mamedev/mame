@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "machine/mb3773.h"
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
 #include "screen.h"
@@ -22,7 +23,8 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_watchdog(*this, "watchdog")
 		{ }
 
 	/* memory pointers */
@@ -45,7 +47,9 @@ public:
 	required_device<excellent_spr_device> m_sprgen;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<mb3773_device> m_watchdog;
 
+	DECLARE_WRITE8_MEMBER(aquarium_watchdog_w);
 	DECLARE_WRITE8_MEMBER(aquarium_z80_bank_w);
 	DECLARE_READ8_MEMBER(aquarium_oki_r);
 	DECLARE_WRITE8_MEMBER(aquarium_oki_w);

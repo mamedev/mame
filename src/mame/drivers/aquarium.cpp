@@ -59,6 +59,12 @@ Notes:
 #include "speaker.h"
 
 
+WRITE8_MEMBER(aquarium_state::aquarium_watchdog_w)
+{
+	m_watchdog->write_line_ck(BIT(data, 7));
+	// bits 0 & 1 also used
+}
+
 WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 {
 	// uses bits ---x --xx
@@ -106,7 +112,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0xd80082, 0xd80083) AM_READNOP /* stored but not read back ? check code at 0x01f440 */
 	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP        /* ?? video related */
+	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(aquarium_watchdog_w, 0xff00)
 	AM_RANGE(0xd8008a, 0xd8008b) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -288,6 +294,9 @@ static MACHINE_CONFIG_START( aquarium )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6) // clock not verified on pcb
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_portmap)
+
+	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
