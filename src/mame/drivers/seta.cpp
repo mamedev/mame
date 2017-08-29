@@ -1731,16 +1731,6 @@ ADDRESS_MAP_END
                                 Caliber 50
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
-	}
-}
-
 static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM                             // ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                             // RAM
@@ -1764,7 +1754,8 @@ static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 /**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_WRITE(calibr50_soundlatch_w)    // From Sub CPU
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) // From Sub CPU
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff) // To Sub CPU
 /**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? $4000
 ADDRESS_MAP_END
 
@@ -1840,7 +1831,7 @@ static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb40004, 0xb40007) AM_READ(usclssic_trackball_y_r)        // TrackBall Y + Buttons
 	AM_RANGE(0xb4000a, 0xb4000b) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0xb40010, 0xb40011) AM_READ_PORT("COINS")                  // Coins
-	AM_RANGE(0xb40010, 0xb40011) AM_WRITE(calibr50_soundlatch_w)        // To Sub CPU
+	AM_RANGE(0xb40010, 0xb40011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff) // To Sub CPU
 	AM_RANGE(0xb40018, 0xb4001f) AM_READ(usclssic_dsw_r)                // 2 DSWs
 	AM_RANGE(0xb40018, 0xb40019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xb80000, 0xb80001) AM_READ(ipl2_ack_r)
@@ -3511,7 +3502,23 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(seta_state,calibr50)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	sub_bankswitch_w(space, 0, 0);
+	calibr50_sub_bankswitch_w(space, 0, 0);
+}
+
+WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
+{
+	// Bits 7-4: BK3-BK0
+	sub_bankswitch_w(space, 0, data);
+
+	// Bit 3: NMICLR
+	if (!BIT(data, 3))
+		m_soundlatch->acknowledge_w(space, 0, 0);
+
+	// Bit 2: IRQCLR
+	if (!BIT(data, 2))
+		m_subcpu->set_input_line(0, CLEAR_LINE);
+
+	// Bit 1: PCMMUTE
 }
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
@@ -3523,7 +3530,7 @@ WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1snd", x1_010_device, read ,write) // Sound
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             // From Main CPU
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_bankswitch_w)         // Bankswitching
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(calibr50_sub_bankswitch_w)        // Bankswitching
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                             // ROM
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(calibr50_soundlatch2_w)   // To Main CPU
@@ -7998,7 +8005,7 @@ static MACHINE_CONFIG_START( usclssic )
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_hold)   /* NMI caused by main cpu when writing to the sound latch */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -8027,6 +8034,8 @@ static MACHINE_CONFIG_START( usclssic )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_X1_010_ADDRESS(0x1000)
@@ -8053,8 +8062,7 @@ static MACHINE_CONFIG_START( calibr50 )
 
 	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_hold, 4*60)  /* IRQ: 4/frame
-	                           NMI: when the 68k writes the sound latch */
+	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
 
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("ROT1")
@@ -8084,6 +8092,9 @@ static MACHINE_CONFIG_START( calibr50 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
