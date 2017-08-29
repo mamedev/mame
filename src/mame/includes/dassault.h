@@ -34,7 +34,6 @@ public:
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
 		m_ram(*this, "ram"),
-		m_shared_ram(*this, "shared_ram"),
 		m_ram2(*this, "ram2")
 
 	{ }
@@ -58,17 +57,13 @@ public:
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 	required_shared_ptr<uint16_t> m_pf4_rowscroll;
 	required_shared_ptr<uint16_t> m_ram;
-	required_shared_ptr<uint16_t> m_shared_ram;
 	required_shared_ptr<uint16_t> m_ram2;
 
+	DECLARE_WRITE16_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(sub_irq_ack_w);
 	DECLARE_READ16_MEMBER(dassault_control_r);
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
 	DECLARE_READ16_MEMBER(dassault_sub_control_r);
-	DECLARE_WRITE16_MEMBER(dassault_sound_w);
-	DECLARE_READ16_MEMBER(dassault_irq_r);
-	DECLARE_WRITE16_MEMBER(dassault_irq_w);
-	DECLARE_WRITE16_MEMBER(shared_ram_w);
-	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(thndzone);
 	DECLARE_DRIVER_INIT(dassault);

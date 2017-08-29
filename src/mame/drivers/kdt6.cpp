@@ -4,10 +4,10 @@
 
     Kontron KDT6
 
-	This is the base board for various machines, it needs to be combined
-	with an I/O board and a bus board. This gives us
-	- KDT6 + 9xx/IOC + 9xx/BUS: PSI908/PSI9C
-	- KDT6 + 98/IOC + 98/BUS: PSI98
+    This is the base board for various machines, it needs to be combined
+    with an I/O board and a bus board. This gives us
+    - KDT6 + 9xx/IOC + 9xx/BUS: PSI908/PSI9C
+    - KDT6 + 98/IOC + 98/BUS: PSI98
 
 ***************************************************************************/
 
@@ -22,9 +22,13 @@
 #include "machine/clock.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
+#include "sound/spkrdev.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/psi_kbd/psi_kbd.h"
+#include "bus/rs232/rs232.h"
 #include "screen.h"
 #include "speaker.h"
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -38,14 +42,22 @@ public:
 	driver_device(mconfig, type, tag),
 	m_cpu(*this, "maincpu"),
 	m_dma(*this, "dma"),
+	m_sio(*this, "sio"),
 	m_crtc(*this, "crtc"),
 	m_page_r(*this, "page%x_r", 0), m_page_w(*this, "page%x_w", 0),
 	m_boot(*this, "boot"),
 	m_palette(*this, "palette"),
 	m_gfx(*this, "gfx"),
+	m_rtc(*this, "rtc"),
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, "fdc:0"),
 	m_floppy1(*this, "fdc:1"),
+	m_beeper(*this, "beeper"),
+	m_beep_timer(*this, "beep_timer"),
+	m_centronics(*this, "centronics"),
+	m_dip_s2(*this, "S2"),
+	m_keyboard(*this, "kbd"),
+	m_rs232b(*this, "rs232b"),
 	m_sasi_dma(false),
 	m_dma_map(0),
 	m_status0(0), m_status1(0), m_status2(0),
@@ -76,11 +88,20 @@ public:
 	DECLARE_WRITE8_MEMBER(video_address_latch_high_w);
 	DECLARE_WRITE8_MEMBER(video_address_latch_low_w);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
+
 	DECLARE_WRITE8_MEMBER(fdc_tc_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void drive0_led_cb(floppy_image_device *floppy, int state);
+	void drive1_led_cb(floppy_image_device *floppy, int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE8_MEMBER(pio_porta_w);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232b_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
 
 protected:
 	virtual void machine_start() override;
@@ -89,14 +110,22 @@ protected:
 private:
 	required_device<z80_device> m_cpu;
 	required_device<z80dma_device> m_dma;
+	required_device<z80sio_device> m_sio;
 	required_device<mc6845_device> m_crtc;
 	required_memory_bank_array<16> m_page_r, m_page_w;
 	required_memory_region m_boot;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_gfx;
+	required_device<upd1990a_device> m_rtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_device<beep_device> m_beeper;
+	required_device<timer_device> m_beep_timer;
+	required_device<centronics_device> m_centronics;
+	required_ioport m_dip_s2;
+	required_device<psi_keyboard_bus_device> m_keyboard;
+	required_device<rs232_port_device> m_rs232b;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<uint16_t[]> m_vram; // 10-bit
@@ -175,6 +204,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 INPUT_PORTS_START( psi98 )
+	PORT_START("S2")
+	PORT_DIPNAME(0x01, 0x01, "SIO B") PORT_DIPLOCATION("S2:1")
+	PORT_DIPSETTING(0x00, "RS232")
+	PORT_DIPSETTING(0x01, "Keyboard")
 INPUT_PORTS_END
 
 
@@ -183,7 +216,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 static SLOT_INTERFACE_START( kdt6_floppies )
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+	SLOT_INTERFACE("fd55f", TEAC_FD_55F)
 SLOT_INTERFACE_END
 
 WRITE8_MEMBER( kdt6_state::fdc_tc_w )
@@ -196,6 +229,16 @@ WRITE_LINE_MEMBER( kdt6_state::fdc_drq_w )
 {
 	if (!m_sasi_dma && BIT(m_status0, 4) == 0)
 		m_dma->rdy_w(state);
+}
+
+void kdt6_state::drive0_led_cb(floppy_image_device *floppy, int state)
+{
+	machine().output().set_value("drive0_led", state);
+}
+
+void kdt6_state::drive1_led_cb(floppy_image_device *floppy, int state)
+{
+	machine().output().set_value("drive1_led", state);
 }
 
 
@@ -247,11 +290,10 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t code = m_vram[((m_status1 & 0x03) << 14) | (ma + i)];
-
 		if (BIT(m_status1, 6))
 		{
 			// text mode
+			uint16_t code = m_vram[((m_status1 & 0x03) << 14) | (ma + i)];
 			uint8_t data = m_gfx[((code & 0xff) << 4) | ra];
 
 			int inverse = BIT(code, 8) | BIT(m_status1, 5) | ((i == cursor_x) ? 1 : 0);
@@ -267,7 +309,62 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 		else
 		{
 			// gfx mode
+			uint8_t data = m_vram[(ma << 4) | (ra << 6) | i];
+
+			// draw 8 pixels of the cell
+			for (int x = 0; x < 8; x++)
+				bitmap.pix32(y, x + i*8) = pen[BIT(data, 7 - x)];
 		}
+	}
+}
+
+
+//**************************************************************************
+//  SOUND
+//**************************************************************************
+
+TIMER_DEVICE_CALLBACK_MEMBER( kdt6_state::beeper_off )
+{
+	m_beeper->set_state(0);
+}
+
+
+//**************************************************************************
+//  EXTERNAL I/O
+//**************************************************************************
+
+WRITE8_MEMBER( kdt6_state::pio_porta_w )
+{
+	m_centronics->write_strobe(BIT(data, 0));
+	m_centronics->write_init(BIT(data, 1));
+}
+
+WRITE_LINE_MEMBER( kdt6_state::keyboard_rx_w )
+{
+	if (machine().phase() >= machine_phase::RESET)
+	{
+		if ((m_dip_s2->read() & 0x01) == 0x01)
+			m_sio->rxb_w(state);
+	}
+}
+
+WRITE_LINE_MEMBER( kdt6_state::rs232b_rx_w )
+{
+	if (machine().phase() >= machine_phase::RESET)
+	{
+		if ((m_dip_s2->read() & 0x01) == 0x00)
+			m_sio->rxb_w(state);
+	}
+}
+
+WRITE_LINE_MEMBER( kdt6_state::siob_tx_w )
+{
+	if (machine().phase() >= machine_phase::RESET)
+	{
+		if ((m_dip_s2->read() & 0x01) == 0x01)
+			m_keyboard->tx_w(state);
+		else
+			m_rs232b->write_txd(state);
 	}
 }
 
@@ -320,8 +417,21 @@ READ8_MEMBER( kdt6_state::page1_r )
 
 READ8_MEMBER( kdt6_state::sasi_ctrl_r )
 {
-	logerror("sasi_ctrl_r: 0xff\n");
-	return 0xff;
+	uint8_t data = 0;
+
+	// 7-------  sasi select
+	// -6------  sasi reset
+	// --5-----  sasi input/output
+	// ---4----  sasi control/data
+	// ----3---  sasi message
+	// -----2--  sasi request
+	// ------1-  sasi busy
+	// -------0  data output upd1990
+
+	data |= m_rtc->data_out_r() << 0;
+	data |= 0xfe;
+
+	return data;
 }
 
 WRITE8_MEMBER( kdt6_state::sasi_ctrl_w )
@@ -351,7 +461,8 @@ WRITE8_MEMBER( kdt6_state::mapper_w )
 		m_page_r[offset]->set_base(addr < 0x40000 ? &m_ram[addr] : &m_dummy_r[0]);
 		m_page_w[offset]->set_base(addr < 0x40000 ? &m_ram[addr] : &m_dummy_w[0]);
 
-		logerror("map_page: %x -> %06x\n", offset, addr);
+		if (0)
+			logerror("map_page: %x -> %06x\n", offset, addr);
 	}
 }
 
@@ -369,6 +480,12 @@ WRITE8_MEMBER( kdt6_state::status0_w )
 	// -------0  watchdog enable
 
 	m_cpu->set_unscaled_clock((XTAL_16MHz / 4) * (BIT(data, 1) ? 1 : 0.5));
+
+	if ((BIT(m_status0, 2) ^ BIT(data, 2)) && BIT(data, 2))
+	{
+		m_beeper->set_state(1);
+		m_beep_timer->adjust(attotime::from_msec(250)); // timing unknown
+	}
 
 	if (m_floppy0->get_device())
 		m_floppy0->get_device()->mon_w(BIT(data, 7) ? 0 : 1);
@@ -414,7 +531,8 @@ WRITE8_MEMBER( kdt6_state::status1_w )
 
 WRITE8_MEMBER( kdt6_state::status2_w )
 {
-	logerror("status2_w: %02x\n", data);
+	if (0)
+		logerror("status2_w: %02x\n", data);
 
 	// 7-------  rtc chip select
 	// -6------  rtc output enable
@@ -423,6 +541,15 @@ WRITE8_MEMBER( kdt6_state::status2_w )
 	// ----321-  rtc control 2-0
 	// -------0  rtc data
 	// ----3210  memory mapper bit 0-3
+
+	m_rtc->cs_w(BIT(data, 7));
+	m_rtc->oe_w(BIT(data, 6));
+	m_rtc->stb_w(BIT(data, 5));
+	m_rtc->clk_w(BIT(data, 4));
+	m_rtc->c2_w(BIT(data, 3));
+	m_rtc->c1_w(BIT(data, 2));
+	m_rtc->c0_w(BIT(data, 1));
+	m_rtc->data_in_w(BIT(data, 0));
 
 	m_status2 = data & 0x0f;
 }
@@ -441,6 +568,11 @@ void kdt6_state::machine_start()
 
 	m_fdc->set_rate(250000);
 
+	if (m_floppy0->get_device())
+		m_floppy0->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive0_led_cb, this));
+	if (m_floppy1->get_device())
+		m_floppy1->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive1_led_cb, this));
+
 	// register for save states
 	save_pointer(NAME(m_ram.get()), 0x40000);
 	save_pointer(NAME(m_vram.get()), 0x10000);
@@ -449,7 +581,7 @@ void kdt6_state::machine_start()
 	save_item(NAME(m_status0));
 	save_item(NAME(m_status1));
 	save_item(NAME(m_status2));
-	save_item(NAME(m_mapper));
+	save_pointer(NAME(m_mapper), 16);
 	save_item(NAME(m_video_address));
 }
 
@@ -496,7 +628,11 @@ static MACHINE_CONFIG_START( psi98 )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 1000) // frequency unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
 
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(kdt6_state, busreq_w))
@@ -511,30 +647,66 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc1", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz / 8)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 8)
+	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc2", z80ctc_device, trg3))
 
-	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 8, 0, 0, 0, 0)
+	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 4, 0, 0, 0, 0)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", psi_keyboard_bus_device, tx_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(kdt6_state, siob_tx_w))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 8)
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("sio", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))  MCFG_DEVCB_XOR(1)
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(kdt6_state, rs232b_rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("sio", z80sio_device, syncb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))  MCFG_DEVCB_XOR(1)
+
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kdt6_state, pio_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa2_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("pio", z80pio_device, pa3_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("pio", z80pio_device, pa4_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("pio", z80pio_device, pa5_w))
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+	MCFG_UPD1990A_ADD("rtc", XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg0))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(kdt6_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("floppy_list", "psi98")
 
 	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
-	MCFG_PSI_KEYBOARD_RX_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(kdt6_state, keyboard_rx_w))
 	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg1))
 
 	// 6 ECB slots
@@ -570,4 +742,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY    FULLNAME  FLAGS
-COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  0 )

@@ -316,7 +316,7 @@ READ16_MEMBER(gaelco2_state::play2000_shareram_68k_r)
 		if (offset * 2 == 0x42c) return 0x0000;
 		if (offset * 2 == 0x42e) return 0x00f0;
 		if (offset * 2 == 0xc04) return 0x7171;
-		//	return 0x0000;
+		//  return 0x0000;
 	}
 
 	logerror("%04x read from shareram %04x %04x %04x\n", pc, offset * 2, mem_mask, ret & mem_mask);
@@ -326,7 +326,7 @@ READ16_MEMBER(gaelco2_state::play2000_shareram_68k_r)
 WRITE16_MEMBER(gaelco2_state::play2000_shareram_68k_w)
 {
 	int pc = space.device().safe_pc();
-	
+
 	COMBINE_DATA(&m_shareram[offset]);
 
 	if (pc == 0x00552) return; // initial RAM check
@@ -343,10 +343,10 @@ static ADDRESS_MAP_START( play2000_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
 	AM_RANGE(0x214000, 0x214fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
-	AM_RANGE(0x215000, 0x217fff) AM_RAM																		/* Written to, but unused? */
-	AM_RANGE(0x218000, 0x218003) AM_RAM																		/* Written to, but unused? */
+	AM_RANGE(0x215000, 0x217fff) AM_RAM                                                                     /* Written to, but unused? */
+	AM_RANGE(0x218000, 0x218003) AM_RAM                                                                     /* Written to, but unused? */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                   /* Video Registers */
-	AM_RANGE(0x21800a, 0x218fff) AM_RAM																		/* Written to, but unused? */
+	AM_RANGE(0x21800a, 0x218fff) AM_RAM                                                                     /* Written to, but unused? */
 	// AM_RANGE(0x843100, 0x84315e)  ?
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_READWRITE(play2000_shareram_68k_r, play2000_shareram_68k_w) AM_SHARE("shareram")                                                /* Work RAM */
@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( play2000 )
 	MCFG_GAELCO_SND_DATA("gfx1")
 	MCFG_GAELCO_BANKS(1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000) // ?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0) 
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -838,7 +838,7 @@ ROM_START( aligator )
 	ROM_LOAD16_BYTE(    "u44",  0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "aligator_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -873,7 +873,21 @@ ROM_START( aligatorun )
 	ROM_LOAD( "u49",        0x0c00000, 0x0400000, CRC(70a4ee0b) SHA1(07b09916f0366d0c6eed94a905ec0b9d6ac9e7e1) )    /* GFX + Sound */
 ROM_END
 
+ROM_START( aligatoruna )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE(    "STM27C4001.45", 0x000000, 0x080000, CRC(a70301b8) SHA1(b6ffb7339a42ec81c3ec7a0681dfea878f11a538) )
+	ROM_LOAD16_BYTE(    "AM27C040.44",   0x000001, 0x080000, CRC(d45a26ed) SHA1(bb261e7061aba35aa6af6567a8386d9704a9db83) )
 
+	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
+	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
+
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
+	ROM_LOAD( "u48",        0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )    /* GFX only */
+	ROM_LOAD( "u47",        0x0400000, 0x0400000, CRC(74a5a29f) SHA1(8ea2aa1f8a80c5b88ca9222c5ecc3c4794e0a160) )    /* GFX + Sound */
+	ROM_LOAD( "u50",        0x0800000, 0x0400000, CRC(85daecf9) SHA1(824f6d2491075b1ef96ecd6667c5510409338a2f) )    /* GFX only */
+	ROM_LOAD( "u49",        0x0c00000, 0x0400000, CRC(70a4ee0b) SHA1(07b09916f0366d0c6eed94a905ec0b9d6ac9e7e1) )    /* GFX + Sound */
+ROM_END
 
 
 /*============================================================================
@@ -1712,8 +1726,9 @@ ROM_END
 
 
 
-GAME( 1994, aligator,  0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1994, aligatorun,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
+GAME( 1994, aligator,   0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1994, aligatorun, aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
+GAME( 1994, aligatoruna,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 
 GAME( 1995, touchgo,  0,        touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
 GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )

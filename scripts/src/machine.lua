@@ -1012,6 +1012,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/1ma6.h,MACHINES["1MA6"] = true
+---------------------------------------------------
+
+if (MACHINES["1MA6"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/1ma6.cpp",
+		MAME_DIR .. "src/devices/machine/1ma6.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/i2cmem.h,MACHINES["I2CMEM"] = true
 ---------------------------------------------------
 
@@ -2494,6 +2506,18 @@ if (MACHINES["TMS9902"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tms9902.cpp",
 		MAME_DIR .. "src/devices/machine/tms9902.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tube.h,MACHINES["TUBE"] = true
+---------------------------------------------------
+
+if (MACHINES["TUBE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tube.cpp",
+		MAME_DIR .. "src/devices/machine/tube.h",
 	}
 end
 

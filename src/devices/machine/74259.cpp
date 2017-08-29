@@ -249,6 +249,27 @@ WRITE8_MEMBER(addressable_latch_device::write_d0)
 }
 
 //-------------------------------------------------
+//  write_d1 - bus-triggered write handler using
+//  second-lowest data bit
+//-------------------------------------------------
+
+WRITE8_MEMBER(addressable_latch_device::write_d1)
+{
+	if (LOG_MYSTERY_BITS && data != 0x00 && data != 0x02 && data != 0xff)
+		logerror("Mystery bits written to Q%d:%s%s%s%s%s%s%s\n",
+			offset,
+			BIT(data, 7) ? " D7" : "",
+			BIT(data, 6) ? " D6" : "",
+			BIT(data, 5) ? " D5" : "",
+			BIT(data, 4) ? " D4" : "",
+			BIT(data, 3) ? " D3" : "",
+			BIT(data, 2) ? " D2" : "",
+			BIT(data, 0) ? " D0" : "");
+
+	write_bit(offset, BIT(data, 1));
+}
+
+//-------------------------------------------------
 //  write_d7 - bus-triggered write handler using
 //  MSB of (8-bit) data
 //-------------------------------------------------

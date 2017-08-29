@@ -1533,7 +1533,7 @@ generate: \
 
 $(GENDIR)/includes/SDL2:
 	-$(call MKDIR,$@)
-	-$(call COPY,3rdparty/SDL2/include/,$(GENDIR)/includes/SDL2)
+	-$(call COPY,3rdparty/SDL2/include,$(GENDIR)/includes/SDL2)
 
 ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
 stale:

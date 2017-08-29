@@ -95,23 +95,13 @@ Preliminary COP MCU memory map
 
 /*****************************************************************************/
 
-READ16_MEMBER(legionna_state::sound_comms_r)
-{
-	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
-}
-
-READ16_MEMBER(legionna_state::denjinmk_sound_comms_r)
+READ8_MEMBER(legionna_state::denjinmk_sound_comms_r)
 {
 	// Routine at 5FDC spins indefinitely until the lowest bit becomes 1
 	if (offset == 10) // ($100714)
 		return 1;
 
-	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
-}
-
-WRITE16_MEMBER(legionna_state::sound_comms_w)
-{
-	m_seibu_sound->main_word_w(space,(offset >> 1) & 7,data,0x00ff);
+	return m_seibu_sound->main_r(space, (offset >> 1) & 7);
 }
 
 static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
@@ -197,7 +187,7 @@ static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100470, 0x100471) AM_WRITENOP // toggles 0x2000 / 0x0000, tile bank on some games
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
+	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -224,7 +214,7 @@ static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
 	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1007c0, 0x1007df) AM_READWRITE(sound_comms_r,sound_comms_w)
+	AM_RANGE(0x1007c0, 0x1007df) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
@@ -241,7 +231,7 @@ static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
+	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -268,7 +258,7 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(denjinmk_sound_comms_r,sound_comms_w)
+	AM_RANGE(0x100700, 0x10071f) AM_READ8(denjinmk_sound_comms_r, 0xff) AM_DEVWRITE8_MOD("seibu_sound", seibu_sound_device, main_w, rshift<1>, 0x00ff)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -294,7 +284,7 @@ static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100480, 0x100487) AM_WRITE(grainbow_layer_config_w) // probably a COP feature
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
+	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -318,7 +308,7 @@ static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
+	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -343,14 +333,14 @@ static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16, legionna_state )
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100600, 0x10067f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_xor, write_xor)
+	AM_RANGE(0x100600, 0x10067f) AM_DEVREADWRITE_MOD("crtc", seibu_crtc_device, read, write, xor<0x20>)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
 	AM_RANGE(0x10070c, 0x10070d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x10071c, 0x10071d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100740, 0x10075f) AM_READWRITE(sound_comms_r,sound_comms_w)
+	AM_RANGE(0x100740, 0x10075f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")

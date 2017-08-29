@@ -4626,6 +4626,36 @@ ROM_START( athena )
 	ROM_LOAD( "up01_t2.rom",  0x10000, 0x8000, CRC(57b35c73) SHA1(6d15b94b50c3734f7d60bd9bd1c5e6c76591d829) )
 ROM_END
 
+ROM_START( sathena )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.128", 0x0000, 0x4000, CRC(26eb2ce1) SHA1(fb60cfbc01d1e3446e0e98b9a6ba8854563bb418) )
+	ROM_LOAD( "2.256", 0x4000, 0x8000, CRC(925f60ce) SHA1(ba59f6a3e675341e2f79ce1fae05ae669bf1d0f9) )
+
+	ROM_REGION( 0x10000 , "sub", 0 )
+	ROM_LOAD( "3.128", 0x0000, 0x4000, CRC(d0853f62) SHA1(6945eaa7cd46a8d4af543e40a9f2774bfecb337e) )
+	ROM_LOAD( "4.256", 0x4000, 0x8000, CRC(8c697bca) SHA1(776254fed53ee5985f0f618f739e48e0b43bcebe) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "0.128", 0x0000, 0x4000, CRC(42dbe029) SHA1(9aa311860693bd3e73f2b72ca4b171cb95f069ee) )
+	ROM_LOAD( "5.256", 0x4000, 0x8000, CRC(596f1c8a) SHA1(8f1400c77473c845e57a14fa479cf4f7ac66a909) )
+
+	ROM_REGION( 0x0c00, "proms", 0 ) // not dumped from this set
+	ROM_LOAD( "up02_c2.rom", 0x000, 0x400, CRC(294279ae) SHA1(b3db5617b83845a6c1abca8f71fa4598758a2a56) BAD_DUMP )
+	ROM_LOAD( "up02_b1.rom", 0x400, 0x400, CRC(d25c9099) SHA1(f3933075cce1255affc61dfefd9559b6e15ed29c) BAD_DUMP )
+	ROM_LOAD( "up02_c1.rom", 0x800, 0x400, CRC(a4a4e7dc) SHA1(aa694c2d44dcabc6cfd46307c55c3759eff57236) BAD_DUMP )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "11.128", 0x0000, 0x4000, CRC(18b4bcca) SHA1(2476aa6c8d55e117d840202a97fe2a65e252ad7f) )
+
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
+	ROM_LOAD( "10.256", 0x0000, 0x8000, CRC(f269c0eb) SHA1(a947c6e4d82e0aafa616d25395ef63c33d9beb06) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "7.256", 0x00000, 0x8000, CRC(c63a871f) SHA1(0ab8ebebd750fdcad283eed427179f2124b300ae) )
+	ROM_LOAD( "8.256", 0x08000, 0x8000, CRC(760568d8) SHA1(9dc447c446791c79322e21e3caef6ceae347e2fb) )
+	ROM_LOAD( "9.256", 0x10000, 0x8000, CRC(57b35c73) SHA1(6d15b94b50c3734f7d60bd9bd1c5e6c76591d829) )
+ROM_END
+
 /***********************************************************************/
 
 ROM_START( fitegolf )
@@ -6465,6 +6495,7 @@ GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, 0,        ROT2
 GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.N.K III (US)", 0 )
 GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
 GAME( 1986, athena,    0,        athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena", 0 )
+GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
 GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
 GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
 GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )

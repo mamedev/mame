@@ -313,8 +313,7 @@ void menu_select_software::build_software_list()
 	// iterate thru all software lists
 	for (software_list_device &swlist : software_list_device_iterator(config.root_device()))
 	{
-		m_filter_data.swlist.name.push_back(swlist.list_name());
-		m_filter_data.swlist.description.push_back(swlist.description());
+		m_filter_data.add_list(swlist.list_name(), swlist.description());
 		for (const software_info &swinfo : swlist.get_info())
 		{
 			const software_part &part = swinfo.parts().front();
@@ -337,10 +336,10 @@ void menu_select_software::build_software_list()
 
 				ui_software_info tmpmatches(swinfo, part, *m_driver, swlist.list_name(), instance_name, type_name);
 
-				m_filter_data.region.set(tmpmatches.longname);
-				m_filter_data.publisher.set(tmpmatches.publisher);
-				m_filter_data.year.set(tmpmatches.year);
-				m_filter_data.type.set(tmpmatches.devicetype);
+				m_filter_data.add_region(tmpmatches.longname);
+				m_filter_data.add_publisher(tmpmatches.publisher);
+				m_filter_data.add_year(tmpmatches.year);
+				m_filter_data.add_device_type(tmpmatches.devicetype);
 				m_swinfo.emplace_back(std::move(tmpmatches));
 			}
 		}
@@ -375,8 +374,7 @@ void menu_select_software::build_software_list()
 	}
 
 	std::string searchstr, curpath;
-	const osd::directory::entry *dir;
-	for (auto & elem : m_filter_data.swlist.name)
+	for (auto & elem : m_filter_data.list_names())
 	{
 		path_iterator path(machine().options().media_path());
 		while (path.next(curpath))
@@ -385,6 +383,7 @@ void menu_select_software::build_software_list()
 			file_enumerator fpath(searchstr.c_str());
 
 			// iterate while we get new objects
+			osd::directory::entry const *dir;
 			while ((dir = fpath.next()) != nullptr)
 			{
 				std::string name;
@@ -408,10 +407,7 @@ void menu_select_software::build_software_list()
 
 	// sort array
 	std::stable_sort(m_swinfo.begin() + 1, m_swinfo.end(), compare_software);
-	std::stable_sort(m_filter_data.region.ui.begin(), m_filter_data.region.ui.end());
-	std::stable_sort(m_filter_data.year.ui.begin(), m_filter_data.year.ui.end());
-	std::stable_sort(m_filter_data.type.ui.begin(), m_filter_data.type.ui.end());
-	std::stable_sort(m_filter_data.publisher.ui.begin(), m_filter_data.publisher.ui.end());
+	m_filter_data.finalise();
 
 	for (size_t x = 1; x < m_swinfo.size(); ++x)
 		m_sortedlist.push_back(&m_swinfo[x]);

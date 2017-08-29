@@ -1319,8 +1319,11 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			break;
 
 		case 0x50:  // graphics mode
-			machine().first_screen()->update_now();
-			m_video->m_graphics = true;
+			if (m_video->m_graphics == false) // avoid flickering from II+ refresh polling
+			{
+				machine().first_screen()->update_now();
+				m_video->m_graphics = true;
+			}
 			break;
 
 		case 0x51:  // text mode

@@ -4021,7 +4021,7 @@ ROM_START( glpracr3j )
 	ROM_LOAD( "mg08", 0x000000, 0x000008, CRC(679367fe) SHA1(495b03e1cdad9d6aaf509b73d837340e2b1bb23b) )
 ROM_END
 
-ROM_START( tecmowcm )
+ROM_START( twcupmil )
 	TPS_BIOS
 
 	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
@@ -5211,7 +5211,7 @@ GAME( 1999, flamegunj, flamegun, coh1002m,    zn,       zn_state, 0, ROT0, "Gaps
 GAME( 1999, lpadv,     coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Amuse World",            "Logic Pro Adventure (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2000, tblkkuzu,  coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tamsoft / D3 Publisher", "The Block Kuzushi (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2000, 1on1gov,   coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "1 on 1 Government (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, tecmowcm,  coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "Tecmo World Cup Millennium (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, twcupmil,  coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "Tecmo World Cup Millennium (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2001, mfjump,    coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "Monster Farm Jump (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Video System */

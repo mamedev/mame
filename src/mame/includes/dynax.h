@@ -6,10 +6,7 @@
 
 ***************************************************************************/
 
-#include "machine/74259.h"
 #include "machine/bankdev.h"
-#include "machine/msm6242.h"
-#include "sound/ym2413.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -21,13 +18,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
-		, m_ym2413(*this, "ym2413")
 		, m_oki(*this, "oki")
 		, m_msm(*this, "msm")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_rtc(*this, "rtc")
-		, m_mainlatch(*this, "mainlatch")
 		, m_bankdev(*this, "bankdev")
 		, m_gfx_region1(*this, "gfx1")
 		, m_gfx_region2(*this, "gfx2")
@@ -44,13 +38,10 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
-	optional_device<ym2413_device> m_ym2413;
 	optional_device<okim6295_device> m_oki;
 	optional_device<msm5205_device> m_msm;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<msm6242_device> m_rtc;
-	optional_device<ls259_device> m_mainlatch;
 	optional_device<address_map_bank_device> m_bankdev;
 	optional_region_ptr<uint8_t> m_gfx_region1;
 	optional_region_ptr<uint8_t> m_gfx_region2;
@@ -164,7 +155,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nanajign_palette_hi_w);
 	void nanajign_palette_update(offs_t offset);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(yarunara_mainlatch_w);
 	DECLARE_WRITE8_MEMBER(hjingi_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(hjingi_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(hjingi_hopper_w);

@@ -154,6 +154,7 @@ public:
 	DECLARE_DRIVER_INIT(puyopuy2);
 	DECLARE_DRIVER_INIT(zunkyou);
 	DECLARE_DRIVER_INIT(pclub);
+	DECLARE_DRIVER_INIT(pclubj);
 	DECLARE_DRIVER_INIT(pclubjv2);
 	DECLARE_DRIVER_INIT(pclubjv4);
 	DECLARE_DRIVER_INIT(pclubjv5);
@@ -2079,6 +2080,16 @@ ROM_START( pclubjv5 ) /* Print Club vol.5 (c)1996 Atlus */
 	ROM_LOAD( "epr-18169.ic4", 0x000000, 0x080000, CRC(5c00ccfb) SHA1(d043ffa6528bb9b76774c96df4edf8222a1878a4) )
 ROM_END
 
+ROM_START( pclub ) /* english version based on v2 */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-ic32.32", 0x000000, 0x080000, CRC(3fe9bda7) SHA1(2d3bf0f10c8b9a07a263365c5d81067c91974fe1) )
+	ROM_LOAD16_BYTE( "epr-ic31.31", 0x000001, 0x080000, CRC(90f994d0) SHA1(687d537481bfc05a5809161a8f1c686aa157cb8f) )
+	ROM_LOAD16_BYTE( "epr-ic34.34", 0x100000, 0x080000, CRC(4d1ebb55) SHA1(f403990ff41418d14bae645cffd5c042ce13312c) )
+	ROM_LOAD16_BYTE( "epr-ic33.33", 0x100001, 0x080000, CRC(bdfdc797) SHA1(aec561a591ca1387b7d38ffe48a2c179a39c1b06) )
+
+	ROM_REGION( 0x080000, "upd", 0 )
+	ROM_LOAD( "epr-ic4.4", 0x000000, 0x080000, CRC(84eed1c4) SHA1(271b199250f9a7f6ba5d3bf09e187417b7c2f88e) )
+ROM_END
 
 
 /******************************************************************************
@@ -2459,41 +2470,35 @@ DRIVER_INIT_MEMBER(segac2_state,zunkyou)
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_zunkyou),this));
 }
 
+DRIVER_INIT_MEMBER(segac2_state, pclub)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+}
 
-DRIVER_INIT_MEMBER(segac2_state,pclub)
+DRIVER_INIT_MEMBER(segac2_state,pclubj)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclub),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv2),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv4),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv5),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 
@@ -2573,8 +2578,12 @@ GAME( 1994, puyopuy2,  0,        segac2, puyopuy2, segac2_state, puyopuy2, ROT0,
 
 GAME( 1994, zunkyou,   0,        segac2, zunkyou, segac2_state,  zunkyou,  ROT0,   "Sega", "Zunzunkyou No Yabou (Japan)", 0 )
 
-/* Atlus Print Club 'Games' (C-2 Hardware, might not be possible to support them because they use camera + printer, really just put here for reference) */
-GAME( 1995, pclubj,    0,        segac2, pclub,    segac2_pc_state, pclub,    ROT0, "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )
-GAME( 1995, pclubjv2,  pclubj,   segac2, pclubjv2, segac2_pc_state, pclubjv2, ROT0, "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING )
-GAME( 1996, pclubjv4,  pclubj,   segac2, pclubjv2, segac2_pc_state, pclubjv4, ROT0, "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING )
-GAME( 1996, pclubjv5,  pclubj,   segac2, pclubjv2, segac2_pc_state, pclubjv5, ROT0, "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING )
+/* Atlus Print Club 'Games' (C-2 Hardware) requires printer and camera emulation */
+GAME( 1995, pclubj,    0,        segac2, pclub,    segac2_pc_state, pclubj,   ROT0, "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )
+
+GAME( 1995, pclubjv2,  0,        segac2, pclubjv2, segac2_pc_state, pclubjv2, ROT0, "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING )
+GAME( 1995, pclub,     pclubjv2, segac2, pclubjv2, segac2_pc_state, pclubj,   ROT0, "Atlus", "Print Club (World)", MACHINE_NOT_WORKING ) // based on Japan Vol.2 but no Vol.2 subtitle
+
+GAME( 1996, pclubjv4,  0,        segac2, pclubjv2, segac2_pc_state, pclubjv4, ROT0, "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING )
+
+GAME( 1996, pclubjv5,  0,        segac2, pclubjv2, segac2_pc_state, pclubjv5, ROT0, "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING )

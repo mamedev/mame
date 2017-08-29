@@ -145,6 +145,11 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		// clear the IRQ request.  The MCU does not clear it itself.
 		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 		break;
+	case TIMER_DEC8_M6502:
+		// Gondomania schematics show a LS194 for the sound IRQ, sharing the 6502 clock
+		// S1=H, S0=L, LSI=H, and QA is the only output connected (to NMI)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		break;
 	default:
 		assert_always(false, "Unknown id in dec8_state::device_timer");
 	}
@@ -157,7 +162,7 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
 		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-		timer_set(m_mcu->clocks_to_attotime(64), TIMER_DEC8_I8751); // 64 clocks not confirmed
+		m_i8751_timer->adjust(m_mcu->clocks_to_attotime(64)); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;
@@ -378,7 +383,8 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 WRITE8_MEMBER(dec8_state::dec8_sound_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
 WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
@@ -1896,6 +1902,9 @@ INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
 
 void dec8_state::machine_start()
 {
+	m_i8751_timer = timer_alloc(TIMER_DEC8_I8751);
+	m_m6502_timer = timer_alloc(TIMER_DEC8_M6502);
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_i8751_port0));

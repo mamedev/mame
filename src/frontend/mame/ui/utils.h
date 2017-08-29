@@ -26,7 +26,17 @@ class mame_ui_manager;
 class render_container;
 
 
-// TODO: namespace this thing
+// TODO: namespace these things
+
+struct ui_system_info
+{
+	ui_system_info() { }
+	ui_system_info(game_driver const &d, bool a) : driver(&d), available(a) { }
+
+	game_driver const *driver = nullptr;
+	bool available = false;
+};
+
 struct ui_software_info
 {
 	ui_software_info() { }
@@ -49,8 +59,9 @@ struct ui_software_info
 	ui_software_info &operator=(ui_software_info const &) = default;
 	ui_software_info &operator=(ui_software_info &&) = default;
 
-	bool operator==(ui_software_info const &r)
+	bool operator==(ui_software_info const &r) const
 	{
+		// compares all fields except available
 		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
 			   && year == r.year && publisher == r.publisher && supported == r.supported
 			   && part == r.part && driver == r.driver && listname == r.listname
@@ -65,7 +76,7 @@ struct ui_software_info
 	std::string publisher;
 	uint8_t supported = 0;
 	std::string part;
-	const game_driver *driver = nullptr;
+	game_driver const *driver = nullptr;
 	std::string listname;
 	std::string interface;
 	std::string instance;
@@ -79,7 +90,36 @@ struct ui_software_info
 
 namespace ui {
 
-struct s_filter; // FIXME: this is declared in custmenu.h, it shouldn't be
+class software_filter_data
+{
+public:
+	std::vector<std::string> const &regions()           const { return m_regions; }
+	std::vector<std::string> const &publishers()        const { return m_publishers; }
+	std::vector<std::string> const &years()             const { return m_years; }
+	std::vector<std::string> const &device_types()      const { return m_device_types; }
+	std::vector<std::string> const &list_names()        const { return m_list_names; }
+	std::vector<std::string> const &list_descriptions() const { return m_list_descriptions; }
+
+	// adding entries
+	void add_region(std::string const &longname);
+	void add_publisher(std::string const &publisher);
+	void add_year(std::string const &year);
+	void add_device_type(std::string const &device_type);
+	void add_list(std::string const &name, std::string const &description);
+	void finalise();
+
+	// use heuristics to extract meaningful parts from software list fields
+	static std::string extract_region(std::string const &longname);
+	static std::string extract_publisher(std::string const &publisher);
+
+private:
+	std::vector<std::string>    m_regions;
+	std::vector<std::string>    m_publishers;
+	std::vector<std::string>    m_years;
+	std::vector<std::string>    m_device_types;
+	std::vector<std::string>    m_list_names, m_list_descriptions;
+};
+
 
 template <class Impl, typename Entry>
 class filter_base
@@ -108,17 +148,19 @@ public:
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const
 	{
-		std::copy_if(first, last, dest, [this] (Entry const *info) { return apply(*info); });
+		std::copy_if(first, last, dest, [this] (auto const &info) { return this->apply(info); });
 	}
 
 protected:
 	using entry_type = Entry;
 
 	filter_base() { }
+
+	bool apply(Entry const *info) const { return apply(*info); }
 };
 
 
-class machine_filter : public filter_base<machine_filter, game_driver>
+class machine_filter : public filter_base<machine_filter, ui_system_info>
 {
 public:
 	enum type : uint16_t
@@ -133,6 +175,7 @@ public:
 		CATEGORY,
 		FAVORITE,
 		BIOS,
+		NOT_BIOS,
 		PARENTS,
 		CLONES,
 		MANUFACTURER,
@@ -158,8 +201,8 @@ public:
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
-	using filter_base<machine_filter, game_driver>::config_name;
-	using filter_base<machine_filter, game_driver>::display_name;
+	using filter_base<machine_filter, ui_system_info>::config_name;
+	using filter_base<machine_filter, ui_system_info>::display_name;
 
 protected:
 	machine_filter();
@@ -199,8 +242,8 @@ public:
 	virtual type get_type() const = 0;
 	virtual std::string adorned_display_name(type n) const = 0;
 
-	static ptr create(type n, s_filter const &data) { return create(n, data, nullptr, nullptr, 0); }
-	static ptr create(emu_file &file, s_filter const &data) { return create(file, data, 0); }
+	static ptr create(type n, software_filter_data const &data) { return create(n, data, nullptr, nullptr, 0); }
+	static ptr create(emu_file &file, software_filter_data const &data) { return create(file, data, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
@@ -210,8 +253,8 @@ public:
 protected:
 	software_filter();
 
-	static ptr create(type n, s_filter const &data, char const *value, emu_file *file, unsigned indent);
-	static ptr create(emu_file &file, s_filter const &data, unsigned indent);
+	static ptr create(type n, software_filter_data const &data, char const *value, emu_file *file, unsigned indent);
+	static ptr create(emu_file &file, software_filter_data const &data, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)

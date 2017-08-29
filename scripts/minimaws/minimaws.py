@@ -5,7 +5,7 @@
 ##
 ## Demonstrates use of MAME's XML system information output
 ##
-## This script requires Python 2.7 or Python 3, and ## SQLite 3.6.19 at
+## This script requires Python 2.7 or Python 3.4, and SQLite 3.6.19 at
 ## the very least.  Help is provided for all command-line options (use
 ## -h or --help).
 ##

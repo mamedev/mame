@@ -111,6 +111,7 @@ private:
 
 	uint32_t m_cpu_regs[0x1ff / 4];
 	uint16_t m_nile_irq_state;
+	int m_uart_irq;
 
 	void setup_pci_space();
 	uint32_t m_pci_laddr[2], m_pci_mask[2], m_pci_type[2];

@@ -54,7 +54,18 @@ device_bbc_tube_interface::~device_bbc_tube_interface()
 
 bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_TUBE_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	m_card(nullptr),
+	m_irq_handler(*this)
+{
+}
+
+
+//-------------------------------------------------
+//  bbc_tube_slot_device - destructor
+//-------------------------------------------------
+
+bbc_tube_slot_device::~bbc_tube_slot_device()
 {
 }
 
@@ -66,6 +77,9 @@ bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const 
 void bbc_tube_slot_device::device_start()
 {
 	m_card = dynamic_cast<device_bbc_tube_interface *>(get_card_device());
+
+	// resolve callbacks
+	m_irq_handler.resolve_safe();
 }
 
 
@@ -83,44 +97,75 @@ void bbc_tube_slot_device::device_reset()
 
 
 //-------------------------------------------------
-//  SLOT_INTERFACE( bbc_tube_ext_devices )
+//  host_r
 //-------------------------------------------------
+
+READ8_MEMBER(bbc_tube_slot_device::host_r)
+{
+	if (m_card)
+		return m_card->host_r(space, offset);
+	else
+		return 0xfe;
+}
+
+//-------------------------------------------------
+//  host_w
+//-------------------------------------------------
+
+WRITE8_MEMBER(bbc_tube_slot_device::host_w)
+{
+	if (m_card)
+		m_card->host_w(space, offset, data);
+}
 
 
 // slot devices
-//#include "6502copro.h"
-//#include "z80copro.h"
-//#include "32016copro.h"
-//#include "cambcopro.h"
-//#include "armcopro.h"
-//#include "unicopro.h"
+#include "tube_6502.h"
+#include "tube_65c102.h"
+#include "tube_80186.h"
+//#include "tube_80286.h"
+//#include "tube_arm.h"
+#include "tube_casper.h"
+//#include "tube_x25.h"
+#include "tube_z80.h"
+//#include "tube_zep100.h"
 
 
-SLOT_INTERFACE_START( bbc_tube_ext_devices )
-//  SLOT_INTERFACE("6502copro",  BBC_6502_COPRO)     /* Acorn ANC01 6502 2nd processor */
-//  SLOT_INTERFACE("z80copro",   BBC_Z80_COPRO)      /* Acorn ANC04 Z80 2nd processor */
-//  SLOT_INTERFACE("32016copro", BBC_32016_COPRO)    /* Acorn ANC05 32016 2nd processor */
-//  SLOT_INTERFACE("cambcopro",  BBC_CAMB_COPRO)     /* Acorn ANC06 Cambridge Co-Processor */
-//  SLOT_INTERFACE("armcopro",   BBC_ARM_COPRO)      /* Acorn ANC13 ARM Evaluation System */
-//  SLOT_INTERFACE("unicopro",   BBC_UNIVERSAL)      /* Acorn ANC21 Universal 2nd Processor Unit */
-//  SLOT_INTERFACE("a500copro",  BBC_A500_COPRO)     /* Acorn A500 2nd Processor */
+//-------------------------------------------------
+//  SLOT_INTERFACE( bbc_extube_devices )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( bbc_extube_devices )
+	SLOT_INTERFACE("6502",   BBC_TUBE_6502)    /* Acorn ANC01 6502 2nd processor */
+	SLOT_INTERFACE("z80",    BBC_TUBE_Z80)     /* Acorn ANC04 Z80 2nd processor */
+//  SLOT_INTERFACE("32016", BBC_TUBE_32016)    /* Acorn ANC05 32016 2nd processor */
+//  SLOT_INTERFACE("camb",  BBC_TUBE_CAMB)     /* Acorn ANC06 Cambridge Co-Processor */
+//  SLOT_INTERFACE("arm",    BBC_TUBE_ARM)     /* Acorn ANC13 ARM Evaluation System */
+//  SLOT_INTERFACE("80286",  BBC_TUBE_80286)   /* Acorn 80286 2nd Processor */
+//  SLOT_INTERFACE("a500",  BBC_TUBE_A500)     /* Acorn A500 2nd Processor */
+	SLOT_INTERFACE("casper", BBC_TUBE_CASPER)  /* Casper 68000 2nd Processor */
+//  SLOT_INTERFACE("zep100", BBC_TUBE_ZEP100)  /* Torch Z80 Communicator (ZEP100) */
+	/* Acorn ANC21 Universal 2nd Processor Unit */
+	SLOT_INTERFACE("65c102", BBC_TUBE_65C102)  /* Acorn ADC06 65C102 co-processor */
+	SLOT_INTERFACE("80186",  BBC_TUBE_80186)   /* Acorn ADC08 80186 co-processor */
 SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  SLOT_INTERFACE( bbc_tube_int_devices )
+//  SLOT_INTERFACE( bbc_intube_devices )
 //-------------------------------------------------
 
-
-// slot devices
-//#include "65c102copro.h"
-//#include "80186copro.h"
-//#include "arm7copro.h"
-
-
-SLOT_INTERFACE_START( bbc_tube_int_devices )
-//  SLOT_INTERFACE("65c102copro", BBC_65C102_COPRO)  /* Acorn ADC06 6502 co-processor */
-//  SLOT_INTERFACE("80186copro",  BBC_80186_COPRO)   /* Acorn ADC08 80186 co-processor */
-//  SLOT_INTERFACE("80286copro",  BBC_80286_COPRO)   /* Acorn ADC08 80286 co-processor */
-//  SLOT_INTERFACE("arm7copro",   BBC_ARM7_COPRO)    /* Sprow ARM7 co-processor */
+SLOT_INTERFACE_START( bbc_intube_devices )
+	SLOT_INTERFACE("65c102", BBC_TUBE_65C102)  /* Acorn ADC06 65C102 co-processor */
+	SLOT_INTERFACE("80186",  BBC_TUBE_80186)   /* Acorn ADC08 80186 co-processor */
+//  SLOT_INTERFACE("arm7",   BBC_TUBE_ARM7)    /* Sprow ARM7 co-processor */
 SLOT_INTERFACE_END
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( bbc_x25tube_devices )
+//-------------------------------------------------
+
+//SLOT_INTERFACE_START( bbc_x25tube_devices )
+//  SLOT_INTERFACE("x25", BBC_TUBE_X25)        /* Econet X25 Gateway */
+//SLOT_INTERFACE_END

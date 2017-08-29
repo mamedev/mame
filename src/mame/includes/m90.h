@@ -35,7 +35,6 @@ public:
 	uint8_t m_last_pf2;
 	DECLARE_WRITE16_MEMBER(m90_coincounter_w);
 	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
 	DECLARE_WRITE16_MEMBER(m90_video_control_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
 	DECLARE_DRIVER_INIT(bomblord);

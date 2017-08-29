@@ -1653,10 +1653,10 @@ ROM_END
 /* ROM sets from Didact was not versioned in general, so the numbering are just assumptions */
 ROM_START( e100 )
 	ROM_REGION(0x4000, "roms", 0)
-	ROM_DEFAULT_BIOS("rev2 BASIC")
+	ROM_DEFAULT_BIOS("rev2-basic")
 
 	/* TODO: Get the original ROMs */
-	ROM_SYSTEM_BIOS(0, "rev1 BASIC", "Esselte 100 rev1 BASIC")
+	ROM_SYSTEM_BIOS(0, "rev1-basic", "Esselte 100 rev1 BASIC")
 	ROMX_LOAD( "e100r1U201.bin", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(1) )
 	ROMX_LOAD( "e100r1U202.bin", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(1) )
 	ROMX_LOAD( "e100r1U203.bin", 0x2000, 0x0800, NO_DUMP, ROM_BIOS(1) )
@@ -1666,7 +1666,7 @@ ROM_START( e100 )
 
 	/* This is a prototype ROM, commercial relase not verified. The prototype also have different keyboard and supports
 	   more ram so might need to be split out as a clone later */
-	ROM_SYSTEM_BIOS(1, "rev2 BASIC", "Esselte 100 rev2 BASIC")
+	ROM_SYSTEM_BIOS(1, "rev2-basic", "Esselte 100 rev2 BASIC")
 	ROMX_LOAD( "e100r2U201.bin", 0x0000, 0x2000, CRC(53513b67) SHA1(a91c5c32aead82dcc87db5d818ff286a7fc6a5c8), ROM_BIOS(2) )
 	ROMX_LOAD( "e100r2U202.bin", 0x2000, 0x2000, CRC(eab3adf2) SHA1(ff3f5f5c8ea8732702a39cff76d0706ab6b751ee), ROM_BIOS(2) )
 

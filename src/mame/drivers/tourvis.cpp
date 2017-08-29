@@ -29,6 +29,7 @@
     Be Ball (93)
   * Blodia
     Bomberman (71)
+    Bomberman 93 (204)
     Bull Fight (185)
     Burning Angels (49)
     Cadash (203)
@@ -41,7 +42,7 @@
     Daisempuu (3)
     Dead Moon (?)
     Devil Crash (47)
-  * Die Hard
+    Die Hard (73)
     Dodge Ball (194)
     Doraemon Meikyuu Daisakusen (20)
     Doreamon - Nobita's Dorabian Night (Doraemon II, 43)
@@ -50,7 +51,7 @@
     Dragon Saber (65)
     Dragon Spirit (?)
     Drop Rock Hora Hora (12)
-    Dungeon Explorer (?)
+    Dungeon Explorer (209)
   * F1 Triple Battle
     Fighting Run (195)
     Final Blaster (29)
@@ -62,11 +63,13 @@
     Gunhed (148)
     Hana Taka Daka (Super Long Nose Goblin) (6)
   * Hatris
+    Hit The Ice (97)
     Image Fight (99)
     Jackie Chan (54)
     Jinmu Densho (19)
     Kato & Ken (42)
     Kiki Kaikai (120)
+    Knight Rider Special (193)
     Legend Of Hero Tomna (56)
     Makyo Densetsu - The Legendary Axe (40)
     Mashin Eiyuden Wataru (27)
@@ -547,18 +550,20 @@ MACHINE_CONFIG_END
 
 #define TOURVISION_BIOS \
 	ROM_REGION( 0x8000, "subcpu", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "60", "U4-60" ) \
-	ROMX_LOAD( "u4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
-	ROM_SYSTEM_BIOS( 1, "55", "U4-55" ) \
-	ROMX_LOAD( "u4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
-	ROM_SYSTEM_BIOS( 2, "53", "U4-53" ) \
-	ROMX_LOAD( "u4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(3) ) \
-	ROM_SYSTEM_BIOS( 3, "52", "U4-52" ) \
-	ROMX_LOAD( "u4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(4) ) \
-	ROM_SYSTEM_BIOS( 4, "43", "U4-43" ) \
-	ROMX_LOAD( "u4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
-	ROM_SYSTEM_BIOS( 5, "40", "U4-40" ) \
-	ROMX_LOAD( "u4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 0, "60", "V4-60" ) \
+	ROMX_LOAD( "v4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
+	ROM_SYSTEM_BIOS( 1, "55", "V4-55" ) \
+	ROMX_LOAD( "v4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
+	ROM_SYSTEM_BIOS( 2, "53", "V4-53" ) \
+	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(3) ) \
+	ROM_SYSTEM_BIOS( 3, "52", "V4-52" ) \
+	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(4) ) \
+	ROM_SYSTEM_BIOS( 4, "43", "V4-43" ) \
+	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
+	ROM_SYSTEM_BIOS( 5, "40", "V4-40" ) \
+	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(6) ) \
+	ROM_SYSTEM_BIOS( 6, "12", "V1-20" ) \
+	ROMX_LOAD( "v1_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(7) )
 
 
 ROM_START(tourvis)

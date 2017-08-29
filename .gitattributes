@@ -32,6 +32,7 @@
 *.py                svneol=native#text/plain
 
 *.dtd               svneol=native#application/xml-dtd
+*.cfg               svneol=native#text/xml
 *.hsi               svneol=native#text/xml
 *.lay               svneol=native#text/xml
 *.xml               svneol=native#text/xml

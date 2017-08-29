@@ -5542,7 +5542,7 @@ ROM_END
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
 ****************************************/
 
-ROM_START( tws96 ) /* MVS ONLY RELEASE */
+ROM_START( twsoc96 ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "086-p1.p1", 0x000000, 0x100000, CRC(03e20ab6) SHA1(3a0a5a54649178ce7a6158980cb4445084b40fb5) ) /* mask rom TC538200 */
 
@@ -7218,9 +7218,10 @@ ROM_END
  NEO-MVS PROGBK1 / NEO-MVS CHA256
 ****************************************/
 
+// newer, sports lives setting in service mode plus other minor differences
 ROM_START( shocktro ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x500000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
-	ROM_LOAD16_WORD_SWAP( "238-p1.p1",  0x000000, 0x100000, CRC(5677456f) SHA1(f76169fa5c90871d65e2a16fd1bb036c90533ac8) )
+	ROM_LOAD16_WORD_SWAP( "238-pg1.p1", 0x000000, 0x100000, CRC(efedf8dc) SHA1(f638df9bf7aa7d514ee2bccfc7f2adbf39ca83fc) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "238-p2.sp2", 0x100000, 0x400000, CRC(5b4a09c5) SHA1(de04036cba2da4bb2da73d902d1822b82b4f67a9) ) /* TC5332205 */
 
 	NEO_SFIX_128K( "238-s1.s1", CRC(1f95cedb) SHA1(adfa74868147fd260481e4c387d254d3b6de83f4) ) /* TC531000 */
@@ -7244,7 +7245,7 @@ ROM_END
 
 ROM_START( shocktroa ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x500000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
-	ROM_LOAD16_WORD_SWAP( "238-pg1.p1", 0x000000, 0x100000, CRC(efedf8dc) SHA1(f638df9bf7aa7d514ee2bccfc7f2adbf39ca83fc) ) /* TC538200 */
+	ROM_LOAD16_WORD_SWAP( "238-p1.p1",  0x000000, 0x100000, CRC(5677456f) SHA1(f76169fa5c90871d65e2a16fd1bb036c90533ac8) )
 	ROM_LOAD16_WORD_SWAP( "238-p2.sp2", 0x100000, 0x400000, CRC(5b4a09c5) SHA1(de04036cba2da4bb2da73d902d1822b82b4f67a9) ) /* TC5332205 */
 
 	NEO_SFIX_128K( "238-s1.s1", CRC(1f95cedb) SHA1(adfa74868147fd260481e4c387d254d3b6de83f4) ) /* TC531000 */
@@ -11047,7 +11048,7 @@ GAME( 1995, gowcaizr,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1996, sdodgeb,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Super Dodge Ball / Kunio no Nekketsu Toukyuu Densetsu", MACHINE_SUPPORTS_SAVE )
 
 /* Tecmo */
-GAME( 1996, tws96,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, twsoc96,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", MACHINE_SUPPORTS_SAVE )
 
 /* Viccom */
 GAME( 1994, fightfev,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Viccom", "Fight Fever (set 1)", MACHINE_SUPPORTS_SAVE )

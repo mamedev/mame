@@ -223,6 +223,7 @@ protected:
 		SEEK_WAIT_STEP_SIGNAL_TIME_DONE,
 		SEEK_WAIT_STEP_TIME,
 		SEEK_WAIT_STEP_TIME_DONE,
+		SEEK_WAIT_DONE,
 		SEEK_DONE,
 
 		HEAD_LOAD_DONE,
@@ -368,6 +369,7 @@ protected:
 	uint8_t fifo_pop(bool internal);
 	void set_drq(bool state);
 	bool get_ready(int fid);
+	void set_ds(int state);
 
 	void enable_transfer();
 	void disable_transfer();

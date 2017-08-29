@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 

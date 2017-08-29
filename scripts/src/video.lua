@@ -270,6 +270,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/nt7534.h,VIDEOS["NT7534"] = true
+--------------------------------------------------
+
+if (VIDEOS["NT7534"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/nt7534.cpp",
+		MAME_DIR .. "src/devices/video/nt7534.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd44102.h,VIDEOS["HD44102"] = true
 --------------------------------------------------
 

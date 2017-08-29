@@ -10,6 +10,8 @@
 
 #include "png.h"
 
+#include "unicode.h"
+
 #include <zlib.h>
 
 #include <algorithm>
@@ -17,9 +19,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cmath>
-#include <list>
 #include <new>
-#include <utility>
 
 #include <math.h>
 #include <stdlib.h>
@@ -37,44 +37,6 @@ static const int samples[] = { 1, 0, 3, 1, 2, 0, 4 };
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-static inline uint8_t fetch_8bit(uint8_t *v)
-{
-	return *v;
-}
-
-
-#ifdef UNUSED_FUNCTION
-static inline uint16_t fetch_16bit(uint8_t *v)
-{
-	return big_endianize_int16(*(uint16_t *)v);
-}
-#endif
-
-static inline uint32_t fetch_32bit(uint8_t *v)
-{
-	return big_endianize_int32(*(uint32_t *)v);
-}
-
-
-static inline void put_8bit(uint8_t *v, uint8_t data)
-{
-	*v = data;
-}
-
-
-#ifdef UNUSED_FUNCTION
-static inline void put_16bit(uint8_t *v, uint16_t data)
-{
-	*(uint16_t *)v = big_endianize_int16(data);
-}
-#endif
-
-static inline void put_32bit(uint8_t *v, uint32_t data)
-{
-	*(uint32_t *)v = big_endianize_int32(data);
-}
-
 
 static inline int compute_rowbytes(const png_info &pnginfo)
 {
@@ -94,15 +56,7 @@ static inline int compute_rowbytes(const png_info &pnginfo)
 
 void png_info::free_data()
 {
-	while (textlist)
-	{
-		png_text *const temp = textlist;
-		textlist = temp->next;
-		if (temp->keyword)
-			delete[] (std::uint8_t *)temp->keyword;
-		delete temp;
-	}
-
+	textlist.clear();
 	palette.reset();
 	trans.reset();
 	image.reset();
@@ -111,6 +65,50 @@ void png_info::free_data()
 
 
 namespace {
+
+#define PNG_Signature       "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"
+#define MNG_Signature       "\x8A\x4D\x4E\x47\x0D\x0A\x1A\x0A"
+
+// Chunk names
+constexpr std::uint32_t PNG_CN_IHDR     = 0x49484452L;
+constexpr std::uint32_t PNG_CN_PLTE     = 0x504C5445L;
+constexpr std::uint32_t PNG_CN_IDAT     = 0x49444154L;
+constexpr std::uint32_t PNG_CN_IEND     = 0x49454E44L;
+constexpr std::uint32_t PNG_CN_gAMA     = 0x67414D41L;
+//constexpr std::uint32_t PNG_CN_sBIT     = 0x73424954L;
+//constexpr std::uint32_t PNG_CN_cHRM     = 0x6348524DL;
+constexpr std::uint32_t PNG_CN_tRNS     = 0x74524E53L;
+//constexpr std::uint32_t PNG_CN_bKGD     = 0x624B4744L;
+//constexpr std::uint32_t PNG_CN_hIST     = 0x68495354L;
+constexpr std::uint32_t PNG_CN_tEXt     = 0x74455874L;
+//constexpr std::uint32_t PNG_CN_zTXt     = 0x7A545874L;
+constexpr std::uint32_t PNG_CN_pHYs     = 0x70485973L;
+//constexpr std::uint32_t PNG_CN_oFFs     = 0x6F464673L;
+//constexpr std::uint32_t PNG_CN_tIME     = 0x74494D45L;
+//constexpr std::uint32_t PNG_CN_sCAL     = 0x7343414CL;
+
+// MNG Chunk names
+constexpr std::uint32_t MNG_CN_MHDR     = 0x4D484452L;
+constexpr std::uint32_t MNG_CN_MEND     = 0x4D454E44L;
+//constexpr std::uint32_t MNG_CN_TERM     = 0x5445524DL;
+//constexpr std::uint32_t MNG_CN_BACK     = 0x4241434BL;
+
+// Prediction filters
+constexpr std::uint8_t  PNG_PF_None     = 0;
+constexpr std::uint8_t  PNG_PF_Sub      = 1;
+constexpr std::uint8_t  PNG_PF_Up       = 2;
+constexpr std::uint8_t  PNG_PF_Average  = 3;
+constexpr std::uint8_t  PNG_PF_Paeth    = 4;
+
+
+inline uint8_t fetch_8bit(uint8_t const *v) { return *v; }
+inline uint16_t fetch_16bit(uint8_t const *v) { return big_endianize_int16(*reinterpret_cast<uint16_t const *>(v)); }
+inline uint32_t fetch_32bit(uint8_t const *v) { return big_endianize_int32(*reinterpret_cast<uint32_t const *>(v)); }
+
+inline void put_8bit(uint8_t *v, uint8_t data) { *v = data; }
+inline void put_16bit(uint8_t *v, uint16_t data) { *reinterpret_cast<uint16_t *>(v) = big_endianize_int16(data); }
+inline void put_32bit(uint8_t *v, uint32_t data) { *reinterpret_cast<uint32_t *>(v) = big_endianize_int32(data); }
+
 
 class png_private
 {
@@ -137,6 +135,8 @@ private:
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown colour format
 		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
 			return PNGERR_UNSUPPORTED_FORMAT; // unknown interlace method
+		if ((3 == pnginfo.color_type) && (!pnginfo.num_palette || !pnginfo.palette))
+			return PNGERR_FILE_CORRUPT; // indexed colour with no palette
 
 		// calculate the offset for each pass of the interlace
 		unsigned const pass_count(get_pass_count());
@@ -306,10 +306,14 @@ private:
 
 		case PNG_CN_PLTE: // palette
 			pnginfo.num_palette = length / 3;
+			if ((length % 3) || ((3 == pnginfo.color_type) && ((1 << pnginfo.bit_depth) < pnginfo.num_palette)))
+				return PNGERR_FILE_CORRUPT;
 			pnginfo.palette = std::move(data);
 			break;
 
 		case PNG_CN_tRNS: // transparency information
+			if (((0 == pnginfo.color_type) && (2 > length)) || ((2 == pnginfo.color_type) && (6 > length)))
+				return PNGERR_FILE_CORRUPT;
 			pnginfo.num_trans = length;
 			pnginfo.trans = std::move(data);
 			break;
@@ -334,24 +338,32 @@ private:
 			break;
 
 		case PNG_CN_tEXt: // text
+			try
 			{
+				// split into keyword and string
+				std::uint8_t const *kwbegin(&data[0]);
+				std::uint8_t const *const textend(kwbegin + length);
+				std::uint8_t const *const kwend(std::find(kwbegin, textend, '\0'));
+				std::uint8_t const *textbegin(kwend + ((textend == kwend) ? 0 : 1));
+
+				// text is ISO-8859-1 but MAME likes UTF-8
+				std::size_t buflen(2 * std::max(kwend - kwbegin, textend - textbegin));
+				std::unique_ptr<char []> utf8buf(new char [buflen]);
+				char const *const bufend(utf8buf.get() + buflen);
+				char *dst;
+				for (dst = utf8buf.get(); kwend > kwbegin; dst += utf8_from_uchar(dst, bufend - dst, *kwbegin++)) { }
+				std::string keyword(utf8buf.get(), dst);
+				for (dst = utf8buf.get(); textend > textbegin; dst += utf8_from_uchar(dst, bufend - dst, *textbegin++)) { }
+				std::string text(utf8buf.get(), dst);
+
 				// allocate a new text item
-				png_text *text;
-				try { text = new png_text; }
-				catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
-
-				// set the elements
-				text->keyword = (char *)data.release();
-				text->text = text->keyword + strlen(text->keyword) + 1;
-				text->next = nullptr;
-
-				// add to the end of the list
-				png_text *pt, *ct;
-				for (pt = nullptr, ct = pnginfo.textlist; ct != nullptr; pt = ct, ct = ct->next) { }
-				(pt ? pt->next : pnginfo.textlist) = text;
-
-				break;
+				pnginfo.textlist.emplace_back(std::move(keyword), std::move(text));
 			}
+			catch (std::bad_alloc const &)
+			{
+				return PNGERR_OUT_OF_MEMORY;
+			}
+			break;
 
 		/* anything else */
 		default:
@@ -530,12 +542,17 @@ public:
 			{
 				// handle grayscale non-alpha case
 				uint32_t const bpp(pnginfo.bit_depth >> 3);
+				std::uint16_t const transpen(pnginfo.trans ? fetch_16bit(pnginfo.trans.get()) : 0U);
+				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
 					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						rgb_t const pix(0xff, src[0], src[0], src[0]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+						std::uint16_t i_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src));
+						std::uint8_t const a_val((pnginfo.trans && (transpen == i_val)) ? 0x00 : 0xff);
+						i_val >>= samp_shift;
+						accumalpha &= a_val;
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, i_val, i_val, i_val);
 					}
 				}
 			}
@@ -560,12 +577,23 @@ public:
 				uint32_t const r(0 * bps);
 				uint32_t const g(1 * bps);
 				uint32_t const b(2 * bps);
+				std::uint16_t const transpen_r(pnginfo.trans ? fetch_16bit(&pnginfo.trans[0]) : 0U);
+				std::uint16_t const transpen_g(pnginfo.trans ? fetch_16bit(&pnginfo.trans[2]) : 0U);
+				std::uint16_t const transpen_b(pnginfo.trans ? fetch_16bit(&pnginfo.trans[4]) : 0U);
+				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
 					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						rgb_t const pix(0xff, src[r], src[g], src[b]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+						uint16_t r_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + r));
+						uint16_t g_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + g));
+						uint16_t b_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + b));
+						std::uint8_t const a_val((pnginfo.trans && (transpen_r == r_val) && (transpen_g == g_val) && (transpen_b == b_val)) ? 0x00 : 0xff);
+						r_val >>= samp_shift;
+						g_val >>= samp_shift;
+						b_val >>= samp_shift;
+						accumalpha &= a_val;
+						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, r_val, g_val, b_val);
 					}
 				}
 			}
@@ -622,6 +650,7 @@ public:
 		try { outbuf.reset(new std::uint8_t [outp_offset[pass_count]]); }
 		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
 
+		// upsample bitmap
 		std::uint8_t const bytesamples(8 / pnginfo.bit_depth);
 		for (unsigned pass = 0; pass_count > pass; ++pass)
 		{
@@ -660,6 +689,15 @@ public:
 					inp++;
 				}
 			}
+		}
+
+		// upsample transparent pen as well
+		if ((0 == pnginfo.color_type) && pnginfo.trans)
+		{
+			std::uint16_t pen(fetch_16bit(&pnginfo.trans[0]));
+			for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
+				pen |= pen << k;
+			put_16bit(&pnginfo.trans[0], pen);
 		}
 
 		pnginfo.image = std::move(outbuf);
@@ -790,31 +828,37 @@ png_error png_info::expand_buffer_8bit()
 
 png_error png_info::add_text(const char *keyword, const char *text)
 {
+	// apply rules to keyword
+	char32_t prev(0);
+	std::size_t cnt(0);
+	char const *const kwend(keyword + std::strlen(keyword));
+	for (char const *ptr = keyword; kwend > ptr; )
+	{
+		char32_t ch;
+		int const len(uchar_from_utf8(&ch, ptr, kwend - ptr));
+		if ((0 >= len) || (32 > ch) || (255 < ch) || ((126 < ch) && (161 > ch)) || (((32 == prev) || (keyword == ptr)) && (32 == ch)))
+			return PNGERR_UNSUPPORTED_FORMAT;
+		prev = ch;
+		++cnt;
+		ptr += len;
+	}
+	if ((32 == prev) || (1 > cnt) || (79 < cnt))
+		return PNGERR_UNSUPPORTED_FORMAT;
+
+	// apply rules to text
+	char const *const textend(text + std::strlen(text));
+	for (char const *ptr = text; textend > ptr; )
+	{
+		char32_t ch;
+		int const len(uchar_from_utf8(&ch, ptr, textend - ptr));
+		if ((0 >= len) || (1 > ch) || (255 < ch))
+			return PNGERR_UNSUPPORTED_FORMAT;
+		ptr += len;
+	}
+
 	// allocate a new text element
-	std::unique_ptr<png_text> newtext;
-	try { newtext.reset(new png_text); }
+	try { textlist.emplace_back(std::piecewise_construct, std::forward_as_tuple(keyword, kwend), std::forward_as_tuple(text, textend)); }
 	catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
-
-	// allocate a string long enough to hold both
-	std::size_t const keylen(std::strlen(keyword));
-	char *textdata;
-	try { textdata = reinterpret_cast<char *>(new std::uint8_t [keylen + 1 + std::strlen(text) + 1]); }
-	catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
-
-	// copy in the data
-	std::strcpy(textdata, keyword);
-	std::strcpy(textdata + keylen + 1, text);
-
-	// text follows a trailing nullptr
-	newtext->keyword = textdata;
-	newtext->text = textdata + keylen + 1;
-	newtext->next = nullptr;
-
-	// add us to the end of the linked list
-	png_text *pt, *ct;
-	for (pt = nullptr, ct = textlist; ct != nullptr; pt = ct, ct = ct->next) { }
-	(pt ? pt->next : textlist) = newtext.release();
-
 	return PNGERR_NONE;
 }
 
@@ -1087,10 +1131,9 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
 static png_error write_png_stream(util::core_file &fp, png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	uint8_t tempbuff[16];
-	png_text *text;
 	png_error error;
 
-	/* create an unfiltered image in either palette or RGB form */
+	// create an unfiltered image in either palette or RGB form
 	if (bitmap.format() == BITMAP_FORMAT_IND16 && palette_length <= 256)
 		error = convert_bitmap_to_image_palette(pnginfo, bitmap, palette_length, palette);
 	else
@@ -1098,9 +1141,9 @@ static png_error write_png_stream(util::core_file &fp, png_info &pnginfo, const 
 	if (error != PNGERR_NONE)
 		return error;
 
-	/* if we wanted to get clever and do filtering, we would do it here */
+	// if we wanted to get clever and do filtering, we would do it here
 
-	/* write the IHDR chunk */
+	// write the IHDR chunk
 	put_32bit(tempbuff + 0, pnginfo.width);
 	put_32bit(tempbuff + 4, pnginfo.height);
 	put_8bit(tempbuff + 8, pnginfo.bit_depth);
@@ -1112,26 +1155,58 @@ static png_error write_png_stream(util::core_file &fp, png_info &pnginfo, const 
 	if (error != PNGERR_NONE)
 		return error;
 
-	/* write the PLTE chunk */
+	// write the PLTE chunk
 	if (pnginfo.num_palette > 0)
 		error = write_chunk(fp, pnginfo.palette.get(), PNG_CN_PLTE, pnginfo.num_palette * 3);
 	if (error != PNGERR_NONE)
 		return error;
 
-	/* write a single IDAT chunk */
+	// write a single IDAT chunk */
 	error = write_deflated_chunk(fp, pnginfo.image.get(), PNG_CN_IDAT, pnginfo.height * (compute_rowbytes(pnginfo) + 1));
 	if (error != PNGERR_NONE)
 		return error;
 
-	/* write TEXT chunks */
-	for (text = pnginfo.textlist; text != nullptr; text = text->next)
+	// write TEXT chunks
+	std::vector<std::uint8_t> textbuf;
+	for (png_info::png_text const &text : pnginfo.textlist)
 	{
-		error = write_chunk(fp, (uint8_t *)text->keyword, PNG_CN_tEXt, (uint32_t)strlen(text->keyword) + 1 + (uint32_t)strlen(text->text));
+		try { textbuf.resize(text.first.length() + 1 + text.second.length()); }
+		catch (std::bad_alloc const &) { return PNGERR_OUT_OF_MEMORY; }
+		std::uint8_t *dst(&textbuf[0]);
+
+		// convert keyword to ISO-8859-1
+		char const *const kwend(text.first.c_str() + text.first.length());
+		for (char const *src = text.first.c_str(); kwend > src; ++dst)
+		{
+			char32_t ch;
+			int const len(uchar_from_utf8(&ch, src, kwend - src));
+			if (0 >= len)
+				break;
+			*dst = std::uint8_t(ch);
+			src += len;
+		}
+
+		// NUL separator between keword and text
+		*dst++ = 0;
+
+		// convert text to ISO-8859-1
+		char const *const textend(text.second.c_str() + text.second.length());
+		for (char const *src = text.second.c_str(); textend > src; ++dst)
+		{
+			char32_t ch;
+			int const len(uchar_from_utf8(&ch, src, textend - src));
+			if (0 >= len)
+				break;
+			*dst = std::uint8_t(ch);
+			src += len;
+		}
+
+		error = write_chunk(fp, &textbuf[0], PNG_CN_tEXt, dst - &textbuf[0]);
 		if (error != PNGERR_NONE)
 			return error;
 	}
 
-	/* write an IEND chunk */
+	// write an IEND chunk
 	return write_chunk(fp, nullptr, PNG_CN_IEND, 0);
 }
 

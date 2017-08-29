@@ -59,27 +59,10 @@ Notes:
 #include "speaker.h"
 
 
-READ16_MEMBER(aquarium_state::aquarium_coins_r)
+WRITE8_MEMBER(aquarium_state::aquarium_watchdog_w)
 {
-	int data;
-	data = (ioport("SYSTEM")->read() & 0x7fff);
-	data |= m_aquarium_snd_ack;
-	m_aquarium_snd_ack = 0;
-
-	return data;
-}
-
-WRITE8_MEMBER(aquarium_state::aquarium_snd_ack_w)
-{
-	m_aquarium_snd_ack = 0x8000;
-}
-
-WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
-{
-//  popmessage("sound write %04x",data);
-
-	m_soundlatch->write(space, 1, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_watchdog->write_line_ck(BIT(data, 7));
+	// bits 0 & 1 also used
 }
 
 WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
@@ -99,18 +82,7 @@ WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 
 uint8_t aquarium_state::aquarium_snd_bitswap( uint8_t scrambled_data )
 {
-	uint8_t data = 0;
-
-	data |= ((scrambled_data & 0x01) << 7);
-	data |= ((scrambled_data & 0x02) << 5);
-	data |= ((scrambled_data & 0x04) << 3);
-	data |= ((scrambled_data & 0x08) << 1);
-	data |= ((scrambled_data & 0x10) >> 1);
-	data |= ((scrambled_data & 0x20) >> 3);
-	data |= ((scrambled_data & 0x40) >> 5);
-	data |= ((scrambled_data & 0x80) >> 7);
-
-	return data;
+	return BITSWAP8(scrambled_data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER(aquarium_state::aquarium_oki_r)
@@ -139,9 +111,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
 	AM_RANGE(0xd80082, 0xd80083) AM_READNOP /* stored but not read back ? check code at 0x01f440 */
 	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xd80086, 0xd80087) AM_READ(aquarium_coins_r)
-	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP        /* ?? video related */
-	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE(aquarium_sound_w)
+	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(aquarium_watchdog_w, 0xff00)
+	AM_RANGE(0xd8008a, 0xd8008b) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -156,7 +128,7 @@ static ADDRESS_MAP_START( snd_portmap, AS_IO, 8, aquarium_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w) // only written with 0 for some reason
 	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
 ADDRESS_MAP_END
 
@@ -225,7 +197,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound status */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 INPUT_PORTS_END
 
 static const gfx_layout char5bpplayout =
@@ -312,16 +284,6 @@ static GFXDECODE_START( aquarium )
 	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-void aquarium_state::machine_start()
-{
-	save_item(NAME(m_aquarium_snd_ack));
-}
-
-void aquarium_state::machine_reset()
-{
-	m_aquarium_snd_ack = 0;
-}
-
 static MACHINE_CONFIG_START( aquarium )
 
 	/* basic machine hardware */
@@ -332,6 +294,9 @@ static MACHINE_CONFIG_START( aquarium )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6) // clock not verified on pcb
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_portmap)
+
+	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -352,6 +317,8 @@ static MACHINE_CONFIG_START( aquarium )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) // clock not verified on pcb
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

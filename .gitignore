@@ -40,6 +40,7 @@
 !/*.bdf
 !/LICENSE
 /.idea
+docs/build
 regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt

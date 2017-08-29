@@ -856,7 +856,7 @@ static SLOT_INTERFACE_START(rainbow_floppies)
 SLOT_INTERFACE("525qd", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
 SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
 SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
-SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster 
+SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
 SLOT_INTERFACE_END
 
 void rainbow_state::machine_start()
@@ -1224,7 +1224,7 @@ void rainbow_state::machine_reset()
 		}
 	}
 
-	if (m_inp6->read() == 0x00) // Unmap port if Corvus not present 
+	if (m_inp6->read() == 0x00) // Unmap port if Corvus not present
 			io.unmap_readwrite(0x20, 0x20);
 
 	// *********** FLOPPY DISK CONTROLLER [ NOT OPTIONAL ]
@@ -1424,7 +1424,7 @@ WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
 {
-	m_mpsc->rxca_w(state); 
+	m_mpsc->rxca_w(state);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
@@ -2327,7 +2327,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 
 		if ( fdc_ready && ((fdc_status & 0x40) == 0) && m_POWER_GOOD )
 			fdc_write_gate = 1; // "valid only when drive is selected" !
-	} 
+	}
 
 	int data = (
 		((fdc_step) ? 0x00 : 0x80) |
@@ -2441,9 +2441,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		m_floppy->ss_w((data & 0x20) ? 1 : 0); // RX50 board in Rainbow has 'side select'
 		m_floppy->set_rpm(300.);
 
-		if ( !m_floppy->exists() && (selected_drive > 1) ) 
+		if ( !m_floppy->exists() && (selected_drive > 1) )
 			popmessage("NO IMAGE ATTACHED TO %c\n", 65 + selected_drive );
-	} 
+	}
 
 	if(selected_drive < MAX_FLOPPIES)
 	{
@@ -2453,9 +2453,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		m_fdc->set_force_ready(force_ready); // 1 : assert DRIVE READY on FDC (diagnostic override)
 
 		if (selected_drive < 2)
-		{	data |= 8;
+		{   data |= 8;
 			enable_start = 0;
-			disable_start = 2; 
+			disable_start = 2;
 		}
 			else
 		{
@@ -2513,8 +2513,8 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
 
 // Edstrom: "The call to m1_r() on line 2571 is not needed as the 7201 does not have an M1 input, instead it expects to get a software iack."
-//				if (i == IRQ_COMM_PTR_INTR_L)
-//					m_mpsc->m1_r();  // serial interrupt acknowledge
+//              if (i == IRQ_COMM_PTR_INTR_L)
+//                  m_mpsc->m1_r();  // serial interrupt acknowledge
 
 				intnum = vectors[i] | m_irq_high;
 				break;

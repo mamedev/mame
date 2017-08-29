@@ -40,6 +40,28 @@
 		</part>
 	</software>
 
+	<software name="acornhit1">
+		<description>The Acornsoft Hits Vol.1</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="The Acornsoft Hits Vol1.ssd" size="102400" crc="426c5a05" sha1="b2758253391909771c43c30cc19b11b1088fd0ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acornhit2">
+		<description>The Acornsoft Hits Vol.2</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="95744">
+				<rom name="The Acornsoft Hits Vol2.ssd" size="95744" crc="01be9682" sha1="1e3afc6fb9a47b87e72efb55ab612150155d4981" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alps23">
 		<description>ALPS - Adventure Language Programming System</description>
 		<year>1987</year>
@@ -261,15 +283,15 @@
 		<year>1987</year>
 		<publisher>Bug Byte</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A: Master Version"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Dunjunz-SideA.ssd" size="102400" crc="720106d5" sha1="f999969ece13bc9054772290e8b57f64d7ad2b9b" offset="0" />
+				<rom name="Dunjunz-SideA.ssd" size="102400" crc="9c45c1c4" sha1="bf6120ed9c5756fb59af6731112fe71233aca0cf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B: BBC B Version"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Dunjunz-SideB.ssd" size="102400" crc="9c45c1c4" sha1="bf6120ed9c5756fb59af6731112fe71233aca0cf" offset="0" />
+				<rom name="Dunjunz-SideB.ssd" size="102400" crc="720106d5" sha1="f999969ece13bc9054772290e8b57f64d7ad2b9b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -301,7 +323,8 @@
 	<software name="elitea">
 		<description>Elite-A</description>
 		<year>1997</year>
-		<publisher>Unreleased</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Angus Duggan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="elitea.ssd" size="204800" crc="8f13afce" sha1="31e3cba984e5edc3bbd7f287f563b6d9aa6dd67e" offset="0" />
@@ -406,7 +429,7 @@
 	<software name="frogman">
 		<description>Frogman (Demo)</description>
 		<year>1993</year>
-		<publisher>Unreleased</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65280">
 				<rom name="frogman-demo.ssd" size="65280" crc="c4fc4bc9" sha1="c81ab2374b31fb3cd761e5a6aca7ed1fc321667f" offset="0" />
@@ -489,7 +512,7 @@
 		<description>Hyper Sports</description>
 		<year>1985</year>
 		<publisher>Imagine</publisher>
-		<info name="compatibility" value="disable Speech" />
+		<info name="usage" value="disable Speech" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="91392">
 				<rom name="HyperSports.ssd" size="91392" crc="8a99db6a" sha1="92ae7c8bbcef78f8ad4d89c3c2a61514d73291cb" offset="0" />
@@ -623,6 +646,28 @@
 		</part>
 	</software>
 
+	<software name="quill00" cloneof="quill">
+		<description>The Quill (A00)</description>
+		<year>1985</year>
+		<publisher>Gilsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="The Quill A00 (1985)(Gilsoft).ssd" size="204800" crc="8578f744" sha1="6beafe69e3b9aba39908f4bcc98c00dedc4f9c2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quill">
+		<description>The Quill (A03)</description>
+		<year>1985</year>
+		<publisher>Gilsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="The Quill A03 (1985)(Gilsoft).ssd" size="204800" crc="2d4ae9d7" sha1="596fd6983324146c12eca04aa02c047e9ade97e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="retdoom">
 		<description>Return to Doom</description>
 		<year>1988</year>
@@ -637,7 +682,7 @@
 	<software name="scavhunt">
 		<description>Scavenger Hunt</description>
 		<year>1984</year>
-		<publisher>Jacaranda Wiley</publisher>
+		<publisher>Jacaranda Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="scavenger_hunt.ssd" size="102400" crc="1aebeea2" sha1="b964f4c81e0f629c2bfc63e68be4ba016a65ba57" offset="0" />
@@ -652,6 +697,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="27904">
 				<rom name="Scrabble.ssd" size="27904" crc="5a4acaef" sha1="f708cb357ba9de9bac255d758b5da024bb35c754" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snapple">
+		<description>Snapple Hopper</description>
+		<year>1985</year>
+		<publisher>Macmillian</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Snapple Hopper.ssd" size="102400" crc="ba35ce9e" sha1="7731af036d80e3ae66d2f4062f8d93c0b9de0963" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -817,6 +873,39 @@
 		</part>
 	</software>
 
+	<software name="triviabb">
+		<description>Trivial Pursuit - Baby Boomer Edition</description>
+		<year>1986</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="Trivial Pursuit Baby Boomer Edition (Domark).ssd" size="179200" crc="b65fdcbe" sha1="a10ea2cb66e95df53e2c5ab2d01d617a539c8c1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trivialg">
+		<description>Trivial Pursuit - Genus Edition</description>
+		<year>1986</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="Trivial Pursuit Genus Edition (Domark).ssd" size="163840" crc="b56d7876" sha1="26af5eae4de2ebd46abb91223670997a02f76e44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triviayp">
+		<description>Trivial Pursuit - Young Players Edition</description>
+		<year>1986</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="Trivial Pursuit Young Players Edition (Domark).ssd" size="184320" crc="16cbb180" sha1="9d5582818b302a3ff9cf419a11f53117d500e517" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="welcome">
 		<description>Welcome and Disc Utils</description>
 		<year>1982</year>
@@ -890,7 +979,7 @@
 	<software name="zen">
 		<description>Zen</description>
 		<year>2012</year>
-		<publisher>Unreleased</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="author" value="Andrew Cook" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -1018,6 +1107,18 @@
 		</part>
 	</software>
 
+	<software name="modemmstr">
+		<description>Modem Master</description>
+		<year>1987</year>
+		<publisher>BBC Soft</publisher>
+		<info name="author" value="Peter Gaunt" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Modem Master (1987)(BBCSoft).ssd" size="102400" crc="5a5ee41f" sha1="4bc8b4d9f570d56ab718334155593ecbac61c391" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="offcmate">
 		<description>Office Mate</description>
 		<year>1986</year>
@@ -1120,14 +1221,36 @@
 		</part>
 	</software>
 
+	<software name="cntrville">
+		<description>Centre Ville</description>
+		<year>1986</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Centre Ville (Chalksoft).ssd" size="102400" crc="66ae85f4" sha1="0f4793fec5100de5b0a8a505c323e719606201c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chemstru">
 		<description>Chemical Structures</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SNE14" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="18176">
-				<rom name="chemical_structures.ssd" size="18176" crc="44c09860" sha1="ed725f3e1996ff8bb76043c37d5747a00b0c598a" offset="0" />
+			<dataarea name="flop" size="102400">
+				<rom name="Chemical Structures (1983)(Acornsoft).ssd" size="102400" crc="0ebd4344" sha1="7738b8a3657bc8ba19617f1b9eab8a5055ea4996" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chickchas">
+		<description>Chick Chase</description>
+		<year>1987</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Chick Chase (Chalksoft).ssd" size="102400" crc="0aefde4a" sha1="305210091a95f796b7e1f0d6eec1e0d3c4a49252" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1203,6 +1326,35 @@
 		</part>
 	</software>
 
+	<software name="firstfilr">
+		<description>First Filer</description>
+		<year>1986</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="First Filer - Program (Chalksoft).ssd" size="102400" crc="4d3ca4ee" sha1="990716b324373ad823411f9c0b835ea3da231a34" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="First Filer - Data (Chalksoft).ssd" size="102400" crc="af1b275f" sha1="49a46a7a69818745cd5687e371bd19f126773f2a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knitwear">
+		<description>Knitwear Designer</description>
+		<year>1987</year>
+		<publisher>Database Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Knitwear Designer (Database).ssd" size="204800" crc="a3b8b5d4" sha1="87c2b85ca57346646a34e82705616f6ac35db61e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="londonadv">
 		<description>London Adventure</description>
 		<year>1986</year>
@@ -1221,6 +1373,50 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="43520">
 				<rom name="Mr Yog and the Nippet (Sherston).ssd" size="43520" crc="9dd6d401" sha1="aba82455fbefb8a6621d39af219d5238a8bb426a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noteinvd">
+		<description>Note Invaders</description>
+		<year>1985</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Note Invaders (Chalksoft).ssd" size="102400" crc="d21d458e" sha1="98a5c7405cceb9d1e076f8322459abc2688cdb6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbscop">
+		<description>NumbersCope</description>
+		<year>1987</year>
+		<publisher>Fisher-Marriott</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="NumbersCope (Fisher-Marriott).ssd" size="102400" crc="36ca945b" sha1="e2378aebfb27fad374a5a9649a5a27a3b2744448" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numpictr">
+		<description>Numbers and Pictures</description>
+		<year>1987</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Numbers and Pictures (Chalksoft).ssd" size="102400" crc="41f5f07e" sha1="3c40260499fcf80589eecd2478d55386bff18697" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pirate">
+		<description>Pirate</description>
+		<year>1986</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Pirate (Chalksoft).ssd" size="102400" crc="25bba368" sha1="1c100059d8f5ce28e18784d086e22f9de9654ddc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1249,6 +1445,41 @@
 		</part>
 	</software>
 
+	<software name="rhythmkr">
+		<description>Rhythm Maker</description>
+		<year>1989</year>
+		<publisher>E.S.P.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Rhythm Maker (ESP).ssd" size="102400" crc="07e41dd0" sha1="f337e45544a69b8cc1f03ece0c82c388ebaa6fde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sciencesh">
+		<description>Science - Start Here!</description>
+		<year>1987</year>
+		<publisher>Central Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Pack 1 - Weather"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Science Start Here - Weather.ssd" size="102400" crc="92a082fe" sha1="96593ba84836b34b2bf785d4874bd5ffbc80144d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Pack 1 - Birds"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Science Start Here - Birds.ssd" size="102400" crc="d1953425" sha1="04ad7abfc7794339596143d30da1061b28c0f252" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Pack 1 - Myself"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Science Start Here - Myself.ssd" size="102400" crc="85d59681" sha1="70b6503a233de49a846ab6d37fafc429f766dc04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sellador">
 		<description>Selladore Tales</description>
 		<year>1991</year>
@@ -1267,6 +1498,61 @@
 		</part>
 	</software>
 
+	<software name="shapeup">
+		<description>Shape Up</description>
+		<year>1987</year>
+		<publisher>GSN Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Shape Up (GSN).ssd" size="102400" crc="d702a090" sha1="091c3476b72614ff5ce4ac645be843d93fd024a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spell">
+		<description>Spell!</description>
+		<year>198?</year>
+		<publisher>Database Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Spell (Database).ssd" size="204800" crc="1a00c48c" sha1="164923b68d9d7637b9d567639d676528628978ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starspelpe" cloneof="starspelp">
+		<description>Starspell Plus (Early)</description>
+		<year>1986</year>
+		<publisher>Fisher-Marriott</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Starspell Plus (Early) (Fisher-Marriott).ssd" size="204800" crc="7bd0b00e" sha1="9878b168191b475881cd6ec162730bb6d65d7854" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starspelp">
+		<description>Starspell Plus</description>
+		<year>1986</year>
+		<publisher>Fisher-Marriott</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Starspell Plus (Fisher-Marriott).ssd" size="102400" crc="43f94ccc" sha1="67fe665f659aca1e4de93b54d1176bbc01252d9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timeshar">
+		<description>TimeShare</description>
+		<year>1987</year>
+		<publisher>Fisher-Marriott</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="TimeShare (Fisher-Marriott).ssd" size="102400" crc="60aa3359" sha1="d5d9dd3d8fb03882380e4c2b78dcd35304bc3150" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wizretn">
 		<description>The Wizard's Return</description>
 		<year>1985</year>
@@ -1281,6 +1567,17 @@
 			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="102400">
 				<rom name="TheWizardsReturnPart2.ssd" size="102400" crc="b119a085" sha1="613e1de1a297adab19e3d63aece6c1c85b2bfc42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordskill">
+		<description>Word Skill</description>
+		<year>1984</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Word Skill (Chalksoft).ssd" size="102400" crc="2f110c6e" sha1="8baa49853bcb420f089d2872b8336f465e349664" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1448,13 +1745,13 @@
 
 	<software name="adfsutil">
 		<description>ADFS Utilities</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Acorn</publisher>
 		<info name="release" value="ANJ03" />
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="ADFS_Utilities.adm" size="327680" crc="4f7202c9" sha1="ce59c12cba87f146396c9fc4357690987ec42eb6" offset="0" />
+			<dataarea name="flop" size="163840">
+				<rom name="ADFS_Utilities.ads" size="163840" crc="c3d4c582" sha1="f5dc3ffabac313782cdbd9de0734403e8120171d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1489,6 +1786,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="econet_level_1_utils.ssd" size="204800" crc="ad0fb810" sha1="5df83812d0d8492943ad8d6582c049e1fc1fa583" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="integraw" supported="no">
+		<description>Integra Windows 1.00</description>
+		<year>1989</year>
+		<publisher>Computech</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Integra Windows 1.00 (Computech).ssd" size="102400" crc="c28d1caa" sha1="d1fe037f04b9b8b7c60d71fa671b64a8d4452103" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2361,6 +2669,270 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="81920">
 				<rom name="tyb-expansions.ssd" size="81920" crc="d0bc04b3" sha1="5f09b1f385e02df99c004d068f234fe249c54c33" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Teletext -->
+
+	<software name="4tstory1">
+		<description>The Fantastic Adventures of 4-T</description>
+		<year>1984</year>
+		<publisher>Meritel</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="4T_Story1.ssd" size="102400" crc="ec0febbe" sha1="c556d938e75e94279364c7c0752827ce7bc6fed2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4txmas">
+		<description>The Christmas Adventures of 4-T and his Friends</description>
+		<year>1984</year>
+		<publisher>Meritel</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="4T_Xmas.ssd" size="102400" crc="4bea988b" sha1="da755a6fec66bddfc859ca40fa5451a65a97ae01" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funrun">
+		<description>The Great British Fun Run</description>
+		<year>1985</year>
+		<publisher>Health Education Coucil</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="funrun.ssd" size="102400" crc="c88a9bf6" sha1="4c8ead3b8a1e442e1531b71be18eca40ad1ced10" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="health">
+		<description>Look After Yourself!</description>
+		<year>1986</year>
+		<publisher>Health Education Council</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="health.ssd" size="102400" crc="4f26c92c" sha1="7fbfb474aaa23c42cbb63b8ec04a34c1f355677c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- BeebSID -->
+
+	<software name="beebsid1">
+		<description>Beeb SID Player Disk #1 - The Bill Carr Selection</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="69120">
+				<rom name="pj_sid_01.ssd" size="69120" crc="dfe6f2a5" sha1="cdfe2d49ac6ce3580f93d28d896fd0cac044102f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid2">
+		<description>Beeb SID Player II - BBC Games</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="43520">
+				<rom name="pj_sid2.ssd" size="43520" crc="9339f2cf" sha1="efc7f3032cba441f5f8110fc63371549e545b3c7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid3">
+		<description>BeebSID III - The 80's</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107520">
+				<rom name="beebsid3.ssd" size="107520" crc="489c8c0b" sha1="ca8bbc734a9444007c6306f07e896cb12c8b04ca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid4">
+		<description>BeebSID IV - The Beatles</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="94720">
+				<rom name="beebsid4.ssd" size="94720" crc="7c987505" sha1="3ce0787e7fcd932fec34cb3dcccf05c1d7c8ede9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid5">
+		<description>BeebSID V - Movies</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="110080">
+				<rom name="beebsid5.ssd" size="110080" crc="d5da528d" sha1="9cb71cb0ffb48d3344b9937a0f0d16f3852cc476" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid6">
+		<description>BeebSID VI - Madonna</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="58880">
+				<rom name="beebsid6.ssd" size="58880" crc="77f4e91d" sha1="0fe012e7bdf35d05184c6e8c349ebbdb5981c1e0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid7">
+		<description>BeebSID VII - Xmas Time</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="76800">
+				<rom name="xmassid.ssd" size="76800" crc="fa1a0f10" sha1="d145872660c3d0ffa86903f1d6c603f2d67406fb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid8">
+		<description>BeebSID VIII - Queen</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="140800">
+				<rom name="beebsid8.ssd" size="140800" crc="c14ad72b" sha1="acda17c6e244cd002295d880b804b503dac369de" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid9">
+		<description>BeebSID IX - 1981</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="125440">
+				<rom name="beebsid9.ssd" size="125440" crc="1fff70c8" sha1="95547a9ec5f1c5e9e073da2744e661848500d8a5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid10">
+		<description>BeebSID X - Olympics</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81920">
+				<rom name="beebsid10.ssd" size="81920" crc="1bac6da7" sha1="ceea68da1c446a270e120242f18960023981a5be" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid11">
+		<description>BeebSID 11 - On the Telly</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="beebsid11.ssd" size="89600" crc="6e5493fc" sha1="88a381da146f1cb671c476a20bdbe84fffecf4c7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid12">
+		<description>BeebSID 12 - Jean-Michel Jarre</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="43520">
+				<rom name="beebsid12.ssd" size="43520" crc="24958ba0" sha1="83cf1e9ba640899aef5f90bfb68d6a2cf34d96e6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid13">
+		<description>BeebSID 13 - Michael Jackson</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="94720">
+				<rom name="beebsid13.ssd" size="94720" crc="ec6bed41" sha1="d5ebf345594c45289431875cf4a30e75da18afbd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid14">
+		<description>BeebSID 14 - 1982</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="53760">
+				<rom name="beebsid14.ssd" size="53760" crc="51378281" sha1="b75f6a1b119b003c251918efb9ccd65c9617a75f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid15">
+		<description>BeebSID 15 - 70's Rock</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="74240">
+				<rom name="beebsid15.ssd" size="74240" crc="dcf94822" sha1="fbb9b5bc34630545e42f2e8fa4e17e7b7ca5deac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid16">
+		<description>BeebSID 16 - ABBA</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104960">
+				<rom name="beebsid16.ssd" size="104960" crc="7cc1c77e" sha1="2158fa955c56e0bf51daf8546614891e6fdda91e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid17">
+		<description>BeebSID 17 - Pet Shop Boys</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="58880">
+				<rom name="beebsid17.ssd" size="58880" crc="b3a15530" sha1="24f43d128d28d4e4072826fc5437ea4ba3e37978" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidquiz">
+		<description>Beeb SID Quiz</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="240640">
+				<rom name="sidquiz.dsd" size="240640" crc="0a47bf55" sha1="26b9413b47f1e5d6b0fd501efcc73ab302fa3cff" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

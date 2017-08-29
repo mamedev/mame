@@ -3,6 +3,7 @@
 
 #include "machine/74157.h"
 #include "machine/eepromser.h"
+#include "machine/mb3773.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
 #include "video/excellent_spr.h"
@@ -19,6 +20,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
+		m_watchdog(*this, "watchdog"),
 		m_oki(*this, "oki"),
 		m_msm(*this, "msm"),
 		m_adpcm_select(*this, "adpcm_select"),
@@ -33,6 +35,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<mb3773_device> m_watchdog;
 	required_device<okim6295_device> m_oki;
 	required_device<msm6585_device> m_msm;
 	required_device<hct157_device> m_adpcm_select;

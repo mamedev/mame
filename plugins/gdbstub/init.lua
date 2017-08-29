@@ -156,7 +156,7 @@ function gdbstub.startplugin()
 			if cmd == "g" then
 				local regs = {}
 				for reg, idx in pairs(map.togdb) do
-					regs[idx] = makebestr(cpu.state[reg].value, map.regsize) 
+					regs[idx] = makebestr(cpu.state[reg].value, map.regsize)
 				end
 				local data = table.concat(regs)
 				socket:write("+$" .. data .. "#" .. chksum(data))

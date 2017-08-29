@@ -162,8 +162,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbcb_1mhzbus_devices );
-SLOT_INTERFACE_EXTERN( bbcm_1mhzbus_devices );
+SLOT_INTERFACE_EXTERN( bbc_1mhzbus_devices );
 
 
 #endif // MAME_BUS_BBC_1MHZBUS_1MHZBUS_H

@@ -25,8 +25,11 @@
 #define MCFG_MEPHISTO_SENSORS_BOARD_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MEPHISTO_SENSORS_BOARD, 0) \
 
-#define MCFG_MEPHISTO_BOARD_UPDATE_ALL_LEDS(_val) \
-	mephisto_board_device::static_set_upd_all_leds(*device, _val);
+#define MCFG_MEPHISTO_BUTTONS_BOARD_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MEPHISTO_BUTTONS_BOARD, 0) \
+
+#define MCFG_MEPHISTO_BOARD_DISABLE_LEDS(_val) \
+	mephisto_board_device::static_set_disable_leds(*device, _val);
 
 #define MCFG_MEPHISTO_DISPLAY_MODUL_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MEPHISTO_DISPLAY_MODUL, 0)
@@ -45,27 +48,29 @@ public:
 	mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	static void static_set_upd_all_leds(device_t &device, bool _upd_all_leds) { mephisto_board_device &dev=downcast<mephisto_board_device &>(device); dev.m_upd_all_leds = _upd_all_leds; }
+	static void static_set_disable_leds(device_t &device, int _disable_leds) { mephisto_board_device &dev=downcast<mephisto_board_device &>(device); dev.m_disable_leds = _disable_leds; }
 
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(led_upd_w);
-	DECLARE_WRITE8_MEMBER(mux_upd_w);
+
+	TIMER_CALLBACK_MEMBER(leds_update_callback);
+	TIMER_CALLBACK_MEMBER(leds_refresh_callback);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_leds();
-
 private:
 	required_ioport_array<8> m_sensors;
-	bool                     m_upd_all_leds;
+	emu_timer *              m_leds_update_timer;
+	emu_timer *              m_leds_refresh_timer;
+	bool                     m_disable_leds;
 	uint8_t                  m_mux;
 	uint8_t                  m_leds;
+	uint8_t                  m_leds_state[64];
 };
 
 // ======================> mephisto_sensors_board_device
@@ -75,6 +80,21 @@ class mephisto_sensors_board_device : public mephisto_board_device
 public:
 	// construction/destruction
 	mephisto_sensors_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+
+// ======================> mephisto_buttons_board_device
+
+class mephisto_buttons_board_device : public mephisto_board_device
+{
+public:
+	// construction/destruction
+	mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 
@@ -112,6 +132,7 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(MEPHISTO_SENSORS_BOARD, mephisto_sensors_board_device)
+DECLARE_DEVICE_TYPE(MEPHISTO_BUTTONS_BOARD, mephisto_buttons_board_device)
 DECLARE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODUL, mephisto_display_modul_device)
 
 

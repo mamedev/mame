@@ -731,6 +731,16 @@ uint32_t cdrom_get_track_start_phys(cdrom_file *file, uint32_t track)
 	return file->cdtoc.tracks[track].physframeofs;
 }
 
+/*-------------------------------------------------
+    cdrom_get_chd - get a handle to a CHD
+    from a cdrom
+-------------------------------------------------*/
+
+chd_file *cdrom_get_chd(cdrom_file *file)
+{
+	return file->chd;
+}
+
 /***************************************************************************
     TOC UTILITIES
 ***************************************************************************/
