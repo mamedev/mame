@@ -59,6 +59,7 @@
 /* Devices */
 #include "formats/acorn_dsk.h"
 #include "formats/fsd_dsk.h"
+#include "formats/pc_dsk.h"
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
@@ -189,7 +190,7 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 																																																							/*    fe80-fe9f  FDC            Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_DEVREADWRITE("mc6854", mc6854_device, read, write)                              /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)                            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
-	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
+	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)                      /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                                     /*    ff00-ffff                 OS ROM (continued)              */
 ADDRESS_MAP_END
 
@@ -226,6 +227,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -239,6 +241,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -252,6 +255,7 @@ static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_NOP                                                             /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_NOP                                                             /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -303,6 +307,9 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 		if (m_fdc) m_fdc->reset();
 		if (m_i8271) m_i8271->reset();
 		if (m_1mhzbus) m_1mhzbus->reset();
+		if (m_tube) m_tube->reset();
+		if (m_intube) m_intube->reset();
+		if (m_extube) m_extube->reset();
 	}
 }
 
@@ -768,7 +775,7 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_OPUS_DDOS_FORMAT,
-	FLOPPY_ACORN_CPM_FORMAT,
+	FLOPPY_OPUS_DDCPM_FORMAT,
 	FLOPPY_TORCH_CPN_FORMAT,
 	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END0
@@ -777,10 +784,11 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_ACORN_CPM_FORMAT,
+	FLOPPY_OPUS_DDCPM_FORMAT,
 	FLOPPY_TORCH_CPN_FORMAT,
 	FLOPPY_ACORN_DOS_FORMAT,
-	FLOPPY_FSD_FORMAT
+	FLOPPY_FSD_FORMAT,
+	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END0
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcmc )
@@ -990,7 +998,8 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(bbc_state, bus_nmi_w))
 
 	/* tube port */
-	MCFG_BBC_TUBE_SLOT_ADD("tube", bbc_tube_ext_devices, nullptr)
+	MCFG_BBC_TUBE_SLOT_ADD("tube", bbc_extube_devices, nullptr)
+	MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<4>))
 
 	/* user port */
 	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
@@ -999,10 +1008,6 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b",      "bbcb_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b",      "bbcb_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_flop_orig")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80",    "bbc_flop_z80")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016",  "bbc_flop_32016")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000",  "bbc_flop_68000")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_6502",   "bbc_flop_6502")
 MACHINE_CONFIG_END
 
 
@@ -1111,13 +1116,9 @@ static MACHINE_CONFIG_DERIVED( torchf, bbcb )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Add Torch Z80 Communicator co-processor */
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_torch", "bbc_flop_torch")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
+	//MCFG_DEVICE_MODIFY("tube")
+	//MCFG_SLOT_DEFAULT_OPTION("zep100")
+	//MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
 
@@ -1151,9 +1152,9 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
 	/* Add Z80 co-processor */
-	//MCFG_DEVICE_MODIFY("tube")
-	//MCFG_SLOT_DEFAULT_OPTION("z80")
-	//MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("tube")
+	MCFG_SLOT_DEFAULT_OPTION("z80")
+	MCFG_SLOT_FIXED(true)
 
 	/* Add ADAPTEC ACB-4000 Winchester Disc Controller */
 	//MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
@@ -1175,9 +1176,6 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1197,13 +1195,11 @@ static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
 	/* Add 20MB ST-412 Winchester Cambridge */
 
 	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_flop_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1224,10 +1220,6 @@ static MACHINE_CONFIG_DERIVED( abc310, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1260,10 +1252,6 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 
 	/* expansion ports */
 	MCFG_DEVICE_REMOVE("analogue")
@@ -1382,9 +1370,6 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_m", "bbcm_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_m", "bbcm_flop")
 	MCFG_SOFTWARE_LIST_ADD("cart_ls_m", "bbcm_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80",   "bbc_flop_z80")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_flop_32016")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000", "bbc_flop_68000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a",      "bbca_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b",      "bbcb_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b",      "bbcb_flop")
@@ -1453,8 +1438,10 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(bbc_state, bus_nmi_w))
 
 	/* tube ports */
-	MCFG_BBC_TUBE_SLOT_ADD("tube_ext", bbc_tube_ext_devices, nullptr)
-	MCFG_BBC_TUBE_SLOT_ADD("tube_int", bbc_tube_int_devices, nullptr)
+	MCFG_BBC_TUBE_SLOT_ADD("intube", bbc_intube_devices, nullptr)
+	MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<4>))
+	MCFG_BBC_TUBE_SLOT_ADD("extube", bbc_extube_devices, nullptr)
+	MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<5>))
 
 	/* user port */
 	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
@@ -1463,20 +1450,17 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbcmt, bbcm )
 	/* Add 65C102 co-processor */
-	//MCFG_DEVICE_MODIFY("tube_int")
-	//MCFG_SLOT_DEFAULT_OPTION("65c102copro")
-	//MCFG_SLOT_FIXED(true)
-
-	/* software lists */
-		MCFG_SOFTWARE_LIST_ADD("flop_ls_65c102", "bbc_flop_65c102")
+	MCFG_DEVICE_MODIFY("intube")
+	MCFG_SLOT_DEFAULT_OPTION("65c102")
+	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcmaiv, bbcm )
 	/* Add 65C102 co-processor */
-	//MCFG_DEVICE_MODIFY("intube")
-	//MCFG_SLOT_DEFAULT_OPTION("65c102")
-	//MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("intube")
+	MCFG_SLOT_DEFAULT_OPTION("65c102")
+	MCFG_SLOT_FIXED(true)
 
 	/* Add Philips VP415 Laserdisc player */
 
@@ -1499,9 +1483,6 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 
 	/* acia */
 	MCFG_DEVICE_REMOVE("acia6850")
@@ -1521,19 +1502,14 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcm512, bbcm )
-
 	/* Add Intel 80186 co-processor */
-	//MCFG_DEVICE_MODIFY("tube_int")
-	//MCFG_SLOT_DEFAULT_OPTION("80186copro")
-	//MCFG_SLOT_FIXED(true)
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_80186", "bbc_flop_80186")
+	MCFG_DEVICE_MODIFY("intube")
+	MCFG_SLOT_DEFAULT_OPTION("80186")
+	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
-
 	/* Add ARM co-processor */
 
 	/* software lists */
@@ -1607,9 +1583,6 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 	MCFG_SOFTWARE_LIST_REMOVE("cart_ls_m")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_mc", "bbcmc_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_pro128s", "pro128s_flop")
@@ -1617,6 +1590,8 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	/* expansion ports */
 	MCFG_DEVICE_REMOVE("analogue")
 	MCFG_COMPACT_JOYPORT_ADD("joyport", bbc_joyport_devices, "joystick")
+	MCFG_DEVICE_REMOVE("intube")
+	MCFG_DEVICE_REMOVE("extube")
 MACHINE_CONFIG_END
 
 
@@ -2029,7 +2004,7 @@ ROM_START(econx25)
 	ROM_LOAD("2201,248_03_anfs.rom",  0x1c000, 0x4000, CRC(744a60a7) SHA1(c733b108d74cf3b1c5de395335236800a7c9c0d8))
 	ROM_LOAD("0201,241_01_bpos2.rom", 0x20000, 0x8000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))
 	/* X25 TSI is in IC37 which is supposed to take a speech PHROM, so not sure where this is mapped */
-	ROM_LOAD("0246,215_02_x25tsi_v0.51.rom", 0x30000, 0x8000, CRC(71dd84e4) SHA1(bbfa892fdcc6f753dda5134ecb97cc7c42b959c2))
+	ROM_LOAD("0246,215_02_x25tsi_v0.51.rom", 0x30000, 0x4000, CRC(71dd84e4) SHA1(bbfa892fdcc6f753dda5134ecb97cc7c42b959c2))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -2377,7 +2352,7 @@ COMP ( 1985, ltmpbp,   bbcbp,   0,     ltmpbp,   ltmpbp, bbc_state,      bbc,   
 COMP ( 1985, reutapm,  bbcbp,   0,     reutapm,  bbcb,   bbc_state,      bbc,     "Acorn",           "Reuters APM",                   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 COMP ( 1986, econx25,  bbcbp,   0,     econx25,  bbcbp,  bbc_state,      bbc,     "Acorn",           "Econet X25 Gateway",            MACHINE_NOT_WORKING)
 COMP ( 1986, bbcm,     0,       bbcb,  bbcm,     bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master 128",                MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1986, bbcmt,    bbcm,    0,     bbcmt,    bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master Turbo",              MACHINE_NOT_WORKING)
+COMP ( 1986, bbcmt,    bbcm,    0,     bbcmt,    bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master Turbo",              MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmaiv,  bbcm,    0,     bbcmaiv,  bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master AIV",                MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmet,   bbcm,    0,     bbcmet,   bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master ET",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcm512,  bbcm,    0,     bbcm512,  bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master 512",                MACHINE_NOT_WORKING)

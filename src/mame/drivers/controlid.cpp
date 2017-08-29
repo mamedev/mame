@@ -41,7 +41,7 @@ public:
 		m_lcdc(*this, "nt7534") { }
 	DECLARE_WRITE8_MEMBER( p0_w );
 	DECLARE_WRITE8_MEMBER( p1_w );
-        DECLARE_PALETTE_INIT( controlidx628 );
+		DECLARE_PALETTE_INIT( controlidx628 );
 
 	required_device<nt7534_device> m_lcdc;
 private:
@@ -61,11 +61,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, controlidx628_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 
-//	/* Ports start here */
+//  /* Ports start here */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_WRITE(p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
-//	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_RAM
-//	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_RAM
+//  AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_RAM
+//  AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -94,8 +94,8 @@ PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 {
 	// These colors were selected from a photo of the display
 	// using the color-picker in Inkscape:
-        palette.set_pen_color(0, rgb_t(0x06, 0x61, 0xEE));
-        palette.set_pen_color(1, rgb_t(0x00, 0x23, 0x84));
+		palette.set_pen_color(0, rgb_t(0x06, 0x61, 0xEE));
+		palette.set_pen_color(1, rgb_t(0x00, 0x23, 0x84));
 }
 
 /*************************
@@ -108,19 +108,19 @@ static MACHINE_CONFIG_START( controlidx628 )
 	MCFG_CPU_PROGRAM_MAP(prog_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-        /* video hardware */
-        MCFG_SCREEN_ADD("screen", LCD)
-        MCFG_SCREEN_REFRESH_RATE(50)
-        MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-        MCFG_SCREEN_SIZE(132, 65)
-        MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
-        MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
-        MCFG_SCREEN_PALETTE("palette")
+		/* video hardware */
+		MCFG_SCREEN_ADD("screen", LCD)
+		MCFG_SCREEN_REFRESH_RATE(50)
+		MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+		MCFG_SCREEN_SIZE(132, 65)
+		MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
+		MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
+		MCFG_SCREEN_PALETTE("palette")
 
-        MCFG_PALETTE_ADD("palette", 2)
-        MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
+		MCFG_PALETTE_ADD("palette", 2)
+		MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
 
-        MCFG_NT7534_ADD("nt7534")
+		MCFG_NT7534_ADD("nt7534")
 MACHINE_CONFIG_END
 
 

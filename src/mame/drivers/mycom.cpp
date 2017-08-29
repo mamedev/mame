@@ -561,7 +561,7 @@ ROM_START( mycom )
 	ROM_SYSTEM_BIOS(0, "mycom", "40 column")
 	ROMX_LOAD( "bios0.rom", 0x10000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a), ROM_BIOS(1))
 	ROMX_LOAD( "basic0.rom",0x13000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "Takeda", "80 column")
+	ROM_SYSTEM_BIOS(1, "takeda", "80 column")
 	ROMX_LOAD( "bios1.rom", 0x10000, 0x3000, CRC(c51d7fcb) SHA1(31d39db43b77cca4d49ff9814d531e056924e716), ROM_BIOS(2))
 	ROMX_LOAD( "basic1.rom",0x13000, 0x1000, CRC(30a573f1) SHA1(e3fe2e73644e831b52e2789dc7c181989cc30b82), ROM_BIOS(2))
 	/* Takeda bios has no cursor. Use the next lines to turn on cursor, but you must comment out when done. */

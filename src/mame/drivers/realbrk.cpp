@@ -1115,7 +1115,7 @@ ROM_END
 
 ROM_START( realbrkj )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* TMP68301 Code */
-	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) ) // sldh w/realbrko 
+	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) ) // sldh w/realbrko
 	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(9cc1596e) SHA1(a598f18eaac1ed6943069e9500b07b77e263f0d0) ) // sldh w/realbrko
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */

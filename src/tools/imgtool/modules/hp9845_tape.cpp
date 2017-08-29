@@ -150,7 +150,7 @@
 #define BYTES_USED_MASK     0x00ff  // Mask of "bytes used" field
 #define FORMAT_SECT_SIZE    ((tape_pos_t)(2.85 * hti_format_t::ONE_INCH_POS)) // Size of sectors including padding: 2.85"
 #define PREAMBLE_WORD       0   // Value of preamble word
-#define WORDS_PER_HEADER_N_SECTOR	(WORDS_PER_SECTOR + 5)
+#define WORDS_PER_HEADER_N_SECTOR   (WORDS_PER_SECTOR + 5)
 #define MIN_IRG_SIZE        ((tape_pos_t)(0.066 * hti_format_t::ONE_INCH_POS))    // Minimum size of IRG gaps: 0.066"
 
 // File types

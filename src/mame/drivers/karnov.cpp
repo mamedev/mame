@@ -367,7 +367,6 @@ WRITE16_MEMBER(karnov_state::karnov_control_w)
 
 		case 2: /* SONREQ (Sound CPU byte) */
 			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
@@ -838,6 +837,7 @@ static MACHINE_CONFIG_START( karnov )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

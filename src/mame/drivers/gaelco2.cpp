@@ -316,7 +316,7 @@ READ16_MEMBER(gaelco2_state::play2000_shareram_68k_r)
 		if (offset * 2 == 0x42c) return 0x0000;
 		if (offset * 2 == 0x42e) return 0x00f0;
 		if (offset * 2 == 0xc04) return 0x7171;
-		//	return 0x0000;
+		//  return 0x0000;
 	}
 
 	logerror("%04x read from shareram %04x %04x %04x\n", pc, offset * 2, mem_mask, ret & mem_mask);
@@ -326,7 +326,7 @@ READ16_MEMBER(gaelco2_state::play2000_shareram_68k_r)
 WRITE16_MEMBER(gaelco2_state::play2000_shareram_68k_w)
 {
 	int pc = space.device().safe_pc();
-	
+
 	COMBINE_DATA(&m_shareram[offset]);
 
 	if (pc == 0x00552) return; // initial RAM check
@@ -343,10 +343,10 @@ static ADDRESS_MAP_START( play2000_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
 	AM_RANGE(0x214000, 0x214fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
-	AM_RANGE(0x215000, 0x217fff) AM_RAM																		/* Written to, but unused? */
-	AM_RANGE(0x218000, 0x218003) AM_RAM																		/* Written to, but unused? */
+	AM_RANGE(0x215000, 0x217fff) AM_RAM                                                                     /* Written to, but unused? */
+	AM_RANGE(0x218000, 0x218003) AM_RAM                                                                     /* Written to, but unused? */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                   /* Video Registers */
-	AM_RANGE(0x21800a, 0x218fff) AM_RAM																		/* Written to, but unused? */
+	AM_RANGE(0x21800a, 0x218fff) AM_RAM                                                                     /* Written to, but unused? */
 	// AM_RANGE(0x843100, 0x84315e)  ?
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_READWRITE(play2000_shareram_68k_r, play2000_shareram_68k_w) AM_SHARE("shareram")                                                /* Work RAM */
@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( play2000 )
 	MCFG_GAELCO_SND_DATA("gfx1")
 	MCFG_GAELCO_BANKS(1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000) // ?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0) 
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

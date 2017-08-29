@@ -62,7 +62,7 @@ public:
 			REG_CR_CLK    = 0x0100,
 			REG_CR_POT_MASK = 0x00e0,
 			REG_CR_MODE_MASK   = 0x001c, // Mode mask
-			REG_CR_MODE_ICOC   = 0x0000, // Input Capture Output Compare 
+			REG_CR_MODE_ICOC   = 0x0000, // Input Capture Output Compare
 			REG_CR_MODE_SQWG   = 0x0004, // Square Wave Generator
 			REG_CR_MODE_VDCSW  = 0x0008, // Variable Duty Cycle Square Wave generator
 			REG_CR_MODE_VWSSPG = 0x000c, // Variable Width Single Shot Pulse Generator
@@ -78,15 +78,15 @@ public:
 	};
 
 	enum {
-			REG_SR_IRQ 		= 0x8000,
-			REG_SR_TO  		= 0x4000,
-			REG_SR_TG  		= 0x2000,
-			REG_SR_TC  		= 0x1000,
-			REG_SR_TGL 		= 0x0800,
-			REG_SR_ON  		= 0x0400,
-			REG_SR_OUT 		= 0x0200,
-			REG_SR_COM		= 0x0100,
-			REG_SR_PSC_OUT	= 0x00ff,
+			REG_SR_IRQ      = 0x8000,
+			REG_SR_TO       = 0x4000,
+			REG_SR_TG       = 0x2000,
+			REG_SR_TC       = 0x1000,
+			REG_SR_TGL      = 0x0800,
+			REG_SR_ON       = 0x0400,
+			REG_SR_OUT      = 0x0200,
+			REG_SR_COM      = 0x0100,
+			REG_SR_PSC_OUT  = 0x00ff,
 	};
 
 };

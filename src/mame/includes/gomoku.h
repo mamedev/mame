@@ -3,7 +3,6 @@
 #ifndef MAME_INCLUDES_GOMOKU_H
 #define MAME_INCLUDES_GOMOKU_H
 
-#include "machine/74259.h"
 #include "screen.h"
 
 class gomoku_state : public driver_device
@@ -16,7 +15,6 @@ public:
 		m_bgram(*this, "bgram"),
 		m_inputs(*this, {"IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4"}),
 		m_maincpu(*this, "maincpu"),
-		m_latch(*this, "latch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
 
@@ -29,7 +27,6 @@ public:
 	bitmap_ind16 m_bg_bitmap;
 	optional_ioport_array<8> m_inputs;
 	DECLARE_READ8_MEMBER(input_port_r);
-	DECLARE_WRITE8_MEMBER(gomoku_latch_w);
 	DECLARE_WRITE8_MEMBER(gomoku_videoram_w);
 	DECLARE_WRITE8_MEMBER(gomoku_colorram_w);
 	DECLARE_WRITE8_MEMBER(gomoku_bgram_w);
@@ -40,7 +37,6 @@ public:
 	DECLARE_PALETTE_INIT(gomoku);
 	uint32_t screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<ls259_device> m_latch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 };

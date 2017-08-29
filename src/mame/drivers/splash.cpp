@@ -186,12 +186,12 @@ READ8_MEMBER(splash_state::roldfrog_unk_r)
 static ADDRESS_MAP_START( roldfrog_sound_io_map, AS_IO, 8, splash_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_NOP
 	AM_RANGE(0x31, 0x31) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x37, 0x37) AM_WRITE(roldfrog_vblank_ack_w )
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x70, 0x70) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
-	AM_RANGE(0x0, 0xff) AM_READ(roldfrog_unk_r)
+	AM_RANGE(0x20, 0x23) AM_READ(roldfrog_unk_r)
 ADDRESS_MAP_END
 
 READ16_MEMBER(funystrp_state::spr_read)
@@ -572,6 +572,7 @@ static MACHINE_CONFIG_START( roldfrog )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(splash_state, ym_irq))

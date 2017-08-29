@@ -160,7 +160,7 @@
 
     This game is similar to the NSW/ACT games however it requires a four-digit setup code before it can be initialized.
     By default, this number is 4856.
-    
+
 After the game has accepted this code, press Collect (A) and Play 7 Lines (G) at the same time to clear the memory.
 
     TODO (MK-5 specific):

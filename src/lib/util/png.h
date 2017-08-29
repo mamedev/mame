@@ -66,7 +66,7 @@ public:
 	void free_data();
 	void reset() { free_data(); operator=(png_info()); }
 
-	std::unique_ptr<std::uint8_t []>	image;
+	std::unique_ptr<std::uint8_t []>    image;
 	std::uint32_t                       width, height;
 	std::uint32_t                       xres = 0, yres = 0;
 	rectangle                           screen;

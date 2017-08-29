@@ -1456,16 +1456,18 @@ void validity_checker::validate_roms(device_t &root)
 		m_current_device = &device;
 
 		// scan the ROM entries for this device
-		const char *last_region_name = "???";
-		const char *last_name = "???";
+		char const *last_region_name = "???";
+		char const *last_name = "???";
 		u32 current_length = 0;
 		int items_since_region = 1;
 		int last_bios = 0;
 		int total_files = 0;
-		for (const rom_entry *romp = rom_first_region(device); romp != nullptr && !ROMENTRY_ISEND(romp); romp++)
+		std::unordered_map<std::string, int> bios_names;
+		std::unordered_map<std::string, std::string> bios_descs;
+		char const *defbios = nullptr;
+		for (const rom_entry *romp = rom_first_region(device); romp && !ROMENTRY_ISEND(romp); romp++)
 		{
-			// if this is a region, make sure it's valid, and record the length
-			if (ROMENTRY_ISREGION(romp))
+			if (ROMENTRY_ISREGION(romp)) // if this is a region, make sure it's valid, and record the length
 			{
 				// if we haven't seen any items since the last region, print a warning
 				if (items_since_region == 0)
@@ -1494,18 +1496,39 @@ void validity_checker::validate_roms(device_t &root)
 				if (!m_region_map.insert(std::make_pair(fulltag, current_length)).second)
 					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.c_str());
 			}
-
-			// If this is a system bios, make sure it is using the next available bios number
-			else if (ROMENTRY_ISSYSTEM_BIOS(romp))
+			else if (ROMENTRY_ISSYSTEM_BIOS(romp)) // If this is a system bios, make sure it is using the next available bios number
 			{
-				int bios_flags = ROM_GETBIOSFLAGS(romp);
+				int const bios_flags = ROM_GETBIOSFLAGS(romp);
+				char const *const biosname = ROM_GETNAME(romp);
 				if (bios_flags != last_bios + 1)
-					osd_printf_error("Non-sequential bios %s (specified as %d, expected to be %d)\n", ROM_GETNAME(romp), bios_flags, last_bios + 1);
+					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags, last_bios + 1);
 				last_bios = bios_flags;
-			}
 
-			// if this is a file, make sure it is properly formatted
-			else if (ROMENTRY_ISFILE(romp))
+				// validate the name
+				if (strlen(biosname) > 16)
+					osd_printf_error("BIOS name %s exceeds maximum 16 characters\n", biosname);
+				for (char const *s = biosname; *s; ++s)
+				{
+					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '.') && (*s != '_') && (*s != '-'))
+					{
+						osd_printf_error("BIOS name %s contains invalid characters\n", biosname);
+						break;
+					}
+				}
+
+				// check for duplicate names/descriptions
+				auto const nameins = bios_names.emplace(biosname, bios_flags);
+				if (!nameins.second)
+					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags);
+				auto const descins = bios_descs.emplace(ROM_GETHASHDATA(romp), biosname);
+				if (!descins.second)
+					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, ROM_GETHASHDATA(romp), descins.first->second.c_str());
+			}
+			else if (ROMENTRY_ISDEFAULT_BIOS(romp)) // if this is a default BIOS setting, remember it so it to check at the end
+			{
+				defbios = ROM_GETNAME(romp);
+			}
+			else if (ROMENTRY_ISFILE(romp)) // if this is a file, make sure it is properly formatted
 			{
 				// track the last filename we found
 				last_name = ROM_GETNAME(romp);
@@ -1526,10 +1549,13 @@ void validity_checker::validate_roms(device_t &root)
 			}
 		}
 
+		// check that default BIOS exists
+		if (defbios && (bios_names.find(defbios) == bios_names.end()))
+			osd_printf_error("Default BIOS '%s' not found\n", defbios);
+
 		// final check for empty regions
 		if (items_since_region == 0)
 			osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
-
 
 		// reset the current device
 		m_current_device = nullptr;
@@ -1939,8 +1965,9 @@ void validity_checker::validate_device_types()
 			}
 
 			// check for name conflicts
-			auto const drvname(m_names_map.find(dev->shortname()));
-			auto const devname(device_shortname_map.emplace(dev->shortname(), &type));
+			std::string tmpname(dev->shortname());
+			game_driver_map::const_iterator const drvname(m_names_map.find(tmpname));
+			auto const devname(device_shortname_map.emplace(std::move(tmpname), &type));
 			if (m_names_map.end() != drvname)
 			{
 				game_driver const &dup(*drvname->second);
@@ -1962,8 +1989,9 @@ void validity_checker::validate_device_types()
 		else
 		{
 			// check for description conflicts
-			auto const drvdesc(m_descriptions_map.find(dev->name()));
-			auto const devdesc(device_name_map.emplace(dev->name(), &type));
+			std::string tmpdesc(dev->name());
+			game_driver_map::const_iterator const drvdesc(m_descriptions_map.find(tmpdesc));
+			auto const devdesc(device_name_map.emplace(std::move(tmpdesc), &type));
 			if (m_descriptions_map.end() != drvdesc)
 			{
 				game_driver const &dup(*drvdesc->second);

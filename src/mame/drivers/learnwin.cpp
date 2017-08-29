@@ -8,8 +8,8 @@ Learning-Window Teaching Computer by V-Tech /  Spiel Master by Yuvo (German)
 
 Info from Kevin Horton (Kevtris):
 The -081 on the 'speech' cart board had that mystery sp0256 next to it with its markings ground off.
-The chip with the marking ground off is the most common SP0256 chip, the SP0256-AL2 chip 
-(it was common enough to be sold by electronic stores like Radio Shack in the USA) 
+The chip with the marking ground off is the most common SP0256 chip, the SP0256-AL2 chip
+(it was common enough to be sold by electronic stores like Radio Shack in the USA)
 and used on the currah speech cart for c64 and many many other places.
 
 The rom for this exists in MAME as:
@@ -33,7 +33,7 @@ SPR128A-047    -  Learning Window speech cart US (rev 1)
 SPR128A-049    -  Learning Window cart Number Power  US
 SPR128A-050    -  Learning Window cart Alphabet Soup  U.S.
 SPR128A-055    -  Learning Window cart IQ Builder U.S.
-SPR128A-069    -  Learning Window system french 
+SPR128A-069    -  Learning Window system french
 SPR128A-077    -  Learning Window system US (rev 2)
 SPR128A-080    -  Learning Window system (German)
 SPR128A-081    -  Learning Window speech cart (German)
@@ -140,7 +140,7 @@ void learnwin_state::machine_reset()
 static MACHINE_CONFIG_START( learnwin )
 
 	/* video hardware */
-//	MCFG_SCREEN_ADD("screen", LCD)
+//  MCFG_SCREEN_ADD("screen", LCD)
 //    MCFG_SCREEN_REFRESH_RATE(60)
 //    MCFG_SCREEN_SIZE(48, 32)
 //    MCFG_SCREEN_VISIBLE_AREA(0,47,0,31)
@@ -201,8 +201,8 @@ ROM_START( spielmast )
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 1986, learnwin,  0,        learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (Rev 3)", MACHINE_IS_SKELETON )
-GAME( 1986, learnwin2, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (Rev 2)", MACHINE_IS_SKELETON )
-GAME( 1986, learnwin1, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (Rev 1)", MACHINE_IS_SKELETON )
-GAME( 1986, learnwinf, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "V-Tech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
-GAME( 1986, spielmast, learnwin, learnwin, learnwin, learnwin_state, 0, ROT0, "Yuvo",   "Spiel Master (German)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin,  0,        0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 3)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin2, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 2)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin1, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 1)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwinf, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
+COMP( 1986, spielmast, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "Yuvo",   "Spiel Master (German)", MACHINE_IS_SKELETON )

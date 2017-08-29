@@ -244,6 +244,7 @@ enum
 	XTAL_54MHz          = 54000000,     /* Taito JC */
 	XTAL_55MHz          = 55000000,     /* Eolith Vega */
 	XTAL_57_2727MHz     = 57272727,     /* Psikyo SH2 with /2 divider (16x NTSC subcarrier)*/
+	XTAL_58MHz          = 58000000,     /* Magic Reel (Play System) */
 	XTAL_60MHz          = 60000000,
 	XTAL_61_44MHz       = 61440000,     /* dkong */
 	XTAL_64MHz          = 64000000,     /* BattleToads */

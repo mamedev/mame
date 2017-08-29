@@ -49,10 +49,10 @@ namespace webpp {
 
 		std::string remote_endpoint_address;
 		unsigned short remote_endpoint_port;
-		
+
 		virtual ~Request() {}
 	};
-	
+
 	struct Response {
 		virtual Response& status(int number) = 0;
 		virtual void type(std::string str) = 0;
@@ -61,7 +61,7 @@ namespace webpp {
 
 		virtual ~Response() {}
 	};
-	
+
 	class http_server;
 }
 #endif  /* MAME_LIB_UTIL_SERVER_HTTP_HPP */

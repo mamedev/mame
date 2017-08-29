@@ -193,7 +193,7 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		m_ir = data;
 	}
 
-        if (m_ir == 0xE2)
+		if (m_ir == 0xE2)
 	{
 		// Reset
 		memset(m_ddram, 0x00, sizeof(m_ddram));
@@ -202,14 +202,14 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		LOG("NT7534: Reset \n");
 		return;
 	}
-        else if ((m_ir & 0xFE) == 0xAE)
+		else if ((m_ir & 0xFE) == 0xAE)
 	{
 		// Display ON/OFF
 		m_display_on = m_ir & 1;
 		LOG("NT7534: Display %s\n", m_display_on ? "ON" : "OFF");
 		return;
 	}
-        else if ((m_ir & 0xC0) == 0x40)
+		else if ((m_ir & 0xC0) == 0x40)
 	{
 		// Display Start Line Set
 		m_display_start_line = m_ir & 0x3F;
@@ -240,28 +240,28 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		LOG("NT7534: set column address LSB %x\n", m_column & 0x0F);
 		return;
 	}
-        else if ((m_ir & 0xFE) == 0xA0)
+	else if ((m_ir & 0xFE) == 0xA0)
 	{
 		// ADC Select
 		m_adc = m_ir & 1;
 		LOG("NT7534: ADC: %d\n", m_adc);
 		return;
 	}
-        else if ((m_ir & 0xFE) == 0xA6)
+	else if ((m_ir & 0xFE) == 0xA6)
 	{
 		// Normal/Reverse Display
 		m_reverse = m_ir & 1;
 		LOG("NT7534: Display Reverse ? %s\n", m_reverse ? "Yes" : "No");
 		return;
 	}
-        else if ((m_ir & 0xFE) == 0xA4)
+	else if ((m_ir & 0xFE) == 0xA4)
 	{
 		// Entire display ON
 		m_entire_display_on = m_ir & 1;
 		LOG("NT7534: Entire Display ON ? %s\n", m_entire_display_on ? "Yes" : "No");
 		return;
 	}
-        else if (m_ir == 0xE0)
+	else if (m_ir == 0xE0)
 	{
 		// Enable Read-Modify-Write
 		m_read_modify_write = true;
@@ -269,7 +269,7 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		LOG("NT7534: Enable Read-Modify-Write. Backup column: %d\n", m_backup_column);
 		return;
 	}
-        else if (m_ir == 0xEE)
+	else if (m_ir == 0xEE)
 	{
 		// Disable Read-Modify-Write
 		m_read_modify_write = false;
@@ -299,11 +299,11 @@ READ8_MEMBER(nt7534_device::control_read)
 
 WRITE8_MEMBER(nt7534_device::data_write)
 {
-//	if (m_busy_flag)
-//	{
-//		logerror("NT7534: Ignoring data write %02x due to busy flag\n", data);
-//		return;
-//	}
+//  if (m_busy_flag)
+//  {
+//      logerror("NT7534: Ignoring data write %02x due to busy flag\n", data);
+//      return;
+//  }
 
 	if (m_data_len == 4)
 	{

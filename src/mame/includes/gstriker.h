@@ -46,19 +46,25 @@ public:
 	required_device<mb3773_device> m_watchdog;
 
 	required_shared_ptr<uint16_t> m_CG10103_m_vram;
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram;
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram2;
 	required_shared_ptr<uint16_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mixerregs1;
 	required_shared_ptr<uint16_t> m_mixerregs2;
 
+	enum {
+		TECMO_WCUP94_MCU = 1,
+		TECMO_WCUP94A_MCU,
+		VGOAL_SOCCER_MCU
+	}m_mcutype;
 	int m_gametype;
-	uint16_t m_mcu_data;
 	uint16_t m_prot_reg[2];
 
 	// common
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 
 	// vgoalsoc and twrldc
-	DECLARE_WRITE8_MEMBER(twrldc94_prot_reg_w);
+	DECLARE_WRITE8_MEMBER(twcup94_prot_reg_w);
 
 	// vgoalsoc only
 	DECLARE_READ16_MEMBER(vbl_toggle_r);
@@ -66,11 +72,12 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(twrldc94a);
+	DECLARE_DRIVER_INIT(twcup94a);
 	DECLARE_DRIVER_INIT(vgoalsoc);
-	DECLARE_DRIVER_INIT(twrldc94);
+	DECLARE_DRIVER_INIT(twcup94);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void mcu_init();
 };

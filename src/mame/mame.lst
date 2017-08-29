@@ -926,6 +926,7 @@ svolly91                        // (c) 1991 Video System Co. (Japan)
 turbofrc                        // (c) 1991 Video System Co.
 turbofrcu                       // (c) 1991 Video System Co. (US)
 wbbc97                          // (c) 1997 Comad
+kickball                        // (c) 1998 Seoung Youn
 
 @source:age_candy.cpp
 age_cand                        // AGE Candy Crane
@@ -14133,8 +14134,8 @@ x2222o                          // (c) 2000, Oriental Soft
 gstriker                        // (c) [1993] Human
 gstrikera                       // (c) [1993] Human
 gstrikerj                       // (c) [1993] Human
-twrldc94                        // (c) 1994 Tecmo
-twrldc94a                       // (c) 1994 Tecmo
+twcup94                         // (c) 1994 Tecmo
+twcup94a                        // (c) 1994 Tecmo
 vgoalsca                        // (c) 199? Tecmo
 vgoalsoc                        // (c) 199? Tecmo
 
@@ -18094,6 +18095,9 @@ magmax                          // (c) 1985
 @source:magnum.cpp
 magnum                          //
 
+@source:magreel.cpp
+magreel                         //
+
 @source:magtouch.cpp
 magtouch                        // (c) 1995
 
@@ -20288,7 +20292,7 @@ mp_shnb3                        // 09
 mp_soni2                        // 07
 mp_sonic                        // 01
 mp_sor2                         // 05
-mp_twc                          // 04
+mp_twcup                        // 04
 
 @source:megasys1.cpp
 64street                        // (c) 1991
@@ -20934,22 +20938,19 @@ mmd2                            //
 mmm_ldip                        // Lucky Dip
 
 @source:mmodular.cpp
-academy                         // 1989 Mephisto Academy Schachcomputer
 alm16                           // 1988 Mephisto Almeria 68000
-alm32                           // 1988 Mephisto Alimera 68020
-berlinp                         // 1994 Mephisto Berlin Pro 68020
-bpl32                           // 1996 Mephisto Berlin Pro London Upgrade V5.00
-gen32                           // 1993 Mephisto Genius030 V4.00
-gen32_41                        // 1993 Mephisto Genius030 V4.01
-lond020                         // 1996 Mephisto London 68020 32 Bit
-lond030                         // 1996 Mephisto Genius030 London Upgrade V5.00
+alm32                           // 1988 Mephisto Almeria 68020
+port16                          // 1989 Mephisto Portorose 68000
+port32                          // 1989 Mephisto Portorose 68020
 lyon16                          // 1990 Mephisto Lyon 68000
 lyon32                          // 1990 Mephisto Lyon 68020
-megaiv                          // 1989 Mephisto Mega IV Schachcomputer
-milano                          // 1989 Mephisto Milano Schachcomputer
-monteciv                        // 1990 Mephisto Monte Carlo IV LE Schachcomputer
 van16                           // 1991 Mephisto Vancouver 68000
 van32                           // 1991 Mephisto Vancouver 68020
+gen32                           // 1993 Mephisto Genius 68030
+lond020                         // 1996 Mephisto London 68020
+lond030                         // 1996 Mephisto Genius 68030 London Upgrade
+berlinp                         // 1994 Mephisto Berlin Pro 68020
+bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mod8.cpp
 mod8                            //
@@ -28751,6 +28752,7 @@ dragntra                        // 2003.05 Dragon Treasure (Rev A)
 dragntr                         // 2003.10 Dragon Treasure (Rev B)
 dragntr2                        // 2004.?? Dragon Treasure 2 (Rev A)
 dragntr3                        // 2005.11 Dragon Treasure 3 (Rev A)
+drbyocwb                        // 2001.?? Derby Owners Club World Edition (Rev B)
 drbyocwc                        // 2001.?? Derby Owners Club World Edition (Rev C)
 dybb99                          // 1999.11 Dynamite Baseball '99 (Rev B)
 dybbnao                         // 1998.12 Dynamite Baseball NAOMI
@@ -29416,7 +29418,7 @@ tpgolf                          // 0003 (c) 1990 SNK
 trally                          // 0038 (c) 1991 Alpha Denshi Co.
 turfmast                        // 0200 (c) 1996 Nazca
 twinspri                        // 0224 (c) 1996 ADK
-tws96                           // 0086 (c) 1996 Tecmo
+twsoc96                         // 0086 (c) 1996 Tecmo
 viewpoin                        // 0051 (c) 1992 Sammy
 vliner                          //
 vlinero                         //
@@ -31555,6 +31557,11 @@ polgar                          // 1989 Mephisto Polgar
 polgar10                        // 1990 Mephisto Polgar 10MHz
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
+academy                         // 1989 Mephisto Academy
+milano                          // 1991 Mephisto Milano
+nshort                          // 1993 Mephisto Nigel Short
+megaiv                          // 1989 Mephisto Mega IV
+monteciv                        // 1990 Mephisto Monte Carlo IV LE
 
 @source:policetr.cpp
 policetr                        // (c) 1996 P&P Marketing
@@ -33748,13 +33755,13 @@ eightfrc                        // (c) 1994 Tecmo
 extdwnhl                        // (c) 1995 Sammy Japan
 gundhara                        // (c) 1995 Banpresto
 gundharac                       // (c) 1995 Banpresto (Chinese, bootleg?)
-inttoote                        // (c) 1998 Coinmaster
-inttootea                       // (c) 1998 Coinmaster
+inttoote                        // (c) 1998 Coinmaster (bootleg)
+inttoote2                       // (c) 1993 Coinmaster (bootleg)
 jjsquawk                        // (c) 1993 Athena / Able
 jjsquawkb                       // bootleg
 jjsquawkb2                      // bootleg
 jjsquawko                       // (c) 1993 Athena / Able
-jockeyc                         // (c) 1990 [Seta] (Visco license)
+jockeyc                         // (c) 1990 Seta (Visco license)
 kamenrid                        // (c) 1993 Toei / Banpresto
 keroppi                         // (c) 1993 Sammy
 keroppij                        // (c) 1993 Sammy
@@ -34158,6 +34165,7 @@ shtzone                         // (c) 1987
 
 @source:sms_bootleg.cpp
 smssgame
+smssgamea
 
 @source:shuuz.cpp
 shuuz                           // 136083           (c) 1990
@@ -34433,6 +34441,7 @@ madcrush                        // A2005      (c) 1984
 marvins                         // A2003      (c) 1983
 psychos                         // 'PS' (c) 1987
 psychosj                        // 'PS' (c) 1987 (Japan)
+sathena                         // bootleg
 sgladiat                        // A3006      (c) 1984
 tdfever                         // A6006 'TD' (c) 1987
 tdfever2                        // A6006 'TD'?(c) 1988
@@ -37051,6 +37060,7 @@ v6809                           //
 aoh                             // (c) 2001
 boonggab                        // (c) 2001 Taff System
 coolmini                        // (c) 1999 SemiCom
+coolminii                       // (c) 1999 SemiCom
 dquizgo2                        // (c) 2000 Semicom
 dtfamily                        // (c) 2001 Semicom
 finalgdr                        // (c) 2001 Semicom
@@ -37517,6 +37527,7 @@ wackygtr                        // Wacky Gator
 @source:wallc.cpp
 brkblast                        // bootleg (Fadesa)
 sidampkr                        //
+unkitpkr                        //
 wallc                           // (c) 1984 Midcoin
 wallca                          // (c) 1984 Midcoin
 
@@ -37553,15 +37564,15 @@ warriorb                        // D24 (c) 1991 Taito Corporation (Japan)
 
 @source:wc90.cpp
 pac90                           // bootleg
-wc90                            // (c) 1989 Tecmo
-wc90a                           // (c) 1989 Tecmo
-wc90b                           // (c) 1989 Tecmo
-wc90t                           // (c) 1989 Tecmo
+twcup90                            // (c) 1989 Tecmo
+twcup90a                           // (c) 1989 Tecmo
+twcup90b                           // (c) 1989 Tecmo
+twcup90t                           // (c) 1989 Tecmo
 
 @source:wc90b.cpp
-wc90b1                          // bootleg
-wc90b2                          // bootleg
-wc90ba                          // bootleg
+twcup90b1                          // bootleg
+twcup90b2                          // bootleg
+twcup90ba                          // bootleg
 
 @source:wecleman.cpp
 hotchase                        // GX763 (c) 1988
@@ -38692,7 +38703,7 @@ strider2a                       // Strider 2 (ASIA 991213)
 tblkkuzu                        // The Block Kuzushi (JAPAN)
 techromn                        // Tech Romancer (EURO 980914)
 techromnu                       // Tech Romancer (USA 980914)
-tecmowcm                        // Tecmo World Cup Millennium (JAPAN)
+twcupmil                        // Tecmo World Cup Millennium (JAPAN)
 tgmj                            // Tetris The Grand Master (JAPAN 980710)
 tondemo                         // Tondemo Crisis (JAPAN)
 ts2                             // Battle Arena Toshinden 2 (USA 951124)

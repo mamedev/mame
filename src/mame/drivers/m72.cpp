@@ -114,7 +114,7 @@ Major Title                        1990  M82-A-A + M82-B-A   N
 Hammerin' Harry (World ver)        1990  M81-A-B + M81-B-B   N
 Hammerin' H..(US)/ Daiku no Gensan 1990  M84-A-A + M84-C-A   N
                    Daiku no Gensan 1990  M72                 Y
-				   Daiku no Gensan 1990  M82-A-A + M82-B-A   N
+                   Daiku no Gensan 1990  M82-A-A + M82-B-A   N
 Pound for Pound                    1990  M85-A-B + M85-B     N
 Air Duel (World)                   1990  M82-A-A + M82-B-A   N
 Air Duel (Japan)                   1990  M72                 Y

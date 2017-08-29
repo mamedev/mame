@@ -29,6 +29,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "includes/munchmo.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -40,9 +41,9 @@ Stephh's notes (based on the game Z80 code and some tests) :
  *
  *************************************/
 
-WRITE8_MEMBER(munchmo_state::nmi_enable_w)
+WRITE_LINE_MEMBER(munchmo_state::nmi_enable_w)
 {
-	m_nmi_enable = data;
+	m_nmi_enable = state;
 }
 
 /* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
@@ -103,14 +104,9 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0xbaba, 0xbaba) AM_WRITENOP /* ? */
 	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_SHARE("status_vram")
 	AM_RANGE(0xbe00, 0xbe00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xbe01, 0xbe01) AM_WRITE(palette_bank_w)
+	AM_RANGE(0xbe01, 0xbe01) AM_SELECT(0x0070) AM_DEVWRITE_MOD("mainlatch", ls259_device, write_d0, rshift<4>)
 	AM_RANGE(0xbe02, 0xbe02) AM_READ_PORT("DSW1")
 	AM_RANGE(0xbe03, 0xbe03) AM_READ_PORT("DSW2")
-	AM_RANGE(0xbe11, 0xbe11) AM_WRITENOP /* ? */
-	AM_RANGE(0xbe21, 0xbe21) AM_WRITENOP /* ? */
-	AM_RANGE(0xbe31, 0xbe31) AM_WRITENOP /* ? */
-	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(nmi_enable_w) // ENI 1-10C
 	AM_RANGE(0xbf00, 0xbf00) AM_WRITE(nmi_ack_w) // CNI 1-8C
 	AM_RANGE(0xbf01, 0xbf01) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xbf02, 0xbf02) AM_READ_PORT("P1")
@@ -317,13 +313,6 @@ void munchmo_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-void munchmo_state::machine_reset()
-{
-	m_palette_bank = 0;
-	m_flipscreen = 0;
-	m_nmi_enable = 0;
-}
-
 static MACHINE_CONFIG_START( mnchmobl )
 
 	/* basic machine hardware */
@@ -334,6 +323,15 @@ static MACHINE_CONFIG_START( mnchmobl )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/8) // from pin 12 of XTAL-driven 163
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 12E
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(munchmo_state, palette_bank_0_w)) // BCL0 2-11E
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(munchmo_state, palette_bank_1_w)) // BCL1 2-11E
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // CL2 2-11E
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // CL3 2-11E
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(munchmo_state, flipscreen_w)) // INV
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // DISP
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(munchmo_state, nmi_enable_w)) // ENI 1-10C
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

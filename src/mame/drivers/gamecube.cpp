@@ -149,13 +149,13 @@ MACHINE_CONFIG_END
 //  ROM DEFINITIONS
 //**************************************************************************
 
-/*	There are a lot of bad dumps of the gamecube IPLs floating around.
-	The following IPL dumps are known bad, with RAM/MAC address garbage in the last 0x8000 bytes:
-	ROM_LOAD("ipl_bad_ntsc_v10.bin",  0x000000, 0x200000, CRC(6d740ae7) SHA1(015808f637a984acde6a06efa7546e278293c6ee))
-	ROM_LOAD("ipl_bad2_ntsc_v10.bin", 0x000000, 0x200000, CRC(8bdabbd4) SHA1(f1b0ef434cd74fd8fe23698e2fc911d945b45bf1))
-	ROM_LOAD("ipl_bad_pal_v10.bin",   0x000000, 0x200000, CRC(dd8cab7c) SHA1(6f305c37dc1fbe332883bb8153eee26d3d325629))
-	The following rom is flat out unknown and unseen in the wild, except for its checksums:
-	ROM_LOAD("ipl_unknown.bin",       0x000000, 0x200000, CRC(d235e3f9) SHA1(96f69a21645de73a5ba61e57951ef303d55788c5))
+/*  There are a lot of bad dumps of the gamecube IPLs floating around.
+    The following IPL dumps are known bad, with RAM/MAC address garbage in the last 0x8000 bytes:
+    ROM_LOAD("ipl_bad_ntsc_v10.bin",  0x000000, 0x200000, CRC(6d740ae7) SHA1(015808f637a984acde6a06efa7546e278293c6ee))
+    ROM_LOAD("ipl_bad2_ntsc_v10.bin", 0x000000, 0x200000, CRC(8bdabbd4) SHA1(f1b0ef434cd74fd8fe23698e2fc911d945b45bf1))
+    ROM_LOAD("ipl_bad_pal_v10.bin",   0x000000, 0x200000, CRC(dd8cab7c) SHA1(6f305c37dc1fbe332883bb8153eee26d3d325629))
+    The following rom is flat out unknown and unseen in the wild, except for its checksums:
+    ROM_LOAD("ipl_unknown.bin",       0x000000, 0x200000, CRC(d235e3f9) SHA1(96f69a21645de73a5ba61e57951ef303d55788c5))
 */
 
 ROM_START( gcjp ) // DOL-001(JPN) and DOL-101(JPN); NTSC gamecube board, outputs NTSC color, NTSC timings; JPN Region jumper set

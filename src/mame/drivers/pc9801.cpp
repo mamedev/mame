@@ -74,12 +74,12 @@
     - alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
     - applecl1: can't pass hands apparently;
     - arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
-	- arcus2: has intro glitches; 
-	- artjigs*: some text doesn't appear? Namely under the puzzles and when you clear one;
+    - arcus2: has intro glitches;
+    - artjigs*: some text doesn't appear? Namely under the puzzles and when you clear one;
     - atragon: HDD install disk swap doesn't work?
     - asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
     - arquelph: beeps out at initial sound check,  no voice samples, extra sound board tested;
-	- akitsuka: could not setup "initial data" (regression);
+    - akitsuka: could not setup "initial data" (regression);
     - bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
     - biblems2: initial GLODIA logo uses raster effects?
     - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
@@ -659,16 +659,16 @@ READ8_MEMBER(pc9801_state::f0_r)
 	if(offset == 0)
 	{
 		// iterate thru all devices to check if an AMD98 is present
-		for (pc9801_amd98_device &amd98 : device_type_iterator<pc9801_amd98_device>(machine().root_device())) 
+		for (pc9801_amd98_device &amd98 : device_type_iterator<pc9801_amd98_device>(machine().root_device()))
 		{
 			logerror("Read AMD98 ID %s\n",amd98.tag());
 			return 0x18; // return the right ID
 		}
-		
+
 		logerror("Read port 0 from 0xf0 (AMD98 check?)\n");
 		return 0; // card not present
 	}
-	
+
 	return 0xff;
 }
 

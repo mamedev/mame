@@ -369,6 +369,7 @@ protected:
 	uint8_t fifo_pop(bool internal);
 	void set_drq(bool state);
 	bool get_ready(int fid);
+	void set_ds(int state);
 
 	void enable_transfer();
 	void disable_transfer();

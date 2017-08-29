@@ -254,7 +254,7 @@ namespace webpp {
 				unsigned char fin_rsv_opcode=129) const {
 			std::shared_ptr<Connection> connection = std::dynamic_pointer_cast<Connection> (conn);
 			if (!connection) return;
-			
+
 			if(fin_rsv_opcode!=136)
 				timer_idle_reset(connection);
 

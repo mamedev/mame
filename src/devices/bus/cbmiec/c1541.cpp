@@ -344,7 +344,7 @@ const tiny_rom_entry *fsd1_device::device_rom_region() const
 
 ROM_START( fsd2 )
 	ROM_REGION( 0x4000, M6502_TAG, 0 ) // data lines D3 and D4 are swapped
-	ROM_DEFAULT_BIOS("fsd2")
+	ROM_DEFAULT_BIOS("rb")
 	ROM_SYSTEM_BIOS( 0, "ra", "Revision A" )
 	ROMX_LOAD( "fsd2a.u3", 0x0000, 0x4000, CRC(edf18265) SHA1(47a7c4bdcc20ecc5e59d694b151f493229becaea), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "rb", "Revision B" )

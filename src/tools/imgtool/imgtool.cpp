@@ -1750,7 +1750,6 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 {
 	imgtoolerr_t err;
 	imgtool::stream::ptr f;
-	char *new_fname = nullptr;
 	char *alloc_dest = nullptr;
 	const char *filter_extension = nullptr;
 
@@ -1785,15 +1784,11 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 		goto done;
 	}
 
-	err = read_file(new_fname, fork, *f, filter);
-	if (err)
-		goto done;
+	err = read_file(filename, fork, *f, filter);
 
 done:
 	if (alloc_dest != nullptr)
 		free(alloc_dest);
-	if (new_fname != nullptr)
-		free(new_fname);
 	return err;
 }
 

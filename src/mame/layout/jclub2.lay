@@ -229,406 +229,216 @@
 
   <!-- Config (Physical Key) -->
   <element name="config">
-	<rect state="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
-	<rect state="1"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
+	<rect state="0">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
+	<rect state="1">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
 	<text string="&#x26BF; CONFIG" align="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.00" green="0.00" blue="0.00"/></text>
   </element>
   <!-- Reset (Physical Key) -->
   <element name="reset">
-	<rect state="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
-	<rect state="1"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
+	<rect state="0">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
+	<rect state="1">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
 	<text string="&#x26BF; RESET" align="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.00" green="0.00" blue="0.00"/></text>
   </element>
   <!-- Meter (Physical Key) -->
   <element name="meter">
-	<rect state="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
-	<rect state="1"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
+	<rect state="0">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
+	<rect state="1">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
 	<text string="&#x26BF; METER" align="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.00" green="0.00" blue="0.00"/></text>
   </element>
   <!-- Last Game (Physical Key) -->
   <element name="last">
-	<rect state="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
-	<rect state="1"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
+	<rect state="0">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
+	<rect state="1">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
 	<text string="&#x26BF; LAST" align="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.00" green="0.00" blue="0.00"/></text>
   </element>
   <!-- Door 1 -->
   <element name="door1">
-	<rect state="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
-	<rect state="1"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
+	<rect state="0">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
+	<rect state="1">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
 	<text string="DOOR 1" align="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.00" green="0.00" blue="0.00"/></text>
   </element>
   <!-- Door 2 -->
   <element name="door2">
-	<rect state="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
-	<rect state="1"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
+	<rect state="0">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.40" green="0.40" blue="0.40"/></rect>
+	<rect state="1">   <bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.80" green="0.80" blue="0.80"/></rect>
 	<text string="DOOR 2" align="0"><bounds x="0.00" y="0.00" width="2.00" height="0.50"/><color red="0.00" green="0.00" blue="0.00"/></text>
   </element>
 
 
 
+  <!-- Player 1 Keyboard -->
+  <group name="keyboard_p1">
+	<!-- Border -->
+	<bezel element="keyboard_outer"> <bounds x="0.0" y="0.0" width="14" height="4"/> </bezel>
+	<bezel element="keyboard_inner"> <bounds x="0.5" y="0.5" width="13" height="3"/> </bezel>
+	<!-- Top Row -->
+	<bezel element="1-2"    inputtag="KEY1.1"  inputmask="0x01">       <bounds x="0.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-3"    inputtag="KEY1.1"  inputmask="0x02">       <bounds x="1.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-4"    inputtag="KEY1.1"  inputmask="0x04">       <bounds x="2.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-5"    inputtag="KEY1.1"  inputmask="0x08">       <bounds x="3.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-6"    inputtag="KEY1.1"  inputmask="0x10">       <bounds x="4.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-7"    inputtag="KEY1.1"  inputmask="0x20">       <bounds x="5.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-8"    inputtag="KEY1.1"  inputmask="0x40">       <bounds x="6.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-3"    inputtag="KEY1.2"  inputmask="0x01">       <bounds x="7.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-4"    inputtag="KEY1.2"  inputmask="0x02">       <bounds x="8.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-5"    inputtag="KEY1.2"  inputmask="0x04">       <bounds x="9.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-6"    inputtag="KEY1.2"  inputmask="0x08">       <bounds x="10.6" y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-7"    inputtag="KEY1.2"  inputmask="0x10">       <bounds x="11.6" y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-8"    inputtag="KEY1.2"  inputmask="0x20">       <bounds x="12.6" y="0.6" width="0.8" height="0.8"/> </bezel>
+	<!-- Middle Row -->
+	<bezel element="3-4"    inputtag="KEY1.3"  inputmask="0x01">       <bounds x="0.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-5"    inputtag="KEY1.3"  inputmask="0x02">       <bounds x="1.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-6"    inputtag="KEY1.3"  inputmask="0x04">       <bounds x="2.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-7"    inputtag="KEY1.3"  inputmask="0x08">       <bounds x="3.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-8"    inputtag="KEY1.3"  inputmask="0x10">       <bounds x="4.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-5"    inputtag="KEY1.4"  inputmask="0x01">       <bounds x="5.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-6"    inputtag="KEY1.4"  inputmask="0x02">       <bounds x="6.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-7"    inputtag="KEY1.4"  inputmask="0x04">       <bounds x="7.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-8"    inputtag="KEY1.4"  inputmask="0x08">       <bounds x="8.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5-6"    inputtag="KEY1.5"  inputmask="0x01">       <bounds x="9.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5-7"    inputtag="KEY1.5"  inputmask="0x02">       <bounds x="10.6" y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5-8"    inputtag="KEY1.5"  inputmask="0x04">       <bounds x="11.6" y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="cancel" inputtag="SERVICE" inputmask="0x04000000"> <bounds x="12.6" y="1.6" width="0.8" height="0.8"/> </bezel>
+	<!-- Bottom Row -->
+	<bezel element="6-7"    inputtag="KEY1.6"  inputmask="0x01">       <bounds x="0.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="6-8"    inputtag="KEY1.6"  inputmask="0x02">       <bounds x="1.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="7-8"    inputtag="KEY1.7"  inputmask="0x01">       <bounds x="2.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1"      inputtag="KEY1.0"  inputmask="0x01">       <bounds x="3.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2"      inputtag="KEY1.0"  inputmask="0x02">       <bounds x="4.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3"      inputtag="KEY1.0"  inputmask="0x04">       <bounds x="5.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4"      inputtag="KEY1.0"  inputmask="0x08">       <bounds x="6.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5"      inputtag="KEY1.0"  inputmask="0x10">       <bounds x="7.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="6"      inputtag="KEY1.0"  inputmask="0x20">       <bounds x="8.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="7"      inputtag="KEY1.0"  inputmask="0x40">       <bounds x="9.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="8"      inputtag="KEY1.0"  inputmask="0x80">       <bounds x="10.6" y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="payout" inputtag="SERVICE" inputmask="0x02000000"> <bounds x="11.6" y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="start"  inputtag="SERVICE" inputmask="0x01000000"> <bounds x="12.6" y="2.6" width="0.8" height="0.8"/> </bezel>
+  </group>
+
+
+
+  <!-- Player 2 Keyboard -->
+  <group name="keyboard_p2">
+	<!-- Border -->
+	<bezel element="keyboard_outer"> <bounds x="0.0" y="0.0" width="14" height="4"/> </bezel>
+	<bezel element="keyboard_inner"> <bounds x="0.5" y="0.5" width="13" height="3"/> </bezel>
+	<!-- Top Row -->
+	<bezel element="1-2"    inputtag="KEY2.1"  inputmask="0x01">       <bounds x="0.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-3"    inputtag="KEY2.1"  inputmask="0x02">       <bounds x="1.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-4"    inputtag="KEY2.1"  inputmask="0x04">       <bounds x="2.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-5"    inputtag="KEY2.1"  inputmask="0x08">       <bounds x="3.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-6"    inputtag="KEY2.1"  inputmask="0x10">       <bounds x="4.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-7"    inputtag="KEY2.1"  inputmask="0x20">       <bounds x="5.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1-8"    inputtag="KEY2.1"  inputmask="0x40">       <bounds x="6.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-3"    inputtag="KEY2.2"  inputmask="0x01">       <bounds x="7.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-4"    inputtag="KEY2.2"  inputmask="0x02">       <bounds x="8.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-5"    inputtag="KEY2.2"  inputmask="0x04">       <bounds x="9.6"  y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-6"    inputtag="KEY2.2"  inputmask="0x08">       <bounds x="10.6" y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-7"    inputtag="KEY2.2"  inputmask="0x10">       <bounds x="11.6" y="0.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2-8"    inputtag="KEY2.2"  inputmask="0x20">       <bounds x="12.6" y="0.6" width="0.8" height="0.8"/> </bezel>
+	<!-- Middle Row -->
+	<bezel element="3-4"    inputtag="KEY2.3"  inputmask="0x01">       <bounds x="0.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-5"    inputtag="KEY2.3"  inputmask="0x02">       <bounds x="1.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-6"    inputtag="KEY2.3"  inputmask="0x04">       <bounds x="2.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-7"    inputtag="KEY2.3"  inputmask="0x08">       <bounds x="3.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3-8"    inputtag="KEY2.3"  inputmask="0x10">       <bounds x="4.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-5"    inputtag="KEY2.4"  inputmask="0x01">       <bounds x="5.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-6"    inputtag="KEY2.4"  inputmask="0x02">       <bounds x="6.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-7"    inputtag="KEY2.4"  inputmask="0x04">       <bounds x="7.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4-8"    inputtag="KEY2.4"  inputmask="0x08">       <bounds x="8.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5-6"    inputtag="KEY2.5"  inputmask="0x01">       <bounds x="9.6"  y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5-7"    inputtag="KEY2.5"  inputmask="0x02">       <bounds x="10.6" y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5-8"    inputtag="KEY2.5"  inputmask="0x04">       <bounds x="11.6" y="1.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="cancel" inputtag="SERVICE" inputmask="0x20000000"> <bounds x="12.6" y="1.6" width="0.8" height="0.8"/> </bezel>
+	<!-- Bottom Row -->
+	<bezel element="6-7"    inputtag="KEY2.6"  inputmask="0x01">       <bounds x="0.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="6-8"    inputtag="KEY2.6"  inputmask="0x02">       <bounds x="1.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="7-8"    inputtag="KEY2.7"  inputmask="0x01">       <bounds x="2.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="1"      inputtag="KEY2.0"  inputmask="0x01">       <bounds x="3.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="2"      inputtag="KEY2.0"  inputmask="0x02">       <bounds x="4.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="3"      inputtag="KEY2.0"  inputmask="0x04">       <bounds x="5.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="4"      inputtag="KEY2.0"  inputmask="0x08">       <bounds x="6.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="5"      inputtag="KEY2.0"  inputmask="0x10">       <bounds x="7.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="6"      inputtag="KEY2.0"  inputmask="0x20">       <bounds x="8.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="7"      inputtag="KEY2.0"  inputmask="0x40">       <bounds x="9.6"  y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="8"      inputtag="KEY2.0"  inputmask="0x80">       <bounds x="10.6" y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="payout" inputtag="SERVICE" inputmask="0x10000000"> <bounds x="11.6" y="2.6" width="0.8" height="0.8"/> </bezel>
+	<bezel element="start"  inputtag="SERVICE" inputmask="0x08000000"> <bounds x="12.6" y="2.6" width="0.8" height="0.8"/> </bezel>
+  </group>
+
+
+
+  <!-- Service Keys -->
+  <group name="service">
+	<bezel element="reset"  inputtag="SERVICE" inputmask="0x00020000"> <bounds x="0"  y="0" width="2.0" height="0.5"/> </bezel>
+	<bezel element="meter"  inputtag="SERVICE" inputmask="0x00040000"> <bounds x="4"  y="0" width="2.0" height="0.5"/> </bezel>
+	<bezel element="last"   inputtag="SERVICE" inputmask="0x00080000"> <bounds x="8"  y="0" width="2.0" height="0.5"/> </bezel>
+	<bezel element="config" inputtag="SERVICE" inputmask="0x00010000"> <bounds x="12" y="0" width="2.0" height="0.5"/> </bezel>
+	<bezel element="door1"  inputtag="SERVICE" inputmask="0x00200000"> <bounds x="16" y="0" width="2.0" height="0.5"/> </bezel>
+	<bezel element="door2"  inputtag="SERVICE" inputmask="0x00400000"> <bounds x="20" y="0" width="2.0" height="0.5"/> </bezel>
+  </group>
+
+
+
   <view name="Wide Screen (5:3) and Two Keyboards">
-
-
 	<!-- Screen (Top Center) -->
 	<screen index="0">
 	  <bounds x="0" y="0" width="30" height="18"/>
 	</screen>
 
-
 	<!-- Player 1 Keyboard (Left) -->
-	<bezel element="keyboard_outer"> <bounds x="0.5" y="18.0" width="14" height="4"/> </bezel>
-	<bezel element="keyboard_inner"> <bounds x="1.0" y="18.5" width="13" height="3"/> </bezel>
-	<!-- Top Row -->
-	<bezel element="1-2"    inputtag="KEY1.1"  inputmask="0x01"> <bounds x="1.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-3"    inputtag="KEY1.1"  inputmask="0x02"> <bounds x="2.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-4"    inputtag="KEY1.1"  inputmask="0x04"> <bounds x="3.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-5"    inputtag="KEY1.1"  inputmask="0x08"> <bounds x="4.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-6"    inputtag="KEY1.1"  inputmask="0x10"> <bounds x="5.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-7"    inputtag="KEY1.1"  inputmask="0x20"> <bounds x="6.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-8"    inputtag="KEY1.1"  inputmask="0x40"> <bounds x="7.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-3"    inputtag="KEY1.2"  inputmask="0x01"> <bounds x="8.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-4"    inputtag="KEY1.2"  inputmask="0x02"> <bounds x="9.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-5"    inputtag="KEY1.2"  inputmask="0x04"> <bounds x="10.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-6"    inputtag="KEY1.2"  inputmask="0x08"> <bounds x="11.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-7"    inputtag="KEY1.2"  inputmask="0x10"> <bounds x="12.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-8"    inputtag="KEY1.2"  inputmask="0x20"> <bounds x="13.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Middle Row -->
-	<bezel element="3-4"    inputtag="KEY1.3"  inputmask="0x01"> <bounds x="1.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-5"    inputtag="KEY1.3"  inputmask="0x02"> <bounds x="2.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-6"    inputtag="KEY1.3"  inputmask="0x04"> <bounds x="3.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-7"    inputtag="KEY1.3"  inputmask="0x08"> <bounds x="4.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-8"    inputtag="KEY1.3"  inputmask="0x10"> <bounds x="5.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-5"    inputtag="KEY1.4"  inputmask="0x01"> <bounds x="6.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-6"    inputtag="KEY1.4"  inputmask="0x02"> <bounds x="7.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-7"    inputtag="KEY1.4"  inputmask="0x04"> <bounds x="8.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-8"    inputtag="KEY1.4"  inputmask="0x08"> <bounds x="9.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-6"    inputtag="KEY1.5"  inputmask="0x01"> <bounds x="10.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-7"    inputtag="KEY1.5"  inputmask="0x02"> <bounds x="11.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-8"    inputtag="KEY1.5"  inputmask="0x04"> <bounds x="12.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="cancel" inputtag="SERVICE" inputmask="0x04000000"> <bounds x="13.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Bottom Row -->
-	<bezel element="6-7"    inputtag="KEY1.6"  inputmask="0x01"> <bounds x="1.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6-8"    inputtag="KEY1.6"  inputmask="0x02"> <bounds x="2.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7-8"    inputtag="KEY1.7"  inputmask="0x01"> <bounds x="3.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1"      inputtag="KEY1.0"  inputmask="0x01"> <bounds x="4.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2"      inputtag="KEY1.0"  inputmask="0x02"> <bounds x="5.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3"      inputtag="KEY1.0"  inputmask="0x04"> <bounds x="6.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4"      inputtag="KEY1.0"  inputmask="0x08"> <bounds x="7.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5"      inputtag="KEY1.0"  inputmask="0x10"> <bounds x="8.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6"      inputtag="KEY1.0"  inputmask="0x20"> <bounds x="9.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7"      inputtag="KEY1.0"  inputmask="0x40"> <bounds x="10.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="8"      inputtag="KEY1.0"  inputmask="0x80"> <bounds x="11.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="payout" inputtag="SERVICE" inputmask="0x02000000"> <bounds x="12.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="start"  inputtag="SERVICE" inputmask="0x01000000"> <bounds x="13.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-
+	<group ref="keyboard_p1"> <bounds x="0.5"  y="18.0" width="14" height="4" />   </group>
 
 	<!-- Player 2 Keyboard (Right) -->
-	<bezel element="keyboard_outer"> <bounds x="15.5" y="18.0" width="14" height="4"/> </bezel>
-	<bezel element="keyboard_inner"> <bounds x="16.0" y="18.5" width="13" height="3"/> </bezel>
-	<!-- Top Row -->
-	<bezel element="1-2"    inputtag="KEY2.1"  inputmask="0x01"> <bounds x="16.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-3"    inputtag="KEY2.1"  inputmask="0x02"> <bounds x="17.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-4"    inputtag="KEY2.1"  inputmask="0x04"> <bounds x="18.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-5"    inputtag="KEY2.1"  inputmask="0x08"> <bounds x="19.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-6"    inputtag="KEY2.1"  inputmask="0x10"> <bounds x="20.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-7"    inputtag="KEY2.1"  inputmask="0x20"> <bounds x="21.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-8"    inputtag="KEY2.1"  inputmask="0x40"> <bounds x="22.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-3"    inputtag="KEY2.2"  inputmask="0x01"> <bounds x="23.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-4"    inputtag="KEY2.2"  inputmask="0x02"> <bounds x="24.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-5"    inputtag="KEY2.2"  inputmask="0x04"> <bounds x="25.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-6"    inputtag="KEY2.2"  inputmask="0x08"> <bounds x="26.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-7"    inputtag="KEY2.2"  inputmask="0x10"> <bounds x="27.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-8"    inputtag="KEY2.2"  inputmask="0x20"> <bounds x="28.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Middle Row -->
-	<bezel element="3-4"    inputtag="KEY2.3"  inputmask="0x01"> <bounds x="16.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-5"    inputtag="KEY2.3"  inputmask="0x02"> <bounds x="17.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-6"    inputtag="KEY2.3"  inputmask="0x04"> <bounds x="18.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-7"    inputtag="KEY2.3"  inputmask="0x08"> <bounds x="19.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-8"    inputtag="KEY2.3"  inputmask="0x10"> <bounds x="20.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-5"    inputtag="KEY2.4"  inputmask="0x01"> <bounds x="21.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-6"    inputtag="KEY2.4"  inputmask="0x02"> <bounds x="22.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-7"    inputtag="KEY2.4"  inputmask="0x04"> <bounds x="23.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-8"    inputtag="KEY2.4"  inputmask="0x08"> <bounds x="24.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-6"    inputtag="KEY2.5"  inputmask="0x01"> <bounds x="25.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-7"    inputtag="KEY2.5"  inputmask="0x02"> <bounds x="26.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-8"    inputtag="KEY2.5"  inputmask="0x04"> <bounds x="27.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="cancel" inputtag="SERVICE" inputmask="0x20000000"> <bounds x="28.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Bottom Row -->
-	<bezel element="6-7"    inputtag="KEY2.6"  inputmask="0x01"> <bounds x="16.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6-8"    inputtag="KEY2.6"  inputmask="0x02"> <bounds x="17.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7-8"    inputtag="KEY2.7"  inputmask="0x01"> <bounds x="18.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1"      inputtag="KEY2.0"  inputmask="0x01"> <bounds x="19.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2"      inputtag="KEY2.0"  inputmask="0x02"> <bounds x="20.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3"      inputtag="KEY2.0"  inputmask="0x04"> <bounds x="21.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4"      inputtag="KEY2.0"  inputmask="0x08"> <bounds x="22.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5"      inputtag="KEY2.0"  inputmask="0x10"> <bounds x="23.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6"      inputtag="KEY2.0"  inputmask="0x20"> <bounds x="24.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7"      inputtag="KEY2.0"  inputmask="0x40"> <bounds x="25.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="8"      inputtag="KEY2.0"  inputmask="0x80"> <bounds x="26.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="payout" inputtag="SERVICE" inputmask="0x10000000"> <bounds x="27.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="start"  inputtag="SERVICE" inputmask="0x08000000"> <bounds x="28.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-
+	<group ref="keyboard_p2"> <bounds x="15.5" y="18.0" width="14" height="4" />   </group>
 
 	<!-- Service Keys (Bottom) -->
-	<bezel element="reset"  inputtag="SERVICE" inputmask="0x00020000"> <bounds x="4"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="meter"  inputtag="SERVICE" inputmask="0x00040000"> <bounds x="8"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="last"   inputtag="SERVICE" inputmask="0x00080000"> <bounds x="12" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="config" inputtag="SERVICE" inputmask="0x00010000"> <bounds x="16" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door1"  inputtag="SERVICE" inputmask="0x00200000"> <bounds x="20" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door2"  inputtag="SERVICE" inputmask="0x00400000"> <bounds x="24" y="22.1" width="2.0" height="0.5"/> </bezel>
-
-
+	<group ref="service">     <bounds x="4.0"  y="22.1" width="22" height="0.5" /> </group>
   </view>
 
 
   <view name="Wide Screen (5:3) and One Keyboard">
-
-
 	<!-- Screen (Top Center) -->
 	<screen index="0">
 	  <bounds x="0" y="0" width="30" height="18"/>
 	</screen>
 
-
 	<!-- Player 1 Keyboard (Center) -->
-	<bezel element="keyboard_outer"> <bounds x="8.0" y="18.0" width="14" height="4"/> </bezel>
-	<bezel element="keyboard_inner"> <bounds x="8.5" y="18.5" width="13" height="3"/> </bezel>
-	<!-- Top Row -->
-	<bezel element="1-2"    inputtag="KEY1.1"  inputmask="0x01"> <bounds x="8.6"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-3"    inputtag="KEY1.1"  inputmask="0x02"> <bounds x="9.6"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-4"    inputtag="KEY1.1"  inputmask="0x04"> <bounds x="10.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-5"    inputtag="KEY1.1"  inputmask="0x08"> <bounds x="11.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-6"    inputtag="KEY1.1"  inputmask="0x10"> <bounds x="12.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-7"    inputtag="KEY1.1"  inputmask="0x20"> <bounds x="13.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-8"    inputtag="KEY1.1"  inputmask="0x40"> <bounds x="14.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-3"    inputtag="KEY1.2"  inputmask="0x01"> <bounds x="15.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-4"    inputtag="KEY1.2"  inputmask="0x02"> <bounds x="16.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-5"    inputtag="KEY1.2"  inputmask="0x04"> <bounds x="17.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-6"    inputtag="KEY1.2"  inputmask="0x08"> <bounds x="18.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-7"    inputtag="KEY1.2"  inputmask="0x10"> <bounds x="19.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-8"    inputtag="KEY1.2"  inputmask="0x20"> <bounds x="20.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Middle Row -->
-	<bezel element="3-4"    inputtag="KEY1.3"  inputmask="0x01"> <bounds x="8.6"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-5"    inputtag="KEY1.3"  inputmask="0x02"> <bounds x="9.6"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-6"    inputtag="KEY1.3"  inputmask="0x04"> <bounds x="10.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-7"    inputtag="KEY1.3"  inputmask="0x08"> <bounds x="11.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-8"    inputtag="KEY1.3"  inputmask="0x10"> <bounds x="12.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-5"    inputtag="KEY1.4"  inputmask="0x01"> <bounds x="13.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-6"    inputtag="KEY1.4"  inputmask="0x02"> <bounds x="14.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-7"    inputtag="KEY1.4"  inputmask="0x04"> <bounds x="15.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-8"    inputtag="KEY1.4"  inputmask="0x08"> <bounds x="16.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-6"    inputtag="KEY1.5"  inputmask="0x01"> <bounds x="17.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-7"    inputtag="KEY1.5"  inputmask="0x02"> <bounds x="18.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-8"    inputtag="KEY1.5"  inputmask="0x04"> <bounds x="19.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="cancel" inputtag="SERVICE" inputmask="0x04000000"> <bounds x="20.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Bottom Row -->
-	<bezel element="6-7"    inputtag="KEY1.6"  inputmask="0x01"> <bounds x="8.6"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6-8"    inputtag="KEY1.6"  inputmask="0x02"> <bounds x="9.6"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7-8"    inputtag="KEY1.7"  inputmask="0x01"> <bounds x="10.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1"      inputtag="KEY1.0"  inputmask="0x01"> <bounds x="11.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2"      inputtag="KEY1.0"  inputmask="0x02"> <bounds x="12.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3"      inputtag="KEY1.0"  inputmask="0x04"> <bounds x="13.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4"      inputtag="KEY1.0"  inputmask="0x08"> <bounds x="14.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5"      inputtag="KEY1.0"  inputmask="0x10"> <bounds x="15.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6"      inputtag="KEY1.0"  inputmask="0x20"> <bounds x="16.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7"      inputtag="KEY1.0"  inputmask="0x40"> <bounds x="17.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="8"      inputtag="KEY1.0"  inputmask="0x80"> <bounds x="18.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="payout" inputtag="SERVICE" inputmask="0x02000000"> <bounds x="19.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="start"  inputtag="SERVICE" inputmask="0x01000000"> <bounds x="20.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-
+	<group ref="keyboard_p1"> <bounds x="8.0" y="18.0" width="14" height="4" />   </group>
 
 	<!-- Service Keys (Bottom) -->
-	<bezel element="reset"  inputtag="SERVICE" inputmask="0x00020000"> <bounds x="4"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="meter"  inputtag="SERVICE" inputmask="0x00040000"> <bounds x="8"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="last"   inputtag="SERVICE" inputmask="0x00080000"> <bounds x="12" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="config" inputtag="SERVICE" inputmask="0x00010000"> <bounds x="16" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door1"  inputtag="SERVICE" inputmask="0x00200000"> <bounds x="20" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door2"  inputtag="SERVICE" inputmask="0x00400000"> <bounds x="24" y="22.1" width="2.0" height="0.5"/> </bezel>
-
-
+	<group ref="service">     <bounds x="4.0" y="22.1" width="22" height="0.5" /> </group>
   </view>
 
 
   <view name="Slightly Wide Screen (7:5) and Two Keyboards">
-
-
 	<!-- Screen (Top Center) -->
 	<screen index="0">
 	  <bounds x="2.4" y="0" width="25.2" height="18"/>
 	</screen>
 
-
 	<!-- Player 1 Keyboard (Left) -->
-	<bezel element="keyboard_outer"> <bounds x="0.5" y="18.0" width="14" height="4"/> </bezel>
-	<bezel element="keyboard_inner"> <bounds x="1.0" y="18.5" width="13" height="3"/> </bezel>
-	<!-- Top Row -->
-	<bezel element="1-2"    inputtag="KEY1.1"  inputmask="0x01"> <bounds x="1.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-3"    inputtag="KEY1.1"  inputmask="0x02"> <bounds x="2.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-4"    inputtag="KEY1.1"  inputmask="0x04"> <bounds x="3.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-5"    inputtag="KEY1.1"  inputmask="0x08"> <bounds x="4.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-6"    inputtag="KEY1.1"  inputmask="0x10"> <bounds x="5.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-7"    inputtag="KEY1.1"  inputmask="0x20"> <bounds x="6.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-8"    inputtag="KEY1.1"  inputmask="0x40"> <bounds x="7.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-3"    inputtag="KEY1.2"  inputmask="0x01"> <bounds x="8.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-4"    inputtag="KEY1.2"  inputmask="0x02"> <bounds x="9.1"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-5"    inputtag="KEY1.2"  inputmask="0x04"> <bounds x="10.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-6"    inputtag="KEY1.2"  inputmask="0x08"> <bounds x="11.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-7"    inputtag="KEY1.2"  inputmask="0x10"> <bounds x="12.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-8"    inputtag="KEY1.2"  inputmask="0x20"> <bounds x="13.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Middle Row -->
-	<bezel element="3-4"    inputtag="KEY1.3"  inputmask="0x01"> <bounds x="1.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-5"    inputtag="KEY1.3"  inputmask="0x02"> <bounds x="2.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-6"    inputtag="KEY1.3"  inputmask="0x04"> <bounds x="3.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-7"    inputtag="KEY1.3"  inputmask="0x08"> <bounds x="4.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-8"    inputtag="KEY1.3"  inputmask="0x10"> <bounds x="5.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-5"    inputtag="KEY1.4"  inputmask="0x01"> <bounds x="6.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-6"    inputtag="KEY1.4"  inputmask="0x02"> <bounds x="7.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-7"    inputtag="KEY1.4"  inputmask="0x04"> <bounds x="8.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-8"    inputtag="KEY1.4"  inputmask="0x08"> <bounds x="9.1"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-6"    inputtag="KEY1.5"  inputmask="0x01"> <bounds x="10.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-7"    inputtag="KEY1.5"  inputmask="0x02"> <bounds x="11.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-8"    inputtag="KEY1.5"  inputmask="0x04"> <bounds x="12.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="cancel" inputtag="SERVICE" inputmask="0x04000000"> <bounds x="13.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Bottom Row -->
-	<bezel element="6-7"    inputtag="KEY1.6"  inputmask="0x01"> <bounds x="1.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6-8"    inputtag="KEY1.6"  inputmask="0x02"> <bounds x="2.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7-8"    inputtag="KEY1.7"  inputmask="0x01"> <bounds x="3.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1"      inputtag="KEY1.0"  inputmask="0x01"> <bounds x="4.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2"      inputtag="KEY1.0"  inputmask="0x02"> <bounds x="5.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3"      inputtag="KEY1.0"  inputmask="0x04"> <bounds x="6.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4"      inputtag="KEY1.0"  inputmask="0x08"> <bounds x="7.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5"      inputtag="KEY1.0"  inputmask="0x10"> <bounds x="8.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6"      inputtag="KEY1.0"  inputmask="0x20"> <bounds x="9.1"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7"      inputtag="KEY1.0"  inputmask="0x40"> <bounds x="10.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="8"      inputtag="KEY1.0"  inputmask="0x80"> <bounds x="11.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="payout" inputtag="SERVICE" inputmask="0x02000000"> <bounds x="12.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="start"  inputtag="SERVICE" inputmask="0x01000000"> <bounds x="13.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-
+	<group ref="keyboard_p1"> <bounds x="0.5"  y="18.0" width="14" height="4" />   </group>
 
 	<!-- Player 2 Keyboard (Right) -->
-	<bezel element="keyboard_outer"> <bounds x="15.5" y="18.0" width="14" height="4"/> </bezel>
-	<bezel element="keyboard_inner"> <bounds x="16.0" y="18.5" width="13" height="3"/> </bezel>
-	<!-- Top Row -->
-	<bezel element="1-2"    inputtag="KEY2.1"  inputmask="0x01"> <bounds x="16.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-3"    inputtag="KEY2.1"  inputmask="0x02"> <bounds x="17.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-4"    inputtag="KEY2.1"  inputmask="0x04"> <bounds x="18.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-5"    inputtag="KEY2.1"  inputmask="0x08"> <bounds x="19.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-6"    inputtag="KEY2.1"  inputmask="0x10"> <bounds x="20.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-7"    inputtag="KEY2.1"  inputmask="0x20"> <bounds x="21.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-8"    inputtag="KEY2.1"  inputmask="0x40"> <bounds x="22.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-3"    inputtag="KEY2.2"  inputmask="0x01"> <bounds x="23.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-4"    inputtag="KEY2.2"  inputmask="0x02"> <bounds x="24.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-5"    inputtag="KEY2.2"  inputmask="0x04"> <bounds x="25.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-6"    inputtag="KEY2.2"  inputmask="0x08"> <bounds x="26.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-7"    inputtag="KEY2.2"  inputmask="0x10"> <bounds x="27.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-8"    inputtag="KEY2.2"  inputmask="0x20"> <bounds x="28.1" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Middle Row -->
-	<bezel element="3-4"    inputtag="KEY2.3"  inputmask="0x01"> <bounds x="16.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-5"    inputtag="KEY2.3"  inputmask="0x02"> <bounds x="17.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-6"    inputtag="KEY2.3"  inputmask="0x04"> <bounds x="18.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-7"    inputtag="KEY2.3"  inputmask="0x08"> <bounds x="19.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-8"    inputtag="KEY2.3"  inputmask="0x10"> <bounds x="20.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-5"    inputtag="KEY2.4"  inputmask="0x01"> <bounds x="21.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-6"    inputtag="KEY2.4"  inputmask="0x02"> <bounds x="22.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-7"    inputtag="KEY2.4"  inputmask="0x04"> <bounds x="23.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-8"    inputtag="KEY2.4"  inputmask="0x08"> <bounds x="24.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-6"    inputtag="KEY2.5"  inputmask="0x01"> <bounds x="25.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-7"    inputtag="KEY2.5"  inputmask="0x02"> <bounds x="26.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-8"    inputtag="KEY2.5"  inputmask="0x04"> <bounds x="27.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="cancel" inputtag="SERVICE" inputmask="0x20000000"> <bounds x="28.1" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Bottom Row -->
-	<bezel element="6-7"    inputtag="KEY2.6"  inputmask="0x01"> <bounds x="16.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6-8"    inputtag="KEY2.6"  inputmask="0x02"> <bounds x="17.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7-8"    inputtag="KEY2.7"  inputmask="0x01"> <bounds x="18.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1"      inputtag="KEY2.0"  inputmask="0x01"> <bounds x="19.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2"      inputtag="KEY2.0"  inputmask="0x02"> <bounds x="20.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3"      inputtag="KEY2.0"  inputmask="0x04"> <bounds x="21.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4"      inputtag="KEY2.0"  inputmask="0x08"> <bounds x="22.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5"      inputtag="KEY2.0"  inputmask="0x10"> <bounds x="23.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6"      inputtag="KEY2.0"  inputmask="0x20"> <bounds x="24.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7"      inputtag="KEY2.0"  inputmask="0x40"> <bounds x="25.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="8"      inputtag="KEY2.0"  inputmask="0x80"> <bounds x="26.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="payout" inputtag="SERVICE" inputmask="0x10000000"> <bounds x="27.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="start"  inputtag="SERVICE" inputmask="0x08000000"> <bounds x="28.1" y="20.6" width="0.8" height="0.8"/> </bezel>
-
+	<group ref="keyboard_p2"> <bounds x="15.5" y="18.0" width="14" height="4" />   </group>
 
 	<!-- Service Keys (Bottom) -->
-	<bezel element="reset"  inputtag="SERVICE" inputmask="0x00020000"> <bounds x="4"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="meter"  inputtag="SERVICE" inputmask="0x00040000"> <bounds x="8"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="last"   inputtag="SERVICE" inputmask="0x00080000"> <bounds x="12" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="config" inputtag="SERVICE" inputmask="0x00010000"> <bounds x="16" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door1"  inputtag="SERVICE" inputmask="0x00200000"> <bounds x="20" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door2"  inputtag="SERVICE" inputmask="0x00400000"> <bounds x="24" y="22.1" width="2.0" height="0.5"/> </bezel>
-
-
+	<group ref="service">     <bounds x="4.0"  y="22.1" width="22" height="0.5" /> </group>
   </view>
 
 
   <view name="Slightly Wide Screen (7:5) and One Keyboard">
-
-
 	<!-- Screen (Top Center) -->
 	<screen index="0">
 	  <bounds x="2.4" y="0" width="25.2" height="18"/>
 	</screen>
 
-
 	<!-- Player 1 Keyboard (Center) -->
-	<bezel element="keyboard_outer"> <bounds x="8.0" y="18.0" width="14" height="4"/> </bezel>
-	<bezel element="keyboard_inner"> <bounds x="8.5" y="18.5" width="13" height="3"/> </bezel>
-	<!-- Top Row -->
-	<bezel element="1-2"    inputtag="KEY1.1"  inputmask="0x01"> <bounds x="8.6"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-3"    inputtag="KEY1.1"  inputmask="0x02"> <bounds x="9.6"  y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-4"    inputtag="KEY1.1"  inputmask="0x04"> <bounds x="10.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-5"    inputtag="KEY1.1"  inputmask="0x08"> <bounds x="11.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-6"    inputtag="KEY1.1"  inputmask="0x10"> <bounds x="12.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-7"    inputtag="KEY1.1"  inputmask="0x20"> <bounds x="13.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1-8"    inputtag="KEY1.1"  inputmask="0x40"> <bounds x="14.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-3"    inputtag="KEY1.2"  inputmask="0x01"> <bounds x="15.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-4"    inputtag="KEY1.2"  inputmask="0x02"> <bounds x="16.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-5"    inputtag="KEY1.2"  inputmask="0x04"> <bounds x="17.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-6"    inputtag="KEY1.2"  inputmask="0x08"> <bounds x="18.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-7"    inputtag="KEY1.2"  inputmask="0x10"> <bounds x="19.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2-8"    inputtag="KEY1.2"  inputmask="0x20"> <bounds x="20.6" y="18.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Middle Row -->
-	<bezel element="3-4"    inputtag="KEY1.3"  inputmask="0x01"> <bounds x="8.6"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-5"    inputtag="KEY1.3"  inputmask="0x02"> <bounds x="9.6"  y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-6"    inputtag="KEY1.3"  inputmask="0x04"> <bounds x="10.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-7"    inputtag="KEY1.3"  inputmask="0x08"> <bounds x="11.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3-8"    inputtag="KEY1.3"  inputmask="0x10"> <bounds x="12.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-5"    inputtag="KEY1.4"  inputmask="0x01"> <bounds x="13.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-6"    inputtag="KEY1.4"  inputmask="0x02"> <bounds x="14.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-7"    inputtag="KEY1.4"  inputmask="0x04"> <bounds x="15.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4-8"    inputtag="KEY1.4"  inputmask="0x08"> <bounds x="16.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-6"    inputtag="KEY1.5"  inputmask="0x01"> <bounds x="17.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-7"    inputtag="KEY1.5"  inputmask="0x02"> <bounds x="18.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5-8"    inputtag="KEY1.5"  inputmask="0x04"> <bounds x="19.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="cancel" inputtag="SERVICE" inputmask="0x04000000"> <bounds x="20.6" y="19.6" width="0.8" height="0.8"/> </bezel>
-	<!-- Bottom Row -->
-	<bezel element="6-7"    inputtag="KEY1.6"  inputmask="0x01"> <bounds x="8.6"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6-8"    inputtag="KEY1.6"  inputmask="0x02"> <bounds x="9.6"  y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7-8"    inputtag="KEY1.7"  inputmask="0x01"> <bounds x="10.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="1"      inputtag="KEY1.0"  inputmask="0x01"> <bounds x="11.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="2"      inputtag="KEY1.0"  inputmask="0x02"> <bounds x="12.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="3"      inputtag="KEY1.0"  inputmask="0x04"> <bounds x="13.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="4"      inputtag="KEY1.0"  inputmask="0x08"> <bounds x="14.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="5"      inputtag="KEY1.0"  inputmask="0x10"> <bounds x="15.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="6"      inputtag="KEY1.0"  inputmask="0x20"> <bounds x="16.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="7"      inputtag="KEY1.0"  inputmask="0x40"> <bounds x="17.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="8"      inputtag="KEY1.0"  inputmask="0x80"> <bounds x="18.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="payout" inputtag="SERVICE" inputmask="0x02000000"> <bounds x="19.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-	<bezel element="start"  inputtag="SERVICE" inputmask="0x01000000"> <bounds x="20.6" y="20.6" width="0.8" height="0.8"/> </bezel>
-
+	<group ref="keyboard_p1"> <bounds x="8.0" y="18.0" width="14" height="4" />   </group>
 
 	<!-- Service Keys (Bottom) -->
-	<bezel element="reset"  inputtag="SERVICE" inputmask="0x00020000"> <bounds x="4"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="meter"  inputtag="SERVICE" inputmask="0x00040000"> <bounds x="8"  y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="last"   inputtag="SERVICE" inputmask="0x00080000"> <bounds x="12" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="config" inputtag="SERVICE" inputmask="0x00010000"> <bounds x="16" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door1"  inputtag="SERVICE" inputmask="0x00200000"> <bounds x="20" y="22.1" width="2.0" height="0.5"/> </bezel>
-	<bezel element="door2"  inputtag="SERVICE" inputmask="0x00400000"> <bounds x="24" y="22.1" width="2.0" height="0.5"/> </bezel>
-
-
+	<group ref="service">     <bounds x="4.0" y="22.1" width="22" height="0.5" /> </group>
   </view>
 
 

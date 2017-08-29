@@ -57,7 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(coinlockout_w);
-	DECLARE_WRITE8_MEMBER(audiocpu_cmd_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
@@ -111,12 +110,6 @@ WRITE8_MEMBER(segajw_state::coinlockout_w)
 
 	for(int i=0; i<3; i++)
 		output().set_indexed_value("towerlamp", i, BIT(data, 3 + i));
-}
-
-WRITE8_MEMBER(segajw_state::audiocpu_cmd_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
@@ -174,7 +167,7 @@ static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
-	AM_RANGE(0x180004, 0x180005) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_WRITE8(audiocpu_cmd_w, 0x00ff)
+	AM_RANGE(0x180004, 0x180005) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("DSW3")
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("DSW2")
@@ -402,6 +395,8 @@ static MACHINE_CONFIG_START( segajw )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)   // unknown clock

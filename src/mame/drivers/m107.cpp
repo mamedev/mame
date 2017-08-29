@@ -37,40 +37,10 @@ confirmed for m107 games as well.
 #include "speaker.h"
 
 
-// this is the hacky code from m92.c, but better than per-game irq vector hacks.
-#define USE_HACKED_IRQS
-
-#ifdef USE_HACKED_IRQS
-
-#define M107_TRIGGER_IRQ0 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+0 ); /* VBL interrupt */
-#define M107_TRIGGER_IRQ1 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+1 ); /* Sprite buffer complete interrupt */
-#define M107_TRIGGER_IRQ2 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+2 ); /* Raster interrupt */
-#define M107_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
-// not used due to HOLD LINE logic
-#define M107_CLEAR_IRQ0 ;
-#define M107_CLEAR_IRQ1 ;
-#define M107_CLEAR_IRQ2 ;
-#define M107_CLEAR_IRQ3 ;
-
-#else
-
-#define M107_TRIGGER_IRQ0 m_upd71059c->ir0_w(1);
-#define M107_TRIGGER_IRQ1 m_upd71059c->ir1_w(1);
-#define M107_TRIGGER_IRQ2 m_upd71059c->ir2_w(1);
-#define M107_TRIGGER_IRQ3 m_upd71059c->ir3_w(1);
-// not sure when these should happen, probably the source of our issues
-#define M107_CLEAR_IRQ0 m_upd71059c->ir0_w(0);
-#define M107_CLEAR_IRQ1 m_upd71059c->ir1_w(0);
-#define M107_CLEAR_IRQ2 m_upd71059c->ir2_w(0);
-#define M107_CLEAR_IRQ3 m_upd71059c->ir3_w(0);
-
-#endif
-
 /*****************************************************************************/
 
 void m107_state::machine_start()
 {
-	save_item(NAME(m_sound_status));
 }
 
 /*****************************************************************************/
@@ -83,21 +53,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 	if (scanline == m_raster_irq_position)
 	{
 		m_screen->update_partial(scanline);
-		M107_TRIGGER_IRQ2
+		m_upd71059c->ir2_w(1);
 	}
 	else
 	{
-		M107_CLEAR_IRQ2
-
 		/* VBLANK interrupt */
 		if (scanline == m_screen->visible_area().max_y + 1)
 		{
 			m_screen->update_partial(scanline);
-			M107_TRIGGER_IRQ0
+			m_upd71059c->ir0_w(1);
+			m_upd71059c->ir2_w(0);
 		}
 		else
 		{
-			M107_CLEAR_IRQ0
+			m_upd71059c->ir0_w(0);
 		}
 
 	}
@@ -107,52 +76,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::coincounter_w)
+WRITE8_MEMBER(m107_state::coincounter_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
-	}
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE16_MEMBER(m107_state::bankswitch_w)
+WRITE8_MEMBER(m107_state::bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		membank("bank1")->set_entry((data & 0x06) >> 1);
-		if (data & 0xf9)
-			logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
-	}
-}
-
-WRITE16_MEMBER(m107_state::soundlatch_w)
-{
-	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
-	m_soundlatch->write(space, 0, data & 0xff);
-//      logerror("m_soundlatch->write %02x\n",data);
-}
-
-READ16_MEMBER(m107_state::sound_status_r)
-{
-	return m_sound_status;
-}
-
-READ16_MEMBER(m107_state::soundlatch_r)
-{
-	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-	return m_soundlatch->read(space, offset) | 0xff00;
-}
-
-WRITE16_MEMBER(m107_state::sound_irq_ack_w)
-{
-	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-}
-
-WRITE16_MEMBER(m107_state::sound_status_w)
-{
-	COMBINE_DATA(&m_sound_status);
-	M107_TRIGGER_IRQ3
+	membank("bank1")->set_entry((data & 0x06) >> 1);
+	if (data & 0xf9)
+		logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
 }
 
 WRITE16_MEMBER(m107_state::sound_reset_w)
@@ -177,9 +111,9 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ(sound_status_r)   /* answer from sound CPU */
-	AM_RANGE(0x00, 0x01) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(coincounter_w)
+	AM_RANGE(0x08, 0x09) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)   // answer from sound CPU
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(coincounter_w, 0x00ff)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(control_w)
@@ -187,6 +121,11 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0xb0, 0xb1) AM_WRITE(spritebuffer_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(sound_reset_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dsoccr94_io_map, AS_IO, 16, m107_state )
+	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
+	AM_IMPORT_FROM(main_portmap)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
@@ -221,8 +160,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(soundlatch_r, sound_irq_ack_w)
-	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(sound_status_w)
+	AM_RANGE(0xa8044, 0xa8045) AM_DEVREADWRITE8("soundlatch", generic_latch_8_device, read, acknowledge_w, 0x00ff)
+	AM_RANGE(0xa8046, 0xa8047) AM_DEVWRITE8("soundlatch2", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
 ADDRESS_MAP_END
 
@@ -775,14 +714,12 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( firebarr )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, 28000000/2)    /* NEC V33, 28MHz clock */
+	MCFG_CPU_ADD("maincpu", V33, XTAL_28MHz/2)    /* NEC V33, 28MHz clock */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-#ifndef USE_HACKED_IRQS
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-#endif
 
-	MCFG_CPU_ADD("soundcpu", V35, 14318000)
+	MCFG_CPU_ADD("soundcpu", V35, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
@@ -808,13 +745,18 @@ static MACHINE_CONFIG_START( firebarr )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_IREMGA20_ADD("irem", 14318180/4)
+	MCFG_IREMGA20_ADD("irem", XTAL_14_31818MHz/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -824,6 +766,7 @@ static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
+	MCFG_CPU_IO_MAP(dsoccr94_io_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
@@ -1048,7 +991,6 @@ DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::bankswitch_w),this));
 
 	m_spritesystem = 0;
 }

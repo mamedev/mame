@@ -162,7 +162,7 @@ uint32_t labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_in
 	address_space &space = machine().dummy_space();
 	uint8_t ctrl_0 = m_k007121->ctrlram_r(space, 0);
 	rectangle finalclip0, finalclip1;
-	
+
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -261,7 +261,7 @@ uint32_t labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_in
 		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(1), 0);
 		if(use_clip3[0])
 			m_layer0->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(1), 0);
-		
+
 		m_layer1->draw(screen, bitmap, finalclip1, 0, 0);
 		if(use_clip3[1])
 			m_layer1->draw(screen, bitmap, finalclip3, 0, 0);
