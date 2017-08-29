@@ -15,6 +15,9 @@
 
 #include "softlist_dev.h"
 
+// Size of optional ROMs (8k)
+static constexpr offs_t HP80_OPTROM_SIZE = 0x2000;
+
 class hp80_optrom_cart_device : public device_t,
 								public device_slot_card_interface
 {
@@ -38,7 +41,7 @@ public:
 	hp80_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp80_optrom_slot_device();
 
-	uint8_t *get_rom_image(uint8_t& select_code);
+	void install_read_handler(address_space& space);
 
 protected:
 	// device-level overrides

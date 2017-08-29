@@ -49,14 +49,11 @@ hp80_optrom_slot_device::~hp80_optrom_slot_device()
 {
 }
 
-uint8_t *hp80_optrom_slot_device::get_rom_image(uint8_t& select_code)
+void hp80_optrom_slot_device::install_read_handler(address_space& space)
 {
 	if (loaded_through_softlist()) {
-		select_code = m_select_code;
-		void *ptr = get_software_region("rom");
-		return (uint8_t*)ptr;
-	} else {
-		return nullptr;
+		offs_t start = (offs_t)m_select_code * HP80_OPTROM_SIZE;
+		space.install_rom(start , start + HP80_OPTROM_SIZE - 1 , get_software_region("rom"));
 	}
 }
 
@@ -93,7 +90,7 @@ image_init_result hp80_optrom_slot_device::call_load()
 
 	auto length = get_software_region_length("rom");
 
-	if (length != 0x2000) {
+	if (length != HP80_OPTROM_SIZE) {
 		LOG("hp80_optrom: illegal region length (%x)\n" , length);
 		return image_init_result::FAIL;
 	}
