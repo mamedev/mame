@@ -36,9 +36,6 @@ public:
 	tilemap_t  *m_mid_tilemap;
 	tilemap_t  *m_bak_tilemap;
 
-	/* misc */
-	int m_aquarium_snd_ack;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -49,9 +46,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ16_MEMBER(aquarium_coins_r);
-	DECLARE_WRITE8_MEMBER(aquarium_snd_ack_w);
-	DECLARE_WRITE16_MEMBER(aquarium_sound_w);
 	DECLARE_WRITE8_MEMBER(aquarium_z80_bank_w);
 	DECLARE_READ8_MEMBER(aquarium_oki_r);
 	DECLARE_WRITE8_MEMBER(aquarium_oki_w);
@@ -62,8 +56,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_aquarium_txt_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_bak_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t aquarium_snd_bitswap( uint8_t scrambled_data );
