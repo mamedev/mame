@@ -14,6 +14,22 @@ void gstriker_state::video_start()
 
 	// Initialize the chip for the screen plane
 	m_bg->set_transparent_pen(0xf);
+	
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(0x2000);
+	m_buffered_spriteram2 = std::make_unique<uint16_t[]>(0x2000);
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x2000);
+	save_pointer(NAME(m_buffered_spriteram2.get()), 0x2000);
+}
+
+WRITE_LINE_MEMBER(gstriker_state::screen_vblank)
+{
+	// sprites are two frames ahead
+	// TODO: probably all Video System games are (Aero Fighters definitely desyncs wrt background)
+	if(state)
+	{		
+		memcpy(m_buffered_spriteram.get(), m_CG10103_m_vram, 0x2000);
+		memcpy(m_buffered_spriteram2.get(), m_buffered_spriteram.get(), 0x2000);
+	}
 }
 
 
@@ -29,15 +45,14 @@ uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_tx->set_pal_base( (m_mixerregs1[2]&0xf000)>>8 );
 
 
-	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
-	//  needs sprite orthogonality
+	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably needs sprite orthogonality
 	m_bg->draw( screen, bitmap,cliprect, 0);
 
-	m_spr->draw_sprites(m_CG10103_m_vram, 0x2000, screen, bitmap, cliprect, 0x2, 0x0);
+	m_spr->draw_sprites(m_buffered_spriteram2.get(), 0x2000, screen, bitmap, cliprect, 0x2, 0x0);
 
 	m_tx->draw(screen, bitmap, cliprect, 0);
 
-	m_spr->draw_sprites(m_CG10103_m_vram, 0x2000, screen, bitmap, cliprect, 0x2, 0x2);
+	m_spr->draw_sprites(m_buffered_spriteram2.get(), 0x2000, screen, bitmap, cliprect, 0x2, 0x2);
 
 	return 0;
 }

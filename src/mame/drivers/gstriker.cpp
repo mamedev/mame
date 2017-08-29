@@ -502,6 +502,7 @@ static MACHINE_CONFIG_START( gstriker )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gstriker_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstriker)
@@ -1021,7 +1022,7 @@ GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, 0,        R
 
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
-GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
-GAME( 1994, twcup94, 0,        twc94,    twcup94, gstriker_state, twcup94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94a,twcup94,  twc94,    twcup94, gstriker_state, twcup94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vgoalsoc, 0,         vgoal,    vgoalsoc, gstriker_state, vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
+GAME( 1994, vgoalsca, vgoalsoc,  vgoal,    vgoalsoc, gstriker_state, vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
+GAME( 1994, twcup94, 0,          twc94,    twcup94,  gstriker_state, twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94a,twcup94,    twc94,    twcup94,  gstriker_state, twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

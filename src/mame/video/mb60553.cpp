@@ -279,6 +279,7 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 		incxx = m_lineram[(line)*8+0]<<4;
 		// startx has an offset based off current x zoom value
 		// This is confirmed by Tecmo World Cup '94 startx being 0xff40 (-192) when showing footballer pics on attract mode (incxx is 0x800)
+		// TODO: slightly offset?
 		xoffset = (float)incxx/(float)0x10000 * 384.0;
 
 		startx = m_regs[0] + (uint32_t)xoffset;

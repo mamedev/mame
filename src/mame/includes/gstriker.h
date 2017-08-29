@@ -46,6 +46,8 @@ public:
 	required_device<mb3773_device> m_watchdog;
 
 	required_shared_ptr<uint16_t> m_CG10103_m_vram;
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram;
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram2;
 	required_shared_ptr<uint16_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mixerregs1;
 	required_shared_ptr<uint16_t> m_mixerregs2;
@@ -76,6 +78,7 @@ public:
 	DECLARE_DRIVER_INIT(twcup94);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void mcu_init();
 };
