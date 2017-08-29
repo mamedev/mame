@@ -868,7 +868,7 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 					// In "continue" screen
 					// if( w@FFE078 & 80) 75
 					// *** after 75 beq
-					case 0x75: PC(0x005098); break; // match adder, and check if limit is reached for ending
+					case 0x75: PC(0x005088); break; // match adder, and check if limit is reached for ending
 
 					// unreachable code at end of attract loop 6a->79->6f
 					case 0x6a: PC(NULL_SUB); break;
