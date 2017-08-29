@@ -103,6 +103,12 @@ sc28c94_device::sc28c94_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+//--------------------------------------------------------------------------------------------------------------------
+// The read and write methods are meant to catch all differences in the register model between 68681 and 68340
+// serial module. Eg some registers are (re)moved into the 68340 like the vector register. There are also no counter
+// in the 68340. The CSR clock register is also different for the external clock modes. The implementation assumes
+// that the code knows all of this and will not warn if those registers are accessed as it could be ported code.
+//--------------------------------------------------------------------------------------------------------------------
 m68340_serial_device::m68340_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
   : mc68681_base_device(mconfig, M68340SERIAL, tag, owner, clock)
 {
@@ -362,28 +368,25 @@ TIMER_CALLBACK_MEMBER( mc68681_base_device::duart_timer_callback )
 READ8_MEMBER( m68340_serial_device::read )
 {
 	uint8_t r = 0;
-	offset &= 0x1f;
-
-	if (offset < 0x10)
-	{
-		return mc68681_base_device::read(space, offset, mem_mask);
-	}
 
 	switch (offset)
 	{
-		case 0x10: /* MR1A/MR2C */
-		case 0x11: /* SRC */
-		case 0x13: /* Rx Holding Register C */
-			r = m_chanC->read_chan_reg(offset & 3);
+		case 0x00: /* MR1A - does not share register address with MR2A */
+			r = m_chanA->read_MR1();
 			break;
-
-		case 0x18: /* MR1D/MR2D */
-		case 0x19: /* SRD */
-		case 0x1b: /* RHRD */
-			r = m_chanD->read_chan_reg(offset & 3);
+		case 0x08: /* MR1B - does not share register address with MR2B */
+			r = m_chanB->read_MR1();
 			break;
+		case 0x10: /* MR2A - does not share register address with MR1A */
+			r = m_chanA->read_MR2();
+			break;
+		case 0x11: /* MR2B - does not share register address with MR1B */
+			r = m_chanB->read_MR2();
+			break;
+		default:
+			r = mc68681_base_device::read(space, offset, mem_mask);
+		
 	}
-
 	return r;
 }
 
@@ -523,28 +526,22 @@ WRITE8_MEMBER( m68340_serial_device::write )
 {
   printf("Duart write %02x -> %02x\n", data, offset);
   
-	offset &= 0x1f;
-
-	if (offset < 0x10)
-	{
-		mc68681_base_device::write(space, offset, data, mem_mask);
-	}
-
 	switch(offset)
 	{
-		case 0x10: /* MRC */
-		case 0x11: /* CSRC */
-		case 0x12: /* CRC */
-		case 0x13: /* THRC */
-			m_chanC->write_chan_reg(offset&3, data);
+		case 0x00: /* MR1A - does not share register address with MR2A */
+			m_chanA->write_MR1(data);
 			break;
-
-		case 0x18: /* MRC */
-		case 0x19: /* CSRC */
-		case 0x1a: /* CRC */
-		case 0x1b: /* THRC */
-			m_chanD->write_chan_reg(offset&3, data);
+		case 0x08: /* MR1B - does not share register address with MR2B */
+			m_chanB->write_MR1(data);
 			break;
+		case 0x10: /* MR2A - does not share register address with MR1A */
+			m_chanA->write_MR2(data);
+			break;
+		case 0x11: /* MR2B - does not share register address with MR1B */
+			m_chanB->write_MR2(data);
+			break;
+		default:
+			mc68681_base_device::write(space, offset, data, mem_mask);
 	}
 }
 

@@ -41,7 +41,7 @@ public:
 			REG_MCR_STP   = 0x8000,
 			REG_MCR_FRZ1  = 0x4000,
 			REG_MCR_FRZ2  = 0x2000,
-			REG_MCR_SUPV  = 0x0800,
+			REG_MCR_SUPV  = 0x0080,
 			REG_MCR_ARBLV = 0x000f,
 	};
 

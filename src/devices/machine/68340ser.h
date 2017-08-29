@@ -22,6 +22,35 @@ public:
 
 	//protected:
 	required_device<m68340_serial_device> m_duart;
+
+	// Module registers not in the DUART part
+	uint8_t m_mcrh;
+	uint8_t m_mcrl;
+	uint8_t m_ilr;
+	uint8_t m_ivr;
+
+	enum {
+		REG_MCRH	= 0,
+		REG_MCRL	= 1,
+		REG_ILR		= 4,
+		REG_IVR		= 5,
+	};
+
+	enum {
+		REG_MCRH_STP	= 0x80,
+		REG_MCRH_FRZ1	= 0x40,
+		REG_MCRH_FRZ2	= 0x20,
+		REG_MCRH_ICCS	= 0x10,
+	};
+	
+	enum {
+		REG_MCRL_SUPV	= 0x80,
+		REG_MCRL_ARBLV	= 0x0f,
+	};
+
+	enum {
+		REG_ILR_MASK	= 0x07
+	};
 };
 
 DECLARE_DEVICE_TYPE(M68340_SERIAL_MODULE, m68340_serial)

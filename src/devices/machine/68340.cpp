@@ -90,8 +90,6 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 							    read16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_r),this),
 							    write16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_w),this),0xffffffff);
 			internal->install_readwrite_handler(base + 0x700, base + 0x723,
-							    //read8_delegate(FUNC(m68340_cpu_device::m68340_internal_serial_r),this),
-							    //write8_delegate(FUNC(m68340_cpu_device::m68340_internal_serial_w),this),0xffffffff);
 							    READ8_DEVICE_DELEGATE(m_serial, m68340_serial, read),
 							    WRITE8_DEVICE_DELEGATE(m_serial, m68340_serial, write),0xffffffff);
 			internal->install_readwrite_handler(base + 0x780, base + 0x7bf,

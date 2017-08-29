@@ -75,6 +75,12 @@ public:
 
 	uint8_t get_chan_CSR();
 
+	// Access methods needed for 68340 serial module register model
+	uint8_t read_MR1(){ return MR1; }
+	uint8_t read_MR2(){ return MR2; } 
+	void write_MR1(uint8_t data){ MR1 = data; }
+	void write_MR2(uint8_t data){ MR2 = data; }
+
 private:
 	/* Registers */
 	uint8_t CR;  /* Command register */
