@@ -26,10 +26,14 @@ Grand Striker has an IRQ2 which is probably network related.
 DSWs need correctly mapping, they're just commented for the moment.
 
 TODO:
-Finish hooking up the inputs
-Tilemap scrolling/rotation/zooming or whatever effect it needs
-Priorities are wrong. I suspect they need sprite orthogonality
-Missing mixer registers (mainly layer enable/disable)
+- Finish hooking up the inputs
+- Tilemap scrolling/rotation/zooming or whatever effect it needs
+- Priorities are wrong. I suspect they need sprite orthogonality
+- Missing mixer registers (mainly layer enable/disable)
+- Tecmo World Cup '94 has missing protection emulation for draw buy-in 
+  (as seen by code snippet 0x42ee, referenced in other places as well)
+  It's unknown how the game logic should be at current stage.
+- Tecmo World Cup '94 also has no name entry whatsoever.
 
 ******************************************************************************/
 
@@ -245,6 +249,8 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x00f000)
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w )
+	AM_RANGE(0x200010, 0x200011) AM_WRITENOP
+	AM_RANGE(0x200020, 0x200021) AM_WRITENOP
 	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs1")
 	AM_RANGE(0x200060, 0x20007f) AM_RAM AM_SHARE("mixerregs2")
 	AM_RANGE(0x200080, 0x20009f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
