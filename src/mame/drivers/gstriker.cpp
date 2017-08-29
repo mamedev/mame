@@ -868,7 +868,7 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 					// In "continue" screen
 					// if( w@FFE078 & 80) 75
 					// *** after 75 beq
-					case 0x75: PC(NULL_SUB); break;
+					case 0x75: PC(0x005098); break; // match adder, and check if limit is reached for ending
 
 					// unreachable code at end of attract loop 6a->79->6f
 					case 0x6a: PC(NULL_SUB); break;
@@ -876,7 +876,7 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 					case 0x6f: PC(NULL_SUB); break;
 
 					default:
-						logerror("Unknown MCU CMD %04x\n",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(NULL_SUB);
 						break;
 						
@@ -886,6 +886,7 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 			
 			// same as above but with +0x10 displacement offsets
 			case TECMO_WCUP94A_MCU:
+				
 				switch (mcu_data)
 				{
 					#define NULL_SUB 0x0000829E
@@ -897,14 +898,16 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 
 					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
 					case 0x72: PC(0x000040AE); break; // game over
-					
+
+					case 0x75: PC(0x005098); break; // match adder, and check if limit is reached for ending
+
 					// attract mode
 					case 0x6e: PC(0x00010E38); break; // loop
 					case 0x6b: PC(0x00010EFC); break; // attract even
 					case 0x69: PC(0x0001121A); break; // attract odd
 					
 					default:
-						logerror("Unknown MCU CMD %04x\n",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(NULL_SUB);
 						break;
 					
@@ -927,7 +930,7 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 					case 0x79: PC(0x0006072E); break; // after select, start match
 
 					default:
-						logerror("Unknown MCU CMD %04x\n",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(0x00000586); // rts
 						break;
 				}
@@ -987,9 +990,6 @@ WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 
 void gstriker_state::mcu_init()
 {
-	m_mcu_data = 0;
-
-	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_prot_reg));
 }
 

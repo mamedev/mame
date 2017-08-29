@@ -58,7 +58,6 @@ public:
 		VGOAL_SOCCER_MCU
 	}m_mcutype;
 	int m_gametype;
-	uint16_t m_mcu_data;
 	uint16_t m_prot_reg[2];
 
 	// common
