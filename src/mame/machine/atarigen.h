@@ -13,7 +13,6 @@
 
 #include "includes/slapstic.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/eeprompar.h"
 #include "video/atarimo.h"
 #include "screen.h"
 
@@ -78,14 +77,6 @@
 	{ std::string fulltag(device->tag()); fulltag.append(":mob"); device_t *device; \
 	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag.c_str(), "^^screen", _config) \
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("^" _gfxtag) }
-
-
-
-#define MCFG_ATARI_EEPROM_2804_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ATARI_EEPROM_2804, 0)
-
-#define MCFG_ATARI_EEPROM_2816_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ATARI_EEPROM_2816, 0)
 
 
 
@@ -251,67 +242,6 @@ private:
 
 	uint16_t              m_control[0x40/2];          // control data
 };
-
-
-// ======================> atari_eeprom_device
-
-// device type definition
-DECLARE_DEVICE_TYPE(ATARI_EEPROM_2804, atari_eeprom_2804_device)
-DECLARE_DEVICE_TYPE(ATARI_EEPROM_2816, atari_eeprom_2816_device)
-
-class atari_eeprom_device : public device_t
-{
-protected:
-	// construction/destruction
-	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
-
-public:
-	// unlock controls
-	DECLARE_READ8_MEMBER(unlock_read);
-	DECLARE_WRITE8_MEMBER(unlock_write);
-	DECLARE_READ16_MEMBER(unlock_read);
-	DECLARE_WRITE16_MEMBER(unlock_write);
-	DECLARE_READ32_MEMBER(unlock_read);
-	DECLARE_WRITE32_MEMBER(unlock_write);
-
-	// EEPROM read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// internal state
-	required_device<eeprom_parallel_28xx_device> m_eeprom;
-
-	// live state
-	bool        m_unlocked;
-};
-
-class atari_eeprom_2804_device : public atari_eeprom_device
-{
-public:
-	// construction/destruction
-	atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-};
-
-class atari_eeprom_2816_device : public atari_eeprom_device
-{
-public:
-	// construction/destruction
-	atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-};
-
 
 
 /***************************************************************************
