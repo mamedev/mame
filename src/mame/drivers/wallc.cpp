@@ -77,6 +77,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(wallc);
+	DECLARE_PALETTE_INIT(unkitpkr);
 	DECLARE_VIDEO_START(unkitpkr);
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
@@ -134,6 +135,45 @@ PALETTE_INIT_MEMBER(wallc_state, wallc)
 			2,  resistances_rg, weights_r,  330,    0,
 			2,  resistances_rg, weights_g,  330,    0,
 			3,  resistances_b,  weights_b,  330,    655+220);
+
+	for (i = 0;i < palette.entries();i++)
+	{
+		int bit0,bit1,bit7,r,g,b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 5) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		r = combine_2_weights(weights_r, bit1, bit0);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i] >> 3) & 0x01;
+		g = combine_2_weights(weights_g, bit1, bit0);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit7 = (color_prom[i] >> 7) & 0x01;
+		b = combine_3_weights(weights_b, bit7, bit1, bit0);
+
+		palette.set_pen_color(i,rgb_t(r,g,b));
+	}
+}
+
+PALETTE_INIT_MEMBER(wallc_state, unkitpkr)
+{
+//  this pcb has 470 ohms resistors instead of the expected 330 ohms.
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+
+	static const int resistances_rg[2] = { 470, 220 };
+	static const int resistances_b[3] = { 655, 470, 220 };
+	double weights_r[2], weights_g[2], weights_b[3];
+
+	compute_resistor_weights(0, 255,    -1.0,
+			2,  resistances_rg, weights_r,  470,    0,
+			2,  resistances_rg, weights_g,  470,    0,
+			3,  resistances_b,  weights_b,  470,    655+220);
 
 	for (i = 0;i < palette.entries();i++)
 	{
@@ -460,6 +500,8 @@ static MACHINE_CONFIG_DERIVED( unkitpkr, wallc )
 	MCFG_CPU_PROGRAM_MAP(unkitpkr_map)
 
 	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(wallc_state, unkitpkr)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("aysnd")
