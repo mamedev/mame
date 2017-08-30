@@ -5073,7 +5073,7 @@ ROM_START( jdredd )
 	AC_BIOS
 
 	ROM_REGION32_LE( 0x200000, "roms", 0 )
-	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u-36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) /* labeled as 9E54 01-16-98 #1566 U 36  -  checksum 9E54 */
+	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) /* labeled as 9E54 01-16-98 #1566 U 36  -  checksum 9E54 */
 	ROM_LOAD16_BYTE( "79d3_01-16-98_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) /* labeled as 79D3 01-16-98 #1565 U 35  -  checksum 79D3 */
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -5087,7 +5087,7 @@ ROM_START( jdreddb )
 	AC_BIOS
 
 	ROM_REGION32_LE( 0x200000, "roms", 0 )
-	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u-36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) /* labeled as 9E54 01-16-98 #1566 U 36  -  checksum 9E54 */
+	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) /* labeled as 9E54 01-16-98 #1566 U 36  -  checksum 9E54 */
 	ROM_LOAD16_BYTE( "79d3_01-16-98_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) /* labeled as 79D3 01-16-98 #1565 U 35  -  checksum 79D3 */
 
 	DISK_REGION( "ata:0:hdd:image" )
