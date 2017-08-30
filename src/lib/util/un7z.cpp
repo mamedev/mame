@@ -479,7 +479,7 @@ void m7z_file_impl::make_utf8_name(int index)
 	out_pos = 0;
 	for (std::size_t in_pos = 0; in_pos < (len - 1); )
 	{
-		const int used = uchar_from_utf16(&m_uchar_buf[out_pos], (char16_t *)&m_utf16_buf[in_pos], len - in_pos);
+		const int used = uchar_from_utf16(m_uchar_buf[out_pos], (char16_t *)&m_utf16_buf[in_pos], len - in_pos);
 		if (used < 0)
 		{
 			in_pos++;

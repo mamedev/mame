@@ -1716,7 +1716,7 @@ protected:
 					// loop over characters
 					while (*s != 0)
 					{
-						int scharcount = uchar_from_utf8(&schar, s, ends - s);
+						int scharcount = uchar_from_utf8(schar, s, ends - s);
 
 						if (scharcount == -1)
 							break;
@@ -1877,7 +1877,7 @@ private:
 					// loop over characters
 					while (*s != 0)
 					{
-						int scharcount = uchar_from_utf8(&schar, s, ends - s);
+						int scharcount = uchar_from_utf8(schar, s, ends - s);
 
 						if (scharcount == -1)
 							break;
@@ -2125,7 +2125,7 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 	// loop over characters
 	while (*s != 0)
 	{
-		int scharcount = uchar_from_utf8(&schar, s, ends - s);
+		int scharcount = uchar_from_utf8(schar, s, ends - s);
 
 		if (scharcount == -1)
 			break;

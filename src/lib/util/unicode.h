@@ -92,9 +92,9 @@ bool uchar_is_printable(char32_t uchar);
 bool uchar_is_digit(char32_t uchar);
 
 // converting strings to 32-bit Unicode chars
-int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count);
-int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count);
-int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count);
+int uchar_from_utf8(char32_t &uchar, const char *utf8char, size_t count);
+int uchar_from_utf16(char32_t &uchar, const char16_t *utf16char, size_t count);
+int uchar_from_utf16f(char32_t &uchar, const char16_t *utf16char, size_t count);
 
 // converting 32-bit Unicode chars to strings
 int utf8_from_uchar(char *utf8string, size_t count, char32_t uchar);

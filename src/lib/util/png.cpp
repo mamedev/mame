@@ -835,7 +835,7 @@ png_error png_info::add_text(const char *keyword, const char *text)
 	for (char const *ptr = keyword; kwend > ptr; )
 	{
 		char32_t ch;
-		int const len(uchar_from_utf8(&ch, ptr, kwend - ptr));
+		int const len(uchar_from_utf8(ch, ptr, kwend - ptr));
 		if ((0 >= len) || (32 > ch) || (255 < ch) || ((126 < ch) && (161 > ch)) || (((32 == prev) || (keyword == ptr)) && (32 == ch)))
 			return PNGERR_UNSUPPORTED_FORMAT;
 		prev = ch;
@@ -850,7 +850,7 @@ png_error png_info::add_text(const char *keyword, const char *text)
 	for (char const *ptr = text; textend > ptr; )
 	{
 		char32_t ch;
-		int const len(uchar_from_utf8(&ch, ptr, textend - ptr));
+		int const len(uchar_from_utf8(ch, ptr, textend - ptr));
 		if ((0 >= len) || (1 > ch) || (255 < ch))
 			return PNGERR_UNSUPPORTED_FORMAT;
 		ptr += len;
@@ -1179,7 +1179,7 @@ static png_error write_png_stream(util::core_file &fp, png_info &pnginfo, const 
 		for (char const *src = text.first.c_str(); kwend > src; ++dst)
 		{
 			char32_t ch;
-			int const len(uchar_from_utf8(&ch, src, kwend - src));
+			int const len(uchar_from_utf8(ch, src, kwend - src));
 			if (0 >= len)
 				break;
 			*dst = std::uint8_t(ch);
@@ -1194,7 +1194,7 @@ static png_error write_png_stream(util::core_file &fp, png_info &pnginfo, const 
 		for (char const *src = text.second.c_str(); textend > src; ++dst)
 		{
 			char32_t ch;
-			int const len(uchar_from_utf8(&ch, src, textend - src));
+			int const len(uchar_from_utf8(ch, src, textend - src));
 			if (0 >= len)
 				break;
 			*dst = std::uint8_t(ch);

@@ -1380,7 +1380,7 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 			j = 0;
 			do
 			{
-				i += uchar_from_utf16(&ch, &lfn_buf[i], ARRAY_LENGTH(lfn_buf) - i);
+				i += uchar_from_utf16(ch, &lfn_buf[i], ARRAY_LENGTH(lfn_buf) - i);
 				j += utf8_from_uchar(&ent.long_filename[j], ARRAY_LENGTH(ent.long_filename) - j, ch);
 			}
 			while(ch != 0);
@@ -1454,7 +1454,7 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 
 	while(*filename)
 	{
-		filename += uchar_from_utf8(&ch, filename, UTF8_CHAR_MAX);
+		filename += uchar_from_utf8(ch, filename, UTF8_CHAR_MAX);
 
 		/* append to short filename, if possible */
 		if ((ch < 32) || (ch > 128))

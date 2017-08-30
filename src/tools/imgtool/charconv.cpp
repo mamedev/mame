@@ -73,7 +73,7 @@ void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *sr
 	{
 		// get the next character
 		char32_t ch;
-		int rc = uchar_from_utf8(&ch, &*iter, normalized_src.end() - iter);
+		int rc = uchar_from_utf8(ch, &*iter, normalized_src.end() - iter);
 		if (rc < 0)
 		{
 			ch = 0xFFFD;

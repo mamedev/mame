@@ -433,7 +433,7 @@ int core_text_file::getc()
 				auto const readlen = read(utf8_buffer, sizeof(utf8_buffer));
 				if (readlen > 0)
 				{
-					auto const charlen = uchar_from_utf8(&uchar, utf8_buffer, readlen / sizeof(utf8_buffer[0]));
+					auto const charlen = uchar_from_utf8(uchar, utf8_buffer, readlen / sizeof(utf8_buffer[0]));
 					seek(std::int64_t(charlen * sizeof(utf8_buffer[0])) - readlen, SEEK_CUR);
 				}
 			}
@@ -444,7 +444,7 @@ int core_text_file::getc()
 				auto const readlen = read(utf16_buffer, sizeof(utf16_buffer));
 				if (readlen > 0)
 				{
-					auto const charlen = uchar_from_utf16be(&uchar, utf16_buffer, readlen / sizeof(utf16_buffer[0]));
+					auto const charlen = uchar_from_utf16be(uchar, utf16_buffer, readlen / sizeof(utf16_buffer[0]));
 					seek(std::int64_t(charlen * sizeof(utf16_buffer[0])) - readlen, SEEK_CUR);
 				}
 			}
@@ -455,7 +455,7 @@ int core_text_file::getc()
 				auto const readlen = read(utf16_buffer, sizeof(utf16_buffer));
 				if (readlen > 0)
 				{
-					auto const charlen = uchar_from_utf16le(&uchar, utf16_buffer, readlen / sizeof(utf16_buffer[0]));
+					auto const charlen = uchar_from_utf16le(uchar, utf16_buffer, readlen / sizeof(utf16_buffer[0]));
 					seek(std::int64_t(charlen * sizeof(utf16_buffer[0])) - readlen, SEEK_CUR);
 				}
 			}

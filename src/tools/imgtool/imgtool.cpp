@@ -1682,7 +1682,7 @@ imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fo
 			while (filename[i])
 			{
 				char32_t ch;
-				int count = uchar_from_utf8(&ch, &filename[i], UTF8_CHAR_MAX);
+				int count = uchar_from_utf8(ch, &filename[i], UTF8_CHAR_MAX);
 				if (count > 0)
 				{
 					char32_t upper_ch = uchar_toupper(ch);

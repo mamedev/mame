@@ -382,7 +382,7 @@ void convert_command_glyph(std::string &str)
 	{
 		// decode UTF-8
 		char32_t uchar;
-		int const codelen(uchar_from_utf8(&uchar, &str[i], len - i));
+		int const codelen(uchar_from_utf8(uchar, &str[i], len - i));
 		if (0 >= codelen)
 			break;
 		i += codelen;
@@ -869,7 +869,7 @@ float render_font::string_width(float height, float aspect, const char *string)
 	// loop over characters
 	while (*s != 0)
 	{
-		int scharcount = uchar_from_utf8(&schar, s, ends - s);
+		int scharcount = uchar_from_utf8(schar, s, ends - s);
 		totwidth += get_char(schar).width;
 		s += scharcount;
 	}
@@ -895,7 +895,7 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 	for (std::size_t offset = 0U; offset < length; offset += unsigned(count))
 	{
 		char32_t uchar;
-		count = uchar_from_utf8(&uchar, utf8string + offset, length - offset);
+		count = uchar_from_utf8(uchar, utf8string + offset, length - offset);
 		if (count < 0)
 			break;
 

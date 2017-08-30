@@ -420,7 +420,7 @@ void natural_keyboard::post(char32_t ch)
 		const char *altstring = info->alternate;
 		while (*altstring != 0)
 		{
-			altstring += uchar_from_utf8(&ch, altstring, strlen(altstring));
+			altstring += uchar_from_utf8(ch, altstring, strlen(altstring));
 			internal_post(ch);
 		}
 	}
@@ -469,7 +469,7 @@ void natural_keyboard::post_utf8(const char *text, size_t length, const attotime
 	{
 		// decode the next character
 		char32_t uc;
-		int count = uchar_from_utf8(&uc, text, length);
+		int count = uchar_from_utf8(uc, text, length);
 		if (count < 0)
 		{
 			count = 1;
@@ -670,7 +670,7 @@ bool natural_keyboard::can_post_alternate(char32_t ch)
 	while (*altstring != 0)
 	{
 		char32_t uchar;
-		int count = uchar_from_utf8(&uchar, altstring, strlen(altstring));
+		int count = uchar_from_utf8(uchar, altstring, strlen(altstring));
 		if (count <= 0)
 			return false;
 		if (!can_post_directly(uchar))
