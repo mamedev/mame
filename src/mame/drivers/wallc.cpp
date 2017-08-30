@@ -77,6 +77,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(wallc);
+	DECLARE_PALETTE_INIT(unkitpkr);
 	DECLARE_VIDEO_START(unkitpkr);
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
@@ -159,6 +160,45 @@ PALETTE_INIT_MEMBER(wallc_state, wallc)
 	}
 }
 
+PALETTE_INIT_MEMBER(wallc_state, unkitpkr)
+{
+//  this pcb has 470 ohms resistors instead of the expected 330 ohms.
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+
+	static const int resistances_rg[2] = { 470, 220 };
+	static const int resistances_b[3] = { 655, 470, 220 };
+	double weights_r[2], weights_g[2], weights_b[3];
+
+	compute_resistor_weights(0, 255,    -1.0,
+			2,  resistances_rg, weights_r,  470,    0,
+			2,  resistances_rg, weights_g,  470,    0,
+			3,  resistances_b,  weights_b,  470,    655+220);
+
+	for (i = 0;i < palette.entries();i++)
+	{
+		int bit0,bit1,bit7,r,g,b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 5) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		r = combine_2_weights(weights_r, bit1, bit0);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i] >> 3) & 0x01;
+		g = combine_2_weights(weights_g, bit1, bit0);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit7 = (color_prom[i] >> 7) & 0x01;
+		b = combine_3_weights(weights_b, bit7, bit1, bit0);
+
+		palette.set_pen_color(i,rgb_t(r,g,b));
+	}
+}
+
 WRITE8_MEMBER(wallc_state::videoram_w)
 {
 	m_videoram[offset] = data;
@@ -197,10 +237,12 @@ uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
+
 WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 2);
 }
+
 
 WRITE8_MEMBER(wallc_state::unkitpkr_out0_w)
 {
@@ -237,19 +279,19 @@ static ADDRESS_MAP_START( unkitpkr_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */
 
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb100, 0xb100) AM_READ_PORT("IN0")
-	AM_RANGE(0xb200, 0xb200) AM_READ_PORT("IN1")
-	AM_RANGE(0xb300, 0xb300) AM_READ_PORT("IN2")
-	AM_RANGE(0xb500, 0xb5ff) AM_READNOP // read by memory test routine left over from some other game
-	AM_RANGE(0xb600, 0xb600) AM_READ_PORT("DSW")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN0")
+	AM_RANGE(0xb100, 0xb100) AM_READ_PORT("IN1")
+	AM_RANGE(0xb200, 0xb200) AM_READ_PORT("IN2")
+	AM_RANGE(0xb300, 0xb300) AM_READ_PORT("IN3")
+	AM_RANGE(0xb500, 0xb5ff) AM_READNOP // read by memory test routine. left over from some other game
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(unkitpkr_out0_w)
 	AM_RANGE(0xb100, 0xb100) AM_WRITE(unkitpkr_out1_w)
 	AM_RANGE(0xb200, 0xb200) AM_WRITE(unkitpkr_out2_w)
 	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8912_device, address_w)
-	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8912_device, data_w)
+	AM_RANGE(0xb600, 0xb600) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)  // Port A = DSW
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( wallc )
 	PORT_START("SYSTEM")    /* b200 */
@@ -309,7 +351,7 @@ static INPUT_PORTS_START( wallc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkitpkr )
-	PORT_START("SYSTEM")    /* b000 */
+	PORT_START("IN0")    /* b000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -319,27 +361,27 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN0")    /* b100 */
+	PORT_START("IN1")    /* b100 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // coin clear?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // coin out
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("IN1")    /* b200 */
+	PORT_START("IN2")    /* b200 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-	PORT_START("IN2")    /* b300 */
+	PORT_START("IN3")    /* b300 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
@@ -350,17 +392,17 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("DSW")      /* b600 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW2:1,2") // ok
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:1,2") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x03, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW2:3,4") // ok
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:3,4") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x00, "Coin C" )                PORT_DIPLOCATION("SW2:5,6") // ok
+	PORT_DIPNAME( 0x30, 0x00, "Coin C" )			PORT_DIPLOCATION("SW2:5,6") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
@@ -368,6 +410,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
+
 
 static const gfx_layout charlayout =
 {
@@ -383,6 +426,7 @@ static const gfx_layout charlayout =
 static GFXDECODE_START( wallc )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout, 0, 4 )
 GFXDECODE_END
+
 
 DRIVER_INIT_MEMBER(wallc_state, wallc)
 {
@@ -424,7 +468,6 @@ DRIVER_INIT_MEMBER(wallc_state, wallca)
 }
 
 
-
 static MACHINE_CONFIG_START( wallc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
@@ -450,13 +493,23 @@ static MACHINE_CONFIG_START( wallc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( unkitpkr, wallc )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unkitpkr_map)
 
 	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(wallc_state, unkitpkr)
+
+	/* sound hardware */
+	MCFG_SOUND_MODIFY("aysnd")
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -504,7 +557,6 @@ ROM_START( brkblast )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
 ROM_END
-
 
 
 /*
@@ -614,6 +666,37 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
 	}
 }
 
+/*
+  Unknown Italian Poker
+  Seems a brute hack of an unknown game.
+  
+  The "conforme alla legge n." string is overwritting the hands table:
+
+  "CONFORME"   = Royal Flush
+  (blank line) = Straight Flush
+  "ALLA LEGGE" = Four of a Kind
+  (blank line) = Full House
+  "N.904 DEL"  = Flush
+  (blank line) = Straight
+  "17.12.1986" = Three of a Kind
+  (blank line) = Double Pair
+  "........."  = Simple Pair
+
+  Also the code is hacked/patched to avoid some jumps:
+
+  00cb: ld a,(hl)
+  00cc: cp c
+  00cd: nop
+  00ce: nop
+  00cf: nop
+  
+  00d2: ld a,(hl)
+  00d3: cp c
+  00d4: nop
+  00d5: nop
+  00d6: nop
+
+*/
 ROM_START( unkitpkr )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1", 0x0000, 0x2000, CRC(82dacf83) SHA1(d2bd4664737aeb968e9e34da74c2654e556c8567) )
@@ -627,7 +710,7 @@ ROM_START( unkitpkr )
 	ROM_CONTINUE(  0x2000, 0x1000 ) // first half is empty
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) BAD_DUMP ) // from wallc; not dumped yet
+	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) ) // dumped; matches the wallc bp
 ROM_END
 
 DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
@@ -643,9 +726,11 @@ DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
 	}
 }
 
-GAME( 1984, wallc,    0,     wallc,    wallc,    wallc_state, wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca,   wallc, wallc,    wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast, wallc, wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,     wallc,    wallc,    wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, unkitpkr, 0,     unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT      ROT      COMPANY             FULLNAME                              FLAGS
+GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,   wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+
+GAME( 1984, sidampkr, 0,      wallc,    wallc,    wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

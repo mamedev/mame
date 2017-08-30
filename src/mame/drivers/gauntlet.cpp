@@ -124,6 +124,7 @@
 #include "includes/gauntlet.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
@@ -279,7 +280,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 
 	/* MBUS */
 	AM_RANGE(0x800000, 0x801fff) AM_MIRROR(0x2fc000) AM_RAM
-	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x803000, 0x803001) AM_MIRROR(0x2fcef0) AM_READ_PORT("803000")
 	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
@@ -289,7 +290,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 
 	/* VBUS */
@@ -498,7 +499,8 @@ static MACHINE_CONFIG_START( gauntlet_base )
 	MCFG_MACHINE_START_OVERRIDE(gauntlet_state,gauntlet)
 	MCFG_MACHINE_RESET_OVERRIDE(gauntlet_state,gauntlet)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

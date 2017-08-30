@@ -1,5 +1,5 @@
 # Turkish translations for PACKAGE package
-# PACKAGE paketi i�in T�rk�e �eviriler.
+# PACKAGE paketi için Türkçe çeviriler.
 # Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Automatically generated, 2016.
@@ -31,7 +31,7 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(sonuçlar %1$s 'a kaydedilecek)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -42,7 +42,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "Denetlemeyi Başlat"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:116
 msgid "Cannot save over directory"
@@ -61,23 +61,23 @@ msgstr ""
 
 #: src/frontend/mame/ui/filesel.cpp:261
 msgid "[create]"
-msgstr ""
+msgstr "[oluştur]"
 
 #: src/frontend/mame/ui/filesel.cpp:265 src/frontend/mame/ui/swlist.cpp:94
 msgid "[software list]"
-msgstr ""
+msgstr "[yazılım listesi]"
 
 #: src/frontend/mame/ui/filesel.cpp:525
 msgid "Select access mode"
-msgstr ""
+msgstr "Erişim tipini seçin"
 
 #: src/frontend/mame/ui/filesel.cpp:526
 msgid "Read-only"
-msgstr ""
+msgstr "Salt-okunur"
 
 #: src/frontend/mame/ui/filesel.cpp:528
 msgid "Read-write"
-msgstr ""
+msgstr "Salt-yazılır"
 
 #: src/frontend/mame/ui/filesel.cpp:529
 msgid "Read this image, write to another image"
@@ -89,7 +89,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:35
 msgid "ROMs"
-msgstr ""
+msgstr "ROMlar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
@@ -101,7 +101,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:38 src/frontend/mame/ui/custui.cpp:157
 msgid "Language"
-msgstr ""
+msgstr "Dil"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgid "Samples"
@@ -109,27 +109,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgid "DATs"
-msgstr ""
+msgstr "DATlar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:41
 msgid "INIs"
-msgstr ""
+msgstr "INIler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "Kategori INIleri"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
-msgstr ""
+msgstr "Simgeler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
 msgid "Cheats"
-msgstr ""
+msgstr "Hileler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/selmenu.cpp:49
 msgid "Snapshots"
-msgstr ""
+msgstr "Ekran Görüntüleri"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/selmenu.cpp:50
 msgid "Cabinets"

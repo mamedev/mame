@@ -23,6 +23,7 @@
 #include "includes/skullxbo.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -102,7 +103,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xff0000, 0xff07ff) AM_WRITE(skullxbo_mobmsb_w)
 	AM_RANGE(0xff0800, 0xff0bff) AM_WRITE(skullxbo_halt_until_hblank_0_w)
-	AM_RANGE(0xff0c00, 0xff0fff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0xff0c00, 0xff0fff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0xff1000, 0xff13ff) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xff1400, 0xff17ff) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
 	AM_RANGE(0xff1800, 0xff1bff) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
@@ -120,7 +121,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff5000, 0xff5001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0x00ff)
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
 	AM_RANGE(0xff5802, 0xff5803) AM_READ_PORT("FF5802")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0xff6000, 0xff6fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(playfield_latched_w) AM_SHARE("playfield")
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_DEVWRITE("playfield", tilemap_device, write_ext) AM_SHARE("playfield_ext")
 	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
@@ -234,7 +235,8 @@ static MACHINE_CONFIG_START( skullxbo )
 	MCFG_TIMER_DRIVER_ADD("scan_timer", skullxbo_state, scanline_timer)
 	MCFG_MACHINE_RESET_OVERRIDE(skullxbo_state,skullxbo)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
