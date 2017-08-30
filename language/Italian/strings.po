@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-25 23:38+1000\n"
-"PO-Revision-Date: 2017-08-30 09:23+0200\n"
+"PO-Revision-Date: 2017-08-30 09:37+0200\n"
 "Last-Translator: Piergiorgio Bellezza\n"
 "Language-Team: MAME Language Team\n"
 "Language: it\n"
@@ -337,7 +337,7 @@ msgstr "%s"
 #: src/frontend/mame/ui/info.cpp:264
 #, c-format
 msgid ", %s"
-msgstr ",%s"
+msgstr ", %s"
 
 #: src/frontend/mame/ui/info.cpp:213
 msgid "Imperfectly emulated features: "
@@ -1826,7 +1826,7 @@ msgstr "Audio: OK"
 #: src/frontend/mame/ui/selmenu.cpp:665
 #, c-format
 msgid "%1$s %2$s"
-msgstr "%1$s%2$s"
+msgstr "%1$s %2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:1995
 msgid "Images"
