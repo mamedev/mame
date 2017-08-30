@@ -938,7 +938,7 @@ msgstr "Gráficos\tNo implementados\n"
 
 #: src/frontend/mame/ui/selgame.cpp:881
 msgid "Graphics\tWrong Colors\n"
-msgstr ""
+msgstr "Gráficos\tColores erróneos\n"
 
 #: src/frontend/mame/ui/selgame.cpp:883
 msgid "Graphics\tImperfect Colors\n"
