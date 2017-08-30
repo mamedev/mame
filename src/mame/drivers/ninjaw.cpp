@@ -742,7 +742,11 @@ static MACHINE_CONFIG_START( ninjaw )
 	MCFG_CPU_PROGRAM_MAP(ninjaw_slave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* CPU slices */
+	// TODO: if CPUs are unsynched then seldomly stages loads up with no enemies
+	//       Let's use a better timer (was 6000 before) based off actual CPU timing.
+	//       Might as well bump the divider in case the bug still occurs before resorting to perfect CPU.
+	MCFG_QUANTUM_TIME(attotime::from_hz(16000000/1024))  /* CPU slices */
+	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
 	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
@@ -863,7 +867,8 @@ static MACHINE_CONFIG_START( darius2 )
 	MCFG_CPU_PROGRAM_MAP(darius2_slave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* CPU slices */
+	MCFG_QUANTUM_TIME(attotime::from_hz(16000000/1024))  /* CPU slices */
+	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
 	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))

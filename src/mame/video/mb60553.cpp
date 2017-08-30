@@ -277,10 +277,12 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 		
 
 		incxx = m_lineram[(line)*8+0]<<4;
+		incyy = m_lineram[(line)*8+3]<<4;
+
 		// startx has an offset based off current x zoom value
 		// This is confirmed by Tecmo World Cup '94 startx being 0xff40 (-192) when showing footballer pics on attract mode (incxx is 0x800)
 		// TODO: slightly offset?
-		xoffset = (float)incxx/(float)0x10000 * 384.0;
+		xoffset = ((float)incxx/(float)0x10000) * 384.0;
 
 		startx = m_regs[0] + (uint32_t)xoffset;
 		starty = m_regs[1];
@@ -288,7 +290,6 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 		// TODO: what's this? Used by Grand Striker playfield
 //		startx -=  m_lineram[(line)*8+7]/2;
 
-		incyy = m_lineram[(line)*8+3]<<4;
 		
 		clip.min_y = clip.max_y = line;
 
