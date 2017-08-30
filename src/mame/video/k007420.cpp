@@ -5,6 +5,9 @@ Konami 007420
 ------
 Sprite generator. 8 bytes per sprite with zoom. It uses 0x200 bytes of RAM,
 and a variable amount of ROM. Nothing is known about its external interface.
+
+TODO:
+- sprite X wraparound? (Rock N Rage sprites disappears on left edge of screen)
 */
 
 #include "emu.h"
