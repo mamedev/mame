@@ -696,6 +696,12 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
   00d5: nop
   00d6: nop
 
+  1866: pop af
+  1867: cp $46
+  1869: nop
+  186a: nop
+  186b: nop
+
 */
 ROM_START( unkitpkr )
 	ROM_REGION( 0x8000, "maincpu", 0 )
