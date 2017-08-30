@@ -207,14 +207,14 @@ WRITE8_MEMBER(wallc_state::videoram_w)
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] + ((tile_index & 0x1f) >= 0x08 && (tile_index & 0x1f) < 0x10 ? 0 : 0x100), 1, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 1, 0);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
 {
 	int code = m_videoram[tile_index];
 
-	// hack to display cards
+	// hack to display cards (TODO: what determines tile banking?)
 	if ((tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
 		code |= 0x100;
 
