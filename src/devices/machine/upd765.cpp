@@ -11,6 +11,7 @@ DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
 DEFINE_DEVICE_TYPE(I8272A,         i8272a_device,         "i8272a",         "Intel 8272A FDC")
 DEFINE_DEVICE_TYPE(UPD72065,       upd72065_device,       "upd72065",       "NEC uPD72065 FDC")
+DEFINE_DEVICE_TYPE(I82072,         i82072_device,         "i82072",         "Intel 82072 FDC")
 DEFINE_DEVICE_TYPE(SMC37C78,       smc37c78_device,       "smc37c78",       "SMC FDC73C78 FDC")
 DEFINE_DEVICE_TYPE(N82077AA,       n82077aa_device,       "n82077aa",       "Intel N82077AA FDC")
 DEFINE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device, "pc_fdc_superio", "PC FDC SUPERIO")
@@ -37,6 +38,11 @@ ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, upd72065_device)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START(map, 8, i82072_device)
+	AM_RANGE(0x0, 0x0) AM_READWRITE(msr_r, dsr_w)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
@@ -2458,6 +2464,11 @@ i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, dev
 }
 
 upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD72065, tag, owner, clock)
+{
+	dor_reset = 0x0c;
+}
+
+i82072_device::i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, I82072, tag, owner, clock)
 {
 	dor_reset = 0x0c;
 }
