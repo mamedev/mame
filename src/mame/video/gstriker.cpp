@@ -36,7 +36,12 @@ WRITE_LINE_MEMBER(gstriker_state::screen_vblank)
 uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_mixerregs1[8]&0x07ff, cliprect); // complete guess, causes green behind test grid in twc94 and blue behind title screen on gstriker
-
+	
+	/*
+	[4] AAAA BBBB ---- ---- sprite priority number A/B?
+	[5] xxxx ---- ---- ---- background layer priority number?
+	[6] xxxx ---- ---- ---- foreground layer priority number?
+	*/
 //	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x", m_mixerregs1[0],m_mixerregs1[1],m_mixerregs1[2],m_mixerregs1[3],m_mixerregs1[4],m_mixerregs1[5],m_mixerregs1[6],m_mixerregs1[7],  m_mixerregs1[8],m_mixerregs1[9],m_mixerregs1[10],m_mixerregs1[11],m_mixerregs1[12],m_mixerregs1[13],m_mixerregs1[14],m_mixerregs1[15] );
 //  popmessage("%04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x", m_mixerregs2[0],m_mixerregs2[1],m_mixerregs2[2],m_mixerregs2[3],m_mixerregs2[4],m_mixerregs2[5],m_mixerregs2[6],m_mixerregs2[7],  m_mixerregs2[8],m_mixerregs2[9],m_mixerregs2[10],m_mixerregs2[11],m_mixerregs2[12],m_mixerregs2[13],m_mixerregs2[14],m_mixerregs2[15] );
 
