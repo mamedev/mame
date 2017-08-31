@@ -2651,7 +2651,7 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 	/* determine the screen Y */                                                \
 	scry = y;                                                                   \
 	if (FBZMODE_Y_ORIGIN(FBZMODE))                                              \
-		scry = (vd->fbi.yorigin - y) & 0x3ff;                                    \
+		scry = (vd->fbi.yorigin - y);                                    \
 																				\
 	/* compute dithering */                                                     \
 	COMPUTE_DITHER_POINTERS(FBZMODE, y, FOGMODE);                               \

@@ -2860,6 +2860,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 			break;
 
 		case trexInit1:
+			vd->logerror("VOODOO.%d.REG:%s(%d) write = %08X\n", vd->index, (regnum < 0x384 / 4) ? vd->regnames[regnum] : "oob", chips, data);
 			/* send tmu config data to the frame buffer */
 			vd->send_config = (TREXINIT_SEND_TMU_CONFIG(data) > 0);
 			goto default_case;
@@ -3189,7 +3190,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 		/* determine the screen Y */
 		scry = y;
 		if (LFBMODE_Y_ORIGIN(vd->reg[lfbMode].u))
-			scry = (vd->fbi.yorigin - y) & 0x3ff;
+			scry = (vd->fbi.yorigin - y);
 
 		/* advance pointers to the proper row */
 		bufoffs = scry * vd->fbi.rowpixels + x;
@@ -3247,7 +3248,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 		/* determine the screen Y */
 		scry = y;
 		if (FBZMODE_Y_ORIGIN(vd->reg[fbzMode].u))
-			scry = (vd->fbi.yorigin - y) & 0x3ff;
+			scry = (vd->fbi.yorigin - y);
 
 		/* advance pointers to the proper row */
 		dest += scry * vd->fbi.rowpixels;
@@ -4055,7 +4056,7 @@ static uint32_t lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 		/* determine the screen Y */
 		scry = y;
 		if (LFBMODE_Y_ORIGIN(vd->reg[lfbMode].u))
-			scry = (vd->fbi.yorigin - y) & 0x3ff;
+			scry = (vd->fbi.yorigin - y);
 	} else {
 		// Direct lfb access
 		buffer = (uint16_t *)(vd->fbi.ram + vd->fbi.lfb_base*4);
@@ -5884,7 +5885,7 @@ void voodoo_device::raster_fastfill(void *destbase, int32_t y, const poly_extent
 	/* determine the screen Y */
 	scry = y;
 	if (FBZMODE_Y_ORIGIN(vd->reg[fbzMode].u))
-		scry = (vd->fbi.yorigin - y) & 0x3ff;
+		scry = (vd->fbi.yorigin - y);
 
 	/* fill this RGB row */
 	if (FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u))
