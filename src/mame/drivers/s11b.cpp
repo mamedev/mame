@@ -233,12 +233,6 @@ WRITE8_MEMBER( s11b_state::pia34_pa_w )
 	set_segment2(seg);
 }
 
-WRITE_LINE_MEMBER( s11b_state::pia40_ca2_w)
-{
-	if(state == ASSERT_LINE)
-		m_ym->reset();
-}
-
 DRIVER_INIT_MEMBER( s11b_state, s11b )
 {
 	s11a_state::init_s11a();
@@ -352,7 +346,7 @@ static MACHINE_CONFIG_START( s11b )
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac1", dac_byte_interface, write))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia40_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11b_state, pia40_ca2_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("ym2151", ym2151_device, reset_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia40_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))

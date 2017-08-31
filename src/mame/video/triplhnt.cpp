@@ -28,7 +28,6 @@ void triplhnt_state::video_start()
 
 	save_item(NAME(m_cmos));
 	save_item(NAME(m_da_latch));
-	save_item(NAME(m_misc_flags));
 	save_item(NAME(m_cmos_latch));
 	save_item(NAME(m_hit_code));
 	save_item(NAME(m_sprite_zoom));

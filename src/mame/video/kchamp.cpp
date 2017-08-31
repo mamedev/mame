@@ -39,9 +39,9 @@ WRITE8_MEMBER(kchamp_state::kchamp_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kchamp_state::kchamp_flipscreen_w)
+WRITE_LINE_MEMBER(kchamp_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(state);
 }
 
 TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)

@@ -70,9 +70,9 @@ WRITE8_MEMBER(jedi_state::irq_ack_w)
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::jedi_audio_reset_w)
+WRITE_LINE_MEMBER(jedi_state::audio_reset_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

@@ -660,6 +660,7 @@ magicard.cpp
 magicfly.cpp
 magictg.cpp
 magmax.cpp
+magreel.cpp
 magtouch.cpp
 mainevt.cpp
 mainsnk.cpp
@@ -1270,6 +1271,7 @@ umipoker.cpp
 undrfire.cpp
 unianapc.cpp
 unico.cpp
+unkfr.cpp
 unkhorse.cpp
 upscope.cpp
 usbilliards.cpp

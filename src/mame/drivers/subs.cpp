@@ -23,7 +23,7 @@
 #include "includes/subs.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/discrete.h"
+#include "machine/74259.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -59,15 +59,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, subs_state )
 	AM_RANGE(0x0020, 0x0027) AM_READ(coin_r)
 //  AM_RANGE(0x0040, 0x0040) AM_WRITE(timer_reset_w)
 	AM_RANGE(0x0060, 0x0063) AM_READ(options_r)
-	AM_RANGE(0x0060, 0x0061) AM_WRITE(lamp1_w)
-	AM_RANGE(0x0062, 0x0063) AM_WRITE(lamp2_w)
-	AM_RANGE(0x0064, 0x0065) AM_WRITE(sonar2_w)
-	AM_RANGE(0x0066, 0x0067) AM_WRITE(sonar1_w)
-// Schematics show crash and explode reversed.  But this is proper.
-	AM_RANGE(0x0068, 0x0069) AM_WRITE(explode_w)
-	AM_RANGE(0x006a, 0x006b) AM_WRITE(crash_w)
-	AM_RANGE(0x006c, 0x006d) AM_WRITE(invert1_w)
-	AM_RANGE(0x006e, 0x006f) AM_WRITE(invert2_w)
+	AM_RANGE(0x0060, 0x006f) AM_DEVWRITE("latch", ls259_device, write_a0)
 	AM_RANGE(0x0090, 0x009f) AM_SHARE("spriteram")
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
@@ -220,6 +212,17 @@ static MACHINE_CONFIG_START( subs )
 	MCFG_DISCRETE_INTF(subs)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // C9
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(subs_state, lamp1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(subs_state, lamp2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR1_EN>))
+	// Schematics show crash and explode reversed.  But this is proper.
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_EXPLODE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_CRASH_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(subs_state, invert1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(subs_state, invert2_w))
 MACHINE_CONFIG_END
 
 

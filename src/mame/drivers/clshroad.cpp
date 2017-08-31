@@ -31,6 +31,7 @@ TODO:
 #include "audio/wiping.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,19 +59,14 @@ READ8_MEMBER(clshroad_state::input_r)
 
 // irq/reset controls like in wiping.cpp
 
-WRITE8_MEMBER(clshroad_state::subcpu_reset_w)
+WRITE_LINE_MEMBER(clshroad_state::main_irq_mask_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_main_irq_mask = state;
 }
 
-WRITE8_MEMBER(clshroad_state::main_irq_mask_w)
+WRITE_LINE_MEMBER(clshroad_state::sound_irq_mask_w)
 {
-	m_main_irq_mask = data & 1;
-}
-
-WRITE8_MEMBER(clshroad_state::sound_irq_mask_w)
-{
-	m_sound_irq_mask = data & 1;
+	m_sound_irq_mask = state;
 }
 
 
@@ -80,9 +76,7 @@ static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9dff) AM_RAM
 	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(subcpu_reset_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(main_irq_mask_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xa100, 0xa107) AM_READ(input_r)
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
 	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_SHARE("vregs") // Scroll
@@ -93,7 +87,7 @@ static ADDRESS_MAP_START( clshroad_sound_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("custom", wiping_sound_device, sound_w)
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(sound_irq_mask_w)
+	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -287,6 +281,12 @@ static MACHINE_CONFIG_START( firebatl )
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -321,6 +321,12 @@ static MACHINE_CONFIG_START( clshroad )
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
 	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // never writes here?
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

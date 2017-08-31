@@ -79,14 +79,14 @@ WRITE8_MEMBER(mermaid_state::mermaid_colorram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_x_w)
+WRITE_LINE_MEMBER(mermaid_state::flip_screen_x_w)
 {
-	flip_screen_x_set(data & 0x01);
+	flip_screen_x_set(state);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_y_w)
+WRITE_LINE_MEMBER(mermaid_state::flip_screen_y_w)
 {
-	flip_screen_y_set(data & 0x01);
+	flip_screen_y_set(state);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_bg_scroll_w)
@@ -101,14 +101,14 @@ WRITE8_MEMBER(mermaid_state::mermaid_fg_scroll_w)
 	m_fg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_gfxbankswitch1_w)
+WRITE_LINE_MEMBER(mermaid_state::rougien_gfxbankswitch1_w)
 {
-	m_rougien_gfxbank1 = data & 0x01;
+	m_rougien_gfxbank1 = state;
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_gfxbankswitch2_w)
+WRITE_LINE_MEMBER(mermaid_state::rougien_gfxbankswitch2_w)
 {
-	m_rougien_gfxbank2 = data & 0x01;
+	m_rougien_gfxbank2 = state;
 }
 
 READ8_MEMBER(mermaid_state::mermaid_collision_r)

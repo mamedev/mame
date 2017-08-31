@@ -148,6 +148,7 @@
 
 #include "emu.h"
 #include "includes/turbo.h"
+#include "machine/74259.h"
 #include "machine/i8279.h"
 #include "machine/segacrpt_device.h"
 #include "sound/samples.h"
@@ -401,20 +402,21 @@ WRITE8_MEMBER(turbo_state::turbo_analog_reset_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_coin_and_lamp_w)
+WRITE_LINE_MEMBER(turbo_state::coin_meter_1_w)
 {
-	switch (offset & 7)
-	{
-		case 0:
-			machine().bookkeeping().coin_counter_w(0, data & 1);
-			break;
-		case 1:
-			machine().bookkeeping().coin_counter_w(1, data & 1);
-			break;
-		case 3:
-			output().set_led_value(0, data & 1);
-			break;
-	}
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(turbo_state::coin_meter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+
+WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
+{
+	machine().output().set_led_value(0, state);
 }
 
 
@@ -500,7 +502,7 @@ WRITE8_MEMBER(turbo_state::spriteram_w)
 static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_READWRITE(spriteram_r, spriteram_w)
-	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_WRITE(turbo_coin_and_lamp_w)
+	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("spritepos")
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE(turbo_analog_reset_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")
@@ -866,6 +868,11 @@ static MACHINE_CONFIG_START( turbo )
 	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))    // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC125 - outputs passed through CN5
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(turbo_state, coin_meter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(turbo_state, coin_meter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(turbo_state, start_lamp_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)

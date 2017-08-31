@@ -194,13 +194,13 @@ MACHINE_CONFIG_MEMBER( efo_zsu_device::device_add_mconfig )
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in0_w))
+	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(efo_zsu_device, ctc0_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(efo_zsu_device, ctc0_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(efo_zsu_device, ctc0_z2_w))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in0_w))
+	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(efo_zsu_device, ctc1_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(efo_zsu_device, ctc1_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(efo_zsu_device, ctc1_z2_w))
@@ -213,9 +213,9 @@ MACHINE_CONFIG_MEMBER( efo_zsu_device::device_add_mconfig )
 #endif
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in1_w))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<2>))
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("soundirq") // 74HC03 NAND gate
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq") // 74HC03 NAND gate
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

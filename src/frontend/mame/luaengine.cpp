@@ -12,6 +12,10 @@
 #include <lua.hpp>
 #include "emu.h"
 #include "mame.h"
+#include "debugger.h"
+#include "debug/debugcon.h"
+#include "debug/debugcpu.h"
+#include "debug/textbuf.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "ui/ui.h"
@@ -1133,9 +1137,9 @@ void lua_engine::initialize()
  * machine:input() - get input_manager
  * machine:uiinput() - get ui_input_manager
  * machine.paused - get paused state
- * machine.devices - get device table
- * machine.screens - get screens table
- * machine.images - get available image devices
+ * machine.devices[] - get device table
+ * machine.screens[] - get screens table
+ * machine.images[] - get available image devices
  * machine:popmessage(str) - print str as popup
  * machine:logerror(str) - print str to log
  */
@@ -1156,6 +1160,11 @@ void lua_engine::initialize()
 			"outputs", &running_machine::output,
 			"input", &running_machine::input,
 			"uiinput", &running_machine::ui_input,
+			"debugger", [this](running_machine &m) -> sol::object {
+					if(!(m.debug_flags & DEBUG_FLAG_ENABLED))
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), &m.debugger());
+				},
 			"paused", sol::property(&running_machine::paused),
 			"devices", sol::property([this](running_machine &m) {
 					std::function<void(device_t &, sol::table)> tree;
@@ -1209,11 +1218,124 @@ void lua_engine::initialize()
 			"compatible_with", sol::readonly(&game_driver::compatible_with),
 			"default_layout", sol::readonly(&game_driver::default_layout));
 
+/* machine:debugger()
+ * debug:command(cmd) - run cmd in debugger console
+ * debug.consolelog[] - get consolelog
+ * debug.errorlog[] - get errorlog
+ * debug.visible_cpu - accessor for debugger active cpu for commands, affects debug views
+ * debug.execution_state - accessor for active cpu run state
+ */
+
+	struct wrap_textbuf { wrap_textbuf(text_buffer *buf) { textbuf = buf; }; text_buffer *textbuf; };
+
+	sol().registry().new_usertype<debugger_manager>("debugger", "new", sol::no_constructor,
+			"command", [](debugger_manager &debug, const std::string &cmd) { debug.console().execute_command(cmd, false); },
+			"consolelog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_console_textbuf()); }),
+			"errorlog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_errorlog_textbuf()); }),
+			"visible_cpu", sol::property([](debugger_manager &debug) { debug.cpu().get_visible_cpu(); },
+				[](debugger_manager &debug, device_t &dev) { debug.cpu().set_visible_cpu(&dev); }),
+			"execution_state", sol::property([](debugger_manager &debug) {
+					int execstate = debug.cpu().execution_state();
+					if(execstate == 0)
+						return "stop";
+					return "run";
+				},
+				[](debugger_manager &debug, const std::string &state) {
+					int execstate = 1;
+					if(state == "stop")
+						execstate = 0;
+					debug.cpu().set_execution_state(execstate);
+				}));
+
+	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
+			"__metatable", [](){},
+			"__newindex", [](){},
+			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },
+			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
+
+/* device:debug()
+ * debug:step([opt] steps) - run cpu steps, default 1
+ * debug:go() - run cpu
+ * debug:bpset(addr, cond, act) - set break, cond and act are debugger expressions
+ * debug:bpclr(idx) - clear break
+ * debug:bplist()[] - table of breakpoints
+ * debug:wpset(space, type, addr, len, cond, act) - set watch, cond and act are debugger expressions
+ * debug:wpclr(idx) - clear watch
+ * debug:wplist(space)[] - table of watchpoints
+ */
+	sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor,
+			"step", [this](device_debug &dev, sol::object num) {
+					int steps = 1;
+					if(num.is<int>())
+						steps = num.as<int>();
+					dev.single_step(steps);
+				},
+			"go", &device_debug::go,
+			"bpset", [](device_debug &dev, offs_t addr, const char *cond, const char *act) { return dev.breakpoint_set(addr, cond, act); },
+			"bpclr", &device_debug::breakpoint_clear,
+			"bplist", [this](device_debug &dev) {
+					sol::table table = sol().create_table();
+					device_debug::breakpoint *list = dev.breakpoint_first();
+					while(list)
+					{
+						sol::table bp = sol().create_table();
+						bp["enabled"] = list->enabled();
+						bp["address"] = list->address();
+						bp["condition"] = list->condition();
+						bp["action"] = list->action();
+						table[list->index()] = bp;
+						list = list->next();
+					}
+					return table;
+				},
+			"wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
+					int wptype = WATCHPOINT_READ;
+					if(type == "w")
+						wptype = WATCHPOINT_WRITE;
+					else if((type == "rw") || (type == "wr"))
+						wptype = WATCHPOINT_READ | WATCHPOINT_WRITE;
+					return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
+				},
+			"wpclr", &device_debug::watchpoint_clear,
+			"wplist", [this](device_debug &dev, addr_space &sp) {
+					sol::table table = sol().create_table();
+					device_debug::watchpoint *list = dev.watchpoint_first(sp.space.spacenum());
+					while(list)
+					{
+						sol::table wp = sol().create_table();
+						wp["enabled"] = list->enabled();
+						wp["address"] = list->address();
+						wp["length"] = list->length();
+						switch(list->type())
+						{
+							case WATCHPOINT_READ:
+								wp["type"] = "r";
+								break;
+							case WATCHPOINT_WRITE:
+								wp["type"] = "w";
+								break;
+							case WATCHPOINT_READ | WATCHPOINT_WRITE:
+								wp["type"] = "rw";
+								break;
+							default: // huh?
+								wp["type"] = "";
+								break;
+						}
+						wp["condition"] = list->condition();
+						wp["action"] = list->action();
+						table[list->index()] = wp;
+						list = list->next();
+					}
+					return table;
+				});
+
+
 /* machine.devices[device_tag]
  * device:name() - device long name
  * device:shortname() - device short name
  * device:tag() - device tree tag
  * device:owner() - device parent tag
+ * device:debug() - debug interface, cpus only
  * device.spaces[] - device address spaces table
  * device.state[] - device state entries table
  * device.items[] - device save state items table
@@ -1224,6 +1346,11 @@ void lua_engine::initialize()
 			"shortname", &device_t::shortname,
 			"tag", &device_t::tag,
 			"owner", &device_t::owner,
+			"debug", [this](device_t &dev) -> sol::object {
+					if(!(dev.machine().debug_flags & DEBUG_FLAG_ENABLED) || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not cpu
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), dev.debug());
+				},
 			"spaces", sol::property([this](device_t &dev) {
 					device_memory_interface *memdev = dynamic_cast<device_memory_interface *>(&dev);
 					sol::table sp_table = sol().create_table();
@@ -1636,7 +1763,7 @@ void lua_engine::initialize()
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
 			"orientation", [](screen_device &sdev) {
-					uint32_t flags = sdev.machine().system().flags & ORIENTATION_MASK;
+					uint32_t flags = sdev.machine().system().flags & machine_flags::MASK_ORIENTATION;
 					int rotation_angle = 0;
 					switch (flags)
 					{

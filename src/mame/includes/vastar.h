@@ -38,9 +38,8 @@ public:
 	tilemap_t *m_bg2_tilemap;
 	uint8_t m_nmi_mask;
 
-	DECLARE_WRITE8_MEMBER(hold_cpu2_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(bg1videoram_w);
 	DECLARE_WRITE8_MEMBER(bg2videoram_w);

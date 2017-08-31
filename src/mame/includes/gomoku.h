@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gomoku_videoram_w);
 	DECLARE_WRITE8_MEMBER(gomoku_colorram_w);
 	DECLARE_WRITE8_MEMBER(gomoku_bgram_w);
-	DECLARE_WRITE8_MEMBER(gomoku_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(gomoku_bg_dispsw_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(bg_dispsw_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gomoku);

@@ -5,6 +5,7 @@
 */
 
 #include "machine/taito68705interface.h"
+#include "machine/input_merger.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 #include "screen.h"
@@ -25,8 +26,10 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") ,
-		m_soundlatch(*this, "soundlatch") { }
+		m_palette(*this, "palette"),
+		m_soundnmi(*this, "soundnmi"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_charram;
@@ -46,10 +49,6 @@ public:
 	int         m_bg_scrollx;
 	uint8_t       m_sprite_lookup[0x2000];
 
-	/* sound-related */
-	int         m_sound_nmi_enable;
-	int         m_pending_nmi;
-
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
@@ -58,14 +57,17 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<input_merger_device> m_soundnmi;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
+	DECLARE_READ8_MEMBER(sound_status_main_r);
+	DECLARE_READ8_MEMBER(sound_status_sound_r);
 	DECLARE_WRITE8_MEMBER(buggychl_chargen_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_bank_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);

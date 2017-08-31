@@ -30,48 +30,42 @@ void triplhnt_state::set_collision(int code)
 }
 
 
-void triplhnt_state::update_misc(address_space &space, int offset)
+WRITE_LINE_MEMBER(triplhnt_state::ram_2_w)
 {
-	uint8_t is_witch_hunt;
-	uint8_t bit = offset >> 1;
+	if (state)
+		m_cmos[m_cmos_latch] = m_da_latch;
+}
 
-	/* BIT0 => UNUSED      */
-	/* BIT1 => LAMP        */
-	/* BIT2 => SCREECH     */
-	/* BIT3 => LOCKOUT     */
-	/* BIT4 => SPRITE ZOOM */
-	/* BIT5 => CMOS WRITE  */
-	/* BIT6 => TAPE CTRL   */
-	/* BIT7 => SPRITE BANK */
 
-	if (offset & 1)
-	{
-		m_misc_flags |= 1 << bit;
+WRITE_LINE_MEMBER(triplhnt_state::sprite_zoom_w)
+{
+	m_sprite_zoom = state;
+}
 
-		if (bit == 5)
-		{
-			m_cmos[m_cmos_latch] = m_da_latch;
-		}
-	}
-	else
-	{
-		m_misc_flags &= ~(1 << bit);
-	}
 
-	m_sprite_zoom = (m_misc_flags >> 4) & 1;
-	m_sprite_bank = (m_misc_flags >> 7) & 1;
+WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
+{
+	m_sprite_bank = state;
+}
 
-	output().set_led_value(0, m_misc_flags & 0x02);
 
-	machine().bookkeeping().coin_lockout_w(0, !(m_misc_flags & 0x08));
-	machine().bookkeeping().coin_lockout_w(1, !(m_misc_flags & 0x08));
+WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
+{
+	output().set_led_value(0, state);
+}
 
-	m_discrete->write(space, TRIPLHNT_SCREECH_EN, m_misc_flags & 0x04); // screech
-	m_discrete->write(space, TRIPLHNT_LAMP_EN, m_misc_flags & 0x02);    // Lamp is used to reset noise
-	m_discrete->write(space, TRIPLHNT_BEAR_EN, m_misc_flags & 0x80);    // bear
 
-	is_witch_hunt = ioport("0C09")->read() == 0x40;
-	bit = ~m_misc_flags & 0x40;
+WRITE_LINE_MEMBER(triplhnt_state::coin_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+
+WRITE_LINE_MEMBER(triplhnt_state::tape_control_w)
+{
+	bool is_witch_hunt = ioport("0C09")->read() == 0x40;
+	bool bit = !state;
 
 	/* if we're not playing the sample yet, start it */
 	if (!m_samples->playing(0))
@@ -82,12 +76,6 @@ void triplhnt_state::update_misc(address_space &space, int offset)
 	/* bit 6 turns cassette on/off */
 	m_samples->pause(0,  is_witch_hunt || bit);
 	m_samples->pause(1, !is_witch_hunt || bit);
-}
-
-
-WRITE8_MEMBER(triplhnt_state::misc_w)
-{
-	update_misc(space, offset);
 }
 
 
@@ -108,7 +96,7 @@ READ8_MEMBER(triplhnt_state::input_port_4_r)
 
 READ8_MEMBER(triplhnt_state::misc_r)
 {
-	update_misc(space, offset);
+	m_latch->write_a0(space, offset, 0);
 	return ioport("VBLANK")->read() | m_hit_code;
 }
 
@@ -141,7 +129,7 @@ static ADDRESS_MAP_START( triplhnt_map, AS_PROGRAM, 8, triplhnt_state )
 	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(input_port_4_r)
 	AM_RANGE(0x0c10, 0x0c1f) AM_READ(da_latch_r)
 	AM_RANGE(0x0c20, 0x0c2f) AM_READ(cmos_r) AM_SHARE("nvram")
-	AM_RANGE(0x0c30, 0x0c3f) AM_READWRITE(misc_r, misc_w)
+	AM_RANGE(0x0c30, 0x0c3f) AM_READ(misc_r) AM_DEVWRITE("latch", f9334_device, write_a0)
 	AM_RANGE(0x0c40, 0x0c40) AM_READ_PORT("0C40")
 	AM_RANGE(0x0c48, 0x0c48) AM_READ_PORT("0C48")
 	AM_RANGE(0x7000, 0x7fff) AM_ROM /* program */
@@ -308,7 +296,19 @@ static MACHINE_CONFIG_START( triplhnt )
 	MCFG_CPU_PROGRAM_MAP(triplhnt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // battery-backed 74C89 at J5
+
+	MCFG_DEVICE_ADD("latch", F9334, 0) // J7
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // unused
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(triplhnt_state, lamp1_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("discrete", discrete_device, write_line<TRIPLHNT_LAMP_EN>)) // Lamp is used to reset noise
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<TRIPLHNT_SCREECH_EN>)) // screech
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(triplhnt_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(triplhnt_state, sprite_zoom_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(triplhnt_state, ram_2_w)) // CMOS write
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(triplhnt_state, tape_control_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(triplhnt_state, sprite_bank_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("discrete", discrete_device, write_line<TRIPLHNT_BEAR_EN>)) // bear
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

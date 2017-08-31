@@ -25,6 +25,7 @@ Year   Game                PCB            NOTES
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -38,25 +39,24 @@ Year   Game                PCB            NOTES
  *
  *************************************/
 
-WRITE8_MEMBER(gaelco_state::bigkarnk_sound_command_w)
+WRITE_LINE_MEMBER(gaelco_state::coin1_lockout_w)
 {
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	machine().bookkeeping().coin_lockout_w(0, state);
 }
 
-WRITE8_MEMBER(gaelco_state::bigkarnk_coin_w)
+WRITE_LINE_MEMBER(gaelco_state::coin2_lockout_w)
 {
-	switch ((offset >> 3))
-	{
-		case 0x00:  /* Coin Lockouts */
-		case 0x01:
-			machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
-			break;
-		case 0x02:  /* Coin Counters */
-		case 0x03:
-			machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
-			break;
-	}
+	machine().bookkeeping().coin_lockout_w(1, state);
+}
+
+WRITE_LINE_MEMBER(gaelco_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(gaelco_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 WRITE8_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
@@ -120,8 +120,8 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE8(bigkarnk_sound_command_w, 0x00ff)                                     /* Triggers a FIRQ on the sound CPU */
-	AM_RANGE(0x70000a, 0x70003b) AM_WRITE8(bigkarnk_coin_w, 0x00ff)                                          /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)               /* Triggers a FIRQ on the sound CPU */
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
 
@@ -163,6 +163,7 @@ static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
@@ -180,6 +181,7 @@ static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
@@ -510,6 +512,11 @@ static MACHINE_CONFIG_START( bigkarnk )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -530,6 +537,7 @@ static MACHINE_CONFIG_START( bigkarnk )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3580000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -578,6 +586,12 @@ static MACHINE_CONFIG_START( squash )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // B8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // used
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -611,6 +625,12 @@ static MACHINE_CONFIG_START( thoop )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // B8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) // not inverted
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) // not inverted
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // used
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -277,6 +277,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
 	}
@@ -292,6 +294,16 @@ if (BUSES["BBC_TUBE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_6502.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_6502.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_65c102.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_65c102.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80186.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80186.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.h",
 	}
 end
 
@@ -3128,9 +3140,27 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.h",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/psi_kbd/psi_kbd.h,BUSES["PSI_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["PSI_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psi_kbd/psi_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/psi_kbd/psi_kbd.h",
+		MAME_DIR .. "src/devices/bus/psi_kbd/ergoline.cpp",
+		MAME_DIR .. "src/devices/bus/psi_kbd/ergoline.h",
+		MAME_DIR .. "src/devices/bus/psi_kbd/hle.cpp",
+		MAME_DIR .. "src/devices/bus/psi_kbd/hle.h",
 	}
 end

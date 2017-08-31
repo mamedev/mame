@@ -24,6 +24,9 @@
 struct ui_software_info;
 
 namespace ui {
+
+class machine_static_info;
+
 class menu_select_launch : public menu
 {
 public:
@@ -35,10 +38,35 @@ protected:
 	// tab navigation
 	enum class focused_menu
 	{
-		main,
-		left,
-		righttop,
-		rightbottom
+		MAIN,
+		LEFT,
+		RIGHTTOP,
+		RIGHTBOTTOM
+	};
+
+	class system_flags
+	{
+	public:
+		system_flags(machine_static_info const &info);
+		system_flags(system_flags const &) = default;
+		system_flags(system_flags &&) = default;
+		system_flags &operator=(system_flags const &) = default;
+		system_flags &operator=(system_flags &&) = default;
+
+		::machine_flags::type machine_flags() const { return m_machine_flags; }
+		device_t::feature_type unemulated_features() const { return m_unemulated_features; }
+		device_t::feature_type imperfect_features() const { return m_imperfect_features; }
+		bool has_keyboard() const { return m_has_keyboard; }
+		bool has_analog() const { return m_has_analog; }
+		rgb_t status_color() const { return m_status_color; }
+
+	private:
+		::machine_flags::type   m_machine_flags;
+		device_t::feature_type  m_unemulated_features;
+		device_t::feature_type  m_imperfect_features;
+		bool                    m_has_keyboard;
+		bool                    m_has_analog;
+		rgb_t                   m_status_color;
 	};
 
 	class reselect_last
@@ -69,6 +97,8 @@ protected:
 	bool dismiss_error();
 	void set_error(reset_options ropt, std::string &&message);
 
+	system_flags const &get_system_flags(game_driver const &driver);
+
 	void launch_system(game_driver const &driver) { launch_system(ui(), driver, nullptr, nullptr, nullptr); }
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo) { launch_system(ui(), driver, &swinfo, nullptr, nullptr); }
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo, std::string const &part) { launch_system(ui(), driver, &swinfo, &part, nullptr); }
@@ -77,6 +107,8 @@ protected:
 
 	// handlers
 	void inkey_navigation();
+	virtual void inkey_export() = 0;
+	void inkey_dats();
 
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
@@ -84,13 +116,29 @@ protected:
 
 	bool draw_error_text();
 
+	template <typename Filter>
+	float draw_left_panel(
+			typename Filter::type current,
+			std::map<typename Filter::type, typename Filter::ptr> const &filters,
+			float x1, float y1, float x2, float y2);
+
 	template <typename T> bool select_bios(T const &driver, bool inlist);
 	bool select_part(software_info const &info, ui_software_info const &ui_info);
 
-	int     visible_items;
-	void    *m_prev_selected;
-	int     m_total_lines;
-	int     m_topline_datsview;   // right box top line
+	void *get_selection_ptr() const
+	{
+		void *const selected_ref(get_selection_ref());
+		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
+	}
+
+	int         visible_items;
+	void        *m_prev_selected;
+	int         m_total_lines;
+	int         m_topline_datsview;
+	int         m_filter_highlight;
+	std::string m_search;
+
+	static char const *const s_info_titles[];
 
 private:
 	using bitmap_vector = std::vector<bitmap_argb32>;
@@ -141,6 +189,7 @@ private:
 	using cache_ptr = std::shared_ptr<cache>;
 	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
 
+	using flags_cache = util::lru_cache_map<game_driver const *, system_flags>;
 	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
 
 	static constexpr std::size_t MAX_ICONS_RENDER = 128;
@@ -153,6 +202,7 @@ private:
 
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
+	float draw_collapsed_left_panel(float x1, float y1, float x2, float y2);
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);
@@ -160,6 +210,7 @@ private:
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
+	virtual bool accept_search() const { return true; }
 	void select_prev()
 	{
 		if (!m_prev_selected)
@@ -191,6 +242,9 @@ private:
 	// handle mouse
 	virtual void handle_events(uint32_t flags, event &ev) override;
 
+	// live search active?
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
+
 	// draw game list
 	virtual void draw(uint32_t flags) override;
 
@@ -208,6 +262,9 @@ private:
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
 	virtual std::string make_driver_description(game_driver const &driver) const = 0;
 	virtual std::string make_software_description(ui_software_info const &software) const = 0;
+
+	// filter navigation
+	virtual void filter_selected() = 0;
 
 	static void launch_system(mame_ui_manager &mui, game_driver const &driver, ui_software_info const *swinfo, std::string const *part, int const *bios);
 	static bool select_part(mame_ui_manager &mui, render_container &container, software_info const &info, ui_software_info const &ui_info);
@@ -234,6 +291,7 @@ private:
 
 	int                     m_right_visible_lines;  // right box lines
 
+	flags_cache             m_flags;
 	icon_cache              m_icons;
 
 	static std::mutex       s_cache_guard;

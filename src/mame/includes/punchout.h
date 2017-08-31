@@ -62,15 +62,12 @@ public:
 	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
 	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_reset_w);
 	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_clock_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(punchout_bg_top_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_bg_bot_videoram_w);
 	DECLARE_WRITE8_MEMBER(armwrest_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_spr1_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_spr2_videoram_w);
-	DECLARE_WRITE8_MEMBER(punchout_speech_reset_w);
-	DECLARE_WRITE8_MEMBER(punchout_speech_st_w);
-	DECLARE_WRITE8_MEMBER(punchout_speech_vcu_w);
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(armwrest_top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);

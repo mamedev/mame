@@ -1362,7 +1362,7 @@ void validity_checker::validate_driver()
 	// determine if we are a clone
 	bool is_clone = (strcmp(m_current_driver->parent, "0") != 0);
 	int clone_of = m_drivlist.clone(*m_current_driver);
-	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
+	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 		is_clone = false;
 
 	// if we have at least 100 drivers, validate the clone
@@ -1422,17 +1422,24 @@ void validity_checker::validate_driver()
 		}
 
 	// make sure sound-less drivers are flagged
-	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && !iter.first() && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_NO_SOUND_HW)) == 0)
-		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
+	device_t::feature_type const unemulated(m_current_driver->type.unemulated_features());
+	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
+	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
+	{
+		sound_interface_iterator iter(m_current_config->root_device());
+		if (!iter.first())
+			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
+	}
 
 	// catch invalid flag combinations
-	if ((m_current_driver->flags & MACHINE_WRONG_COLORS) && (m_current_driver->flags & MACHINE_IMPERFECT_COLORS))
-		osd_printf_error("Driver cannot have colours that are both completely wrong and imperfect\n");
-	if ((m_current_driver->flags & MACHINE_NO_SOUND_HW) && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)))
-		osd_printf_error("Machine without sound hardware cannot have unemulated sound\n");
-	if ((m_current_driver->flags & MACHINE_NO_SOUND) && (m_current_driver->flags & MACHINE_IMPERFECT_SOUND))
-		osd_printf_error("Driver cannot have sound emulation that's both imperfect and not present\n");
+	if (unemulated & ~device_t::feature::ALL)
+		osd_printf_error("Driver has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+	if (imperfect & ~device_t::feature::ALL)
+		osd_printf_error("Driver has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+	if (unemulated & imperfect)
+		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+	if ((m_current_driver->flags & machine_flags::NO_SOUND_HW) && ((unemulated | imperfect) & device_t::feature::SOUND))
+		osd_printf_error("Machine without sound hardware cannot have unemulated/imperfect sound\n");
 }
 
 
@@ -1449,16 +1456,18 @@ void validity_checker::validate_roms(device_t &root)
 		m_current_device = &device;
 
 		// scan the ROM entries for this device
-		const char *last_region_name = "???";
-		const char *last_name = "???";
+		char const *last_region_name = "???";
+		char const *last_name = "???";
 		u32 current_length = 0;
 		int items_since_region = 1;
 		int last_bios = 0;
 		int total_files = 0;
-		for (const rom_entry *romp = rom_first_region(device); romp != nullptr && !ROMENTRY_ISEND(romp); romp++)
+		std::unordered_map<std::string, int> bios_names;
+		std::unordered_map<std::string, std::string> bios_descs;
+		char const *defbios = nullptr;
+		for (const rom_entry *romp = rom_first_region(device); romp && !ROMENTRY_ISEND(romp); romp++)
 		{
-			// if this is a region, make sure it's valid, and record the length
-			if (ROMENTRY_ISREGION(romp))
+			if (ROMENTRY_ISREGION(romp)) // if this is a region, make sure it's valid, and record the length
 			{
 				// if we haven't seen any items since the last region, print a warning
 				if (items_since_region == 0)
@@ -1487,18 +1496,39 @@ void validity_checker::validate_roms(device_t &root)
 				if (!m_region_map.insert(std::make_pair(fulltag, current_length)).second)
 					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.c_str());
 			}
-
-			// If this is a system bios, make sure it is using the next available bios number
-			else if (ROMENTRY_ISSYSTEM_BIOS(romp))
+			else if (ROMENTRY_ISSYSTEM_BIOS(romp)) // If this is a system bios, make sure it is using the next available bios number
 			{
-				int bios_flags = ROM_GETBIOSFLAGS(romp);
+				int const bios_flags = ROM_GETBIOSFLAGS(romp);
+				char const *const biosname = ROM_GETNAME(romp);
 				if (bios_flags != last_bios + 1)
-					osd_printf_error("Non-sequential bios %s (specified as %d, expected to be %d)\n", ROM_GETNAME(romp), bios_flags, last_bios + 1);
+					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags, last_bios + 1);
 				last_bios = bios_flags;
-			}
 
-			// if this is a file, make sure it is properly formatted
-			else if (ROMENTRY_ISFILE(romp))
+				// validate the name
+				if (strlen(biosname) > 16)
+					osd_printf_error("BIOS name %s exceeds maximum 16 characters\n", biosname);
+				for (char const *s = biosname; *s; ++s)
+				{
+					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '.') && (*s != '_') && (*s != '-'))
+					{
+						osd_printf_error("BIOS name %s contains invalid characters\n", biosname);
+						break;
+					}
+				}
+
+				// check for duplicate names/descriptions
+				auto const nameins = bios_names.emplace(biosname, bios_flags);
+				if (!nameins.second)
+					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags);
+				auto const descins = bios_descs.emplace(ROM_GETHASHDATA(romp), biosname);
+				if (!descins.second)
+					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, ROM_GETHASHDATA(romp), descins.first->second.c_str());
+			}
+			else if (ROMENTRY_ISDEFAULT_BIOS(romp)) // if this is a default BIOS setting, remember it so it to check at the end
+			{
+				defbios = ROM_GETNAME(romp);
+			}
+			else if (ROMENTRY_ISFILE(romp)) // if this is a file, make sure it is properly formatted
 			{
 				// track the last filename we found
 				last_name = ROM_GETNAME(romp);
@@ -1519,10 +1549,13 @@ void validity_checker::validate_roms(device_t &root)
 			}
 		}
 
+		// check that default BIOS exists
+		if (defbios && (bios_names.find(defbios) == bios_names.end()))
+			osd_printf_error("Default BIOS '%s' not found\n", defbios);
+
 		// final check for empty regions
 		if (items_since_region == 0)
 			osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
-
 
 		// reset the current device
 		m_current_device = nullptr;
@@ -1932,8 +1965,9 @@ void validity_checker::validate_device_types()
 			}
 
 			// check for name conflicts
-			auto const drvname(m_names_map.find(dev->shortname()));
-			auto const devname(device_shortname_map.emplace(dev->shortname(), &type));
+			std::string tmpname(dev->shortname());
+			game_driver_map::const_iterator const drvname(m_names_map.find(tmpname));
+			auto const devname(device_shortname_map.emplace(std::move(tmpname), &type));
 			if (m_names_map.end() != drvname)
 			{
 				game_driver const &dup(*drvname->second);
@@ -1955,9 +1989,10 @@ void validity_checker::validate_device_types()
 		else
 		{
 			// check for description conflicts
-			auto const drvdesc(m_descriptions_map.find(dev->name()));
-			auto const devdesc(device_name_map.emplace(dev->name(), &type));
-			if (m_names_map.end() != drvdesc)
+			std::string tmpdesc(dev->name());
+			game_driver_map::const_iterator const drvdesc(m_descriptions_map.find(tmpdesc));
+			auto const devdesc(device_name_map.emplace(std::move(tmpdesc), &type));
+			if (m_descriptions_map.end() != drvdesc)
 			{
 				game_driver const &dup(*drvdesc->second);
 				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
@@ -1977,6 +2012,16 @@ void validity_checker::validate_device_types()
 		// check that reported type matches supplied type
 		if (dev->type().type() != type.type())
 			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
+
+		// catch invalid flag combinations
+		device_t::feature_type const unemulated(dev->type().unemulated_features());
+		device_t::feature_type const imperfect(dev->type().imperfect_features());
+		if (unemulated & ~device_t::feature::ALL)
+			osd_printf_error("Device has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+		if (imperfect & ~device_t::feature::ALL)
+			osd_printf_error("Device has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+		if (unemulated & imperfect)
+			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
 
 		config.device_remove(&config.root_device(), "_tmp");
 	}

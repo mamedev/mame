@@ -23,7 +23,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "igui9680", "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)")
+DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "tgui9680", "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)")
 
 
 //-------------------------------------------------

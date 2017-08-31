@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia, Peter Ferrie
+// copyright-holders:Manuel Abadia, Peter Ferrie, David Haywood
 /***************************************************************************
 
 Thunder Hoop II: Strikes Back (c) 1994 Gaelco
@@ -8,8 +8,47 @@ Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 updated by Peter Ferrie <peter.ferrie@gmail.com>
 
-Game crashes at first boss even with DS5002FP emulation
-maybe bad dump of DS5002FP rom, maybe CPU bugs
+There is a priority bug on the title screen (Gaelco logo is hidden by black
+borders)  It seems sprite priority is hacked around on most of the older
+Gaelco drivers.
+
+
+REF.940411
++-------------------------------------------------+
+|       C1                                  6116  |
+|  VOL  C2*                                 6116  |
+|          30MHz                            6116  |
+|    M6295                    +----------+  6116  |
+|     1MHz                    |TMS       |        |
+|       6116                  |TPC1020AFN|        |
+|J      6116                  |   -084C  |    H8  |
+|A     +------------+         +----------+        |
+|M     |DS5002FP Box|         +----------+        |
+|M     +------------+         |TMS       |    H12 |
+|A             65756          |TPC1020AFN|        |
+|              65756          |   -084C  |        |
+|                             +----------+        |
+|SW1                                   PAL   65764|
+|     24MHz    MC68000P12                    65764|
+|SW2           C22                    6116        |
+|      PAL     C23                    6116        |
++-------------------------------------------------+
+
+  CPU: MC68000P12 & DS5002FP (used for protection)
+Sound: OKI M6295
+  OSC: 30MHz, 24MHz & 1MHz resonator
+  RAM: MHS HM3-65756K-5  32K x 8 SRAM (x2)
+       MHS HM3-65764E-5  8K x 8 SRAM (x2)
+       UM6116BK-35  2K x 8 SRAM (x8)
+  PAL: TI F20L8-25CNT DIP24 (x2)
+  VOL: Volume pot
+   SW: Two 8 switch dipswitches
+
+DS5002FP Box contains:
+  Dallas DS5002SP @ 12MHz
+  KM62256BLG-7L - 32Kx8 Low Power CMOS SRAM
+  3.6v Battery
+  JP1 - 5 pin port to program SRAM
 
 ***************************************************************************/
 
@@ -20,6 +59,7 @@ maybe bad dump of DS5002FP rom, maybe CPU bugs
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 
@@ -32,30 +72,29 @@ void thoop2_state::machine_start()
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-WRITE16_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
+WRITE8_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7){
-		membank("okibank")->set_entry(data & 0x0f);
-	}
+	membank("okibank")->set_entry(data & 0x0f);
 }
 
-WRITE16_MEMBER(thoop2_state::coin_w)
+WRITE_LINE_MEMBER(thoop2_state::coin1_lockout_w)
 {
-	if (ACCESSING_BITS_0_7){
-		switch ((offset >> 3)){
-			case 0x00:  /* Coin Lockouts */
-			case 0x01:
-				machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
-				break;
-			case 0x02:  /* Coin Counters */
-			case 0x03:
-				machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
-				break;
-		}
-	}
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
 
-	/* 04b unknown. Sound related? */
-	/* 05b unknown */
+WRITE_LINE_MEMBER(thoop2_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+WRITE_LINE_MEMBER(thoop2_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(thoop2_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 WRITE8_MEMBER(thoop2_state::shareram_w)
@@ -88,9 +127,9 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                        /* OKI6295 bankswitch */
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)               /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                  /* OKI6295 data register */
-	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                     /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
@@ -224,6 +263,14 @@ static MACHINE_CONFIG_START( thoop2 )
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(thoop2_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(thoop2_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thoop2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(thoop2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // unknown. Sound related?
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // unknown
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -242,7 +289,7 @@ static MACHINE_CONFIG_START( thoop2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // 1MHz resonator - pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -255,7 +302,7 @@ ROM_START( thoop2 )
 	ROM_LOAD16_BYTE(    "th2c22.040",   0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(67cbf579) SHA1(40a543b9d0f57d374ceccb720be20b9e42ecc91a) ) /* marked as BAD_DUMP until a 2nd board is used to verify, also because game currently crashes */
+	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, CRC(6881384d) SHA1(c1eff5558716293e1325b766e2205783286c12f9) ) /* dumped from 3 boards, reconstructed with 2/3 wins rule, all bytes verified by hand as correct */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -272,4 +319,4 @@ ROM_START( thoop2 )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 
-GAME( 1994, thoop2,  0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, thoop2,  0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

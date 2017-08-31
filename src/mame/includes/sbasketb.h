@@ -13,7 +13,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_palettebank(*this, "palettebank"),
-		m_spriteram_select(*this, "spriteramsel"),
 		m_scroll(*this, "scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -27,7 +26,6 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_palettebank;
-	required_shared_ptr<uint8_t> m_spriteram_select;
 	required_shared_ptr<uint8_t> m_scroll;
 
 	/* devices */
@@ -40,14 +38,17 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	bool       m_spriteram_select;
 
-	uint8_t    m_irq_mask;
+	bool       m_irq_mask;
 	DECLARE_WRITE8_MEMBER(sbasketb_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sbasketb_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(sbasketb_videoram_w);
 	DECLARE_WRITE8_MEMBER(sbasketb_colorram_w);
-	DECLARE_WRITE8_MEMBER(sbasketb_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(spriteram_select_w);
 	DECLARE_DRIVER_INIT(sbasketb);
 
 	uint8_t m_SN76496_latch;

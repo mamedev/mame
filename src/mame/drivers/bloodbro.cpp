@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
 	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a000d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0x0a0000, 0x0a000d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 //  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x0c0080, 0x0c0081) AM_WRITENOP // ??? IRQ Ack VBL?
 	AM_RANGE(0x0c00c0, 0x0c00c1) AM_WRITENOP // ??? watchdog?
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
 {
-	m_seibu_sound->main_word_w(space, offset, data, mem_mask);
+	m_seibu_sound->main_w(space, offset, data, mem_mask);
 
 	// Probably incorrect, but these interrupts must be triggered somehow
 	if (offset == 1)

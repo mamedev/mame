@@ -25,13 +25,17 @@
 #include "speaker.h"
 
 
+WRITE_LINE_MEMBER(holeland_state::coin_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
 static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", sp0256_device, ald_w)
-	AM_RANGE(0xc000, 0xc001) AM_WRITE(pal_offs_w)
-	AM_RANGE(0xc006, 0xc007) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("latch", ls259_device, write_d0) AM_READNOP
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
@@ -44,7 +48,7 @@ static ADDRESS_MAP_START( crzrally_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(scroll_w)
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(pal_offs_w)
+	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, holeland_state )
@@ -276,6 +280,12 @@ static MACHINE_CONFIG_START( holeland )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
+	MCFG_DEVICE_ADD("latch", LS259, 0) // 3J
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(holeland_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(holeland_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(holeland_state, flipscreen_y_w))
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -352,6 +362,10 @@ static MACHINE_CONFIG_START( crzrally )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_DEVICE_ADD("latch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(holeland_state, coin_counter_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

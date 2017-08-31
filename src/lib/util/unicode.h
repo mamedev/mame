@@ -111,6 +111,10 @@ std::string normalize_unicode(const std::string &s, unicode_normalization_form n
 std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form);
 std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form);
 
+// upper and lower case
+char32_t uchar_toupper(char32_t ch);
+char32_t uchar_tolower(char32_t ch);
+
 // misc UTF-8 helpers
 const char *utf8_previous_char(const char *utf8string);
 bool utf8_is_valid_string(const char *utf8string);

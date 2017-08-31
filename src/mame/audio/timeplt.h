@@ -14,9 +14,10 @@ class timeplt_audio_device : public device_t, public device_sound_interface
 public:
 	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( sh_irqtrigger_w );
-	DECLARE_WRITE8_MEMBER( filter_w );
-	DECLARE_READ8_MEMBER( portB_r );
+	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	DECLARE_WRITE_LINE_MEMBER(mute_w);
+	DECLARE_WRITE8_MEMBER(filter_w);
+	DECLARE_READ8_MEMBER(portB_r);
 
 protected:
 	// device-level overrides

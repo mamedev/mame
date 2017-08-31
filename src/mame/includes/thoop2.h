@@ -20,8 +20,12 @@ public:
 		m_shareram(*this, "shareram")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_w);
+	DECLARE_WRITE8_MEMBER(OKIM6295_bankswitch_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(shareram_w);
 	DECLARE_READ8_MEMBER(shareram_r);

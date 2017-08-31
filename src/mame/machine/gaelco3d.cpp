@@ -343,12 +343,12 @@ TIMER_CALLBACK_MEMBER( gaelco_serial_device::link_cb )
 
 
 
-WRITE8_MEMBER( gaelco_serial_device::irq_enable )
+WRITE_LINE_MEMBER(gaelco_serial_device::irq_enable)
 {
-	LOGMSG(("???? irq enable %d\n", data));
+	LOGMSG(("???? irq enable %d\n", state));
 }
 
-READ8_MEMBER( gaelco_serial_device::status_r)
+READ8_MEMBER(gaelco_serial_device::status_r)
 {
 	uint8_t ret = 0;
 
@@ -363,7 +363,7 @@ READ8_MEMBER( gaelco_serial_device::status_r)
 	return ret;
 }
 
-WRITE8_MEMBER( gaelco_serial_device::data_w)
+WRITE8_MEMBER(gaelco_serial_device::data_w)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -394,18 +394,18 @@ READ8_MEMBER( gaelco_serial_device::data_r)
 	return ret;
 }
 
-WRITE8_MEMBER( gaelco_serial_device::unknown_w)
+WRITE_LINE_MEMBER(gaelco_serial_device::unknown_w)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
-	LOGMSG(("???? unknown serial access %d\n", data));
+	LOGMSG(("???? unknown serial access %d\n", state));
 
 }
 
-WRITE8_MEMBER( gaelco_serial_device::rts_w )
+WRITE_LINE_MEMBER(gaelco_serial_device::rts_w)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
-	if (data == 0)
+	if (state == 0)
 		m_out_ptr->stat |= GAELCOSER_STATUS_RTS;
 	else
 	{
@@ -415,11 +415,11 @@ WRITE8_MEMBER( gaelco_serial_device::rts_w )
 	}
 }
 
-WRITE8_MEMBER( gaelco_serial_device::tr_w)
+WRITE_LINE_MEMBER(gaelco_serial_device::tr_w)
 {
 	LOGMSG(("set transmit %d\n", data));
 	std::lock_guard<std::mutex> guard(m_mutex);
-	if ((data & 0x01) != 0)
+	if (state != 0)
 		m_status |= GAELCOSER_STATUS_SEND;
 	else
 		m_status &= ~GAELCOSER_STATUS_SEND;

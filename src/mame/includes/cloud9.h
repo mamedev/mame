@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "machine/x2212.h"
 #include "screen.h"
 
@@ -21,7 +22,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette"),
+		m_videolatch(*this, "videolatch") { }
 
 	/* devices */
 	required_device<m6502_device> m_maincpu;
@@ -34,6 +36,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_videolatch;
 
 	/* video-related */
 	const uint8_t *m_syncprom;
@@ -43,7 +46,6 @@ public:
 	double      m_rweights[3];
 	double      m_gweights[3];
 	double      m_bweights[3];
-	uint8_t       m_video_control[8];
 	uint8_t       m_bitmode_addr[2];
 
 	/* misc */
@@ -53,12 +55,13 @@ public:
 	uint8_t       m_irq_state;
 
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(cloud9_led_w);
-	DECLARE_WRITE8_MEMBER(cloud9_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
+	DECLARE_WRITE_LINE_MEMBER(led2_w);
 	DECLARE_READ8_MEMBER(leta_r);
 	DECLARE_WRITE8_MEMBER(nvram_recall_w);
 	DECLARE_WRITE8_MEMBER(nvram_store_w);
-	DECLARE_WRITE8_MEMBER(cloud9_video_control_w);
 	DECLARE_WRITE8_MEMBER(cloud9_paletteram_w);
 	DECLARE_WRITE8_MEMBER(cloud9_videoram_w);
 	DECLARE_READ8_MEMBER(cloud9_bitmode_r);

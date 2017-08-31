@@ -19,6 +19,8 @@ class hle_device_base
 public:
 	virtual ~hle_device_base() override;
 
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
 protected:
 	// constructor/destructor
 	hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);

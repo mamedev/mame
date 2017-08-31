@@ -313,9 +313,9 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
-	png_info pnginfo = { nullptr };
-	png_add_text(&pnginfo, "Software", text1.c_str());
-	png_add_text(&pnginfo, "System", text2.c_str());
+	png_info pnginfo;
+	pnginfo.add_text("Software", text1.c_str());
+	pnginfo.add_text("System", text2.c_str());
 
 	// now do the actual work
 	const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
@@ -323,9 +323,6 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
 	if (error != PNGERR_NONE)
 		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
-
-	// free any data allocated
-	png_free(&pnginfo);
 }
 
 
@@ -884,11 +881,7 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 {
 	// we're allowed to sleep via the OSD code only if we're configured to do so
 	// and we're not frameskipping due to autoframeskip, or if we're paused
-	bool allowed_to_sleep = false;
-	if (machine().options().sleep() && (!effective_autoframeskip() || effective_frameskip() == 0))
-		allowed_to_sleep = true;
-	if (machine().paused())
-		allowed_to_sleep = true;
+	bool const allowed_to_sleep = (machine().options().sleep() && (!effective_autoframeskip() || effective_frameskip() == 0)) || machine().paused();
 
 	// loop until we reach our target
 	g_profiler.start(PROFILER_IDLE);
@@ -896,30 +889,25 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	while (current_ticks < target_ticks)
 	{
 		// compute how much time to sleep for, taking into account the average oversleep
-		osd_ticks_t delta = (target_ticks - current_ticks) * 1000 / (1000 + m_average_oversleep);
-		if (!delta)
-			delta = 1;
+		osd_ticks_t const delta = (target_ticks - current_ticks) * 1000 / (1000 + m_average_oversleep);
 
 		// see if we can sleep
-		bool slept = false;
-		if (allowed_to_sleep)
-		{
+		bool const slept = allowed_to_sleep && delta;
+		if (slept)
 			osd_sleep(delta);
-			slept = true;
-		}
 
 		// read the new value
-		osd_ticks_t new_ticks = osd_ticks();
+		osd_ticks_t const new_ticks = osd_ticks();
 
 		// keep some metrics on the sleeping patterns of the OSD layer
 		if (slept)
 		{
 			// if we overslept, keep an average of the amount
-			osd_ticks_t actual_ticks = new_ticks - current_ticks;
+			osd_ticks_t const actual_ticks = new_ticks - current_ticks;
 			if (actual_ticks > delta)
 			{
 				// take 90% of the previous average plus 10% of the new value
-				osd_ticks_t oversleep_milliticks = 1000 * (actual_ticks - delta) / delta;
+				osd_ticks_t const oversleep_milliticks = 1000 * (actual_ticks - delta) / delta;
 				m_average_oversleep = (m_average_oversleep * 99 + oversleep_milliticks) / 100;
 
 				if (LOG_THROTTLE)
@@ -1306,21 +1294,20 @@ void video_manager::record_frame()
 		while (m_mng_next_frame_time <= curtime)
 		{
 			// set up the text fields in the movie info
-			png_info pnginfo = { nullptr };
+			png_info pnginfo;
 			if (m_mng_frame == 0)
 			{
 				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
-				png_add_text(&pnginfo, "Software", text1.c_str());
-				png_add_text(&pnginfo, "System", text2.c_str());
+				pnginfo.add_text("Software", text1.c_str());
+				pnginfo.add_text("System", text2.c_str());
 			}
 
 			// write the next frame
 			screen_device *screen = machine().first_screen();
 			const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
 			int entries = (screen != nullptr && screen->has_palette()) ? screen->palette().entries() : 0;
-			png_error error = mng_capture_frame(*m_mng_file, &pnginfo, m_snap_bitmap, entries, palette);
-			png_free(&pnginfo);
+			png_error error = mng_capture_frame(*m_mng_file, pnginfo, m_snap_bitmap, entries, palette);
 			if (error != PNGERR_NONE)
 			{
 				g_profiler.stop();

@@ -20,11 +20,9 @@ public:
 		m_fg_scrollram(*this, "fg_scrollram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_ay8910_enable(*this, "ay8910_enable"),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm"),
-		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2"),
+		m_ay8910(*this, "ay%u", 1),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -38,7 +36,6 @@ public:
 	required_shared_ptr<uint8_t> m_fg_scrollram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_ay8910_enable;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -61,12 +58,12 @@ public:
 	uint8_t    m_adpcm_trigger;
 	uint8_t    m_adpcm_rom_sel;
 	uint8_t    m_adpcm_play_reg;
+	bool       m_ay8910_enable[2];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<msm5205_device> m_adpcm;
-	required_device<ay8910_device> m_ay1;
-	required_device<ay8910_device> m_ay2;
+	required_device_array<ay8910_device, 2> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -74,19 +71,21 @@ public:
 	uint8_t    m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_control_port_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(rougien_sample_rom_lo_w);
-	DECLARE_WRITE8_MEMBER(rougien_sample_rom_hi_w);
-	DECLARE_WRITE8_MEMBER(rougien_sample_playback_w);
+	DECLARE_WRITE_LINE_MEMBER(ay1_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(ay2_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_lo_w);
+	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_hi_w);
+	DECLARE_WRITE_LINE_MEMBER(rougien_sample_playback_w);
 	DECLARE_WRITE8_MEMBER(mermaid_videoram2_w);
 	DECLARE_WRITE8_MEMBER(mermaid_videoram_w);
 	DECLARE_WRITE8_MEMBER(mermaid_colorram_w);
-	DECLARE_WRITE8_MEMBER(mermaid_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(mermaid_flip_screen_y_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(mermaid_bg_scroll_w);
 	DECLARE_WRITE8_MEMBER(mermaid_fg_scroll_w);
-	DECLARE_WRITE8_MEMBER(rougien_gfxbankswitch1_w);
-	DECLARE_WRITE8_MEMBER(rougien_gfxbankswitch2_w);
+	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch1_w);
+	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch2_w);
 	DECLARE_READ8_MEMBER(mermaid_collision_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

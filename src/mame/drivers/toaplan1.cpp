@@ -612,6 +612,7 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
+#include "machine/74259.h"
 #include "sound/3812intf.h"
 #include "speaker.h"
 
@@ -842,7 +843,7 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_rallybik_sta
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x30) AM_WRITE(rallybik_coin_w)  /* Coin counter/lockout */
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("coinlatch", ls259_device, write_nibble)  /* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
@@ -1898,6 +1899,12 @@ static MACHINE_CONFIG_START( rallybik )
 	MCFG_CPU_IO_MAP(rallybik_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_DEVICE_ADD("coinlatch", LS259, 0) // 19L
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_lockout_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_lockout_2_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 

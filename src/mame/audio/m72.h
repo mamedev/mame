@@ -27,19 +27,18 @@ public:
 		Z80_CLEAR
 	};
 
-	WRITE_LINE_MEMBER( ym2151_irq_handler );
-	DECLARE_WRITE8_MEMBER( sound_command_byte_w );
-	DECLARE_WRITE16_MEMBER( sound_command_w );
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w );
-	DECLARE_READ8_MEMBER( sample_r );
-	DECLARE_WRITE8_MEMBER( sample_w );
+	WRITE_LINE_MEMBER(ym2151_irq_handler);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
+	DECLARE_READ8_MEMBER(sample_r);
+	DECLARE_WRITE8_MEMBER(sample_w);
 
 	/* the port goes to different address bits depending on the game */
-	void set_sample_start( int start );
-	DECLARE_WRITE8_MEMBER( vigilant_sample_addr_w );
-	DECLARE_WRITE8_MEMBER( shisen_sample_addr_w );
-	DECLARE_WRITE8_MEMBER( rtype2_sample_addr_w );
-	DECLARE_WRITE8_MEMBER( poundfor_sample_addr_w );
+	void set_sample_start(int start);
+	DECLARE_WRITE8_MEMBER(vigilant_sample_addr_w);
+	DECLARE_WRITE8_MEMBER(shisen_sample_addr_w);
+	DECLARE_WRITE8_MEMBER(rtype2_sample_addr_w);
+	DECLARE_WRITE8_MEMBER(poundfor_sample_addr_w);
 
 protected:
 	// device-level overrides

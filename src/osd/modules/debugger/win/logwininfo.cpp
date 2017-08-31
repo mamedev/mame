@@ -10,6 +10,7 @@
 #include "logwininfo.h"
 
 #include "debugviewinfo.h"
+#include "logviewinfo.h"
 
 
 logwin_info::logwin_info(debugger_windows_interface &debugger) :
@@ -18,12 +19,17 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	if (!window())
 		return;
 
-	m_views[0].reset(global_alloc(debugview_info(debugger, *this, window(), DVT_LOG)));
+	m_views[0].reset(global_alloc(logview_info(debugger, *this, window())));
 	if ((m_views[0] == nullptr) || !m_views[0]->is_valid())
 	{
 		m_views[0].reset();
 		return;
 	}
+
+	// create the log menu
+	HMENU const logmenu = CreatePopupMenu();
+	AppendMenu(logmenu, MF_ENABLED, ID_CLEAR_LOG, TEXT("Clear"));
+	AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)logmenu, TEXT("Log"));
 
 	// compute a client rect
 	RECT bounds;
@@ -45,4 +51,15 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 
 logwin_info::~logwin_info()
 {
+}
+
+bool logwin_info::handle_command(WPARAM wparam, LPARAM lparam)
+{
+	if ((HIWORD(wparam) == 0) && (LOWORD(wparam) == ID_CLEAR_LOG))
+	{
+		downcast<logview_info *>(m_views[0].get())->clear();
+		machine().debug_view().update_all(DVT_LOG);
+		return true;
+	}
+	return debugwin_info::handle_command(wparam, lparam);
 }

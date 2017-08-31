@@ -29,6 +29,7 @@
 #include "includes/slapstic.h"
 
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
@@ -63,17 +64,12 @@ WRITE8_MEMBER(starwars_state::quad_pokeyn_w)
 void starwars_state::machine_reset()
 {
 	/* ESB-specific */
-	if (m_is_esb)
+	if (m_slapstic_device.found())
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
 		/* reset the slapstic */
 		m_slapstic_device->slapstic_reset();
 		m_slapstic_current_bank = m_slapstic_device->slapstic_bank();
 		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
-
-		/* reset all the banks */
-		starwars_out_w(space, 4, 0);
 	}
 
 	/* reset the matrix processor */
@@ -150,7 +146,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4620, 0x463f) AM_DEVWRITE("avg", avg_starwars_device, reset_w)
 	AM_RANGE(0x4640, 0x465f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x4660, 0x467f) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE(starwars_out_w)
+	AM_RANGE(0x4680, 0x4687) AM_READNOP AM_MIRROR(0x0018) AM_DEVWRITE("outlatch", ls259_device, write_d7)
 	AM_RANGE(0x46a0, 0x46bf) AM_WRITE(starwars_nstore_w)
 	AM_RANGE(0x46c0, 0x46c2) AM_WRITE(starwars_adc_select_w)
 	AM_RANGE(0x46e0, 0x46e0) AM_WRITE(starwars_soundrst_w)
@@ -164,6 +160,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* rest of main_rom */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( esb_main_map, AS_PROGRAM, 8, starwars_state )
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(esb_slapstic_r, esb_slapstic_w)
+	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank2")
+	AM_IMPORT_FROM(main_map)
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -320,6 +321,16 @@ static MACHINE_CONFIG_START( starwars )
 
 	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 9L/M
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(starwars_state, coin1_counter_w)) // Coin counter 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(starwars_state, coin2_counter_w)) // Coin counter 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(starwars_state, led3_w)) // LED 3
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(starwars_state, led2_w)) // LED 2
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1")) // bank switch
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(starwars_state, prng_reset_w)) // reset PRNG
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(starwars_state, led1_w)) // LED 1
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(starwars_state, recall_w)) // NVRAM array recall
+
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -358,7 +369,14 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( esb, starwars )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(esb_main_map)
+
 	MCFG_SLAPSTIC_ADD("slapstic", 101)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
+	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("bank2"))
 MACHINE_CONFIG_END
 
 
@@ -528,7 +546,6 @@ ROM_END
 DRIVER_INIT_MEMBER(starwars_state,starwars)
 {
 	/* prepare the mathbox */
-	m_is_esb = 0;
 	starwars_mproc_init();
 
 	/* initialize banking */
@@ -546,14 +563,7 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 	m_slapstic_source = &rom[0x14000];
 	m_slapstic_base = &rom[0x08000];
 
-	/* install read/write handlers for it */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),this), write8_delegate(FUNC(starwars_state::esb_slapstic_w),this));
-
-	/* install additional banking */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xa000, 0xffff, "bank2");
-
 	/* prepare the matrix processor */
-	m_is_esb = 1;
 	starwars_mproc_init();
 
 	/* initialize banking */

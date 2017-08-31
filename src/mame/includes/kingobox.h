@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 
 class kingofb_state : public driver_device
 {
@@ -23,6 +24,7 @@ public:
 		m_sprite_cpu(*this, "sprite"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_nmigate(*this, "nmigate"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
@@ -39,9 +41,6 @@ public:
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
 	int        m_palette_bank;
-
-	/* misc */
-	int        m_nmi_enable;
 
 	/* devices */
 	required_device<cpu_device> m_video_cpu;
@@ -76,6 +75,7 @@ public:
 	void ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<input_merger_device> m_nmigate;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;

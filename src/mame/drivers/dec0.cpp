@@ -360,10 +360,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 
 		case 4: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
-			{
 				m_soundlatch->write(space, 0, data & 0xff);
-				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			}
 			break;
 
 		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
@@ -423,30 +420,10 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 	}
 }
 
-WRITE16_MEMBER(dec0_state::slyspy_control_w)
-{
-	switch (offset << 1)
-	{
-		case 0:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_soundlatch->write(space, 0, data & 0xff);
-				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			}
-			break;
-		case 2:
-			dec0_priority_w(space, 0, data, mem_mask);
-			break;
-	}
-}
-
 WRITE16_MEMBER(dec0_state::midres_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
-	{
 		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
 }
 
 /******************************************************************************/
@@ -625,7 +602,8 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_SHARE("ram") /* Sly spy main ram */
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_SHARE("spriteram")   /* Sprites */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
+	AM_RANGE(0x314000, 0x314001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x314002, 0x314003) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
 	AM_RANGE(0x31c000, 0x31c00f) AM_READ(slyspy_protection_r) AM_WRITENOP
 ADDRESS_MAP_END
@@ -639,7 +617,7 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(midres_controls_r)
 	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(midres_sound_w)
+	AM_RANGE(0x1a0000, 0x1a0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0x200000, 0x200007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_0_w)
 	AM_RANGE(0x200010, 0x200017) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_1_w)
@@ -1479,6 +1457,7 @@ static MACHINE_CONFIG_START( dec0_base )
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dec0, dec0_base )
@@ -1849,7 +1828,6 @@ static MACHINE_CONFIG_DERIVED( midresb, midres )
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
 	MCFG_CPU_ADD("mcu", M68705R3, XTAL_3_579545MHz)
-	MCFG_DEVICE_DISABLE()
 
 	MCFG_SOUND_MODIFY("ym2")
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

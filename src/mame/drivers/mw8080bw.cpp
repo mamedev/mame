@@ -56,6 +56,9 @@
         * "Gun Fight" (Midway) is ported version of "Western Gun" (Taito)
         * in Japan, Taito released "Tornado Baseball" as "Ball Park",
           "Extra Inning" as "Ball Park II".
+        * "Road Runner" (Midway): To access the test mode, adjust the
+          "Extended Time At" dipswitch to select "Test Mode". While in
+          the test mode, hold Fire until the gun alignment screen appears.
 
     Known issues/to-do's:
         * Space Encounters: verify strobe light frequency
@@ -3010,7 +3013,7 @@ ROM_START( roadrunm )
 	ROM_LOAD( "9316.1h",    0x0000, 0x0800, CRC(c0030d7c) SHA1(4d0a3a59d4f8181c6e30966a6b1d19ba5b29c398) )
 	ROM_LOAD( "9316.1g",    0x0800, 0x0800, CRC(1ddde10b) SHA1(8fb8e85844a8ec6c0722883013ecdd4eeaeb08c1) )
 	ROM_LOAD( "9316.1f",    0x1000, 0x0800, CRC(808e46f1) SHA1(1cc4e9b0aa7e9546c133bd40d40ede6f2fbe93ba) )
-	ROM_LOAD( "9316.1e",    0x1800, 0x0800, CRC(db5996a5) SHA1(cbc784e3ff9c7ad4954f3af8bfd786d3d17d1e0c) )
+	ROM_LOAD( "9316.1e",    0x1800, 0x0800, CRC(06f01571) SHA1(6a72ff96a68aeeb0aca4834843c00b789c9bdaa0) )
 ROM_END
 
 

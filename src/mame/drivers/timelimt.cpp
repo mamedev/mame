@@ -18,6 +18,7 @@ Notes:
 #include "includes/timelimt.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -33,20 +34,16 @@ void timelimt_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-void timelimt_state::machine_reset()
+WRITE_LINE_MEMBER(timelimt_state::nmi_enable_w)
 {
-	m_nmi_enabled = 0;
+	m_nmi_enabled = state;
+	if (!m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(timelimt_state::nmi_enable_w)
+WRITE_LINE_MEMBER(timelimt_state::coin_lockout_w)
 {
-	m_nmi_enabled = data & 1;   /* bit 0 = nmi enable */
-}
-
-WRITE8_MEMBER(timelimt_state::sound_reset_w)
-{
-	if (data & 1)
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
 /***************************************************************************/
@@ -60,8 +57,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(nmi_enable_w) /* nmi enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_reset_w)/* sound reset ? */
+	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* sound write */
 	AM_RANGE(0xb800, 0xb800) AM_READNOP     /* NMI ack? */
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(scroll_x_lsb_w)
@@ -103,7 +99,7 @@ static INPUT_PORTS_START( timelimt )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
@@ -148,7 +144,7 @@ static INPUT_PORTS_START( progress )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
@@ -216,8 +212,8 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(timelimt_state::irq)
 {
-	if ( m_nmi_enabled )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enabled)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 /***************************************************************************/
@@ -236,6 +232,13 @@ static MACHINE_CONFIG_START( timelimt )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", timelimt_state,  irq0_line_hold) /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC15
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(timelimt_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(timelimt_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // probably flip screen
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // probably flip screen
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -295,7 +298,7 @@ ROM_START( timelimt )
 	ROM_LOAD( "tl2",    0x2000, 0x2000, CRC(4693b849) SHA1(fbebedde53599fb1eaedc648bd704b321ab096b5) )
 	ROM_LOAD( "tl1",    0x0000, 0x2000, CRC(c4007caf) SHA1(ae05af3319545d5ca98a046bfc100138a5a3ed96) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0060, "proms", 0 ) // N82S123N color PROMs
 	ROM_LOAD( "clr.35", 0x0000, 0x0020, CRC(9c9e6073) SHA1(98496175bf19a8cdb0018705bc1a2193b8a782e1) )
 	ROM_LOAD( "clr.48", 0x0020, 0x0020, CRC(a0bcac59) SHA1(e5832831b21981363509b79d89766757bd9273b0) ) /* FIXED BITS (xxxxxx1x) */
 	ROM_LOAD( "clr.57", 0x0040, 0x0020, CRC(3a9f5394) SHA1(0b501f81ce1df722cf7ef982c03e0be337bfe9ee) )

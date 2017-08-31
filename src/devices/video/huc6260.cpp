@@ -80,13 +80,9 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			/* Get next pixel information */
 			m_pixel_data = m_next_pixel_data_cb( 0, 0xffff );
 			g_profiler.stop();
-			if ( m_greyscales )
-			{
-				m_pixel_data += 512;
-			}
 		}
 
-		bitmap_line[ h ] = m_palette[ m_pixel_data ];
+		bitmap_line[ h ] = m_palette[ m_pixel_data ] | m_greyscales;
 		m_pixel_clock = ( m_pixel_clock + 1 ) % m_pixels_per_clock;
 		h = ( h + 1 ) % WPF;
 
@@ -231,7 +227,7 @@ WRITE8_MEMBER( huc6260_device::write )
 	switch ( offset & 7 )
 	{
 		case 0x00:  /* Control register */
-			m_greyscales = data & 0x80;
+			m_greyscales = (data & 0x80) << 2; // setup the greyscale base
 			m_blur = data & 0x04;
 			m_pixels_per_clock = ( data & 0x02 ) ? 2 : ( ( data & 0x01 ) ? 3 : 4 );
 			break;

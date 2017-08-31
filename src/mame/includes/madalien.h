@@ -56,8 +56,6 @@ public:
 	DECLARE_READ8_MEMBER(shift_r);
 	DECLARE_READ8_MEMBER(shift_rev_r);
 	DECLARE_WRITE8_MEMBER(madalien_output_w);
-	DECLARE_WRITE8_MEMBER(madalien_sound_command_w);
-	DECLARE_READ8_MEMBER(madalien_sound_command_r);
 	DECLARE_WRITE8_MEMBER(madalien_videoram_w);
 	DECLARE_WRITE8_MEMBER(madalien_charram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);

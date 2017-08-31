@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "prot_cthd.h"
 
-DEFINE_DEVICE_TYPE(NG_CTHD_PROT, cthd_prot_device, "ng_cthd_prot", "Neo Goe CTHD Protection (bootleg)")
+DEFINE_DEVICE_TYPE(NG_CTHD_PROT, cthd_prot_device, "ng_cthd_prot", "Neo Geo CTHD Protection (bootleg)")
 
 
 cthd_prot_device::cthd_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

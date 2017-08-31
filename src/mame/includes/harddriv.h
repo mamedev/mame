@@ -20,6 +20,7 @@
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/tms34010/tms34010.h"
 
+#include "machine/74259.h"
 #include "machine/asic65.h"
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"
@@ -485,6 +486,11 @@ public:
 	DECLARE_READ16_MEMBER(hdsnd68k_320port_r);
 	DECLARE_READ16_MEMBER(hdsnd68k_status_r);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_latches_w);
+	DECLARE_WRITE_LINE_MEMBER(speech_write_w);
+	DECLARE_WRITE_LINE_MEMBER(speech_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(speech_rate_w);
+	DECLARE_WRITE_LINE_MEMBER(cram_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(led_w);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_speech_w);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_irqclr_w);
 	DECLARE_READ16_MEMBER(hdsnd68k_320ram_r);
@@ -510,6 +516,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_soundcpu;
+	required_device<ls259_device> m_latch;
 	required_device<dac_word_interface> m_dac;
 	required_device<cpu_device> m_sounddsp;
 	required_shared_ptr<uint16_t> m_sounddsp_ram;

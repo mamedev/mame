@@ -189,8 +189,7 @@ WRITE8_MEMBER( ts803_state::keyboard_put )
 /* disk drive */
 
 static SLOT_INTERFACE_START( ts803_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_DD )
-	SLOT_INTERFACE( "drive1", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 WRITE8_MEMBER( ts803_state::disk_0_control_w )
@@ -528,8 +527,8 @@ static MACHINE_CONFIG_START( ts803 )
 	/* floppy disk */
 	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 	//MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("sti", z80sti_device, i7_w))   // add when sti is in
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "drive0", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* keyboard */

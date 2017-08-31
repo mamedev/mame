@@ -1914,6 +1914,42 @@ static INPUT_PORTS_START( sf2amf )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sf2accp2 )
+	PORT_INCLUDE( sf2 )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x80, 0x00, "Shot Type" )   PORT_DIPLOCATION("SW(A):8")
+	PORT_DIPSETTING(    0x80, "Directional shots curve up or down" )
+	PORT_DIPSETTING(    0x00, "3D wave shots slow-med-fast" )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x38, 0x20, "Game speed" )   PORT_DIPLOCATION("SW(B):4,5,6") // Manual has some errors here
+	PORT_DIPSETTING(    0x38, "Extremely fast" ) // loop counter 30
+	PORT_DIPSETTING(    0x30, "Very fast" ) // loop counter 70
+	PORT_DIPSETTING(    0x28, "Fast" ) // loop counter 90
+	PORT_DIPSETTING(    0x20, "Normal" ) // loop counter 150
+	PORT_DIPSETTING(    0x18, "Slow" ) // loop counter 190
+	PORT_DIPSETTING(    0x10, "Very slow" ) // loop counter 230
+	PORT_DIPSETTING(    0x00, "Slowest" ) // loop counter 310
+	PORT_DIPSETTING(    0x08, "Speed test mode" ) // loop counter 1
+	// Manual says: we suggest changing the "Special rapid multiple shots feature on a random basis,
+	// never turning on more than 1 at any one time, as this feature will prolong the game time.
+	PORT_DIPNAME( 0x40, 0x40, "Guile special rapid multiple shots" )   PORT_DIPLOCATION("SW(B):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Blanka special rapid multiple shots" )   PORT_DIPLOCATION("SW(B):8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "Ken special rapid multiple shots" )   PORT_DIPLOCATION("SW(C):1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Ryu special rapid multiple shots" )   PORT_DIPLOCATION("SW(C):2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( 3wonders )
 	PORT_INCLUDE( cps1_3b )
 
@@ -6002,8 +6038,58 @@ ROM_START( cawingr1 )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 ROM_END
 
-/* B-Board 89624B-3 */
+/* B-Board 89625B-1 */
 ROM_START( cawingu )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "cau_36.12f",  0x00000, 0x20000, CRC(c2574c0c) SHA1(dc74a02cc81f7ef283e4c750b1f3c08a85c7f9a4) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_42.12h",  0x00001, 0x20000, CRC(d89e00be) SHA1(4c64648f0f80c7e85170a50f5e558a100b937c8f) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_37.13f",  0x40000, 0x20000, CRC(8e6d4f8a) SHA1(dd9c429e753b8e4c10a16f5121ebd727c7c653a4) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_43.13h",  0x40001, 0x20000, CRC(ece07955) SHA1(46e3f0123c9f651b3d7c3798938ca14dd0227f76) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_34.10f",  0x80000, 0x20000, CRC(5fda906e) SHA1(7b3ef17d494a2f92e58ab7e34a3beaad8c149fca) )
+	ROM_LOAD16_BYTE( "cau_40.10h",  0x80001, 0x20000, CRC(736c1835) SHA1(a91f479fab30603a111304adc0478d430faa80fc) )
+	ROM_LOAD16_BYTE( "cau_35.11f",  0xc0000, 0x20000, CRC(74c2ddf0) SHA1(df1b50649fdad9cc57dfddbf12345056a2f1d121) )
+	ROM_LOAD16_BYTE( "cau_41.11h",  0xc0001, 0x20000, CRC(2a44bfe5) SHA1(f29cf5548e753c79b081e742cf30af9c177c2cc7) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "cau_09.4b",  0x000000, 0x20000, CRC(d4b17c3a) SHA1(e5be3afbe0071e3a7c424bae0e9d9445aedd4f4b) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_01.4a",  0x000001, 0x20000, CRC(34c3094e) SHA1(281b52b1d0b6ff5af47d28f405d09803d8db54f8) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_13.9b",  0x000002, 0x20000, CRC(9d5c7911) SHA1(de67245cb097c60c3a5ea0fc6d0a427fc0167338) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_05.9a",  0x000003, 0x20000, CRC(f042cc7b) SHA1(904b9df5170e86ebc64d61812ff9affdb4722993) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_24.5e",  0x000004, 0x20000, CRC(0eac450f) SHA1(0ff0bd0835c91003d0a3ebd6b2b36928a835462e) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_17.5c",  0x000005, 0x20000, CRC(4fab0d0c) SHA1(f05cde37e9860008a777b0def7477203444a84dd) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_38.8h",  0x000006, 0x20000, CRC(cb96ed24) SHA1(9888181030b0cdd3be34fbae1a178f362187988a) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_32.8f",  0x000007, 0x20000, CRC(433a0859) SHA1(76534bf08d0779bd018c2400ac3f1b4b2de27e1c) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_10.5b",  0x100000, 0x20000, CRC(4af10ef2) SHA1(a118f0ab73b1580ac1e860b615417d2ad423571c) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_02.5a",  0x100001, 0x20000, CRC(3e1f5b34) SHA1(baf2a29fd56c24314dca2d1ea0b6eb9e7db1445e) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_14.10b", 0x100002, 0x20000, CRC(2bef78c4) SHA1(a72e6ac95b533b19df22272e98af5fa859f6b810) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_06.10a", 0x100003, 0x20000, CRC(3777ede1) SHA1(46344a5696492351f0ee81b94e9e324f882222ca) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_25.7e",  0x100004, 0x20000, CRC(859ee531) SHA1(59174d333f8a97119e0e733743c06b1fad4d9214) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_18.7c",  0x100005, 0x20000, CRC(4c52edf1) SHA1(acc8e79881d97e0404316c58609577fab4dcb0bb) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_39.9h",  0x100006, 0x20000, CRC(147be975) SHA1(69dbe31ea3bb0ef310a4e02e43aa863e072cd762) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_33.9f",  0x100007, 0x20000, CRC(8560c130) SHA1(dc4d3f7699f208fbf2284efa37fe8634d6881a97) , ROM_SKIP(7) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "cau_23.13b",  0x00000, 0x08000, CRC(96fe7485) SHA1(10466889dfc6bc8afd3075385e241a16372efbeb) )   // == ca_9.12b
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "cau_30.12c",  0x00000, 0x20000, CRC(4a613a2c) SHA1(06e10644fc60925b85d2ca0888c9fa057bfe996a) )   // == ca_18.11c
+	ROM_LOAD( "cau_31.13c",  0x20000, 0x20000, CRC(74584493) SHA1(5cfb15f1b9729323707972646313aee8ab3ac4eb) )   // == ca_19.12c
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "ca22b.1a",     0x0000, 0x0117, CRC(5152e678) SHA1(ac61df30cd073b26f2145e3ea0c513ec804d047a) )   // photo shows this to be labeled CA222B
+	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )    /* seen the same pcb with LWIO.12E */
+ROM_END
+
+/* B-Board 89624B-3 */
+ROM_START( cawingur1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "cau_30a.11f",    0x00000, 0x20000, CRC(91fceacd) SHA1(4845999a96fee829264346ca399fdd64a8408001) ) // == cae_30a.11f
 	ROM_LOAD16_BYTE( "cau_35a.11h",    0x00001, 0x20000, CRC(f090d9b2) SHA1(261dc4ac79507299a7f9a1ad5edb8425345db06c) )
@@ -7508,6 +7594,43 @@ ROM_START( sf2qp1 )
 	ROM_CONTINUE(              0xc0000, 0x40000 )
 	ROM_LOAD16_WORD_SWAP( "stfii-qkn-cps-17.34", 0x080000, 0x40000, CRC(4ed215d8) SHA1(b09075f883c3a4976ab47203acc04f8f993969a8) )
 	ROM_CONTINUE(              0x40000, 0x40000 )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "sf2_06.bin", 0x000000, 0x80000, CRC(22c9cc8e) SHA1(b9194fb337b30502c1c9501cd6c64ae4035544d4) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-5m.4a
+	ROMX_LOAD( "sf2_08.bin", 0x000002, 0x80000, CRC(57213be8) SHA1(3759b851ac0904ec79cbb67a2264d384b6f2f9f9) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-7m.6a
+	ROMX_LOAD( "sf2_05.bin", 0x000004, 0x80000, CRC(ba529b4f) SHA1(520840d727161cf09ca784919fa37bc9b54cc3ce) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-1m.3a
+	ROMX_LOAD( "sf2_07.bin", 0x000006, 0x80000, CRC(4b1b33a8) SHA1(2360cff890551f76775739e2d6563858bff80e41) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-3m.5a
+	ROMX_LOAD( "sf2_15.bin", 0x200000, 0x80000, CRC(2c7e2229) SHA1(357c2275af9133fd0bd6fbb1fa9ad5e0b490b3a2) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-6m.4c
+	ROMX_LOAD( "sf2_17.bin", 0x200002, 0x80000, CRC(b5548f17) SHA1(baa92b91cf616bc9e2a8a66adc777ffbf962a51b) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-8m.6c
+	ROMX_LOAD( "sf2_14.bin", 0x200004, 0x80000, CRC(14b84312) SHA1(2eea16673e60ba7a10bd4d8f6c217bb2441a5b0e) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-2m.3c
+	ROMX_LOAD( "sf2_16.bin", 0x200006, 0x80000, CRC(5e9cd89a) SHA1(f787aab98668d4c2c54fc4ba677c0cb808e4f31e) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-4m.5c
+	ROMX_LOAD( "sf2_25.bin", 0x400000, 0x80000, CRC(994bfa58) SHA1(5669b845f624b10e7be56bfc89b76592258ce48b) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-13m.4d
+	ROMX_LOAD( "sf2_27.bin", 0x400002, 0x80000, CRC(3e66ad9d) SHA1(9af9df0826988872662753e9717c48d46f2974b0) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-15m.6d
+	ROMX_LOAD( "sf2_24.bin", 0x400004, 0x80000, CRC(c1befaa8) SHA1(a6a7f4725e52678cbd8d557285c01cdccb2c2602) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-9m.3d
+	ROMX_LOAD( "sf2_26.bin", 0x400006, 0x80000, CRC(0627c831) SHA1(f9a92d614e8877d648449de2612fc8b43c85e4c2) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-11m.5d
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sf2_09.bin",    0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "sf2_18.bin",    0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
+	ROM_LOAD( "sf2_19.bin",    0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+ROM_END
+
+ROM_START( sf2qp2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "qkn.33", 0x00000, 0x40000, CRC(43aa343d) SHA1(501f14a68143344f8ff7f9091d7233ab53e0d531) )
+	ROM_CONTINUE(                   0xc0000, 0x40000 )
+	ROM_LOAD16_WORD_SWAP( "qkn.34", 0x80000, 0x40000, CRC(d03b553f) SHA1(edce2f9792ec2eb7da8c755d01616b874fbdef8e) )
+	ROM_CONTINUE(                   0x40000, 0x40000 )
 
 	ROM_REGION( 0x600000, "gfx", 0 )
 	ROMX_LOAD( "sf2_06.bin", 0x000000, 0x80000, CRC(22c9cc8e) SHA1(b9194fb337b30502c1c9501cd6c64ae4035544d4) , ROM_GROUPWORD | ROM_SKIP(6) )    // == sf2-5m.4a
@@ -12459,7 +12582,8 @@ GAME( 1990, mswordu,     msword,   cps1_10MHz, msword,   cps_state,   cps1,     
 GAME( 1990, mswordj,     msword,   cps1_10MHz, msword,   cps_state,   cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (Japan 900623)", MACHINE_SUPPORTS_SAVE )    // 23.06.1990  "JAPAN"
 GAME( 1990, cawing,      0,        cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (World 901012)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, cawingr1,    cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (World 901009)", MACHINE_SUPPORTS_SAVE )   // "ETC"
-GAME( 1990, cawingu,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (USA 901012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cawingu,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (USA 901130)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cawingur1,   cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (USA 901012)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cawingj,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "U.S. Navy (Japan 901012)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nemo,        0,        cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (World 901130)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemor1,      nemo,     cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (World 901109)", MACHINE_SUPPORTS_SAVE )   // "ETC"
@@ -12491,6 +12615,7 @@ GAME( 1992, sf2ebbl3,    sf2,      cps1_10MHz, sf2hack,  cps_state,   sf2hack,  
 GAME( 1992, sf2stt,      sf2,      cps1_10MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (TAB Austria, bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // 910214 - based on World version
 GAME( 1992, sf2rk,       sf2,      cps1_10MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (RK, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // 920211 (pcb)
 GAME( 1991, sf2qp1,      sf2,      cps1_10MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (Quicken Pt-I, bootleg)", MACHINE_SUPPORTS_SAVE )     // 910214 - based on World version
+GAME( 1991, sf2qp2,      sf2,      cps1_10MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (Quicken, bootleg)", MACHINE_SUPPORTS_SAVE )          // 910522 - based on USA Rev.I? version
 GAME( 1991, sf2thndr,    sf2,      cps1_10MHz, sf2,      cps_state,   sf2thndr, ROT0,   "bootleg", "Street Fighter II: The World Warrior (Thunder Edition, bootleg)", MACHINE_SUPPORTS_SAVE )  // 910214 - based on World version
 GAME( 1991, 3wonders,    0,        cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (World 910520)", MACHINE_SUPPORTS_SAVE )  // "ETC"
 GAME( 1991, 3wondersr1,  3wonders, cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (World 910513)", MACHINE_SUPPORTS_SAVE )  // "ETC"
@@ -12529,7 +12654,7 @@ GAME( 1992, sf2red,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     
 GAME( 1992, sf2v004,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (V004, bootleg)", MACHINE_SUPPORTS_SAVE )             // 102092 !!! - based on (heavily modified) World version
 GAME( 1992, sf2acc,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on World version
 GAME( 1992, sf2acca,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on World version
-GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator Pt.II, bootleg)", MACHINE_SUPPORTS_SAVE )        // 920313 - based on World version
+GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2accp2, cps_state,   cps1,     ROT0,   "bootleg (Testron)", "Street Fighter II': Champion Edition (Accelerator Pt.II, bootleg)", MACHINE_SUPPORTS_SAVE )        // 920313 - based on World version
 GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Alpha Magic-F, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", MACHINE_SUPPORTS_SAVE ) // 902140 !!! - based on USA version

@@ -29,10 +29,12 @@ public:
 	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(rocnrope_interrupt_vector_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(rocnrope_videoram_w);
 	DECLARE_WRITE8_MEMBER(rocnrope_colorram_w);
-	DECLARE_WRITE8_MEMBER(rocnrope_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_DRIVER_INIT(rocnrope);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

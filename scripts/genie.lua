@@ -1074,6 +1074,7 @@ configuration { "android*" }
 		"-Wno-undef",
 		"-Wno-typedef-redefinition",
 		"-Wno-unknown-warning-option",
+		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
 		"-x c++",

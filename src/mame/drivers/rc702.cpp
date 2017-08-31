@@ -334,7 +334,7 @@ void rc702_state::kbd_put(u8 data)
 }
 
 static SLOT_INTERFACE_START( floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( rc702 )
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( rc702 )
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg3))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma", am9517a_device, dreq1_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Keyboard */

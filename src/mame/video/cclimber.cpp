@@ -13,8 +13,6 @@
 #include "includes/cclimber.h"
 
 
-#define CCLIMBER_FLIP_X     (m_flip_screen[0] & 0x01)
-#define CCLIMBER_FLIP_Y     (m_flip_screen[1] & 0x01)
 #define CCLIMBER_BG_PEN     (0)
 #define SWIMMER_SIDE_BG_PEN (0x120)
 #define SWIMMER_BG_SPLIT    (0x18 * 8)
@@ -338,10 +336,27 @@ WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
 }
 
 
-WRITE8_MEMBER(cclimber_state::cannonb_flip_screen_w)
+WRITE_LINE_MEMBER(cclimber_state::flip_screen_x_w)
 {
-	m_flip_screen[0] = data;
-	m_flip_screen[1] = data;
+	m_flip_x = state;
+}
+
+
+WRITE_LINE_MEMBER(cclimber_state::flip_screen_y_w)
+{
+	m_flip_y = state;
+}
+
+
+WRITE_LINE_MEMBER(cclimber_state::sidebg_enable_w)
+{
+	m_swimmer_side_background_enabled = state;
+}
+
+
+WRITE_LINE_MEMBER(cclimber_state::palette_bank_w)
+{
+	m_swimmer_palettebank = state;
 }
 
 
@@ -376,7 +391,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::swimmer_get_pf_tile_info)
 		tile_index = tile_index ^ 0x20;
 
 	code = ((m_colorram[tile_index] & 0x10) << 4) | m_videoram[tile_index];
-	color = ((*m_swimmer_palettebank & 0x01) << 4) | (m_colorram[tile_index] & 0x0f);
+	color = (m_swimmer_palettebank << 4) | (m_colorram[tile_index] & 0x0f);
 
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
@@ -448,6 +463,9 @@ VIDEO_START_MEMBER(cclimber_state,cclimber)
 	m_bs_tilemap->set_scroll_rows(1);
 	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
 	m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
+
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
 }
 
 
@@ -462,6 +480,11 @@ VIDEO_START_MEMBER(cclimber_state,swimmer)
 	m_bs_tilemap->set_scroll_rows(1);
 	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
 	m_bs_tilemap->set_transmask(1, 0xff, 0);  /* all 8 pens are transparent */
+
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
+	save_item(NAME(m_swimmer_side_background_enabled));
+	save_item(NAME(m_swimmer_palettebank));
 }
 
 
@@ -478,6 +501,9 @@ VIDEO_START_MEMBER(cclimber_state,toprollr)
 	m_bs_tilemap->set_scroll_rows(1);
 	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
 	m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
+
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
 }
 
 
@@ -486,8 +512,8 @@ void cclimber_state::draw_playfield(screen_device &screen, bitmap_ind16 &bitmap,
 	int i;
 
 	m_pf_tilemap->mark_all_dirty();
-	m_pf_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-									(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) |
+									(m_flip_y ? TILEMAP_FLIPY : 0));
 	for (i = 0; i < 32; i++)
 		m_pf_tilemap->set_scrolly(i, m_column_scroll[i]);
 
@@ -511,7 +537,7 @@ void cclimber_state::cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16
 	m_bs_tilemap->mark_all_dirty();
 
 	m_bs_tilemap->set_flip((bigsprite_flip_x ? TILEMAP_FLIPX : 0) |
-									(CCLIMBER_FLIP_Y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
+									(m_flip_y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
 
 	m_bs_tilemap->set_scrollx(0, x);
 	m_bs_tilemap->set_scrolly(0, y);
@@ -527,7 +553,7 @@ void cclimber_state::toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16
 
 	m_bs_tilemap->mark_all_dirty();
 
-	m_bs_tilemap->set_flip(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0);
+	m_bs_tilemap->set_flip(m_flip_y ? TILEMAP_FLIPY : 0);
 
 	m_bs_tilemap->set_scrollx(0, x);
 	m_bs_tilemap->set_scrolly(0, y);
@@ -559,13 +585,13 @@ void cclimber_state::cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		int flipx = m_spriteram[offs + 0] & 0x40;
 		int flipy = m_spriteram[offs + 0] & 0x80;
 
-		if (CCLIMBER_FLIP_X)
+		if (m_flip_x)
 		{
 			x = 242 - x;
 			flipx = !flipx;
 		}
 
-		if (CCLIMBER_FLIP_Y)
+		if (m_flip_y)
 		{
 			y = 240 - y;
 			flipy = !flipy;
@@ -596,13 +622,13 @@ void cclimber_state::toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		int flipx = m_spriteram[offs + 0] & 0x40;
 		int flipy = m_spriteram[offs + 0] & 0x80;
 
-		if (CCLIMBER_FLIP_X)
+		if (m_flip_x)
 		{
 			x = 240 - x;
 			flipx = !flipx;
 		}
 
-		if (CCLIMBER_FLIP_Y)
+		if (m_flip_y)
 		{
 			y = 240 - y;
 			flipy = !flipy;
@@ -627,19 +653,19 @@ void cclimber_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 		int code = ((m_spriteram[offs + 1] & 0x10) << 2) |
 					(m_spriteram[offs + 0] & 0x3f);
 
-		int color = ((*m_swimmer_palettebank & 0x01) << 4) |
+		int color = (m_swimmer_palettebank << 4) |
 					(m_spriteram[offs + 1] & 0x0f);
 
 		int flipx = m_spriteram[offs + 0] & 0x40;
 		int flipy = m_spriteram[offs + 0] & 0x80;
 
-		if (CCLIMBER_FLIP_X)
+		if (m_flip_x)
 		{
 			x = 240 - x;
 			flipx = !flipx;
 		}
 
-		if (CCLIMBER_FLIP_Y)
+		if (m_flip_y)
 		{
 			y = 240 - y;
 			flipy = !flipy;
@@ -681,7 +707,7 @@ uint32_t cclimber_state::screen_update_yamato(screen_device &screen, bitmap_ind1
 	for (i = 0; i < 0x100; i++)
 	{
 		int j;
-		pen_t pen = YAMATO_SKY_PEN_BASE + sky_rom[(CCLIMBER_FLIP_X ? 0x80 : 0) + (i >> 1)];
+		pen_t pen = YAMATO_SKY_PEN_BASE + sky_rom[(m_flip_x ? 0x80 : 0) + (i >> 1)];
 
 		for (j = 0; j < 0x100; j++)
 			bitmap.pix16(j, (i - 8) & 0xff) = pen;
@@ -711,9 +737,9 @@ uint32_t cclimber_state::screen_update_swimmer(screen_device &screen, bitmap_ind
 {
 	swimmer_set_background_pen();
 
-	if (*m_swimmer_side_background_enabled & 0x01)
+	if (m_swimmer_side_background_enabled)
 	{
-		if (CCLIMBER_FLIP_X)
+		if (m_flip_x)
 		{
 			rectangle split_rect_left(0, 0xff - SWIMMER_BG_SPLIT, 0, 0xff);
 			rectangle split_rect_right(0x100 - SWIMMER_BG_SPLIT, 0xff, 0, 0xff);
@@ -768,8 +794,8 @@ uint32_t cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_in
 	bitmap.fill(CCLIMBER_BG_PEN, cliprect);
 
 	m_toproller_bg_tilemap->set_scrollx(0, m_toprollr_bg_videoram[0]);
-	m_toproller_bg_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-											(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+	m_toproller_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) |
+											(m_flip_y ? TILEMAP_FLIPY : 0));
 	m_toproller_bg_tilemap->mark_all_dirty();
 	m_toproller_bg_tilemap->draw(screen, bitmap, scroll_area_clip, 0, 0);
 
@@ -788,8 +814,8 @@ uint32_t cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_in
 	}
 
 	m_pf_tilemap->mark_all_dirty();
-	m_pf_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-									(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) |
+									(m_flip_y ? TILEMAP_FLIPY : 0));
 	m_pf_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;

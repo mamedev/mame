@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Ville Linde, Segher Boessenkool
 /* Triforce Skeleton
  -- split from Naomi.c
 
@@ -504,7 +504,7 @@ static INPUT_PORTS_START( triforce )
 INPUT_PORTS_END
 
 // bootrom descrambler reversed by segher
-// Copyright 2008 Segher Boessenkool <segher@kernel.crashing.org>
+// Copyright 2008-2017 Segher Boessenkool <segher@kernel.crashing.org>
 static void descrambler(uint8_t* data, uint32_t size)
 {
 	uint8_t acc = 0;
@@ -964,7 +964,7 @@ ROM_START( vs42006 )
 	TRIFORCE_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0020d", 0, BAD_DUMP SHA1(db256d094b9754d452d7a2b8a370699d21141c1f) )
+	DISK_IMAGE_READONLY( "gdt-0020d", 0, SHA1(09000f5b6ef680c603a16ea8028414aec0cc05f2) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0432-jpn.data", 0x00, 0x50, CRC(e3d13191) SHA1(4255c09aad06eb38c16bdec881897404a3a68b37) )

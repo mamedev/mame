@@ -534,7 +534,10 @@ static imgtoolerr_t fat_partition_create(imgtool::image &image, uint64_t first_b
 	place_integer_le(header, 32, 4, (uint32_t) (block_count >> 16));
 	place_integer_le(header, 36, 1, 0xFF);
 	place_integer_le(header, 38, 1, 0x28);
-	place_integer_le(header, 39, 4, imgtool::image::rand());
+	place_integer_le(header, 39, 1, std::rand());
+	place_integer_le(header, 40, 1, std::rand());
+	place_integer_le(header, 41, 1, std::rand());
+	place_integer_le(header, 42, 1, std::rand());
 	memcpy(&header[43], "           ", 11);
 	memcpy(&header[54], fat_bits_string, 8);
 
@@ -1635,7 +1638,7 @@ static void fat_bump_dirent(imgtool::partition &partition, uint8_t *entry, size_
 	{
 		/* extreme degenerate case; simply randomize the filename */
 		for (i = 0; i < 6; i++)
-			sfn_entry[i] = 'A' + (imgtool::image::rand() % 26);
+			sfn_entry[i] = 'A' + (std::rand() % 26);
 		sfn_entry[6] = '~';
 		sfn_entry[7] = '0';
 	}

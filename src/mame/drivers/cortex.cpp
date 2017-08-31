@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
+#include "machine/74259.h"
 #include "video/tms9928a.h"
 
 class cortex_state : public driver_device
@@ -51,8 +52,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cortex_io, AS_IO, 8, cortex_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0x0000, 0x000f) AM_READWRITE(pio_r,pio_w)
-	//AM_RANGE(0x0010, 0x001f) AM_READ(keyboard_r)
+	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0030) AM_DEVWRITE("control", ls259_device, write_a0)
+	//AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0020) AM_READ(pio_r)
+	//AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0020) AM_READ(keyboard_r)
 	//AM_RANGE(0x0080, 0x00bf) AM_READWRITE(rs232_r,rs232_w)
 	//AM_RANGE(0x0180, 0x01bf) AM_READWRITE(cass_r,cass_w)
 	//AM_RANGE(0x0800, 0x080f) AM_WRITE(cent_data_w)
@@ -80,6 +82,15 @@ static MACHINE_CONFIG_START( cortex )
 	// Standard variant, no overflow int
 	// No lines connected yet
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, cortex_mem, cortex_io)
+
+	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
+	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))
+	//MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cortex_state, keyboard_ack_w))
+	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cortex_state, ebus_int_ack_w))
+	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cortex_state, ebus_to_en_w))
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cortex_state, disk_size_w))
+	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cortex_state, eprom_on_off_w))
+	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cortex_state, bell_en_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )

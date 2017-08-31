@@ -14,6 +14,7 @@ Tomasz Slanina
 #include "includes/changela.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -132,24 +133,29 @@ READ8_MEMBER(changela_state::changela_2d_r)
 	return (ioport("IN1")->read() & 0x20) | gas | (v8 << 4);
 }
 
-WRITE8_MEMBER(changela_state::mcu_pc_0_w)
+WRITE_LINE_MEMBER(changela_state::mcu_pc_0_w)
 {
-	m_mcu->pc_w(space, 0, 0xfe | (data & 0x01));
+	m_mcu->pc_w(machine().dummy_space(), 0, 0xfe | state);
 }
 
-WRITE8_MEMBER(changela_state::changela_collision_reset_0)
+WRITE_LINE_MEMBER(changela_state::collision_reset_0_w)
 {
-	m_collision_reset = data & 0x01;
+	m_collision_reset = state;
 }
 
-WRITE8_MEMBER(changela_state::changela_collision_reset_1)
+WRITE_LINE_MEMBER(changela_state::collision_reset_1_w)
 {
-	m_tree_collision_reset = data & 0x01;
+	m_tree_collision_reset = state;
 }
 
-WRITE8_MEMBER(changela_state::changela_coin_counter_w)
+WRITE_LINE_MEMBER(changela_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(changela_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -172,14 +178,11 @@ static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
 	AM_RANGE(0xd010, 0xd011) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 
 	/* LS259 - U44 */
-	AM_RANGE(0xd020, 0xd020) AM_WRITE(changela_collision_reset_0)
-	AM_RANGE(0xd021, 0xd022) AM_WRITE(changela_coin_counter_w)
-//AM_RANGE(0xd023, 0xd023) AM_WRITENOP
+	AM_RANGE(0xd020, 0xd027) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 
 	/* LS139 - U24 */
-	AM_RANGE(0xd024, 0xd024) AM_READWRITE(changela_24_r, mcu_pc_0_w)
-	AM_RANGE(0xd025, 0xd025) AM_READWRITE(changela_25_r, changela_collision_reset_1)
-	AM_RANGE(0xd026, 0xd026) AM_WRITENOP
+	AM_RANGE(0xd024, 0xd024) AM_READ(changela_24_r)
+	AM_RANGE(0xd025, 0xd025) AM_READ(changela_25_r)
 	AM_RANGE(0xd028, 0xd028) AM_READ(mcu_r)
 	AM_RANGE(0xd02c, 0xd02c) AM_READ(changela_2c_r)
 	AM_RANGE(0xd02d, 0xd02d) AM_READ(changela_2d_r)
@@ -281,7 +284,7 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPNAME( 0x01, 0x01, "Right Slot" )                PORT_DIPLOCATION("SWD:1")
 	PORT_DIPSETTING(    0x01, "On Right (Bottom) Counter" )
 	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
-	PORT_DIPNAME( 0x02, 0x02, "Left Slot" )                 PORT_DIPLOCATION("SWD:2")
+	PORT_DIPNAME( 0x02, 0x00, "Left Slot" )                 PORT_DIPLOCATION("SWD:2")
 	PORT_DIPSETTING(    0x02, "On Right (Bottom) Counter" )
 	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
 	PORT_DIPNAME( 0x1c, 0x00, "Credits For Bonus" )         PORT_DIPLOCATION("SWD:3,4,5")
@@ -306,11 +309,16 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+#ifdef THREE_STATE_SWITCH
 	PORT_DIPNAME( 0x30, 0x30, "Self Test Switch" )          PORT_DIPLOCATION("SWT:1,2")
 	//PORT_DIPSETTING(    0x00, "?" )                       /* Not possible, 3-state switch */
 	PORT_DIPSETTING(    0x20, "Free Game" )                 /* "Puts a credit on the game without increasing the coin counter." */
 	PORT_DIPSETTING(    0x10, DEF_STR( Test ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
+#else // schematics don't make it clear exactly how this switch is supposed to work
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Free Game/Self-Test")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+#endif
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
@@ -418,6 +426,13 @@ static MACHINE_CONFIG_START( changela )
 	MCFG_M68705_PORTA_W_CB(WRITE8(changela_state, changela_68705_port_a_w))
 	MCFG_M68705_PORTC_W_CB(WRITE8(changela_state, changela_68705_port_c_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U44 on Sound I/O Board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(changela_state, collision_reset_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(changela_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(changela_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(changela_state, mcu_pc_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(changela_state, collision_reset_1_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

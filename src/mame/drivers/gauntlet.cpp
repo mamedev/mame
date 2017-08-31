@@ -190,12 +190,10 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 		if ((oldword ^ m_sound_reset_val) & 1)
 		{
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			m_soundctl->clear_w(m_sound_reset_val & 1);
 			m_soundcomm->sound_cpu_reset();
 			if (m_sound_reset_val & 1)
 			{
-				m_ym2151->reset();
-				m_tms5220->reset();
-				m_tms5220->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / 11);
 				m_ym2151->set_output_gain(ALL_OUTPUTS, 0.0f);
 				m_pokey->set_output_gain(ALL_OUTPUTS, 0.0f);
 				m_tms5220->set_output_gain(ALL_OUTPUTS, 0.0f);
@@ -231,27 +229,22 @@ READ8_MEMBER(gauntlet_state::switch_6502_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
+WRITE_LINE_MEMBER(gauntlet_state::speech_squeak_w)
 {
-	switch (offset & 7)
-	{
-		case 0: /* music reset, bit D7, low reset */
-			if (((data>>7)&1) == 0) m_ym2151->reset();
-			break;
+	uint8_t data = 5 | (state ? 2 : 0);
+	m_tms5220->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / (16 - data));
+}
 
-		case 1: /* speech write, bit D7, active low */
-			m_tms5220->wsq_w(data >> 7);
-			break;
+WRITE_LINE_MEMBER(gauntlet_state::coin_counter_left_w)
+{
+	// coins 1 & 2 combined
+	machine().bookkeeping().coin_counter_w(0, state);
+}
 
-		case 2: /* speech reset, bit D7, active low */
-			m_tms5220->rsq_w(data >> 7);
-			break;
-
-		case 3: /* speech squeak, bit D7 */
-			data = 5 | ((data >> 6) & 2);
-			m_tms5220->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / (16 - data));
-			break;
-	}
+WRITE_LINE_MEMBER(gauntlet_state::coin_counter_right_w)
+{
+	// coins 3 & 4 combined
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -325,7 +318,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gauntlet_state )
 	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)
 	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)
 	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
-	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
+	AM_RANGE(0x1030, 0x1030) AM_MIRROR(0x27cf) AM_READ(switch_6502_r)
+	AM_RANGE(0x1030, 0x1037) AM_MIRROR(0x27c8) AM_DEVWRITE("soundctl", ls259_device, write_d7)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE("tms", tms5220_device, data_w)
@@ -544,6 +538,14 @@ static MACHINE_CONFIG_START( gauntlet_base )
 	MCFG_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11) /* potentially ATARI_CLOCK_14MHz/2/9 as well */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+
+	MCFG_DEVICE_ADD("soundctl", LS259, 0) // 16T/U
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(gauntlet_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gauntlet_state, coin_counter_left_w))
 MACHINE_CONFIG_END
 
 

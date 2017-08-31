@@ -2543,7 +2543,14 @@ time_t ioport_manager::playback_init()
 
 	// open the playback file
 	osd_file::error filerr = m_playback_file.open(filename);
-	assert_always(filerr == osd_file::error::NONE, "Failed to open file for playback");
+
+	// return an explicit error if file isn't found in given path
+	if(filerr == osd_file::error::NOT_FOUND)
+		fatalerror("Input file %s not found\n",filename);
+
+	// TODO: bail out any other error laconically for now
+	if(filerr != osd_file::error::NONE)
+		fatalerror("Failed to open file %s for playback (code error=%d)\n",filename,int(filerr));
 
 	// read the header and verify that it is a modern version; if not, print an error
 	inp_header header;

@@ -197,8 +197,8 @@ RoadBlasters (aka Future Vette):005*
 #include "machine/atarigen.h"
 #include "machine/6522via.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
 #include "sound/pokey.h"
+#include "sound/ym2151.h"
 #include "video/atarimo.h"
 #include "speaker.h"
 
@@ -238,7 +238,6 @@ MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
 	m_joystick_int = 0;
 	m_joystick_int_enable = 0;
 }
-
 
 
 /*************************************
@@ -411,13 +410,31 @@ READ8_MEMBER(atarisy1_state::via_pb_r)
 
 /*************************************
  *
- *  Sound LED handlers
+ *  LED and coin counter handlers
  *
  *************************************/
 
-WRITE8_MEMBER(atarisy1_state::led_w)
+WRITE_LINE_MEMBER(atarisy1_state::led_1_w)
 {
-	output().set_led_value(offset, ~data & 1);
+	machine().output().set_led_value(0, !state);
+}
+
+
+WRITE_LINE_MEMBER(atarisy1_state::led_2_w)
+{
+	machine().output().set_led_value(1, !state);
+}
+
+
+WRITE_LINE_MEMBER(atarisy1_state::coin_counter_right_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(atarisy1_state::coin_counter_left_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -468,7 +485,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x1810, 0x1810) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_command_r, sound_response_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
-	AM_RANGE(0x1824, 0x1825) AM_WRITE(led_w)
+	AM_RANGE(0x1820, 0x1827) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -722,6 +739,13 @@ static MACHINE_CONFIG_START( atarisy1 )
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(atarisy1_state, led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(atarisy1_state, led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(atarisy1_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(atarisy1_state, coin_counter_left_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

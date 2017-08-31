@@ -42,6 +42,7 @@ the "America" release.
 #include "includes/tsamurai.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -73,9 +74,9 @@ MACHINE_START_MEMBER(tsamurai_state, vsgongf)
 	machine_start();
 }
 
-WRITE8_MEMBER(tsamurai_state::nmi_enable_w)
+WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
 {
-	m_nmi_enabled = data;
+	m_nmi_enabled = state;
 }
 
 INTERRUPT_GEN_MEMBER(tsamurai_state::interrupt)
@@ -126,14 +127,19 @@ WRITE8_MEMBER(tsamurai_state::m660_sound_command3_w)
 	m_audio3->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::flip_screen_w)
+WRITE_LINE_MEMBER(tsamurai_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	flip_screen_set(state);
 }
 
-WRITE8_MEMBER(tsamurai_state::coincounter_w)
+WRITE_LINE_MEMBER(tsamurai_state::coin1_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(offset,data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(tsamurai_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -164,10 +170,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(textbank1_w)
-	AM_RANGE(0xfc03, 0xfc04) AM_WRITE(coincounter_w)
+	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m660_map, AS_PROGRAM, 8, tsamurai_state )
@@ -198,11 +201,7 @@ static ADDRESS_MAP_START( m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(textbank1_w)
-	AM_RANGE(0xfc03, 0xfc04) AM_WRITE(coincounter_w)
-	AM_RANGE(0xfc07, 0xfc07) AM_WRITE(m660_textbank2_w)/* Mission 660 uses a bit here */
+	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, tsamurai_state )
@@ -354,10 +353,7 @@ static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP
 	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* vreg? always 0 */
 	AM_RANGE(0xf803, 0xf803) AM_WRITENOP /* vreg? always 0 */
-	AM_RANGE(0xfc00, 0xfc00) AM_RAM /* vreg? always 0 */
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xfc02, 0xfc03) AM_WRITE(coincounter_w)
-	AM_RANGE(0xfc04, 0xfc04) AM_WRITE(textbank1_w)
+	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
@@ -722,6 +718,13 @@ static MACHINE_CONFIG_START( tsamurai )
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tsamurai_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -762,6 +765,13 @@ static MACHINE_CONFIG_START( vsgongf )
 	MCFG_CPU_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,vsgongf)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 4L
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // vreg? always 0
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -810,6 +820,14 @@ static MACHINE_CONFIG_START( m660 )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  nmi_line_pulse)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tsamurai_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tsamurai_state, textbank2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

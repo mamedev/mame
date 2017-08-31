@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "sound/discrete.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
@@ -19,7 +20,7 @@ public:
 		m_galaga_ram1(*this, "galaga_ram1"),
 		m_galaga_ram2(*this, "galaga_ram2"),
 		m_galaga_ram3(*this, "galaga_ram3"),
-		m_galaga_starcontrol(*this, "starcontrol"),
+		m_videolatch(*this, "videolatch"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
@@ -33,7 +34,7 @@ public:
 	optional_shared_ptr<uint8_t> m_galaga_ram1;
 	optional_shared_ptr<uint8_t> m_galaga_ram2;
 	optional_shared_ptr<uint8_t> m_galaga_ram3;
-	optional_shared_ptr<uint8_t> m_galaga_starcontrol;    // 6 addresses
+	optional_device<ls259_device> m_videolatch; // not present on Xevious
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
@@ -42,7 +43,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	emu_timer *m_cpu3_interrupt_timer;
-	uint8_t m_custom_mod;
 
 	/* machine state */
 	uint32_t m_stars_scrollx;
@@ -62,15 +62,16 @@ public:
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_nmi_mask;
 	DECLARE_READ8_MEMBER(bosco_dsw_r);
-	DECLARE_WRITE8_MEMBER(galaga_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(bosco_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(irq1_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(irq2_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
-	DECLARE_WRITE8_MEMBER(gatsbee_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
 	DECLARE_WRITE8_MEMBER(out_0);
 	DECLARE_WRITE8_MEMBER(out_1);
 	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
 	DECLARE_READ8_MEMBER(namco_52xx_si_r);
-	DECLARE_READ8_MEMBER(custom_mod_r);
 	DECLARE_DRIVER_INIT(galaga);
 	DECLARE_DRIVER_INIT(gatsbee);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
@@ -86,7 +87,6 @@ public:
 	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void bosco_latch_reset();
 	struct star
 	{
 		uint16_t x,y;

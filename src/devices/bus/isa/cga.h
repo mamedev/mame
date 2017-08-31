@@ -26,6 +26,7 @@ class isa8_cga_device :
 	friend class isa8_cga_pc1512_device;
 
 public:
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 	// construction/destruction
 	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

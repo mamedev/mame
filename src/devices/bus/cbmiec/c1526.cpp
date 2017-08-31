@@ -25,7 +25,6 @@
 
 DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "MPS802/C1526 Printer")
 DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "C4023 Printer")
-const device_type MPS802 = C1526;
 
 
 //-------------------------------------------------

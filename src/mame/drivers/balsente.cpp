@@ -35,7 +35,6 @@
 
     Looking for ROMs for these:
         * Euro Stocker
-        * Team Hat Trick
 
     Known bugs:
         * CEM3394 emulation is not perfect

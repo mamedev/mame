@@ -32,7 +32,6 @@ Gorby no Pipeline Daisakusen                            Apr-91  Compile (FDx1)
 Gyakutama Ou: Wedding Errantry                          Jan-95  Grocer  (FDx5)
 Hana Yori Dango                                         Apr-92  Active  (FDx3)
 Igo DB                                                  Jul-92  Fujitsu (FDx2)
-Illusion City                                           Mar-93  Takeru  (FDx8)
 Image                                                   May-94  Software House Parsley  (FDx2)
 Image 2                                                 Jun-94  Software House Parsley  (FDx4)
 Kiwame Jouseki Shuu                                     Nov-92  Log (FDx1)
@@ -919,6 +918,64 @@ Yuki Neko                                               Apr-95  Jast    (FDx4)
 		</part>
 	</software>
 
+	<software name="illcity">
+		<!--
+		Origin: Tokugawa Corporate Forums (yukin)
+		-->
+		<description>Illusion City - Gen'ei Toshi</description>
+		<year>1993</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="release" value="199303xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 1).hdm" size="1261568" crc="96691e55" sha1="6e19483a53bce49613e2b8d1b248731a08759955" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 2).hdm" size="1261568" crc="b1c3c0a2" sha1="800831eded14baa4d8d96fd812d2fa455eabce6f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 3).hdm" size="1261568" crc="1c72b1b8" sha1="15426c64002961e9a73c6db61f26d0988ff4cdc2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 4).hdm" size="1261568" crc="b1296ae2" sha1="cad77c6db1d943de23baee76e5bfeba2e2df5092" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 5).hdm" size="1261568" crc="be558e9a" sha1="c76562e36b52fd2033400d11ae36398785158a66" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 6).hdm" size="1261568" crc="1792c9f2" sha1="5c9d942bce8f73b9b504aeeb2d3abc634fc7e8d0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 7).hdm" size="1261568" crc="b7f3fa0c" sha1="6b1944768d6431e5e6128bbe7ce71613bfd75f56" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="1261568">
+				<rom name="illusion city (disk 8).hdm" size="1261568" crc="cfc82740" sha1="f037c25c480807b15e77c3bec89185345c6e3d15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="musicpro">
 		<description>Music Pro-Towns</description>
 		<year>1989</year>
@@ -1321,6 +1378,20 @@ Yuki Neko                                               Apr-95  Jast    (FDx4)
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
 				<rom name="ushinawareta rakuen (disk e).hdm" size="1261568" crc="1481c370" sha1="95676fc68d7e402fd9e463a5ad9d82490ac544a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vingsoft">
+		<!--
+		Origin: Tokugawa Corporate Forums (yukin)
+		-->
+		<description>Ving Soft Collection</description>
+		<year>1993?</year>
+		<publisher>ビング (Ving)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="ving.bin" size="1261568" crc="b380deb5" sha1="3f906b81a5277fe971b2d05ba2e739130873c143" offset="0" />
 			</dataarea>
 		</part>
 	</software>

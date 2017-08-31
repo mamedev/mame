@@ -88,9 +88,9 @@ WRITE8_MEMBER(gng_state::gng_bgscrolly_w)
 }
 
 
-WRITE8_MEMBER(gng_state::gng_flipscreen_w)
+WRITE_LINE_MEMBER(gng_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(!state);
 }
 
 

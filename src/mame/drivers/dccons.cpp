@@ -668,7 +668,8 @@ ROM_START( dceu )
 	DREAMCAST_COMMON_BIOS
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )
+	ROM_LOAD( "dceu_pal.bin",  0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) ) // bad, in few parts modified by some emulator
+	ROM_LOAD( "dceu_pala.bin", 0x000000, 0x020000, BAD_DUMP CRC(4b350ed0) SHA1(273bfb2fb9dbc4306a09d6dae31d5a1faf128589) ) // from VA1 with 1.01d BIOS
 ROM_END
 
 ROM_START( dcjp )

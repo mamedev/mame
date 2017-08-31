@@ -3195,6 +3195,22 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="suprbas5">
+		<description>Superbase 5 Demo</description>
+		<year>1988</year>
+		<publisher>Computer Associates International</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Superbase 5 Demo [5.25][1of2].img" size="368640" crc="7f1f4683" sha1="6ed604a51038f5943e17573ada799c1541cc43c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Superbase 5 Demo [5.25][2of2].img" size="368640" crc="aa8e794b" sha1="1669c0c06bbe6ae4a5f72947f3cf3778f6b55390" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tbasic10">
 		<description>Turbo Basic</description>
 		<year>1987</year>
@@ -5218,6 +5234,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Arkanoid 2 [Taito Corporation] [1989] [5.25].img" size="368640" crc="426a4568" sha1="05a16d118679ff265d0a812537431efee3b43bcf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bat">
+		<description>B.A.T. (VGA Version)</description>
+		<year>1990</year>
+		<publisher>Ubi Soft Entertainment Software</publisher>
+		<info name="developer" value="Computer's Dream" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="B.A.T. [Ubi Soft] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="d20b827d" sha1="87f9b041c29b98f1c2998e9b15cd386eb6d55275" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="B.A.T. [Ubi Soft] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="355d6947" sha1="0905d60a8887dbbf2d8f1e5c20a065bb7b6a6d03" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

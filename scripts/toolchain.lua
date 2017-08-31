@@ -854,6 +854,9 @@ if os.getenv("ANDROID_NDK_ROOT") then
 end
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
@@ -879,6 +882,7 @@ end
 			"android",
 			"log",
 		}
+
 if os.getenv("ANDROID_NDK_ROOT") then
 		if (os.isfile(checkndk13)) then
 			links {
@@ -894,6 +898,12 @@ if os.getenv("ANDROID_NDK_ROOT") then
 		end
 end
 		links {
+--=======
+--			"c++_static",
+--			"c++abi",
+--			"android_support",
+--			"stdc++",
+-->>>>>>> 2beedc540f14267850036f8b2aba81e874895ade
 			"gcc",
 		}
 -- LIBRETRO HACK END support ndk-r13b structure
@@ -922,6 +932,7 @@ end
 	configuration { "android-arm" }
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
+				"$(ANDROID_NDK_ARM)/lib/gcc/arm-linux-androideabi/4.9.x/armv7-a",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
 			}
 			includedirs {
@@ -934,6 +945,9 @@ end
 				"-mfloat-abi=softfp",
 				"-mfpu=vfpv3-d16",
 				"-mthumb",
+			}
+			links {
+				"unwind",
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",

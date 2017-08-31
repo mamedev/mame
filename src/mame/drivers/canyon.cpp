@@ -95,9 +95,20 @@ READ8_MEMBER(canyon_state::canyon_options_r)
  *
  *************************************/
 
-WRITE8_MEMBER(canyon_state::canyon_led_w)
+WRITE8_MEMBER(canyon_state::output_latch_w)
 {
-	output().set_led_value(offset & 0x01, offset & 0x02);
+	// ADR1 = D, ADR8 = A2, ADR7 = A1, ADR0 = A0
+	m_outlatch->write_bit((offset & 0x180) >> 6 | BIT(offset, 0), BIT(offset, 1));
+}
+
+WRITE_LINE_MEMBER(canyon_state::led1_w)
+{
+	output().set_led_value(0, state);
+}
+
+WRITE_LINE_MEMBER(canyon_state::led2_w)
+{
+	output().set_led_value(1, state);
 }
 
 
@@ -115,9 +126,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, canyon_state )
 	AM_RANGE(0x0400, 0x0401) AM_WRITE(canyon_motor_w)
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(canyon_explode_w)
 	AM_RANGE(0x0501, 0x0501) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog, disabled in service mode */
-	AM_RANGE(0x0600, 0x0603) AM_WRITE(canyon_whistle_w)
-	AM_RANGE(0x0680, 0x0683) AM_WRITE(canyon_led_w)
-	AM_RANGE(0x0700, 0x0703) AM_WRITE(canyon_attract_w)
+	AM_RANGE(0x0600, 0x0603) AM_SELECT(0x0180) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(canyon_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x17ff) AM_READ(canyon_switches_r) AM_WRITENOP  /* sloppy code writes here */
 	AM_RANGE(0x1800, 0x1fff) AM_READ(canyon_options_r)
@@ -244,6 +253,14 @@ static MACHINE_CONFIG_START( canyon )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", canyon_state,  nmi_line_pulse)
+
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // C7
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(canyon_state, led1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(canyon_state, led2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT2_EN>))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)

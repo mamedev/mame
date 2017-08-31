@@ -432,8 +432,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
 		m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 2) | ((data >> 1) & 1));
 
 	// reset the YM2151 if needed
-	if ((data & 1) == 0)
-		m_ym2151->reset();
+	m_ym2151->reset_w(BIT(data, 0));
 }
 
 
@@ -625,8 +624,7 @@ WRITE8_MEMBER( atari_jsa_i_device::wrio_w )
 	}
 
 	// reset the YM2151 if needed
-	if ((data & 1) == 0)
-		m_ym2151->reset();
+	m_ym2151->reset_w(BIT(data, 0));
 }
 
 

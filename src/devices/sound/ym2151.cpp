@@ -1021,6 +1021,8 @@ void ym2151_device::device_start()
 	save_item(NAME(irqlinestate));
 
 	save_item(NAME(connect));
+
+	save_item(NAME(m_reset_active));
 }
 
 void ym2151_device::device_clock_changed()
@@ -1664,7 +1666,8 @@ ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, dev
 		m_stream(nullptr),
 		m_lastreg(0),
 		m_irqhandler(*this),
-		m_portwritehandler(*this)
+		m_portwritehandler(*this),
+		m_reset_active(false)
 {
 }
 
@@ -1693,8 +1696,11 @@ WRITE8_MEMBER( ym2151_device::write )
 {
 	if (offset & 1)
 	{
-		m_stream->update();
-		write_reg(m_lastreg, data);
+		if (!m_reset_active)
+		{
+			m_stream->update();
+			write_reg(m_lastreg, data);
+		}
 	}
 	else
 		m_lastreg = data;
@@ -1773,11 +1779,32 @@ void ym2151_device::device_reset()
 
 
 //-------------------------------------------------
+//  reset_w - handle writes to the reset lines of
+//  the YM2151 and its associated DAC
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(ym2151_device::reset_w)
+{
+	// active low reset
+	if (!m_reset_active && !state)
+		reset();
+
+	m_reset_active = !state;
+}
+
+
+//-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
 void ym2151_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_reset_active)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		return;
+	}
+
 	for (int i=0; i<samples; i++)
 	{
 		advance_eg();

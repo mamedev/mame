@@ -23,23 +23,23 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-enum ui_event_type
-{
-	UI_EVENT_NONE,
-	UI_EVENT_MOUSE_MOVE,
-	UI_EVENT_MOUSE_LEAVE,
-	UI_EVENT_MOUSE_DOWN,
-	UI_EVENT_MOUSE_UP,
-	UI_EVENT_MOUSE_RDOWN,
-	UI_EVENT_MOUSE_RUP,
-	UI_EVENT_MOUSE_DOUBLE_CLICK,
-	UI_EVENT_MOUSE_WHEEL,
-	UI_EVENT_CHAR
-};
-
 struct ui_event
 {
-	ui_event_type       event_type;
+	enum type
+	{
+		NONE,
+		MOUSE_MOVE,
+		MOUSE_LEAVE,
+		MOUSE_DOWN,
+		MOUSE_UP,
+		MOUSE_RDOWN,
+		MOUSE_RUP,
+		MOUSE_DOUBLE_CLICK,
+		MOUSE_WHEEL,
+		IME_CHAR
+	};
+
+	type                event_type;
 	render_target *     target;
 	s32                 mouse_x;
 	s32                 mouse_y;
@@ -64,6 +64,9 @@ public:
 
 	/* pops an event off of the queue */
 	bool pop_event(ui_event *event);
+
+	/* check the next event type without removing it */
+	ui_event::type peek_event_type() const { return (m_events_start != m_events_end) ? m_events[m_events_start].event_type : ui_event::NONE; }
 
 	/* clears all outstanding events */
 	void reset();

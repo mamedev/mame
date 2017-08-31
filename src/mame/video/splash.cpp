@@ -223,7 +223,7 @@ void splash_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	}
 }
 
-void splash_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void funystrp_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
@@ -263,7 +263,7 @@ uint32_t splash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-uint32_t splash_state::screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t funystrp_state::screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
 	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);

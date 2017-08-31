@@ -273,11 +273,12 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 	else if (data & 0x40)
 		drive = 3;
 
+	// the motor is always turned on or off for all drives
 	for (int i = 0; i < 4; i++)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w(((i == drive) && (data & 0x08)) ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w(BIT(data, 3) ? 0 : 1);
 	}
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;

@@ -48,7 +48,7 @@
 #include "emu.h"
 #include "machine/315-5838_317-0229_comp.h"
 
-DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838", "Sega 315-4838 / 317-0029 Compression (Encryption?)")
+DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838", "Sega 315-5838 / 317-0229 Compression (Encryption?)")
 
 //#define DEBUG_DATA_DUMP
 

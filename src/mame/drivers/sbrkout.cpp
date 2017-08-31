@@ -36,6 +36,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -50,6 +51,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -65,13 +67,14 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_READ8_MEMBER(sbrkoutct_switches_r);
-	DECLARE_WRITE8_MEMBER(pot_mask1_w);
-	DECLARE_WRITE8_MEMBER(pot_mask2_w);
-	DECLARE_WRITE8_MEMBER(start_1_led_w);
-	DECLARE_WRITE8_MEMBER(start_2_led_w);
-	DECLARE_WRITE8_MEMBER(serve_led_w);
-	DECLARE_WRITE8_MEMBER(serve_2_led_w);
-	DECLARE_WRITE8_MEMBER(coincount_w);
+	DECLARE_WRITE_LINE_MEMBER(pot_mask1_w);
+	DECLARE_WRITE_LINE_MEMBER(pot_mask2_w);
+	DECLARE_WRITE8_MEMBER(output_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(start_1_led_w);
+	DECLARE_WRITE_LINE_MEMBER(start_2_led_w);
+	DECLARE_WRITE_LINE_MEMBER(serve_led_w);
+	DECLARE_WRITE_LINE_MEMBER(serve_2_led_w);
+	DECLARE_WRITE_LINE_MEMBER(coincount_w);
 	DECLARE_READ8_MEMBER(sync_r);
 	DECLARE_READ8_MEMBER(sync2_r);
 	DECLARE_WRITE8_MEMBER(sbrkout_videoram_w);
@@ -84,6 +87,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
 	required_device<cpu_device> m_maincpu;
+	required_device<f9334_device> m_outlatch;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -253,17 +257,17 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::pot_trigger_callback)
 }
 
 
-WRITE8_MEMBER(sbrkout_state::pot_mask1_w)
+WRITE_LINE_MEMBER(sbrkout_state::pot_mask1_w)
 {
-	m_pot_mask[0] = ~offset & 1;
+	m_pot_mask[0] = !state;
 	m_pot_trigger[0] = 0;
 	update_nmi_state();
 }
 
 
-WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
+WRITE_LINE_MEMBER(sbrkout_state::pot_mask2_w)
 {
-	m_pot_mask[1] = ~offset & 1;
+	m_pot_mask[1] = !state;
 	m_pot_trigger[1] = 0;
 	update_nmi_state();
 }
@@ -282,33 +286,38 @@ WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
     reversed for the Serve LED, which has a NOT on the signal.
 */
 
-WRITE8_MEMBER(sbrkout_state::start_1_led_w)
+WRITE8_MEMBER(sbrkout_state::output_latch_w)
 {
-	output().set_led_value(0, offset & 1);
+	m_outlatch->write_bit(offset >> 4, offset & 1);
 }
 
 
-WRITE8_MEMBER(sbrkout_state::start_2_led_w)
+WRITE_LINE_MEMBER(sbrkout_state::start_1_led_w)
 {
-	output().set_led_value(1, offset & 1);
+	output().set_led_value(0, state);
 }
 
 
-WRITE8_MEMBER(sbrkout_state::serve_led_w)
+WRITE_LINE_MEMBER(sbrkout_state::start_2_led_w)
 {
-	output().set_led_value(0, ~offset & 1);
+	output().set_led_value(1, state);
 }
 
-WRITE8_MEMBER(sbrkout_state::serve_2_led_w)
+
+WRITE_LINE_MEMBER(sbrkout_state::serve_led_w)
 {
-	output().set_led_value(1, ~offset & 1);
+	output().set_led_value(0, !state);
 }
 
-WRITE8_MEMBER(sbrkout_state::coincount_w)
+WRITE_LINE_MEMBER(sbrkout_state::serve_2_led_w)
 {
-	machine().bookkeeping().coin_counter_w(0, offset & 1);
+	output().set_led_value(1, !state);
 }
 
+WRITE_LINE_MEMBER(sbrkout_state::coincount_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
 
 
 /*************************************
@@ -403,12 +412,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
 	AM_RANGE(0x08c0, 0x08c0) AM_MIRROR(0x003f) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_READ(sync_r)
-	AM_RANGE(0x0c10, 0x0c11) AM_MIRROR(0x000e) AM_WRITE(serve_led_w)
-	AM_RANGE(0x0c30, 0x0c31) AM_MIRROR(0x000e) AM_WRITE(start_1_led_w)
-	AM_RANGE(0x0c40, 0x0c41) AM_MIRROR(0x000e) AM_WRITE(start_2_led_w)
-	AM_RANGE(0x0c50, 0x0c51) AM_MIRROR(0x000e) AM_WRITE(pot_mask1_w)
-	AM_RANGE(0x0c60, 0x0c61) AM_MIRROR(0x000e) AM_WRITE(pot_mask2_w)
-	AM_RANGE(0x0c70, 0x0c71) AM_MIRROR(0x000e) AM_WRITE(coincount_w)
+	AM_RANGE(0x0c00, 0x0c7f) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ(sync2_r)
@@ -424,13 +428,7 @@ static ADDRESS_MAP_START( sbrkoutct_main_map, AS_PROGRAM, 8, sbrkout_state )
 	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
 	AM_RANGE(0x08c0, 0x08c0) AM_MIRROR(0x003f) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_READ(sync_r)
-	AM_RANGE(0x0c10, 0x0c11) AM_MIRROR(0x000e) AM_WRITE(serve_led_w)
-	AM_RANGE(0x0c20, 0x0c21) AM_MIRROR(0x000e) AM_WRITE(serve_2_led_w)
-	AM_RANGE(0x0c30, 0x0c31) AM_MIRROR(0x000e) AM_WRITE(start_1_led_w)
-	AM_RANGE(0x0c40, 0x0c41) AM_MIRROR(0x000e) AM_WRITE(start_2_led_w)
-	AM_RANGE(0x0c50, 0x0c51) AM_MIRROR(0x000e) AM_WRITE(pot_mask1_w)
-	AM_RANGE(0x0c60, 0x0c61) AM_MIRROR(0x000e) AM_WRITE(pot_mask2_w)
-	AM_RANGE(0x0c70, 0x0c71) AM_MIRROR(0x000e) AM_WRITE(coincount_w)
+	AM_RANGE(0x0c00, 0x0c7f) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ(sync2_r)
@@ -586,6 +584,14 @@ static MACHINE_CONFIG_START( sbrkout )
 	MCFG_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16)       /* 375 KHz? Should be 750KHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // H8
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sbrkout_state, serve_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sbrkout_state, start_1_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sbrkout_state, start_2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sbrkout_state, pot_mask1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sbrkout_state, pot_mask2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(sbrkout_state, coincount_w))
+
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
@@ -610,6 +616,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED(sbrkoutct, sbrkout)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sbrkoutct_main_map)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sbrkout_state, serve_2_led_w))
 MACHINE_CONFIG_END
 
 /*************************************

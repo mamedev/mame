@@ -429,6 +429,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/74259.h,MACHINES["TTL74259"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL74259"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/74259.cpp",
+		MAME_DIR .. "src/devices/machine/74259.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/7474.h,MACHINES["TTL7474"] = true
 ---------------------------------------------------
 
@@ -766,20 +778,6 @@ if (MACHINES["CXD1095"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/dm9334.h,MACHINES["DM9334"] = true
----------------------------------------------------
-
-if (MACHINES["DM9334"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/dm9334.cpp",
-		MAME_DIR .. "src/devices/machine/dm9334.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/ds1204.h,MACHINES["DS1204"] = true
 ---------------------------------------------------
 
@@ -1009,6 +1007,18 @@ if (MACHINES["HP_TACO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/hp_taco.cpp",
 		MAME_DIR .. "src/devices/machine/hp_taco.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/1ma6.h,MACHINES["1MA6"] = true
+---------------------------------------------------
+
+if (MACHINES["1MA6"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/1ma6.cpp",
+		MAME_DIR .. "src/devices/machine/1ma6.h",
 	}
 end
 
@@ -2496,6 +2506,18 @@ if (MACHINES["TMS9902"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tms9902.cpp",
 		MAME_DIR .. "src/devices/machine/tms9902.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tube.h,MACHINES["TUBE"] = true
+---------------------------------------------------
+
+if (MACHINES["TUBE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tube.cpp",
+		MAME_DIR .. "src/devices/machine/tube.h",
 	}
 end
 

@@ -33,6 +33,7 @@ EEPROM chip: 93C46
 #include "includes/xorworld.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "sound/saa1099.h"
 
@@ -50,24 +51,6 @@ EEPROM chip: 93C46
                 EEPROM read/write/control
 ****************************************************************/
 
-WRITE16_MEMBER(xorworld_state::eeprom_chip_select_w)
-{
-	/* bit 0 is CS (active low) */
-	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE16_MEMBER(xorworld_state::eeprom_serial_clock_w)
-{
-	/* bit 0 is SK (active high) */
-	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE16_MEMBER(xorworld_state::eeprom_data_w)
-{
-	/* bit 0 is EEPROM data (DIN) */
-	m_eeprom->di_write(data & 0x01);
-}
-
 WRITE16_MEMBER(xorworld_state::irq2_ack_w)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
@@ -84,13 +67,11 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
-	AM_RANGE(0xa0000a, 0xa0000b) AM_WRITE(eeprom_serial_clock_w)
-	AM_RANGE(0xa0000c, 0xa0000d) AM_WRITE(eeprom_data_w)
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(irq2_ack_w)
-	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(irq6_ack_w)
+	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(irq2_ack_w) AM_READNOP
+	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(irq6_ack_w) AM_READNOP
 	AM_RANGE(0xffc884, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -183,6 +164,11 @@ static MACHINE_CONFIG_START( xorworld )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) // CS (active low)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) // SK (active high)
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) // EEPROM data (DIN)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

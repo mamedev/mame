@@ -430,7 +430,7 @@ emu_options::emu_options(option_support support)
 	set_value_changed_handler(OPTION_COIN_IMPULSE,              [this](const char *value) { m_coin_impulse = int_value(OPTION_COIN_IMPULSE); });
 	set_value_changed_handler(OPTION_JOYSTICK_CONTRADICTORY,    [this](const char *value) { m_joystick_contradictory = bool_value(OPTION_JOYSTICK_CONTRADICTORY); });
 	set_value_changed_handler(OPTION_SLEEP,                     [this](const char *value) { m_sleep = bool_value(OPTION_SLEEP); });
-	set_value_changed_handler(OPTION_REFRESHSPEED,              [this](const char *value) { m_sleep = bool_value(OPTION_REFRESHSPEED); });
+	set_value_changed_handler(OPTION_REFRESHSPEED,              [this](const char *value) { m_refresh_speed = bool_value(OPTION_REFRESHSPEED); });
 	set_value_changed_handler(OPTION_UI, [this](const std::string &value)
 	{
 		if (value == "simple")

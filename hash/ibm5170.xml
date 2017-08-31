@@ -34,6 +34,19 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="ps2dg70">
+		<!-- Diagnostics Diskette for IBM Personal System/2 model 70/80 -->
+		<description>Vianmäärityslevyke IBM Personal System/2 malli 70/80 (v1.06, Finnish)</description>
+		<year>1988</year>
+		<publisher>IBM</publisher>
+		<info name="serial" value="08F1118" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="08f1118.img" size="1474560" crc="f6fd007f" sha1="4d8e6554c8b9a1e32f06878e751d8156d2fa7f8b" offset="0" status="baddump" /> <!-- h0t5s18 bad -->
+			</dataarea>
+		</part>
+	</software>
+
 <!-- OS Disks -->
 	<software name="gem11">
 		<description>GEM Desktop 1.1</description>
@@ -4223,6 +4236,18 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="aftdark">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>After Dark for Windows</description>
+		<year>1990</year>
+		<publisher>Berkeley Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="after dark.img" size="1474560" crc="0b6222f5" sha1="2a61d82ef15ee9fba2a738632da7626e935e5683" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aol20" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>America Online</description>
@@ -4236,14 +4261,71 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="aftdark">
-		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>After Dark for Windows</description>
+	<software name="ami">
+		<description>Amí (1.2b)</description>
 		<year>1990</year>
-		<publisher>Berkeley Systems</publisher>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.2b" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="after dark.img" size="1474560" crc="0b6222f5" sha1="2a61d82ef15ee9fba2a738632da7626e935e5683" offset="0" />
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_1.img" size="737280" crc="311ba808" sha1="393a9b6973784b1032ab3355560ab43bf2480b5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_2.img" size="737280" crc="637f4961" sha1="de0cf9b62a880f3ee4419769b9be9354c6db4386" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_3.img" size="737280" crc="a3ba8028" sha1="db324383d266ab93d8122f8aa55a3025b4dd5c4c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amia" cloneof="ami">
+		<!-- Dumped via Kryoflux, shows as good with most tracks modified -->
+		<!-- Included with Commodore PC40-III -->
+		<description>Amí (1.00B, Commodore OEM)</description>
+		<year>1989</year>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.00B" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="ami.img" size="1228800" crc="5071b3bd" sha1="1d9abc49bc1b8287e0fe3603e7bca718848551a3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amib" cloneof="ami">
+		<!-- Includes Microsoft Windows/286 version 2.1 -->
+		<description>Amí (1.0)</description>
+		<year>1988</year>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 SAE Setup, Build &amp; Displays 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk01.img" size="1228800" crc="ebe9e37b" sha1="e8040b3bbd2cf91da77c2351a44a2669c2e88ff9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 Displays 2 &amp; Utilities 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk02.img" size="1228800" crc="c9844f84" sha1="9a0d30d811fcb668639a92fd512fb0d7636535e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 Utilities 2 &amp; Fonts" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk03.img" size="1228800" crc="471a8b4c" sha1="5d7d27b3b65aacf9fecf18a11c4b9a89ee4cca85" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Amí Program Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk04.img" size="1228800" crc="6c261d8c" sha1="9160d5474af8abbdb4fd4e4e99d16250f1eab4a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4950,6 +5032,17 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="robotc2d">
+		<description>RobotC2 Demo</description>
+		<year>1989</year>
+		<publisher>Jaguar System</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="[PC] RobotC2 Demo [5.25].img" size="1228800" crc="b41e9f4c" sha1="503379cfd0e132bcc43c2f7951a211cc4ae8f4f7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vrplyhse">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>Virtual Reality Playhouse (Cover disk)</description>
@@ -5637,6 +5730,48 @@ Missing files come here
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="B-17 Flying Fortress (1992)(MicroProse)(Disk 4 of 4).dsk" size="1474560" crc="cc028485" sha1="68ade93d34ae98167d1fe25f237f17328e847a76" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bat2">
+		<description>B.A.T. II</description>
+		<year>1992</year>
+		<publisher>Ubi Soft Entertainment Software</publisher>
+		<info name="developer" value="Computer's Dream" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5DD] [Disk 1 of 7].img" size="737280" crc="cb69a667" sha1="ae03749881ef540867c87db7d8a1fe03fa411ff9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="9a131ad6" sha1="5433af89cbcdb0d689ed792707acd24eca546ac6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="a91729ab" sha1="513643202ff7d2442467cfc440e3391829a69fe1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="40252fb1" sha1="014ed3b64a28df44840df474f699e62ddd117adc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="bab1adce" sha1="9efc6c1c909c1929e876da447ca476bd9b389420" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="2077bd17" sha1="0623621a990d323b7dbed4dd7ae044a8630fb792" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="B.A.T. II [Ubi Soft] [1992] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="f03aba54" sha1="9d027dfcec389d8a9412ee21facc684e4be1e0a8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7986,6 +8121,176 @@ Missing files come here
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="disk 4.img" size="1228800" crc="caf1057e" sha1="bff9d7c21675da1197cbcf039823982e69d9c6c0" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingcom">
+		<description>Wing Commander</description>
+		<year>1990</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander [ORIGIN Systems] [1990] [5.25HD] [Disk 1 of 3].img" size="1228800" crc="fad97724" sha1="dcdf6ad1f536fdfcb06aba94de58d143128cce19" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander [ORIGIN Systems] [1990] [5.25HD] [Disk 2 of 3].img" size="1228800" crc="c8a4cf27" sha1="07fa82b9c595bc410f50c6ae811f26eb7eea35d0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander [ORIGIN Systems] [1990] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="fda1f93a" sha1="9bf96166b48b63b0efe379d78de752b9df1615b1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wngcomsm">
+		<description>Wing Commander: The Secret Missions</description>
+		<year>1990</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander - The Secret Missions [ORIGIN Systems] [1990] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="85701fe1" sha1="5cfe3ab82180a7824ef3bc5aa0d7124ca649fd20" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wngcomsm2">
+		<description>Wing Commander: The Secret Missions 2</description>
+		<year>1991</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander - The Secret Missions 2 [ORIGIN Systems] [1991] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="561cc930" sha1="e2cc230566b0acf1741635c01eed071d2498ba7c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingcom2">
+		<description>Wing Commander II - Vengeance of the Kilrathi (3.5")</description>
+		<year>1991</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 1 of 14].img" size="737280" crc="7b8c391d" sha1="d1d3ca158f3098bc6d127bbd2341b6e19d9dd917" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 2 of 14].img" size="737280" crc="fdec2a70" sha1="708dde30c4d9c37f49593388ebffa80cf665bb7d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 3 of 14].img" size="737280" crc="a82860de" sha1="038f2d158422713d7167b4f68085b6222f16880b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 4 of 14].img" size="737280" crc="61835992" sha1="27dc0c2e350d0c8bbd4a244b851b2fde12c7d3ce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 5 of 14].img" size="737280" crc="c179992a" sha1="22929e6f4800698c6af6f551cd2b49f8a2dd27cd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 6 of 14].img" size="737280" crc="27b67d04" sha1="ed4c778e4bd86f6d08d021e439740ae69d8a8153" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 7 of 14].img" size="737280" crc="943c53e5" sha1="66f7b6c524f89226741405ef14f86eb2360a8942" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 8 of 14].img" size="737280" crc="17fbd59f" sha1="4ecf8b78f7bf3fbebb060a9214740a461c1d2f5c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 9 of 14].img" size="737280" crc="c568c3bd" sha1="c2d33dd6178a8b6c96c8ad8a1616607d0bca2577" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 10 of 14].img" size="737280" crc="76bc16a8" sha1="25be0e9bb2b3dbb09be61745d62d38200065748a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 11 of 14].img" size="737280" crc="66143d27" sha1="f6e3642da6172642fdb1bdb50cd838df2919d41b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 12 of 14].img" size="737280" crc="23f9b40f" sha1="60d0ebf34b2fa15b80d8fbafca5d76b6e588e85a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 13 of 14].img" size="737280" crc="4204f4c9" sha1="46602f8dbffb481d47f0991dc2a5361f5a488be3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [3.5DD] [Disk 14 of 14].img" size="737280" crc="84a8cae6" sha1="063ec4ca40096643515dd170c8e9aabfc43f2176" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingcom2_525" cloneof="wingcom2">
+		<description>Wing Commander II - Vengeance of the Kilrathi (5.25")</description>
+		<year>1991</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 1 of 8].img" size="1228800" crc="77240a47" sha1="bf6579efed01c1cb4b78e835dead2f5ea0ad74c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 2 of 8].img" size="1228800" crc="d97df920" sha1="009bb62522739248badbe6df9fbb45e09b577446" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 3 of 8].img" size="1228800" crc="3b712dca" sha1="a71e63a2416ebf4c4b35a17a0841000720d9e37b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 4 of 8].img" size="1228800" crc="f30daca2" sha1="4f8f4049c8c2f2015d3c9c73d7be9cff8be67f97" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 5 of 8].img" size="1228800" crc="b6f46b70" sha1="3a42eb9a90680c8123173a7a981b1c4100d70135" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 6 of 8].img" size="1228800" crc="cecac616" sha1="e3c932008eda8d2c3dbc9bdf5116df9f934cbd5a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 7 of 8].img" size="1228800" crc="af966d7b" sha1="1bcae647fe8f6efc6f518e86e8b931a59d4414c7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Wing Commander II [ORIGIN Systems] [1991] [5.25HD] [Disk 8 of 8].img" size="1228800" crc="d33c2714" sha1="0a1418d27509eae929fd2b5f22946b945df6d9c2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

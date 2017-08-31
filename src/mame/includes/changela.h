@@ -62,10 +62,11 @@ public:
 	DECLARE_READ8_MEMBER(changela_31_r);
 	DECLARE_READ8_MEMBER(changela_2c_r);
 	DECLARE_READ8_MEMBER(changela_2d_r);
-	DECLARE_WRITE8_MEMBER(mcu_pc_0_w);
-	DECLARE_WRITE8_MEMBER(changela_collision_reset_0);
-	DECLARE_WRITE8_MEMBER(changela_collision_reset_1);
-	DECLARE_WRITE8_MEMBER(changela_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_pc_0_w);
+	DECLARE_WRITE_LINE_MEMBER(collision_reset_0_w);
+	DECLARE_WRITE_LINE_MEMBER(collision_reset_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(changela_colors_w);
 	DECLARE_WRITE8_MEMBER(changela_mem_device_select_w);
 	DECLARE_WRITE8_MEMBER(changela_mem_device_w);

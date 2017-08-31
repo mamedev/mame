@@ -42,6 +42,18 @@ void generic_latch_base_device::device_start()
 {
 	m_data_pending_cb.resolve_safe();
 	save_item(NAME(m_latch_written));
+
+	// synchronization is needed since other devices may not be initialized yet
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_base_device::init_callback), this));
+}
+
+//-------------------------------------------------
+//  init_callback - set initial state
+//-------------------------------------------------
+
+void generic_latch_base_device::init_callback(void *ptr, s32 param)
+{
+	m_data_pending_cb(m_latch_written ? 1 : 0);
 }
 
 //-------------------------------------------------
