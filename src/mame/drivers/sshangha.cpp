@@ -425,6 +425,9 @@ static MACHINE_CONFIG_START( sshangha )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
