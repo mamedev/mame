@@ -43,7 +43,8 @@ public:
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
-		m_ram(*this, "ram")
+		m_ram(*this, "ram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	/* devices */
@@ -72,6 +73,7 @@ public:
 	required_shared_ptr<uint16_t> m_pf3_rowscroll;
 	required_shared_ptr<uint16_t> m_pf4_rowscroll;
 	optional_shared_ptr<uint16_t> m_ram;
+	optional_memory_bank m_okibank;
 
 	/* misc */
 	int        m_scanline;
@@ -84,6 +86,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
 	DECLARE_DRIVER_INIT(stoneage);
 	DECLARE_DRIVER_INIT(mutantf);
 	DECLARE_DRIVER_INIT(cninja);
