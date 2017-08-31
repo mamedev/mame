@@ -741,7 +741,7 @@ void vrc5074_device::update_nile_irqs()
 TIMER_CALLBACK_MEMBER(vrc5074_device::nile_timer_callback)
 {
 	int which = param;
-	uint32_t *regs = &m_cpu_regs[NREG_T0CTRL + which * 4];
+
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
 
 	/* adjust the timer to fire again */
