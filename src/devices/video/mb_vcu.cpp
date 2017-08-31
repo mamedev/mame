@@ -283,8 +283,10 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	uint8_t pen = 0;
 	uint8_t cur_layer;
 
+//	printf("%02x %02x\n",m_mode >> 2,m_mode & 3);
+	
 //  cur_layer = (m_mode & 0x3);
-	cur_layer = 0;
+	cur_layer = (m_mode & 2) >> 1;
 
 	switch(m_mode >> 2)
 	{
@@ -386,6 +388,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 	int dstx,dsty;
 //  uint8_t dot;
 	int bits = 0;
+	#if 0
 	if(m_mode == 0x13 || m_mode == 0x03)
 	{
 		printf("[0] %02x ",m_ram[m_param_offset_latch]);
@@ -399,7 +402,8 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 		printf("VB:%02x ",m_vbank);
 		printf("\n");
 	}
-
+	#endif
+	
 	switch(m_mode)
 	{
 		case 0x13:
@@ -500,34 +504,18 @@ uint32_t mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	int x,y;
 	uint8_t dot;
 
-	bitmap.fill(0x100,cliprect);
+	bitmap.fill(m_palette->pen(0x100),cliprect);
 
 	for(y=0;y<256;y++)
 	{
 		for(x=0;x<256;x++)
 		{
-			dot = read_byte((x >> 0)|(y<<8)|0<<16|(m_vbank ^ 1)<<18);
+			dot = read_byte((x >> 0)|(y<<8)|1<<16|(m_vbank ^ 1)<<18);
 			//if(dot != 0xf)
 			{
 				dot|= m_vregs[1] << 4;
 
 				bitmap.pix32(y,x) = m_palette->pen(dot);
-			}
-		}
-	}
-
-	#if 0
-	for(y=0;y<256;y++)
-	{
-		for(x=0;x<256;x++)
-		{
-			dot = read_byte((x >> 0)|(y<<8)|3<<16);
-
-			if(dot != 0xf)
-			{
-				dot|= m_vregs[1] << 4;
-
-				bitmap.pix32(y,x) = machine().pens[dot];
 			}
 		}
 	}
@@ -542,36 +530,22 @@ uint32_t mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			{
 				dot|= m_vregs[1] << 4;
 
-				bitmap.pix32(y,x) = machine().pens[dot];
+				bitmap.pix32(y,x) = m_palette->pen(dot);
 			}
 		}
 	}
-
-	for(y=0;y<256;y++)
-	{
-		for(x=0;x<256;x++)
-		{
-			dot = read_byte((x >> 0)|(y<<8)|1<<16);
-
-			if(dot != 0xf)
-			{
-				dot|= m_vregs[1] << 4;
-
-				bitmap.pix32(y,x) = machine().pens[dot];
-			}
-		}
-	}
-	#endif
 
 	return 0;
 }
 
 void mb_vcu_device::screen_eof(void)
 {
-	//for(int i=0;i<0x10000;i++)
+	#if 0
+	for(int i=0;i<0x10000;i++)
 	{
-		//write_byte(i|0x00000|m_vbank<<18,0x0f);
+		write_byte(i|0x00000|m_vbank<<18,0x0f);
 		//write_byte(i|0x10000|m_vbank<<18,0x0f);
 		//write_byte(i|0x30000|m_vbank<<18,0x0f);
 	}
+	#endif
 }
