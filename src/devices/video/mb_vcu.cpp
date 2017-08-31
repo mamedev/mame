@@ -377,7 +377,10 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	return 0; // open bus?
 }
 
+
 /*
+Read-Modify-Write operation, not fully understood
+
 ---0 -111 (0x07) write to i/o?
 ---0 -011 (0x03) read to i/o?
 ---1 -011 (0x13) read to vram?
@@ -389,7 +392,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 //  uint8_t dot;
 	int bits = 0;
 	#if 0
-	if(m_mode == 0x13 || m_mode == 0x03)
+	if(m_mode == 0x13) //|| m_mode == 0x03)
 	{
 		printf("[0] %02x ",m_ram[m_param_offset_latch]);
 		printf("X: %04x ",m_xpos);
@@ -408,6 +411,8 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 	{
 		case 0x13:
 		case 0x03:
+		{
+			
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
 				for (xi = 0; xi < m_pix_xsize; xi++)
@@ -417,6 +422,11 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 
 					if(dstx < 256 && dsty < 256)
 					{
+						if(m_mode == 0x03)
+							write_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18, 0xf);
+//						else
+//							write_byte(dstx|dsty<<8|1<<16|(m_vbank)<<18, 0xf);
+
 						#if 0
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
 						dot&= 3;
@@ -445,6 +455,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 				}
 			}
 			break;
+		}
 
 		case 0x07:
 			for(int i=0;i<m_pix_xsize;i++)
@@ -524,7 +535,7 @@ uint32_t mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		for(x=0;x<256;x++)
 		{
-			dot = read_byte((x >> 0)|(y<<8)|0<<16);
+			dot = read_byte((x >> 0)|(y<<8)|0<<16|(m_vbank ^ 1)<<18);
 
 			if(dot != 0xf)
 			{
