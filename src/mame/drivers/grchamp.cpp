@@ -440,7 +440,7 @@ READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
  *************************************/
 TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_w_cb)
 {
-	if ((m_soundlatch_flag != false) && (m_soundlatch_data != param))
+	if (m_soundlatch_flag && (m_soundlatch_data != param))
 		logerror("Warning: soundlatch written before being read. Previous: %02x, new: %02x\n", m_soundlatch_data, param);
 	m_soundlatch_data = param;
 	m_soundlatch_flag = true;
@@ -449,7 +449,7 @@ TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_w_cb)
 
 TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_clear7_w_cb)
 {
-	if (m_soundlatch_flag != false)
+	if (m_soundlatch_flag)
 		logerror("Warning: soundlatch bit 7 cleared before being read. Previous: %02x, new: %02x\n", m_soundlatch_data, m_soundlatch_data&0x7f);
 	m_soundlatch_data &= 0x7F;
 }
