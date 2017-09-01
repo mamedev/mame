@@ -2288,7 +2288,6 @@ Taito, 1988
 
 This PCB comes in two variations: one which is on the older, color prom based P0-025-A PCB as used on extrmatn, drtoppel
 and one which is a unique PCB sort of an 'older version of p0-051-a' which uses color ram like tnzs.
-The color prom version is not dumped yet.
 
 The chukatai (p0-025-a) PCB has a sticker label which says "????????? // CHUKATAISEN"
 The chukatai (p0-028-a) PCB has a sticker label which says "K1100??2A // CHUKATAISEN"
@@ -2335,10 +2334,9 @@ Notes:
       6264: 8K x8 SRAM
       6116: 2K x8 SRAM
 
-The undumped Chuka Taisen set has a daughterboard which plugs into the
+The P0-025-A Chuka Taisen set has a daughterboard which plugs into the
 GFX ROM sockets and allows use of 27c1000d eproms instead of 23c1000 mask roms.
-The undumped set, unlike the two here, runs on an older drtoppel/extrmatn pcb
-and uses color proms!
+This set, unlike the two others, uses color proms!
 
 
 */
@@ -2458,11 +2456,6 @@ ROM_START( chukataija )
 	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
 	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
-
-/*An undumped set of chuka taisen exists with all roms in the b44-14
-thru b44-25 number range and 27c1000d gfx roms, AND COLOR PROMS, using the older p0-025-a pcb
-This set, unlike the others, does use the b06-10.pal16l8a.d9.jed "older" pal rather than the 'newer' b06-101.pal16l8a.d9.jed pal.
-*/
 
 
 /*
