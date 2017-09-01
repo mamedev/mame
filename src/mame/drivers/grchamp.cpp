@@ -52,6 +52,8 @@
 
     -   The Speech Feature enhances the game play.
 
+    -   Schematics: https://ia800501.us.archive.org/16/items/ArcadeGameManualGrandchampion/grandchampion.pdf
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -108,7 +110,7 @@ void grchamp_state::machine_start()
 
 	void grchamp_state::machine_reset()
 {
-	m_soundnmi->in_w<0>(1); // disable sound nmi
+	m_soundnmi->in_w<0>(0); // disable sound nmi
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
 	machine().bookkeeping().coin_lockout_w(1, (ioport("DSWB")->read() & 0x10) ? 1 : 0);
 }
