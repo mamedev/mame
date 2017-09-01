@@ -2449,8 +2449,8 @@ ROM_START( chukataija )
 	ROM_LOAD( "b44-28.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, BAD_DUMP CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )  /* hi bytes, AM27S29 or compatible like MB7124 - NOT dumped yet B44-29?? */
-	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, BAD_DUMP CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )  /* lo bytes, AM27S29 or compatible like MB7124 - NOT dumped yet B44-30?? */
+	ROM_LOAD( "b44-30.15f", 0x00000, 0x200, CRC(b3de8312) SHA1(dac0d9bfb593d691fd7030e2b1b13be1218929a4) )  /* hi bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b44-29.17f", 0x00200, 0x200, CRC(ae44b8fb) SHA1(2bf5aca32bb301c0187deb05a3f4a482ac97f0ef) )  /* lo bytes, AM27S29 or compatible like MB7124 */
 
 	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
 	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
@@ -2880,7 +2880,7 @@ GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   0, ROT90,  
 GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
 GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito America Corporation", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
 GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chukataija,chukatai, extrmatn, chukatau, extrmatn_state, 0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* Higher rom ID# but older PCB stock - Missing color proms */
+GAME( 1988, chukataija,chukatai, extrmatn, chukatau, extrmatn_state, 0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Higher rom ID# but older PCB stock */
 
 GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    0, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
