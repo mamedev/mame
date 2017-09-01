@@ -2676,30 +2676,6 @@ ADDRESS_MAP_END
                                 Krazy Bowl
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::krzybowl_input_r)
-{
-	// analog ports
-	int dir1x = m_track1_x->read() & 0xfff;
-	int dir1y = m_track1_y->read() & 0xfff;
-	int dir2x = m_track2_x->read() & 0xfff;
-	int dir2y = m_track2_y->read() & 0xfff;
-
-	switch (offset)
-	{
-		case 0x0/2: return dir1x & 0xff;
-		case 0x2/2: return dir1x >> 8;
-		case 0x4/2: return dir1y & 0xff;
-		case 0x6/2: return dir1y >> 8;
-		case 0x8/2: return dir2x & 0xff;
-		case 0xa/2: return dir2x >> 8;
-		case 0xc/2: return dir2y & 0xff;
-		case 0xe/2: return dir2y >> 8;
-		default:
-			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
-			return 0;
-	}
-}
-
 static ADDRESS_MAP_START( krzybowl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM                             // RAM
@@ -2710,7 +2686,8 @@ static ADDRESS_MAP_START( krzybowl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")              // Coins
-	AM_RANGE(0x600000, 0x60000f) AM_READ(krzybowl_input_r)          // P1
+	AM_RANGE(0x600000, 0x600007) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0x00ff) // P1 trackball
+	AM_RANGE(0x600008, 0x60000f) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff) // P2 trackball
 	AM_RANGE(0x8000f0, 0x8000f1) AM_RAM                             // NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM                             // NVRAM
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
@@ -4992,7 +4969,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 #define KRZYBOWL_TRACKBALL(_dir_, _n_ ) \
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_PLAYER(_n_) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_REVERSE
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_PLAYER(_n_) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET
 
 static INPUT_PORTS_START( krzybowl )
 	PORT_START("P1") //Player 1
@@ -8940,6 +8917,14 @@ static MACHINE_CONFIG_START( krzybowl )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(krzybowl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK1_X")
+	MCFG_UPD4701_PORTY("TRACK1_Y")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK2_X")
+	MCFG_UPD4701_PORTY("TRACK2_Y")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")

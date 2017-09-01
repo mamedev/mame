@@ -155,7 +155,6 @@ public:
 	DECLARE_READ16_MEMBER(keroppi_protection_init_r);
 	DECLARE_READ16_MEMBER(keroppi_coin_r);
 	DECLARE_WRITE16_MEMBER(keroppi_prize_w);
-	DECLARE_READ16_MEMBER(krzybowl_input_r);
 	DECLARE_WRITE16_MEMBER(msgundam_vregs_w);
 	DECLARE_READ16_MEMBER(kiwame_nvram_r);
 	DECLARE_WRITE16_MEMBER(kiwame_nvram_w);
