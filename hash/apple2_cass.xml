@@ -38,7 +38,7 @@
 		<description>Startrek / Starwars</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="usage" value="16K &gt;Load" />
+		<info name="usage" value="16K >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Side A: Startrek"/>
 			<dataarea name="cass" size="4134574">
