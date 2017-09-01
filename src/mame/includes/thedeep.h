@@ -48,7 +48,6 @@ public:
 	uint8_t m_mcu_p3_reg;
 
 	DECLARE_WRITE8_MEMBER(nmi_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(e004_r);
 	DECLARE_READ8_MEMBER(protection_r);
