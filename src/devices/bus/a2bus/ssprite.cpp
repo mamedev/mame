@@ -127,7 +127,8 @@ void a2bus_ssprite_device::write_c0nx(address_space &space, uint8_t offset, uint
 		case 2:
 			m_tms5220->data_w(space, offset, data);
 			break;
-		case 12 ... 13:
+		case 12:
+		case 13:
 			m_ay->data_w(space, 0, data);
 			break;
 		case 14:
