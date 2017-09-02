@@ -213,13 +213,13 @@ std::string &strmakeupper(std::string& str)
 }
 
 /**
- * @fn  std::string strmakelower(std::string& str)
+ * @fn  std::string &strmakelower(std::string& str)
  *
- * @brief   Strmakelowers the given string.
+ * @brief   Changes the given string to lower case.
  *
- * @param [in,out]  str The string.
+ * @param [in,out]  str The string to make lower case
  *
- * @return  A std::string.
+ * @return  A reference to the original std::string having been changed to lower case
  */
 
 std::string &strmakelower(std::string& str)
