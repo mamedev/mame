@@ -4959,8 +4959,10 @@ ROM_START( royaljp )
 	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "royaljp_nvram.bin",  0x0000, 0x0800, CRC(48e51e2a) SHA1(b81a1741eef299384d4fa98a534099b2c0332074) )
 
-//	ROM_REGION( 0x0200, "plds", 0 ) /* There are 3 GALs */
-//	ROM_LOAD( "tab01_3.bin",    0x0000, 0x0104, CRC(a13a7a0a) SHA1(28e918ece4dcfa3883d2439c226b2f125d43f386) )
+	ROM_REGION( 0x0600, "plds", 0 ) /* There are 3 GALs */
+	ROM_LOAD( "gal20v8b.bin",    0x0000, 0x0157,   NO_DUMP )
+	ROM_LOAD( "gal20v8a.bin",    0x0200, 0x0157,   NO_DUMP )
+	ROM_LOAD( "gal16v8d.bin",    0x0400, 0x0117,   NO_DUMP )
 ROM_END
 
 
