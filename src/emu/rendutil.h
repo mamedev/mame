@@ -5,6 +5,7 @@
     rendutil.h
 
     Core rendering utilities.
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_RENDUTIL_H
@@ -15,6 +16,18 @@
 #include "render.h"
 
 #include <math.h>
+
+
+/* ----- image formats ----- */
+
+enum ru_imgformat
+{
+	RENDUTIL_IMGFORMAT_PNG,
+
+	RENDUTIL_IMGFORMAT_UNKNOWN,
+	RENDUTIL_IMGFORMAT_ERROR
+};
+
 
 
 /***************************************************************************
@@ -29,6 +42,7 @@ bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_q
 void render_line_to_quad(const render_bounds *bounds, float width, float length_extension, render_bounds *bounds0, render_bounds *bounds1);
 void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename);
 bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename, bool load_as_alpha_to_existing = false);
+ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char *filename);
 
 
 
