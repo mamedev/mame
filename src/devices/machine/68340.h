@@ -80,8 +80,6 @@ public:
 	WRITE32_MEMBER( m68340_internal_base_w );
 	READ32_MEMBER( m68340_internal_dma_r );
 	WRITE32_MEMBER( m68340_internal_dma_w );
-	READ32_MEMBER( m68340_internal_serial_r );
-	WRITE32_MEMBER( m68340_internal_serial_w );
 	READ16_MEMBER( m68340_internal_sim_r );
 	READ8_MEMBER( m68340_internal_sim_ports_r );
 	READ32_MEMBER( m68340_internal_sim_cs_r );
@@ -104,6 +102,9 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	required_device<m68340_serial> m_serial;
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
 	TIMER_CALLBACK_MEMBER(timer1_callback);
@@ -127,7 +128,6 @@ protected:
 	/* 68340 peripheral modules */
 	m68340_sim*    m68340SIM;
 	m68340_dma*    m68340DMA;
-	m68340_serial* m68340SERIAL;
 	m68340_timer*  m68340TIMER;
 
 	uint32_t m68340_base;

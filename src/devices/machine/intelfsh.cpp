@@ -204,6 +204,15 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0xda;
 		m_top_boot_sector = true;
 		break;
+#if 0
+	case FLASH_AMD_29F800B_16BIT:
+		m_bits = 16;
+		m_size = 0x100000;
+		m_maker_id = MFG_AMD;
+		m_device_id = 0xda;
+		m_top_boot_sector = false;
+		break;
+#endif
 	case FLASH_AMD_29LV200T:
 		m_bits = 8;
 		m_size = 0x40000;
