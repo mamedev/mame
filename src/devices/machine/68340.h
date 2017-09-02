@@ -51,6 +51,8 @@
 
 class m68340_cpu_device : public fscpu32_device
 {
+	friend class m68340_serial;
+
 public:
 	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

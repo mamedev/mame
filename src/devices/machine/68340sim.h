@@ -25,7 +25,7 @@ public:
 	uint16_t m_mcr;		// 0x608f
 	uint16_t m_syncr;	// 0x3f00
 	uint16_t m_avr_rsr;	// 0x0000
-	uint16_t m_swiv_sypcr;//0x0f00
+	uint16_t m_swiv_sypcr;	// 0x0f00
 	uint16_t m_picr;	// 0x000f
 	uint16_t m_pitr;	// 0x0000 | ~MODCK pin
 	uint16_t m_swsr;	// 0x0000

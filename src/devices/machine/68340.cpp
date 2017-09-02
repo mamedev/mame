@@ -108,7 +108,6 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 
 }
 
-
 static ADDRESS_MAP_START( m68340_internal_map, AS_PROGRAM, 32, m68340_cpu_device )
 	AM_RANGE(0x0003ff00, 0x0003ff03) AM_READWRITE( m68340_internal_base_r, m68340_internal_base_w)
 ADDRESS_MAP_END
@@ -119,6 +118,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 MACHINE_CONFIG_MEMBER( m68340_cpu_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("serial", M68340_SERIAL_MODULE, 0)
+	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("serial", m68340_serial, irq_w))
 MACHINE_CONFIG_END
 
 

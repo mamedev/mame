@@ -13,8 +13,9 @@
 #define LOG_SETUP   (1U <<  1)
 #define LOG_READ    (1U <<  2)
 #define LOG_SERIAL  (1U <<  3)
+#define LOG_INT     (1U <<  4)
 
-#define VERBOSE  (LOG_SETUP|LOG_READ|LOG_SERIAL)
+#define VERBOSE  (LOG_SETUP|LOG_READ|LOG_SERIAL|LOG_INT)
 #define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
 
 #include "logmacro.h"
@@ -23,12 +24,19 @@
 #define LOGSETUP(...)  LOGMASKED(LOG_SETUP,  __VA_ARGS__)
 #define LOGR(...)      LOGMASKED(LOG_READ,   __VA_ARGS__)
 #define LOGSERIAL(...) LOGMASKED(LOG_SERIAL, __VA_ARGS__)
+#define LOGINT(...)    LOGMASKED(LOG_INT,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+void m68340_serial::device_start()
+{
+	m_cpu = downcast<m68340_cpu_device *>(owner());
+	mc68681_base_device::device_start();
+}
 
 READ8_MEMBER( m68340_serial::read )
 {
@@ -79,7 +87,7 @@ READ8_MEMBER( m68340_serial::read )
 		 "MR1B", "SRB",  "n/a",  "RBB",  "n/a",  "IP",   "n/a",  "n/a",  // 0x18 - 0x1f
 		 "MR2A", "MR2B" }}[offset]);                                     // 0x20 - 0x21
 	
-	return offset >= 0x10 && offset < 0x22 ? m_duart->read(space, offset - 0x10, mem_mask) : val;
+	return offset >= 0x10 && offset < 0x22 ? mc68681_base_device::read(space, offset - 0x10, mem_mask) : val;
 }
 
 WRITE8_MEMBER( m68340_serial::write )
@@ -132,35 +140,30 @@ WRITE8_MEMBER( m68340_serial::write )
 		LOGSERIAL("- Interrupt Vector: %02x - not implemented\n", data);
 		break;
 	default:
-		if (offset >= 0x10 && offset < 0x22) m_duart->write(space, offset - 0x10, data, mem_mask);
+		if (offset >= 0x10 && offset < 0x22) mc68681_base_device::write(space, offset - 0x10, data, mem_mask);
 	}
 
 }
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-MACHINE_CONFIG_MEMBER( m68340_serial::device_add_mconfig )
-	MCFG_DEVICE_ADD("duart", M68340SERIAL, 0)
-MACHINE_CONFIG_END
+WRITE_LINE_MEMBER( m68340_serial::irq_w )
+{
+	LOGINT("IRQ!\n%s\n", FUNCNAME);
+	if (m_ilr > 0)
+	{
+		if (((m_cpu->m68340SIM->m_avr_rsr >> (8 + m_ilr)) & 1) != 0) // use autovector ?
+		{
+			m_cpu->set_input_line(m_ilr, HOLD_LINE);
+		}
+		else // otherwise not...
+		{
+			m_cpu->set_input_line_and_vector(m_ilr, HOLD_LINE, m_ivr);
+		}
+	}
+}
 
 m68340_serial::m68340_serial(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, M68340_SERIAL_MODULE, tag, owner, clock),
-	m_duart(*this, "duart")
+  : m68340_serial_device(mconfig, "serial", owner, clock)
 {
-}
-
-void m68340_serial::device_start()
-{
-	LOGSETUP("%s\n", FUNCNAME);
-}
-
-void m68340_serial::device_reset()
-{
-	LOGSETUP("%s %s \n",tag(), FUNCNAME);
-
-	// Do channel reset
-	m_duart->reset();
 }
 
 DEFINE_DEVICE_TYPE(M68340_SERIAL_MODULE, m68340_serial,   "m68340 serial module",         "Motorola 68340 Serial Module")

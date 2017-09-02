@@ -7,21 +7,24 @@
 
 #include "machine/mc68681.h"
 
-class m68340_serial : public device_t
+class m68340_cpu_device;
+
+class m68340_serial : public m68340_serial_device
 {
-public:
+	friend class m68340_cpu_device;
+
+ public:
 	m68340_serial(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
-	READ8_MEMBER( read );
-	WRITE8_MEMBER( write );	
+	READ8_MEMBER( read ) override;
+	WRITE8_MEMBER( write ) override;
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
-	//protected:
-	required_device<m68340_serial_device> m_duart;
+protected:
+	m68340_cpu_device *m_cpu;
 
 	// Module registers not in the DUART part
 	uint8_t m_mcrh;
