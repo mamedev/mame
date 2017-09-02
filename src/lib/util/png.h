@@ -57,6 +57,7 @@ public:
 
 	~png_info() { free_data(); }
 
+	png_error verify_header(util::core_file &fp);
 	png_error read_file(util::core_file &fp);
 	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
 	png_error expand_buffer_8bit();

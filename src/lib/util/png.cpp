@@ -413,21 +413,6 @@ private:
 		return ((samples[pnginfo.color_type] * pnginfo.bit_depth) + 7) >> 3;
 	}
 
-	static png_error verify_header(util::core_file &fp)
-	{
-		uint8_t signature[8];
-
-		/* read 8 bytes */
-		if (fp.read(signature, 8) != 8)
-			return PNGERR_FILE_TRUNCATED;
-
-		/* return an error if we don't match */
-		if (memcmp(signature, PNG_Signature, 8) != 0)
-			return PNGERR_BAD_SIGNATURE;
-
-		return PNGERR_NONE;
-	}
-
 	static png_error read_chunk(util::core_file &fp, std::unique_ptr<std::uint8_t []> &data, std::uint32_t &type, std::uint32_t &length)
 	{
 		std::uint8_t tempbuff[4];
@@ -705,6 +690,21 @@ public:
 		return PNGERR_NONE;
 	}
 
+	png_error verify_header(util::core_file &fp)
+	{
+		uint8_t signature[8];
+
+		/* read 8 bytes */
+		if (fp.read(signature, 8) != 8)
+			return PNGERR_FILE_TRUNCATED;
+
+		/* return an error if we don't match */
+		if (memcmp(signature, PNG_Signature, 8) != 0)
+			return PNGERR_BAD_SIGNATURE;
+
+		return PNGERR_NONE;
+	}
+
 	png_error read_file(util::core_file &fp)
 	{
 		// initialize the data structures
@@ -753,6 +753,17 @@ constexpr unsigned png_private::ADAM7_Y_OFFS[7];
 } // anonymous namespace
 
 
+
+
+/*-------------------------------------------------
+    verify_header - verify PNG file header from a
+    core stream
+-------------------------------------------------*/
+
+png_error png_info::verify_header(util::core_file &fp)
+{
+	return png_private(*this).verify_header(fp);
+}
 
 
 /*-------------------------------------------------
