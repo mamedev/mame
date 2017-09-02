@@ -4938,7 +4938,7 @@ ROM_END
 
 
 /*
-  Royal Jackpot (Video Klein)
+  Royal Card / Royal Jackpot (with third draw) (encrypted)
 
   Encrypted graphics 'alla TAB blue PCB.
   Maybe is the infamous encrypted Impera green PCB.
@@ -4956,10 +4956,10 @@ ROM_START( royaljp )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "rj_d27hc65d-2_(82s147).bin",  0x0000, 0x0200, CRC(d6570420) SHA1(90b6c126b485db823acffbfd195964a6282e60ea) )
 
-//	ROM_REGION( 0x0800, "nvram", 0 )
-//	ROM_LOAD( "royalcrdt_nv.bin",  0x0000, 0x0800, CRC(67a6e68b) SHA1(d7ab01c4d9bd4fe58b5d0f4a945c00c5c4906008) )
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "royaljp_nvram.bin",  0x0000, 0x0800, CRC(48e51e2a) SHA1(b81a1741eef299384d4fa98a534099b2c0332074) )
 
-//	ROM_REGION( 0x0200, "plds", 0 ) /* Device type is 16L8 */
+//	ROM_REGION( 0x0200, "plds", 0 ) /* There are 3 GALs */
 //	ROM_LOAD( "tab01_3.bin",    0x0000, 0x0104, CRC(a13a7a0a) SHA1(28e918ece4dcfa3883d2439c226b2f125d43f386) )
 ROM_END
 
