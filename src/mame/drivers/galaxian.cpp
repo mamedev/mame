@@ -5724,13 +5724,6 @@ static MACHINE_CONFIG_DERIVED( konami_base, galaxian_base )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scramble_base, konami_base )
-	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
-
-	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("stars", galaxian_state, scramble_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
-MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_START( konami_sound_1x_ay8910 )
 
@@ -5786,6 +5779,14 @@ static MACHINE_CONFIG_START( konami_sound_2x_ay8910 )
 	MCFG_SOUND_ADD("konami", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(konami_sound)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( scramble_base, konami_base )
+	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+
+	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("stars", galaxian_state, scramble_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
 MACHINE_CONFIG_END
 
 
