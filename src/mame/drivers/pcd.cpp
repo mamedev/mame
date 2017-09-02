@@ -495,8 +495,11 @@ static MACHINE_CONFIG_START( pcd )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL_16MHz / 24)) // adjusted to pass post
 
-	MCFG_PIC8259_ADD("pic1", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NOOP)
-	MCFG_PIC8259_ADD("pic2", DEVWRITELINE("maincpu", i80186_cpu_device, int1_w), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
+
+	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
 
 	MCFG_DEVICE_ADD("video", PCD_VIDEO, 0)
 

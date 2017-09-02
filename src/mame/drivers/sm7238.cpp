@@ -360,7 +360,8 @@ static MACHINE_CONFIG_START( sm7238 )
 	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm7238)
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("t_hblank", PIT8253, 0)
 	MCFG_PIT8253_CLK1(XTAL_16_384MHz/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise

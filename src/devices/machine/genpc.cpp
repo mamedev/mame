@@ -426,7 +426,8 @@ MACHINE_CONFIG_MEMBER( ibm5160_mb_device::device_add_mconfig )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(ibm5160_mb_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ibm5160_mb_device, pc_dack3_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE(":maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(ibm5160_mb_device, pc_ppi_porta_r))

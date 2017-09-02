@@ -909,8 +909,14 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(octopus_state, dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(octopus_state, dack7_w))
 
-	MCFG_PIC8259_ADD("pic_master", INPUTLINE("maincpu",0), VCC, READ8(octopus_state,get_slave_ack))
-	MCFG_PIC8259_ADD("pic_slave", DEVWRITELINE("pic_master",pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(octopus_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	// RTC (MC146818 via i8255 PPI)
 	MCFG_DEVICE_ADD("ppi", I8255, 0)

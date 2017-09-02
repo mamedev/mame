@@ -172,9 +172,14 @@ static MACHINE_CONFIG_START( bebox )
 
 	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
 
-	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(bebox_state,bebox_pic8259_master_set_int_line), VCC, READ8(bebox_state,get_slave_ack) )
+	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(bebox_state, bebox_pic8259_master_set_int_line))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(bebox_state, get_slave_ack))
 
-	MCFG_PIC8259_ADD( "pic8259_2", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(bebox_state, bebox_pic8259_slave_set_int_line))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD( "ns16550_0", NS16550, 0 )   /* TODO: Verify model */
 	MCFG_DEVICE_ADD( "ns16550_1", NS16550, 0 )   /* TODO: Verify model */
