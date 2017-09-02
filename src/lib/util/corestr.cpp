@@ -171,7 +171,7 @@ void strreplacechr(std::string& str, char ch, char newch)
 	}
 }
 
-static std::string internal_strtrimspace(std::string& str, bool right_only)
+static std::string &internal_strtrimspace(std::string& str, bool right_only)
 {
 	// identify the start
 	std::string::iterator start = str.begin();
@@ -196,17 +196,17 @@ static std::string internal_strtrimspace(std::string& str, bool right_only)
 	return str;
 }
 
-std::string strtrimspace(std::string& str)
+std::string &strtrimspace(std::string& str)
 {
 	return internal_strtrimspace(str, false);
 }
 
-std::string strtrimrightspace(std::string& str)
+std::string &strtrimrightspace(std::string& str)
 {
 	return internal_strtrimspace(str, true);
 }
 
-std::string strmakeupper(std::string& str)
+std::string &strmakeupper(std::string& str)
 {
 	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 	return str;
@@ -222,7 +222,7 @@ std::string strmakeupper(std::string& str)
  * @return  A std::string.
  */
 
-std::string strmakelower(std::string& str)
+std::string &strmakelower(std::string& str)
 {
 	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 	return str;
