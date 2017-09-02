@@ -29146,6 +29146,9 @@ nc100                           // 1992 NC100
 nc150                           // 1992 NC150
 nc200                           // 1993 NC200
 
+@source:nds.cpp
+nds                             // 2004 Nintendp
+
 @source:nemesis.cpp
 blkpnthr                        // GX604 (c) 1987 (Japan)
 bubsys                          //
