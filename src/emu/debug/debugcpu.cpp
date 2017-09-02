@@ -79,9 +79,8 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	/* add the temporary variables to the global symbol table */
 	for (int regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
 	{
-		char symname[10];
-		sprintf(symname, "temp%d", regnum);
-		m_symtable->add(symname, symbol_table::READ_WRITE, &m_tempvar[regnum]);
+		std::string symname = util::string_format("temp%d", regnum);
+		m_symtable->add(std::move(symname), symbol_table::READ_WRITE, &m_tempvar[regnum]);
 	}
 
 	/* first CPU is visible by default */
@@ -1560,7 +1559,7 @@ device_debug::device_debug(device_t &device)
 		for (const auto &entry : m_state->state_entries())
 		{
 			strmakelower(tempstr.assign(entry->symbol()));
-			m_symtable.add(tempstr.c_str(), (void *)(uintptr_t)entry->index(), get_state, set_state, entry->format_string());
+			m_symtable.add(std::move(tempstr), (void *)(uintptr_t)entry->index(), get_state, set_state, entry->format_string());
 		}
 	}
 
