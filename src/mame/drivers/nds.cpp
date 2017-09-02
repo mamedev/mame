@@ -11,21 +11,6 @@
 #include "emu.h"
 #include "includes/nds.h"
 
-#define VERBOSE_LEVEL   (0)
-
-static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%08x: %s", device.machine().describe_context(), buf );
-	}
-}
-
 static ADDRESS_MAP_START( nds_arm9_map, AS_PROGRAM, 32, nds_state )
 	AM_RANGE(0x00000000, 0x00000fff) AM_ROM
 	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_SHARE("mainram")
