@@ -1123,8 +1123,8 @@ ROM_END
 //    YEAR  NAME       PARENT    MACHINE   INPUT      STATE         INIT  MONITOR  COMPANY                      FULLNAME                                 FLAGS
 GAME( 1988, syvalion,  0,        syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionu, syvalion, syvalion, syvalionp, taitoh_state, 0,    ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionw, syvalion, syvalion, syvalionp, taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state, 0,    ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state, 0,    ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)",        MACHINE_SUPPORTS_SAVE )
