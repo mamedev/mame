@@ -60,11 +60,14 @@
 #include "machine/6840ptm.h"
 #include "bus/hp_dio/hp_dio.h"
 #include "bus/hp_dio/hp98544.h"
+#include "bus/hp_hil/hp_hil.h"
+#include "bus/hp_hil/hil_devices.h"
 #include "screen.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG "iocpu"
 #define PTM6840_TAG "ptm"
+#define MLC_TAG "mlc"
 
 class hp9k3xx_state : public driver_device
 {
@@ -73,12 +76,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_iocpu(*this, IOCPU_TAG),
+		m_mlc(*this, MLC_TAG),
 		m_vram16(*this, "vram16"),
 		m_vram(*this, "vram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8042_device> m_iocpu;
+	optional_device<hp_hil_mlc_device> m_mlc;
 	virtual void machine_reset() override;
 
 	optional_shared_ptr<uint16_t> m_vram16;
@@ -91,6 +96,13 @@ public:
 	DECLARE_WRITE16_MEMBER(buserror16_w);
 	DECLARE_READ32_MEMBER(buserror_r);
 	DECLARE_WRITE32_MEMBER(buserror_w);
+
+	/* 8042 interface */
+	DECLARE_WRITE8_MEMBER(iocpu_port1_w);
+        DECLARE_WRITE8_MEMBER(iocpu_port2_w);
+        DECLARE_READ8_MEMBER(iocpu_port1_r);
+        DECLARE_READ8_MEMBER(iocpu_test0_r);
+
 	DECLARE_WRITE32_MEMBER(led_w)
 	{
 		if (mem_mask != 0x000000ff)
@@ -117,6 +129,10 @@ public:
 private:
 	bool m_in_buserr;
 	uint32_t m_last_buserr_pc;
+
+	bool m_hil_read;
+	uint8_t m_hil_data;
+	uint8_t m_latch_data;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -160,6 +176,8 @@ ADDRESS_MAP_END
 // 9000/310 - has onboard video that the graphics card used in other 3xxes conflicts with
 static ADDRESS_MAP_START(hp9k310_map, AS_PROGRAM, 16, hp9k3xx_state)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITENOP  // writes to 1fffc are the LED
+
+	AM_RANGE(0x00428000, 0x00428003) AM_DEVREADWRITE8(IOCPU_TAG, upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff)
 
 	AM_RANGE(0x510000, 0x510003) AM_READWRITE(buserror16_r, buserror16_w)   // no "Alpha display"
 	AM_RANGE(0x538000, 0x538003) AM_READWRITE(buserror16_r, buserror16_w)   // no "Graphics"
@@ -315,6 +333,41 @@ WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 	}
 }
 
+WRITE8_MEMBER(hp9k3xx_state::iocpu_port1_w)
+{
+	m_hil_data = data;
+}
+
+static constexpr uint8_t HIL_CS = 0x01;
+static constexpr uint8_t HIL_WE = 0x02;
+static constexpr uint8_t HIL_OE = 0x04;
+static constexpr uint8_t LATCH_EN = 0x08;
+
+WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
+{
+	if ((data & (HIL_CS|HIL_WE)) == 0)
+		m_mlc->write(space, (m_latch_data & 0xc0) >> 6, m_hil_data, 0xff);
+
+	m_hil_read = ((data & (HIL_CS|HIL_OE)) == 0);
+
+	if (!(data & LATCH_EN))
+		m_latch_data = m_hil_data;
+
+	m_maincpu->set_input_line(M68K_IRQ_1, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(hp9k3xx_state::iocpu_port1_r)
+{
+        if (m_hil_read)
+                return m_mlc->read(space, (m_latch_data & 0xc0) >> 6, 0xff);
+	return 0xff;
+}
+
+READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
+{
+        return !m_mlc->get_int();
+}
+
 static SLOT_INTERFACE_START(dio16_cards)
 	SLOT_INTERFACE("98544", HPDIO_98544) /* 98544 High Resolution Monochrome Card */
 SLOT_INTERFACE_END
@@ -326,6 +379,13 @@ static MACHINE_CONFIG_START( hp9k310 )
 
 	MCFG_CPU_ADD(IOCPU_TAG, I8042, 5000000)
 	MCFG_CPU_PROGRAM_MAP(iocpu_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
+
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
@@ -343,6 +403,13 @@ static MACHINE_CONFIG_START( hp9k320 )
 
 	MCFG_CPU_ADD(IOCPU_TAG, I8042, 5000000)
 	MCFG_CPU_PROGRAM_MAP(iocpu_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
+
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)

@@ -133,6 +133,7 @@ public:
 	template <class Object> static devcb_base &set_nmi_callback(device_t &device, Object &&cb) { return downcast<hp_hil_mlc_device &>(device).nmi_cb.set_callback(std::forward<Object>(cb)); }
 
 	void add_hp_hil_device(device_hp_hil_interface *device);
+	bool get_int(void) { return m_r3 & 1; }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
