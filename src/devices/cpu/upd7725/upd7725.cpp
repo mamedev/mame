@@ -508,15 +508,17 @@ void necdsp_device::exec_op(uint32_t opcode) {
 
 	exec_ld((regs.idb << 6) + dst);
 
-	switch(dpl) {
-	case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
-	case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
-	case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
+	if (dst != 4) {
+		switch(dpl) {
+		case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
+		case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
+		case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
+		}
+
+		regs.dp ^= dphm << 4;
 	}
 
-	regs.dp ^= dphm << 4;
-
-	if(rpdcr) regs.rp--;
+	if(rpdcr && (dst != 5)) regs.rp--;
 }
 
 void necdsp_device::exec_rt(uint32_t opcode) {
