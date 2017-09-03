@@ -91,7 +91,7 @@ enum
 #define Z8_P01M_P0L_MODE_MASK       0x03
 #define Z8_P01M_P0L_MODE_OUTPUT     0x00
 #define Z8_P01M_P0L_MODE_INPUT      0x01
-#define Z8_P01M_P0L_MODE_A8_A11     0x02    /* not supported */
+#define Z8_P01M_P0L_MODE_A8_A11     0x02
 #define Z8_P01M_INTERNAL_STACK      0x04
 #define Z8_P01M_P1_MODE_MASK        0x18
 #define Z8_P01M_P1_MODE_OUTPUT      0x00
@@ -102,7 +102,7 @@ enum
 #define Z8_P01M_P0H_MODE_MASK       0xc0
 #define Z8_P01M_P0H_MODE_OUTPUT     0x00
 #define Z8_P01M_P0H_MODE_INPUT      0x40
-#define Z8_P01M_P0H_MODE_A12_A15    0x80    /* not supported */
+#define Z8_P01M_P0H_MODE_A12_A15    0x80
 
 #define Z8_P3M_P2_ACTIVE_PULLUPS    0x01    /* not supported */
 #define Z8_P3M_P0_STROBED           0x04    /* not supported */
@@ -234,11 +234,55 @@ device_memory_interface::space_config_vector z8_device::memory_space_config() co
     INLINE FUNCTIONS
 ***************************************************************************/
 
+uint16_t z8_device::mask_external_address(uint16_t addr)
+{
+	switch (P01M & (Z8_P01M_P0L_MODE_A8_A11 | Z8_P01M_P0H_MODE_A12_A15))
+	{
+		case 0:
+			addr = (addr & 0x00ff) | register_read(Z8_REGISTER_P0) << 8;
+			break;
+
+		case Z8_P01M_P0L_MODE_A8_A11:
+			addr = (addr & 0x0fff) | (register_read(Z8_REGISTER_P0) & 0xf0) << 8;
+			break;
+
+		case Z8_P01M_P0H_MODE_A12_A15:
+			addr = (addr & 0xf0ff) | (register_read(Z8_REGISTER_P0) & 0x0f) << 8;
+			break;
+	}
+	return addr;
+}
+
+
 uint8_t z8_device::fetch()
 {
-	uint8_t data = m_direct->read_byte(m_pc);
+	uint16_t real_pc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
+	uint8_t data = m_direct->read_byte(real_pc);
 
 	m_pc++;
+
+	return data;
+}
+
+
+uint8_t z8_device::fetch_opcode()
+{
+	m_ppc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
+	debugger_instruction_hook(this, m_ppc);
+
+	uint8_t data = m_direct->read_byte(m_ppc);
+
+	m_pc++;
+
+	return data;
+}
+
+
+uint16_t z8_device::fetch_word()
+{
+	// ensure correct order of operations by using separate instructions
+	uint16_t data = fetch() << 8;
+	data |= fetch();
 
 	return data;
 }
@@ -709,7 +753,7 @@ void z8_device::device_start()
 	{
 		state_add(Z8_PC,         "PC",        m_pc);
 		state_add(STATE_GENPC,   "GENPC",     m_pc).noshow();
-		state_add(STATE_GENPCBASE, "CURPC",   m_pc).noshow();
+		state_add(STATE_GENPCBASE, "CURPC",   m_ppc).noshow();
 		state_add(Z8_SP,         "SP",        m_fake_sp).callimport().callexport();
 		state_add(STATE_GENSP,   "GENSP",     m_fake_sp).callimport().callexport().noshow();
 		state_add(Z8_RP,         "RP",        m_r[Z8_REGISTER_RP]);
@@ -773,17 +817,12 @@ void z8_device::execute_run()
 {
 	do
 	{
-		uint8_t opcode;
-		int cycles;
-
-		debugger_instruction_hook(this, m_pc);
-
 		/* TODO: sample interrupts */
 		m_input[3] = m_input_cb[3]();
 
 		/* fetch opcode */
-		opcode = fetch();
-		cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
+		uint8_t opcode = fetch_opcode();
+		int cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
 
 		/* execute instruction */
 		(this->*(Z8601_OPCODE_MAP[opcode].function))(opcode, &cycles);
@@ -800,10 +839,6 @@ void z8_device::execute_run()
 void z8_device::device_reset()
 {
 	m_pc = 0x000c;
-
-	// crude hack for Z8681
-	if (m_rom_size == 0)
-		m_pc |= m_input_cb[0]() << 8;
 
 	register_write(Z8_REGISTER_TMR, 0x00);
 	register_write(Z8_REGISTER_PRE1, PRE1 & 0xfc);

@@ -114,6 +114,7 @@ private:
 
 	/* registers */
 	uint16_t m_pc;              /* program counter */
+	uint16_t m_ppc;             /* program counter at last opcode fetch */
 	uint8_t m_r[256];           /* register file */
 	uint8_t m_input[4];         /* port input latches */
 	uint8_t m_output[4];        /* port output latches */
@@ -137,7 +138,10 @@ private:
 	TIMER_CALLBACK_MEMBER( t0_tick );
 	TIMER_CALLBACK_MEMBER( t1_tick );
 
+	inline uint16_t mask_external_address(uint16_t addr);
 	inline uint8_t fetch();
+	inline uint8_t fetch_opcode();
+	inline uint16_t fetch_word();
 	inline uint8_t register_read(uint8_t offset);
 	inline uint16_t register_pair_read(uint8_t offset);
 	inline void register_write(uint8_t offset, uint8_t data);
@@ -152,10 +156,10 @@ private:
 	inline void set_flag(uint8_t flag, int state);
 	inline void clear(uint8_t dst);
 	inline void load(uint8_t dst, uint8_t src);
-	inline void load_from_memory(address_space *space);
-	inline void load_to_memory(address_space *space);
-	inline void load_from_memory_autoinc(address_space *space);
-	inline void load_to_memory_autoinc(address_space *space);
+	inline void load_from_memory(address_space &space);
+	inline void load_to_memory(address_space &space);
+	inline void load_from_memory_autoinc(address_space &space);
+	inline void load_to_memory_autoinc(address_space &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
 	inline void add_carry(uint8_t dst, int8_t src);
