@@ -180,7 +180,7 @@ std::string machine_info::warnings_string() const
 		buf << m_machine.rom_load().software_load_warnings_message();
 
 	// if we have at least one warning flag, print the general header
-	if ((m_machine.rom_load().knownbad() > 0) || (machine_flags() & (MACHINE_WARNINGS | MACHINE_BTANB)) || unemulated_features() || imperfect_features())
+	if ((m_machine.rom_load().knownbad() > 0) || (machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS | MACHINE_BTANB)) || unemulated_features() || imperfect_features())
 	{
 		if (!buf.str().empty())
 			buf << '\n';
