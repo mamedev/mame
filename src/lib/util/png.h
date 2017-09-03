@@ -57,7 +57,6 @@ public:
 
 	~png_info() { free_data(); }
 
-	png_error verify_header(util::core_file &fp);
 	png_error read_file(util::core_file &fp);
 	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
 	png_error expand_buffer_8bit();
@@ -66,6 +65,8 @@ public:
 
 	void free_data();
 	void reset() { free_data(); operator=(png_info()); }
+
+	static png_error verify_header(util::core_file &fp);
 
 	std::unique_ptr<std::uint8_t []>    image;
 	std::uint32_t                       width, height;
