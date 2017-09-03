@@ -177,7 +177,7 @@ public:
 	// inline configuration
 	static void static_set_hp_hil_mlc(device_t &device, device_t *mlc_device);
 
-	virtual void hil_write(uint16_t data) { };
+	virtual bool hil_write(uint16_t *data) { return true; };
 	int device_id() { return m_device_id; };
 
 protected:
