@@ -413,6 +413,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "machine/intelfsh.h"
 
 #include "video/sda5708.h"
 #include "machine/latch8.h" // IP16
@@ -428,8 +429,8 @@
 #define LOG_DISPLAY (1U <<  2)
 #define LOG_FLASH   (1U <<  3)
 
-//#define VERBOSE  (LOG_FLASH)
-//#define LOG_OUTPUT_FUNC printf
+#define VERBOSE  (LOG_FLASH)
+#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
@@ -443,6 +444,8 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+#define LOCALFLASH 0 //  1 = local flash rom implementation 0 = intelflash_device
 
 class dbox_state : public driver_device
 {
@@ -459,26 +462,33 @@ class dbox_state : public driver_device
 
 	virtual void machine_reset() override;
 	virtual void machine_start () override;
-	DECLARE_READ16_MEMBER (sysflash_r);
-	DECLARE_WRITE16_MEMBER (sysflash_w);
 	DECLARE_DRIVER_INIT(dbox);
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
-private:
+
+#if LOCALFLASH
+	DECLARE_READ16_MEMBER (sysflash_r);
+	DECLARE_WRITE16_MEMBER (sysflash_w);
+private:  
   	uint16_t *m_sysflash;
 	uint32_t m_sf_mode;
 	uint32_t m_sf_state;
+#endif
+  
 };
 
 void dbox_state::machine_start()
 {
 	LOG("%s\n", FUNCNAME);
+
+#if LOCALFLASH
 	save_pointer (NAME (m_sysflash), sizeof(m_sysflash));
 
-	m_sysflash = (uint16_t*)(memregion ("roms")->base());
+	m_sysflash = (uint16_t*)(memregion ("flash")->base());
 	m_sf_mode  = 0;
 	m_sf_state = 0;
+#endif
 }
 
 void dbox_state::machine_reset()
@@ -504,8 +514,8 @@ WRITE8_MEMBER (dbox_state::write_pa){
 	m_display->load_w((0x04 & data) == 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-/* Good enough emulation of the 29F800B 8Mbit flashes for now , relies on a complete command cycle is done per device, not in parallell */
+#if LOCALFLASH
+/* Lcoal emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallell */
 /* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
 WRITE16_MEMBER (dbox_state::sysflash_w){
   	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, space.device().safe_pc(), offset, data, mem_mask);
@@ -568,13 +578,18 @@ READ16_MEMBER (dbox_state::sysflash_r){
   return 0;
 }
 /* End of flash emulation */
+#endif
 
 static ADDRESS_MAP_START( dbox_map, AS_PROGRAM, 32, dbox_state )
 // CS0 - bootrom
 // 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_READ16(sysflash_r, 0xffffffff) AM_REGION("roms", 0)
+#if LOCALFLASH
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_READ16(sysflash_r, 0xffffffff) AM_REGION("flash", 0)
 	AM_RANGE(0x000000, 0x3fffff) AM_WRITE16(sysflash_w, 0xffffffff)
+#else
+	AM_RANGE(0x000000, 0x3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
+#endif
 // CS2 - CS demux
 // 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
 // 000000a2 Base address CS2 00000054, 00700003 (ffffffff) - Base: 00700000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
@@ -605,6 +620,8 @@ static MACHINE_CONFIG_START( dbox )
 	//MCFG_MC68340_TOUT2_OUTPUT_CB(DEVWRITELINE("dcs", descrambler_device,  txd_receiver))
 	//MCFG_MC68340_TGATE2_INPUT_CB(DEVREADLINE("dsc", descrambler_device,  rxd_receiver))
 
+	MCFG_AMD_29F800B_16BIT_ADD("flash")
+
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
 	MCFG_DEFAULT_LAYOUT(layout_sda5708)
@@ -620,7 +637,7 @@ DRIVER_INIT_MEMBER(dbox_state, dbox)
 // TODO: Figure out correct ROM address map
 // TODO: Figure out what DVB2000 is doing
 ROM_START( dbox )
-	ROM_REGION16_BE(0x400000, "roms", 0)
+	ROM_REGION16_BE(0x400000, "flash", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("b200uns")
 
 	ROM_SYSTEM_BIOS(0, "b200uns", "Nokia Bootloader B200uns")
