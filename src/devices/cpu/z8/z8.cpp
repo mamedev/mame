@@ -214,10 +214,20 @@ offs_t z8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint
 
 device_memory_interface::space_config_vector z8_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
+	// Separate data space is optional
+	if (has_configured_map(AS_DATA))
+	{
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_DATA,    &m_data_config)
+		};
+	}
+	else
+	{
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config)
+		};
+	}
 }
 
 /***************************************************************************
@@ -447,20 +457,20 @@ void z8_device::stack_push_byte(uint8_t src)
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
-		/* SP <- SP - 1 */
+		// SP <- SP - 1 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 1;
 		register_write(Z8_REGISTER_SPL, sp);
 
-		/* @SP <- src */
+		// @SP <- src
 		register_write(sp, src);
 	}
 	else
 	{
-		/* SP <- SP - 1 */
+		// SP <- SP - 1 (predecrement)
 		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) - 1;
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
-		/* @SP <- src */
+		// @SP <- src
 		m_data->write_byte(sp, src);
 	}
 }
@@ -469,20 +479,20 @@ void z8_device::stack_push_word(uint16_t src)
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
-		/* SP <- SP - 2 */
+		// SP <- SP - 2 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 2;
 		register_write(Z8_REGISTER_SPL, sp);
 
-		/* @SP <- src */
+		// @SP <- src
 		register_pair_write(sp, src);
 	}
 	else
 	{
-		/* SP <- SP - 2 */
+		// SP <- SP - 2 (predecrement)
 		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) - 2;
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
-		/* @SP <- src */
+		// @SP <- src
 		m_data->write_word(sp, src);
 	}
 }
@@ -491,21 +501,25 @@ uint8_t z8_device::stack_pop_byte()
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
-		/* SP <- SP + 1 */
-		uint8_t sp = register_read(Z8_REGISTER_SPL) + 1;
-		register_write(Z8_REGISTER_SPL, sp);
+		// @SP <- src
+		uint8_t sp = register_read(Z8_REGISTER_SPL);
+		uint8_t byte = register_read(sp);
 
-		/* @SP <- src */
-		return register_read(sp);
+		// SP <- SP + 1 (postincrement)
+		register_write(Z8_REGISTER_SPL, sp + 1);
+
+		return byte;
 	}
 	else
 	{
-		/* SP <- SP + 1 */
-		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) + 1;
-		register_pair_write(Z8_REGISTER_SPH, sp);
+		// @SP <- src
+		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
+		uint8_t byte = m_data->read_byte(sp);
 
-		/* @SP <- src */
-		return m_data->read_byte(sp);
+		// SP <- SP + 1 (postincrement)
+		register_pair_write(Z8_REGISTER_SPH, sp + 1);
+
+		return byte;
 	}
 }
 
@@ -513,21 +527,25 @@ uint16_t z8_device::stack_pop_word()
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
-		/* SP <- SP + 2 */
-		uint8_t sp = register_read(Z8_REGISTER_SPL) + 2;
-		register_write(Z8_REGISTER_SPL, sp);
+		// @SP <- src
+		uint8_t sp = register_read(Z8_REGISTER_SPL);
+		uint16_t word = register_pair_read(sp);
 
-		/* @SP <- src */
-		return register_read(sp);
+		// SP <- SP + 2 (postincrement)
+		register_write(Z8_REGISTER_SPL, sp + 2);
+
+		return word;
 	}
 	else
 	{
-		/* SP <- SP + 2 */
-		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) + 2;
-		register_pair_write(Z8_REGISTER_SPH, sp);
+		// @SP <- src
+		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
+		uint16_t word = m_data->read_word(sp);
 
-		/* @SP <- src */
-		return m_data->read_word(sp);
+		// SP <- SP + 2 (postincrement)
+		register_pair_write(Z8_REGISTER_SPH, sp + 2);
+
+		return word;
 	}
 }
 
@@ -715,7 +733,7 @@ void z8_device::device_start()
 	/* find address spaces */
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_data = &space(AS_DATA);
+	m_data = has_space(AS_DATA) ? &space(AS_DATA) : m_program;
 
 	/* allocate timers */
 	m_t0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::t0_tick), this));
