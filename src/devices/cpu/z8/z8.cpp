@@ -515,7 +515,7 @@ void z8_device::stack_push_byte(uint8_t src)
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		// @SP <- src
-		m_data->write_byte(sp, src);
+		m_data->write_byte(mask_external_address(sp), src);
 	}
 }
 
@@ -537,7 +537,7 @@ void z8_device::stack_push_word(uint16_t src)
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		// @SP <- src
-		m_data->write_word(sp, src);
+		m_data->write_word(mask_external_address(sp), src);
 	}
 }
 
@@ -558,7 +558,7 @@ uint8_t z8_device::stack_pop_byte()
 	{
 		// @SP <- src
 		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
-		uint8_t byte = m_data->read_byte(sp);
+		uint8_t byte = m_data->read_byte(mask_external_address(sp));
 
 		// SP <- SP + 1 (postincrement)
 		register_pair_write(Z8_REGISTER_SPH, sp + 1);
@@ -584,7 +584,7 @@ uint16_t z8_device::stack_pop_word()
 	{
 		// @SP <- src
 		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
-		uint16_t word = m_data->read_word(sp);
+		uint16_t word = m_data->read_word(mask_external_address(sp));
 
 		// SP <- SP + 2 (postincrement)
 		register_pair_write(Z8_REGISTER_SPH, sp + 2);
