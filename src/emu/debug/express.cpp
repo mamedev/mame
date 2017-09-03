@@ -114,7 +114,7 @@ public:
 	// construction/destruction
 	integer_symbol_entry(symbol_table &table, std::string &&name, symbol_table::read_write rw, u64 *ptr = nullptr);
 	integer_symbol_entry(symbol_table &table, std::string &&name, u64 constval);
-	integer_symbol_entry(symbol_table &table, std::string &&name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format);
+	integer_symbol_entry(symbol_table &table, std::string &&name, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, const std::string &format);
 
 	// symbol access
 	virtual bool is_lval() const override;
@@ -122,6 +122,9 @@ public:
 	virtual void set_value(u64 newvalue) override;
 
 private:
+	// construction/destruction
+	integer_symbol_entry(symbol_table &table, std::string &&name, const std::string &format, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, u64 constval);
+
 	// internal helpers
 	static u64 internal_getter(symbol_table &table, void *symref);
 	static void internal_setter(symbol_table &table, void *symref, u64 value);
@@ -233,28 +236,28 @@ symbol_entry::~symbol_entry()
 //-------------------------------------------------
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, symbol_table::read_write rw, u64 *ptr)
-	: symbol_entry(table, SMT_INTEGER, std::move(name), "", (ptr == nullptr) ? &m_value : ptr),
-		m_getter(internal_getter),
-		m_setter((rw == symbol_table::READ_ONLY) ? nullptr : internal_setter),
-		m_value(0)
+	: integer_symbol_entry(table, std::move(name), "", (ptr == nullptr) ? &m_value : ptr, symbol_table::getter_func(internal_getter), (rw == symbol_table::READ_ONLY) ? nullptr : internal_setter, 0)
 {
 }
 
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, u64 constval)
-	: symbol_entry(table, SMT_INTEGER, std::move(name), "", &m_value),
-		m_getter(internal_getter),
-		m_setter(nullptr),
-		m_value(constval)
+	: integer_symbol_entry(table, std::move(name), "", &m_value, symbol_table::getter_func(internal_getter), nullptr, constval)
 {
 }
 
 
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, const std::string &format)
+	: integer_symbol_entry(table, std::move(name), format, ref, std::move(getter), std::move(setter), 0)
+{
+}
+
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, const std::string &format, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, u64 constval)
 	: symbol_entry(table, SMT_INTEGER, std::move(name), format, ref),
-		m_getter(getter),
-		m_setter(setter),
-		m_value(0)
+		m_getter(std::move(getter)),
+		m_setter(std::move(setter)),
+		m_value(constval)
 {
 }
 
@@ -435,9 +438,13 @@ void symbol_table::add(std::string &&name, u64 value)
 //  add - add a new register symbol
 //-------------------------------------------------
 
+#ifdef _MSC_VER
 void symbol_table::add(std::string &&name, void *ref, getter_func getter, setter_func setter, const std::string &format_string)
+#else
+void symbol_table::add(std::string &&name, void *ref, getter_func &&getter, setter_func &&setter, const std::string &format_string)
+#endif
 {
-	std::unique_ptr<symbol_entry> symentry = std::make_unique<integer_symbol_entry>(*this, std::move(name), ref, getter, setter, format_string);
+	std::unique_ptr<symbol_entry> symentry = std::make_unique<integer_symbol_entry>(*this, std::move(name), ref, std::move(getter), std::move(setter), format_string);
 	internal_add(std::move(symentry));
 }
 
@@ -459,8 +466,7 @@ void symbol_table::add(std::string &&name, void *ref, int minparams, int maxpara
 
 void symbol_table::internal_add(std::unique_ptr<symbol_entry> &&symentry)
 {
-	m_symlist.erase(symentry->name());
-	m_symlist.emplace(std::string(symentry->name()), std::move(symentry));
+	m_symlist[symentry->name()] = std::move(symentry);
 }
 
 

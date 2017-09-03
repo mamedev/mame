@@ -181,7 +181,12 @@ public:
 	// symbol access
 	void add(std::string &&name, read_write rw, u64 *ptr = nullptr);
 	void add(std::string &&name, u64 constvalue);
+#ifdef _MSC_VER
+	// MSVC2015 seems to not like the rvalue reference
 	void add(std::string &&name, void *ref, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
+#else
+	void add(std::string &&name, void *ref, getter_func &&getter, setter_func &&setter = nullptr, const std::string &format_string = "");
+#endif
 	void add(std::string &&name, void *ref, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
