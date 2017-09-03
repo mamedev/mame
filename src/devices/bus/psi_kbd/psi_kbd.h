@@ -4,24 +4,24 @@
 
     Kontron PSI keyboard interface
 
-	This interface supports both a parallel and a serial keyboard
+    This interface supports both a parallel and a serial keyboard
 
-	 9  KEY.D0
-	 8  KEY.D1
-	 7  KEY.D2
-	 6  KEY.D3
-	 5  KEY.D4
-	 4  KEY.D5
-	 3  KEY.D6
-	 2  KEY.D7
-	11  KEY.STRB
-	15  + KEY.TRANSM
-	16  - KEY.TRANSM
-	17  + KEY.REC
-	18  + KEY.REC
-	13  + 5V
-	14  GND
-	 1  Shield
+     9  KEY.D0
+     8  KEY.D1
+     7  KEY.D2
+     6  KEY.D3
+     5  KEY.D4
+     4  KEY.D5
+     3  KEY.D6
+     2  KEY.D7
+    11  KEY.STRB
+    15  + KEY.TRANSM
+    16  - KEY.TRANSM
+    17  + KEY.REC
+    18  + KEY.REC
+    13  + 5V
+    14  GND
+     1  Shield
 
 ***************************************************************************/
 

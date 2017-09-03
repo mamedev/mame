@@ -154,11 +154,9 @@ WRITE8_MEMBER(gaiden_state::drgnbowl_irq_ack_w)
 
 WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);   /* Ninja Gaiden */
-	if (ACCESSING_BITS_8_15)
-		m_soundlatch->write(space, 0, data >> 8); /* Tecmo Knight */
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
+	// It's not clear which 8 data lines are actually used, but byte smearing is almost certainly involved.
+	m_soundlatch->write(space, 0, data & 0xff);
 }
 
 
@@ -788,6 +786,7 @@ static MACHINE_CONFIG_START( shadoww )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

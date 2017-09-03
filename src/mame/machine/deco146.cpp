@@ -1252,7 +1252,6 @@ void deco_146_base_device::write_protport(address_space &space, uint16_t address
 	else if ((address&0xff) == m_soundlatch_port)
 	{
 			logerror("LOAD SOUND LATCH %04x %04x\n", data, mem_mask);
-			COMBINE_DATA(&m_soundlatch);
 			m_soundlatch_w(space, data, mem_mask);
 	}
 
@@ -1315,11 +1314,11 @@ uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, ui
 
 deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
+	m_port_a_r(*this),
+	m_port_b_r(*this),
+	m_port_c_r(*this),
 	m_sound_latch(*this, ":soundlatch")
 {
-	m_port_a_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_a_default), this);
-	m_port_b_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_b_default), this);
-	m_port_c_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_c_default), this);
 	m_soundlatch_w =  deco146_port_write_cb(FUNC(deco_146_base_device::soundlatch_default), this);
 
 	m_external_addrswap[0] = 0;
@@ -1336,30 +1335,6 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device
 
 
 
-uint16_t deco_146_base_device::port_dummy_cb(int unused)
-{
-	return 0x00;
-}
-
-void deco_146_base_device::soundlatch_dummy(address_space &space, uint16_t data, uint16_t mem_mask)
-{
-}
-
-uint16_t deco_146_base_device::port_a_default(int unused)
-{
-	return ioport(":INPUTS")->read();
-}
-
-uint16_t deco_146_base_device::port_b_default(int unused)
-{
-	return ioport(":SYSTEM")->read();
-}
-
-uint16_t deco_146_base_device::port_c_default(int unused)
-{
-	return ioport(":DSW")->read();
-}
-
 void deco_146_base_device::soundlatch_default(address_space &space, uint16_t data, uint16_t mem_mask)
 {
 	if (m_sound_latch != nullptr)
@@ -1371,9 +1346,6 @@ void deco_146_base_device::soundlatch_default(address_space &space, uint16_t dat
 
 
 
-void deco_146_base_device::set_port_a_cb(device_t &device,deco146_port_read_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_port_a_r = port_cb; }
-void deco_146_base_device::set_port_b_cb(device_t &device,deco146_port_read_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_port_b_r = port_cb; }
-void deco_146_base_device::set_port_c_cb(device_t &device,deco146_port_read_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_port_c_r = port_cb; }
 void deco_146_base_device::set_soundlatch_cb(device_t &device,deco146_port_write_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_soundlatch_w = port_cb; }
 void deco_146_base_device::set_interface_scramble(device_t &device,uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0)
 {
@@ -1406,15 +1378,14 @@ void deco_146_base_device::device_start()
 
 
 	// bind our handler
-	m_port_a_r.bind_relative_to(*owner());
-	m_port_b_r.bind_relative_to(*owner());
-	m_port_c_r.bind_relative_to(*owner());
+	m_port_a_r.resolve_safe(0xffff);
+	m_port_b_r.resolve_safe(0xffff);
+	m_port_c_r.resolve_safe(0xffff);
 	m_soundlatch_w.bind_relative_to(*owner());
 
 
 	save_item(NAME(m_xor));
 	save_item(NAME(m_nand));
-	save_item(NAME(m_soundlatch));
 
 	save_item(NAME(m_rambank0));
 	save_item(NAME(m_rambank1));
@@ -1439,8 +1410,6 @@ void deco_146_base_device::device_reset()
 
 
 	m_current_rambank = 0;
-
-	m_soundlatch = 0x0000;
 
 	m_latchaddr = 0xffff;
 	m_latchdata = 0x0000;

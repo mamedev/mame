@@ -136,6 +136,7 @@ public:
 	DECLARE_READ16_MEMBER(misncrft_speedup_r);
 	DECLARE_READ16_MEMBER(misncrfta_speedup_r);
 	DECLARE_READ16_MEMBER(coolmini_speedup_r);
+	DECLARE_READ16_MEMBER(coolminii_speedup_r);
 	DECLARE_READ16_MEMBER(suplup_speedup_r);
 	DECLARE_READ16_MEMBER(luplup_speedup_r);
 	DECLARE_READ16_MEMBER(luplup29_speedup_r);
@@ -179,6 +180,7 @@ public:
 	DECLARE_DRIVER_INIT(vamphalfr1);
 	DECLARE_DRIVER_INIT(vamphafk);
 	DECLARE_DRIVER_INIT(coolmini);
+	DECLARE_DRIVER_INIT(coolminii);
 	DECLARE_DRIVER_INIT(mrkickera);
 	DECLARE_DRIVER_INIT(mrdig);
 	DECLARE_DRIVER_INIT(jmpbreak);
@@ -1243,7 +1245,7 @@ Graphics: Actel A40MX04-F PL84
           ROML00, ROMU00 - unpopulated
    DRAM1: LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 
-   
+
 
 Both PCBs:
    VROM1: Macronix MX27C2000 2MBit DIP32 EPROM
@@ -1631,6 +1633,25 @@ ROM_START( coolmini )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(fcc28081) SHA1(44031df0ee28ca49df12bcb73c83299fac205e21) )
+ROM_END
+
+ROM_START( coolminii )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "cm-rom1.040", 0x00000, 0x80000, CRC(aa94bb86) SHA1(f1d75bf54b75f234cc872779c5b1ff6679778841) )
+	ROM_LOAD( "cm-rom2.040", 0x80000, 0x80000, CRC(be7d02c8) SHA1(4897f3c890dd66f94d7a29f7a73c59857e4af218) )
+
+	ROM_REGION( 0x1000000, "gfx1", 0 )  /* 16x16x8 Sprites - not dumped from this set, using parent ROMs */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(4b141f31) SHA1(cf4885789b0df67d00f9f3659c445248c4e72446) BAD_DUMP )
+	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, CRC(9b2fb12a) SHA1(8dce367c4c2cab6e84f586bd8dfea3ea0b6d7225) BAD_DUMP )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1e3a04bb) SHA1(9eb84b6a0172a8868f440065c30b4519e0c3fe33) BAD_DUMP )
+	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(06dd1a6c) SHA1(8c707d388848bc5826fbfc48c3035fdaf5018515) BAD_DUMP )
+	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(1e8c12cb) SHA1(f57489e81eb1e476939148cfc8d03f3df03b2a84) BAD_DUMP )
+	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(4551d4fc) SHA1(4ec102120ab99e324d9574bfce93837d8334da06) BAD_DUMP )
+	ROM_LOAD32_WORD( "roml03", 0xc00000, 0x200000, CRC(231650bf) SHA1(065f742a37d5476ec6f72f0bd8ba2cfbe626b872) BAD_DUMP )
+	ROM_LOAD32_WORD( "romu03", 0xc00002, 0x200000, CRC(273d5654) SHA1(0ae3d1c4c4862a8642dbebd7c955b29df29c4938) BAD_DUMP )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(e1fc2ba4) SHA1(d2a9c55b9e90135b15abc53bc30d214716e83f25) )
 ROM_END
 
 /*
@@ -2617,7 +2638,6 @@ READ16_MEMBER(vamphalf_state::misncrfta_speedup_r)
 	return m_wram[(0x72eb4/2)+offset];
 }
 
-
 READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
 {
 	if(space.device().safe_pc() == 0x75f7a)
@@ -2629,6 +2649,19 @@ READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
 	}
 
 	return m_wram[(0xd2e80/2)+offset];
+}
+
+READ16_MEMBER(vamphalf_state::coolminii_speedup_r)
+{
+	if(space.device().safe_pc() == 0x76016)
+	{
+		if(irq_active(space))
+			space.device().execute().spin_until_interrupt();
+		else
+			space.device().execute().eat_cycles(50);
+	}
+
+	return m_wram[(0xd3130/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::suplup_speedup_r)
@@ -2916,6 +2949,14 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 	m_flip_bit = 1;
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d3130, 0x000d3133, read16_delegate(FUNC(vamphalf_state::coolminii_speedup_r), this));
+
+	m_palshift = 0;
+	m_flip_bit = 1;
+}
+
 DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
@@ -3108,6 +3149,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 }
 
 GAME( 1999, coolmini,  0,        coolmini,  common,   vamphalf_state, coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolminii, coolmini, coolmini,  common,   vamphalf_state, coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jmpbreak,  0,        jmpbreak,  common,   vamphalf_state, jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, poosho,    0,        jmpbreak,  common,   vamphalf_state, poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )

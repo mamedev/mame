@@ -196,7 +196,7 @@ class towns_state : public driver_device
 	uint8_t m_pit_out2;
 	uint8_t m_timer0;
 	uint8_t m_timer1;
-	
+
 	uint8_t m_serial_irq_source;
 	uint8_t m_serial_irq_enable;  // RS232 interrupt control
 
@@ -211,7 +211,7 @@ class towns_state : public driver_device
 		RXRDY_IRQ_ENABLE  = 0x02,
 		TXRDY_IRQ_ENABLE  = 0x01
 	};
-	
+
 	emu_timer* m_towns_wait_timer;
 	emu_timer* m_towns_status_timer;
 	emu_timer* m_towns_cdda_timer;
@@ -297,7 +297,7 @@ class towns_state : public driver_device
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(towns_serial_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_rxrdy_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_txrdy_irq);

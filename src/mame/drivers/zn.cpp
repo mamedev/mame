@@ -4021,7 +4021,7 @@ ROM_START( glpracr3j )
 	ROM_LOAD( "mg08", 0x000000, 0x000008, CRC(679367fe) SHA1(495b03e1cdad9d6aaf509b73d837340e2b1bb23b) )
 ROM_END
 
-ROM_START( tecmowcm )
+ROM_START( twcupmil )
 	TPS_BIOS
 
 	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
@@ -5073,11 +5073,11 @@ ROM_START( jdredd )
 	AC_BIOS
 
 	ROM_REGION32_LE( 0x200000, "roms", 0 )
-	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
-	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
+	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) /* known to have other dates like  11-21-97  - still same checksum of 9E54 */
+	ROM_LOAD16_BYTE( "79d3_01-16-98_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) /* known to have other dates like  11-21-97  - still same checksum of 79D3 */
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "jdreddc", 0, SHA1(eee205f83e5f590f8baf36452c873d7063156bd0) )
+	DISK_IMAGE( "jdreddc", 0, SHA1(eee205f83e5f590f8baf36452c873d7063156bd0) ) /* label on drive reads:  1576 Rev.C  */
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "ac02", 0x000000, 0x000008, CRC(1412d475) SHA1(c2f62232a261870f58353d09dc0d6ce2ad17a729) )
@@ -5087,11 +5087,11 @@ ROM_START( jdreddb )
 	AC_BIOS
 
 	ROM_REGION32_LE( 0x200000, "roms", 0 )
-	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
-	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
+	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) /* known to have other dates like  11-21-97  - still same checksum of 9E54 */
+	ROM_LOAD16_BYTE( "79d3_01-16-98_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) /* known to have other dates like  11-21-97  - still same checksum of 79D3 */
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "jdreddb", 0, SHA1(20f696fa6e1fbf97793bac2a794631c5dd4fb39a) )
+	DISK_IMAGE( "jdreddb", 0, SHA1(20f696fa6e1fbf97793bac2a794631c5dd4fb39a) ) /* label on drive reads:  1576 Rev.B  */
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "ac02", 0x000000, 0x000008, CRC(1412d475) SHA1(c2f62232a261870f58353d09dc0d6ce2ad17a729) )
@@ -5211,7 +5211,7 @@ GAME( 1999, flamegunj, flamegun, coh1002m,    zn,       zn_state, 0, ROT0, "Gaps
 GAME( 1999, lpadv,     coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Amuse World",            "Logic Pro Adventure (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2000, tblkkuzu,  coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tamsoft / D3 Publisher", "The Block Kuzushi (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2000, 1on1gov,   coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "1 on 1 Government (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, tecmowcm,  coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "Tecmo World Cup Millennium (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, twcupmil,  coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "Tecmo World Cup Millennium (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2001, mfjump,    coh1002m, coh1002m,    zn,       zn_state, 0, ROT0, "Tecmo",                  "Monster Farm Jump (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Video System */

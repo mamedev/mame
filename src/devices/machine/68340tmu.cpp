@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h 
+//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
 #define LOG_SETUP   (1U <<  1)
 #define LOG_READ    (1U <<  2)
 #define LOG_TIMER   (1U <<  3)
@@ -157,13 +157,13 @@ WRITE16_MEMBER( m68340_cpu_device::m68340_internal_timer_w )
 		LOGTIMER("- Prescaler: Divide by %d\n", (0x101 << ((data & m68340_timer::REG_CR_POT_MASK) >> 5) & 0x1fe));
 		LOGTIMER("- MODE: %s\n", std::array<char const *, 8>
 			 {{  "Input Capture/Output Compare",
-			       "Square-Wave Generator - not implemented",
-			       "Variable Duty-Cycle Square-Wave Generator - not implemented",
-			       "Variable-Width Single-Shot Pulse Generator - not implemented",
-			       "Pulse Width Measurement - not implemented",
-			       "Period Measurement - not implemented",
-			       "Event Count - not implemented",
-			       "Timer Bypass (Simple Test Method) - not implemented"
+				   "Square-Wave Generator - not implemented",
+				   "Variable Duty-Cycle Square-Wave Generator - not implemented",
+				   "Variable-Width Single-Shot Pulse Generator - not implemented",
+				   "Pulse Width Measurement - not implemented",
+				   "Period Measurement - not implemented",
+				   "Event Count - not implemented",
+				   "Timer Bypass (Simple Test Method) - not implemented"
 			 }}[data & m68340_timer::REG_CR_MODE_MASK]);
 
 		LOGTIMER("- OC: %s mode\n", std::array<char const *, 4>{{"Disabled", "Toggle", "Zero", "One"}}[data & m68340_timer::REG_CR_OC_MASK]);
@@ -197,7 +197,7 @@ WRITE16_MEMBER( m68340_cpu_device::m68340_internal_timer_w )
 		}
 		else
 		{ // TODO: Detect Disable mode setting line to three state
-		  	if ((timer.m_cr[id] & m68340_timer::REG_CR_OC_MASK) == m68340_timer::REG_CR_OC_ONE)
+			if ((timer.m_cr[id] & m68340_timer::REG_CR_OC_MASK) == m68340_timer::REG_CR_OC_ONE)
 			{
 				id == 0 ? m_tout1_out_cb(ASSERT_LINE) : m_tout2_out_cb(ASSERT_LINE);
 			}
@@ -429,7 +429,7 @@ void m68340_cpu_device::do_timer_tick( int id )
 	timer.m_timer_counter[id]--; // Count flanks, least significant bit is state of the clock line
 	if ( (timer.m_mcr[id] & m68340_timer::REG_MCR_STP) == 0)
 	{
-	  	if (timer.m_timer_counter[id] & 1) // Raising flank, copy shadow to register
+		if (timer.m_timer_counter[id] & 1) // Raising flank, copy shadow to register
 		{
 		  // Shadow the counter only if we are NOT in the ICOC mode WHILE the TG bit is set
 		  if (!((timer.m_cr[id] & m68340_timer::REG_CR_MODE_MASK) == m68340_timer::REG_CR_MODE_ICOC &&

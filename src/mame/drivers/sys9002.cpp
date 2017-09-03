@@ -6,12 +6,12 @@
 
         2017-08-17 Skeleton driver.
 
-        Chips used: 
-			Siemens SAB8085A-P
-			NEC D8251AFC * 2
-			NEC D4016C-3 * 4 + 2 
-			ST M2764A-4F1 * 4
-			HD6845P
+        Chips used:
+            Siemens SAB8085A-P
+            NEC D8251AFC * 2
+            NEC D4016C-3 * 4 + 2
+            ST M2764A-4F1 * 4
+            HD6845P
 ****************************************************************************/
 
 #include "emu.h"
@@ -50,7 +50,7 @@ static MACHINE_CONFIG_START( sys9002 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz) // XTAL not visible on images
 	MCFG_CPU_PROGRAM_MAP(sys9002_mem)
-	MCFG_CPU_IO_MAP(sys9002_io)	
+	MCFG_CPU_IO_MAP(sys9002_io)
 MACHINE_CONFIG_END
 
 /* ROM definition */

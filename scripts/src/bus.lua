@@ -1731,6 +1731,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/agat7langcard.h",
 		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.h",
+		MAME_DIR .. "src/devices/bus/a2bus/ssprite.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/ssprite.h",
 	}
 end
 
@@ -3085,6 +3087,17 @@ end
 if (BUSES["HP_OPTROM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
+		}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/hp80_optroms/hp80_optrom.h,BUSES["HP80_OPTROM"] = true
+---------------------------------------------------
+
+if (BUSES["HP80_OPTROM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp80_optroms/hp80_optrom.cpp",
 		}
 end
 

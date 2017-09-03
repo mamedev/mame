@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "includes/atarig42.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -329,14 +330,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00030, 0xe00031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
 	AM_RANGE(0xe00040, 0xe00041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
-	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xe03800, 0xe03801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
 	AM_RANGE(0xf40000, 0xf40001) AM_DEVREAD("asic65", asic65_device, io_r)
 	AM_RANGE(0xf60000, 0xf60001) AM_DEVREAD("asic65", asic65_device, read)
 	AM_RANGE(0xf80000, 0xf80003) AM_DEVWRITE("asic65", asic65_device, data_w)
-	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
@@ -531,7 +532,8 @@ static MACHINE_CONFIG_START( atarig42 )
 	MCFG_MACHINE_START_OVERRIDE(atarig42_state,atarig42)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig42_state,atarig42)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -632,7 +634,7 @@ ROM_START( roadriot )
 	ROM_LOAD( "136089-1050.15e",  0x40000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
 	ROM_LOAD( "136089-1051.12e",  0x60000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
 
-	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "roadriot-eeprom.5c", 0x0000, 0x800, CRC(8d9b957d) SHA1(9d895c5977a3f405130594a10d530a82a6aa265f) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -689,7 +691,7 @@ ROM_START( roadriota )
 	ROM_LOAD( "136089-1050.15e",  0x40000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
 	ROM_LOAD( "136089-1051.12e",  0x60000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
 
-	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "roadriot-eeprom.5c", 0x0000, 0x800, CRC(8d9b957d) SHA1(9d895c5977a3f405130594a10d530a82a6aa265f) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -746,7 +748,7 @@ ROM_START( roadriotb )
 	ROM_LOAD( "136089-1050.15e",  0x40000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
 	ROM_LOAD( "136089-1051.12e",  0x60000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
 
-	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "roadriot-eeprom.5c", 0x0000, 0x800, CRC(8d9b957d) SHA1(9d895c5977a3f405130594a10d530a82a6aa265f) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -794,7 +796,7 @@ ROM_START( guardian )
 	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136092-0010-snd.19e",  0x00000, 0x80000, CRC(bca27f40) SHA1(91a41eac116eb7d9a790abc590eb06328726d1c2) )
 
-	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "guardian-eeprom.5c", 0x0000, 0x800, CRC(85835fab) SHA1(747e2851c8baa0e7f1c0784b0d6900514230ab07) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */

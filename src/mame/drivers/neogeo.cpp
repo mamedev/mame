@@ -5542,7 +5542,7 @@ ROM_END
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
 ****************************************/
 
-ROM_START( tws96 ) /* MVS ONLY RELEASE */
+ROM_START( twsoc96 ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "086-p1.p1", 0x000000, 0x100000, CRC(03e20ab6) SHA1(3a0a5a54649178ce7a6158980cb4445084b40fb5) ) /* mask rom TC538200 */
 
@@ -11048,7 +11048,7 @@ GAME( 1995, gowcaizr,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1996, sdodgeb,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Super Dodge Ball / Kunio no Nekketsu Toukyuu Densetsu", MACHINE_SUPPORTS_SAVE )
 
 /* Tecmo */
-GAME( 1996, tws96,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, twsoc96,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", MACHINE_SUPPORTS_SAVE )
 
 /* Viccom */
 GAME( 1994, fightfev,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Viccom", "Fight Fever (set 1)", MACHINE_SUPPORTS_SAVE )

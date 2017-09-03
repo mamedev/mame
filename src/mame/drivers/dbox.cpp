@@ -137,7 +137,7 @@
  *  The bootstrap copies the firmware to RAM and jumps to it
  *  -------------------------------------------------------------
  *
- *  --- PC > 0x700000 
+ *  --- PC > 0x700000
  *  SIM40 + 0x0022: 0x0140     PICR Periodic Interrupt Control Register
  *  SIM40 + 0x0024: 0x0029     PICR Periodic Interrupt Timer Register
  *
@@ -290,8 +290,8 @@
  *  tbc...
  *
  * // Tricks with the CS0 and the GAL:s
- * 008004d8 SIM40 + 0x0044: 0x00000053 CS0 base 1 - base addr = 0x000000, Supervisor Data Space, No CPU Space, Valid CS 
- * 008004e2 SIM40 + 0x0040: 0x003FFF05 CS0 mask 1 - block size = 4194304 (4MB), 
+ * 008004d8 SIM40 + 0x0044: 0x00000053 CS0 base 1 - base addr = 0x000000, Supervisor Data Space, No CPU Space, Valid CS
+ * 008004e2 SIM40 + 0x0040: 0x003FFF05 CS0 mask 1 - block size = 4194304 (4MB),
  * ... strange series of operations between 800834 and 8008D4, suspecting GAL:s to be involved in some magic here
  * 008004ee SIM40 + 0x0040: 0x003FFFF5 CS0 mask 1 - block size = 4194304 (4MB), Mask all accesses
  * 008004f8 SIM40 + 0x0044: 0x0000005b CS0 base 1 - base addr = 0x000000, Supervisor Data Space, Write Protect, No CPU Space, Valid CS

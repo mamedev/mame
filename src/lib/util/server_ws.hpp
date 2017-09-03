@@ -39,11 +39,11 @@ namespace webpp {
 
 		std::string remote_endpoint_address;
 		unsigned short remote_endpoint_port;
-		
+
 		Connection(unsigned short remote_endpoint_port) : remote_endpoint_port(remote_endpoint_port) {}
 		virtual ~Connection() {}
 	};
-	
+
 	class ws_server;
 }
 #endif  /* MAME_LIB_UTIL_SERVER_WS_HPP */

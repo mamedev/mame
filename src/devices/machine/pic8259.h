@@ -32,11 +32,17 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_PIC8259_ADD(_tag, _out_int, _sp_en, _read_slave_ack) \
-	MCFG_DEVICE_ADD(_tag, PIC8259, 0) \
-	devcb = &pic8259_device::static_set_out_int_callback( *device, DEVCB_##_out_int ); \
-	devcb = &pic8259_device::static_set_sp_en_callback( *device, DEVCB_##_sp_en ); \
-	devcb = &pic8259_device::static_set_read_slave_ack_callback( *device, DEVCB_##_read_slave_ack );
+// Interrupt request output to CPU or master 8259 (active high)
+#define MCFG_PIC8259_OUT_INT_CB(_devcb) \
+	devcb = &pic8259_device::static_set_out_int_callback(*device, DEVCB_##_devcb);
+
+// Slave program select (VCC = master; GND = slave; pin becomes EN output in buffered mode)
+#define MCFG_PIC8259_IN_SP_CB(_devcb) \
+	devcb = &pic8259_device::static_set_in_sp_callback(*device, DEVCB_##_devcb);
+
+// Cascaded interrupt acknowledge request for slave 8259 to place vector on data bus
+#define MCFG_PIC8259_CASCADE_ACK_CB(_devcb) \
+	devcb = &pic8259_device::static_set_read_slave_ack_callback(*device, DEVCB_##_devcb);
 
 
 class pic8259_device : public device_t
@@ -45,7 +51,7 @@ public:
 	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> static devcb_base &static_set_out_int_callback(device_t &device, Object &&cb) { return downcast<pic8259_device &>(device).m_out_int_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_sp_en_callback(device_t &device, Object &&cb) { return downcast<pic8259_device &>(device).m_sp_en_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_in_sp_callback(device_t &device, Object &&cb) { return downcast<pic8259_device &>(device).m_in_sp_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, Object &&cb) { return downcast<pic8259_device &>(device).m_read_slave_ack_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
@@ -86,7 +92,7 @@ private:
 	};
 
 	devcb_write_line m_out_int_func;
-	devcb_read_line m_sp_en_func;
+	devcb_read_line m_in_sp_func;
 	devcb_read8 m_read_slave_ack_func;
 
 	state_t m_state;

@@ -33,6 +33,10 @@
 	downcast<upd72065_device *>(device)->set_ready_line_connected(_ready);  \
 	downcast<upd72065_device *>(device)->set_select_lines_connected(_select);
 
+#define MCFG_I82072_ADD(_tag, _ready)   \
+	MCFG_DEVICE_ADD(_tag, I82072, 0)    \
+	downcast<i82072_device *>(device)->set_ready_line_connected(_ready);
+
 #define MCFG_SMC37C78_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SMC37C78, 0)
 
@@ -369,6 +373,7 @@ protected:
 	uint8_t fifo_pop(bool internal);
 	void set_drq(bool state);
 	bool get_ready(int fid);
+	void set_ds(int state);
 
 	void enable_transfer();
 	void disable_transfer();
@@ -437,6 +442,13 @@ public:
 class i8272a_device : public upd765_family_device {
 public:
 	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+};
+
+class i82072_device : public upd765_family_device {
+public:
+	i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
@@ -526,6 +538,7 @@ DECLARE_DEVICE_TYPE(UPD765A,        upd765a_device)
 DECLARE_DEVICE_TYPE(UPD765B,        upd765b_device)
 DECLARE_DEVICE_TYPE(I8272A,         i8272a_device)
 DECLARE_DEVICE_TYPE(UPD72065,       upd72065_device)
+DECLARE_DEVICE_TYPE(I82072,         i82072_device)
 DECLARE_DEVICE_TYPE(SMC37C78,       smc37c78_device)
 DECLARE_DEVICE_TYPE(N82077AA,       n82077aa_device)
 DECLARE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device)

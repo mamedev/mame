@@ -272,7 +272,7 @@
 	<!-- LCD panel -->
 		<screen index="0"><bounds x="30" y="88" width="24" height="4.5" /></screen>
 	</view>
-	
+
 	<view name="Display Modul">
 		<screen index="0"><bounds x="0" y="0" width="24" height="4.5" /></screen>
 	</view>

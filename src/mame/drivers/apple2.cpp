@@ -76,6 +76,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/ramcard128k.h"
 #include "bus/a2bus/ramcard16k.h"
 #include "bus/a2bus/timemasterho.h"
+#include "bus/a2bus/ssprite.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -1318,6 +1319,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("ezcgi", A2BUS_EZCGI)    /* E-Z Color Graphics Interface */
 	SLOT_INTERFACE("ezcgi9938", A2BUS_EZCGI_9938)   /* E-Z Color Graphics Interface (TMS9938) */
 	SLOT_INTERFACE("ezcgi9958", A2BUS_EZCGI_9958)   /* E-Z Color Graphics Interface (TMS9958) */
+	SLOT_INTERFACE("ssprite", A2BUS_SSPRITE)    /* Synetix SuperSprite Board */
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 
@@ -1396,9 +1398,11 @@ static MACHINE_CONFIG_START( apple2_common )
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
 	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("apple2_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2, apple2_common )

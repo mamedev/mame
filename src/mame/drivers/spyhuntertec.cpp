@@ -83,7 +83,6 @@ public:
 //  DECLARE_VIDEO_START(spyhuntertec);
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
-	DECLARE_WRITE8_MEMBER(spyhuntertec_fd00_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
 
 	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
@@ -337,16 +336,9 @@ uint32_t spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, b
 
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_fd00_w)
-{
-//  printf("%04x spyhuntertec_fd00_w %02x\n", space.device().safe_pc(), data);
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 {
-	// it writes 04 / 14 to the sound latch (spyhuntertec_fd00_w) before
+	// it writes 04 / 14 to the sound latch (at FD00) before
 	// reading bit 6 here a minimum of 32 times.
 	// seems to be how it reads the analog controls? probably via sound CPU??
 
@@ -444,7 +436,7 @@ static ADDRESS_MAP_START( spyhuntertec_map, AS_PROGRAM, 8, spyhuntertec_state )
 	AM_RANGE(0xfc02, 0xfc02) AM_READ(spyhuntertec_in2_r)
 	AM_RANGE(0xfc03, 0xfc03) AM_READ(spyhuntertec_in3_r)
 
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE( spyhuntertec_fd00_w )
+	AM_RANGE(0xfd00, 0xfd00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram2") // actual spriteram for this hw??
 ADDRESS_MAP_END
@@ -701,6 +693,7 @@ static MACHINE_CONFIG_START( spyhuntertec )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

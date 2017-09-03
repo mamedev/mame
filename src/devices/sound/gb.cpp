@@ -358,12 +358,12 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cyc
 			snd.cycles_left = 4 - (cycles & 3);
 		}
 		cycles >>= 2;
-		uint16_t	distance = 0x800 - snd.frequency_counter;
+		uint16_t    distance = 0x800 - snd.frequency_counter;
 		if (cycles >= distance)
 		{
 			cycles -= distance;
 			distance = 0x800 - snd.frequency;
-			uint64_t	counter = 1 + cycles / distance;
+			uint64_t    counter = 1 + cycles / distance;
 
 			snd.duty_count = (snd.duty_count + counter) & 0x07;
 			snd.signal = wave_duty_table[snd.duty][snd.duty_count];
@@ -470,13 +470,13 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 			snd.cycles_left = 1;
 		}
 		cycles >>= 1;
-		uint16_t	distance = 0x800 - snd.frequency_counter;
+		uint16_t    distance = 0x800 - snd.frequency_counter;
 		if (cycles >= distance)
 		{
 			cycles -= distance;
 			distance = 0x800 - snd.frequency;
 			// How many times the condition snd.frequency_counter == 0 is true
-			uint64_t	counter = 1 + cycles / distance;
+			uint64_t    counter = 1 + cycles / distance;
 
 			snd.offset = (snd.offset + counter) & 0x1F;
 			snd.current_sample = m_snd_regs[AUD3W0 + snd.offset / 2];
@@ -505,9 +505,9 @@ void gameboy_sound_device::update_noise_channel(struct SOUND &snd, uint64_t cycl
 	if (cycles >= snd.cycles_left)
 	{
 		cycles -= snd.cycles_left;
-		uint64_t	period = noise_period_cycles();
-		uint64_t	counter = 1 + cycles / period, i = 0;
-		uint16_t	start = snd.noise_lfsr;
+		uint64_t    period = noise_period_cycles();
+		uint64_t    counter = 1 + cycles / period, i = 0;
+		uint16_t    start = snd.noise_lfsr;
 		while (i < counter) {
 			/* Using a Polynomial Counter (aka Linear Feedback Shift Register)
 			 Mode 4 has a 15 bit counter so we need to shift the

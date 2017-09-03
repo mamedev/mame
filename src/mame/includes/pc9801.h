@@ -135,7 +135,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	
+
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE8_MEMBER(dmapg4_w);
@@ -193,7 +193,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801rs_knjram_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_bank_w);
 	DECLARE_READ8_MEMBER(f0_r);
-	
+
 	DECLARE_READ8_MEMBER(a20_ctrl_r);
 	DECLARE_WRITE8_MEMBER(a20_ctrl_w);
 	DECLARE_READ8_MEMBER(fdc_mode_ctrl_r);
@@ -294,7 +294,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_reset_after_children() override;
 
-	
+
 private:
 	enum
 	{
@@ -329,7 +329,7 @@ private:
 	uint8_t m_sasi_data;
 	int m_sasi_data_enable;
 	uint8_t m_sasi_ctrl;
-	
+
 	struct{
 		uint8_t control;
 		uint8_t lx;
@@ -337,10 +337,10 @@ private:
 		uint8_t freq_reg;
 		uint8_t freq_index;
 	}m_mouse;
-	
+
 	uint8_t m_ide_sel;
 	bool m_ide1_irq, m_ide2_irq;
-	
+
 	/* PC9801RS specific, move to specific state */
 	uint8_t m_gate_a20; //A20 line
 	uint8_t m_access_ctrl; // DMA related
@@ -364,7 +364,7 @@ private:
 	void egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t egc_blit_r(uint32_t offset, uint16_t mem_mask);
 
-	
+
 	/* PC9821 specific */
 	uint8_t m_sdip[24], m_sdip_bank;
 	uint8_t m_pc9821_window_bank;
@@ -382,7 +382,7 @@ private:
 	} m_egc;
 
 	uint16_t m_pc9821_256vram_bank;
-	
+
 	uint8_t m_sdip_read(uint16_t port, uint8_t sdip_offset);
 	void m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data);
 	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const;

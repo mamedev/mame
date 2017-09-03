@@ -297,7 +297,7 @@
 			<bounds x="52" y="95" width="1.5" height="1.5" />
 		</bezel>
 	</view>
-	
+
 	<view name="Display Only">
 		<screen index="0"><bounds x="0" y="0" width="24" height="4.5" /></screen>
 

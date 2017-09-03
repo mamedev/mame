@@ -23,6 +23,7 @@
 #include "includes/vindictr.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -74,8 +75,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vindictr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ_PORT("260020")
@@ -189,7 +190,8 @@ static MACHINE_CONFIG_START( vindictr )
 
 	MCFG_MACHINE_RESET_OVERRIDE(vindictr_state,vindictr)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

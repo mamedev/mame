@@ -1454,7 +1454,7 @@ static ADDRESS_MAP_START( ghox_hd647180_mem_map, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   // Internal 512 byte RAM
 	AM_RANGE(0x3fe00, 0x3ffff) AM_RAM   // Relocated internal RAM (RMCR = 30)
 
-	AM_RANGE(0x40000, 0x407ff) AM_RAM AM_SHARE("shared_ram") 
+	AM_RANGE(0x40000, 0x407ff) AM_RAM AM_SHARE("shared_ram")
 
 	AM_RANGE(0x80002, 0x80002) AM_READ_PORT("DSWA")
 	AM_RANGE(0x80004, 0x80004) AM_READ_PORT("DSWB")

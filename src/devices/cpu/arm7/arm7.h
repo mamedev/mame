@@ -53,6 +53,52 @@ public:
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	enum
+	{
+		ARCHFLAG_T    = 1,        // Thumb present
+		ARCHFLAG_E    = 2,        // extended DSP operations present (only for v5+)
+		ARCHFLAG_J    = 4,        // "Jazelle" (direct execution of Java bytecode)
+		ARCHFLAG_MMU  = 8,        // has on-board MMU (traditional ARM style like the SA1110)
+		ARCHFLAG_SA   = 16,       // StrongARM extensions (enhanced TLB)
+		ARCHFLAG_XSCALE   = 32,   // XScale extensions (CP14, enhanced TLB)
+		ARCHFLAG_MODE26   = 64    // supports 26-bit backwards compatibility mode
+	};
+
+	enum
+	{
+		ARM9_COPRO_ID_STEP_SA1110_A0 = 0,
+		ARM9_COPRO_ID_STEP_SA1110_B0 = 4,
+		ARM9_COPRO_ID_STEP_SA1110_B1 = 5,
+		ARM9_COPRO_ID_STEP_SA1110_B2 = 6,
+		ARM9_COPRO_ID_STEP_SA1110_B4 = 8,
+
+		ARM9_COPRO_ID_STEP_PXA255_A0 = 6,
+
+		ARM9_COPRO_ID_STEP_ARM946_A0 = 1,
+
+		ARM9_COPRO_ID_PART_SA1110 = 0xB11 << 4,
+		ARM9_COPRO_ID_PART_ARM946 = 0x946 << 4,
+		ARM9_COPRO_ID_PART_ARM920 = 0x920 << 4,
+		ARM9_COPRO_ID_PART_ARM710 = 0x710 << 4,
+		ARM9_COPRO_ID_PART_GENERICARM7 = 0x700 << 4,
+
+		ARM9_COPRO_ID_PXA255_CORE_REV_SHIFT = 10,
+		ARM9_COPRO_ID_PXA255_CORE_GEN_XSCALE = 0x01 << 13,
+
+		ARM9_COPRO_ID_ARCH_V4     = 0x01 << 16,
+		ARM9_COPRO_ID_ARCH_V4T    = 0x02 << 16,
+		ARM9_COPRO_ID_ARCH_V5     = 0x03 << 16,
+		ARM9_COPRO_ID_ARCH_V5T    = 0x04 << 16,
+		ARM9_COPRO_ID_ARCH_V5TE   = 0x05 << 16,
+
+		ARM9_COPRO_ID_SPEC_REV0   = 0x00 << 20,
+		ARM9_COPRO_ID_SPEC_REV1   = 0x01 << 20,
+
+		ARM9_COPRO_ID_MFR_ARM = 0x41 << 24,
+		ARM9_COPRO_ID_MFR_DEC = 0x44 << 24,
+		ARM9_COPRO_ID_MFR_INTEL = 0x69 << 24
+	};
+
 	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness);
 
 	// device-level overrides
@@ -523,14 +569,25 @@ class arm9_cpu_device : public arm7_cpu_device
 public:
 	// construction/destruction
 	arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness);
 };
 
 
-class arm920t_cpu_device : public arm7_cpu_device
+class arm920t_cpu_device : public arm9_cpu_device
 {
 public:
 	// construction/destruction
 	arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class arm946es_cpu_device : public arm9_cpu_device
+{
+public:
+	// construction/destruction
+	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -550,12 +607,13 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(ARM7,    arm7_cpu_device)
-DECLARE_DEVICE_TYPE(ARM7_BE, arm7_be_cpu_device)
-DECLARE_DEVICE_TYPE(ARM7500, arm7500_cpu_device)
-DECLARE_DEVICE_TYPE(ARM9,    arm9_cpu_device)
-DECLARE_DEVICE_TYPE(ARM920T, arm920t_cpu_device)
-DECLARE_DEVICE_TYPE(PXA255,  pxa255_cpu_device)
-DECLARE_DEVICE_TYPE(SA1110,  sa1110_cpu_device)
+DECLARE_DEVICE_TYPE(ARM7,     arm7_cpu_device)
+DECLARE_DEVICE_TYPE(ARM7_BE,  arm7_be_cpu_device)
+DECLARE_DEVICE_TYPE(ARM7500,  arm7500_cpu_device)
+DECLARE_DEVICE_TYPE(ARM9,     arm9_cpu_device)
+DECLARE_DEVICE_TYPE(ARM920T,  arm920t_cpu_device)
+DECLARE_DEVICE_TYPE(ARM946ES, arm946es_cpu_device)
+DECLARE_DEVICE_TYPE(PXA255,   pxa255_cpu_device)
+DECLARE_DEVICE_TYPE(SA1110,   sa1110_cpu_device)
 
 #endif // MAME_CPU_ARM7_ARM7_H

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "video/k051960.h"
 #include "video/k051316.h"
 #include "video/konami_helper.h"
@@ -22,7 +23,8 @@ public:
 		m_k051316_2(*this, "k051316_2"),
 		m_k051316_3(*this, "k051316_3"),
 		m_k051960(*this, "k051960"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_soundnmi(*this, "soundnmi") { }
 
 	int        m_bank0;
 	int        m_bank1;
@@ -36,9 +38,9 @@ public:
 	required_device<k051316_device> m_k051316_3;
 	required_device<k051960_device> m_k051960;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<input_merger_device> m_soundnmi;
 
-	DECLARE_WRITE16_MEMBER(sound_cmd_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_trigger_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
 	DECLARE_WRITE16_MEMBER(ultraman_gfxctrl_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

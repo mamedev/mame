@@ -132,6 +132,7 @@ compucolor.cpp
 comquest.cpp
 comx35.cpp
 concept.cpp
+controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
@@ -413,6 +414,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp

@@ -45,20 +45,19 @@ void (*arm7_coproc_dt_r_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, 
 void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
 
 
-DEFINE_DEVICE_TYPE(ARM7,    arm7_cpu_device,    "arm7_le", "ARM7 (little)")
-DEFINE_DEVICE_TYPE(ARM7_BE, arm7_be_cpu_device, "arm7_be", "ARM7 (big)")
-DEFINE_DEVICE_TYPE(ARM7500, arm7500_cpu_device, "arm7500", "ARM7500")
-DEFINE_DEVICE_TYPE(ARM9,    arm9_cpu_device,    "arm9",    "ARM9")
-DEFINE_DEVICE_TYPE(ARM920T, arm920t_cpu_device, "arm920t", "ARM920T")
-DEFINE_DEVICE_TYPE(PXA255,  pxa255_cpu_device,  "pxa255",  "Intel XScale PXA255")
-DEFINE_DEVICE_TYPE(SA1110,  sa1110_cpu_device,  "sa1110",  "Intel StrongARM SA-1110")
-
+DEFINE_DEVICE_TYPE(ARM7,     arm7_cpu_device,     "arm7_le",  "ARM7 (little)")
+DEFINE_DEVICE_TYPE(ARM7_BE,  arm7_be_cpu_device,  "arm7_be",  "ARM7 (big)")
+DEFINE_DEVICE_TYPE(ARM7500,  arm7500_cpu_device,  "arm7500",  "ARM7500")
+DEFINE_DEVICE_TYPE(ARM9,     arm9_cpu_device,     "arm9",     "ARM9")
+DEFINE_DEVICE_TYPE(ARM920T,  arm920t_cpu_device,  "arm920t",  "ARM920T")
+DEFINE_DEVICE_TYPE(ARM946ES, arm946es_cpu_device, "arm946es", "ARM946ES")
+DEFINE_DEVICE_TYPE(PXA255,   pxa255_cpu_device,   "pxa255",   "Intel XScale PXA255")
+DEFINE_DEVICE_TYPE(SA1110,   sa1110_cpu_device,   "sa1110",   "Intel StrongARM SA-1110")
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 {
 }
-
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -66,56 +65,104 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	, m_endian(endianness)
 	, m_archRev(archRev)
 	, m_archFlags(archFlags)
-	, m_copro_id(0x41 | (1 << 23) | (7 << 12))  // <-- where did this come from?
 	, m_pc(0)
 {
 	memset(m_r, 0x00, sizeof(m_r));
+	uint32_t arch = ARM9_COPRO_ID_ARCH_V4;
+	if (m_archFlags & ARCHFLAG_T)
+		arch = ARM9_COPRO_ID_ARCH_V4T;
+
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM | arch | ARM9_COPRO_ID_PART_GENERICARM7;
 }
 
 
 arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7_BE, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_BIG)
+	: arm7_cpu_device(mconfig, ARM7_BE, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_BIG)
 {
 }
 
 
 arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 3, eARM_ARCHFLAGS_MODE26, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
 {
-	m_copro_id = (0x41 << 24) | (0 << 20) | (1 << 16) | (0x710 << 4) | (0 << 0);
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM
+	           | ARM9_COPRO_ID_ARCH_V4
+	           | ARM9_COPRO_ID_PART_ARM710;
 }
 
 
 arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM9, tag, owner, clock, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E, ENDIANNESS_LITTLE)
-	// ARMv5
-	// has TE extensions
+	: arm9_cpu_device(mconfig, ARM9, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
 {
+}
+
+
+arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
+	: arm7_cpu_device(mconfig, type, tag, owner, clock, archRev, archFlags, endianness)
+{
+	uint32_t arch = ARM9_COPRO_ID_ARCH_V4;
+	switch (archRev)
+	{
+		case 4:
+			if (archFlags & ARCHFLAG_T)
+				arch = ARM9_COPRO_ID_ARCH_V4T;
+			break;
+		case 5:
+			arch = ARM9_COPRO_ID_ARCH_V5;
+			if (archFlags & ARCHFLAG_T)
+			{
+				arch = ARM9_COPRO_ID_ARCH_V5T;
+				if (archFlags & ARCHFLAG_E)
+				{
+					arch = ARM9_COPRO_ID_ARCH_V5TE;
+				}
+			}
+			break;
+		default: break;
+	}
+
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM | arch | (0x900 << 4);
 }
 
 
 arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM920T, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE)
-	// ARMv4
-	// has T extension
+	: arm9_cpu_device(mconfig, ARM920T, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 {
-	m_copro_id = (0x41 << 24) | (1 << 20) | (2 << 16) | (0x920 << 4) | (0 << 0);
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM
+	           | ARM9_COPRO_ID_SPEC_REV1
+	           | ARM9_COPRO_ID_ARCH_V4T
+	           | ARM9_COPRO_ID_PART_ARM920
+	           | 0; // Stepping
 }
 
+
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm9_cpu_device(mconfig, ARM946ES, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM
+	           | ARM9_COPRO_ID_ARCH_V5TE
+	           | ARM9_COPRO_ID_PART_ARM946
+	           | ARM9_COPRO_ID_STEP_ARM946_A0;
+}
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, PXA255, tag, owner, clock, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E | eARM_ARCHFLAGS_XSCALE, ENDIANNESS_LITTLE)
-	// ARMv5
-	// has TE and XScale extensions
+	: arm7_cpu_device(mconfig, PXA255, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_XSCALE, ENDIANNESS_LITTLE)
 {
+	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
+	           | ARM9_COPRO_ID_ARCH_V5TE
+	           | ARM9_COPRO_ID_PXA255_CORE_GEN_XSCALE
+	           | (3 << ARM9_COPRO_ID_PXA255_CORE_REV_SHIFT)
+	           | ARM9_COPRO_ID_STEP_PXA255_A0;
 }
 
-
 sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, SA1110, tag, owner, clock, 4, eARM_ARCHFLAGS_SA, ENDIANNESS_LITTLE)
-	// ARMv4
+	: arm7_cpu_device(mconfig, SA1110, tag, owner, clock, 4, ARCHFLAG_SA, ENDIANNESS_LITTLE)
 	// has StrongARM, no Thumb, no Enhanced DSP
 {
+	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
+	           | ARM9_COPRO_ID_ARCH_V4
+	           | ARM9_COPRO_ID_PART_SA1110
+	           | ARM9_COPRO_ID_STEP_SA1110_A0;
 }
 
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const
@@ -133,7 +180,7 @@ void arm7_cpu_device::update_reg_ptr()
 void arm7_cpu_device::set_cpsr(uint32_t val)
 {
 	uint8_t old_mode = GET_CPSR & MODE_FLAG;
-	if (m_archFlags & eARM_ARCHFLAGS_MODE26)
+	if (m_archFlags & ARCHFLAG_MODE26)
 	{
 		if ((val & 0x10) != (m_r[eCPSR] & 0x10))
 		{
@@ -815,35 +862,35 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 	// we only handle system copro here
 	if (cpnum != 15)
 	{
-		if (m_archFlags & eARM_ARCHFLAGS_XSCALE)
-	{
-		// handle XScale specific CP14
-		if (cpnum == 14)
+		if (m_archFlags & ARCHFLAG_XSCALE)
 		{
-			switch( cReg )
+			// handle XScale specific CP14
+			if (cpnum == 14)
 			{
-				case 1: // clock counter
-					data = (uint32_t)total_cycles();
-					break;
+				switch( cReg )
+				{
+					case 1: // clock counter
+						data = (uint32_t)total_cycles();
+						break;
 
-				default:
-					break;
+					default:
+						break;
+				}
 			}
+			else
+			{
+				fatalerror("XScale: Unhandled coprocessor %d (archFlags %x)\n", cpnum, m_archFlags);
+			}
+
+			return data;
 		}
 		else
 		{
-			fatalerror("XScale: Unhandled coprocessor %d (archFlags %x)\n", cpnum, m_archFlags);
+			LOG( ("ARM7: Unhandled coprocessor %d (archFlags %x)\n", cpnum, m_archFlags) );
+			m_pendingUnd = true;
+			update_irq_state();
+			return 0;
 		}
-
-		return data;
-	}
-	else
-	{
-		LOG( ("ARM7: Unhandled coprocessor %d (archFlags %x)\n", cpnum, m_archFlags) );
-		m_pendingUnd = true;
-		update_irq_state();
-		return 0;
-	}
 	}
 
 	switch( cReg )
@@ -859,73 +906,25 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 			LOG( ( "arm7_rt_r_callback CR%d, RESERVED\n", cReg ) );
 			break;
 		case 0:             // ID
-		switch(op2)
-		{
-			case 0:
-			switch (m_archRev)
+			switch(op2)
 			{
-				case 3: // ARM6 32-bit
-				data = 0x41;
+			case 0:
+				data = m_copro_id;
 				break;
-
-				case 4: // ARM7/SA11xx
-					if (m_archFlags & eARM_ARCHFLAGS_SA)
-					{
-						// ARM Architecture Version 4
-						// Part Number 0xB11 (SA1110)
-						// Stepping B5
-							data = 0x69 | ( 0x01 << 16 ) | ( 0xB11 << 4 ) | 0x9;
-					}
-					else
-					{
-						data = m_copro_id;
-					}
-					break;
-
-				case 5: // ARM9/10/XScale
-					data = 0x41 | (9 << 12);
-					if (m_archFlags & eARM_ARCHFLAGS_T)
-					{
-						if (m_archFlags & eARM_ARCHFLAGS_E)
-						{
-							if (m_archFlags & eARM_ARCHFLAGS_J)
-							{
-								data |= (6<<16);    // v5TEJ
-							}
-							else
-							{
-								data |= (5<<16);    // v5TE
-							}
-						}
-						else
-						{
-							data |= (4<<16);    // v5T
-						}
-					}
-
-					/* ID from PXA-250 manual */
-					//data = 0x69052100;
-					break;
-
-				case 6: // ARM11
-					data = 0x41 | (10<< 12) | (7<<16);  // v6
-					break;
+			case 1: // cache type
+				data = 0x0f0d2112;  // HACK: value expected by ARMWrestler (probably Nintendo DS ARM9's value)
+				//data = (6 << 25) | (1 << 24) | (0x172 << 12) | (0x172 << 0); // ARM920T (S3C24xx)
+				break;
+			case 2: // TCM type
+				data = 0;
+				break;
+			case 3: // TLB type
+				data = 0;
+				break;
+			case 4: // MPU type
+				data = 0;
+				break;
 			}
-			break;
-		case 1: // cache type
-			data = 0x0f0d2112;  // HACK: value expected by ARMWrestler (probably Nintendo DS ARM9's value)
-			//data = (6 << 25) | (1 << 24) | (0x172 << 12) | (0x172 << 0); // ARM920T (S3C24xx)
-			break;
-		case 2: // TCM type
-			data = 0;
-			break;
-		case 3: // TLB type
-			data = 0;
-			break;
-		case 4: // MPU type
-			data = 0;
-			break;
-		}
 			LOG( ( "arm7_rt_r_callback, ID %02x (%02x) -> %08x (PC=%08x)\n",op2,m_archRev,data,GET_PC ) );
 			break;
 		case 1:             // Control
@@ -1079,7 +1078,7 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
 {
 	uint8_t cpn = (insn >> 8) & 0xF;
-	if ((m_archFlags & eARM_ARCHFLAGS_XSCALE) && (cpn == 0))
+	if ((m_archFlags & ARCHFLAG_XSCALE) && (cpn == 0))
 	{
 		LOG( ( "arm7_dt_r_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
 	}
@@ -1094,7 +1093,7 @@ void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
 void arm7_cpu_device::arm7_dt_w_callback(uint32_t insn, uint32_t *prn)
 {
 	uint8_t cpn = (insn >> 8) & 0xF;
-	if ((m_archFlags & eARM_ARCHFLAGS_XSCALE) && (cpn == 0))
+	if ((m_archFlags & ARCHFLAG_XSCALE) && (cpn == 0))
 	{
 		LOG( ( "arm7_dt_w_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
 	}

@@ -512,7 +512,7 @@ int acorn_dos_format::identify(io_generic *io, uint32_t form_factor)
 	int type = find_size(io, form_factor);
 
 	if(type != -1)
-		return 90; 
+		return 90;
 	return 0;
 }
 
@@ -593,7 +593,7 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 			spt = 10;
 			desc_pc_sector sects[10];
 			uint8_t sectdata[10*512];
-			
+
 			io_generic_read(io, sectdata, file_offset, spt * bps);
 
 			for (int i = 0; i < spt; i++) {

@@ -74,12 +74,12 @@
     - alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
     - applecl1: can't pass hands apparently;
     - arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
-	- arcus2: has intro glitches; 
-	- artjigs*: some text doesn't appear? Namely under the puzzles and when you clear one;
+    - arcus2: has intro glitches;
+    - artjigs*: some text doesn't appear? Namely under the puzzles and when you clear one;
     - atragon: HDD install disk swap doesn't work?
     - asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
     - arquelph: beeps out at initial sound check,  no voice samples, extra sound board tested;
-	- akitsuka: could not setup "initial data" (regression);
+    - akitsuka: could not setup "initial data" (regression);
     - bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
     - biblems2: initial GLODIA logo uses raster effects?
     - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
@@ -659,16 +659,16 @@ READ8_MEMBER(pc9801_state::f0_r)
 	if(offset == 0)
 	{
 		// iterate thru all devices to check if an AMD98 is present
-		for (pc9801_amd98_device &amd98 : device_type_iterator<pc9801_amd98_device>(machine().root_device())) 
+		for (pc9801_amd98_device &amd98 : device_type_iterator<pc9801_amd98_device>(machine().root_device()))
 		{
 			logerror("Read AMD98 ID %s\n",amd98.tag());
 			return 0x18; // return the right ID
 		}
-		
+
 		logerror("Read port 0 from 0xf0 (AMD98 check?)\n");
 		return 0; // card not present
 	}
-	
+
 	return 0xff;
 }
 
@@ -2286,8 +2286,15 @@ static MACHINE_CONFIG_START( pc9801_common )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc9801_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc9801_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc9801_state, dack3_w))
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP) // TODO: Check ir7_w
+
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(pc9801_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w)) // TODO: Check ir7_w
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("ppi8255_sys", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))

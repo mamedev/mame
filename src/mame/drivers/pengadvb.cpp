@@ -25,7 +25,7 @@ NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 TODO:
 - A timer apparently expires when beating stage 4 (signalled by a long beeping sound).
   Player needs to insert another credit and press start button (?) in order to continue.
-  Is this timer supposed to be shown on screen or there are additional 7-LEDs not handled? 
+  Is this timer supposed to be shown on screen or there are additional 7-LEDs not handled?
 
 ***************************************************************************/
 
@@ -178,7 +178,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
 }
 
 READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
-{	
+{
 	// TODO: dipswitch
 	switch (m_kb_matrix_row)
 	{

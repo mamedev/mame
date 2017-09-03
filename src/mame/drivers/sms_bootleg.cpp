@@ -244,7 +244,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(smsbootleg_state::port08_w)
 {
-//	logerror("port08_w %02x\n", data);
+//  logerror("port08_w %02x\n", data);
 }
 
 WRITE8_MEMBER(smsbootleg_state::port18_w)

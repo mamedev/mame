@@ -678,6 +678,7 @@ BUSES["IQ151"] = true
 BUSES["ISA"] = true
 BUSES["ISBX"] = true
 BUSES["HP_OPTROM"] = true
+BUSES["HP80_OPTROM"] = true
 BUSES["HP9845_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
@@ -2465,6 +2466,8 @@ files {
 	MAME_DIR .. "src/mame/includes/gba.h",
 	MAME_DIR .. "src/mame/drivers/n64.cpp",
 	MAME_DIR .. "src/mame/includes/n64.h",
+	MAME_DIR .. "src/mame/drivers/nds.cpp",
+	MAME_DIR .. "src/mame/includes/nds.h",
 	MAME_DIR .. "src/mame/drivers/nes.cpp",
 	MAME_DIR .. "src/mame/includes/nes.h",
 	MAME_DIR .. "src/mame/machine/nes.cpp",

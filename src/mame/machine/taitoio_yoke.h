@@ -44,7 +44,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( handle_up_r );
 	DECLARE_READ_LINE_MEMBER( handle_down_r );
 
-	
+
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:

@@ -2808,9 +2808,14 @@ static MACHINE_CONFIG_START( towns_base )
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(towns_state, pit2_out1_changed))
 	MCFG_PIT8253_CLK2(307200) // reserved
 
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(towns_state,get_slave_ack))
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(towns_state, get_slave_ack))
 
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_MB8877_ADD("fdc",XTAL_8MHz/4)  // clock unknown
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(towns_state,mb8877a_irq_w))
@@ -2853,7 +2858,7 @@ static MACHINE_CONFIG_START( towns_base )
 	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
-	
+
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(towns_state, towns_rxrdy_irq))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(towns_state, towns_txrdy_irq))

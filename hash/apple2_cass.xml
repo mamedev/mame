@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="apple2_cass" description="Apple II cassettes">
+
+	<software name="clrdlbo">
+		<description>Color Demosoft / Little Brickout</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="usage" value="16K ]Load" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Side A: Color Demosoft"/>
+			<dataarea name="cass" size="1391234">
+				<rom name="color demosoft (1979)(apple computer).wav" size="1391234" crc="2ba255a5" sha1="3b3340d96435a8e377e897ecbfa36aa0d901188d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Side B: Little Brickout"/>
+			<dataarea name="cass" size="3092524">
+				<rom name="little brickout (1979)(apple computer).wav" size="3092524" crc="8aa1ca88" sha1="a19b143204faeb88d61001f4f57ba4d4ca8939fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karma">
+		<description>Lords of Karma</description>
+		<year>1980</year>
+		<publisher>Microcomputer Games</publisher>
+		<info name="usage" value="32K 0800.7FFFR 0800G" />
+		<part name="cass" interface="apple2_cass">
+			<dataarea name="cass" size="8095936">
+				<rom name="lords of karma (1980)(microcomputer games).wav" size="8095936" crc="295520d8" sha1="ddaf810d7c610da485620738a506fb0436319303" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strtstw">
+		<description>Startrek / Starwars</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="usage" value="16K >Load" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Side A: Startrek"/>
+			<dataarea name="cass" size="4134574">
+				<rom name="startrek (1978)(apple computer).wav" size="4134574" crc="7112bff5" sha1="279545abc5bf9b57dc79e7ea322df59b733803b0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Side B: Starwars"/>
+			<dataarea name="cass" size="2590032">
+				<rom name="starwars (1978)(apple computer).wav" size="2590032" crc="d2ea22a1" sha1="823ac3669a4b98fb7ca41f90db0d562c624d4904" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -403,7 +403,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 		m_wheel_board_u8_latch |= BIT(data, 2) << 4; // WA2; C for U9
 		m_wheel_board_u8_latch |= BIT(data, 3) << 3; // WA3; G2B for U9
 	}
-	
+
 	if (!BIT(data, 9))
 	{
 		logerror("Wheel board (U13 74HC245; DCS) = %02X\n", data & 0xFF);
@@ -475,7 +475,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 					logerror("Wheel board (U14 74HC574; DCS Control) = %02X\n", arg);
 					break;
 				case 1: // GALCTLZ
-					logerror("Wheel board (U19 PAL22V10; Galil Control) = %02X\n", arg); 
+					logerror("Wheel board (U19 PAL22V10; Galil Control) = %02X\n", arg);
 					break;
 				case 2: // ATODWRZ
 					logerror("Wheel board (ATODWRZ) = %02X\n", arg);
@@ -501,7 +501,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 			}
 		}
 	}
-	
+
 	m_wheel_board_last = data;
 }
 

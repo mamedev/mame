@@ -247,8 +247,8 @@ Known undumped prototypes:
 			</dataarea>
 		</part>
 	</software>
-	
-		<software name="cmines2bt" cloneof="cmines2">
+
+	<software name="cmines2bt" cloneof="cmines2">
 		<description>Crystal Mines II - Buried Treasure (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>Songbird Productions</publisher>

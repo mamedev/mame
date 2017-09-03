@@ -22,7 +22,7 @@
 // ======================> psi_hle_keyboard_device
 
 class psi_hle_keyboard_device : public device_t,
-                                public device_psi_keyboard_interface,
+								public device_psi_keyboard_interface,
 								protected device_matrix_keyboard_interface<7>
 {
 public:

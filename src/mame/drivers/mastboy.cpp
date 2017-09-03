@@ -11,6 +11,8 @@
     Notes:
 
     Why does RAM-M fail on first boot, Charles mentioned it can (randomly?) fail on real HW too, is it buggy code?
+    The EAROM (28C16 parallel EEPROM) takes a long time to write out if RAM-M fails internal testing.
+
     Are the correct/incorrect samples when you answer a question meant to loop as they do?
     Video timing should be hooked up with MAME's new video timing system
 
@@ -18,8 +20,6 @@
     having a different internal program, or is it just a (bad) hack?
 
     This Can be converted to tilemaps very easily, but probably not worth it
-
-    EEPROM enable / disable needs figuring out properly
 */
 
 /*
@@ -475,16 +475,12 @@ public:
 	uint8_t* m_vram;
 	uint8_t m_bank;
 	int m_irq0_ack;
-	int m_earom_enabled;
 	int m_m5205_next;
 	int m_m5205_part;
 
 	DECLARE_READ8_MEMBER(banked_ram_r);
 	DECLARE_WRITE8_MEMBER(banked_ram_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(earom_r);
-	DECLARE_WRITE8_MEMBER(earom_w);
-	DECLARE_WRITE_LINE_MEMBER(earom_enable_w);
 	DECLARE_WRITE8_MEMBER(msm5205_data_w);
 	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
 	DECLARE_READ8_MEMBER(port_38_read);
@@ -626,32 +622,6 @@ WRITE8_MEMBER(mastboy_state::bank_w)
 	m_bank = data;
 }
 
-// EAROM (28C16 parallel EEPROM) access
-
-READ8_MEMBER(mastboy_state::earom_r)
-{
-	return m_earom->read(space, offset);
-}
-
-WRITE8_MEMBER(mastboy_state::earom_w)
-{
-//  if (m_earom_enabled)
-//  {
-		m_earom->write(space, offset, data);
-//  }
-//  else
-//  {
-//      logerror("Write to EAROM when disabled! %04x, %02x\n", offset,data);
-//  }
-}
-
-WRITE_LINE_MEMBER(mastboy_state::earom_enable_w)
-{
-	/* This is some kind of enable / disable control for backup memory (see Charles's notes) but I'm not
-	   sure how it works in practice, if we use it then it writes a lot of data with it disabled */
-	m_earom_enabled = state;
-}
-
 /* MSM5205 Related */
 
 WRITE8_MEMBER(mastboy_state::msm5205_data_w)
@@ -699,7 +669,7 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 
-	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(earom_r, earom_w)
+	AM_RANGE(0xff000, 0xff7ff) AM_DEVREADWRITE("earom", eeprom_parallel_28xx_device, read, write)
 
 	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
 	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
@@ -855,7 +825,6 @@ void mastboy_state::machine_start()
 
 	save_item(NAME(m_bank));
 	save_item(NAME(m_irq0_ack));
-	save_item(NAME(m_earom_enabled));
 	save_item(NAME(m_m5205_next));
 	save_item(NAME(m_m5205_part));
 }
@@ -884,7 +853,7 @@ static MACHINE_CONFIG_START( mastboy )
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("msm", msm5205_device, s2_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("msm", msm5205_device, s1_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mastboy_state, earom_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
