@@ -680,7 +680,7 @@ function cheat.startplugin()
 			  end,
 			  function()
 				return menu_populate()
-			  end, "Cheat")
+			  end, _("Cheat"))
 
 	emu.register_start(function()
 		if not stop then
