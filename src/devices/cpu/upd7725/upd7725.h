@@ -119,16 +119,16 @@ protected:
 private:
 	struct Flag
 	{
-		bool s1, s0, c, z, ov1, ov0, ov0p, ov0pp;
+		bool s1, s0, c, z, ov1, ov0;
 
 		inline operator unsigned() const
 		{
-			return (s1 << 7) + (s0 << 6) + (c << 5) + (z << 4) + (ov1 << 3) + (ov0 << 2) + (ov0p << 1) + (ov0pp << 0);
+			return (s1 << 5) + (s0 << 4) + (c << 3) + (z << 2) + (ov1 << 1) + (ov0 << 0);
 		}
 
 		inline unsigned operator=(unsigned d)
 		{
-			s1 = d & 0x80; s0 = d & 0x40; c = d & 0x20; z = d & 0x10; ov1 = d & 0x08; ov0 = d & 0x04; ov0p = d & 0x02; ov0pp = d & 0x01;
+			s1 = d & 0x20; s0 = d & 0x10; c = d & 0x08; z = d & 0x04; ov1 = d & 0x02; ov0 = d & 0x01;
 			return d;
 		}
 	};
