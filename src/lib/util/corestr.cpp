@@ -223,9 +223,11 @@ static std::string &strtransform_uchar(std::string& str, char32_t(*callback)(cha
 			if (old_character != new_character)
 			{
 				// if the character has changed, replace it
-				std::string new_character_string = utf8_from_uchar(new_character);
-				str.replace(i, rc, new_character_string);
-				advance = new_character_string.size();
+				char new_character_utf8_buffer[UTF8_CHAR_MAX];
+				int new_character_utf8_length = utf8_from_uchar(new_character_utf8_buffer, ARRAY_LENGTH(new_character_utf8_buffer), new_character);
+				assert(new_character_utf8_length > 0);
+				str.replace(i, rc, new_character_utf8_buffer, new_character_utf8_length);
+				advance = new_character_utf8_length;
 			}
 			else
 			{
