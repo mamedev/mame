@@ -327,6 +327,9 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 	, m_accept_char()
 	, m_charqueue_empty()
 {
+	// special sanity check
+	static_assert(SHIFT_COUNT == UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1, "SHIFT_COUNT and UCHAR_SHIFT_[BEGIN|END] must line up");
+
 	// try building a list of keycodes; if none are available, don't bother
 	build_codes(machine.ioport());
 	if (!m_keycode_map.empty())

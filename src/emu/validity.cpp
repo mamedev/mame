@@ -13,6 +13,7 @@
 
 #include "emuopts.h"
 #include "video/rgbutil.h"
+#include "natkeyboard.h"
 
 #include <ctype.h>
 #include <type_traits>

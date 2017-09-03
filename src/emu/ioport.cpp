@@ -3071,10 +3071,6 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 
 ioport_configurer& ioport_configurer::field_add_char(char32_t ch)
 {
-	// special hack to allow for PORT_CODE('\xA3')
-	if (ch >= 0xffffff80 && ch <= 0xffffffff)
-		ch &= 0xff;
-
 	for (int index = 0; index < ARRAY_LENGTH(m_curfield->m_chars); index++)
 		if (m_curfield->m_chars[index] == 0)
 		{
