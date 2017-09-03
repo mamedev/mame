@@ -116,7 +116,6 @@ public:
 
 private:
 	bool m_in_buserr;
-	uint32_t m_last_buserr_pc;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -154,6 +153,10 @@ static ADDRESS_MAP_START(hp9k3xx_common, AS_PROGRAM, 32, hp9k3xx_state)
 	AM_RANGE(0x00510000, 0x00510003) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
 	AM_RANGE(0x00538000, 0x00538003) AM_READWRITE(buserror_r, buserror_w)   // no "Graphics"
 	AM_RANGE(0x005c0000, 0x005c0003) AM_READWRITE(buserror_r, buserror_w)   // no add-on FP coprocessor
+
+	AM_RANGE(0x00600000, 0x007fffff) AM_READWRITE(buserror_r, buserror_w)   // prevent reading invalid DIO slots
+	AM_RANGE(0x01000000, 0x1fffffff) AM_READWRITE(buserror_r, buserror_w)   // prevent reading invalid DIO-II slots
+
 	AM_RANGE(0x005f8000, 0x005f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
@@ -166,7 +169,7 @@ static ADDRESS_MAP_START(hp9k310_map, AS_PROGRAM, 16, hp9k3xx_state)
 	AM_RANGE(0x5c0000, 0x5c0003) AM_READWRITE(buserror16_r, buserror16_w)   // no add-on FP coprocessor
 
 	AM_RANGE(0x5f8000, 0x5f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff)
-
+	AM_RANGE(0x600000, 0x7ffffd) AM_READWRITE(buserror16_r, buserror16_w)   // prevent reading invalid DIO slots
 	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(buserror16_r, buserror16_w)
 	AM_RANGE(0x800000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -242,76 +245,51 @@ INPUT_PORTS_END
 void hp9k3xx_state::machine_reset()
 {
 	m_in_buserr = false;
-	m_last_buserr_pc = 0;
 }
 
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
-	if (m_last_buserr_pc == space.device().safe_pc())
-	{
-		return 0;
-	}
-
 	if (!m_in_buserr)
 	{
 		m_in_buserr = true;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_in_buserr = false;
-		m_last_buserr_pc = space.device().safe_pc();
 	}
 	return 0;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
-	if (m_last_buserr_pc == space.device().safe_pc())
-	{
-		return;
-	}
-
 	if (!m_in_buserr)
 	{
 		m_in_buserr = true;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_in_buserr = false;
-		m_last_buserr_pc = space.device().safe_pc();
 	}
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
 {
-	if (m_last_buserr_pc == space.device().safe_pc())
-	{
-		return 0;
-	}
-
 	if (!m_in_buserr)
 	{
 		m_in_buserr = true;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_in_buserr = false;
-		m_last_buserr_pc = space.device().safe_pc();
 	}
 	return 0;
 }
 
 WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 {
-	if (m_last_buserr_pc == space.device().safe_pc())
-	{
-		return;
-	}
-
 	if (!m_in_buserr)
 	{
 		m_in_buserr = true;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_in_buserr = false;
-		m_last_buserr_pc = space.device().safe_pc();
 	}
 }
 
