@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_IOPORT_H
 #define MAME_EMU_IOPORT_H
 
+#include "natkeyboard.h"
+
 #include <cstdint>
 #include <cstring>
 #include <time.h>
@@ -41,7 +43,7 @@ const char32_t UCHAR_PRIVATE = 0x100000;
 const char32_t UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
 const char32_t UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
 const char32_t UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
-const char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_2;
+const char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_BEGIN + natural_keyboard::SHIFT_COUNT - 1;
 const char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
 
 
@@ -1144,7 +1146,7 @@ private:
 
 	// data relevant to other specific types
 	u8                          m_way;              // digital joystick 2/4/8-way descriptions
-	char32_t                    m_chars[4];         // unicode key data
+	char32_t                    m_chars[natural_keyboard::SHIFT_STATES];         // unicode key data
 };
 
 
