@@ -218,9 +218,15 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
+	bool validated_any = false;
 	while (m_drivlist.next())
+	{
 		if (m_drivlist.matches(string, m_drivlist.driver().name))
+		{
 			validate_one(m_drivlist.driver());
+			validated_any = true;
+		}
+	}
 
 	// validate devices
 	if (!string)
@@ -228,6 +234,10 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// cleanup
 	validate_end();
+
+	// if we failed to match anything, it
+	if (string && !validated_any)
+		throw emu_fatalerror(EMU_ERR_FAILED_VALIDITY, "\"%s\" failed to match any drivers\n", string);
 
 	return !(m_errors > 0 || m_warnings > 0);
 }
