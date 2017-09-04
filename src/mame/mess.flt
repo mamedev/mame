@@ -550,6 +550,7 @@ rsc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
+rzone.cpp
 sacstate.cpp
 sage2.cpp
 samcoupe.cpp

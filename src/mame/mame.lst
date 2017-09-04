@@ -14625,7 +14625,6 @@ knfl                            // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
 nupogodi                        // Elektronika
-rzindy500                       // Tiger
 tddragon                        // Tiger
 tgaunt                          // Tiger
 tsjam                           // Tiger
@@ -32481,6 +32480,9 @@ rvoicepc                        //
 
 @source:rx78.cpp
 rx78                            //
+
+@source:rzone.cpp
+rzindy500                       //
 
 @source:s11.cpp
 gmine_l2                        //
