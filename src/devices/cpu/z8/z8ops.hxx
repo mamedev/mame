@@ -293,7 +293,7 @@ void z8_device::compare(uint8_t dst, uint8_t src)
 	uint8_t data = register_read(dst);
 	uint16_t new_data = data - src;
 
-	set_flag_c(!(new_data & 0x100));
+	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
@@ -378,9 +378,9 @@ void z8_device::subtract_carry(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst - src - C */
 	uint8_t data = register_read(dst);
-	uint16_t new_data = data - src;
+	uint16_t new_data = data - src - flag(C);
 
-	set_flag_c(!(new_data & 0x100));
+	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
@@ -403,7 +403,7 @@ void z8_device::subtract(uint8_t dst, uint8_t src)
 	uint8_t data = register_read(dst);
 	uint16_t new_data = data - src;
 
-	set_flag_c(!(new_data & 0x100));
+	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
