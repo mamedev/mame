@@ -33,12 +33,6 @@ class natural_keyboard
 	DISABLE_COPYING(natural_keyboard);
 
 public:
-	enum
-	{
-		SHIFT_COUNT = 2,
-		SHIFT_STATES = 1 << SHIFT_COUNT
-	};
-
 	// construction/destruction
 	natural_keyboard(running_machine &machine);
 
@@ -65,6 +59,12 @@ public:
 	std::string dump() const;
 
 private:
+	enum
+	{
+		SHIFT_COUNT = UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1,
+		SHIFT_STATES = 1 << SHIFT_COUNT
+	};
+
 	// internal keyboard code information
 	struct keycode_map_entry
 	{

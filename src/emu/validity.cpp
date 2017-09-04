@@ -13,7 +13,6 @@
 
 #include "emuopts.h"
 #include "video/rgbutil.h"
-#include "natkeyboard.h"
 
 #include <ctype.h>
 #include <type_traits>
@@ -1825,11 +1824,16 @@ void validity_checker::validate_inputs()
 						validate_condition(setting.condition(), device, port_map);
 
 				// verify natural keyboard codes
-				for (int which = 0; which < natural_keyboard::SHIFT_STATES; which++)
+				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
 				{
 					char32_t code = field.keyboard_code(which);
 					if (code && !uchar_isvalid(code))
-						osd_printf_error("Field '%s' has an invalid natural keyboard code (0x%x)\n", name, (unsigned) code);
+					{
+						osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
+							name,
+							(unsigned)code,
+							(int)code);
+					}
 				}
 			}
 
