@@ -124,6 +124,7 @@ video z80
 #include "video/mb_vcu.h"
 #include "screen.h"
 #include "speaker.h"
+#include "machine/nvram.h"
 
 
 #define MAZERBLA 0x01
@@ -962,7 +963,7 @@ static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8, mazerbla_state )
@@ -1473,6 +1474,8 @@ static MACHINE_CONFIG_START( mazerbla )
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1484,7 +1487,7 @@ static MACHINE_CONFIG_START( mazerbla )
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
-
+	
 	/* sound hardware */
 MACHINE_CONFIG_END
 
@@ -1514,6 +1517,8 @@ static MACHINE_CONFIG_START( greatgun )
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
