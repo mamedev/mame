@@ -837,7 +837,7 @@ void z8_device::take_interrupt(int irq)
 	stack_push_byte(m_r[Z8_REGISTER_FLAGS]);
 
 	// branch to the vector
-	m_pc = m_direct->read_byte(vector) << 16;
+	m_pc = m_direct->read_byte(vector) << 8;
 	m_pc |= m_direct->read_byte(vector + 1);
 }
 
