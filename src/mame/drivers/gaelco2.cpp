@@ -212,19 +212,29 @@ static MACHINE_CONFIG_DERIVED( maniacsq_d5002fp, maniacsq )
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
-ROM_START( maniacsq )
+
+ROM_START( maniacsq ) // REF 940411
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "d8-d15.1m",   0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
-	ROM_LOAD16_BYTE( "d0-d7.1m",    0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
+	ROM_LOAD16_BYTE( "TMS27C010A.MSU45",   0x000000, 0x020000, CRC(fa44c907) SHA1(4d9b3a6cf044395cc4e04f6dd8d1109e8ee4d52d) )
+	ROM_LOAD16_BYTE( "TMS27C010A.MSU44",   0x000001, 0x020000, CRC(42e20121) SHA1(6662fa8ec5756bf5c4ebaaa9aa2e0e241cf582a4) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "ms_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	//DS5002FP_SET_MON( x )
+	//DS5002FP_SET_RPCTL( x )
+	//DS5002FP_SET_CRCR( x )
 
 	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
-	ROM_LOAD( "d0-d7.4m",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
-	ROM_LOAD( "d8-d15.4m",  0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
-	ROM_LOAD( "d16-d23.1m", 0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
-	ROM_FILL(               0x0120000, 0x0060000, 0x00 )         /* Empty */
-	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
-	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         /* Empty */
-	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+	// all 4 roms on a sub-board, no IC positions marked
+	ROM_LOAD( "MS1",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
+	ROM_LOAD( "MS2",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
+	ROM_LOAD( "MS3",   0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
+	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
+	ROM_LOAD( "MS4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
+	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
+	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 ROM_START( maniacsqa ) // REF 940411
@@ -249,6 +259,21 @@ ROM_START( maniacsqa ) // REF 940411
 	ROM_LOAD( "MS4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
 	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+ROM_END
+
+ROM_START( maniacsqu )
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "d8-d15.1m",   0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
+	ROM_LOAD16_BYTE( "d0-d7.1m",    0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
+
+	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_LOAD( "d0-d7.4m",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
+	ROM_LOAD( "d8-d15.4m",  0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
+	ROM_LOAD( "d16-d23.1m", 0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
+	ROM_FILL(               0x0120000, 0x0060000, 0x00 )         /* Empty */
+	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
+	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         /* Empty */
+	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 /*============================================================================
@@ -1774,8 +1799,10 @@ GAME( 1995, touchgok, touchgo,  touchgo,          touchgo,  gaelco2_state, touch
 
 GAME( 1995, wrally2,  0,        wrally2, wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
 
-GAME( 1996, maniacsq, 0,        maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
-GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+// All sets identify as Version 1.0, but are clearly different revisions
+GAME( 1996, maniacsq, 0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1996, maniacsqu,maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
 
 GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
