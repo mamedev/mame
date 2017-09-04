@@ -2288,8 +2288,6 @@ Taito, 1988
 
  Seta: P0-028-A
 Taito: K1100416A J1100332A
-which is described in the diagram below.
-
 |--------------------------------------------------|
 |    SETA                     SETA         12MHz   |
 |    X1-003     6116          X1-001               |
@@ -2321,7 +2319,7 @@ which is described in the diagram below.
 Notes:
       6264: 8K x8 SRAM
       6116: 2K x8 SRAM
-
+	  Graphics ROMs are 23C1000/TC531000 MASK ROMs
 
 
 Chuka Taisen 'later' version: 
