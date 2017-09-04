@@ -32,14 +32,19 @@ PALETTE_INIT_MEMBER(munchmo_state, munchmo)
 	}
 }
 
-WRITE8_MEMBER(munchmo_state::palette_bank_w)
+WRITE_LINE_MEMBER(munchmo_state::palette_bank_0_w)
 {
-	m_palette_bank = data & 0x3;
+	m_palette_bank = (state ? 1 : 0) | (m_palette_bank & 2);
 }
 
-WRITE8_MEMBER(munchmo_state::flipscreen_w)
+WRITE_LINE_MEMBER(munchmo_state::palette_bank_1_w)
 {
-	m_flipscreen = data;
+	m_palette_bank = (state ? 2 : 0) | (m_palette_bank & 1);
+}
+
+WRITE_LINE_MEMBER(munchmo_state::flipscreen_w)
+{
+	m_flipscreen = state;
 }
 
 

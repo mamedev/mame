@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont,Ryan Holtz
 /***************************************************************************
 
-  gba.c
+  gba.cpp
 
   Driver file to handle emulation of the Nintendo Game Boy Advance.
 

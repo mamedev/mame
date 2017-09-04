@@ -800,14 +800,18 @@ static MACHINE_CONFIG_START( notetakr )
 	MCFG_CPU_PROGRAM_MAP(notetaker_iocpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_iocpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("iopic8259", pic8259_device, inta_cb)
-	MCFG_PIC8259_ADD("iopic8259", INPUTLINE("iocpu", 0), VCC, NOOP) // iP8259A-2 @ E6
+
+	MCFG_DEVICE_ADD("iopic8259", PIC8259, 0) // iP8259A-2 @ E6
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iocpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
 	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(notetaker_emulatorcpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_emulatorcpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("emulatorpic8259", pic8259_device, inta_cb)
-	MCFG_PIC8259_ADD("emulatorpic8259", INPUTLINE("emulatorcpu", 0), VCC, NOOP) // iP8259A-2 @ E6
+
+	MCFG_DEVICE_ADD("emulatorpic8259", PIC8259, 0) // iP8259A-2 @ E6
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("emulatorcpu", 0))
 	*/
 
 	/* video hardware */

@@ -187,6 +187,28 @@ Missing dumps:
 		</part>
 	</software>
 
+	<software name="vwrit128">
+		<description>VizaWrite 128</description>
+		<year>1985</year>
+		<publisher>Viza</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="romh" size="0x2000">
+				<rom name="vizawrite 128.bin" size="0x2000" crc="b4846e5d" sha1="ab250d5bd264faacffea68fd0791d9956e7282e8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="vizawrite 128.d81" size="819200" crc="e0ea7b98" sha1="2b1acf1f3916883df9216b593e64a98b03e7b957" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="partn128">
 		<description>PARTNER 128</description>
 		<year>1985</year>

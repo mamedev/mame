@@ -62,8 +62,6 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch2;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_READ8_MEMBER(sound_status_main_r);

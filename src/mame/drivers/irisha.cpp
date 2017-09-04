@@ -417,7 +417,8 @@ static MACHINE_CONFIG_START( irisha )
 	MCFG_I8255_IN_PORTC_CB(READ8(irisha_state, irisha_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(irisha_state, irisha_8255_portc_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
 /* ROM definition */

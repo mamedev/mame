@@ -4387,7 +4387,7 @@
 	NEO-MVS PROGBK1 / NEO-MVS CHA256B
 	-->
 
-	<software name="tws96">
+	<software name="twsoc96">
 		<description>Tecmo World Soccer '96</description>
 		<year>1996</year>
 		<publisher>Tecmo</publisher>

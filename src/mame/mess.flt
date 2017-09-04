@@ -414,6 +414,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp

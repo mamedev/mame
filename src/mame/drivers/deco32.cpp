@@ -728,11 +728,6 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 /**********************************************************************************/
 
 
-uint16_t deco32_state::port_b_nslasher(int unused)
-{
-	return (m_eeprom->do_read());
-}
-
 void deco32_state::nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
@@ -741,7 +736,7 @@ void deco32_state::nslasher_sound_cb( address_space &space, uint16_t data, uint1
 	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint16_t deco32_state::port_b_tattass(int unused)
+READ16_MEMBER(deco32_state::port_b_tattass)
 {
 	return m_tattass_eprom_bit;
 }
@@ -1913,6 +1908,9 @@ static MACHINE_CONFIG_START( captaven )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,captaven)
@@ -1937,21 +1935,6 @@ static MACHINE_CONFIG_START( captaven )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-
-uint16_t deco32_state::port_a_fghthist(int unused)
-{
-	return machine().root_device().ioport(":IN0")->read();
-}
-
-uint16_t deco32_state::port_b_fghthist(int unused)
-{
-	return machine().device<eeprom_serial_93cxx_device>(":eeprom")->do_read();
-}
-
-uint16_t deco32_state::port_c_fghthist(int unused)
-{
-	return machine().root_device().ioport(":IN1")->read();
-}
 
 DECO16IC_BANK_CB_MEMBER(deco32_state::fghthist_bank_callback)
 {
@@ -2018,9 +2001,9 @@ static MACHINE_CONFIG_START( fghthist ) /* DE-0380-2 PCB */
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
-	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_fghthist )
-	MCFG_DECO146_SET_PORTC_CALLBACK( deco32_state, port_c_fghthist )
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
@@ -2104,9 +2087,9 @@ static MACHINE_CONFIG_START( fghthsta ) /* DE-0395-1 PCB */
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
-	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_fghthist )
-	MCFG_DECO146_SET_PORTC_CALLBACK( deco32_state, port_c_fghthist )
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
@@ -2149,9 +2132,9 @@ static MACHINE_CONFIG_DERIVED( fghthistz, fghthsta )
 	/*
 	MCFG_DEVICE_REMOVE("ioprot")
 	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
-	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_fghthist )
-	MCFG_DECO146_SET_PORTC_CALLBACK( deco32_state, port_c_fghthist )
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, nslasher_sound_cb)
@@ -2236,6 +2219,9 @@ static MACHINE_CONFIG_START( dragngun )
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
@@ -2344,6 +2330,9 @@ static MACHINE_CONFIG_START( lockload )
 	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
@@ -2441,7 +2430,9 @@ static MACHINE_CONFIG_START( tattass )
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_tattass )
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(READ16(deco32_state, port_b_tattass))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, tattass_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
@@ -2517,7 +2508,9 @@ static MACHINE_CONFIG_START( nslasher )
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
 
 	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_nslasher )
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, nslasher_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
@@ -2551,7 +2544,9 @@ static MACHINE_CONFIG_DERIVED( nslasheru, nslasher )
 
 	MCFG_DEVICE_REMOVE("ioprot104")
 	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_nslasher )
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 MACHINE_CONFIG_END

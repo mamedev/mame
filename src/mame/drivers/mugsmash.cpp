@@ -61,7 +61,6 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 	{
 	case 1:
 		m_soundlatch->write(space, 1, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:
@@ -424,6 +423,7 @@ static MACHINE_CONFIG_START( mugsmash )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

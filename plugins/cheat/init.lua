@@ -616,7 +616,7 @@ function cheat.startplugin()
 				param.index = param.index - 1
 				param_calc(param)
 				cheat.cheat_env.param = param.value
-				if not is_oneshot() then
+				if not is_oneshot(cheat) then
 					run_if(cheat, cheat.script.change)
 				end
 				return true
@@ -680,7 +680,7 @@ function cheat.startplugin()
 			  end,
 			  function()
 				return menu_populate()
-			  end, "Cheat")
+			  end, _("Cheat"))
 
 	emu.register_start(function()
 		if not stop then

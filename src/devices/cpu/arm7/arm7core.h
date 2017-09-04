@@ -140,18 +140,6 @@ enum
 
 #define COPRO_FCSE_PID                      m_fcsePID
 
-enum
-{
-	eARM_ARCHFLAGS_T    = 1,        // Thumb present
-	eARM_ARCHFLAGS_E    = 2,        // extended DSP operations present (only for v5+)
-	eARM_ARCHFLAGS_J    = 4,        // "Jazelle" (direct execution of Java bytecode)
-	eARM_ARCHFLAGS_MMU  = 8,        // has on-board MMU (traditional ARM style like the SA1110)
-	eARM_ARCHFLAGS_SA   = 16,       // StrongARM extensions (enhanced TLB)
-	eARM_ARCHFLAGS_XSCALE   = 32,       // XScale extensions (CP14, enhanced TLB)
-	eARM_ARCHFLAGS_MODE26   = 64        // supports 26-bit backwards compatibility mode
-};
-
-
 //#define ARM7_USE_DRC
 
 /* forward declaration of implementation-specific state */
@@ -522,7 +510,8 @@ enum arm_flavor
 
 	/* ARM9 variants */
 	ARM_TYPE_ARM9,
-	ARM_TYPE_ARM920T
+	ARM_TYPE_ARM920T,
+	ARM_TYPE_ARM946ES
 };
 
 #endif /* __ARM7CORE_H__ */

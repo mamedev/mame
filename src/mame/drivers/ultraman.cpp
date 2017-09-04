@@ -22,16 +22,9 @@
 #include "speaker.h"
 
 
-WRITE16_MEMBER(ultraman_state::sound_cmd_w)
+WRITE8_MEMBER(ultraman_state::sound_nmi_enable_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
-}
-
-WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundnmi->in_w<1>(BIT(data, 0));
 }
 
 
@@ -45,8 +38,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c0008, 0x1c0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE(ultraman_gfxctrl_w)   /* counters + gfx ctrl */
-	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
+	AM_RANGE(0x1c0020, 0x1c0021) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x1c0028, 0x1c0029) AM_DEVWRITE8("soundnmi", input_merger_device, in_set<0>, 0x00ff)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) /* K051316 #0 RAM */
 	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) /* K051316 #1 RAM */
@@ -62,14 +55,14 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-//  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)       /* M6295 */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, ultraman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP                     /* ??? */
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<0>)
 ADDRESS_MAP_END
 
 
@@ -174,6 +167,8 @@ void ultraman_state::machine_reset()
 	m_bank0 = -1;
 	m_bank1 = -1;
 	m_bank2 = -1;
+
+	m_soundnmi->in_w<0>(0);
 }
 
 static MACHINE_CONFIG_START( ultraman )
@@ -186,6 +181,9 @@ static MACHINE_CONFIG_START( ultraman )
 	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)    /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

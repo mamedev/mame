@@ -144,7 +144,6 @@ public:
 	DECLARE_WRITE16_MEMBER(sharedram_68000_w);
 	DECLARE_WRITE16_MEMBER(sub_ctrl_w);
 	DECLARE_READ16_MEMBER(seta_dsw_r);
-	DECLARE_WRITE16_MEMBER(calibr50_soundlatch_w);
 	DECLARE_READ16_MEMBER(usclssic_dsw_r);
 	DECLARE_READ16_MEMBER(usclssic_trackball_x_r);
 	DECLARE_READ16_MEMBER(usclssic_trackball_y_r);
@@ -156,7 +155,6 @@ public:
 	DECLARE_READ16_MEMBER(keroppi_protection_init_r);
 	DECLARE_READ16_MEMBER(keroppi_coin_r);
 	DECLARE_WRITE16_MEMBER(keroppi_prize_w);
-	DECLARE_READ16_MEMBER(krzybowl_input_r);
 	DECLARE_WRITE16_MEMBER(msgundam_vregs_w);
 	DECLARE_READ16_MEMBER(kiwame_nvram_r);
 	DECLARE_WRITE16_MEMBER(kiwame_nvram_w);
@@ -172,6 +170,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sub_bankswitch_lockout_w);
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_READ8_MEMBER(downtown_ip_r);
+	DECLARE_WRITE8_MEMBER(calibr50_sub_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(calibr50_soundlatch2_w);
 	DECLARE_READ16_MEMBER(twineagl_debug_r);
 	DECLARE_READ16_MEMBER(twineagl_200100_r);

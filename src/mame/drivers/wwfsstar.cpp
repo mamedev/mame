@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x180004, 0x180007) AM_WRITE(scroll_w)
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P2")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(sound_w)
+	AM_RANGE(0x180008, 0x180009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM                             /* Work Ram */
 ADDRESS_MAP_END
@@ -218,12 +218,6 @@ WRITE16_MEMBER(wwfsstar_state::scroll_w)
 			m_scrolly = data;
 			break;
 	}
-}
-
-WRITE16_MEMBER(wwfsstar_state::sound_w)
-{
-	m_soundlatch->write(space, 1, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
@@ -441,6 +435,7 @@ static MACHINE_CONFIG_START( wwfsstar )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
