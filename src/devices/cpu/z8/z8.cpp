@@ -11,12 +11,12 @@
     TODO:
 
     - strobed I/O
-    - interrupts
     - expose register file to disassembler
     - decimal adjust instruction
     - timer Tin/Tout modes
     - serial
     - instruction pipeline
+    - internal diagnostic ROM in data space (requires high voltage reset)
 
 */
 
@@ -115,14 +115,16 @@ enum
 #define Z8_P3M_P3_SERIAL            0x40    /* not supported */
 #define Z8_P3M_PARITY               0x80    /* not supported */
 
-#define Z8_IMR_ENABLE               0x80    /* not supported */
+#define Z8_IMR_ENABLE               0x80
 #define Z8_IMR_RAM_PROTECT          0x40    /* not supported */
-#define Z8_IMR_ENABLE_IRQ5          0x20    /* not supported */
-#define Z8_IMR_ENABLE_IRQ4          0x10    /* not supported */
-#define Z8_IMR_ENABLE_IRQ3          0x08    /* not supported */
-#define Z8_IMR_ENABLE_IRQ2          0x04    /* not supported */
-#define Z8_IMR_ENABLE_IRQ1          0x02    /* not supported */
-#define Z8_IMR_ENABLE_IRQ0          0x01    /* not supported */
+
+#define Z8_IRQ_MASK                 0x3f
+#define Z8_IRQ_FLAG_IRQ5            0x20
+#define Z8_IRQ_FLAG_IRQ4            0x10
+#define Z8_IRQ_FLAG_IRQ3            0x08
+#define Z8_IRQ_FLAG_IRQ2            0x04
+#define Z8_IRQ_FLAG_IRQ1            0x02
+#define Z8_IRQ_FLAG_IRQ0            0x01
 
 #define Z8_FLAGS_F1                 0x01
 #define Z8_FLAGS_F2                 0x02
@@ -721,7 +723,7 @@ TIMER_CALLBACK_MEMBER( z8_device::t0_tick )
 		m_t0 = T0;
 		m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE0 >> 2) + 1)));
 		m_t0_timer->enable(PRE0 & Z8_PRE0_COUNT_MODULO_N);
-		m_irq[4] = ASSERT_LINE;
+		m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ4;
 	}
 }
 
@@ -734,7 +736,7 @@ TIMER_CALLBACK_MEMBER( z8_device::t1_tick )
 		m_t1 = T1;
 		m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE1 >> 2) + 1)));
 		m_t1_timer->enable(PRE1 & Z8_PRE0_COUNT_MODULO_N);
-		m_irq[5] = ASSERT_LINE;
+		m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ5;
 	}
 }
 
@@ -784,8 +786,8 @@ void z8_device::device_start()
 	m_t1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::t1_tick), this));
 
 	/* Clear state */
-	for (auto & elem : m_irq)
-		elem = 0;
+	for (auto & elem : m_irq_line)
+		elem = CLEAR_LINE;
 	for (auto & elem : m_r)
 		elem = 0;
 	for ( int i = 0; i < 4; i++ )
@@ -804,9 +806,153 @@ void z8_device::device_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_input));
 	save_item(NAME(m_output));
-	save_item(NAME(m_irq));
+	save_item(NAME(m_irq_line));
+	save_item(NAME(m_irq_taken));
 
 	m_icountptr = &m_icount;
+}
+
+/***************************************************************************
+    INTERRUPTS
+***************************************************************************/
+
+void z8_device::take_interrupt(int irq)
+{
+	//logerror("Taking IRQ%d (previous PC = %04X)\n", irq, m_pc);
+	m_irq_taken = true;
+
+	// disable interrupts
+	m_r[Z8_REGISTER_IMR] &= ~Z8_IMR_ENABLE;
+
+	// acknowledge the IRQ
+	m_r[Z8_REGISTER_IRQ] &= ~(1 << irq);
+
+	// get the interrupt vector address
+	uint16_t vector = irq * 2;
+	if (m_rom_size == 0)
+		vector = mask_external_address(vector);
+
+	// push registers onto stack
+	stack_push_word(m_pc);
+	stack_push_byte(m_r[Z8_REGISTER_FLAGS]);
+
+	// branch to the vector
+	m_pc = m_direct->read_byte(vector) << 16;
+	m_pc |= m_direct->read_byte(vector + 1);
+}
+
+void z8_device::process_interrupts()
+{
+	m_irq_taken = false;
+	uint8_t pending_irqs = m_r[Z8_REGISTER_IMR] & m_r[Z8_REGISTER_IRQ] & Z8_IRQ_MASK;
+	if (!(m_r[Z8_REGISTER_IMR] & Z8_IMR_ENABLE) || pending_irqs == 0)
+		return;
+
+	int group_a[2] = { 5, 3 };
+	int group_b[2] = { 2, 0 };
+	int group_c[2] = { 1, 4 };
+
+	if (BIT(m_r[Z8_REGISTER_IPR], 5))
+		std::swap(group_a[0], group_a[1]);
+	if (BIT(m_r[Z8_REGISTER_IPR], 2))
+		std::swap(group_b[0], group_b[1]);
+	if (BIT(m_r[Z8_REGISTER_IPR], 1))
+		std::swap(group_c[0], group_c[1]);
+
+	switch ((m_r[Z8_REGISTER_IPR] & 0x18) >> 2 | (m_r[Z8_REGISTER_IPR] & 0x01))
+	{
+		case 0: // (000) reserved according to Zilog (but must process at least IRQ4)
+		case 1: // (001) C > A > B
+			if (BIT(pending_irqs, group_c[0]))
+				take_interrupt(group_c[0]);
+			else if (BIT(pending_irqs, group_c[1]))
+				take_interrupt(group_c[1]);
+			else if (BIT(pending_irqs, group_a[0]))
+				take_interrupt(group_a[0]);
+			else if (BIT(pending_irqs, group_a[1]))
+				take_interrupt(group_a[1]);
+			else if (BIT(pending_irqs, group_b[0]))
+				take_interrupt(group_b[0]);
+			else if (BIT(pending_irqs, group_b[1]))
+				take_interrupt(group_b[1]);
+			break;
+
+		case 2: // (010) A > B > C
+			if (BIT(pending_irqs, group_a[0]))
+				take_interrupt(group_a[0]);
+			else if (BIT(pending_irqs, group_a[1]))
+				take_interrupt(group_a[1]);
+			else if (BIT(pending_irqs, group_b[0]))
+				take_interrupt(group_b[0]);
+			else if (BIT(pending_irqs, group_b[1]))
+				take_interrupt(group_b[1]);
+			else if (BIT(pending_irqs, group_c[0]))
+				take_interrupt(group_c[0]);
+			else if (BIT(pending_irqs, group_c[1]))
+				take_interrupt(group_c[1]);
+			break;
+
+		case 3: // (011) A > C > B
+			if (BIT(pending_irqs, group_a[0]))
+				take_interrupt(group_a[0]);
+			else if (BIT(pending_irqs, group_a[1]))
+				take_interrupt(group_a[1]);
+			else if (BIT(pending_irqs, group_c[0]))
+				take_interrupt(group_c[0]);
+			else if (BIT(pending_irqs, group_c[1]))
+				take_interrupt(group_c[1]);
+			else if (BIT(pending_irqs, group_b[0]))
+				take_interrupt(group_b[0]);
+			else if (BIT(pending_irqs, group_b[1]))
+				take_interrupt(group_b[1]);
+			break;
+
+		case 4: // (100) B > C > A
+			if (BIT(pending_irqs, group_b[0]))
+				take_interrupt(group_b[0]);
+			else if (BIT(pending_irqs, group_b[1]))
+				take_interrupt(group_b[1]);
+			else if (BIT(pending_irqs, group_c[0]))
+				take_interrupt(group_c[0]);
+			else if (BIT(pending_irqs, group_c[1]))
+				take_interrupt(group_c[1]);
+			else if (BIT(pending_irqs, group_a[0]))
+				take_interrupt(group_a[0]);
+			else if (BIT(pending_irqs, group_a[1]))
+				take_interrupt(group_a[1]);
+			break;
+
+		case 5: // (101) C > B > A
+			if (BIT(pending_irqs, group_c[0]))
+				take_interrupt(group_c[0]);
+			else if (BIT(pending_irqs, group_c[1]))
+				take_interrupt(group_c[1]);
+			else if (BIT(pending_irqs, group_b[0]))
+				take_interrupt(group_b[0]);
+			else if (BIT(pending_irqs, group_b[1]))
+				take_interrupt(group_b[1]);
+			else if (BIT(pending_irqs, group_a[0]))
+				take_interrupt(group_a[0]);
+			else if (BIT(pending_irqs, group_a[1]))
+				take_interrupt(group_a[1]);
+			break;
+
+		case 6: // (110) B > A > C
+		case 7: // (111) reserved according to Zilog
+			if (BIT(pending_irqs, group_b[0]))
+				take_interrupt(group_b[0]);
+			else if (BIT(pending_irqs, group_b[1]))
+				take_interrupt(group_b[1]);
+			else if (BIT(pending_irqs, group_a[0]))
+				take_interrupt(group_a[0]);
+			else if (BIT(pending_irqs, group_a[1]))
+				take_interrupt(group_a[1]);
+			else if (BIT(pending_irqs, group_c[0]))
+				take_interrupt(group_c[0]);
+			else if (BIT(pending_irqs, group_c[1]))
+				take_interrupt(group_c[1]);
+			break;
+	}
 }
 
 /***************************************************************************
@@ -817,17 +963,23 @@ void z8_device::execute_run()
 {
 	do
 	{
-		/* TODO: sample interrupts */
-		m_input[3] = m_input_cb[3]();
+		process_interrupts();
+		if (m_irq_taken)
+		{
+			// interrupt processing takes 58 external clock cycles
+			m_icount -= 27;
+		}
+		else
+		{
+			/* fetch opcode */
+			uint8_t opcode = fetch_opcode();
+			int cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
 
-		/* fetch opcode */
-		uint8_t opcode = fetch_opcode();
-		int cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
+			/* execute instruction */
+			(this->*(Z8601_OPCODE_MAP[opcode].function))(opcode, &cycles);
 
-		/* execute instruction */
-		(this->*(Z8601_OPCODE_MAP[opcode].function))(opcode, &cycles);
-
-		m_icount -= cycles;
+			m_icount -= cycles;
+		}
 	}
 	while (m_icount > 0);
 }
@@ -847,6 +999,7 @@ void z8_device::device_reset()
 	register_write(Z8_REGISTER_P3M, 0x00);
 	register_write(Z8_REGISTER_P01M, 0x4d);
 	register_write(Z8_REGISTER_IRQ, 0x00);
+	register_write(Z8_REGISTER_IMR, 0x00);
 	register_write(Z8_REGISTER_RP, 0x00);
 }
 
@@ -912,19 +1065,27 @@ void z8_device::execute_set_input(int inputnum, int state)
 	switch ( inputnum )
 	{
 		case INPUT_LINE_IRQ0:
-			m_irq[0] = state;
+			if (state != CLEAR_LINE && m_irq_line[0] == CLEAR_LINE)
+				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ0;
+			m_irq_line[0] = state;
 			break;
 
 		case INPUT_LINE_IRQ1:
-			m_irq[1] = state;
+			if (state != CLEAR_LINE && m_irq_line[1] == CLEAR_LINE)
+				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ1;
+			m_irq_line[1] = state;
 			break;
 
 		case INPUT_LINE_IRQ2:
-			m_irq[2] = state;
+			if (state != CLEAR_LINE && m_irq_line[2] == CLEAR_LINE)
+				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ2;
+			m_irq_line[2] = state;
 			break;
 
 		case INPUT_LINE_IRQ3:
-			m_irq[3] = state;
+			if (state != CLEAR_LINE && m_irq_line[3] == CLEAR_LINE)
+				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ3;
+			m_irq_line[3] = state;
 			break;
 
 	}
