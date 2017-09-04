@@ -39,7 +39,9 @@ void bingowav_state::machine_start()
 
 
 static ADDRESS_MAP_START( bingowav_main_map, AS_PROGRAM, 16, bingowav_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x140000, 0x140001) AM_READNOP
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("maintmp", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
 
