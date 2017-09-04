@@ -58,16 +58,21 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/6840ptm.h"
+#include "sound/sn76496.h"
 #include "bus/hp_dio/hp_dio.h"
 #include "bus/hp_dio/hp98544.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
 #include "screen.h"
+#include "speaker.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG "iocpu"
 #define PTM6840_TAG "ptm"
 #define MLC_TAG "mlc"
+#define SN76494_TAG "sn76494"
+
+#define SN76494_CLOCK 333333
 
 class hp9k3xx_state : public driver_device
 {
@@ -77,6 +82,7 @@ public:
 		m_maincpu(*this, MAINCPU_TAG),
 		m_iocpu(*this, IOCPU_TAG),
 		m_mlc(*this, MLC_TAG),
+		m_sound(*this, SN76494_TAG),
 		m_vram16(*this, "vram16"),
 		m_vram(*this, "vram")
 		{ }
@@ -84,6 +90,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8042_device> m_iocpu;
 	optional_device<hp_hil_mlc_device> m_mlc;
+	optional_device<sn76494_device> m_sound;
 	virtual void machine_reset() override;
 
 	optional_shared_ptr<uint16_t> m_vram16;
@@ -317,11 +324,15 @@ static constexpr uint8_t HIL_CS = 0x01;
 static constexpr uint8_t HIL_WE = 0x02;
 static constexpr uint8_t HIL_OE = 0x04;
 static constexpr uint8_t LATCH_EN = 0x08;
+static constexpr uint8_t SN76494_EN = 0x80;
 
 WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
 {
 	if ((data & (HIL_CS|HIL_WE)) == 0)
 		m_mlc->write(space, (m_latch_data & 0xc0) >> 6, m_hil_data, 0xff);
+
+	if ((data & SN76494_EN) == 0)
+		m_sound->write(m_hil_data);
 
 	m_hil_read = ((data & (HIL_CS|HIL_OE)) == 0);
 
@@ -365,6 +376,10 @@ static MACHINE_CONFIG_START( hp9k310 )
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
 	MCFG_DEVICE_ADD("diobus", DIO16, 0)
 	MCFG_DIO16_CPU(":maincpu")
 	MCFG_DIO16_SLOT_ADD("diobus", "sl1", dio16_cards, "98544", true)
@@ -388,6 +403,10 @@ static MACHINE_CONFIG_START( hp9k320 )
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_ADD("diobus", DIO32, 0)
 	MCFG_DIO32_CPU(":maincpu")
@@ -526,11 +545,11 @@ ROM_START( hp9k382 )
 ROM_END
 
 /*    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT    STATE       INIT  COMPANY            FULLNAME      FLAGS */
-COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, hp9k332, 0,      0,      hp9k332,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING)
+COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k332, 0,      0,      hp9k332,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING)
+COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING)
+COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING)
