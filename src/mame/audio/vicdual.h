@@ -3,3 +3,4 @@
 
 MACHINE_CONFIG_EXTERN( frogs_audio );
 MACHINE_CONFIG_EXTERN( headon_audio );
+MACHINE_CONFIG_EXTERN( brdrline_audio );
