@@ -41,6 +41,8 @@ void bingowav_state::machine_start()
 static ADDRESS_MAP_START( bingowav_main_map, AS_PROGRAM, 16, bingowav_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainioh", te7750_device, read, write, 0xff00)
+	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainiol", te7750_device, read, write, 0x00ff)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("maintmp", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
@@ -75,9 +77,11 @@ static MACHINE_CONFIG_START( bingowav )
 
 	MCFG_DEVICE_ADD("maintmp", TMP68301, 0) // wrong
 
-	MCFG_DEVICE_ADD("mainio1", TE7750, 0)
+	MCFG_DEVICE_ADD("mainioh", TE7750, 0)
+	MCFG_TE7750_IOS_CB(CONSTANT(5))
 
-	MCFG_DEVICE_ADD("mainio2", TE7750, 0)
+	MCFG_DEVICE_ADD("mainiol", TE7750, 0)
+	MCFG_TE7750_IOS_CB(CONSTANT(4))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(bingowav_audio_map)
