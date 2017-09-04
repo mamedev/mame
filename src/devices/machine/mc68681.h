@@ -41,6 +41,10 @@
 #define MCFG_SC28C94_D_TX_CALLBACK(_cb) \
 	devcb = &sc28c94_device::set_d_tx_cb(*device, DEVCB_##_cb);
 
+// M68340SERIAL specific callbacks
+#define MCFG_M68340SERIAL_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, M68340SERIAL, _clock)
+
 #define MC68681_RX_FIFO_SIZE                3
 
 // forward declaration
@@ -70,6 +74,12 @@ public:
 	void ACR_updated();
 
 	uint8_t get_chan_CSR();
+
+	// Access methods needed for 68340 serial module register model
+	uint8_t read_MR1(){ return MR1; }
+	uint8_t read_MR2(){ return MR2; }
+	void write_MR1(uint8_t data){ MR1 = data; }
+	void write_MR2(uint8_t data){ MR2 = data; }
 
 private:
 	/* Registers */
@@ -230,8 +240,23 @@ protected:
 private:
 };
 
+class m68340_serial_device : public mc68681_base_device
+{
+public:
+	m68340_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+};
+
 DECLARE_DEVICE_TYPE(MC68681, mc68681_device)
 DECLARE_DEVICE_TYPE(SC28C94, sc28c94_device)
+DECLARE_DEVICE_TYPE(M68340SERIAL, m68340_serial_device)
 DECLARE_DEVICE_TYPE(MC68681_CHANNEL, mc68681_channel)
 
 #endif // MAME_MACHINE_MC68681_H
