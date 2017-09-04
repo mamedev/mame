@@ -13,7 +13,7 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
-	return "Gameinit"
+	return _("Gameinit")
 end
 
 function dat.get()

@@ -746,7 +746,8 @@ void lua_engine::initialize()
  * emu.print_info(str) -- output to stderr at info level
  * emu.print_debug(str) -- output to stderr at debug level
  * emu.driver_find(driver) -- find and return game_driver for driver
- * emu.wait(len) -- wait from len within coroutine
+ * emu.wait(len) -- wait for len within coroutine
+ * emu.lang_translate(str) -- get translation for str if available
  */
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
