@@ -8680,6 +8680,9 @@ bingor4                         // (c) 2002 Unknown
 bingor5                         // (c) 2002 Unknown
 vip2000                         // (c) Paloma-Elektronik
 
+@source:bingowav.cpp
+bingowav                        // (c) 1994 Taito
+
 @source:bionicc.cpp
 bionicc                         // 3/1987 (c) 1987 (Euro)
 bionicc1                        // 3/1987 (c) 1987 (US)
