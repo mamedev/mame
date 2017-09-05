@@ -319,6 +319,7 @@ protected:
 	bool ready_connected, ready_polled, select_connected;
 
 	bool external_ready;
+	bool has_motor_command; // enable support for i82072 motor on/off command
 
 	int mode;
 	int main_phase;
@@ -361,6 +362,7 @@ protected:
 		C_SCAN_EQUAL,
 		C_SCAN_LOW,
 		C_SCAN_HIGH,
+		C_MOTOR_ONOFF,
 
 		C_INVALID,
 		C_INCOMPLETE
