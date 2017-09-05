@@ -7,9 +7,23 @@
   Tiger R-Zone driver
 
   This is a backwards console, the heart of the machine is the cartridge.
+  The console houses the controller, speaker, power, backlight, and a
+  polarizer filter for the screen. The cartridge has the MCU, optional
+  sound ROM, and the LCD screen in a translucent window.
+
+  Console family:
+
+  1995: R-Zone HeadGear: Wearable headset, controller is separate,
+  red-on-black screen is reflected in front of the right eye.
+  1996: R-Zone SuperScreen: Handheld console, inverted filter(aka black
+  LCD segments), optional background sheet as with standalone handhelds.
+  1997: R-Zone X.P.G - Xtreme Pocket Game: Handheld version of HeadGear.
+  1997: R-Zone DataZone: PDA with a built-in SuperScreen.
 
   TODO:
-  - x
+  - support for SuperScreen. SVG colors will need to be inverted, or maybe
+    with artwork or HLSL?
+  - add DataZone, will get its own driver
 
 ***************************************************************************/
 
@@ -27,18 +41,18 @@ class rzone_state : public hh_sm510_state
 public:
 	rzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag),
-		m_led_out(*this, "led%u", 0U),
+		m_led_out(*this, "led"),
 		m_led_off(*this, "led_off")
 	{ }
 
-	output_finder<1> m_led_out;
+	output_finder<> m_led_out;
 	required_device<timer_device> m_led_off;
 
 	int m_led_pin;
 	int m_sctrl;
 	int m_sclock;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(led_off_callback) { m_led_out[0] = m_led_pin ? 1 : 0; }
+	TIMER_DEVICE_CALLBACK_MEMBER(led_off_callback) { m_led_out = m_led_pin ? 1 : 0; }
 	DECLARE_WRITE_LINE_MEMBER(led_w);
 	DECLARE_WRITE_LINE_MEMBER(audio_w);
 	DECLARE_WRITE_LINE_MEMBER(sctrl_w);
@@ -87,7 +101,7 @@ WRITE_LINE_MEMBER(rzone_state::led_w)
 {
 	// LED: enable backlight
 	if (state)
-		m_led_out[0] = 1;
+		m_led_out = 1;
 
 	// delay led off to prevent flickering
 	if (!state && m_led_pin)
@@ -128,7 +142,7 @@ READ_LINE_MEMBER(rzone_state::sdata_r)
 }
 
 
-// cartridge type 1
+// cartridge type 1: simple SM510
 
 WRITE8_MEMBER(rzone_state::t1_write_r)
 {
