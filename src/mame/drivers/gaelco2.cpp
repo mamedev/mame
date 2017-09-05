@@ -219,12 +219,13 @@ ROM_START( maniacsq ) // REF 940411
 	ROM_LOAD16_BYTE( "TMS27C010A.MSU44",   0x000001, 0x020000, CRC(42e20121) SHA1(6662fa8ec5756bf5c4ebaaa9aa2e0e241cf582a4) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "ms_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "maniacsq_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(afe9703d) SHA1(e737bf154bcb268b8f0764879b513489b163e462) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
 	// all 4 roms on a sub-board, no IC positions marked
@@ -243,12 +244,13 @@ ROM_START( maniacsqa ) // REF 940411
 	ROM_LOAD16_BYTE( "MS_U_44.U44",   0x000001, 0x020000, CRC(1785dd41) SHA1(5c6a65c00248971ce54c8185858393f2c52cc583) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "ms_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "maniacsq_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(afe9703d) SHA1(e737bf154bcb268b8f0764879b513489b163e462) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
 	// all 4 roms on a sub-board, no IC positions marked
@@ -874,7 +876,7 @@ ROM_START( aligator )
 	ROM_LOAD16_BYTE(    "2.u44",  0x000001, 0x080000, CRC(96bc77c2) SHA1(72975fa188598d8ed595cbba097b60efe14bd190) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "aligator_ds5002fp.bin", 0x00000, 0x8000, CRC(6558f215) SHA1(c961a9c81aa6b746294baf83ea5d1fcf7acab9db) )
+	ROM_LOAD( "aligator_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6558f215) SHA1(c961a9c81aa6b746294baf83ea5d1fcf7acab9db) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -899,7 +901,7 @@ ROM_START( aligators )
 	ROM_LOAD16_BYTE(    "u44",  0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) ) /* differs by 1 byte from above set, see note */
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "aligator_ds5002fp.bin", 0x00000, 0x8000, CRC(6558f215) SHA1(c961a9c81aa6b746294baf83ea5d1fcf7acab9db) )
+	ROM_LOAD( "aligator_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6558f215) SHA1(c961a9c81aa6b746294baf83ea5d1fcf7acab9db) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -1183,7 +1185,7 @@ ROM_START( touchgo ) /* REF: 950906 */
 	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(a497e1af) SHA1(68ee1f87631183541adadf927fb18ed4422d5bb6) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(a497e1af) SHA1(68ee1f87631183541adadf927fb18ed4422d5bb6) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
@@ -1210,7 +1212,7 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
@@ -1237,7 +1239,7 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
@@ -1757,7 +1759,7 @@ ROM_START( wrally2 )
 
 	   either way the 2nd dump is in much better state, so we're using that.
 	*/
-	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -1800,8 +1802,8 @@ GAME( 1995, touchgok, touchgo,  touchgo,          touchgo,  gaelco2_state, touch
 GAME( 1995, wrally2,  0,        wrally2, wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
-GAME( 1996, maniacsq, 0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1996, maniacsq, 0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
+GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
 GAME( 1996, maniacsqu,maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
 
 GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
