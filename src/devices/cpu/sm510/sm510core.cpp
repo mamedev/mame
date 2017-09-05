@@ -5,7 +5,7 @@
   Sharp SM510 MCU core implementation
 
   TODO:
-  - buzzer control divider bit is mask-programmable?
+  - X
 
 */
 
@@ -55,10 +55,20 @@ offs_t sm510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 
 void sm510_device::clock_melody()
 {
-	// buzzer from divider, R2 inverse phase
-	u8 out = m_div >> 2 & 1;
-	out |= (out << 1 ^ 2);
-	out &= m_r;
+	u8 out = 0;
+
+	if (m_r_direct)
+	{
+		// direct output
+		out = m_r & 3;
+	}
+	else
+	{
+		// buzzer from divider, R2 inverse phase
+		out = m_div >> 2 & 1;
+		out |= (out << 1 ^ 2);
+		out &= m_r;
+	}
 
 	// output to R pins
 	if (out != m_r_out)

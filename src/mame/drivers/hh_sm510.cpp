@@ -4,6 +4,8 @@
 /***************************************************************************
 
   Sharp SM5xx family handhelds.
+  List of child drivers:
+  - rzone: Tiger R-Zone
 
   TODO:
   - improve LCD segments in SVGs for: gnw_mc25, gnw_eg26, exospace
@@ -14,9 +16,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/hh_sm510.h"
 #include "cpu/sm510/sm510.h"
 #include "cpu/sm510/sm500.h"
-#include "sound/spkrdev.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -26,61 +28,6 @@
 #include "gnw_dualh.lh"
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
 //#include "hh_sm500_test.lh" // "
-
-
-class hh_sm510_state : public driver_device
-{
-public:
-	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
-		m_speaker(*this, "speaker"),
-		m_inp_lines(0),
-		m_display_wait(33)
-	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
-	output_finder<16, 16, 4> m_out_x;
-	optional_device<speaker_sound_device> m_speaker;
-
-	// misc common
-	u16 m_inp_mux;                  // multiplexed inputs mask
-	int m_inp_lines;                // number of input mux columns
-	u8 m_s;                         // MCU S output pins
-	u8 m_r;                         // MCU R output pins
-
-	u8 read_inputs(int columns);
-
-	virtual void update_k_line();
-	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
-	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
-	virtual DECLARE_WRITE8_MEMBER(sm500_lcd_segment_w);
-	virtual DECLARE_READ8_MEMBER(input_r);
-	virtual DECLARE_WRITE8_MEMBER(input_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
-
-	// display common
-	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 33ms)
-	u8 m_display_x_len;             // lcd number of groups
-	u8 m_display_y_len;             // lcd number of segments
-	u8 m_display_z_len;             // lcd number of commons
-	u32 m_display_state[0x20];      // lcd segment data (max. 5-bit offset)
-	u8 m_display_decay[0x20][0x20]; // (internal use)
-
-	void set_display_size(u8 x, u8 y, u8 z);
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-};
 
 
 // machine start/reset
@@ -2335,46 +2282,35 @@ ROM_START( tsjam )
 ROM_END
 
 
-ROM_START( rzindy500 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "10_22", 0x0000, 0x1000, CRC(99a746d0) SHA1(64264499d45a566fa9a0801c20e7fa27eac18da6) )
 
-	ROM_REGION( 533414, "svg", 0)
-	ROM_LOAD( "rzindy500.svg", 0, 533414, CRC(21c9bd2e) SHA1(549f079c5bd5883b21dc9b29b281a73728ed7827) )
-ROM_END
+//    YEAR  NAME       PARENT  COMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1989, kdribble,  0,        0, kdribble,  kdribble,  kdribble_state, 0, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   ktopgun_state,  0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kcontra,   0,        0, kcontra,   kcontra,   kcontra_state,  0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     ktmnt_state,    0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kgradius,  0,        0, kgradius,  kgradius,  kgradius_state, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kloneran,  0,        0, kloneran,  kloneran,  kloneran_state, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kblades,   0,        0, kblades,   kblades,   kblades_state,  0, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, knfl,      0,        0, knfl,      knfl,      knfl_state,     0, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kbilly,    0,        0, kbilly,    kbilly,    kbilly_state,   0, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, kbucky,    0,        0, kbucky,    kbucky,    kbucky_state,   0, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, kgarfld,   0,        0, kgarfld,   kgarfld,   kgarfld_state,  0, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1981, gnw_mc25,  0,        0, mc25,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_eg26,  gnw_mc25, 0, eg26,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, nupogodi,  gnw_mc25, 0, nupogodi,  mc25,      mc25_state,     0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, exospace,  gnw_mc25, 0, exospace,  exospace,  mc25_state,     0, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1982, gnw_dm53,  0,        0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_jr55,  0,        0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_mw56,  0,        0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
 
-//    YEAR  NAME        PARENT  COMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1989, kdribble,   0,        0, kdribble,  kdribble,  kdribble_state, 0, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktopgun,    0,        0, ktopgun,   ktopgun,   ktopgun_state,  0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kcontra,    0,        0, kcontra,   kcontra,   kcontra_state,  0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktmnt,      0,        0, ktmnt,     ktmnt,     ktmnt_state,    0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kgradius,   0,        0, kgradius,  kgradius,  kgradius_state, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kloneran,   0,        0, kloneran,  kloneran,  kloneran_state, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kblades,    0,        0, kblades,   kblades,   kblades_state,  0, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, knfl,       0,        0, knfl,      knfl,      knfl_state,     0, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kbilly,     0,        0, kbilly,    kbilly,    kbilly_state,   0, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, kbucky,     0,        0, kbucky,    kbucky,    kbucky_state,   0, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, kgarfld,    0,        0, kgarfld,   kgarfld,   kgarfld_state,  0, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gnw_dj101, 0,        0, dj101,     dj101,     dj101_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_ml102, 0,        0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, gnw_mc25,   0,        0, mc25,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_eg26,   gnw_mc25, 0, eg26,      mc25,      mc25_state,     0, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, nupogodi,   gnw_mc25, 0, nupogodi,  mc25,      mc25_state,     0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, exospace,   gnw_mc25, 0, exospace,  exospace,  mc25_state,     0, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gnw_dm53,   0,        0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_jr55,   0,        0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_mw56,   0,        0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
-
-CONS( 1982, gnw_dj101,  0,        0, dj101,     dj101,     dj101_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_ml102,  0,        0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-
-CONS( 1984, gnw_bx301,  0,        0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
-
-CONS( 1988, tgaunt,     0,        0, tgaunt,    tgaunt,    tgaunt_state,   0, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, tddragon,   0,        0, tddragon,  tddragon,  tddragon_state, 0, "Tiger Electronics (licensed from Tradewest/Technos)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, tsonic,     0,        0, tsonic,    tsonic,    tsonic_state,   0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, tsjam,      0,        0, tsjam,     tsjam,     tsjam_state,    0, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
-
-CONS( 1996, rzindy500,  0,        0, tsjam,     tsjam,     tsjam_state,    0, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, tgaunt,    0,        0, tgaunt,    tgaunt,    tgaunt_state,   0, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, tddragon,  0,        0, tddragon,  tddragon,  tddragon_state, 0, "Tiger Electronics (licensed from Tradewest/Technos)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, tsonic,    0,        0, tsonic,    tsonic,    tsonic_state,   0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1996, tsjam,     0,        0, tsjam,     tsjam,     tsjam_state,    0, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )

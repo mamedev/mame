@@ -603,6 +603,21 @@ ROM_START(gnr_300d)
 	ROM_LOAD("gnru37.snd", 0x180000, 0x80000, CRC(4930e1f2) SHA1(1569d0c7fea1af008acbdc492c3677ace7d1897a))
 ROM_END
 
+ROM_START(gnr_200)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gnrcpua.200", 0x0000, 0x10000, CRC(365ddd22) SHA1(e316ddca4b68145e6f4efc2cd1d3f6d13fefad1d))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("gnrdispa.300", 0x00000, 0x80000, CRC(4abf29e3) SHA1(595328e0f92a6e1972d71c56505a5dd07a373ef5))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("gnru7.snd", 0x0000, 0x10000, CRC(3b9de915) SHA1(a901a1f37bf5433c819393c4355f9d13164b32ce))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("gnru17.snd", 0x000000, 0x80000, CRC(3d3219d6) SHA1(ac4a6d3eff0cdd02b8c79dddcb8fec2e22faa9b9))
+	ROM_LOAD("gnru21.snd", 0x080000, 0x80000, CRC(d2ca17ab) SHA1(db7c4f74a2e2c099fe14f38de922fdc851bd4a6b))
+	ROM_LOAD("gnru36.snd", 0x100000, 0x80000, CRC(5b32396e) SHA1(66462a6a929c869d668968e057fac199d05df267))
+	ROM_LOAD("gnru37.snd", 0x180000, 0x80000, CRC(4930e1f2) SHA1(1569d0c7fea1af008acbdc492c3677ace7d1897a))
+ROM_END
+
 /*-------------------------------------------------------------
 / Hook - CPU Rev 3 /DMD  Type 1 128K Rom - CPU Rom
 /------------------------------------------------------------*/
@@ -1249,6 +1264,7 @@ GAME(1991,  ckpt_a17,       0,          de_3_dmd1,   de_3, de_3_state,   de_3,  
 GAME(1994,  gnr_300,        0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Guns N Roses (3.00)",                                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  gnr_300f,       gnr_300,    de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Guns N Roses (3.00 French)",                                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  gnr_300d,       gnr_300,    de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Guns N Roses (3.00 Dutch)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  gnr_200,        gnr_300,    de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Guns N Roses (2.00)",                                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  hook_408,       0,          de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Hook (4.08)",                                                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  hook_401,       hook_408,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Hook (4.01)",                                                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  hook_401p,      hook_408,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Hook (4.01 with prototype sound)",                             MACHINE_IS_SKELETON_MECHANICAL)

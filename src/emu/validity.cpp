@@ -218,9 +218,15 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
+	bool validated_any = false;
 	while (m_drivlist.next())
+	{
 		if (m_drivlist.matches(string, m_drivlist.driver().name))
+		{
 			validate_one(m_drivlist.driver());
+			validated_any = true;
+		}
+	}
 
 	// validate devices
 	if (!string)
@@ -228,6 +234,10 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// cleanup
 	validate_end();
+
+	// if we failed to match anything, it
+	if (string && !validated_any)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", string);
 
 	return !(m_errors > 0 || m_warnings > 0);
 }
@@ -1822,6 +1832,19 @@ void validity_checker::validate_inputs()
 				for (ioport_setting &setting : field.settings())
 					if (!setting.condition().none())
 						validate_condition(setting.condition(), device, port_map);
+
+				// verify natural keyboard codes
+				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
+				{
+					char32_t code = field.keyboard_code(which);
+					if (code && !uchar_isvalid(code))
+					{
+						osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
+							name,
+							(unsigned)code,
+							(int)code);
+					}
+				}
 			}
 
 			// done with this port

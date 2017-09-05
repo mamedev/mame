@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER( background_color_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( vbank_w );
+	DECLARE_WRITE8_MEMBER( vbank_clear_w );
 	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
 	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
 

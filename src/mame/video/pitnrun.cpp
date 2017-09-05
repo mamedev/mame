@@ -53,13 +53,10 @@ WRITE8_MEMBER(pitnrun_state::videoram2_w)
 	m_bg ->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pitnrun_state::char_bank_select)
+WRITE_LINE_MEMBER(pitnrun_state::char_bank_select_w)
 {
-	if(m_char_bank!=data)
-	{
-		m_bg ->mark_all_dirty();
-		m_char_bank=data;
-	}
+	m_char_bank = state;
+	m_bg->mark_all_dirty();
 }
 
 
@@ -89,9 +86,9 @@ WRITE8_MEMBER(pitnrun_state::v_heed_w)
 	m_v_heed=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::color_select_w)
+WRITE_LINE_MEMBER(pitnrun_state::color_select_w)
 {
-	m_color_select=data;
+	m_color_select = state;
 	machine().tilemap().mark_all_dirty();
 }
 

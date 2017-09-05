@@ -3631,6 +3631,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/bigevglf.cpp",
 	MAME_DIR .. "src/mame/includes/bigevglf.h",
 	MAME_DIR .. "src/mame/video/bigevglf.cpp",
+	MAME_DIR .. "src/mame/drivers/bingowav.cpp",
 	MAME_DIR .. "src/mame/drivers/bking.cpp",
 	MAME_DIR .. "src/mame/includes/bking.h",
 	MAME_DIR .. "src/mame/video/bking.cpp",

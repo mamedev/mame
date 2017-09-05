@@ -303,6 +303,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4-(bits & 7));
 						dot&= 0xf;
 
+						
 						//if(dot != 0xf || m_mode & 2)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, dot);
 					}
@@ -502,8 +503,20 @@ READ8_MEMBER( mb_vcu_device::status_r )
 }
 
 WRITE8_MEMBER( mb_vcu_device::vbank_w )
-{
+{	
 	m_vbank = (data & 0x40) >> 6;
+}
+
+WRITE8_MEMBER( mb_vcu_device::vbank_clear_w )
+{	
+	m_vbank = (data & 0x40) >> 6;
+
+	// setting vbank clears VRAM in the setted bank, applies to Great Guns only since it never ever access the RMW stuff
+	for(int i=0;i<0x10000;i++)
+	{
+		write_byte(i|0x00000|m_vbank<<18,0x0f);
+		write_byte(i|0x10000|m_vbank<<18,0x0f);
+	}
 }
 
 //-------------------------------------------------
