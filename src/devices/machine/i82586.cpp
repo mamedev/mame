@@ -13,7 +13,7 @@
 *
 * This implementation should cover all of the above reasonably well, but
 * no testing of big endian mode in particular, and very limited testing
-* of the 82586 or 82596 in non-linear modes has been done so far.
+* of the 82596 in non-linear modes has been done so far.
 *
 * Some documents covering the above include:
 *
@@ -22,7 +22,7 @@
 *   https://www.intel.com/assets/pdf/general/82596ca.pdf
 *
 * TODO
-*   - testing for 82586 and 82596 big endian and non-linear modes
+*   - testing for 82596 big endian and non-linear modes
 *   - more complete statistics capturing
 *   - 82596 monitor mode
 *   - throttle timers and diagnostic command
@@ -419,8 +419,10 @@ void i82586_base_device::cu_execute()
 			break;
 
 		case CB_TRANSMIT:
+			// always turn on the heartbeat indicator status after a successful transmission; not
+			// strictly correct, but allows one InterPro 2000 diagnostic to pass
 			if (cu_transmit(cb_cs))
-				cb_cs |= CB_OK;
+				cb_cs |= CB_OK | CB_S6;
 			break;
 
 		case CB_TDREFLECT:
@@ -758,14 +760,18 @@ void i82586_device::device_reset()
 
 void i82586_device::initialise()
 {
-	u16 scb_offset = m_space->read_word(m_scp_address + 2);
+	// read iscp address from scp
+	u32 iscp_address = m_space->read_dword(m_scp_address + 8);
+	LOG("initialise iscp address 0x%08x\n", iscp_address);
 
-	m_scb_base = m_space->read_dword(m_scp_address + 4);
-	m_scb_address = (m_scb_base + scb_offset);
+	u16 scb_offset = m_space->read_word(iscp_address + 2);
+
+	m_scb_base = m_space->read_dword(iscp_address + 4);
+	m_scb_address = m_scb_base + scb_offset;
 	LOG("initialise scb base address 0x%06x offset 0x%04x address 0x%08x\n", m_scb_base, scb_offset, m_scb_address);
 
 	// clear iscp busy byte
-	m_space->write_byte(m_scp_address, 0);
+	m_space->write_byte(iscp_address, 0);
 
 	m_cx = true;
 	m_cna = true;
@@ -890,9 +896,9 @@ bool i82586_device::cu_transmit(u32 command)
 {
 	u16 tbd_count;
 
-	// ethernet frame buffer (rounded up to 8 byte boundary)
-	u8 buf[1528];
-	int length = 0;
+	// ethernet frame buffer
+	u8 buf[MAX_FRAME_SIZE];
+	u16 length = 0;
 
 	u16 tbd_offset = m_space->read_word(m_cba + 6);
 
@@ -1184,7 +1190,6 @@ void i82596_device::device_start()
 	save_item(NAME(m_cfg_bytes));
 
 	save_item(NAME(m_sysbus));
-	save_item(NAME(m_iscp_address));
 
 	save_item(NAME(m_mac_multi_ia));
 }
@@ -1230,9 +1235,9 @@ void i82596_device::port(u32 data)
 
 void i82596_device::initialise()
 {
-	// read sysbus and iscp address from scp
+	// read iscp address and sysbus from scp
+	u32 iscp_address = m_space->read_dword(m_scp_address + 8);
 	m_sysbus = m_space->read_byte(m_scp_address + 2);
-	m_iscp_address = m_space->read_dword(m_scp_address + 8);
 
 	LOG("initialise sysbus 0x%02x mode %s, %s triggering of bus throttle timers, lock function %s, interrupt active %s, 32-bit address pointers in linear mode per %s stepping)\n",
 		m_sysbus,
@@ -1241,29 +1246,29 @@ void i82596_device::initialise()
 		m_sysbus & SYSBUS_LOCK ? "disabled" : "enabled",
 		m_sysbus & SYSBUS_INT ? "low" : "high",
 		m_sysbus & SYSBUS_BE ? "B" : "A1");
-	LOG("initialise iscp address 0x%08x\n", m_iscp_address);
+	LOG("initialise iscp address 0x%08x\n", iscp_address);
 
 	switch (mode())
 	{
 	case MODE_82586:
 	case MODE_32SEGMENTED:
 	{
-		u16 scb_offset = m_space->read_word(m_iscp_address + 2);
+		u16 scb_offset = m_space->read_word(iscp_address + 2);
 
-		m_scb_base = m_space->read_dword(m_iscp_address + 4);
+		m_scb_base = m_space->read_dword(iscp_address + 4);
 		m_scb_address = m_scb_base + scb_offset;
 		LOG("initialise scb base address 0x%08x offset 0x%04x address 0x%08x\n", m_scb_base, scb_offset, m_scb_address);
 	}
 		break;
 
 	case MODE_LINEAR:
-		m_scb_address = m_space->read_dword(m_iscp_address + 4);
+		m_scb_address = m_space->read_dword(iscp_address + 4);
 		LOG("initialise scb address 0x%08x\n", m_scb_address);
 		break;
 	}
 
 	// clear iscp busy byte
-	m_space->write_byte(m_iscp_address, 0);
+	m_space->write_byte(iscp_address, 0);
 
 	m_cx = true;
 	m_cna = true;
@@ -1505,9 +1510,9 @@ bool i82596_device::cu_transmit(u32 command)
 	u32 tbd_address;
 	u16 tcb_count, tbd_count;
 
-	// ethernet frame buffer (rounded up to 8 byte boundary)
-	u8 buf[1528];
-	int length = 0;
+	// ethernet frame buffer
+	u8 buf[MAX_FRAME_SIZE];
+	u16 length = 0;
 
 	// need offset into tcb for linear mode
 	int offset = mode() == MODE_LINEAR ? 4 : 0;
