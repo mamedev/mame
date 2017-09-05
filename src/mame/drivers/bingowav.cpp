@@ -110,6 +110,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( bingowav )
+	// Program and graphics ROMs from the "Terminal PCB" are currently missing
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prg-h.ic35", 0x00000, 0x20000, CRC(0ae8c738) SHA1(c040c4f46089a07ef3c4d5067068ea3cd1546e4e) )
 	ROM_LOAD16_BYTE( "prg-l.ic42", 0x00001, 0x20000, CRC(a7742e54) SHA1(2ab75c51ced0bb37b50f5077b611cde1770e2411) )
