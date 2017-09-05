@@ -119,6 +119,7 @@ video z80
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
@@ -142,7 +143,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_vcu(*this,"vcu"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch")
 		{ }
 
 	/* devices */
@@ -150,6 +152,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<mb_vcu_device> m_vcu;
 	required_device<screen_device> m_screen;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmaps[4];
@@ -186,7 +189,6 @@ public:
 	uint8_t m_bcd_7445;
 
 	uint8_t m_vsb_ls273;
-	uint8_t m_soundlatch;
 
 #if 0
 	int m_dbg_info;
@@ -211,11 +213,8 @@ public:
 	DECLARE_WRITE8_MEMBER(zpu_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(cfb_led_w);
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
-	DECLARE_WRITE8_MEMBER(main_sound_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	DECLARE_READ8_MEMBER(soundcommand_r);
 	DECLARE_DRIVER_INIT(mazerbla);
 	DECLARE_DRIVER_INIT(greatgun);
 	virtual void machine_start() override;
@@ -227,7 +226,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
@@ -924,32 +922,9 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	output().set_led_value(1, BIT(data, 5));
 }
 
-READ8_MEMBER(mazerbla_state::soundcommand_r)
-{
-	return m_soundlatch;
-}
-
-TIMER_CALLBACK_MEMBER(mazerbla_state::delayed_sound_w)
-{
-	m_soundlatch = param;
-
-	/* cause NMI on sound CPU */
-	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-WRITE8_MEMBER(mazerbla_state::main_sound_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::delayed_sound_w),this), data & 0xff);
-}
-
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
-}
-
-WRITE8_MEMBER(mazerbla_state::sound_nmi_clear_w)
-{
-	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1017,7 +992,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
+	AM_RANGE(0x4c, 0x4c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
 	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
 	AM_RANGE(0x66, 0x66) AM_WRITENOP
@@ -1032,7 +1007,7 @@ static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
@@ -1439,7 +1414,6 @@ void mazerbla_state::machine_start()
 	save_item(NAME(m_bcd_7445));
 
 	save_item(NAME(m_vsb_ls273));
-	save_item(NAME(m_soundlatch));
 }
 
 void mazerbla_state::machine_reset()
@@ -1465,7 +1439,9 @@ void mazerbla_state::machine_reset()
 	m_plane = 0;
 	m_bcd_7445 = 0;
 	m_vsb_ls273 = 0;
-	m_soundlatch = 0;
+
+	m_soundlatch->clear_w(machine().dummy_space(), 0, 0);
+	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -1565,12 +1541,16 @@ static MACHINE_CONFIG_START( greatgun )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK / 8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mazerbla_state, soundcommand_r))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK / 8)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mazerbla_state, gg_led_ctrl_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 MACHINE_CONFIG_END
 
 /*************************************
