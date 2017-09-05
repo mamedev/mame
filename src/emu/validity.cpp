@@ -1832,6 +1832,19 @@ void validity_checker::validate_inputs()
 				for (ioport_setting &setting : field.settings())
 					if (!setting.condition().none())
 						validate_condition(setting.condition(), device, port_map);
+
+				// verify natural keyboard codes
+				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
+				{
+					char32_t code = field.keyboard_code(which);
+					if (code && !uchar_isvalid(code))
+					{
+						osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
+							name,
+							(unsigned)code,
+							(int)code);
+					}
+				}
 			}
 
 			// done with this port
