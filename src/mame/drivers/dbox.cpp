@@ -621,7 +621,6 @@ static MACHINE_CONFIG_START( dbox )
 	//MCFG_MC68340_TOUT2_OUTPUT_CB(DEVWRITELINE("dcs", descrambler_device,  txd_receiver))
 	//MCFG_MC68340_TGATE2_INPUT_CB(DEVREADLINE("dsc", descrambler_device,  rxd_receiver))
 
-#if 0
 	/* Configure the serial ports */
 #define CHA ":rs232"
 #define CHB ":modem"
@@ -632,7 +631,6 @@ static MACHINE_CONFIG_START( dbox )
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", m68340_serial, rx_a_w))
 	MCFG_RS232_PORT_ADD (CHB, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", m68340_serial, rx_b_w))
-#endif
 
 	/* Add the boot flash */
 	MCFG_AMD_29F800B_16BIT_ADD("flash")
