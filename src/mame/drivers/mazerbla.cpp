@@ -1440,8 +1440,11 @@ void mazerbla_state::machine_reset()
 	m_bcd_7445 = 0;
 	m_vsb_ls273 = 0;
 
-	m_soundlatch->clear_w(machine().dummy_space(), 0, 0);
-	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	if (m_soundlatch.found())
+	{
+		m_soundlatch->clear_w(machine().dummy_space(), 0, 0);
+		m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	}
 
 	for (i = 0; i < 4; i++)
 	{
