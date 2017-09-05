@@ -44,6 +44,8 @@ static ADDRESS_MAP_START( bingowav_main_map, AS_PROGRAM, 16, bingowav_state )
 	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainioh", te7750_device, read, write, 0xff00)
 	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainiol", te7750_device, read, write, 0x00ff)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP
+	AM_RANGE(0x150000, 0x150001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x150002, 0x150003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("maintmp", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
 
