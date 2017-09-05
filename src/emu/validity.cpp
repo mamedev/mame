@@ -237,7 +237,7 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// if we failed to match anything, it
 	if (string && !validated_any)
-		throw emu_fatalerror(EMU_ERR_FAILED_VALIDITY, "\"%s\" failed to match any drivers\n", string);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", string);
 
 	return !(m_errors > 0 || m_warnings > 0);
 }
