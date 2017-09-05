@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
 
 Glass (c) 1993 Gaelco (Developed by OMK. Produced by Gaelco)
 
 Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
-The DS5002FP has up to 128KB undumped gameplay code making the game unplayable,
-except for the Promat licensed Korean version which is unprotected.
+Todo:
+ - video priorities are incorrect, like most earlier Gaelco titles in MAME
 
 ***************************************************************************/
 
@@ -16,6 +16,7 @@ except for the Promat licensed Korean version which is unprotected.
 
 #include "machine/gaelco_ds5002fp.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
@@ -273,12 +274,13 @@ ROM_START( glass ) /* Version 1.1 */
 	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( 0x88 )
-	//DS5002FP_SET_RPCTL( 0x00 )
-	//DS5002FP_SET_CRCR( 0x80 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -301,12 +303,13 @@ ROM_START( glass10 ) /* Version 1.0 */
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -329,12 +332,13 @@ ROM_START( glass10a ) /* Title screen shows "GLASS" and under that "Break Editio
 	ROM_LOAD16_BYTE( "spl-c22.bin", 0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -419,13 +423,16 @@ DRIVER_INIT_MEMBER(glass_state, glass)
 }
 
 
+/*
+ ALL versions of Glass contain the 'Break Edition' string (it just seems to be part of the title?)
+ The 2 version 1.0 releases are very similar code, it was thought that one was a break edition and the other wasn't, but this is not the case.
+ 
+ Version 1.1 releases also show Version 1994 on the title screen.  These versions do not have skulls in the playfield (at least not on early stages)
+ The protected version 1.1 also doesn't show any kind of attract gameplay, looks like it was patched out? (should be verified on an untouched original 1.1 using it's original SRAM tho)
+ The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
+*/
 
-// ALL versions of Glass contain the 'Break Edition' string (it just seems to be part of the title?)
-// The 2 version 1.0 releases are very similar code, it was thought that one was a break edition and the other wasn't, but as both contain the string this seems unlikely.
-// Version 1.1 releases also show Version 1994 on the title screen.  These versions do not have skulls in the playfield (at least not on early stages)
-// The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
-
-GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Version 1994)",                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, glasskr,  glass, glass,          glass, glass_state, glass, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE ) // promat stickers on program roms
-GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 1)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 2)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Checksum 49D5E66B, Version 1994)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glasskr,  glass, glass,          glass, glass_state, glass, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Checksum D419AB69, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program roms
+GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum C5513F3C)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum D3864FDB)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
