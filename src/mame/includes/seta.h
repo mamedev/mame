@@ -7,8 +7,10 @@
 
 ***************************************************************************/
 
+#include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
+#include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
@@ -43,6 +45,8 @@ public:
 		m_x1(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
+		m_upd4701(*this, "upd4701"),
+		m_buttonmux(*this, "buttonmux"),
 		m_dsw(*this, "DSW"),
 		m_rot(*this, {"ROT1", "ROT2"}),
 		m_p1(*this, "P1"),
@@ -71,6 +75,8 @@ public:
 	optional_device<x1_010_device> m_x1;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<upd4701_device> m_upd4701;
+	optional_device<hc157_device> m_buttonmux;
 
 	optional_ioport m_dsw;
 	optional_ioport_array<2> m_rot;
@@ -145,9 +151,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sub_ctrl_w);
 	DECLARE_READ16_MEMBER(seta_dsw_r);
 	DECLARE_READ16_MEMBER(usclssic_dsw_r);
-	DECLARE_READ16_MEMBER(usclssic_trackball_x_r);
-	DECLARE_READ16_MEMBER(usclssic_trackball_y_r);
-	DECLARE_WRITE16_MEMBER(usclssic_lockout_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
+	DECLARE_WRITE8_MEMBER(usclssic_lockout_w);
 	DECLARE_READ16_MEMBER(zombraid_gun_r);
 	DECLARE_WRITE16_MEMBER(zombraid_gun_w);
 	DECLARE_READ16_MEMBER(zingzipbl_unknown_r);
@@ -205,6 +211,7 @@ public:
 	DECLARE_MACHINE_RESET(calibr50);
 	DECLARE_PALETTE_INIT(palette_init_RRRRRGGGGGBBBBB_proms);
 	DECLARE_PALETTE_INIT(usclssic);
+	DECLARE_MACHINE_START(usclssic);
 	DECLARE_VIDEO_START(seta_2_layers);
 	DECLARE_PALETTE_INIT(blandia);
 	DECLARE_PALETTE_INIT(zingzip);
