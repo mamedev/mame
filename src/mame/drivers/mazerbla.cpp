@@ -1058,27 +1058,28 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW0")  /* Strobe 1: Dip Switches 28-35*/
-	// TODO: these are for mazerblaa set, mazerbla differs significantly
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Freeze Time" )
-	PORT_DIPSETTING(    0x0c, "1.5 seconds" )
-	PORT_DIPSETTING(    0x08, "2.0 seconds" )
-	PORT_DIPSETTING(    0x04, "2.5 seconds" )
-	PORT_DIPSETTING(    0x00, "3.0 seconds" )
-	PORT_DIPNAME( 0x30, 0x00, "Number of points for extra frezze & first life" )
-	PORT_DIPSETTING(    0x30, "20000" )
-	PORT_DIPSETTING(    0x20, "25000" )
-	PORT_DIPSETTING(    0x10, "30000" )
-	PORT_DIPSETTING(    0x00, "35000" )
-	PORT_DIPNAME( 0xc0, 0x00, "Number of points for extra life other than first" )
-	PORT_DIPSETTING(    0xc0, "40000" )
-	PORT_DIPSETTING(    0x80, "50000" )
-	PORT_DIPSETTING(    0x40, "60000" )
-	PORT_DIPSETTING(    0x00, "70000" )
+	PORT_DIPSETTING(    0x0c, "2.0 seconds" )
+	PORT_DIPSETTING(    0x08, "2.5 seconds" )
+	PORT_DIPSETTING(    0x04, "3.0 seconds" )
+	PORT_DIPSETTING(    0x00, "3.5 seconds" )
+	PORT_DIPNAME( 0x70, 0x40, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x70, "10000" )
+	PORT_DIPSETTING(    0x60, "15000" )
+	PORT_DIPSETTING(    0x50, "20000" )
+	PORT_DIPSETTING(    0x40, "25000" )
+	PORT_DIPSETTING(    0x30, "30000" )
+	PORT_DIPSETTING(    0x20, "35000" )
+	PORT_DIPSETTING(    0x10, "40000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  //probably unused
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")  /* Strobe 2: Dip Switches 20-27*/
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
@@ -1143,10 +1144,10 @@ static INPUT_PORTS_START( mazerbla )
 
 	PORT_START("DSW3")  /* Strobe 4: Dip Switches 4-11 */
 	PORT_DIPNAME( 0x03, 0x02, "Number of Freezes" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPNAME( 0x04, 0x04, "Gun Knocker" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1190,6 +1191,32 @@ static INPUT_PORTS_START( mazerbla )
 
 	PORT_START("UNUSED")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mazerblaa )
+	PORT_INCLUDE( mazerbla )
+	
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Freeze Time" )
+	PORT_DIPSETTING(    0x0c, "1.5 seconds" )
+	PORT_DIPSETTING(    0x08, "2.0 seconds" )
+	PORT_DIPSETTING(    0x04, "2.5 seconds" )
+	PORT_DIPSETTING(    0x00, "3.0 seconds" )
+	PORT_DIPNAME( 0x30, 0x00, "Number of points for extra frezze & first life" )
+	PORT_DIPSETTING(    0x30, "20000" )
+	PORT_DIPSETTING(    0x20, "25000" )
+	PORT_DIPSETTING(    0x10, "30000" )
+	PORT_DIPSETTING(    0x00, "35000" )
+	PORT_DIPNAME( 0xc0, 0x00, "Number of points for extra life other than first" )
+	PORT_DIPSETTING(    0xc0, "40000" )
+	PORT_DIPSETTING(    0x80, "50000" )
+	PORT_DIPSETTING(    0x40, "60000" )
+	PORT_DIPSETTING(    0x00, "70000" )	
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( greatgun )
@@ -1338,6 +1365,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
 
 	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
+	// for whatever reason this should be inverted?
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_INVERT PORT_KEYDELTA(7) PORT_PLAYER(2)
 
 	PORT_START("UNUSED")
@@ -1678,5 +1706,5 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 }
 
 GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // newer?
 GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
