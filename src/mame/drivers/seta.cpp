@@ -1378,6 +1378,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
+#include "machine/tmp68301.h"
 #include "machine/upd4701.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
@@ -2806,23 +2807,14 @@ ADDRESS_MAP_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-// TODO: not NVRAM!!!
-READ16_MEMBER(seta_state::kiwame_nvram_r)
+WRITE16_MEMBER(seta_state::kiwame_row_select_w)
 {
-	return m_kiwame_nvram[offset] & 0xff;
-}
-
-WRITE16_MEMBER(seta_state::kiwame_nvram_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		COMBINE_DATA( &m_kiwame_nvram[offset] );
-	}
+	m_kiwame_row_select = data & 0x001f;
 }
 
 READ16_MEMBER(seta_state::kiwame_input_r)
 {
-	int row_select = kiwame_nvram_r( space, 0x10a/2,0x00ff ) & 0x1f;
+	int row_select = m_kiwame_row_select;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
@@ -2854,7 +2846,7 @@ static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00009) AM_READ(kiwame_input_r)            // mahjong panel
 	AM_RANGE(0xe00000, 0xe00003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_SHARE("kiwame_nvram")  // TODO: actual unknown device
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
 
 
@@ -9178,6 +9170,8 @@ static MACHINE_CONFIG_START( kiwame )
 	MCFG_CPU_PROGRAM_MAP(kiwame_map)
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta_state, kiwame_row_select_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

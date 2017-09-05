@@ -61,7 +61,6 @@ public:
 		m_vctrl_2(*this,"vctrl_2"),
 		m_paletteram(*this,"paletteram"),
 		m_paletteram2(*this,"paletteram2"),
-		m_kiwame_nvram(*this,"kiwame_nvram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -92,7 +91,6 @@ public:
 	optional_shared_ptr<uint16_t> m_vctrl_2;
 	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_paletteram2;
-	optional_shared_ptr<uint16_t> m_kiwame_nvram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -135,6 +133,8 @@ public:
 	uint16_t m_pairslove_protram_old[0x200];
 	uint16_t m_downtown_protection[0x200/2];
 
+	uint16_t m_kiwame_row_select;
+
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_2_w);
@@ -156,8 +156,7 @@ public:
 	DECLARE_READ16_MEMBER(keroppi_coin_r);
 	DECLARE_WRITE16_MEMBER(keroppi_prize_w);
 	DECLARE_WRITE16_MEMBER(msgundam_vregs_w);
-	DECLARE_READ16_MEMBER(kiwame_nvram_r);
-	DECLARE_WRITE16_MEMBER(kiwame_nvram_w);
+	DECLARE_WRITE16_MEMBER(kiwame_row_select_w);
 	DECLARE_READ16_MEMBER(kiwame_input_r);
 	DECLARE_READ16_MEMBER(thunderl_protection_r);
 	DECLARE_WRITE16_MEMBER(thunderl_protection_w);
