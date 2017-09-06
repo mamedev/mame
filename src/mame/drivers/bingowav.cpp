@@ -4,7 +4,34 @@
 
     Taito Bingo Wave
 
-    Skeleton driver.
+    This is a skeleton driver for what appears to be a satellite betting
+    game similar to Sega's Caribbean Boule.
+
+    "MAIN PCB"
+    - Toshiba TMP68303F-16 (IC26)
+    - TEL TE7750 (IC38, IC47)
+    - Taito TC0140SYT (IC68)
+    - Zilog Z80-A (IC74)
+    - Yamaha YM2610 (IC77)
+    - ??MHz XTAL (OSC1)
+
+    "TERMINAL PCB"
+    - Toshiba TMP68303F-16 (IC35)
+    - Taito TC0650FDA (IC26)
+    - TEL TE7750 (IC42)
+    - Taito TCO470LIN (IC33)
+    - Taito TC0600OBT (IC11)
+    - Yamaha YM2149F (IC53)
+    - 36MHz XTAL (OSC1)
+    - 32MHz XTAL (OSC2)
+    - DIP switches (1x8)
+    - JAMMA edge connector
+
+    "CONTROL PCB"
+    - Taito PC060HA (IC2)
+    - Zilog Z80 (IC13)
+    - 16MHz XTAL (OSC1)
+    - DIP switches (1x8)
 
 ***************************************************************************/
 
