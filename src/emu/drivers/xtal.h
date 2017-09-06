@@ -196,6 +196,7 @@ enum
 	XTAL_25_447MHz      = 25447000,     /* Namco EVA3A (Funcube2) */
 	XTAL_25_590906MHz   = 25590906,     /* Atari Jaguar NTSC */
 	XTAL_25_593900MHz   = 25593900,     /* Atari Jaguar PAL */
+	XTAL_26MHz          = 26000000,     /* Gaelco PCBs */
 	XTAL_26_601712MHz   = 26601712,     /* Astro Corp.'s Show Hand, PAL Vtech/Yeno Socrates (6x PAL subcarrier) */
 	XTAL_26_66666MHz    = 26666666,     /* Irem M92 but most use 27MHz */
 	XTAL_26_686MHz      = 26686000,     /* Typically used on 90's Taito PCBs to drive the custom chips */
@@ -221,6 +222,7 @@ enum
 	XTAL_33_333MHz      = 33333000,     /* Sega Model 3 CPU board, Vegas */
 	XTAL_33_833MHz      = 33833000,
 	XTAL_33_8688MHz     = 33868800,     /* Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
+	XTAL_34MHz          = 34000000,     /* Gaelco PCBs */
 	XTAL_36MHz          = 36000000,     /* Sega Model 1 video board */
 	XTAL_38_76922MHz    = 38769220,     /* Namco System 21 video board */
 	XTAL_40MHz          = 40000000,
