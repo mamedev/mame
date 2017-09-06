@@ -9,6 +9,8 @@
 
     "MAIN PCB"
     - Toshiba TMP68303F-16 (IC26)
+    - Mitsubishi M66220SP (IC19)
+    - Unpopulated space for 68000 (IC36)
     - TEL TE7750 (IC38, IC47)
     - Taito TC0140SYT (IC68)
     - Zilog Z80-A (IC74)
@@ -18,6 +20,7 @@
     "TERMINAL PCB"
     - Toshiba TMP68303F-16 (IC35)
     - Taito TC0650FDA (IC26)
+    - Unpopulated space for 68000-16 (IC41)
     - TEL TE7750 (IC42)
     - Taito TCO470LIN (IC33)
     - Taito TC0600OBT (IC11)
