@@ -52,6 +52,9 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
+// set this to 1 to break Prop Cycle (28C64 page write emulation needed)
+#define EMULATE_POLLING 0
+
 
 //**************************************************************************
 //  BASE DEVICE IMPLEMENTATION
@@ -175,7 +178,7 @@ READ8_MEMBER(eeprom_parallel_28xx_device::read)
 	}
 
 	// if a write has not completed yet, the highest bit of data written will be read back inverted when polling the offset
-	if (ready())
+	if (ready() || !EMULATE_POLLING)
 		return eeprom_base_device::read(offset);
 	else
 	{

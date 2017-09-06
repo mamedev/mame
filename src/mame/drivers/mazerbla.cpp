@@ -119,6 +119,8 @@ video z80
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "video/mb_vcu.h"
@@ -141,7 +143,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_vcu(*this,"vcu"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch")
 		{ }
 
 	/* devices */
@@ -149,6 +152,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<mb_vcu_device> m_vcu;
 	required_device<screen_device> m_screen;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmaps[4];
@@ -185,7 +189,6 @@ public:
 	uint8_t m_bcd_7445;
 
 	uint8_t m_vsb_ls273;
-	uint8_t m_soundlatch;
 
 #if 0
 	int m_dbg_info;
@@ -210,11 +213,8 @@ public:
 	DECLARE_WRITE8_MEMBER(zpu_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(cfb_led_w);
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
-	DECLARE_WRITE8_MEMBER(main_sound_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	DECLARE_READ8_MEMBER(soundcommand_r);
 	DECLARE_DRIVER_INIT(mazerbla);
 	DECLARE_DRIVER_INIT(greatgun);
 	virtual void machine_start() override;
@@ -226,7 +226,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
@@ -923,32 +922,9 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	output().set_led_value(1, BIT(data, 5));
 }
 
-READ8_MEMBER(mazerbla_state::soundcommand_r)
-{
-	return m_soundlatch;
-}
-
-TIMER_CALLBACK_MEMBER(mazerbla_state::delayed_sound_w)
-{
-	m_soundlatch = param;
-
-	/* cause NMI on sound CPU */
-	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-WRITE8_MEMBER(mazerbla_state::main_sound_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::delayed_sound_w),this), data & 0xff);
-}
-
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
-}
-
-WRITE8_MEMBER(mazerbla_state::sound_nmi_clear_w)
-{
-	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -962,7 +938,7 @@ static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8, mazerbla_state )
@@ -1016,7 +992,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
+	AM_RANGE(0x4c, 0x4c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
 	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
 	AM_RANGE(0x66, 0x66) AM_WRITENOP
@@ -1031,7 +1007,13 @@ static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("vcu", mb_vcu_device, vbank_clear_w)
+	AM_IMPORT_FROM( mazerbla_cpu3_io_map )
 ADDRESS_MAP_END
 
 
@@ -1051,26 +1033,28 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW0")  /* Strobe 1: Dip Switches 28-35*/
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x0c, 0x00, "Freeze Time" )
-	PORT_DIPSETTING(    0x0c, "1.5 seconds" )
-	PORT_DIPSETTING(    0x08, "2.0 seconds" )
-	PORT_DIPSETTING(    0x04, "2.5 seconds" )
-	PORT_DIPSETTING(    0x00, "3.0 seconds" )
-	PORT_DIPNAME( 0x30, 0x00, "Number of points for extra frezze & first life" )
-	PORT_DIPSETTING(    0x30, "20000" )
-	PORT_DIPSETTING(    0x20, "25000" )
-	PORT_DIPSETTING(    0x10, "30000" )
-	PORT_DIPSETTING(    0x00, "35000" )
-	PORT_DIPNAME( 0xc0, 0x00, "Number of points for extra life other than first" )
-	PORT_DIPSETTING(    0xc0, "40000" )
-	PORT_DIPSETTING(    0x80, "50000" )
-	PORT_DIPSETTING(    0x40, "60000" )
-	PORT_DIPSETTING(    0x00, "70000" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Freeze Time" )
+	PORT_DIPSETTING(    0x0c, "2.0 seconds" )
+	PORT_DIPSETTING(    0x08, "2.5 seconds" )
+	PORT_DIPSETTING(    0x04, "3.0 seconds" )
+	PORT_DIPSETTING(    0x00, "3.5 seconds" )
+	PORT_DIPNAME( 0x70, 0x40, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x70, "10000" )
+	PORT_DIPSETTING(    0x60, "15000" )
+	PORT_DIPSETTING(    0x50, "20000" )
+	PORT_DIPSETTING(    0x40, "25000" )
+	PORT_DIPSETTING(    0x30, "30000" )
+	PORT_DIPSETTING(    0x20, "35000" )
+	PORT_DIPSETTING(    0x10, "40000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  //probably unused
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")  /* Strobe 2: Dip Switches 20-27*/
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
@@ -1110,9 +1094,7 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x70, "1 Coin/14 Credits" )
 
 	PORT_START("DSW2")  /* Strobe 3: Dip Switches 12-19*/
-	PORT_DIPNAME( 0x01, 0x01, "Service Index" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) PORT_NAME("Service Index")
 	PORT_DIPNAME( 0x02, 0x02, "Switch Test" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1137,10 +1119,10 @@ static INPUT_PORTS_START( mazerbla )
 
 	PORT_START("DSW3")  /* Strobe 4: Dip Switches 4-11 */
 	PORT_DIPNAME( 0x03, 0x02, "Number of Freezes" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPNAME( 0x04, 0x04, "Gun Knocker" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1184,6 +1166,32 @@ static INPUT_PORTS_START( mazerbla )
 
 	PORT_START("UNUSED")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mazerblaa )
+	PORT_INCLUDE( mazerbla )
+	
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Freeze Time" )
+	PORT_DIPSETTING(    0x0c, "1.5 seconds" )
+	PORT_DIPSETTING(    0x08, "2.0 seconds" )
+	PORT_DIPSETTING(    0x04, "2.5 seconds" )
+	PORT_DIPSETTING(    0x00, "3.0 seconds" )
+	PORT_DIPNAME( 0x30, 0x00, "Number of points for extra frezze & first life" )
+	PORT_DIPSETTING(    0x30, "20000" )
+	PORT_DIPSETTING(    0x20, "25000" )
+	PORT_DIPSETTING(    0x10, "30000" )
+	PORT_DIPSETTING(    0x00, "35000" )
+	PORT_DIPNAME( 0xc0, 0x00, "Number of points for extra life other than first" )
+	PORT_DIPSETTING(    0xc0, "40000" )
+	PORT_DIPSETTING(    0x80, "50000" )
+	PORT_DIPSETTING(    0x40, "60000" )
+	PORT_DIPSETTING(    0x00, "70000" )	
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( greatgun )
@@ -1317,20 +1325,23 @@ static INPUT_PORTS_START( greatgun )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STICK0_X")  /* Strobe 6: horizontal movement of gun */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
+
 	PORT_START("STICK0_Y")  /* Strobe 7: vertical movement of gun */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
 
 	PORT_START("STICK1_X")  /* Strobe 8: horizontal movement of gun */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
+
 	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
+	// for whatever reason this should be inverted?
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_INVERT PORT_KEYDELTA(7) PORT_PLAYER(2)
 
 	PORT_START("UNUSED")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1403,7 +1414,6 @@ void mazerbla_state::machine_start()
 	save_item(NAME(m_bcd_7445));
 
 	save_item(NAME(m_vsb_ls273));
-	save_item(NAME(m_soundlatch));
 }
 
 void mazerbla_state::machine_reset()
@@ -1429,7 +1439,12 @@ void mazerbla_state::machine_reset()
 	m_plane = 0;
 	m_bcd_7445 = 0;
 	m_vsb_ls273 = 0;
-	m_soundlatch = 0;
+
+	if (m_soundlatch.found())
+	{
+		m_soundlatch->clear_w(machine().dummy_space(), 0, 0);
+		m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	}
 
 	for (i = 0; i < 4; i++)
 	{
@@ -1468,6 +1483,8 @@ static MACHINE_CONFIG_START( mazerbla )
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1475,10 +1492,11 @@ static MACHINE_CONFIG_START( mazerbla )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mazerbla_state, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
-
+	
 	/* sound hardware */
 MACHINE_CONFIG_END
 
@@ -1497,7 +1515,7 @@ static MACHINE_CONFIG_START( greatgun )
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK) /* 4 MHz, no  NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu3_map)
-	MCFG_CPU_IO_MAP(mazerbla_cpu3_io_map)
+	MCFG_CPU_IO_MAP(greatgun_cpu3_io_map)
 /* (vblank related ??) int generated by a custom video processor
     and cleared on ANY port access.
     but handled differently for now
@@ -1508,6 +1526,8 @@ static MACHINE_CONFIG_START( greatgun )
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1524,12 +1544,16 @@ static MACHINE_CONFIG_START( greatgun )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK / 8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mazerbla_state, soundcommand_r))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK / 8)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mazerbla_state, gg_led_ctrl_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -1665,5 +1689,5 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 }
 
 GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // newer?
 GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

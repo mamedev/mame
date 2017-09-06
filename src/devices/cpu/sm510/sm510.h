@@ -36,6 +36,10 @@
 #define MCFG_SM510_WRITE_R_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
 
+// R port can be set to direct control with a mask option (default false)
+#define MCFG_SM510_R_DIRECT_CONTROL(_direct) \
+	sm510_base_device::set_r_direct_control(*device, _direct);
+
 // LCD segment outputs: H1-4 as offset(low), a/b/c 1-16 as data d0-d15
 #define MCFG_SM510_WRITE_SEGA_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_sega_callback(*device, DEVCB_##_devcb);
@@ -81,8 +85,8 @@ a1 48 |                                              | 28 b10
 H4 49 |                                              | 27 a11
 H3 50 |                                              | 26 b11
 H2 51 |                                              | 25 a12
-H1 52 |                    SM510                     | 24 b12
-S1 53 |                    SM511                     | 23 a13
+H1 52 |                                              | 24 b12
+S1 53 |                    SM510                     | 23 a13
 S2 54 |                                              | 22 b13
 S3 55 |                                              | 21 a14
 S4 56 |                                              | 20 b14
@@ -108,6 +112,7 @@ public:
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
+		, m_r_direct(false)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
 		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
 		, m_melody_rom(*this, "melody")
@@ -123,6 +128,7 @@ public:
 	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_s_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_r_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_r.set_callback(std::forward<Object>(cb)); }
+	static void set_r_direct_control(device_t &device, bool direct) { downcast<sm510_base_device &>(device).m_r_direct = direct; }
 
 	template <class Object> static devcb_base &set_write_sega_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_sega.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_segb_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segb.set_callback(std::forward<Object>(cb)); }
@@ -179,6 +185,7 @@ protected:
 	bool m_skip;
 	u8 m_w;
 	u8 m_r, m_r_out;
+	bool m_r_direct;
 	bool m_k_active;
 	bool m_halt;
 	int m_clk_div;

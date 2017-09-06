@@ -7,18 +7,17 @@
 
 #include "machine/gen_latch.h"
 
-typedef device_delegate<uint16_t (int unused)> deco146_port_read_cb;
 typedef device_delegate<void (address_space &space, uint16_t data, uint16_t mem_mask)> deco146_port_write_cb;
 
 
-#define MCFG_DECO146_SET_PORTA_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_a_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_DECO146_IN_PORTA_CB(_devcb) \
+	devcb = &deco_146_base_device::set_port_a_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_DECO146_SET_PORTB_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_b_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_DECO146_IN_PORTB_CB(_devcb) \
+	devcb = &deco_146_base_device::set_port_b_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_DECO146_SET_PORTC_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_c_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_DECO146_IN_PORTC_CB(_devcb) \
+	devcb = &deco_146_base_device::set_port_c_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_DECO146_SET_SOUNDLATCH_CALLBACK( _class, _method) \
 	deco_146_base_device::set_soundlatch_cb(*device, deco146_port_write_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
@@ -86,9 +85,9 @@ public:
 	void write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags);
 	uint16_t read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags);
 
-	static void set_port_a_cb(device_t &device,deco146_port_read_cb port_cb);
-	static void set_port_b_cb(device_t &device,deco146_port_read_cb port_cb);
-	static void set_port_c_cb(device_t &device,deco146_port_read_cb port_cb);
+	template<class Object> static devcb_base &set_port_a_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_a_r.set_callback(std::forward<Object>(object)); }
+	template<class Object> static devcb_base &set_port_b_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_b_r.set_callback(std::forward<Object>(object)); }
+	template<class Object> static devcb_base &set_port_c_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_c_r.set_callback(std::forward<Object>(object)); }
 	static void set_soundlatch_cb(device_t &device,deco146_port_write_cb port_cb);
 	static void set_interface_scramble(device_t &device,uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0);
 	static void set_use_magic_read_address_xor(device_t &device, int use_xor);
@@ -97,17 +96,12 @@ public:
 
 
 
-	deco146_port_read_cb m_port_a_r;
-	deco146_port_read_cb m_port_b_r;
-	deco146_port_read_cb m_port_c_r;
+	devcb_read16 m_port_a_r;
+	devcb_read16 m_port_b_r;
+	devcb_read16 m_port_c_r;
 	deco146_port_write_cb m_soundlatch_w;
 
-	uint16_t port_a_default(int unused);
-	uint16_t port_b_default(int unused);
-	uint16_t port_c_default(int unused);
-	uint16_t port_dummy_cb(int unused);
 	void soundlatch_default(address_space &space, uint16_t data, uint16_t mem_mask);
-	void soundlatch_dummy(address_space &space, uint16_t data, uint16_t mem_mask);
 
 	uint8_t m_bankswitch_swap_read_address;
 	uint16_t m_magic_read_address_xor;
@@ -139,7 +133,6 @@ protected:
 
 	uint16_t m_nand;
 	uint16_t m_xor;
-	uint16_t m_soundlatch;
 
 	uint16_t m_latchaddr;
 	uint16_t m_latchdata;

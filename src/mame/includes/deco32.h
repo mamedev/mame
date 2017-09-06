@@ -176,14 +176,10 @@ public:
 	void updateAceRam();
 	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
-	uint16_t port_a_fghthist(int unused);
-	uint16_t port_b_fghthist(int unused);
-	uint16_t port_c_fghthist(int unused);
 	void deco32_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 
-	uint16_t port_b_nslasher(int unused);
 	void nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-	uint16_t port_b_tattass(int unused);
+	DECLARE_READ16_MEMBER(port_b_tattass);
 	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 	void deco32_set_audio_output(uint8_t raw_data);
 	void update_irq_state(uint8_t irq_cause, bool assert_state);

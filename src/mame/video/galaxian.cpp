@@ -846,7 +846,7 @@ void galaxian_state::stars_update_origin()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::galaxian_stars_blink_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::scramble_stars_blink_timer)
 {
 	m_stars_blink_state++;
 }

@@ -34,7 +34,7 @@ protected:
 	virtual void key_break(uint8_t row, uint8_t column) override;
 
 	// device_hp_hil_interface overrides
-	virtual void hil_write(uint16_t data) override;
+	virtual bool hil_write(uint16_t *data) override;
 
 private:
 	void transmit_byte(uint8_t byte);

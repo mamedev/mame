@@ -110,7 +110,9 @@ PCB2  (Top board, CPU board)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -145,20 +147,23 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_scrolly;
 
-	uint8_t m_nmi_en;
+	bool m_int_en;
+	bool m_nmi_en;
 
-	DECLARE_WRITE8_MEMBER(to_sound_w);
+	DECLARE_WRITE_LINE_MEMBER(int_mask_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(sub);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(main_irq);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 };
 
 void sub_state::machine_start()
 {
+	save_item(NAME(m_int_en));
 	save_item(NAME(m_nmi_en));
 }
 
@@ -244,6 +249,13 @@ uint32_t sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+WRITE_LINE_MEMBER(sub_state::int_mask_w)
+{
+	m_int_en = state;
+	if (!m_int_en)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0x0000, 0xafff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
@@ -253,12 +265,8 @@ static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("scrolly")
 
-	AM_RANGE(0xe000, 0xe000) AM_NOP
-	AM_RANGE(0xe800, 0xe800) AM_NOP
-	AM_RANGE(0xe801, 0xe801) AM_NOP
-	AM_RANGE(0xe802, 0xe802) AM_NOP
-	AM_RANGE(0xe803, 0xe803) AM_NOP
-	AM_RANGE(0xe805, 0xe805) AM_NOP
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0xe800, 0xe807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0") // DSW0?
 	AM_RANGE(0xf020, 0xf020) AM_READ_PORT("DSW1") // DSW1?
@@ -266,20 +274,16 @@ static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0xf060, 0xf060) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(sub_state::to_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_soundcpu->set_input_line(0, HOLD_LINE);
-}
-
 WRITE8_MEMBER(sub_state::nmi_mask_w)
 {
 	m_nmi_en = data & 1;
+	if (!m_nmi_en)
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(to_sound_w) // to/from sound CPU
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // to/from sound CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
@@ -436,10 +440,16 @@ PALETTE_INIT_MEMBER(sub_state, sub)
 }
 
 
+INTERRUPT_GEN_MEMBER(sub_state::main_irq)
+{
+	if (m_int_en)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+}
+
 INTERRUPT_GEN_MEMBER(sub_state::sound_irq)
 {
-	if(m_nmi_en)
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_en)
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( sub )
@@ -448,13 +458,20 @@ static MACHINE_CONFIG_START( sub )
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(subm_map)
 	MCFG_CPU_IO_MAP(subm_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sub_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sub_state, main_irq)
 
 	MCFG_CPU_ADD("soundcpu", Z80,MASTER_CLOCK/6)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(subm_sound_map)
 	MCFG_CPU_IO_MAP(subm_sound_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sub_state, int_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP)
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // same as Q0?
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -474,6 +491,8 @@ static MACHINE_CONFIG_START( sub )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */

@@ -1144,7 +1144,7 @@ private:
 
 	// data relevant to other specific types
 	u8                          m_way;              // digital joystick 2/4/8-way descriptions
-	char32_t                    m_chars[4];         // unicode key data
+	char32_t                    m_chars[1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)];         // unicode key data
 };
 
 

@@ -193,26 +193,15 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 #include "speaker.h"
 
 
-// It looks like this needs a synch between z80 and 68k ??? See z80:006A-0091
-READ16_MEMBER(tecmosys_state::sound_r)
+READ8_MEMBER(tecmosys_state::sound_command_pending_r)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().scheduler().synchronize();
-		return m_soundlatch2->read(space, 0);
-	}
-
-	return 0;
+	return m_soundlatch->pending_r();
 }
 
-WRITE16_MEMBER(tecmosys_state::sound_w)
+WRITE8_MEMBER(tecmosys_state::sound_nmi_disable_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().scheduler().synchronize();
-		m_soundlatch->write(space, 0x00, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	// 00 and FF are the only values written here; the latter value is set during initialization and NMI processing
+	m_soundnmi->in_w<1>(data == 0);
 }
 
 /*
@@ -318,9 +307,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_w )
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
-	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
+	AM_RANGE(0xf00000, 0xf00001) AM_READ8(sound_command_pending_r, 0x00ff)
 	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
 ADDRESS_MAP_END
 
@@ -353,7 +342,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	AM_RANGE(0x20, 0x20) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(z80_bank_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0x50, 0x50) AM_WRITE(sound_nmi_disable_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 ADDRESS_MAP_END
 
@@ -477,7 +466,10 @@ static MACHINE_CONFIG_START( deroon )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
 	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

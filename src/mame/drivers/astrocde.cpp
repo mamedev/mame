@@ -455,13 +455,6 @@ WRITE8_MEMBER(astrocde_state::demndrgn_sound_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::tenpindx_sound_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 WRITE8_MEMBER(astrocde_state::tenpindx_lamp_w)
 {
 	/* lamps */
@@ -668,6 +661,20 @@ static ADDRESS_MAP_START( port_map_16col_pattern_nosound, AS_IO, 8, astrocde_sta
 	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE(profpac_screenram_ctrl_w)
 	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(demndrgn_banksw_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( port_map_16col_pattern_tenpindx, AS_IO, 8, astrocde_state )
+	AM_RANGE(0x0060, 0x0060) AM_MIRROR(0xff00) AM_READ_PORT("P60")
+	AM_RANGE(0x0061, 0x0061) AM_MIRROR(0xff00) AM_READ_PORT("P61")
+	AM_RANGE(0x0062, 0x0062) AM_MIRROR(0xff00) AM_READ_PORT("P62")
+	AM_RANGE(0x0063, 0x0063) AM_MIRROR(0xff00) AM_READ_PORT("P63")
+	AM_RANGE(0x0064, 0x0064) AM_MIRROR(0xff00) AM_READ_PORT("P64")
+	AM_RANGE(0x0065, 0x0066) AM_MIRROR(0xff00) AM_WRITE(tenpindx_lamp_w)
+	AM_RANGE(0x0067, 0x0067) AM_MIRROR(0xff00) AM_WRITE(tenpindx_counter_w)
+	AM_RANGE(0x0068, 0x0068) AM_MIRROR(0xff00) AM_WRITE(tenpindx_lights_w)
+	AM_RANGE(0x0097, 0x0097) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_IMPORT_FROM(port_map_16col_pattern_nosound)
 ADDRESS_MAP_END
 
 
@@ -1443,7 +1450,7 @@ static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(profpac_map)
-	MCFG_CPU_IO_MAP(port_map_16col_pattern_nosound)
+	MCFG_CPU_IO_MAP(port_map_16col_pattern_tenpindx)
 
 	MCFG_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
 	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
@@ -1457,6 +1464,7 @@ static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DIPSW"))
@@ -1767,18 +1775,7 @@ DRIVER_INIT_MEMBER(astrocde_state,demndrgn)
 
 DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
 {
-	address_space &iospace = m_maincpu->space(AS_IO);
-
 	m_video_config = 0x00;
-	iospace.install_read_port(0x60, 0x60, 0xff00, "P60");
-	iospace.install_read_port(0x61, 0x61, 0xff00, "P61");
-	iospace.install_read_port(0x62, 0x62, 0xff00, "P62");
-	iospace.install_read_port(0x63, 0x63, 0xff00, "P63");
-	iospace.install_read_port(0x64, 0x64, 0xff00, "P64");
-	iospace.install_write_handler(0x65, 0x66, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_lamp_w), this));
-	iospace.install_write_handler(0x67, 0x67, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_counter_w), this));
-	iospace.install_write_handler(0x68, 0x68, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_lights_w), this));
-	iospace.install_write_handler(0x97, 0x97, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_sound_w), this));
 
 	/* configure banking */
 	m_bank8000->configure_entries(0, 4, memregion("banks")->base() + 0x4000, 0x8000);
@@ -1818,5 +1815,5 @@ GAME( 1981, robby,    0,    robby,    robby,     astrocde_state, robby,    ROT0,
 GAME( 1983, profpac,  0,    profpac,  profpac,   astrocde_state, profpac,  ROT0,   "Dave Nutting Associates / Bally Midway", "Professor Pac-Man", MACHINE_SUPPORTS_SAVE )
 
 /* 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board */
-GAME( 1982, demndrgn, 0,    demndrgn, demndrgn,  astrocde_state, demndrgn, ROT0,   "Dave Nutting Associates / Bally Midway", "Demons & Dragons (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, demndrgn, 0,    demndrgn, demndrgn,  astrocde_state, demndrgn, ROT0,   "Dave Nutting Associates / Bally Midway", "Demons & Dragons (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx,  astrocde_state, tenpindx, ROT0,   "Dave Nutting Associates / Bally Midway", "Ten Pin Deluxe", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_tenpindx )

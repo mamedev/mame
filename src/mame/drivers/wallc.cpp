@@ -696,6 +696,14 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
   00d5: nop
   00d6: nop
 
+  1866: pop af
+  1867: cp $46
+  1869: nop
+  186a: nop
+  186b: nop
+
+  Main PCB has a Microchip AY-3-8912A PSG, a 3.6V battery and no ROM numbered 4.
+  A daughterboard contains the Z80 and some RAM.
 */
 ROM_START( unkitpkr )
 	ROM_REGION( 0x8000, "maincpu", 0 )

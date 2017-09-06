@@ -9,7 +9,7 @@
  *                ___                                     |               |       ________    ________      |
  *               |   |                                    |_______________|      |        |  |        |     |
  *               |   |                                                           | FLASH  |  | FLASH  |     |
- *               |   |                                                           | 29F800 |  | 29F800 |     |
+ *               |   |                                                           | 29F800B|  | 29F800B|     |
  *               |   |                                                           |        |  |        |     |
  *               |   |                 ____________                              |  1Mb   |  |  1Mb   |     |
  *               |   |                |            |                             |        |  |        |     |
@@ -48,6 +48,7 @@
  *
  * Misc links about Nokia Multimedia Division and this board:
  * http://www.siliconinvestor.com/readmsg.aspx?msgid=5097482
+ * http://www.sat-digest.com/SatXpress/Digital/MM/Mediamaster.htm
  * http://www.telecompaper.com/news/beta-research-publishes-dbox-specifications--163443
  * https://de.wikipedia.org/wiki/D-box
  * http://dvb2000.org/dvb2000/
@@ -56,7 +57,7 @@
  *--------------
  * - Serial port on the back runs at 19200 at issues modem commands when attached to terminal
  * - It is possible to attach a BDM emulator and retrieve the ROM through it.
- * - It is possible to flash new firmware by adding jumper XP06 (under the modem board)
+ * - It is possible to flash new firmware through BDM by adding jumper XP06 (under the modem board)
  * - The bootstrap is based on RTXC 3.2g RTOS
  * - The bootstrap jumps to firmware from 0xb82 to RAM at 0x800000
  *
@@ -72,12 +73,30 @@
  * Lucent AV6220A MPEG2 demultiplexer w. crypto interface
  * CI Common Interface module
  * LSI L2A0371 Tuner
- * 2 x 29F800-90 (2Mb FLASH)
+ * 2 x 29F800B-90 (2Mb FLASH) - schematics shows a 29F400 as second device so firmware checks device ID
  * 2 x 42260-60  (1Mb DRAM)
  * Siemens SDA5708 dot matrix display, SPI like connection
  *  - http://arduinotehniq.blogspot.se/2015/07/sda5708-display-8-character-7x5-dot.html
  *  - charset stored at 0x808404 to 0x808780, 7 bytes per character
  *
+ * Known Nokia Receivers
+ * -----------------------------
+ * D-box SCART, built-in Irdeto CAM, modem, SCSI
+ * 9200 SCART, SCSI
+ * 9500 SCART, built-in Irdeto CAM, modem, SCSI
+ * 9600 SCART
+ * 9602 SCART, modem
+ * 9610 SCART, modem, SCSI
+ * 8200 RF, SCSI
+ * 8500 RF, built-in Irdeto CAM, modem, SCSI
+ * 8600 RF
+ *
+ * Known board revs and changes
+ * -----------------------------
+ * Main Board 55 31893-11 DVB 9500 S
+ * Main Board 55 31893-33 DVB 9500 S - GALs named after functions in schematics
+ * Main Board 55 31893-46 D-box      - OE* IP09 tied to GND, only one flash IP02
+ * Main Board 55 31893-89 DVB 9500 S - OE* IP09 tied to GND
  *
  * Address Map
  * --------------------------------------------------------------------------
@@ -330,7 +349,7 @@
  *
  *  Address map decoding
  *  --------------------
- *  IP06 GAL16V8 - DRAM
+ *  IP06 GAL16V8 - DRAM-PS8V0.9
  *  pin signal   connected to
  *   1   Q       V-FIFO-CLK inverted SCSI_CLK, origin to be found
  *   2   I1      SCSI_CLK
@@ -341,22 +360,39 @@
  *   7   I6      BG   68340 pin 101 IP01
  *   8   I7      SIZ0 68340 pin 105 IP01
  *   9   I8      R/W  68340 pin 107 IP01
- *  11   I9/OE*  GND  68340 pin 107 IP01 via an 100R resistor
- *  19   O0      FC2  68340 pin  71 IP01
- *  18   O1      I8   GAL168V pin 9 IP07 SCSI GAL
- *  17   O2      nc
- *  16   O3      RAS1 514260 pin 14 IP10-11 512KB DRAM each (IP11 is empty socket)
- *  15   O4      LCAS 514260 pin 29 IP09-11 512KB DRAM each (IP11 is empty socket)
- *  14   O5      UCAS 514260 pin 28 IP09-11 512KB DRAM each (IP11 is empty socket)
- *  13   O6      RAS0 514260 pin 14 IP09    512KB DRAM
- *  12   O7      I2 GAL16V8 pin 3 IP07 SCSI GAL (ANDed with !CS1) DMA_REQ
- *               I1 GAL16V8 pin 2 IP08 LOGC GAL (ANDed with !CS1) DMA_REQ
- *               G1 74257 pin 1 IP04-05 MUXes
+ *  11   I9/OE*  GND  via an 100R resistor
+ *  12   O0      FC2  68340 pin  71 IP01
+ *  13   O1      I8   GAL168V pin 9 IP07 SCSI GAL
+ *  14   O2      nc
+ *  15   O3      RAS1 514260 pin 14 IP10-11 512KB DRAM each (IP11 is empty socket)
+ *  16   O4      LCAS 514260 pin 29 IP09-11 512KB DRAM each (IP11 is empty socket)
+ *  17   O5      UCAS 514260 pin 28 IP09-11 512KB DRAM each (IP11 is empty socket)
+ *  18   O6      RAS0 514260 pin 14 IP09    512KB DRAM
+ *  19   O7      I2 GAL16V8 pin 3 IP07 SCSI GAL (ANDed with !CS1) DMA_REQ
+ *              +I1 GAL16V8 pin 2 IP08 LOGC GAL (ANDed with !CS1) DMA_REQ
+ *              +G1 74257 pin 1 IP04-05 MUXes
  *
- *  Identified low level drivers in firmware
- *  ----------------------------------------
- *  800420..80046C : Some PORT A serialisation routine for the
- *                   Siemens SDA5708 dot matrix display
+ *  IP07 GAL16V8 - SCSI-PS8V0.8
+ *  pin signal   connected to
+ *   1   Q       V-FIFO-CLK inverted SCSI_CLK, origin to be found
+ *   2   I1      R/W  68340 pin 107 IP01
+ *   3   I2      DMA_REQ
+ *   4   I3      Q    7474  pin   5 IP25
+ *   5   I4      DACK1 68340 pin 15
+ *   6   I5      D0   74138 pin  15 IP12
+ *   7   I6      !BG  7404<-68340 pin 101 IP01 Inverted Bus Grant
+ *   8   I7      3    7408 pin 3 IP23 OE for IP10
+ *   9   I8      O1   GAL16V pin 18 IP06 DRAM GAL
+ *  11   I9/OE*  GND via an 100R resistor
+ *  12   O0      DREQ1 68340 pin 16
+ *  13   O1      WE   514260 pin 13 IP10 512KB DRAM
+ *  14   O2      DMA_ACK
+ *  15   O3      CS_SCSI
+ *  16   O4      RD_SCSI
+ *  17   O5      WE   514260 pin 13 IP11 empty socket
+ *  18   O6      WR_SCSI
+ *  19   O7      MWE
+ *              +WE   514260 pin 13 IP09 512KB DRAM
  *
  * Interrupt sources
  * ----------------------------------------------------------
@@ -368,29 +404,23 @@
  *  IRQ5 CAM module INT
  *  IRQ3 Audio/Video INT
  *
- * ----------------------------------------------------------
- *
- * DMAC Channel Assignments
- * ----------------------------------------------------------
- * Channel         Device
- * ----------------------------------------------------------
- * ----------------------------------------------------------
- *
  *  TODO:
  *  - Dump/understand the address decoder GAL:s IP06-IP08 (3 x 16V8)
- *  - Setup a working address map
  *  - Fix debug terminal
- *  - TBC
+ *  - write demuxer
  *
  ****************************************************************************/
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "machine/intelfsh.h"
 
 #include "video/sda5708.h"
 #include "machine/latch8.h" // IP16
 
 #include "sda5708.lh"
+
+#include "bus/rs232/rs232.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -399,21 +429,25 @@
 //#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
 #define LOG_SETUP   (1U <<  1)
 #define LOG_DISPLAY (1U <<  2)
+#define LOG_FLASH   (1U <<  3)
 
-//#define VERBOSE  (LOG_GENERAL|LOG_SETUP|LOG_DISPLAY)
-//#define LOG_OUTPUT_FUNC printf
+#define VERBOSE  (LOG_FLASH)
+#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
 //#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY, __VA_ARGS__)
+#define LOGFLASH(...)  LOGMASKED(LOG_FLASH,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+#define LOCALFLASH 0 //  1 = local flash rom implementation 0 = intelflash_device
 
 class dbox_state : public driver_device
 {
@@ -429,11 +463,34 @@ class dbox_state : public driver_device
 	required_device<latch8_device> m_ip16_74259;
 
 	virtual void machine_reset() override;
+	virtual void machine_start () override;
 	DECLARE_DRIVER_INIT(dbox);
-	DECLARE_WRITE8_MEMBER (sda5708_reset);
-	DECLARE_WRITE8_MEMBER (sda5708_clk);
+	DECLARE_WRITE8_MEMBER(sda5708_reset);
+	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
+
+#if LOCALFLASH
+	DECLARE_READ16_MEMBER (sysflash_r);
+	DECLARE_WRITE16_MEMBER (sysflash_w);
+private:
+	uint16_t *m_sysflash;
+	uint32_t m_sf_mode;
+	uint32_t m_sf_state;
+#endif
 };
+
+void dbox_state::machine_start()
+{
+	LOG("%s\n", FUNCNAME);
+
+#if LOCALFLASH
+	save_pointer (NAME (m_sysflash), sizeof(m_sysflash));
+
+	m_sysflash = (uint16_t*)(memregion ("flash")->base());
+	m_sf_mode  = 0;
+	m_sf_state = 0;
+#endif
+}
 
 void dbox_state::machine_reset()
 {
@@ -458,13 +515,96 @@ WRITE8_MEMBER (dbox_state::write_pa){
 	m_display->load_w((0x04 & data) == 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
+#if LOCALFLASH
+/* Lcoal emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallell */
+/* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
+WRITE16_MEMBER (dbox_state::sysflash_w){
+	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, space.device().safe_pc(), offset, data, mem_mask);
+
+	/*Data bits DQ15–DQ8 are don’t cares for unlock and command cycles.*/
+	m_sf_state = ((m_sf_state << 8) & 0xffffff00) | (data & 0xff);
+	switch (m_sf_state)
+	{
+	case 0xf0:// Reset command, to get back to reading flash data
+	  m_sf_mode = 0;
+	  m_sf_state = 0;
+	  LOGFLASH("- Reset command\n");
+	  break;
+	case 0xaa: // Building a multi byte command
+	  m_sf_mode = 1;
+	  break;
+	case 0xaa55: // Building a multi byte command
+	case 0xaa55a0: // Program Data
+	case 0xaa5580: // Erase
+	case 0xaa5580aa: // Chip or Sector Erase
+	  break;
+	case 0xaa5590: // Autoselect mode
+	  m_sf_mode = 4;
+	  m_sf_state = 0;
+	  LOGFLASH("- Autoselect Mode\n");
+	  break;
+	case 0xb0: // Erase Suspend Mode
+	  m_sf_mode = 2;
+	  m_sf_state = 0;
+	  LOGFLASH("- Erase Suspend Mode\n");
+	  break;
+	case 0x30: // Erase Resume Mode
+	  m_sf_mode = 3;
+	  m_sf_state = 0;
+	  LOGFLASH("- Erase Resume Mode\n");
+	  break;
+	}
+}
+
+READ16_MEMBER (dbox_state::sysflash_r){
+
+  if (m_sf_mode == 0)
+  {
+	return m_sysflash[offset];
+  }
+  else
+  {
+    if (m_sf_mode == 4)
+    {
+      switch (offset & 0xff)
+      {
+      case 0x00: LOGFLASH("- Manufacturer ID\n"); return 01; break; // Manufacturer ID
+//      case 0x01: LOGFLASH("- Device ID\n"); return 0x22d6; break; // Device ID (Top Boot Block) 29F800TA
+      case 0x01: LOGFLASH("- Device ID\n"); return 0x2258; break; // Device ID (Bottom Boot Block) 29F800BA
+      case 0x02: LOGFLASH("- Sector %02x protection: 1 (hardcoded)\n", offset >> 12); return 01; break;
+      default:     LOGFLASH(" - Unhandled Mode:%d State:%08x\n", m_sf_mode, m_sf_state);
+      }
+    }
+  }
+  return 0;
+}
+/* End of flash emulation */
+#endif
+
 static ADDRESS_MAP_START( dbox_map, AS_PROGRAM, 32, dbox_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x700000, 0x77ffff) AM_RAM // CS2
-//  AM_RANGE(0x780000, 0x7807ff) AM_RAM // CS3
+// CS0 - bootrom
+// 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
+// 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
+#if LOCALFLASH
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_READ16(sysflash_r, 0xffffffff) AM_REGION("flash", 0)
+	AM_RANGE(0x000000, 0x3fffff) AM_WRITE16(sysflash_w, 0xffffffff)
+#else
+	AM_RANGE(0x000000, 0x3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
+#endif
+// CS2 - CS demux
+// 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
+// 000000a2 Base address CS2 00000054, 00700003 (ffffffff) - Base: 00700000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
+	//AM_RANGE(0x700000, 0x77ffff)
+// CS3 - 8 bit devices
+// 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
+// 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
+	// AM_RANGE(0x780000, 0x7807ff)
 	AM_RANGE(0x780100, 0x7801ff) AM_WRITE8(sda5708_reset, 0xffffffff)
 	AM_RANGE(0x780600, 0x7806ff) AM_WRITE8(sda5708_clk, 0xffffffff)
-	AM_RANGE(0x800000, 0x8fffff) AM_RAM // CS1
+// CS1 - RAM area
+// 0000008a Address mask CS1 00000048, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
+// 00000092 Base address CS1 0000004c, 00800003 (ffffffff) - Base: 00800000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
+	AM_RANGE(0x800000, 0xcfffff) AM_RAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -481,6 +621,20 @@ static MACHINE_CONFIG_START( dbox )
 	//MCFG_MC68340_TOUT2_OUTPUT_CB(DEVWRITELINE("dcs", descrambler_device,  txd_receiver))
 	//MCFG_MC68340_TGATE2_INPUT_CB(DEVREADLINE("dsc", descrambler_device,  rxd_receiver))
 
+	/* Configure the serial ports */
+#define CHA ":rs232"
+#define CHB ":modem"
+	MCFG_DEVICE_MODIFY("maincpu:serial")
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(CHA, rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE(CHB, rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD (CHA, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", m68340_serial, rx_a_w))
+	MCFG_RS232_PORT_ADD (CHB, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", m68340_serial, rx_b_w))
+
+	/* Add the boot flash */
+	MCFG_AMD_29F800B_16BIT_ADD("flash")
+
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
 	MCFG_DEFAULT_LAYOUT(layout_sda5708)
@@ -496,9 +650,17 @@ DRIVER_INIT_MEMBER(dbox_state, dbox)
 // TODO: Figure out correct ROM address map
 // TODO: Figure out what DVB2000 is doing
 ROM_START( dbox )
-	ROM_REGION(0x1000000, "maincpu", 0)
-//  ROM_LOAD16_WORD( "dvb2000.bin", 0x000000, 0x08b742, CRC(5b21c455) SHA1(1e7654c37dfa65d1b8ac2469cdda82f91b47b3c7) )
-	ROM_LOAD16_WORD( "nokboot.bin", 0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
+	ROM_REGION16_BE(0x400000, "flash", ROMREGION_ERASEFF)
+	ROM_DEFAULT_BIOS("b200uns")
+
+	ROM_SYSTEM_BIOS(0, "b200uns", "Nokia Bootloader B200uns")
+	ROMX_LOAD( "b200uns.bin",   0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(1, "b210uns", "Nokia Bootloader B210uns")
+	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS(2, "nbc106.bin", "Nokia Bootloader CI v1.06")
+	ROMX_LOAD( "bootCi106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
 ROM_END
 
 COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_IS_SKELETON )

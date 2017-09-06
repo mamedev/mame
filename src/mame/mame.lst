@@ -8680,6 +8680,9 @@ bingor4                         // (c) 2002 Unknown
 bingor5                         // (c) 2002 Unknown
 vip2000                         // (c) Paloma-Elektronik
 
+@source:bingowav.cpp
+bingowav                        // (c) 1994 Taito
+
 @source:bionicc.cpp
 bionicc                         // 3/1987 (c) 1987 (Euro)
 bionicc1                        // 3/1987 (c) 1987 (US)
@@ -10511,6 +10514,7 @@ crvisioj                        //
 crvision                        // 1981 creatiVision
 fnvision                        // 1983 FunVision
 manager                         //
+lasr2001
 rameses                         //
 vz2000                          //
 wizzard                         //
@@ -10916,6 +10920,7 @@ ckpt_a17                        //
 gnr_300                         //
 gnr_300d                        //
 gnr_300f                        //
+gnr_200                         //
 hook_401                        //
 hook_401p                       //
 hook_404                        //
@@ -12829,6 +12834,7 @@ royalcrdg                       // (c) 1991 TAB-Austria
 royalcrdh                       // (c) 1991 TAB-Austria
 royalcrdp                       // (c) 1993 Digital Dreams
 royalcrdt                       // (c) 1991 TAB-Austria orig
+royaljp                         // (c) 1991 TAB / Video Klein
 saloon                          // 199? unknown
 sjcd2kx3                        // (c) 1985 M.P.
 soccernw                        // 199? bootleg
@@ -12872,14 +12878,16 @@ thoop                           // (c) 1992 - Ref 922804/1
 
 @source:gaelco2.cpp
 aligator                        // (c) 1994 - Ref 940411
+aligators                       // (c) 1994 - Ref 940411
 aligatorun                      // (c) 1994 - Ref 940411 (unprotected)
 aligatoruna                     // (c) 1994 - Ref 940411 (unprotected)
 bang                            // (c) 1998 - Ref ???
 bangj                           // (c) 1999 - Ref ???
 play2000                        // (c) 1999 - Ref ???
 play2000a                       // (c) 1999 - Ref ???
-maniacsq                        // (c) 1996 - Ref 940411 - (unprotected)
+maniacsq                        // (c) 1996 - Ref 940411
 maniacsqa                       // (c) 1996 - Ref 940411
+maniacsqu                       // (c) 1996 - Ref 940411 - (unprotected)
 snowboar                        // (c) 1996 - Ref 960419/1
 snowboara                       // (c) 1996 - Ref 960419/1
 touchgo                         // (c) 1995 - Ref 950906
@@ -20830,6 +20838,9 @@ minicom                         //
 
 @source:miniforce.cpp
 miniforce                       // D26 cabinet test board
+
+@source:miniframe.cpp
+minifram
 
 @source:minitel_2_rpic.cpp
 minitel2                        //
@@ -29145,6 +29156,9 @@ nc100                           // 1992 NC100
 nc150                           // 1992 NC150
 nc200                           // 1993 NC200
 
+@source:nds.cpp
+nds                             // 2004 Nintendo
+
 @source:nemesis.cpp
 blkpnthr                        // GX604 (c) 1987 (Japan)
 bubsys                          //
@@ -32468,6 +32482,9 @@ rvoicepc                        //
 @source:rx78.cpp
 rx78                            //
 
+@source:rzone.cpp
+rzindy500                       //
+
 @source:s11.cpp
 gmine_l2                        //
 grand_l3                        //
@@ -34867,6 +34884,7 @@ ironmaid                        //
 lazrlord                        //
 lightnin                        //
 meteorp                         //
+meteorp2                        //
 nineball                        //
 orbitor1                        //
 quicksil                        //
@@ -35727,6 +35745,8 @@ gogold                          // B56 (c) 1988 Taito Corporation (Japan)
 recordbr                        // B56 (c) 1988 Taito Corporation Japan (World)
 syvalion                        // B51 (c) 1988 Taito Corporation (Japan)
 syvalionp                       //
+syvalionu
+syvalionw
 tetristh                        // C26 (c) 1988 Sega Enterprises,Ltd. (Japan)
 
 @source:taito_l.cpp

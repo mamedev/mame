@@ -746,6 +746,8 @@ void lua_engine::initialize()
  * emu.print_info(str) -- output to stderr at info level
  * emu.print_debug(str) -- output to stderr at debug level
  * emu.driver_find(driver) -- find and return game_driver for driver
+ * emu.wait(len) -- wait for len within coroutine
+ * emu.lang_translate(str) -- get translation for str if available
  */
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
@@ -806,6 +808,7 @@ void lua_engine::initialize()
 			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
 			return lua_yield(L, 0);
 		});
+	emu["lang_translate"] = &lang_translate;
 
 /*
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
