@@ -1381,7 +1381,7 @@ void upd765_family_device::start_command(int cmd)
 		 *
 		 * The Intergraph InterPro 2000 uses an i82072 with a single 3.5" drive
 		 * fitted at id 3. The diagnostic and boot code in the system has some
-		 * very specific requirements relating to the sense interrupt status 
+		 * very specific requirements relating to the sense interrupt status
 		 * command behaviour and drive busy bits.
 		 *
 		 * 1. The RDY line is not connected: this means that on soft reset (by
@@ -1392,25 +1392,22 @@ void upd765_family_device::start_command(int cmd)
 		 * 2. In many cases, the system essentially ignores drive poll interrupts,
 		 *    and executes another command such as a seek regardless. In these
 		 *    cases, the system code expects the SIS to return the result of the
-		 *    seek command, and not the drive poll interrupt result. It's not
-		 *    clear if there is some kind of prioritisation in the chip, but
-		 *    one possibility is that the SIS results are sent in reverse order,
-		 *    from drive 3 through 0. This works for the InterPro case where the
-		 *    only (standard) floppy is fitted at id 3; can't be sure this is
-		 *    the real device behaviour, but it does align with the description
-		 *    above regarding the tf20 ignoring the polling interrupts?
+		 *    seek command, and not the drive poll interrupt result. The code
+		 *    below is an unsatisfactory hack to simulate what the InterPro
+		 *    expects by looking for non-poll interrupt results first.
 		 *
 		 * 3. This system tests the drive busy bits at various stages, and expects
 		 *    them to follow the datasheet. In particular, the drive busy bit set
 		 *    during a seek or recalibrate is expected to be 1 until the first byte
-		 *    of the result of SIS has been read from the fifo, and 0 after.
+		 *    of the result of SIS has been read, and 0 after.
 		*/
 		main_phase = PHASE_RESULT;
 
-		// search for a valid interrupt status result in decrementing drive order
 		int fid;
-		for (fid = 3; fid>=0 && !flopi[fid].st0_filled; fid--) {};
-		if(fid == -1) {
+		for (fid = 0; fid<4 && (!flopi[fid].st0_filled || flopi[fid].st0 == (ST0_ABRT | fid)); fid++) {};
+		if (fid == 4)
+			for(fid=0; fid<4 && !flopi[fid].st0_filled; fid++) {};
+		if(fid == 4) {
 			result[0] = ST0_UNK;
 			result_pos = 1;
 			LOG("command sense interrupt status (%02x) (%s)\n", result[0], machine().describe_context());
@@ -1469,10 +1466,11 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	for(int i=0; i != result_pos; i++)
 		LOG(" %02x", result[i]);
 	LOG("\n");
-	if (fi.main_state != RECALIBRATE && fi.main_state != SEEK)
-		fi.main_state = fi.sub_state = IDLE;
 	if(data_completion)
+	{
+		fi.main_state = fi.sub_state = IDLE;
 		data_irq = true;
+	}
 	else
 	{
 		other_irq = true;
