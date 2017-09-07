@@ -3,6 +3,14 @@
 
 /*
 
+Driver is marked as NOT WORKING because interaction between BIOS and 68k side is
+not fully understood.  The BIOS often doesn't register that a game has been started
+and leaves the 'PRESS P1 OR P2 START' message onscreen during gameplay as a result.
+If this happens, the games usually then crash when you run out of lives as they end
+up in an unknown state.
+
+
+
 About MegaPlay:
 
 Megaplay games are specially designed Genesis games, produced for arcade use.
@@ -20,6 +28,9 @@ Like the Megatech the Megaplay boards have an additional Z80 and SMS VDP chip wh
 to the standard Genesis hardware.  In this case the additional hardware creates a layer
 which is displayed as an overlay to the game screen.  This layer contains basic text
 such as Insert Coin, and the Megaplay Logo / Instructions during the attract loop.
+
+The BIOS reads the Start inputs and (once enough coins have been inserted) passes them to
+the 68k rather than using the regular Genesis PAD hookups.
 
 Communication between the various CPUs seems to be fairly complex and it is not fully
 understood what is shared, where, and how.  One of the BIOS sets doesn't work, maybe for
@@ -402,9 +413,13 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
     It should be possible to multiplex different game ROMs at
     0x000000-0x3fffff based on these bits.
 */
+	if (BIT(m_bios_bank ^ data, 4))
+		logerror("BIOS: P1 Start %sactive\n", BIT(data, 4) ? "in" : "");
+	if (BIT(m_bios_bank ^ data, 5))
+		logerror("BIOS: P2 Start %sactive\n", BIT(data, 5) ? "in" : "");
 	m_bios_bank = data;
 	m_bios_mode = MP_ROM;
-	logerror("BIOS: ROM bank %i selected [0x%02x]\n", m_bios_bank >> 6, data);
+//  logerror("BIOS: ROM bank %i selected [0x%02x]\n", m_bios_bank >> 6, data);
 }
 
 WRITE8_MEMBER(mplay_state::bios_gamesel_w)
@@ -566,6 +581,7 @@ WRITE8_MEMBER(mplay_state::game_w)
 	}
 
 	m_bios_bank_addr = ((m_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
+	logerror("BIOS bank addr = %X\n", m_bios_bank_addr);
 }
 
 static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
