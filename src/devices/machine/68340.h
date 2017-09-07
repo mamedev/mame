@@ -51,7 +51,7 @@
 
 class m68340_cpu_device : public fscpu32_device
 {
-	friend class m68340_serial;
+	friend class mc68340_serial_module_device;
 
 public:
 	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -106,7 +106,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	required_device<m68340_serial> m_serial;
+	required_device<mc68340_serial_module_device> m_serial;
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
 	TIMER_CALLBACK_MEMBER(timer1_callback);

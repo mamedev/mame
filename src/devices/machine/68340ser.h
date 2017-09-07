@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Joakim Larsson Edstrom
 #ifndef MAME_MACHINE_68340SER_H
 #define MAME_MACHINE_68340SER_H
 
@@ -7,14 +7,19 @@
 
 #include "machine/mc68681.h"
 
+// MCFG macros to hide the implementation
+#define MCFG_MC68340SER_IRQ_CALLBACK(_cb) MCFG_MC68681_IRQ_CALLBACK(_cb)
+#define MCFG_MC68340SER_A_TX_CALLBACK(_cb) MCFG_MC68681_A_TX_CALLBACK(_cb)
+#define MCFG_MC68340SER_B_TX_CALLBACK(_cb) MCFG_MC68681_B_TX_CALLBACK(_cb)
+
 class m68340_cpu_device;
 
-class m68340_serial : public m68340_serial_device
+class mc68340_serial_module_device : public mc68340_duart_device
 {
 	friend class m68340_cpu_device;
 
 public:
-	m68340_serial(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,6 +61,6 @@ protected:
 	};
 };
 
-DECLARE_DEVICE_TYPE(M68340_SERIAL_MODULE, m68340_serial)
+DECLARE_DEVICE_TYPE(MC68340_SERIAL_MODULE, mc68340_serial_module_device)
 
 #endif // MAME_MACHINE_68340SER_H

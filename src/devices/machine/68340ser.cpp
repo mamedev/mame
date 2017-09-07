@@ -32,13 +32,13 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-void m68340_serial::device_start()
+void mc68340_serial_module_device::device_start()
 {
 	m_cpu = downcast<m68340_cpu_device *>(owner());
-	m68340_serial_device::device_start();
+	mc68340_duart_device::device_start();
 }
 
-READ8_MEMBER( m68340_serial::read )
+READ8_MEMBER( mc68340_serial_module_device::read )
 {
 	LOG("%s\n", FUNCNAME);
 	int val = 0;
@@ -87,10 +87,10 @@ READ8_MEMBER( m68340_serial::read )
 		 "MR1B", "SRB",  "n/a",  "RBB",  "n/a",  "IP",   "n/a",  "n/a",  // 0x18 - 0x1f
 		 "MR2A", "MR2B" }}[offset]);                                     // 0x20 - 0x21
 
-	return offset >= 0x10 && offset < 0x22 ? m68340_serial_device::read(space, offset - 0x10, mem_mask) : val;
+	return offset >= 0x10 && offset < 0x22 ? mc68340_duart_device::read(space, offset - 0x10, mem_mask) : val;
 }
 
-WRITE8_MEMBER( m68340_serial::write )
+WRITE8_MEMBER( mc68340_serial_module_device::write )
 {
 	LOG("\n%s\n", FUNCNAME);
 	LOGSETUP(" * Reg %02x <- %02x - %s\n", offset, data,
@@ -140,12 +140,12 @@ WRITE8_MEMBER( m68340_serial::write )
 		LOGSERIAL("- Interrupt Vector: %02x\n", data);
 		break;
 	default:
-		if (offset >= 0x10 && offset < 0x22) m68340_serial_device::write(space, offset - 0x10, data, mem_mask);
+		if (offset >= 0x10 && offset < 0x22) mc68340_duart_device::write(space, offset - 0x10, data, mem_mask);
 	}
 
 }
 
-WRITE_LINE_MEMBER( m68340_serial::irq_w )
+WRITE_LINE_MEMBER( mc68340_serial_module_device::irq_w )
 {
 	LOGINT("IRQ!\n%s\n", FUNCNAME);
 	if (m_ilr > 0)
@@ -163,9 +163,9 @@ WRITE_LINE_MEMBER( m68340_serial::irq_w )
 	}
 }
 
-m68340_serial::m68340_serial(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-  : m68340_serial_device(mconfig, "serial", owner, clock)
+mc68340_serial_module_device::mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+  : mc68340_duart_device(mconfig, MC68340_SERIAL_MODULE, tag, owner, clock)
 {
 }
 
-DEFINE_DEVICE_TYPE(M68340_SERIAL_MODULE, m68340_serial,   "m68340 serial module",         "Motorola 68340 Serial Module")
+DEFINE_DEVICE_TYPE(MC68340_SERIAL_MODULE, mc68340_serial_module_device, "mc68340sermod", "MC68340 Serial Module")
