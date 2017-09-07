@@ -211,7 +211,7 @@ std::string &strtrimrightspace(std::string& str)
 static std::string &strtransform_uchar(std::string& str, char32_t(*callback)(char32_t ch))
 {
 	size_t i = 0;
-	while(i < str.size())
+	while (i < str.size())
 	{
 		size_t advance;
 		char32_t old_character;
