@@ -454,6 +454,7 @@ TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_clear7_w_cb)
 	m_soundlatch_data &= 0x7F;
 }
 
+// RD5000
 READ8_MEMBER(grchamp_state::soundlatch_r)
 {
 	if (!machine().side_effect_disabled())
@@ -464,14 +465,16 @@ READ8_MEMBER(grchamp_state::soundlatch_r)
 	return m_soundlatch_data;
 }
 
+// WR5000
 WRITE8_MEMBER(grchamp_state::soundlatch_clear7_w)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::soundlatch_clear7_w_cb), this), data);
 }
 
+// RD5001
 READ8_MEMBER(grchamp_state::soundlatch_flags_r)
 {
-	return 0x03 | (m_soundlatch_flag?0x8:0);
+	return (m_soundlatch_flag?8:0) /*| (m_sound_semaphore2?4:0)*/ | 3;
 }
 
 WRITE8_MEMBER(grchamp_state::portA_0_w)
