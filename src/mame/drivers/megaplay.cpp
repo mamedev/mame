@@ -3,19 +3,6 @@
 
 /*
 
-Driver is marked as NOT WORKING because interaction between BIOS and 68k side is
-not fully understood.  The BIOS often doesn't register that a game has been started
-and leaves the 'PRESS P1 OR P2 START' message onscreen during gameplay as a result.
-If this happens, the games usually then crash when you run out of lives as they end
-up in an unknown state.
-
-The BIOS reads the Start inputs in a different way to the 68k side, but even mirroring
-the reads so that they happen at the same time doesn't fix the problem 100% of the
-time.  It's possible all inputs are meant to be read by the BIOS and passed to the 68k
-rather than using the regular Genesis PAD hookups.  There are a lot of ports not fully
-understood that could be involved.
-
-
 About MegaPlay:
 
 Megaplay games are specially designed Genesis games, produced for arcade use.
@@ -62,6 +49,9 @@ public:
 	m_vdp1(*this, "vdp1"),
 	m_bioscpu(*this, "mtbios")
 	{ }
+
+	DECLARE_READ_LINE_MEMBER(start1_r);
+	DECLARE_READ_LINE_MEMBER(start2_r);
 
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
@@ -125,20 +115,20 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-/*
-   Caused 01081: - but the BIOS TEST menu reads them here, unlike all the other buttons.
-   Maybe the BIOS port writes should be passing them to the 68k side rather than the 68k side reading directly, might explain the emulation bugs
-    PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-*/
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_MODIFY("PAD1") // P1 Start input processed through BIOS
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start1_r)
+
+	PORT_MODIFY("PAD2") // P2 Start input processed through BIOS
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start2_r)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -394,6 +384,16 @@ static INPUT_PORTS_START ( mp_gunhe )
 INPUT_PORTS_END
 
 /*MEGAPLAY specific*/
+
+READ_LINE_MEMBER(mplay_state::start1_r)
+{
+	return BIT(m_bios_bank, 4);
+}
+
+READ_LINE_MEMBER(mplay_state::start2_r)
+{
+	return BIT(m_bios_bank, 5);
+}
 
 WRITE8_MEMBER(mplay_state::bios_banksel_w)
 {
@@ -952,21 +952,21 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 ** Probably reused cart case
 */
 
-/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Mega Play BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-/* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)", MACHINE_NOT_WORKING )
-/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)", MACHINE_NOT_WORKING )
-/* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)", MACHINE_NOT_WORKING )
-/* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)", MACHINE_NOT_WORKING )
-/* 04 */ GAME( 1993, mp_twcup, megaplay, megaplay, mp_twc,   mplay_state, megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)", MACHINE_NOT_WORKING )
-/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)", MACHINE_NOT_WORKING )
-/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)", MACHINE_NOT_WORKING )
-/* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)", MACHINE_NOT_WORKING )
+/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Mega Play BIOS", MACHINE_IS_BIOS_ROOT )
+/* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)", 0 )
+/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)", 0 )
+/* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)", 0 )
+/* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)", 0 )
+/* 04 */ GAME( 1993, mp_twcup, megaplay, megaplay, mp_twc,   mplay_state, megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)", 0 )
+/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)", 0 )
+/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)", 0 )
+/* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)", 0 )
 /* 08 - Columns 3? see below */
-/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, megaplay, ROT0, "Sega",                  "Shinobi III (Mega Play)", MACHINE_NOT_WORKING )
-/* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, megaplay, ROT0, "Sega",                  "Gunstar Heroes (Mega Play)", MACHINE_NOT_WORKING )
-/* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, megaplay, ROT0, "Sega",                  "Shinobi III (Mega Play)", 0 )
+/* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, megaplay, ROT0, "Sega",                  "Gunstar Heroes (Mega Play)", 0 )
+/* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", 0 )
 
-/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", MACHINE_NOT_WORKING )
+/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", 0 )
 
 
 /* Not confirmed to exist:
