@@ -235,7 +235,7 @@ WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 
 void cgc7900_state::irq_encoder(int pin, int state)
 {
-	if(state == ASSERT_LINE)
+	if (state == ASSERT_LINE)
 		m_int_active |= (1 << pin);
 	else
 		m_int_active &= ~(1 << pin);
@@ -245,23 +245,6 @@ void cgc7900_state::irq_encoder(int pin, int state)
 		m_maincpu->set_input_line_and_vector(int_levels[pin], state, int_vectors[pin]);
 	}
 }
-
-WRITE_LINE_MEMBER(cgc7900_state::irq_0) { irq_encoder(0, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_1) { irq_encoder(1, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_2) { irq_encoder(2, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_3) { irq_encoder(3, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_4) { irq_encoder(4, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_5) { irq_encoder(5, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_6) { irq_encoder(6, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_7) { irq_encoder(7, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_8) { irq_encoder(8, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_9) { irq_encoder(9, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_a) { irq_encoder(0xa, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_b) { irq_encoder(0xb, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_c) { irq_encoder(0xc, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_d) { irq_encoder(0xd, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_e) { irq_encoder(0xe, state); }
-WRITE_LINE_MEMBER(cgc7900_state::irq_f) { irq_encoder(0xf, state); }
 
 /*-------------------------------------------------
     disk_data_r - disk data read
@@ -470,9 +453,9 @@ void cgc7900_state::machine_start()
 
 void cgc7900_state::machine_reset()
 {
-	uint8_t* user1 = memregion(M68000_TAG)->base();
+	uint8_t *user1 = memregion(M68000_TAG)->base();
 
-	memcpy((uint8_t*)m_chrom_ram.target(), user1, 8); // not really what happens but...
+	memcpy((uint8_t *)m_chrom_ram.target(), user1, 8); // not really what happens but...
 
 	m_maincpu->reset();
 
@@ -525,7 +508,7 @@ static MACHINE_CONFIG_START( cgc7900 )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(cgc7900_state, kbd_put))
 
 	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL_32_768kHz)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(cgc7900_state, irq_0))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(cgc7900_state, irq<0x0>))
 
 	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL_5_0688MHz)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(cgc7900_state, write_rs232_clock))
@@ -535,8 +518,8 @@ static MACHINE_CONFIG_START( cgc7900 )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq_f))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq_3))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0xf>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x3>))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8251_0_TAG, i8251_device, write_rxd))
@@ -546,8 +529,8 @@ static MACHINE_CONFIG_START( cgc7900 )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq_8))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq_1))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x8>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x1>))
 
 	MCFG_RS232_PORT_ADD("rs449", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8251_1_TAG, i8251_device, write_rxd))
