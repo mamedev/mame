@@ -1194,6 +1194,7 @@ static INPUT_PORTS_START( mazerblaa )
 	PORT_DIPSETTING(    0x00, "70000" )	
 INPUT_PORTS_END
 
+// TODO: defaults, not listed in manual
 static INPUT_PORTS_START( greatgun )
 	PORT_START("ZPU")   /* Strobe 0: ZPU Switches */
 	PORT_DIPNAME( 0x40, 0x40, "ZPU Switch 1" )
@@ -1204,17 +1205,17 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW0")  /* Strobe 1: Dip Switches 28-35*/
-	PORT_DIPNAME( 0x03, 0x00, "Starting Number of Bullets/Credit" )
+	PORT_DIPNAME( 0x03, 0x03, "Starting Number of Bullets/Credit" )
 	PORT_DIPSETTING(    0x03, "60" )
 	PORT_DIPSETTING(    0x02, "70" )
 	PORT_DIPSETTING(    0x01, "80" )
 	PORT_DIPSETTING(    0x00, "90" )
-	PORT_DIPNAME( 0x0c, 0x00, "Target Size" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Target Size" )
 	PORT_DIPSETTING(    0x0c, "7 x 7" )
 	PORT_DIPSETTING(    0x08, "9 x 9" )
 	PORT_DIPSETTING(    0x04, "11x11" )
 	PORT_DIPSETTING(    0x00, "7 x 7" )
-	PORT_DIPNAME( 0x70, 0x00, "Number of points for extra bullet" )
+	PORT_DIPNAME( 0x70, 0x70, "Number of points for extra bullet" )
 	PORT_DIPSETTING(    0x70, "1000" )
 	PORT_DIPSETTING(    0x60, "2000" )
 	PORT_DIPSETTING(    0x50, "3000" )
@@ -1226,7 +1227,7 @@ static INPUT_PORTS_START( greatgun )
 	/* from manual:
 	    "This switch is used when an optional coin return or ticket dispenser is used"
 	*/
-	PORT_DIPNAME( 0x80, 0x00, "Number of coins or tickets returned" )
+	PORT_DIPNAME( 0x80, 0x80, "Number of coins or tickets returned" )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
@@ -1690,4 +1691,4 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 
 GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // newer?
-GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
