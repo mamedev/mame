@@ -136,22 +136,6 @@
  *  SIM40 + 0x0058: 0x000007F2 CS3 mask 1 - block size = 2048 (2KB)
  *  SIM40 + 0x005C: 0x00780003 CS3 base 1
  *  SIM40 + 0x001F: 0x40       PBARB Port B Pin Assignment
- *
-- 0000007a void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000040, 003ffff5 (ffffffff) - not implemented
-- 00000082 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000044, 00000003 (ffffffff) - not implemented
-- 0000008a void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000048, 003ffff5 (ffffffff) - not implemented
-- 00000092 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 0000004c, 00800003 (ffffffff) - not implemented
-- 0000009a void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000050, 00007fff (ffffffff) - not implemented
-- 000000a2 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000054, 00700003 (ffffffff) - not implemented
-- 000000aa void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000058, 000007f2 (ffffffff) - not implemented
-- 000000b2 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 0000005c, 00780003 (ffffffff) - not implemented
-...
-- 008004d8 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000044, 00000053 (ffffffff) - not implemented
-- 008004e2 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000040, 003fff05 (ffffffff) - not implemented
-- 008004ee void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000040, 003ffff5 (ffffffff) - not implemented
-- 008004f8 void m68340_cpu_device::m68340_internal_sim_cs_w(address_space&, offs_t, osd::u32, osd::u32) 00000044, 0000005b (ffffffff) - not implemented
-
-
  *  -------------------------------------------------------------
  *  The bootstrap copies the firmware to RAM and jumps to it
  *  -------------------------------------------------------------
@@ -625,12 +609,12 @@ static MACHINE_CONFIG_START( dbox )
 #define CHA ":rs232"
 #define CHB ":modem"
 	MCFG_DEVICE_MODIFY("maincpu:serial")
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(CHA, rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE(CHB, rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD (CHA, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", m68340_serial, rx_a_w))
-	MCFG_RS232_PORT_ADD (CHB, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", m68340_serial, rx_b_w))
+	MCFG_MC68340SER_A_TX_CALLBACK(DEVWRITELINE(CHA, rs232_port_device, write_txd))
+	MCFG_MC68340SER_B_TX_CALLBACK(DEVWRITELINE(CHB, rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD (CHA, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", mc68340_serial_module_device, rx_a_w))
+	MCFG_RS232_PORT_ADD (CHB, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", mc68340_serial_module_device, rx_b_w))
 
 	/* Add the boot flash */
 	MCFG_AMD_29F800B_16BIT_ADD("flash")
@@ -663,4 +647,4 @@ ROM_START( dbox )
 	ROMX_LOAD( "bootCi106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
 ROM_END
 
-COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_IS_SKELETON )
+COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

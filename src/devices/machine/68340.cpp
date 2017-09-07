@@ -92,8 +92,8 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 							    read16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_r),this),
 							    write16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_w),this),0xffffffff);
 			internal->install_readwrite_handler(base + 0x700, base + 0x723,
-							    READ8_DEVICE_DELEGATE(m_serial, m68340_serial, read),
-							    WRITE8_DEVICE_DELEGATE(m_serial, m68340_serial, write),0xffffffff);
+							    READ8_DEVICE_DELEGATE(m_serial, mc68340_serial_module_device, read),
+							    WRITE8_DEVICE_DELEGATE(m_serial, mc68340_serial_module_device, write),0xffffffff);
 			internal->install_readwrite_handler(base + 0x780, base + 0x7bf,
 							    read32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_r),this),
 							    write32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_w),this));
@@ -119,8 +119,8 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 MACHINE_CONFIG_MEMBER( m68340_cpu_device::device_add_mconfig )
-	MCFG_DEVICE_ADD("serial", M68340_SERIAL_MODULE, 0)
-	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("serial", m68340_serial, irq_w))
+	MCFG_DEVICE_ADD("serial", MC68340_SERIAL_MODULE, 0)
+	MCFG_MC68340SER_IRQ_CALLBACK(DEVWRITELINE("serial", mc68340_serial_module_device, irq_w))
 MACHINE_CONFIG_END
 
 
