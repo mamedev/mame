@@ -410,10 +410,21 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 	
 	switch(m_mode)
 	{
+		#if 0
 		case 0x13:
+		{
+			uint8_t res = read_byte(m_xpos|m_ypos<<8|0<<16|(m_vbank)<<18);
+
+			// TODO: offset?
+			if(res != 0xf)
+				m_ram[0x28] = res;
+					
+			break;
+		}
+		#endif
+		
 		case 0x03:
 		{
-			
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
 				for (xi = 0; xi < m_pix_xsize; xi++)
@@ -423,10 +434,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 
 					if(dstx < 256 && dsty < 256)
 					{
-						if(m_mode == 0x03)
-							write_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18, 0xf);
-//						else
-//							write_byte(dstx|dsty<<8|1<<16|(m_vbank)<<18, 0xf);
+						write_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18, 0xf);
 
 						#if 0
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
