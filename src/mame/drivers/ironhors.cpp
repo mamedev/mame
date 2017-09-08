@@ -457,6 +457,28 @@ MACHINE_CONFIG_END
 
 ROM_START( ironhors )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "560_k03.13c",  0x4000, 0x8000, CRC(395351b4) SHA1(21cf2f39a208571d06f20ca8ca346999541e870a) )
+	ROM_LOAD( "560_k02.12c",  0xc000, 0x4000, CRC(1cff3d59) SHA1(9194f31ec1e9a90850f2f44aef10b5b32a28ef1d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "560_h01.10c",  0x0000, 0x4000, CRC(2b17930f) SHA1(be7b21f050f6b74c75a33c9284455bbed5b03c63) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "560_h06.08f",  0x00000, 0x8000, CRC(f21d8c93) SHA1(4245fff5360e10441e11d0d207d510e5c317bb0e) )
+	ROM_LOAD16_BYTE( "560_h05.07f",  0x00001, 0x8000, CRC(60107859) SHA1(ab59b6be155d36811a37dc873abbd97cd0a4120d) )
+	ROM_LOAD16_BYTE( "560_h07.09f",  0x10000, 0x8000, CRC(c761ec73) SHA1(78266c9ff3ea74a59fd3ce84afb4f8a1164c8bba) )
+	ROM_LOAD16_BYTE( "560_h04.06f",  0x10001, 0x8000, CRC(c1486f61) SHA1(4b96aebe5d35fd1d73bde8576689addbb1ff66ed) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "03f_h08.bin",  0x0000, 0x0100, CRC(9f6ddf83) SHA1(08a37182a974c5448156637f10fe60bfe5f225ad) ) /* palette red */
+	ROM_LOAD( "04f_h09.bin",  0x0100, 0x0100, CRC(e6773825) SHA1(7523e7fa090d850fe79ff0069d3260c76645d65a) ) /* palette green */
+	ROM_LOAD( "05f_h10.bin",  0x0200, 0x0100, CRC(30a57860) SHA1(3ec7535286c8bc65e203320f47e4ed6f1d3d61c9) ) /* palette blue */
+	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) /* character lookup table */
+	ROM_LOAD( "10f_h11.bin",  0x0400, 0x0100, CRC(a63e37d8) SHA1(1a0a76ecd14310125bdf41a8431d562ed498eb27) ) /* sprite lookup table */
+ROM_END
+
+ROM_START( ironhorsh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "13c_h03.bin",  0x4000, 0x8000, CRC(24539af1) SHA1(1eb96a2cb03007665587d6ec114894ab4cafdb23) )
 	ROM_LOAD( "12c_h02.bin",  0xc000, 0x4000, CRC(fab07f86) SHA1(9f599d32d473d873113b89f2b24a54a435dbcbe5) )
 
@@ -479,8 +501,8 @@ ROM_END
 
 ROM_START( dairesya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "560-k03.13c",  0x4000, 0x8000, CRC(2ac6103b) SHA1(331e1be3f29df85d65081831c215743354d76778) )
-	ROM_LOAD( "560-k02.12c",  0xc000, 0x4000, CRC(07bc13a9) SHA1(1d3a44ad41799f89bfa84cc05fbe0792e57305af) )
+	ROM_LOAD( "560-k03.13c",  0x4000, 0x8000, CRC(2ac6103b) SHA1(331e1be3f29df85d65081831c215743354d76778) ) // sldh
+	ROM_LOAD( "560-k02.12c",  0xc000, 0x4000, CRC(07bc13a9) SHA1(1d3a44ad41799f89bfa84cc05fbe0792e57305af) ) // sldh
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "560-j01.10c",  0x0000, 0x4000, CRC(a203b223) SHA1(fd19ae55bda467a09151539be6dce3791c28f18a) )
@@ -532,7 +554,8 @@ ROM_END
  *  Game driver(s)
  *
  *************************************/
-
-GAME( 1986, ironhors, 0,        ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dairesya, ironhors, ironhors, dairesya, ironhors_state, 0, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, farwest,  ironhors, farwest,  ironhors, ironhors_state, 0, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// versions are taken from the letters on the program ROMs' labels
+GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, 0, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, 0, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
