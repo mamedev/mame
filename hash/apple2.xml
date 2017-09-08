@@ -6455,6 +6455,21 @@
 		</part>
 	</software>
 
+	<software name="thief">
+		<description>Thief (clean crack)</description>
+		<!-- Apple II clone of Berzerk arcade game by Bob Flanagan - Thief: "The damn things nearly killed me." -->
+		<!-- All files transfered from a highly protected DOS 3.2 disc to a PronoDOS disc -->
+		<!-- Also includes a single file BRUNable conversion of the game -->
+		<year>1981</year>
+		<publisher>Datamost</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="thief (1981)(datamost)(san inc &amp; trex crack).dsk" size="143360" crc="e2faf16e" sha1="bedfb20b1753acb6d1babdc44143761d07bc8782" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="trinity">
 		<description>Trinity</description>
 		<year>1986</year>
