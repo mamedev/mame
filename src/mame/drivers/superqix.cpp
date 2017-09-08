@@ -171,7 +171,7 @@ code at z80:0093:
 
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/ay8910.h"
+#include "cpu/m6805/m68705.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -286,10 +286,21 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_port3_w_cb)
 	m_fromMCU = param;
 }
 
+TIMER_CALLBACK_MEMBER(superqix_state::z80_ay1_sync_address_w_cb)
+{
+	m_ay1->address_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, param, 0xff);
+}
+
+
 TIMER_CALLBACK_MEMBER(superqix_state::z80_ay2_iob_w_cb)
 {
 	// the ay #2 iob bus and the mcu port 3 are literally directly connected together, so technically the result could be a binary AND of the two...
 	m_fromZ80 = param;
+}
+
+WRITE8_MEMBER(superqix_state::z80_ay1_sync_address_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::z80_ay1_sync_address_w_cb), this), data);
 }
 
 READ8_MEMBER(superqix_state::z80_ay2_iob_r)
@@ -325,7 +336,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::bootleg_mcu_port1_w_cb)
 	m_bl_port1 = param;
 	m_bl_fake_port2 &= ~(1<<((m_bl_port1&0xe)>>1)); // mask out the 'old bit'
 	m_bl_fake_port2 |= ((m_bl_port1&1)<<((m_bl_port1&0xe)>>1)); // or in the 'new bit'
-	mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, m_bl_fake_port2, 0xFF);
+	mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff);
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_port1_w)
@@ -909,7 +920,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// the act of clearing this latch asserts the z80 reset, and the mcu must clear it itself by writing
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
-		mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF);
+		mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xff);
 		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
@@ -944,8 +955,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, hotsmash_state ) // used by both pbillian and hotsmash
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READWRITE(hotsmash_Z80_mcu_r, hotsmash_Z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w) /* Coin Counters, ROM bank, NMI enable, Flipscreen */
 	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
@@ -957,7 +968,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+	AM_RANGE(0x0402, 0x0402) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x0403, 0x0403) AM_WRITE(z80_ay1_sync_address_w) // sync on address write, so semaphores are accurately read
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(z80_semaphore_assert_r)
@@ -1340,7 +1352,7 @@ static MACHINE_CONFIG_START( pbillian )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/8) // AY-3-8910A
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) // AY-3-8910A
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -1361,8 +1373,6 @@ static MACHINE_CONFIG_START( sqix )
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL_12MHz/3)  /* TODO: VERIFY DIVISOR, is this 3mhz or 4mhz? */
 	MCFG_CPU_IO_MAP(sqix_mcu_io_map)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 

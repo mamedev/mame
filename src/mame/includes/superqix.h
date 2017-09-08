@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
-#include "cpu/m6805/m68705.h"
+
+#include "sound/ay8910.h"
 #include "sound/samples.h"
 
 class superqix_state_base : public driver_device
@@ -15,6 +16,7 @@ public:
 		m_bitmapram2(*this, "bitmapram2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_ay1(*this, "ay1"),
 		m_mcu(*this, "mcu") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -24,6 +26,7 @@ public:
 	optional_shared_ptr<uint8_t> m_bitmapram2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ay8910_device> m_ay1;
 	optional_device<cpu_device> m_mcu;
 
 	// commmon 68705/8751/HLE
@@ -67,9 +70,12 @@ class superqix_state : public superqix_state_base
 {
 public:
 	superqix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: superqix_state_base(mconfig, type, tag)
+		: superqix_state_base(mconfig, type, tag),
+		m_ay2(*this, "ay2")
 	{
 	}
+
+	required_device<ay8910_device> m_ay2;
 
 	// 8031 and/or 8751 MCU related
 	uint8_t m_bl_port1;
@@ -82,6 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_READ8_MEMBER(mcu_port3_r);
 	DECLARE_READ8_MEMBER(bootleg_mcu_port3_r);
+	DECLARE_WRITE8_MEMBER(z80_ay1_sync_address_w);
 	DECLARE_READ8_MEMBER(z80_ay2_iob_r);
 	DECLARE_WRITE8_MEMBER(z80_ay2_iob_w);
 	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
@@ -98,6 +105,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(z80_semaphore_assert_cb);
 	TIMER_CALLBACK_MEMBER(mcu_port2_w_cb);
 	TIMER_CALLBACK_MEMBER(mcu_port3_w_cb);
+	TIMER_CALLBACK_MEMBER(z80_ay1_sync_address_w_cb);
 	TIMER_CALLBACK_MEMBER(z80_ay2_iob_w_cb);
 	TIMER_CALLBACK_MEMBER(bootleg_mcu_port1_w_cb);
 };
