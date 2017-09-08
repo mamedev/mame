@@ -380,48 +380,48 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 
 
 /*
-Read-Modify-Write operation, not fully understood
+Read-Modify-Write operations
 
----0 -111 (0x07) write to i/o?
----0 -011 (0x03) read to i/o?
----1 -011 (0x13) read to vram?
+---0 -111 (0x07) write to i/o
+---0 -011 (0x03) clear VRAM
+---1 -011 (0x13) collision detection
 */
 READ8_MEMBER( mb_vcu_device::load_set_clr )
 {
 	int xi,yi;
 	int dstx,dsty;
 //  uint8_t dot;
-	int bits = 0;
-	#if 0
-	if(m_mode == 0x13) //|| m_mode == 0x03)
-	{
-		printf("[0] %02x ",m_ram[m_param_offset_latch]);
-		printf("X: %04x ",m_xpos);
-		printf("Y: %04x ",m_ypos);
-		printf("C1:%02x ",m_color1);
-		printf("C2:%02x ",m_color2);
-		printf("M :%02x ",m_mode);
-		printf("XS:%02x ",m_pix_xsize);
-		printf("YS:%02x ",m_pix_ysize);
-		printf("VB:%02x ",m_vbank);
-		printf("\n");
-	}
-	#endif
 	
 	switch(m_mode)
 	{
-		#if 0
 		case 0x13:
 		{
-			uint8_t res = read_byte(m_xpos|m_ypos<<8|0<<16|(m_vbank)<<18);
+			bool collision_flag = false;
 
-			// TODO: offset?
-			if(res != 0xf)
-				m_ram[0x28] = res;
+			for (yi = 0; yi < m_pix_ysize; yi++)
+			{
+				for (xi = 0; xi < m_pix_xsize; xi++)
+				{
+					dstx = (m_xpos + xi);
+					dsty = (m_ypos + yi);
+
+					if(dstx < 256 && dsty < 256)
+					{
+						uint8_t res = read_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18);
+	
+						if(res != 0xf)
+							collision_flag = true;
+					}
+				}
+			}
+
+			if(collision_flag == true)
+				m_ram[m_param_offset_latch] |= 8;
+			else
+				m_ram[m_param_offset_latch] &= ~8;
 					
 			break;
 		}
-		#endif
 		
 		case 0x03:
 		{
@@ -435,32 +435,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 					if(dstx < 256 && dsty < 256)
 					{
 						write_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18, 0xf);
-
-						#if 0
-						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
-						dot&= 3;
-
-						switch(dot)
-						{
-							case 0:
-								write_byte(dstx|dsty<<8, m_color1 & 0xf);
-								break;
-							case 1:
-								write_byte(dstx|dsty<<8, m_color1 >> 4);
-								break;
-							case 2:
-								write_byte(dstx|dsty<<8, m_color2 & 0xf);
-								break;
-							case 3:
-								write_byte(dstx|dsty<<8, m_color2 >> 4);
-								break;
-						}
-						#endif
-
-						//write_byte(dstx|dsty<<8, m_mode >> 4);
 					}
-
-					bits+=2;
 				}
 			}
 			break;
