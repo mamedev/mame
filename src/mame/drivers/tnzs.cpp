@@ -2286,22 +2286,8 @@ ROM_END
 Chuka Taisen
 Taito, 1988
 
-This PCB comes in two variations: one which is on the older, color prom based P0-025-A PCB as used on extrmatn, drtoppel
-and one which is a unique PCB sort of an 'older version of p0-051-a' which uses color ram like tnzs.
-
-The chukatai (p0-025-a) PCB has a sticker label which says "????????? // CHUKATAISEN"
-The chukatai (p0-028-a) PCB has a sticker label which says "K1100??2A // CHUKATAISEN"
-
-PCB:
-Older(technically 'newer rom ids but used to get rid of old pcb stock') set is:
-Seta: P0-025-A
-Taito: K1100241A J1100107A
-
-The two newer sets are:
-Seta: P0-028-A
+ Seta: P0-028-A
 Taito: K1100416A J1100332A
-which is described in the diagram below.
-
 |--------------------------------------------------|
 |    SETA                     SETA         12MHz   |
 |    X1-003     6116          X1-001               |
@@ -2333,11 +2319,46 @@ which is described in the diagram below.
 Notes:
       6264: 8K x8 SRAM
       6116: 2K x8 SRAM
+	  Graphics ROMs are 23C1000/TC531000 MASK ROMs
 
-The P0-025-A Chuka Taisen set has a daughterboard which plugs into the
-GFX ROM sockets and allows use of 27c1000d eproms instead of 23c1000 mask roms.
-This set, unlike the two others, uses color proms!
 
+Chuka Taisen 'later' version: 
+   Seta: PO-025-A
+  Taito: K1100241A J1100107A
+Sticker: K1100364A CHUKA TAISEN
+
+Technically newer ROM ID#s but was used to get rid of old pcb stock.
+This set, unlike the PO-028-A PCB versions, uses two color proms.
+
+
+************************************************
+Guru-Readme for EPROM version of Chuuka Taisen
+------------------------------------------------
+
+Main Board (same as Extermination/Dr Toppel etc)
+----------
+PO-025-A
+J1100107A K1100241A
+Sticker: K1100364A CHUUKA TAISEN
+Sticker: M4300092A CHUUKA TAISEN
+
+All EPROMs are NEC D27C512D-15
+M-Chip labelled "B06 14" at location 3G
+
+PALs (all MMI PAL16L8A-2CN): B06-13.2C, B06-12.3C, B06-11.6D, B06-10.8D
+PALs are protected
+
+PROMs are AM27S29
+
+
+ROM Board
+---------
+K9100189A J9100141A ROM7PCB 
+Sticker: K9100189A CHUUKA TAISEN
+
+All EPROMs are Toshiba TC571000D-20
+
+************************************************
 
 */
 
@@ -2436,15 +2457,15 @@ ROM_START( chukataija )
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b06__14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "b44-21.a13", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) ) /* same data as B44-01 through B44-08 */
-	ROM_LOAD( "b44-22.a12", 0x20000, 0x20000, CRC(7f0b9568) SHA1(415d2638d1b0eb36b2e2f63219cbc0dbebe02dc6) )
-	ROM_LOAD( "b44-23.a10", 0x40000, 0x20000, CRC(5a54a3b9) SHA1(6b219f1c3570f16eb4a06221d7e527c735437bac) )
-	ROM_LOAD( "b44-24.a08", 0x60000, 0x20000, CRC(3c5f544b) SHA1(d3b0ee18f1027483a36ef02757b62f42a086a8e2) )
-	ROM_LOAD( "b44-25.a07", 0x80000, 0x20000, CRC(d1b7e314) SHA1(8b4181caa32955b4274614a4238bb24d67ecb729) )
-	ROM_LOAD( "b44-26.a05", 0xa0000, 0x20000, CRC(269978a8) SHA1(aef7b8d3d00dcc4201e0a1e28026f6f1bdafd0b7) )
-	ROM_LOAD( "b44-27.a04", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
-	ROM_LOAD( "b44-28.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* located on the K9100189A J9100141A ROM7PCB daughterboard */
+	ROM_LOAD( "b44-21.rom4l", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) ) /* same data as B44-01 through B44-08 */
+	ROM_LOAD( "b44-22.rom4h", 0x20000, 0x20000, CRC(7f0b9568) SHA1(415d2638d1b0eb36b2e2f63219cbc0dbebe02dc6) )
+	ROM_LOAD( "b44-23.rom3l", 0x40000, 0x20000, CRC(5a54a3b9) SHA1(6b219f1c3570f16eb4a06221d7e527c735437bac) )
+	ROM_LOAD( "b44-24.rom3h", 0x60000, 0x20000, CRC(3c5f544b) SHA1(d3b0ee18f1027483a36ef02757b62f42a086a8e2) )
+	ROM_LOAD( "b44-25.rom2l", 0x80000, 0x20000, CRC(d1b7e314) SHA1(8b4181caa32955b4274614a4238bb24d67ecb729) )
+	ROM_LOAD( "b44-26.rom2h", 0xa0000, 0x20000, CRC(269978a8) SHA1(aef7b8d3d00dcc4201e0a1e28026f6f1bdafd0b7) )
+	ROM_LOAD( "b44-27.rom1l", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
+	ROM_LOAD( "b44-28.rom1h", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b44-30.15f", 0x00000, 0x200, CRC(b3de8312) SHA1(dac0d9bfb593d691fd7030e2b1b13be1218929a4) )  /* hi bytes, AM27S29 or compatible like MB7124 */

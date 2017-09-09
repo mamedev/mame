@@ -621,7 +621,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	// reset sequences and chars
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
-	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = char32_t(0);
+	std::fill(std::begin(m_chars), std::end(m_chars), char32_t(0));
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -766,17 +766,10 @@ ioport_type_class ioport_field::type_class() const
 
 char32_t ioport_field::keyboard_code(int which) const
 {
-	char32_t ch;
-
 	if (which >= ARRAY_LENGTH(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
 
-	ch = m_chars[which];
-
-	// special hack to allow for PORT_CODE('\xA3')
-	if (ch >= 0xffffff80 && ch <= 0xffffffff)
-		ch &= 0xff;
-	return ch;
+	return m_chars[which];
 }
 
 

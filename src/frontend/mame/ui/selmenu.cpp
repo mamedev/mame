@@ -2555,16 +2555,16 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float oy1 = origy1 + line_height;
 
-	char const *const snaptext(m_info_view ? _(m_items_list[m_info_view - 1].c_str()) : _(first));
+	char const *const snaptext(m_info_view ? m_items_list[m_info_view - 1].c_str() : _(first));
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		char const *const name(x ? m_items_list[x - 1].c_str() : first);
+		char const *const name(x ? m_items_list[x - 1].c_str() : _(first));
 		float txt_length(0.0f);
 		ui().draw_text_full(
-				container(), _(name),
+				container(), name,
 				origx1, origy1, origx2 - origx1,
 				ui::text_layout::CENTER, ui::text_layout::NEVER,
 				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,

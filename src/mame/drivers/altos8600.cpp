@@ -134,7 +134,7 @@ READ16_MEMBER(altos8600_state::errhi_r)
 
 WRITE16_MEMBER(altos8600_state::clear_w)
 {
-	m_mmuerr = 0xff;
+	m_mmuerr = 0xffff;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmistat = false;
 }
@@ -281,6 +281,7 @@ void altos8600_state::xlate_w(address_space &space, offs_t offset, u16 data, u16
 	else if(m_user && BIT(flags, 3) && ((offset & 0x7ff) < 64))
 		seterr(offset, mem_mask, 8);
 	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
+	m_mmuflags[offset >> 11] |= 4;
 }
 
 READ16_MEMBER(altos8600_state::cpuram_r)
@@ -365,6 +366,7 @@ WRITE16_MEMBER(altos8600_state::dmacram_w)
 		return;
 	}
 	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
+	m_mmuflags[offset >> 11] |= 4;
 }
 
 READ16_MEMBER(altos8600_state::nmi_r)
@@ -517,4 +519,4 @@ ROM_START(altos8600)
 	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos", "8600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos Computer Systems", "ACS8600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

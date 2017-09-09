@@ -2,15 +2,21 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __CGC7900__
-#define __CGC7900__
+#ifndef MAME_INCLUDES_CGC7900_H
+#define MAME_INCLUDES_CGC7900_H
 
 
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"
+#include "machine/com8116.h"
+#include "machine/mm58167.h"
+#include "machine/keyboard.h"
 #include "sound/ay8910.h"
+
+#include "screen.h"
 
 #define M68000_TAG      "uh8"
 #define INS8251_0_TAG   "uc10"
@@ -29,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
 			m_palette(*this, "palette"),
+			m_screen(*this, "screen"),
 			m_char_rom(*this, "gfx1"),
 			m_chrom_ram(*this, "chrom_ram"),
 			m_plane_ram(*this, "plane_ram"),
@@ -43,11 +50,15 @@ public:
 			m_plane_switch(*this, "plane_switch"),
 			m_color_status_fg(*this, "color_status_fg"),
 			m_color_status_bg(*this, "color_status_bg"),
-			m_roll_overlay(*this, "roll_overlay")
+			m_roll_overlay(*this, "roll_overlay"),
+			m_i8251_0(*this, INS8251_0_TAG),
+			m_i8251_1(*this, INS8251_1_TAG),
+			m_dbrg(*this, K1135A_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint16_t> m_chrom_ram;
 	required_shared_ptr<uint16_t> m_plane_ram;
@@ -63,6 +74,9 @@ public:
 	required_shared_ptr<uint16_t> m_color_status_fg;
 	required_shared_ptr<uint16_t> m_color_status_bg;
 	required_shared_ptr<uint16_t> m_roll_overlay;
+	required_device<i8251_device> m_i8251_0;
+	required_device<i8251_device> m_i8251_1;
+	required_device<com8116_device> m_dbrg;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,19 +95,35 @@ public:
 	DECLARE_WRITE16_MEMBER( z_mode_w );
 	DECLARE_WRITE16_MEMBER( color_status_w );
 	DECLARE_READ16_MEMBER( sync_r );
+	DECLARE_READ16_MEMBER( unmapped_r );
+
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { irq_encoder(N, state); }
+
+	DECLARE_WRITE8_MEMBER(baud_write);
+	DECLARE_WRITE_LINE_MEMBER(write_rs232_clock);
+	DECLARE_WRITE_LINE_MEMBER(write_rs449_clock);
 
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);
 	void draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap);
 
 	/* interrupt state */
-	uint16_t m_int_mask;
+	uint16_t m_int_mask, m_int_active;
 
 	/* video state */
 	rgb_t m_clut[256];
 	int m_blink;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
+
+	void kbd_put(u8 data);
+
+private:
+	u16 kbd_mods;
+	u8 kbd_data;
+	bool kbd_ready;
+
+	void irq_encoder(int pin, int state);
 };
 
 /*----------- defined in video/cgc7900.c -----------*/

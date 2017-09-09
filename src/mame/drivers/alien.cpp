@@ -6,12 +6,19 @@
 
     skeleton driver
 
-    - sh-4 clocked with 200MHz
-    - 2 x Panasonic MN677511DE chips (MPEG2 decoders)
+   Main board:
+    - Hitachi SH-4 HD6417750S at 200MHz
+    - 2 x Fujitsu MB86292 Graphics Controller
     - Altera ACEX 1K PLD
     - M48T35Y timekeeper device
-    - CF interface
     - YMZ770B-F
+   Upper board (game specific):
+    - CF interface
+    - 2 x Panasonic MN677511DE MPEG2 decoders (optional)
+
+   Known undumped games:
+    - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
+    - Donkey Kong: Banana Kingdom (c) 2006 Capcom / Nintendo / Namco
 
 ***********************************************************************************/
 

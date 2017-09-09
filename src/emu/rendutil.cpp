@@ -815,8 +815,7 @@ ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char
 		return RENDUTIL_IMGFORMAT_ERROR;
 
 	// PNG: check for valid header
-	png_info png;
-	png_error const result = png.verify_header(file);
+	png_error const result = png_info::verify_header(file);
 	if (result == PNGERR_NONE)
 	{
 		file.close();

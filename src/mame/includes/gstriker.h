@@ -4,6 +4,7 @@
 #ifndef __GSTRIKER_H
 #define __GSTRIKER_H
 
+#include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "video/vsystem_spr.h"
@@ -28,10 +29,10 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_watchdog(*this, "watchdog"),
+		m_acia(*this, "acia"),
 		m_CG10103_m_vram(*this, "cg10103_m_vram"),
 		m_work_ram(*this, "work_ram"),
-		m_mixerregs1(*this, "mixerregs1"),
-		m_mixerregs2(*this, "mixerregs2")
+		m_mixerregs(*this, "mixerregs")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -44,13 +45,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<mb3773_device> m_watchdog;
+	optional_device<acia6850_device> m_acia;
 
 	required_shared_ptr<uint16_t> m_CG10103_m_vram;
 	std::unique_ptr<uint16_t[]>    m_buffered_spriteram;
 	std::unique_ptr<uint16_t[]>    m_buffered_spriteram2;
 	required_shared_ptr<uint16_t> m_work_ram;
-	required_shared_ptr<uint16_t> m_mixerregs1;
-	required_shared_ptr<uint16_t> m_mixerregs2;
+	required_shared_ptr<uint16_t> m_mixerregs;
 
 	enum {
 		TECMO_WCUP94_MCU = 1,

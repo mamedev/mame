@@ -1378,7 +1378,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
-#include "machine/upd4701.h"
+#include "machine/tmp68301.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
@@ -1776,45 +1776,32 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 	return 0;
 }
 
-READ16_MEMBER(seta_state::usclssic_trackball_x_r)
+CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_x_r)
 {
-	static const char *const portx_name[2] = { "P1X", "P2X" };
-
-	switch (offset)
-	{
-		case 0/2:   return (ioport(portx_name[m_usclssic_port_select])->read() >> 0) & 0xff;
-		case 2/2:   return (ioport(portx_name[m_usclssic_port_select])->read() >> 8) & 0xff;
-	}
-	return 0;
+	return (m_usclssic_port_select ? m_track2_x : m_track1_x)->read();
 }
 
-READ16_MEMBER(seta_state::usclssic_trackball_y_r)
+CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_y_r)
 {
-	static const char *const porty_name[2] = { "P1Y", "P2Y" };
-
-	switch (offset)
-	{
-		case 0/2:   return (ioport(porty_name[m_usclssic_port_select])->read() >> 0) & 0xff;
-		case 2/2:   return (ioport(porty_name[m_usclssic_port_select])->read() >> 8) & 0xff;
-	}
-	return 0;
+	return (m_usclssic_port_select ? m_track2_y : m_track1_y)->read();
 }
 
 
-WRITE16_MEMBER(seta_state::usclssic_lockout_w)
+WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		int tiles_offset = (data & 0x10) ? 0x4000: 0;
+	int tiles_offset = BIT(data, 4) ? 0x4000: 0;
 
-		m_usclssic_port_select = (data & 0x40) >> 6;
+	m_usclssic_port_select = BIT(data, 6);
+	m_buttonmux->select_w(m_usclssic_port_select);
 
-		if (tiles_offset != m_tiles_offset)
-			machine().tilemap().mark_all_dirty();
-		m_tiles_offset = tiles_offset;
+	m_upd4701->resetx_w(BIT(data, 7));
+	m_upd4701->resety_w(BIT(data, 7));
 
-		seta_coin_lockout_w(data);
-	}
+	if (tiles_offset != m_tiles_offset)
+		machine().tilemap().mark_all_dirty();
+	m_tiles_offset = tiles_offset;
+
+	seta_coin_lockout_w(data);
 }
 
 
@@ -1826,9 +1813,8 @@ static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16, seta_state )
 /**/AM_RANGE(0x900000, 0x900001) AM_RAM                                 // ? $4000
 	AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl_0")         // VRAM Ctrl
 /**/AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
-	AM_RANGE(0xb40000, 0xb40003) AM_READ(usclssic_trackball_x_r)        // TrackBall X
-	AM_RANGE(0xb40000, 0xb40001) AM_WRITE(usclssic_lockout_w)           // Coin Lockout + Tiles Banking
-	AM_RANGE(0xb40004, 0xb40007) AM_READ(usclssic_trackball_y_r)        // TrackBall Y + Buttons
+	AM_RANGE(0xb40000, 0xb40007) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
+	AM_RANGE(0xb40000, 0xb40001) AM_WRITE8(usclssic_lockout_w, 0x00ff)  // Coin Lockout + Tiles Banking
 	AM_RANGE(0xb4000a, 0xb4000b) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0xb40010, 0xb40011) AM_READ_PORT("COINS")                  // Coins
 	AM_RANGE(0xb40010, 0xb40011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff) // To Sub CPU
@@ -2806,23 +2792,14 @@ ADDRESS_MAP_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-// TODO: not NVRAM!!!
-READ16_MEMBER(seta_state::kiwame_nvram_r)
+WRITE16_MEMBER(seta_state::kiwame_row_select_w)
 {
-	return m_kiwame_nvram[offset] & 0xff;
-}
-
-WRITE16_MEMBER(seta_state::kiwame_nvram_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		COMBINE_DATA( &m_kiwame_nvram[offset] );
-	}
+	m_kiwame_row_select = data & 0x001f;
 }
 
 READ16_MEMBER(seta_state::kiwame_input_r)
 {
-	int row_select = kiwame_nvram_r( space, 0x10a/2,0x00ff ) & 0x1f;
+	int row_select = m_kiwame_row_select;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
@@ -2854,7 +2831,7 @@ static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00009) AM_READ(kiwame_input_r)            // mahjong panel
 	AM_RANGE(0xe00000, 0xe00003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_SHARE("kiwame_nvram")  // TODO: actual unknown device
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
 
 
@@ -6374,33 +6351,31 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( usclssic )
-	PORT_START("P1X")     /* muxed port 0 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("TRACKX")
+	PORT_BIT( 0xfff, 0x000, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_x_r, nullptr)
 
-	PORT_START("P1Y")     /* muxed port 0 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("TRACKY")
+	PORT_BIT( 0xfff, 0x000, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_y_r, nullptr)
 
-	PORT_START("P2X")     /* muxed port 1 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("TRACK1_X")     /* muxed port 0 */
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
 
-	PORT_START("P2Y")     /* muxed port 1 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("TRACK1_Y")     /* muxed port 0 */
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
+
+	PORT_START("TRACK2_X")     /* muxed port 1 */
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+
+	PORT_START("TRACK2_Y")     /* muxed port 1 */
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, a0_w)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, a1_w)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, a2_w)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, b0_w)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, b1_w)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, b2_w)
 
 	PORT_START("COINS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN  )    // tested (sound related?)
@@ -7972,6 +7947,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 }
 
 
+MACHINE_START_MEMBER(seta_state, usclssic)
+{
+	m_buttonmux->ab_w(0xff);
+}
+
+
 static MACHINE_CONFIG_START( usclssic )
 
 	/* basic machine hardware */
@@ -7984,6 +7965,16 @@ static MACHINE_CONFIG_START( usclssic )
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
 
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX")
+	MCFG_UPD4701_PORTY("TRACKY")
+
+	MCFG_DEVICE_ADD("buttonmux", HC157, 0)
+	MCFG_74157_OUT_CB(DEVWRITELINE("upd4701", upd4701_device, middle_w)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, right_w)) MCFG_DEVCB_BIT(1)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, left_w)) MCFG_DEVCB_BIT(2)
+
+	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -9178,6 +9169,8 @@ static MACHINE_CONFIG_START( kiwame )
 	MCFG_CPU_PROGRAM_MAP(kiwame_map)
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta_state, kiwame_row_select_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

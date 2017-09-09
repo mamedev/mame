@@ -47,7 +47,7 @@ READ16_MEMBER( m68340_cpu_device::m68340_internal_timer_r )
 	int val = 0;
 
 	int pc = space.device().safe_pc();
-	logerror("%08x m68340_internal_timer_r %08x, (%08x)\n", pc, offset * 2, mem_mask);
+	LOGR("%08x m68340_internal_timer_r %08x, (%08x)\n", pc, offset * 2, mem_mask);
 
 	int id = (offset * 2) < 0x40 ? 0 : 1; // Timer1 or Timer2
 
@@ -257,7 +257,7 @@ WRITE16_MEMBER( m68340_cpu_device::m68340_internal_timer_w )
 	}
 
 	int pc = space.device().safe_pc();
-	logerror("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", pc, offset * 2, data, mem_mask);
+	LOG("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", pc, offset * 2, data, mem_mask);
 }
 
 void m68340_timer::reset()

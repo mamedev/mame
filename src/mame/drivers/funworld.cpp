@@ -1908,33 +1908,60 @@ static INPUT_PORTS_START( royaljp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+/* ________________________________________________________________________
+  |DIP Schalter 1                          | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Hopperbetrieb über Board        ein/on  |on |   |   |   |   |   |   |   |
+  |(Hopper Payout)                 aus/off |off|   |   |   |   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Autohold                        an/yes  |   |on |   |   |   |   |   |   |
+  |                                aus/no  |   |off|   |   |   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Gewinn ab: "Hohes Paar"/"High pair"     |   |   |on |   |   |   |   |   |
+  |(Profit)   "König oder As"/"King or Ace"|   |   |off|   |   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Insert "Dattl"                          |   |   |   |on |   |   |   |   |
+  |Insert "Royal-Jackpot"                  |   |   |   |off|   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Coin A = 10  Coin B = 50                |   |   |   |   |on |on |   |   |
+  |Coin A = 10  Coin B = 20                |   |   |   |   |on |off|   |   |
+  |Coin A = 1   Coin B = 20                |   |   |   |   |off|off|   |   |
+  |Coin A = 1   Coin B = 50                |   |   |   |   |off|on |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Immer / always                          |   |   |   |   |   |   |off|   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Keyboard Test                           |   |   |   |   |   |   |   |on |
+  |Spielbetrieb / Maingame                 |   |   |   |   |   |   |   |off|
+  |________________________________________|___|___|___|___|___|___|___|___|
+
+  Default Settings from Video Klein:  01101100
+
+*/
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Main Game" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )    // Shown as "Always Off" in the manual
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "50 Points/Coin" )
 	PORT_DIPSETTING(    0x04, "20 Points/Coin" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "10 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "1 Point/Coin" )
 	PORT_DIPNAME( 0x10, 0x10, "Insert" )            PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Dattl Insert" )
 	PORT_DIPSETTING(    0x10, "Royal Jackpot" )
-	PORT_DIPNAME( 0x20, 0x20, "Profit" )            PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x00, "Profit" )            PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "Hohes Paar" )
 	PORT_DIPSETTING(    0x20, "2 Kings or Aces" )
-	PORT_DIPNAME( 0x40, 0x40, "Autohold" )          PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Autohold" )          PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-
-	/* after nvram init, set the following one to 'manual'
-	to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, "Hopper" )
-	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Payout" )     PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( cuoreuno )
 	PORT_START("IN0")
@@ -4942,6 +4969,9 @@ ROM_END
 
   Encrypted graphics 'alla TAB blue PCB.
   Maybe is the infamous encrypted Impera green PCB.
+  
+  From the manual: "With third draw"
+  ...but I couldn't trigger this feature. 
  
  */
 

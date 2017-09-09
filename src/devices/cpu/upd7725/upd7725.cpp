@@ -119,16 +119,12 @@ void necdsp_device::device_start()
 	save_item(NAME(regs.flaga.z));
 	save_item(NAME(regs.flaga.ov1));
 	save_item(NAME(regs.flaga.ov0));
-	save_item(NAME(regs.flaga.ov0p));
-	save_item(NAME(regs.flaga.ov0pp));
 	save_item(NAME(regs.flagb.s1));
 	save_item(NAME(regs.flagb.s0));
 	save_item(NAME(regs.flagb.c));
 	save_item(NAME(regs.flagb.z));
 	save_item(NAME(regs.flagb.ov1));
 	save_item(NAME(regs.flagb.ov0));
-	save_item(NAME(regs.flagb.ov0p));
-	save_item(NAME(regs.flagb.ov0pp));
 	save_item(NAME(regs.tr));
 	save_item(NAME(regs.trb));
 	save_item(NAME(regs.dr));
@@ -251,9 +247,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 							regs.flaga.c ? 'C' : 'c',
 							regs.flaga.z ? 'Z' : 'z',
 							regs.flaga.ov1 ? "OV1" : "ov1",
-							regs.flaga.ov0 ? "OV0" : "ov0",
-							regs.flaga.ov0p ? "OV0P" : "ov0p",
-							regs.flaga.ov0pp ? "OV0PP" : "ov0pp");
+							regs.flaga.ov0 ? "OV0" : "ov0");
 			break;
 
 		case UPD7725_FLAGB:
@@ -263,9 +257,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 							regs.flagb.c ? 'C' : 'c',
 							regs.flagb.z ? 'Z' : 'z',
 							regs.flagb.ov1 ? "OV1" : "ov1",
-							regs.flagb.ov0 ? "OV0" : "ov0",
-							regs.flagb.ov0p ? "OV0P" : "ov0p",
-							regs.flagb.ov0pp ? "OV0PP" : "ov0pp");
+							regs.flagb.ov0 ? "OV0" : "ov0");
 			break;
 	}
 }
@@ -442,8 +434,6 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	flag.s1 = 0;
 	flag.ov0 = 0;
 	flag.ov1 = 0;
-	flag.ov0p = 0;
-	flag.ov0pp = 0;
 
 	switch(pselect) {
 		case 0: p = dataRAM[regs.dp]; break;
@@ -469,7 +459,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 		case  9: r = q + 1; p = 1; break;             //INC
 		case 10: r = ~q; break;                       //CMP
 		case 11: r = (q >> 1) | (q & 0x8000); break;  //SHR1 (ASR)
-		case 12: r = (q << 1) | (c ? 1 : 0); break;             //SHL1 (ROL)
+		case 12: r = (q << 1) | (c ? 1 : 0); break;   //SHL1 (ROL)
 		case 13: r = (q << 2) | 3; break;             //SHL2
 		case 14: r = (q << 4) | 15; break;            //SHL4
 		case 15: r = (q << 8) | (q >> 8); break;      //XCHG
@@ -477,13 +467,12 @@ void necdsp_device::exec_op(uint32_t opcode) {
 
 	flag.s0 = (r & 0x8000);
 	flag.z = (r == 0);
-	flag.ov0pp = flag.ov0p;
-	flag.ov0p = flag.ov0;
+	if (!flag.ov1) flag.s1 = flag.s0;
 
 	switch(alu) {
 		case  1: case  2: case  3: case 10: case 13: case 14: case 15: {
 		flag.c = 0;
-		flag.ov0 = flag.ov0p = flag.ov0pp = 0; // ASSUMPTION: previous ov0 values are nulled here to make ov1 zero
+		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 		break;
 		}
 		case  4: case  5: case  6: case  7: case  8: case  9: {
@@ -496,23 +485,20 @@ void necdsp_device::exec_op(uint32_t opcode) {
 			flag.ov0 = (q ^ r) &  (q ^ p) & 0x8000;
 			flag.c = (r > q);
 		}
+		flag.ov1 = (flag.ov0 & flag.ov1) ? (flag.s1 == flag.s0) : (flag.ov0 | flag.ov1);
 		break;
 		}
 		case 11: {
 		flag.c = q & 1;
-		flag.ov0 = flag.ov0p = flag.ov0pp = 0; // ASSUMPTION: previous ov0 values are nulled here to make ov1 zero
+		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 		break;
 		}
 		case 12: {
 		flag.c = q >> 15;
-		flag.ov0 = flag.ov0p = flag.ov0pp = 0; // ASSUMPTION: previous ov0 values are nulled here to make ov1 zero
+		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 		break;
 		}
 	}
-	// flag.ov1 is only set if the number of overflows of the past 3 opcodes (of type 4,5,6,7,8,9) is odd
-	flag.ov1 = (flag.ov0 + flag.ov0p + flag.ov0pp) & 1;
-	// flag.s1 is based on ov1: s1 = ov1 ^ s0;
-	flag.s1 = flag.ov1 ^ flag.s0;
 
 	switch(asl) {
 		case 0: regs.a = r; regs.flaga = flag; break;
@@ -522,15 +508,17 @@ void necdsp_device::exec_op(uint32_t opcode) {
 
 	exec_ld((regs.idb << 6) + dst);
 
-	switch(dpl) {
-	case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
-	case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
-	case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
+	if (dst != 4) {
+		switch(dpl) {
+		case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
+		case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
+		case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
+		}
+
+		regs.dp ^= dphm << 4;
 	}
 
-	regs.dp ^= dphm << 4;
-
-	if(rpdcr) regs.rp--;
+	if(rpdcr && (dst != 5)) regs.rp--;
 }
 
 void necdsp_device::exec_rt(uint32_t opcode) {

@@ -341,17 +341,17 @@ function cheatfind.startplugin()
 		if cheat_save then
 			local cplayer = { "All", "P1", "P2", "P3", "P4" }
 			local ctype = { "Infinite Credits", "Infinite Time", "Infinite Lives", "Infinite Energy", "Infinite Ammo", "Infinite Bombs", "Invincibility" }
-			menu[#menu + 1] = function() return { "Save Cheat", "", "off" }, nil end
+			menu[#menu + 1] = function() return { _("Save Cheat"), "", "off" }, nil end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
-				local c = { "Default", "Custom" }
-				local m = { "Cheat Name", c[name], 0 }
+				local c = { _("Default"), _("Custom") }
+				local m = { _("Cheat Name"), c[name], 0 }
 				menu_lim(name, 1, #c, m)
 				local function f(event)
 					local r
 					name, r = incdec(event, name, 1, #c)
 					if (event == "select" or event == "comment") and name == 1 then
-						manager:machine():popmessage("Default name is " .. cheat_save.name)
+						manager:machine():popmessage(_("Default name is ") .. cheat_save.name)
 					end
 					return r
 				end
@@ -359,18 +359,18 @@ function cheatfind.startplugin()
 			end
 			if name == 2 then
 				menu[#menu + 1] = function()
-					local m = { "Player", cplayer[name_player], 0 }
+					local m = { _("Player"), cplayer[name_player], 0 }
 					menu_lim(name_player, 1, #cplayer, m)
 					return m, function(event) local r name_player, r = incdec(event, name_player, 1, #cplayer) return r end
 				end
 				menu[#menu + 1] = function()
-					local m = { "Type", ctype[name_type], 0 }
+					local m = { _("Type"), ctype[name_type], 0 }
 					menu_lim(name_type, 1, #ctype, m)
 					return m, function(event) local r name_type, r = incdec(event, name_type, 1, #ctype) return r end
 				end
 			end
 			menu[#menu + 1] = function()
-				local m = { "Save", "", 0 }
+				local m = { _("Save"), "", 0 }
 				local function f(event)
 					if event == "select" then
 						local desc
@@ -396,7 +396,7 @@ function cheatfind.startplugin()
 								file = io.open(cheat_save.path .. "/cheat.simple", "a")
 								file:write(string.format(cheat_save.simple, desc))
 								file:close()
-								manager:machine():popmessage("Cheat written to " .. cheat_save.filename .. " and added to cheat.simple")
+								manager:machine():popmessage(_("Cheat written to ") .. cheat_save.filename .. _(" and added to cheat.simple"))
 							end
 							written = true
 						elseif not devtable[devcur].space.shortname then
@@ -404,12 +404,12 @@ function cheatfind.startplugin()
 							if file then
 								file:write(string.format(cheat_save.simple, desc))
 								file:close()
-								manager:machine():popmessage("Cheat added to cheat.simple")
+								manager:machine():popmessage(_("Cheat added to cheat.simple"))
 								written = true
 							end
 						end
 						if not written then
-							manager:machine():popmessage("Unable to write file\nCheck cheatpath dir exists")
+							manager:machine():popmessage(_("Unable to write file\nCheck cheatpath dir exists"))
 						end
 						cheat_save = nil
 						return true
@@ -418,16 +418,16 @@ function cheatfind.startplugin()
 				end
 				return m, f
 			end
-			menu[#menu + 1] = function() return { "Cancel", "", 0 }, function(event) if event == "select" then cheat_save = nil return true end end end
+			menu[#menu + 1] = function() return { _("Cancel"), "", 0 }, function(event) if event == "select" then cheat_save = nil return true end end end
 			return menu_prepare()
 		end
 
 		menu[#menu + 1] = function()
-			local m = { "CPU or RAM", devtable[devsel].tag, 0 }
+			local m = { _("CPU or RAM"), devtable[devsel].tag, 0 }
 			menu_lim(devsel, 1, #devtable, m)
 			local function f(event)
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
-					manager:machine():popmessage("Changes to this only take effect when \"Start new search\" is selected")
+					manager:machine():popmessage(_("Changes to this only take effect when \"Start new search\" is selected"))
 				end
 				devsel = incdec(event, devsel, 1, #devtable)
 				return true
@@ -446,7 +446,7 @@ function cheatfind.startplugin()
 						menu_blocks[num] = {}
 						menu_blocks[num][1] = cheat.save(devtable[devcur].space, region.offset, region.size)
 					end
-					manager:machine():popmessage("Data cleared and current state saved")
+					manager:machine():popmessage(_("Data cleared and current state saved"))
 					watches = {}
 					leftop = 2
 					rightop = 1
@@ -454,7 +454,7 @@ function cheatfind.startplugin()
 					return true
 				end
 			end
-			return { "Start new search", "", 0 }, f
+			return { _("Start new search"), "", 0 }, f
 		end
 		if #menu_blocks ~= 0 then
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
@@ -464,14 +464,14 @@ function cheatfind.startplugin()
 						for num, region in ipairs(devtable[devcur].ram) do
 							menu_blocks[num][#menu_blocks[num] + 1] = cheat.save(devtable[devcur].space, region.offset, region.size)
 						end
-						manager:machine():popmessage("Current state saved")
+						manager:machine():popmessage(_("Current state saved"))
 						leftop = (leftop == #menu_blocks[1]) and #menu_blocks[1] + 1 or leftop
 						rightop = (rightop == #menu_blocks[1] - 1) and #menu_blocks[1] or rightop
 						devsel = devcur
 						return true
 					end
 				end
-				return { "Save current -- #" .. #menu_blocks[1] + 1, "", 0 }, f
+				return { _("Save current -- #") .. #menu_blocks[1] + 1, "", 0 }, f
 			end
 			menu[#menu + 1] = function()
 				local function f(event)
@@ -503,50 +503,50 @@ function cheatfind.startplugin()
 								count = count + #matches[#matches][num]
 							end
 						end
-						manager:machine():popmessage(count .. " total matches found")
+						manager:machine():popmessage(count .. _(" total matches found"))
 						matches[#matches].count = count
 						matchpg = 0
 						devsel = devcur
 						return true
 					end
 				end
-				return { "Compare", "", 0 }, f
+				return { _("Compare"), "", 0 }, f
 			end
 			menu[#menu + 1] = function()
-				local m = { "Left operand", leftop, "" }
+				local m = { _("Left operand"), leftop, "" }
 				menu_lim(leftop, 1, #menu_blocks[1] + 1, m)
 				if leftop == #menu_blocks[1] + 1 then
-					m[2] = "Current"
+					m[2] = _("Current")
 				end
 				return m, function(event) local r leftop, r = incdec(event, leftop, 1, #menu_blocks[1] + 1) return r end
 			end
 			menu[#menu + 1] = function()
-				local m = { "Operator", optable[opsel], "" }
+				local m = { _("Operator"), optable[opsel], "" }
 				menu_lim(opsel, 1, #optable, m)
 				local function f(event)
 					local r
 					opsel, r = incdec(event, opsel, 1, #optable)
 					if event == "left" or event == "right" or event == "comment" then
 						if optable[opsel] == "lt" then
-							manager:machine():popmessage("Left less than right, value is difference")
+							manager:machine():popmessage(_("Left less than right, value is difference"))
 						elseif optable[opsel] == "gt" then
-							manager:machine():popmessage("Left greater than right, value is difference")
+							manager:machine():popmessage(_("Left greater than right, value is difference"))
 						elseif optable[opsel] == "eq" then
-							manager:machine():popmessage("Left equal to right")
+							manager:machine():popmessage(_("Left equal to right"))
 						elseif optable[opsel] == "ne" then
-							manager:machine():popmessage("Left not equal to right, value is difference")
+							manager:machine():popmessage(_("Left not equal to right, value is difference"))
 						elseif optable[opsel] == "beq" then
-							manager:machine():popmessage("Left equal to right with bitmask")
+							manager:machine():popmessage(_("Left equal to right with bitmask"))
 						elseif optable[opsel] == "bne" then
-							manager:machine():popmessage("Left not equal to right with bitmask")
+							manager:machine():popmessage(_("Left not equal to right with bitmask"))
 						elseif optable[opsel] == "ltv" then
-							manager:machine():popmessage("Left less than value")
+							manager:machine():popmessage(_("Left less than value"))
 						elseif optable[opsel] == "gtv" then
-							manager:machine():popmessage("Left greater than value")
+							manager:machine():popmessage(_("Left greater than value"))
 						elseif optable[opsel] == "eqv" then
-							manager:machine():popmessage("Left equal to value")
+							manager:machine():popmessage(_("Left equal to value"))
 						elseif optable[opsel] == "nev" then
-							manager:machine():popmessage("Left not equal to value")
+							manager:machine():popmessage(_("Left not equal to value"))
 						end
 					end
 					return r
@@ -557,7 +557,7 @@ function cheatfind.startplugin()
 				if optable[opsel]:sub(3, 3) == "v" then
 					return nil
 				end
-				local m = { "Right operand", rightop, "" }
+				local m = { _("Right operand"), rightop, "" }
 				menu_lim(rightop, 1, #menu_blocks[1], m)
 				return m, function(event) local r rightop, r = incdec(event, rightop, 1, #menu_blocks[1]) return r end
 			end
@@ -565,17 +565,17 @@ function cheatfind.startplugin()
 				if optable[opsel] == "bne" or optable[opsel] == "beq" or optable[opsel] == "eq" then
 					return nil
 				end
-				local m = { "Value", value, "" }
+				local m = { _("Value"), value, "" }
 				local max = 100 -- max value?
 				menu_lim(value, 0, max, m)
 				if value == 0 and optable[opsel]:sub(3, 3) ~= "v" then
-					m[2] = "Any"
+					m[2] = _("Any")
 				end
 				return m, function(event) local r value, r = incdec(event, value, 0, max) return r end
 			end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
-				local m = { "Data Format", formname[width], 0 }
+				local m = { _("Data Format"), formname[width], 0 }
 				menu_lim(width, 1, #formtable, m)
 				return m, function(event) local r width, r = incdec(event, width, 1, #formtable) return r end
 			end
@@ -583,10 +583,10 @@ function cheatfind.startplugin()
 				if optable[opsel] == "bne" or optable[opsel] == "beq" then
 					return nil
 				end
-				local m = { "BCD", "Off", 0 }
+				local m = { "BCD", _("Off"), 0 }
 				menu_lim(bcd, 0, 1, m)
 				if bcd == 1 then
-					m[2] = "On"
+					m[2] = _("On")
 				end
 				return m, function(event) local r bcd, r = incdec(event, bcd, 0, 1) return r end
 			end
@@ -599,14 +599,14 @@ function cheatfind.startplugin()
 							return true
 						end
 					end
-					return { "Undo last search -- #" .. #matches, "", 0 }, f
+					return { _("Undo last search -- #") .. #matches, "", 0 }, f
 				end
 				menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 				menu[#menu + 1] = function()
-					local m = { "Match block", matchsel, "" }
+					local m = { _("Match block"), matchsel, "" }
 					menu_lim(matchsel, 0, #matches[#matches], m)
 					if matchsel == 0 then
-						m[2] = "All"
+						m[2] = _("All")
 					end
 					local function f(event)
 						local r
@@ -657,7 +657,7 @@ function cheatfind.startplugin()
 
 				local function match_exec(match)
 					local dev = devtable[devcur]
-					local cheat = { desc = string.format("Test cheat at addr %08X", match.addr), script = {} }
+					local cheat = { desc = string.format(_("Test cheat at addr %08X"), match.addr), script = {} }
 					local wid = formtable[width]:sub(2, 2):lower()
 					local widchar
 					local form
@@ -689,7 +689,7 @@ function cheatfind.startplugin()
 					end
 					if match.mode == 1 then
 						if not _G.ce then
-							manager:machine():popmessage("Cheat engine not available")
+							manager:machine():popmessage(_("Cheat engine not available"))
 						else
 							_G.ce.inject(cheat)
 						end
@@ -715,7 +715,7 @@ function cheatfind.startplugin()
 						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
 						cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
 						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
-						manager:machine():popmessage("Default name is " .. cheat_save.name)
+						manager:machine():popmessage(_("Default name is ") .. cheat_save.name)
 						return true
 					else
 						local func = "return space:read"
@@ -738,7 +738,7 @@ function cheatfind.startplugin()
 						if not match.mode then
 							match.mode = 1
 						end
-						local modes = { "Test", "Write", "Watch" }
+						local modes = { _("Test"), _("Write"), _("Watch") }
 						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval,
 													  match.newval), modes[match.mode], 0 }
 						menu_lim(match.mode, 1, #modes, m)
@@ -755,7 +755,7 @@ function cheatfind.startplugin()
 				end
 				if matches[#matches].count > 100 then
 					menu[#menu + 1] = function()
-						local m = { "Page", matchpg, 0 }
+						local m = { _("Page"), matchpg, 0 }
 						local max
 						if matchsel == 0 then
 							max = math.ceil(matches[#matches].count / 100)
@@ -773,7 +773,7 @@ function cheatfind.startplugin()
 			end
 			if #watches ~= 0 then
 				menu[#menu + 1] = function()
-					return { "Clear Watches", "", 0 }, function(event) if event == "select" then watches = {} return true end end
+					return { _("Clear Watches"), "", 0 }, function(event) if event == "select" then watches = {} return true end end
 				end
 			end
 		end
@@ -783,7 +783,7 @@ function cheatfind.startplugin()
 	local function menu_callback(index, event)
 		return menu_func[index](event)
 	end
-	emu.register_menu(menu_callback, menu_populate, "Cheat Finder")
+	emu.register_menu(menu_callback, menu_populate, _("Cheat Finder"))
 	emu.register_frame_done(function ()
 			local tag, screen = next(manager:machine().screens)
 			local height = mame_manager:ui():get_line_height()
