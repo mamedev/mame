@@ -365,7 +365,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 								pen = m_color2 >> 4;
 								break;
 						}
-					
+						
 						if(pen != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
 					}
