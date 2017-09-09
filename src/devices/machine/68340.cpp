@@ -9,7 +9,6 @@
 
 DEFINE_DEVICE_TYPE(M68340, m68340_cpu_device, "mc68340", "MC68340")
 
-
 int m68340_cpu_device::calc_cs(offs_t address) const
 {
 	if ( !(m68340SIM->m_ba[0] & 1) ) return 1;
@@ -88,9 +87,12 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 			internal->install_readwrite_handler(base + 0x040, base + 0x05f,
 							    read32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_r),this),
 							    write32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_w),this));
-			internal->install_readwrite_handler(base + 0x600, base + 0x67f,
-							    read16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_r),this),
-							    write16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_w),this),0xffffffff);
+			internal->install_readwrite_handler(base + 0x600, base + 0x63f,
+							    READ16_DEVICE_DELEGATE(m_timer1, mc68340_timer_module_device, read),
+							    WRITE16_DEVICE_DELEGATE(m_timer1, mc68340_timer_module_device, write),0xffffffff);
+			internal->install_readwrite_handler(base + 0x640, base + 0x67f,
+							    READ16_DEVICE_DELEGATE(m_timer2, mc68340_timer_module_device, read),
+							    WRITE16_DEVICE_DELEGATE(m_timer2, mc68340_timer_module_device, write),0xffffffff);
 			internal->install_readwrite_handler(base + 0x700, base + 0x723,
 							    READ8_DEVICE_DELEGATE(m_serial, mc68340_serial_module_device, read),
 							    WRITE8_DEVICE_DELEGATE(m_serial, mc68340_serial_module_device, write),0xffffffff);
@@ -121,6 +123,8 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_MEMBER( m68340_cpu_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("serial", MC68340_SERIAL_MODULE, 0)
 	MCFG_MC68340SER_IRQ_CALLBACK(DEVWRITELINE("serial", mc68340_serial_module_device, irq_w))
+	MCFG_DEVICE_ADD("timer1", MC68340_TIMER_MODULE, 0)
+	MCFG_DEVICE_ADD("timer2", MC68340_TIMER_MODULE, 0)
 MACHINE_CONFIG_END
 
 
@@ -131,6 +135,8 @@ MACHINE_CONFIG_END
 m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, ADDRESS_MAP_NAME(m68340_internal_map))
 	, m_serial(*this, "serial")
+	, m_timer1(*this, "timer1")
+	, m_timer2(*this, "timer2")
 	, m_clock_mode(0)
 	, m_crystal(0)
 	, m_extal(0)
@@ -138,23 +144,11 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	, m_pa_in_cb(*this)
 	, m_pb_out_cb(*this)
 	, m_pb_in_cb(*this)
-	, m_tout1_out_cb(*this)
-	, m_tin1_in_cb(*this)
-	, m_tgate1_in_cb(*this)
-	, m_tout2_out_cb(*this)
-	, m_tin2_in_cb(*this)
-	, m_tgate2_in_cb(*this)
 {
 	m68340SIM = nullptr;
 	m68340DMA = nullptr;
-	m68340TIMER = nullptr;
 	m68340_base = 0;
 }
-
-
-
-
-
 
 void m68340_cpu_device::device_reset()
 {
@@ -176,14 +170,11 @@ void m68340_cpu_device::device_start()
 
 	m68340SIM    = new m68340_sim();
 	m68340DMA    = new m68340_dma();
-	m68340TIMER  = new m68340_timer();
 
 	m68340SIM->reset();
 	m68340DMA->reset();
-	m68340TIMER->reset();
 
 	start_68340_sim();
-	start_68340_timer();
 
 	m68340_base = 0x00000000;
 
