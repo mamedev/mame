@@ -199,23 +199,53 @@ private:
 		}
 		return archive_file::error::NONE;
 	}
+    
+    static constexpr std::time_t MIN_TO_SEC  = 60;
+    static constexpr std::time_t HOUR_TO_SEC = MIN_TO_SEC * 60;
+    static constexpr std::time_t DAY_TO_SEC  = HOUR_TO_SEC * 24;
+    static constexpr std::time_t YEAR_2100   = 120;
+    // number of days from 1970 to 1980
+    static constexpr std::time_t DAYS_OFFSET = 365*10+2;
 
+    static bool dos_is_leap_year(std::time_t year)
+    {
+        return !(year & 3) && year != YEAR_2100;
+    }
+    
 	static std::chrono::system_clock::time_point decode_dos_time(std::uint16_t date, std::uint16_t time)
 	{
-		// FIXME: work out why this doesn't always work
-		// negative tm_isdst should automatically determine whether DST is in effect for the date,
-		// but on Windows apparently it doesn't, so you get time offsets
-		std::tm datetime;
-		datetime.tm_sec = (time << 1) & 0x003e;
-		datetime.tm_min = (time >> 5) & 0x003f;
-		datetime.tm_hour = (time >> 11) & 0x001f;
-		datetime.tm_mday = (date >> 0) & 0x001f;
-		datetime.tm_mon = ((date >> 5) & 0x000f) - 1;
-		datetime.tm_year = ((date >> 9) & 0x007f) + 80;
-		datetime.tm_wday = 0;
-		datetime.tm_yday = 0;
-		datetime.tm_isdst = -1;
-		return std::chrono::system_clock::from_time_t(std::mktime(&datetime));
+        static std::time_t const days_in_year[] = { 0,0,31,59,90,120,151,181,212,243,273,304,334,0,0,0 };
+        
+        std::time_t day   = ((date >> 0) & 0x1f) - 1;
+        std::time_t month = (date >> 5) & 0x0f;
+        std::time_t year  = (date >> 9);
+        
+        std::time_t leap_days = (year + 3) / 4;
+        if (year > YEAR_2100)
+        {
+            // 2100 is not a leap year
+            leap_days--;
+        }
+        
+        if (dos_is_leap_year(year) && month > 2)
+        {
+            leap_days++;
+        }
+        
+        std::time_t days = year * 365;
+        days += days_in_year[month];
+        days += day;
+        days += DAYS_OFFSET;
+        days += leap_days;
+        
+        std::time_t dt =
+              ((time >>  0) & 0x1f) * 2             // seconds
+            + ((time >>  5) & 0x3f) * MIN_TO_SEC    // minutes
+            + ((time >> 11) & 0x1f) * HOUR_TO_SEC   // hours
+            + days * DAY_TO_SEC                     // days
+        ;
+        
+		return std::chrono::system_clock::from_time_t(dt);
 	}
 
 	// ZIP file parsing
