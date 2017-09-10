@@ -12245,6 +12245,8 @@ waveterm                        //
 
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
+europc2							// Schneider Euro PC II
+euroxt							// Schneider Euro XT
 
 @source:eva.cpp
 eva11                           //
@@ -30191,6 +30193,7 @@ zdsupers                        //
 ncrpc4i                         // NCR PC4i
 laser_turbo_xt                  // 1988 VTech Laser Turbo XT
 laser_xt3                       // 1989 VTech Laser XT/3
+olytext30						// AEG Olympia Olytext 30
 
 @source:pc100.cpp
 pc100                           //
