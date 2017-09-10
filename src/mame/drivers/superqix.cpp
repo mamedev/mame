@@ -41,6 +41,9 @@ Super Qix:
   (due to someone inserting and powering the chip backwards) and is definitely
   the cause of at least one other ROM failure during a repair. Be aware of
   this, if you find or own one of these PCBs!
+  On certain pcbs the rom may be labeled just '7' rather than 'sq07'.
+  The 8031 may have a capacitor or diode (unclear?) between vcc and p1.2 for an
+  unknown reason. Some pcbs have it, some do not.
 
 - The MCU sends some ID to the Z80 on startup, but the Z80 happily ignores it.
   This happens in all sets. There appears to be code that would check part of
@@ -331,12 +334,30 @@ WRITE8_MEMBER(superqix_state::mcu_port3_w)
 TIMER_CALLBACK_MEMBER(superqix_state::bootleg_mcu_port1_w_cb)
 {
 	// on the 8031 bootleg, the low 4 bits of port1 effectively control what would normally be port2 writes
-	// of the 4 high bits, 3 bits (0x80 is unused?) control a multiplexer for port3
+	// the 4 high bits control a multiplexer for port3 input and a latch for port3 output
 	// we assume the 'fake port2 writes' are absolutely identical to those of the real game
+	// 76543210
+	// |||||||\- new bit for 'fake port2 latch'
+	// ||||\\\-- bit selected within 'fake port2 latch'
+	// |||\----- port3 input is connected to DSW1 via transparent latch if this is low
+	// ||\------ port3 input is connected to SYSTEM via transparent latch if this is low
+	// |\------- port3 input is connected to AY2 iob via transparent latch if this is low
+	// \-------- port3 output is latched to an octal latch (which drives AY2 iob) on the rising edge of this pin
+	u8 const changed_m_bl_port1 = m_bl_port1 ^ param;
 	m_bl_port1 = param;
+
 	m_bl_fake_port2 &= ~(1<<((m_bl_port1&0xe)>>1)); // mask out the 'old bit'
-	m_bl_fake_port2 |= ((m_bl_port1&1)<<((m_bl_port1&0xe)>>1)); // or in the 'new bit'
-	mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff);
+	m_bl_fake_port2 |= ( BIT(m_bl_port1, 0) << ((m_bl_port1&0xe)>>1) ); // or in the 'new bit'
+
+	if (BIT(changed_m_bl_port1, 7) && BIT(m_bl_port1, 7)) // on rising edge of p1.7
+	{
+		if ((m_bl_port1 & 0x70) != 0x70) logerror("WARNING: port3 out latched to m_fromMCU while port3 multiplexer set to a non-open-bus value!\n");
+		m_fromMCU = m_bl_port3_out; // latch port3 out to ay2 iob bus
+		//note we are not doing a synchronize here, because this callback is
+		//already after a synchronize, and doing another one would be redundant
+	}
+
+	mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_port1_w)
@@ -358,7 +379,22 @@ READ8_MEMBER(superqix_state::bootleg_mcu_port3_r)
 	{
 		return m_fromZ80;
 	}
-	return 0;
+	// There are eight vertically mounted single resistors on the 8031 bootleg
+	// pcb to (presumably, needs tracing) pull this bus high when no input is
+	// selected.
+	// It is possible that the value of m_fromMCU will be read here rather than
+	// 0xff, the circuit of the bootleg pcb needs to be fully traced out to
+	// prove this.
+	return 0xff;
+}
+
+WRITE8_MEMBER(superqix_state::bootleg_mcu_port3_w)
+{
+	// unlike the 8751, the 8031 bootleg port3 does not directly connect to ay2
+	// iob; there is a 74ls374 octal latch next to the 8031 which probably
+	// connects between ay2 iob and port3, and the octal latch is clocked from
+	// port3 by the rising edge of 8031 p1.7.
+	m_bl_port3_out = data;
 }
 
 WRITE8_MEMBER(superqix_state::mcu_port2_w)
@@ -897,6 +933,7 @@ void superqix_state::machine_init_common()
 	save_item(NAME(m_bl_port1));
 	save_item(NAME(m_bl_fake_port2));
 	save_item(NAME(m_port2_raw));
+	save_item(NAME(m_bl_port3_out));
 }
 
 void hotsmash_state::machine_init_common()
@@ -975,7 +1012,7 @@ static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0408, 0x0408) AM_READ(z80_semaphore_assert_r)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)  /* ROM bank, NMI enable, tile bank, bitmap bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
-	// following two ranges are made of two 64x4 4464 DRAM chips at 9L and 9M, "GRAPHICS RAM" or "GRP BIT" if there is an error in POST
+	// following two ranges are made of two 64kx4 4464 DRAM chips at 9L and 9M, "GRAPHICS RAM" or "GRP BIT" if there is an error in POST
 	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE(superqix_bitmapram_w) AM_SHARE("bitmapram")
 	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_SHARE("bitmapram2")
 	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
@@ -986,7 +1023,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_8031_mcu_io_map, AS_IO, 8, superqix_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(bootleg_mcu_port1_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_port3_r, mcu_port3_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_port3_r, bootleg_mcu_port3_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_mcu_io_map, AS_IO, 8, superqix_state )
@@ -1366,12 +1403,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sqix )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)    /* 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* Z80B, 12 MHz / 2 (6 MHz), verified from pcb tracing */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sqix_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_12MHz/3)  /* TODO: VERIFY DIVISOR, is this 3mhz or 4mhz? */
+	MCFG_CPU_ADD("mcu", I8751, XTAL_12MHz/2) /* i8751-88, 12 MHz / 2 (6 MHz), verified from pcb tracing */
 	MCFG_CPU_IO_MAP(sqix_mcu_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
@@ -1394,13 +1431,13 @@ static MACHINE_CONFIG_START( sqix )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) // AY-3-8910 @3P, outputs directly tied together
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) // AY-3-8910A @3P, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2")) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) // AY-3-8910 @3M, outputs directly tied together
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) // AY-3-8910A @3M, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, z80_ay2_iob_r)) /* port Bread */
@@ -1410,7 +1447,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( sqix_8031, sqix )
-	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_MODIFY("mcu") /* p8031ah, clock not verified */
 	MCFG_CPU_IO_MAP(sqix_8031_mcu_io_map)
 MACHINE_CONFIG_END
 
