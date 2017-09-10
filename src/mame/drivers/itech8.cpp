@@ -25,7 +25,7 @@
         * Ninja Clowns
 
     Known issues:
-        * Ninja Clowns main ROM dump claims it's bad
+        * None
 
 ****************************************************************************
 
@@ -831,11 +831,21 @@ WRITE16_MEMBER(itech8_state::display_page16_w)
 		page_w(space, 0, ~data >> 8);
 }
 
-
-WRITE16_MEMBER(itech8_state::palette16_w)
+READ16_MEMBER(itech8_state::rom_constant_r)
 {
-	if (ACCESSING_BITS_8_15)
-		palette_w(space, offset / 8, data >> 8);
+//	Ninja Clowns reads this area for program ROM checksum
+	logerror("Read ROM constant area %04x\n",offset*2+0x40000);
+	return 0xd840;
+}
+
+READ8_MEMBER(itech8_state::ninclown_palette_r)
+{
+	return m_tlc34076->read(space, offset / 16);
+}
+
+WRITE8_MEMBER(itech8_state::ninclown_palette_w)
+{
+	m_tlc34076->write(space, offset / 16, data);
 }
 
 
@@ -893,19 +903,19 @@ static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-
 /*------ Ninja Clowns layout ------*/
 static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x004000, 0x07ffff) AM_ROM
+	AM_RANGE(0x004000, 0x03ffff) AM_ROM
+	AM_RANGE(0x040000, 0x07ffff) AM_READ(rom_constant_r)
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
 	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w)
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
 	AM_RANGE(0x100240, 0x100241) AM_DEVWRITE8("tms34061", tms34061_device, latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
 	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(blitter_r, blitter_w, 0xffff)
-	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
+	AM_RANGE(0x100380, 0x1003ff) AM_READWRITE8(ninclown_palette_r, ninclown_palette_w, 0xff00)
 	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(tms34061_r, tms34061_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -2569,10 +2579,9 @@ ROM_END
 
 
 ROM_START( ninclown )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prog1", 0x00000, 0x20000, CRC(fabfdcd2) SHA1(7a9852838cf7772d8f8f956b03823c4222520a5a) )
 	ROM_LOAD16_BYTE( "prog0", 0x00001, 0x20000, CRC(eca63db5) SHA1(b86d75ee81e155a21de18c2e0fa898f15d61560d) )
-	ROM_COPY(    "maincpu", 0x0000, 0x40000, 0x40000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nc-snd", 0x08000, 0x8000, CRC(f9d5b4e1) SHA1(e5c3774db349b60baf11baecf55ac432871e612c) )
@@ -2776,7 +2785,7 @@ GAME( 1991, rimrockn16, rimrockn, rimrockn,         rimrockn, itech8_state, rimr
 GAME( 1991, rimrockn12, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
 
 /* Ninja Clowns-style PCB */
-GAME( 1991, ninclown, 0,        ninclown,           ninclown, itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (08/27/91)", 0 )
+GAME( 1991, ninclown, 0,        ninclown,           ninclown, itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
 GAME( 1992, gpgolf,   0,        gtg2,               gpgolf,   itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
