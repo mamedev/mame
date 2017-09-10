@@ -141,7 +141,7 @@ class function_symbol_entry : public symbol_entry
 {
 public:
 	// construction/destruction
-	function_symbol_entry(symbol_table &table, std::string &&name, void *ref, int minparams, int maxparams, symbol_table::execute_func execute);
+	function_symbol_entry(symbol_table &table, std::string &&name, void *ref, int minparams, int maxparams, symbol_table::execute_func &&execute);
 
 	// symbol access
 	virtual bool is_lval() const override;
@@ -326,11 +326,11 @@ void integer_symbol_entry::internal_setter(symbol_table &table, void *symref, u6
 //  function_symbol_entry - constructor
 //-------------------------------------------------
 
-function_symbol_entry::function_symbol_entry(symbol_table &table, std::string &&name, void *ref, int minparams, int maxparams, symbol_table::execute_func execute)
+function_symbol_entry::function_symbol_entry(symbol_table &table, std::string &&name, void *ref, int minparams, int maxparams, symbol_table::execute_func &&execute)
 	: symbol_entry(table, SMT_FUNCTION, std::move(name), "", ref),
 		m_minparams(minparams),
 		m_maxparams(maxparams),
-		m_execute(execute)
+		m_execute(std::move(execute))
 {
 }
 
@@ -453,9 +453,13 @@ void symbol_table::add(std::string &&name, void *ref, getter_func &&getter, sett
 //  add - add a new function symbol
 //-------------------------------------------------
 
+#ifdef _MSC_VER
 void symbol_table::add(std::string &&name, void *ref, int minparams, int maxparams, execute_func execute)
+#else
+void symbol_table::add(std::string &&name, void *ref, int minparams, int maxparams, execute_func &&execute)
+#endif
 {
-	std::unique_ptr<symbol_entry> symentry = std::make_unique<function_symbol_entry>(*this, std::move(name), ref, minparams, maxparams, execute);
+	std::unique_ptr<symbol_entry> symentry = std::make_unique<function_symbol_entry>(*this, std::move(name), ref, minparams, maxparams, std::move(execute));
 	internal_add(std::move(symentry));
 }
 

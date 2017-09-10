@@ -184,10 +184,11 @@ public:
 #ifdef _MSC_VER
 	// MSVC2015 seems to not like the rvalue reference
 	void add(std::string &&name, void *ref, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
+	void add(std::string &&name, void *ref, int minparams, int maxparams, execute_func execute);
 #else
 	void add(std::string &&name, void *ref, getter_func &&getter, setter_func &&setter = nullptr, const std::string &format_string = "");
+	void add(std::string &&name, void *ref, int minparams, int maxparams, execute_func &&execute);
 #endif
-	void add(std::string &&name, void *ref, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
 
