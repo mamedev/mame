@@ -841,12 +841,7 @@ std::string ioport_field::key_name(int which) const
 
 	// if that doesn't work, convert to UTF-8
 	if (ch > 0x7F || isprint(ch))
-	{
-		char buf[10];
-		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
-		buf[count] = 0;
-		return std::string(buf);
-	}
+		return utf8_from_uchar(ch);
 
 	// otherwise, opt for question marks
 	return "???";
