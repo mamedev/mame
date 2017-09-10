@@ -1936,7 +1936,8 @@ static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 
 	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ninclown_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
+	// definitely doesn't like the generate_nmi code, so we just generate VBlank irq here instead
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  irq3_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
