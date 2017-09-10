@@ -21,6 +21,7 @@ ZPU-2000 - main cpu board (Zentral (sic) Processor Unit)
  - 32 dipswitches in 4 banks of 8
  - four 'test button' style switches
  - one 4Mhz xtal @A1
+ - one PAL16R8? @7D (UNDUMPED, if present)
  - this same board is shared with cliff hanger (cliffhgr.c)
 
 CFB-1000 - video/subcpu board (Color Frame Board)
@@ -32,7 +33,7 @@ CFB-1000 - video/subcpu board (Color Frame Board)
  - DIP64 custom framebuffer controller "Video Controller"@E11
  - "Parameter ram" ?6116? SRAM @K13
  - "Frame buffer" 16x ?4116? DRAM @ right edge of pcb
- - "Erase PROM" @A16 (UNDUMPED)
+ - "Erase PROM" 82S137 or MMI6353-1 @A16 (UNDUMPED)
  - 22.1164Mhz xtal @K14
  - 8 dipswitches in 2 banks of 4, @B5 and @B7
  - LED @B7
@@ -465,10 +466,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE(ls670_1_r, ls670_0_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w) // AM_READ from protection pal, if populated
 	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
+	// 64 is some sort of output latch, unpopulated?
+	// 66 is some sort of output latch, unpopulated?
 	AM_RANGE(0x68, 0x68) AM_WRITE(zpu_coin_counter_w)
 	AM_RANGE(0x6a, 0x6a) AM_WRITE(zpu_lamps_w)
+	// 6c RW is a 6850 acia for communication with another cabinet or debug console? unpopulated?
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 
