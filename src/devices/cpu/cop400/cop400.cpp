@@ -50,6 +50,7 @@
     - COP410L/COP410C
     - save internal RAM when CKO is RAM power supply pin
     - COP404L opcode map switching, dual timer, microbus enable
+    - improve SIO output timing for interface with 93CXX serial EEPROMs
 
 */
 
