@@ -52,6 +52,7 @@
 class m68340_cpu_device : public fscpu32_device
 {
 	friend class mc68340_serial_module_device;
+	friend class mc68340_timer_module_device;
 
 public:
 	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -61,12 +62,12 @@ public:
 	template <class Object> static devcb_base &set_pb_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_pb_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_tout1_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_tout1_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tin1_in_callback (device_t &device, Object &&cb)  { return downcast<m68340_cpu_device &>(device).m_tin1_in_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tgate1_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_tgate1_in_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tout2_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_tout2_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tin2_in_callback (device_t &device, Object &&cb)  { return downcast<m68340_cpu_device &>(device).m_tin2_in_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tgate2_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_tgate2_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tout1_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_timer1->m_tout_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tin1_in_callback (device_t &device, Object &&cb)  { return downcast<m68340_cpu_device &>(device).m_timer1->m_tin_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tgate1_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_timer1->m_tgate_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tout2_out_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_timer2->m_tout_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tin2_in_callback (device_t &device, Object &&cb)  { return downcast<m68340_cpu_device &>(device).m_timer2->m_tin_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tgate2_in_callback (device_t &device, Object &&cb){ return downcast<m68340_cpu_device &>(device).m_timer2->m_tgate_in_cb.set_callback (std::forward<Object>(cb)); }
 
 	uint16_t get_cs(offs_t address);
 
@@ -88,18 +89,16 @@ public:
 	WRITE16_MEMBER( m68340_internal_sim_w );
 	WRITE8_MEMBER( m68340_internal_sim_ports_w );
 	WRITE32_MEMBER( m68340_internal_sim_cs_w );
-	READ16_MEMBER( m68340_internal_timer_r );
-	WRITE16_MEMBER( m68340_internal_timer_w );
 
 	// Clock/VCO setting TODO: support external clock with PLL and Limp mode
 	DECLARE_WRITE_LINE_MEMBER( set_modck );
 	DECLARE_WRITE_LINE_MEMBER( extal_w );
 
 	// Timer input methods, can be used instead of the corresponding polling MCFG callbacks
-	DECLARE_WRITE_LINE_MEMBER( tin1_w );
-	DECLARE_WRITE_LINE_MEMBER( tgate1_w );
-	DECLARE_WRITE_LINE_MEMBER( tin2_w );
-	DECLARE_WRITE_LINE_MEMBER( tgate2_w );
+	DECLARE_WRITE_LINE_MEMBER( tin1_w )  { m_timer1->tin_w(state);  }
+	DECLARE_WRITE_LINE_MEMBER( tgate1_w ){ m_timer1->tgate_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tin2_w )  { m_timer2->tin_w(state);  }
+	DECLARE_WRITE_LINE_MEMBER( tgate2_w ){ m_timer2->tgate_w(state); }
 
 protected:
 	virtual void device_start() override;
@@ -107,19 +106,17 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<mc68340_serial_module_device> m_serial;
+	required_device<mc68340_timer_module_device> m_timer1;
+	required_device<mc68340_timer_module_device> m_timer2;
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
-	TIMER_CALLBACK_MEMBER(timer1_callback);
-	TIMER_CALLBACK_MEMBER(timer2_callback);
 
 	void start_68340_sim();
-	void start_68340_timer();
 	void do_pit_irq();
 	void do_tick_pit();
-	void do_timer_irq(int id);
-	void do_timer_tick(int id);
 
 	int calc_cs(offs_t address) const;
+	int get_timer_index(mc68340_timer_module_device *timer) { return (timer == m_timer1) ? 0 : 1; }
 
 	int m_currentcs;
 	uint32_t m_clock_mode;
@@ -130,7 +127,6 @@ protected:
 	/* 68340 peripheral modules */
 	m68340_sim*    m68340SIM;
 	m68340_dma*    m68340DMA;
-	m68340_timer*  m68340TIMER;
 
 	uint32_t m68340_base;
 
@@ -140,12 +136,6 @@ protected:
 	devcb_read8         m_pa_in_cb;
 	devcb_write8        m_pb_out_cb;
 	devcb_read8         m_pb_in_cb;
-	devcb_write_line    m_tout1_out_cb;
-	devcb_write_line    m_tin1_in_cb;
-	devcb_write_line    m_tgate1_in_cb;
-	devcb_write_line    m_tout2_out_cb;
-	devcb_write_line    m_tin2_in_cb;
-	devcb_write_line    m_tgate2_in_cb;
 };
 
 DECLARE_DEVICE_TYPE(M68340, m68340_cpu_device)
