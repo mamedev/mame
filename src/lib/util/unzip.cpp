@@ -168,7 +168,15 @@ public:
 	bool current_is_directory() const { return m_curr_is_dir; }
 	const std::string &current_name() const { return m_header.file_name; }
 	std::uint64_t current_uncompressed_length() const { return m_header.uncompressed_length; }
-	std::chrono::system_clock::time_point current_last_modified() const { return m_header.modified; }
+	std::chrono::system_clock::time_point current_last_modified() const
+	{
+		if (!m_header.modified_cached)
+		{
+			m_header.modified = decode_dos_time(m_header.modified_date, m_header.modified_time);
+			m_header.modified_cached = true;
+		}
+		return m_header.modified;
+	}
 	std::uint32_t current_crc() const { return m_header.crc; }
 
 	archive_file::error decompress(void *buffer, std::uint32_t length);
@@ -229,17 +237,20 @@ private:
 
 	struct file_header
 	{
-		std::uint16_t                           version_created;        // version made by
-		std::uint16_t                           version_needed;         // version needed to extract
-		std::uint16_t                           bit_flag;               // general purpose bit flag
-		std::uint16_t                           compression;            // compression method
-		std::chrono::system_clock::time_point   modified;               // last mod file date/time
-		std::uint32_t                           crc;                    // crc-32
-		std::uint64_t                           compressed_length;      // compressed size
-		std::uint64_t                           uncompressed_length;    // uncompressed size
-		std::uint32_t                           start_disk_number;      // disk number start
-		std::uint64_t                           local_header_offset;    // relative offset of local header
-		std::string                             file_name;              // file name
+		std::uint16_t                                   version_created;        // version made by
+		std::uint16_t                                   version_needed;         // version needed to extract
+		std::uint16_t                                   bit_flag;               // general purpose bit flag
+		std::uint16_t                                   compression;            // compression method
+		mutable std::chrono::system_clock::time_point   modified;               // last mod file date/time
+		std::uint32_t                                   crc;                    // crc-32
+		std::uint64_t                                   compressed_length;      // compressed size
+		std::uint64_t                                   uncompressed_length;    // uncompressed size
+		std::uint32_t                                   start_disk_number;      // disk number start
+		std::uint64_t                                   local_header_offset;    // relative offset of local header
+		std::string                                     file_name;              // file name
+
+		std::uint16_t                                   modified_date, modified_time;
+		mutable bool                                    modified_cached;
 	};
 
 	// contains extracted end of central directory information
@@ -705,12 +716,16 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 		m_header.version_needed      = reader.version_needed();
 		m_header.bit_flag            = reader.general_flag();
 		m_header.compression         = reader.compression_method();
-		m_header.modified            = decode_dos_time(reader.modified_date(), reader.modified_time());
 		m_header.crc                 = reader.crc32();
 		m_header.compressed_length   = reader.compressed_size();
 		m_header.uncompressed_length = reader.uncompressed_size();
 		m_header.start_disk_number   = reader.start_disk();
 		m_header.local_header_offset = reader.header_offset();
+
+		// don't immediately decode DOS timestamp - it's expensive
+		m_header.modified_date       = reader.modified_date();
+		m_header.modified_time       = reader.modified_time();
+		m_header.modified_cached     = false;
 
 		// advance the position
 		m_cd_pos += reader.total_length();
@@ -763,6 +778,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 						ntfs_times_reader const times(tag);
 						ntfs_duration const ticks(times.mtime());
 						m_header.modified = system_clock_time_point_from_ntfs_duration(ticks);
+						m_header.modified_cached = true;
 					}
 				}
 			}
