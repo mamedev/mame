@@ -300,7 +300,7 @@ void mc68340_timer_module_device::device_start()
 
 	m_cpu = downcast<m68340_cpu_device *>(owner());
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(timer_callback),this));
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68340_timer_module_device::timer_callback),this));
 
 	// Resolve Timer callbacks
 	m_tout_out_cb.resolve_safe();
@@ -310,7 +310,7 @@ void mc68340_timer_module_device::device_start()
 
 void mc68340_timer_module_device::do_timer_irq()
 {
-	assert(m68340SIM);
+	assert(m_cpu->m68340SIM);
 	m68340_sim &sim = *m_cpu->m68340SIM;
 	int timer_irq_level  = (m_ir & 0x0700) >> 8;
 	int timer_irq_vector = (m_ir & 0x00ff) >> 0;
