@@ -19,6 +19,7 @@ TODO:
 - Understand how transparent pens are handled aka is 0x0f always transparent or
   there's some clut gimmick? Great Guns title screen makes me think of the
   latter option;
+- Mazer Blazer collision detection parameters are a complete guesswork 
 
 ***************************************************************************/
 
@@ -405,7 +406,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 			//int16_t srcy = m_ram[m_param_offset_latch + 3];
 			//uint16_t src_xsize = m_ram[m_param_offset_latch + 18] + 1;
 	        //uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
-			bool collision_flag = false;
+			int collision_flag = 0;
 			
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
@@ -423,7 +424,10 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 
 						// TODO: how it calculates the pen? Might use the commented out stuff and/or the offset somehow
 						if(res == 5)
-							collision_flag = true;
+						{
+							collision_flag++;
+//							test++;
+						}
 					}
 					
 					//srcx++;
@@ -431,8 +435,12 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 				//srcy++;
 			}
 			
-				
-			if(collision_flag == true)
+			// threshold for collision, necessary to avoid bogus collision hits
+			// the typical test scenario is to shoot near the top left hatch for stage 1 then keep shooting,
+			// at some point the top right hatch will bogusly detect a collision without this.
+			// It's also unlikely that game tests 1x1 targets anyway, as the faster moving targets are quite too easy to hit that way.
+			// TODO: likely it works differently (checks area?)
+			if(collision_flag > 5)
 				m_ram[m_param_offset_latch] |= 8;
 			else
 				m_ram[m_param_offset_latch] &= ~8;
