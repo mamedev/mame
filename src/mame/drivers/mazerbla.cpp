@@ -60,33 +60,19 @@ It is currently unknown what versions the two sets in MAME correspond to.
 The other roms are likely always version RA1, as the RA3-zpu-2000 board has RA1
 roms for all roms except the zpu-2000 board.
 
-Issues:
-======
-Sprites leave trails in both games
-Sprites should be transparent (color 0x0f)
-Screen flickers heavily in Great Guns (double buffer issue?).
-
-
 TO DO:
 =====
-- handle page flipping
-
-- figure out the VCU modes used in "clr_r":
-  0x13 -? sprites related
-  0x03 -? could be collision detection (if there is such a thing)
-
-- figure out how the palette is handled (partially done)
-
-- find out if there are any CLUTs (might be the other unknown cases in mode 7)
+- fix remaining issues in mb_vcu device.
 
 - figure out what really should happen during VCU test in Great Guns (patched
   out at the moment) (btw. Mazer Blazer doesn't test VCU)
 
-- add sound to Mazer Blazer - Speech processor is unknown chip
+- add sound interface to Mazer Blazer - Speech processor is Digitalker chip, sample ROMs are currently 
+  undumped;
 
-====
+============================================================================
 
-Mazer Blazer DASM notes:
+Mazer Blazer DASM notes (reference only):
 master z80
 [0x0000]: clear 0x4c-0x4f i/o ports (ls670)
 [0x0792]: z80 regs check
@@ -1187,6 +1173,6 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 	rom[0x0380] = 0;
 }
 
-GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // newer?
+GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?
 GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
