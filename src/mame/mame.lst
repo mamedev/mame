@@ -32488,6 +32488,7 @@ rvoicepc                        //
 rx78                            //
 
 @source:rzone.cpp
+rzbatfor                        //
 rzindy500                       //
 
 @source:s11.cpp

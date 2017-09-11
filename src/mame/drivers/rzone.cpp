@@ -63,6 +63,10 @@ public:
 	DECLARE_WRITE8_MEMBER(t1_write_s);
 	virtual DECLARE_READ8_MEMBER(input_r) override;
 
+	void t2_update_audio();
+	DECLARE_WRITE8_MEMBER(t2_write_r);
+	DECLARE_WRITE8_MEMBER(t2_write_s);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -169,6 +173,37 @@ READ8_MEMBER(rzone_state::input_r)
 }
 
 
+// cartridge type 2: simple SM512, 2 audio lines
+
+void rzone_state::t2_update_audio()
+{
+	audio_w((m_s >> 2 & 1) | (m_r & 1));
+}
+
+WRITE8_MEMBER(rzone_state::t2_write_r)
+{
+	// R: Audio
+	m_r = data;
+	t2_update_audio();
+}
+
+WRITE8_MEMBER(rzone_state::t2_write_s)
+{
+	// S1: SCTRL
+	sctrl_w(data & 1);
+
+	// S2: SCLOCK
+	sclock_w(data >> 1 & 1);
+
+	// S3: Audio
+	m_s = data;
+	t2_update_audio();
+
+	// S4: LED
+	led_w(data >> 3 & 1);
+}
+
+
 
 /***************************************************************************
 
@@ -228,6 +263,31 @@ static MACHINE_CONFIG_START( rzindy500 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( rzbatfor )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM512, XTAL_32_768kHz) // no external XTAL
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(rzone_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(rzone_state, t2_write_s))
+	MCFG_SM510_WRITE_R_CB(WRITE8(rzone_state, t2_write_r))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1368, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1368-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_rzone)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 
 
 /***************************************************************************
@@ -237,13 +297,25 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( rzindy500 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "10_22", 0x0000, 0x1000, CRC(99a746d0) SHA1(64264499d45a566fa9a0801c20e7fa27eac18da6) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // SM510 under epoxy, KMS10 22
+	ROM_LOAD( "kms10_22", 0x0000, 0x1000, CRC(99a746d0) SHA1(64264499d45a566fa9a0801c20e7fa27eac18da6) )
 
 	ROM_REGION( 533407, "svg", 0)
 	ROM_LOAD( "rzindy500.svg", 0, 533407, CRC(07f72e35) SHA1(034972c1255f8899b53a94063d6c66bdef089ce9) )
 ROM_END
 
+ROM_START( rzbatfor )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // SM512 under epoxy, KMN1202
+	ROM_LOAD( "kmn1202.program", 0x0000, 0x1000, CRC(27abdb52) SHA1(b356ff80b628244da588b4748404b78d7a57eccd) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "kmn1202.melody", 0x000, 0x100, CRC(d794746c) SHA1(f0706c5100c090c65fcb2d768b5a5b4a55b29e04) )
+
+	ROM_REGION( 652606, "svg", 0)
+	ROM_LOAD( "rzbatfor.svg", 0, 652606, CRC(ac0786e7) SHA1(c23c51c771d16c979cd02b4625616cc25a8520f1) )
+ROM_END
+
 
 //    YEAR  NAME       PARENT  COMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
 CONS( 1995, rzindy500, 0,        0, rzindy500, rzone,     rzone_state,    0, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )
+CONS( 1995, rzbatfor,  0,        0, rzbatfor,  rzone,     rzone_state,    0, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
