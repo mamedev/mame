@@ -32,7 +32,7 @@ PCB Layout
 |    YM3014     MAHJONG28                     |
 |---------------------------------------------|
 Notes:
-      COP - COP402 or COP404 MCU (DIP40, +5V on pin 17, GND on pin 22).
+      COP - DIP40 identified as COP402 MCU (+5V on pin 17, GND on pin 22).
           pins 4,3,2 of 93C46 tied to COP pins 23,24,25
       All clocks unknown, PCB not working
       Possibly Z80's @ 4MHz and YM2203 @ 2MHz
@@ -655,7 +655,7 @@ ROM_START( quizpun2 )
 	ROM_LOAD( "u1", 0x00000, 0x10000, CRC(58506040) SHA1(9d8bed2585e8f188a20270fccd9cfbdb91e48599) )
 	ROM_LOAD( "u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM (tied to the unknown DIP40)
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM
 	ROM_LOAD( "93c46", 0x00, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) BAD_DUMP ) // backup ram error
 ROM_END
 

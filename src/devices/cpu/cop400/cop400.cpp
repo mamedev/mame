@@ -50,7 +50,6 @@
     - COP410L/COP410C
     - save internal RAM when CKO is RAM power supply pin
     - COP404L opcode map switching, dual timer, microbus enable
-    - improve SIO output timing for interface with 93CXX serial EEPROMs
 
 */
 
@@ -84,6 +83,9 @@ DEFINE_DEVICE_TYPE(COP446C, cop446c_cpu_device, "cop446c", "COP446C")
 ***************************************************************************/
 
 #define LOG_MICROBUS 0
+
+// step through skipped instructions in debugger
+#define COP_DEBUG_SKIP 0
 
 
 /***************************************************************************
@@ -181,9 +183,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	, m_d_mask(d_mask)
 	, m_in_mask(in_mask)
 {
-	for (int i = 0; i < 256; i++) {
+	for (int i = 0; i < 256; i++)
 		m_InstLen[i] = 1;
-	}
 
 	m_InstLen[0x33] = m_InstLen[0x23] = 2;
 
@@ -192,7 +193,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 		case COP410_FEATURE:
 			m_opcode_map = COP410_OPCODE_MAP;
 
-			for (int r = 0; r < 2; r++) {
+			for (int r = 0; r < 2; r++)
+			{
 				m_InstLen[0x60 + r] = 2; // JMP
 				m_InstLen[0x68 + r] = 2; // JSR
 			}
@@ -201,7 +203,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 		case COP420_FEATURE:
 			m_opcode_map = COP420_OPCODE_MAP;
 
-			for (int r = 0; r < 4; r++) {
+			for (int r = 0; r < 4; r++)
+			{
 				m_InstLen[0x60 + r] = 2; // JMP
 				m_InstLen[0x68 + r] = 2; // JSR
 			}
@@ -210,7 +213,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 		case COP444L_FEATURE:
 			m_opcode_map = COP444L_OPCODE_MAP;
 
-			for (int r = 0; r < 8; r++) {
+			for (int r = 0; r < 8; r++)
+			{
 				m_InstLen[0x60 + r] = 2; // JMP
 				m_InstLen[0x68 + r] = 2; // JSR
 			}
@@ -219,7 +223,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 		case COP424C_FEATURE:
 			m_opcode_map = COP424C_OPCODE_MAP;
 
-			for (int r = 0; r < 8; r++) {
+			for (int r = 0; r < 8; r++)
+			{
 				m_InstLen[0x60 + r] = 2; // JMP
 				m_InstLen[0x68 + r] = 2; // JSR
 			}
@@ -369,16 +374,39 @@ void cop400_cpu_device::WRITE_G(uint8_t data)
 	OUT_G(G);
 }
 
+void cop400_cpu_device::WRITE_EN(uint8_t data)
+{
+	if (EN != data)
+	{
+		EN = data;
+
+		if (BIT(EN, 2))
+		{
+			OUT_L(Q);
+		}
+		else
+		{
+			// tri-state(floating) pins
+			OUT_L(m_read_l_tristate(0, 0xff));
+		}
+
+		sk_update();
+	}
+}
+
 /***************************************************************************
     OPCODE HANDLERS
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) void (cop400_cpu_device::mnemonic)(uint8_t opcode)
+#define INSTRUCTION(mnemonic) void (cop400_cpu_device::mnemonic)(uint8_t operand)
 #define OP(mnemonic) &cop400_cpu_device::mnemonic
 
 INSTRUCTION(illegal)
 {
-	logerror("COP400: PC = %03x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
+	if (m_second_byte)
+		logerror("COP400: PC = %03x, Illegal opcode = %02x %02x\n", m_prevpc, m_opcode, operand);
+	else
+		logerror("COP400: PC = %03x, Illegal opcode = %02x\n", m_prevpc, m_opcode);
 }
 
 #include "cop400op.hxx"
@@ -426,9 +454,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP410_OPCODE_23_
 	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
-void cop400_cpu_device::cop410_op23(uint8_t opcode)
+void cop400_cpu_device::cop410_op23(uint8_t operand)
 {
-	uint8_t opcode23 = fetch();
+	uint8_t opcode23 = operand;
 
 	(this->*COP410_OPCODE_23_MAP[opcode23])(opcode23);
 }
@@ -472,9 +500,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP410_OPCODE_33_
 	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
-void cop400_cpu_device::cop410_op33(uint8_t opcode)
+void cop400_cpu_device::cop410_op33(uint8_t operand)
 {
-	uint8_t opcode33 = fetch();
+	uint8_t opcode33 = operand;
 
 	(this->*COP410_OPCODE_33_MAP[opcode33])(opcode33);
 }
@@ -557,9 +585,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP420_OPCODE_23_
 	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
-void cop400_cpu_device::cop420_op23(uint8_t opcode)
+void cop400_cpu_device::cop420_op23(uint8_t operand)
 {
-	uint8_t opcode23 = fetch();
+	uint8_t opcode23 = operand;
 
 	(this->*COP420_OPCODE_23_MAP[opcode23])(opcode23);
 }
@@ -603,9 +631,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP420_OPCODE_33_
 	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
-void cop400_cpu_device::cop420_op33(uint8_t opcode)
+void cop400_cpu_device::cop420_op33(uint8_t operand)
 {
-	uint8_t opcode33 = fetch();
+	uint8_t opcode33 = operand;
 
 	(this->*COP420_OPCODE_33_MAP[opcode33])(opcode33);
 }
@@ -688,9 +716,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP444L_OPCODE_23
 	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)
 };
 
-void cop400_cpu_device::cop444l_op23(uint8_t opcode)
+void cop400_cpu_device::cop444l_op23(uint8_t operand)
 {
-	uint8_t opcode23 = fetch();
+	uint8_t opcode23 = operand;
 
 	(this->*COP444L_OPCODE_23_MAP[opcode23])(opcode23);
 }
@@ -734,9 +762,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP444L_OPCODE_33
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)
 };
 
-void cop400_cpu_device::cop444l_op33(uint8_t opcode)
+void cop400_cpu_device::cop444l_op33(uint8_t operand)
 {
-	uint8_t opcode33 = fetch();
+	uint8_t opcode33 = operand;
 
 	(this->*COP444L_OPCODE_33_MAP[opcode33])(opcode33);
 }
@@ -819,9 +847,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP424C_OPCODE_23
 	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)
 };
 
-void cop400_cpu_device::cop424c_op23(uint8_t opcode)
+void cop400_cpu_device::cop424c_op23(uint8_t operand)
 {
-	uint8_t opcode23 = fetch();
+	uint8_t opcode23 = operand;
 
 	(this->*COP424C_OPCODE_23_MAP[opcode23])(opcode23);
 }
@@ -865,9 +893,9 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP424C_OPCODE_33
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)
 };
 
-void cop400_cpu_device::cop424c_op33(uint8_t opcode)
+void cop400_cpu_device::cop424c_op33(uint8_t operand)
 {
-	uint8_t opcode33 = fetch();
+	uint8_t opcode33 = operand;
 
 	(this->*COP424C_OPCODE_33_MAP[opcode33])(opcode33);
 }
@@ -911,6 +939,24 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP424C_OPCODE_MA
 	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jid)
 };
 
+inline bool cop400_cpu_device::is_control_transfer(uint8_t opcode)
+{
+	// JP, JSRP, JID or LQID
+	// (TODO: verify that LQID inhibits interrupts since it transfers control temporarily)
+	if ((opcode & 0x80) == 0x80)
+		return true;
+
+	// JMP or JSR
+	if ((opcode & 0xf0) == 0x60)
+		return true;
+
+	// RET or RETSK
+	if ((opcode & 0xfe) == 0x48)
+		return true;
+
+	return false;
+}
+
 /***************************************************************************
     TIMER CALLBACKS
 ***************************************************************************/
@@ -930,10 +976,6 @@ void cop400_cpu_device::serial_tick()
 		// serial output
 
 		OUT_SO(BIT(EN, 3));
-
-		// serial clock
-
-		OUT_SK(SKL);
 
 		// serial input
 
@@ -971,17 +1013,6 @@ void cop400_cpu_device::serial_tick()
 			OUT_SO(0);
 		}
 
-		// serial clock
-
-		if (SKL)
-		{
-			OUT_SK(1); // SYNC
-		}
-		else
-		{
-			OUT_SK(0);
-		}
-
 		// serial input
 
 		SIO = ((SIO << 1) | IN_SI()) & 0x0f;
@@ -992,7 +1023,8 @@ void cop400_cpu_device::counter_tick()
 {
 	T++;
 
-	if (!T) {
+	if (!T)
+	{
 		m_skt_latch = 1;
 		m_idle = false;
 	}
@@ -1000,12 +1032,9 @@ void cop400_cpu_device::counter_tick()
 
 void cop400_cpu_device::inil_tick()
 {
-	uint8_t in;
-	int i;
+	uint8_t in = IN_IN();
 
-	in = IN_IN();
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_in[i] = (m_in[i] << 1) | BIT(in, i);
 
@@ -1024,16 +1053,8 @@ void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 {
 	switch (id)
 	{
-	case TIMER_SERIAL:
-		serial_tick();
-		break;
-
 	case TIMER_COUNTER:
 		counter_tick();
-		break;
-
-	case TIMER_INIL:
-		inil_tick();
 		break;
 	}
 }
@@ -1059,24 +1080,12 @@ void cop400_cpu_device::device_start()
 	m_write_sk.resolve_safe();
 	m_read_cko.resolve_safe(0);
 
-	/* allocate serial timer */
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki, clock()));
-
 	/* allocate counter timer */
 	m_counter_timer = nullptr;
 	if (m_has_counter)
 	{
 		m_counter_timer = timer_alloc(TIMER_COUNTER);
 		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 4, clock()));
-	}
-
-	/* allocate IN latch timer */
-	m_inil_timer = nullptr;
-	if (m_has_inil)
-	{
-		m_inil_timer = timer_alloc(TIMER_INIL);
-		m_inil_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki, clock()));
 	}
 
 	/* register for state saving */
@@ -1102,6 +1111,8 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_in));
 	save_item(NAME(m_halt));
 	save_item(NAME(m_idle));
+	save_item(NAME(m_opcode));
+	save_item(NAME(m_second_byte));
 
 	// setup debugger state display
 	offs_t pc_mask = m_program->addrmask();
@@ -1112,18 +1123,20 @@ void cop400_cpu_device::device_start()
 	state_add(COP400_PC, "PC", m_pc).mask(pc_mask);
 	state_add(COP400_SA, "SA", m_sa).mask(pc_mask);
 	state_add(COP400_SB, "SB", m_sb).mask(pc_mask);
-	if (!(m_featuremask & COP410_FEATURE)) {
+	if (!(m_featuremask & COP410_FEATURE))
 		state_add(COP400_SC, "SC", m_sc).mask(pc_mask);
-	}
 	state_add(COP400_B, "B", m_b);
 	state_add(COP400_A, "A", m_a).mask(0xf);
+	state_add(COP400_M, "M", m_temp_m).mask(0xf).callimport().callexport();
 	state_add(COP400_G, "G", m_g).mask(0xf);
 	state_add(COP400_Q, "Q", m_q);
-	state_add(COP400_SIO, "SIO", m_sio).mask(0xf);
+	state_add(COP400_SIO, "SIO", m_sio).mask(0xf).formatstr("%4s");
 	state_add(COP400_EN, "EN", m_en).mask(0xf);
-	if (m_featuremask & COP424C_FEATURE) {
+	if (m_has_counter)
 		state_add(COP400_T, "T", m_t);
-	}
+#if COP_DEBUG_SKIP
+	state_add(COP400_SKIP, "SKIP", m_skip).mask(1);
+#endif
 
 	m_icountptr = &m_icount;
 
@@ -1133,12 +1146,14 @@ void cop400_cpu_device::device_start()
 	m_sc = 0;
 	m_sio = 0;
 	m_flags = 0;
+	m_temp_m = 0;
 	m_il = 0;
 	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
 	m_si = 0;
 	m_skip_lbi = 0;
 	m_last_skip = false;
 	m_skip = false;
+	m_opcode = 0x44;
 }
 
 
@@ -1154,55 +1169,80 @@ void cop400_cpu_device::device_reset()
 	C = 0;
 	OUT_D(0);
 	EN = 0;
+	OUT_L(m_read_l_tristate(0, 0xff));
 	WRITE_G(0);
 	SKL = 1;
+	OUT_SK(0);
 
 	T = 0;
 	m_skt_latch = 1;
 
 	m_halt = false;
 	m_idle = false;
+	m_second_byte = false;
 }
 
 /***************************************************************************
     EXECUTION
 ***************************************************************************/
 
-uint8_t cop400_cpu_device::fetch()
+void cop400_cpu_device::skip()
 {
-	m_icount--;
+	// skip the next instruction (TODO: this flag can become an output)
+	m_skip = true;
+}
 
-	return ROM(PC++);
+void cop400_cpu_device::sk_update()
+{
+	// update SK output after XAS or LEI
+	if (BIT(EN, 0))
+	{
+		// SK = SKL when EN0 = 1 (binary counter mode)
+		OUT_SK(SKL);
+	}
+	else
+	{
+		// SK = clock or 0 when EN0 = 0 (shift register mode)
+		OUT_SK(0);
+	}
 }
 
 void cop400_cpu_device::execute_run()
 {
 	do
 	{
-		if (!m_skip) {
+		if (!m_second_byte && (!m_skip || COP_DEBUG_SKIP))
+		{
 			// debugger hook
 			m_prevpc = PC;
 			debugger_instruction_hook(this, PC);
 		}
 
 		// halt logic
-		if (m_cko == COP400_CKO_HALT_IO_PORT) {
+		if (m_cko == COP400_CKO_HALT_IO_PORT)
 			m_halt = IN_CKO();
-		}
 
-		if (m_halt || m_idle) {
-			m_icount--;
-			continue;
-		}
+		if (!m_halt && !m_idle)
+		{
+			if (!BIT(EN, 0) && SKL)
+			{
+				// Sync pulse actually has a 50% duty cycle, coinciding with address latch for external program
+				// This implementation, however, is good enough to interface with 93CXX serial EEPROMs
+				OUT_SK(0);
+				OUT_SK(1);
+			}
 
-		// fetch opcode
-		uint8_t opcode = fetch();
-		cop400_opcode_func function = m_opcode_map[opcode];
+			// fetch opcode/operand
+			uint8_t operand = ROM(PC++);
+			if (!m_second_byte)
+				m_opcode = operand;
 
-		// check for interrupt
-		if (BIT(EN, 1) && BIT(IL, 1)) {
-			// all successive transfer of control instructions and successive LBIs have been completed
-			if ((function != OP(jp)) && (function != OP(jmp)) && (function != OP(jsr)) && !m_skip_lbi) {
+			// check for interrupt when all successive transfer of control instructions and successive LBIs have been completed
+			if (!m_second_byte && BIT(EN, 1) && BIT(IL, 1) && !is_control_transfer(m_opcode) && !m_skip_lbi)
+			{
+				// acknowledge interrupt
+				IL &= ~2;
+
 				// store skip logic
 				m_last_skip = m_skip;
 				m_skip = false;
@@ -1213,31 +1253,53 @@ void cop400_cpu_device::execute_run()
 				// jump to interrupt service routine
 				PC = 0x0ff;
 
-				// disable interrupt
-				EN &= ~0x02;
+				// disable interrupts
+				EN &= ~2;
+			}
+			else if (!m_second_byte && m_InstLen[m_opcode] > 1)
+			{
+				m_second_byte = true;
+			}
+			else if (m_skip)
+			{
+				// finish skipping and execute next instruction
+				m_skip = false;
+				m_second_byte = false;
+			}
+			else
+			{
+				cop400_opcode_func function = m_opcode_map[m_opcode];
+
+				if (!m_second_byte && (function == OP(jid) || function == OP(lqid)))
+				{
+					// JID and LQID must first transfer control and then fetch the operand
+					// LQID saves the old program counter on the stack; JID doesn't and just jumps again
+					if (function == OP(lqid))
+						PUSH(PC);
+
+					// jump within page to operand at A/M
+					PC = (PC & 0x700) | (A << 4) | RAM_R(B);
+					m_second_byte = true;
+				}
+				else
+				{
+					// execute instruction
+					(this->*(function))(operand);
+
+					// LBI skip logic
+					if (m_skip_lbi > 0)
+						m_skip_lbi--;
+
+					// ready for the next instruction
+					m_second_byte = false;
+				}
 			}
 
-			IL &= ~2;
+			serial_tick();
+			if (m_has_inil)
+				inil_tick();
 		}
-
-		if (m_skip) {
-			// skip instruction
-			if (m_InstLen[opcode] == 2) {
-				// fetch second byte
-				opcode = fetch();
-			}
-
-			m_skip = false;
-			continue;
-		}
-
-		// execute instruction
-		(this->*(function))(opcode);
-
-		// LBI skip logic
-		if (m_skip_lbi > 0) {
-			m_skip_lbi--;
-		}
+		m_icount--;
 	} while (m_icount > 0);
 }
 
@@ -1256,6 +1318,11 @@ void cop400_cpu_device::state_import(const device_state_entry &entry)
 		m_c = BIT(m_flags, 1);
 		m_skl = BIT(m_flags, 0);
 		break;
+
+	case COP400_M:
+		auto dis = machine().disable_side_effect();
+		RAM_W(B, m_temp_m);
+		break;
 	}
 }
 
@@ -1265,6 +1332,11 @@ void cop400_cpu_device::state_export(const device_state_entry &entry)
 	{
 	case STATE_GENFLAGS:
 		m_flags = (m_skt_latch ? 0x04 : 0x00) | (m_c ? 0x02 : 0x00) | (m_skl ? 0x01 : 0x00);
+		break;
+
+	case COP400_M:
+		auto dis = machine().disable_side_effect();
+		m_temp_m = RAM_R(B);
 		break;
 	}
 }
@@ -1278,6 +1350,22 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 				m_c ? 'C' : '.',
 				m_skl ? 'S' : '.',
 				m_skt_latch ? 'T' : '.');
+		break;
+	case COP400_SIO:
+		if (BIT(EN, 0))
+		{
+			// display counter in hex
+			str = string_format("%X   ", m_sio);
+		}
+		else
+		{
+			// display shift register in binary
+			str = string_format("%d%d%d%d",
+					BIT(m_sio, 3),
+					BIT(m_sio, 2),
+					BIT(m_sio, 1),
+					BIT(m_sio, 0));
+		}
 		break;
 	}
 }
