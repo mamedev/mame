@@ -1619,7 +1619,7 @@ ROM_START( arkanoidj ) // V2.1 Japan
 	ROM_LOAD( "a75_25.ic16",   0x8000, 0x8000, CRC(c13b2038) SHA1(0b8197b48e57ffe9ccad0ebbc24891d1da7c9880) ) // v2.1? JPN, region byte is 0x76
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75__26.ic14",  0x0000, 0x0800, CRC(9c382c67) SHA1(c8518b726c40bf6ede494b38763dde4918309ef3) ) // verified authentic, dumped from actual MCU
+	ROM_LOAD( "a75__26.ic14",  0x0000, 0x0800, CRC(1c4d212b) SHA1(1df0dfbb3538de6bfddabcb6195efe67719e3f77) ) // verified authentic, dumped from actual MCU
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
