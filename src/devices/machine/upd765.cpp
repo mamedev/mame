@@ -130,7 +130,6 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	external_ready = false;
 	dor_reset = 0x00;
 	mode = MODE_AT;
-	has_motor_command = false;
 }
 
 void upd765_family_device::set_ready_line_connected(bool _ready)
@@ -184,6 +183,7 @@ void upd765_family_device::device_start()
 	}
 	cur_rate = 250000;
 	tc = false;
+	selected_drive = -1;
 
 	// reset at upper levels may cause a write to tc ending up with
 	// live_sync, which will crash if the live structure isn't
@@ -238,6 +238,7 @@ void upd765_family_device::soft_reset()
 	cur_live.fi = nullptr;
 	tc_done = false;
 	st1 = st2 = st3 = 0x00;
+	selected_drive = -1;
 
 	check_irq();
 	if(ready_polled)
@@ -269,14 +270,18 @@ bool upd765_family_device::get_ready(int fid)
 	return !external_ready;
 }
 
-void upd765_family_device::set_ds(int state)
+void upd765_family_device::set_ds(int fid)
 {
-	for(int i = 0; i < 4; i++)
-	{
-		floppy_info &fi = flopi[i];
+	if (selected_drive == fid)
+		return;
+
+	// pass drive select to connected drives
+	for (auto &fi : flopi)
 		if (fi.dev)
-			fi.dev->ds_w(state);
-	}
+			fi.dev->ds_w(fid);
+
+	// record selected drive
+	selected_drive = fid;
 }
 
 void upd765_family_device::set_floppy(floppy_image_device *flop)
@@ -378,11 +383,10 @@ READ8_MEMBER(upd765_family_device::msr_r)
 			//msr |= MSR_CB;
 		}
 
-	// log msr values only when changed
+	// log msr when changed
 	if (VERBOSE)
 	{
 		static u8 last_msr = 0;
-
 		if (msr != last_msr)
 		{
 			last_msr = msr;
@@ -433,8 +437,8 @@ READ8_MEMBER(upd765_family_device::fifo_r)
 		{
 			// clear drive busy bit after the first sense interrupt status result byte is read
 			for (auto &fi : flopi)
-				if ((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.st0_filled == false)
-					fi.main_state = fi.sub_state = IDLE;
+				if ((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
+					fi.main_state = IDLE;
 		}
 		break;
 	default:
@@ -1177,7 +1181,6 @@ int upd765_family_device::check_command()
 	// 00001000 sense interrupt status
 	// ..001001 write deleted data
 	// 0.001010 read id
-	// ...01011 motor on/off
 	// ...01100 read deleted data
 	// 0.001101 format track
 	// 00001110 dumpreg
@@ -1228,9 +1231,6 @@ int upd765_family_device::check_command()
 	case 0x0a:
 		return command_pos == 2 ? C_READ_ID            : C_INCOMPLETE;
 
-	case 0x0b:
-		return has_motor_command ? C_MOTOR_ONOFF : C_INVALID;
-
 	case 0x0d:
 		return command_pos == 6 ? C_FORMAT_TRACK       : C_INCOMPLETE;
 
@@ -1269,11 +1269,18 @@ void upd765_family_device::start_command(int cmd)
 	result_pos = 0;
 	main_phase = PHASE_EXEC;
 	tc_done = false;
+
+	execute_command(cmd);
+}
+
+void upd765_family_device::execute_command(int cmd)
+{
 	switch(cmd) {
 	case C_CONFIGURE:
 		LOG("command configure %02x %02x %02x\n",
 					command[1], command[2], command[3]);
 		// byte 1 is ignored, byte 3 is precompensation-related
+		motorcfg = command[1];
 		fifocfg = command[2];
 		precomp = command[3];
 		main_phase = PHASE_CMD;
@@ -1376,37 +1383,10 @@ void upd765_family_device::start_command(int cmd)
 		// - each drive has its own st0 and irq trigger
 		// - SIS drops the irq always, but also returns the first full st0 it finds
 
-		/*
-		 * The InterPro 2000 case
-		 *
-		 * The Intergraph InterPro 2000 uses an i82072 with a single 3.5" drive
-		 * fitted at id 3. The diagnostic and boot code in the system has some
-		 * very specific requirements relating to the sense interrupt status
-		 * command behaviour and drive busy bits.
-		 *
-		 * 1. The RDY line is not connected: this means that on soft reset (by
-		 *    writing the SWR bit in the DSR), it expects drive polling to
-		 *    detect all four drives are ready, and SIS is used four times,
-		 *    once for each drive.
-		 *
-		 * 2. In many cases, the system essentially ignores drive poll interrupts,
-		 *    and executes another command such as a seek regardless. In these
-		 *    cases, the system code expects the SIS to return the result of the
-		 *    seek command, and not the drive poll interrupt result. The code
-		 *    below is an unsatisfactory hack to simulate what the InterPro
-		 *    expects by looking for non-poll interrupt results first.
-		 *
-		 * 3. This system tests the drive busy bits at various stages, and expects
-		 *    them to follow the datasheet. In particular, the drive busy bit set
-		 *    during a seek or recalibrate is expected to be 1 until the first byte
-		 *    of the result of SIS has been read, and 0 after.
-		*/
 		main_phase = PHASE_RESULT;
 
 		int fid;
-		for (fid = 0; fid<4 && (!flopi[fid].st0_filled || flopi[fid].st0 == (ST0_ABRT | fid)); fid++) {};
-		if (fid == 4)
-			for(fid=0; fid<4 && !flopi[fid].st0_filled; fid++) {};
+		for(fid=0; fid<4 && !flopi[fid].st0_filled; fid++) {};
 		if(fid == 4) {
 			result[0] = ST0_UNK;
 			result_pos = 1;
@@ -1439,21 +1419,6 @@ void upd765_family_device::start_command(int cmd)
 		write_data_start(flopi[command[1] & 3]);
 		break;
 
-	case C_MOTOR_ONOFF:
-	{
-		int fid = (command[0] >> 5) & 0x3;
-		bool motor_on = command[0] & 0x80;
-		floppy_info &fi = flopi[fid];
-
-		LOG("command motor %s drive %d\n", motor_on ? "on" : "off", fid);
-
-		if (fi.dev)
-			fi.dev->mon_w(motor_on ? 0 : 1);
-
-		main_phase = PHASE_CMD;
-		break;
-	}
-
 	default:
 		fprintf(stderr, "start command %d\n", cmd);
 		exit(1);
@@ -1466,9 +1431,10 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	for(int i=0; i != result_pos; i++)
 		LOG(" %02x", result[i]);
 	LOG("\n");
+	fi.sub_state = IDLE;
 	if(data_completion)
 	{
-		fi.main_state = fi.sub_state = IDLE;
+		fi.main_state = IDLE;
 		data_irq = true;
 	}
 	else
@@ -2187,8 +2153,9 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
 
-	LOG("command read id%s, rate=%d\n",
+	LOG("command read id%s %d, rate=%d\n",
 				command[0] & 0x40 ? " mfm" : "",
+				command[1] & 3,
 				cur_rate);
 
 	if(fi.dev)
@@ -2541,7 +2508,186 @@ upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag,
 i82072_device::i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, I82072, tag, owner, clock)
 {
 	dor_reset = 0x0c;
-	has_motor_command = true;
+}
+
+void i82072_device::soft_reset()
+{
+	motorcfg = 0x60;
+
+	upd765_family_device::soft_reset();
+}
+
+int i82072_device::check_command()
+{
+	// ...01011 motor on/off
+	switch (command[0] & 0x1f) 
+	{
+	case 0x0b:
+		return C_MOTOR_ONOFF;
+	}
+
+	return upd765_family_device::check_command();
+}
+
+void i82072_device::start_command(int cmd)
+{
+	// check if the command specifies a target drive
+	switch (cmd)
+	{
+	case C_READ_TRACK:
+	case C_SENSE_DRIVE_STATUS:
+	case C_WRITE_DATA:
+	case C_READ_DATA:
+	case C_RECALIBRATE:
+	//case C_WRITE_DELETED_DATA:
+	case C_READ_ID:
+	//case C_READ_DELETED_DATA:
+	case C_FORMAT_TRACK:
+	case C_SEEK:
+		// start the motor
+		motor_control(command[1] & 0x3, true);
+
+		// TODO: motor on delay
+		//if (motor_on_counter > 0)
+		break;
+	}
+
+	upd765_family_device::start_command(cmd);
+}
+
+void i82072_device::execute_command(int cmd)
+{
+	switch (cmd) {
+	case C_DUMP_REG:
+		upd765_family_device::execute_command(cmd);
+
+		// i82072 dumps motor configuration at offset 7
+		result[7] = motorcfg;
+		break;
+
+	case C_MOTOR_ONOFF:
+	{
+		bool motor_on = command[0] & 0x80;
+		floppy_info &fi = flopi[(command[0] >> 5) & 0x3];
+
+		LOG("command motor %s drive %d\n", motor_on ? "on" : "off", fi.id);
+
+		// select the drive
+		if (motor_on)
+			set_ds(fi.id);
+
+		// start the motor
+		if (fi.dev)
+			fi.dev->mon_w(motor_on ? 0 : 1);
+
+		main_phase = PHASE_CMD;
+		break;
+	}
+
+	case C_SPECIFY:
+		/*
+		 * The InterPro 2000 expects the sense interrupt status command to return
+		 * the status of a completed recalibrate or seek operation instead of a
+		 * pending drive poll status after a soft reset. This behaviour does not
+		 * seem to match any of the other upd765 devices, and without hardware,
+		 * it's difficult to know exactly how it works at this point.
+		 *
+		 * For now, reproduce the expected behaviour by clearing pending drive 
+		 * poll results in the specify command, giving two different result
+		 * pathways (both present in InterPro boot code):
+		 *
+		 *   1. reset, poll, sense interrupt status -> drive poll status
+		 *   2. reset, poll, specify, recalibrate, sense interrupt status -> recalibrate status
+		 *
+		 * Possible alternatives include:
+		 *
+		 *   1. Clearing pending status during all command execution.
+		 *   2. Returning results in LIFO order.
+		 *   3. Returning results in priority order (where recalibrate/seek is "higher" priority than poll)
+		 */
+
+		// clear pending interrupts and fall through
+		for (auto &fi : flopi)
+			fi.st0_filled = false;
+
+	default:
+		upd765_family_device::execute_command(cmd);
+		break;
+	}
+}
+
+void i82072_device::motor_control(int fid, bool start_motor)
+{
+	// check if motor control is enabled
+	if (motorcfg == 0)
+		return;
+
+	floppy_info &fi = flopi[fid];
+
+	if (start_motor)
+	{
+		// if we are selecting a different drive, stop the motor on the previously selected drive
+		if (selected_drive != fid && flopi[selected_drive].dev && flopi[selected_drive].dev->mon_r() == 0)
+			flopi[selected_drive].dev->mon_w(1);
+
+		// start the motor on the selected drive
+		if (fi.dev && fi.dev->mon_r() == 1)
+		{
+			LOG("motor_control: switching on motor for drive %d\n", fid);
+
+			// select the drive and enable the motor
+			set_ds(fid);
+			fi.dev->mon_w(0);
+
+			// set motor on counter
+			motor_on_counter = (motorcfg & MON) << (motorcfg & HSDA ? 1 : 0);
+		}
+
+		// FIXME: reset motor off timer on command end, not start
+		motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
+	}
+	else
+	{
+		// motor off timer only applies to the selected drive
+		if (selected_drive != fid)
+			return;
+
+		// decrement motor on counter
+		if (motor_on_counter)
+			motor_on_counter--;
+
+		// ignore motor off timer while drive is busy
+		if (fi.main_state == SEEK || fi.main_state == RECALIBRATE)
+			return;
+
+		// check if the motor is already off
+		if (motor_off_counter == 0 || (fi.dev && fi.dev->mon_r() == 1))
+			return;
+
+		// decrement the counter
+		motor_off_counter--;
+
+		// if the motor off timer has expired, stop the motor
+		if (motor_off_counter == 0 && fi.dev)
+		{
+			LOG("motor_control: switching off motor for drive %d\n", fid);
+			fi.dev->mon_w(1);
+		}
+	}
+}
+
+void i82072_device::index_callback(floppy_image_device *floppy, int state)
+{
+	for (auto &fi : flopi)
+	{
+		if (fi.dev != floppy)
+			continue;
+
+		// update motor on/off counters and stop motor if necessary
+		motor_control(fi.id, false);
+	}
+
+	upd765_family_device::index_callback(floppy, state);
 }
 
 smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, SMC37C78, tag, owner, clock)
