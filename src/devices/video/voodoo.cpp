@@ -5906,16 +5906,16 @@ void voodoo_device::raster_fastfill(void *destbase, int32_t y, const poly_extent
 	/* fill this dest buffer row */
 	if (FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u) && vd->fbi.auxoffs != ~0)
 	{
-		uint32_t depth = vd->reg[zaColor].u;
-		uint64_t expanded = ((uint64_t)depth << 32) | (uint64_t)depth;
+		uint16_t depth = vd->reg[zaColor].u;
+		uint64_t expanded = ((uint64_t)depth << 48) | ((uint64_t)depth << 32) | ((uint64_t)depth << 16) | (uint64_t)depth;
 		uint16_t *dest = (uint16_t *)(vd->fbi.ram + vd->fbi.auxoffs) + scry * vd->fbi.rowpixels;
 
 		for (x = startx; x < stopx && (x & 3) != 0; x++)
-			dest[x] = (uint16_t) depth;
+			dest[x] = depth;
 		for ( ; x < (stopx & ~3); x += 4)
 			*(uint64_t *)&dest[x] = expanded;
 		for ( ; x < stopx; x++)
-			dest[x] = (uint16_t) depth;
+			dest[x] = depth;
 	}
 }
 
