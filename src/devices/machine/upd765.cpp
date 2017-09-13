@@ -149,6 +149,8 @@ void upd765_family_device::set_mode(int _mode)
 
 void upd765_family_device::device_start()
 {
+	save_item(NAME(motorcfg));
+
 	intrq_cb.resolve_safe();
 	drq_cb.resolve_safe();
 	hdl_cb.resolve_safe();
@@ -276,7 +278,7 @@ void upd765_family_device::set_ds(int fid)
 		return;
 
 	// pass drive select to connected drives
-	for (auto &fi : flopi)
+	for (floppy_info &fi : flopi)
 		if (fi.dev)
 			fi.dev->ds_w(fid);
 
@@ -286,7 +288,7 @@ void upd765_family_device::set_ds(int fid)
 
 void upd765_family_device::set_floppy(floppy_image_device *flop)
 {
-	for(auto & elem : flopi) {
+	for(floppy_info & elem : flopi) {
 		if(elem.dev)
 			elem.dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		elem.dev = flop;
@@ -383,18 +385,6 @@ READ8_MEMBER(upd765_family_device::msr_r)
 			//msr |= MSR_CB;
 		}
 
-	// log msr when changed
-	if (VERBOSE)
-	{
-		static u8 last_msr = 0;
-		if (msr != last_msr)
-		{
-			last_msr = msr;
-
-			LOG("msr_r 0x%02x (%s)\n", msr, machine().describe_context());
-		}
-	}
-
 	if(data_irq) {
 		data_irq = false;
 		check_irq();
@@ -433,13 +423,14 @@ READ8_MEMBER(upd765_family_device::fifo_r)
 		memmove(result, result+1, result_pos);
 		if(!result_pos)
 			main_phase = PHASE_CMD;
-		else if (result_pos == 1)
-		{
-			// clear drive busy bit after the first sense interrupt status result byte is read
-			for (auto &fi : flopi)
-				if ((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
-					fi.main_state = IDLE;
-		}
+		else
+			if (result_pos == 1)
+			{
+				// clear drive busy bit after the first sense interrupt status result byte is read
+				for (floppy_info &fi : flopi)
+					if ((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
+						fi.main_state = IDLE;
+			}
 		break;
 	default:
 		LOG("fifo_r in phase %d\n", main_phase);
@@ -2306,7 +2297,7 @@ void upd765_family_device::run_drive_ready_polling()
 
 void upd765_family_device::index_callback(floppy_image_device *floppy, int state)
 {
-	for(auto & fi : flopi) {
+	for(floppy_info & fi : flopi) {
 		if(fi.dev != floppy)
 			continue;
 
@@ -2607,7 +2598,7 @@ void i82072_device::execute_command(int cmd)
 		 */
 
 		// clear pending interrupts and fall through
-		for (auto &fi : flopi)
+		for (floppy_info &fi : flopi)
 			fi.st0_filled = false;
 
 	default:
@@ -2678,7 +2669,7 @@ void i82072_device::motor_control(int fid, bool start_motor)
 
 void i82072_device::index_callback(floppy_image_device *floppy, int state)
 {
-	for (auto &fi : flopi)
+	for (floppy_info &fi : flopi)
 	{
 		if (fi.dev != floppy)
 			continue;
