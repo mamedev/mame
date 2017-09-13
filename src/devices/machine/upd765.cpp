@@ -423,14 +423,12 @@ READ8_MEMBER(upd765_family_device::fifo_r)
 		memmove(result, result+1, result_pos);
 		if(!result_pos)
 			main_phase = PHASE_CMD;
-		else
-			if (result_pos == 1)
-			{
-				// clear drive busy bit after the first sense interrupt status result byte is read
-				for (floppy_info &fi : flopi)
-					if ((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
-						fi.main_state = IDLE;
-			}
+		else if (result_pos == 1) {
+			// clear drive busy bit after the first sense interrupt status result byte is read
+			for (floppy_info &fi : flopi)
+				if ((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
+					fi.main_state = IDLE;
+		}
 		break;
 	default:
 		LOG("fifo_r in phase %d\n", main_phase);
@@ -1423,13 +1421,10 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 		LOG(" %02x", result[i]);
 	LOG("\n");
 	fi.sub_state = IDLE;
-	if(data_completion)
-	{
+	if(data_completion) {
 		fi.main_state = IDLE;
 		data_irq = true;
-	}
-	else
-	{
+	} else {
 		other_irq = true;
 		fi.st0_filled = true;
 	}
@@ -1564,8 +1559,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
-	if(!fi.ready)
-	{
+	if(!fi.ready) {
 		fi.st0 |= ST0_NR | ST0_FAIL;
 		fi.sub_state = COMMAND_DONE;
 		st1 = 0;
@@ -1610,8 +1604,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
-	if(!fi.ready)
-	{
+	if(!fi.ready) {
 		fi.st0 |= ST0_NR | ST0_FAIL;
 		fi.sub_state = COMMAND_DONE;
 		st1 = 0;
@@ -1800,8 +1793,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
-	if(!fi.ready)
-	{
+	if(!fi.ready) {
 		fi.st0 |= ST0_NR | ST0_FAIL;
 		fi.sub_state = COMMAND_DONE;
 		st1 = 0;
@@ -1922,8 +1914,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
-	if(!fi.ready)
-	{
+	if(!fi.ready) {
 		fi.st0 |= ST0_NR | ST0_FAIL;
 		fi.sub_state = COMMAND_DONE;
 		st1 = 0;
@@ -2084,8 +2075,7 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
-	if(!fi.ready)
-	{
+	if(!fi.ready) {
 		fi.st0 = (command[1] & 7) | ST0_NR | ST0_FAIL;
 		fi.sub_state = TRACK_DONE;
 		format_track_continue(fi);
@@ -2163,8 +2153,7 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
-	if(!fi.ready)
-	{
+	if(!fi.ready) {
 		fi.st0 |= ST0_NR | ST0_FAIL;
 		fi.sub_state = COMMAND_DONE;
 		read_id_continue(fi);
@@ -2511,8 +2500,7 @@ void i82072_device::soft_reset()
 int i82072_device::check_command()
 {
 	// ...01011 motor on/off
-	switch (command[0] & 0x1f) 
-	{
+	switch (command[0] & 0x1f) {
 	case 0x0b:
 		return C_MOTOR_ONOFF;
 	}
@@ -2523,8 +2511,7 @@ int i82072_device::check_command()
 void i82072_device::start_command(int cmd)
 {
 	// check if the command specifies a target drive
-	switch (cmd)
-	{
+	switch (cmd) {
 	case C_READ_TRACK:
 	case C_SENSE_DRIVE_STATUS:
 	case C_WRITE_DATA:
@@ -2556,8 +2543,7 @@ void i82072_device::execute_command(int cmd)
 		result[7] = motorcfg;
 		break;
 
-	case C_MOTOR_ONOFF:
-	{
+	case C_MOTOR_ONOFF:	{
 		bool motor_on = command[0] & 0x80;
 		floppy_info &fi = flopi[(command[0] >> 5) & 0x3];
 
@@ -2615,15 +2601,13 @@ void i82072_device::motor_control(int fid, bool start_motor)
 
 	floppy_info &fi = flopi[fid];
 
-	if (start_motor)
-	{
+	if (start_motor) {
 		// if we are selecting a different drive, stop the motor on the previously selected drive
 		if (selected_drive != fid && flopi[selected_drive].dev && flopi[selected_drive].dev->mon_r() == 0)
 			flopi[selected_drive].dev->mon_w(1);
 
 		// start the motor on the selected drive
-		if (fi.dev && fi.dev->mon_r() == 1)
-		{
+		if (fi.dev && fi.dev->mon_r() == 1) {
 			LOG("motor_control: switching on motor for drive %d\n", fid);
 
 			// select the drive and enable the motor
@@ -2636,9 +2620,7 @@ void i82072_device::motor_control(int fid, bool start_motor)
 
 		// FIXME: reset motor off timer on command end, not start
 		motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
-	}
-	else
-	{
+	} else {
 		// motor off timer only applies to the selected drive
 		if (selected_drive != fid)
 			return;
@@ -2659,8 +2641,7 @@ void i82072_device::motor_control(int fid, bool start_motor)
 		motor_off_counter--;
 
 		// if the motor off timer has expired, stop the motor
-		if (motor_off_counter == 0 && fi.dev)
-		{
+		if (motor_off_counter == 0 && fi.dev) {
 			LOG("motor_control: switching off motor for drive %d\n", fid);
 			fi.dev->mon_w(1);
 		}
@@ -2669,8 +2650,7 @@ void i82072_device::motor_control(int fid, bool start_motor)
 
 void i82072_device::index_callback(floppy_image_device *floppy, int state)
 {
-	for (floppy_info &fi : flopi)
-	{
+	for (floppy_info &fi : flopi) {
 		if (fi.dev != floppy)
 			continue;
 
@@ -2761,8 +2741,7 @@ WRITE8_MEMBER(tc8566af_device::cr1_w)
 {
 	m_cr1 = data;
 
-	if (m_cr1 & 0x02)
-	{
+	if (m_cr1 & 0x02) {
 		// Not sure if this inverted or not
 		tc_w((m_cr1 & 0x01) ? true : false);
 	}
