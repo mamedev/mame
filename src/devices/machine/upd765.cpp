@@ -150,6 +150,7 @@ void upd765_family_device::set_mode(int _mode)
 void upd765_family_device::device_start()
 {
 	save_item(NAME(motorcfg));
+	save_item(NAME(selected_drive));
 
 	intrq_cb.resolve_safe();
 	drq_cb.resolve_safe();
@@ -2490,6 +2491,14 @@ i82072_device::i82072_device(const machine_config &mconfig, const char *tag, dev
 	dor_reset = 0x0c;
 }
 
+void i82072_device::device_start()
+{
+	upd765_family_device::device_start();
+
+	save_item(NAME(motor_off_counter));
+	save_item(NAME(motor_on_counter));
+}
+
 void i82072_device::soft_reset()
 {
 	motorcfg = 0x60;
@@ -2543,7 +2552,7 @@ void i82072_device::execute_command(int cmd)
 		result[7] = motorcfg;
 		break;
 
-	case C_MOTOR_ONOFF:	{
+	case C_MOTOR_ONOFF: {
 		bool motor_on = command[0] & 0x80;
 		floppy_info &fi = flopi[(command[0] >> 5) & 0x3];
 

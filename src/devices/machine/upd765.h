@@ -456,6 +456,8 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 
 protected:
+	virtual void device_start() override;
+
 	enum motorcfg_mask
 	{
 		MON  = 0x0f, // motor on delay
