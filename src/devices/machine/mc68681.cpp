@@ -10,7 +10,7 @@
     Updated by Jonathan Gevaryahu AKA Lord Nightmare
     Improved interrupt handling by R. Belmont
     Rewrite and modernization in progress by R. Belmont
-    Addition of 68340 serial module support by Edstrom
+    Addition of the duart compatible 68340 serial module support by Edstrom
 */
 
 #include "emu.h"
@@ -62,7 +62,7 @@ static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 
 // device type definition
 DEFINE_DEVICE_TYPE(MC68681, mc68681_device, "mc68681", "MC68681 DUART")
 DEFINE_DEVICE_TYPE(SC28C94, sc28c94_device, "sc28c94", "SC28C94 QUART")
-DEFINE_DEVICE_TYPE(M68340SERIAL, m68340_serial_device, "m68340ser", "M68340 SERIAL MODULE")
+DEFINE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device, "mc68340duart", "MC68340 DUART Device")
 DEFINE_DEVICE_TYPE(MC68681_CHANNEL, mc68681_channel, "mc68681_channel", "MC68681 DUART channel")
 
 
@@ -110,8 +110,13 @@ sc28c94_device::sc28c94_device(const machine_config &mconfig, const char *tag, d
 // that the code knows all of this and will not warn if those registers are accessed as it could be ported code.
 // TODO: A lot of subtle differences and also detect misuse of unavailable registers as they should be ignored
 //--------------------------------------------------------------------------------------------------------------------
-m68340_serial_device::m68340_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-  : mc68681_base_device(mconfig, M68340SERIAL, tag, owner, clock)
+mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mc68681_base_device(mconfig, type, tag, owner, clock)
+{
+}
+
+mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68340_duart_device(mconfig, MC68340_DUART, tag, owner, clock)
 {
 }
 
@@ -187,7 +192,7 @@ MACHINE_CONFIG_MEMBER( sc28c94_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(CHAND_TAG, MC68681_CHANNEL, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( m68340_serial_device::device_add_mconfig )
+MACHINE_CONFIG_MEMBER( mc68340_duart_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(CHANA_TAG, MC68681_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, MC68681_CHANNEL, 0)
 MACHINE_CONFIG_END
@@ -366,7 +371,7 @@ TIMER_CALLBACK_MEMBER( mc68681_base_device::duart_timer_callback )
 
 }
 
-READ8_MEMBER( m68340_serial_device::read )
+READ8_MEMBER( mc68340_duart_device::read )
 {
 	uint8_t r = 0;
 
@@ -522,7 +527,7 @@ READ8_MEMBER( mc68681_base_device::read )
 	return r;
 }
 
-WRITE8_MEMBER( m68340_serial_device::write )
+WRITE8_MEMBER( mc68340_duart_device::write )
 {
 	//printf("Duart write %02x -> %02x\n", data, offset);
 

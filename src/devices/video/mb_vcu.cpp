@@ -7,16 +7,19 @@ Device for Mazer Blazer/Great Guns custom Video Controller Unit
 Written by Angelo Salese, based off old implementation by Jarek Burczynski
 
 TODO:
-- understand what exactly modes 0x03 and 0x13 really reads in set_clr() and
-  where it puts results (yeah, shared VCU RAM, but exactly where?). Almost
-  surely Mazer Blazer tries to read the pixel data for collision detection and
-  Great Guns read backs VRAM for VCU test (patched for now, btw).
+- priority, especially noticeable in Great Guns sprites and Mazer Blazer 
+  bonus stages;
+- bit 0 of m_mode;
+- first byte of parameter info;
+- Glitchy UFO in Mazer Blazer when it's gonna zap one of the player lives, m_mode = 0xe and
+  it's supposed to be set into layer 0 somehow but this breaks Mazer Blazer title screen sparkles;
 - Understand look-up tables in i/o space.
-- Understand how to handle layer clearance.
-- Understand how planes are really handled.
-- Understand how transparent pens are handled (is 0x0f always transparent or
+- Understand how to handle layer clearance (mostly done).
+- Understand how planes are really handled (mostly done).
+- Understand how transparent pens are handled aka is 0x0f always transparent or
   there's some clut gimmick? Great Guns title screen makes me think of the
-  latter option)
+  latter option;
+- Mazer Blazer collision detection parameters are a complete guesswork 
 
 ***************************************************************************/
 
@@ -282,11 +285,13 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	int bits = 0;
 	uint8_t pen = 0;
 	uint8_t cur_layer;
-
+	uint8_t opaque_pen;
+	
 //	printf("%02x %02x\n",m_mode >> 2,m_mode & 3);
 	
 //  cur_layer = (m_mode & 0x3);
 	cur_layer = (m_mode & 2) >> 1;
+	opaque_pen = (cur_layer == 1);
 
 	switch(m_mode >> 2)
 	{
@@ -304,7 +309,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot&= 0xf;
 
 						
-						//if(dot != 0xf || m_mode & 2)
+						if(dot != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, dot);
 					}
 					bits += 4;
@@ -326,7 +331,8 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot&= 1;
 
 						pen = dot ? (m_color1 >> 4) : (m_color1 & 0xf);
-						//if(pen != 0xf || m_mode & 2)
+
+						if(pen != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
 					}
 					bits++;
@@ -360,8 +366,8 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 								pen = m_color2 >> 4;
 								break;
 						}
-
-						//if(pen != 0xf)
+						
+						if(pen != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
 					}
 
@@ -380,40 +386,69 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 
 
 /*
-Read-Modify-Write operation, not fully understood
+Read-Modify-Write operations
 
----0 -111 (0x07) write to i/o?
----0 -011 (0x03) read to i/o?
----1 -011 (0x13) read to vram?
+---0 -111 (0x07) write to i/o
+---0 -011 (0x03) clear VRAM
+---1 -011 (0x13) collision detection
 */
 READ8_MEMBER( mb_vcu_device::load_set_clr )
 {
 	int xi,yi;
 	int dstx,dsty;
 //  uint8_t dot;
-	int bits = 0;
-	#if 0
-	if(m_mode == 0x13) //|| m_mode == 0x03)
-	{
-		printf("[0] %02x ",m_ram[m_param_offset_latch]);
-		printf("X: %04x ",m_xpos);
-		printf("Y: %04x ",m_ypos);
-		printf("C1:%02x ",m_color1);
-		printf("C2:%02x ",m_color2);
-		printf("M :%02x ",m_mode);
-		printf("XS:%02x ",m_pix_xsize);
-		printf("YS:%02x ",m_pix_ysize);
-		printf("VB:%02x ",m_vbank);
-		printf("\n");
-	}
-	#endif
 	
 	switch(m_mode)
 	{
 		case 0x13:
-		case 0x03:
 		{
+			//int16_t srcx = m_ram[m_param_offset_latch + 1];
+			//int16_t srcy = m_ram[m_param_offset_latch + 3];
+			//uint16_t src_xsize = m_ram[m_param_offset_latch + 18] + 1;
+	        //uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
+			int collision_flag = 0;
 			
+			for (yi = 0; yi < m_pix_ysize; yi++)
+			{
+				for (xi = 0; xi < m_pix_xsize; xi++)
+				{
+					dstx = (m_xpos + xi);
+					dsty = (m_ypos + yi);
+					
+					if(dstx < 256 && dsty < 256)
+					{
+						uint8_t res = read_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18);
+						//uint8_t res2 = read_byte(srcx|srcy<<8|0<<16|(m_vbank)<<18);
+
+						//printf("%02x %02x\n",res,res2);
+
+						// TODO: how it calculates the pen? Might use the commented out stuff and/or the offset somehow
+						if(res == 5)
+						{
+							collision_flag++;
+//							test++;
+						}
+					}
+					
+					//srcx++;
+				}
+				//srcy++;
+			}
+			
+			// threshold for collision, necessary to avoid bogus collision hits
+			// the typical test scenario is to shoot near the top left hatch for stage 1 then keep shooting,
+			// at some point the top right hatch will bogusly detect a collision without this.
+			// It's also unlikely that game tests 1x1 targets anyway, as the faster moving targets are quite too easy to hit that way.
+			// TODO: likely it works differently (checks area?)
+			if(collision_flag > 5)
+				m_ram[m_param_offset_latch] |= 8;
+			else
+				m_ram[m_param_offset_latch] &= ~8;
+			break;
+		}
+		
+		case 0x03:
+		{			
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
 				for (xi = 0; xi < m_pix_xsize; xi++)
@@ -422,37 +457,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 					dsty = (m_ypos + yi);
 
 					if(dstx < 256 && dsty < 256)
-					{
-						if(m_mode == 0x03)
-							write_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18, 0xf);
-//						else
-//							write_byte(dstx|dsty<<8|1<<16|(m_vbank)<<18, 0xf);
-
-						#if 0
-						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
-						dot&= 3;
-
-						switch(dot)
-						{
-							case 0:
-								write_byte(dstx|dsty<<8, m_color1 & 0xf);
-								break;
-							case 1:
-								write_byte(dstx|dsty<<8, m_color1 >> 4);
-								break;
-							case 2:
-								write_byte(dstx|dsty<<8, m_color2 & 0xf);
-								break;
-							case 3:
-								write_byte(dstx|dsty<<8, m_color2 >> 4);
-								break;
-						}
-						#endif
-
-						//write_byte(dstx|dsty<<8, m_mode >> 4);
-					}
-
-					bits+=2;
+						write_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18, 0xf);
 				}
 			}
 			break;

@@ -41,9 +41,9 @@
 #define MCFG_SC28C94_D_TX_CALLBACK(_cb) \
 	devcb = &sc28c94_device::set_d_tx_cb(*device, DEVCB_##_cb);
 
-// M68340SERIAL specific callbacks
-#define MCFG_M68340SERIAL_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, M68340SERIAL, _clock)
+// MC68340SERIAL specific callbacks
+#define MCFG_MC68340DUART_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, MC68340_DUART, _clock)
 
 #define MC68681_RX_FIFO_SIZE                3
 
@@ -240,23 +240,22 @@ protected:
 private:
 };
 
-class m68340_serial_device : public mc68681_base_device
+class mc68340_duart_device : public mc68681_base_device
 {
 public:
-	m68340_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+  mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
+	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(MC68681, mc68681_device)
 DECLARE_DEVICE_TYPE(SC28C94, sc28c94_device)
-DECLARE_DEVICE_TYPE(M68340SERIAL, m68340_serial_device)
+DECLARE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device)
 DECLARE_DEVICE_TYPE(MC68681_CHANNEL, mc68681_channel)
 
 #endif // MAME_MACHINE_MC68681_H

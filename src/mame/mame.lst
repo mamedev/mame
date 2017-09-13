@@ -2556,6 +2556,7 @@ attckufo                        // (c) 1980 Ryoto Electric Co.
 @source:atvtrack.cpp
 atvtrack                        // (c) 2002 - Ref 020419
 atvtracka                       // (c) 2002 - Ref 020419
+gfootbal                        // (c) 2002 - Ref 020201
 smashdrv                        // (c) 2000
 
 @source:aussiebyte.cpp
@@ -12108,6 +12109,7 @@ ironfort                        // (c) 1998 Eolith
 ironfortj                       // (c) 1998 Eolith
 landbrk                         // (c) 1999 Eolith
 landbrka                        // (c) 1999 Eolith
+landbrkb						// (c) 1999 Eolith
 linkypip                        // (c) 1998 Eolith
 nhidctch                        // (c) 1999 Eolith
 penfan                          // (c) 1999 Eolith
@@ -15212,6 +15214,7 @@ irobot                          // 136029           (c) 1983
 dairesya                        // GX560 (c) 1986 (Japan)
 farwest                         // bootleg
 ironhors                        // GX560 (c) 1986
+ironhorsh                       // GX560 (c) 1986
 
 @source:isbc.cpp
 isbc286                         //
@@ -30174,6 +30177,8 @@ bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
 dgone                           // 1984 Data General/One
 eagle1600                       //
+epc                             // 1984 Ericsson PC
+eppc                            // 1985 Ericsson Portable PC
 ibm5550                         //
 iskr3104                        //
 mbc16                           // Sanyo MBC-16
@@ -32483,6 +32488,7 @@ rvoicepc                        //
 rx78                            //
 
 @source:rzone.cpp
+rzbatfor                        //
 rzindy500                       //
 
 @source:s11.cpp

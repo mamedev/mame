@@ -4,7 +4,6 @@
 #include "machine/taitosjsec.h"
 
 #include "machine/input_merger.h"
-#include "machine/gen_latch.h"
 
 #include "sound/dac.h"
 #include "sound/discrete.h"

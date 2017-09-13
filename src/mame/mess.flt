@@ -371,6 +371,7 @@ mikrosha.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
+miniframe.cpp
 minitel_2_rpic.cpp
 mits680b.cpp
 mk1.cpp
