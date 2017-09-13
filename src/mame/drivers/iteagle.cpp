@@ -357,10 +357,10 @@ static INPUT_PORTS_START( virtpool )
 	PORT_INCLUDE( iteagle )
 
 	PORT_MODIFY("SW5")
-	PORT_DIPNAME( 0x3, 0x3, "Resolution" )
+	PORT_DIPNAME( 0x3, 0x1, "Resolution" )  // Setting to low resolution will hang the game
 	PORT_DIPSETTING(0x1, "Medium" )
-	PORT_DIPSETTING(0x0, "Low" )
-	PORT_DIPSETTING(0x3, "VGA" )
+	PORT_DIPSETTING(0x0, "Low (Hangs)" )
+	PORT_DIPSETTING(0x3, "VGA (Buggy)" )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "English" )
@@ -656,7 +656,7 @@ ROM_END
  *************************************/
 
 GAME( 2000, iteagle,    0,        iteagle,  iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, iteagle_state, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, iteagle_state, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, carnking,   iteagle,  carnking, bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", MACHINE_SUPPORTS_SAVE )
