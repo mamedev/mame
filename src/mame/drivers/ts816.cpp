@@ -2,12 +2,15 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-2013-09-10 Skeleton driver for Televideo ts816
+2013-09-10 Skeleton driver for Televideo TS816
 
 TODO:
 - Connect up the devices to each other
 - Connect up RS232 terminal instead of parallel one
 - Connect centronics printer to PIO
+- 4 diagnostic LEDs
+- Hard Drive
+- Tape Drive
 - Get a good dump of the rom. If the undocumented DSW is enabled, it
   calls up code in the missing half of the rom. Also it isn't possible
   at the moment to get any useful response to commands.
@@ -98,7 +101,7 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( ts816 )
 	PORT_START("DSW") // 
-	PORT_DIPNAME( 0x07, 0x01, "Switch A") // read at @0368
+	PORT_DIPNAME( 0x07, 0x01, "System Terminal") // read at @0368
 	PORT_DIPSETTING(    0x00, "19200 baud")
 	PORT_DIPSETTING(    0x01, "9600 baud")
 	PORT_DIPSETTING(    0x02, "4800 baud")
