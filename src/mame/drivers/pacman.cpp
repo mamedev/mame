@@ -554,10 +554,8 @@ READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
 {
 	/* The return value determines what the mystery item is.  Each bit corresponds
 	   to a question mark */
-	// we use z80 R register due of a bug in rand() function (inp desyncing on playback, supposedly caused by emu/ioport.cpp line 498)
-	// it needs to be changed anyway by testing this device on real HW
-	//return machine().rand() & 0x0f;
-	return m_maincpu->state_int(Z80_R) & 0x0f;
+	return machine().rand() & 0x0f;
+//	return m_maincpu->state_int(Z80_R) & 0x0f;
 }
 
 
