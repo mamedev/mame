@@ -295,7 +295,7 @@ static MACHINE_CONFIG_DERIVED( hexionb, hexion )
 
 	MCFG_DEVICE_REMOVE("k051649")
 
-	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
