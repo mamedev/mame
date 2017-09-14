@@ -72,7 +72,7 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 	, m_int2_en_cb(*this)
 	, m_int1_ack_cb(*this)
 	, m_int2_ack_cb(*this)
-	//, m_int_time_cb(*this)
+	, m_int_time_cb(*this)
 	, m_offsx(0)
 	, m_offsy(0)
 	, m_slave_screen(*this, finder_base::DUMMY_TAG) // ugly, needed to work with the rungun etc. video demux board
@@ -90,7 +90,7 @@ void k053252_device::device_start()
 	m_int2_en_cb.resolve_safe();
 	m_int1_ack_cb.resolve_safe();
 	m_int2_ack_cb.resolve_safe();
-	//m_int_time_cb.resolve_safe();
+	m_int_time_cb.resolve_safe();
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_hc));
@@ -244,7 +244,7 @@ WRITE8_MEMBER( k053252_device::write )
 			res_change();
 			break;
 
-		//case 0x0d: m_int_time(data); break;
+		case 0x0d: m_int_time_cb(data); break;
 		case 0x0e: m_int1_ack_cb(1); break;
 		case 0x0f: m_int2_ack_cb(1); break;
 	}
