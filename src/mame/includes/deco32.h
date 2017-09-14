@@ -4,6 +4,7 @@
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
+#include "machine/deco_irq.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
@@ -20,6 +21,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_deco_irq(*this, "irq"),
 		m_deco146(*this, "ioprot"),
 		m_deco104(*this, "ioprot104"),
 		m_decobsmt(*this, "decobsmt"),
@@ -49,6 +51,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<deco_irq_device> m_deco_irq;
 	optional_device<deco146_device> m_deco146;
 	optional_device<deco104_device> m_deco104;
 	optional_device<decobsmt_device> m_decobsmt;
@@ -77,8 +80,6 @@ public:
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_shared_ptr<uint32_t> m_ace_ram;
 
-	int m_raster_enable; // captaven, dragongun and lockload
-	timer_device *m_raster_irq_timer; // captaven, dragongun and lockload
 	uint8_t m_nslasher_sound_irq; // nslasher and lockload
 	int m_tattass_eprom_bit; // tattass
 	int m_lastClock; // tattass
@@ -119,6 +120,7 @@ public:
 	DECLARE_WRITE32_MEMBER(fghthist_eeprom_w);
 	DECLARE_READ32_MEMBER(fghthist_protection_region_0_146_r);
 	DECLARE_WRITE32_MEMBER(fghthist_protection_region_0_146_w);
+	DECLARE_WRITE32_MEMBER(vblank_ack_w);
 
 	// nslasher
 	DECLARE_WRITE32_MEMBER(nslasher_eeprom_w);
@@ -129,10 +131,6 @@ public:
 	// nslasher and lockload
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_nslasher);
 	DECLARE_READ8_MEMBER(latch_r);
-
-	// captaven, dragongun and lockload
-	DECLARE_READ32_MEMBER(irq_controller_r);
-	DECLARE_WRITE32_MEMBER(irq_controller_w);
 
 	// nslasher and tattass
 	DECLARE_READ16_MEMBER(nslasher_protection_region_0_104_r);
@@ -162,13 +160,9 @@ public:
 	DECLARE_DRIVER_INIT(nslasher);
 	DECLARE_DRIVER_INIT(captaven);
 	DECLARE_DRIVER_INIT(fghthist);
-	DECLARE_MACHINE_RESET(deco32);
 	DECLARE_VIDEO_START(captaven);
 	DECLARE_VIDEO_START(fghthist);
 	DECLARE_VIDEO_START(nslasher);
-
-	INTERRUPT_GEN_MEMBER(vblank_irq_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(raster_irq_gen);
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -182,14 +176,6 @@ public:
 	DECLARE_READ16_MEMBER(port_b_tattass);
 	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 	void deco32_set_audio_output(uint8_t raw_data);
-	void update_irq_state(uint8_t irq_cause, bool assert_state);
-	uint8_t m_irq_cause;
-	static const uint8_t VBLANK_IRQ = 0x10;
-	static const uint8_t RASTER_IRQ = 0x20;
-	static const uint8_t LIGHTGUN_IRQ = 0x40;
-	static const int vblankout = 8;
-	static const int vblankin = 248;
-	//uint8_t m_irq_source; // captaven, dragongun and lockload
 
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
@@ -215,7 +201,6 @@ public:
 
 	uint32_t m_sprite_ctrl;
 	int m_lightgun_port;
-	int m_gun_latch;
 	bitmap_rgb32 m_temp_render_bitmap;
 
 	DECLARE_READ32_MEMBER(lightgun_r);
@@ -237,8 +222,6 @@ public:
 	DECLARE_VIDEO_START(lockload);
 	void dragngun_init_common();
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vblank_irq_gen);
 
 	uint32_t screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
