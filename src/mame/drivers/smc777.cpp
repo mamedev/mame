@@ -515,7 +515,7 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 	{
 		case 0x00:
 			m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
-			m_raminh_prefetch = (uint8_t)(space.device().state().state_int(Z80_R)) & 0x7f;
+			m_raminh_prefetch = (uint8_t)(m_maincpu->state_int(Z80_R)) & 0x7f;
 			break;
 		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
 		case 0x05: m_beeper->set_state(data & 0x10); break;
@@ -571,7 +571,7 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 
 	if(m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
 	{
-		z80_r = (uint8_t)space.device().state().state_int(Z80_R);
+		z80_r = (uint8_t)m_maincpu->state_int(Z80_R);
 
 		if(z80_r == ((m_raminh_prefetch+2) & 0x7f))
 		{
