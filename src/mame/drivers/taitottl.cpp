@@ -15,7 +15,7 @@
  Ball Park (??/1974) (clone of Midway's Ball Park)                                  YES
  Basketball (04/1974) (clone of Midway's TV Basketball)                             NO
  Bombs Away (??/1977) (clone of Meadows' Bombs Away)                                YES
- Cisco/Fisco 400 (04/1977)                                                          UNKNOWN
+ Cisco/Fisco 400 (04/1977)                                                          YES        24 Chips of various sizes
  Clean Sweep (??/1976) (clone of Ramtek's Clean Sweep)                              YES
  Clean Sweep II (??/1976) (clone of Ramtek's Clean Sweep)                           YES
  Crashing Race (06/1976) (clone of Atari's Crash'n Score?)                          UNKNOWN
@@ -163,6 +163,72 @@ MACHINE_CONFIG_END
 
 /*
 
+ Fisco 400
+ 
+ label  loc. Part #
+ ==========================================================
+ TOP PCB : [FS070001 FSN00001A]
+ CR11   L9  MMI 6301
+ FS01 	J10 Texas Instruments 74S288 (read as AMD 74S288)
+ FS02   D10 MMI 6301
+ FS03 	E10 MMI 6301
+ FS04   A7  Intersil IM5624
+ FS05   B7  Intersil IM5624
+ FS06   C7  Intersil IM5624
+ FS07   D7  Intersil IM5624
+ FS08   E7  Intersil IM5624
+ FS09   A6  Intersil IM5624
+ FS10   B6  Intersil IM5624
+ FS11   C6  Intersil IM5624
+ FS12	D6  Intersil IM5624
+
+ Bottom PCB : [FS070002A FSN00002A]
+ FS13   H8  Texas Inst. 74S287 (read as national 74S287)
+ FS14   J8  Texas Inst. 74S287 (read as national 74S287)
+ FS15   K8  Texas Inst. 74S287 (read as national 74S287)
+ FS16   L8  Texas Inst. 74S287 (read as national 74S287)
+ FS17   M8  Texas Inst. 74S287 (read as national 74S287)
+ FS18   A8  MMI 6306 (read as Harris 7621)
+ FS19   B8  MMI 6306 (read as Harris 7621)
+ FS20   C8  MMI 6306 (read as Harris 7621)
+ FS21   D8  MMI 6306 (read as Harris 7621)
+ FS22   E8  MMI 6306 (read as Harris 7621)
+ FS23   F8  MMI 6306 (read as Harris 7621)
+
+*/
+
+ROM_START( fisco400 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "cr11.l9",      0x0000, 0x0100, CRC(b3250118) SHA1(ab8bfa11b112b03b8ff00b09b3e6d9b221051ad2) ) // Score
+	ROM_LOAD( "fs01.j10",     0x0000, 0x0020, CRC(0a11a36a) SHA1(4064cc76f8565514d692ae9e00a9c7533f0c067c) ) // Game Control
+	ROM_LOAD( "fs02.d10",     0x0000, 0x0100, CRC(e95f6e38) SHA1(f78cebe214d712bfe08a93fedbf8a394036dc434) ) // Checkered Flag
+	ROM_LOAD( "fs03.e10",     0x0000, 0x0100, CRC(1e7f6bec) SHA1(ed897c599542194be654650c1627879ba4db4d16) ) // Insert Coin Graphic
+	ROM_LOAD( "fs04.a7",      0x0000, 0x0200, CRC(c9be1200) SHA1(6471e91a09d7644777bb594e3cf4357afb389a5d) ) // Track Graphics
+	ROM_LOAD( "fs05.b7",      0x0000, 0x0200, CRC(2d9786da) SHA1(869df761c9ad9f90f56f558880ec405dfc56b6d9) ) // Track Graphics
+	ROM_LOAD( "fs06.c7",      0x0000, 0x0200, CRC(cbf412fb) SHA1(3fb00127ed19758db35a4ab148ba531c6f2e520f) ) // Track Graphics
+	ROM_LOAD( "fs07.d7",      0x0000, 0x0200, CRC(f6014074) SHA1(522b98f62a3de2980a615723d88542cbb23a7fa3) ) // Track Graphics
+	ROM_LOAD( "fs08.e7",      0x0000, 0x0200, CRC(9b0d955b) SHA1(9d676bee180c57cfce9c8a6929a16d00eca2a468) ) // Track Graphics
+	ROM_LOAD( "fs09.a6",      0x0000, 0x0200, CRC(f278ac29) SHA1(6287ee2f922c01f2f027103f04684ca952ece479) ) // Track Graphics
+	ROM_LOAD( "fs10.b6",      0x0000, 0x0200, CRC(7fe466d2) SHA1(ad07f2fb7fe0ad35dbd41f53dc53415894b8de2f) ) // Track Graphics
+	ROM_LOAD( "fs11.c6",      0x0000, 0x0200, CRC(13747458) SHA1(65611ea3011b65869bf5482f343476b6a50404a5) ) // Track Graphics
+	ROM_LOAD( "fs12.d6",      0x0000, 0x0200, CRC(91a8b55b) SHA1(7d01ef51ec75af3d05f1a5a903d4cc112de433ba) ) // Track Graphics
+	ROM_LOAD( "fs13.8h",      0x0000, 0x0100, CRC(2717181d) SHA1(2bee55d004fbbb991dfc95aba1d16be6fd65e7b3) ) // Speed Data Storage
+	ROM_LOAD( "fs14.8j",      0x0000, 0x0100, CRC(fb2dc57d) SHA1(cb08fce0988acc920158433e5b54666e6edb78ea) ) // Speed Data Storage
+	ROM_LOAD( "fs15.8k",      0x0000, 0x0100, CRC(76414291) SHA1(d90d0eb639887ed58dfee9256b808d59a02925ec) ) // Speed Data Storage
+	ROM_LOAD( "fs16.8l",      0x0000, 0x0100, CRC(32cf6200) SHA1(648d6a1bfa561641fa5dd368a7a8c7c73bd339b4) ) // Speed Data Storage
+	ROM_LOAD( "fs17.8m",      0x0000, 0x0100, CRC(aff8ac17) SHA1(4a35dcab142238b7247ea14a8b1c0eeeded792fc) ) // Speed Data Storage
+	ROM_LOAD( "fs18.8a",      0x0000, 0x0200, CRC(4e354f7d) SHA1(8e2270c3eddefdd62f807d37a581b6fb1dc44e5e) ) // Car Form
+	ROM_LOAD( "fs19.8b",      0x0000, 0x0200, CRC(9813b6ea) SHA1(3a2dca63bbae3f894061f1a4726686149e12b08e) ) // Car Form
+	ROM_LOAD( "fs20.8c",      0x0000, 0x0200, CRC(77acbc5c) SHA1(bc371002d8fd4f38fc15a26cb82e0405308c8cf9) ) // Car Form
+	ROM_LOAD( "fs21.8d",      0x0000, 0x0200, CRC(b24e6610) SHA1(d5e87aa63b8d7d0f71ad85b8670cba786bef29c7) ) // Car Form
+	ROM_LOAD( "fs22.8e",      0x0000, 0x0200, CRC(b71eacb0) SHA1(c26b260f5cdbf72a2b069f17ca73757dfe92218f) ) // Car Form
+	ROM_LOAD( "fs23.8f",      0x0000, 0x0200, CRC(48171b93) SHA1(b6a87710a8132cf179e65411c45fbcb7a41eb11e) ) // Car Form
+ROM_END
+
+/*
+
  Gunman
 
  label  loc. Part #
@@ -185,14 +251,14 @@ ROM_START( gunman )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "cr11.n5",     0x0000, 0x0200, CRC(8e2ec052) SHA1(b849080c9ed325a478739fbdf315c8a6c2bb7bd7) )
-	ROM_LOAD( "gn10.h5",     0x0000, 0x0200, CRC(a976c4c7) SHA1(f2fb56ccec99ceb19d607bee3b4cca31d6db58fd) )
-	ROM_LOAD( "gn06.h6",     0x0000, 0x0400, CRC(17376de6) SHA1(4ef660da9d37024a13925af12a7e102a49c67ff6) )
-	ROM_LOAD( "gn05.g9",     0x0000, 0x0200, CRC(f3d7f6cb) SHA1(7abf445cc814dc242ebf2393e9c1335ba4aedb90) )
-	ROM_LOAD( "gn04.f9",     0x0000, 0x0800, CRC(dec942db) SHA1(165d8594e07837fd4a87895f0a350d5ed8112ead) )
-	ROM_LOAD( "gn03.d9",     0x0000, 0x0400, CRC(b0e6e473) SHA1(9665608b7ec1dfb39e4e1df74adbfc773e9a6aa7) )
-	ROM_LOAD( "gn02.c9",     0x0000, 0x0200, CRC(897ae7b8) SHA1(2e91bc8336f8620faedd5329ce7d9734f19a2cfa) )
-	ROM_LOAD( "gn01.b9",     0x0000, 0x0800, CRC(69474a3a) SHA1(7396f1be991a0e6207eaa79e0206a5286a8d615d) )
+	ROM_LOAD( "cr11.n5",      0x0000, 0x0200, CRC(8e2ec052) SHA1(b849080c9ed325a478739fbdf315c8a6c2bb7bd7) )
+	ROM_LOAD( "gn10.h5",      0x0000, 0x0200, CRC(a976c4c7) SHA1(f2fb56ccec99ceb19d607bee3b4cca31d6db58fd) )
+	ROM_LOAD( "gn06.h6",      0x0000, 0x0400, CRC(17376de6) SHA1(4ef660da9d37024a13925af12a7e102a49c67ff6) )
+	ROM_LOAD( "gn05.g9",      0x0000, 0x0200, CRC(f3d7f6cb) SHA1(7abf445cc814dc242ebf2393e9c1335ba4aedb90) )
+	ROM_LOAD( "gn04.f9",      0x0000, 0x0800, CRC(dec942db) SHA1(165d8594e07837fd4a87895f0a350d5ed8112ead) )
+	ROM_LOAD( "gn03.d9",      0x0000, 0x0400, CRC(b0e6e473) SHA1(9665608b7ec1dfb39e4e1df74adbfc773e9a6aa7) )
+	ROM_LOAD( "gn02.c9",      0x0000, 0x0200, CRC(897ae7b8) SHA1(2e91bc8336f8620faedd5329ce7d9734f19a2cfa) )
+	ROM_LOAD( "gn01.b9",      0x0000, 0x0800, CRC(69474a3a) SHA1(7396f1be991a0e6207eaa79e0206a5286a8d615d) )
 ROM_END
 
 /*
@@ -237,20 +303,20 @@ ROM_START( ttblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "tl01.4a",     0x0000, 0x0800, CRC(65b730f7) SHA1(f82931c9a128021c97d1d41b5eac05df55dd5994) ) // MMI 6353
+	ROM_LOAD( "tl01.4a",      0x0000, 0x0800, CRC(65b730f7) SHA1(f82931c9a128021c97d1d41b5eac05df55dd5994) ) // MMI 6353
 ROM_END
-
 
 ROM_START( zzblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "tz01.1e",     0x0000, 0x0200, CRC(bd1e59e0) SHA1(038ad0b1b629c6c04f4d885fce6fe1c1f72b33e5) )
-	ROM_LOAD( "tz02.1d",     0x0000, 0x0200, CRC(befc8ad3) SHA1(80ce2a9978d22d45ccbe055c7dafba5c0ad6cf3c) )
-	ROM_LOAD( "tz03.6f",     0x0000, 0x0020, CRC(1ba385b1) SHA1(b70c356174a1748723c0116ae8dd74b25e1fe6b4) )
+	ROM_LOAD( "tz01.1e",      0x0000, 0x0200, CRC(bd1e59e0) SHA1(038ad0b1b629c6c04f4d885fce6fe1c1f72b33e5) )
+	ROM_LOAD( "tz02.1d",      0x0000, 0x0200, CRC(befc8ad3) SHA1(80ce2a9978d22d45ccbe055c7dafba5c0ad6cf3c) )
+	ROM_LOAD( "tz03.6f",      0x0000, 0x0020, CRC(1ba385b1) SHA1(b70c356174a1748723c0116ae8dd74b25e1fe6b4) )
 ROM_END
 
 
+GAME( 1977, fisco400,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",     MACHINE_IS_SKELETON )
 GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Gunman [TTL]",        MACHINE_IS_SKELETON )
 GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Missile-X [TTL]",     MACHINE_IS_SKELETON )
 GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T Block [TTL]",    MACHINE_IS_SKELETON )

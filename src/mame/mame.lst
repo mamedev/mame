@@ -2473,11 +2473,15 @@ laststar                        // (proto)          (c) 1984
 @source:atarittl.cpp
 antiairc                        // (c) 1975 Atari
 crashnsc                        // (c) 1975 Atari
+gtrak10                         // (c) 1974 Atari / Kee
+gtrak20                         // (c) 1974 Atari / Kee
 indy4                           // (c) 1976 Atari / Kee
 indy800                         // (c) 1975 Atari / Kee
 jetfight                        // (c) 1975 Atari
 jetfighta                       // (c) 1975 Atari
+lemans                          // (c) 1976 Atari
 outlaw                          // (c) 1976 Atari
+qwakttl                         // (c) 1974 Atari
 sharkjaw                        // (c) 1975 Atari / Horror Games
 steeplec                        // (c) 1975 Atari
 stuntcyc                        // (c) 1976 Atari
@@ -35929,6 +35933,7 @@ wwestern                        // WW  (c) 1982 Taito Corporation
 wwestern1                       // WW  (c) 1982 Taito Corporation
 
 @source:taitottl.cpp
+fisco400                        // (c) 1977 Taito
 gunman                          // (c) 1977 Taito
 missilex                        // (c) 1977 Taito
 ttblock                         // (c) 1977 Taito
