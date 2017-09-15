@@ -2190,7 +2190,7 @@ void shaders::init_slider_list()
 				item.text = core_slider->description;
 				item.subtext = "";
 				item.flags = 0;
-				item.ref = core_slider;
+				item.ref = core_slider.get();
 				item.type = ui::menu_item_type::SLIDER;
 				m_sliders.push_back(item);
 				m_core_sliders.push_back(std::move(core_slider));
