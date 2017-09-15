@@ -26,6 +26,7 @@
 
 class running_machine;
 class osd_window;
+struct slider_state;
 class slider_dirty_notifier;
 class render_primitive;
 
@@ -103,6 +104,7 @@ private:
 	std::vector<bgfx_chain*>    m_screen_chains;
 	std::vector<std::string>    m_chain_names;
 	std::vector<ui::menu_item>  m_selection_sliders;
+	std::vector<std::unique_ptr<slider_state>> m_core_sliders;
 	std::vector<int32_t>        m_current_chain;
 
 	static const uint32_t       CHAIN_NONE;

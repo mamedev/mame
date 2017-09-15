@@ -32,7 +32,7 @@ struct slider_state
 	int32_t           maxval;             /* maximum value */
 	int32_t           incval;             /* increment value */
 	int             id;
-	char            description[1];     /* textual description */
+	std::string     description;        /* textual description */
 };
 
 #endif // __UI_SLIDER__

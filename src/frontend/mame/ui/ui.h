@@ -266,7 +266,7 @@ private:
 
 	// private methods
 	void exit();
-	slider_state* slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
+	std::unique_ptr<slider_state> slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
 
 	// slider controls
 	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) override;
@@ -296,6 +296,8 @@ private:
 	int32_t slider_crossscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	int32_t slider_crossoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	#endif
+
+	std::vector<std::unique_ptr<slider_state>> m_sliders;
 };
 
 
