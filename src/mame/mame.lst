@@ -20428,6 +20428,11 @@ mm50                            // Mephisto 5.0 ROM
 mm5tk                           // Mephisto 5.1 ROM Turbo Kit Speed
 rebel5                          // Mephisto 5
 
+@source:mephisto_montec.cpp
+montec                          // 1987 Mephisto Monte Carlo
+megaiv                          // 1989 Mephisto Mega IV
+monteciv                        // 1990 Mephisto Monte Carlo IV LE
+
 @source:mephistp.cpp
 mephistp                        //
 mephistp1                       //
@@ -31585,9 +31590,8 @@ mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 academy                         // 1989 Mephisto Academy
 milano                          // 1991 Mephisto Milano
+modena                          // 1992 Mephisto Modena
 nshort                          // 1993 Mephisto Nigel Short
-megaiv                          // 1989 Mephisto Mega IV
-monteciv                        // 1990 Mephisto Monte Carlo IV LE
 
 @source:policetr.cpp
 policetr                        // (c) 1996 P&P Marketing
