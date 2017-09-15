@@ -709,30 +709,43 @@ void menu::draw(uint32_t flags)
 				ui().draw_text_full(container(), itemtext, effective_left, line_y0, effective_width,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, &item_width, nullptr);
 
-				// give 2 spaces worth of padding
-				item_width += 2.0f * gutter_width;
-
-				// if the subitem doesn't fit here, display dots
-				if (ui().get_string_width(subitem_text) > effective_width - item_width)
+				if (pitem.flags & FLAG_COLOR_BOX)
 				{
-					subitem_text = "...";
-					if (is_selected(itemnum))
-						selected_subitem_too_big = true;
+					rgb_t color = rgb_t((uint32_t)strtoul(subitem_text, nullptr, 16));
+
+					// give 2 spaces worth of padding
+					subitem_width = ui().get_string_width("FF00FF00");
+
+					ui().draw_outlined_box(container(), effective_left + effective_width - subitem_width, line_y0,
+						effective_left + effective_width, line_y1, color);
 				}
+				else
+				{
+					// give 2 spaces worth of padding
+					item_width += 2.0f * gutter_width;
 
-				// customize subitem text color
-				if (!core_stricmp(subitem_text, _("On")))
-					fgcolor2 = rgb_t(0x00,0xff,0x00);
+					// if the subitem doesn't fit here, display dots
+					if (ui().get_string_width(subitem_text) > effective_width - item_width)
+					{
+						subitem_text = "...";
+						if (is_selected(itemnum))
+							selected_subitem_too_big = true;
+					}
 
-				if (!core_stricmp(subitem_text, _("Off")))
-					fgcolor2 = rgb_t(0xff,0x00,0x00);
+					// customize subitem text color
+					if (!core_stricmp(subitem_text, _("On")))
+						fgcolor2 = rgb_t(0x00,0xff,0x00);
 
-				if (!core_stricmp(subitem_text, _("Auto")))
-					fgcolor2 = rgb_t(0xff,0xff,0x00);
+					if (!core_stricmp(subitem_text, _("Off")))
+						fgcolor2 = rgb_t(0xff,0x00,0x00);
 
-				// draw the subitem right-justified
-				ui().draw_text_full(container(), subitem_text, effective_left + item_width, line_y0, effective_width - item_width,
-							ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
+					if (!core_stricmp(subitem_text, _("Auto")))
+						fgcolor2 = rgb_t(0xff,0xff,0x00);
+
+					// draw the subitem right-justified
+					ui().draw_text_full(container(), subitem_text, effective_left + item_width, line_y0, effective_width - item_width,
+								ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
+				}
 
 				// apply arrows
 				if (is_selected(itemnum) && (pitem.flags & FLAG_LEFT_ARROW))
