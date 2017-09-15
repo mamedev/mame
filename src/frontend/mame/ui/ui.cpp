@@ -1332,7 +1332,7 @@ std::vector<ui::menu_item>& mame_ui_manager::get_slider_list(void)
 //  slider_alloc - allocate a new slider entry
 //-------------------------------------------------
 
-std::unique_ptr<slider_state> mame_ui_manager::slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
+std::unique_ptr<slider_state> mame_ui_manager::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
 	auto state = make_unique_clear<slider_state>();
 
@@ -1362,7 +1362,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	m_sliders.clear();
 
 	// add overall volume
-	m_sliders.push_back(slider_alloc(machine, SLIDER_ID_VOLUME, _("Master Volume"), -32, 0, 0, 1, nullptr));
+	m_sliders.push_back(slider_alloc(SLIDER_ID_VOLUME, _("Master Volume"), -32, 0, 0, 1, nullptr));
 
 	// add per-channel volume
 	mixer_input info;
@@ -1372,7 +1372,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		int32_t defval = 1000;
 
 		std::string str = string_format(_("%1$s Volume"), info.stream->input_name(info.inputnum));
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_MIXERVOL + item, str.c_str(), 0, defval, maxval, 20, (void *)(uintptr_t)item));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_MIXERVOL + item, str.c_str(), 0, defval, maxval, 20, (void *)(uintptr_t)item));
 	}
 
 	// add analog adjusters
@@ -1383,7 +1383,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		{
 			if (field.type() == IPT_ADJUSTER)
 			{
-				m_sliders.push_back(slider_alloc(machine, SLIDER_ID_ADJUSTER + slider_index++, field.name(), field.minval(), field.defvalue(), field.maxval(), 1, (void *)&field));
+				m_sliders.push_back(slider_alloc(SLIDER_ID_ADJUSTER + slider_index++, field.name(), field.minval(), field.defvalue(), field.maxval(), 1, (void *)&field));
 			}
 		}
 	}
@@ -1396,7 +1396,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		{
 			void *param = (void *)&exec.device();
 			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
 		}
 		for (device_sound_interface &snd : sound_interface_iterator(machine.root_device()))
 		{
@@ -1405,7 +1405,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 			{
 				void *param = (void *)&snd.device();
 				std::string str = string_format(_("Overclock %1$s sound"), snd.device().tag());
-				m_sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
+				m_sliders.push_back(slider_alloc(SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
 			}
 		}
 	}
@@ -1426,26 +1426,26 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		if (machine.options().cheat())
 		{
 			std::string str = string_format(_("%1$s Refresh Rate"), screen_desc);
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_REFRESH + slider_index, str.c_str(), -10000, 0, 10000, 1000, param));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_REFRESH + slider_index, str.c_str(), -10000, 0, 10000, 1000, param));
 		}
 
 		// add standard brightness/contrast/gamma controls per-screen
 		std::string str = string_format(_("%1$s Brightness"), screen_desc);
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_BRIGHTNESS + slider_index, str.c_str(), 100, 1000, 2000, 10, param));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_BRIGHTNESS + slider_index, str.c_str(), 100, 1000, 2000, 10, param));
 		str = string_format(_("%1$s Contrast"), screen_desc);
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_CONTRAST + slider_index, str.c_str(), 100, 1000, 2000, 50, param));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_CONTRAST + slider_index, str.c_str(), 100, 1000, 2000, 50, param));
 		str = string_format(_("%1$s Gamma"), screen_desc);
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_GAMMA + slider_index, str.c_str(), 100, 1000, 3000, 50, param));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_GAMMA + slider_index, str.c_str(), 100, 1000, 3000, 50, param));
 
 		// add scale and offset controls per-screen
 		str = string_format(_("%1$s Horiz Stretch"), screen_desc);
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_XSCALE + slider_index, str.c_str(), 500, defxscale, 1500, 2, param));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_XSCALE + slider_index, str.c_str(), 500, defxscale, 1500, 2, param));
 		str = string_format(_("%1$s Horiz Position"), screen_desc);
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_XOFFSET + slider_index, str.c_str(), -500, defxoffset, 500, 2, param));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_XOFFSET + slider_index, str.c_str(), -500, defxoffset, 500, 2, param));
 		str = string_format(_("%1$s Vert Stretch"), screen_desc);
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_YSCALE + slider_index, str.c_str(), 500, defyscale, 1500, 2, param));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_YSCALE + slider_index, str.c_str(), 500, defyscale, 1500, 2, param));
 		str = string_format(_("%1$s Vert Position"), screen_desc);
-		m_sliders.push_back(slider_alloc(machine, SLIDER_ID_YOFFSET + slider_index, str.c_str(), -500, defyoffset, 500, 2, param));
+		m_sliders.push_back(slider_alloc(SLIDER_ID_YOFFSET + slider_index, str.c_str(), -500, defyoffset, 500, 2, param));
 		slider_index++;
 	}
 
@@ -1464,13 +1464,13 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 
 			// add scale and offset controls per-overlay
 			std::string str = string_format(_("Laserdisc '%1$s' Horiz Stretch"), laserdisc.tag());
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERLAY_XSCALE + slider_index, str.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, param));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERLAY_XSCALE + slider_index, str.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, param));
 			str = string_format(_("Laserdisc '%1$s' Horiz Position"), laserdisc.tag());
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERLAY_YSCALE + slider_index, str.c_str(), -500, defxoffset, 500, 2, param));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERLAY_YSCALE + slider_index, str.c_str(), -500, defxoffset, 500, 2, param));
 			str = string_format(_("Laserdisc '%1$s' Vert Stretch"), laserdisc.tag());
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERLAY_XOFFSET + slider_index, str.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, param));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERLAY_XOFFSET + slider_index, str.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, param));
 			str = string_format(_("Laserdisc '%1$s' Vert Position"), laserdisc.tag());
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_OVERLAY_YOFFSET + slider_index, str.c_str(), -500, defyoffset, 500, 2, param));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERLAY_YOFFSET + slider_index, str.c_str(), -500, defyoffset, 500, 2, param));
 			slider_index++;
 		}
 	}
@@ -1481,10 +1481,10 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		if (screen.screen_type() == SCREEN_TYPE_VECTOR)
 		{
 			// add vector control
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_FLICKER + slider_index, _("Vector Flicker"), 0, 0, 1000, 10, nullptr));
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_WIDTH_MIN + slider_index, _("Beam Width Minimum"), 100, 100, 1000, 1, nullptr));
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_WIDTH_MAX + slider_index, _("Beam Width Maximum"), 100, 100, 1000, 1, nullptr));
-			m_sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_INTENSITY + slider_index, _("Beam Intensity Weight"), -1000, 0, 1000, 10, nullptr));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_FLICKER + slider_index, _("Vector Flicker"), 0, 0, 1000, 10, nullptr));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_BEAM_WIDTH_MIN + slider_index, _("Beam Width Minimum"), 100, 100, 1000, 1, nullptr));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_BEAM_WIDTH_MAX + slider_index, _("Beam Width Maximum"), 100, 100, 1000, 1, nullptr));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_BEAM_INTENSITY + slider_index, _("Beam Intensity Weight"), -1000, 0, 1000, 10, nullptr));
 			slider_index++;
 			break;
 		}
@@ -1500,9 +1500,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.player() == 0)
 			{
 				std::string str = string_format(_("Crosshair Scale %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
-				m_sliders.push_back(slider_alloc(machine, SLIDER_ID_CROSSHAIR_SCALE + slider_index, str.c_str(), -3000, 1000, 3000, 100, (void *)&field));
+				m_sliders.push_back(slider_alloc(SLIDER_ID_CROSSHAIR_SCALE + slider_index, str.c_str(), -3000, 1000, 3000, 100, (void *)&field));
 				str = string_format(_("Crosshair Offset %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
-				m_sliders.push_back(slider_alloc(machine, SLIDER_ID_CROSSHAIR_OFFSET + slider_index, str.c_str(), -3000, 0, 3000, 100, (void *)&field));
+				m_sliders.push_back(slider_alloc(SLIDER_ID_CROSSHAIR_OFFSET + slider_index, str.c_str(), -3000, 0, 3000, 100, (void *)&field));
 			}
 		}
 	}
