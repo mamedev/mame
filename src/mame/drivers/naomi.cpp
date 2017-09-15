@@ -5650,7 +5650,7 @@ ROM_START( shootplm )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x3000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "epr-24148.ic11", 0x000000, 0x400000, CRC(d575f311) SHA1(7f45d897412fd75eda740a82320fce08331fa310) )
+	ROM_LOAD( "epr-24148.ic11", 0x000000, 0x400000, CRC(d575f311) SHA1(7f45d897412fd75eda740a82320fce08331fa310) ) // Build: 23 Jan 2004
 	ROM_LOAD32_WORD( "opr-24174.ic17s", 0x1000000, 0x800000, CRC(ccd6aec5) SHA1(a8105ce6986601d8673ffea41353fe399cf8557d) )
 	ROM_LOAD32_WORD( "opr-24175.ic18",  0x1000002, 0x800000, CRC(e66e6345) SHA1(28a372168419c9352cb7fc5285bbd37bd37f3b71) )
 	ROM_LOAD32_WORD( "opr-24176.ic19s", 0x2000000, 0x800000, CRC(1277bca8) SHA1(e1bd9d1a6f4170a9c29658f95e9e96caf4b0cb84) )
@@ -10162,8 +10162,8 @@ ROM_END
 /* 0128    */ GAME( 2003, shootpl,   naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) (Rev A)", GAME_FLAGS )
 /* 0130    */ GAME( 2002, hopper,    naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "SWP Hopper Board", GAME_FLAGS )
 // 0132 Mushiking 2K3 2ND (Japan)
-/* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B", GAME_FLAGS )
-/* 0136    */ GAME( 2004, shootplmp, shootplm, naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B -P", GAME_FLAGS )
+/* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B", GAME_FLAGS ) // Build: 23 Jan 2004
+/* 0136    */ GAME( 2004, shootplmp, shootplm, naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B -P", GAME_FLAGS ) // Build: 15 Dec 2003
 /* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
 /* 0150    */ GAME( 2003, mtkob2,    naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND, World)", GAME_FLAGS ) // not for Japan
 /* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
