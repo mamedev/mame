@@ -255,7 +255,7 @@ private:
 	// images render
 	void arts_render(float origx1, float origy1, float origx2, float origy2);
 	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
-	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
+	void arts_render_images(bitmap_argb32 &&bitmap, float origx1, float origy1, float origx2, float origy2);
 	void draw_snapx(float origx1, float origy1, float origx2, float origy2);
 
 	// text for main top/bottom panels
