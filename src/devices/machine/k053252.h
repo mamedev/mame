@@ -22,8 +22,8 @@
 #define MCFG_K053252_INT2_ACK_CB(_devcb) \
 	devcb = &k053252_device::set_int2_ack_callback(*device, DEVCB_##_devcb);
 
-/*#define MCFG_K053252_INT_TIME_CB(_devcb) \
-    devcb = &k053252_device::set_int_time_callback(*device, DEVCB_##_devcb); */
+#define MCFG_K053252_INT_TIME_CB(_devcb) \
+    devcb = &k053252_device::set_int_time_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_K053252_OFFSETS(_offsx, _offsy) \
 	k053252_device::set_offsets(*device, _offsx, _offsy);
@@ -41,7 +41,7 @@ public:
 	template <class Object> static devcb_base &set_int2_en_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int2_en_cb.set_callback(std::forward<Object>(obj)); }
 	template <class Object> static devcb_base &set_int1_ack_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int1_ack_cb.set_callback(std::forward<Object>(obj)); }
 	template <class Object> static devcb_base &set_int2_ack_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int2_ack_cb.set_callback(std::forward<Object>(obj)); }
-	//template <class Object> static devcb_base &set_int_time_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int_time_cb.set_callback(std::forward<Object>(obj)); }
+	template <class Object> static devcb_base &set_int_time_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int_time_cb.set_callback(std::forward<Object>(obj)); }
 	static void set_offsets(device_t &device, int offsx, int offsy) { downcast<k053252_device &>(device).m_offsx = offsx; downcast<k053252_device &>(device).m_offsy = offsy; }
 
 	DECLARE_READ8_MEMBER( read );  // CCU registers
@@ -69,7 +69,7 @@ protected:
 	devcb_write_line   m_int2_en_cb;
 	devcb_write_line   m_int1_ack_cb;
 	devcb_write_line   m_int2_ack_cb;
-//  devcb_write8       m_int_time_cb;
+	devcb_write8       m_int_time_cb;
 	int                m_offsx;
 	int                m_offsy;
 

@@ -81,6 +81,7 @@ public:
 	uint8_t m_bl_port1;
 	uint8_t m_bl_fake_port2;
 	uint8_t m_port2_raw;
+	uint8_t m_bl_port3_out;
 
 	DECLARE_READ8_MEMBER(z80_semaphore_assert_r);
 	DECLARE_WRITE8_MEMBER(bootleg_mcu_port1_w);
@@ -88,6 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_READ8_MEMBER(mcu_port3_r);
 	DECLARE_READ8_MEMBER(bootleg_mcu_port3_r);
+	DECLARE_WRITE8_MEMBER(bootleg_mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(z80_ay1_sync_address_w);
 	DECLARE_READ8_MEMBER(z80_ay2_iob_r);
 	DECLARE_WRITE8_MEMBER(z80_ay2_iob_w);

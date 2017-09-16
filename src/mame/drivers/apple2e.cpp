@@ -1343,14 +1343,20 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			break;
 
 		case 0x54:  // set page 1
-			machine().first_screen()->update_now();
+			if (!m_video->m_80col)
+			{
+				machine().first_screen()->update_now();
+			}
 			m_page2 = false;
 			m_video->m_page2 = false;
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			machine().first_screen()->update_now();
+			if (!m_video->m_80col)
+			{
+				machine().first_screen()->update_now();
+			}
 			m_page2 = true;
 			m_video->m_page2 = true;
 			auxbank_update();

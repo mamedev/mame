@@ -323,7 +323,9 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map_qb3, AS_IO, 8, cinemat_state )
+	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
 	AM_RANGE(0x00, 0x00) AM_WRITE(qb3_ram_bank_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(qb3_sound_fifo_w)
 	AM_RANGE(0x0f, 0x0f) AM_READ(qb3_frame_r)
 	AM_IMPORT_FROM(io_map)
 ADDRESS_MAP_END

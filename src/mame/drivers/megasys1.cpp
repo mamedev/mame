@@ -514,6 +514,16 @@ static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( kickoffb_sound_map, AS_PROGRAM, 16, megasys1_state ) // TODO: wrong, needs to be checked range for range
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read)
+	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)   // to main cpu
+	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ8(oki_status_1_r, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
+ADDRESS_MAP_END
+
 
 /***************************************************************************
                         [ Sound CPU - System B / C ]
@@ -1671,6 +1681,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system_A_soldam, system_A )
 	MCFG_DEVICE_MODIFY("scroll1")
 	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( kickoffb, system_A )
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(kickoffb_sound_map)
+
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("oki2")
+
+	MCFG_SOUND_ADD("ymsnd", YM2203, SOUND_CPU_CLOCK / 2)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(megasys1_state, sound_irq)) // TODO: needs to be checked
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_B, system_A )
@@ -3071,7 +3094,7 @@ ROM_START( kickoff )
 	ROM_LOAD( "kioff05.rom", 0x000000, 0x020000, CRC(e7232103) SHA1(4bb72fb835ab491cf5b58a34af4e2a767703320c) )
 	ROM_LOAD( "kioff06.rom", 0x020000, 0x020000, CRC(a0b3cb75) SHA1(4840177d84e825c39e2e8252c75f0c1aab156b19) )
 	ROM_LOAD( "kioff07.rom", 0x040000, 0x020000, CRC(ed649919) SHA1(e8955c0dc2d1546d875a16fc9d8595ed4a507539) )
-	ROM_LOAD( "kioff10.rom", 0x060000, 0x020000, CRC(fd739fec) SHA1(1442d5ef7b8fbaa0c9f71c12ce993626364d2e1a) )
+	ROM_LOAD( "kioff10.rom", 0x060000, 0x020000, CRC(fd739fec) SHA1(1442d5ef7b8fbaa0c9f71c12ce993626364d2e1a) ) // TODO: this is the ROM for one of the two oki. Loading it in the oki2 region gives cheering
 
 	ROM_REGION( 0x080000, "scroll1", ROMREGION_ERASEFF ) /* Scroll 1 */
 	// scroll 1 is unused
@@ -3098,6 +3121,57 @@ ROM_START( kickoff )
 	ROM_LOAD( "kick.bin",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
+/*
+Bootleg board
+
+Main 68000 CPU @6MHz
+Sound 68000 CPU @7.2MHz
+MSM6295 @3.6MHz, PIN 7 is HIGH
+YM2203 @3.6MHz
+H-SYNC @15.34KHz
+V-SYNC @56.24Hz
+*/
+
+ROM_START( kickoffb )
+	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "K-14.1B", 0x000000, 0x010000, CRC(b728c1af) SHA1(3575c113b442e3864c1575709ac410a8da1bc969) )
+	ROM_LOAD16_BYTE( "K-13.1A", 0x000001, 0x010000, CRC(93a8483f) SHA1(c4e60fc05232624fcb95147df845a44bfbfd04dc) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "K-4.3K", 0x000000, 0x010000, CRC(ae816738) SHA1(06bf166472c82967e6abaa626f0eae7cac1bedfe) )
+	ROM_LOAD16_BYTE( "K-3.3H", 0x000001, 0x010000, CRC(b3d6c452) SHA1(f27cabaf0bbaf53f484288640d15422046342221) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "K-18.2P", 0x000000, 0x010000, CRC(e3eb2f5b) SHA1(e3306a3ddf0d012a6ddadc806261c5ff5a2c3ae6) )
+	ROM_LOAD( "K-19.3P", 0x010000, 0x010000, CRC(b0dfdd52) SHA1(96f46840107546d86d070dd60d7844bb4eb8edcf) )
+	ROM_LOAD( "K-17.1P", 0x020000, 0x010000, CRC(ceaac281) SHA1(1c89e733c13b4db9806172b15658c1b59cff72b6) )
+	ROM_LOAD( "K-20.4P", 0x030000, 0x010000, CRC(c79bc519) SHA1(d33620969e9cc13f78d67ddf4425e79d8323ea80) )
+	ROM_LOAD( "F-23.6P", 0x040000, 0x010000, CRC(e865e811) SHA1(1a79db74fb6270bd553f1e395eb2bd2e8ba28378) )
+	ROM_LOAD( "F-24.7P", 0x050000, 0x010000, CRC(57e5d4d0) SHA1(51eba172d58dda6cdad00ee44899f5ec4bc8084e) )
+
+	ROM_REGION( 0x080000, "scroll1", ROMREGION_ERASEFF ) /* Scroll 1 */
+	// scroll 1 is unused
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "K-16.16H", 0x000000, 0x010000, CRC(d3e9eb63) SHA1(b657e9f374783238a90483dd0c096dfd95652688) )
+	ROM_LOAD( "K-15.15H", 0x010000, 0x010000, CRC(304bef85) SHA1(97cef07124d064bdd173da8788d408cdf8e345e0) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "K-7.17G",  0x000000, 0x010000, CRC(b27d1691) SHA1(efd8b6e05cf07863a88eb374f45737d65864a317) )
+	ROM_LOAD( "K-10.18G", 0x010000, 0x010000, CRC(c02cfdaa) SHA1(6749017d1da5745d541d857f0e7cc9dd5d6cbeb1) )
+	ROM_LOAD( "K-8.17H",  0x020000, 0x010000, CRC(9be1949a) SHA1(128656e16c88cecd774a6a3dd1ea9d1345db1416) )
+	ROM_LOAD( "K-11.18H", 0x030000, 0x010000, CRC(d4a6ea48) SHA1(486c1731a05db809055f8ba26764f290d19b36e6) )
+	ROM_LOAD( "K-5.16G",  0x040000, 0x010000, CRC(f7232c58) SHA1(698be1590417ac382c5faec4ce18d59723a02dac) )
+	ROM_LOAD( "K-6.16H",  0x050000, 0x010000, CRC(6bc0f046) SHA1(37a419decd3c80d67fd6e388d48b6f112d047869) )
+	ROM_LOAD( "K-9.17K",  0x060000, 0x010000, CRC(063ad48d) SHA1(4f058cdcd3b0aef0366ac23db4e00e3b3e6db57b) )
+	ROM_LOAD( "K-12.18K", 0x070000, 0x010000, CRC(a79bb2dc) SHA1(5b66480c85c5cb7bc629f8df0b6d14d7d58c19e9) )
+
+	ROM_REGION( 0x010000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "K-1.1H", 0x000000, 0x010000, CRC(4e09f403) SHA1(5d2ec598333e968b3a9ac797e93e4d3830436d26) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "kick.bin",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+ROM_END
 
 /***************************************************************************
 
@@ -4610,6 +4684,7 @@ GAME( 1988, p47,      0,        system_A,          p47,      megasys1_state, 0, 
 GAME( 1988, p47j,     p47,      system_A,          p47,      megasys1_state, 0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47je,    p47,      system_A,          p47,      megasys1_state, 0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoff,  0,        system_A,          kickoff,  megasys1_state, 0,        ROT0,   "Jaleco", "Kick Off (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoffb, kickoff,  kickoffb,          kickoff,  megasys1_state, 0,        ROT0,   "bootleg (Comodo)", "Kick Off (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // YM2203 isn't hooked up, OKI needs to be checked
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )

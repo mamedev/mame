@@ -14,22 +14,21 @@ Status: Boots into monitor, some commands work, some freeze.
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class pm68k_state : public driver_device
 {
 public:
 	pm68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_base(*this, "rambase"),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_p_base(*this, "rambase")
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
+
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -55,8 +54,8 @@ static ADDRESS_MAP_START(pm68k_mem, AS_PROGRAM, 16, pm68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x200000, 0x205fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x600000, 0x600001) AM_READ(keyin_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0xff00)
+	AM_RANGE(0x200000, 0x205fff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x600000, 0x600001) AM_READ(keyin_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_READ(status_r)
 ADDRESS_MAP_END
 
@@ -68,7 +67,7 @@ INPUT_PORTS_END
 
 void pm68k_state::machine_reset()
 {
-	uint8_t* ROM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("roms")->base();
 	memcpy(m_p_base, ROM, 8);
 	m_maincpu->reset();
 }
@@ -84,13 +83,13 @@ static MACHINE_CONFIG_START( pm68k )
 	MCFG_CPU_PROGRAM_MAP(pm68k_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pm68k_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pm68k )
-	ROM_REGION16_BE(0x6000, "maincpu", 0)
+	ROM_REGION16_BE(0x6000, "roms", 0)
 	ROM_LOAD16_BYTE("u103", 0x00000, 0x1000, CRC(86d32d6c) SHA1(ce9c54b62c64c37ae9106fb06b8a2b2152d1ddf6) )
 	ROM_LOAD16_BYTE("u101", 0x00001, 0x1000, CRC(66607e54) SHA1(06f380fdeba13dc3aee826dd166f4bd3031febb9) )
 	ROM_LOAD16_BYTE("u104", 0x02000, 0x2000, CRC(ccd2ba4d) SHA1(5cdcf875e136aa9af5f150e0102cd209c496885e) )

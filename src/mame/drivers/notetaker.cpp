@@ -522,20 +522,6 @@ More or less:
 BootSeqDone is 0, DisableROM is ignored, mem map is 0x00000-0xfffff reading is the 0x1000-long ROM, repeated every 0x1000 bytes. writing goes nowhere.
 BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is the 0x1000-long ROM, remainder of memory map goes to RAM or open bus. writing the ROM area goes nowhere, writing RAM goes to RAM.
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
-
-
-Emulator cpu mem map:
-a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   4KPage0'
-x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
-x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
-x   x   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   *    x                       RW  System/Shared RAM
-   EXCEPT for the following, decoded by the EP board and superseding above:
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
-   And the following, decoded by the memory address logic board:
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset(bit 6)/int(bit 5)/boot(bit 4) for each processor; data bits 3,2,1,0 are 'processor address'; 0010 means IP, 0111 means EP; all others ignored.))
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp(syndrome) bits 13-8, bits 7-0 are the highest address bits)
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
 */
 
 static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
@@ -663,7 +649,40 @@ read from 0x44 (byte wide) to check input fifo status
 
 */
 
+
+
 /* Emulator CPU */
+
+/* WRITE16_MEMBER(notetaker_state::EPConReg_w)
+{
+	m_EP_LED1 = m_EP_ParityError; // if parity checking is enabled AND the last access was to the low 4k AND there was a parity error, the parity error latch is latched here. It triggers an interrupt.
+	m_EP_LED2 = (data&0x40)?1:0;
+	m_EP_LED3 = (data&0x20)?1:0;
+	m_EP_LED4 = (data&0x10)?1:0;
+	m_EP_SelROM_q = (data&0x08)?1:0; // this doesn't appear to be hooked anywhere, and may just drive an LED
+	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision
+	m_EP_ProcLock = (data&0x04)?1:0; // bus lock for this processor (hold other processor in wait state)
+	m_EP_SetParity_q = (data&0x02)?1:0; // enable parity checking on local ram if low
+	m_EP_DisLMem_q = (data&0x01)?1:0; // if low, the low 4k of local memory is disabled and accesses the shared memory instead.
+	popmessage("EP LEDS: CR1: %d, CR2: %d, CR3: %d, CR4: %d", (data&0x80)>>2, (data&0x40)>>3, (data&0x20)>>1, (data&0x10));
+}
+*/
+
+/*
+Emulator cpu mem map:
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   DisLMem_q
+0?  0?  0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
+0?  0?  0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
+<anything not all zeroes >   *    *   *   *   *    *   *   *   *    *   *   *   *    x                       RW  System/Shared RAM
+   EXCEPT for the following, decoded by the EP board and superseding above:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
+   And the following, decoded by the memory address logic board:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset(bit 6)/int(bit 5)/boot(bit 4) for each processor; data bits 3,2,1,0 are 'processor address'; 0010 means IP, 0111 means EP; all others ignored.))
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp(syndrome) bits 13-8, bits 7-0 are the highest address bits)
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
+*/
+
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
     AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
@@ -677,6 +696,14 @@ ADDRESS_MAP_END
    0x1800 is accessed it will write to both the debug 8255 AND the pic8259!
    I'm not sure the code abuses this or not, but it might do so to both write
    registers and clear parity at once, or something similar. */
+/*
+Emulator cpu i/o map:
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   4KPage0'
+x   x   x   x    x   x   x   x    1   x   x   x    x   x   x   x    x   x   *   x    x                       RW  8259
+x   x   x   x    x   x   x   1    x   x   x   x    x   x   x   x    x   *   *   x    x                       RW  EP debugger 8255, same exact interface on both cpu and alto side as the IOP debugger 8255
+x   x   x   x    x   x   1   x    x   x   x   x    x   x   x   x    x   x   x   x    x                       W   EPConReg
+x   x   x   x    x   1   x   x    x   x   x   x    x   x   x   x    x   x   x   x    x                       W   Writing anything here clears the parity error latch
+*/
 
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
@@ -885,37 +912,49 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 }
 
 /* ROM definition */
+/*
+The notetaker, over its lifetime from 1978 to 1981, had three different classes of IOP roms, with multiple versions of each one.
+These were:
+BIOP - "Bootable", standalone "user" unit, running smalltalk-78 off of a boot disk, either single or double density; early notetakers used an fd1791 while later ones used a wd1791.
+XIOP - "eXercizer" intended for initial testing of each NoteTaker system as assembled; only usable running tethered to a Xerox Alto running notex (notex.cm) as a hardware scripting language for system testing
+MIOP - only bootable tethered to a Xerox Alto via a debug card, running smalltalk on the NoteTaker, but not booted off of the floppy disk.
+The 'Z-iop' firmware 1.5 below seems to be a BIOP firmware.
+*/
+
 ROM_START( notetakr )
 	ROM_REGION( 0x1000, "iocpuload", ROMREGION_ERASEFF ) // load roms here before descrambling
-	ROM_SYSTEM_BIOS( 0, "v2.00", "IO Monitor v2.00" ) // dumped from Notetaker
+	ROM_SYSTEM_BIOS( 0, "v2.00", "Bootable IO Monitor v2.00" ) // dumped from Notetaker
 	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0x0000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v1.50", "IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
+	ROM_SYSTEM_BIOS( 1, "v1.50", "Bootable IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
 	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(122ffb5b) SHA1(b957fe24620e1aa98b3158dbcf459937dbd54bac), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_REGION( 0x100000, "iocpu", ROMREGION_ERASEFF ) // area for descrambled roms
 	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
+	ROM_REGION( 0x400, "kbmcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "keyboard.i8748.a10a", 0x000, 0x400, NO_DUMP ) // keyboard mcu which handles key scanning as well as reading the mouse quadratures, and issues state responses if requested by the iocpu
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
-	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board
-	ROM_LOAD( "memcasraswrite.prom.82s147.b1", 0x200, 0x200, NO_DUMP ) // memory cas/ras/write state machine prom from the memory address logic board; the equations for this are listed in one of the documents on bitsavers
-	ROM_LOAD( "setmemrq.prom.82s126.d9", 0x400, 0x100, NO_DUMP ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
+	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board; there are two different versions of this prom, both generated by BCPL programs, one from 1978 (Single density only?) and one from 1979.
+	ROM_LOAD( "timingprom.82s147.b1", 0x200, 0x200, CRC(3003b50a) SHA1(77d9ffe4716c2297708b8e5ebce7f930619c3cc3) ) // memory cas/ras/write state machine prom from the memory address logic board; the contents of this are listed in http://www.bitsavers.org/pdf/xerox/notetaker/schematics/19781027_Memory_Address_Timing.pdf
+	ROM_LOAD( "memreqprom.82s126.d9", 0x400, 0x100, CRC(56b2be8b) SHA1(5df0579ed8afeb59113700be6f2982ef85f64b44) ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
 	/*
 	SetMemRq:
 	Address:
-	01234567
-	|||||||\- RCtr.3 (LSB)
-	||||||\-- RCtr.2
-	|||||\--- RCtr.1
-	||||\---- RCtr.0 (MSB)
-	|||\----- WCtr.3 (LSB)
-	||\------ WCtr.2
-	|\------- WCtr.1
-	\-------- WCtr.0 (MSB)
+	76543210
+	|||||||\- WCtr.0 (MSB)
+	||||||\-- WCtr.1
+	|||||\--- WCtr.2
+	||||\---- WCtr.3 (LSB)
+	|||\----- RCtr.0 (MSB)
+	||\------ RCtr.1
+	|\------- RCtr.2
+	\-------- RCtr.3 (LSB)
 
+	The schematic has an error here, showing the SetMemRq_q output coming from data bit 0, in reality based on the listing it comes from data bit 3
 	Data:
-	0123
-	|\\\- N/C (zero?)
-	\---- SetMemRq
+	3210
+	|\\\- N/C (always zero)
+	\---- SetMemRq_q
 
 	Equation: SETMEMRQ == (
 	  ((Rctr == 0) && ((Wctr == 0)||(Wctr == 4)||(Wctr == 8)))
@@ -923,7 +962,7 @@ ROM_START( notetakr )
 	||((Rctr == 8) && ((Wctr == 8)||(Wctr == 12)||(Wctr == 0)))
 	||((Rctr == 12) && ((Wctr == 12)||(Wctr == 0)||(Wctr == 4)))
 	)
-	(the setmemrq output might be inverted, as well)
+	The PROM output is SetMemRq_q and is inverted compared to the equation above.
 	*/
 ROM_END
 

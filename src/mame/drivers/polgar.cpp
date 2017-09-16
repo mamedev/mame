@@ -19,6 +19,7 @@
 #include "mephisto_lcd.lh"
 #include "mephisto_academy.lh"
 #include "mephisto_milano.lh"
+#include "mephisto_modena.lh"
 
 
 class mephisto_polgar_state : public driver_device
@@ -87,11 +88,37 @@ public:
 
 protected:
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display_modul_device> m_display;
 	uint8_t m_led_latch;
+};
+
+class mephisto_modena_state : public mephisto_polgar_state
+{
+public:
+	mephisto_modena_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mephisto_polgar_state(mconfig, type, tag)
+		, m_board(*this, "board")
+		, m_beeper(*this, "beeper")
+	{ }
+
+	DECLARE_READ8_MEMBER(modena_input_r);
+	DECLARE_WRITE8_MEMBER(modena_digits_w);
+	DECLARE_WRITE8_MEMBER(modena_io_w);
+	DECLARE_WRITE8_MEMBER(modena_led_w);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
+private:
+	required_device<mephisto_board_device> m_board;
+	required_device<beep_device> m_beeper;
+	uint8_t m_digits_idx;
+	uint8_t m_io_ctrl;
 };
 
 class mephisto_academy_state : public mephisto_polgar_state
@@ -272,6 +299,51 @@ static ADDRESS_MAP_START(milano_mem, AS_PROGRAM, 8, mephisto_milano_state)
 ADDRESS_MAP_END
 
 
+READ8_MEMBER(mephisto_modena_state::modena_input_r)
+{
+	if (m_board->mux_r(space, offset) == 0xff)
+		return m_keys->read();
+	else
+		return m_board->input_r(space, offset) ^ 0xff;
+}
+
+WRITE8_MEMBER(mephisto_modena_state::modena_led_w)
+{
+	m_board->mux_w(space, offset, data);
+
+	if (m_io_ctrl & 0x0e)
+	{
+		for(int i=0; i<8; i++)
+		{
+			if (m_io_ctrl & 0x02)	output().set_led_value(100 + i, BIT(data, i) ? 0 : 1);
+			if (m_io_ctrl & 0x04)	output().set_led_value(0 + i, BIT(data, i) ? 0 : 1);
+			if (m_io_ctrl & 0x08)	output().set_led_value(8 + i, BIT(data, i) ? 0 : 1);
+		}
+	}
+}
+
+WRITE8_MEMBER(mephisto_modena_state::modena_io_w)
+{
+	m_io_ctrl = data;
+	m_beeper->set_state(BIT(data, 6));
+}
+
+WRITE8_MEMBER(mephisto_modena_state::modena_digits_w)
+{
+	output().set_digit_value(m_digits_idx, data ^ ((m_io_ctrl & 0x10) ? 0xff : 0x00));
+	m_digits_idx = (m_digits_idx + 1) & 3;
+}
+
+static ADDRESS_MAP_START(modena_mem, AS_PROGRAM, 8, mephisto_modena_state)
+	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
+	AM_RANGE( 0x4000, 0x4000 ) AM_WRITE(modena_digits_w)
+	AM_RANGE( 0x5000, 0x5000 ) AM_WRITE(modena_led_w)
+	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE(modena_io_w)
+	AM_RANGE( 0x7000, 0x7fff ) AM_READ(modena_input_r)
+	AM_RANGE( 0x8000, 0xffff ) AM_ROM
+ADDRESS_MAP_END
+
+
 INTERRUPT_GEN_MEMBER(mephisto_academy_state::academy_irq)
 {
 	if (m_enable_nmi)
@@ -321,18 +393,6 @@ static ADDRESS_MAP_START(academy_mem, AS_PROGRAM, 8, mephisto_academy_state )
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START(monteciv_mem, AS_PROGRAM, 8, mephisto_polgar_state )
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(megaiv_mem, AS_PROGRAM, 8, mephisto_polgar_state )
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
-
-
 static INPUT_PORTS_START( polgar )
 	PORT_START("KEY")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Trn")    PORT_CODE(KEYCODE_T)
@@ -345,26 +405,16 @@ static INPUT_PORTS_START( polgar )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( monteciv )
-	PORT_START("KEY.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("1 Pawn")   PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("2 Knight") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("3 Bishop") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("4 Rook")   PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("5 Queen")  PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("6 King")   PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("7 Black")  PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("8 White")  PORT_CODE(KEYCODE_8)
-
-	PORT_START("KEY.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("9 Book")   PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("0 Pos")    PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("Mem")      PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("Info")     PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("Clear")    PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("Level")    PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("Enter")    PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)        PORT_NAME("Reset")    PORT_CODE(KEYCODE_DEL)
+static INPUT_PORTS_START( modena )
+	PORT_START("KEY")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("BOOK")      PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("INFO")      PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("MEMORY")    PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("POSITION")  PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("LEVEL")     PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("FUNCTION")  PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("ENTER")     PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("CLEAR")     PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
 void mephisto_risc_state::machine_start()
@@ -394,9 +444,26 @@ void mephisto_risc_state::machine_reset()
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+void mephisto_milano_state::machine_start()
+{
+	save_item(NAME(m_led_latch));
+}
+
 void mephisto_milano_state::machine_reset()
 {
 	m_led_latch = 0;
+}
+
+void mephisto_modena_state::machine_start()
+{
+	save_item(NAME(m_digits_idx));
+	save_item(NAME(m_io_ctrl));
+}
+
+void mephisto_modena_state::machine_reset()
+{
+	m_digits_idx = 0;
+	m_io_ctrl = 0;
 }
 
 void mephisto_academy_state::machine_reset()
@@ -456,21 +523,21 @@ static MACHINE_CONFIG_DERIVED( academy, polgar )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( monteciv )
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_8MHz)
-	MCFG_CPU_PROGRAM_MAP( monteciv_mem )
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL_4_9152MHz / (1 << 13))
+static MACHINE_CONFIG_DERIVED( modena, milano )
+	MCFG_CPU_MODIFY("maincpu")			// W65C02SP
+	MCFG_CPU_CLOCK(XTAL_4_194304Mhz)
+	MCFG_CPU_PROGRAM_MAP(modena_mem)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_modena_state, nmi_line_pulse, (double)XTAL_4_194304Mhz / (1 << 13))
 
+	MCFG_DEVICE_REMOVE("display")
+	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
+
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( megaiv, monteciv )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_4_9152MHz )
-	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
-MACHINE_CONFIG_END
 
 ROM_START(polgar)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -530,16 +597,14 @@ ROM_START(nshort)
 	ROM_LOAD("nshort.bin", 0x00000, 0x10000, CRC(4bd51e23) SHA1(3f55cc1c55dae8818b7e9384b6b8d43dc4f0a1af))
 ROM_END
 
-
-ROM_START(megaiv)
+ROM_START(modena)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("megaiv.bin", 0x8000, 0x8000, CRC(dee355d2) SHA1(6bc79c0fb169020f017412f5f9696b9ecafbf99f))
+	ROM_SYSTEM_BIOS( 0, "v1", "v1" )
+	ROMX_LOAD("modena 12aug1992.bin", 0x8000, 0x8000, CRC(dd7b4920) SHA1(4606b9d1f8a30180aabedfc0ed3cca0c96618524), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v1alt", "v1alt" )
+	ROMX_LOAD("27C256 (457F).bin", 0x8000, 0x8000, CRC(2889082c) SHA1(b63f0d856793b4f87471837e2219ce2a42fe18de), ROM_BIOS(2))
 ROM_END
 
-ROM_START(monteciv)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("mciv.bin", 0x8000, 0x8000, CRC(c4887694) SHA1(7f482d2a40fcb3125266e7a5407da315b4f9b49c))
-ROM_END
 
 /***************************************************************************
     Game driver(s)
@@ -555,5 +620,4 @@ CONS( 1994, mrisc2,   mrisc,   0,      mrisc,     polgar,   mephisto_risc_state,
 CONS( 1989, academy,  0,       0,      academy,   polgar,   mephisto_academy_state, 0,   "Hegener & Glaser", "Mephisto Academy",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1991, milano,   0,       0,      milano,    polgar,   mephisto_milano_state,  0,   "Hegener & Glaser", "Mephisto Milano",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1993, nshort,   milano,  0,      milano,    polgar,   mephisto_milano_state,  0,   "Hegener & Glaser", "Mephisto Nigel Short",      MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, megaiv,   0,       0,      megaiv,    monteciv, mephisto_polgar_state,  0,   "Hegener & Glaser", "Mephisto Mega IV",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1990, monteciv, 0,       0,      monteciv,  monteciv, mephisto_polgar_state,  0,   "Hegener & Glaser", "Mephisto Monte Carlo IV LE",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1992, modena,   0,       0,      modena,    modena,   mephisto_modena_state,  0,   "Hegener & Glaser", "Mephisto Modena",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -2473,11 +2473,15 @@ laststar                        // (proto)          (c) 1984
 @source:atarittl.cpp
 antiairc                        // (c) 1975 Atari
 crashnsc                        // (c) 1975 Atari
+gtrak10                         // (c) 1974 Atari / Kee
+gtrak20                         // (c) 1974 Atari / Kee
 indy4                           // (c) 1976 Atari / Kee
 indy800                         // (c) 1975 Atari / Kee
 jetfight                        // (c) 1975 Atari
 jetfighta                       // (c) 1975 Atari
+lemans                          // (c) 1976 Atari
 outlaw                          // (c) 1976 Atari
+qwakttl                         // (c) 1974 Atari
 sharkjaw                        // (c) 1975 Atari / Horror Games
 steeplec                        // (c) 1975 Atari
 stuntcyc                        // (c) 1976 Atari
@@ -2556,6 +2560,7 @@ attckufo                        // (c) 1980 Ryoto Electric Co.
 @source:atvtrack.cpp
 atvtrack                        // (c) 2002 - Ref 020419
 atvtracka                       // (c) 2002 - Ref 020419
+gfootbal                        // (c) 2002 - Ref 020201
 smashdrv                        // (c) 2000
 
 @source:aussiebyte.cpp
@@ -2747,6 +2752,7 @@ bbusters                        // A9003 'BB' (c) 1989
 bbustersu                       // A9003 'BB' (c) 1989
 bbustersua                      // A9003 'BB' (c) 1989
 bbustersj                       //
+bbustersja                      //
 mechatt                         // A8002 'MA' (c) 1989
 mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
@@ -15246,6 +15252,7 @@ istreb                          //
 bbh2sp                          //
 bbhcotw                         //
 bbhsc                           //
+bbhsca                          //
 carnking                        //
 gtfore01                        //
 gtfore02                        //
@@ -20324,6 +20331,7 @@ iganinju                        // (c) 1988 (Japan)
 jitsupro                        // (c) 1989 (Japan)
 kazan                           // (c) 1988 (World)
 kickoff                         // (c) 1988 (Japan)
+kickoffb                        // bootleg (Comodo)
 lomakai                         // (c) 1988 (World)
 lordofk                         // (c) 1989 (Japan)
 makaiden                        // (c) 1988 (Japan)
@@ -20420,6 +20428,11 @@ mm5                             // Mephisto 5.1 ROM
 mm50                            // Mephisto 5.0 ROM
 mm5tk                           // Mephisto 5.1 ROM Turbo Kit Speed
 rebel5                          // Mephisto 5
+
+@source:mephisto_montec.cpp
+montec                          // 1987 Mephisto Monte Carlo
+megaiv                          // 1989 Mephisto Mega IV
+monteciv                        // 1990 Mephisto Monte Carlo IV LE
 
 @source:mephistp.cpp
 mephistp                        //
@@ -28901,8 +28914,9 @@ shaktmsp                        // 2001.04.04 Shakatto Tambourine Motto Norinori
 shangril                        // 1999.08 Dengen Tenshi Taisen Janshi Shangri-la
 shikgam2                        // 2003.04 Shikigami No Shiro II / The Castle of Shikigami II
 shootopl                        // 2002.?? Shootout Pool
-shootpl                         // 2003.?? Shootout Pool The Medal / Shootout Pool Prize (Rev A)
-shootplm                        // 2004.?? Shootout Pool The Medal Ver. B / Shootout Pool Prize Ver. B
+shootpl                         // 2003.?? Shootout Pool Prize / Shootout Pool The Medal (Rev A)
+shootplm                        // 2004.?? Shootout Pool Prize / Shootout Pool The Medal Ver. B
+shootplmp                       // 2004.?? Shootout Pool Prize / Shootout Pool The Medal Ver. B -P
 sl2007                          // 2007.07 Shooting Love
 slasho                          // 2000.07 Slashout
 slashout                        // 2000.?? Slashout
@@ -30176,6 +30190,8 @@ bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
 dgone                           // 1984 Data General/One
 eagle1600                       //
+epc                             // 1984 Ericsson PC
+eppc                            // 1985 Ericsson Portable PC
 ibm5550                         //
 iskr3104                        //
 mbc16                           // Sanyo MBC-16
@@ -31575,9 +31591,8 @@ mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 academy                         // 1989 Mephisto Academy
 milano                          // 1991 Mephisto Milano
+modena                          // 1992 Mephisto Modena
 nshort                          // 1993 Mephisto Nigel Short
-megaiv                          // 1989 Mephisto Mega IV
-monteciv                        // 1990 Mephisto Monte Carlo IV LE
 
 @source:policetr.cpp
 policetr                        // (c) 1996 P&P Marketing
@@ -32485,6 +32500,7 @@ rvoicepc                        //
 rx78                            //
 
 @source:rzone.cpp
+rzbatfor                        //
 rzindy500                       //
 
 @source:s11.cpp
@@ -35923,6 +35939,7 @@ wwestern                        // WW  (c) 1982 Taito Corporation
 wwestern1                       // WW  (c) 1982 Taito Corporation
 
 @source:taitottl.cpp
+fisco400                        // (c) 1977 Taito
 gunman                          // (c) 1977 Taito
 missilex                        // (c) 1977 Taito
 ttblock                         // (c) 1977 Taito
@@ -36821,6 +36838,7 @@ ts816                           //
 @source:tsamurai.cpp
 alphaxz                         // AZ  (c) 1986 Ed/Wood Place
 ladymstr                        // A49 (c) 1985 Taito
+ladymstr2                       // A49 (c) 1985 Taito
 m660                            // ??? (c) 1986 Taito America Corporation
 m660b                           // bootleg
 m660j                           // ??? (c) 1986 Taito Corporation (Japan)

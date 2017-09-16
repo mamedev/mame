@@ -50,6 +50,8 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
+#include "bus/hp_hil/hp_hil.h"
+#include "bus/hp_hil/hil_devices.h"
 #include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
@@ -58,13 +60,15 @@
 #define CRTC_TAG    "crtc"
 #define SCREEN_TAG  "screen"
 #define DUART_TAG   "duart"
+#define MLC_TAG	    "mlc"
 
 class hp16500_state : public driver_device
 {
 public:
 	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, MAINCPU_TAG)
+		m_maincpu(*this, MAINCPU_TAG),
+		m_mlc(*this, MLC_TAG)
 		{ }
 
 	virtual void video_start() override;
@@ -72,6 +76,7 @@ public:
 	uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<hp_hil_mlc_device> m_mlc;
 	std::vector<uint8_t> m_vram;
 
 	uint8_t m_mask, m_val;
@@ -93,7 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pal_b_w);
 
 	DECLARE_WRITE16_MEMBER(maskval_w);
-
+	DECLARE_WRITE_LINE_MEMBER(irq_2);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
@@ -209,6 +214,11 @@ WRITE16_MEMBER(hp16500_state::maskval_w)
 	m_mask = (data & 0xff) ^ 0xff;
 }
 
+WRITE_LINE_MEMBER(hp16500_state::irq_2)
+{
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
+}
+
 static ADDRESS_MAP_START(hp1650_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
 
@@ -296,6 +306,7 @@ static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 
 	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM // system ram test is really strange.
 
+	AM_RANGE(0x0020f800, 0x0020f80f) AM_DEVREADWRITE8(MLC_TAG, hp_hil_mlc_device, read, write, 0xffffffff);
 	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
 	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
 	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8 (mask_w, 0xff000000)
@@ -468,6 +479,18 @@ static MACHINE_CONFIG_START( hp16500 )
 	MCFG_SCREEN_SIZE(576,384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+
+	// FIXME: Where is the AP line connected to? The MLC documentation recommends
+	// connecting it to VBLANK
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE(MLC_TAG, hp_hil_mlc_device, ap_w))
+
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp16500_state, irq_2))
+
+	// TODO: for now hook up the ipc hil keyboard - this might be replaced
+	// later with a 16500b specific keyboard implementation
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil2", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(DUART_TAG, MC68681, 20000000)
 

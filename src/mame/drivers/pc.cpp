@@ -280,6 +280,37 @@ Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddi
 On board ports: speaker
 Options: 8087 FPU
 
+Ericsson PC
+===========
+Links: https://youtu.be/6uilOdMJc24 
+Form Factor: Desktop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: 6x ISA
+Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: 2 x 5.25" 360K or 1 20Mb HDD
+On board ports: Beeper,
+Ports: serial, parallel
+Internal Options: Up to 640K RAM through add-on RAM card
+Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
+
+Ericsson Portable PC - EPPC
+===========================
+Links: https://youtu.be/Qmke4L4Jls8 , https://youtu.be/yXK01gBQE6Q
+Form Factor: Laptop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: No internal slots
+Video: Monochrome 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: half height 5.25" 360K
+On board ports: Beeper,
+Ports: serial, parallel, ext. floppy
+Internal Options: 256K RAM, thermal printer
+External Options: A disk cabinet with networking, 1200/300 accoustic modem, 256K Ergo disk electronic disk drive
+Misc: No battery due to the power hungry GP display. 10-15.000 units sold
+
 ***************************************************************************/
 
 
@@ -454,6 +485,12 @@ static MACHINE_CONFIG_DERIVED( dgone, pccga )
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 MACHINE_CONFIG_END
 
+// Ericsson Information System
+static MACHINE_CONFIG_DERIVED( epc, pccga )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( eppc, pccga )
+MACHINE_CONFIG_END
 
 // Bondwell BW230
 static INPUT_PORTS_START( bondwell )
@@ -716,6 +753,18 @@ ROM_START( dgone )
 	ROM_LOAD( "dgone.bin",  0x8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
 ROM_END
 
+ROM_START( epc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55))
+	ROM_LOAD( "epcbios2.bin",  0xc000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e))
+	ROM_LOAD( "epcbios3.bin",  0xa000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f))
+ROM_END
+
+ROM_START( eppc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "eppcbios60605.bin",  0xc000, 0x04000, CRC(fe82e11b) SHA1(97ed48dc30f1ed0acce0a14b8085f13b84d4444b))
+ROM_END
+
 ROM_START( bw230 )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_LOAD("bondwell.bin", 0xe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
@@ -879,6 +928,8 @@ ROM_END
 
 //    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
 COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
+COMP( 1985,   epc,              ibm5150,    0,          epc,            pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
+COMP( 1985,   eppc,             ibm5150,    0,          eppc,           pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
 COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
 COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
 COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )

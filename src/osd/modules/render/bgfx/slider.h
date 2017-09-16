@@ -16,7 +16,9 @@
 #include <string>
 #include <vector>
 
-#include "../frontend/mame/ui/slider.h"
+#include "../frontend/mame/ui/sliderchangednotifier.h"
+
+struct slider_state;
 
 class bgfx_slider : public slider_changed_notifier
 {
@@ -52,7 +54,7 @@ public:
 	slider_type type() const { return m_type; }
 	float value() const { return m_value; }
 	float uniform_value() const { return float(m_value); }
-	slider_state* core_slider() const { return m_slider_state; }
+	slider_state *core_slider() const { return m_slider_state.get(); }
 	size_t size() const { return get_size_for_type(m_type); }
 	static size_t get_size_for_type(slider_type type);
 
@@ -61,7 +63,7 @@ public:
 
 protected:
 	virtual int32_t slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, int32_t newval) override;
-	slider_state* create_core_slider(running_machine &machine);
+	std::unique_ptr<slider_state> create_core_slider();
 	int32_t as_int() const { return int32_t(floor(m_value / m_step + 0.5f)); }
 
 	std::string     m_name;
@@ -75,7 +77,7 @@ protected:
 	std::string     m_description;
 	std::vector<std::string> m_strings;
 	float           m_value;
-	slider_state*   m_slider_state;
+	std::unique_ptr<slider_state> m_slider_state;
 	running_machine&m_machine;
 };
 
