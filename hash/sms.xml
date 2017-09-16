@@ -3547,6 +3547,7 @@
 		<year>1993</year>
 		<publisher>Sieco</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean" />
 			<dataarea name="rom" size="524288">
 				<rom name="jang pung ii (kr).bin" size="524288" crc="929222c4" sha1="10a5095513efebae3d045b217caa7a520e66f26f" offset="000000" />
 			</dataarea>
@@ -6803,6 +6804,12 @@
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27025-50"/>
 		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on elotrolado.net forum:
+			https://www.elotrolado.net/hilo_hilo-oficial-dossier-completo-de-sega-master-system_2197710_s60
+			-->
+			<feature name="pcb" value="171-6339A" />
+			<feature name="ic1" value="MPR-14831-F" />
+			<feature name="ic2" value="KM62256BLP-10L" /> <!-- 32768 * 8 bit CMOS Static RAM -->
 			<dataarea name="rom" size="262144">
 				<rom name="terminator, the (europe).bin" size="262144" crc="edc5c012" sha1="eaf733d385e61526b90c1b194bf605078d43e2d3" offset="000000" />
 			</dataarea>

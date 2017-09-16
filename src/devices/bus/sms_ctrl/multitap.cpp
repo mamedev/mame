@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SMS_MULTITAP, sms_multitap_device, "sms_multitap", "Sega SMS Multitap")
+DEFINE_DEVICE_TYPE(SMS_MULTITAP, sms_multitap_device, "sms_multitap", "Furrtek SMS Multitap")
 
 
 //**************************************************************************
