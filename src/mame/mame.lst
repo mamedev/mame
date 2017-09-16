@@ -30207,6 +30207,7 @@ zdsupers                        //
 ncrpc4i                         // NCR PC4i
 laser_turbo_xt                  // 1988 VTech Laser Turbo XT
 laser_xt3                       // 1989 VTech Laser XT/3
+olytext30						// AEG Olympia Olytext 30
 
 @source:pc100.cpp
 pc100                           //

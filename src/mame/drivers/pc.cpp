@@ -311,12 +311,28 @@ Internal Options: 256K RAM, thermal printer
 External Options: A disk cabinet with networking, 1200/300 accoustic modem, 256K Ergo disk electronic disk drive
 Misc: No battery due to the power hungry GP display. 10-15.000 units sold
 
+AEG Olympia Olytext 30
+=======================
+Form Factor: Desktop
+CPU: NEC V20 @ 4.77MHz
+RAM: 768K, not sure how to address the area above 640K
+Bus: 8x ISA:    1) NEC V20 Slot CPU with 786K RAM, TI TACT80181FT chip
+                2) Z180 CP/M emulation card, needed to run the proprietary Olytext 30 word processor)
+                3) Monochrome graphics/color graphics card (possibly EGA capable) ICs: Chips P82C441 and P82A442A
+				4) MFM hard disk controller HDC-770, ICs: HDC9224, HDC92C26, HDC9223, 
+				5) Floppy, serial and RTC DIO-770, ICs: 2x UM8250B, UM8272A, OKI M5832
+Video: MDA/Hercules/CGA, possibly EGA
+Mass storage: 1x 3.5" 720K, 20MB Miniscribe harddisk
+On board ports: speaker
+Options: 8087 FPU
+
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "machine/genpc.h"
 #include "cpu/i86/i86.h"
+#include "cpu/nec/nec.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -475,6 +491,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cfg_single_360K )
 	MCFG_DEVICE_MODIFY("fdc:0")
 	MCFG_SLOT_DEFAULT_OPTION("525dd")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_REMOVE("fdc:1")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( cfg_single_720K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("35dd")
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
@@ -744,6 +767,20 @@ static MACHINE_CONFIG_START( laser_turbo_xt )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
+//Olytext 30
+static MACHINE_CONFIG_DERIVED(olytext30, pccga)
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_PC(pc8, pc8, V20, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
+	MCFG_DEVICE_MODIFY("isa3")
+	MCFG_SLOT_DEFAULT_OPTION("")
+	MCFG_DEVICE_MODIFY("isa5")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("768K")
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
@@ -919,6 +956,10 @@ ROM_START( laser_xt3 )
 	ROM_LOAD("laser_xt3.bin", 0x0e000, 0x02000, CRC(b45a7dd3) SHA1(62f17c408be0036d00a182e94c5c88b83d46b625)) // version 1.26 - 27c64
 ROM_END
 
+ROM_START( olytext30 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("o45995.bin", 0xe000, 0x2000, CRC(fdc05b4f) SHA1(abb94e75e7394be1e85ff706d4d8f3b9cdfea09f))
+ROM_END
 
 /***************************************************************************
 
@@ -950,3 +991,4 @@ COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,  
 COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    pc_state, 0,        "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
 COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
 COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )
+COMP( 198?,   olytext30,        ibm5150,    0,          olytext30,      pccga,    pc_state, 0,        "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
