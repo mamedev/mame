@@ -79,8 +79,12 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	return;
 #else
 
-	luma = lumaram[BYTE_XOR_LE(lumabase + (0xf << 3))] & 0x3F;
+	luma = lumaram[BYTE_XOR_LE(lumabase + (0xf << 3))];
 
+	// fix luma overflow
+	if(luma > 0x3f)
+		luma = 0x3f;
+	
 	color = state->m_palram[BYTE_XOR_LE(color + 0x1000)] & 0x7fff;
 
 	colortable_r += ((color >>  0) & 0x1f) << 8;
@@ -177,7 +181,11 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		if ( t == 0x0f )
 			continue;
 #endif
-		luma = lumaram[BYTE_XOR_LE(lumabase + (t << 3))] & 0x3f;
+		luma = lumaram[BYTE_XOR_LE(lumabase + (t << 3))];
+		
+		// Virtua Striker sets up a luma of 0x40 for flags, fix here.
+		if(luma > 0x3f)
+			luma = 0x3f;
 
 		/* we have the 6 bits of luma information along with 5 bits per color component */
 		/* now build and index into the master color lookup table and extract the raw RGB values */
