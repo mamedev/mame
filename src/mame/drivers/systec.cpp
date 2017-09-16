@@ -35,45 +35,27 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
+#include "machine/z80sio.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 
-#define TERMINAL_TAG "terminal"
 
 class systec_state : public driver_device
 {
 public:
 	systec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sio(*this, "sio")
+	{ }
 
+	DECLARE_WRITE_LINE_MEMBER(clock_tick);
+
+private:
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(systec_c4_r);
-	DECLARE_READ8_MEMBER(systec_c6_r);
-	void kbd_put(u8 data);
-	uint8_t m_term_data;
+	required_device<z80sio_device> m_sio;
 	virtual void machine_reset() override;
 };
-
-READ8_MEMBER( systec_state::systec_c4_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( systec_state::systec_c6_r )
-{
-	return 0x04 | (m_term_data ? 1 : 0);
-}
-
-void systec_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 static ADDRESS_MAP_START(systec_mem, AS_PROGRAM, 8, systec_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -82,8 +64,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(systec_io, AS_IO, 8, systec_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc4, 0xc4) AM_READ(systec_c4_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0xc6, 0xc6) AM_READ(systec_c6_r)
+	AM_RANGE(0x68, 0x6b) // fdc?
+	AM_RANGE(0x6c, 0x6c) // motor control?
+	AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -97,16 +80,32 @@ void systec_state::machine_reset()
 	memcpy(m_p_maincpu, m_p_roms, 0x2000);
 }
 
+// source of baud frequency is unknown, so we invent a clock
+WRITE_LINE_MEMBER( systec_state::clock_tick )
+{
+	m_sio->txca_w(state);
+	m_sio->rxca_w(state);
+}
+
 static MACHINE_CONFIG_START( systec )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(systec_mem)
 	MCFG_CPU_IO_MAP(systec_io)
 
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(systec_state, clock_tick))
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(systec_state, kbd_put))
+	/* Devices */
+	MCFG_Z80SIO_ADD("sio", XTAL_4MHz, 0, 0, 0, 0)
+	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 MACHINE_CONFIG_END
 
 

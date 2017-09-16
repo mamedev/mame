@@ -73,12 +73,12 @@ static MACHINE_CONFIG_START( jade )
 	MCFG_CPU_PROGRAM_MAP(jade_mem)
 	MCFG_CPU_IO_MAP(jade_io)
 
-	MCFG_DEVICE_ADD("siot_clock", CLOCK, 153600)
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(jade_state, clock_tick))
 
 	/* Devices */
 	MCFG_Z80SIO_ADD("sio", XTAL_4MHz, 0, 0, 0, 0)
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // interrupts not programmed by default
+	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))

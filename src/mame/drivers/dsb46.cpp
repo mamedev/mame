@@ -6,6 +6,15 @@
 2013-07-31 Connected to terminal [Robbbert]
 2016-07-11 After 10 seconds the monitor program will start [Robbbert]
 
+Commands: (no spaces allowed)
+B - Boot the disk
+D - Dump memory to screen
+F - Fill Memory
+G - Go To
+H - Help
+P - Alter port values
+S - Alter memory
+
 
 The photos show 3 boards:
 - A scsi board (all 74-series TTL)
@@ -21,7 +30,11 @@ Both roms contain Z80 code.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 
 
 class dsb46_state : public driver_device
@@ -30,20 +43,17 @@ public:
 	dsb46_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
-	{
-	}
+		, m_sio(*this, "sio")
+	{ }
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	void kbd_put(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_WRITE8_MEMBER(port1a_w);
 	DECLARE_DRIVER_INIT(dsb46);
 	DECLARE_MACHINE_RESET(dsb46);
+
 private:
-	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<z80sio_device> m_sio;
 };
 
 static ADDRESS_MAP_START( dsb46_mem, AS_PROGRAM, 8, dsb46_state )
@@ -54,13 +64,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dsb46_io, AS_IO, 8, dsb46_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
 	AM_RANGE(0x1a, 0x1a) AM_WRITE(port1a_w)
-	//AM_RANGE(0x00, 0x01) uartch1
-	//AM_RANGE(0x02, 0x03) uartch2
-	//AM_RANGE(0x08, 0x08) ??
-	//AM_RANGE(0x0a, 0x0b) ??
 	//AM_RANGE(0x10, 0x10) disk related
 	//AM_RANGE(0x14, 0x14) ??
 	//AM_RANGE(0x18, 0x18) ??
@@ -83,7 +89,6 @@ MACHINE_RESET_MEMBER( dsb46_state,dsb46 )
 {
 	membank("read")->set_entry(0);
 	membank("write")->set_entry(0);
-	m_term_data = 0;
 	m_maincpu->reset();
 }
 
@@ -92,33 +97,47 @@ WRITE8_MEMBER( dsb46_state::port1a_w )
 	membank("read")->set_entry(data & 1);
 }
 
-READ8_MEMBER( dsb46_state::port01_r )
+// source of baud frequency is unknown, so we invent a clock
+WRITE_LINE_MEMBER( dsb46_state::clock_tick )
 {
-	return (m_term_data) ? 5 : 4;
+	m_sio->txca_w(state);
+	m_sio->rxca_w(state);
 }
 
-READ8_MEMBER( dsb46_state::port00_r )
+static const z80_daisy_config daisy_chain[] =
 {
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
+	{ "ctc1" },
+	{ "sio" },
+	{ nullptr }
+};
 
-void dsb46_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 static MACHINE_CONFIG_START( dsb46 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(dsb46_mem)
 	MCFG_CPU_IO_MAP(dsb46_io)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+
 	MCFG_MACHINE_RESET_OVERRIDE(dsb46_state, dsb46)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dsb46_state, kbd_put))
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(dsb46_state, clock_tick))
+
+	/* Devices */
+	MCFG_Z80SIO_ADD("sio", XTAL_4MHz, 0, 0, 0, 0)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 ROM_START( dsb46 )
