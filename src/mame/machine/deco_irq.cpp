@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "screen.h"
 #include "deco_irq.h"
 
 
@@ -141,82 +140,77 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( deco_irq_device::read )
+DEVICE_ADDRESS_MAP_START(map, 8, deco_irq_device)
+	AM_RANGE(0x0, 0x0) AM_WRITE(control_w)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(scanline_r, scanline_w)
+	AM_RANGE(0x2, 0x2) AM_READWRITE(raster_irq_ack_r, vblank_irq_ack_w)
+	AM_RANGE(0x3, 0x3) AM_READ(status_r)
+ADDRESS_MAP_END
+
+WRITE8_MEMBER( deco_irq_device::control_w )
 {
-	switch (offset)
-	{
-	case 1:
-		return m_raster_irq_scanline;
+	// 765-----  unused?
+	// ---4----  raster irq target
+	// ----3---  unused?
+	// -----2--  unknown
+	// ------1-  raster irq mask
+	// -------0  unused?
 
-	case 2:
-		m_raster_irq = false;
-		m_raster1_irq_cb(CLEAR_LINE);
-		m_raster2_irq_cb(CLEAR_LINE);
-		return 0xff;
+	m_raster_irq_target = BIT(data, 4);
+	m_raster_irq_masked = bool(BIT(data, 1));
 
-	case 3:
-		uint8_t data = 0;
+	if (m_raster_irq_masked)
+		raster_irq_ack_r(space, 0);
+}
 
-		// 7-------  unknown
-		// -6------  lightgun irq
-		// --5-----  raster irq
-		// ---4----  vblank irq
-		// ----32--  unknown
-		// ------1-  vblank
-		// -------0  hblank?
+READ8_MEMBER( deco_irq_device::scanline_r )
+{
+	return m_raster_irq_scanline;
+}
 
-		data |= 1 << 7;
-		data |= (m_lightgun_irq ? 1 : 0) << 6;
-		data |= (m_raster_irq ? 1 : 0) << 5;
-		data |= (m_vblank_irq ? 1 : 0) << 4;
-		data |= 0 << 3;
-		data |= 0 << 2;
-		data |= m_screen->vblank() << 1;
-//		data |= (m_screen->hblank() & m_screen->vblank()) << 0;
-		data |= m_screen->hblank() << 0;
+WRITE8_MEMBER( deco_irq_device::scanline_w )
+{
+	m_raster_irq_scanline = data;
+}
 
-		return data;
-	}
+READ8_MEMBER( deco_irq_device::raster_irq_ack_r )
+{
+	m_raster_irq = false;
+	m_raster1_irq_cb(CLEAR_LINE);
+	m_raster2_irq_cb(CLEAR_LINE);
 
-	logerror("Read from invalid offset %x\n", offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( deco_irq_device::write )
+WRITE8_MEMBER( deco_irq_device::vblank_irq_ack_w )
 {
-	switch (offset)
-	{
-	case 0:
-		// 765-----  unused?
-		// ---4----  raster irq target
-		// ----3---  unused?
-		// -----2--  unknown
-		// ------1-  raster irq mask
-		// -------0  unused?
+	m_vblank_irq = false;
+	m_vblank_irq_cb(CLEAR_LINE);
+}
 
-		m_raster_irq_target = BIT(data, 4);
-		m_raster_irq_masked = bool(BIT(data, 1));
+READ8_MEMBER( deco_irq_device::status_r )
+{
+	uint8_t data = 0;
 
-		if (m_raster_irq_masked)
-		{
-			m_raster_irq = false;
-			m_raster1_irq_cb(CLEAR_LINE);
-			m_raster2_irq_cb(CLEAR_LINE);
-		}
+	// 7-------  unknown
+	// -6------  lightgun irq
+	// --5-----  raster irq
+	// ---4----  vblank irq
+	// ----32--  unknown
+	// ------1-  vblank
+	// -------0  hblank?
 
-		return;
+	data |= 1 << 7;
+	data |= (m_lightgun_irq ? 1 : 0) << 6;
+	data |= (m_raster_irq ? 1 : 0) << 5;
+	data |= (m_vblank_irq ? 1 : 0) << 4;
+	data |= 0 << 3;
+	data |= 0 << 2;
+	data |= m_screen->vblank() << 1;
+//	data |= (m_screen->hblank() & m_screen->vblank()) << 0;
+	data |= m_screen->hblank() << 0;
 
-	case 1:
-		m_raster_irq_scanline = data;
-		return;
-
-	case 2:
-		m_vblank_irq = false;
-		m_vblank_irq_cb(CLEAR_LINE);
-		return;
-	}
-
-	logerror("Write %02x to invalid offset %x\n", data, offset);
+	return data;
 }
 
 WRITE_LINE_MEMBER( deco_irq_device::lightgun1_trigger_w )
@@ -236,4 +230,3 @@ WRITE_LINE_MEMBER( deco_irq_device::lightgun_irq_ack_w )
 	m_lightgun_irq = false;
 	m_lightgun_irq_cb(CLEAR_LINE);
 }
-

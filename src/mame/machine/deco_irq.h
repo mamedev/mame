@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "screen.h"
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -59,7 +61,6 @@ public:
 	template <class Object> static devcb_base &set_lightgun_irq_callback(device_t &device, Object &&cb)
 	{ return downcast<deco_irq_device &>(device).m_lightgun_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-
 	template <class Object> static devcb_base &set_raster1_irq_callback(device_t &device, Object &&cb)
 	{ return downcast<deco_irq_device &>(device).m_raster1_irq_cb.set_callback(std::forward<Object>(cb)); }
 
@@ -69,14 +70,19 @@ public:
 	template <class Object> static devcb_base &set_vblank_irq_callback(device_t &device, Object &&cb)
 	{ return downcast<deco_irq_device &>(device).m_vblank_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-
 	// static configuration
 	static void set_screen_tag(device_t &device, const char *tag);
 
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_ADDRESS_MAP(map, 8);
+
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_READ8_MEMBER(scanline_r);
+	DECLARE_WRITE8_MEMBER(scanline_w);
+	DECLARE_READ8_MEMBER(raster_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(vblank_irq_ack_w);
+	DECLARE_READ8_MEMBER(status_r);
 
 	DECLARE_WRITE_LINE_MEMBER(lightgun1_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(lightgun2_trigger_w);
@@ -117,5 +123,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(DECO_IRQ, deco_irq_device)
+
 
 #endif // MAME_MACHINE_DECO_IRQ_H

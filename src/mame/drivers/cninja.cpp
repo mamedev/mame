@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_SHARE("pf4_rowscroll")
 
 	AM_RANGE(0x184000, 0x187fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x190000, 0x190007) AM_DEVREADWRITE8("irq", deco_irq_device, read, write, 0x00ff)
+	AM_RANGE(0x190000, 0x190007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
 	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x1a4000, 0x1a47ff) AM_RAM AM_SHARE("spriteram")           /* Sprites */
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x180000, 0x187fff) AM_RAM // more ram on bootleg?
 
-	AM_RANGE(0x190000, 0x190007) AM_DEVREADWRITE8("irq", deco_irq_device, read, write, 0x00ff)
+	AM_RANGE(0x190000, 0x190007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
 	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(sshangha_protection_region_8_146_r,sshangha_protection_region_8_146_w)
 
-	AM_RANGE(0x1a4000, 0x1a4007) AM_DEVREADWRITE8("irq", deco_irq_device, read, write, 0x00ff)
+	AM_RANGE(0x1a4000, 0x1a4007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
 	AM_RANGE(0x1ac000, 0x1ac001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
 	AM_RANGE(0x1bc000, 0x1bc7ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x1bc800, 0x1bcfff) AM_WRITENOP /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16, cninja_state )
 
 AM_RANGE(0x198000, 0x198001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
 	AM_RANGE(0x1a8000, 0x1a9fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x1b0000, 0x1b0007) AM_DEVREADWRITE8("irq", deco_irq_device, read, write, 0x00ff)
+	AM_RANGE(0x1b0000, 0x1b0007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
 	AM_RANGE(0x1b8000, 0x1bbfff) AM_RAM AM_SHARE("ram") /* Main ram */
 	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
 	AM_RANGE(0x1f8000, 0x1f8001) AM_READ_PORT("DSW3") /* Dipswitch #3 */
