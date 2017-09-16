@@ -5676,5 +5676,5 @@ GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22_state, alpinesa,
 GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)"            , MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
 GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22_state, aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)"              , MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
 GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22_state, alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)"       , MACHINE_IMPERFECT_GRAPHICS ) // 97/01/10 17:10:59
-GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22_state, alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A， World)"       , MACHINE_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
+GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22_state, alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)"       , MACHINE_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
 GAME( 1996, adillor,  0,         adillor,   adillor,   namcos22_state, adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)"      , MACHINE_IMPERFECT_GRAPHICS ) // 97/04/07 19:19:41
