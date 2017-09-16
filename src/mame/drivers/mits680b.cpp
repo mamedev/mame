@@ -16,14 +16,15 @@ P this does a rti and causes a momentary crash. Weird.
 
 
 ToDo:
-- Find out what uart is used (not 8251, not 6551, not Z80SIO) and hook it up.
-  Initialisation consists of writing 03 to F000.
+
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/terminal.h"
+#include "machine/6850acia.h"
+#include "bus/rs232/rs232.h"
+#include "machine/clock.h"
 
 
 class mits680b_state : public driver_device
@@ -32,21 +33,17 @@ public:
 	mits680b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
+		, m_acia(*this, "acia")
 	{
 	}
 
-	DECLARE_READ8_MEMBER(terminal_status_r);
-	DECLARE_READ8_MEMBER(terminal_r);
 	DECLARE_READ8_MEMBER(status_check_r);
-	void kbd_put(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
-protected:
+private:
 	virtual void machine_reset() override;
-
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	uint8_t m_term_data;
+	required_device<acia6850_device> m_acia;
 };
 
 READ8_MEMBER( mits680b_state::status_check_r )
@@ -54,26 +51,20 @@ READ8_MEMBER( mits680b_state::status_check_r )
 	return 0; // crashes at start if bit 7 high
 }
 
-READ8_MEMBER( mits680b_state::terminal_status_r )
+WRITE_LINE_MEMBER( mits680b_state::clock_tick )
 {
-	return (m_term_data) ? 3 : 2;
-}
-
-READ8_MEMBER( mits680b_state::terminal_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
 }
 
 
 static ADDRESS_MAP_START(mits680b_mem, AS_PROGRAM, 8, mits680b_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff ) AM_RAM // 1024 bytes RAM
-	AM_RANGE( 0xf000, 0xf000 ) AM_READ(terminal_status_r)
-	AM_RANGE( 0xf001, 0xf001 ) AM_READ(terminal_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE( 0xf002, 0xf002 ) AM_READ(status_check_r)
-	AM_RANGE( 0xff00, 0xffff ) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1024 bytes RAM
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(status_check_r)
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -83,12 +74,6 @@ INPUT_PORTS_END
 
 void mits680b_state::machine_reset()
 {
-	m_term_data = 0;
-}
-
-void mits680b_state::kbd_put(u8 data)
-{
-	m_term_data = data;
 }
 
 static MACHINE_CONFIG_START( mits680b )
@@ -96,9 +81,16 @@ static MACHINE_CONFIG_START( mits680b )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mits680b_mem)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mits680b_state, kbd_put))
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mits680b_state, clock_tick))
 MACHINE_CONFIG_END
 
 /* ROM definition */
