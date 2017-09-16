@@ -181,6 +181,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_showfps_end(0)
 	, m_show_profiler(false)
 	, m_popup_text_end(0)
+	, m_mouse_bitmap(32, 32)
 	, m_mouse_arrow_texture(nullptr)
 	, m_mouse_show(false) {}
 
@@ -208,11 +209,10 @@ void mame_ui_manager::init()
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mame_ui_manager::exit, this));
 
 	// create mouse bitmap
-	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine(), bitmap_argb32(32, 32));
-	uint32_t *dst = &ui_mouse_bitmap->pix32(0);
+	uint32_t *dst = &m_mouse_bitmap.pix32(0);
 	memcpy(dst,mouse_bitmap,32*32*sizeof(uint32_t));
 	m_mouse_arrow_texture = machine().render().texture_alloc();
-	m_mouse_arrow_texture->set_bitmap(*ui_mouse_bitmap, ui_mouse_bitmap->cliprect(), TEXFORMAT_ARGB32);
+	m_mouse_arrow_texture->set_bitmap(m_mouse_bitmap, m_mouse_bitmap.cliprect(), TEXFORMAT_ARGB32);
 }
 
 

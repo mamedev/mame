@@ -243,6 +243,7 @@ private:
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
 	std::unique_ptr<uint8_t[]> m_non_char_keys_down;
+	bitmap_argb32           m_mouse_bitmap;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
 	ui_options              m_ui_options;
