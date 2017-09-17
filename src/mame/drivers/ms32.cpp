@@ -338,6 +338,13 @@ WRITE32_MEMBER(ms32_state::pip_w)
 		popmessage("fce00a7c = %02x",data);
 }
 
+WRITE32_MEMBER(ms32_state::coin_counter_w)
+{
+	// desertwr/p47aces sets 4 here
+	// f1superb sets 2	
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+}
 
 static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
@@ -374,7 +381,7 @@ static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 /**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_SHARE("tx_scroll")   /* tx layer scroll */
 /**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_SHARE("bg_scroll")   /* bg layer scroll */
 	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)    // ??? layer related? seems to be always 0
-//  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(coin_counter_w) //   coin counters + something else
 	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
 	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_SHARE("mahjong_select")
 ADDRESS_MAP_END
