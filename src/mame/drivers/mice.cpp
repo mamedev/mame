@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-Microtek International Inc MICE
+Microtek International Inc MICE (Micro-In-Circuit Emulator)
 
 2013-08-27 Skeleton driver.
 
@@ -13,61 +13,59 @@ Each CPU has a plugin card with various chips. The usual complement is
 
 The connection to the outside world is via RS232 to a terminal.
 
+No schematic or manuals available. This driver is guesswork.
+
+There's a mistake in the boot rom: if the test of the 8155 or 8255 fail, it
+attempts to write a suitable message to the screen, but as the 8251 hasn't
+yet been initialised, it hangs.
+
+After successfully testing the hardware, it goes off waiting for something
+to happen, and this is why there's no output to the screen.
+
 ****************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
+#include "machine/i8155.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 
 class mice_state : public driver_device
 {
 public:
 	mice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "uart")
+	{ }
 
-	DECLARE_READ8_MEMBER(port50_r);
-	DECLARE_READ8_MEMBER(port51_r);
-	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(rpt_pc_r);
+	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
-protected:
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-
-	uint8_t m_term_data;
+private:
 	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<i8251_device> m_uart;
 };
 
 
-READ8_MEMBER( mice_state::port50_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( mice_state::port51_r )
-{
-	return (m_term_data) ? 5 : 1;
-}
-
 static ADDRESS_MAP_START(mice_mem, AS_PROGRAM, 8, mice_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("mice_6502", 0)
-	AM_RANGE( 0x6000, 0xffff ) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("mice_6502", 0)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM //(U13)
+	AM_RANGE(0x6000, 0x60ff) AM_DEVREADWRITE("rpt", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mice_io, AS_IO, 8, mice_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x50, 0x50) AM_READ(port50_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0x51, 0x51) AM_READ(port51_r)
+	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("rpt", i8155_device, io_r, io_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -79,9 +77,17 @@ void mice_state::machine_reset()
 {
 }
 
-void mice_state::kbd_put(u8 data)
+// This port presumably connects to dipswitches to set the serial protocol
+READ8_MEMBER( mice_state::rpt_pc_r )
 {
-	m_term_data = data;
+	return 0xef; // select our default rs232 settings
+}
+
+// source of baud frequency is not known, so we invent a clock
+WRITE_LINE_MEMBER( mice_state::clock_tick )
+{
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
 }
 
 static MACHINE_CONFIG_START( mice )
@@ -91,8 +97,22 @@ static MACHINE_CONFIG_START( mice )
 	MCFG_CPU_IO_MAP(mice_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mice_state, kbd_put))
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mice_state, clock_tick))
+
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+
+	MCFG_DEVICE_ADD("rpt", I8155, 1000) // this value is the timer clock, no idea what it should be.
+	MCFG_I8155_IN_PORTC_CB(READ8(mice_state, rpt_pc_r))
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -121,4 +141,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT  CLASS       INIT  COMPANY                       FULLNAME  FLAGS
-COMP( 1980, mice,  0,      0,       mice,     mice,  mice_state, 0,    "Microtek International Inc", "Mice",   MACHINE_IS_SKELETON )
+COMP( 1981, mice,  0,      0,       mice,     mice,  mice_state, 0,    "Microtek International Inc", "Mice",   MACHINE_IS_SKELETON )

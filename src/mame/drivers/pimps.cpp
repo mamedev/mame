@@ -84,7 +84,7 @@ public:
 		, m_uart2(*this, "uart2")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( clock_tick );
+	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
