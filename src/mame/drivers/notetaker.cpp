@@ -3,14 +3,30 @@
 /* Xerox NoteTaker, 1978
  * Driver by Jonathan Gevaryahu
 
- *  Notetaker Team At Xerox PARC 1976-1980:
+ *  Notetaker Team At Xerox PARC 1976-1981:
      Alan Kay - Team Lead
-     Bruce Horn - BIOS code and more
+     Bruce Horn - BIOS code and NoteTaker Hardware/Electronics Design (Ethernet, others)
      Ted Kaehler - SmallTalk-76 code porting[2] and more ( http://tedkaehler.weather-dimensions.com/us/ted/index.html )
-     Dan Ingalls - BitBlt engine and SmallTalk kernel and more[3]
-     Doug Fairbairn - NoteTaker Hardware/Electronics Design ( http://www.computerhistory.org/atchm/author/dfairbairn/ )
-     James Leung - NoteTaker Hardware/Electronics Design
-     Ron Freeman - NoteTaker Hardware/Electronics Design
+     Dan Ingalls - Later BitBlt engine and SmallTalk-76 kernel and more[3]
+     Doug Fairbairn - NoteTaker Hardware/Electronics Design (EmulatorP, IOP, ADC, Alto Debug/Test Interface)
+         ( http://www.computerhistory.org/atchm/author/dfairbairn/ )
+     Ed Wakida - NoteTaker Hardware/Electronics Design (Tablet/Touch interface)
+     Bob Nishimura - NoteTaker Hardware/Electronics Design (PSU/Cabling/Machining/Battery)
+     James "Jim" Leung - NoteTaker Hardware/Electronics Design (Alto Debug/Test Interface)
+     Ron Freeman - NoteTaker Hardware/Electronics Design (Keyboard, Disk/Display)
+     Ben Sato - NoteTaker Hardware/Electronics Design (Memory/Timing, ECC)
+     B. Wang - NoteTaker Hardware/Electronics Design (Keyboard)
+     Larry Tesler - NoteTaker Hardware/Electronics Design (Ethernet, others)
+     Dale Mann - NoteTaker Hardware/Electronics Design (Ethernet, Circuit Assembly)
+     Lawrence "Larry" D. Stewart - NoteTaker Hardware/Electronics Design (Mouse)
+     Jim Althoff - Smalltalk-78 and Smalltalk-80
+     Adele Goldberg - Smalltalk team
+     Diana Merry-Shapiro - Original BitBlt from Smalltalk-72
+     Dave Robson - Smalltalk team
+     Ted Strollo - IC/VLSI design (MPC580 cell library)
+     Bert Sutherland - Manager of Systems Science Laboratory (SSL)
+     Terri Doughty - Administration, Editing
+     Chris Jeffers - Smalltalk music
      <there are probably others I've missed>
 
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
@@ -22,12 +38,17 @@
    * Memory Control Module \_ (bus control, buffering, refresh, Parity/ECC/Syndrome logic lives on these boards)
    * Memory Data Module    /
    * Memory Storage Module x2 (the 4116 DRAMs live on these boards)
-   * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms, and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively] and dump registers to alto screen, etc)
+   * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms,\
+     and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively]
+     and dump registers to alto screen, etc)
+   
+   * In 1980-1981 an Ethernet card with another 8086 on it was developed, but unclear if this ever fully worked.
 
  * Prototypes only, 10 units[2] manufactured 1978-1980
    Known surviving units:
-   * One at CHM (missing? mouse, no media)
-   * One at Xerox Museum at PARC (with mouse and 2 floppies, floppies were not imaged to the best of my knowledge)
+   * One at CHM (missing? mouse, no media, has BIOP-2.0 roms)
+   * One at Xerox Museum at PARC (with mouse and 2? floppies, floppies were not imaged to the best of my knowledge, unknown roms)
+   * Rumor has it at least a few of the remaining units survived beyond these two.
 
  * The NoteTaker used the BitBlt graphical operation (from SmallTalk-76) to do most graphical functions, in order to fit the SmallTalk code and programs within 256K of RAM[2]. The actual BitBlt code lives in ROM[3].
 
@@ -48,14 +69,13 @@
 
 TODO: everything below.
 * Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
-
+* Hack together a functional boot disk using the recovered EP bootloader and smalltalk engine code from the alto disks.
 * Harris 6402 keyboard UART (within keyboard, next to MCU)
 * The harris 6402 UART is pin compatible with WD TR1865 UART, as well as the AY-3-1015A/D
    (These are 5v-only versions of the older WD TR1602 and AY-5-1013 parts which used 5v and 12v)
 * HLE for the missing i8748[5] MCU in the keyboard which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
 * floppy controller wd1791 and its interrupt
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
-* According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
 * hook up the DiskInt from the wd1791 either using m_fdc->intrq_r() polling or using device lines (latter is a much better idea)
 
 WIP:
@@ -63,7 +83,6 @@ WIP:
 * pic8259 interrupt controller - this is attached as a device, but only the vblank interrupt is hooked to it yet.
 * Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
 * Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
-* we're missing a dump of the 82s126 SETMEMRQ PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic and I'm planning to regenerate the prom contents from that, see ROM_LOAD section
 * The DAC, its FIFO and its timer are hooked up and the v2.0 bios beeps, but the stereo latches are not hooked up at all, DAC is treated as mono for now
 
 DONE:
@@ -73,6 +92,9 @@ DONE:
   - framebuffer, at least for bios 1.5, lives from 0x4000-0xd5ff, exactly 640x480 pixels 1bpp, interlaced (even? plane is at 4000-8aff, odd? plane is at 8b00-d5ff); however the starting address of the framebuffer is configurable to any address within the 0x0000-0x1ffff range? (this exact range is unclear)
 * figure out how the emulation-cpu boots and where its 8k of local ram maps to - done
   - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addresses
+* 82s147 DISKSEP PROM regenerated from original BCPL code
+* SETMEMREQ PROM retyped from binary listing
+* TIMING PROM retyped from binary listing
 */
 
 #include "emu.h"
@@ -670,25 +692,26 @@ read from 0x44 (byte wide) to check input fifo status
 
 /*
 Emulator cpu mem map:
+(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the processor when /reset is de-asserted by the iocpu)
 a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   DisLMem_q
-0?  0?  0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
-0?  0?  0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
+x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
+x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
 <anything not all zeroes >   *    *   *   *   *    *   *   *   *    *   *   *   *    x                       RW  System/Shared RAM
    EXCEPT for the following, decoded by the EP board and superseding above:
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
    And the following, decoded by the memory address logic board:
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset(bit 6)/int(bit 5)/boot(bit 4) for each processor; data bits 3,2,1,0 are 'processor address'; 0010 means IP, 0111 means EP; all others ignored.))
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp(syndrome) bits 13-8, bits 7-0 are the highest address bits)
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset(bit 6)/int(bit 5)/boot(bit 4) for each processor; data bits 3,2,1,0 are 'processor address'; 0010 means IP, 0111 means EP; all others ignored.))
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp(syndrome) bits 13-8, bits 7-0 are the highest address bits)
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
 */
 
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
     AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
     AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-    AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
-    AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
+    AM_RANGE(0xFFFC0, 0xFFFDF) AM_MIRROR(0xC0000) AM_READWRITE(proc_illinst_r, proc_illinst_w)
+    AM_RANGE(0xFFFE0, 0xFFFEF) AM_MIRROR(0xC0000) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
 */
 
@@ -933,8 +956,17 @@ ROM_START( notetakr )
 	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
 	ROM_REGION( 0x400, "kbmcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "keyboard.i8748.a10a", 0x000, 0x400, NO_DUMP ) // keyboard mcu which handles key scanning as well as reading the mouse quadratures, and issues state responses if requested by the iocpu
-	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
-	ROM_LOAD( "disksep.82s147.a4", 0x000, 0x200, CRC(38363714) SHA1(c995d2702573f5afb5fc919150d3a5661013f999) ) // disk data separator prom from the disk/display module board; there are two different versions of this prom, both generated by BCPL programs, one from 1978 (Single density only? seems very buggy and might not even work) and one from 1979 (which seems like it should work and appears here). Note that the bit order for the state counter (data bits 6,5,4,3) may be reversed vs the real machine, but since the prom address bus is the only thing that ever sees the prom data bus, this prom will work even if the bit order for those bits is backwards.
+	ROM_REGION( 0x500, "proms", ROMREGION_ERASEFF )
+	/* disk data separator prom from the disk/display module board:
+	   there are two different versions of this prom, both generated by BCPL programs,
+	   one from mid 1978 (Single density only? seems very buggy and might not even work)
+	   and one from 1979 (which should work and appears here).
+	   Note that the bit order for the state counter (data bits 6,5,4,3) may be
+	   reversed vs the real machine, but since the prom address bus is the only
+	   thing that ever sees the prom data bus, this prom will work even if the
+	   bit order for those bits is backwards.
+	*/
+	ROM_LOAD( "disksep.82s147.a4", 0x000, 0x200, CRC(38363714) SHA1(c995d2702573f5afb5fc919150d3a5661013f999) ) // 1979 version
 	ROM_LOAD( "timingprom.82s147.b1", 0x200, 0x200, CRC(3003b50a) SHA1(77d9ffe4716c2297708b8e5ebce7f930619c3cc3) ) // memory cas/ras/write state machine prom from the memory address logic board; the contents of this are listed in http://www.bitsavers.org/pdf/xerox/notetaker/schematics/19781027_Memory_Address_Timing.pdf
 	ROM_LOAD( "memreqprom.82s126.d9", 0x400, 0x100, CRC(56b2be8b) SHA1(5df0579ed8afeb59113700be6f2982ef85f64b44) ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
 	/*
