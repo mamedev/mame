@@ -15,38 +15,36 @@ Early on, it does a read from port F2. If bit 3 is low, the system becomes
 a Model 400.
 
 Since IM2 is used, it is assumed there are Z80 peripherals on board.
-There's unknown usage of ports 11 thru 1B, 34, and F0 thru F2.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+#include "machine/z80sio.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 
-#define TERMINAL_TAG "terminal"
 
 class ccs300_state : public driver_device
 {
 public:
 	ccs300_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sio(*this, "sio")
+	{ }
 
+	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_DRIVER_INIT(ccs300);
 	DECLARE_MACHINE_RESET(ccs300);
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_READ8_MEMBER(port11_r);
-	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
-	void kbd_put(u8 data);
 
 private:
-	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<z80sio_device> m_sio;
 };
 
 static ADDRESS_MAP_START(ccs300_mem, AS_PROGRAM, 8, ccs300_state)
@@ -58,41 +56,34 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ccs300_io, AS_IO, 8, ccs300_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r,port10_w)
-	AM_RANGE(0x11, 0x11) AM_READ(port11_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("pio", z80pio_device, read_alt, write_alt)  // init bytes seem to be for a PIO
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)  // init bytes seem to be for a CTC
+	AM_RANGE(0x30, 0x33) // fdc?
+	AM_RANGE(0x34, 0x34) // motor control?
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
+	AM_RANGE(0xf0, 0xf0) // unknown, long sequence of init bytes
+	AM_RANGE(0xf2, 0xf2) // dip or jumper?
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( ccs300 )
 INPUT_PORTS_END
 
-//*************************************
-//
-//  Keyboard
-//
-//*************************************
-READ8_MEMBER( ccs300_state::port10_r )
+// source of baud frequency is unknown, so we invent a clock
+WRITE_LINE_MEMBER( ccs300_state::clock_tick )
 {
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
+	m_sio->txca_w(state);
+	m_sio->rxca_w(state);
 }
 
-READ8_MEMBER( ccs300_state::port11_r )
+static const z80_daisy_config daisy_chain[] =
 {
-	return (m_term_data) ? 5 : 4;
-}
-
-WRITE8_MEMBER( ccs300_state::port10_w )
-{
-	m_terminal->write(space, 0, data & 0x7f);
-}
-
-void ccs300_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
+	{ "ctc" },
+	{ "sio" },
+	{ "pio" },
+	{ nullptr }
+};
 
 //*************************************
 //
@@ -119,16 +110,46 @@ DRIVER_INIT_MEMBER( ccs300_state, ccs300 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
+// bit 7 needs to be stripped off, we do this by choosing 7 bits and even parity
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( ccs300 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(ccs300_mem)
 	MCFG_CPU_IO_MAP(ccs300_io)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+
 	MCFG_MACHINE_RESET_OVERRIDE(ccs300_state, ccs300)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ccs300_state, kbd_put))
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ccs300_state, clock_tick))
+
+	/* Devices */
+	MCFG_Z80SIO_ADD("sio", XTAL_4MHz, 0, 0, 0, 0)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 /* ROM definition */

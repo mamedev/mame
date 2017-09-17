@@ -10,52 +10,32 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "bus/rs232/rs232.h"
 
-#define TERMINAL_TAG "terminal"
 
 class vector4_state : public driver_device
 {
 public:
 	vector4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart1(*this, "uart1")
+		, m_uart2(*this, "uart2")
+		, m_uart3(*this, "uart3")
+	{ }
 
-	DECLARE_READ8_MEMBER(vector4_02_r);
-	DECLARE_READ8_MEMBER(vector4_03_r);
-	DECLARE_WRITE8_MEMBER(vector4_02_w);
-	void kbd_put(u8 data);
+	DECLARE_WRITE_LINE_MEMBER( clock_tick );
 
-protected:
+private:
 	virtual void machine_reset() override;
-
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	uint8_t m_term_data;
+	required_device<i8251_device> m_uart1;
+	required_device<i8251_device> m_uart2;
+	required_device<i8251_device> m_uart3;
 };
 
-
-
-WRITE8_MEMBER( vector4_state::vector4_02_w )
-{
-	if (data < 0xff)
-		m_terminal->write(space, 0, data);
-}
-
-READ8_MEMBER( vector4_state::vector4_03_r )
-{
-	return (m_term_data) ? 3 : 1;
-}
-
-READ8_MEMBER( vector4_state::vector4_02_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
 
 static ADDRESS_MAP_START(vector4_mem, AS_PROGRAM, 8, vector4_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -69,8 +49,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(vector4_io, AS_IO, 8, vector4_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(vector4_02_r,vector4_02_w)
-	AM_RANGE(0x03, 0x03) AM_READ(vector4_03_r)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
+	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("uart3", i8251_device, data_r, data_w)
+	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("uart3", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -80,13 +64,18 @@ INPUT_PORTS_END
 
 void vector4_state::machine_reset()
 {
-	m_term_data = 0;
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
-void vector4_state::kbd_put(u8 data)
+// source of baud frequency is not documented, so we invent a clock
+WRITE_LINE_MEMBER( vector4_state::clock_tick )
 {
-	m_term_data = data;
+	m_uart1->write_txc(state);
+	m_uart1->write_rxc(state);
+	m_uart2->write_txc(state);
+	m_uart2->write_rxc(state);
+	m_uart3->write_txc(state);
+	m_uart3->write_rxc(state);
 }
 
 static MACHINE_CONFIG_START( vector4 )
@@ -95,10 +84,40 @@ static MACHINE_CONFIG_START( vector4 )
 	MCFG_CPU_PROGRAM_MAP(vector4_mem)
 	MCFG_CPU_IO_MAP(vector4_io)
 
-
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(vector4_state, kbd_put))
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vector4_state, clock_tick))
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
+	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
+
+	MCFG_DEVICE_ADD("uart2", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2", i8251_device, write_cts))
+
+	MCFG_DEVICE_ADD("uart3", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232c", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232c", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232c", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232c", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart3", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart3", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart3", i8251_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
