@@ -388,6 +388,7 @@ WRITE16_MEMBER(ms32_state::ms32_extra_w16)
 	COMBINE_DATA(&m_f1superb_extraram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
+
 READ16_MEMBER(ms32_state::ms32_extra_r16)
 {
 	return m_f1superb_extraram[offset];
@@ -421,8 +422,8 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
 
-	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) AM_SHARE("f1sb_extraram") // definitely line ram
-	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
+	AM_RANGE(0xfdc00000, 0xfdc1ffff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) AM_SHARE("f1sb_extraram") // definitely line ram
+	AM_RANGE(0xfde00000, 0xfde1ffff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)
 ADDRESS_MAP_END
