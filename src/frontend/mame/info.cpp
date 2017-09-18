@@ -649,21 +649,23 @@ void info_xml_creator::output_sampleof(device_t &device)
 void info_xml_creator::output_bios(device_t const &device)
 {
 	// first determine the default BIOS name
-	std::string defaultname;
-	for (const rom_entry &rom : device.rom_region_vector())
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			defaultname = ROM_GETNAME(&rom);
+	char const *defaultname(nullptr);
+	for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+	{
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			defaultname = rom->name;
+	}
 
 	// iterate over ROM entries and look for BIOSes
-	for (const rom_entry &rom : device.rom_region_vector())
+	for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
+		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
 			// output extracted name and descriptions
 			fprintf(m_output, "\t\t<biosset");
-			fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(&rom)));
-			fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(ROM_GETHASHDATA(&rom)));
-			if (defaultname == ROM_GETNAME(&rom))
+			fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(rom->name));
+			fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(rom->hashdata));
+			if (defaultname && !std::strcmp(defaultname, rom->name))
 				fprintf(m_output, " default=\"yes\"");
 			fprintf(m_output, "/>\n");
 		}
@@ -707,7 +709,7 @@ void info_xml_creator::output_rom(driver_enumerator *drivlist, device_t &device)
 				if (!is_disk && is_bios)
 				{
 					// scan backwards through the ROM entries
-					for (const rom_entry *brom = rom - 1; brom != device.rom_region(); brom--)
+					for (const rom_entry *brom = rom - 1; brom != &device.rom_region_vector().front(); brom--)
 					{
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{

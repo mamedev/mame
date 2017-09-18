@@ -30,11 +30,11 @@ bool xbox_base_state::find_bios_hash(running_machine &mach, int bios, uint32_t &
 	uint32_t crc = 0;
 	const std::vector<rom_entry> &rev = mach.root_device().rom_region_vector();
 
-	for (rom_entry re : rev)
+	for (rom_entry const &re : rev)
 	{
-		if ((re.flags() & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_ROM)
+		if (ROMENTRY_ISFILE(re))
 		{
-			if ((re.flags() & ROM_BIOSFLAGSMASK) == ROM_BIOS(bios + 1))
+			if (ROM_GETBIOSFLAGS(re) == (bios + 1))
 			{
 				const std::string &h = re.hashdata();
 				util::hash_collection hc(h.c_str());

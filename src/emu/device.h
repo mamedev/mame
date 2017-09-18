@@ -451,7 +451,7 @@ public:
 	const machine_config &mconfig() const { return m_machine_config; }
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
 	const std::vector<rom_entry> &rom_region_vector() const;
-	const rom_entry *rom_region() const { return rom_region_vector().data(); }
+	const tiny_rom_entry *rom_region() const { return device_rom_region(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
 	u8 default_bios() const { return m_default_bios; }
 	u8 system_bios() const { return m_system_bios; }

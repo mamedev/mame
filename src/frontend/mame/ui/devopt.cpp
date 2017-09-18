@@ -145,25 +145,28 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	int bios = 0;
 	if (dev->rom_region())
 	{
-		std::string bios_str;
 		// first loop through roms in search of default bios (shortname)
-		for (const rom_entry &rom : dev->rom_region_vector())
-			if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-				bios_str.assign(ROM_GETNAME(&rom));
+		char const *bios_str(nullptr);
+		for (const tiny_rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); ++rom)
+		{
+			if (ROMENTRY_ISDEFAULT_BIOS(rom))
+				bios_str = rom->name;
+		}
 
 		// then loop again to count bios options and to get the default bios complete name
-		for (const rom_entry &rom : dev->rom_region_vector())
+		char const *bios_desc(nullptr);
+		for (const tiny_rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); ++rom)
 		{
-			if (ROMENTRY_ISSYSTEM_BIOS(&rom))
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
 			{
 				bios++;
-				if (bios_str.compare(ROM_GETNAME(&rom))==0)
-					bios_str.assign(ROM_GETHASHDATA(&rom));
+				if (bios_str && !std::strcmp(bios_str, rom->name))
+					bios_desc = rom->hashdata;
 			}
 		}
 
 		if (bios)
-			util::stream_format(str, "* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_str.c_str());
+			util::stream_format(str, "* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_desc ? bios_desc : bios_str ? bios_str : "");
 	}
 
 	int input = 0, input_mj = 0, input_hana = 0, input_gamble = 0, input_analog = 0, input_adjust = 0;

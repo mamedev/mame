@@ -2384,28 +2384,29 @@ bool menu_select_launch::has_multiple_bios(game_driver const &driver, s_bios &bi
 	if (!driver.rom)
 		return false;
 
-	auto const entries = rom_build_entries(driver.rom);
-
-	std::string default_name;
-	for (const rom_entry &rom : entries)
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			default_name = ROM_GETNAME(&rom);
-
-	for (const rom_entry &rom : entries)
+	char const *default_name(nullptr);
+	for (tiny_rom_entry const *rom = driver.rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			std::string name(ROM_GETHASHDATA(&rom));
-			std::string bname(ROM_GETNAME(&rom));
-			int bios_flags = ROM_GETBIOSFLAGS(&rom);
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			default_name = rom->name;
+	}
 
-			if (bname == default_name)
+	for (tiny_rom_entry const *rom = driver.rom; !ROMENTRY_ISEND(rom); ++rom)
+	{
+		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		{
+			std::string name(rom->hashdata);
+			u32 const bios_flags(ROM_GETBIOSFLAGS(rom));
+
+			if (default_name && !std::strcmp(rom->name, default_name))
 			{
 				name.append(_(" (default)"));
-				biosname.emplace(biosname.begin(), name, bios_flags - 1);
+				biosname.emplace(biosname.begin(), std::move(name), bios_flags - 1);
 			}
 			else
-				biosname.emplace_back(name, bios_flags - 1);
+			{
+				biosname.emplace_back(std::move(name), bios_flags - 1);
+			}
 		}
 	}
 	return biosname.size() > 1U;

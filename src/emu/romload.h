@@ -19,6 +19,8 @@
 #include "chd.h"
 #include "romentry.h"
 
+#include <type_traits>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -29,57 +31,60 @@
     MACROS
 ***************************************************************************/
 
+template <typename T> inline std::enable_if_t<!std::is_pointer<T>::value, T const &> ROMENTRY_UNWRAP(T const &r) { return r; }
+template <typename T> inline T const &ROMENTRY_UNWRAP(T const *r) { return *r; }
+
 /* ----- per-entry macros ----- */
-#define ROMENTRY_GETTYPE(r)         ((r)->flags() & ROMENTRY_TYPEMASK)
-#define ROMENTRY_ISSPECIAL(r)       (ROMENTRY_GETTYPE(r) != ROMENTRYTYPE_ROM)
-#define ROMENTRY_ISFILE(r)          (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_ROM)
-#define ROMENTRY_ISREGION(r)        (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_REGION)
-#define ROMENTRY_ISEND(r)           (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_END)
-#define ROMENTRY_ISRELOAD(r)        (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_RELOAD)
-#define ROMENTRY_ISCONTINUE(r)      (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_CONTINUE)
-#define ROMENTRY_ISFILL(r)          (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_FILL)
-#define ROMENTRY_ISCOPY(r)          (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_COPY)
-#define ROMENTRY_ISIGNORE(r)        (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_IGNORE)
-#define ROMENTRY_ISSYSTEM_BIOS(r)   (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_SYSTEM_BIOS)
-#define ROMENTRY_ISDEFAULT_BIOS(r)  (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_DEFAULT_BIOS)
-#define ROMENTRY_ISPARAMETER(r)     (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_PARAMETER)
-#define ROMENTRY_ISREGIONEND(r)     (ROMENTRY_ISREGION(r) || ROMENTRY_ISPARAMETER(r) || ROMENTRY_ISEND(r))
+template <typename T> inline u32  ROMENTRY_GETTYPE(T const &r)         { return ROMENTRY_UNWRAP(r).get_flags() & ROMENTRY_TYPEMASK; }
+template <typename T> inline bool ROMENTRY_ISSPECIAL(T const &r)       { return ROMENTRY_GETTYPE(r) != ROMENTRYTYPE_ROM; }
+template <typename T> inline bool ROMENTRY_ISFILE(T const &r)          { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_ROM; }
+template <typename T> inline bool ROMENTRY_ISREGION(T const &r)        { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_REGION; }
+template <typename T> inline bool ROMENTRY_ISEND(T const &r)           { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_END; }
+template <typename T> inline bool ROMENTRY_ISRELOAD(T const &r)        { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_RELOAD; }
+template <typename T> inline bool ROMENTRY_ISCONTINUE(T const &r)      { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_CONTINUE; }
+template <typename T> inline bool ROMENTRY_ISFILL(T const &r)          { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_FILL; }
+template <typename T> inline bool ROMENTRY_ISCOPY(T const &r)          { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_COPY; }
+template <typename T> inline bool ROMENTRY_ISIGNORE(T const &r)        { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_IGNORE; }
+template <typename T> inline bool ROMENTRY_ISSYSTEM_BIOS(T const &r)   { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_SYSTEM_BIOS; }
+template <typename T> inline bool ROMENTRY_ISDEFAULT_BIOS(T const &r)  { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_DEFAULT_BIOS; }
+template <typename T> inline bool ROMENTRY_ISPARAMETER(T const &r)     { return ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_PARAMETER; }
+template <typename T> inline bool ROMENTRY_ISREGIONEND(T const &r)     { return ROMENTRY_ISREGION(r) || ROMENTRY_ISPARAMETER(r) || ROMENTRY_ISEND(r); }
 
 /* ----- per-region macros ----- */
 #define ROMREGION_GETTAG(r)         ((r)->name().c_str())
-#define ROMREGION_GETLENGTH(r)      ((r)->length())
-#define ROMREGION_GETFLAGS(r)       ((r)->flags())
-#define ROMREGION_GETWIDTH(r)       (8 << ((ROMREGION_GETFLAGS(r) & ROMREGION_WIDTHMASK) >> 8))
-#define ROMREGION_ISLITTLEENDIAN(r) ((ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-#define ROMREGION_ISBIGENDIAN(r)    ((ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_BE)
-#define ROMREGION_ISINVERTED(r)     ((ROMREGION_GETFLAGS(r) & ROMREGION_INVERTMASK) == ROMREGION_INVERT)
-#define ROMREGION_ISERASE(r)        ((ROMREGION_GETFLAGS(r) & ROMREGION_ERASEMASK) == ROMREGION_ERASE)
-#define ROMREGION_GETERASEVAL(r)    ((ROMREGION_GETFLAGS(r) & ROMREGION_ERASEVALMASK) >> 16)
-#define ROMREGION_GETDATATYPE(r)    (ROMREGION_GETFLAGS(r) & ROMREGION_DATATYPEMASK)
-#define ROMREGION_ISROMDATA(r)      (ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEROM)
-#define ROMREGION_ISDISKDATA(r)     (ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEDISK)
+template <typename T> inline u32  ROMREGION_GETLENGTH(T const &r)      { return ROMENTRY_UNWRAP(r).get_length(); }
+template <typename T> inline u32  ROMREGION_GETFLAGS(T const &r)       { return ROMENTRY_UNWRAP(r).get_flags(); }
+template <typename T> inline u32  ROMREGION_GETWIDTH(T const &r)       { return 8 << ((ROMREGION_GETFLAGS(r) & ROMREGION_WIDTHMASK) >> 8); }
+template <typename T> inline bool ROMREGION_ISLITTLEENDIAN(T const &r) { return (ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_LE; }
+template <typename T> inline bool ROMREGION_ISBIGENDIAN(T const &r)    { return (ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_BE; }
+template <typename T> inline bool ROMREGION_ISINVERTED(T const &r)     { return (ROMREGION_GETFLAGS(r) & ROMREGION_INVERTMASK) == ROMREGION_INVERT; }
+template <typename T> inline bool ROMREGION_ISERASE(T const &r)        { return (ROMREGION_GETFLAGS(r) & ROMREGION_ERASEMASK) == ROMREGION_ERASE; }
+template <typename T> inline u32  ROMREGION_GETERASEVAL(T const &r)    { return (ROMREGION_GETFLAGS(r) & ROMREGION_ERASEVALMASK) >> 16; }
+template <typename T> inline u32  ROMREGION_GETDATATYPE(T const &r)    { return ROMREGION_GETFLAGS(r) & ROMREGION_DATATYPEMASK; }
+template <typename T> inline bool ROMREGION_ISROMDATA(T const &r)      { return ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEROM; }
+template <typename T> inline bool ROMREGION_ISDISKDATA(T const &r)     { return ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEDISK; }
 
 
 /* ----- per-ROM macros ----- */
 #define ROM_GETNAME(r)              ((r)->name().c_str())
 #define ROM_SAFEGETNAME(r)          (ROMENTRY_ISFILL(r) ? "fill" : ROMENTRY_ISCOPY(r) ? "copy" : ROM_GETNAME(r))
-#define ROM_GETOFFSET(r)            ((r)->offset())
-#define ROM_GETLENGTH(r)            ((r)->length())
-#define ROM_GETFLAGS(r)             ((r)->flags())
+template <typename T> inline u32  ROM_GETOFFSET(T const &r)            { return ROMENTRY_UNWRAP(r).get_offset(); }
+template <typename T> inline u32  ROM_GETLENGTH(T const &r)            { return ROMENTRY_UNWRAP(r).get_length(); }
+template <typename T> inline u32  ROM_GETFLAGS(T const &r)             { return ROMENTRY_UNWRAP(r).get_flags(); }
 #define ROM_GETHASHDATA(r)          ((r)->hashdata().c_str())
-#define ROM_ISOPTIONAL(r)           ((ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == ROM_OPTIONAL)
-#define ROM_GETGROUPSIZE(r)         (((ROM_GETFLAGS(r) & ROM_GROUPMASK) >> 8) + 1)
-#define ROM_GETSKIPCOUNT(r)         ((ROM_GETFLAGS(r) & ROM_SKIPMASK) >> 12)
-#define ROM_ISREVERSED(r)           ((ROM_GETFLAGS(r) & ROM_REVERSEMASK) == ROM_REVERSE)
-#define ROM_GETBITWIDTH(r)          (((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) >> 16) + 8 * ((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) == 0))
-#define ROM_GETBITSHIFT(r)          ((ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 20)
-#define ROM_INHERITSFLAGS(r)        ((ROM_GETFLAGS(r) & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS)
-#define ROM_GETBIOSFLAGS(r)         ((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24)
+template <typename T> inline bool ROM_ISOPTIONAL(T const &r)           { return (ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == ROM_OPTIONAL; }
+template <typename T> inline u32  ROM_GETGROUPSIZE(T const &r)         { return ((ROM_GETFLAGS(r) & ROM_GROUPMASK) >> 8) + 1; }
+template <typename T> inline u32  ROM_GETSKIPCOUNT(T const &r)         { return (ROM_GETFLAGS(r) & ROM_SKIPMASK) >> 12; }
+template <typename T> inline bool ROM_ISREVERSED(T const &r)           { return (ROM_GETFLAGS(r) & ROM_REVERSEMASK) == ROM_REVERSE; }
+template <typename T> inline u32  ROM_GETBITWIDTH(T const &r)          { return (ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) ? ((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) >> 16) : 8; }
+template <typename T> inline u32  ROM_GETBITSHIFT(T const &r)          { return (ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 20; }
+template <typename T> inline bool ROM_INHERITSFLAGS(T const &r)        { return (ROM_GETFLAGS(r) & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS; }
+template <typename T> inline bool ROM_GETBIOSFLAGS(T const &r)         { return (ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24; }
 
 
 /* ----- per-disk macros ----- */
-#define DISK_GETINDEX(r)            ((r)->offset())
-#define DISK_ISREADONLY(r)          ((ROM_GETFLAGS(r) & DISK_READONLYMASK) == DISK_READONLY)
+template <typename T> inline u32  DISK_GETINDEX(T const &r)            { return ROMENTRY_UNWRAP(r).get_offset(); }
+template <typename T> inline bool DISK_ISREADONLY(T const &r)          { return (ROM_GETFLAGS(r) & DISK_READONLYMASK) == DISK_READONLY; }
 
 
 /* ----- start/stop macros ----- */
