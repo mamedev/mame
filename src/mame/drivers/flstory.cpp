@@ -28,58 +28,59 @@ READ8_MEMBER(flstory_state::snd_flag_r)
 	return (m_soundlatch->pending_r() ? 0 : 1) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
-static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
+WRITE8_MEMBER(flstory_state::snd_reset_w)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
+
+	// rumba lumber reads area 0xc800-0xcfff
+	// onna34ro checks the whole range during POST but having a mirror or not doesn't make any difference for the check to pass
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x800) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
+
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog */
+	AM_RANGE(0xd002, 0xd002) AM_NOP    		/* unknown read & coin lock out? */
+
 	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xd403, 0xd403) AM_READNOP AM_WRITE(snd_reset_w) // unknown read (set/clr side effect?)
+	
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
-//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+	
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
-	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
+
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+
+	// victorious nine read 0xf80a during attract, unknown purpose
+	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("workram") /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
+	AM_IMPORT_FROM(base_map)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+
+	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
+//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
+	AM_IMPORT_FROM(base_map)
 //  AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
 //  AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_mcu_map, AS_PROGRAM, 8, flstory_state )
@@ -96,59 +97,25 @@ CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 }
 
 static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
+	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
+
 	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")   /* also mcu */
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-//  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
+	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-//  AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-//  AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
+
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
 
@@ -770,7 +737,9 @@ MACHINE_RESET_MEMBER(flstory_state,flstory)
 
 	/* video */
 	m_gfxctrl = 0;
-	m_char_bank = 0;
+//  onna34ro doesn't set this up when checking RAM/VRAM (available by keeping pressed service button at startup)
+//  so we invert the logic here
+	m_char_bank = 1;
 	m_palette_bank = 0;
 	/* sound */
 	m_snd_ctrl0 = 0;
