@@ -29,6 +29,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
+#include "kdt6.lh"
 
 
 //**************************************************************************
@@ -618,6 +619,7 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEFAULT_LAYOUT(layout_kdt6)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_13_5168MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
