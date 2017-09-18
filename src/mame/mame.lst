@@ -12251,6 +12251,8 @@ waveterm                        //
 
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
+europc2							// 1989 Schneider Euro PC II
+euroxt							// Schneider Euro XT
 
 @source:eva.cpp
 eva11                           //
