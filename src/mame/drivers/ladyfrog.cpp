@@ -10,6 +10,9 @@ driver by Tomasz Slanina
 
 'N.Y. Captor' (TAITO) hardware , without sub cpu.
 
+TODO:
+- merge with flstory.cpp
+
 Sound rom is 'borrowed' from NYC.
 1.115 = a80_16.i26 + a80_17.i25
 
@@ -299,10 +302,11 @@ static MACHINE_CONFIG_START( ladyfrog )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1) // black borders in ladyfrog gameplay are correct
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) // black borders in ladyfrog gameplay are correct
+	MCFG_SCREEN_RAW_PARAMS( 8000000, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
