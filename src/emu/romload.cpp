@@ -191,10 +191,8 @@ u32 rom_file_size(const rom_entry *romp)
 	/* loop until we run out of reloads */
 	do
 	{
-		u32 curlength;
-
 		/* loop until we run out of continues/ignores */
-		curlength = ROM_GETLENGTH(romp++);
+		u32 curlength = ROM_GETLENGTH(romp++);
 		while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp))
 			curlength += ROM_GETLENGTH(romp++);
 

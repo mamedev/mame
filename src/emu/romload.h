@@ -79,7 +79,7 @@ template <typename T> inline bool ROM_ISREVERSED(T const &r)           { return 
 template <typename T> inline u32  ROM_GETBITWIDTH(T const &r)          { return (ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) ? ((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) >> 16) : 8; }
 template <typename T> inline u32  ROM_GETBITSHIFT(T const &r)          { return (ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 20; }
 template <typename T> inline bool ROM_INHERITSFLAGS(T const &r)        { return (ROM_GETFLAGS(r) & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS; }
-template <typename T> inline bool ROM_GETBIOSFLAGS(T const &r)         { return (ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24; }
+template <typename T> inline u32  ROM_GETBIOSFLAGS(T const &r)         { return (ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24; }
 
 
 /* ----- per-disk macros ----- */
