@@ -145,7 +145,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:55
 msgid "Ends"
-msgstr ""
+msgstr "Sonlar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:52
 msgid "PCBs"
@@ -1165,7 +1165,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/filecreate.cpp:183
 msgid "Create"
-msgstr ""
+msgstr "Oluştur"
 
 #: src/frontend/mame/ui/filecreate.cpp:214
 msgid "Please enter a file extension too"
@@ -1177,27 +1177,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/menu.cpp:294
 msgid "Return to Machine"
-msgstr ""
+msgstr "Makineye Dön"
 
 #: src/frontend/mame/ui/menu.cpp:299 src/frontend/mame/ui/menu.cpp:301
 msgid "Exit"
-msgstr ""
+msgstr "Çıkış"
 
 #: src/frontend/mame/ui/menu.cpp:306 src/frontend/mame/ui/menu.cpp:308
 msgid "Return to Previous Menu"
-msgstr ""
+msgstr "Önceki Menüye Dön"
 
 #: src/frontend/mame/ui/menu.cpp:730
 msgid "Auto"
-msgstr ""
+msgstr "Oto"
 
 #: src/frontend/mame/ui/barcode.cpp:74
 msgid "New Barcode:"
-msgstr ""
+msgstr "Yeni Barkod:"
 
 #: src/frontend/mame/ui/barcode.cpp:78
 msgid "Enter Code"
-msgstr ""
+msgstr "Kod Girin"
 
 #: src/frontend/mame/ui/barcode.cpp:119
 msgid "Barcode length invalid!"
@@ -1205,7 +1205,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
-msgstr ""
+msgstr "Yazılım Kullanımı"
 
 #: src/frontend/mame/ui/datmenu.cpp:362
 msgid "Revision: "
@@ -1221,11 +1221,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:60
 msgid "Input (general)"
-msgstr ""
+msgstr "Girdi (genel)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:62
 msgid "Input (this Machine)"
-msgstr ""
+msgstr "Girdi (bu Makine)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:66
 msgid "Analog Controls"
@@ -1237,7 +1237,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "Machine Configuration"
-msgstr ""
+msgstr "Makine Yapılandırması"
 
 #: src/frontend/mame/ui/mainmenu.cpp:75
 msgid "Bookkeeping Info"
@@ -1245,15 +1245,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:78
 msgid "Machine Information"
-msgstr ""
+msgstr "Makine Bilgisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:85
 msgid "Image Information"
-msgstr ""
+msgstr "İmaj Bilgisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:88
 msgid "File Manager"
-msgstr ""
+msgstr "Dosya Yöneticisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:96
 msgid "Tape Control"
@@ -1261,7 +1261,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "BIOS Seçimi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1277,7 +1277,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr ""
+msgstr "Klavye Modu"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Slider Controls"
@@ -1285,7 +1285,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:124 src/frontend/mame/ui/submenu.cpp:99
 msgid "Video Options"
-msgstr ""
+msgstr "Görüntü Seçenekleri"
 
 #: src/frontend/mame/ui/mainmenu.cpp:128
 msgid "Crosshair Options"
@@ -1293,7 +1293,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr ""
+msgstr "Hile"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgid "Plugin Options"
@@ -1305,15 +1305,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:145 src/frontend/mame/ui/miscmenu.cpp:778
 msgid "Add To Favorites"
-msgstr ""
+msgstr "Favorilere Ekle"
 
 #: src/frontend/mame/ui/mainmenu.cpp:147 src/frontend/mame/ui/miscmenu.cpp:780
 msgid "Remove From Favorites"
-msgstr ""
+msgstr "Favorilerden kaldır"
 
 #: src/frontend/mame/ui/mainmenu.cpp:154
 msgid "Select New Machine"
-msgstr ""
+msgstr "Yeni Makine Seçin"
 
 #: src/frontend/mame/ui/selsoft.cpp:456
 msgid ""
@@ -1700,7 +1700,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:358
 msgid "BIOS selection:"
-msgstr "BIOS seçimi"
+msgstr "BIOS seçimi:"
 
 #: src/frontend/mame/ui/selmenu.cpp:589
 #, c-format
@@ -2090,7 +2090,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:630
 msgid "Name:             Description:\n"
-msgstr "Ad:             Açıklama:\n"
+msgstr "Ad:               Açıklama:\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:641
 #, c-format
@@ -2434,7 +2434,7 @@ msgid "Window Mode"
 msgstr "Pencere Kipi"
 
 #: src/frontend/mame/ui/submenu.cpp:110
-  msgid "Enforce Aspect Ratio"
+msgid "Enforce Aspect Ratio"
 msgstr "En-boy oranını zorla"
 
 #: src/frontend/mame/ui/submenu.cpp:111
