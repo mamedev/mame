@@ -39,7 +39,7 @@
 #include "6840ptm.h"
 
 //#define VERBOSE 1
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
 
@@ -428,7 +428,7 @@ READ8_MEMBER( ptm6840_device::read )
 
 		case PTM_6840_STATUS:
 		{
-			LOG("%s: MC6840: Status read = %04X\n", machine().describe_context().c_str(), m_status_reg);
+			LOG("%s: MC6840: Status read = %04X\n", machine().describe_context(), m_status_reg);
 			m_status_read_since_int |= m_status_reg & 0x07;
 			val = m_status_reg;
 			break;
@@ -450,7 +450,7 @@ READ8_MEMBER( ptm6840_device::read )
 
 			m_lsb_buffer = result & 0xff;
 
-			LOG("%s: MC6840: Counter %d read = %04X\n", machine().describe_context().c_str(), idx, result >> 8);
+			LOG("%s: MC6840: Counter %d read = %04X\n", machine().describe_context(), idx, result >> 8);
 			val = result >> 8;
 			break;
 		}
@@ -565,7 +565,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 				reload_count(idx);
 			}
 
-			LOG("%s:MC6840: Counter %d latch = %04X\n", machine().describe_context().c_str(), idx, m_latch[idx]);
+			LOG("%s:MC6840: Counter %d latch = %04X\n", machine().describe_context(), idx, m_latch[idx]);
 			break;
 		}
 	}
