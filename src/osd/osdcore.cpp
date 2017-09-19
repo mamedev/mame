@@ -8,6 +8,14 @@
 #if defined(SDLMAME_ANDROID)
 #include <SDL2/SDL.h>
 #endif
+
+#ifdef _WIN32
+#include <windows.h>
+#include <stdio.h>
+#include <shellapi.h>
+#include "strconv.h"
+#endif
+
 static const int MAXSTACK = 10;
 static osd_output *m_stack[MAXSTACK];
 static int m_ptr = -1;
@@ -193,4 +201,44 @@ osd_ticks_t osd_ticks_per_second(void)
 void osd_sleep(osd_ticks_t duration)
 {
 	std::this_thread::sleep_for(std::chrono::high_resolution_clock::duration(duration));
+}
+
+
+//============================================================
+//  osd_get_command_line - returns command line arguments
+//	in an std::vector<std::string> in UTF-8
+//
+//	The real purpose of this call is to hide details necessary
+//	on Windows (provided that one wants to avoid using wmain)
+//============================================================
+
+std::vector<std::string> osd_get_command_line(int argc, char *argv[])
+{
+	std::vector<std::string> results;
+#ifdef WIN32
+	{
+		// Get the command line from Windows
+		int count;
+		LPWSTR *wide_args = CommandLineToArgvW(GetCommandLineW(), &count);
+
+		// Convert the returned command line arguments to UTF8 std::vector<std::string>
+		results.reserve(count);
+		for (int i = 0; i < count; i++)
+		{
+			std::string arg = osd::text::from_wstring(wide_args[i]);
+			results.push_back(std::move(arg));
+		}
+
+		LocalFree(wide_args);
+	}
+#else // !WIN32
+	{
+		// for non Windows platforms, we are assuming that arguments are
+		// already UTF-8; we just need to convert to std::vector<std::string>
+		results.reserve(argc);
+		for (int i = 0; i < argc; i++)
+			results.emplace_back(argv[i]);
+	}
+#endif // WIN32
+	return results;
 }

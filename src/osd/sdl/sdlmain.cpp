@@ -183,15 +183,9 @@ sdl_options::sdl_options()
 extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
 #endif
 
-// translated to utf8_main
-#if defined(SDLMAME_WIN32)
-int main(std::vector<std::string> &args)
-{
-#else
 int main(int argc, char** argv)
 {
-	std::vector<std::string> args(argv, argv+argc);
-#endif
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
 	int res = 0;
 
 	// disable I/O buffering
