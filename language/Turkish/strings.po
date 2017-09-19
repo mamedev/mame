@@ -145,7 +145,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:55
 msgid "Ends"
-msgstr ""
+msgstr "Sonlar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:52
 msgid "PCBs"
@@ -1165,7 +1165,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/filecreate.cpp:183
 msgid "Create"
-msgstr ""
+msgstr "Oluştur"
 
 #: src/frontend/mame/ui/filecreate.cpp:214
 msgid "Please enter a file extension too"
@@ -1177,27 +1177,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/menu.cpp:294
 msgid "Return to Machine"
-msgstr ""
+msgstr "Makineye Dön"
 
 #: src/frontend/mame/ui/menu.cpp:299 src/frontend/mame/ui/menu.cpp:301
 msgid "Exit"
-msgstr ""
+msgstr "Çıkış"
 
 #: src/frontend/mame/ui/menu.cpp:306 src/frontend/mame/ui/menu.cpp:308
 msgid "Return to Previous Menu"
-msgstr ""
+msgstr "Önceki Menüye Dön"
 
 #: src/frontend/mame/ui/menu.cpp:730
 msgid "Auto"
-msgstr ""
+msgstr "Oto"
 
 #: src/frontend/mame/ui/barcode.cpp:74
 msgid "New Barcode:"
-msgstr ""
+msgstr "Yeni Barkod:"
 
 #: src/frontend/mame/ui/barcode.cpp:78
 msgid "Enter Code"
-msgstr ""
+msgstr "Kod Girin"
 
 #: src/frontend/mame/ui/barcode.cpp:119
 msgid "Barcode length invalid!"
@@ -1205,7 +1205,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
-msgstr ""
+msgstr "Yazılım Kullanımı"
 
 #: src/frontend/mame/ui/datmenu.cpp:362
 msgid "Revision: "
@@ -1221,11 +1221,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:60
 msgid "Input (general)"
-msgstr ""
+msgstr "Girdi (genel)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:62
 msgid "Input (this Machine)"
-msgstr ""
+msgstr "Girdi (bu Makine)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:66
 msgid "Analog Controls"
@@ -1237,7 +1237,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "Machine Configuration"
-msgstr ""
+msgstr "Makine Yapılandırması"
 
 #: src/frontend/mame/ui/mainmenu.cpp:75
 msgid "Bookkeeping Info"
@@ -1245,15 +1245,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:78
 msgid "Machine Information"
-msgstr ""
+msgstr "Makine Bilgisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:85
 msgid "Image Information"
-msgstr ""
+msgstr "İmaj Bilgisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:88
 msgid "File Manager"
-msgstr ""
+msgstr "Dosya Yöneticisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:96
 msgid "Tape Control"
@@ -1261,7 +1261,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:102
 msgid "BIOS Selection"
-msgstr ""
+msgstr "BIOS Seçimi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Slot Devices"
@@ -1277,7 +1277,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr ""
+msgstr "Klavye Modu"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Slider Controls"
@@ -1285,7 +1285,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:124 src/frontend/mame/ui/submenu.cpp:99
 msgid "Video Options"
-msgstr ""
+msgstr "Görüntü Seçenekleri"
 
 #: src/frontend/mame/ui/mainmenu.cpp:128
 msgid "Crosshair Options"
@@ -1293,7 +1293,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr ""
+msgstr "Hile"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgid "Plugin Options"
@@ -1305,15 +1305,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:145 src/frontend/mame/ui/miscmenu.cpp:778
 msgid "Add To Favorites"
-msgstr ""
+msgstr "Favorilere Ekle"
 
 #: src/frontend/mame/ui/mainmenu.cpp:147 src/frontend/mame/ui/miscmenu.cpp:780
 msgid "Remove From Favorites"
-msgstr ""
+msgstr "Favorilerden kaldır"
 
 #: src/frontend/mame/ui/mainmenu.cpp:154
 msgid "Select New Machine"
-msgstr ""
+msgstr "Yeni Makine Seçin"
 
 #: src/frontend/mame/ui/selsoft.cpp:456
 msgid ""
@@ -1358,7 +1358,7 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:292
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr ""
+msgstr "İsim girin veya seçin: %1$s_"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:294
 msgid "Type name or select: (random)"
@@ -1378,36 +1378,36 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:330
 #: src/frontend/mame/ui/selmenu.cpp:634
 msgid "Overall: NOT WORKING"
-msgstr ""
+msgstr "Genel olarak: ÇALIŞMIYOR"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:332
 #: src/frontend/mame/ui/selmenu.cpp:636
 msgid "Overall: Unemulated Protection"
-msgstr ""
+msgstr "Genel olarak: Uygulanmamış Koruma"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:334
 #: src/frontend/mame/ui/selmenu.cpp:638
 msgid "Overall: Working"
-msgstr ""
+msgstr "Genel olarak: Çalışıyor"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:339
 #: src/frontend/mame/ui/simpleselgame.cpp:349
 msgid "Unimplemented"
-msgstr ""
+msgstr "Uygulanmamış"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:341
 #: src/frontend/mame/ui/simpleselgame.cpp:351
 msgid "Imperfect"
-msgstr ""
+msgstr "Kusurlu"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:343
 #: src/frontend/mame/ui/simpleselgame.cpp:353
 msgid "OK"
-msgstr ""
+msgstr "Tamam"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:347
 msgid "None"
-msgstr ""
+msgstr "Hiçbiri"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:355
 #, c-format
@@ -1416,27 +1416,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:31
 msgid "Show All"
-msgstr ""
+msgstr "Hepsini Göster"
 
 #: src/frontend/mame/ui/custui.cpp:32
 msgid "Hide Filters"
-msgstr ""
+msgstr "Filtreleri Gizle"
 
 #: src/frontend/mame/ui/custui.cpp:33
 msgid "Hide Info/Image"
-msgstr ""
+msgstr "Bilgi/Görüntü Gizle"
 
 #: src/frontend/mame/ui/custui.cpp:34
 msgid "Hide Both"
-msgstr ""
+msgstr "Hepsini Gizle"
 
 #: src/frontend/mame/ui/custui.cpp:151
 msgid "Fonts"
-msgstr ""
+msgstr "Yazıtipleri"
 
 #: src/frontend/mame/ui/custui.cpp:152
 msgid "Colors"
-msgstr ""
+msgstr "Renkler"
 
 #: src/frontend/mame/ui/custui.cpp:161
 msgid "Show side panels"
@@ -1448,31 +1448,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:223
 msgid "default"
-msgstr ""
+msgstr "varsayılan"
 
 #: src/frontend/mame/ui/custui.cpp:331
 msgid "UI Font"
-msgstr ""
+msgstr "Kullanıcı arayüzü yazıtipi"
 
 #: src/frontend/mame/ui/custui.cpp:336
 msgid "Bold"
-msgstr ""
+msgstr "Kalın"
 
 #: src/frontend/mame/ui/custui.cpp:337
 msgid "Italic"
-msgstr ""
+msgstr "Eğik"
 
 #: src/frontend/mame/ui/custui.cpp:342
 msgid "Lines"
-msgstr ""
+msgstr "Çizgiler"
 
 #: src/frontend/mame/ui/custui.cpp:348
 msgid "Infos text size"
-msgstr ""
+msgstr "Bilgiler yazı boyutu"
 
 #: src/frontend/mame/ui/custui.cpp:362
 msgid "UI Fonts Settings"
-msgstr ""
+msgstr "Kullanıcı arayüzü Yazıtipi Seçenekleri"
 
 #: src/frontend/mame/ui/custui.cpp:371
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -1480,19 +1480,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:451
 msgid "Normal text"
-msgstr ""
+msgstr "Normal yazı"
 
 #: src/frontend/mame/ui/custui.cpp:452
 msgid "Selected color"
-msgstr ""
+msgstr "Seçilen renk"
 
 #: src/frontend/mame/ui/custui.cpp:453
 msgid "Normal text background"
-msgstr ""
+msgstr "Normal yazı arkaplanı"
 
 #: src/frontend/mame/ui/custui.cpp:454
 msgid "Selected background color"
-msgstr ""
+msgstr "Seçilen arkaplan rengi"
 
 #: src/frontend/mame/ui/custui.cpp:455
 msgid "Subitem color"
@@ -1500,15 +1500,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:456 src/frontend/mame/ui/custui.cpp:511
 msgid "Clone"
-msgstr ""
+msgstr "Klon"
 
 #: src/frontend/mame/ui/custui.cpp:457
 msgid "Border"
-msgstr ""
+msgstr "Çerçeve"
 
 #: src/frontend/mame/ui/custui.cpp:458
 msgid "Background"
-msgstr ""
+msgstr "Arkaplan"
 
 #: src/frontend/mame/ui/custui.cpp:459
 msgid "Dipswitch"
@@ -1544,7 +1544,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:469
 msgid "Restore originals colors"
-msgstr ""
+msgstr "Orijinal renkleri geri yükle"
 
 #: src/frontend/mame/ui/custui.cpp:481
 msgid "UI Colors Settings"
@@ -1557,11 +1557,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:498
 msgid "Menu Preview"
-msgstr ""
+msgstr "Menü önizleme"
 
 #: src/frontend/mame/ui/custui.cpp:507
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: src/frontend/mame/ui/custui.cpp:508
 msgid "Subitem"
@@ -1569,7 +1569,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:509
 msgid "Selected"
-msgstr ""
+msgstr "Seçili"
 
 #: src/frontend/mame/ui/custui.cpp:510
 msgid "Mouse Over"
@@ -1577,66 +1577,66 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:740
 msgid "ARGB Settings"
-msgstr ""
+msgstr "ARGB Ayarları"
 
 #: src/frontend/mame/ui/custui.cpp:745 src/frontend/mame/ui/custui.cpp:748
 msgid "Alpha"
-msgstr ""
+msgstr "Alfa"
 
 #: src/frontend/mame/ui/custui.cpp:753 src/frontend/mame/ui/custui.cpp:756
 #: src/frontend/mame/ui/custui.cpp:898
 msgid "Red"
-msgstr ""
+msgstr "Kırmızı"
 
 #: src/frontend/mame/ui/custui.cpp:761 src/frontend/mame/ui/custui.cpp:764
 #: src/frontend/mame/ui/custui.cpp:901
 msgid "Green"
-msgstr ""
+msgstr "Yeşil"
 
 #: src/frontend/mame/ui/custui.cpp:769 src/frontend/mame/ui/custui.cpp:772
 #: src/frontend/mame/ui/custui.cpp:902
 msgid "Blue"
-msgstr ""
+msgstr "Mavi"
 
 #: src/frontend/mame/ui/custui.cpp:775
 msgid "Choose from palette"
-msgstr ""
+msgstr "Paletten seç"
 
 #: src/frontend/mame/ui/custui.cpp:813
 msgid "Color preview ="
-msgstr ""
+msgstr "Renk önizleme="
 
 #: src/frontend/mame/ui/custui.cpp:894
 msgid "White"
-msgstr ""
+msgstr "Beyaz"
 
 #: src/frontend/mame/ui/custui.cpp:895
 msgid "Silver"
-msgstr ""
+msgstr "Gümüş"
 
 #: src/frontend/mame/ui/custui.cpp:896
 msgid "Gray"
-msgstr ""
+msgstr "Gri"
 
 #: src/frontend/mame/ui/custui.cpp:897
 msgid "Black"
-msgstr ""
+msgstr "Siyah"
 
 #: src/frontend/mame/ui/custui.cpp:899
 msgid "Orange"
-msgstr ""
+msgstr "Turuncu"
 
 #: src/frontend/mame/ui/custui.cpp:900
 msgid "Yellow"
-msgstr ""
+msgstr "Sarı"
 
 #: src/frontend/mame/ui/custui.cpp:903
 msgid "Violet"
-msgstr ""
+msgstr "Mor"
 
 #: src/frontend/mame/ui/selmenu.cpp:51
 msgid "Control Panels"
-msgstr ""
+msgstr "Kontrol Paneli"
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Artwork Preview"
@@ -1644,7 +1644,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:60
 msgid "Game Over"
-msgstr ""
+msgstr "Oyun Bitti"
 
 #: src/frontend/mame/ui/selmenu.cpp:69
 msgid "Add or remove favorites"
@@ -1660,7 +1660,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:127
 msgid "Command"
-msgstr ""
+msgstr "Komut"
 
 #: src/frontend/mame/ui/selmenu.cpp:128
 msgid "Gameinit"
@@ -1668,11 +1668,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "High Scores"
-msgstr ""
+msgstr "Yüksek Skorlar"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "History"
-msgstr ""
+msgstr "Tarihçe"
 
 #: src/frontend/mame/ui/selmenu.cpp:131
 msgid "MAMEinfo"
@@ -1700,7 +1700,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:358
 msgid "BIOS selection:"
-msgstr ""
+msgstr "BIOS seçimi:"
 
 #: src/frontend/mame/ui/selmenu.cpp:589
 #, c-format
@@ -1713,15 +1713,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:596
 msgid "Supported: No"
-msgstr ""
+msgstr "Destekleniyor: Hayır"
 
 #: src/frontend/mame/ui/selmenu.cpp:601
 msgid "Supported: Partial"
-msgstr ""
+msgstr "Destekleniyor: Kısmen"
 
 #: src/frontend/mame/ui/selmenu.cpp:606
 msgid "Supported: Yes"
-msgstr ""
+msgstr "Destekleniyor: Evet"
 
 #: src/frontend/mame/ui/selmenu.cpp:611
 #, c-format
@@ -1739,31 +1739,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:642
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "Grafik: Uygulanmamış"
 
 #: src/frontend/mame/ui/selmenu.cpp:644
 msgid "Graphics: Imperfect, "
-msgstr ""
+msgstr "Grafik: Kusurlu"
 
 #: src/frontend/mame/ui/selmenu.cpp:646
 msgid "Graphics: OK, "
-msgstr ""
+msgstr "Grafik: Tamam"
 
 #: src/frontend/mame/ui/selmenu.cpp:649
 msgid "Sound: None"
-msgstr ""
+msgstr "Ses: Yok"
 
 #: src/frontend/mame/ui/selmenu.cpp:651
 msgid "Sound: Unimplemented"
-msgstr ""
+msgstr "Ses: Uygulanmamış"
 
 #: src/frontend/mame/ui/selmenu.cpp:653
 msgid "Sound: Imperfect"
-msgstr ""
+msgstr "Ses: Kusurlu"
 
 #: src/frontend/mame/ui/selmenu.cpp:655
 msgid "Sound: OK"
-msgstr ""
+msgstr "Ses: Tamam"
 
 #: src/frontend/mame/ui/selmenu.cpp:665
 #, c-format
@@ -1772,23 +1772,23 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:1995
 msgid "Images"
-msgstr ""
+msgstr "Görüntüler"
 
 #: src/frontend/mame/ui/selmenu.cpp:1996
 msgid "Infos"
-msgstr ""
+msgstr "Bilgiler"
 
 #: src/frontend/mame/ui/selmenu.cpp:2416 src/frontend/mame/ui/miscmenu.cpp:831
 msgid " (default)"
-msgstr ""
+msgstr " (varsayılan)"
 
 #: src/frontend/mame/ui/selmenu.cpp:2483
 msgid "Usage"
-msgstr ""
+msgstr "Kullanım"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "General Info"
-msgstr ""
+msgstr "Genel Bilgi"
 
 #: src/frontend/mame/ui/ui.cpp:337
 msgid "This driver requires images to be loaded in the following device(s): "
@@ -1830,15 +1830,19 @@ msgid ""
 "Press ''%1$s'' to quit,\n"
 "Press ''%2$s'' to return to emulation."
 msgstr ""
+"Çıkmak istediğinize emin misiniz?\n"
+"\n"
+"Çıkmak için ''%1$s'' e basın,\n"
+"Dönmek için ''%2$s'' e basın."
 
 #: src/frontend/mame/ui/ui.cpp:1366
 msgid "Master Volume"
-msgstr ""
+msgstr "Ana Ses"
 
 #: src/frontend/mame/ui/ui.cpp:1375
 #, c-format
 msgid "%1$s Volume"
-msgstr ""
+msgstr "%1$s Ses"
 
 #: src/frontend/mame/ui/ui.cpp:1399
 #, c-format
@@ -2023,7 +2027,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/viewgfx.cpp:406
 msgid " COLORS"
-msgstr ""
+msgstr "RENKLER"
 
 #: src/frontend/mame/ui/viewgfx.cpp:406
 msgid " PENS"
@@ -2031,15 +2035,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:43
 msgid "Keyboard Mode:"
-msgstr ""
+msgstr "Klavye Kipi"
 
 #: src/frontend/mame/ui/miscmenu.cpp:43
 msgid "Natural"
-msgstr ""
+msgstr "Doğal"
 
 #: src/frontend/mame/ui/miscmenu.cpp:43
 msgid "Emulated"
-msgstr ""
+msgstr "Emule edilmiş"
 
 #: src/frontend/mame/ui/miscmenu.cpp:239
 #, c-format
@@ -2077,7 +2081,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:506
 msgid "Visible Delay"
-msgstr ""
+msgstr "Görünür Gecikme"
 
 #: src/frontend/mame/ui/miscmenu.cpp:604
 #, c-format
@@ -2086,7 +2090,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:630
 msgid "Name:             Description:\n"
-msgstr ""
+msgstr "Ad:               Açıklama:\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:641
 #, c-format
@@ -2107,7 +2111,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:766
 msgid "Driver"
-msgstr ""
+msgstr "Sürücü"
 
 #: src/frontend/mame/ui/miscmenu.cpp:769
 msgid "This machine has no BIOS."
@@ -2123,7 +2127,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/sndmenu.cpp:135
 msgid "Sound"
-msgstr ""
+msgstr "Ses"
 
 #: src/frontend/mame/ui/sndmenu.cpp:136
 msgid "Sample Rate"
@@ -2135,23 +2139,23 @@ msgstr ""
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Load State"
-msgstr ""
+msgstr "Durumu yükle"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Select position to load from"
-msgstr ""
+msgstr "Yüklenecek konumu seçin"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Save State"
-msgstr ""
+msgstr "Durumu kaydet"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Select position to save to"
-msgstr ""
+msgstr "Kaydedilecek konumu seçin"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
-msgstr ""
+msgstr "Çeşitli Seçenekler"
 
 #: src/frontend/mame/ui/submenu.cpp:23
 msgid "Re-select last machine played"
@@ -2163,15 +2167,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
-msgstr ""
+msgstr "Fare işaretçisini göster"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
-msgstr ""
+msgstr "Makinelerden çıkarken onayla"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
-msgstr ""
+msgstr "Başlangıçta bilgi ekranını atla"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
@@ -2179,7 +2183,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
-msgstr ""
+msgstr "Görüntüyü arkaplan olarak kullan"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
@@ -2199,47 +2203,47 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Advanced Options"
-msgstr ""
+msgstr "Gelişmiş Seçenekler"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
-msgstr ""
+msgstr "Performans Seçenekleri"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr ""
+msgstr "Otomatik çerçeve atlama"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr ""
+msgstr "Çerçeve atlama"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
-msgstr ""
+msgstr "Kısma"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Sleep"
-msgstr ""
+msgstr "Uyku"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Speed"
-msgstr ""
+msgstr "Hız"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Refresh speed"
-msgstr ""
+msgstr "Yenileme Hızı"
 
 #: src/frontend/mame/ui/submenu.cpp:47
 msgid "Rotation Options"
-msgstr ""
+msgstr "Döndürme Seçenekleri"
 
 #: src/frontend/mame/ui/submenu.cpp:49
 msgid "Rotate right"
-msgstr ""
+msgstr "Sağa döndür"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate left"
-msgstr ""
+msgstr "Sola döndür"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
@@ -2311,11 +2315,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
-msgstr ""
+msgstr "Fare"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Joystick"
-msgstr ""
+msgstr "Oyun Kolu"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Lightgun"
@@ -2323,19 +2327,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Multi-keyboard"
-msgstr ""
+msgstr "Çoklu Klavye"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Multi-mouse"
-msgstr ""
+msgstr "Çoklu fare"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Steadykey"
-msgstr ""
+msgstr "Yapışkan Tuş"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "UI active"
-msgstr ""
+msgstr "Kullanıcı arayüzü aktif"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Offscreen reload"
@@ -2351,7 +2355,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:81
 msgid "Natural keyboard"
-msgstr ""
+msgstr "Doğal Klavye"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Simultaneous contradictory"
@@ -2383,27 +2387,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Paddle Device Assignment"
-msgstr ""
+msgstr "Pedal Aygıtı Atama"
 
 #: src/frontend/mame/ui/submenu.cpp:93
 msgid "Dial Device Assignment"
-msgstr ""
+msgstr "Tuşlama Aygıtı Atama"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Positional Device Assignment"
-msgstr ""
+msgstr "Konumsal Aygıt Atama"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Mouse Device Assignment"
-msgstr ""
+msgstr "Fare Aygıtı Atama"
 
 #: src/frontend/mame/ui/submenu.cpp:100
 msgid "Video Mode"
-msgstr ""
+msgstr "Görüntü Kipi"
 
 #: src/frontend/mame/ui/submenu.cpp:101
 msgid "Number Of Screens"
-msgstr ""
+msgstr "Ekran Sayısı"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Triple Buffering"
@@ -2423,24 +2427,24 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "Bitmap ön oranlama"
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Window Mode"
-msgstr ""
+msgstr "Pencere Kipi"
 
 #: src/frontend/mame/ui/submenu.cpp:110
 msgid "Enforce Aspect Ratio"
-msgstr ""
+msgstr "En-boy oranını zorla"
 
 #: src/frontend/mame/ui/submenu.cpp:111
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "Büyütülmüş olarak başlat"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "Eşitlenmiş Yenileme"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "Dikey eşitlemeyi bekle"
