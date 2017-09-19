@@ -45,7 +45,6 @@
  ****************************************************************************/
 
 #include "emu.h"
-
 #include "cpu/m6800/m6800.h" // For mp68a, md6802 and e100
 #include "cpu/m6809/m6809.h" // For candela
 #include "machine/6821pia.h" // For all boards
@@ -57,6 +56,7 @@
 #include "machine/wd_fdc.h"  // For candela
 #include "video/dm9368.h"    // For the mp68a
 #include "video/mc6845.h"    // For candela
+
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
@@ -70,26 +70,28 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
+//#define LOG_GENERAL (1U <<  0)
 #define LOG_SETUP   (1U <<  1)
 #define LOG_SCAN    (1U <<  2)
-#define LOG_SERIAL  (1U <<  3)
+#define LOG_BANK    (1U <<  3)
 #define LOG_SCREEN  (1U <<  4)
 #define LOG_READ    (1U <<  5)
 #define LOG_CS      (1U <<  6)
+#define LOG_PLA     (1U <<  7)
+#define LOG_PROM    (1U <<  8)
 
-//#define VERBOSE  (LOG_GENERAL|LOG_SETUP|LOG_SCREEN)
+//#define VERBOSE (LOG_READ | LOG_GENERAL | LOG_SETUP | LOG_PLA | LOG_BANK)
 //#define LOG_OUTPUT_FUNC printf
-
 #include "logmacro.h"
 
-//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
-#define LOGSETUP(...)  LOGMASKED(LOG_SETUP, __VA_ARGS__)
-#define LOGSCAN(...)   LOGMASKED(LOG_SCAN, __VA_ARGS__)
-#define LOGSER(...)    LOGMASKED(LOG_SERIAL, __VA_ARGS__)
-#define LOGSCREEN(...) LOGMASKED(LOG_SCREEN, __VA_ARGS__)
-#define LOGR(...)      LOGMASKED(LOG_READ, __VA_ARGS__)
-#define LOGCS(...)     LOGMASKED(LOG_CS, __VA_ARGS__)
+#define LOGSETUP(...)	LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGSCAN(...)	LOGMASKED(LOG_SCAN,    __VA_ARGS__)
+#define LOGBANK(...) 	LOGMASKED(LOG_BANK,    __VA_ARGS__)
+#define LOGSCREEN(...)	LOGMASKED(LOG_SCREEN,  __VA_ARGS__)
+#define LOGR(...)	 	LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGCS(...)		LOGMASKED(LOG_CS,      __VA_ARGS__)
+#define LOGPLA(...)		LOGMASKED(LOG_PLA,     __VA_ARGS__)
+#define LOGPROM(...)	LOGMASKED(LOG_PROM,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -854,85 +856,342 @@ ADDRESS_MAP_END
  *
  */
 /*
- * Candela Terminal
+ * Candela CAN09 SBC
  * TODO:
  * - Map additional PIA:s on the ROM board
- * - ROM/RAM paging by using the PIA:s, now static address map but CDBASIC RLOAD doesn't work for instance
  * - Vram and screen
  * - Keyboard
  * - LCD
  * - AD/DA support for related BASIC functions
  * - Promett rom cartridge support
  */
-/* Candela terminal driver class */
+
+#define SYSPIA_TAG PIA1_TAG
+#define USRPIA_TAG PIA2_TAG
+
+// Start offset for each device segment in bank array
+#define RAM0 0x00
+#define RAM1 0x08
+#define PROM 0x10
+#define RAM2 0x18
+#define IO   0x1a
+
+/* Candela CAN09 driver class */
 class can09t_state : public didact_state
 {
 public:
 	can09t_state(const machine_config &mconfig, device_type type, const char * tag)
 		: didact_state(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
-		,m_pia1(*this, PIA1_TAG)
-		,m_pia2(*this, PIA2_TAG)
+		,m_syspia(*this, SYSPIA_TAG)
+		,m_usrpia(*this, USRPIA_TAG)
 		,m_pia3(*this, PIA3_TAG)
 		,m_pia4(*this, PIA4_TAG)
 		,m_ptm(*this, "ptm")
 		,m_acia(*this, "acia")
-#if 0
-		,m_io_line5(*this, "LINE5")
-		,m_io_line6(*this, "LINE6")
-		,m_io_line7(*this, "LINE7")
-		,m_io_line8(*this, "LINE8")
-		,m_io_line9(*this, "LINE9")
-#endif
-		{ }
+		,m_banksel(1)
+	{ }
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
-	virtual void machine_start() override { LOG("%s()\n", FUNCNAME); };
-	DECLARE_READ8_MEMBER( pia1_A_r );
-	DECLARE_READ8_MEMBER( pia1_B_r );
-	DECLARE_WRITE8_MEMBER( pia1_B_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER( pia2_cb2_w);
+	virtual void machine_start() override;
+	DECLARE_READ8_MEMBER (read);
+	DECLARE_WRITE8_MEMBER (write);
+	DECLARE_READ8_MEMBER( syspia_A_r );
+	DECLARE_READ8_MEMBER( syspia_B_r );
+	DECLARE_WRITE8_MEMBER( syspia_B_w );
+	DECLARE_WRITE_LINE_MEMBER( syspia_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER( usrpia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER (write_acia_clock);
 protected:
-	required_device<pia6821_device> m_pia1;
-	required_device<pia6821_device> m_pia2;
+	required_device<pia6821_device> m_syspia;
+	required_device<pia6821_device> m_usrpia;
 	required_device<pia6821_device> m_pia3;
 	required_device<pia6821_device> m_pia4;
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
-#if 0
-	required_ioport m_io_line5;
-	required_ioport m_io_line6;
-	required_ioport m_io_line7;
-	required_ioport m_io_line8;
-	required_ioport m_io_line9;
-#endif
+
+	uint8_t m_banksel;
+	uint8_t *m_plap;
+	uint8_t *m_epromp;
+
+	uint8_t m_ram0[1024 *  8]; // IC3
+	uint8_t m_ram1[1024 * 32]; // IC4
+	uint8_t m_ram2[1024 *  8]; // IC5
+private:
+	enum {
+		PLA_EPROM = 0x80,
+		PLA_IO1	  = 0x40,
+		PLA_RAM2  = 0x20,
+		PLA_RAM1  = 0x10,
+		PLA_RAM0  = 0x08,
+		PLA_RAM13 = 0x04,
+		PLA_RAM14 = 0x02,
+		PLA_MPX   = 0x01
+	};
+
+	enum {
+		CPU_A4 = 0x010,
+		CPU_A5 = 0x020,
+		CPU_A6 = 0x040,
+		CPU_A7 = 0x080,
+		CPU_A8 = 0x100,
+		CPU_A9 = 0x200,
+	};
+
+	enum { // 74138 outputs, naming after schematics
+		X0XX = 0x0000,
+		X1XX = 0x0010,
+		X2XX = 0x0020,
+		X3XX = 0x0030,
+		X4XX = 0x0080,
+		X5XX = 0x0090,
+		X6XX = 0x00a0,
+		X7XX = 0x00b0,
+	};
 };
 
-READ8_MEMBER( can09t_state::pia1_A_r )
+void can09t_state::machine_start()
+{
+	LOG("%s()\n", FUNCNAME);
+
+	/* TBP18S030 32 bytes fuse PROM controls the entire memory map in two parts/map-banks
+	   BANK 0: 6f 6f 69 69 7b 7b ee ee e8 e8 ec bc ea ea 7f 7f  
+	   BANK 1: f1 f1 f5 f5 f3 f3 f7 f7 dc dc ec bc ea ea 7f 7f
+
+	   Connected as follows:
+	                  A12 -- A0  Y0 -- MPX* - latch for screen RAM
+					  A13 -- A1  Y1 -- RAM14
+					  A14 -- A2  Y2 -- RAM13
+	                  A15 -- A3  Y3 -- RAM0
+	   SYSPIA PB5 -- BANK -- A4  Y4 -- RAM1
+	                 E+Q  -- S*  Y5 -- RAM2
+                                 Y6 -- IO1
+                                 Y7 -- EPROM
+
+	   The PAL outputs are used as follows:
+	   --------------------------------
+	   Y0 IC12 MUX 74245: D0-D7 + MPX + RW => BD0-BD7
+	   Y1 RAM14 is used together with the other outputs
+	   Y2 RAM13 is used together with the other outputs
+	   Y3 IC3 SRAM  6264: A0-A12 + RAM13:CS2 + RAM14:NC + RAM0:OE:CE + jumper B2 RW/pulled high:RW + VCC:BATTERY
+	   Y4 IC4 SRAM 62256: A0-A12 + RAM13 + RAM14 + RW + RAM1:OE:CE + BD0-BD7
+	   Y5 IC5 SRAM  6264: A0-A12 + RAM13:CS2 + RAM14:NC + RW + RAM2:OE:CE + BD0-BD7
+	   Y6 IC11 DMX 74138: A4:A A5:B A7:C A8:G1 IO1:G2A A9:G2B => x0xx-x7xx see bellow:
+	   Y7 IC2 PROM 27256: A0-A14 + EPROM
+
+	   The 74138 demuxer outputs are used as follows:
+	    A B C (A4 A5 and A7 respectivelly, not A6!)
+	   ----------------------------------------------
+	    0 0 0 Y0 x0xx ACIA   0xB100-B101
+	    0 0 1 Y1 x1xx SYSPIA 0xB110-B113
+	    0 1 0 Y2 x2xx USRPIA 0xB120-B123
+	    0 1 1 Y3 x3xx PTM    0xB130-B137
+	    1 0 0 Y4 x4xx        0xB180-B18F
+	    1 0 1 Y5 x5xx J1, J2 0xB190-B19F
+	    1 1 0 Y6 x6xx
+	    1 1 1 Y7 x7xx J1, J2 0xB1B0-B1BF
+	 */
+	m_plap = (uint8_t*)(memregion ("plas")->base ());
+	m_epromp = (uint8_t*)(memregion ("roms")->base ());
+	memset(m_ram0, 0, sizeof(m_ram0));
+	memset(m_ram1, 0, sizeof(m_ram1));
+	memset(m_ram2, 0, sizeof(m_ram2));
+};
+
+READ8_MEMBER( can09t_state::read )
+{
+	LOG("%s %02x\n", FUNCNAME, offset);
+	uint8_t pla_offset = 0;
+	uint8_t pla_data = 0;
+	uint8_t byte = 0;
+
+	// Form the offset into the PLA (see above for explanation on PLA hookup)
+	pla_offset = ((offset >> 12) & 0x0f) | (m_banksel ? 0x10 : 0x00);
+
+	// Get the PLA data byte
+	pla_data = m_plap[pla_offset & 0x1f];
+	LOGPLA("PLA[%02x] read: %02x Bank%d\n", pla_offset, pla_data, m_banksel != 0 ? 0 : 1);
+
+	// Find the device
+	// IC2 EPROM - PAL Y7 PROM 27256: A0-A14 + EPROM
+	if (~pla_data & PLA_EPROM)
+	{
+		byte = m_epromp[(offset & 0x7fff) % memregion("roms")->bytes()];
+		LOGPROM("- EPROM %04x[%04x]->%02x\n", offset, (offset & 0x7fff) % memregion("roms")->bytes(), byte);
+	}
+
+	// IC3 RAM0 - PAL Y3 SRAM 6264: A0-A12 + RAM13:1 (RAM14 connected to NC)
+	if ( (~pla_data & PLA_RAM0) && (pla_data & PLA_RAM13))
+	{
+		byte = m_ram0[offset % sizeof(m_ram0)];
+		LOGPLA("- RAM0 %04x->%02x\n", offset, byte);
+	}
+
+	// IC4 RAM1 PAL Y4 SRAM 62256: A0-A12 + banked with RAM13/RAM14 data buffer 74LS245 enabled through PAL Y0
+	if ( (~pla_data & PLA_RAM1) && (~pla_data & PLA_MPX) )
+	{
+		uint16_t ofs = (offset & 0x1fff) | ((pla_data & PLA_RAM13) ? 0x2000 : 0) | ((pla_data & PLA_RAM14) ? 0x4000 : 0);
+		byte = m_ram1[ofs % sizeof(m_ram1)];
+		LOGPLA("- RAM1 %04x->%02x\n", ofs, byte);
+	}
+
+	// IC5 RAM2 - PAL Y5 SRAM 6264: A0-A12 + RAM13:1 (RAM14 connected to NC) data buffer 74LS245 enabled through PAL Y0
+	if ( (~pla_data & PLA_RAM0) && (pla_data & PLA_RAM13) && (~pla_data & PLA_MPX) )
+	{
+		byte = m_ram2[offset % sizeof(m_ram2)];
+		LOGPLA("- RAM2 %04x->%02x\n", offset, byte);
+	}
+
+	// IC11 74138 Y6 demultiplexer : A5, A5, A7 + A8:1 + A9:0 maps in the i/o area at some 
+	if ( (~pla_data & PLA_IO1) && (~pla_data & PLA_MPX) && (offset & CPU_A8) && (~offset & CPU_A9) )
+	{
+		switch (offset & 0x00f0)
+		{
+		case X0XX: // ACIA
+			LOGPLA("-- ACIA\n");
+			if (offset & 1)
+				byte = m_acia->data_r(space, 0);
+			else
+				byte = m_acia->status_r(space, 0);
+			break;
+		case X1XX: // SYSPIA
+			LOGPLA("-- SYSPIA\n");
+			byte = m_syspia->read_alt(space, offset & 3);
+			break;
+		case X2XX: // USRPIA
+			LOGPLA("-- USRPIA\n");
+			byte = m_usrpia->read_alt(space, offset & 3);
+			break;
+		case X3XX: // PTM
+			LOGPLA("-- PTM\n");
+			byte = m_ptm->read(space, offset & 7);
+			break;
+		case X4XX: // 
+			LOGPLA("-- XX4X\n");
+			break;
+		case X5XX: // J1, J2
+			LOGPLA("-- XX5X\n");
+			break;
+		case X6XX: // 
+			LOGPLA("-- XX6X\n");
+			break;
+		case X7XX: // J1, J2
+			LOGPLA("-- XX7X\n");
+			break;
+		}
+	}
+	LOGR("- %04x <- %02x\n\n", offset, byte);
+	return byte;
+}
+
+WRITE8_MEMBER( can09t_state::write )
+{
+	LOG("%s() %04x : %02x\n", FUNCNAME, offset, data);
+	uint8_t pla_offset = 0;
+	uint8_t pla_data = 0;
+
+	// Form the offset into the PLA (see above for explanation on PLA hookup)
+	pla_offset = ((offset >> 12) & 0x0f) | (m_banksel ? 0x10 : 0x00);
+
+	// Get the PLA data byte
+	pla_data = m_plap[pla_offset & 0x1f];
+	LOGPLA("PLA[%02x] write: %02x Bank%d\n", pla_offset, pla_data, m_banksel != 0 ? 0 : 1);
+
+	// Find the device
+	// IC2 EPROM - PAL Y7 PROM 27256: A0-A14 + EPROM*
+	if (~pla_data & PLA_EPROM)
+	{
+		LOGPLA("- EPROM (ignored) %04x<-%02x\n", offset, data);
+	}
+
+	// IC3 RAM0 - PAL Y3 SRAM 6264: A0-A12 + RAM13:1 (RAM14 connected to NC)
+	if ( (~pla_data & PLA_RAM0) && (pla_data & PLA_RAM13))
+	{
+		m_ram0[offset % sizeof(m_ram0)] = data;
+		LOGPLA("- RAM0 %04x<-%02x\n", offset, data);
+	}
+
+	// IC4 RAM1 Y4 SRAM 62256: A0-A12 + banked with RAM13/RAM14 data buffer 74LS245 enabled through PAL Y0
+	if ( (~pla_data & PLA_RAM1) && (~pla_data & PLA_MPX) )
+	{
+		uint16_t ofs = (offset & 0x1fff) | ((pla_data & PLA_RAM13) ? 0x2000 : 0) | ((pla_data & PLA_RAM14) ? 0x4000 : 0);
+		m_ram1[ofs % sizeof(m_ram1)] = data;
+		LOGPLA("- RAM1 %04x<-%02x\n", ofs, data);
+	}
+
+	// IC5 RAM2 - PAL Y5 SRAM 6264: A0-A12 + RAM13:1 (RAM14 connected to NC) data buffer 74LS245 enabled through PAL Y0
+	if ( (~pla_data & PLA_RAM0) && (pla_data & PLA_RAM13) && (~pla_data & PLA_MPX) )
+	{
+		m_ram2[offset % sizeof(m_ram2)] = data;
+		LOGPLA("- RAM2 %04x->%02x\n", offset, data);
+	}
+
+	// IC11 74138 Y6 demultiplexer : A5, A5, A7 + A8:1 + A9:0 maps in the i/o area at some 
+	if ( (~pla_data & PLA_IO1) && (~pla_data & PLA_MPX) && (offset & CPU_A8) && (~offset & CPU_A9) )
+	{
+		LOGPLA("- IO1 %04x<-%02x\n", offset, data);
+		switch (offset & 0x00f0)
+		{
+		case X0XX: // ACIA
+			LOGPLA("-- ACIA\n");
+			if (offset & 1)
+				m_acia->data_w(space, 0, data);
+			else
+				m_acia->control_w(space, 0, data);
+			break;
+		case X1XX: // SYSPIA
+			LOGPLA("-- SYSPIA\n");
+			m_syspia->write_alt(space, offset & 3, data);
+			break;
+		case X2XX: // USRPIA
+			LOGPLA("-- USRPIA\n");
+			m_usrpia->write_alt(space, offset & 3, data);
+			break;
+		case X3XX: // PTM
+			LOGPLA("-- PTM\n");
+			m_ptm->write(space, offset & 7, data);
+			break;
+		case X4XX: // 
+			LOGPLA("-- XX4X\n");
+			break;
+		case X5XX: // J1, J2
+			LOGPLA("-- XX5X\n");
+			break;
+		case X6XX: // 
+			LOGPLA("-- XX6X\n");
+			break;
+		case X7XX: // J1, J2
+			LOGPLA("-- XX7X\n");
+			break;
+		}
+	}
+}
+
+READ8_MEMBER( can09t_state::syspia_A_r )
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
-READ8_MEMBER( can09t_state::pia1_B_r )
+READ8_MEMBER( can09t_state::syspia_B_r )
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
-WRITE8_MEMBER( can09t_state::pia1_B_w )
+WRITE8_MEMBER( can09t_state::syspia_B_w )
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
+
+	m_banksel = (data & 0x20) ? 0x10 : 0;
+	LOGBANK("Bank select: %d", (m_banksel >> 4) & 1);
 }
 
-WRITE_LINE_MEMBER(can09t_state::pia1_cb2_w)
+WRITE_LINE_MEMBER(can09t_state::syspia_cb2_w)
 {
 	LOG("%s(%02x)\n", FUNCNAME, state);
 }
 
-WRITE_LINE_MEMBER(can09t_state::pia2_cb2_w)
+WRITE_LINE_MEMBER(can09t_state::usrpia_cb2_w)
 {
 	LOG("%s(%02x)\n", FUNCNAME, state);
 }
@@ -942,19 +1201,29 @@ WRITE_LINE_MEMBER (can09t_state::write_acia_clock){
 		m_acia->write_rxc (state);
 }
 
-// traced and guessed from pcb images and debugger
-// It is very likelly that this is a PIA based dynamic address map, needs more analysis
+/*
+ * Address map from documentation based on specific PAL
+ *
+ *   BANK 0                            BANK 1
+ *   0x0000-0x34ff PROM VDU-program    0x0000-0x34ff RAM0 user applications (0)
+ *   0x3500-0x5fff PROM simulator      0x3500-0x5fff RAM0 user applications (0)
+ *   0x6000-0x7fff RAM screen memory   0x6000-0x7fff RAM0 user applications (0)
+ *   0x8000-0x9fff RAM screen memory   0x8000-0x9fff PROM user applications (2)
+ *  *0xa000-0xafff RAM Stack, system   0xa000-0xafff RAM Stack, system
+ *  *0xb000-0xb0ff Free                0xb000-0xb0ff Free
+ *  *0xb100-0xb101 ACIA                0xb100-0xb101 ACIA
+ *  *0xb110-0xb113 PIA System          0xb110-0xb113 PIA System
+ *  *0xb120-0xb123 PIA User apps       0xb120-0xb123 PIA User apps
+ *  *0xb130-0xb137 PTM                 0xb130-0xb137 PTM
+ *  *0xb180-0xb1bf Free                0xb180-0xb1bf Free
+ *  *0xb200-0xb3ff Free                0xb200-0xb3ff Free
+ *  *0xc000-0xdfff RAM User apps (1)   0xc000-0xdfff RAM User apps (1)
+ *  *0xe000-0xffff PROM monitor        0xe000-0xffff PROM monitor
+ */
+
 static ADDRESS_MAP_START( can09t_map, AS_PROGRAM, 8, can09t_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x8000, 0xafff) AM_RAM
-	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xb101, 0xb101) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
-	AM_RANGE(0xb110, 0xb113) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xb120, 0xb123) AM_DEVREADWRITE(PIA2_TAG, pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xb130, 0xb137) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0xb200, 0xc1ff) AM_ROM AM_REGION("roms", 0x3200)
-	AM_RANGE(0xc200, 0xdfff) AM_RAM /* Needed for BASIC etc */
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("roms", 0x6000)
+// Everything is dynamically and asymetrically mapped through the PAL decoded by read/write
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write) 
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( can09t )
@@ -1368,26 +1637,26 @@ static MACHINE_CONFIG_START( can09t )
 	MCFG_CPU_PROGRAM_MAP(can09t_map)
 
 	/* --PIA inits----------------------- */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(can09t_state, pia1_A_r))
-	MCFG_PIA_READPB_HANDLER(READ8(can09t_state, pia1_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(can09t_state, pia1_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, pia1_cb2_w))
-	/* 0xE1FB 0xB112 (PIA1 Control A) = 0x00 - Channel A IRQ disabled */
-	/* 0xE1FB 0xB113 (PIA1 Control B) = 0x00 - Channel B IRQ disabled */
-	/* 0xE203 0xB110 (PIA1 DDR A)     = 0x00 - Port A all inputs */
-	/* 0xE203 0xB111 (PIA1 DDR B)     = 0x7F - Port B mixed mode */
-	/* 0xE20A 0xB112 (PIA1 Control A) = 0x05 - IRQ A enabled on falling transition on CA2 */
-	/* 0xE20A 0xB113 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
-	/* 0xE20E 0xB111 (PIA1 port B)    = 0x10 - Data to port B */
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, pia2_cb2_w))
-	/* 0xE212 0xB122 (PIA2 Control A) = 0x00 - Channel A IRQ disabled */
-	/* 0xE212 0xB123 (PIA2 Control B) = 0x00 - Channel B IRQ disabled */
-	/* 0xE215 0xB120 (PIA2 DDR A)     = 0x00 - Port A all inputs */
-	/* 0xE215 0xB121 (PIA2 DDR B)     = 0xFF - Port B all outputs */
-	/* 0xE21A 0xB122 (PIA2 Control A) = 0x34 - CA2 is low and lock DDRB */
-	/* 0xE21A 0xB123 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
+	MCFG_DEVICE_ADD(SYSPIA_TAG, PIA6821, 0) // CPU board
+	MCFG_PIA_READPA_HANDLER(READ8(can09t_state, syspia_A_r))
+	MCFG_PIA_READPB_HANDLER(READ8(can09t_state, syspia_B_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(can09t_state, syspia_B_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, syspia_cb2_w))
+	/* 0xE1FB 0xB112 (SYSPIA Control A) = 0x00 - Channel A IRQ disabled */
+	/* 0xE1FB 0xB113 (SYSPIA Control B) = 0x00 - Channel B IRQ disabled */
+	/* 0xE203 0xB110 (SYSPIA DDR A)     = 0x00 - Port A all inputs */
+	/* 0xE203 0xB111 (SYSPIA DDR B)     = 0x7F - Port B mixed mode */
+	/* 0xE20A 0xB112 (SYSPIA Control A) = 0x05 - IRQ A enabled on falling transition on CA2 */
+	/* 0xE20A 0xB113 (SYSPIA Control B) = 0x34 - CB2 is low and lock DDRB */
+	/* 0xE20E 0xB111 (SYSPIA port B)    = 0x10 - Data to port B */
+	MCFG_DEVICE_ADD(USRPIA_TAG, PIA6821, 0) // CPU board
+	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, usrpia_cb2_w))
+	/* 0xE212 0xB122 (USRPIA Control A) = 0x00 - Channel A IRQ disabled */
+	/* 0xE212 0xB123 (USRPIA Control B) = 0x00 - Channel B IRQ disabled */
+	/* 0xE215 0xB120 (USRPIA DDR A)     = 0x00 - Port A all inputs */
+	/* 0xE215 0xB121 (USRPIA DDR B)     = 0xFF - Port B all outputs */
+	/* 0xE21A 0xB122 (USRPIA Control A) = 0x34 - CA2 is low and lock DDRB */
+	/* 0xE21A 0xB123 (USRPIA Control B) = 0x34 - CB2 is low and lock DDRB */
 	MCFG_DEVICE_ADD(PIA3_TAG, PIA6821, 0) // ROM board
 	MCFG_DEVICE_ADD(PIA4_TAG, PIA6821, 0) // ROM board
 
@@ -1455,8 +1724,8 @@ static MACHINE_CONFIG_START( can09 )
 	/* Floppy */
 	MCFG_WD1770_ADD("wd1770", XTAL_8MHz ) // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop525_list", "candela")
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")
 #endif
 
 	/* --PIA inits----------------------- */
@@ -1636,16 +1905,17 @@ static MACHINE_CONFIG_START( mp68a )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mp68a_state, scan_artwork, attotime::from_hz(10))
 MACHINE_CONFIG_END
 
-ROM_START( can09t )
+ROM_START( can09t ) /* The smaller grey computer */
 	ROM_REGION(0x10000, "roms", 0)
 	/* CAN09 v7 and CDBASIC 3.8 */
 	ROM_LOAD( "ic2-mon58b-c8d7.bin", 0x0000, 0x8000, CRC(7eabfec6) SHA1(e08e2349035389b441227df903aa54f4c1e4a337) )
-	/* Programmable logic for the CAN09 1.4 PCB */
+
 	ROM_REGION(0x1000, "plas", 0)
+	/* Programmable logic for the CAN09 1.4 PCB (CAN21.1) */
 	ROM_LOAD( "ic10-21.1.bin",       0x0000, 0x20,   CRC(b75ac72d) SHA1(689363200035b11a823d17a8d717f313eeefc3bf) )
 ROM_END
 
-ROM_START( can09 )
+ROM_START( can09 ) /* The bigger black computer CAN v1 */
 	ROM_REGION(0x10000, "roms", 0)
 	ROM_LOAD( "ic14-vdu42.bin", 0x0000, 0x2000, CRC(67fc3c8c) SHA1(1474d6259646798377ef4ce7e43d3c8d73858344) )
 ROM_END
@@ -1686,9 +1956,9 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 	ROM_LOAD( "didactB.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME                     FLAGS
-COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  mp68a_state,  0,          "Didact AB",        "mp68a",                     MACHINE_NO_SOUND_HW )
-COMP( 1982, e100,       0,          0,      e100,       e100,   e100_state,   0,          "Didact AB",        "Esselte 100",               MACHINE_NO_SOUND_HW )
-COMP( 1983, md6802,     0,          0,      md6802,     md6802, md6802_state, 0,          "Didact AB",        "Mikrodator 6802",           MACHINE_NO_SOUND_HW )
-COMP( 1984, can09,      0,          0,      can09,      can09,  can09_state,  0,          "Candela Data AB",  "Candela CAN09 main unit",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, can09t,     0,          0,      can09t,     can09t, can09t_state, 0,          "Candela Data AB",  "Candela CAN09 terminal",    MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME            FLAGS
+COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  mp68a_state,  0,          "Didact AB",        "mp68a",            MACHINE_NO_SOUND_HW )
+COMP( 1982, e100,       0,          0,      e100,       e100,   e100_state,   0,          "Didact AB",        "Esselte 100",      MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+COMP( 1983, md6802,     0,          0,      md6802,     md6802, md6802_state, 0,          "Didact AB",        "Mikrodator 6802",  MACHINE_NO_SOUND_HW )
+COMP( 1984, can09,      0,          0,      can09,      can09,  can09_state,  0,          "Candela Data AB",  "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1984, can09t,     0,          0,      can09t,     can09t, can09t_state, 0,          "Candela Data AB",  "Candela CAN09",    MACHINE_NO_SOUND_HW )
