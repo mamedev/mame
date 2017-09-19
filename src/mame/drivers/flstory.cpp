@@ -775,7 +775,7 @@ static MACHINE_CONFIG_START( flstory )
 //	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 //	MCFG_SCREEN_SIZE(32*8, 32*8)
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	// derived from ladyfrog.cpp
+	// derived from ladyfrog.cpp, guess
 	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
@@ -843,7 +843,7 @@ static MACHINE_CONFIG_START( onna34ro )
 //	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 //	MCFG_SCREEN_SIZE(32*8, 32*8)
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	// derived from ladyfrog.cpp
+	// derived from ladyfrog.cpp, guess
 	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
@@ -921,7 +921,7 @@ static MACHINE_CONFIG_START( victnine )
 //	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 //	MCFG_SCREEN_SIZE(32*8, 32*8)
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	// derived from ladyfrog.cpp
+	// derived from ladyfrog.cpp, guess
 	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHzs
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_victnine)
 	MCFG_SCREEN_PALETTE("palette")
@@ -993,7 +993,7 @@ static MACHINE_CONFIG_START( rumba )
 //	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 //	MCFG_SCREEN_SIZE(32*8, 32*8)
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	// derived from ladyfrog.cpp
+	// derived from ladyfrog.cpp, guess
 	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_rumba)
 	MCFG_SCREEN_PALETTE("palette")
