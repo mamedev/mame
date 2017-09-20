@@ -2258,6 +2258,7 @@ at                              // 1987 AMI Bios and Diagnostics
 at386                           // 19?? IBM AT 386
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
+at386sx                         // 19?? AT VGA 386sx
 c386sx16                        // 1990 Commodore 386SX-16
 cmdpc30                         //
 ct386sx                         //
