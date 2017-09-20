@@ -2339,6 +2339,7 @@ static ADDRESS_MAP_START( copro_sharc_map, AS_DATA, 32, model2_state )
 	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
 	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
 	AM_RANGE(0x1c00000, 0x1dfffff) AM_ROM AM_REGION("user5", 0)
+//	AM_RANGE(0x3c000000, 0x3fffffff) AM_WRITE(copro_sharc_output_fifo_w) // last bronx, cpu core bug?
 ADDRESS_MAP_END
 
 #if 0
