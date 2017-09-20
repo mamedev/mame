@@ -43,7 +43,7 @@ public:
 	bitmap_ind16 m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	int         m_sl_bank;
-	int         m_bg_on;
+	int         m_bg_clip_on;
 	int         m_sky_on;
 	int         m_sprite_color_base;
 	int         m_bg_scrollx;
