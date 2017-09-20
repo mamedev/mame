@@ -24,7 +24,6 @@ typedef std::function<int32_t(running_machine&, void*, int, std::string*, int32_
 
 struct slider_state
 {
-	slider_state *  next;               /* pointer to next slider */
 	slider_update   update;             /* callback */
 	void *          arg;                /* argument */
 	int32_t           minval;             /* minimum value */
