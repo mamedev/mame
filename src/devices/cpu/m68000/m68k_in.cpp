@@ -7610,7 +7610,7 @@ M68KMAKE_OP(mull, 32, ., .)
 M68KMAKE_OP(nbcd, 8, ., d)
 {
 	uint32_t* r_dst = &DY(mc68kcpu);
-	uint32_t dst = *r_dst;
+	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
 	uint32_t res = -dst - XFLAG_1(mc68kcpu);
 
 	if(res != 0)
