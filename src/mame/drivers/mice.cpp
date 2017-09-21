@@ -44,7 +44,6 @@ public:
 	DECLARE_READ8_MEMBER(rpt_pc_r);
 
 private:
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -68,11 +67,6 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( mice )
 INPUT_PORTS_END
-
-
-void mice_state::machine_reset()
-{
-}
 
 // This port presumably connects to dipswitches to set the serial protocol
 READ8_MEMBER( mice_state::rpt_pc_r )

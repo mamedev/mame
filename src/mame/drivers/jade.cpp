@@ -29,7 +29,6 @@ public:
 	{ }
 
 private:
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -52,10 +51,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jade )
 INPUT_PORTS_END
 
-
-void jade_state::machine_reset()
-{
-}
 
 static MACHINE_CONFIG_START( jade )
 	/* basic machine hardware */

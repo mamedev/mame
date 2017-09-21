@@ -51,7 +51,6 @@ public:
 	{ }
 
 private:
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -74,11 +73,6 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
-
-
-void zsbc3_state::machine_reset()
-{
-}
 
 
 static MACHINE_CONFIG_START( zsbc3 )

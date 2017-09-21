@@ -45,7 +45,6 @@ public:
 	{ }
 
 private:
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -73,10 +72,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( seattle )
 INPUT_PORTS_END
 
-
-void seattle_comp_state::machine_reset()
-{
-}
 
 // bit 7 needs to be stripped off, we do this by choosing 7 bits and even parity
 static DEVICE_INPUT_DEFAULTS_START( terminal )

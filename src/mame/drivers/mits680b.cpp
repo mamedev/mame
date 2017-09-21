@@ -33,28 +33,17 @@ public:
 	mits680b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_acia(*this, "acia")
-	{
-	}
+	{ }
 
 	DECLARE_READ8_MEMBER(status_check_r);
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia;
 };
 
 READ8_MEMBER( mits680b_state::status_check_r )
 {
 	return 0; // crashes at start if bit 7 high
-}
-
-WRITE_LINE_MEMBER( mits680b_state::clock_tick )
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
 }
 
 
@@ -72,14 +61,14 @@ static INPUT_PORTS_START( mits680b )
 INPUT_PORTS_END
 
 
-void mits680b_state::machine_reset()
-{
-}
-
 static MACHINE_CONFIG_START( mits680b )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mits680b_mem)
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -88,9 +77,6 @@ static MACHINE_CONFIG_START( mits680b )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
-
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mits680b_state, clock_tick))
 MACHINE_CONFIG_END
 
 /* ROM definition */
