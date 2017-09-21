@@ -351,6 +351,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( neat, atvga )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(neat_io)
+	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
+	MCFG_DS12885_ADD("mb:rtc")
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
 MACHINE_CONFIG_END
 
@@ -1112,7 +1114,7 @@ COMP ( 1987, at,       ibm5170, 0,       ibm5162,   0,    at_state,      at,    
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     0,    at_state,      at,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     0,    at_state,      at,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1988, ct386sx,  ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, at386sx,  ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1988, at386sx,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     0,    at_state,      at,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      0,    at_state,      at,      "<generic>",  "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1989, ec1842,   ibm5150, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1842", MACHINE_NOT_WORKING )
