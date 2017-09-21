@@ -80,17 +80,11 @@ public:
 	pimps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart1(*this, "uart1")
-		, m_uart2(*this, "uart2")
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart1;
-	required_device<i8251_device> m_uart2;
 };
 
 
@@ -118,15 +112,6 @@ void pimps_state::machine_reset()
 	m_maincpu->set_pc(0xf000);
 }
 
-// source of baud frequency is not documented, so we invent a clock
-WRITE_LINE_MEMBER( pimps_state::clock_tick )
-{
-	m_uart1->write_txc(state);
-	m_uart1->write_rxc(state);
-	m_uart2->write_txc(state);
-	m_uart2->write_rxc(state);
-}
-
 // baud is not documented, we will use 9600
 static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 9600, 7 bits, even parity
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
@@ -144,7 +129,10 @@ static MACHINE_CONFIG_START( pimps )
 	MCFG_CPU_IO_MAP(pimps_io)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(pimps_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))

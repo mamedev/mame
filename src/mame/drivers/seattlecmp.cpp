@@ -42,15 +42,11 @@ public:
 	seattle_comp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "uart")
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart;
 };
 
 
@@ -82,13 +78,6 @@ void seattle_comp_state::machine_reset()
 {
 }
 
-// source of baud frequency is not documented, so we invent a clock
-WRITE_LINE_MEMBER( seattle_comp_state::clock_tick )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 // bit 7 needs to be stripped off, we do this by choosing 7 bits and even parity
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
@@ -107,7 +96,8 @@ static MACHINE_CONFIG_START( seattle )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(seattle_comp_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))

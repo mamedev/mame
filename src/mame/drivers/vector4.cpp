@@ -21,19 +21,12 @@ public:
 	vector4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart1(*this, "uart1")
-		, m_uart2(*this, "uart2")
-		, m_uart3(*this, "uart3")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( clock_tick );
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart1;
-	required_device<i8251_device> m_uart2;
-	required_device<i8251_device> m_uart3;
 };
 
 
@@ -67,16 +60,6 @@ void vector4_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
-// source of baud frequency is not documented, so we invent a clock
-WRITE_LINE_MEMBER( vector4_state::clock_tick )
-{
-	m_uart1->write_txc(state);
-	m_uart1->write_rxc(state);
-	m_uart2->write_txc(state);
-	m_uart2->write_rxc(state);
-	m_uart3->write_txc(state);
-	m_uart3->write_rxc(state);
-}
 
 static MACHINE_CONFIG_START( vector4 )
 	/* basic machine hardware */
@@ -86,7 +69,12 @@ static MACHINE_CONFIG_START( vector4 )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vector4_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart3", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart3", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
@@ -97,7 +85,6 @@ static MACHINE_CONFIG_START( vector4 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
-	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
 
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))

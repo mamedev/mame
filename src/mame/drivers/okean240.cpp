@@ -75,7 +75,6 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_io_modifiers(*this, "MODIFIERS")
 		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "uart")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(clock_tick);
@@ -104,7 +103,6 @@ private:
 	optional_ioport m_io_modifiers;
 	ioport_port *m_io_port[11];
 	required_device<cpu_device> m_maincpu;
-	optional_device<i8251_device> m_uart;
 };
 
 // okean240 requires bit 4 to change
@@ -482,13 +480,6 @@ static GFXDECODE_START( okean240a )
 	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
-// source of baud frequency is not documented, so we invent a clock
-WRITE_LINE_MEMBER( okean240_state::clock_tick )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 
 static MACHINE_CONFIG_START( okean240t )
 	/* basic machine hardware */
@@ -497,7 +488,8 @@ static MACHINE_CONFIG_START( okean240t )
 	MCFG_CPU_IO_MAP(okean240t_io)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(okean240_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))

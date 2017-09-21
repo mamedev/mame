@@ -39,16 +39,13 @@ public:
 	mice_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "uart")
 	{ }
 
 	DECLARE_READ8_MEMBER(rpt_pc_r);
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart;
 };
 
 
@@ -83,12 +80,6 @@ READ8_MEMBER( mice_state::rpt_pc_r )
 	return 0xef; // select our default rs232 settings
 }
 
-// source of baud frequency is not known, so we invent a clock
-WRITE_LINE_MEMBER( mice_state::clock_tick )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
 
 static MACHINE_CONFIG_START( mice )
 	/* basic machine hardware */
@@ -98,7 +89,8 @@ static MACHINE_CONFIG_START( mice )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mice_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))

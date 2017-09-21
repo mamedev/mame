@@ -41,14 +41,11 @@ public:
 	microdec_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart1(*this, "uart1")
-		, m_uart2(*this, "uart2")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy(nullptr)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_READ8_MEMBER(portf5_r);
 	DECLARE_READ8_MEMBER(portf6_r);
 	DECLARE_WRITE8_MEMBER(portf6_w);
@@ -63,8 +60,6 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart1;
-	required_device<i8251_device> m_uart2;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	floppy_image_device *m_floppy;
@@ -186,14 +181,6 @@ DRIVER_INIT_MEMBER( microdec_state, microdec )
 	membank("bankw0")->configure_entry(0, &main[0x1000]);
 }
 
-WRITE_LINE_MEMBER( microdec_state::clock_tick )
-{
-	m_uart1->write_txc(state);
-	m_uart1->write_rxc(state);
-	m_uart2->write_txc(state);
-	m_uart2->write_rxc(state);
-}
-
 static MACHINE_CONFIG_START( microdec )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -202,7 +189,10 @@ static MACHINE_CONFIG_START( microdec )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(microdec_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))

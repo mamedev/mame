@@ -52,17 +52,11 @@ public:
 	ipc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart1(*this, "uart1")
-		, m_uart2(*this, "uart2")
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart1;
-	required_device<i8251_device> m_uart2;
 };
 
 
@@ -91,14 +85,6 @@ void ipc_state::machine_reset()
 	m_maincpu->set_state_int(i8085a_cpu_device::I8085_PC, 0xE800);
 }
 
-// source of baud frequency is not documented, so we invent a clock
-WRITE_LINE_MEMBER( ipc_state::clock_tick )
-{
-	m_uart1->write_txc(state);
-	m_uart1->write_rxc(state);
-	m_uart2->write_txc(state);
-	m_uart2->write_rxc(state);
-}
 
 static MACHINE_CONFIG_START( ipc )
 	/* basic machine hardware */
@@ -108,7 +94,10 @@ static MACHINE_CONFIG_START( ipc )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ipc_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0) // 8 data bits, no parity, 1 stop bit
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
