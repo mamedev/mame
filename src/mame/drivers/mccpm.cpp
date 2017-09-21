@@ -41,16 +41,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
-		, m_sio(*this, "sio")
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
-	required_device<z80sio_device> m_sio;
 };
 
 
@@ -77,12 +73,6 @@ void mccpm_state::machine_reset()
 	memcpy(m_p_ram, bios, 0x1000);
 }
 
-WRITE_LINE_MEMBER( mccpm_state::clock_tick )
-{
-	m_sio->txca_w(state);
-	m_sio->rxca_w(state);
-}
-
 static MACHINE_CONFIG_START( mccpm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -91,7 +81,8 @@ static MACHINE_CONFIG_START( mccpm )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mccpm_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
 	MCFG_Z80SIO_ADD("sio", XTAL_4MHz, 0, 0, 0, 0)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

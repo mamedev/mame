@@ -48,15 +48,11 @@ public:
 	zsbc3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sio(*this, "sio")
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<z80sio_device> m_sio;
 };
 
 
@@ -84,13 +80,6 @@ void zsbc3_state::machine_reset()
 {
 }
 
-// source of baud frequency is unknown, so we invent a clock
-WRITE_LINE_MEMBER( zsbc3_state::clock_tick )
-{
-	m_sio->txca_w(state);
-	m_sio->rxca_w(state);
-}
-
 
 static MACHINE_CONFIG_START( zsbc3 )
 	/* basic machine hardware */
@@ -100,7 +89,8 @@ static MACHINE_CONFIG_START( zsbc3 )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(zsbc3_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
 	/* Devices */
 	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 4, 0, 0, 0, 0)

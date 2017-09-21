@@ -77,7 +77,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
 	DECLARE_READ8_MEMBER(term_status_r);

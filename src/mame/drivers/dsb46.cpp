@@ -43,17 +43,14 @@ public:
 	dsb46_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sio(*this, "sio")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_WRITE8_MEMBER(port1a_w);
 	DECLARE_DRIVER_INIT(dsb46);
 	DECLARE_MACHINE_RESET(dsb46);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<z80sio_device> m_sio;
 };
 
 static ADDRESS_MAP_START( dsb46_mem, AS_PROGRAM, 8, dsb46_state )
@@ -97,13 +94,6 @@ WRITE8_MEMBER( dsb46_state::port1a_w )
 	membank("read")->set_entry(data & 1);
 }
 
-// source of baud frequency is unknown, so we invent a clock
-WRITE_LINE_MEMBER( dsb46_state::clock_tick )
-{
-	m_sio->txca_w(state);
-	m_sio->rxca_w(state);
-}
-
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc1" },
@@ -123,7 +113,8 @@ static MACHINE_CONFIG_START( dsb46 )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(dsb46_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
 	/* Devices */
 	MCFG_Z80SIO_ADD("sio", XTAL_4MHz, 0, 0, 0, 0)

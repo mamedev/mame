@@ -26,15 +26,11 @@ public:
 	jade_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sio(*this, "sio")
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<z80sio_device> m_sio;
 };
 
 
@@ -56,12 +52,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jade )
 INPUT_PORTS_END
 
-// source of baud frequency is unknown, so we invent a clock
-WRITE_LINE_MEMBER( jade_state::clock_tick )
-{
-	m_sio->txca_w(state);
-	m_sio->rxca_w(state);
-}
 
 void jade_state::machine_reset()
 {
@@ -74,7 +64,8 @@ static MACHINE_CONFIG_START( jade )
 	MCFG_CPU_IO_MAP(jade_io)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(jade_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
 	/* Devices */
 	MCFG_Z80SIO_ADD("sio", XTAL_4MHz, 0, 0, 0, 0)
