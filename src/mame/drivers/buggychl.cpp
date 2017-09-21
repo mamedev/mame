@@ -17,11 +17,16 @@ TODO:
   background, and the gradient can move around (the latter doesn't seem to
   be used except for making it cover the whole screen on the title screen,
   and start at the middle during gameplay)
+  Update: stage 2 is supposed to have a different gradient, how/where 
+  this is located is unknown (pen 0x20?)
 - Video driver is largely unoptimized
 - Support for the 7630's controlling the sound chip outputs (bass/treble,
   volume) is completely missing.
 - The sound Z80 seems to write answers for the main Z80, but the latter doesn't
   seem to read them.
+- videoram and spriteram garbage occurs when entering into cross hatch test and exiting.
+  Game attempts to transfer content of videoram into spriteram/scrollram, then transfer 
+  back again into videoram. Maybe the host CPU cannot read contents of VRAM at all?
 
 Notes:
 - There is also a 4-channel version of the sound board for the cockpit
@@ -93,7 +98,6 @@ Schematics show the jumper set to the 6mhz setting.
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 #include "buggychl.lh"
@@ -239,7 +243,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0x4820, 0x4820) AM_RAM /* VOL/BAL   for the 7630 on the MSM5232 output */
+	AM_RANGE(0x4820, 0x4820) AM_WRITE(ta7630_volbal_msm_w) /* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output */
 	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x5001, 0x5001) AM_READ(sound_status_sound_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>)
@@ -392,19 +396,28 @@ static GFXDECODE_START( buggychl )
 GFXDECODE_END
 
 
+WRITE8_MEMBER(buggychl_state::ta7630_volbal_msm_w)
+{
+	m_ta7630->set_device_volume(m_msm, data >> 4);
+}
 
-WRITE8_MEMBER(buggychl_state::port_a_0_w)
+WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay1_w)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
+	m_ta7630->set_device_volume(m_ay1, data >> 4);
 }
+
 WRITE8_MEMBER(buggychl_state::port_b_0_w)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
-WRITE8_MEMBER(buggychl_state::port_a_1_w)
+
+WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay2_w)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
+	m_ta7630->set_device_volume(m_ay2, data >> 4);
 }
+
 WRITE8_MEMBER(buggychl_state::port_b_1_w)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
@@ -483,13 +496,15 @@ static MACHINE_CONFIG_START( buggychl )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
+	MCFG_TA7630_ADD("ta7630")
+	
 	MCFG_SOUND_ADD("ay1", YM2149, XTAL_8MHz/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_0_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", YM2149, XTAL_8MHz/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_1_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -575,5 +590,5 @@ ROM_START( buggychlt )
 ROM_END
 
 
-GAMEL( 1984, buggychl, 0,        buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_buggychl )
-GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychl, 0,        buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )

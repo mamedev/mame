@@ -1433,3 +1433,15 @@ if (SOUNDS["DAVE"]~=null) then
 		MAME_DIR .. "src/devices/sound/dave.h",
 	}
 end
+
+---------------------------------------------------
+-- Toshiba TA7630
+--@src/devices/sound/ta7630.h,SOUNDS["TA7630"] = true
+---------------------------------------------------
+
+if (SOUNDS["TA7630"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ta7630.cpp",
+		MAME_DIR .. "src/devices/sound/ta7630.h",
+	}
+end

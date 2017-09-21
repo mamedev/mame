@@ -8,6 +8,8 @@
 #include "machine/input_merger.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "sound/ta7630.h"
+#include "sound/ay8910.h"
 #include "screen.h"
 
 class buggychl_state : public driver_device
@@ -23,14 +25,17 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_bmcu(*this, "bmcu"),
+		m_ta7630(*this, "ta7630"),
 		m_msm(*this, "msm"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundnmi(*this, "soundnmi"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_pedal_input(*this, "PEDAL") 
+		m_pedal_input(*this, "PEDAL")
 		{ }
 
 	/* memory pointers */
@@ -44,7 +49,10 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
 	required_device<taito68705_mcu_device> m_bmcu;
+	required_device<ta7630_device> m_ta7630;
 	required_device<msm5232_device> m_msm;
+	required_device<ay8910_device> m_ay1;
+	required_device<ay8910_device> m_ay2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -63,10 +71,11 @@ public:
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);
 	DECLARE_WRITE8_MEMBER(buggychl_ctrl_w);
 	DECLARE_WRITE8_MEMBER(buggychl_bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(port_a_0_w);
+	DECLARE_WRITE8_MEMBER(ta7630_volbal_ay1_w);
 	DECLARE_WRITE8_MEMBER(port_b_0_w);
-	DECLARE_WRITE8_MEMBER(port_a_1_w);
+	DECLARE_WRITE8_MEMBER(ta7630_volbal_ay2_w);
 	DECLARE_WRITE8_MEMBER(port_b_1_w);
+	DECLARE_WRITE8_MEMBER(ta7630_volbal_msm_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
