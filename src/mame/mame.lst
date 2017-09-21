@@ -20435,7 +20435,9 @@ mm5tk                           // Mephisto 5.1 ROM Turbo Kit Speed
 rebel5                          // Mephisto 5
 
 @source:mephisto_montec.cpp
+smondial                        // 1986 Mephisto Super Mondial
 montec                          // 1987 Mephisto Monte Carlo
+smondial2                       // 1989 Mephisto Super Mondial II
 megaiv                          // 1989 Mephisto Mega IV
 monteciv                        // 1990 Mephisto Monte Carlo IV LE
 

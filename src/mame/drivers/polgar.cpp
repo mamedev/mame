@@ -101,6 +101,7 @@ class mephisto_modena_state : public mephisto_polgar_state
 public:
 	mephisto_modena_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mephisto_polgar_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
 		, m_beeper(*this, "beeper")
 	{ }
@@ -109,12 +110,15 @@ public:
 	DECLARE_WRITE8_MEMBER(modena_digits_w);
 	DECLARE_WRITE8_MEMBER(modena_io_w);
 	DECLARE_WRITE8_MEMBER(modena_led_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);  }
 
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
 private:
+	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<beep_device> m_beeper;
 	uint8_t m_digits_idx;
@@ -527,7 +531,10 @@ static MACHINE_CONFIG_DERIVED( modena, milano )
 	MCFG_CPU_MODIFY("maincpu")			// W65C02SP
 	MCFG_CPU_CLOCK(XTAL_4_194304Mhz)
 	MCFG_CPU_PROGRAM_MAP(modena_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_modena_state, nmi_line_pulse, (double)XTAL_4_194304Mhz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_REMOVE()
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_on", mephisto_modena_state, nmi_on, attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)))
+	MCFG_TIMER_START_DELAY(attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)) - attotime::from_usec(975)) 	// active for 975us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)))
 
 	MCFG_DEVICE_REMOVE("display")
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
