@@ -138,7 +138,7 @@ WRITE8_MEMBER(flstory_state::sound_control_1_w)
 	m_snd_ctrl1 = data & 0xff;
 	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 	for(int i=0;i<4;i++)
-		m_ta7630->set_channel_volume(m_msm,i+4,m_snd_ctrl0 >> 4);
+		m_ta7630->set_channel_volume(m_msm,i+4,m_snd_ctrl1 >> 4);
 
 //	m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 //	m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
