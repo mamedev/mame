@@ -80,6 +80,18 @@
 -->
 	</software>
 
+	<software name="arcpinball">
+		<description>ArcPinball</description>
+		<year>1990</year>
+		<publisher>Shibumi Software</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="ArcPinball (1990)(Shibumi Soft).ssd" size="204800" crc="e255f429" sha1="ae0308ac16ebb277668dd96d1a8e58d666b318c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arsoccer">
 		<description>Arcade Soccer</description>
 		<year>1989</year>

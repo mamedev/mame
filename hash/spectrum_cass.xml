@@ -697,6 +697,67 @@
 		</part>
 	</software>
 
+	<software name="uspeech">
+		<description>Currah µSpeech Demo</description>
+		<year>1983</year>
+		<publisher>Fuller Micro Systems</publisher>
+		<info name="usage" value="Requires Currah µSpeech" />
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="20032">
+				<rom name="Currah Microspeech - Side 1.tzx" size="20032" crc="969108b3" sha1="d67e1ac0964dce44af05753bfc1d8817a876b287" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="15004">
+				<rom name="Currah Microspeech - Side 2.tzx" size="15004" crc="f35496b8" sha1="895a121b29a3433bbb404225324ba026d5f6223c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fuller">
+		<description>Fuller Box &amp; Orator Demonstration</description>
+		<year>1983</year>
+		<publisher>Fuller Micro Systems</publisher>
+		<info name="usage" value="Requires Fuller Box" />
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="12252">
+				<rom name="Fuller Box &amp; Orator Demonstration.tzx" size="12252" crc="e854ac02" sha1="89459c6818962229fe7af53ac77cd44dfd95401a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unicorn">
+		<description>Shadow of the Unicorn</description>
+		<year>1985</year>
+		<publisher>Mikro-Gen</publisher>
+		<info name="usage" value="Requires Mikro-Plus interface" />
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side 1: Shadow of the Unicorn"/>
+			<dataarea name="cass" size="39018">
+				<rom name="Shadow Of The Unicorn - Side A.tzx" size="39018" crc="ed86cebe" sha1="207cf2ea9e3b50b51d500c856b6ddb746888ce58" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side 2: Tape Alignment"/>
+			<dataarea name="cass" size="667">
+				<rom name="Shadow Of The Unicorn - Side B.tzx" size="667" crc="d61d459a" sha1="4dc5abb8c0f92637d15a5ff7ac873b9e5d6ccdb3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vchess">
+		<description>Spectrum Voice Chess</description>
+		<year>1982</year>
+		<publisher>Arctic Computing</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="37209">
+				<rom name="Spectrum Voice Chess.tzx" size="37209" crc="e936739b" sha1="f668bd949c0a68b99e657fbdcebd4d3a78feabcd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!--NC128-->
 	<software name="earthshkb" cloneof="earthshk">
 		<description>Earth Shaker (set 3) (48K)</description>
@@ -845,7 +906,3 @@
 		</part>
 	</software>
 </softwarelist>
-
-
-
-
