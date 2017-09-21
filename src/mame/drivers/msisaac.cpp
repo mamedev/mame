@@ -483,9 +483,11 @@ static MACHINE_CONFIG_START( msisaac )
 	MCFG_TA7630_ADD("ta7630")
 	
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)

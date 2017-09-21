@@ -5,6 +5,8 @@
 #include "machine/input_merger.h"
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
+#include "sound/ta7630.h"
+#include "sound/ay8910.h"
 
 class flstory_state : public driver_device
 {
@@ -19,6 +21,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
+		m_ay(*this, "aysnd"),
+		m_ta7630(*this, "ta7630"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -40,7 +44,6 @@ public:
 	uint8_t    m_palette_bank;
 
 	/* sound-related */
-	int      m_vol_ctrl[16];
 	uint8_t    m_snd_ctrl0;
 	uint8_t    m_snd_ctrl1;
 	uint8_t    m_snd_ctrl2;
@@ -55,6 +58,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
+	required_device<ay8910_device> m_ay;
+	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;

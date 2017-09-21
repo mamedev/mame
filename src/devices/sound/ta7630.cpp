@@ -91,7 +91,7 @@ void ta7630_device::set_device_volume(device_sound_interface *device,uint8_t val
 	device->set_output_gain(ALL_OUTPUTS,m_vol_ctrl[value & 0xf]);
 }
 
-//	Most Taito implementations seems to use this, is it correct?
+//	TODO: Most Taito implementations uses this, is it correct?
 void ta7630_device::set_channel_volume(device_sound_interface *device, uint8_t ch,uint8_t value)
 {
 	device->set_output_gain(ch,m_vol_ctrl[value & 0xf]);
