@@ -138,6 +138,7 @@ enum
 	XTAL_12_48MHz       = 12480000,     /* TRS-80 Model II */
 	XTAL_12_5MHz        = 12500000,     /* Red Alert audio board */
 	XTAL_12_8MHz        = 12800000,     /* Cave CV1000 */
+	XTAL_12_8544MHz     = 12854400,     /* alphatronic P3 */
 	XTAL_12_9792MHz     = 12979200,     /* Exidy 440 */
 	XTAL_13_3MHz        = 13300000,     /* BMC bowling */
 	XTAL_13_33056MHz    = 13330560,     /* Taito L */
