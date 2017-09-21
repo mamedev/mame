@@ -36,7 +36,8 @@ public:
 
 	// filter setters
 	void set_device_volume(device_sound_interface *device,uint8_t value);
-	
+	void set_channel_volume(device_sound_interface *device, uint8_t ch,uint8_t value);
+
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
