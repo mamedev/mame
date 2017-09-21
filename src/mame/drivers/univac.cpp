@@ -27,6 +27,7 @@
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "machine/clock.h"
 #include "screen.h"
 
 
@@ -91,8 +92,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uts20_io, AS_IO, 8, univac_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w) // ?? no idea
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
 	AM_RANGE(0x80, 0xbf) AM_RAM AM_SHARE("nvram")
@@ -185,6 +185,13 @@ static MACHINE_CONFIG_START( uts20 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxcb_w))
+
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DART_ADD("dart", XTAL_4MHz, 0, 0, 0, 0 )

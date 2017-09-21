@@ -54,7 +54,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/z80sio.h"
 
-#define TERMINAL_TAG "terminal"
 
 class sun1_state : public driver_device
 {

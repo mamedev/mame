@@ -42,13 +42,9 @@ public:
 	dmax8000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_dart1(*this, "dart1")
-		, m_dart2(*this, "dart2")
-		, m_ctc (*this, "ctc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
-	{
-	}
+	{ }
 
 	DECLARE_DRIVER_INIT(dmax8000);
 	DECLARE_MACHINE_RESET(dmax8000);
@@ -56,15 +52,10 @@ public:
 	DECLARE_WRITE8_MEMBER(port0d_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<z80dart_device> m_dart1;
-	required_device<z80dart_device> m_dart2;
-	required_device<z80ctc_device> m_ctc;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 };
@@ -147,25 +138,10 @@ DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-// Baud rate generator. All inputs are 2MHz.
-WRITE_LINE_MEMBER( dmax8000_state::clock_w )
-{
-	m_ctc->trg0(state);
-	m_ctc->trg1(state);
-	m_ctc->trg2(state);
-}
-
-WRITE_LINE_MEMBER( dmax8000_state::ctc_z0_w )
-{
-	m_dart1->rxca_w(state);
-	m_dart1->txca_w(state);
-	m_dart2->rxca_w(state);
-	m_dart2->txca_w(state);
-}
-
 static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( dmax8000 )
 	/* basic machine hardware */
@@ -175,10 +151,15 @@ static MACHINE_CONFIG_START( dmax8000 )
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4MHz / 2) // 2MHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(dmax8000_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(dmax8000_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("dart1", z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart1", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80dart_device, txca_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart2", z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart1", z80dart_device, rxtxcb_w))
 
@@ -186,6 +167,7 @@ static MACHINE_CONFIG_START( dmax8000 )
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart1", z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("dart1", z80dart_device, dcda_w))
