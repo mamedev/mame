@@ -12,7 +12,9 @@ Status: Boots into monitor, some commands work, some freeze.
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
+#include "bus/rs232/rs232.h"
+#include "machine/clock.h"
+#include "machine/z80sio.h"
 
 
 class pm68k_state : public driver_device
@@ -22,32 +24,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_base(*this, "rambase")
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
 	{ }
 
-	void kbd_put(u8 data);
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
-
 private:
-	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 };
-
-READ16_MEMBER( pm68k_state::keyin_r )
-{
-	uint16_t ret = m_term_data;
-	m_term_data = 0;
-	return ret << 8;
-}
-
-READ16_MEMBER( pm68k_state::status_r )
-{
-	return (m_term_data) ? 0x500 : 0x400;
-}
 
 
 static ADDRESS_MAP_START(pm68k_mem, AS_PROGRAM, 16, pm68k_state)
@@ -55,8 +38,7 @@ static ADDRESS_MAP_START(pm68k_mem, AS_PROGRAM, 16, pm68k_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x205fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x600000, 0x600001) AM_READ(keyin_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_READ(status_r)
+	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("mpsc", i8274_new_device, ba_cd_r, ba_cd_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -72,19 +54,34 @@ void pm68k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-void pm68k_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
-
 static MACHINE_CONFIG_START( pm68k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(pm68k_mem)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pm68k_state, kbd_put))
+	MCFG_DEVICE_ADD("mpsc", I8274_NEW, 0)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("baudclock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", i8274_new_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", i8274_new_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", i8274_new_device, txcb_w))
+
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, rxa_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, rxb_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
