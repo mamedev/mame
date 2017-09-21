@@ -2882,6 +2882,40 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/spectrum/exp.h,BUSES["SPECTRUM"] = true
+---------------------------------------------------
+
+if (BUSES["SPECTRUM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/spectrum/exp.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/exp.h",
+		MAME_DIR .. "src/devices/bus/spectrum/intf1.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/intf1.h",
+		MAME_DIR .. "src/devices/bus/spectrum/intf2.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/intf2.h",
+		MAME_DIR .. "src/devices/bus/spectrum/fuller.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/fuller.h",
+		MAME_DIR .. "src/devices/bus/spectrum/kempjoy.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/kempjoy.h",
+		MAME_DIR .. "src/devices/bus/spectrum/melodik.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/melodik.h",
+		MAME_DIR .. "src/devices/bus/spectrum/mikroplus.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/mikroplus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/plus2test.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/plus2test.h",
+		MAME_DIR .. "src/devices/bus/spectrum/protek.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/protek.h",
+		MAME_DIR .. "src/devices/bus/spectrum/uslot.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/uslot.h",
+		MAME_DIR .. "src/devices/bus/spectrum/usource.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/usource.h",
+		MAME_DIR .. "src/devices/bus/spectrum/uspeech.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/uspeech.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/vtech/memexp/memexp.h,BUSES["VTECH_MEMEXP"] = true
 ---------------------------------------------------
 
