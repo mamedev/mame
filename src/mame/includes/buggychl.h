@@ -29,7 +29,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundnmi(*this, "soundnmi"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2") { }
+		m_soundlatch2(*this, "soundlatch2"),
+		m_pedal_input(*this, "PEDAL") 
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_charram;
@@ -37,17 +39,6 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scrollv;
 	required_shared_ptr<uint8_t> m_scrollh;
-
-	/* video-related */
-	bitmap_ind16 m_tmp_bitmap1;
-	bitmap_ind16 m_tmp_bitmap2;
-	tilemap_t     *m_bg_tilemap;
-	int         m_sl_bank;
-	int         m_bg_clip_on;
-	int         m_sky_on;
-	int         m_sprite_color_base;
-	int         m_bg_scrollx;
-	uint8_t       m_sprite_lookup[0x2000];
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -60,6 +51,7 @@ public:
 	required_device<input_merger_device> m_soundnmi;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
+	required_ioport m_pedal_input;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);
@@ -80,9 +72,21 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(buggychl);
 	uint32_t screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+	DECLARE_CUSTOM_INPUT_MEMBER( pedal_in_r );
+
+private:
 	void draw_sky( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	/* video-related */
+	bitmap_ind16 m_tmp_bitmap1;
+	bitmap_ind16 m_tmp_bitmap2;
+	int         m_sl_bank;
+	int         m_bg_clip_on;
+	int         m_sky_on;
+	int         m_sprite_color_base;
+	int         m_bg_scrollx;
+	bool		m_sound_irq_enable;
+	uint8_t       m_sprite_lookup[0x2000];
 };

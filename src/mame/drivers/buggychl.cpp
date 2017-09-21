@@ -250,6 +250,13 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+// accelerator is 4-bit, we need to convert it here so that it doesn't clash with other inputs in IN1 (known i/o framework fault)
+CUSTOM_INPUT_MEMBER( buggychl_state::pedal_in_r )
+{
+	return m_pedal_input->read() >> 4;
+}
+
+
 static INPUT_PORTS_START( buggychl )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" ) PORT_DIPLOCATION("SW1:1,2")   /* Arks/Flags/Fuel */
@@ -311,11 +318,11 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPNAME( 0x01, 0x01, "Start button needed" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )        /* Only listed as OFF in the manual */
 	PORT_DIPNAME( 0x04, 0x04, "Fuel loss (Cheat)") PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Crash only" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )        /* Only listed as OFF in the manual */
 	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
@@ -333,7 +340,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )   /* shift */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")  /* shift */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -344,7 +351,10 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_BUTTON1 )   /* accelerator */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, buggychl_state, pedal_in_r, nullptr) 
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
 
 	PORT_START("WHEEL") /* wheel */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
@@ -406,10 +416,9 @@ void buggychl_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x2000);
 
-
 	save_item(NAME(m_sprite_lookup));
 	save_item(NAME(m_sl_bank));
-	save_item(NAME(m_bg_on));
+	save_item(NAME(m_bg_clip_on));
 	save_item(NAME(m_sky_on));
 	save_item(NAME(m_sprite_color_base));
 	save_item(NAME(m_bg_scrollx));
@@ -418,7 +427,7 @@ void buggychl_state::machine_start()
 void buggychl_state::machine_reset()
 {
 	m_sl_bank = 0;
-	m_bg_on = 0;
+	m_bg_clip_on = 0;
 	m_sky_on = 0;
 	m_sprite_color_base = 0;
 	m_bg_scrollx = 0;
@@ -433,7 +442,7 @@ static MACHINE_CONFIG_START( buggychl )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* 4 MHz according to schematics */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 2*60) // timer irq
+	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL_8MHz/2)/2)/256)/64)) // timer irq
 	// schematics shows a 61.035 (x2?) Hz, similar to flstory.cpp and other Taito MSM5232 based games.
 	// apparently schematics also shows a switch for the timer irq that makes it to run at half speed, no idea where this is located.
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
