@@ -44,8 +44,6 @@ protected:
 private:
 	required_device<spectrum_expansion_slot_device> m_exp1;
 	required_device<spectrum_expansion_slot_device> m_exp2;
-
-	int m_romcs;
 };
 
 
