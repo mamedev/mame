@@ -710,10 +710,10 @@ void am9513_device::step_counter(int c, bool force_load)
 
 	if (m_count[c] == 0)
 	{
-		LOGMASKED(LOG_TC, "Counter %d: Terminal count\n", c + 1);
 		set_tc(c, true);
 		m_count[c] = reload_from_hold(c) ? m_counter_hold[c] : m_counter_load[c];
 		m_alternate_count[c] = !m_alternate_count[c];
+		LOGMASKED(LOG_TC, "Counter %d: Terminal count (%u reloaded)\n", c + 1, m_count[c]);
 
 		// Modes A, B, C, N & O: disarm counter after counting to TC once
 		if ((m_counter_mode[c] & 0x0060) == 0x0000)
@@ -728,15 +728,19 @@ void am9513_device::step_counter(int c, bool force_load)
 		if ((m_counter_mode[c] & 0xc000) == 0xc000 && ((m_counter_mode[c] & 0x00c0) != 0x0040 || !m_alternate_count[c]))
 			m_counter_running[c] = false;
 	}
-	else if (m_tc[c])
+	else
 	{
-		set_tc(c, false);
-		if (force_load)
-			m_count[c] = reload_from_hold(c) ? m_counter_hold[c] : m_counter_load[c];
-	}
+		// Drive counter out of TC
+		if (m_tc[c])
+			set_tc(c, false);
 
-	if (force_load)
-		LOGMASKED(LOG_GENERAL, "Counter %d: %u loaded\n", c + 1, m_count[c]);
+		// Load if requested
+		if (force_load)
+		{
+			m_count[c] = reload_from_hold(c) ? m_counter_hold[c] : m_counter_load[c];
+			LOGMASKED(LOG_GENERAL, "Counter %d: %u loaded\n", c + 1, m_count[c]);
+		}
+	}
 
 	// Active comparators
 	if (c < 2 && BIT(m_mmr, c + 2))
@@ -777,14 +781,14 @@ void am9513_device::gate_count(int c, bool state)
 		if (counter_is_mode_x(c))
 			m_counter_hold[c] = m_count[c];
 
-		// Modes N, O, Q, R: hardware retriggering
+		// Modes N, O, Q & R: hardware retriggering
 		if ((m_counter_mode[c] & 0x00c0) == 0x0080)
 		{
 			m_counter_hold[c] = m_count[c];
 			m_count[c] = m_counter_load[c];
 		}
 
-		// Modes C, F, I, L, O, R, X: start count on active gate edge
+		// Modes C, F, I, L, O, R & X: start count on active gate edge
 		if ((m_counter_mode[c] & 0xc000) == 0xc000)
 			m_counter_running[c] = true;
 	}
