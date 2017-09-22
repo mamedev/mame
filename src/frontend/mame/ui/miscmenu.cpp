@@ -116,15 +116,12 @@ void menu_bios_selection::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_t *dev = (device_t *)menu_event->itemref;
-			int cnt = 0;
-			for (const tiny_rom_entry *rom = dev->rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
-			{
-				if (ROMENTRY_ISSYSTEM_BIOS(rom))
-					++cnt;
-			}
+			int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
 			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
-			if (val < 1) val = cnt;
-			if (val > cnt) val = 1;
+			if (val < 1)
+				val = cnt;
+			if (val > cnt)
+				val = 1;
 			dev->set_system_bios(val);
 			if (strcmp(dev->tag(),":")==0) {
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE);
@@ -813,28 +810,25 @@ void menu_machine_configure::setup_bios()
 	}
 
 	std::size_t bios_count = 0;
-	for (tiny_rom_entry const *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (romload::system_bios const &bios : romload::entries(m_drv->rom).get_system_bioses())
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		std::string name(bios.get_description());
+		u32 const bios_flags(bios.get_value());
+		std::string const bios_number(std::to_string(bios_flags - 1));
+
+		// check biosnumber and name
+		if ((bios_number == specbios) || (specbios == bios.get_name()))
+			m_curbios = bios_count;
+
+		if (default_name && !std::strcmp(bios.get_name(), default_name))
 		{
-			std::string name(rom->hashdata);
-			u32 const bios_flags(ROM_GETBIOSFLAGS(rom));
-			std::string const bios_number(std::to_string(bios_flags - 1));
-
-			// check biosnumber and name
-			if ((bios_number == specbios) || (specbios == rom->name))
+			name.append(_(" (default)"));
+			if (specbios == "default")
 				m_curbios = bios_count;
-
-			if (default_name && !std::strcmp(rom->name, default_name))
-			{
-				name.append(_(" (default)"));
-				if (specbios == "default")
-					m_curbios = bios_count;
-			}
-
-			m_bios.emplace_back(std::move(name), bios_flags - 1);
-			bios_count++;
 		}
+
+		m_bios.emplace_back(std::move(name), bios_flags - 1);
+		bios_count++;
 	}
 }
 

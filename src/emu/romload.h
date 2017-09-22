@@ -87,6 +87,295 @@ template <typename T> inline u32  DISK_GETINDEX(T const &r)            { return 
 template <typename T> inline bool DISK_ISREADONLY(T const &r)          { return (ROM_GETFLAGS(r) & DISK_READONLYMASK) == DISK_READONLY; }
 
 
+namespace romload {
+
+template <typename T>
+class const_entry_iterator
+{
+protected:
+	tiny_rom_entry const *m_data;
+
+	constexpr const_entry_iterator() noexcept : m_data(nullptr) { }
+	constexpr const_entry_iterator(tiny_rom_entry const *data) noexcept : m_data(data) { }
+	constexpr const_entry_iterator(const_entry_iterator const &) noexcept = default;
+	const_entry_iterator(const_entry_iterator &&) noexcept = default;
+	const_entry_iterator &operator=(const_entry_iterator const &) noexcept = default;
+	const_entry_iterator &operator=(const_entry_iterator &&) noexcept = default;
+
+public:
+	typedef T value_type;
+	typedef value_type const *pointer;
+	typedef value_type const &reference;
+	typedef std::ptrdiff_t difference_type;
+	typedef std::forward_iterator_tag iterator_category;
+
+	reference operator*() const noexcept { return reinterpret_cast<reference>(*m_data); }
+	pointer operator->() const noexcept { return reinterpret_cast<pointer>(m_data); }
+};
+
+
+class file final : tiny_rom_entry
+{
+private:
+	file() = default;
+	file(file const &) = delete;
+	file &operator=(file const &) = delete;
+
+public:
+	// ROM
+	constexpr char const *get_name()       const { return name; }
+	constexpr u32         get_offset()     const { return offset; }
+	constexpr u32         get_length()     const { return length; }
+	constexpr u32         get_flags()      const { return flags; }
+	constexpr char const *get_hashdata()   const { return hashdata; }
+	constexpr bool        is_optional()    const { return (flags & ROM_OPTIONALMASK) == ROM_OPTIONAL; }
+	constexpr u32         get_groupsize()  const { return ((flags & ROM_GROUPMASK) >> 8) + 1; }
+	constexpr u32         get_skipcount()  const { return (flags & ROM_SKIPMASK) >> 12; }
+	constexpr bool        is_reversed()    const { return (flags & ROM_REVERSEMASK) == ROM_REVERSE; }
+	constexpr u32         get_bitwidth()   const { return (flags & ROM_BITWIDTHMASK) ? ((flags & ROM_BITWIDTHMASK) >> 16) : 8; }
+	constexpr u32         get_bitshift()   const { return (flags & ROM_BITSHIFTMASK) >> 20; }
+	constexpr bool        inherits_flags() const { return (flags & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS; }
+	constexpr u32         get_bios_flags() const { return (flags & ROM_BIOSFLAGSMASK) >> 24; }
+
+	// disk
+	constexpr u32         get_index()      const { return offset; }
+	constexpr bool        is_readonly()    const { return (flags & DISK_READONLYMASK) == DISK_READONLY; }
+};
+
+class files
+{
+private:
+	tiny_rom_entry const *m_data;
+
+public:
+	class const_iterator : public const_entry_iterator<file>
+	{
+	private:
+		friend class files;
+
+		constexpr const_iterator(tiny_rom_entry const *data) noexcept : const_entry_iterator<file>(data) { }
+
+	public:
+		constexpr const_iterator() noexcept = default;
+		constexpr const_iterator(const_iterator const &) noexcept = default;
+		const_iterator(const_iterator &&) noexcept = default;
+		const_iterator &operator=(const_iterator const &) noexcept = default;
+		const_iterator &operator=(const_iterator &&) noexcept = default;
+
+		const_iterator &operator++() noexcept
+		{
+			while (m_data)
+			{
+				++m_data;
+				if (ROMENTRY_ISFILE(m_data))
+					break;
+				else if (ROMENTRY_ISREGIONEND(m_data))
+					m_data = nullptr;
+			}
+			return *this;
+		}
+
+		const_iterator operator++(int) noexcept { const_iterator result(*this); operator++(); return result; }
+
+		constexpr bool operator==(const_iterator const &rhs) const noexcept { return m_data == rhs.m_data; }
+		constexpr bool operator!=(const_iterator const &rhs) const noexcept { return m_data != rhs.m_data; }
+	};
+
+	files(tiny_rom_entry const *data) : m_data(data)
+	{
+		while (m_data && !ROMENTRY_ISFILE(m_data))
+		{
+			if (ROMENTRY_ISREGIONEND(m_data))
+				m_data = nullptr;
+			else
+				++m_data;
+		}
+	}
+
+	const_iterator begin() const { return const_iterator(m_data); }
+	const_iterator cbegin() const { return const_iterator(m_data); }
+	const_iterator end() const { return const_iterator(nullptr); }
+	const_iterator cend() const { return const_iterator(nullptr); }
+};
+
+
+class region final : tiny_rom_entry
+{
+private:
+	region() = default;
+	region(region const &) = delete;
+	region &operator=(region const &) = delete;
+
+public:
+	constexpr char const *get_tag()         const { return name; }
+	constexpr u32         get_length()      const { return length; }
+	constexpr u32         get_width()       const { return 8 << ((flags & ROMREGION_WIDTHMASK) >> 8); }
+	constexpr bool        is_littleendian() const { return (flags & ROMREGION_ENDIANMASK) == ROMREGION_LE; }
+	constexpr bool        is_bigendian()    const { return (flags & ROMREGION_ENDIANMASK) == ROMREGION_BE; }
+	constexpr bool        is_inverted()     const { return (flags & ROMREGION_INVERTMASK) == ROMREGION_INVERT; }
+	constexpr bool        is_erase()        const { return (flags & ROMREGION_ERASEMASK) == ROMREGION_ERASE; }
+	constexpr u32         get_eraseval()    const { return (flags & ROMREGION_ERASEVALMASK) >> 16; }
+	constexpr u32         get_datatype()    const { return flags & ROMREGION_DATATYPEMASK; }
+	constexpr bool        is_romdata()      const { return get_datatype() == ROMREGION_DATATYPEROM; }
+	constexpr bool        is_diskdata()     const { return get_datatype() == ROMREGION_DATATYPEDISK; }
+
+	files get_files() const { return files(static_cast<tiny_rom_entry const *>(this) + 1); }
+};
+
+class regions
+{
+private:
+	tiny_rom_entry const *m_data;
+
+public:
+	class const_iterator : public const_entry_iterator<region>
+	{
+	private:
+		friend class regions;
+
+		constexpr const_iterator(tiny_rom_entry const *data) noexcept : const_entry_iterator<region>(data) { }
+
+	public:
+		constexpr const_iterator() noexcept = default;
+		constexpr const_iterator(const_iterator const &) noexcept = default;
+		const_iterator(const_iterator &&) noexcept = default;
+		const_iterator &operator=(const_iterator const &) noexcept = default;
+		const_iterator &operator=(const_iterator &&) noexcept = default;
+
+		const_iterator &operator++() noexcept
+		{
+			while (m_data)
+			{
+				++m_data;
+				if (ROMENTRY_ISREGION(m_data))
+					break;
+				else if (ROMENTRY_ISEND(m_data))
+					m_data = nullptr;
+			}
+			return *this;
+		}
+
+		const_iterator operator++(int) noexcept { const_iterator result(*this); operator++(); return result; }
+
+		constexpr bool operator==(const_iterator const &rhs) const noexcept { return m_data == rhs.m_data; }
+		constexpr bool operator!=(const_iterator const &rhs) const noexcept { return m_data != rhs.m_data; }
+	};
+
+	regions(tiny_rom_entry const *data) : m_data(data)
+	{
+		while (m_data && !ROMENTRY_ISREGION(m_data))
+		{
+			if (ROMENTRY_ISEND(m_data))
+				m_data = nullptr;
+			else
+				++m_data;
+		}
+	}
+
+	const_iterator begin() const { return const_iterator(m_data); }
+	const_iterator cbegin() const { return const_iterator(m_data); }
+	const_iterator end() const { return const_iterator(nullptr); }
+	const_iterator cend() const { return const_iterator(nullptr); }
+};
+
+
+class system_bios final : tiny_rom_entry
+{
+private:
+	system_bios() = default;
+	system_bios(system_bios const &) = delete;
+	system_bios &operator=(system_bios const &) = delete;
+
+public:
+	constexpr u32         get_value()       const { return (flags & ROM_BIOSFLAGSMASK) >> 24; }
+	constexpr char const *get_name()        const { return name; }
+	constexpr char const *get_description() const { return hashdata; }
+};
+
+class system_bioses
+{
+private:
+	tiny_rom_entry const *m_data;
+
+public:
+	class const_iterator : public const_entry_iterator<system_bios>
+	{
+	private:
+		friend class system_bioses;
+
+		constexpr const_iterator(tiny_rom_entry const *data) noexcept : const_entry_iterator<system_bios>(data) { }
+
+	public:
+		constexpr const_iterator() noexcept = default;
+		constexpr const_iterator(const_iterator const &) noexcept = default;
+		const_iterator(const_iterator &&) noexcept = default;
+		const_iterator &operator=(const_iterator const &) noexcept = default;
+		const_iterator &operator=(const_iterator &&) noexcept = default;
+
+		const_iterator &operator++() noexcept
+		{
+			while (m_data)
+			{
+				++m_data;
+				if (ROMENTRY_ISSYSTEM_BIOS(m_data))
+					break;
+				else if (ROMENTRY_ISEND(m_data))
+					m_data = nullptr;
+			}
+			return *this;
+		}
+
+		const_iterator operator++(int) noexcept { const_iterator result(*this); operator++(); return result; }
+
+		constexpr bool operator==(const_iterator const &rhs) const noexcept { return m_data == rhs.m_data; }
+		constexpr bool operator!=(const_iterator const &rhs) const noexcept { return m_data != rhs.m_data; }
+	};
+
+	system_bioses(tiny_rom_entry const *data) : m_data(data)
+	{
+		while (m_data && !ROMENTRY_ISSYSTEM_BIOS(m_data))
+		{
+			if (ROMENTRY_ISEND(m_data))
+				m_data = nullptr;
+			else
+				++m_data;
+		}
+	}
+
+	const_iterator begin() const { return const_iterator(m_data); }
+	const_iterator cbegin() const { return const_iterator(m_data); }
+	const_iterator end() const { return const_iterator(nullptr); }
+	const_iterator cend() const { return const_iterator(nullptr); }
+};
+
+
+class default_bios final : tiny_rom_entry
+{
+private:
+	default_bios() = default;
+	default_bios(default_bios const &) = delete;
+	default_bios &operator=(default_bios const &) = delete;
+
+public:
+	constexpr char const *get_name() const { return name; }
+};
+
+
+class entries
+{
+private:
+	tiny_rom_entry const *m_data;
+
+public:
+	constexpr entries(tiny_rom_entry const *data) : m_data(data) { }
+
+	regions get_regions() const { return regions(m_data); }
+	system_bioses get_system_bioses() const { return system_bioses(m_data); }
+};
+
+} // namespace romload
+
+
 /* ----- start/stop macros ----- */
 #define ROM_NAME(name)                              rom_##name
 #define ROM_START(name)                             static const tiny_rom_entry ROM_NAME(name)[] = {

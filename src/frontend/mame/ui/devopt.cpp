@@ -155,14 +155,11 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 
 		// then loop again to count bios options and to get the default bios complete name
 		char const *bios_desc(nullptr);
-		for (const tiny_rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); ++rom)
+		for (romload::system_bios const &rom : romload::entries(dev->rom_region()).get_system_bioses())
 		{
-			if (ROMENTRY_ISSYSTEM_BIOS(rom))
-			{
-				bios++;
-				if (bios_str && !std::strcmp(bios_str, rom->name))
-					bios_desc = rom->hashdata;
-			}
+			bios++;
+			if (bios_str && !std::strcmp(bios_str, rom.get_name()))
+				bios_desc = rom.get_description();
 		}
 
 		if (bios)

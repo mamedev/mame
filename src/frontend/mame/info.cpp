@@ -658,18 +658,15 @@ void info_xml_creator::output_bios(device_t const &device)
 	}
 
 	// iterate over ROM entries and look for BIOSes
-	for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+	for (romload::system_bios const &bios : romload::entries(device.rom_region()).get_system_bioses())
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
-		{
-			// output extracted name and descriptions
-			fprintf(m_output, "\t\t<biosset");
-			fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(rom->name));
-			fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(rom->hashdata));
-			if (defaultname && !std::strcmp(defaultname, rom->name))
-				fprintf(m_output, " default=\"yes\"");
-			fprintf(m_output, "/>\n");
-		}
+		// output extracted name and descriptions
+		fprintf(m_output, "\t\t<biosset");
+		fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(bios.get_name()));
+		fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(bios.get_description()));
+		if (defaultname && !std::strcmp(defaultname, bios.get_name()))
+			fprintf(m_output, " default=\"yes\"");
+		fprintf(m_output, "/>\n");
 	}
 }
 
@@ -1847,23 +1844,20 @@ void info_xml_creator::output_ramoptions(device_t &root)
 const char *info_xml_creator::get_merge_name(driver_enumerator &drivlist, util::hash_collection const &romhashes)
 {
 	// walk the parent chain
-	const char *merge_name = nullptr;
-	for (int clone_of = drivlist.find(drivlist.driver().parent); clone_of != -1; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+	for (int clone_of = drivlist.find(drivlist.driver().parent); 0 <= clone_of; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
 	{
 		// look in the parent's ROMs
-		device_t *device = &drivlist.config(clone_of, m_lookup_options)->root_device();
-		for (const rom_entry *pregion = rom_first_region(*device); pregion != nullptr; pregion = rom_next_region(pregion))
-			for (const rom_entry *prom = rom_first_file(pregion); prom != nullptr; prom = rom_next_file(prom))
+		for (romload::region const &pregion : romload::entries(drivlist.driver(clone_of).rom).get_regions())
+		{
+			for (romload::file const &prom : pregion.get_files())
 			{
-				util::hash_collection phashes(ROM_GETHASHDATA(prom));
-				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && romhashes == phashes)
-				{
-					// stop when we find a match
-					merge_name = ROM_GETNAME(prom);
-					break;
-				}
+				// stop when we find a match
+				util::hash_collection const phashes(prom.get_hashdata());
+				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
+					return prom.get_name();
 			}
+		}
 	}
 
-	return merge_name;
+	return nullptr;
 }

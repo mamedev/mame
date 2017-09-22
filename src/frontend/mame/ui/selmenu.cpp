@@ -2391,22 +2391,19 @@ bool menu_select_launch::has_multiple_bios(game_driver const &driver, s_bios &bi
 			default_name = rom->name;
 	}
 
-	for (tiny_rom_entry const *rom = driver.rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (romload::system_bios const &bios : romload::entries(driver.rom).get_system_bioses())
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
-		{
-			std::string name(rom->hashdata);
-			u32 const bios_flags(ROM_GETBIOSFLAGS(rom));
+		std::string name(bios.get_description());
+		u32 const bios_flags(bios.get_value());
 
-			if (default_name && !std::strcmp(rom->name, default_name))
-			{
-				name.append(_(" (default)"));
-				biosname.emplace(biosname.begin(), std::move(name), bios_flags - 1);
-			}
-			else
-			{
-				biosname.emplace_back(std::move(name), bios_flags - 1);
-			}
+		if (default_name && !std::strcmp(bios.get_name(), default_name))
+		{
+			name.append(_(" (default)"));
+			biosname.emplace(biosname.begin(), std::move(name), bios_flags - 1);
+		}
+		else
+		{
+			biosname.emplace_back(std::move(name), bios_flags - 1);
 		}
 	}
 	return biosname.size() > 1U;
