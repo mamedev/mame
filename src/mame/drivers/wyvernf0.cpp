@@ -26,6 +26,9 @@ from the bottom speaker and the sound of enemies in the air is heard from the to
 
 Actual game video: http://www.nicozon.net/watch/sm10823430
 
+TODO:
+-  TA7630;
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -34,6 +37,8 @@ Actual game video: http://www.nicozon.net/watch/sm10823430
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -428,7 +433,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wyvernf0_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xd600, 0xd600) AM_RAM // VOL/BAL?
+	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostics ROM
 ADDRESS_MAP_END
 
@@ -672,26 +677,30 @@ static MACHINE_CONFIG_START( wyvernf0 )
 
 	// coin, fire, lift-off
 	MCFG_SOUND_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// lift-off, explosion (saucers), boss alarm
 	MCFG_SOUND_ADD("ay2", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// music
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000) // ?
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 0.5)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 0.5)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 0.5)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 0.5)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 0.5)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 0.5)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 0.5)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
+	
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
