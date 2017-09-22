@@ -3697,6 +3697,286 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<!-- Operating Systems -->
 
+	<software name="condos32">
+		<description>Concurrent PC DOS Version 3.2 (Maintenance Release)</description>
+		<year>1984</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="3.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup 1/5" />
+			<dataarea name="flop" size = "327680">
+				<rom name="disk1.img" size="327680" crc="8987871b" sha1="5ca3337ff23b46b78d523517eea2dc37510f18f1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #1 2/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk2.img" size="368640" crc="cbed4e52" sha1="00eb5e2bd4a08204cd8fd8420bab7c04d47a9c8e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #2 3/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk3.img" size="368640" crc="7e23f38c" sha1="78ecdeb4a2056a3fe9b63f55d51b040fd1f41579" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Applications 4/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk4.img" size="368640" crc="e04a903a" sha1="ca40f9b9b80f4a8145d74cfaf79e434052fd02a3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Reference 5/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk5.img" size="368640" crc="769d3db3" sha1="d2cfa061151c89266278deab82d3457efdc83568" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="condos32a" cloneof="condos32">
+		<description>Concurrent PC DOS Version 3.2</description>
+		<year>1984</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="3.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup 1/5" />
+			<dataarea name="flop" size = "327680">
+				<rom name="disk1a.img" size="327680" crc="bc21d868" sha1="796807474ffcf28e627755e97578284c6ff004bd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #1 2/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk2a.img" size="368640" crc="862c1765" sha1="61e0dac55a297a82f4a5bfb00691d24b861c4f49" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #2 3/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk3a.img" size="368640" crc="c6c779dc" sha1="6e77f4c2542ae100ca3e2580d422ca6c1fee5364" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Applications 4/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk4a.img" size="368640" crc="6431ecc6" sha1="063918277a7aeea95fbdb431fc147fc516ceb48a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Reference 5/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk5a.img" size="368640" crc="c3d603c7" sha1="8871b29b67c98c83d67682c8482b759140746c69" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- disks are marked with serial numbers so each dump is unique -->
+	<software name="condos41">
+		<description>Concurrent PC DOS Version 4.1 (set 1)</description>
+		<year>1985</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="4.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "131986">
+				<rom name="ccpm86-1.td0" size="131986" crc="b88f6053" sha1="0fda143166e027e95004c7cff3d99d1691ef8b04" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "182906">
+				<rom name="ccpm86-2.td0" size="182906" crc="0c0cdc2d" sha1="ae33cb6b53ac49da6ecc4242a89248c98f4f5a18" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "142538">
+				<rom name="ccpm86-3.td0" size="142538" crc="4d3bcd16" sha1="16feb37c7b35bf48966d9c9a66a467403a654c43" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "172854">
+				<rom name="ccpm86-4.td0" size="172854" crc="dcd15a2e" sha1="de5d6a0a6e112cae92316a471d99f7c514ed181a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "91582">
+				<rom name="ccpm86-5.td0" size="91582" crc="08857b94" sha1="16c9b8a80c7295bf2adf0a175242b6bde7b3a521" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="condos41a" cloneof="condos41">
+		<description>Concurrent PC DOS Version 4.1 (set 2)</description>
+		<year>1985</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="4.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup 1/5" />
+			<dataarea name="flop" size = "327680">
+				<rom name="disk1a.img" size="327680" crc="3277a0ad" sha1="b9a62c380a43610750ecbbfb886362eba7d5d68f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #1 2/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk2a.img" size="368640" crc="af973fd2" sha1="13e306bdb376f9ba1c2043229389b11975521b5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #2 3/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk3a.img" size="368640" crc="d683855b" sha1="e3daeb5ba86551223c1d3e03ea3612a77bd50717" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Applications 4/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk4a.img" size="368640" crc="2f3bf660" sha1="46f5ab2227c16cf44767d0a8e55172c061eacff3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Reference 5/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk5a.img" size="368640" crc="cf20f695" sha1="dccb323394b2d94933af38f4d041f7ada16ac986" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="condos41b">
+		<description>Concurrent PC DOS Version 4.1 (set 3)</description>
+		<year>1985</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="4.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup 1/5" />
+			<dataarea name="flop" size = "327680">
+				<rom name="disk1b.img" size="327680" crc="71051f94" sha1="804ff0af390063ce0d8fa2207040f3c6443d061e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #1 2/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk2b.img" size="368640" crc="dd688bc2" sha1="d3dac14c9a29a58251ba05a83f9adcf123c92daa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities #2 3/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk3b.img" size="368640" crc="a0710728" sha1="c91a83c4ec5e4b447b3c7c80550b43678792636a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Applications 4/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk4b.img" size="368640" crc="5253cb87" sha1="7862134af037e45a771a74d0af048cb06e551ebc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Reference 5/5" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk5b.img" size="368640" crc="0dd8a5c6" sha1="00d5b5da06708ceeac305e04ff788dd354e9a787" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="condosxm">
+		<description>Concurrent DOS XM 6.01</description>
+		<year>1988</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.01" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "195684">
+				<rom name="cpc-dos1.td0" size="195684" crc="889f5624" sha1="3f9c744b3cbcb318df1f1687826d74db0a9657f1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "153206">
+				<rom name="cpc-dos2.td0" size="153206" crc="8bccd82f" sha1="ebbf914e4508912a7d99d2a21a80a1698d11a660" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "172038">
+				<rom name="cpc-dos3.td0" size="172038" crc="2420f361" sha1="16321a08858e80b2d89ec6d3441c14aaf8c1cfa3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "196828">
+				<rom name="cpc-dos4.td0" size="196828" crc="822d56f6" sha1="5e4e203bd8b4ab96065836fde34c469ae24bfbe8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="condosxm60" cloneof="condosxm" supported="no">
+		<description>Concurrent DOS XM 6.0 (5.25")</description>
+		<year>1987</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk01_525.img" size="368640" crc="7e9bd858" sha1="489e02138a5236f565bf4a835f0bd6dbe2a98326" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk02_525.img" size="368640" crc="ca104b51" sha1="941e8e9b41f5c8caa1b01594757d8d7614e4e7be" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk03_525.img" size="368640" crc="57458342" sha1="8836b8a0e11256be3c6b07a61070e0cd69af2d3e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk04_525.img" size="368640" crc="b88e9832" sha1="1bc16d9eecdaaf0b9053312d04ea1d53c526f06e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="condosxm60_35" cloneof="condosxm">
+		<description>Concurrent DOS XM 6.0 (3.5")</description>
+		<year>1987</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk01_35.img" size="737280" crc="58aca8b9" sha1="c792c02f35911ca71b07d5d3b939bb56bd0c6a10" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk02_35.img" size="737280" crc="73cd78c1" sha1="9aa6676c48a0a148bbc166080ddc1c42274bd3b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- not bootable -->
+	<software name="condosxm621" cloneof="condosxm">
+		<description>Concurrent DOS XM 6.21</description>
+		<year>1989</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="6.21" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk1.img" size="368640" crc="6a9799db" sha1="5c883e4ac86059d7971f40dbf6f48fc5ddbf7229" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk2.img" size="368640" crc="756818e4" sha1="298a3843806bd542eceddcaa8786152ad29ae024" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk3.img" size="368640" crc="ced3228c" sha1="9a5fb16226f506460dbec4194b7764bf1ef30bd3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk4.img" size="368640" crc="07a0bae3" sha1="207a404950f020ce3ce942279f64ada0194feb4a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cpm8610">
 		<description>CP/M-86 for the IBM Personal Computer (Version 1.0)</description>
 		<year>1982</year>
