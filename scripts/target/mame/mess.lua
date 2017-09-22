@@ -1150,6 +1150,10 @@ function createMESSProjects(_target, _subtarget, _name)
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
 	}
+
+	includedirs {
+		ext_includedir("zlib")
+	}
 end
 
 function createProjects_mame_mess(_target, _subtarget)

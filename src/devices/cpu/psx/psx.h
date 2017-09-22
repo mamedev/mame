@@ -24,12 +24,15 @@
 
 // interrupts
 
-#define PSXCPU_IRQ0 ( 0 )
-#define PSXCPU_IRQ1 ( 1 )
-#define PSXCPU_IRQ2 ( 2 )
-#define PSXCPU_IRQ3 ( 3 )
-#define PSXCPU_IRQ4 ( 4 )
-#define PSXCPU_IRQ5 ( 5 )
+enum
+{
+	PSXCPU_IRQ0 = 0,
+	PSXCPU_IRQ1,
+	PSXCPU_IRQ2,
+	PSXCPU_IRQ3,
+	PSXCPU_IRQ4,
+	PSXCPU_IRQ5,
+};
 
 // register enumeration
 
@@ -95,6 +98,14 @@ enum
 	PSXCPU_CP2CR26, PSXCPU_CP2CR27,
 	PSXCPU_CP2CR28, PSXCPU_CP2CR29,
 	PSXCPU_CP2CR30, PSXCPU_CP2CR31
+};
+
+// delay slot sentinels
+
+enum
+{
+	PSXCPU_DELAYR_PC = 32,
+	PSXCPU_DELAYR_NOTPC = 33
 };
 
 
@@ -293,7 +304,7 @@ protected:
 	void commit_delayed_load();
 	void set_pc( unsigned pc );
 	void fetch_next_op();
-	int advance_pc();
+	void advance_pc();
 	void load( uint32_t reg, uint32_t value );
 	void delayed_load( uint32_t reg, uint32_t value );
 	void branch( uint32_t address );
@@ -307,6 +318,7 @@ protected:
 	void store_bus_error_exception();
 	void load_bad_address( uint32_t address );
 	void store_bad_address( uint32_t address );
+	int program_counter_breakpoint();
 	int data_address_breakpoint( int dcic_rw, int dcic_status, uint32_t address );
 	int load_data_address_breakpoint( uint32_t address );
 	int store_data_address_breakpoint( uint32_t address );
