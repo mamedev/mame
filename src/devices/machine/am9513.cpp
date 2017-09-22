@@ -968,7 +968,8 @@ void am9513_device::internal_write(u16 data)
 		break;
 	case 0x07: // Alarm 1 register
 	case 0x0f: // Alarm 2 register
-		LOGMASKED(LOG_GENERAL, "Counter %d: Alarm = %u\n", BIT(m_dpr, 3) ? 2 : 1, data);
+		if (m_alarm[BIT(m_dpr, 3)] != data)
+			LOGMASKED(LOG_GENERAL, "Counter %d: Alarm = %u\n", BIT(m_dpr, 3) ? 2 : 1, data);
 		m_alarm[BIT(m_dpr, 3)] = data;
 		break;
 	case 0x01: // Counter 1 mode register
@@ -976,7 +977,8 @@ void am9513_device::internal_write(u16 data)
 	case 0x03: // Counter 3 mode register
 	case 0x04: // Counter 4 mode register
 	case 0x05: // Counter 5 mode register
-		LOGMASKED(LOG_GENERAL, "Counter %d: Mode = %04X\n", m_dpr & 7, data);
+		if (m_counter_mode[(m_dpr & 7) - 1] != data)
+			LOGMASKED(LOG_GENERAL, "Counter %d: Mode = %04X\n", m_dpr & 7, data);
 		set_counter_mode((m_dpr & 7) - 1, data);
 		break;
 	case 0x09: // Counter 1 load register
@@ -984,7 +986,8 @@ void am9513_device::internal_write(u16 data)
 	case 0x0b: // Counter 3 load register
 	case 0x0c: // Counter 4 load register
 	case 0x0d: // Counter 5 load register
-		LOGMASKED(LOG_GENERAL, "Counter %d: Load = %u\n", m_dpr & 7, data);
+		if (m_counter_load[(m_dpr & 7) - 1] != data)
+			LOGMASKED(LOG_GENERAL, "Counter %d: Load = %u\n", m_dpr & 7, data);
 		m_counter_load[(m_dpr & 7) - 1] = data;
 		break;
 	case 0x11: case 0x19: // Counter 1 hold register
@@ -992,7 +995,8 @@ void am9513_device::internal_write(u16 data)
 	case 0x13: case 0x1b: // Counter 3 hold register
 	case 0x14: case 0x1c: // Counter 4 hold register
 	case 0x15: case 0x1d: // Counter 5 hold register
-		LOGMASKED(LOG_GENERAL, "Counter %d: Hold = %u\n", m_dpr & 7, data);
+		if (m_counter_hold[(m_dpr & 7) - 1] != data)
+			LOGMASKED(LOG_GENERAL, "Counter %d: Hold = %u\n", m_dpr & 7, data);
 		m_counter_hold[(m_dpr & 7) - 1] = data;
 		break;
 	default: // Invalid register
@@ -1013,13 +1017,15 @@ void am9513_device::internal_write(u16 data)
 
 void am9513_device::advance_dpr()
 {
-	if (BIT(m_mmr, 14) || machine().side_effect_disabled())
+	if (machine().side_effect_disabled())
 		return;
 
 	if (bus_is_16_bit() || !BIT(m_status, 0))
 	{
 		// Least significant byte (or 16-bit word) transferred next
 		m_status |= 0x01;
+		if (BIT(m_mmr, 14))
+			return;
 	}
 	else
 	{
