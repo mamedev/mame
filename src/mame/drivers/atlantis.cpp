@@ -61,29 +61,33 @@
 #define RESET_IDE           0x10
 #define RESET_DUART         0x20
 
-// IRQ Bits
+// IRQ  Status Bits
 #define IOASIC_IRQ_SHIFT    0
 #define ROMBUS_IRQ_SHIFT    1
-#define ZEUS0_IRQ_SHIFT     2
-#define ZEUS1_IRQ_SHIFT     3
-#define ZEUS2_IRQ_SHIFT     4
+#define ZEUS_IRQ_SHIFT      2
+#define DUART_IRQ_SHIFT     3
+// PCI Slot and USB Chip
+#define PCI_IRQ_SHIFT       4
 #define WDOG_IRQ_SHIFT      5
 #define A2D_IRQ_SHIFT       6
 #define VBLANK_IRQ_SHIFT    7
-
-// DUART mapped to int3 (map3 = 0x08)
-#define UART1_IRQ_SHIFT     ZEUS1_IRQ_SHIFT
-#define UART2_IRQ_SHIFT     ZEUS1_IRQ_SHIFT
-// PCI mapped to int2 (map2 = 0x10)
-#define PCI_IRQ_SHIFT       ZEUS2_IRQ_SHIFT
 
 /* static interrupts */
 #define GALILEO_IRQ_NUM         MIPS3_IRQ0
 #define IDE_IRQ_NUM             MIPS3_IRQ4
 
-#define PCI_ID_NILE     ":pci:00.0"
+// From linux header
+// IDSEL = AD17, USB chip
+// IDSEL = AD18, CMD646 chip
+// IDSEL = AD19, onboard PCI slot
+// IDSEL = AD20, Nile 3 chip
+// IDSEL = AD21, PLX9050 chip
+// IDSEL = AD22, PCI expansion
+// IDSEL = AD23, PCI expansion
+// IDSEL = AD24, PCI expansion
+#define PCI_ID_IDE      ":pci:08.0"
+#define PCI_ID_NILE     ":pci:0a.0"
 #define PCI_ID_9050     ":pci:0b.0"
-#define PCI_ID_IDE      ":pci:0c.0"
 
 #define DEBUG_CONSOLE   (0)
 #define LOG_RTC         (0)
@@ -161,8 +165,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
 	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
 
-	DECLARE_WRITE_LINE_MEMBER(uart1_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(uart2_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_callback);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
 	DECLARE_READ16_MEMBER(port_ctrl_r);
@@ -183,8 +186,9 @@ public:
 // Parallel Port
 READ8_MEMBER(atlantis_state::parallel_r)
 {
-	logerror("%06X: parallel_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0);
-	return 0x3;
+	uint8_t result = 0x7;
+	logerror("%06X: parallel_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, result);
+	return result;
 }
 
 WRITE8_MEMBER(atlantis_state::parallel_w)
@@ -268,9 +272,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 		// 0x1 VBlank clear?
 		if (changeData & 0x1) {
 			if ((data & 0x0001) == 0) {
-				uint32_t status_bit = (1 << VBLANK_IRQ_SHIFT);
-				board_ctrl[CAUSE] &= ~status_bit;
-				board_ctrl[STATUS] &= ~status_bit;
+				board_ctrl[STATUS] &= ~(1 << VBLANK_IRQ_SHIFT);
 				update_asic_irq();
 			}
 			else {
@@ -281,7 +283,6 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 		break;
 	case IRQ_EN:
 		// Zero bit will clear cause
-		board_ctrl[CAUSE] &= data;
 		update_asic_irq();
 		if (LOG_IRQ)
 			logerror("%s:board_ctrl_w write to IRQ_EN offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
@@ -395,39 +396,20 @@ READ32_MEMBER(atlantis_state::user_io_input)
 }
 
 /*************************************
-*  UART1 interrupt handler
+*  DUART interrupt handler
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::uart1_irq_callback)
+WRITE_LINE_MEMBER(atlantis_state::duart_irq_callback)
 {
-	uint32_t status_bit = UART1_IRQ_SHIFT;
+	uint32_t status_bit = 1 << DUART_IRQ_SHIFT;
 	if (state && !(board_ctrl[STATUS] & status_bit)) {
 		board_ctrl[STATUS] |= status_bit;
 		update_asic_irq();
 	}
 	else if (!state && (board_ctrl[STATUS] & status_bit)) {
 		board_ctrl[STATUS] &= ~status_bit;
-		board_ctrl[CAUSE] &= ~status_bit;
 		update_asic_irq();
 	}
-	logerror("atlantis_state::uart1_irq_callback state = %1x\n", state);
-}
-
-/*************************************
-*  UART2 interrupt handler
-*************************************/
-WRITE_LINE_MEMBER(atlantis_state::uart2_irq_callback)
-{
-	uint32_t status_bit = UART2_IRQ_SHIFT;
-	if (state && !(board_ctrl[STATUS] & status_bit)) {
-		board_ctrl[STATUS] |= status_bit;
-		update_asic_irq();
-	}
-	else if (!state && (board_ctrl[STATUS] & status_bit)) {
-		board_ctrl[STATUS] &= ~status_bit;
-		board_ctrl[CAUSE] &= ~status_bit;
-		update_asic_irq();
-	}
-	logerror("atlantis_state::uart2_irq_callback state = %1x\n", state);
+	logerror("atlantis_state::duart_irq_callback state = %1x\n", state);
 }
 
 /*************************************
@@ -438,27 +420,23 @@ WRITE_LINE_MEMBER(atlantis_state::vblank_irq)
 	//logerror("%s: atlantis_state::vblank state = %i\n", machine().describe_context(), state);
 	if (state) {
 		board_ctrl[STATUS] |= (1 << VBLANK_IRQ_SHIFT);
-		update_asic_irq();
 	}
 	else {
 		board_ctrl[STATUS] &= ~(1 << VBLANK_IRQ_SHIFT);
-		board_ctrl[CAUSE] &= ~(1 << VBLANK_IRQ_SHIFT);
-		update_asic_irq();
 	}
+	update_asic_irq();
 }
 
 WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
 {
 	//logerror("%s: atlantis_state::zeus_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
-		board_ctrl[STATUS] |= (1 << ZEUS0_IRQ_SHIFT);
-		update_asic_irq();
+		board_ctrl[STATUS] |= (1 << ZEUS_IRQ_SHIFT);
 	}
 	else {
-		board_ctrl[STATUS] &= ~(1 << ZEUS0_IRQ_SHIFT);
-		board_ctrl[CAUSE] &= ~(1 << ZEUS0_IRQ_SHIFT);
-		update_asic_irq();
+		board_ctrl[STATUS] &= ~(1 << ZEUS_IRQ_SHIFT);
 	}
+	update_asic_irq();
 }
 
 /*************************************
@@ -466,7 +444,14 @@ WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
 *************************************/
 WRITE_LINE_MEMBER(atlantis_state::ide_irq)
 {
-	m_maincpu->set_input_line(IDE_IRQ_NUM, state);
+	if (state) {
+		m_maincpu->set_input_line(IDE_IRQ_NUM, ASSERT_LINE);
+		m_irq_state |= (1 << IDE_IRQ_NUM);
+	}
+	else {
+		m_maincpu->set_input_line(IDE_IRQ_NUM, CLEAR_LINE);
+		m_irq_state &= ~(1 << IDE_IRQ_NUM);
+	}
 	if (LOG_IRQ)
 		logerror("%s: atlantis_state::ide_irq state = %i\n", machine().describe_context(), state);
 }
@@ -480,13 +465,11 @@ WRITE_LINE_MEMBER(atlantis_state::ioasic_irq)
 		logerror("%s: atlantis_state::ioasic_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
 		board_ctrl[STATUS] |= (1 << IOASIC_IRQ_SHIFT);
-		update_asic_irq();
 	}
 	else {
 		board_ctrl[STATUS] &= ~(1 << IOASIC_IRQ_SHIFT);
-		board_ctrl[CAUSE] &= ~(1 << IOASIC_IRQ_SHIFT);
-		update_asic_irq();
 	}
+	update_asic_irq();
 }
 
 /*************************************
@@ -498,14 +481,11 @@ WRITE_LINE_MEMBER(atlantis_state::watchdog_irq)
 		logerror("%s: atlantis_state::watchdog_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
 		board_ctrl[STATUS] |= (1 << WDOG_IRQ_SHIFT);
-		update_asic_irq();
 	}
 	else {
 		board_ctrl[STATUS] &= ~(1 << WDOG_IRQ_SHIFT);
-		board_ctrl[CAUSE] &= ~(1 << WDOG_IRQ_SHIFT);
-		update_asic_irq();
 	}
-
+	update_asic_irq();
 }
 
 /*************************************
@@ -525,12 +505,13 @@ WRITE_LINE_MEMBER(atlantis_state::watchdog_reset)
 *************************************/
 void atlantis_state::update_asic_irq()
 {
+	// Update cause register
+	board_ctrl[CAUSE] = board_ctrl[IRQ_EN] & board_ctrl[STATUS];
+	// Check the MAP1, MAP2, and MAP3 and signal interrupt
 	for (int irqIndex = 0; irqIndex < 3; irqIndex++) {
-		uint32_t irqBits = (board_ctrl[IRQ_EN] & board_ctrl[IRQ_MAP1 + irqIndex] & board_ctrl[STATUS]);
-		uint32_t causeBits = (board_ctrl[IRQ_EN] & board_ctrl[IRQ_MAP1 + irqIndex] & board_ctrl[CAUSE]);
+		uint32_t causeBits = board_ctrl[CAUSE] & board_ctrl[IRQ_MAP1 + irqIndex];
 		uint32_t currState = m_irq_state & (2 << irqIndex);
-		board_ctrl[CAUSE] |= irqBits;
-		if (irqBits && !currState) {
+		if (causeBits && !currState) {
 			m_maincpu->set_input_line(MIPS3_IRQ1 + irqIndex, ASSERT_LINE);
 			m_irq_state |= (2 << irqIndex);
 			if (LOG_IRQ)
@@ -727,9 +708,9 @@ static INPUT_PORTS_START( mwskins )
 	PORT_DIPSETTING(0x0002, "Boot Disk Based Self Test")
 	PORT_DIPSETTING(0x0001, "Boot EEPROM Based Self Test")
 	PORT_DIPSETTING(0x0000, "Run Interactive Tests")
-	PORT_DIPNAME(0x0004, 0x0004, "Boot Message")
-	PORT_DIPSETTING(0x0004, "Quiet")
-	PORT_DIPSETTING(0x0000, "Squawk During Boot")
+	PORT_DIPNAME(0x0004, 0x0004, "Console Enable")
+	PORT_DIPSETTING(0x0004, DEF_STR(No))
+	PORT_DIPSETTING(0x0000, DEF_STR(Yes))
 	PORT_DIPUNUSED(0xfff8, 0xfff8)
 
 	PORT_START("SYSTEM")
@@ -816,6 +797,7 @@ static MACHINE_CONFIG_START( mwskins )
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)    // clock is TRUSTED
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(66666666)
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
@@ -832,8 +814,13 @@ static MACHINE_CONFIG_START( mwskins )
 	MCFG_M48T37_RESET_HANDLER(WRITELINE(atlantis_state, watchdog_reset))
 	MCFG_M48T37_IRQ_HANDLER(WRITELINE(atlantis_state, watchdog_irq))
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x07, 0x0)
+	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x05, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(":", atlantis_state, ide_irq))
+	// The pci-ide by default expects the system controller to be pci:00.0 so need to fix here
+	MCFG_DEVICE_MODIFY(PCI_ID_IDE":ide")
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(PCI_ID_NILE, AS_DATA)
+	MCFG_DEVICE_MODIFY(PCI_ID_IDE":ide2")
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(PCI_ID_NILE, AS_DATA)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
@@ -868,13 +855,13 @@ static MACHINE_CONFIG_START( mwskins )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com1", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com1", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com1", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, uart1_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, duart_irq_callback))
 
 	MCFG_DEVICE_ADD("uart2", NS16550, XTAL_24MHz)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com2", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com2", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com2", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, uart2_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, duart_irq_callback))
 
 	MCFG_RS232_PORT_ADD("com1", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, rx_w))

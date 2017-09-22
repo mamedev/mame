@@ -358,8 +358,7 @@ public:
 	uint32_t m_keypad_select;
 	uint32_t m_gear;
 
-	DECLARE_WRITE_LINE_MEMBER(uart1_irq_cb);
-	DECLARE_WRITE_LINE_MEMBER(uart2_irq_cb);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_cb);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 	DECLARE_DRIVER_INIT(gauntleg);
 	DECLARE_DRIVER_INIT(cartfury);
@@ -581,22 +580,12 @@ void vegas_state::update_sio_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(vegas_state::uart1_irq_cb)
+WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
 {
 	if (state)
-		m_sio_irq_state |= (1 << 4);
+		m_nile->pci_intr_c(ASSERT_LINE);
 	else
-		m_sio_irq_state &= ~(1 << 4);
-	update_sio_irqs();
-}
-
-WRITE_LINE_MEMBER(vegas_state::uart2_irq_cb)
-{
-	if (state)
-		m_sio_irq_state |= (1 << 4);
-	else
-		m_sio_irq_state &= ~(1 << 4);
-	update_sio_irqs();
+		m_nile->pci_intr_c(CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(vegas_state::vblank_assert)
@@ -949,7 +938,7 @@ READ32_MEMBER(vegas_state::unknown_r)
 *************************************/
 READ8_MEMBER(vegas_state::parallel_r)
 {
-	uint8_t result = 0x3;
+	uint8_t result = 0x7;
 	logerror("%06X: parallel_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, result);
 	return result;
 }
@@ -1524,9 +1513,9 @@ static INPUT_PORTS_START( sf2049se )
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPUNUSED( 0x001e, 0x001e )
-	PORT_DIPNAME(0x0020, 0x0020, "Boot Message")
-	PORT_DIPSETTING(      0x0020, "Quiet")
-	PORT_DIPSETTING(      0x0000, "Squawk During Boot")
+	PORT_DIPNAME( 0x0020, 0x0020, "Console Enable" )
+	PORT_DIPSETTING(      0x0020, DEF_STR(No))
+	PORT_DIPSETTING(      0x0000, DEF_STR(Yes))
 	PORT_DIPNAME( 0x00c0, 0x00c0, "Test Mode" )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, "Disk-based Test" )
@@ -1636,9 +1625,10 @@ static ADDRESS_MAP_START(vegas_cs7_map, AS_PROGRAM, 32, vegas_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vegas_cs8_map, AS_PROGRAM, 32, vegas_state)
-	AM_RANGE(0x01000000, 0x0100001f) AM_DEVREADWRITE8("uart2", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART2 (TL16C552 CS0)
-	AM_RANGE(0x01400000, 0x0140001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART1 (TL16C552 CS1)
+	AM_RANGE(0x01000000, 0x0100001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS01 (TL16C552 CS0)
+	AM_RANGE(0x01400000, 0x0140001f) AM_DEVREADWRITE8("uart2", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS02 (TL16C552 CS1)
 	AM_RANGE(0x01800000, 0x0180001f) AM_READWRITE8(parallel_r, parallel_w, 0xff) // Parallel UART (TL16C552 CS2)
+	//AM_RANGE(0x01c00000, 0x0180001f) AM_READWRITE8(parallel_r, parallel_w, 0xff) // MPS Reset
 ADDRESS_MAP_END
 
 /*************************************
@@ -1667,7 +1657,7 @@ static MACHINE_CONFIG_START( vegascore )
 	MCFG_VRC5074_SET_CS(6, vegas_cs6_map)
 	MCFG_VRC5074_SET_CS(7, vegas_cs7_map)
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x07, 0x0)
+	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x05, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(PCI_ID_NILE, vrc5074_device, pci_intr_d))
 	//MCFG_IDE_PCI_SET_PIF(0x8f)
 
@@ -1762,25 +1752,25 @@ static MACHINE_CONFIG_DERIVED( denver, vegascore )
 
 	// TL16C552 UART
 	MCFG_DEVICE_ADD("uart1", NS16550, vegas_state::SYSTEM_CLOCK / 12)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com1", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com1", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com1", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", vegas_state, uart1_irq_cb))
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("ttys01", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("ttys01", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("ttys01", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", vegas_state, duart_irq_cb))
 
 	MCFG_DEVICE_ADD("uart2", NS16550, vegas_state::SYSTEM_CLOCK / 12)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com2", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com2", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com2", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", vegas_state, uart2_irq_cb))
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("ttys02", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("ttys02", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("ttys02", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", vegas_state, duart_irq_cb))
 
-	MCFG_RS232_PORT_ADD("com1", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("ttys01", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, dsr_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, cts_w))
 
-	MCFG_RS232_PORT_ADD("com2", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("ttys02", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, dsr_w))

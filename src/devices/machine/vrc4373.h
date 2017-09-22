@@ -20,6 +20,9 @@
 #define MCFG_VRC4373_SET_SIMM0(_size) \
 	downcast<vrc4373_device *>(device)->set_simm0_size(_size);
 
+#define MCFG_VRC4373_IRQ_CB(_devcb) \
+	devcb = &ide_pci_device::set_irq_cb(*device, DEVCB_##_devcb);
+
 
 class vrc4373_device : public pci_host_device {
 public:
@@ -30,6 +33,7 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	void postload(void);
 
+	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<vrc4373_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(const int size) { m_ram_size = size; };
 	void set_simm0_size(const int size) { m_simm0_size = size; };
@@ -80,9 +84,10 @@ private:
 
 	void map_cpu_space();
 
+	devcb_write_line m_irq_cb;
+
 	mips3_device *m_cpu;
 	const char *cpu_tag;
-	int m_irq_num;
 	int m_ram_size;
 	int m_simm0_size;
 
