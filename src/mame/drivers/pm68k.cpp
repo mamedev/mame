@@ -13,7 +13,7 @@ Status: Boots into monitor, some commands work, some freeze.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"
-#include "machine/clock.h"
+#include "machine/am9513.h"
 #include "machine/z80sio.h"
 
 
@@ -39,6 +39,7 @@ static ADDRESS_MAP_START(pm68k_mem, AS_PROGRAM, 16, pm68k_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x205fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("mpsc", i8274_new_device, ba_cd_r, ba_cd_w, 0xff00)
+	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE("stc", am9513_device, read16, write16)
 ADDRESS_MAP_END
 
 
@@ -67,10 +68,10 @@ static MACHINE_CONFIG_START( pm68k )
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
 
-	MCFG_DEVICE_ADD("baudclock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("mpsc", i8274_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", i8274_new_device, rxcb_w))
+	MCFG_DEVICE_ADD("stc", AM9513, 3993600)
+	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("mpsc", i8274_new_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", i8274_new_device, txca_w))
+	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("mpsc", i8274_new_device, rxcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", i8274_new_device, txcb_w))
 
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
