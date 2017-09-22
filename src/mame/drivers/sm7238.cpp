@@ -29,15 +29,15 @@
 #include "machine/nvram.h"
 #include "screen.h"
 
-#define KSM_COLUMNS 132
 
-#define KSM_TOTAL_HORZ (KSM_COLUMNS*10)
-#define KSM_DISP_HORZ  (KSM_COLUMNS*8)
-#define KSM_HORZ_START KSM_COLUMNS
+#define KSM_COLUMNS_MAX 132
+
+#define KSM_TOTAL_HORZ (KSM_COLUMNS_MAX*10)
+#define KSM_DISP_HORZ  (KSM_COLUMNS_MAX*8)
 
 #define KSM_TOTAL_VERT 260
 #define KSM_DISP_VERT  250
-#define KSM_VERT_START 5
+
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -212,14 +212,27 @@ WRITE_LINE_MEMBER(sm7238_state::write_printer_clock)
 
 void sm7238_state::recompute_parameters()
 {
-	machine().first_screen()->set_visible_area(m_video.stride, m_video.stride + (m_video.stride * 8) - 1,
-		KSM_VERT_START, KSM_VERT_START + KSM_DISP_VERT - 1);
+	rectangle visarea;
+	attoseconds_t refresh;
+
+	visarea.set(0, m_video.stride * 8 - 1, 0, KSM_DISP_VERT - 1);
+
+	if (m_video.stride == 80)
+	{
+		refresh = HZ_TO_ATTOSECONDS(XTAL_12_5MHz) * m_video.stride * 10 * KSM_TOTAL_VERT;
+	}
+	else
+	{
+		refresh = HZ_TO_ATTOSECONDS(XTAL_20_625MHz) * m_video.stride * 10 * KSM_TOTAL_VERT;
+	}
+
+	machine().first_screen()->configure(m_video.stride * 10, KSM_TOTAL_VERT, visarea, refresh);
 }
 
 uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y, ra, gfx, fg, bg, attr, ctl1, ctl2 = 0;
-	uint16_t chr, sy = KSM_VERT_START, ma = 0, x = 0;
+	uint16_t chr, sy = 0, ma = 0, x = 0;
 	bool double_width = false, double_height = false, bottom_half = false;
 
 	if (!BIT(m_video.control, 3))
@@ -235,7 +248,7 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			if (y == 1 && ctl2 && ra < ctl2)
 				continue;
 
-			uint16_t *p = &bitmap.pix16(sy++, m_video.stride);
+			uint16_t *p = &bitmap.pix16(sy++, 0);
 
 			for (x = ma; x < ma + m_video.stride; x++)
 			{
@@ -355,10 +368,7 @@ static MACHINE_CONFIG_START( sm7238 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	// 80 column mode actually uses XTAL_12_5MHz
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20_625MHz,
-		KSM_TOTAL_HORZ, KSM_HORZ_START, KSM_HORZ_START+KSM_DISP_HORZ,
-		KSM_TOTAL_VERT, KSM_VERT_START, KSM_VERT_START+KSM_DISP_VERT);
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20_625MHz, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
