@@ -269,6 +269,7 @@ SOUNDS["MEA8000"] = true
 --SOUNDS["DAC76"] = true
 --SOUNDS["MM5837"] = true
 SOUNDS["DAVE"] = true
+--SOUNDS["LC7535"] = true
 
 --------------------------------------------------
 -- specify available video cores

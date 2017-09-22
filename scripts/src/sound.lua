@@ -1445,3 +1445,15 @@ if (SOUNDS["TA7630"]~=null) then
 		MAME_DIR .. "src/devices/sound/ta7630.h",
 	}
 end
+
+---------------------------------------------------
+-- Sanyo LC7535
+--@src/devices/sound/lc7535.h,SOUNDS["LC7535"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC7535"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc7535.cpp",
+		MAME_DIR .. "src/devices/sound/lc7535.h",
+	}
+end

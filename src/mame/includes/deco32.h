@@ -7,6 +7,7 @@
 #include "machine/deco_irq.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "sound/lc7535.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "machine/deco146.h"
@@ -77,7 +78,7 @@ public:
 	required_shared_ptr<uint32_t> m_pf2_rowscroll32;
 	required_shared_ptr<uint32_t> m_pf3_rowscroll32;
 	required_shared_ptr<uint32_t> m_pf4_rowscroll32;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_shared_ptr<uint32_t> m_ace_ram;
 
 	uint8_t m_nslasher_sound_irq; // nslasher and lockload
@@ -103,6 +104,15 @@ public:
 	uint16_t    m_pf4_rowscroll[0x1000]; // common
 
 	// common
+	DECLARE_READ16_MEMBER(deco_104_r);
+	DECLARE_WRITE16_MEMBER(deco_104_w);
+	DECLARE_READ16_MEMBER(deco_146_r);
+	DECLARE_WRITE16_MEMBER(deco_146_w);
+	DECLARE_READ8_MEMBER(eeprom_r);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(volume_w);
+	DECLARE_WRITE32_MEMBER(vblank_ack_w);
+
 	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
 	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
 	DECLARE_WRITE32_MEMBER(pf3_rowscroll_w);
@@ -111,19 +121,15 @@ public:
 
 	// captaven
 	DECLARE_READ32_MEMBER(_71_r);
-	DECLARE_READ32_MEMBER(captaven_soundcpu_r);
-	DECLARE_WRITE32_MEMBER(nonbuffered_palette_w);
+	DECLARE_READ8_MEMBER(captaven_dsw1_r);
+	DECLARE_READ8_MEMBER(captaven_dsw2_r);
+	DECLARE_READ8_MEMBER(captaven_dsw3_r);
+	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
 
 	// fghthist
 	DECLARE_WRITE32_MEMBER(sound_w);
-	DECLARE_READ32_MEMBER(fghthist_control_r);
-	DECLARE_WRITE32_MEMBER(fghthist_eeprom_w);
-	DECLARE_READ32_MEMBER(fghthist_protection_region_0_146_r);
-	DECLARE_WRITE32_MEMBER(fghthist_protection_region_0_146_w);
-	DECLARE_WRITE32_MEMBER(vblank_ack_w);
-
-	// nslasher
-	DECLARE_WRITE32_MEMBER(nslasher_eeprom_w);
+	DECLARE_READ16_MEMBER(fghthist_in0_r);
+	DECLARE_READ16_MEMBER(fghthist_in1_r);
 
 	// tattass
 	DECLARE_WRITE32_MEMBER(tattass_control_w);
@@ -133,8 +139,6 @@ public:
 	DECLARE_READ8_MEMBER(latch_r);
 
 	// nslasher and tattass
-	DECLARE_READ16_MEMBER(nslasher_protection_region_0_104_r);
-	DECLARE_WRITE16_MEMBER(nslasher_protection_region_0_104_w);
 	DECLARE_READ16_MEMBER(nslasher_debug_r);
 	DECLARE_READ32_MEMBER(spriteram2_r);
 	DECLARE_WRITE32_MEMBER(spriteram2_w);
@@ -151,11 +155,6 @@ public:
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);
 	DECLARE_WRITE32_MEMBER(palette_dma_w);
 
-	// captaven, dragongun and lockload
-	DECLARE_READ16_MEMBER(dg_protection_region_0_146_r);
-	DECLARE_WRITE16_MEMBER(dg_protection_region_0_146_w);
-
-	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(tattass);
 	DECLARE_DRIVER_INIT(nslasher);
 	DECLARE_DRIVER_INIT(captaven);
@@ -175,12 +174,15 @@ public:
 	void nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 	DECLARE_READ16_MEMBER(port_b_tattass);
 	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-	void deco32_set_audio_output(uint8_t raw_data);
 
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
+
+protected:
+	virtual void video_start() override;
+
 };
 
 class dragngun_state : public deco32_state
@@ -191,13 +193,20 @@ public:
 		m_sprite_layout_0_ram(*this, "lay0"),
 		m_sprite_layout_1_ram(*this, "lay1"),
 		m_sprite_lookup_0_ram(*this, "look0"),
-		m_sprite_lookup_1_ram(*this, "look1")
+		m_sprite_lookup_1_ram(*this, "look1"),
+		m_oki3(*this, "oki3"),
+		m_vol_main(*this, "vol_main"),
+		m_vol_gun(*this, "vol_gun"),
+		m_gun_speaker_disabled(true)
 	{ }
 
 	required_shared_ptr<uint32_t> m_sprite_layout_0_ram;
 	required_shared_ptr<uint32_t> m_sprite_layout_1_ram;
 	required_shared_ptr<uint32_t> m_sprite_lookup_0_ram;
 	required_shared_ptr<uint32_t> m_sprite_lookup_1_ram;
+	optional_device<okim6295_device> m_oki3;
+	required_device<lc7535_device> m_vol_main;
+	required_device<lc7535_device> m_vol_gun;
 
 	uint32_t m_sprite_ctrl;
 	int m_lightgun_port;
@@ -209,10 +218,13 @@ public:
 	DECLARE_WRITE32_MEMBER(spriteram_dma_w);
 	DECLARE_WRITE32_MEMBER(gun_irq_ack_w);
 	DECLARE_READ32_MEMBER(unk_video_r);
-	DECLARE_READ32_MEMBER(service_r);
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
+
+	DECLARE_WRITE32_MEMBER(volume_w);
+	DECLARE_WRITE32_MEMBER(speaker_switch_w);
+	LC7535_VOLUME_CHANGED(volume_main_changed);
+	LC7535_VOLUME_CHANGED(volume_gun_changed);
 
 	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(dragngun);
@@ -227,4 +239,7 @@ public:
 
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
+
+private:
+	bool m_gun_speaker_disabled;
 };
