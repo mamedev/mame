@@ -29,7 +29,7 @@
 #define LOG_MODE (1U << 1)
 #define LOG_INPUT (1U << 2)
 #define LOG_TC (1U << 3)
-#define VERBOSE (LOG_GENERAL | LOG_MODE | LOG_INPUT)
+#define VERBOSE (LOG_GENERAL | LOG_MODE)
 
 #include "logmacro.h"
 
@@ -107,7 +107,7 @@ void am9513_device::device_start()
 	for (int f = 0; f < 5; f++)
 	{
 		m_freq_timer[f] = timer_alloc(TIMER_F1 + f);
-		m_freq_timer_selected[f] = (f == 0) ? (m_fout_cb.isnull() ? 0x1e : 0x1f) : 0;
+		m_freq_timer_selected[f] = (f == 0) ? (m_fout_cb.isnull() ? 0x3e : 0x3f) : 0;
 		m_freq_timer_cycle[f] = 0;
 	}
 
@@ -595,7 +595,7 @@ void am9513_device::write_source(int s, bool level)
 		return;
 
 	m_src[s] = level;
-	LOGMASKED(LOG_INPUT, "Source %d: %s edge\n", s, level ? "Rising" : "Falling");
+	LOGMASKED(LOG_INPUT, "Source %d: %s edge\n", s + 1, level ? "Rising" : "Falling");
 
 	for (int c = 0; c < 5; c++)
 	{
