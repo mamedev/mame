@@ -353,6 +353,8 @@ static MACHINE_CONFIG_DERIVED( neat, atvga )
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
 	MCFG_DS12885_ADD("mb:rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
 MACHINE_CONFIG_END
 

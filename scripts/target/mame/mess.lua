@@ -1392,6 +1392,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/altos5.cpp",
 	MAME_DIR .. "src/mame/drivers/altos486.cpp",
 	MAME_DIR .. "src/mame/drivers/altos8600.cpp",
+	MAME_DIR .. "src/mame/machine/acs8600_ics.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ami")
