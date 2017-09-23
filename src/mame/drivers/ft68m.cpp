@@ -82,10 +82,11 @@ static MACHINE_CONFIG_START( ft68m )
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_DEVICE_ADD("stc", AM9513A, XTAL_19_6608MHz / 8)
+	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6))
+	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
 	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("mpsc", upd7201_new_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", upd7201_new_device, txca_w))
 	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("mpsc", upd7201_new_device, rxcb_w))
@@ -98,8 +99,6 @@ static MACHINE_CONFIG_START( ft68m )
 
 	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxb_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

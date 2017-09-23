@@ -129,6 +129,7 @@ static MACHINE_CONFIG_START( sun1 )
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxa_w))
