@@ -165,8 +165,8 @@ void am9513_device::master_reset()
 {
 	LOGMASKED(LOG_MODE, "Master reset\n");
 
-	// Clear master mode register to all zeroes
-	m_mmr = 0;
+	// Clear master mode register
+	set_master_mode(0);
 
 	// Enable prefetch for write
 	m_write_prefetch = true;
@@ -175,9 +175,13 @@ void am9513_device::master_reset()
 	std::fill(std::begin(m_tc), std::end(m_tc), false);
 	std::fill(std::begin(m_toggle), std::end(m_toggle), false);
 
-	// Initialize counter mode registers
+	// Initialize counter mode, load and hold registers
 	for (int c = 0; c < 5; c++)
+	{
 		set_counter_mode(c, 0x0b00);
+		m_counter_load[c] = 0;
+		m_counter_hold[c] = 0;
+	}
 }
 
 
