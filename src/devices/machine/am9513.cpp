@@ -447,6 +447,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 			break;
 
 		case 0x0002:
+		case 0x0003: // SCP-300F sets this up; why?
 			if (c < 2 && BIT(m_mmr, c + 2))
 				set_output(c, m_count[c] == m_alarm[c]);
 			else
@@ -541,7 +542,7 @@ void am9513_device::set_output(int c, bool state)
 void am9513_device::set_toggle(int c, bool state)
 {
 	m_toggle[c] = state;
-	if ((m_counter_mode[c] & 0x0007) == 0x0002)
+	if ((m_counter_mode[c] & 0x0006) == 0x0002)
 		set_output(c, state);
 }
 
@@ -564,6 +565,7 @@ void am9513_device::set_tc(int c, bool state)
 			set_output(c, state);
 			break;
 		case 0x0002:
+		case 0x0003: // SCP-300F sets this up; why?
 			// TC toggled output
 			if (!state)
 				set_toggle(c, !m_toggle[c]);
