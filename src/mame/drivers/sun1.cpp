@@ -102,16 +102,21 @@ void sun1_state::machine_reset()
 }
 
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( sun1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
-	MCFG_DEVICE_ADD("timer", AM9513, 3993600) // actually XTAL_10MHz / 2
+	MCFG_DEVICE_ADD("timer", AM9513, 4000000) // supposedly XTAL_10MHz / 2, but that produces blatantly incorrect output rates
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
 	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Watchdog; generates BERR/Reset
 	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // User timer
-	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh timer
+	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh timer (2 ms)
 	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("iouart", upd7201_new_device, txca_w))
 	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxcb_w))
@@ -129,6 +134,7 @@ static MACHINE_CONFIG_START( sun1 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, ctsa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, dcda_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxb_w))

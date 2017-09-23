@@ -60,6 +60,11 @@ void codata_state::machine_reset()
 	m_maincpu->reset();
 }
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( codata )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
@@ -72,7 +77,7 @@ static MACHINE_CONFIG_START( codata )
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs423b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
-	MCFG_DEVICE_ADD("timer", AM9513A, 3993600) // actually XTAL_16MHz / 4, which produces 9615 baud when divided
+	MCFG_DEVICE_ADD("timer", AM9513A, XTAL_16MHz / 4)
 	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Timer 1 = "Abort/Reset" (watchdog)
 	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // Timer 2
 	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh
@@ -85,6 +90,7 @@ static MACHINE_CONFIG_START( codata )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxa_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", upd7201_new_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", upd7201_new_device, ctsa_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_RS232_PORT_ADD("rs423b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxb_w))
