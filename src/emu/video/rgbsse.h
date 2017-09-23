@@ -282,7 +282,13 @@ public:
 	void blend(const rgbaint_t& other, u8 factor);
 
 	void scale_and_clamp(const rgbaint_t& scale);
-	void scale_imm_and_clamp(const s32 scale);
+
+	inline void scale_imm_and_clamp(const s32 scale)
+	{
+		mul_imm(scale);
+		sra_imm(8);
+		clamp_to_uint8();
+	}
 
 	inline void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other)
 	{
