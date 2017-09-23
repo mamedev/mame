@@ -380,18 +380,44 @@ void am9513_device::set_counter_mode(int c, u16 data)
 {
 	if ((data & 0xe0e0) != (m_counter_mode[c] & 0xe0e0))
 	{
-		// Mode selection and gating control
+		// CM15-CM13, CM7-CM5: Mode selection and gating control
 		int mode = ((data >> 5) & 7) * 3;
-		if ((data & 0xc000) == 0xc000)
-			mode += 2; // Edge gating
-		else if ((data & 0xe000) != 0)
-			mode += 1; // Level gating
-		LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected\n", c + 1, mode + 'A');
+		switch (data & 0xe000)
+		{
+		case 0x0000:
+			mode += 'A';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (no gating)\n", c + 1, mode);
+			break;
+
+		case 0x2000:
+			mode += 'B';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (active high TC%d)\n", c + 1, mode, c);
+			break;
+
+		case 0x4000:
+		case 0x6000:
+			mode += 'B';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (active high GATE %d)\n", c + 1, mode, BIT(data, 13) ? c + 2 : c);
+			break;
+
+		case 0x8000:
+		case 0xa000:
+			mode += 'B';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (active %s GATE %d)\n", c + 1, mode, BIT(data, 13) ? "low" : "high", c + 1);
+			break;
+
+		case 0xc000:
+		case 0xe000:
+			mode += 'C';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (%s edge GATE %d)\n", c + 1, mode, BIT(data, 13) ? "falling" : "rising", c + 1);
+			break;
+		}
 	}
 
 	if ((data & 0x1f00) != (m_counter_mode[c] & 0x1f00))
 	{
-		// Source selection and edge control
+		// CM11-CM8: Source selection
+		// CM12: Source edge control
 		int source = (data >> 8) & 15;
 		int old_source = (m_counter_mode[c] >> 8) & 15;
 		if (old_source >= 11 && old_source <= 15 && source != old_source)
@@ -412,9 +438,9 @@ void am9513_device::set_counter_mode(int c, u16 data)
 	if ((data & 0x0018) != (m_counter_mode[c] & 0x0018))
 		LOGMASKED(LOG_MODE, "Counter %d: %s %s count\n", c + 1, BIT(data, 4) ? "BCD" : "Binary", BIT(data, 3) ? "up" : "down");
 
-	// Output forms
 	if ((data & 0x0007) != (m_counter_mode[c] & 0x0007))
 	{
+		// CM2-CM0: Output form
 		switch (data & 0x0007)
 		{
 		case 0x0000:
