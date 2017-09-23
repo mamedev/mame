@@ -176,7 +176,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( maniacsq )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)     /* 13 MHz? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_26MHz / 2)     /* 13 MHz? */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
@@ -212,7 +212,58 @@ static MACHINE_CONFIG_DERIVED( maniacsq_d5002fp, maniacsq )
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
-ROM_START( maniacsq )
+
+ROM_START( maniacsq ) // REF 940411
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "TMS27C010A.MSU45",   0x000000, 0x020000, CRC(fa44c907) SHA1(4d9b3a6cf044395cc4e04f6dd8d1109e8ee4d52d) )
+	ROM_LOAD16_BYTE( "TMS27C010A.MSU44",   0x000001, 0x020000, CRC(42e20121) SHA1(6662fa8ec5756bf5c4ebaaa9aa2e0e241cf582a4) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "maniacsq_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(afe9703d) SHA1(e737bf154bcb268b8f0764879b513489b163e462) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	// all 4 roms on a sub-board, no IC positions marked
+	ROM_LOAD( "MS1",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
+	ROM_LOAD( "MS2",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
+	ROM_LOAD( "MS3",   0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
+	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
+	ROM_LOAD( "MS4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
+	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
+	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+ROM_END
+
+ROM_START( maniacsqa ) // REF 940411
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "MS_U_45.U45",   0x000000, 0x020000, CRC(98f4fdc0) SHA1(1e4d5b0a8a432de885c96319c21280d304b38db0) )
+	ROM_LOAD16_BYTE( "MS_U_44.U44",   0x000001, 0x020000, CRC(1785dd41) SHA1(5c6a65c00248971ce54c8185858393f2c52cc583) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "maniacsq_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(afe9703d) SHA1(e737bf154bcb268b8f0764879b513489b163e462) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	// all 4 roms on a sub-board, no IC positions marked
+	ROM_LOAD( "MS1",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
+	ROM_LOAD( "MS2",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
+	ROM_LOAD( "MS3",   0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
+	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
+	ROM_LOAD( "MS4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
+	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
+	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+ROM_END
+
+ROM_START( maniacsqu )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "d8-d15.1m",   0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
 	ROM_LOAD16_BYTE( "d0-d7.1m",    0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
@@ -225,30 +276,6 @@ ROM_START( maniacsq )
 	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         /* Empty */
 	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
-ROM_END
-
-ROM_START( maniacsqa ) // REF 940411
-	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "MS_U_45.U45",   0x000000, 0x020000, CRC(98f4fdc0) SHA1(1e4d5b0a8a432de885c96319c21280d304b38db0) )
-	ROM_LOAD16_BYTE( "MS_U_44.U44",   0x000001, 0x020000, CRC(1785dd41) SHA1(5c6a65c00248971ce54c8185858393f2c52cc583) )
-
-	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "ms_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
-
-	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
-
-	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
-	// all 4 roms on a sub-board, no IC positions marked
-	ROM_LOAD( "MS1",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
-	ROM_LOAD( "MS2",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
-	ROM_LOAD( "MS3",   0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
-	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
-	ROM_LOAD( "MS4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
-	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
-	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 /*============================================================================
@@ -416,11 +443,11 @@ ROM_END
 
 static MACHINE_CONFIG_START( play2000 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 11059200)     /* or from the 34MHz? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
 	MCFG_CPU_PROGRAM_MAP(play2000_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	// MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, 11059200) /* ? */
+	// MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_11_0592MHz) /* 11.0592MHz */
 	// MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
@@ -513,7 +540,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( bang )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)         /* 15 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 2) /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
@@ -760,7 +787,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( alighunt )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/2)         /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)         /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(alighunt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
@@ -792,7 +819,7 @@ static MACHINE_CONFIG_START( alighunt )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( alighunt_d5002fp, alighunt )
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* ? */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* 12 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
@@ -832,13 +859,49 @@ REF: 940411
 */
 
 
+/* 
+	the byte at 0x1ff in the rom at u44 controls the language / region settings
+	and even allows for an alt. title of Lizard Hunt
+
+    Bits        Usage
+	---------------------------------------------------------------------------------
+	0000 1000   Title (0x00 = LIZARD HUNT, 0x08 = ALLIGATOR HUNT)
+	0000 0100   Language (0x00 = SPANISH, 0x04 = ENGLISH)
+	0000 0011   Region warning ( 0x00, 0x02 = USA, 0x01 = NOT USA, 0x03 = NO WARNING)
+*/
+
 ROM_START( aligator )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE(    "u45",  0x000000, 0x080000, CRC(61c47c56) SHA1(6dd3fc6fdab252e0fb43c0793eef70203c888d7f) )
-	ROM_LOAD16_BYTE(    "u44",  0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) )
+	ROM_LOAD16_BYTE(    "1.u45",  0x000000, 0x080000, CRC(61c47c56) SHA1(6dd3fc6fdab252e0fb43c0793eef70203c888d7f) )
+	ROM_LOAD16_BYTE(    "2.u44",  0x000001, 0x080000, CRC(96bc77c2) SHA1(72975fa188598d8ed595cbba097b60efe14bd190) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "aligator_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "aligator_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6558f215) SHA1(c961a9c81aa6b746294baf83ea5d1fcf7acab9db) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
+	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
+
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
+	ROM_LOAD( "u48",        0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )    /* GFX only */
+	ROM_LOAD( "u47",        0x0400000, 0x0400000, CRC(74a5a29f) SHA1(8ea2aa1f8a80c5b88ca9222c5ecc3c4794e0a160) )    /* GFX + Sound */
+	ROM_LOAD( "u50",        0x0800000, 0x0400000, CRC(85daecf9) SHA1(824f6d2491075b1ef96ecd6667c5510409338a2f) )    /* GFX only */
+	ROM_LOAD( "u49",        0x0c00000, 0x0400000, CRC(70a4ee0b) SHA1(07b09916f0366d0c6eed94a905ec0b9d6ac9e7e1) )    /* GFX + Sound */
+ROM_END
+
+ROM_START( aligators )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE(    "u45",  0x000000, 0x080000, CRC(61c47c56) SHA1(6dd3fc6fdab252e0fb43c0793eef70203c888d7f) )
+	ROM_LOAD16_BYTE(    "u44",  0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) ) /* differs by 1 byte from above set, see note */
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "aligator_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6558f215) SHA1(c961a9c81aa6b746294baf83ea5d1fcf7acab9db) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -1021,7 +1084,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( touchgo )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)         /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)         /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(touchgo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
@@ -1069,7 +1132,7 @@ static MACHINE_CONFIG_START( touchgo )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( touchgo_d5002fp, touchgo )
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* ? */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_40MHz / 4) /* 10MHz? - Not verified */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
@@ -1122,7 +1185,7 @@ ROM_START( touchgo ) /* REF: 950906 */
 	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(a497e1af) SHA1(68ee1f87631183541adadf927fb18ed4422d5bb6) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(a497e1af) SHA1(68ee1f87631183541adadf927fb18ed4422d5bb6) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
@@ -1149,7 +1212,7 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
@@ -1176,7 +1239,7 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
@@ -1267,7 +1330,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( snowboar )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)         /* 15 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 2)         /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
@@ -1510,11 +1573,11 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( wrally2 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)         /* 13 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_26MHz / 2) /* 13 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_34MHz / 4) /* 8.5MHz? (or 13MHz - 26MHz/2) - Not verified */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
@@ -1696,7 +1759,7 @@ ROM_START( wrally2 )
 
 	   either way the 2nd dump is in much better state, so we're using that.
 	*/
-	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	/* these are the default states stored in NVRAM */
@@ -1726,7 +1789,8 @@ ROM_END
 
 
 
-GAME( 1994, aligator,   0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1994, aligator,   0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (World, protected)", 0 )
+GAME( 1994, aligators,  aligator,alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
 GAME( 1994, aligatorun, aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
 GAME( 1994, aligatoruna,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 
@@ -1737,8 +1801,10 @@ GAME( 1995, touchgok, touchgo,  touchgo,          touchgo,  gaelco2_state, touch
 
 GAME( 1995, wrally2,  0,        wrally2, wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
 
-GAME( 1996, maniacsq, 0,        maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
-GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+// All sets identify as Version 1.0, but are clearly different revisions
+GAME( 1996, maniacsq, 0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
+GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
+GAME( 1996, maniacsqu,maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
 
 GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )

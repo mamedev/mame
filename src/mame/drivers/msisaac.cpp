@@ -213,44 +213,26 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(msisaac_state,ta7630)
-{
-	int i;
-
-	double db           = 0.0;
-	double db_step      = 0.50; /* 0.50 dB step (at least, maybe more) */
-	double db_step_inc  = 0.275;
-	for (i=0; i<16; i++)
-	{
-		double max = 100.0 / pow(10.0, db/20.0 );
-		m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15 - i, m_vol_ctrl[15 - i], db);*/
-		db += db_step;
-		db_step += db_step_inc;
-	}
-
-	/*for (i=0; i<8; i++)
-	    logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );*/
-/*
-  channels 0-2 AY#0
-  channels 3-5 AY#1
-  channels 6,7 MSM5232 group1,group2
-*/
-}
-
 WRITE8_MEMBER(msisaac_state::sound_control_0_w)
 {
 	m_snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
 
-	m_msm->set_output_gain(0, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(1, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(2, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(3, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	for(int i=0;i<4;i++)
+	{
+		// group1
+		m_ta7630->set_channel_volume(m_msm,i,   m_snd_ctrl0 & 0xf);
+		// group2
+		m_ta7630->set_channel_volume(m_msm,i+4, m_snd_ctrl0 >> 4);
+	}
+//	m_msm->set_output_gain(0, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//	m_msm->set_output_gain(1, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//	m_msm->set_output_gain(2, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//	m_msm->set_output_gain(3, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//	m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//	m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//	m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//	m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 WRITE8_MEMBER(msisaac_state::sound_control_1_w)
 {
@@ -432,7 +414,6 @@ void msisaac_state::machine_start()
 	/* sound */
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_vol_ctrl));
 	save_item(NAME(m_snd_ctrl0));
 	save_item(NAME(m_snd_ctrl1));
 
@@ -445,7 +426,7 @@ void msisaac_state::machine_start()
 
 void msisaac_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	//MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
 	m_bg2_textbank = 0;
@@ -499,11 +480,14 @@ static MACHINE_CONFIG_START( msisaac )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
+	MCFG_TA7630_ADD("ta7630")
+	
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)

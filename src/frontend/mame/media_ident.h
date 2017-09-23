@@ -102,7 +102,7 @@ private:
 		file_flavour flavour() const { return m_flavour; }
 		std::vector<match_data> const &matches() const { return m_matches; }
 
-		void match(device_t const &device, rom_entry const &rom, util::hash_collection const &hashes);
+		void match(device_t const &device, romload::file const &rom, util::hash_collection const &hashes);
 		void match(std::string const &list, software_info const &software, rom_entry const &rom, util::hash_collection const &hashes);
 
 	private:

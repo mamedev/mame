@@ -732,6 +732,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<description>Conqueror</description>
 		<year>1988</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="release" value="SKG14" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="Conqueror (1988)(Superior Software).adf" size="819200" crc="f6fc9510" sha1="baa5dc8148cdca11753ac61f9c73df83f17f4301" offset="0" />
@@ -2837,6 +2838,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<description>Zarch</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="release" value="SKG13" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="332598">
 				<rom name="Zarch (1987)(Superior Software).apd" size="332598" crc="052c6a08" sha1="1acddc24bda274a747ea22f1b39b483b4cdef252" offset="0"/>
@@ -2848,6 +2850,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<description>Zarch [cracked]</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="release" value="SKG13" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="Zarch (1987)(Superior).adf" size="819200" crc="f168c848" sha1="089912e90a6ba485e7fc81acd00ecec87e8946d1" offset="0"/>
@@ -3889,7 +3892,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<software name="euclid">
 		<description>Euclid</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>Ace Computing</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Euclid"/>
@@ -3910,7 +3913,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Qrt"/>
+			<feature name="part_id" value="QkRayTrace"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Qrt(AceComputing).adf" size="819200" crc="ff59946f" sha1="eac22852f022ef5ce47067e680c97e0c0fa713dc" offset="0"/>
 			</dataarea>
@@ -3958,7 +3961,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<software name="fontdir">
 		<description>Font Directory</description>
-		<year>1995</year>
+		<year>1994</year>
 		<publisher>Look Systems</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -4335,7 +4338,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<software name="pcemul">
-		<description>PC Emulator</description>
+		<description>PC Emulator v1.6</description>
 		<year>1989</year>
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4343,6 +4346,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 				<rom name="PC Emulator (Acorn).adf" size="819200" crc="8f0e4809" sha1="bf6708ff04f4f16e6afc0984a493f104b515b293" offset="0" />
 			</dataarea>
 		</part>
+		<!-- MS-DOS 3.21 -->
 	</software>
 
 	<software name="pendown">
@@ -4931,6 +4935,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<description>Acorn ANSI C (Release 2)</description>
 		<year>1988</year>
 		<publisher>Acorn</publisher>
+		<info name="release" value="SKL70" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="0281,881"/>
 			<dataarea name="flop" size="819200">
@@ -4943,6 +4948,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<description>Acorn ANSI C (Release 3)</description>
 		<year>1989</year>
 		<publisher>Acorn</publisher>
+		<info name="release" value="SKL80" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="819200">
@@ -5013,6 +5019,19 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="EasyC(1993)(RISC Development).adf" size="819200" crc="d67beb3d" sha1="fee528214ab968380fb355e5d62a07bece2d3865" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Hardware -->
+
+	<software name="scsiutils">
+		<description>SCSI Support Disc</description>
+		<year>1992</year>
+		<publisher>Morley Electronics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="A3000 SCSI support disc(Morley).adf" size="819200" crc="17175efb" sha1="9e105b3bbbc8c3cc3a62087d8f70079b96f3ed52" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

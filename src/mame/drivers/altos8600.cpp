@@ -134,7 +134,7 @@ READ16_MEMBER(altos8600_state::errhi_r)
 
 WRITE16_MEMBER(altos8600_state::clear_w)
 {
-	m_mmuerr = 0xff;
+	m_mmuerr = 0xffff;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmistat = false;
 }
@@ -281,6 +281,7 @@ void altos8600_state::xlate_w(address_space &space, offs_t offset, u16 data, u16
 	else if(m_user && BIT(flags, 3) && ((offset & 0x7ff) < 64))
 		seterr(offset, mem_mask, 8);
 	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
+	m_mmuflags[offset >> 11] |= 4;
 }
 
 READ16_MEMBER(altos8600_state::cpuram_r)
@@ -365,6 +366,7 @@ WRITE16_MEMBER(altos8600_state::dmacram_w)
 		return;
 	}
 	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
+	m_mmuflags[offset >> 11] |= 4;
 }
 
 READ16_MEMBER(altos8600_state::nmi_r)
@@ -454,9 +456,18 @@ static MACHINE_CONFIG_START(altos8600)
 	MCFG_I8089_SINTR1(DEVWRITELINE("pic8259_2", pic8259_device, ir3_w))
 	MCFG_I8089_SINTR2(DEVWRITELINE("pic8259_2", pic8259_device, ir4_w))
 
-	MCFG_PIC8259_ADD("pic8259_1", INPUTLINE("maincpu", 0), VCC, READ8(altos8600_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NOOP)
-	MCFG_PIC8259_ADD("pic8259_3", DEVWRITELINE("pic8259_1", pic8259_device, ir3_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(altos8600_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir2_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
+
+	MCFG_DEVICE_ADD("pic8259_3", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir3_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
@@ -508,4 +519,4 @@ ROM_START(altos8600)
 	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos", "8600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos Computer Systems", "ACS8600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

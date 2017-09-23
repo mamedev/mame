@@ -26,10 +26,14 @@ Grand Striker has an IRQ2 which is probably network related.
 DSWs need correctly mapping, they're just commented for the moment.
 
 TODO:
-Finish hooking up the inputs
-Tilemap scrolling/rotation/zooming or whatever effect it needs
-Priorities are wrong. I suspect they need sprite orthogonality
-Missing mixer registers (mainly layer enable/disable)
+- Finish hooking up the inputs
+- Tilemap scrolling/rotation/zooming or whatever effect it needs
+- Priorities are wrong. I suspect they need sprite orthogonality
+- Missing mixer registers (mainly layer enable/disable)
+- Tecmo World Cup '94 has missing protection emulation for draw buy-in 
+  (as seen by code snippet 0x42ee, referenced in other places as well)
+  It's unknown how the game logic should be at current stage.
+- Tecmo World Cup '94 also has no name entry whatsoever.
 
 ******************************************************************************/
 
@@ -147,7 +151,7 @@ X3: 14.31818
 
 Note: Same hardware as Tecmo World Cup '94, minus one VS9209 chip.
 
-*** ROMSET: twrldc94
+*** ROMSET: twcup94
 
 Tecmo World Cup 94
 Tecmo 1994
@@ -185,6 +189,12 @@ Frequencies: 68k is XTAL_32MHZ/2
 void gstriker_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x8000);
+
+	if (m_acia.found())
+	{
+		m_acia->write_cts(0);
+		m_acia->write_dcd(0);
+	}
 }
 
 /*** SOUND RELATED ***********************************************************/
@@ -229,7 +239,6 @@ static GFXDECODE_START( gstriker )
 	GFXDECODE_ENTRY( "gfx1", 0, gs_8x8x4_layout,     0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,   0, 256 )
-
 GFXDECODE_END
 
 
@@ -237,7 +246,7 @@ GFXDECODE_END
 
 
 
-static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
+static ADDRESS_MAP_START( twcup94_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  vram_r, vram_w )
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_m_vram")
@@ -246,12 +255,19 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x00f000)
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w )
-	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs1")
-	AM_RANGE(0x200060, 0x20007f) AM_RAM AM_SHARE("mixerregs2")
+	AM_RANGE(0x200010, 0x200011) AM_WRITENOP
+	AM_RANGE(0x200020, 0x200021) AM_WRITENOP
+	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs")
 	AM_RANGE(0x200080, 0x20009f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
 	AM_RANGE(0x2000a0, 0x2000a1) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("work_ram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
+	AM_RANGE(0x200060, 0x200061) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x200062, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
+	AM_IMPORT_FROM(twcup94_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gstriker_state )
@@ -354,9 +370,19 @@ static INPUT_PORTS_START( gstriker )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                   // "Self Test Mode"
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( twrldc94 )
+static INPUT_PORTS_START( twcup94 )
 	PORT_INCLUDE( gstriker_generic )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -413,7 +439,7 @@ static INPUT_PORTS_START( vgoalsoc )
 	PORT_INCLUDE( gstriker_generic )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -423,7 +449,7 @@ static INPUT_PORTS_START( vgoalsoc )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -433,33 +459,31 @@ static INPUT_PORTS_START( vgoalsoc )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR (Unknown) ) // Probably difficulty
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:7,8")
 	PORT_DIPSETTING(    0x80, "A" )
 	PORT_DIPSETTING(    0xc0, "B" )
 	PORT_DIPSETTING(    0x40, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Player VS CPU Time" ) // no coperative
+	PORT_DIPNAME( 0x03, 0x03, "Player VS CPU Time" ) PORT_DIPLOCATION("SWB:1,2") // no cooperative
 	PORT_DIPSETTING(    0x02, "1:00" )
 	PORT_DIPSETTING(    0x03, "1:30" )
 	PORT_DIPSETTING(    0x01, "2:00" )
 	PORT_DIPSETTING(    0x00, "2:30" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Player VS Player Time" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Player VS Player Time" ) PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x08, "1:30" )
 	PORT_DIPSETTING(    0x0c, "2:00" )
 	PORT_DIPSETTING(    0x04, "2:30" )
 	PORT_DIPSETTING(    0x00, "3:00" )
-	PORT_DIPNAME( 0x10, 0x10, "Countdown" )
+	PORT_DIPNAME( 0x10, 0x10, "Countdown" ) PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x10, "54 sec" )
 	PORT_DIPSETTING(    0x00, "60 sec" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DWS2:6" )        // hangs at POST
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Start credit" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
+	PORT_DIPNAME( 0x80, 0x80, "Start credit" ) PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -486,6 +510,11 @@ static MACHINE_CONFIG_START( gstriker )
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
+	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -493,6 +522,7 @@ static MACHINE_CONFIG_START( gstriker )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gstriker_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstriker)
@@ -531,12 +561,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( twc94, gstriker )
 	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(gstriker_map)
+	MCFG_CPU_PROGRAM_MAP(twcup94_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, twrldc94_prot_reg_w))
+	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, twcup94_prot_reg_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
+
+	MCFG_DEVICE_REMOVE("acia")
 MACHINE_CONFIG_END
 
 
@@ -713,7 +745,7 @@ ROM_START( vgoalsca )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
 ROM_END
 
-ROM_START( twrldc94 )
+ROM_START( twcup94 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "13.u37",           0x00000, 0x80000, CRC(42adb463) SHA1(ec7bcb684489b56f81ab851a9d8f42d54679363b) )
 
@@ -743,7 +775,7 @@ ROM_START( twrldc94 )
 	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
 ROM_END
 
-ROM_START( twrldc94a )
+ROM_START( twcup94a )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "twrdc94a_13.u37",           0x00000, 0x80000, CRC(08f314ee) SHA1(3fca5050f5bcd60533d3bd9dea81ba631a98bfd6) )
 
@@ -792,7 +824,7 @@ m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
 m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
-WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
+WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 {
 	m_prot_reg[1] = m_prot_reg[0];
 	m_prot_reg[0] = data;
@@ -800,16 +832,16 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 	// Command byte is also written to VS9209 port F, which is set for input only.
 	// Does the MCU somehow strobe it out of there?
 	uint8_t mcu_data = m_work_ram[0x00f/2] & 0x00ff;
-
+	
 	if( ((m_prot_reg[1] & 4) == 0) && ((m_prot_reg[0] & 4) == 4) )
 	{
 		switch( m_gametype )
 		{
-			case 1:
+			case TECMO_WCUP94_MCU:
 				switch (mcu_data)
 				{
 					#define NULL_SUB 0x0000828E
-					case 0x53: PC(0x0000a4c); break; // boot -> main loop
+					case 0x53: PC(0x00000A4C); break; // boot -> main loop
 
 					/*
 					    68 and 62 could be sprite or sound changes, or ?
@@ -824,12 +856,12 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					    }
 					*/
 					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x0003AF4); break; // after time up, pk shootout???
-					case 0x65: PC(0x0003F26); break;
+					case 0x61: PC(0x00003AF4); break; // after time up, pk shootout???
+					case 0x65: PC(0x00003F26); break;
 
 					// 62->72
 					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
-					case 0x72: PC(0x000409E); break; // game over
+					case 0x72: PC(0x0000409E); break; // game over
 
 					/*
 					    Attract mode is pre programmed loop called from main
@@ -851,14 +883,14 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					    0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
 
 					*/
-					case 0x6e: PC(0x0010E28); break; // loop
-					case 0x6b: PC(0x0010EEC); break; // attract even
-					case 0x69: PC(0x001120A); break; // attract odd
+					case 0x6e: PC(0x00010E28); break; // loop
+					case 0x6b: PC(0x00010EEC); break; // attract even
+					case 0x69: PC(0x0001120A); break; // attract odd
 
 					// In "continue" screen
 					// if( w@FFE078 & 80) 75
 					// *** after 75 beq
-					case 0x75: PC(NULL_SUB); break;
+					case 0x75: PC(0x005088); break; // match adder, and check if limit is reached for ending
 
 					// unreachable code at end of attract loop 6a->79->6f
 					case 0x6a: PC(NULL_SUB); break;
@@ -866,26 +898,47 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					case 0x6f: PC(NULL_SUB); break;
 
 					default:
-						popmessage("Unknown MCU CMD %04x",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(NULL_SUB);
 						break;
+						
+					#undef NULL_SUB
 				}
 				break;
-
-			case 2:
+			
+			// same as above but with +0x10 displacement offsets
+			case TECMO_WCUP94A_MCU:
+				
 				switch (mcu_data)
 				{
-					case 0x53: PC(0x00000a5c); break; // POST
+					#define NULL_SUB 0x0000829E
+					case 0x53: PC(0x00000A5C); break; // POST
 
+					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
+					case 0x61: PC(0x00003B04); break; // after time up, pk shootout???
+					case 0x65: PC(0x00003F36); break;
+
+					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
+					case 0x72: PC(0x000040AE); break; // game over
+
+					case 0x75: PC(0x005098); break; // match adder, and check if limit is reached for ending
+
+					// attract mode
+					case 0x6e: PC(0x00010E38); break; // loop
+					case 0x6b: PC(0x00010EFC); break; // attract even
+					case 0x69: PC(0x0001121A); break; // attract odd
+					
 					default:
-						popmessage("Unknown MCU CMD %04x",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(NULL_SUB);
 						break;
+					
+					#undef NULL_SUB
 				}
 				break;
 
 
-			case 3:
+			case VGOAL_SOCCER_MCU:
 				switch (mcu_data)
 				{
 					case 0x33: PC(0x00063416); break; // *after game over, is this right?
@@ -899,7 +952,7 @@ WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					case 0x79: PC(0x0006072E); break; // after select, start match
 
 					default:
-						popmessage("Unknown MCU CMD %04x",m_mcu_data);
+						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(0x00000586); // rts
 						break;
 				}
@@ -959,27 +1012,24 @@ WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 
 void gstriker_state::mcu_init()
 {
-	m_mcu_data = 0;
-
-	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_prot_reg));
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twrldc94)
+DRIVER_INIT_MEMBER(gstriker_state,twcup94)
 {
-	m_gametype = 1;
+	m_gametype = TECMO_WCUP94_MCU;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twrldc94a)
+DRIVER_INIT_MEMBER(gstriker_state,twcup94a)
 {
-	m_gametype = 2;
+	m_gametype = TECMO_WCUP94A_MCU;
 	mcu_init();
 }
 
 DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 {
-	m_gametype = 3;
+	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16_delegate(FUNC(gstriker_state::vbl_toggle_w),this)); // vblank toggle
@@ -988,13 +1038,13 @@ DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker, 0,         gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstriker, 0,         gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Europe, Oceania)",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Americas)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Japan)",    MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
-GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
-GAME( 1994, twrldc94, 0,        twc94,    twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twrldc94a,twrldc94, twc94,    twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vgoalsoc, 0,         vgoal,    vgoalsoc, gstriker_state, vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
+GAME( 1994, vgoalsca, vgoalsoc,  vgoal,    vgoalsoc, gstriker_state, vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
+GAME( 1994, twcup94, 0,          twc94,    twcup94,  gstriker_state, twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94a,twcup94,    twc94,    twcup94,  gstriker_state, twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

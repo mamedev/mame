@@ -4,6 +4,8 @@
 /***************************************************************************
 
   Sharp SM5xx family handhelds.
+  List of child drivers:
+  - rzone: Tiger R-Zone
 
   TODO:
   - improve LCD segments in SVGs for: gnw_mc25, gnw_eg26, exospace
@@ -14,9 +16,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/hh_sm510.h"
 #include "cpu/sm510/sm510.h"
 #include "cpu/sm510/sm500.h"
-#include "sound/spkrdev.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -26,61 +28,6 @@
 #include "gnw_dualh.lh"
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
 //#include "hh_sm500_test.lh" // "
-
-
-class hh_sm510_state : public driver_device
-{
-public:
-	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
-		m_speaker(*this, "speaker"),
-		m_inp_lines(0),
-		m_display_wait(33)
-	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
-	output_finder<16, 16, 4> m_out_x;
-	optional_device<speaker_sound_device> m_speaker;
-
-	// misc common
-	u16 m_inp_mux;                  // multiplexed inputs mask
-	int m_inp_lines;                // number of input mux columns
-	u8 m_s;                         // MCU S output pins
-	u8 m_r;                         // MCU R output pins
-
-	u8 read_inputs(int columns);
-
-	virtual void update_k_line();
-	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
-	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
-	virtual DECLARE_WRITE8_MEMBER(sm500_lcd_segment_w);
-	virtual DECLARE_READ8_MEMBER(input_r);
-	virtual DECLARE_WRITE8_MEMBER(input_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
-
-	// display common
-	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 33ms)
-	u8 m_display_x_len;             // lcd number of groups
-	u8 m_display_y_len;             // lcd number of segments
-	u8 m_display_z_len;             // lcd number of commons
-	u32 m_display_state[0x20];      // lcd segment data (max. 5-bit offset)
-	u8 m_display_decay[0x20][0x20]; // (internal use)
-
-	void set_display_size(u8 x, u8 y, u8 z);
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-};
 
 
 // machine start/reset

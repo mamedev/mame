@@ -65,7 +65,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(flip_screen);
 	DECLARE_READ16_MEMBER(input_ports_r);
-	DECLARE_WRITE16_MEMBER(sound_brt_w);
+	DECLARE_WRITE8_MEMBER(screen_brt_w);
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(irq_w);
 	DECLARE_WRITE16_MEMBER(scanline_w);

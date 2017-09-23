@@ -9,7 +9,7 @@
 #include "emu.h"
 
 #include "slider.h"
-#include "ui/uimain.h"
+#include "../frontend/mame/ui/slider.h"
 
 bgfx_slider::bgfx_slider(running_machine &machine, std::string name, float min, float def, float max, float step, slider_type type, screen_type screen, std::string format, std::string description, std::vector<std::string>& strings)
 	: m_name(name)
@@ -30,7 +30,7 @@ bgfx_slider::bgfx_slider(running_machine &machine, std::string name, float min, 
 		m_strings.push_back(string);
 	}
 
-	m_slider_state = create_core_slider(machine);
+	m_slider_state = create_core_slider();
 }
 
 bgfx_slider::~bgfx_slider()
@@ -52,10 +52,9 @@ void bgfx_slider::import(float val)
 	slider_changed(m_machine, this, m_slider_state->id, nullptr, int32_t(floor(m_value / m_step + 0.5f)));
 }
 
-slider_state* bgfx_slider::create_core_slider(running_machine& machine)
+std::unique_ptr<slider_state> bgfx_slider::create_core_slider()
 {
-	int size = sizeof(slider_state) + m_description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, uint8_t, size));
+	auto state = make_unique_clear<slider_state>();
 
 	state->minval = int32_t(floor(m_min / m_step + 0.5f));
 	state->defval = int32_t(floor(m_default / m_step + 0.5f));
@@ -67,7 +66,7 @@ slider_state* bgfx_slider::create_core_slider(running_machine& machine)
 
 	state->arg = this;
 	state->id = 0;
-	strcpy(state->description, m_description.c_str());
+	state->description = m_description;
 
 	return state;
 }

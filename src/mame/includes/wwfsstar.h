@@ -37,7 +37,6 @@ public:
 	tilemap_t *m_bg0_tilemap;
 
 	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE16_MEMBER(irqack_w);
 	DECLARE_WRITE16_MEMBER(fg0_videoram_w);

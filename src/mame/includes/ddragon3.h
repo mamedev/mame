@@ -54,7 +54,6 @@ public:
 	uint16_t m_bg1_dx[2];
 
 	/* misc */
-	uint16_t          m_io_reg[8];
 	uint8_t m_pri;
 
 	/* devices */
@@ -66,7 +65,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(ddragon3_io_w);
+	DECLARE_WRITE16_MEMBER(ddragon3_vreg_w);
+	DECLARE_WRITE16_MEMBER(irq6_ack_w);
+	DECLARE_WRITE16_MEMBER(irq5_ack_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_scroll_w);
 	DECLARE_READ16_MEMBER(ddragon3_scroll_r);
 	DECLARE_WRITE16_MEMBER(ddragon3_bg_videoram_w);

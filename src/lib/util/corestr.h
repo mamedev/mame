@@ -66,10 +66,10 @@ int strcatvprintf(std::string &str, const char *format, va_list args);
 
 void strdelchr(std::string& str, char chr);
 void strreplacechr(std::string& str, char ch, char newch);
-std::string strtrimspace(std::string& str);
-std::string strtrimrightspace(std::string& str);
-std::string strmakeupper(std::string& str);
-std::string strmakelower(std::string& str);
+std::string &strtrimspace(std::string& str);
+std::string &strtrimrightspace(std::string& str);
+std::string &strmakeupper(std::string& str);
+std::string &strmakelower(std::string& str);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
 #endif /* __CORESTR_H__ */

@@ -61,8 +61,6 @@ public:
 	bitmap_ind16 m_sprite_bitmap;
 
 
-	DECLARE_WRITE16_MEMBER(soundcommand_w);
-
 	DECLARE_WRITE16_MEMBER( spbatnp_90002_w );
 	DECLARE_WRITE16_MEMBER( spbatnp_90006_w );
 	DECLARE_WRITE16_MEMBER( spbatnp_9000a_w );

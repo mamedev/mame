@@ -5501,7 +5501,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="nightmare Gallery (1982)(synergistic)(clean crack).dsk" size="143360" crc="070c08bf" sha1="803dda9229bd086979f400949b4300d18285c75b" offset="0x0000" />
+				<rom name="nightmare gallery (1982)(synergistic)(clean crack).dsk" size="143360" crc="070c08bf" sha1="803dda9229bd086979f400949b4300d18285c75b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6451,6 +6451,21 @@
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="toy_shop_data2_b.dsk" size="143360" crc="18ff41b4" sha1="b715dc919fb98716ee1d4fa323940148d8865605" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thief">
+		<description>Thief (clean crack)</description>
+		<!-- Apple II clone of Berzerk arcade game by Bob Flanagan - Thief: "The damn things nearly killed me." -->
+		<!-- All files transfered from a highly protected DOS 3.2 disc to a PronoDOS disc -->
+		<!-- Also includes a single file BRUNable conversion of the game -->
+		<year>1981</year>
+		<publisher>Datamost</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="thief (1981)(datamost)(san inc &amp; trex crack).dsk" size="143360" crc="e2faf16e" sha1="bedfb20b1753acb6d1babdc44143761d07bc8782" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

@@ -26,17 +26,20 @@ DEVICE_ADDRESS_MAP_START(rtc_map, 32, iteagle_fpga_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(ram_map, 32, iteagle_fpga_device)
-	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(ram_r, ram_w)
+	AM_RANGE(0x00000, 0x40) AM_READWRITE(e1_nvram_r, e1_nvram_w)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(e1_ram_r, e1_ram_w)
 ADDRESS_MAP_END
 
 iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock),
-		m_rtc(*this, "eagle2_rtc"), m_scc1(*this, AM85C30_TAG), m_version(0), m_seq_init(0)
+		m_rtc(*this, "eagle2_rtc"), m_e1_nvram(*this, "eagle1_bram"), m_scc1(*this, AM85C30_TAG), m_version(0), m_seq_init(0)
 {
 }
 
 MACHINE_CONFIG_MEMBER(iteagle_fpga_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
+	MCFG_NVRAM_ADD_1FILL("eagle1_bram")
+
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
 	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_7_3728MHz, 0, XTAL_7_3728MHz, 0)
@@ -57,8 +60,13 @@ MACHINE_CONFIG_END
 
 void iteagle_fpga_device::device_start()
 {
+	m_screen = downcast<screen_device *>(machine().device("screen"));
+
 	// RTC M48T02
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
+
+	// Eagle 1 nvram
+	m_e1_nvram->set_base(m_e1_nv_data, sizeof(m_e1_nv_data));
 
 	pci_device::device_start();
 	status = 0x5555;
@@ -72,26 +80,16 @@ void iteagle_fpga_device::device_start()
 	// RTC defaults to base address 0x000c0000
 	bank_infos[1].adr = 0x000c0000 & (~(bank_infos[1].size - 1));
 
-	add_map(sizeof(m_ram), M_MEM, FUNC(iteagle_fpga_device::ram_map));
+	add_map(0x20000, M_MEM, FUNC(iteagle_fpga_device::ram_map));
 	// RAM defaults to base address 0x000e0000
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
 	m_timer = timer_alloc(0, nullptr);
 
-	// virtpool nvram
-	memset(m_ram, 0, sizeof(m_ram));
-	// byte 0x10 is check sum of first 16 bytes
-	// when corrupt the fw writes the following
-	m_ram[0x00/4] = 0x00010207;
-	m_ram[0x04/4] = 0x04010101;
-	m_ram[0x08/4] = 0x01030101;
-	m_ram[0x0c/4] = 0x00000001;
-	m_ram[0x10/4] = 0x00000018;
-
 	// Save states
 	save_item(NAME(m_fpga_regs));
 	save_item(NAME(m_rtc_regs));
-	save_item(NAME(m_ram));
+	save_item(NAME(m_e1_ram));
 	save_item(NAME(m_prev_reg));
 	// m_version
 	save_item(NAME(m_seq_init));
@@ -110,10 +108,11 @@ void iteagle_fpga_device::device_reset()
 	m_seq_rem2 = 0;
 
 	// Nibble starting at bit 20 is resolution, byte 0 is atmel response
+	// Bit 16 is Eagle 1 battery ok
 	// 0x00080000 and interrupt starts reading from 0x14
 	// 0x02000000 and interrupt starts reading from 0x18
 	// Write 0x01000000 is a global interrupt clear
-	m_fpga_regs[0x04/4] =  0x00000000;
+	m_fpga_regs[0x04/4] =  0x00010000;
 	m_prev_reg = 0;
 
 	m_serial0_1.reset();
@@ -183,20 +182,41 @@ void iteagle_fpga_device::update_sequence_eg1(uint32_t data)
 //-------------------------------------------------
 void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	if (m_fpga_regs[0x4/4] & 0x01000000) {
-		//m_fpga_regs[0x04/4] |=  0x02080000;
-		m_fpga_regs[0x04/4] |=  0x00080000;
-		m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
-		if (LOG_FPGA)
-				logerror("%s:fpga device_timer Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
-	}
+	//int beamy = m_screen->vpos();
+	//const rectangle &visarea = m_screen->visible_area();
+	//beamy++;
+	//if (beamy <= m_screen->visible_area().max_y && beamy <= m_gun_y + BEAM_DY) {
+	//	m_timer->adjust(m_screen->time_until_pos(beamy, std::max(0, m_gun_x - BEAM_DX)));
+	//}
+	//m_fpga_regs[0x04/4] |=  0x02080000;
+	m_fpga_regs[0x04 / 4] |= 0x00080000;
+	m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
+	if (LOG_FPGA)
+		logerror("%s:fpga device_timer Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
+}
 
+WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)
+{
+	m_vblank_state = state;
+	if (state && m_fpga_regs[0x4 / 4] & 0x01000000) {
+		//m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
+		if (1 || (m_fpga_regs[0x14 / 4] & 0x01)) {
+			// Set the gun timer to first fire
+			const rectangle &visarea = m_screen->visible_area();
+			m_gun_x = machine().root_device().ioport("GUNX1")->read() * (visarea.width() - 14) / 512;
+			m_gun_y = machine().root_device().ioport("GUNY1")->read() * visarea.height() / 512;
+			m_timer->adjust(attotime::zero);
+			//m_timer->adjust(m_screen->time_until_pos(std::max(0, m_gun_y - BEAM_DY), std::max(0, m_gun_x - BEAM_DX)));
+			//printf("w: %d h: %d x: %d y: %d\n", visarea.width(), visarea.height(), m_gun_x, m_gun_y);
+		}
+		if (LOG_FPGA)
+			logerror("%s:fpga vblank_update Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
+	}
 }
 
 WRITE_LINE_MEMBER(iteagle_fpga_device::serial_interrupt)
 {
 	if (LOG_SERIAL) {
-		osd_printf_info("iteagle_fpga_device::serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
 		logerror("serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
 	}
 	m_cpu->set_input_line(m_serial_irq_num, state);
@@ -209,7 +229,6 @@ WRITE8_MEMBER(iteagle_fpga_device::serial_rx_w)
 	//osd_printf_info("serial_rx_w: %02x\n", data);
 	m_serial0_1.write_rx_str(1, tmpStr);
 	if (0 && m_serial0_1.check_interrupt()) {
-		osd_printf_info("serial_rx_w: %02x\n", data);
 		m_cpu->set_input_line(m_serial_irq_num, ASSERT_LINE);
 	}
 }
@@ -235,7 +254,8 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x14/4: // GUN1-- Interrupt & 0x4==0x00080000
-			result = ((machine().root_device().ioport("GUNY1")->read())<<16) | (machine().root_device().ioport("GUNX1")->read());
+			//result = ((machine().root_device().ioport("GUNY1")->read())<<16) | (machine().root_device().ioport("GUNX1")->read());
+			result = (m_gun_y << 16) | (m_gun_x << 0);
 			if (LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
@@ -266,7 +286,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				result |= m_scc1->da_r(space, offset) << 24;
 				if (LOG_SERIAL) m_serial0_1.read_data(0);
 			}
-			if (1 && LOG_FPGA)
+			if (0 && LOG_FPGA && m_prev_reg != offset)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x1c/4:
@@ -325,8 +345,6 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			} else if (ACCESSING_BITS_24_31 && (data & 0x01000000)) {
 			// Interrupt clear/enable
 				m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
-				// Not sure what value to use here, needed for lightgun
-				m_timer->adjust(attotime::from_hz(59));
 				if (LOG_FPGA)
 						logerror("%s:fpga_w offset %04X = %08X & %08X Clearing interrupt(%i)\n", machine().describe_context(), offset*4, data, mem_mask, m_irq_num);
 			} else {
@@ -468,6 +486,8 @@ void iteagle_am85c30::write_control(uint8_t data, int channel)
 		m_wr_regs[channel][0] = 0;
 		// Mirror wr2 to rr2[chan0]
 		m_rr_regs[0][2] = m_wr_regs[channel][2];
+		if (addr == 12 || addr == 13)
+			m_rr_regs[channel][addr] = data;
 	}
 }
 
@@ -583,21 +603,38 @@ WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
 }
 
 //*************************************
-//*  FPGA RAM -- Eagle 1 only
+//*  FPGA NV RAM -- Eagle 1 only
 //*************************************
-READ32_MEMBER( iteagle_fpga_device::ram_r )
+READ32_MEMBER(iteagle_fpga_device::e1_nvram_r)
 {
-	uint32_t result = m_ram[offset];
+	uint32_t result = m_e1_nv_data[offset];
 	if (LOG_RAM)
-		logerror("%s:FPGA ram_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+		logerror("FPGA e1_nvram_r from offset %04X = %08X & %08X\n", offset * 4, result, mem_mask);
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_fpga_device::ram_w )
+WRITE32_MEMBER(iteagle_fpga_device::e1_nvram_w)
 {
-	COMBINE_DATA(&m_ram[offset]);
+	COMBINE_DATA(&m_e1_nv_data[offset]);
 	if (LOG_RAM)
-		logerror("%s:FPGA ram_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+		logerror("FPGA e1_ram_w to offset %04X = %08X & %08X\n", offset * 4, data, mem_mask);
+}
+//*************************************
+//*  FPGA RAM -- Eagle 1 only
+//*************************************
+READ32_MEMBER( iteagle_fpga_device::e1_ram_r )
+{
+	uint32_t result = m_e1_ram[offset];
+	if (LOG_RAM)
+		logerror("%s:FPGA e1_ram_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+	return result;
+}
+
+WRITE32_MEMBER( iteagle_fpga_device::e1_ram_w )
+{
+	COMBINE_DATA(&m_e1_ram[offset]);
+	if (LOG_RAM)
+		logerror("%s:FPGA e1_ram_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 }
 
 //************************************
@@ -760,7 +797,11 @@ void iteagle_periph_device::device_reset()
 {
 	pci_device::device_reset();
 	memset(m_ctrl_regs, 0, sizeof(m_ctrl_regs));
-	m_ctrl_regs[0x10/4] =  0x00000000; // 0x6=No SIMM, 0x2, 0x1, 0x0 = SIMM .  Top 16 bits are compared to 0x3. Bit 0 might be lan chip present.
+	// Bit 0: might be lan chip present.
+	// Bit 1: 0 == 8 Meg Ram @ 0x0
+	// Bit 1: 1 == 32 Meg Simm @ 0x0, 8 Meg Ram @ 0x02000000
+	// Top 16 bits are compared to 0x3
+	m_ctrl_regs[0x10/4] =  0x00040002;
 }
 
 READ32_MEMBER( iteagle_periph_device::ctrl_r )
@@ -775,25 +816,31 @@ READ32_MEMBER( iteagle_periph_device::ctrl_r )
 			break;
 		case 0x70/4:
 			if (ACCESSING_BITS_8_15) {
-				// get the current date/time from the core
-				machine().current_datetime(systime);
-				m_rtc_regs[0] = dec_2_bcd(systime.local_time.second);
-				m_rtc_regs[1] = 0x00; // Seconds Alarm
-				m_rtc_regs[2] = dec_2_bcd(systime.local_time.minute);
-				m_rtc_regs[3] = 0x00; // Minutes Alarm
-				m_rtc_regs[4] = dec_2_bcd(systime.local_time.hour);
-				m_rtc_regs[5] = 0x00; // Hours Alarm
+				if (m_rtc_regs[m_ctrl_regs[0x70 / 4] & 0xff] < 0x10) {
+					// get the current date/time from the core
+					machine().current_datetime(systime);
+					m_rtc_regs[0] = dec_2_bcd(systime.local_time.second);
+					m_rtc_regs[1] = 0x00; // Seconds Alarm
+					m_rtc_regs[2] = dec_2_bcd(systime.local_time.minute);
+					m_rtc_regs[3] = 0x00; // Minutes Alarm
+					m_rtc_regs[4] = dec_2_bcd(systime.local_time.hour);
+					m_rtc_regs[5] = 0x00; // Hours Alarm
 
-				m_rtc_regs[6] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-				m_rtc_regs[7] = dec_2_bcd(systime.local_time.mday);
-				m_rtc_regs[8] = dec_2_bcd(systime.local_time.month + 1);
-				m_rtc_regs[9] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
-				//m_rtc_regs[9] = 0x99; // Use 1998
-				//m_rtc_regs[0xa] &= ~0x10; // Reg A Status
-				//m_ctrl_regs[0xb] &= 0x10; // Reg B Status
-				//m_ctrl_regs[0xc] &= 0x10; // Reg C Interrupt Status
-				m_rtc_regs[0xd] = 0x80; // Reg D Valid time/ram Status
+					m_rtc_regs[6] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
+					m_rtc_regs[7] = dec_2_bcd(systime.local_time.mday);
+					m_rtc_regs[8] = dec_2_bcd(systime.local_time.month + 1);
+					m_rtc_regs[9] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
+					//m_rtc_regs[9] = 0x99; // Use 1998
+					//m_rtc_regs[0xa] &= ~0x10; // Reg A Status
+					//m_ctrl_regs[0xb] &= 0x10; // Reg B Status
+					//m_ctrl_regs[0xc] &= 0x10; // Reg C Interrupt Status
+					m_rtc_regs[0xd] = 0x80; // Reg D Valid time/ram Status
+				}
 				result = (result & 0xffff00ff) | (m_rtc_regs[m_ctrl_regs[0x70/4]&0xff]<<8);
+			}
+			else if (ACCESSING_BITS_24_31) {
+				// High 128 bytes of rtc ram
+				result = (result & 0x00ffffff) | (m_rtc_regs[m_ctrl_regs[0x72 / 4] & 0xff] << 24);
 			}
 			if (LOG_PERIPH)
 				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);

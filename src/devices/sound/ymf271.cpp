@@ -11,7 +11,7 @@
     - A/L bit (alternate loop)
     - EN and EXT Out bits
     - Src B and Src NOTE bits
-    - statusreg Busy and End bits
+    - statusreg Busy flag
     - timer register 0x11
     - ch2/ch3 (4 speakers)
     - PFM (FM using external PCM waveform)
@@ -245,6 +245,28 @@ inline bool ymf271_device::check_envelope_end(YMF271Slot *slot)
 	return false;
 }
 
+// calculate status end disable/enable (Desert War shots relies on this)
+inline void ymf271_device::calculate_status_end(int slotnum, bool state)
+{
+	// guess: don't enable/disable if slot isn't a multiple of 4
+	if(slotnum & 3)
+		return;
+	
+   /*
+    bit scheme is kinda twisted
+	status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
+	status2 End44 End32 End20 End8  End40 End28 End16 End4
+    */
+	uint8_t subbit = slotnum / 12;
+	uint8_t bankbit = ((slotnum % 12) >> 2);
+	
+	if(state == false)
+		m_end_status &= ~(1 << (subbit+bankbit*4));
+	else
+		m_end_status |= (1 << (subbit+bankbit*4));
+
+}
+
 void ymf271_device::update_envelope(YMF271Slot *slot)
 {
 	switch (slot->env_state)
@@ -450,6 +472,7 @@ void ymf271_device::update_pcm(int slotnum, int32_t *mixp, int length)
 		if ((slot->stepptr>>16) > slot->endaddr)
 		{
 			slot->stepptr = slot->stepptr - ((uint64_t)slot->endaddr<<16) + ((uint64_t)slot->loopaddr<<16);
+			calculate_status_end(slotnum,true);
 			if ((slot->stepptr>>16) > slot->endaddr)
 			{
 				// overflow
@@ -1003,6 +1026,7 @@ void ymf271_device::write_register(int slotnum, int reg, uint8_t data)
 				slot->active = 1;
 
 				calculate_step(slot);
+				calculate_status_end(slotnum,false);
 				init_envelope(slot);
 				init_lfo(slot);
 				slot->feedback_modulation0 = 0;
@@ -1476,11 +1500,11 @@ READ8_MEMBER( ymf271_device::read )
 	switch (offset & 0xf)
 	{
 		case 0x0:
-			return m_status;
+			return m_status | ((m_end_status & 0xf) << 3);
 
 		case 0x1:
 			// statusreg 2
-			return 0;
+			return m_end_status >> 4;
 
 		case 0x2:
 		{
@@ -1692,6 +1716,7 @@ void ymf271_device::init_state()
 	save_item(NAME(m_timerB));
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_status));
+	save_item(NAME(m_end_status));
 	save_item(NAME(m_enable));
 	save_item(NAME(m_ext_address));
 	save_item(NAME(m_ext_rw));

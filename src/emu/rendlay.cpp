@@ -675,17 +675,28 @@ private:
 	// internal helpers
 	void load_bitmap()
 	{
-		// load the basic bitmap
 		assert(m_file != nullptr);
-		m_hasalpha = render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
 
-		// load the alpha bitmap if specified
-		if (m_bitmap.valid() && !m_alphafile.empty())
-			render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_alphafile.c_str(), true);
+		ru_imgformat const format = render_detect_image(*m_file, m_dirname.c_str(), m_imagefile.c_str());
+		switch (format)
+		{
+			case RENDUTIL_IMGFORMAT_ERROR:
+				break;
 
-		// PNG failed, let's try JPG
-		if (!m_bitmap.valid())
-			render_load_jpeg(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+			case RENDUTIL_IMGFORMAT_PNG:
+				// load the basic bitmap
+				m_hasalpha = render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+
+				// load the alpha bitmap if specified
+				if (m_bitmap.valid() && !m_alphafile.empty())
+					render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_alphafile.c_str(), true);
+				break;
+
+			default:
+				// try JPG
+				render_load_jpeg(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+				break;
+		}
 
 		// if we can't load the bitmap, allocate a dummy one and report an error
 		if (!m_bitmap.valid())

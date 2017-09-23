@@ -226,7 +226,6 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
@@ -450,63 +449,40 @@ static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(fortyl_state,ta7630)
-{
-	int i;
-
-	double db           = 0.0;
-	double db_step      = 1.50; /* 1.50 dB step (at least, maybe more) */
-	double db_step_inc  = 0.125;
-	for (i = 0; i < 16; i++)
-	{
-		double max = 100.0 / pow(10.0, db/20.0);
-		m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, m_vol_ctrl[15 - i], db);*/
-		db += db_step;
-		db_step += db_step_inc;
-	}
-
-	/* for (i = 0; i < 8; i++)
-	    logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) ); */
-/*
-  channels 0-2 AY#0
-  channels 3,4 MSM5232 group1,group2
-*/
-}
-
 WRITE8_MEMBER(fortyl_state::sound_control_0_w)
 {
 	m_snd_ctrl0 = data & 0xff;
 //  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
-	m_msm->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
-	m_msm->set_output_gain(1, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
-	m_msm->set_output_gain(2, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
-	m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	for(int i=0;i<4;i++)
+		m_ta7630->set_channel_volume(m_msm,i,m_snd_ctrl0 >> 4);
+
+	//m_msm->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	//m_msm->set_output_gain(1, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	//m_msm->set_output_gain(2, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	//m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
 WRITE8_MEMBER(fortyl_state::sound_control_1_w)
 {
 	m_snd_ctrl1 = data & 0xff;
 //  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
-	m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	for(int i=0;i<4;i++)
+		m_ta7630->set_channel_volume(m_msm,i+4,m_snd_ctrl1 >> 4);
+
+	//m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	//m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	//m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	//m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
 WRITE8_MEMBER(fortyl_state::sound_control_2_w)
 {
-	device_t *device = machine().device("aysnd");
-	int i;
 	m_snd_ctrl2 = data & 0xff;
 //  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 
-	device_sound_interface *sound;
-	device->interface(sound);
-	for (i = 0; i < 3; i++)
-		sound->set_output_gain(i, m_vol_ctrl[(m_snd_ctrl2 >> 4) & 15] / 100.0); /* ym2149f all */
+	m_ta7630->set_device_volume(m_ay,m_snd_ctrl2 >> 4);
 }
 
 WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
@@ -752,7 +728,7 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 
 MACHINE_RESET_MEMBER(fortyl_state,common)
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	//MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
 	m_pix1 = 0;
@@ -809,7 +785,8 @@ static MACHINE_CONFIG_START( 40love )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
+	MCFG_TA7630_ADD("ta7630")
+	
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortyl_state, sound_control_3_w))
@@ -867,6 +844,7 @@ static MACHINE_CONFIG_START( undoukai )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_TA7630_ADD("ta7630")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))

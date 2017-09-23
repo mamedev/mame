@@ -67,10 +67,10 @@ std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *
 
 const rom_entry *rom_first_region(const device_t &device)
 {
-	const rom_entry *romp = device.rom_region();
-	while (romp && ROMENTRY_ISPARAMETER(romp))
+	const rom_entry *romp = &device.rom_region_vector().front();
+	while (ROMENTRY_ISPARAMETER(romp))
 		romp++;
-	return (romp != nullptr && !ROMENTRY_ISEND(romp)) ? romp : nullptr;
+	return !ROMENTRY_ISEND(romp) ? romp : nullptr;
 }
 
 
@@ -125,7 +125,7 @@ const rom_entry *rom_next_file(const rom_entry *romp)
 
 const rom_entry *rom_first_parameter(const device_t &device)
 {
-	const rom_entry *romp = device.rom_region();
+	const rom_entry *romp = &device.rom_region_vector().front();
 	while (romp && !ROMENTRY_ISEND(romp) && !ROMENTRY_ISPARAMETER(romp))
 		romp++;
 	return (romp != nullptr && !ROMENTRY_ISEND(romp)) ? romp : nullptr;
@@ -191,10 +191,8 @@ u32 rom_file_size(const rom_entry *romp)
 	/* loop until we run out of reloads */
 	do
 	{
-		u32 curlength;
-
 		/* loop until we run out of continues/ignores */
-		curlength = ROM_GETLENGTH(romp++);
+		u32 curlength = ROM_GETLENGTH(romp++);
 		while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp))
 			curlength += ROM_GETLENGTH(romp++);
 
@@ -922,9 +920,9 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 
 					/* handle flag inheritance */
 					if (!ROM_INHERITSFLAGS(&modified_romp))
-						lastflags = modified_romp.flags();
+						lastflags = modified_romp.get_flags();
 					else
-						modified_romp.set_flags((modified_romp.flags() & ~ROM_INHERITEDFLAGS) | lastflags);
+						modified_romp.set_flags((modified_romp.get_flags() & ~ROM_INHERITEDFLAGS) | lastflags);
 
 					explength += ROM_GETLENGTH(&modified_romp);
 
@@ -1547,18 +1545,18 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 std::vector<rom_entry> rom_build_entries(const tiny_rom_entry *tinyentries)
 {
 	std::vector<rom_entry> result;
-
-	if (tinyentries != nullptr)
+	if (tinyentries)
 	{
 		int i = 0;
 		do
 		{
 			result.emplace_back(tinyentries[i]);
-		} while ((tinyentries[i++].flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END);
+		}
+		while (!ROMENTRY_ISEND(tinyentries[i++]));
 	}
 	else
 	{
-		const tiny_rom_entry end_entry = { nullptr, nullptr, 0, 0, ROMENTRYTYPE_END };
+		tiny_rom_entry const end_entry = { nullptr, nullptr, 0, 0, ROMENTRYTYPE_END };
 		result.emplace_back(end_entry);
 	}
 	return result;

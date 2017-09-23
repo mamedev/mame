@@ -28,6 +28,8 @@ public:
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
 		m_lumaram(*this, "lumaram"),
+		m_fbvram1(*this, "fbvram1"),
+		m_fbvram2(*this, "fbvram2"),
 		m_soundram(*this, "soundram"),
 		m_tgp_program(*this, "tgp_program"),
 		m_tgpx4_program(*this, "tgpx4_program"),
@@ -60,6 +62,8 @@ public:
 	required_shared_ptr<uint32_t> m_textureram0;
 	required_shared_ptr<uint32_t> m_textureram1;
 	required_shared_ptr<uint32_t> m_lumaram;
+	required_shared_ptr<uint32_t> m_fbvram1;
+	required_shared_ptr<uint32_t> m_fbvram2;	
 	optional_shared_ptr<uint16_t> m_soundram;
 	optional_shared_ptr<uint32_t> m_tgp_program;
 	optional_shared_ptr<uint64_t> m_tgpx4_program;

@@ -178,13 +178,7 @@ public:
 	menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color);
 	virtual ~menu_palette_sel() override;
 
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
 private:
-	// draw palette menu
-	virtual void draw(uint32_t flags) override;
-
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 

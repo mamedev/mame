@@ -362,9 +362,11 @@ static MACHINE_CONFIG_START( starwars )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa7_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(starwars_state, boost_interleave_hack))
 
 	MCFG_GENERIC_LATCH_8_ADD("mainlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa6_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(starwars_state, boost_interleave_hack))
 MACHINE_CONFIG_END
 
 

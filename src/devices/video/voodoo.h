@@ -1019,14 +1019,21 @@ static const uint8_t dither_matrix_4x4[16] =
 	15,  7, 13,  5
 };
 
+//static const uint8_t dither_matrix_2x2[16] =
+//{
+//		2, 10,  2, 10,
+//	14,  6, 14,  6,
+//		2, 10,  2, 10,
+//	14,  6, 14,  6
+//};
+// Using this matrix allows iteagle video memory tests to pass
 static const uint8_t dither_matrix_2x2[16] =
 {
-		2, 10,  2, 10,
-	14,  6, 14,  6,
-		2, 10,  2, 10,
-	14,  6, 14,  6
+	8, 10, 8, 10,
+	11, 9, 11, 9,
+	8, 10, 8, 10,
+	11, 9, 11, 9
 };
-
 
 
 /*************************************

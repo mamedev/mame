@@ -110,10 +110,12 @@ void a2bus_arcboard_device::write_c0nx(address_space &space, uint8_t offset, uin
 {
 	switch (offset)
 	{
+		case 0:
 		case 2:
 			m_tms->vram_write(space, 0, data);
 			break;
 
+		case 1:
 		case 3:
 			m_tms->register_write(space, 0, data);
 			break;

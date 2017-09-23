@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, Peter Ferrie
-/**********************************************************************************
+/****************************************************************************************
 
   Fun World / TAB / Impera
   Series 7000 hardware.
@@ -12,94 +12,95 @@
   Driver by Roberto Fresca.
   Based on a preliminary work of Curt Coder & Peter Trauner.
 
-***********************************************************************************
+*****************************************************************************************
 
   Games running on this hardware:
 
-  * Jolly Card (Austrian, set 1),                     TAB Austria,        1985.
-  * Jolly Card (Austrian, set 2),                     TAB Austria,        1985.
-  * Jolly Card (3x3 deal),                            TAB Austria,        1985.
-  * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
-  * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
-  * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
-  * Jolly Card (Croatian, set 1),                     TAB Austria,        1985.
-  * Jolly Card (Croatian, set 2),                     Soft Design,        1993.
-  * Jolly Card (Italian, blue TAB board, encrypted),  bootleg,            199?.
-  * Jolly Card (Italian, encrypted bootleg, set 1),   bootleg,            1990.
-  * Jolly Card (Italian, encrypted bootleg, set 2),   bootleg,            1993.
-  * Jolly Card (Italian, different colors, set 1),    bootleg,            1990.
-  * Jolly Card (Italian, different colors, set 2),    bootleg,            1990.
-  * Super Joly 2000 - 3x,                             M.P.                1985.
-  * Jolly Card (Austrian, Fun World, bootleg),        Inter Games,        1986.
-  * Jolly Card (Spanish, blue TAB board, encrypted),  TAB Austria,        1992.
-  * Bonus Card (Austrian),                            Fun World,          1986.
-  * Bonus Card (Austrian, ATG Electronic hack),       Fun World,          1986.
-  * Big Deal (Hungarian, set 1),                      Fun World,          1986.
-  * Big Deal (Hungarian, set 2),                      Fun World,          1986.
-  * Power Card (Ver 0263, encrypted),                 Fun World,          1993.
-  * Cuore 1 (Italian),                                C.M.C.,             1996.
-  * Elephant Family (Italian, new),                   C.M.C.,             1997.
-  * Elephant Family (Italian, old),                   C.M.C.,             1996.
-  * Pool 10 (Italian, set 1),                         C.M.C.,             1996.
-  * Pool 10 (Italian, set 2),                         C.M.C.,             1996.
-  * Pool 10 (Italian, set 3),                         C.M.C.,             1996.
-  * Pool 10 (Italian, set 4),                         C.M.C.,             1997.
-  * Pool 10 (Italian, set 5),                         C.M.C.,             1996.
-  * Pool 10 (Italian, set 6),                         C.M.C.,             1996.
-  * Pool 10 (Italian, set 7),                         C.M.C.,             1997.
-  * Pool 10 (Italian, set 8),                         C.M.C.,             1997.
-  * Pool 10 (Italian, Dino 4 hardware, encrypted),    C.M.C.,             1997.
-  * Royal (Pool 10 hack),                             unknown,            2001.
-  * Tortuga Family (Italian),                         C.M.C.,             1997.
-  * Pot Game (Italian),                               C.M.C.,             1996.
-  * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
-  * Bottle 10 (Italian, set 2),                       C.M.C.,             1996.
-  * Luna Park (set 1, dual program),                  unknown,            1998.
-  * Luna Park (set 2, dual program),                  unknown,            1998.
-  * Luna Park (set 3),                                unknown,            1998.
-  * Crystal Colours (CMC hardware),                   J.C.D. srl,         1998.
-  * Royal Card (Austrian, set 1),                     TAB Austria,        1991.
-  * Royal Card (Austrian, set 2),                     TAB Austria,        1991.
-  * Royal Card (Austrian/Polish, set 3),              TAB Austria,        1991.
-  * Royal Card (Austrian, set 4),                     TAB Austria,        1991.
-  * Royal Card (Austrian, set 5),                     TAB Austria,        1991.
-  * Royal Card (Austrian, set 6),                     TAB Austria,        1991.
-  * Royal Card (Austrian, set 7, CMC C1030 HW),       bootleg,            1991.
-  * Royal Card (French),                              TAB Austria,        1991.
-  * Royal Card (TAB original),                        TAB Austria,        1991.
-  * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
-  * Royal Card Professional 2.0,                      Digital Dreams,     1993.
-  * Royal Card (Italian, Dino 4 hardware, encrypted)  unknown,            1998.
-  * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
-  * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
-  * Magic Card II (Bulgarian),                        Impera,             1996.
-  * Magic Card II (Nov, Yugoslavian),                 Impera,             1996.
-  * Magic Card II (green TAB or Impera board),        Impera,             1996.
-  * Magic Card II (blue TAB board, encrypted),        Impera,             1996.
-  * Royal Vegas Joker Card (Slow deal),               Fun World,          1993.
-  * Royal Vegas Joker Card (Fast deal),               Soft Design,        1993.
-  * Royal Vegas Joker Card (Fast deal, english gfx),  Soft Design,        1993.
-  * Royal Vegas Joker Card (Fast deal, Mile),         Mile,               1993.
-  * Jolly Joker (98bet, set 1).                       Impera,             198?.
-  * Jolly Joker (98bet, set 2).                       Impera,             198?.
-  * Jolly Joker (40bet, croatian hack),               Impera,             198?.
-  * Jolly Joker (Apple Time),                         Apple Time,         198?.
-  * Multi Win (Ver.0167, encrypted),                  Fun World,          1992.
-  * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
-  * Mongolfier New (Italian),                         unknown,            199?.
-  * Soccer New (Italian),                             unknown,            199?.
-  * Saloon (French, encrypted),                       unknown,            199?.
-  * Fun World Quiz (Austrian),                        Fun World,          198?.
-  * Witch Royal (Export version 2.1),                 Video Klein,        199?.
-  * Novo Play Multi Card / Club Card,                 Admiral/Novomatic,  1986.
-  * unknown encrypted Royal Card (Dino4 HW),          unknown,            1998.
-  * China Town (Ver 1B, Dino4 HW),                    unknown,            1998.
-  * Unknown Inter Games poker,                        Inter Games,        1991.
-  * Unknown Fun World A7-11 game 1,                   Fun World,          1985.
-  * Unknown Fun World A7-11 game 2,                   Fun World,          1985.
-  * Unknown Fun World A0-1 game,                      Fun World,          1991.
+  * Jolly Card (Austrian, set 1),                               TAB Austria,        1985.
+  * Jolly Card (Austrian, set 2),                               TAB Austria,        1985.
+  * Jolly Card (3x3 deal),                                      TAB Austria,        1985.
+  * Jolly Card Professional 2.0 (MZS Tech),                     MZS Tech,           1993.
+  * Jolly Card Professional 2.0 (Spale Soft),                   Spale Soft,         2000.
+  * Jolly Card (Evona Electronic),                              Evona Electronic    1998.
+  * Jolly Card (Croatian, set 1),                               TAB Austria,        1985.
+  * Jolly Card (Croatian, set 2),                               Soft Design,        1993.
+  * Jolly Card (Italian, blue TAB board, encrypted),            bootleg,            199?.
+  * Jolly Card (Italian, encrypted bootleg, set 1),             bootleg,            1990.
+  * Jolly Card (Italian, encrypted bootleg, set 2),             bootleg,            1993.
+  * Jolly Card (Italian, different colors, set 1),              bootleg,            1990.
+  * Jolly Card (Italian, different colors, set 2),              bootleg,            1990.
+  * Super Joly 2000 - 3x,                                       M.P.                1985.
+  * Jolly Card (Austrian, Fun World, bootleg),                  Inter Games,        1986.
+  * Jolly Card (Spanish, blue TAB board, encrypted),            TAB Austria,        1992.
+  * Bonus Card (Austrian),                                      Fun World,          1986.
+  * Bonus Card (Austrian, ATG Electronic hack),                 Fun World,          1986.
+  * Big Deal (Hungarian, set 1),                                Fun World,          1986.
+  * Big Deal (Hungarian, set 2),                                Fun World,          1986.
+  * Power Card (Ver 0263, encrypted),                           Fun World,          1993.
+  * Cuore 1 (Italian),                                          C.M.C.,             1996.
+  * Elephant Family (Italian, new),                             C.M.C.,             1997.
+  * Elephant Family (Italian, old),                             C.M.C.,             1996.
+  * Pool 10 (Italian, set 1),                                   C.M.C.,             1996.
+  * Pool 10 (Italian, set 2),                                   C.M.C.,             1996.
+  * Pool 10 (Italian, set 3),                                   C.M.C.,             1996.
+  * Pool 10 (Italian, set 4),                                   C.M.C.,             1997.
+  * Pool 10 (Italian, set 5),                                   C.M.C.,             1996.
+  * Pool 10 (Italian, set 6),                                   C.M.C.,             1996.
+  * Pool 10 (Italian, set 7),                                   C.M.C.,             1997.
+  * Pool 10 (Italian, set 8),                                   C.M.C.,             1997.
+  * Pool 10 (Italian, Dino 4 hardware, encrypted),              C.M.C.,             1997.
+  * Royal (Pool 10 hack),                                       unknown,            2001.
+  * Tortuga Family (Italian),                                   C.M.C.,             1997.
+  * Pot Game (Italian),                                         C.M.C.,             1996.
+  * Bottle 10 (Italian, set 1),                                 C.M.C.,             1996.
+  * Bottle 10 (Italian, set 2),                                 C.M.C.,             1996.
+  * Luna Park (set 1, dual program),                            unknown,            1998.
+  * Luna Park (set 2, dual program),                            unknown,            1998.
+  * Luna Park (set 3),                                          unknown,            1998.
+  * Crystal Colours (CMC hardware),                             J.C.D. srl,         1998.
+  * Royal Card (Austrian, set 1),                               TAB Austria,        1991.
+  * Royal Card (Austrian, set 2),                               TAB Austria,        1991.
+  * Royal Card (Austrian/Polish, set 3),                        TAB Austria,        1991.
+  * Royal Card (Austrian, set 4),                               TAB Austria,        1991.
+  * Royal Card (Austrian, set 5),                               TAB Austria,        1991.
+  * Royal Card (Austrian, set 6),                               TAB Austria,        1991.
+  * Royal Card (Austrian, set 7, CMC C1030 HW),                 bootleg,            1991.
+  * Royal Card (French),                                        TAB Austria,        1991.
+  * Royal Card (TAB original),                                  TAB Austria,        1991.
+  * Royal Card (Slovak, encrypted),                             Evona Electronic,   1991.
+  * Royal Card Professional 2.0,                                Digital Dreams,     1993.
+  * Royal Card (Italian, Dino 4 hardware, encrypted),           unknown,            1998.
+  * RRoyal Card / Royal Jackpot (with a third draw)(encrypted), TAB / Video Klein,  1991
+  * Lucky Lady (3x3 deal),                                      TAB Austria,        1991.
+  * Lucky Lady (4x1 aces),                                      TAB Austria,        1991.
+  * Magic Card II (Bulgarian),                                  Impera,             1996.
+  * Magic Card II (Nov, Yugoslavian),                           Impera,             1996.
+  * Magic Card II (green TAB or Impera board),                  Impera,             1996.
+  * Magic Card II (blue TAB board, encrypted),                  Impera,             1996.
+  * Royal Vegas Joker Card (Slow deal),                         Fun World,          1993.
+  * Royal Vegas Joker Card (Fast deal),                         Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, english gfx),            Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, Mile),                   Mile,               1993.
+  * Jolly Joker (98bet, set 1).                                 Impera,             198?.
+  * Jolly Joker (98bet, set 2).                                 Impera,             198?.
+  * Jolly Joker (40bet, croatian hack),                         Impera,             198?.
+  * Jolly Joker (Apple Time),                                   Apple Time,         198?.
+  * Multi Win (Ver.0167, encrypted),                            Fun World,          1992.
+  * Joker Card (Ver.A267BC, encrypted),                         Vesely Svet,        1993.
+  * Mongolfier New (Italian),                                   unknown,            199?.
+  * Soccer New (Italian),                                       unknown,            199?.
+  * Saloon (French, encrypted),                                 unknown,            199?.
+  * Fun World Quiz (Austrian),                                  Fun World,          198?.
+  * Witch Royal (Export version 2.1),                           Video Klein,        199?.
+  * Novo Play Multi Card / Club Card,                           Admiral/Novomatic,  1986.
+  * unknown encrypted Royal Card (Dino4 HW),                    unknown,            1998.
+  * China Town (Ver 1B, Dino4 HW),                              unknown,            1998.
+  * Unknown Inter Games poker,                                  Inter Games,        1991.
+  * Unknown Fun World A7-11 game 1,                             Fun World,          1985.
+  * Unknown Fun World A7-11 game 2,                             Fun World,          1985.
+  * Unknown Fun World A0-1 game,                                Fun World,          1991.
 
-***********************************************************************************
+*****************************************************************************************
 
   The hardware is generally composed by:
 
@@ -468,8 +469,7 @@
   The only visible changes are in the NVRAM, where the $0000 offset hasn't the JMP $C210 instruction
   injected at the start...
 
-***********************************************************************************
-
+*****************************************************************************************
 
   Memory Map (generic)
   --------------------
@@ -522,16 +522,14 @@
   chinatow:  0x7C  0x60  0x65  0x08  0x21  0x08  0x1F  0x1F  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
 
-***********************************************************************************
-
+*****************************************************************************************
 
   *** Hardware Info ***
 
   Moved all technical info to the ROM load section...
 
 
-***********************************************************************************
-
+*****************************************************************************************
 
   *** Driver Updates by Roberto Fresca and Peter Ferrie ***
 
@@ -983,7 +981,7 @@
   - Implement the MCU in monglfir and soccernw.
 
 
-***********************************************************************************/
+****************************************************************************************/
 
 #define MASTER_CLOCK    XTAL_16MHz
 #define CPU_CLOCK      (MASTER_CLOCK/8)
@@ -1878,6 +1876,92 @@ static INPUT_PORTS_START( royalcrd )
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( royaljp )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Halten (Hold) 1 / Hoch (High)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Loeschen/Gamble (Cancel/Play)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Geben (Start)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Halten (Hold) 5 / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buchhalt (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Halten (Hold) 4 / Kassieren (Take)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Halten (Hold) 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Halten (Hold) 3 / Tief (Low)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("unknown bit 08") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreib (Payout)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+/* ________________________________________________________________________
+  |DIP Schalter 1                          | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Hopperbetrieb über Board        ein/on  |on |   |   |   |   |   |   |   |
+  |(Hopper Payout)                 aus/off |off|   |   |   |   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Autohold                        an/yes  |   |on |   |   |   |   |   |   |
+  |                                aus/no  |   |off|   |   |   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Gewinn ab: "Hohes Paar"/"High pair"     |   |   |on |   |   |   |   |   |
+  |(Profit)   "König oder As"/"King or Ace"|   |   |off|   |   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Insert "Dattl"                          |   |   |   |on |   |   |   |   |
+  |Insert "Royal-Jackpot"                  |   |   |   |off|   |   |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Coin A = 10  Coin B = 50                |   |   |   |   |on |on |   |   |
+  |Coin A = 10  Coin B = 20                |   |   |   |   |on |off|   |   |
+  |Coin A = 1   Coin B = 20                |   |   |   |   |off|off|   |   |
+  |Coin A = 1   Coin B = 50                |   |   |   |   |off|on |   |   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Immer / always                          |   |   |   |   |   |   |off|   |
+  |________________________________________|___|___|___|___|___|___|___|___|
+  |Keyboard Test                           |   |   |   |   |   |   |   |on |
+  |Spielbetrieb / Maingame                 |   |   |   |   |   |   |   |off|
+  |________________________________________|___|___|___|___|___|___|___|___|
+
+  Default Settings from Video Klein:  01101100
+
+*/
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "Keyboard Test" )
+	PORT_DIPSETTING(    0x01, "Main Game" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )    // Shown as "Always Off" in the manual
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, "50 Points/Coin" )
+	PORT_DIPSETTING(    0x04, "20 Points/Coin" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "10 Points/Coin" )
+	PORT_DIPSETTING(    0x08, "1 Point/Coin" )
+	PORT_DIPNAME( 0x10, 0x10, "Insert" )            PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, "Dattl Insert" )
+	PORT_DIPSETTING(    0x10, "Royal Jackpot" )
+	PORT_DIPNAME( 0x20, 0x00, "Profit" )            PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "Hohes Paar" )
+	PORT_DIPSETTING(    0x20, "2 Kings or Aces" )
+	PORT_DIPNAME( 0x40, 0x00, "Autohold" )          PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Payout" )     PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( cuoreuno )
 	PORT_START("IN0")
@@ -4880,6 +4964,38 @@ ROM_START( royalcrdp )
 ROM_END
 
 
+/*
+  Royal Card / Royal Jackpot (with third draw) (encrypted)
+
+  Encrypted graphics 'alla TAB blue PCB.
+  Maybe is the infamous encrypted Impera green PCB.
+  
+  From the manual: "With third draw"
+  ...but I couldn't trigger this feature. 
+ 
+ */
+
+ROM_START( royaljp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.z.1_10.bin", 0x8000, 0x8000, CRC(ad03c41c) SHA1(8241a7eb02d7c06b7ea5bea5ab0d9ed4c6fcfd50) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "02.bin", 0x0000, 0x8000, CRC(c8f6f3e4) SHA1(5d8b32609562647c698926ea75c8f806b703332e) )
+	ROM_LOAD( "01.bin", 0x8000, 0x8000, CRC(3ced6423) SHA1(2309a856226404789fd219cf77ba2f378a90eee7) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "rj_d27hc65d-2_(82s147).bin",  0x0000, 0x0200, CRC(d6570420) SHA1(90b6c126b485db823acffbfd195964a6282e60ea) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "royaljp_nvram.bin",  0x0000, 0x0800, CRC(48e51e2a) SHA1(b81a1741eef299384d4fa98a534099b2c0332074) )
+
+	ROM_REGION( 0x0600, "plds", 0 ) /* There are 3 GALs */
+	ROM_LOAD( "gal20v8b.bin",    0x0000, 0x0157,   NO_DUMP )
+	ROM_LOAD( "gal20v8a.bin",    0x0200, 0x0157,   NO_DUMP )
+	ROM_LOAD( "gal16v8d.bin",    0x0400, 0x0117,   NO_DUMP )
+ROM_END
+
+
 /******************************** Lucky Lady sets ************************************/
 
 ROM_START( lluck3x3 )
@@ -6180,8 +6296,8 @@ DRIVER_INIT_MEMBER(funworld_state, tabblue)
    | Blue TAB PCB Decryption |
    +-------------------------+
 
-    It perform by byte nibble a boolean XOR against the same value shifted to the right, then shift
-    the result to the left carring the less significant bit and losing the most significant one.
+    It performs by byte nibble a boolean XOR against the same value shifted to the right, then shift
+    the result to the left, carring the less significant bit and losing the most significant one.
 
 
     Encrypted nibble:  0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
@@ -6260,7 +6376,7 @@ DRIVER_INIT_MEMBER(funworld_state, mongolnw)
 
 	ROM[0x9115] = 0xa5;
 
-/* prevent one test from triggering hardware error */
+/* prevents one test from triggering hardware error */
 	ROM[0xb8f3] = 0xff;
 }
 
@@ -6940,72 +7056,73 @@ GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  funworld_state, 0,       
 GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
 
 // Royal Card based...
-GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrda, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 2)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian/Polish, set 3)",             0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 4)",                    MACHINE_IMPERFECT_GRAPHICS, layout_jollycrd )
-GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
-GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
-GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  MACHINE_NOT_WORKING )
-GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
-GAMEL( 1991, royalcrdh, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 8)",                    0 ,                      layout_jollycrd )
-GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd )
-GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  funworld_state, 0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
-GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  funworld_state, 0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
+GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrda, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (Austrian, set 2)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (Austrian/Polish, set 3)",             0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (Austrian, set 4)",                    MACHINE_IMPERFECT_GRAPHICS, layout_jollycrd )
+GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
+GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (TAB original)",                       0,                       layout_jollycrd )
+GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic",  "Royal Card (Slovak, encrypted)",                  MACHINE_NOT_WORKING )
+GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "bootleg",           "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
+GAMEL( 1991, royalcrdh, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (Austrian, set 8)",                    0 ,                      layout_jollycrd )
+GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Royal Card (French)",                             0,                       layout_jollycrd )
+GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  funworld_state, 0,        ROT0, "Digital Dreams",    "Royal Card v2.0 Professional",                    0 )
+GAMEL( 199?, royaljp,   royalcrd, royalcd1, royaljp,   funworld_state, tabblue,  ROT0, "TAB / Video Klein", "Royal Card / Royal Jackpot (with a third draw)(encrypted)",  0,            layout_jollycrd )
+GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  funworld_state, 0,        ROT0, "Video Klein",       "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
 
 // Lucky Lady based...
-GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )
-GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
+GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )
+GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",       "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
 
 // Magic Card 2 based...
-GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  funworld_state, 0,        ROT0, "Impera",          "Magic Card II (Bulgarian)",                       0,                       layout_jollycrd )
-GAMEL( 1996, magicrd2a, magicrd2, magicrd2, magicrd2,  funworld_state, 0,        ROT0, "Impera",          "Magic Card II (Nov, Yugoslavian)",                0,                       layout_jollycrd )
-GAME(  1996, magicrd2b, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2b, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       0 )
-GAME(  1996, magicrd2c, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2c, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       0 )
+GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  funworld_state, 0,        ROT0, "Impera",            "Magic Card II (Bulgarian)",                       0,                       layout_jollycrd )
+GAMEL( 1996, magicrd2a, magicrd2, magicrd2, magicrd2,  funworld_state, 0,        ROT0, "Impera",            "Magic Card II (Nov, Yugoslavian)",                0,                       layout_jollycrd )
+GAME(  1996, magicrd2b, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2b, ROT0, "Impera",            "Magic Card II (green TAB or Impera board)",       0 )
+GAME(  1996, magicrd2c, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2c, ROT0, "Impera",            "Magic Card II (blue TAB board, encrypted)",       0 )
 
 // Joker Card based...
-GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  funworld_state, 0,        ROT0, "Fun World",       "Royal Vegas Joker Card (slow deal)",              0,                       layout_jollycrd )
-GAMEL( 1993, vegasfst,  vegasslw, fw2ndpal, vegasfst,  funworld_state, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0,                       layout_jollycrd )
-GAMEL( 1993, vegasfte,  vegasslw, fw2ndpal, vegasfte,  funworld_state, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, English gfx)", 0,                       layout_jollycrd )
-GAMEL( 1993, vegasmil,  vegasslw, fw2ndpal, vegasmil,  funworld_state, 0,        ROT0, "Mile",            "Royal Vegas Joker Card (fast deal, Mile)",        0,                       layout_jollycrd )
+GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  funworld_state, 0,        ROT0, "Fun World",         "Royal Vegas Joker Card (slow deal)",              0,                       layout_jollycrd )
+GAMEL( 1993, vegasfst,  vegasslw, fw2ndpal, vegasfst,  funworld_state, 0,        ROT0, "Soft Design",       "Royal Vegas Joker Card (fast deal)",              0,                       layout_jollycrd )
+GAMEL( 1993, vegasfte,  vegasslw, fw2ndpal, vegasfte,  funworld_state, 0,        ROT0, "Soft Design",       "Royal Vegas Joker Card (fast deal, English gfx)", 0,                       layout_jollycrd )
+GAMEL( 1993, vegasmil,  vegasslw, fw2ndpal, vegasmil,  funworld_state, 0,        ROT0, "Mile",              "Royal Vegas Joker Card (fast deal, Mile)",        0,                       layout_jollycrd )
 
 // Jolly Joker based...
-GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  funworld_state, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, funworld_state, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd ) // bad program ROM...
+GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  funworld_state, 0,        ROT0, "Impera",            "Jolly Joker (98bet, set 1)",                      0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, funworld_state, 0,        ROT0, "Impera",            "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Impera",            "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Apple Time",        "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd ) // bad program ROM...
 
 // Encrypted games...
-GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, multiwin, ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 MACHINE_NOT_WORKING )
-GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                      // clone of Bonus Card.
-GAME(  1993, megacard,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
-GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
-GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      MACHINE_NOT_WORKING )
+GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, multiwin, ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 MACHINE_NOT_WORKING )
+GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                      // clone of Bonus Card.
+GAME(  1993, megacard,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
+GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Vesely Svet",       "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
+GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",         "Saloon (French, encrypted)",                      MACHINE_NOT_WORKING )
 
 // Encrypted TAB blue PCB...
-GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, blue TAB board, encrypted)", 0,                       layout_royalcrd )
-GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg, set 1)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
-GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg, set 2)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
+GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, blue TAB board, encrypted)", 0,                       layout_royalcrd )
+GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 1)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
+GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 2)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 
 // Dino 4 encrypted hardware...
-GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
-GAME ( 1998, rcdino4,   0,        rcdino4,  rcdino4,   funworld_state, rcdino4,  ROT0, "<unknown>",       "Royal Card (Italian, Dino 4 hardware, encrypted)",0 )
-GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdinch,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
+GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",            "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
+GAME ( 1998, rcdino4,   0,        rcdino4,  rcdino4,   funworld_state, rcdino4,  ROT0, "<unknown>",         "Royal Card (Italian, Dino 4 hardware, encrypted)",0 )
+GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdinch,  ROT0, "<unknown>",         "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
 
 // MCU based games...
-GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, mongolnw, ROT0, "<unknown>",       "Mongolfier New (Italian)",                        MACHINE_UNEMULATED_PROTECTION )
-GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw, ROT0, "<unknown>",       "Soccer New (Italian)",                            MACHINE_UNEMULATED_PROTECTION )
+GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, mongolnw, ROT0, "<unknown>",         "Mongolfier New (Italian)",                        MACHINE_UNEMULATED_PROTECTION )
+GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw, ROT0, "<unknown>",         "Soccer New (Italian)",                            MACHINE_UNEMULATED_PROTECTION )
 
 // Other games...
-GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, 0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
-GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  funworld_state, 0,        ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",          0,                       layout_novoplay )
-GAME(  1991, intrgmes,  0,        intrgmes, funworld,  funworld_state, 0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                 MACHINE_NOT_WORKING )
-GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 1",             MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 2",             MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, fw_a0_1,   0,        fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A0-1 game",                MACHINE_NOT_WORKING,     layout_jollycrd )
+GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, 0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                   0 )
+GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  funworld_state, 0,        ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",            0,                       layout_novoplay )
+GAME(  1991, intrgmes,  0,        intrgmes, funworld,  funworld_state, 0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                   MACHINE_NOT_WORKING )
+GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 1",              MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 2",              MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, fw_a0_1,   0,        fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A0-1 game",                 MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
-GAMEL( 1991, royalcrd_nes,  royalcrd,        royalcd2, royalcrd,  funworld_state, 0,        ROT0, "bootleg",     "Royal Card (stealth with NES multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, royalcrd_msx,  royalcrd,        royalcd2, royalcrd,  funworld_state, 0,        ROT0, "bootleg",     "Royal Card (stealth with MSX multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, 0,     ROT0, "bootleg",       "Royal Card (stealth with NES multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, royalcrd_msx,  royalcrd, royalcd2, royalcrd, funworld_state, 0,     ROT0, "bootleg",       "Royal Card (stealth with MSX multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
 

@@ -227,7 +227,8 @@ static MACHINE_CONFIG_START( b2m )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(b2m_state, b2m_romdisk_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(b2m_state, b2m_romdisk_portc_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

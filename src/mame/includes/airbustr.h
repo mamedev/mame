@@ -50,10 +50,6 @@ public:
 	int        m_fg_scrolly;
 	int        m_highbits;
 
-	/* misc */
-	int        m_soundlatch_status;
-	int        m_soundlatch2_status;
-
 	/* devices */
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
@@ -72,10 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_READ8_MEMBER(soundcommand_status_r);
-	DECLARE_READ8_MEMBER(soundcommand_r);
-	DECLARE_READ8_MEMBER(soundcommand2_r);
-	DECLARE_WRITE8_MEMBER(soundcommand_w);
-	DECLARE_WRITE8_MEMBER(soundcommand2_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);

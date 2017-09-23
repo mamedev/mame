@@ -826,6 +826,8 @@ void running_machine::set_rtc_datetime(const system_time &systime)
 //  rand - standardized random numbers
 //-------------------------------------------------
 
+// TODO: using this function in the core is strongly discouraged (can affect inp playback), 
+//       maybe we should consider moving this function to somewhere else instead.
 u32 running_machine::rand()
 {
 	m_rand_seed = 1664525 * m_rand_seed + 1013904223;

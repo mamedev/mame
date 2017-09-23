@@ -621,6 +621,15 @@ ROM_START(meteorp)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
+ROM_START(meteorp2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "cpu_u1a.716", 0x1000, 0x0800, CRC(9ee33909) SHA1(5f58e4e72af47047c8f060f98706ed9607720705))
+	ROM_LOAD( "cpu_u5.716",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
+	ROM_LOAD( "cpu_u2.716",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
+	ROM_LOAD( "cpu_u6.716",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
+	ROM_RELOAD( 0xf800, 0x0800)
+ROM_END
+
 /*--------------------------------
 / Galaxy #114
 /-------------------------------*/
@@ -916,7 +925,8 @@ ROM_START(st_game)
 ROM_END
 
 // 6-digit
-GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Stern)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Stern, set 1)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorp2,   meteorp,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Stern, set 2)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Galaxy",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Ali",                    MACHINE_IS_SKELETON_MECHANICAL)
 

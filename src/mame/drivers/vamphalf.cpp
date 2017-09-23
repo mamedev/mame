@@ -136,6 +136,7 @@ public:
 	DECLARE_READ16_MEMBER(misncrft_speedup_r);
 	DECLARE_READ16_MEMBER(misncrfta_speedup_r);
 	DECLARE_READ16_MEMBER(coolmini_speedup_r);
+	DECLARE_READ16_MEMBER(coolminii_speedup_r);
 	DECLARE_READ16_MEMBER(suplup_speedup_r);
 	DECLARE_READ16_MEMBER(luplup_speedup_r);
 	DECLARE_READ16_MEMBER(luplup29_speedup_r);
@@ -179,6 +180,7 @@ public:
 	DECLARE_DRIVER_INIT(vamphalfr1);
 	DECLARE_DRIVER_INIT(vamphafk);
 	DECLARE_DRIVER_INIT(coolmini);
+	DECLARE_DRIVER_INIT(coolminii);
 	DECLARE_DRIVER_INIT(mrkickera);
 	DECLARE_DRIVER_INIT(mrdig);
 	DECLARE_DRIVER_INIT(jmpbreak);
@@ -2636,7 +2638,6 @@ READ16_MEMBER(vamphalf_state::misncrfta_speedup_r)
 	return m_wram[(0x72eb4/2)+offset];
 }
 
-
 READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
 {
 	if(space.device().safe_pc() == 0x75f7a)
@@ -2648,6 +2649,19 @@ READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
 	}
 
 	return m_wram[(0xd2e80/2)+offset];
+}
+
+READ16_MEMBER(vamphalf_state::coolminii_speedup_r)
+{
+	if(space.device().safe_pc() == 0x76016)
+	{
+		if(irq_active(space))
+			space.device().execute().spin_until_interrupt();
+		else
+			space.device().execute().eat_cycles(50);
+	}
+
+	return m_wram[(0xd3130/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::suplup_speedup_r)
@@ -2935,6 +2949,14 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 	m_flip_bit = 1;
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d3130, 0x000d3133, read16_delegate(FUNC(vamphalf_state::coolminii_speedup_r), this));
+
+	m_palshift = 0;
+	m_flip_bit = 1;
+}
+
 DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
@@ -3127,7 +3149,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 }
 
 GAME( 1999, coolmini,  0,        coolmini,  common,   vamphalf_state, coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coolminii, coolmini, coolmini,  common,   vamphalf_state, coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolminii, coolmini, coolmini,  common,   vamphalf_state, coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jmpbreak,  0,        jmpbreak,  common,   vamphalf_state, jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, poosho,    0,        jmpbreak,  common,   vamphalf_state, poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )

@@ -119,7 +119,8 @@ private:
 	inline int get_internal_keycode(int block, int fns);
 	inline int get_external_keycode(int block, int fns);
 	inline bool check_envelope_end(YMF271Slot *slot);
-
+	inline void calculate_status_end(int slotnum, bool state);
+	
 	// lookup tables
 	std::unique_ptr<int16_t[]> m_lut_waves[8];
 	std::unique_ptr<double[]> m_lut_plfo[4][8];
@@ -141,6 +142,7 @@ private:
 	uint32_t m_timerB;
 	uint8_t m_irqstate;
 	uint8_t m_status;
+	uint16_t m_end_status;
 	uint8_t m_enable;
 
 	uint32_t m_ext_address;

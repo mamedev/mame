@@ -12,17 +12,18 @@
 
     TODO:
 
-    - does not boot
-    - interrupts
-    - vsync interrupt
-    - map ROM to 000000-000007 at boot
+    . does not boot
+    . interrupts
+    . vsync interrupt
+    . map ROM to 000000-000007 at boot
+    - NVRAM (= battery backed SRAM) at 0xE40xxx
     - floppy
     - bitmap display
     - Z mode read/write
     - color status write
     - bitmap roll
     - overlay roll
-    - keyboard
+    . keyboard
     - joystick
     - light pen
     - memory parity
@@ -33,11 +34,29 @@
     - HVG
     - OMTI Series 10 SCSI controller (8" Winchester HD)
 
+    docs:
+
+    bitsavers://pdf/chromatics/
+    http://z80cpu.eu/mirrors/oldcomputers.dyndns.org/public/pub/manuals/omti10a.pdf
+
+    how to:
+
+    C-u @ -- enter Terminal
+    C-u F -- use serial port from Terminal (null_modem has to be set up 9600, 7E1)
+    C-u M -- enter Monitor
+    C-u T -- enter Thaw (setup utility)
+    C-u d -- boot DOS
+    C-u Q 1 -- display clock
+
+    See User's Manual appendix A for more control sequences.
 */
 
 #include "emu.h"
 #include "includes/cgc7900.h"
 #include "speaker.h"
+
+#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -62,11 +81,16 @@
 #define INT_BINT1           0x4000
 #define INT_RS232_RXRDY     0x8000
 
-//static const int INT_LEVEL[] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 };
-
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
+
+void cgc7900_state::kbd_put(u8 data)
+{
+	kbd_ready = true;
+	kbd_data = data;
+	irq_encoder(7, ASSERT_LINE);
+}
 
 /*-------------------------------------------------
     keyboard_r - keyboard data read
@@ -74,6 +98,8 @@
 
 READ16_MEMBER( cgc7900_state::keyboard_r )
 {
+	u16 data;
+
 	/*
 
 	    bit     description
@@ -97,7 +123,23 @@ READ16_MEMBER( cgc7900_state::keyboard_r )
 
 	*/
 
-	return 0;
+	if (kbd_ready)
+	{
+		data = kbd_data | kbd_mods;
+		kbd_ready = false;
+		irq_encoder(7, CLEAR_LINE);
+	}
+	else
+	{
+		data = kbd_mods;
+	}
+
+	LOG("kbd == %04x\n", data);
+
+	if (kbd_mods)
+		kbd_mods = 0;
+
+	return data;
 }
 
 /*-------------------------------------------------
@@ -128,38 +170,80 @@ WRITE16_MEMBER( cgc7900_state::keyboard_w )
 	    15
 
 	*/
+
+	LOG("kbd <- %04x\n", data);
 }
 
 /*-------------------------------------------------
     interrupt_mask_w - interrupt mask write
 -------------------------------------------------*/
 
+static const int int_levels[16] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 };
+static const int int_vectors[16] = {
+	0x4b, 0x44, 0x4c, 0x43, 0x42, 0x4d, 0x45, 0x4a, 0x49, 0x46, 0x4e, 0x41, 0x40, 0x4f, 0x47, 0x48 
+};
+
 WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 {
 	/*
 
-	    bit     description
+	    bit     description		vec	level
 
-	     0      real time clock
-	     1      RS-449 Tx ready
-	     2      BINT 2
-	     3      RS-232 Tx ready
-	     4      disk
-	     5      BINT 3
-	     6      bezel keys
-	     7      keyboard
-	     8      RS-449 Rx ready
-	     9      light pen
-	    10      BINT 4
-	    11      joystick
-	    12      vertical retrace
-	    13      BINT 5
-	    14      BINT 1
-	    15      RS-232 Rx ready
+	     0      real time clock	4b	5
+	     1      RS-449 Tx ready	44	4
+	     2      BINT 2			4c	5
+	     3      RS-232 Tx ready	43	4
+	     4      disk			42	4
+	     5      BINT 3			4d	5
+	     6      bezel keys		45	4
+	     7      keyboard		4a	5
+	     8      RS-449 Rx ready	49	5
+	     9      light pen		46	4
+	    10      BINT 4			4e	5
+	    11      joystick		41	4
+	    12      vert. retrace	40	4
+	    13      BINT 5			4f	5
+	    14      BINT 1			47	4
+	    15      RS-232 Rx ready	48	5
 
+		default mask is 0x7e3f -- RS232 Rx, RS449 Rx, keyboard, bezel.
 	*/
 
+	if (m_int_mask != data)
+	{
+		u16 changed = m_int_mask ^ data;
+
+		LOG("i_mask: changed %04X -> %04X\n", m_int_mask, data);
+
+		for (int i = 0; i < 16; i++)
+		{
+			if (BIT(changed, i) && BIT(data, i))
+			{
+				LOG("i_mask: pin %d disabled, clearing irq\n", i);
+				irq_encoder(i, CLEAR_LINE);
+			}
+			if (BIT(changed, i) && !BIT(data, i))
+			{
+				LOG("i_mask: pin %d enabled, %s irq\n", i, BIT(m_int_active, i) ? "setting" : "clearing");
+				irq_encoder(i, BIT(m_int_active, i));
+			}
+		}
+	}
+
 	m_int_mask = data;
+}
+
+void cgc7900_state::irq_encoder(int pin, int state)
+{
+	if (state == ASSERT_LINE)
+		m_int_active |= (1 << pin);
+	else
+		m_int_active &= ~(1 << pin);
+
+	if (!BIT(m_int_mask, pin))
+	{
+		m_maincpu->set_input_line_and_vector(int_levels[pin], state, int_vectors[pin]);
+	}
 }
 
 /*-------------------------------------------------
@@ -219,6 +303,29 @@ WRITE16_MEMBER( cgc7900_state::disk_command_w )
 {
 }
 
+READ16_MEMBER(cgc7900_state::unmapped_r)
+{
+	return rand();
+}
+
+WRITE8_MEMBER(cgc7900_state::baud_write)
+{
+	m_dbrg->str_w(data >> 0);
+	m_dbrg->stt_w(data >> 4);
+}
+
+WRITE_LINE_MEMBER(cgc7900_state::write_rs232_clock)
+{
+	m_i8251_0->write_txc(state);
+	m_i8251_0->write_rxc(state);
+}
+
+WRITE_LINE_MEMBER(cgc7900_state::write_rs449_clock)
+{
+	m_i8251_1->write_txc(state);
+	m_i8251_1->write_rxc(state);
+}
+
 /***************************************************************************
     MEMORY MAPS
 ***************************************************************************/
@@ -229,9 +336,9 @@ WRITE16_MEMBER( cgc7900_state::disk_command_w )
 
 static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
-	AM_RANGE(0x000008, 0x1fffff) AM_RAM AM_SHARE("chrom_ram")
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chrom_ram")
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
+	AM_RANGE(0x810000, 0x9fffff) AM_READ(unmapped_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(z_mode_r, z_mode_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_SHARE("plane_ram")
 	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(color_status_w)
@@ -257,10 +364,10 @@ static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 //  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
 //  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
 //  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, data_r, data_w, 0xff00)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, data_r, data_w, 0xff00)
-	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, status_r, control_w, 0xff00)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, data_r, data_w, 0xff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, status_r, control_w, 0xff)
+	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, data_r, data_w, 0xff)
+	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, status_r, control_w, 0xff)
 	AM_RANGE(0xff8080, 0xff8081) AM_READWRITE(keyboard_r, keyboard_w)
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
@@ -268,8 +375,8 @@ static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 	AM_RANGE(0xff8100, 0xff8101) AM_READWRITE(disk_data_r, disk_data_w)
 	AM_RANGE(0xff8120, 0xff8121) AM_READWRITE(disk_status_r, disk_command_w)
 	AM_RANGE(0xff8140, 0xff8141) AM_READ_PORT("BEZEL")
-//  AM_RANGE(0xff8180, 0xff8181) AM_DEVWRITE8(K1135A_TAG, k1135a_w, 0xff00) Baud rate generator
-//  AM_RANGE(0xff81c0, 0xff81ff) AM_DEVREADWRITE8(MM58167_TAG, mm58167_r, mm58167_w, 0xff00)
+	AM_RANGE(0xff8180, 0xff8181) AM_WRITE8(baud_write, 0xff00)
+	AM_RANGE(0xff81c0, 0xff81ff) AM_DEVREADWRITE8(MM58167_TAG, mm58167_device, read, write, 0xff)
 	AM_RANGE(0xff8200, 0xff8201) AM_WRITE(interrupt_mask_w)
 //  AM_RANGE(0xff8240, 0xff8241) Light Pen enable
 //  AM_RANGE(0xff8242, 0xff8243) Light Pen X value
@@ -280,6 +387,7 @@ static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8(AY8910_TAG, ay8910_device, address_w, 0xff00)
 	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8(AY8910_TAG, ay8910_device, data_r, 0xff00)
 	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8(AY8910_TAG, ay8910_device, data_w, 0xff00)
+	// DDMA option board
 //  AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
 //  AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
 //  AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register
@@ -345,6 +453,19 @@ void cgc7900_state::machine_start()
 
 void cgc7900_state::machine_reset()
 {
+	uint8_t *user1 = memregion(M68000_TAG)->base();
+
+	memcpy((uint8_t *)m_chrom_ram.target(), user1, 8); // not really what happens but...
+
+	m_maincpu->reset();
+
+	kbd_mods = 0x300; // forces cold boot -- initializes SRAM contents
+	kbd_data = 0;
+	kbd_ready = false;
+
+	m_i8251_0->write_cts(0);
+
+	m_int_active = 0;
 }
 
 /***************************************************************************
@@ -383,11 +504,37 @@ static MACHINE_CONFIG_START( cgc7900 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(cgc7900_state, kbd_put))
+
+	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL_32_768kHz)
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(cgc7900_state, irq<0x0>))
+
+	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(cgc7900_state, write_rs232_clock))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(cgc7900_state, write_rs449_clock))
+
 	MCFG_DEVICE_ADD(INS8251_0_TAG, I8251, 0)
-	// rs232
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0xf>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x3>))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8251_0_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(INS8251_0_TAG, i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD(INS8251_1_TAG, I8251, 0)
-	// rs449
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x8>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x1>))
+
+	MCFG_RS232_PORT_ADD("rs449", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8251_1_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(INS8251_1_TAG, i8251_device, write_dsr))
 MACHINE_CONFIG_END
 
 /***************************************************************************

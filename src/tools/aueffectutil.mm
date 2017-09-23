@@ -55,11 +55,12 @@ static NSString *const ForceGenericViewKey      = @"ForceGenericView";
 static NSString *const WindowFrameKey           = @"WindowFrame";
 
 
-static void UpdateChangeCountCallback(void                      *userData,
-									  void                      *object,
-									  AudioUnitEvent const      *inEvent,
-									  UInt64                    inEventHostTime,
-									  AudioUnitParameterValue   inParameterValue)
+static void UpdateChangeCountCallback(
+		void                      *userData,
+		void                      *object,
+		AudioUnitEvent const      *inEvent,
+		UInt64                    inEventHostTime,
+		AudioUnitParameterValue   inParameterValue)
 {
 	[(NSDocument *)userData updateChangeCount:NSChangeDone];
 }
@@ -99,19 +100,20 @@ static void UpdateChangeCountCallback(void                      *userData,
 @implementation AUEffectDocument
 
 - (void)loadEffectUI {
-	if ((0 == effectNode) || (nil == window))
+	if ((0 == effectNode) || !window)
 		return;
 
 	BOOL customViewValid = NO;
 	OSStatus status;
 	UInt32 uiDescSize;
 	AudioUnitCocoaViewInfo *viewInfo;
-	status = AudioUnitGetPropertyInfo(effectUnit,
-									  kAudioUnitProperty_CocoaUI,
-									  kAudioUnitScope_Global,
-									  0,
-									  &uiDescSize,
-									  NULL);
+	status = AudioUnitGetPropertyInfo(
+			effectUnit,
+			kAudioUnitProperty_CocoaUI,
+			kAudioUnitScope_Global,
+			0,
+			&uiDescSize,
+			NULL);
 	UInt32 const uiClassCount = 1 + ((uiDescSize - sizeof(*viewInfo)) / sizeof(viewInfo->mCocoaAUViewClass[0]));
 	if ((noErr == status) && (0 < uiClassCount))
 	{
@@ -126,7 +128,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 		{
 			NSBundle *const bundle = [NSBundle bundleWithPath:[(NSURL *)viewInfo->mCocoaAUViewBundleLocation path]];
 			Class const viewClass = [bundle classNamed:(NSString *)viewInfo->mCocoaAUViewClass[0]];
-			if ((NULL != viewClass)
+			if (viewClass
 			 && [viewClass conformsToProtocol:@protocol(AUCocoaUIBase)]
 			 && [viewClass instancesRespondToSelector:@selector(uiViewForAudioUnit:withSize:)])
 			{
@@ -145,7 +147,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 		}
 		free(viewInfo);
 	}
-	if (nil == view)
+	if (!view)
 	{
 		view = [[[AUGenericView alloc] initWithAudioUnit:effectUnit] autorelease];
 		[(AUGenericView *)view setShowsExpertParameters:YES];
@@ -190,7 +192,8 @@ static void UpdateChangeCountCallback(void                      *userData,
 }
 
 - (id)init {
-	if (!(self = [super init])) return nil;
+	if (!(self = [super init]))
+		return nil;
 
 	window = nil;
 	genericViewButton = nil;
@@ -232,16 +235,16 @@ static void UpdateChangeCountCallback(void                      *userData,
 }
 
 - (void)dealloc {
-	if (NULL != presets)
+	if (presets)
 		CFRelease(presets);
 
-	if (NULL != listener)
+	if (listener)
 		AUListenerDispose(listener);
 
-	if (nil != restoreFrame)
+	if (restoreFrame)
 		[restoreFrame release];
 
-	if (NULL != graph)
+	if (graph)
 	{
 		AUGraphClose(graph);
 		DisposeAUGraph(graph);
@@ -272,14 +275,16 @@ static void UpdateChangeCountCallback(void                      *userData,
 	[presetButton sizeToFit];
 
 	CGFloat const controlWidth = MAX(NSWidth([genericViewButton frame]), NSWidth([presetButton frame]));
-	NSRect const presetFrame = NSMakeRect(17,
-										  8,
-										  controlWidth,
-										  NSHeight([presetButton frame]));
-	NSRect const genericViewFrame = NSMakeRect(17,
-											   NSMaxY(presetFrame) + 9,
-											   controlWidth,
-											   NSHeight([genericViewButton frame]));
+	NSRect const presetFrame = NSMakeRect(
+			17,
+			8,
+			controlWidth,
+			NSHeight([presetButton frame]));
+	NSRect const genericViewFrame = NSMakeRect(
+			17,
+			NSMaxY(presetFrame) + 9,
+			controlWidth,
+			NSHeight([genericViewButton frame]));
 	[genericViewButton setFrame:genericViewFrame];
 	[presetButton setFrame:presetFrame];
 
@@ -310,7 +315,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 	[window release];
 
 	[self loadEffectUI];
-	if (nil != restoreFrame)
+	if (restoreFrame)
 	{
 		[window setFrameFromString:restoreFrame];
 	}
@@ -331,7 +336,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 	BOOL const hasWrapper = [type isEqualToString:AUEffectDocumentType];
 	if (!hasWrapper && ![type isEqualToString:AUPresetDocumentType])
 	{
-		if (NULL != error)
+		if (error)
 		{
 			NSString *const message = [NSString stringWithFormat:@"Unsupported document type %@", type];
 			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,  NSLocalizedDescriptionKey,
@@ -346,16 +351,16 @@ static void UpdateChangeCountCallback(void                      *userData,
 													 mutabilityOption:0
 															   format:NULL
 													 errorDescription:&errDesc];
-	if ((nil == desc) || ![desc isKindOfClass:[NSDictionary class]] || (nil != errDesc))
+	if (!desc || ![desc isKindOfClass:[NSDictionary class]] || errDesc)
 	{
-		if (NULL != error)
+		if (error)
 		{
 			NSString *const message = [NSString stringWithFormat:@"Error in file format (%@)", errDesc];
 			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,  NSLocalizedDescriptionKey,
 																				  nil];
 			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		}
-		if (nil != errDesc)
+		if (errDesc)
 			[errDesc release];
 		return NO;
 	}
@@ -363,12 +368,12 @@ static void UpdateChangeCountCallback(void                      *userData,
 	id const typeValue = [desc objectForKey:(hasWrapper ? ComponentTypeKey : (NSString *)CFSTR(kAUPresetTypeKey))];
 	id const subtypeValue = [desc objectForKey:(hasWrapper ? ComponentSubTypeKey : (NSString *)CFSTR(kAUPresetSubtypeKey))];
 	id const manufacturerValue = [desc objectForKey:(hasWrapper ? ComponentManufacturerKey : (NSString *)CFSTR(kAUPresetManufacturerKey))];
-	if ((nil == typeValue)          || ![typeValue isKindOfClass:[NSNumber class]]
-	 || (nil == subtypeValue)       || ![subtypeValue isKindOfClass:[NSNumber class]]
-	 || (nil == manufacturerValue)  || ![manufacturerValue isKindOfClass:[NSNumber class]]
+	if (!typeValue          || ![typeValue isKindOfClass:[NSNumber class]]
+	 || !subtypeValue       || ![subtypeValue isKindOfClass:[NSNumber class]]
+	 || !manufacturerValue  || ![manufacturerValue isKindOfClass:[NSNumber class]]
 	 || ([typeValue unsignedLongValue] != kAudioUnitType_Effect))
 	{
-		if (NULL != error)
+		if (error)
 		{
 			NSString *const message = @"Error in effect description file format";
 			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,  NSLocalizedDescriptionKey,
@@ -378,17 +383,17 @@ static void UpdateChangeCountCallback(void                      *userData,
 		return NO;
 	}
 
-	if (NULL != presets)
+	if (presets)
 	{
 		CFRelease(presets);
 		presets = NULL;
 	}
-	if (NULL != listener)
+	if (listener)
 	{
 		AUListenerDispose(listener);
 		listener = NULL;
 	}
-	if (nil != view)
+	if (view)
 	{
 		[[NSNotificationCenter defaultCenter] removeObserver:self
 														name:NSViewFrameDidChangeNotification
@@ -408,14 +413,19 @@ static void UpdateChangeCountCallback(void                      *userData,
 	description.componentManufacturer = [manufacturerValue longValue];
 	status = noErr;
 	status = AUGraphClearConnections(graph);
-	if (noErr == status) status = AUGraphAddNode(graph, &description, &effectNode);
-	if (noErr == status) status = AUGraphNodeInfo(graph, effectNode, NULL, &effectUnit);
-	if (noErr == status) status = AUGraphConnectNodeInput(graph, sourceNode, 0, effectNode, 0);
-	if (noErr == status) status = AUGraphConnectNodeInput(graph, effectNode, 0, outputNode, 0);
-	if (noErr == status) status = AUGraphUpdate(graph, NULL);
+	if (noErr == status)
+		status = AUGraphAddNode(graph, &description, &effectNode);
+	if (noErr == status)
+		status = AUGraphNodeInfo(graph, effectNode, NULL, &effectUnit);
+	if (noErr == status)
+		status = AUGraphConnectNodeInput(graph, sourceNode, 0, effectNode, 0);
+	if (noErr == status)
+		status = AUGraphConnectNodeInput(graph, effectNode, 0, outputNode, 0);
+	if (noErr == status)
+		status = AUGraphUpdate(graph, NULL);
 	if (noErr != status)
 	{
-		if (NULL != error)
+		if (error)
 		{
 			NSString * const message = @"Error encountered while configuring AudioUnit graph";
 			NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
@@ -428,19 +438,21 @@ static void UpdateChangeCountCallback(void                      *userData,
 	}
 
 	CFPropertyListRef const classInfo = (CFPropertyListRef)(hasWrapper ? [desc objectForKey:ClassInfoKey] : desc);
-	if (NULL != classInfo)
+	if (classInfo)
 	{
 		AudioUnitParameter change = { effectUnit, kAUParameterListener_AnyParameter, 0, 0 };
-		status = AudioUnitSetProperty(effectUnit,
-									  kAudioUnitProperty_ClassInfo,
-									  kAudioUnitScope_Global,
-									  0,
-									  &classInfo,
-									  sizeof(classInfo));
-		if (noErr == status) status = AUParameterListenerNotify(NULL, NULL, &change);
+		status = AudioUnitSetProperty(
+				effectUnit,
+				kAudioUnitProperty_ClassInfo,
+				kAudioUnitScope_Global,
+				0,
+				&classInfo,
+				sizeof(classInfo));
+		if (noErr == status)
+			status = AUParameterListenerNotify(NULL, NULL, &change);
 		if (noErr != status)
 		{
-			if (NULL != error)
+			if (error)
 			{
 				NSString * const message = @"Error configuring effect";
 				NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
@@ -463,7 +475,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 			NULL);
 	if (noErr != status)
 	{
-		if (NULL != error)
+		if (error)
 		{
 			NSString * const message = @"Error getting effect parameters";
 			NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
@@ -477,16 +489,17 @@ static void UpdateChangeCountCallback(void                      *userData,
 	UInt32 const paramCount = propertySize / sizeof(AudioUnitParameterID);
 	if (0U < paramCount)
 	{
-		status = AUEventListenerCreate(UpdateChangeCountCallback,
-									   self,
-									   CFRunLoopGetCurrent(),
-									   kCFRunLoopDefaultMode,
-									   0.05,
-									   0.05,
-									   &listener);
+		status = AUEventListenerCreate(
+				UpdateChangeCountCallback,
+				self,
+				CFRunLoopGetCurrent(),
+				kCFRunLoopDefaultMode,
+				0.05,
+				0.05,
+				&listener);
 		if (noErr != status)
 		{
-			if (NULL != error)
+			if (error)
 			{
 				NSString * const message = @"Error creating AudioUnit event listener";
 				NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
@@ -508,7 +521,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 		if (noErr != status)
 		{
 			free(params);
-			if (NULL != error)
+			if (error)
 			{
 				NSString * const message = @"Error getting effect parameters";
 				NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
@@ -533,7 +546,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 		if (noErr != status)
 		{
 			free(params);
-			if (NULL != error)
+			if (error)
 			{
 				NSString * const message = @"Error getting effect parameters";
 				NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
@@ -547,13 +560,14 @@ static void UpdateChangeCountCallback(void                      *userData,
 	}
 
 	propertySize = sizeof(presets);
-	status = AudioUnitGetProperty(effectUnit,
-								  kAudioUnitProperty_FactoryPresets,
-								  kAudioUnitScope_Global,
-								  0,
-								  &presets,
-								  &propertySize);
-	if ((noErr != status) && (NULL != presets))
+	status = AudioUnitGetProperty(
+			effectUnit,
+			kAudioUnitProperty_FactoryPresets,
+			kAudioUnitScope_Global,
+			0,
+			&presets,
+			&propertySize);
+	if ((noErr != status) && presets)
 	{
 		CFRelease(presets);
 		presets = NULL;
@@ -561,16 +575,17 @@ static void UpdateChangeCountCallback(void                      *userData,
 
 	if (hasWrapper)
 	{
-		if ((nil != [desc objectForKey:ForceGenericViewKey])
+		if ([desc objectForKey:ForceGenericViewKey]
 		 && [[desc objectForKey:ForceGenericViewKey] respondsToSelector:@selector(boolValue)])
 		{
 			forceGenericView = [[desc objectForKey:ForceGenericViewKey] boolValue];
 			[genericViewButton setState:(forceGenericView ? NSOnState : NSOffState)];
 		}
-		if ((nil != [desc objectForKey:WindowFrameKey])
+		if ([desc objectForKey:WindowFrameKey]
 		 && [[desc objectForKey:WindowFrameKey] isKindOfClass:[NSString class]])
 		{
-			if (nil != restoreFrame) [restoreFrame release];
+			if (restoreFrame)
+				[restoreFrame release];
 			restoreFrame = [[NSString alloc] initWithString:[desc objectForKey:WindowFrameKey]];
 		}
 	}
@@ -583,12 +598,13 @@ static void UpdateChangeCountCallback(void                      *userData,
 - (NSData *)dataOfType:(NSString *)type error:(NSError **)error {
 	CFPropertyListRef classInfo;
 	UInt32 infoSize = sizeof(classInfo);
-	OSStatus const status = AudioUnitGetProperty(effectUnit,
-												 kAudioUnitProperty_ClassInfo,
-												 kAudioUnitScope_Global,
-												 0,
-												 &classInfo,
-												 &infoSize);
+	OSStatus const status = AudioUnitGetProperty(
+			effectUnit,
+			kAudioUnitProperty_ClassInfo,
+			kAudioUnitScope_Global,
+			0,
+			&classInfo,
+			&infoSize);
 	if (noErr != status)
 	{
 		if (NULL != error)
@@ -623,11 +639,11 @@ static void UpdateChangeCountCallback(void                      *userData,
 		desc = [NSDictionary dictionaryWithDictionary:(NSDictionary *)classInfo];
 	}
 	CFRelease(classInfo);
-	if (nil == desc)
+	if (!desc)
 	{
-			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:@"Unsupported document type", NSLocalizedDescriptionKey,
-																				  nil];
-			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
+		NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:@"Unsupported document type", NSLocalizedDescriptionKey,
+																			  nil];
+		*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		return nil;
 	}
 
@@ -635,12 +651,12 @@ static void UpdateChangeCountCallback(void                      *userData,
 	NSData *const data = [NSPropertyListSerialization dataFromPropertyList:desc
 																	format:NSPropertyListXMLFormat_v1_0
 														  errorDescription:&errDesc];
-	if ((nil == data) || (nil != errDesc))
+	if (!data || errDesc)
 	{
-		if (NULL != error)
+		if (error)
 		{
 			NSString *message;
-			if (nil != errDesc)
+			if (errDesc)
 				message = [NSString stringWithFormat:@"Error serialising effect settings: %@", errDesc];
 			else
 				message = @"Error serialising effect settings";
@@ -648,7 +664,8 @@ static void UpdateChangeCountCallback(void                      *userData,
 																				  nil];
 			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		}
-		if (nil != errDesc) [errDesc release];
+		if (errDesc)
+			[errDesc release];
 		return nil;
 	}
 	return data;
@@ -656,7 +673,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 
 - (IBAction)toggleGenericView:(id)sender {
 	forceGenericView = (NSOnState == [sender state]);
-	if (nil != view)
+	if (view)
 	{
 		[[NSNotificationCenter defaultCenter] removeObserver:self
 														name:NSViewFrameDidChangeNotification
@@ -685,12 +702,13 @@ static void UpdateChangeCountCallback(void                      *userData,
 	}
 
 	AUPreset const *preset = (AUPreset const *)CFArrayGetValueAtIndex(presets, idx);
-	status = AudioUnitSetProperty(effectUnit,
-								  kAudioUnitProperty_PresentPreset,
-								  kAudioUnitScope_Global,
-								  0,
-								  preset,
-								  sizeof(AUPreset));
+	status = AudioUnitSetProperty(
+			effectUnit,
+			kAudioUnitProperty_PresentPreset,
+			kAudioUnitScope_Global,
+			0,
+			preset,
+			sizeof(AUPreset));
 	if (noErr != status)
 	{
 		NSAlert const *alert = [[NSAlert alloc] init];
@@ -718,10 +736,11 @@ static void UpdateChangeCountCallback(void                      *userData,
 - (void)viewFrameDidChange:(NSNotification *)notification {
 	NSRect const oldFrame = [window frame];
 	NSRect const desired = [window frameRectForContentRect:[[notification object] frame]];
-	NSRect const newFrame = NSMakeRect(oldFrame.origin.x,
-									   oldFrame.origin.y + oldFrame.size.height - headerSize.height- desired.size.height,
-									   desired.size.width,
-									   headerSize.height + desired.size.height);
+	NSRect const newFrame = NSMakeRect(
+			oldFrame.origin.x,
+			oldFrame.origin.y + oldFrame.size.height - headerSize.height- desired.size.height,
+			desired.size.width,
+			headerSize.height + desired.size.height);
 	[window setFrame:newFrame display:YES animate:NO];
 }
 
@@ -819,10 +838,10 @@ static void UpdateChangeCountCallback(void                      *userData,
 
 	[menu addItem:[NSMenuItem separatorItem]];
 
-	item = [menu addItemWithTitle:@"Cut" action:@selector(cut:) keyEquivalent:@"x"];
-	item = [menu addItemWithTitle:@"Copy" action:@selector(copy:) keyEquivalent:@"c"];
-	item = [menu addItemWithTitle:@"Paste" action:@selector(paste:) keyEquivalent:@"v"];
-	item = [menu addItemWithTitle:@"Delete" action:@selector(delete:) keyEquivalent:@""];
+	item = [menu addItemWithTitle:@"Cut"        action:@selector(cut:)       keyEquivalent:@"x"];
+	item = [menu addItemWithTitle:@"Copy"       action:@selector(copy:)      keyEquivalent:@"c"];
+	item = [menu addItemWithTitle:@"Paste"      action:@selector(paste:)     keyEquivalent:@"v"];
+	item = [menu addItemWithTitle:@"Delete"     action:@selector(delete:)    keyEquivalent:@""];
 	item = [menu addItemWithTitle:@"Select All" action:@selector(selectAll:) keyEquivalent:@"a"];
 }
 
@@ -859,13 +878,15 @@ static void UpdateChangeCountCallback(void                      *userData,
 }
 
 - (id)init {
-	if (!(self = [super init])) return nil;
+	if (!(self = [super init]))
+		return nil;
 	effects = NULL;
 	return self;
 }
 
 - (void)dealloc {
-	if (effects) free(effects);
+	if (effects)
+		free(effects);
 	[super dealloc];
 }
 
@@ -893,12 +914,13 @@ static void UpdateChangeCountCallback(void                      *userData,
 	NSData *const data = [NSPropertyListSerialization dataFromPropertyList:desc
 																	format:NSPropertyListXMLFormat_v1_0
 														  errorDescription:&errDesc];
-	if ((nil == data) || (nil != errDesc))
+	if (!data || errDesc)
 	{
 		NSAlert *const alert = [[NSAlert alloc] init];
 		[alert setAlertStyle:NSWarningAlertStyle];
 		[alert setMessageText:@"Error serialising properties for new effect"];
-		if (nil != errDesc) [alert setInformativeText:[errDesc autorelease]];
+		if (errDesc)
+			[alert setInformativeText:[errDesc autorelease]];
 		[alert addButtonWithTitle:@"OK"];
 		[alert runModal];
 		[alert release];
@@ -907,10 +929,10 @@ static void UpdateChangeCountCallback(void                      *userData,
 
 	NSError *err = nil;
 	AUEffectDocument *const document = [[AUEffectDocument alloc] init];
-	if ((nil == document) || ![document readFromData:data ofType:AUEffectDocumentType error:&err])
+	if (!document || ![document readFromData:data ofType:AUEffectDocumentType error:&err])
 	{
 		[document release];
-		if (nil != err)
+		if (err)
 		{
 			[[NSAlert alertWithError:err] runModal];
 		}
@@ -983,9 +1005,10 @@ static void UpdateChangeCountCallback(void                      *userData,
 			effects[i].subtype = effectDesc.componentSubType;
 			effects[i].manufacturer = effectDesc.componentManufacturer;
 			HLock(nameHandle);
-			CFStringRef name = CFStringCreateWithPascalString(NULL,
-															  (unsigned char const *)*nameHandle,
-															  kCFStringEncodingMacRoman);
+			CFStringRef const name = CFStringCreateWithPascalString(
+					NULL,
+					(unsigned char const *)*nameHandle,
+					kCFStringEncodingMacRoman);
 			HUnlock(nameHandle);
 			NSMenuItem *const item = [newEffectMenu addItemWithTitle:(NSString *)name
 															  action:@selector(newEffect:)

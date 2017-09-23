@@ -19,6 +19,7 @@
 #include "../frontend/mame/ui/menuitem.h"
 #include "../frontend/mame/ui/sliderchangednotifier.h"
 
+struct slider_state;
 class bgfx_effect;
 class chain_manager;
 
@@ -26,6 +27,7 @@ class bgfx_input_pair : public slider_changed_notifier
 {
 public:
 	bgfx_input_pair(int index, std::string sampler, std::string texture, std::vector<std::string> available_textures, std::string selection, chain_manager& chains, uint32_t screen_index);
+	~bgfx_input_pair();
 
 	void bind(bgfx_effect *effect, const int32_t screen) const;
 	int32_t texture_changed(int32_t index, std::string *str, int32_t newval);
@@ -49,6 +51,7 @@ private:
 	chain_manager&            m_chains;
 	int32_t                   m_current_texture;
 	ui::menu_item             m_selection_slider;
+	std::unique_ptr<slider_state> m_slider_state;
 };
 
 #endif // __DRAWBGFX_INPUT_PAIR__

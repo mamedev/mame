@@ -129,7 +129,11 @@ static MACHINE_CONFIG_START( altos486 )
 	MCFG_CPU_PROGRAM_MAP(altos486_z80_mem)
 	MCFG_CPU_IO_MAP(altos486_z80_io)
 
-	MCFG_PIC8259_ADD("pic8259", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, READ8(altos486_state, read_rmx_ack))
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(altos486_state, read_rmx_ack))
+
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
 	MCFG_UPD765A_ADD("fdc", false, false)

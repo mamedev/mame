@@ -26,6 +26,7 @@ akaiax80.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
+alphatpx.cpp
 alphatro.cpp
 altair.cpp
 alto2.cpp
@@ -371,6 +372,7 @@ mikrosha.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
+miniframe.cpp
 minitel_2_rpic.cpp
 mits680b.cpp
 mk1.cpp
@@ -414,6 +416,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
@@ -549,6 +552,7 @@ rsc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
+rzone.cpp
 sacstate.cpp
 sage2.cpp
 samcoupe.cpp

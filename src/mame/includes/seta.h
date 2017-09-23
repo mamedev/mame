@@ -7,8 +7,10 @@
 
 ***************************************************************************/
 
+#include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
+#include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
@@ -43,6 +45,8 @@ public:
 		m_x1(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
+		m_upd4701(*this, "upd4701"),
+		m_buttonmux(*this, "buttonmux"),
 		m_dsw(*this, "DSW"),
 		m_rot(*this, {"ROT1", "ROT2"}),
 		m_p1(*this, "P1"),
@@ -61,7 +65,6 @@ public:
 		m_vctrl_2(*this,"vctrl_2"),
 		m_paletteram(*this,"paletteram"),
 		m_paletteram2(*this,"paletteram2"),
-		m_kiwame_nvram(*this,"kiwame_nvram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -72,6 +75,8 @@ public:
 	optional_device<x1_010_device> m_x1;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<upd4701_device> m_upd4701;
+	optional_device<hc157_device> m_buttonmux;
 
 	optional_ioport m_dsw;
 	optional_ioport_array<2> m_rot;
@@ -92,7 +97,6 @@ public:
 	optional_shared_ptr<uint16_t> m_vctrl_2;
 	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_paletteram2;
-	optional_shared_ptr<uint16_t> m_kiwame_nvram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -135,6 +139,8 @@ public:
 	uint16_t m_pairslove_protram_old[0x200];
 	uint16_t m_downtown_protection[0x200/2];
 
+	uint16_t m_kiwame_row_select;
+
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_2_w);
@@ -144,11 +150,10 @@ public:
 	DECLARE_WRITE16_MEMBER(sharedram_68000_w);
 	DECLARE_WRITE16_MEMBER(sub_ctrl_w);
 	DECLARE_READ16_MEMBER(seta_dsw_r);
-	DECLARE_WRITE16_MEMBER(calibr50_soundlatch_w);
 	DECLARE_READ16_MEMBER(usclssic_dsw_r);
-	DECLARE_READ16_MEMBER(usclssic_trackball_x_r);
-	DECLARE_READ16_MEMBER(usclssic_trackball_y_r);
-	DECLARE_WRITE16_MEMBER(usclssic_lockout_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
+	DECLARE_WRITE8_MEMBER(usclssic_lockout_w);
 	DECLARE_READ16_MEMBER(zombraid_gun_r);
 	DECLARE_WRITE16_MEMBER(zombraid_gun_w);
 	DECLARE_READ16_MEMBER(zingzipbl_unknown_r);
@@ -156,10 +161,8 @@ public:
 	DECLARE_READ16_MEMBER(keroppi_protection_init_r);
 	DECLARE_READ16_MEMBER(keroppi_coin_r);
 	DECLARE_WRITE16_MEMBER(keroppi_prize_w);
-	DECLARE_READ16_MEMBER(krzybowl_input_r);
 	DECLARE_WRITE16_MEMBER(msgundam_vregs_w);
-	DECLARE_READ16_MEMBER(kiwame_nvram_r);
-	DECLARE_WRITE16_MEMBER(kiwame_nvram_w);
+	DECLARE_WRITE16_MEMBER(kiwame_row_select_w);
 	DECLARE_READ16_MEMBER(kiwame_input_r);
 	DECLARE_READ16_MEMBER(thunderl_protection_r);
 	DECLARE_WRITE16_MEMBER(thunderl_protection_w);
@@ -172,6 +175,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sub_bankswitch_lockout_w);
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_READ8_MEMBER(downtown_ip_r);
+	DECLARE_WRITE8_MEMBER(calibr50_sub_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(calibr50_soundlatch2_w);
 	DECLARE_READ16_MEMBER(twineagl_debug_r);
 	DECLARE_READ16_MEMBER(twineagl_200100_r);
@@ -207,6 +211,7 @@ public:
 	DECLARE_MACHINE_RESET(calibr50);
 	DECLARE_PALETTE_INIT(palette_init_RRRRRGGGGGBBBBB_proms);
 	DECLARE_PALETTE_INIT(usclssic);
+	DECLARE_MACHINE_START(usclssic);
 	DECLARE_VIDEO_START(seta_2_layers);
 	DECLARE_PALETTE_INIT(blandia);
 	DECLARE_PALETTE_INIT(zingzip);

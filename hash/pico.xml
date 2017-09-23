@@ -304,7 +304,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
-		<software name="poohcornsw" cloneof="poohcorn">
+	<software name="poohcornsw" cloneof="poohcorn">
 		<description>Ett År med Nalle Puh (Swe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -436,7 +436,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
-<software name="anpanwpk">
+	<software name="anpanwpk">
 		<description>Anpanman Pico Wakuwaku Pan Koujou (Jpn)</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>

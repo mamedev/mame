@@ -12,6 +12,7 @@
 #include "video/poly.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
+#include "machine/gen_latch.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "screen.h"
 
@@ -69,6 +70,7 @@ public:
 		m_tms(*this, "tms"),
 		m_serial(*this, "serial"),
 		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
 		m_paletteram16(*this, "paletteram"),
 		m_paletteram32(*this, "paletteram"),
 		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
@@ -85,11 +87,12 @@ public:
 	required_device<cpu_device> m_tms;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
 	optional_ioport_array<4> m_analog;
 
-	uint16_t m_sound_data;
 	uint8_t m_sound_status;
 	offs_t m_tms_offset_xor;
 	uint8_t m_analog_ports[4];
@@ -111,8 +114,6 @@ public:
 	int m_video_changed;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(sound_data_w);
-	DECLARE_READ16_MEMBER(sound_data_r);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE16_MEMBER(sound_status_w);
 	DECLARE_WRITE_LINE_MEMBER(analog_port_clock_w);
@@ -143,7 +144,6 @@ public:
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
 	DECLARE_WRITE32_MEMBER(adsp_tx_callback);
