@@ -6,8 +6,12 @@
 
     The Am9513 is a five-channel counter/timer circuit introduced by
     AMD around 1980. (It was also sold as the AmZ8073, apparently due
-    to a licensing deal with Zilog.) Clock source, edge selection,
-    gating and retriggering are programmable for each channel.
+    to a licensing deal with Zilog to develop Z8000 peripherals. No
+    company is known to have second-sourced the device, however.)
+    Clock source, edge selection, gating and retriggering are
+    programmable for each channel. There is also a frequency divider
+    which can take any of the 15 normal counter inputs and divide it
+    by any number between 1 and 16.
 
     All internal counters are 16 bits wide (except the internal 4-bit
     counter for the FOUT divider, which is not externally accessible).
