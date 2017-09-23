@@ -40,6 +40,7 @@ void hh_sm510_state::machine_start()
 	// zerofill
 	m_inp_mux = 0;
 	/* m_inp_lines = 0; */ // not here
+	/* m_inp_fixed = -1; */ // not here
 	m_s = 0;
 	m_r = 0;
 	m_display_x_len = 0;
@@ -51,6 +52,7 @@ void hh_sm510_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_lines));
+	save_item(NAME(m_inp_fixed));
 	save_item(NAME(m_s));
 	save_item(NAME(m_r));
 	save_item(NAME(m_display_x_len));
@@ -133,7 +135,7 @@ WRITE8_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
 
 // generic input handlers - usually S output is input mux, and K input for buttons
 
-u8 hh_sm510_state::read_inputs(int columns)
+u8 hh_sm510_state::read_inputs(int columns, int fixed)
 {
 	u8 ret = 0;
 
@@ -141,6 +143,9 @@ u8 hh_sm510_state::read_inputs(int columns)
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
 			ret |= m_inp_matrix[i]->read();
+
+	if (fixed >= 0)
+		ret |= m_inp_matrix[fixed]->read();
 
 	return ret;
 }
@@ -164,7 +169,7 @@ WRITE8_MEMBER(hh_sm510_state::input_w)
 
 READ8_MEMBER(hh_sm510_state::input_r)
 {
-	return read_inputs(m_inp_lines);
+	return read_inputs(m_inp_lines, m_inp_fixed);
 }
 
 INPUT_CHANGED_MEMBER(hh_sm510_state::acl_button)
@@ -1610,19 +1615,11 @@ class tgaunt_state : public hh_sm510_state
 public:
 	tgaunt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	virtual DECLARE_READ8_MEMBER(input_r) override;
+	{
+		m_inp_lines = 6;
+		m_inp_fixed = 6;
+	}
 };
-
-// handlers
-
-READ8_MEMBER(tgaunt_state::input_r)
-{
-	// K: multiplexed inputs (note: GND row is always on)
-	return m_inp_matrix[6]->read() | read_inputs(6);
-}
-
 
 // config
 
@@ -1673,7 +1670,7 @@ static MACHINE_CONFIG_START( tgaunt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(tgaunt_state, input_r))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
@@ -1711,19 +1708,11 @@ class tddragon_state : public hh_sm510_state
 public:
 	tddragon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	virtual DECLARE_READ8_MEMBER(input_r) override;
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
 };
-
-// handlers
-
-READ8_MEMBER(tddragon_state::input_r)
-{
-	// K: multiplexed inputs (note: GND row is always on)
-	return m_inp_matrix[5]->read() | read_inputs(5);
-}
-
 
 // config
 
@@ -1769,7 +1758,7 @@ static MACHINE_CONFIG_START( tddragon )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(tddragon_state, input_r))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
@@ -1807,19 +1796,11 @@ class taltbeast_state : public hh_sm510_state
 public:
 	taltbeast_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	virtual DECLARE_READ8_MEMBER(input_r) override;
+	{
+		m_inp_lines = 6;
+		m_inp_fixed = 6;
+	}
 };
-
-// handlers
-
-READ8_MEMBER(taltbeast_state::input_r)
-{
-	// K: multiplexed inputs (note: GND row is always on)
-	return m_inp_matrix[6]->read() | read_inputs(6);
-}
-
 
 // config
 
@@ -1869,7 +1850,7 @@ static MACHINE_CONFIG_START( taltbeast )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(taltbeast_state, input_r))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
@@ -1907,19 +1888,11 @@ class tsjam_state : public hh_sm510_state
 public:
 	tsjam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	virtual DECLARE_READ8_MEMBER(input_r) override;
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
 };
-
-// handlers
-
-READ8_MEMBER(tsjam_state::input_r)
-{
-	// K: multiplexed inputs (note: GND row is always on)
-	return m_inp_matrix[5]->read() | read_inputs(5);
-}
-
 
 // config
 
@@ -1965,7 +1938,7 @@ static MACHINE_CONFIG_START( tsjam )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz) // no external XTAL
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(tsjam_state, input_r))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
@@ -2003,12 +1976,14 @@ class tsonic_state : public hh_sm510_state
 public:
 	tsonic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
 
 	void update_speaker();
 	DECLARE_WRITE8_MEMBER(write_r);
 	DECLARE_WRITE8_MEMBER(write_s);
-	virtual DECLARE_READ8_MEMBER(input_r) override;
 };
 
 // handlers
@@ -2033,12 +2008,6 @@ WRITE8_MEMBER(tsonic_state::write_s)
 
 	// other: input mux
 	hh_sm510_state::input_w(space, 0, data >> 1);
-}
-
-READ8_MEMBER(tsonic_state::input_r)
-{
-	// K: multiplexed inputs (note: GND row is always on)
-	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
 
@@ -2087,7 +2056,7 @@ static MACHINE_CONFIG_START( tsonic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(tsonic_state, input_r))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(tsonic_state, write_s))
 	MCFG_SM510_WRITE_R_CB(WRITE8(tsonic_state, write_r))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
