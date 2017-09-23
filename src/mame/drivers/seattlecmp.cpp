@@ -116,6 +116,8 @@ static MACHINE_CONFIG_START( seattle )
 	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir7_w))
 	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
+	// FOUT not shown on schematics, which inexplicably have Source 1 tied to Gate 5
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
