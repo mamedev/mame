@@ -43,7 +43,7 @@ Terminal settings: 8 data bits, 2 stop bits, no parity @ 9600
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
@@ -85,7 +85,7 @@ void konin_state::machine_reset()
 
 static MACHINE_CONFIG_START( konin )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(konin_mem)
 	MCFG_CPU_IO_MAP(konin_io)
 
