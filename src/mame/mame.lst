@@ -1074,8 +1074,10 @@ tnextspcj                       // A8003 'NS' (c) 1989 - Japan
 asma2k                          //
 asmapro                         //
 
-@source:alphatro.cpp
+@source:alphatpx.cpp
 alphatp3                        // 1982 Triumph-Adler
+
+@source:alphatro.cpp
 alphatro                        //
 
 @source:altair.cpp
