@@ -1583,17 +1583,6 @@ void info_xml_creator::output_driver(game_driver const &driver, device_t::featur
 	emulation problems.
 	*/
 
-	auto const print_feature =
-			[this, unemulated, imperfect] (device_t::feature_type feature, char const *name, bool show_good)
-			{
-				if (unemulated & feature)
-					fprintf(m_output, " %s=\"preliminary\"", name);
-				else if (imperfect & feature)
-					fprintf(m_output, " %s=\"imperfect\"", name);
-				else if (show_good)
-					fprintf(m_output, " %s=\"good\"", name);
-			};
-
 	u32 const flags = driver.flags;
 	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
 	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
@@ -1611,14 +1600,8 @@ void info_xml_creator::output_driver(game_driver const &driver, device_t::featur
 	else
 		fprintf(m_output, " emulation=\"good\"");
 
-	print_feature(device_t::feature::PALETTE, "color", true);
-	print_feature(device_t::feature::SOUND, "sound", true);
-	print_feature(device_t::feature::GRAPHICS, "graphic", true);
-
 	if (flags & machine_flags::NO_COCKTAIL)
 		fprintf(m_output, " cocktail=\"preliminary\"");
-
-	print_feature(device_t::feature::PROTECTION, "protection", false);
 
 	if (flags & machine_flags::SUPPORTS_SAVE)
 		fprintf(m_output, " savestate=\"supported\"");
