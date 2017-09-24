@@ -2578,7 +2578,7 @@ void i82072_device::execute_command(int cmd)
 		 * seem to match any of the other upd765 devices, and without hardware,
 		 * it's difficult to know exactly how it works at this point.
 		 *
-		 * For now, reproduce the expected behaviour by clearing pending drive 
+		 * For now, reproduce the expected behaviour by clearing pending drive
 		 * poll results in the specify command, giving two different result
 		 * pathways (both present in InterPro boot code):
 		 *

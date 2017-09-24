@@ -23,7 +23,7 @@
 	devcb = &k053252_device::set_int2_ack_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_K053252_INT_TIME_CB(_devcb) \
-    devcb = &k053252_device::set_int_time_callback(*device, DEVCB_##_devcb);
+	devcb = &k053252_device::set_int_time_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_K053252_OFFSETS(_offsx, _offsy) \
 	k053252_device::set_offsets(*device, _offsx, _offsy);

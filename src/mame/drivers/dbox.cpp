@@ -548,17 +548,17 @@ READ16_MEMBER (dbox_state::sysflash_r){
   }
   else
   {
-    if (m_sf_mode == 4)
-    {
-      switch (offset & 0xff)
-      {
-      case 0x00: LOGFLASH("- Manufacturer ID\n"); return 01; break; // Manufacturer ID
+	if (m_sf_mode == 4)
+	{
+	  switch (offset & 0xff)
+	  {
+	  case 0x00: LOGFLASH("- Manufacturer ID\n"); return 01; break; // Manufacturer ID
 //      case 0x01: LOGFLASH("- Device ID\n"); return 0x22d6; break; // Device ID (Top Boot Block) 29F800TA
-      case 0x01: LOGFLASH("- Device ID\n"); return 0x2258; break; // Device ID (Bottom Boot Block) 29F800BA
-      case 0x02: LOGFLASH("- Sector %02x protection: 1 (hardcoded)\n", offset >> 12); return 01; break;
-      default:     LOGFLASH(" - Unhandled Mode:%d State:%08x\n", m_sf_mode, m_sf_state);
-      }
-    }
+	  case 0x01: LOGFLASH("- Device ID\n"); return 0x2258; break; // Device ID (Bottom Boot Block) 29F800BA
+	  case 0x02: LOGFLASH("- Sector %02x protection: 1 (hardcoded)\n", offset >> 12); return 01; break;
+	  default:     LOGFLASH(" - Unhandled Mode:%d State:%08x\n", m_sf_mode, m_sf_state);
+	  }
+	}
   }
   return 0;
 }

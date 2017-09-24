@@ -96,6 +96,6 @@ private:
 	int         m_sky_on;
 	int         m_sprite_color_base;
 	int         m_bg_scrollx;
-	bool		m_sound_irq_enable;
+	bool        m_sound_irq_enable;
 	uint8_t       m_sprite_lookup[0x2000];
 };

@@ -186,7 +186,7 @@ void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, in
 	//const rectangle &visarea = m_screen->visible_area();
 	//beamy++;
 	//if (beamy <= m_screen->visible_area().max_y && beamy <= m_gun_y + BEAM_DY) {
-	//	m_timer->adjust(m_screen->time_until_pos(beamy, std::max(0, m_gun_x - BEAM_DX)));
+	//  m_timer->adjust(m_screen->time_until_pos(beamy, std::max(0, m_gun_x - BEAM_DX)));
 	//}
 	//m_fpga_regs[0x04/4] |=  0x02080000;
 	m_fpga_regs[0x04 / 4] |= 0x00080000;

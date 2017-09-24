@@ -251,15 +251,15 @@ inline void ymf271_device::calculate_status_end(int slotnum, bool state)
 	// guess: don't enable/disable if slot isn't a multiple of 4
 	if(slotnum & 3)
 		return;
-	
+
    /*
     bit scheme is kinda twisted
-	status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
-	status2 End44 End32 End20 End8  End40 End28 End16 End4
+    status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
+    status2 End44 End32 End20 End8  End40 End28 End16 End4
     */
 	uint8_t subbit = slotnum / 12;
 	uint8_t bankbit = ((slotnum % 12) >> 2);
-	
+
 	if(state == false)
 		m_end_status &= ~(1 << (subbit+bankbit*4));
 	else

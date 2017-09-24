@@ -81,7 +81,7 @@ void dio16_98603_device::device_reset()
 {
 		m_rom = device().machine().root_device().memregion(this->subtag(HP98603_ROM_REGION).c_str())->base();
 		m_dio->install_memory(0x100000, 0x1fffff, read16_delegate(FUNC(dio16_98603_device::rom_r), this),
-				      write16_delegate(FUNC(dio16_98603_device::rom_w), this));
+					  write16_delegate(FUNC(dio16_98603_device::rom_w), this));
 }
 
 READ16_MEMBER(dio16_98603_device::rom_r)

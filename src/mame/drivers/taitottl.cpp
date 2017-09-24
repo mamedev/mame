@@ -164,14 +164,14 @@ MACHINE_CONFIG_END
 /*
 
  Fisco 400
- 
+
  label  loc. Part #
  ==========================================================
  TOP PCB : [FS070001 FSN00001A]
  CR11   L9  MMI 6301
- FS01 	J10 Texas Instruments 74S288 (read as AMD 74S288)
+ FS01   J10 Texas Instruments 74S288 (read as AMD 74S288)
  FS02   D10 MMI 6301
- FS03 	E10 MMI 6301
+ FS03   E10 MMI 6301
  FS04   A7  Intersil IM5624
  FS05   B7  Intersil IM5624
  FS06   C7  Intersil IM5624
@@ -180,7 +180,7 @@ MACHINE_CONFIG_END
  FS09   A6  Intersil IM5624
  FS10   B6  Intersil IM5624
  FS11   C6  Intersil IM5624
- FS12	D6  Intersil IM5624
+ FS12   D6  Intersil IM5624
 
  Bottom PCB : [FS070002A FSN00002A]
  FS13   H8  Texas Inst. 74S287 (read as national 74S287)

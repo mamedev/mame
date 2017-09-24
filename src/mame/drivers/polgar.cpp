@@ -319,9 +319,9 @@ WRITE8_MEMBER(mephisto_modena_state::modena_led_w)
 	{
 		for(int i=0; i<8; i++)
 		{
-			if (m_io_ctrl & 0x02)	output().set_led_value(100 + i, BIT(data, i) ? 0 : 1);
-			if (m_io_ctrl & 0x04)	output().set_led_value(0 + i, BIT(data, i) ? 0 : 1);
-			if (m_io_ctrl & 0x08)	output().set_led_value(8 + i, BIT(data, i) ? 0 : 1);
+			if (m_io_ctrl & 0x02)   output().set_led_value(100 + i, BIT(data, i) ? 0 : 1);
+			if (m_io_ctrl & 0x04)   output().set_led_value(0 + i, BIT(data, i) ? 0 : 1);
+			if (m_io_ctrl & 0x08)   output().set_led_value(8 + i, BIT(data, i) ? 0 : 1);
 		}
 	}
 }
@@ -528,12 +528,12 @@ static MACHINE_CONFIG_DERIVED( academy, polgar )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( modena, milano )
-	MCFG_CPU_MODIFY("maincpu")			// W65C02SP
+	MCFG_CPU_MODIFY("maincpu")          // W65C02SP
 	MCFG_CPU_CLOCK(XTAL_4_194304Mhz)
 	MCFG_CPU_PROGRAM_MAP(modena_mem)
 	MCFG_CPU_PERIODIC_INT_REMOVE()
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_on", mephisto_modena_state, nmi_on, attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)))
-	MCFG_TIMER_START_DELAY(attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)) - attotime::from_usec(975)) 	// active for 975us
+	MCFG_TIMER_START_DELAY(attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)) - attotime::from_usec(975))  // active for 975us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)))
 
 	MCFG_DEVICE_REMOVE("display")

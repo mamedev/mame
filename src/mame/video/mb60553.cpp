@@ -5,12 +5,12 @@
   the actual line scroll / zoom is not properly understood
 
   interestingly the chip seems to require doubled up ROMs (2 copies of each ROM) to draw just the single layer.
-  
+
 */
 /*
-	Tecmo World Cup '94 "service mode" has an item for testing zooming, this is:
-	0xffdf12 target zoom code
-	0xffdf16 current zoom code
+    Tecmo World Cup '94 "service mode" has an item for testing zooming, this is:
+    0xffdf12 target zoom code
+    0xffdf16 current zoom code
 */
 
 #include "emu.h"
@@ -262,7 +262,7 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 {
 	int line;
 	rectangle clip;
-	
+
 	clip.min_x = screen.visible_area().min_x;
 	clip.max_x = screen.visible_area().max_x;
 
@@ -274,7 +274,7 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 		int32_t incxx,incyy;
 		int32_t incxy,incyx;
 		float xoffset;
-		
+
 		// confirmed on how ROZ is used
 		incyy = ((int16_t)m_lineram[(line)*8+0])<<4;
 		incxx = ((int16_t)m_lineram[(line)*8+3])<<4;
@@ -291,7 +291,7 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 		incyx =  ((int16_t)m_lineram[(line)*8+7])<<4;
 		// V Goal Soccer rotation
 		incxy =  ((int16_t)m_lineram[(line)*8+4])<<4;
-		
+
 		clip.min_y = clip.max_y = line;
 
 		draw_roz_core(screen, bitmap, clip, startx<<12,starty<<12,

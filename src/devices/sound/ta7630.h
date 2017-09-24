@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	TA7630P
+    TA7630P
 
 ***************************************************************************/
 
@@ -43,7 +43,7 @@ protected:
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	double m_vol_ctrl[16]; // table for volume gains
 };

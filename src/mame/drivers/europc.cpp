@@ -20,9 +20,9 @@
 *
 * To-Do: * An external 20MB harddisk (Schneider HD20) can be added to the PC and PC II. This is a XT IDE drive. The BIOSs contain their own copy of the WD XT IDE BIOS that can be activated from the BIOS setup menu.
 *          (load debug, then g=f000:a000 to enter formatter routine)
-*		 * emulate internal graphics, but AGA is not quite the correct choice for the standard graphics adapter (it's a Commodore standard), as the Schneiders are only capable of switching between Hercules and CGA modes.
-*        * The PC 2 and XT have 768K of memory that can be configured from the BIOS setup as 640K, 640K+128K EMS and 512K+256K EMS. The EMS options are not visible in our emulation and loading the EMS driver fails. 
-*   	   See http://forum.classic-computing.de/index.php?page=Thread&threadID=8380 for screenshots.
+*        * emulate internal graphics, but AGA is not quite the correct choice for the standard graphics adapter (it's a Commodore standard), as the Schneiders are only capable of switching between Hercules and CGA modes.
+*        * The PC 2 and XT have 768K of memory that can be configured from the BIOS setup as 640K, 640K+128K EMS and 512K+256K EMS. The EMS options are not visible in our emulation and loading the EMS driver fails.
+*          See http://forum.classic-computing.de/index.php?page=Thread&threadID=8380 for screenshots.
 *        * use correct AT style keyboard for XT
 *
 *****************************************************************************************************/

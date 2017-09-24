@@ -1075,7 +1075,7 @@ asma2k                          //
 asmapro                         //
 
 @source:alphatro.cpp
-alphatp3						// 1982 Triumph-Adler
+alphatp3                        // 1982 Triumph-Adler
 alphatro                        //
 
 @source:altair.cpp
@@ -12116,7 +12116,7 @@ ironfort                        // (c) 1998 Eolith
 ironfortj                       // (c) 1998 Eolith
 landbrk                         // (c) 1999 Eolith
 landbrka                        // (c) 1999 Eolith
-landbrkb						// (c) 1999 Eolith
+landbrkb                        // (c) 1999 Eolith
 linkypip                        // (c) 1998 Eolith
 nhidctch                        // (c) 1999 Eolith
 penfan                          // (c) 1999 Eolith
@@ -12253,8 +12253,8 @@ waveterm                        //
 
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
-europc2							// 1989 Schneider Euro PC II
-euroxt							// Schneider Euro XT
+europc2                         // 1989 Schneider Euro PC II
+euroxt                          // Schneider Euro XT
 
 @source:eva.cpp
 eva11                           //
@@ -30215,7 +30215,7 @@ zdsupers                        //
 ncrpc4i                         // NCR PC4i
 laser_turbo_xt                  // 1988 VTech Laser Turbo XT
 laser_xt3                       // 1989 VTech Laser XT/3
-olytext30						// AEG Olympia Olytext 30
+olytext30                       // AEG Olympia Olytext 30
 
 @source:pc100.cpp
 pc100                           //

@@ -2,12 +2,12 @@
 // copyright-holders:Sandro Ronco
 // thanks-to:yoyo_chessboard
 /**************************************************************************************************
-	
-	Mephisto Monte Carlo
-	Mephisto Mega IV
-	Mephisto Monte Carlo IV LE
-	Mephisto Super Mondial
-	Mephisto Super Mondial II
+
+    Mephisto Monte Carlo
+    Mephisto Mega IV
+    Mephisto Monte Carlo IV LE
+    Mephisto Super Mondial
+    Mephisto Super Mondial II
 
 **************************************************************************************************/
 
@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(montec_ldc_cs0_w);
 	DECLARE_WRITE8_MEMBER(montec_ldc_cs1_w);
 	DECLARE_WRITE8_MEMBER(montec_lcd_clk_w);
-	
+
 	DECLARE_READ8_MEMBER(megaiv_input_r);
 	DECLARE_WRITE8_MEMBER(megaiv_led_w);
 
@@ -73,10 +73,10 @@ private:
 
 	struct display_t
 	{
-		uint8_t	pos;
-		int8_t	shift;
-		uint8_t	data;
-		uint8_t	bit;
+		uint8_t pos;
+		int8_t  shift;
+		uint8_t data;
+		uint8_t bit;
 	} m_display;
 };
 
@@ -155,8 +155,8 @@ WRITE8_MEMBER(mephisto_montec_state::montec_lcd_clk_w)
 
 	if (m_display.shift == 8)
 	{
-		if (m_lcd_mux & 0x01)	output().set_digit_value(0 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
-		if (m_lcd_mux & 0x02)	output().set_digit_value(4 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
+		if (m_lcd_mux & 0x01)   output().set_digit_value(0 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
+		if (m_lcd_mux & 0x02)   output().set_digit_value(4 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
 
 		m_display.shift = 0;
 		m_display.pos = (m_display.pos + 1) & 3;
@@ -175,8 +175,8 @@ WRITE8_MEMBER(mephisto_montec_state::montec_mux_w)
 
 READ8_MEMBER(mephisto_montec_state::montec_input_r)
 {
-	if      (m_input_mux & 0x01)	return m_keys[1]->read();
-	else if (m_input_mux & 0x02)	return m_keys[0]->read();
+	if      (m_input_mux & 0x01)    return m_keys[1]->read();
+	else if (m_input_mux & 0x02)    return m_keys[0]->read();
 
 	return m_board->input_r(space, offset) ^ 0xff;
 }
@@ -218,10 +218,10 @@ WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 
 READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
 {
-	if      (m_input_mux & 0x01)	return BIT(m_keys[1]->read(), 0 + offset) << 7;
-	else if (m_input_mux & 0x02)	return BIT(m_keys[1]->read(), 4 + offset) << 7;
-	else if (m_input_mux & 0x04)	return BIT(m_keys[0]->read(), 0 + offset) << 7;
-	else if (m_input_mux & 0x08)	return BIT(m_keys[0]->read(), 4 + offset) << 7;
+	if      (m_input_mux & 0x01)    return BIT(m_keys[1]->read(), 0 + offset) << 7;
+	else if (m_input_mux & 0x02)    return BIT(m_keys[1]->read(), 4 + offset) << 7;
+	else if (m_input_mux & 0x04)    return BIT(m_keys[0]->read(), 0 + offset) << 7;
+	else if (m_input_mux & 0x08)    return BIT(m_keys[0]->read(), 4 + offset) << 7;
 
 	return BIT(m_board->input_r(space, offset), offset) << 7;
 }
@@ -274,9 +274,9 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_board_mux_w)
 
 	for (int i=0; i<8; i++)
 	{
-		if (m_leds_mux & 0x03)		output().set_led_value(100 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x0c)		output().set_led_value(  8 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x30)		output().set_led_value(  0 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
+		if (m_leds_mux & 0x03)      output().set_led_value(100 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
+		if (m_leds_mux & 0x0c)      output().set_led_value(  8 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
+		if (m_leds_mux & 0x30)      output().set_led_value(  0 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
 	}
 }
 

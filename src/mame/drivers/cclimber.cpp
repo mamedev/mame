@@ -2455,10 +2455,10 @@ ROM_START( swimmerb )
 ROM_END
 
 /*
-	Guzzler
+    Guzzler
 
-	CPU/Sound Board: B102-403
-	Video Board:     102-401
+    CPU/Sound Board: B102-403
+    Video Board:     102-401
 */
 
 ROM_START( guzzler )
@@ -2489,11 +2489,11 @@ ROM_START( guzzler )
 ROM_END
 
 /*
-	Guzzler (Swimmer Conversion)
+    Guzzler (Swimmer Conversion)
 
-	CPU/Sound Board:   B102-403
-	Video Board:       102-401
-	CPU Daughterboard: C102-405
+    CPU/Sound Board:   B102-403
+    Video Board:       102-401
+    CPU Daughterboard: C102-405
 */
 
 ROM_START( guzzlers ) /* Swimmer Conversion, 1k vs 2k romsize in maincpu */

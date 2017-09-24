@@ -2,18 +2,18 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	TA7630P
-	
-	Toshiba Dual. Volume / Balance / Tone (Bass/Treble)
+    TA7630P
 
-	A set of discrete filters that applies to sound chip outputs.
-	According to the datasheet, two channels are outputted from here after it applies 
-	all of the filters
-	
-	TODO:
-	- mostly a placeholder, needs a way to read from sound chips and output 
-	  back with filters enabled;
-	- filters balance/bass/treble;
+    Toshiba Dual. Volume / Balance / Tone (Bass/Treble)
+
+    A set of discrete filters that applies to sound chip outputs.
+    According to the datasheet, two channels are outputted from here after it applies
+    all of the filters
+
+    TODO:
+    - mostly a placeholder, needs a way to read from sound chips and output
+      back with filters enabled;
+    - filters balance/bass/treble;
 
 ***************************************************************************/
 
@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(TA7630, ta7630_device, "ta7630", "TA7630 Device")
 
 ta7630_device::ta7630_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TA7630, tag, owner, clock)
-//  	  ,device_sound_interface(mconfig, *this)
+//        ,device_sound_interface(mconfig, *this)
 {
 }
 
@@ -67,7 +67,7 @@ void ta7630_device::device_start()
 		db += db_step;
 		db_step += db_step_inc;
 	}
-	
+
 	save_item(NAME(m_vol_ctrl));
 }
 
@@ -91,7 +91,7 @@ void ta7630_device::set_device_volume(device_sound_interface *device,uint8_t val
 	device->set_output_gain(ALL_OUTPUTS,m_vol_ctrl[value & 0xf]);
 }
 
-//	TODO: Most Taito implementations uses this, is it correct?
+//  TODO: Most Taito implementations uses this, is it correct?
 void ta7630_device::set_channel_volume(device_sound_interface *device, uint8_t ch,uint8_t value)
 {
 	device->set_output_gain(ch,m_vol_ctrl[value & 0xf]);

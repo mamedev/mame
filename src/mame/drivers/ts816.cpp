@@ -100,7 +100,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( ts816 )
-	PORT_START("DSW") // 
+	PORT_START("DSW") //
 	PORT_DIPNAME( 0x07, 0x01, "System Terminal") // read at @0368
 	PORT_DIPSETTING(    0x00, "19200 baud")
 	PORT_DIPSETTING(    0x01, "9600 baud")
@@ -223,7 +223,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ "pio" },
 	{ "ctc1" },
 	{ "ctc2" },
-//	{ "sio0" },
+//  { "sio0" },
 	{ "sio1" },
 	{ "sio2" },
 	{ "sio3" },

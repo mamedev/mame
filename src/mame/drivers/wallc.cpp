@@ -392,17 +392,17 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("DSW")      /* b600 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:1,2") // ok
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x03, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:3,4") // ok
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:3,4") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x00, "Coin C" )			PORT_DIPLOCATION("SW2:5,6") // ok
+	PORT_DIPNAME( 0x30, 0x00, "Coin C" )            PORT_DIPLOCATION("SW2:5,6") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
@@ -669,7 +669,7 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
 /*
   Unknown Italian Poker
   Seems a brute hack of an unknown game.
-  
+
   The "conforme alla legge n." string is overwritting the hands table:
 
   "CONFORME"   = Royal Flush
@@ -689,7 +689,7 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
   00cd: nop
   00ce: nop
   00cf: nop
-  
+
   00d2: ld a,(hl)
   00d3: cp c
   00d4: nop

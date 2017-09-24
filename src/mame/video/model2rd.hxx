@@ -84,7 +84,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	// fix luma overflow
 	if(luma > 0x3f)
 		luma = 0x3f;
-	
+
 	color = state->m_palram[BYTE_XOR_LE(color + 0x1000)] & 0x7fff;
 
 	colortable_r += ((color >>  0) & 0x1f) << 8;
@@ -182,7 +182,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 			continue;
 #endif
 		luma = lumaram[BYTE_XOR_LE(lumabase + (t << 3))];
-		
+
 		// Virtua Striker sets up a luma of 0x40 for flags, fix here.
 		if(luma > 0x3f)
 			luma = 0x3f;

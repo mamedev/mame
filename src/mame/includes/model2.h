@@ -63,7 +63,7 @@ public:
 	required_shared_ptr<uint32_t> m_textureram1;
 	required_shared_ptr<uint32_t> m_lumaram;
 	required_shared_ptr<uint32_t> m_fbvram1;
-	required_shared_ptr<uint32_t> m_fbvram2;	
+	required_shared_ptr<uint32_t> m_fbvram2;
 	optional_shared_ptr<uint16_t> m_soundram;
 	optional_shared_ptr<uint32_t> m_tgp_program;
 	optional_shared_ptr<uint64_t> m_tgpx4_program;

@@ -84,14 +84,14 @@
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
-#define LOGSETUP(...)	LOGMASKED(LOG_SETUP,   __VA_ARGS__)
-#define LOGSCAN(...)	LOGMASKED(LOG_SCAN,    __VA_ARGS__)
-#define LOGBANK(...) 	LOGMASKED(LOG_BANK,    __VA_ARGS__)
-#define LOGSCREEN(...)	LOGMASKED(LOG_SCREEN,  __VA_ARGS__)
-#define LOGR(...)	 	LOGMASKED(LOG_READ,    __VA_ARGS__)
-#define LOGCS(...)		LOGMASKED(LOG_CS,      __VA_ARGS__)
-#define LOGPLA(...)		LOGMASKED(LOG_PLA,     __VA_ARGS__)
-#define LOGPROM(...)	LOGMASKED(LOG_PROM,    __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGSCAN(...)    LOGMASKED(LOG_SCAN,    __VA_ARGS__)
+#define LOGBANK(...)    LOGMASKED(LOG_BANK,    __VA_ARGS__)
+#define LOGSCREEN(...)  LOGMASKED(LOG_SCREEN,  __VA_ARGS__)
+#define LOGR(...)       LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGCS(...)      LOGMASKED(LOG_CS,      __VA_ARGS__)
+#define LOGPLA(...)     LOGMASKED(LOG_PLA,     __VA_ARGS__)
+#define LOGPROM(...)    LOGMASKED(LOG_PROM,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -919,7 +919,7 @@ protected:
 private:
 	enum {
 		PLA_EPROM = 0x80,
-		PLA_IO1	  = 0x40,
+		PLA_IO1   = 0x40,
 		PLA_RAM2  = 0x20,
 		PLA_RAM1  = 0x10,
 		PLA_RAM0  = 0x08,
@@ -954,18 +954,18 @@ void can09t_state::machine_start()
 	LOG("%s()\n", FUNCNAME);
 
 	/* TBP18S030 32 bytes fuse PROM controls the entire memory map in two parts/map-banks
-	   BANK 0: 6f 6f 69 69 7b 7b ee ee e8 e8 ec bc ea ea 7f 7f  
+	   BANK 0: 6f 6f 69 69 7b 7b ee ee e8 e8 ec bc ea ea 7f 7f
 	   BANK 1: f1 f1 f5 f5 f3 f3 f7 f7 dc dc ec bc ea ea 7f 7f
 
 	   Connected as follows:
 	                  A12 -- A0  Y0 -- MPX* - latch for screen RAM
-					  A13 -- A1  Y1 -- RAM14
-					  A14 -- A2  Y2 -- RAM13
+	                  A13 -- A1  Y1 -- RAM14
+	                  A14 -- A2  Y2 -- RAM13
 	                  A15 -- A3  Y3 -- RAM0
 	   SYSPIA PB5 -- BANK -- A4  Y4 -- RAM1
 	                 E+Q  -- S*  Y5 -- RAM2
-                                 Y6 -- IO1
-                                 Y7 -- EPROM
+	                             Y6 -- IO1
+	                             Y7 -- EPROM
 
 	   The PAL outputs are used as follows:
 	   --------------------------------
@@ -1041,7 +1041,7 @@ READ8_MEMBER( can09t_state::read )
 		LOGPLA("- RAM2 %04x->%02x\n", offset, byte);
 	}
 
-	// IC11 74138 Y6 demultiplexer : A5, A5, A7 + A8:1 + A9:0 maps in the i/o area at some 
+	// IC11 74138 Y6 demultiplexer : A5, A5, A7 + A8:1 + A9:0 maps in the i/o area at some
 	if ( (~pla_data & PLA_IO1) && (~pla_data & PLA_MPX) && (offset & CPU_A8) && (~offset & CPU_A9) )
 	{
 		switch (offset & 0x00f0)
@@ -1065,13 +1065,13 @@ READ8_MEMBER( can09t_state::read )
 			LOGPLA("-- PTM\n");
 			byte = m_ptm->read(space, offset & 7);
 			break;
-		case X4XX: // 
+		case X4XX: //
 			LOGPLA("-- XX4X\n");
 			break;
 		case X5XX: // J1, J2
 			LOGPLA("-- XX5X\n");
 			break;
-		case X6XX: // 
+		case X6XX: //
 			LOGPLA("-- XX6X\n");
 			break;
 		case X7XX: // J1, J2
@@ -1125,7 +1125,7 @@ WRITE8_MEMBER( can09t_state::write )
 		LOGPLA("- RAM2 %04x->%02x\n", offset, data);
 	}
 
-	// IC11 74138 Y6 demultiplexer : A5, A5, A7 + A8:1 + A9:0 maps in the i/o area at some 
+	// IC11 74138 Y6 demultiplexer : A5, A5, A7 + A8:1 + A9:0 maps in the i/o area at some
 	if ( (~pla_data & PLA_IO1) && (~pla_data & PLA_MPX) && (offset & CPU_A8) && (~offset & CPU_A9) )
 	{
 		LOGPLA("- IO1 %04x<-%02x\n", offset, data);
@@ -1150,13 +1150,13 @@ WRITE8_MEMBER( can09t_state::write )
 			LOGPLA("-- PTM\n");
 			m_ptm->write(space, offset & 7, data);
 			break;
-		case X4XX: // 
+		case X4XX: //
 			LOGPLA("-- XX4X\n");
 			break;
 		case X5XX: // J1, J2
 			LOGPLA("-- XX5X\n");
 			break;
-		case X6XX: // 
+		case X6XX: //
 			LOGPLA("-- XX6X\n");
 			break;
 		case X7XX: // J1, J2
@@ -1223,7 +1223,7 @@ WRITE_LINE_MEMBER (can09t_state::write_acia_clock){
 
 static ADDRESS_MAP_START( can09t_map, AS_PROGRAM, 8, can09t_state )
 // Everything is dynamically and asymetrically mapped through the PAL decoded by read/write
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write) 
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( can09t )

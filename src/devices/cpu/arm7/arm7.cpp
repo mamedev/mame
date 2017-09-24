@@ -86,8 +86,8 @@ arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char
 	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-	           | ARM9_COPRO_ID_ARCH_V4
-	           | ARM9_COPRO_ID_PART_ARM710;
+			   | ARM9_COPRO_ID_ARCH_V4
+			   | ARM9_COPRO_ID_PART_ARM710;
 }
 
 
@@ -129,10 +129,10 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 	: arm9_cpu_device(mconfig, ARM920T, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-	           | ARM9_COPRO_ID_SPEC_REV1
-	           | ARM9_COPRO_ID_ARCH_V4T
-	           | ARM9_COPRO_ID_PART_ARM920
-	           | 0; // Stepping
+			   | ARM9_COPRO_ID_SPEC_REV1
+			   | ARM9_COPRO_ID_ARCH_V4T
+			   | ARM9_COPRO_ID_PART_ARM920
+			   | 0; // Stepping
 }
 
 
@@ -140,19 +140,19 @@ arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const ch
 	: arm9_cpu_device(mconfig, ARM946ES, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-	           | ARM9_COPRO_ID_ARCH_V5TE
-	           | ARM9_COPRO_ID_PART_ARM946
-	           | ARM9_COPRO_ID_STEP_ARM946_A0;
+			   | ARM9_COPRO_ID_ARCH_V5TE
+			   | ARM9_COPRO_ID_PART_ARM946
+			   | ARM9_COPRO_ID_STEP_ARM946_A0;
 }
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, PXA255, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_XSCALE, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
-	           | ARM9_COPRO_ID_ARCH_V5TE
-	           | ARM9_COPRO_ID_PXA255_CORE_GEN_XSCALE
-	           | (3 << ARM9_COPRO_ID_PXA255_CORE_REV_SHIFT)
-	           | ARM9_COPRO_ID_STEP_PXA255_A0;
+			   | ARM9_COPRO_ID_ARCH_V5TE
+			   | ARM9_COPRO_ID_PXA255_CORE_GEN_XSCALE
+			   | (3 << ARM9_COPRO_ID_PXA255_CORE_REV_SHIFT)
+			   | ARM9_COPRO_ID_STEP_PXA255_A0;
 }
 
 sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -160,9 +160,9 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 	// has StrongARM, no Thumb, no Enhanced DSP
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
-	           | ARM9_COPRO_ID_ARCH_V4
-	           | ARM9_COPRO_ID_PART_SA1110
-	           | ARM9_COPRO_ID_STEP_SA1110_A0;
+			   | ARM9_COPRO_ID_ARCH_V4
+			   | ARM9_COPRO_ID_PART_SA1110
+			   | ARM9_COPRO_ID_STEP_SA1110_A0;
 }
 
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const

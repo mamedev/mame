@@ -256,7 +256,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_port2_w_cb)
 	m_port2_raw = param;
 	// bit 0 = inverted CLK for 74ls174 @1J; normally active on rising edge, this is inverted first, hence active on the falling edge
 	if (BIT(changed_m_port2, 0) && !BIT(m_port2_raw, 0))
-	{ 
+	{
 		// bit 1 = 74ls174@1J.d0 = coin cointer 1
 		machine().bookkeeping().coin_counter_w(0, BIT(m_port2_raw, 1));
 

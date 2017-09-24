@@ -555,7 +555,7 @@ READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
 	/* The return value determines what the mystery item is.  Each bit corresponds
 	   to a question mark */
 	return machine().rand() & 0x0f;
-//	return m_maincpu->state_int(Z80_R) & 0x0f;
+//  return m_maincpu->state_int(Z80_R) & 0x0f;
 }
 
 

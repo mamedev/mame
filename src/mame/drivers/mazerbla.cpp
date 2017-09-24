@@ -67,7 +67,7 @@ TO DO:
 - figure out what really should happen during VCU test in Great Guns (patched
   out at the moment) (btw. Mazer Blazer doesn't test VCU)
 
-- add sound interface to Mazer Blazer - Speech processor is Digitalker chip, sample ROMs are currently 
+- add sound interface to Mazer Blazer - Speech processor is Digitalker chip, sample ROMs are currently
   undumped;
 
 ============================================================================
@@ -668,13 +668,13 @@ static INPUT_PORTS_START( mazerbla )
 
 	PORT_START("STICK0_X")  /* Strobe 6: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
-	
+
 	PORT_START("STICK0_Y")  /* Strobe 7: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
 
 	PORT_START("STICK1_X")  /* Strobe 8: horizontal movement of gun */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -684,7 +684,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mazerblaa )
 	PORT_INCLUDE( mazerbla )
-	
+
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -705,7 +705,7 @@ static INPUT_PORTS_START( mazerblaa )
 	PORT_DIPSETTING(    0xc0, "40000" )
 	PORT_DIPSETTING(    0x80, "50000" )
 	PORT_DIPSETTING(    0x40, "60000" )
-	PORT_DIPSETTING(    0x00, "70000" )	
+	PORT_DIPSETTING(    0x00, "70000" )
 INPUT_PORTS_END
 
 // TODO: defaults, not listed in manual
@@ -969,7 +969,7 @@ static MACHINE_CONFIG_START( mazerbla )
 	MCFG_MB_VCU_PALETTE("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -981,7 +981,7 @@ static MACHINE_CONFIG_START( mazerbla )
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
-	
+
 	/* sound hardware */
 MACHINE_CONFIG_END
 
@@ -1012,7 +1012,7 @@ static MACHINE_CONFIG_START( greatgun )
 	MCFG_MB_VCU_PALETTE("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1155,14 +1155,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
 {
-//	m_game_id = MAZERBLA;
+//  m_game_id = MAZERBLA;
 }
 
 DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 {
 	uint8_t *rom = memregion("sub2")->base();
 
-//	m_game_id = GREATGUN;
+//  m_game_id = GREATGUN;
 
 	//  patch VCU test
 	//  VCU test starts at PC=0x56f

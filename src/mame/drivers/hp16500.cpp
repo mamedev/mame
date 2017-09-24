@@ -60,7 +60,7 @@
 #define CRTC_TAG    "crtc"
 #define SCREEN_TAG  "screen"
 #define DUART_TAG   "duart"
-#define MLC_TAG	    "mlc"
+#define MLC_TAG     "mlc"
 
 class hp16500_state : public driver_device
 {

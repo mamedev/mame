@@ -833,7 +833,7 @@ WRITE16_MEMBER(itech8_state::display_page16_w)
 
 READ16_MEMBER(itech8_state::rom_constant_r)
 {
-//	Ninja Clowns reads this area for program ROM checksum
+//  Ninja Clowns reads this area for program ROM checksum
 	logerror("Read ROM constant area %04x\n",offset*2+0x40000);
 	return 0xd840;
 }
