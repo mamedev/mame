@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( proconn )
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD( "z80sio",   4000000, 0, 0, 0, 0 ) /* ?? Mhz */
+	MCFG_DEVICE_ADD("z80sio", Z80SIO0, 4000000) /* ?? Mhz */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
