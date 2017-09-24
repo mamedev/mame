@@ -226,6 +226,7 @@ enum
 	XTAL_34MHz          = 34000000,     /* Gaelco PCBs */
 	XTAL_36MHz          = 36000000,     /* Sega Model 1 video board */
 	XTAL_38_76922MHz    = 38769220,     /* Namco System 21 video board */
+	XTAL_39_3216MHz     = 39321600,     /* Sun 2/120 */
 	XTAL_40MHz          = 40000000,
 	XTAL_42MHz          = 42000000,     /* BMC A-00211 - Popo Bear */
 	XTAL_42_9545MHz     = 42954545,     /* CPS3 (12x NTSC subcarrier)*/
