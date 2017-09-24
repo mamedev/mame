@@ -2283,31 +2283,31 @@ ROM_END
 
 ROM_START( sstrike )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sstrku5.bin", 0x08000, 0x8000, CRC(af00cddf) SHA1(b866e8dfce1449f7462a79efa385ea6b55cdc6e7) )
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_LOAD( "sstrik_prg-v1_u5.u5", 0x08000, 0x8000, CRC(af00cddf) SHA1(b866e8dfce1449f7462a79efa385ea6b55cdc6e7) ) /* labeled SSTRIKE PRG-V1(U5) */
+	ROM_COPY( "maincpu",     0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sstrku27.bin", 0x08000, 0x8000, CRC(efab7252) SHA1(eb3b2002531e551e3d67958ea3cc56a69fa660e2) )
+	ROM_LOAD( "sstrik_snd1.4_u27.u27", 0x08000, 0x8000, CRC(efab7252) SHA1(eb3b2002531e551e3d67958ea3cc56a69fa660e2) ) /* labeled SSTRIKE SND1.4(U27) */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "spstku53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
+	ROM_LOAD( "spstku53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
 	ROM_CONTINUE(        0x00000, 0x0800 )
 	ROM_CONTINUE(        0x00000, 0x0800 )
 	ROM_CONTINUE(        0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "sstgrom0.bin", 0x00000, 0x20000, CRC(9cfb9849) SHA1(5aa860c0c6e3916ebdb8898ee44f633bf3347ca8) )
-	ROM_LOAD( "sstgrom1.bin", 0x20000, 0x20000, CRC(d9ea14e1) SHA1(4cddf3237c203b0a3f7ae770f85f1be35e9e1b78) )
-	ROM_LOAD( "sstgrom2.bin", 0x40000, 0x20000, CRC(dcd97bf7) SHA1(95361222ac58bf74539f2a7e80574bcd848c615e) )
+	ROM_LOAD( "super_strike_grom0.grom0", 0x00000, 0x20000, CRC(9cfb9849) SHA1(5aa860c0c6e3916ebdb8898ee44f633bf3347ca8) )
+	ROM_LOAD( "super_strike_grom1.grom1", 0x20000, 0x20000, CRC(d9ea14e1) SHA1(4cddf3237c203b0a3f7ae770f85f1be35e9e1b78) )
+	ROM_LOAD( "super_strike_grom2.grom2", 0x40000, 0x20000, CRC(dcd97bf7) SHA1(95361222ac58bf74539f2a7e80574bcd848c615e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "sstsrom0.bin", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
+	ROM_LOAD( "super_strike_srom0.srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
 ROM_END
 
 
 ROM_START( stratabs )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sb_prog-v4t.u5", 0x08000, 0x8000, CRC(38ddae75) SHA1(71a9cbd36cf7b180a88bab3ab92a4dff93ce365f) )
+	ROM_LOAD( "sb_prog-v4t.u5",  0x08000, 0x8000, CRC(38ddae75) SHA1(71a9cbd36cf7b180a88bab3ab92a4dff93ce365f) )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2322,7 +2322,7 @@ ROM_START( stratabs )
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "sb_grom00", 0x00000, 0x20000, CRC(22f6ce56) SHA1(8e423122384257d9c5d8f48192ff6fa1f544fd97) )
 	ROM_LOAD( "sb_grom01", 0x20000, 0x20000, CRC(6cc7ad6f) SHA1(d601b9bb81f26ad86e5cc053cab055831331ccde) )
-	ROM_LOAD( "sb_grom02",  0x40000, 0x20000, CRC(475134ef) SHA1(5920e7a211f1b2234e8a3f51e570303c3787d8fd) )
+	ROM_LOAD( "sb_grom02", 0x40000, 0x20000, CRC(475134ef) SHA1(5920e7a211f1b2234e8a3f51e570303c3787d8fd) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sb_srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
@@ -2767,9 +2767,9 @@ GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slik
 GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
 GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
-GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, itech8_state, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
 GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
+GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, itech8_state, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */
 GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
