@@ -21,17 +21,17 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr ""
+msgstr "存在しないに分類された%1$uマシンのROMを検査しますか？"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "全%1$uマシンのROMを検査しますか？"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "（結果は%1$sに保存されます）"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -39,10 +39,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"マシン%2$u／%3$uのROMを検査中...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "検査を開始"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:116
 msgid "Cannot save over directory"
@@ -95,7 +97,7 @@ msgstr "ROMファイル"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
-msgstr ""
+msgstr "ソフトウェア メディア"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
@@ -119,7 +121,7 @@ msgstr "INIファイル"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "カテゴリ INI"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
@@ -300,7 +302,7 @@ msgstr "ＷＡＮ"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr ""
+msgstr "タイミング"
 
 #: src/frontend/mame/ui/info.cpp:177
 msgid ""
@@ -327,7 +329,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:197
 msgid "Completely unemulated features: "
-msgstr ""
+msgstr "全くエミュレート出来ていない機能： "
 
 #: src/frontend/mame/ui/info.cpp:203 src/frontend/mame/ui/info.cpp:219
 #, c-format
@@ -342,7 +344,7 @@ msgstr "、%s"
 
 #: src/frontend/mame/ui/info.cpp:213
 msgid "Imperfectly emulated features: "
-msgstr ""
+msgstr "不完全なエミュレート機能： "
 
 #: src/frontend/mame/ui/info.cpp:228
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -386,6 +388,9 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"このマシンの一部の要素は、機械仕掛けのデバイスもしくは実際の動作が必要なため"
+"エミュレートできません。このマシンを完全に体験することはできません。\n"
 
 #: src/frontend/mame/ui/info.cpp:262
 #, c-format
@@ -631,15 +636,15 @@ msgstr "リセット"
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
-msgstr ""
+msgstr "フィルタ無し"
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
-msgstr ""
+msgstr "存在する"
 
 #: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
 msgid "Unavailable"
-msgstr ""
+msgstr "存在しない"
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
@@ -651,11 +656,11 @@ msgstr "動作不可"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
-msgstr ""
+msgstr "機械仕掛け"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Not Mechanical"
-msgstr ""
+msgstr "機械仕掛け以外"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
@@ -663,7 +668,7 @@ msgstr "カテゴリ"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "お気に入り"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
 msgid "BIOS"
@@ -671,7 +676,7 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr ""
+msgstr "BIOS以外"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
@@ -679,7 +684,7 @@ msgstr "親セット"
 
 #: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
 msgid "Clones"
-msgstr ""
+msgstr "クローン"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
@@ -691,19 +696,19 @@ msgstr "年度"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "セーブ対応"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "セーブ非対応"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "CHDが必要"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "CHDが不要"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
@@ -723,19 +728,19 @@ msgstr "発売元"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "対応"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
-msgstr ""
+msgstr "一部対応"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "非対応"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
-msgstr ""
+msgstr "リリース地域"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
@@ -768,35 +773,35 @@ msgstr "フィルタを追加"
 
 #: src/frontend/mame/ui/utils.cpp:960
 msgid "Select category:"
-msgstr ""
+msgstr "カテゴリを選択："
 
 #: src/frontend/mame/ui/utils.cpp:991
 msgid "[no category INI files]"
-msgstr ""
+msgstr "［カテゴリINIファイルがありません］"
 
 #: src/frontend/mame/ui/utils.cpp:999
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "［INIファイルにグループが見つかりません］"
 
 #: src/frontend/mame/ui/utils.cpp:1033
 msgid "No category INI files found"
-msgstr ""
+msgstr "カテゴリINIファイルがありません"
 
 #: src/frontend/mame/ui/utils.cpp:1038
 msgid "File"
-msgstr ""
+msgstr "ファイル"
 
 #: src/frontend/mame/ui/utils.cpp:1042
 msgid "No groups found in category file"
-msgstr ""
+msgstr "カテゴリファイルにグループが見つかりません"
 
 #: src/frontend/mame/ui/utils.cpp:1047
 msgid "Group"
-msgstr ""
+msgstr "グループ"
 
 #: src/frontend/mame/ui/utils.cpp:1048
 msgid "Include clones"
-msgstr ""
+msgstr "クローンを含める"
 
 #: src/frontend/mame/ui/utils.cpp:1048 src/frontend/mame/ui/selgame.cpp:948
 #: src/frontend/mame/ui/selgame.cpp:949 src/frontend/mame/ui/selgame.cpp:950
@@ -906,11 +911,11 @@ msgstr "親セットのドライバ\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:867
 msgid "Analog Controls\tYes\n"
-msgstr ""
+msgstr "アナログコントロール\tはい\n"
 
 #: src/frontend/mame/ui/selgame.cpp:869
 msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "キーボード入力\tはい\n"
 
 #: src/frontend/mame/ui/selgame.cpp:872
 msgid "Overall\tNOT WORKING\n"
@@ -930,7 +935,7 @@ msgstr "グラフィック\t未実装\n"
 
 #: src/frontend/mame/ui/selgame.cpp:881
 msgid "Graphics\tWrong Colors\n"
-msgstr ""
+msgstr "グラフィック\t色の誤り\n"
 
 #: src/frontend/mame/ui/selgame.cpp:883
 msgid "Graphics\tImperfect Colors\n"
@@ -1034,11 +1039,11 @@ msgstr "ＷＡＮ\t不完全\n"
 
 #: src/frontend/mame/ui/selgame.cpp:944
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "タイミング\t未実装\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "タイミング\t不完全\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 #, c-format
@@ -1722,7 +1727,7 @@ msgstr "Gameinitファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:129
 msgid "High Scores"
-msgstr ""
+msgstr "ハイスコア"
 
 #: src/frontend/mame/ui/selmenu.cpp:130
 msgid "History"
@@ -1734,7 +1739,7 @@ msgstr "MAMEinfoファイル"
 
 #: src/frontend/mame/ui/selmenu.cpp:132
 msgid "MARPScore"
-msgstr ""
+msgstr "MARPスコア"
 
 #: src/frontend/mame/ui/selmenu.cpp:133
 msgid "MESSinfo"
@@ -2202,7 +2207,7 @@ msgstr "外部サンプル使用"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Load State"
-msgstr ""
+msgstr "状態をロード"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Select position to load from"
@@ -2210,7 +2215,7 @@ msgstr "セーブ元を選択"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Save State"
-msgstr ""
+msgstr "状態をセーブ"
 
 #: src/frontend/mame/ui/state.cpp:412
 msgid "Select position to save to"
@@ -2242,7 +2247,7 @@ msgstr "起動時に情報画面をスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "スナップショットの表示で4：3アスペクト比を強制"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
@@ -2258,11 +2263,11 @@ msgstr "ソフトウェアパーツ選択メニューをスキップする"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
-msgstr ""
+msgstr "情報の自動検査"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "ロム無しのマシンを存在するリストに表示しない"
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Advanced Options"
@@ -2274,23 +2279,23 @@ msgstr "パフォーマンス設定"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr ""
+msgstr "自動フレームスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr ""
+msgstr "フレームスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
-msgstr ""
+msgstr "スロットル"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Sleep"
-msgstr ""
+msgstr "スリープ"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Speed"
-msgstr ""
+msgstr "速度"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Refresh speed"
@@ -2310,27 +2315,27 @@ msgstr "左に回転"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
-msgstr ""
+msgstr "自動で右に回転"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Auto rotate left"
-msgstr ""
+msgstr "自動で左に回転"
 
 #: src/frontend/mame/ui/submenu.cpp:53
 msgid "Flip X"
-msgstr ""
+msgstr "X方向に反転"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Flip Y"
-msgstr ""
+msgstr "Y方向に反転"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Artwork Options"
-msgstr ""
+msgstr "アートワーク設定"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Crop"
-msgstr ""
+msgstr "アートワーク切り落とし"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Use Backdrops"
@@ -2354,19 +2359,19 @@ msgstr "マーキー画像使用"
 
 #: src/frontend/mame/ui/submenu.cpp:64
 msgid "State/Playback Options"
-msgstr ""
+msgstr "状態／プレイバック設定"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "自動セーブ／ロード"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Bilinear snapshot"
-msgstr ""
+msgstr "スナップショットのバイリニア"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Burn-in"
-msgstr ""
+msgstr "焼き付き"
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Input Options"
@@ -2374,7 +2379,7 @@ msgstr "入力設定"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Coin lockout"
-msgstr ""
+msgstr "コインロックアウト"
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
@@ -2390,11 +2395,11 @@ msgstr "ライトガン"
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Multi-keyboard"
-msgstr ""
+msgstr "マルチキーボード"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Multi-mouse"
-msgstr ""
+msgstr "マルチマウス"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Steadykey"
@@ -2402,31 +2407,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "UI active"
-msgstr ""
+msgstr "UI有効"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Offscreen reload"
-msgstr ""
+msgstr "画面外でのリロード"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Joystick deadzone"
-msgstr ""
+msgstr "ジョイスティックデッドゾーン"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Joystick saturation"
-msgstr ""
+msgstr "ジョイスティックサチュレーション"
 
 #: src/frontend/mame/ui/submenu.cpp:81
 msgid "Natural keyboard"
-msgstr ""
+msgstr "ナチュラルキーボード"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Simultaneous contradictory"
-msgstr ""
+msgstr "対称方向の同時入力"
 
 #: src/frontend/mame/ui/submenu.cpp:83
 msgid "Coin impulse"
-msgstr ""
+msgstr "コインインパルス"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Device Mapping"
@@ -2540,7 +2545,7 @@ msgstr "V-Syncを待つ"
 #~ "possible to fully play this machine.\n"
 #~ msgstr ""
 #~ "\n"
-#~ "このマシンの一部の要素は、機械的デバイスによる実際の動作が必要なためエミュ"
+#~ "このマシンの一部の要素は、機械仕掛けのデバイスによる実際の動作が必要なためエミュ"
 #~ "レートできません。そのため、このマシンを完全にプレイすることはできませ"
 #~ "ん。\n"
 
