@@ -224,7 +224,7 @@ void info_xml_creator::output(FILE *out, std::vector<std::string> const &pattern
 	driver_enumerator drivlist(m_lookup_options);
 	std::vector<bool> matched(patterns.size(), false);
 	size_t exact_matches = 0;
-	auto const included = [&patterns, &drivlist, &matched, &exact_matches] (char const *const name) -> bool
+	auto const included = [&patterns, &matched, &exact_matches] (char const *const name) -> bool
 	{
 		if (patterns.empty())
 			return true;
