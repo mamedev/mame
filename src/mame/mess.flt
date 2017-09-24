@@ -357,6 +357,7 @@ mccpm.cpp
 megadriv.cpp
 mekd2.cpp
 mephisto.cpp
+mephisto_montec.cpp
 mes.cpp
 mice.cpp
 micral.cpp
