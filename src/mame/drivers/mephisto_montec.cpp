@@ -19,6 +19,7 @@
 #include "machine/mmboard.h"
 #include "screen.h"
 #include "speaker.h"
+#include "softlist.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -487,6 +488,8 @@ static MACHINE_CONFIG_DERIVED( smondial2, smondial )
 	MCFG_CPU_PROGRAM_MAP(smondial2_mem)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")
+
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_smondial2)
 MACHINE_CONFIG_END
 
