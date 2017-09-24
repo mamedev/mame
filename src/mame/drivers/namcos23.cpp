@@ -2767,7 +2767,7 @@ READ16_MEMBER(namcos23_state::c361_r)
 
 
 
-// C?? (control)
+// C403, C444 (control)
 
 WRITE16_MEMBER(namcos23_state::ctl_w)
 {
@@ -2821,7 +2821,7 @@ READ16_MEMBER(namcos23_state::ctl_r)
 
 
 
-// C?? (MCU enable)
+// C413, C450 (MCU enable)
 
 WRITE16_MEMBER(namcos23_state::mcuen_w)
 {
@@ -2858,7 +2858,7 @@ WRITE16_MEMBER(namcos23_state::mcuen_w)
 
 
 
-// C?? (unknown comms)
+// C416, C452 (Communication RAM)
 
 // while getting the subcpu to be ready, panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
 // timecrs2 locks up in a similar way as panicprk, at the beginning of the 2nd level, by reading/writing to this register a couple of times
@@ -5270,7 +5270,7 @@ GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, 
 GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS )
 GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS )
 GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS )
-GAME( 1998, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (World,  PNP2 Ver. A)",     GAME_FLAGS )
+GAME( 1998, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
 GAME( 1998, panicprkj,   panicprk, s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
 GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS )
 GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS )
