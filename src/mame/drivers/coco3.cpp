@@ -330,8 +330,10 @@ static MACHINE_CONFIG_START( coco3 )
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","COCO3")
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","coco_flop")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list","COCO3")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3p, coco3 )
