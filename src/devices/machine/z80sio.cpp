@@ -1342,7 +1342,7 @@ WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
 
 		if (!m_rx_rr0_latch)
 		{
-			if (m_dcd)
+			if (!m_dcd)
 				m_rr0 |= RR0_DCD;
 			else
 				m_rr0 &= ~RR0_DCD;
