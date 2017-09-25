@@ -45,7 +45,8 @@
  *
  *
  */
-
+ 
+ 
 #include "emu.h"
 #include "video/ygv608.h"
 #include "screen.h"
@@ -370,6 +371,8 @@ static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 	AM_RANGE( 0,  0) AM_READWRITE(pattern_name_table_y_r,pattern_name_table_y_w)
 	AM_RANGE( 1,  1) AM_READWRITE(pattern_name_table_x_r,pattern_name_table_x_w)
 
+	AM_RANGE( 2,  2) AM_READWRITE(ram_access_ctrl_r,ram_access_ctrl_w)
+	
 	AM_RANGE( 3,  3) AM_READWRITE(sprite_address_r,sprite_address_w)
 	AM_RANGE( 4,  4) AM_READWRITE(scroll_address_r,scroll_address_w)
 	AM_RANGE( 5,  5) AM_READWRITE(palette_address_r,palette_address_w)
@@ -952,7 +955,8 @@ void ygv608_device::register_state_save()
 //  save_item(NAME(register_state_save));
 	save_item(NAME(m_color_state_r));
 	save_item(NAME(m_color_state_w));
-
+	// TODO: register save for the newly added variables
+	
 	machine().save().register_postload(save_prepost_delegate(FUNC(ygv608_device::postload), this));
 }
 
@@ -1392,7 +1396,7 @@ READ8_MEMBER( ygv608_device::sprite_data_r )
 {
 	uint8_t res = m_sprite_attribute_table.b[m_sprite_address];
 
-	if (m_regs.s.r2 & r2_saar)
+	if (m_saar == true)
 		m_sprite_address++;
 
 	return res;
@@ -1401,14 +1405,14 @@ READ8_MEMBER( ygv608_device::sprite_data_r )
 // P#2R - scroll data port
 READ8_MEMBER( ygv608_device::scroll_data_r )
 {
-	uint8_t res = m_scroll_data_table[(m_regs.s.r2 & r2_b_a) >> 4][m_scroll_address];
+	uint8_t res = m_scroll_data_table[m_ba_plane_select][m_scroll_address];
 
-	if (m_regs.s.r2 & r2_scar)
+	if (m_scar == true)
 	{
 		m_scroll_address++;
 		/* handle wrap to next plane */
 		if (m_scroll_address == 0)
-			m_regs.s.r2 ^= r2_b_a;
+			m_ba_plane_select ^= 1;
 	}
 
 	return res;
@@ -1423,7 +1427,7 @@ READ8_MEMBER( ygv608_device::palette_data_r )
 	{
 		m_color_state_r = 0;
 
-		if( m_regs.s.r2 & r2_cpar)
+		if(m_cpar == true)
 			m_palette_address++;
 	}
 
@@ -1569,21 +1573,21 @@ WRITE8_MEMBER( ygv608_device::sprite_data_w )
 {
 	m_sprite_attribute_table.b[m_sprite_address] = data;
 
-	if( m_regs.s.r2 & r2_saaw)
+	if( m_saaw == true)
 		m_sprite_address++;
 }
 
 // P#2W - scroll data port
 WRITE8_MEMBER( ygv608_device::scroll_data_w )
 {
-	m_scroll_data_table[(m_regs.s.r2 & r2_b_a) >> 4][m_scroll_address] = data;
+	m_scroll_data_table[m_ba_plane_select][m_scroll_address] = data;
 
-	if (m_regs.s.r2 & r2_scaw)
+	if (m_scaw == true)
 	{
 		m_scroll_address++;
 		/* handle wrap to next plane */
 		if (m_scroll_address == 0)
-			m_regs.s.r2 ^= r2_b_a;
+			m_ba_plane_select ^= 1;
 	}
 }
 
@@ -1601,7 +1605,7 @@ WRITE8_MEMBER( ygv608_device::palette_data_w )
 			pal6bit( m_colour_palette[m_palette_address][1] ),
 			pal6bit( m_colour_palette[m_palette_address][2] ));
 
-		if (m_regs.s.r2 & r2_cpaw)
+		if(m_cpaw == true)
 			m_palette_address++;
 	}
 }
@@ -1795,6 +1799,35 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
 	m_xtile_autoinc = BIT(data,7);
 	if(m_ytile_autoinc == true && m_xtile_autoinc == true)
 		logerror("%s: Warning both X/Y Tiles autoinc enabled!\n",this->tag());
+}
+
+// R#2R - Built in RAM access control
+/***
+ * x--- ---- CPAW Address autoincrements after color palette write
+ * -x-- ---- CPAR Address autoincrements after color palette read
+ * ---x ---- B/(A) P#2 plane access select (1=B Plane)
+ * ---- x--- SCAW Address autoincrements after scroll data write
+ * ---- -x-- SCAR Address autoincrements after scroll data read
+ * ---- --x- SAAW Address autoincrements after sprite attribute table write
+ * ---- ---x SAAR Address autoincrements after sprite attribute table read 
+ ***/
+READ8_MEMBER( ygv608_device::ram_access_ctrl_r )
+{
+	return (m_cpaw<<7) | (m_cpar<<6) |
+	       (m_ba_plane_select<<4) | 
+		   (m_scaw<<3) | (m_scar<<2) | (m_saaw<<1) | (m_saar<<0);
+}
+
+// R#2W - Built in RAM access control
+WRITE8_MEMBER( ygv608_device::ram_access_ctrl_w )
+{
+	m_saar = BIT(data,0);
+	m_saaw = BIT(data,1);
+	m_scar = BIT(data,2);
+	m_scaw = BIT(data,3);
+	m_ba_plane_select = BIT(data,4);
+	m_cpar = BIT(data,6);
+	m_cpaw = BIT(data,7);
 }
 
 

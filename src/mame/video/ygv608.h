@@ -46,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pattern_name_table_x_w);
 	DECLARE_READ8_MEMBER(pattern_name_table_y_r);
 	DECLARE_WRITE8_MEMBER(pattern_name_table_y_w);
+	DECLARE_READ8_MEMBER(ram_access_ctrl_r);
+	DECLARE_WRITE8_MEMBER(ram_access_ctrl_w);
 	DECLARE_READ8_MEMBER(sprite_address_r);
 	DECLARE_WRITE8_MEMBER(sprite_address_w);
 	DECLARE_READ8_MEMBER(scroll_address_r);
@@ -288,6 +290,14 @@ private:
 	uint8_t m_sprite_aux_reg;   /**< SPA: auxiliary bits of sprite attribute table */
 	uint8_t m_border_color;     /**< BDC: border color */
 
+	bool m_saar;					/**< SAAR: Address autoinc after reading sprite attribute table */
+	bool m_saaw;					/**< SAAR: Address autoinc after writing sprite attribute table */
+	bool m_scar;					/**< SAAR: Address autoinc after reading scroll data table */
+	bool m_scaw;					/**< SAAR: Address autoinc after writing scroll data table */
+	bool m_cpar;					/**< SAAR: Address autoinc after reading color palette */
+	bool m_cpaw;					/**< CPAW: Address autoinc after writing color palette */
+	bool m_ba_plane_select;			/**< B/(A) P#2 gains access to scroll data table in A/B plane */
+	
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;
