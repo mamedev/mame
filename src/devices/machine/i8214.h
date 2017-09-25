@@ -32,8 +32,8 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_I8214_IRQ_CALLBACK(_write) \
-	devcb = &i8214_device::set_irq_wr_callback(*device, DEVCB_##_write);
+#define MCFG_I8214_INT_CALLBACK(_write) \
+	devcb = &i8214_device::set_int_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8214_ENLG_CALLBACK(_write) \
 	devcb = &i8214_device::set_enlg_wr_callback(*device, DEVCB_##_write);
@@ -52,7 +52,7 @@ public:
 	// construction/destruction
 	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<i8214_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<i8214_device &>(device).m_write_int.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_enlg_wr_callback(device_t &device, Object &&cb) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
@@ -72,7 +72,7 @@ private:
 	void check_interrupt();
 	void update_interrupt_line();
 
-	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_int;
 	devcb_write_line   m_write_enlg;
 
 	int m_inte;                 // interrupt enable

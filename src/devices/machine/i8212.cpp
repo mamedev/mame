@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(I8212, i8212_device, "i8212", "Intel 8212 I/O")
 
 i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, I8212, tag, owner, clock),
-	m_write_irq(*this),
+	m_write_int(*this),
 	m_read_di(*this),
 	m_write_do(*this),
 	m_md(MODE_INPUT),
@@ -43,7 +43,7 @@ i8212_device::i8212_device(const machine_config &mconfig, const char *tag, devic
 void i8212_device::device_start()
 {
 	// resolve callbacks
-	m_write_irq.resolve_safe();
+	m_write_int.resolve_safe();
 	m_read_di.resolve_safe(0);
 	m_write_do.resolve_safe();
 
@@ -77,7 +77,7 @@ void i8212_device::device_reset()
 READ8_MEMBER( i8212_device::read )
 {
 	// clear interrupt line
-	m_write_irq(CLEAR_LINE);
+	m_write_int(CLEAR_LINE);
 
 	LOG("I8212 INT: %u\n", CLEAR_LINE);
 
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER( i8212_device::stb_w )
 			m_data = m_read_di(0);
 
 			// assert interrupt line
-			m_write_irq(ASSERT_LINE);
+			m_write_int(ASSERT_LINE);
 
 			LOG("I8212 INT: %u\n", ASSERT_LINE);
 		}
