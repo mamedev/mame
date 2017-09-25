@@ -7,7 +7,8 @@
     driver by Angelo Salese & Robbbert.
 
     TODO:
-    - implement printer
+    - implement printer;
+	- Challenge Golf: has gfx and input bugs (starts with home/end keys!?);
 
     Notes:
     - BS-BASIC v1.0 have a graphic bug with the RX-78 logo, it doesn't set the read bank so all of the color
@@ -115,7 +116,8 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	uint8_t *vram = memregion("vram")->base();
 	int x,y,count;
-
+	const int borderx = 32,bordery = 20;
+	
 	bitmap.fill(16, cliprect);
 
 	count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
@@ -138,7 +140,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					bitmap.pix16(y, x+i) = color;
+					bitmap.pix16(y+bordery, x+i+borderx) = color | 8;
 
 				/* fg color */
 				pen[0] = (m_pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
@@ -150,7 +152,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					bitmap.pix16(y, x+i) = color;
+					bitmap.pix16(y+bordery, x+i+borderx) = color;
 			}
 			count++;
 		}
@@ -460,11 +462,14 @@ static MACHINE_CONFIG_START( rx78 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_SIZE(192, 184)
+//	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+	/* guess: generic NTSC video timing at 256x224, system runs at 192x184, suppose with some border area to compensate */
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224) 
 	MCFG_SCREEN_UPDATE_DRIVER(rx78_state, screen_update)
-	MCFG_SCREEN_SIZE(192, 184)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
@@ -512,4 +517,4 @@ DRIVER_INIT_MEMBER(rx78_state,rx78)
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS       INIT   COMPANY     FULLNAME     FLAGS */
-COMP( 1983, rx78,   0,      0,       rx78,      rx78,    rx78_state, rx78,  "Bandai", "Gundam RX-78", 0)
+COMP( 1983, rx78,   0,      0,       rx78,      rx78,    rx78_state, rx78,  "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )
