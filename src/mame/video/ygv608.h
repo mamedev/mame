@@ -60,6 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(screen_ctrl_7_w);
 	DECLARE_READ8_MEMBER(screen_ctrl_8_r);
 	DECLARE_WRITE8_MEMBER(screen_ctrl_8_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_9_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_9_w);
 	DECLARE_READ8_MEMBER(screen_ctrl_10_r);
 	DECLARE_WRITE8_MEMBER(screen_ctrl_10_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
@@ -314,6 +316,9 @@ private:
 	bool m_roz_wrap_disable;		/**< RLRT: ROZ wraparound disable */
 	bool m_scroll_wrap_disable;		/**< RLSC: ROZ wraparound disable */
 
+	uint8_t m_pattern_size;			/**< PTS: pattern size of pattern plane */
+	uint8_t m_h_div_size;			/**< SLH: size of horizontal division in screen division scrolling */
+	uint8_t m_v_div_size;			/**< SLV: size of vertical division in screen division scrolling */
 	
 	// screen section
 	devcb_write_line            m_vblank_handler;

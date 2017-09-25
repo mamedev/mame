@@ -198,11 +198,9 @@ enum {
 #define SLH_32            0x06
 #define SLH_64            0x07
 #define PTS_8X8           0x00
-#define PTS_16X16         0x40
-#define PTS_32X32         0x80
-#define PTS_64X64         0xc0
-#define PTS_SHIFT         0
-#define PTS_MASK          0xc0
+#define PTS_16X16         0x01
+#define PTS_32X32         0x02
+#define PTS_64X64         0x03
 
 // R#10
 #define SPAS_SPRITESIZE    false
@@ -381,7 +379,7 @@ static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 	// screen control
 	AM_RANGE( 7,  7) AM_READWRITE(screen_ctrl_7_r,  screen_ctrl_7_w)
 	AM_RANGE( 8,  8) AM_READWRITE(screen_ctrl_8_r,  screen_ctrl_8_w)
-
+	AM_RANGE( 9,  9) AM_READWRITE(screen_ctrl_9_r,  screen_ctrl_9_w)
 	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_10_r, screen_ctrl_10_w)
 
 	AM_RANGE(13, 13) AM_WRITE(border_color_w)
@@ -1216,7 +1214,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		else
 			index = 0;
 
-		if ((m_regs.s.r9 & r9_pts) == PTS_8X8 )
+		if (m_pattern_size == PTS_8X8 )
 			m_tilemap_A = m_tilemap_A_cache_8[index];
 		else
 			m_tilemap_A = m_tilemap_A_cache_16[index];
@@ -1226,7 +1224,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		// for NCV1 it's sufficient to scroll only columns
 		m_tilemap_A->set_scroll_cols(m_page_x );
 
-		if ((m_regs.s.r9 & r9_pts) == PTS_8X8 )
+		if (m_pattern_size == PTS_8X8 )
 			m_tilemap_B = m_tilemap_B_cache_8[index];
 		else
 			m_tilemap_B = m_tilemap_B_cache_16[index];
@@ -1320,7 +1318,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	ui_draw_text( mode[m_md], 0, 0 );
 	sprintf( buffer, "%02ux%02u", m_page_x, m_page_y );
 	ui_draw_text( buffer, 0, 16 );
-	ui_draw_text( psize[(m_regs.s.r9 & r9_pts) >> 6], 0, 32 );
+	ui_draw_text( psize[m_pattern_size], 0, 32 );
 	sprintf( buffer, "A: SX:%d SY:%d",
 		(int)m_scroll_data_table[0][0x80] +
 		( ( (int)m_scroll_data_table[0][0x81] & 0x0f ) << 8 ),
@@ -1584,7 +1582,7 @@ WRITE8_MEMBER( ygv608_device::sprite_data_w )
 WRITE8_MEMBER( ygv608_device::scroll_data_w )
 {
 	m_scroll_data_table[m_ba_plane_select][m_scroll_address] = data;
-
+	
 	if (m_scaw == true)
 	{
 		m_scroll_address++;
@@ -1967,13 +1965,62 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_8_w )
 	if( (data & 1) != m_page_size)
 		m_tilemap_resize = 1;
 	
-	m_h_display_size = (data >> 6) & 3; 
-	m_v_display_size = (data >> 4) & 3; 
+/**/m_h_display_size = (data >> 6) & 3; 
+/**/m_v_display_size = (data >> 4) & 3; 
 	m_roz_wrap_disable = BIT(data,3);
-	m_scroll_wrap_disable = BIT(data,2);
+/**/m_scroll_wrap_disable = BIT(data,2);
 	m_page_size = BIT(data,0);
 	
 	pattern_mode_setup();
+}
+
+// R#9R - screen control 9
+/***
+ * xx-- ---- PTS: pattern size in pattern planes (8x8, 16x16, 32x32, 64x64)
+ * --xx x--- SLH: size of horizontal division in screen division scrolling
+ * ---- -xxx SLV: size of vertical division in screen division scrolling
+ * ---- -111 64 dots division
+ * ---- -110 32 dots division
+ * ---- -101 16 dots division
+ * ---- -100 8 dots division
+ * ---- -000 entire screen
+ ***/
+READ8_MEMBER( ygv608_device::screen_ctrl_9_r )
+{
+	return (m_pattern_size<<6)|
+	       (m_h_div_size<<3)|(m_v_div_size<<0);
+}
+
+WRITE8_MEMBER( ygv608_device::screen_ctrl_9_w )
+{
+	uint8_t new_pts = (data >> 6) & 3;
+	
+	if(new_pts != m_pattern_size)
+		m_tilemap_resize = 1;
+	
+	m_pattern_size = new_pts;
+	m_h_div_size = (data >> 3) & 7;
+	m_v_div_size = (data >> 0) & 7;
+
+	//popmessage("%02x %02x",m_h_div_size,m_v_div_size);
+	
+	// TODO: this code is garbage ...
+	if(m_v_div_size == 0)
+		m_col_shift = 8;
+	else
+	{
+		if (m_pattern_size == PTS_8X8 )
+			m_col_shift = (m_v_div_size) - 4;
+		else
+			m_col_shift = (m_v_div_size) - 5;
+		if( m_col_shift < 0 )
+		{
+			// we can't handle certain conditions
+			logerror( "Unhandled slv condition (pts=$%X,slv=$%X)\n",
+						m_pattern_size, m_v_div_size);
+			m_col_shift = 8;
+		}
+	}
 }
  
  // R#10R - screen control: mosaic & sprite
@@ -2262,11 +2309,6 @@ void ygv608_device::SetPreShortcuts( int reg, int data )
 	switch( reg ) {
 		
 
-		case 9 :
-			if( ( ( data >> PTS_SHIFT ) & PTS_MASK ) != (m_regs.s.r9 & r9_pts))
-				m_tilemap_resize= 1;
-			break;
-
 		case 40 :
 			if( ( ( data >> HDW_SHIFT ) & HDW_MASK ) != (m_regs.s.r40 & r40_hdw))
 				m_screen_resize = 1;
@@ -2288,32 +2330,6 @@ void ygv608_device::SetPostShortcuts(int reg )
 	switch (reg)
 	{
 
-
-	case 9 :
-	switch (m_regs.s.r9 & r9_slv)
-	{
-		case SLV_SCREEN :
-			// always use scoll table entry #1
-			m_col_shift = 8;
-			break;
-		default :
-			if ((m_regs.s.r9 & r9_pts) == PTS_8X8 )
-				m_col_shift = (m_regs.s.r9 & r9_slv) - 4;
-			else
-				m_col_shift = (m_regs.s.r9 & r9_slv) - 5;
-			if( m_col_shift < 0 )
-			{
-				// we can't handle certain conditions
-				logerror( "Unhandled slv condition (pts=$%X,slv=$%X)\n",
-							m_regs.s.r9 & r9_pts, m_regs.s.r9 & r9_slv);
-				m_col_shift = 8;
-			}
-			break;
-	}
-
-	//if( m_regs.s.slh != SLH_SCREEN )
-	//    logerror( "SLH = %1X\n", m_regs.s.slh );
-	break;
 
 	case 11 :
 	//ShowYGV608Registers();
