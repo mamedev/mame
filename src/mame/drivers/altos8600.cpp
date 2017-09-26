@@ -55,10 +55,12 @@ public:
 	DECLARE_WRITE8_MEMBER(cattn_w);
 	DECLARE_READ8_MEMBER(romport_r);
 	DECLARE_WRITE8_MEMBER(romport_w);
+	DECLARE_WRITE8_MEMBER(clrsys_w);
 	DECLARE_WRITE16_MEMBER(mode_w);
 	DECLARE_WRITE_LINE_MEMBER(cpuif_w);
 	DECLARE_WRITE_LINE_MEMBER(fddrq_w);
 	DECLARE_WRITE8_MEMBER(ics_attn_w);
+	IRQ_CALLBACK_MEMBER(inta);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -155,7 +157,11 @@ READ16_MEMBER(altos8600_state::mmuflags_r)
 WRITE16_MEMBER(altos8600_state::mmuflags_w)
 {
 	data &= ~0x17;
-	COMBINE_DATA(&m_mmuflags[offset & 0xff]);
+	if(mem_mask == 0xff)
+		data |= 0xff00;
+	else if(mem_mask == 0xff00)
+		return;
+	m_mmuflags[offset & 0xff] = data;
 }
 
 WRITE8_MEMBER(altos8600_state::cattn_w)
@@ -197,7 +203,11 @@ WRITE8_MEMBER(altos8600_state::romport_w)
 				m_fdc->set_floppy(nullptr);
 
 			if(m_nmistat && m_nmiinh && !BIT(data, 4))
+			{
+				m_mode &= ~1;
+				m_user = false;
 				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			}
 			else if(BIT(data, 4) && m_nmistat)
 				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			m_nmiinh = BIT(data, 4) ? true : false;
@@ -213,6 +223,11 @@ WRITE8_MEMBER(altos8600_state::romport_w)
 			m_romport[3] = data;
 			break;
 	}
+}
+
+WRITE8_MEMBER(altos8600_state::clrsys_w)
+{
+	m_pic1->ir0_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(altos8600_state::ics_attn_w)
@@ -233,7 +248,6 @@ WRITE16_MEMBER(altos8600_state::mode_w)
 
 READ8_MEMBER(altos8600_state::get_slave_ack)
 {
-	m_user = false;
 	if(offset == 2)
 		return m_pic2->acknowledge();
 	else if(offset == 3)
@@ -245,9 +259,13 @@ void altos8600_state::seterr(offs_t offset, u16 mem_mask, u16 err_mask)
 {
 	if(machine().side_effect_disabled())
 		return;
-	logerror("Fault at %06x type %04x\n", offset << 1, err_mask);
+	logerror("Fault at %05x type %04x\n", offset << 1, err_mask);
 	if(!m_nmiinh)
+	{
+		m_mode &= ~1;
+		m_user = false;
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
 	m_nmistat = true;
 	m_mmuerr &= ~err_mask;
 	m_mmueaddr[0] = (offset << 1) | (!(mem_mask & 0xff) ? 1 : 0);
@@ -332,9 +350,9 @@ WRITE16_MEMBER(altos8600_state::xtraram_w)
 
 READ16_MEMBER(altos8600_state::cpuio_r)
 {
-	if(m_user)
+	if(m_user && !machine().side_effect_disabled())
 	{
-		seterr(offset, mem_mask, 0x800);
+		m_pic1->ir0_w(ASSERT_LINE);
 		return 0;
 	}
 	return m_dmac->space(AS_IO).read_word_unaligned(offset << 1, mem_mask);
@@ -342,9 +360,9 @@ READ16_MEMBER(altos8600_state::cpuio_r)
 
 WRITE16_MEMBER(altos8600_state::cpuio_w)
 {
-	if(m_user)
+	if(m_user && !machine().side_effect_disabled())
 	{
-		seterr(offset, mem_mask, 0x800);
+		m_pic1->ir0_w(ASSERT_LINE);
 		return;
 	}
 	m_dmac->space(AS_IO).write_word_unaligned(offset << 1, data, mem_mask);
@@ -386,6 +404,13 @@ WRITE16_MEMBER(altos8600_state::nmi_w)
 	seterr(offset, mem_mask, 0x100);
 }
 
+IRQ_CALLBACK_MEMBER(altos8600_state::inta)
+{
+	m_user = false;
+	m_mode &= ~1;
+	return m_pic1->acknowledge();
+}
+
 static ADDRESS_MAP_START(cpu_mem, AS_PROGRAM, 16, altos8600_state)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(cpuram_r, cpuram_w)
 ADDRESS_MAP_END
@@ -423,6 +448,7 @@ static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
 	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0xff00)
 	AM_RANGE(0x0050, 0x0057) AM_READWRITE8(romport_r, romport_w, 0xffff)
 	AM_RANGE(0x0058, 0x005f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x0058, 0x005f) AM_WRITE8(clrsys_w, 0xff00)
 	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0068, 0x006f) AM_DEVREADWRITE8("pic8259_3", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0070, 0x0077) AM_NOP
@@ -444,7 +470,7 @@ static MACHINE_CONFIG_START(altos8600)
 	MCFG_I8086_STACK_MAP(stack_mem)
 	MCFG_I8086_CODE_MAP(code_mem)
 	MCFG_I8086_EXTRA_MAP(extra_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(altos8600_state, inta)
 	MCFG_I8086_IF_HANDLER(WRITELINE(altos8600_state, cpuif_w))
 
 	MCFG_CPU_ADD("dmac", I8089, XTAL_5MHz)
