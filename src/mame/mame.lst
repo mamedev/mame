@@ -35245,6 +35245,8 @@ chinatwn                        // MAK (c) 1991 Data East Corporation (Japan)
 supbtime                        // MAE (c) 1990 Data East Corporation (World)
 supbtimea                       // MAE (c) 1990 Data East Corporation (World)
 supbtimej                       // MAE (c) 1990 Data East Corporation (Japan)
+tumblep                         // MAP (c) 1991 Data East Corporation (World)
+tumblepj                        // MAP (c) 1991 Data East Corporation (Japan)
 
 @source:supdrapo.cpp
 supdrapo                        // (c) 1983 + Stern license
@@ -36904,10 +36906,6 @@ tumbleb2                        // bootleg
 tumblepba                       //
 wlstar                          // (c) 1995 Mijin
 wondl96                         // (c) 1996 SemiCom
-
-@source:tumblep.cpp
-tumblep                         // MAP (c) 1991 Data East Corporation (World)
-tumblepj                        // MAP (c) 1991 Data East Corporation (Japan)
 
 @source:tunhunt.cpp
 tunhunt                         // 136000           (c) 1979
