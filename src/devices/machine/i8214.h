@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Intel 8214 Priority Interrupt Controller emulation
+    Intel 8214/3214 Priority Interrupt Control Unit
 
 **********************************************************************
                             _____   _____
@@ -12,7 +12,7 @@
                   _SGS   4 |             | 21  _R6
                   _INT   5 |             | 20  _R5
                   _CLK   6 |    8214     | 19  _R4
-                  INTE   7 |             | 18  _R3
+                  INTE   7 |    3214     | 18  _R3
                    _A0   8 |             | 17  _R2
                    _A1   9 |             | 16  _R1
                    _A2  10 |             | 15  _R0
@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( inte_w );
 
 	uint8_t a_r();
+	DECLARE_READ8_MEMBER(vector_r);
 	void b_w(uint8_t data);
 	void r_w(int line, int state);
 
