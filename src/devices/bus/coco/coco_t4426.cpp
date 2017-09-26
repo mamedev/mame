@@ -18,7 +18,7 @@
  *  |    +-----+    oo 9600       +--+ +--+                    +--+                 |
  *  |                                      +-------------+     |MC|                 |
  *  |    +-----+   +-----+    +-----+      | EF68B50P    |     |14|                 |
- *  |    | 2764|   | 2764|    |     |      | ACIA        |     |89|                 |
+ *  |    | 2764|   | 2764|    | 2732|      | ACIA        |     |89|                 |
  *  |    |     |   |     |    |     |      +-------------+     +--+                 |
  *  |    |CA   |   |CA   |    |PMOS |                                               |
  *  |    | 4426|   | 4426|    | 4426|   +-------------------+                       |
@@ -49,13 +49,15 @@
 //#define LOG_GENERAL (1U <<  0)
 #define LOG_SETUP   (1U <<  1)
 #define LOG_PIA     (1U <<  2)
+#define LOG_ACIA    (1U <<  3)
 
-//#define VERBOSE (LOG_PIA | LOG_GENERAL | LOG_SETUP)
-//#define LOG_OUTPUT_FUNC std::cout
+//#define VERBOSE (LOG_ACIA|LOG_GENERAL) // (LOG_PIA | LOG_GENERAL | LOG_SETUP)
+//#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
 #define LOGSETUP(...)	LOGMASKED(LOG_SETUP,   __VA_ARGS__)
-#define LOGPIA(...)		LOGMASKED(LOG_PIA,     __VA_ARGS__)
+#define LOGPIA(...)	LOGMASKED(LOG_PIA,     __VA_ARGS__)
+#define LOGACIA(...)	LOGMASKED(LOG_ACIA,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -99,7 +101,7 @@ namespace
 		virtual uint8_t* get_cart_base() override;
 		DECLARE_WRITE8_MEMBER(pia_A_w);
 
-		// Clocks TODO: Validate on PCB what lines are used
+		// Clocks
 		void write_acia_clocks(int id, int state);
 		DECLARE_WRITE_LINE_MEMBER (write_f1_clock){ write_acia_clocks(mc14411_device::TIMER_F1, state); }
 		DECLARE_WRITE_LINE_MEMBER (write_f3_clock){ write_acia_clocks(mc14411_device::TIMER_F3, state); }
@@ -146,7 +148,7 @@ MACHINE_CONFIG_MEMBER(coco_t4426_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_t4426_device, pia_A_w))
 
-	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0) // TODO: Figure out address mapping for ACIA
+	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
 
 	MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_rts))
@@ -170,10 +172,10 @@ MACHINE_CONFIG_END
 
 ROM_START( coco_t4426 )
 	// Part of this region is filled by set_bank
-	ROM_REGION(0x8000, CARTSLOT_TAG, ROMREGION_ERASE00)
+	ROM_REGION(0x4000, CARTSLOT_TAG, ROMREGION_ERASE00)
 	// Main cartridge ROM
-	ROM_LOAD("tercoPMOS4426-8549-4.31.bin", 0x6000, 0x1000, CRC(bc65c45c) SHA1(e50cfd1d61e29fe05eb795d8bf6303e7b91ed8e5))
-	ROM_RELOAD(0x07000,0x1000) // Mirrored
+	ROM_LOAD("tercoPMOS4426-8549-4.31.bin", 0x2000, 0x1000, CRC(bc65c45c) SHA1(e50cfd1d61e29fe05eb795d8bf6303e7b91ed8e5))
+	ROM_RELOAD(0x03000,0x1000) // Mirrored
 
 	// this region is loaded from separate ROM images
 	ROM_REGION(0x1a000, CARTBANK_TAG, ROMREGION_ERASE00)
@@ -314,29 +316,29 @@ void coco_t4426_device::write_acia_clocks(int id, int state)
 /*-------------------------------------------------
     scs_read custom devices
   PIA  is located at ff40-ff47
-  ACIA is located at ff48-ff4F
+  ACIA is located at ff48-ff4F with A1 = 1
 -------------------------------------------------*/
 
 READ8_MEMBER(coco_t4426_device::scs_read)
 {
 	uint8_t result = 0x00;
 
-	LOG("%s", FUNCNAME);
+	LOG("%s Offs:%d\n", FUNCNAME, offset);
 
 	if ((offset >= 0x00) && (offset <= 0x07))
 	{
-		LOG(" PIA");
+		LOGPIA("- PIA\n");
 		result = m_pia->read(space, offset & 3);
-		LOG(" - Offs:%04x Data:%02x\n", offset - 0x04, result);
+		LOGPIA("- Offs:%04x Data:%02x\n", offset - 0x04, result);
 	}
-	else if ((offset >= 0x08) && (offset <= 0x0f))
+	else if ((offset >= 0x08) && (offset <= 0x0f) && (offset & 2))
 	{
-		LOG(" ACIA");
+		LOGACIA("- ACIA\n");
 		if (offset & 1)
 			result = m_uart->status_r(space, offset & 1);
 		else
 			result = m_uart->data_r(space, offset & 1);
-		LOG(" - Offs:%04x Data:%02x\n", offset - 0x04, result);
+		LOGACIA("- Offs:%04x Data:%02x\n", offset - 0x04, result);
 	}
 	else
 	{
@@ -349,32 +351,32 @@ READ8_MEMBER(coco_t4426_device::scs_read)
 /*-------------------------------------------------
     scs_write - custom devices
   PIA  is located at ff40-ff47
-  ACIA is located at ff48-ff4F
+  ACIA is located at ff48-ff4F with A1 = 1
 -------------------------------------------------*/
 
 WRITE8_MEMBER(coco_t4426_device::scs_write)
 {
-	LOG("%s(%02x)\n", FUNCNAME, data);
+	LOG("%s Offs:%d Data:%02x\n", FUNCNAME, offset, data);
 	LOGSETUP(" * Offs:%02x <- %02x\n", offset, data);
 
 	if ((offset >= 0x00) && (offset <= 0x07))
 	{
-		LOG(" PIA ");
+		LOG("- PIA\n");
 		m_pia->write(space, offset & 3, data);
 	}
-	else if ((offset >= 0x08) && (offset <= 0x0f))
+	else if ((offset >= 0x08) && (offset <= 0x0f) && (offset & 2))
 	{
-		LOG(" ACIA");
+		LOGACIA("- ACIA");
 		if (offset & 1)
 		  m_uart->control_w(space, offset & 1, data);
 		else
 		  m_uart->data_w(space, offset & 1, data);
-		LOG(" - Offs:%04x Data:%02x\n", offset & 1, data);
+		LOGACIA(" - Offs:%04x Data:%02x\n", offset & 1, data);
 	}
 	else
 	{
-		LOG(" Unknown device");
-	}	  
+		LOG(" Unknown device\n");
+	}
 }
 
 /*----------------------------------------------------
@@ -399,7 +401,6 @@ WRITE8_MEMBER( coco_t4426_device::pia_A_w )
 	LOGPIA("%s(%02x)\n", FUNCNAME, data);
 	m_select = data;
 	set_bank();
-	//cart_base_changed();
 }
 
 void coco_t4426_device::set_bank()
@@ -410,23 +411,15 @@ void coco_t4426_device::set_bank()
 	switch (m_select)
 	{
 	case 0:
-	case ROM0:memcpy(cartbase + 0x4000, bankbase + 0x0000, 0x2000); break;
-	case ROM1:memcpy(cartbase + 0x4000, bankbase + 0x2000, 0x2000); break;
-	case ROM2:memcpy(cartbase + 0x4000, bankbase + 0x4000, 0x2000); break;
-	case ROM3:memcpy(cartbase + 0x4000, bankbase + 0x6000, 0x2000); break;
-	case ROM4:memcpy(cartbase + 0x4000, bankbase + 0x8000, 0x2000); break;
-	case ROM5:memcpy(cartbase + 0x4000, bankbase + 0xa000, 0x2000); break;
-	case ROM6:memcpy(cartbase + 0x4000, bankbase + 0xc000, 0x2000); break;
-	case ROM7:memcpy(cartbase + 0x4000, bankbase + 0xe000, 0x2000); break;
+	case ROM0:memcpy(cartbase, bankbase + 0x0000, 0x2000); break;
+	case ROM1:memcpy(cartbase, bankbase + 0x2000, 0x2000); break;
+	case ROM2:memcpy(cartbase, bankbase + 0x4000, 0x2000); break;
+	case ROM3:memcpy(cartbase, bankbase + 0x6000, 0x2000); break;
+	case ROM4:memcpy(cartbase, bankbase + 0x8000, 0x2000); break;
+	case ROM5:memcpy(cartbase, bankbase + 0xa000, 0x2000); break;
+	case ROM6:memcpy(cartbase, bankbase + 0xc000, 0x2000); break;
+	case ROM7:memcpy(cartbase, bankbase + 0xe000, 0x2000); break;
 	}
-
-#if 0 // Print the beginning of the selected ROM bank, seems to be correct but is not mapped in correctly via coco12.cpp m_sam->read yet
-	printf("%02x\n", m_select);
-	for (int i = 0; i < 48; i++) printf("%02x ", *((uint8_t *)(cartbase + 0x4000 + i)));
-	printf("\n");
-	for (int i = 0; i < 48; i++) printf("'%c'",  *((uint8_t *)(cartbase + 0x4000 + i)));
-	printf("\n");
-#endif
 }
 
 /*-------------------------------------------------
@@ -436,5 +429,5 @@ void coco_t4426_device::set_bank()
 uint8_t* coco_t4426_device::get_cart_base()
 {
 	LOG("%s - m_select %02x -> %02x\n", FUNCNAME, m_select, ~m_select & 0xff );
-	return memregion(CARTSLOT_TAG)->base() + 0x4000;
+	return memregion(CARTSLOT_TAG)->base();
 }
