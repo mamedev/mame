@@ -35,8 +35,9 @@
  *    - add registers into own space, improve naming and variable usage;
  *    - remove code repetition in tilemap drawing functions;
  *    - add crtc section (done partially);
- *    - fix garbage tiles in Mappy Arrange/Abnormal Check;
- *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers);
+ *    - fix garbage tiles in Mappy Arrange (done)
+ *    - fix tile encryption for Abnormal Check (sets extra bit?);
+ *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers) (done);
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
  *    - color palette accessors presumably accesses an internal RAMDAC with controllable auto-increment, convert to that;
@@ -1934,7 +1935,10 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_7_w )
 	m_dspe = BIT(data,0);
 	
 	m_na8_mask = ((m_flip == true) ? 0x03 : 0x0f );
-
+	
+	// changing mode resets the pattern name table states (Mappy Arrange)
+	p0_state_w = 0;
+	p0_state_r = 0;
 	pattern_mode_setup();
 // TODO: add dot clock into CRTC
 //	screen_configure();
