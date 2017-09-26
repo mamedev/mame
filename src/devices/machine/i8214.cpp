@@ -14,7 +14,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(I8214, i8214_device, "i8214", "Intel 8214 PIC")
+DEFINE_DEVICE_TYPE(I8214, i8214_device, "i8214", "Intel 8214 PICU")
 
 
 
