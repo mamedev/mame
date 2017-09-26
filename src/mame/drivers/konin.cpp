@@ -50,7 +50,6 @@ Terminal settings: 8 data bits, 2 stop bits, no parity @ 9600
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "bus/rs232/rs232.h"
-#include "machine/clock.h"
 
 class konin_state : public driver_device
 {
@@ -127,16 +126,16 @@ static MACHINE_CONFIG_START( konin )
 	MCFG_I8214_INT_CALLBACK(DEVWRITELINE("intlatch", i8212_device, stb_w))
 
 	MCFG_DEVICE_ADD("mainpit", PIT8253, 0)
+	// wild guess at UART clock and source
+	MCFG_PIT8253_CLK0(1536000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("mainppi", I8255, 0)
 
 	MCFG_DEVICE_ADD("iopit", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("ioppi", I8255, 0)
-
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
