@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-25 23:38+1000\n"
-"PO-Revision-Date: 2017-08-19 12:55+0100\n"
-"Last-Translator: Ashura-X\n"
+"PO-Revision-Date: 2017-08-26 14:19+0100\n"
+"Last-Translator: katananja\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -21,17 +21,17 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr ""
+msgstr "Auditar ROMs de %1$u marcada como indisponível?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "Auditar todas as ROMs para %1$u máquinas?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(os resultados serão salvos em %1$s)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -39,10 +39,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Auditando ROMs para máquinas %2$u de %3$u...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "Iniciar Auditoria"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:116
 msgid "Cannot save over directory"
@@ -99,11 +101,11 @@ msgstr "Mídia de Software"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
-msgstr "UI"
+msgstr "Interface"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38 src/frontend/mame/ui/custui.cpp:157
 msgid "Language"
-msgstr "Linguagem"
+msgstr "Idioma"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgid "Samples"
@@ -127,11 +129,11 @@ msgstr "Ícones"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
 msgid "Cheats"
-msgstr "Truques"
+msgstr "Trapaças"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/selmenu.cpp:49
 msgid "Snapshots"
-msgstr "Snapshots"
+msgstr "Retratos"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/selmenu.cpp:50
 msgid "Cabinets"
@@ -139,7 +141,7 @@ msgstr "Gabinetes"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/selmenu.cpp:53
 msgid "Flyers"
-msgstr "Flyers"
+msgstr "Panfletos"
 
 #: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/selmenu.cpp:54
 msgid "Titles"
@@ -156,7 +158,7 @@ msgstr "PCBs"
 #: src/frontend/mame/ui/dirmenu.cpp:51 src/frontend/mame/ui/videoopt.cpp:224
 #: src/frontend/mame/ui/selmenu.cpp:64
 msgid "Marquees"
-msgstr "Marquees"
+msgstr "Marquise"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgid "Controls Panels"
@@ -168,7 +170,7 @@ msgstr "Mira"
 
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgid "Artworks"
-msgstr "Artworks"
+msgstr "Arte"
 
 #: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/selmenu.cpp:57
 msgid "Bosses"
@@ -176,7 +178,7 @@ msgstr "Chefes"
 
 #: src/frontend/mame/ui/dirmenu.cpp:56
 msgid "Artworks Preview"
-msgstr "Amostra de Artworks"
+msgstr "Prever Arte"
 
 #: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:63
 msgid "Select"
@@ -398,7 +400,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Existem clones funcionando com esta máquina: %s"
+"Existem clones que funcionam com esta máquina: %s"
 
 #: src/frontend/mame/ui/info.cpp:275
 msgid ""
@@ -520,11 +522,11 @@ msgstr "Configurações"
 msgid ""
 "Cheat Comment:\n"
 "%s"
-msgstr "Comentário do Truque:\n"
+msgstr "Descrição da trapaça:\n"
 
 #: src/frontend/mame/ui/cheatopt.cpp:105
 msgid "All cheats reloaded"
-msgstr "Todos os truques recarregados"
+msgstr "Todas as trapaças foram recarregadas"
 
 #: src/frontend/mame/ui/cheatopt.cpp:136
 msgid "Autofire Settings"
@@ -930,7 +932,7 @@ msgstr "Gráficos\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:881
 msgid "Graphics\tWrong Colors\n"
-msgstr ""
+msgstr "Gráficos\tCores Erradas\n"
 
 #: src/frontend/mame/ui/selgame.cpp:883
 msgid "Graphics\tImperfect Colors\n"
@@ -1166,15 +1168,15 @@ msgstr "Rotação"
 
 #: src/frontend/mame/ui/videoopt.cpp:208
 msgid "Backdrops"
-msgstr "Backdrops"
+msgstr "Cenários"
 
 #: src/frontend/mame/ui/videoopt.cpp:212
 msgid "Overlays"
-msgstr "Overlays"
+msgstr "Sobreposições"
 
 #: src/frontend/mame/ui/videoopt.cpp:216
 msgid "Bezels"
-msgstr "Bezels"
+msgstr "Molduras"
 
 #: src/frontend/mame/ui/videoopt.cpp:220
 msgid "CPanels"
@@ -1282,7 +1284,7 @@ msgstr "Configuração da Máquina"
 
 #: src/frontend/mame/ui/mainmenu.cpp:75
 msgid "Bookkeeping Info"
-msgstr "Info de Bookkeeping"
+msgstr "Informação de Contabilidade"
 
 #: src/frontend/mame/ui/mainmenu.cpp:78
 msgid "Machine Information"
@@ -1334,7 +1336,7 @@ msgstr "Opções de Mira"
 
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr "Truques"
+msgstr "Trapaça"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgid "Plugin Options"
@@ -1497,7 +1499,7 @@ msgstr "Mostrar painéis laterais"
 
 #: src/frontend/mame/ui/custui.cpp:173
 msgid "Custom UI Settings"
-msgstr "Configurações Customizadas do UI"
+msgstr "Configurações da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:223
 msgid "default"
@@ -1505,7 +1507,7 @@ msgstr "padrão"
 
 #: src/frontend/mame/ui/custui.cpp:331
 msgid "UI Font"
-msgstr "Fonte do UI"
+msgstr "Fonte da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:336
 msgid "Bold"
@@ -1525,7 +1527,7 @@ msgstr "Infos do tamanho do texto"
 
 #: src/frontend/mame/ui/custui.cpp:362
 msgid "UI Fonts Settings"
-msgstr "Configurações das fontes do UI"
+msgstr "Configuração da fonte da interface"
 
 #: src/frontend/mame/ui/custui.cpp:371
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -1582,19 +1584,19 @@ msgstr "Fundo do visualizador GFX"
 
 #: src/frontend/mame/ui/custui.cpp:463
 msgid "Mouse over color"
-msgstr "Cor do Mouse over"
+msgstr "Cor da sobreposição do mouse"
 
 #: src/frontend/mame/ui/custui.cpp:464
 msgid "Mouse over background color"
-msgstr "Cor de fundo do Mouse over"
+msgstr "Cor de fundo da sobreposição do mouse"
 
 #: src/frontend/mame/ui/custui.cpp:465
 msgid "Mouse down color"
-msgstr "Cor do Mouse down"
+msgstr "Cor da subposição do mouse"
 
 #: src/frontend/mame/ui/custui.cpp:466
 msgid "Mouse down background color"
-msgstr "Cor de fundo do Mouse down"
+msgstr "Cor de subposição de fundo do mouse"
 
 #: src/frontend/mame/ui/custui.cpp:469
 msgid "Restore originals colors"
@@ -1602,7 +1604,7 @@ msgstr "Restaurar as cores originais"
 
 #: src/frontend/mame/ui/custui.cpp:481
 msgid "UI Colors Settings"
-msgstr "Configurações de cores do UI"
+msgstr "Configurações de cores da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:490
 #, c-format
@@ -1658,7 +1660,7 @@ msgstr "Escolha da paleta"
 
 #: src/frontend/mame/ui/custui.cpp:813
 msgid "Color preview ="
-msgstr "Visualização da cor"
+msgstr "Pré-visualização da cor ="
 
 #: src/frontend/mame/ui/custui.cpp:894
 msgid "White"
@@ -1746,7 +1748,7 @@ msgstr "MAMEscore"
 
 #: src/frontend/mame/ui/selmenu.cpp:135
 msgid "Sysinfo"
-msgstr "Sysinfo"
+msgstr "Informação do sistema"
 
 #: src/frontend/mame/ui/selmenu.cpp:252
 msgid "Software part selection:"
@@ -1852,7 +1854,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
 msgid "Keyboard Emulation Status"
-msgstr "Situação da Emulação do Teclado"
+msgstr "Estado da Emulação do Teclado"
 
 #: src/frontend/mame/ui/ui.cpp:1086
 msgid "Mode: PARTIAL Emulation"
@@ -1860,7 +1862,7 @@ msgstr "Modo: Emulação PARCIAL"
 
 #: src/frontend/mame/ui/ui.cpp:1087
 msgid "UI:   Enabled"
-msgstr "UI:   Ativo"
+msgstr "Interface:   Ativa"
 
 #: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
 msgid "**Use ScrLock to toggle**"
@@ -1872,7 +1874,7 @@ msgstr "Modo: Emulação COMPLETA"
 
 #: src/frontend/mame/ui/ui.cpp:1097
 msgid "UI:   Disabled"
-msgstr "UI:   Desativado"
+msgstr "Interface:   Desativada"
 
 #: src/frontend/mame/ui/ui.cpp:1240
 msgid "Autofire can't be enabled"
@@ -1893,7 +1895,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1366
 msgid "Master Volume"
-msgstr "Volume Mestre"
+msgstr "Volume Principal"
 
 #: src/frontend/mame/ui/ui.cpp:1375
 #, c-format
@@ -1972,7 +1974,7 @@ msgstr "Laserdisc '%1$s' Posição Vertical"
 
 #: src/frontend/mame/ui/ui.cpp:1485
 msgid "Vector Flicker"
-msgstr "Flicker Vetorial"
+msgstr "Cintilação Vetorial"
 
 #: src/frontend/mame/ui/ui.cpp:1486
 msgid "Beam Width Minimum"
@@ -2237,7 +2239,7 @@ msgstr "Mostrar ponteiro do mouse"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
-msgstr "Confirmar saída das máquinas"
+msgstr "Pedir confirmação ao sair"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
@@ -2245,7 +2247,7 @@ msgstr "Pular tela de informação ao iniciar"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
-msgstr "Forçar aspecto 4:3 para a tela de snapshot"
+msgstr "Forçar aspecto 4:3 para a tela de retrato"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
@@ -2329,23 +2331,23 @@ msgstr "Giro Y"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Artwork Options"
-msgstr "Opções da Artwork"
+msgstr "Opções de Arte"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Crop"
-msgstr "Artwork Cortada"
+msgstr "Recortar Arte"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Use Backdrops"
-msgstr "Usar Fundo"
+msgstr "Usar Cenário"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Overlays"
-msgstr "Usar Overlays"
+msgstr "Usar Sobreposições"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Bezels"
-msgstr "Usar Bezels"
+msgstr "Usar Molduras"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Use Control Panels"
@@ -2353,7 +2355,7 @@ msgstr "Usar Painéis de Controle"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Marquees"
-msgstr "Usar Marquees"
+msgstr "Usar Marquise"
 
 #: src/frontend/mame/ui/submenu.cpp:64
 msgid "State/Playback Options"
@@ -2365,7 +2367,7 @@ msgstr "Salvar/Restaurar Automático"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Bilinear snapshot"
-msgstr "Bilinear snapshot"
+msgstr "Retrato bilinear"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Burn-in"
@@ -2405,11 +2407,11 @@ msgstr "Steadykey"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "UI active"
-msgstr "UI ativo"
+msgstr "Interface ativa"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Offscreen reload"
-msgstr "Recarga Offscreen"
+msgstr "Recarga fora da tela"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Joystick deadzone"
