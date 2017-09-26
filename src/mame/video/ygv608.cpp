@@ -36,7 +36,8 @@
  *    - remove code repetition in tilemap drawing functions;
  *    - add crtc section (done partially);
  *    - fix garbage tiles in Mappy Arrange (done)
- *    - fix tile encryption for Abnormal Check (sets extra bit?);
+ *    - fix tile encryption for Abnormal Check (sets extra bit in cuskey);
+ *      nopping bit 0 writes to 0x40081e makes gfxs to draw better!?
  *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers) (done);
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
