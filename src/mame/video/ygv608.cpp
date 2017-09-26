@@ -551,6 +551,13 @@ void ygv608_device::set_gfxbank(uint8_t gfxbank)
 	m_tilemap_resize = 1;
 }
 
+inline int ygv608_device::get_col_division(int raw_col)
+{
+	if((m_v_div_size & 4) == 0)
+		return 0;
+	
+	return ((raw_col >> m_col_shift) * 2) & 0x7f;
+}
 
 
 TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
@@ -570,7 +577,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
-
+	int translated_column = get_col_division(col);
+	
 	uint8_t   attr = 0;
 	int             pattern_name_base = 0;
 	int             set = (m_md == MD_1PLANE_256COLOUR
@@ -608,8 +616,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 
 		/* calculate page according to scroll data */
 		/* - assuming full-screen scroll only for now... */
-		sy = (int)m_scroll_data_table[0][0x00] +
-			(((int)m_scroll_data_table[0][0x01] & 0x0f ) << 8);
+		sy = (int)m_scroll_data_table[0][translated_column] +
+			(((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
 		sx = (int)m_scroll_data_table[0][0x80] +
 			(((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
 
@@ -629,6 +637,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 			page += ( ( ( sy + row * 8 ) % 2048 ) / 512 ) * 8;
 		}
 
+		page &= 0x1f;
+		
 		/* add page, base address to pattern name */
 		j += ( (int)m_scroll_data_table[0][0xc0+page] << 10 );
 		j += ( m_base_addr[0][base] << 8 );
@@ -663,6 +673,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
+	int translated_column = get_col_division(col);
 
 	uint8_t   attr = 0;
 	int             pattern_name_base = ( ( m_page_y << m_pny_shift )
@@ -703,8 +714,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 
 		/* calculate page according to scroll data */
 		/* - assuming full-screen scroll only for now... */
-		sy = (int)m_scroll_data_table[1][0x00] +
-			(((int)m_scroll_data_table[1][0x01] & 0x0f ) << 8);
+		sy = (int)m_scroll_data_table[1][translated_column] +
+			(((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
 		sx = (int)m_scroll_data_table[1][0x80] +
 			(((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
 
@@ -723,6 +734,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 			page = ( ( sx + col * 8 ) % 2048 ) / 256;
 			page += ( ( ( sy + row * 8 ) % 2048 ) / 512 ) * 8;
 		}
+
+		page &= 0x1f;
 
 		/* add page, base address to pattern name */
 		j += ( (int)m_scroll_data_table[1][0xc0+page] << 10 );
@@ -760,6 +773,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
+	int translated_column = get_col_division(col);
 
 	uint8_t   attr = 0;
 	int             pattern_name_base = 0;
@@ -796,8 +810,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 
 	/* calculate page according to scroll data */
 	/* - assuming full-screen scroll only for now... */
-	sy = (int)m_scroll_data_table[0][0x00] +
-			(((int)m_scroll_data_table[0][0x01] & 0x0f ) << 8);
+	sy = (int)m_scroll_data_table[0][translated_column] +
+			(((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
 	sx = (int)m_scroll_data_table[0][0x80] +
 			(((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
 	if(m_md == MD_2PLANE_16BIT ) {
@@ -812,6 +826,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 		page = ( sx + col * 16 ) / 1024;
 		page += ( ( sy + row * 16 ) / 512 ) * 4;
 	}
+
+	page &= 0x1f;
 
 	/* add page, base address to pattern name */
 	j += ( (int)m_scroll_data_table[0][0xc0+page] << 8 );
@@ -849,6 +865,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
+	int translated_column = get_col_division(col);
 
 	uint8_t   attr = 0;
 	int             pattern_name_base = ( ( m_page_y << m_pny_shift )
@@ -886,8 +903,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 
 	/* calculate page according to scroll data */
 	/* - assuming full-screen scroll only for now... */
-	sy = (int)m_scroll_data_table[1][0x00] +
-			(((int)m_scroll_data_table[1][0x01] & 0x0f ) << 8);
+	sy = (int)m_scroll_data_table[1][translated_column] +
+			(((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
 	sx = (int)m_scroll_data_table[1][0x80] +
 			(((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
 	if(m_md == MD_2PLANE_16BIT ) {
@@ -902,6 +919,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 		page = ( sx + col * 16 ) / 1024;
 		page += ( ( sy + row * 16 ) / 512 ) * 4;
 	}
+
+	page &= 0x1f;
 
 	/* add page, base address to pattern name */
 	j += ( (int)m_scroll_data_table[1][0xc0+page] << 8 );
@@ -1244,13 +1263,15 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 	for( col=0; col<m_page_x; col++ )
 	{
-	m_tilemap_B->set_scrolly(col,
-				( (int)m_scroll_data_table[1][(col>>m_col_shift)<<1] +
-					( (int)m_scroll_data_table[1][((col>>m_col_shift)<<1)+1] << 8 ) ) );
+		int translated_column = get_col_division(col);
+		
+		m_tilemap_B->set_scrolly(col,
+			( (int)m_scroll_data_table[1][translated_column] +
+			( (int)m_scroll_data_table[1][translated_column+1] << 8 ) ) );
 
-	m_tilemap_A->set_scrolly(col,
-				( (int)m_scroll_data_table[0][(col>>m_col_shift)<<1] +
-				( (int)m_scroll_data_table[0][((col>>m_col_shift)<<1)+1] << 8 ) ) );
+		m_tilemap_A->set_scrolly(col,
+			( (int)m_scroll_data_table[0][translated_column] +
+			( (int)m_scroll_data_table[0][translated_column+1] << 8 ) ) );
 	}
 
 #endif

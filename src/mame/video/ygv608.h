@@ -333,6 +333,7 @@ private:
 	void raster_irq_check();        /**< mask + pend check for raster irq */
 	void pattern_name_autoinc_check();  /**< check autoinc for tile pointers */
 	void pattern_mode_setup();		/**< refresh pattern mode at register 7/8 change*/
+	int get_col_division(int raw_col); /**< calculate column scroll */	
 	
 	enum
 	{
