@@ -30,7 +30,7 @@ TODO:
 - Tilemap scrolling/rotation/zooming or whatever effect it needs
 - Priorities are wrong. I suspect they need sprite orthogonality
 - Missing mixer registers (mainly layer enable/disable)
-- Tecmo World Cup '94 has missing protection emulation for draw buy-in 
+- Tecmo World Cup '94 has missing protection emulation for draw buy-in
   (as seen by code snippet 0x42ee, referenced in other places as well)
   It's unknown how the game logic should be at current stage.
 - Tecmo World Cup '94 also has no name entry whatsoever.
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( twcup94 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -832,7 +832,7 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 	// Command byte is also written to VS9209 port F, which is set for input only.
 	// Does the MCU somehow strobe it out of there?
 	uint8_t mcu_data = m_work_ram[0x00f/2] & 0x00ff;
-	
+
 	if( ((m_prot_reg[1] & 4) == 0) && ((m_prot_reg[0] & 4) == 4) )
 	{
 		switch( m_gametype )
@@ -901,14 +901,14 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(NULL_SUB);
 						break;
-						
+
 					#undef NULL_SUB
 				}
 				break;
-			
+
 			// same as above but with +0x10 displacement offsets
 			case TECMO_WCUP94A_MCU:
-				
+
 				switch (mcu_data)
 				{
 					#define NULL_SUB 0x0000829E
@@ -927,12 +927,12 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 					case 0x6e: PC(0x00010E38); break; // loop
 					case 0x6b: PC(0x00010EFC); break; // attract even
 					case 0x69: PC(0x0001121A); break; // attract odd
-					
+
 					default:
 						logerror("Unknown MCU CMD %04x\n",mcu_data);
 						PC(NULL_SUB);
 						break;
-					
+
 					#undef NULL_SUB
 				}
 				break;

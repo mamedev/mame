@@ -7,9 +7,9 @@
 
 <!-- Loading Instructions:
 
-      If the system has a disk drive (which the BBC Model B does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
+      If the system has a disk drive (which the BBC Model B does by default in MAME) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
 
-      To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
+      To start/stop the tape you must use the MAME UI, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 -->
 
 <softwarelist name="bbcb_cass_de" description="BBC Micro Model B (German) cassettes">
@@ -103,9 +103,9 @@
 	</software>
 
 	<software name="welcomeg">
-		<description>Welcome (Ger)</description>
+		<description>Willkommen (Ger)</description>
 		<year>1981</year>
-		<publisher>BBC Soft</publisher>
+		<publisher>Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="48009">
 				<rom name="welcome-german(1981)(bbc).uef" size="48009" crc="a2d78451" sha1="b0ff9fd8a51412dee878e763fe0aa54deef2c962" offset="0" />

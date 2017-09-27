@@ -6,7 +6,7 @@
 		<description>Disk Drive</description>
 		<year>198?</year>
 		<publisher>Salora</publisher>
-		
+
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="disk" />
 

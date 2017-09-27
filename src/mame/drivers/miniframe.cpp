@@ -96,9 +96,9 @@ READ16_MEMBER( miniframe_state::ram_mmu_r )
 		if ((mapentry & MMU_STATUS_MASK) == MMU_STATUS_PRESENT_NOT_ACCESSED)
 		{
 			m_mapram[(offset >> 11) & 0x7ff] &= ~MMU_STATUS_MASK;
-			m_mapram[(offset >> 11) & 0x7ff] |= MMU_STATUS_ACCESSED_NOT_WRITTEN;			
+			m_mapram[(offset >> 11) & 0x7ff] |= MMU_STATUS_ACCESSED_NOT_WRITTEN;
 		}
-		
+
 		return m_ramptr[addr];
 	}
 	else
@@ -129,8 +129,8 @@ WRITE16_MEMBER( miniframe_state::ram_mmu_w )
 
 		// indicate page has been written
 		// we know it's OK to just OR this
-		m_mapram[(offset >> 11) & 0x7ff] |= MMU_STATUS_ACCESSED_WRITTEN;	
-		
+		m_mapram[(offset >> 11) & 0x7ff] |= MMU_STATUS_ACCESSED_WRITTEN;
+
 		COMBINE_DATA(&m_ramptr[addr]);
 	}
 	else
@@ -141,7 +141,7 @@ WRITE16_MEMBER( miniframe_state::ram_mmu_w )
 
 WRITE16_MEMBER( miniframe_state::general_ctrl_w )
 {
-	if (data & 0x1000)	// ROM mirror at 0 if set
+	if (data & 0x1000)  // ROM mirror at 0 if set
 	{
 		m_ramrombank->set_bank(1);
 	}
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( miniframe_mem, AS_PROGRAM, 16, miniframe_state )
 	AM_RANGE(0x450000, 0x450001) AM_WRITE(general_ctrl_w)
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8("baudgen", pit8253_device, read, write, 0x00ff)	
+	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8("baudgen", pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xc90000, 0xc90003) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -235,8 +235,8 @@ static MACHINE_CONFIG_START( miniframe )
 
 	// floppy
 	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-//	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(miniframe_state, wd2797_intrq_w))
-//	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(miniframe_state, wd2797_drq_w))
+//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(miniframe_state, wd2797_intrq_w))
+//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(miniframe_state, wd2797_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// 8263s
@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( miniframe )
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk2))
 	// and ir4 on the PIC
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-		
+
 	MCFG_DEVICE_ADD("baudgen", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1228800)
 	MCFG_PIT8253_CLK1(1228800)

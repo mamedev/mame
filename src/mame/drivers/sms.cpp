@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(read_8000)
-	AM_RANGE(0xc000, 0xfff7) AM_READWRITE(read_ram, write_ram)
+	AM_RANGE(0xc000, 0xfffb) AM_READWRITE(read_ram, write_ram)
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
@@ -1109,8 +1109,8 @@ ROM_START(gamegear)
 	ROM_FILL(0x0000, 0x4000, 0x00)
 
 	ROM_REGION(0x0400, "user1", 0)
-	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" ) /* gamegear */
-	ROM_SYSTEM_BIOS( 1, "majesco", "Majesco BIOS" ) /* gamg */
+	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" )
+	ROM_SYSTEM_BIOS( 1, "majesco", "Majesco BIOS" )
 	ROMX_LOAD("majbios.rom", 0x0000, 0x0400, CRC(0ebea9d4) SHA1(914aa165e3d879f060be77870d345b60cfeb4ede), ROM_BIOS(2))
 ROM_END
 

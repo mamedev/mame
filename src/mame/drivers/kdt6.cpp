@@ -29,6 +29,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
+#include "kdt6.lh"
 
 
 //**************************************************************************
@@ -618,6 +619,7 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEFAULT_LAYOUT(layout_kdt6)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_13_5168MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -658,7 +660,7 @@ static MACHINE_CONFIG_START( psi98 )
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc2", z80ctc_device, trg3))
 
-	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 4, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_16MHz / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))

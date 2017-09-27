@@ -2,12 +2,15 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-2013-09-10 Skeleton driver for Televideo ts816
+2013-09-10 Skeleton driver for Televideo TS816
 
 TODO:
 - Connect up the devices to each other
 - Connect up RS232 terminal instead of parallel one
 - Connect centronics printer to PIO
+- 4 diagnostic LEDs
+- Hard Drive
+- Tape Drive
 - Get a good dump of the rom. If the undocumented DSW is enabled, it
   calls up code in the missing half of the rom. Also it isn't possible
   at the moment to get any useful response to commands.
@@ -97,8 +100,8 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( ts816 )
-	PORT_START("DSW") // 
-	PORT_DIPNAME( 0x07, 0x01, "Switch A") // read at @0368
+	PORT_START("DSW") //
+	PORT_DIPNAME( 0x07, 0x01, "System Terminal") // read at @0368
 	PORT_DIPSETTING(    0x00, "19200 baud")
 	PORT_DIPSETTING(    0x01, "9600 baud")
 	PORT_DIPSETTING(    0x02, "4800 baud")
@@ -220,7 +223,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ "pio" },
 	{ "ctc1" },
 	{ "ctc2" },
-//	{ "sio0" },
+//  { "sio0" },
 	{ "sio1" },
 	{ "sio2" },
 	{ "sio3" },
@@ -263,35 +266,38 @@ static MACHINE_CONFIG_START( ts816 )
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts816_state, kbd_put))
 
-	//MCFG_Z80SIO2_ADD("sio0", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	//MCFG_DEVICE_ADD("sio0", Z80SIO2, XTAL_16MHz / 4)
 	//MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio1", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio1", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio2", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio2", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio3", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio3", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio4", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio4", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio5", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio5", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio6", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio6", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio7", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio7", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio8", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio8", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO2_ADD("sio9", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio9", Z80SIO2, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_Z80PIO_IN_PA_CB(READ8(ts816_state, porta_r))
 	//MCFG_Z80PIO_IN_PB_CB(READ8(ts816_state, portb_r))
 	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(ts816_state, portb_w))
+
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz / 4)
 	//MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(ts816_state, busreq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

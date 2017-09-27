@@ -1,0 +1,81 @@
+Inputs:
+
+9, 8, 7, 6, 5, 4, 3, 2, 27, 26, 25, 24, 23, 22, 21, 20
+
+Outputs:
+
+18 (Combinatorial, No output feedback, Active low)
+17 (Combinatorial, No output feedback, Active high)
+16 (Combinatorial, No output feedback, Active high)
+15 (Combinatorial, No output feedback, Active high)
+13 (Combinatorial, No output feedback, Active low)
+12 (Combinatorial, No output feedback, Active high)
+11 (Combinatorial, No output feedback, Active high)
+10 (Combinatorial, No output feedback, Active high)
+
+Equations:
+
+/o18 = /i4 +
+       i9 & /i8 +
+       /i7 & /i6 +
+       i4 & /i25 +
+       i2 & /i27 +
+       /i2
+o18.oe = OE
+
+o17 = /i4 +
+      i8 & /i7 & /i6 & i5 & i4 & i3 & /i2 +
+      /i2 & i24 +
+      i3 & /i26 +
+      /i4 & i26 +
+      /i2
+o17.oe = OE
+
+o16 = /i27 & /i26 +
+      /i26 & /i25 & i23 & i22 +
+      /i7 & /i6 +
+      i4 & /i25 +
+      i5 & /i24 +
+      /i3 & i27
+o16.oe = OE
+
+o15 = i9 & /i25 & i24 & i23 & i22 & /i21 & /i20 +
+      /i27 & /i26 +
+      /i27 & /i24 & /i22 +
+      i6 & /i23 +
+      i9 & /i20 +
+      /i2
+o15.oe = OE
+
+/o13 = /i27 & /i26 +
+       i25 & /i21 & /i20 +
+       i9 & /i8 +
+       i9 & /i5 +
+       i7 & /i22 +
+       i8 & /i21
+o13.oe = OE
+
+o12 = /i8 & i7 & i6 & /i5 & /i4 & /i3 & i2 & /i27 & /i26 +
+      /i27 & /i26 +
+      i27 & i26 +
+      i7 & i3 +
+      /i3 & i20 +
+      /i9 & i21
+o12.oe = OE
+
+o11 = /i9 & /i27 & /i26 & i25 & /i24 & /i23 & /i22 & i21 & i20 +
+      i27 & i26 +
+      /i6 & i4 +
+      /i7 & i23 +
+      /i6 & i24
+o11.oe = OE
+
+o10 = /i8 & i7 & i6 & /i5 & /i4 & /i3 & i2 +
+      /i9 & i25 & /i24 & /i23 & /i22 & i21 & i20 +
+      /i27 & /i26 +
+      i25 & i24 & i23 & i22 & i21 & i20 +
+      i6 & /i4 +
+      /i8 & i22 +
+      /i5 & i25
+o10.oe = OE
+

@@ -9,7 +9,7 @@
 
     TODO:
     - Find out cpu clock speed
-    - Find out what UART type is used
+    - Find out what UART type is used (init byte = 94)
 
     Memory allocation
     - 0000 to 0FFF - standard roms
@@ -36,17 +36,15 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class mcb216_state : public driver_device
 {
 public:
 	mcb216_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
@@ -70,7 +68,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mcb216_io, AS_IO, 8, mcb216_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(status_r)
-	AM_RANGE(0x01, 0x01) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x01, 0x01) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cb308_mem, AS_PROGRAM, 8, mcb216_state)
@@ -123,7 +121,7 @@ static MACHINE_CONFIG_START( mcb216 )
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
 MACHINE_CONFIG_END
 
@@ -135,7 +133,7 @@ static MACHINE_CONFIG_START( cb308 )
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
 MACHINE_CONFIG_END
 

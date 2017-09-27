@@ -240,7 +240,7 @@ static MACHINE_CONFIG_START( pulsar )
 
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 
-	MCFG_Z80DART_ADD("z80dart", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("z80dart", Z80DART, XTAL_4MHz)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))

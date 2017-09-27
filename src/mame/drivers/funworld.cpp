@@ -4969,10 +4969,10 @@ ROM_END
 
   Encrypted graphics 'alla TAB blue PCB.
   Maybe is the infamous encrypted Impera green PCB.
-  
+
   From the manual: "With third draw"
-  ...but I couldn't trigger this feature. 
- 
+  ...but I couldn't trigger this feature.
+
  */
 
 ROM_START( royaljp )

@@ -859,15 +859,15 @@ REF: 940411
 */
 
 
-/* 
-	the byte at 0x1ff in the rom at u44 controls the language / region settings
-	and even allows for an alt. title of Lizard Hunt
+/*
+    the byte at 0x1ff in the rom at u44 controls the language / region settings
+    and even allows for an alt. title of Lizard Hunt
 
     Bits        Usage
-	---------------------------------------------------------------------------------
-	0000 1000   Title (0x00 = LIZARD HUNT, 0x08 = ALLIGATOR HUNT)
-	0000 0100   Language (0x00 = SPANISH, 0x04 = ENGLISH)
-	0000 0011   Region warning ( 0x00, 0x02 = USA, 0x01 = NOT USA, 0x03 = NO WARNING)
+    ---------------------------------------------------------------------------------
+    0000 1000   Title (0x00 = LIZARD HUNT, 0x08 = ALLIGATOR HUNT)
+    0000 0100   Language (0x00 = SPANISH, 0x04 = ENGLISH)
+    0000 0011   Region warning ( 0x00, 0x02 = USA, 0x01 = NOT USA, 0x03 = NO WARNING)
 */
 
 ROM_START( aligator )

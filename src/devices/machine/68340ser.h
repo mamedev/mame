@@ -38,26 +38,26 @@ protected:
 	uint8_t m_ivr;
 
 	enum {
-		REG_MCRH	= 0,
-		REG_MCRL	= 1,
-		REG_ILR		= 4,
-		REG_IVR		= 5,
+		REG_MCRH    = 0,
+		REG_MCRL    = 1,
+		REG_ILR     = 4,
+		REG_IVR     = 5,
 	};
 
 	enum {
-		REG_MCRH_STP	= 0x80,
-		REG_MCRH_FRZ1	= 0x40,
-		REG_MCRH_FRZ2	= 0x20,
-		REG_MCRH_ICCS	= 0x10,
+		REG_MCRH_STP    = 0x80,
+		REG_MCRH_FRZ1   = 0x40,
+		REG_MCRH_FRZ2   = 0x20,
+		REG_MCRH_ICCS   = 0x10,
 	};
 
 	enum {
-		REG_MCRL_SUPV	= 0x80,
-		REG_MCRL_ARBLV	= 0x0f,
+		REG_MCRL_SUPV   = 0x80,
+		REG_MCRL_ARBLV  = 0x0f,
 	};
 
 	enum {
-		REG_ILR_MASK	= 0x07
+		REG_ILR_MASK    = 0x07
 	};
 };
 

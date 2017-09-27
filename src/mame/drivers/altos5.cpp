@@ -399,12 +399,12 @@ static MACHINE_CONFIG_START( altos5 )
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD("dart", XTAL_8MHz / 2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_8MHz / 2)
 	// Channel A - console #3
 	// Channel B - printer
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD("sio", XTAL_8MHz / 2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio", Z80SIO0, XTAL_8MHz / 2)
 	// Channel A - console #2
 	// WRDY connects to (altos5_state, fdc_intrq_w)
 	// Channel B - console #1

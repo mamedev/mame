@@ -89,6 +89,16 @@ WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
 	m_deco104->write_data( space, real_address&0x7fff, data, mem_mask, cs );
 }
 
+WRITE_LINE_MEMBER( pktgaldx_state::vblank_w )
+{
+	if (state)
+		m_maincpu->set_input_line(6, ASSERT_LINE);
+}
+
+WRITE16_MEMBER( pktgaldx_state::vblank_ack_w )
+{
+	m_maincpu->set_input_line(6, CLEAR_LINE);
+}
 
 static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -108,7 +118,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
-
+	AM_RANGE(0x166800, 0x166801) AM_WRITE(vblank_ack_w)
 	AM_RANGE(0x167800, 0x167fff) AM_READWRITE(pktgaldx_protection_region_f_104_r,pktgaldx_protection_region_f_104_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
@@ -160,9 +170,8 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
 	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
-	AM_RANGE(0x160000, 0x167fff) AM_WRITENOP
 	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
-
+	AM_RANGE(0x166800, 0x166801) AM_WRITE(vblank_ack_w)
 	/* should we really be using these to read the i/o in the BOOTLEG?
 	  these look like i/o through protection ... */
 	AM_RANGE(0x167842, 0x167843) AM_READ_PORT("INPUTS")
@@ -330,8 +339,6 @@ static MACHINE_CONFIG_START( pktgaldx )
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(pktgaldx_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pktgaldx_state,  irq6_line_hold)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,6 +347,7 @@ static MACHINE_CONFIG_START( pktgaldx )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pktgaldx_state, vblank_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -393,8 +401,6 @@ static MACHINE_CONFIG_START( pktgaldb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pktgaldb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pktgaldx_state,  irq6_line_hold)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -403,6 +409,7 @@ static MACHINE_CONFIG_START( pktgaldb )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pktgaldx_state, vblank_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)

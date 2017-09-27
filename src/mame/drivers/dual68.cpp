@@ -13,29 +13,26 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class dual68_state : public driver_device
 {
 public:
 	dual68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_p_ram(*this, "p_ram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+		, m_p_ram(*this, "ram")
+	{ }
 
 	void kbd_put(u8 data);
-	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
+	DECLARE_WRITE16_MEMBER(dual68_terminal_w);
 
-protected:
+private:
 	virtual void machine_reset() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	//uint8_t m_term_data;
 	required_shared_ptr<uint16_t> m_p_ram;
+	//uint8_t m_term_data;
 };
 
 
@@ -47,7 +44,7 @@ WRITE16_MEMBER( dual68_state::dual68_terminal_w )
 
 static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16, dual68_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(dual68_terminal_w)
 	AM_RANGE(0x00800000, 0x00801fff) AM_ROM AM_REGION("user1",0)
@@ -91,9 +88,8 @@ static MACHINE_CONFIG_START( dual68 )
 	MCFG_CPU_PROGRAM_MAP(sio4_mem)
 	MCFG_CPU_IO_MAP(sio4_io)
 
-
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
 MACHINE_CONFIG_END
 

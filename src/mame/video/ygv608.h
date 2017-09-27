@@ -46,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pattern_name_table_x_w);
 	DECLARE_READ8_MEMBER(pattern_name_table_y_r);
 	DECLARE_WRITE8_MEMBER(pattern_name_table_y_w);
+	DECLARE_READ8_MEMBER(ram_access_ctrl_r);
+	DECLARE_WRITE8_MEMBER(ram_access_ctrl_w);
 	DECLARE_READ8_MEMBER(sprite_address_r);
 	DECLARE_WRITE8_MEMBER(sprite_address_w);
 	DECLARE_READ8_MEMBER(scroll_address_r);
@@ -54,8 +56,14 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_address_w);
 	DECLARE_READ8_MEMBER(sprite_bank_r);
 	DECLARE_WRITE8_MEMBER(sprite_bank_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_mosaic_sprite_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_mosaic_sprite_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_7_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_7_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_8_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_8_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_9_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_9_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_10_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_10_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -288,6 +296,30 @@ private:
 	uint8_t m_sprite_aux_reg;   /**< SPA: auxiliary bits of sprite attribute table */
 	uint8_t m_border_color;     /**< BDC: border color */
 
+	bool m_saar;					/**< SAAR: Address autoinc after reading sprite attribute table */
+	bool m_saaw;					/**< SAAW: Address autoinc after writing sprite attribute table */
+	bool m_scar;					/**< SCAR: Address autoinc after reading scroll data table */
+	bool m_scaw;					/**< SCAW: Address autoinc after writing scroll data table */
+	bool m_cpar;					/**< CPAR: Address autoinc after reading color palette */
+	bool m_cpaw;					/**< CPAW: Address autoinc after writing color palette */
+	bool m_ba_plane_select;			/**< B/(A) P#2 gains access to scroll data table in A/B plane */
+	
+	bool m_dspe;					/**< DSPE: display permission of pattern plane(s) (screen blanked if 0) */
+	uint8_t m_md;					/**< MDx: mode for pattern planes */
+	bool m_zron;					/**< ZRON: enable ROZ features */
+	bool m_flip;					/**< FLIP: enable flip for attribute bits 11 & 10 */
+	bool m_dckm;					/**< DCKM: dot clock frequency select */
+	
+	bool m_page_size;				/**< PGS: page size setter */
+	uint8_t m_h_display_size;		/**< HDS: horizontal display domain */
+	uint8_t m_v_display_size;		/**< VDS: vertical display domain */
+	bool m_roz_wrap_disable;		/**< RLRT: ROZ wraparound disable */
+	bool m_scroll_wrap_disable;		/**< RLSC: ROZ wraparound disable */
+
+	uint8_t m_pattern_size;			/**< PTS: pattern size of pattern plane */
+	uint8_t m_h_div_size;			/**< SLH: size of horizontal division in screen division scrolling */
+	uint8_t m_v_div_size;			/**< SLV: size of vertical division in screen division scrolling */
+	
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;
@@ -300,7 +332,9 @@ private:
 	void vblank_irq_check();        /**< mask + pend check for vblank irq */
 	void raster_irq_check();        /**< mask + pend check for raster irq */
 	void pattern_name_autoinc_check();  /**< check autoinc for tile pointers */
-
+	void pattern_mode_setup();		/**< refresh pattern mode at register 7/8 change*/
+	int get_col_division(int raw_col); /**< calculate column scroll */	
+	
 	enum
 	{
 		VBLANK_TIMER,

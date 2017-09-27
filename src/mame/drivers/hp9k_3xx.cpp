@@ -107,9 +107,9 @@ public:
 
 	/* 8042 interface */
 	DECLARE_WRITE8_MEMBER(iocpu_port1_w);
-        DECLARE_WRITE8_MEMBER(iocpu_port2_w);
-        DECLARE_READ8_MEMBER(iocpu_port1_r);
-        DECLARE_READ8_MEMBER(iocpu_test0_r);
+	DECLARE_WRITE8_MEMBER(iocpu_port2_w);
+	DECLARE_READ8_MEMBER(iocpu_port1_r);
+	DECLARE_READ8_MEMBER(iocpu_test0_r);
 
 	DECLARE_WRITE32_MEMBER(led_w)
 	{
@@ -117,7 +117,7 @@ public:
 		{
 			return;
 		}
-		#if 0
+#if 0
 		printf("LED: %02x  (", data&0xff);
 		for (int i = 7; i >= 0; i--)
 		{
@@ -131,7 +131,7 @@ public:
 			}
 		}
 		printf(")\n");
-		#endif
+#endif
 	}
 
 private:
@@ -345,14 +345,14 @@ WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
 
 READ8_MEMBER(hp9k3xx_state::iocpu_port1_r)
 {
-        if (m_hil_read)
-                return m_mlc->read(space, (m_latch_data & 0xc0) >> 6, 0xff);
+	if (m_hil_read)
+		return m_mlc->read(space, (m_latch_data & 0xc0) >> 6, 0xff);
 	return 0xff;
 }
 
 READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
 {
-        return !m_mlc->get_int();
+	return !m_mlc->get_int();
 }
 
 static SLOT_INTERFACE_START(dio16_cards)

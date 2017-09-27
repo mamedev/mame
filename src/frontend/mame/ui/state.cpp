@@ -175,7 +175,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 	std::sort(
 		m_entries_vec.begin(),
 		m_entries_vec.end(),
-		[this](const file_entry *a, const file_entry *b)
+		[](const file_entry *a, const file_entry *b)
 		{
 			return a->last_modified() > b->last_modified();
 		});

@@ -1102,7 +1102,7 @@ WRITE8_MEMBER(vicdual_state::carnival_io_w)
 WRITE8_MEMBER(vicdual_state::brdrline_io_w)
 {
 	if (offset & 0x01)  brdrline_audio_w(space, 0, data);
-	if (offset & 0x02)  
+	if (offset & 0x02)
 	{
 		palette_bank_w(space, 0, data);
 		brdrline_audio_aux_w(space,0, data);
@@ -2068,7 +2068,7 @@ static MACHINE_CONFIG_DERIVED( brdrline, vicdual_dualgame_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(brdrline_io_map)
-	
+
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(brdrline_audio)

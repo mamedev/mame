@@ -60,6 +60,8 @@ public:
 
 	READ16_MEMBER( pktgaldx_protection_region_f_104_r );
 	WRITE16_MEMBER( pktgaldx_protection_region_f_104_w );
+	DECLARE_WRITE_LINE_MEMBER( vblank_w );
+	DECLARE_WRITE16_MEMBER( vblank_ack_w );
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };

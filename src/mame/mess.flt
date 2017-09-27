@@ -26,6 +26,7 @@ akaiax80.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
+alphatpx.cpp
 alphatro.cpp
 altair.cpp
 alto2.cpp
@@ -356,6 +357,7 @@ mccpm.cpp
 megadriv.cpp
 mekd2.cpp
 mephisto.cpp
+mephisto_montec.cpp
 mes.cpp
 mice.cpp
 micral.cpp
@@ -390,6 +392,7 @@ mpf1.cpp
 mps1230.cpp
 mpz80.cpp
 ms0515.cpp
+ms6102.cpp
 ms9540.cpp
 msbc1.cpp
 mstation.cpp

@@ -1807,10 +1807,9 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-slider_state* shaders::slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
+std::unique_ptr<slider_state> shaders::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
-	int size = sizeof(slider_state) + strlen(title);
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, uint8_t, size));
+	auto state = make_unique_clear<slider_state>();
 
 	state->minval = minval;
 	state->defval = defval;
@@ -1822,7 +1821,7 @@ slider_state* shaders::slider_alloc(running_machine &machine, int id, const char
 
 	state->arg = arg;
 	state->id = id;
-	strcpy(state->description, title);
+	state->description = title;
 
 	return state;
 }
@@ -2126,6 +2125,7 @@ void *shaders::get_slider_option(int id, int index)
 void shaders::init_slider_list()
 {
 	m_sliders.clear();
+	m_core_sliders.clear();
 
 	for (slider* slider : internal_sliders)
 	{
@@ -2184,15 +2184,16 @@ void shaders::init_slider_list()
 						break;
 				}
 
-				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
+				std::unique_ptr<slider_state> core_slider = slider_alloc(desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
 				ui::menu_item item;
 				item.text = core_slider->description;
 				item.subtext = "";
 				item.flags = 0;
-				item.ref = core_slider;
+				item.ref = core_slider.get();
 				item.type = ui::menu_item_type::SLIDER;
 				m_sliders.push_back(item);
+				m_core_sliders.push_back(std::move(core_slider));
 			}
 		}
 	}

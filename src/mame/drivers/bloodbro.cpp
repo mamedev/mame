@@ -134,7 +134,6 @@ DIP locations verified for Blood Bros. & Sky Smasher via manual & DIP-SW setting
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
 #include "screen.h"
@@ -178,10 +177,7 @@ WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
 {
 	m_seibu_sound->main_w(space, offset, data, mem_mask);
 
-	// Probably incorrect, but these interrupts must be triggered somehow
 	if (offset == 1)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -202,6 +198,37 @@ static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x124000, 0x124005) AM_RAM
 	AM_RANGE(0x124006, 0x1247fd) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x128000, 0x1287ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_END
+
+WRITE_LINE_MEMBER(bloodbro_state::weststry_opl_irq_w)
+{
+	m_weststry_opl_irq = state;
+	weststry_soundnmi_update();
+}
+
+WRITE8_MEMBER(bloodbro_state::weststry_opl_w)
+{
+	// NMI cannot be accepted between address and data writes, or else registers get corrupted
+	m_weststry_soundnmi_mask = BIT(offset, 0);
+	m_ymsnd->write(space, offset, data);
+	weststry_soundnmi_update();
+}
+
+WRITE8_MEMBER(bloodbro_state::weststry_soundnmi_ack_w)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	weststry_soundnmi_update();
+}
+
+void bloodbro_state::weststry_soundnmi_update()
+{
+	if (m_weststry_opl_irq && m_weststry_soundnmi_mask)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+static ADDRESS_MAP_START( weststry_sound_map, AS_PROGRAM, 8, bloodbro_state )
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(weststry_soundnmi_ack_w)
+	AM_IMPORT_FROM(seibu_sound_map)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -533,6 +560,9 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 	MCFG_CPU_PROGRAM_MAP(weststry_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
 
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(weststry_sound_map)
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(1024)
@@ -545,7 +575,10 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(bloodbro_state, weststry_opl_irq_w))
+
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(bloodbro_state, weststry_opl_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( skysmash, bloodbro )
@@ -730,6 +763,12 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 	memory_region *z80_rom = memregion("audiocpu");
 	z80_rom->as_u8(0x160e) = 0x00;
 	z80_rom->as_u8(0x1610) = 0x00;
+
+	m_weststry_opl_irq = false;
+	m_weststry_soundnmi_mask = true;
+
+	save_item(NAME(m_weststry_opl_irq));
+	save_item(NAME(m_weststry_soundnmi_mask));
 }
 
 
@@ -738,5 +777,5 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (set 1)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (set 2)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (set 3)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststry, bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststry, bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, skysmash, 0,        skysmash, skysmash, bloodbro_state, 0,        ROT270, "Nihon System",    "Sky Smasher",                         MACHINE_SUPPORTS_SAVE )

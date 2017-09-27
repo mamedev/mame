@@ -317,7 +317,7 @@ bool hle_device_base::hil_write(uint16_t *pdata)
 	case 0x0f:
 		m_device_id = data - 8;
 		m_device_id16 = (data - 8) << 8;
-	        *pdata &= ~7;
+		*pdata &= ~7;
 		*pdata += (data - 7);
 		break;
 

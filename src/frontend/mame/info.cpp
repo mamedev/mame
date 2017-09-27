@@ -25,6 +25,7 @@
 #include "xmlfile.h"
 
 #include <ctype.h>
+#include <map>
 
 
 #define XML_ROOT                "mame"
@@ -157,11 +158,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t<!ELEMENT driver EMPTY>\n"
 "\t\t\t<!ATTLIST driver status (good|imperfect|preliminary) #REQUIRED>\n"
 "\t\t\t<!ATTLIST driver emulation (good|imperfect|preliminary) #REQUIRED>\n"
-"\t\t\t<!ATTLIST driver color (good|imperfect|preliminary) #REQUIRED>\n"
-"\t\t\t<!ATTLIST driver sound (good|imperfect|preliminary) #REQUIRED>\n"
-"\t\t\t<!ATTLIST driver graphic (good|imperfect|preliminary) #REQUIRED>\n"
 "\t\t\t<!ATTLIST driver cocktail (good|imperfect|preliminary) #IMPLIED>\n"
-"\t\t\t<!ATTLIST driver protection (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
 "\t\t<!ELEMENT feature EMPTY>\n"
 "\t\t\t<!ATTLIST feature type (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing) #REQUIRED>\n"
@@ -223,7 +220,7 @@ void info_xml_creator::output(FILE *out, std::vector<std::string> const &pattern
 	driver_enumerator drivlist(m_lookup_options);
 	std::vector<bool> matched(patterns.size(), false);
 	size_t exact_matches = 0;
-	auto const included = [&patterns, &drivlist, &matched, &exact_matches] (char const *const name) -> bool
+	auto const included = [&patterns, &matched, &exact_matches] (char const *const name) -> bool
 	{
 		if (patterns.empty())
 			return true;
@@ -649,24 +646,23 @@ void info_xml_creator::output_sampleof(device_t &device)
 void info_xml_creator::output_bios(device_t const &device)
 {
 	// first determine the default BIOS name
-	std::string defaultname;
-	for (const rom_entry &rom : device.rom_region_vector())
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			defaultname = ROM_GETNAME(&rom);
+	char const *defaultname(nullptr);
+	for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+	{
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			defaultname = rom->name;
+	}
 
 	// iterate over ROM entries and look for BIOSes
-	for (const rom_entry &rom : device.rom_region_vector())
+	for (romload::system_bios const &bios : romload::entries(device.rom_region()).get_system_bioses())
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			// output extracted name and descriptions
-			fprintf(m_output, "\t\t<biosset");
-			fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(&rom)));
-			fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(ROM_GETHASHDATA(&rom)));
-			if (defaultname == ROM_GETNAME(&rom))
-				fprintf(m_output, " default=\"yes\"");
-			fprintf(m_output, "/>\n");
-		}
+		// output extracted name and descriptions
+		fprintf(m_output, "\t\t<biosset");
+		fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(bios.get_name()));
+		fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(bios.get_description()));
+		if (defaultname && !std::strcmp(defaultname, bios.get_name()))
+			fprintf(m_output, " default=\"yes\"");
+		fprintf(m_output, "/>\n");
 	}
 }
 
@@ -678,97 +674,139 @@ void info_xml_creator::output_bios(device_t const &device)
 
 void info_xml_creator::output_rom(driver_enumerator *drivlist, device_t &device)
 {
-	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
-	bool const do_merge_name = drivlist && dynamic_cast<driver_device *>(&device);
-	for (int rom_type = 0; rom_type < 3; rom_type++)
-		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
-		{
-			bool const is_disk = ROMREGION_ISDISKDATA(region);
-
-			// disk regions only work for disks
-			if ((is_disk && rom_type != 2) || (!is_disk && rom_type == 2))
-				continue;
-
-			// iterate through ROM entries
-			std::string bios_name;
-			for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
+	enum class type { BIOS, NORMAL, DISK };
+	std::map<u32, char const *> biosnames;
+	bool bios_scanned(false);
+	auto const get_biosname =
+			[&biosnames, &bios_scanned] (tiny_rom_entry const *rom) -> char const *
 			{
-				// BIOS ROMs only apply to bioses
-				bool const is_bios = ROM_GETBIOSFLAGS(rom);
-				if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
-					continue;
+				u32 const biosflags(ROM_GETBIOSFLAGS(rom));
+				std::map<u32, char const *>::const_iterator const found(biosnames.find(biosflags));
+				if (biosnames.end() != found)
+					return found->second;
 
-				// if we have a valid ROM and we are a clone, see if we can find the parent ROM
-				util::hash_collection hashes(ROM_GETHASHDATA(rom));
-				const char *const merge_name = (do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, hashes) : nullptr;
-
-				// scan for a BIOS name
-				bios_name.clear();
-				if (!is_disk && is_bios)
+				char const *result(nullptr);
+				if (!bios_scanned)
 				{
-					// scan backwards through the ROM entries
-					for (const rom_entry *brom = rom - 1; brom != device.rom_region(); brom--)
+					for (++rom; !ROMENTRY_ISEND(rom); ++rom)
 					{
-						if (ROMENTRY_ISSYSTEM_BIOS(brom))
+						if (ROMENTRY_ISSYSTEM_BIOS(rom))
 						{
-							bios_name = ROM_GETNAME(brom);
-							break;
+							u32 const biosno(ROM_GETBIOSFLAGS(rom));
+							biosnames.emplace(biosno, rom->name);
+							if (biosflags == biosno)
+								result = rom->name;
 						}
 					}
+					bios_scanned = true;
 				}
+				return result;
+			};
+	auto const rom_file_size = // FIXME: need a common way to do this without the cost of allocating rom_entry
+			[] (tiny_rom_entry const *romp) -> u32
+			{
+				u32 maxlength = 0;
 
-				std::ostringstream output;
-
-				// opening tag
-				if (!is_disk)
-					output << "\t\t<rom";
-				else
-					output << "\t\t<disk";
-
-				// add name, merge, bios, and size tags */
-				const char *const name = ROM_GETNAME(rom);
-				if (name && name[0])
-					util::stream_format(output, " name=\"%s\"", util::xml::normalize_string(name));
-				if (merge_name)
-					util::stream_format(output, " merge=\"%s\"", util::xml::normalize_string(merge_name));
-				if (!bios_name.empty())
-					util::stream_format(output, " bios=\"%s\"", util::xml::normalize_string(bios_name.c_str()));
-				if (!is_disk)
-					util::stream_format(output, " size=\"%u\"", rom_file_size(rom));
-
-				// dump checksum information only if there is a known dump
-				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+				// loop until we run out of reloads
+				do
 				{
-					// iterate over hash function types and print m_output their values
-					output << " " << hashes.attribute_string();
+					// loop until we run out of continues/ignores */
+					u32 curlength(ROM_GETLENGTH(romp++));
+					while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp))
+						curlength += ROM_GETLENGTH(romp++);
+
+					// track the maximum length
+					maxlength = (std::max)(maxlength, curlength);
 				}
-				else
-					output << " status=\"nodump\"";
+				while (ROMENTRY_ISRELOAD(romp));
 
-				// append a region name
-				util::stream_format(output, " region=\"%s\"", ROMREGION_GETTAG(region));
+				return maxlength;
+			};
 
-				if (!is_disk)
-				{
-					// for non-disk entries, print offset
-					util::stream_format(output, " offset=\"%x\"", ROM_GETOFFSET(rom));
-				}
-				else
-				{
-					// for disk entries, add the disk index
-					util::stream_format(output, " index=\"%x\"", DISK_GETINDEX(rom));
-					util::stream_format(output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
-				}
+	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
+	bool const do_merge_name = drivlist && dynamic_cast<driver_device *>(&device);
+	for (type pass : { type::BIOS, type::NORMAL, type::DISK })
+	{
+		tiny_rom_entry const *region(nullptr);
+		for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+		{
+			if (ROMENTRY_ISREGION(rom))
+				region = rom;
+			else if (ROMENTRY_ISSYSTEM_BIOS(rom))
+				biosnames.emplace(ROM_GETBIOSFLAGS(rom), rom->name);
 
-				// add optional flag
-				if (ROM_ISOPTIONAL(rom))
-					output << " optional=\"yes\"";
+			if (!ROMENTRY_ISFILE(rom))
+				continue;
 
-				output << "/>\n";
+			// only list disks on the disk pass
+			bool const is_disk = ROMREGION_ISDISKDATA(region);
+			if ((type::DISK == pass) != is_disk)
+				continue;
 
-				fprintf(m_output, "%s", output.str().c_str());
+			// BIOS ROMs only apply to bioses
+			// FIXME: disk images associated with a system BIOS will never be listed
+			u32 const biosno(ROM_GETBIOSFLAGS(rom));
+			if ((type::BIOS == pass) != bool(biosno))
+				continue;
+			char const *const bios_name((!is_disk && biosno) ? get_biosname(rom) : nullptr);
+
+			// if we have a valid ROM and we are a clone, see if we can find the parent ROM
+			util::hash_collection const hashes(rom->hashdata);
+			char const *const merge_name((do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, hashes) : nullptr);
+
+			std::ostringstream output;
+
+			// opening tag
+			if (is_disk)
+				output << "\t\t<disk";
+			else
+				output << "\t\t<rom";
+
+			// add name, merge, bios, and size tags */
+			char const *const name(rom->name);
+			if (name && name[0])
+				util::stream_format(output, " name=\"%s\"", util::xml::normalize_string(name));
+			if (merge_name)
+				util::stream_format(output, " merge=\"%s\"", util::xml::normalize_string(merge_name));
+			if (bios_name)
+				util::stream_format(output, " bios=\"%s\"", util::xml::normalize_string(bios_name));
+			if (!is_disk)
+				util::stream_format(output, " size=\"%u\"", rom_file_size(rom));
+
+			// dump checksum information only if there is a known dump
+			if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+			{
+				// iterate over hash function types and print m_output their values
+				output << " " << hashes.attribute_string();
 			}
+			else
+				output << " status=\"nodump\"";
+
+			// append a region name
+			util::stream_format(output, " region=\"%s\"", region->name);
+
+			if (!is_disk)
+			{
+				// for non-disk entries, print offset
+				util::stream_format(output, " offset=\"%x\"", ROM_GETOFFSET(rom));
+			}
+			else
+			{
+				// for disk entries, add the disk index
+				util::stream_format(output, " index=\"%x\"", DISK_GETINDEX(rom));
+				util::stream_format(output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+			}
+
+			// add optional flag
+			if (ROM_ISOPTIONAL(rom))
+				output << " optional=\"yes\"";
+
+			output << "/>\n";
+
+			fprintf(m_output, "%s", output.str().c_str());
 		}
+		bios_scanned = true;
+	}
 }
 
 
@@ -1541,17 +1579,6 @@ void info_xml_creator::output_driver(game_driver const &driver, device_t::featur
 	emulation problems.
 	*/
 
-	auto const print_feature =
-			[this, unemulated, imperfect] (device_t::feature_type feature, char const *name, bool show_good)
-			{
-				if (unemulated & feature)
-					fprintf(m_output, " %s=\"preliminary\"", name);
-				else if (imperfect & feature)
-					fprintf(m_output, " %s=\"imperfect\"", name);
-				else if (show_good)
-					fprintf(m_output, " %s=\"good\"", name);
-			};
-
 	u32 const flags = driver.flags;
 	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
 	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
@@ -1569,14 +1596,8 @@ void info_xml_creator::output_driver(game_driver const &driver, device_t::featur
 	else
 		fprintf(m_output, " emulation=\"good\"");
 
-	print_feature(device_t::feature::PALETTE, "color", true);
-	print_feature(device_t::feature::SOUND, "sound", true);
-	print_feature(device_t::feature::GRAPHICS, "graphic", true);
-
 	if (flags & machine_flags::NO_COCKTAIL)
 		fprintf(m_output, " cocktail=\"preliminary\"");
-
-	print_feature(device_t::feature::PROTECTION, "protection", false);
 
 	if (flags & machine_flags::SUPPORTS_SAVE)
 		fprintf(m_output, " savestate=\"supported\"");
@@ -1802,23 +1823,20 @@ void info_xml_creator::output_ramoptions(device_t &root)
 const char *info_xml_creator::get_merge_name(driver_enumerator &drivlist, util::hash_collection const &romhashes)
 {
 	// walk the parent chain
-	const char *merge_name = nullptr;
-	for (int clone_of = drivlist.find(drivlist.driver().parent); clone_of != -1; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+	for (int clone_of = drivlist.find(drivlist.driver().parent); 0 <= clone_of; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
 	{
 		// look in the parent's ROMs
-		device_t *device = &drivlist.config(clone_of, m_lookup_options)->root_device();
-		for (const rom_entry *pregion = rom_first_region(*device); pregion != nullptr; pregion = rom_next_region(pregion))
-			for (const rom_entry *prom = rom_first_file(pregion); prom != nullptr; prom = rom_next_file(prom))
+		for (romload::region const &pregion : romload::entries(drivlist.driver(clone_of).rom).get_regions())
+		{
+			for (romload::file const &prom : pregion.get_files())
 			{
-				util::hash_collection phashes(ROM_GETHASHDATA(prom));
-				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && romhashes == phashes)
-				{
-					// stop when we find a match
-					merge_name = ROM_GETNAME(prom);
-					break;
-				}
+				// stop when we find a match
+				util::hash_collection const phashes(prom.get_hashdata());
+				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
+					return prom.get_name();
 			}
+		}
 	}
 
-	return merge_name;
+	return nullptr;
 }
