@@ -54,28 +54,6 @@
 #include "screen.h"
 
 
-// Fundamental constants
-enum {
-	p5_rwai     = 0x80,     // increment register select on reads
-	p5_rrai     = 0x40,     // increment register select on writes
-	p5_rn       = 0x3f,     // register select
-
-//  p6_res6     = 0xe0,
-	p6_fp       = 0x10,     // position detection flag
-	p6_fv       = 0x08,     // vertical border interval flag
-	p6_fc       = 0x04,
-	p6_hb       = 0x02,     // horizontal blanking flag?
-	p6_vb       = 0x01,     // vertical blanking flag?
-
-//  p7_res7     = 0xc0,
-	p7_tr       = 0x20,
-	p7_tc       = 0x10,
-	p7_tl       = 0x08,
-	p7_ts       = 0x04,
-	p7_tn       = 0x02,
-	p7_sr       = 0x01,
-};
-
 
 // TODO: move these into enums
 // R#7(md)
@@ -322,7 +300,7 @@ DEVICE_ADDRESS_MAP_START( port_map, 8, ygv608_device )
 	AM_RANGE(0x02, 0x02) AM_READWRITE(scroll_data_r,scroll_data_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_data_r,palette_data_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(register_data_r,register_data_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(register_select_w)
+	AM_RANGE(0x05, 0x05) AM_READNOP AM_WRITE(register_select_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(status_port_r,status_port_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(system_control_r,system_control_w)
 ADDRESS_MAP_END
@@ -347,7 +325,7 @@ ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, de
 //-------------------------------------------------
 void ygv608_device::device_start()
 {
-	memset(&m_ports, 0, sizeof(m_ports));
+//	memset(&m_ports, 0, sizeof(m_ports));
 //	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_pattern_name_table, 0, sizeof(m_pattern_name_table));
 	memset(&m_sprite_attribute_table, 0, sizeof(m_sprite_attribute_table));
@@ -870,7 +848,7 @@ void ygv608_device::postload()
 
 void ygv608_device::register_state_save()
 {
-	save_item(NAME(m_ports.b));
+//	save_item(NAME(m_ports.b));
 //	save_item(NAME(m_regs.b));
 	save_item(NAME(m_pattern_name_table));
 	save_item(NAME(m_sprite_attribute_table.b));
@@ -1254,14 +1232,14 @@ READ8_MEMBER( ygv608_device::sprite_data_r )
 // P#2R - scroll data port
 READ8_MEMBER( ygv608_device::scroll_data_r )
 {
-	uint8_t res = m_scroll_data_table[m_ba_plane_select][m_scroll_address];
+	uint8_t res = m_scroll_data_table[m_ba_plane_scroll_select][m_scroll_address];
 
 	if (m_scar == true)
 	{
 		m_scroll_address++;
 		/* handle wrap to next plane */
 		if (m_scroll_address == 0)
-			m_ba_plane_select ^= 1;
+			m_ba_plane_scroll_select ^= 1;
 	}
 
 	return res;
@@ -1324,7 +1302,7 @@ READ8_MEMBER( ygv608_device::status_port_r )
 // P#7R - system control port
 READ8_MEMBER( ygv608_device::system_control_r )
 {
-	return (uint8_t)(m_ports.b[7]);
+	return m_dma_status;
 }
 
 // P#0W - pattern name table data write
@@ -1427,14 +1405,14 @@ WRITE8_MEMBER( ygv608_device::sprite_data_w )
 // P#2W - scroll data port
 WRITE8_MEMBER( ygv608_device::scroll_data_w )
 {
-	m_scroll_data_table[m_ba_plane_select][m_scroll_address] = data;
+	m_scroll_data_table[m_ba_plane_scroll_select][m_scroll_address] = data;
 	
 	if (m_scaw == true)
 	{
 		m_scroll_address++;
 		/* handle wrap to next plane */
 		if (m_scroll_address == 0)
-			m_ba_plane_select ^= 1;
+			m_ba_plane_scroll_select ^= 1;
 	}
 }
 
@@ -1505,21 +1483,27 @@ WRITE8_MEMBER( ygv608_device::status_port_w )
 // P#7W - system control port
 WRITE8_MEMBER( ygv608_device::system_control_w )
 {
-	m_ports.b[7] = data;
-	if (m_ports.b[7] & 0x3e)
+	m_dma_status = data;
+	if (m_dma_status & 0x3e)
 		HandleRomTransfers(data & 0x3e);
-	if (m_ports.b[7] & 0x01)
-		HandleYGV608Reset();
+	if (m_dma_status & 0x01)
+		HandleReset();
 }
 
 
 // TODO: actual timing of this
-void ygv608_device::HandleYGV608Reset()
+void ygv608_device::HandleReset()
 {
 	int i;
 	/* Clear ports #0-7 */
-	memset( &m_ports.b[0], 0, 8 );
-
+	//memset( &m_ports.b[0], 0, 8 );
+	// most likely variables to be reset here from ports, there might be more
+	pattern_name_base_w = 0;
+	pattern_name_base_r = 0;
+	m_register_address = 0;
+	m_register_autoinc_r = false;
+	m_register_autoinc_w = false;
+	
 	/* Clear registers #0-38, #47-49 */
 	for(i=0;i<39;i++)
 		m_iospace->write_byte(i, 0x00);
@@ -1620,6 +1604,7 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_y_w )
 	m_ytile_ptr &= m_page_y -1;
 	m_ytile_autoinc = BIT(data,7);
 	m_plane_select_access = BIT(data,6);
+	// TODO: done by Dig Dug Original
 	if(m_ytile_autoinc == true && m_xtile_autoinc == true)
 		logerror("%s: Warning both X/Y Tiles autoinc enabled!\n",this->tag());
 }
@@ -1639,6 +1624,7 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
 	//      xTile, m_page_x );
 	m_xtile_ptr &= m_page_x -1;
 	m_xtile_autoinc = BIT(data,7);
+	// TODO: done by Dig Dug Original
 	if(m_ytile_autoinc == true && m_xtile_autoinc == true)
 		logerror("%s: Warning both X/Y Tiles autoinc enabled!\n",this->tag());
 }
@@ -1656,7 +1642,7 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
 READ8_MEMBER( ygv608_device::ram_access_ctrl_r )
 {
 	return (m_cpaw<<7) | (m_cpar<<6) |
-	       (m_ba_plane_select<<4) | 
+	       (m_ba_plane_scroll_select<<4) | 
 		   (m_scaw<<3) | (m_scar<<2) | (m_saaw<<1) | (m_saar<<0);
 }
 
@@ -1667,7 +1653,7 @@ WRITE8_MEMBER( ygv608_device::ram_access_ctrl_w )
 	m_saaw = BIT(data,1);
 	m_scar = BIT(data,2);
 	m_scaw = BIT(data,3);
-	m_ba_plane_select = BIT(data,4);
+	m_ba_plane_scroll_select = BIT(data,4);
 	m_cpar = BIT(data,6);
 	m_cpaw = BIT(data,7);
 }

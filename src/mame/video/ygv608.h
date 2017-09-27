@@ -109,17 +109,6 @@ private:
 	const address_space_config m_io_space_config;
 	static constexpr unsigned SPRITE_ATTR_TABLE_SIZE = 256;
 
-	struct YGV_PORTS {
-		uint8_t na;           // P#0 - pattern name table data port (read/write)
-		uint8_t p1;           // P#1 - sprite data port (read/write)
-		uint8_t p2;           // P#2 - scroll data port (read/write)
-		uint8_t p3;           // P#3 - colour palette data port (read/write)
-		uint8_t p4;           // P#4 - register data port (read/write)
-		uint8_t p5;           // P#5 - register select port (write only)
-		uint8_t p6;           // P#6 - status port (read/write)
-		uint8_t p7;           // P#7 - system control port (read/write)
-	};
-
 	static constexpr unsigned MAX_SPRITES = SPRITE_ATTR_TABLE_SIZE >> 2;
 
 	struct SPRITE_ATTR {
@@ -149,13 +138,9 @@ private:
 	tilemap_t *m_tilemap_B;
 	bitmap_ind16 m_work_bitmap;
 
-	void HandleYGV608Reset();
+	void HandleReset();
 	void HandleRomTransfers(uint8_t type);
 
-	union {
-		uint8_t       b[8];
-		YGV_PORTS   s;
-	} m_ports;
 
 	/*
 	*  Built in ram
@@ -181,6 +166,7 @@ private:
 	uint8_t m_na8_mask;       // mask on/off na11/9:8
 	int m_col_shift;                // shift in scroll table column index
 
+	
 	// base address shortcuts
 	uint32_t m_base_addr[2][8];
 	uint32_t m_base_y_shift;    // for extracting pattern y coord 'base'
@@ -194,10 +180,12 @@ private:
 	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
 
 	// === new variable handling starts here ===
+	uint8_t m_screen_status;    /**< port #6: status port r/w */
+	uint8_t m_dma_status;		/**< port #7: system control port r/w */
+	
 	uint8_t m_register_address; /**< RN: Register address select */
 	bool m_register_autoinc_r;  /**< RRAI: Register address auto-increment on read */
 	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */
-	uint8_t m_screen_status;    /**< CD: status port r/w */
 
 	bool m_raster_irq_mask;     /**< IEP: raster irq mask (INT1 occurs if 1) */
 	bool m_vblank_irq_mask;     /**< IEV: vblank irq mask (INT0 occurs if 1) */
@@ -228,7 +216,7 @@ private:
 	bool m_scaw;					/**< SCAW: Address autoinc after writing scroll data table */
 	bool m_cpar;					/**< CPAR: Address autoinc after reading color palette */
 	bool m_cpaw;					/**< CPAW: Address autoinc after writing color palette */
-	bool m_ba_plane_select;			/**< B/(A) P#2 gains access to scroll data table in A/B plane */
+	bool m_ba_plane_scroll_select;			/**< B/(A) P#2 gains access to scroll data table in A/B plane */
 	
 	bool m_dspe;					/**< DSPE: display permission of pattern plane(s) (screen blanked if 0) */
 	uint8_t m_md;					/**< MDx: mode for pattern planes */
