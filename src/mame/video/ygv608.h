@@ -120,76 +120,6 @@ private:
 		uint8_t p7;           // P#7 - system control port (read/write)
 	};
 
-	struct YGV_REGS {
-		uint8_t r0;           // R#0 - pattern name table access ptr (r/w)
-		uint8_t r1;           // R#1 - pattern name table access ptr (r/w)
-		uint8_t r2;           // R#2 - built in ram access control
-		uint8_t saa;          // R#3 - sprite attribute table access ptr (r/w)
-		uint8_t sca;          // R#4 - scroll table access ptr (r/w)
-		uint8_t cc;           // R#5 - color palette access ptr (r/w)
-		uint8_t sba;          // R#6 - sprite generator base address (r/w)
-
-		// R#7 - R#11 - screen control (r/w)
-		uint8_t r7;           // misc screen control (r/w)
-		uint8_t r8;           // misc screen control (r/w)
-		uint8_t r9;           // misc screen control (r/w)
-		uint8_t r10;          // misc screen control (r/w)
-		uint8_t r11;          // misc screen control (r/w)
-
-		uint8_t r12;          // R#12 - color palette selection (r/w)
-		uint8_t bdc;          // R#13 - border colour (wo)
-
-		// R#14 - R#16 - interrupt control
-		uint8_t r14;
-		uint8_t il;
-		uint8_t r16;
-
-		// R#17 - R#24 - base address (wo)
-		uint8_t r17;
-		uint8_t r18;
-		uint8_t r19;
-		uint8_t r20;
-		uint8_t r21;
-		uint8_t r22;
-		uint8_t r23;
-		uint8_t r24;
-
-		// R#25 - R#38 - enlargement, contraction and rotation parameters (wo)
-		uint8_t ax0;
-		uint8_t ax8;
-		uint8_t ax16;
-
-		uint8_t dx0;
-		uint8_t dx8;
-		uint8_t dxy0;
-		uint8_t dxy8;
-
-		uint8_t ay0;
-		uint8_t ay8;
-		uint8_t ay16;
-
-		uint8_t dy0;
-		uint8_t dy8;
-		uint8_t dyx0;
-		uint8_t dyx8;
-
-		// R#39 - R#46 - display scan control (wo)
-		uint8_t r39;
-		uint8_t r40;
-		uint8_t hdsp;
-		uint8_t htl;
-		uint8_t r43;
-		uint8_t r44;
-		uint8_t r45;
-		uint8_t vtl;
-
-		// R#47 - R#49 - rom transfer control (wo)
-		uint8_t tb5;
-		uint8_t tb13;
-		uint8_t tn4;
-
-	};
-
 	static constexpr unsigned MAX_SPRITES = SPRITE_ATTR_TABLE_SIZE >> 2;
 
 	struct SPRITE_ATTR {
@@ -221,17 +151,11 @@ private:
 
 	void HandleYGV608Reset();
 	void HandleRomTransfers(uint8_t type);
-	void ShowYGV608Registers();
 
 	union {
 		uint8_t       b[8];
 		YGV_PORTS   s;
 	} m_ports;
-
-	union {
-		uint8_t       b[50];
-		YGV_REGS    s;
-	} m_regs;
 
 	/*
 	*  Built in ram

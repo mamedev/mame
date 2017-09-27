@@ -74,101 +74,6 @@ enum {
 	p7_ts       = 0x04,
 	p7_tn       = 0x02,
 	p7_sr       = 0x01,
-
-	r0_pnya     = 0x80,     // if set, increment name table address after reads
-	r0_b_a      = 0x40,     // if set, we're reading from the second plane of tile data
-	r0_pny      = 0x3f,     // y-coordinate of current name table address
-
-	r1_pnxa     = 0x80,     // if set, increment name table address after read
-	r1_res1     = 0x40,
-	r1_pnx      = 0x3f,     // x-coordinate of current name table address
-
-	r2_cpaw     = 0x80,     // if set, increment color palette address after writes
-	r2_cpar     = 0x40,     // if set, increment color palette address after reads
-//  r2_res2     = 0x20,
-	r2_b_a      = 0x10,
-	r2_scaw     = 0x08,     // if set, increment scroll address after writes
-	r2_scar     = 0x04,     // if set, increment scroll address after reads
-	r2_saaw     = 0x02,     // if set, increment sprite address after writes
-	r2_saar     = 0x01,     // if set, increment sprite address after reads
-
-	r7_dckm     = 0x80,
-	r7_flip     = 0x40,
-//  r7_res7     = 0x30,
-	r7_zron     = 0x08,     // if set, roz plane is active
-	r7_md       = 0x06,     // determines 1 of 4 possible video modes
-	r7_dspe     = 0x01,     // if set, display is enabled
-
-	r8_hds      = 0xc0,
-	r8_vds      = 0x30,
-	r8_rlrt     = 0x08,
-	r8_rlsc     = 0x04,
-//  r8_res8     = 0x02,
-	r8_pgs      = 0x01,
-
-	r9_pts      = 0xc0,
-	r9_slh      = 0x38,
-	r9_slv      = 0x07,
-
-	r10_spa     = 0xc0,     // misc global sprite attributes (x/y flip or sprite size)
-	r10_spas    = 0x20,     // if set, spa controls sprite flip, if clear, controls sprite size
-	r10_sprd    = 0x10,     // if set, sprites are disabled
-	r10_mcb     = 0x0c,
-	r10_mca     = 0x03,
-
-	r11_scm     = 0xc0,
-	r11_yse     = 0x20,
-	r11_cbdr    = 0x10,
-	r11_prm     = 0x0c,     // determines one of 4 priority settings
-	r11_ctpb    = 0x02,
-	r11_ctpa    = 0x01,
-
-	r12_spf     = 0xc0,
-	r12_bpf     = 0x38,
-	r12_apf     = 0x07,
-
-//  r14_res14   = 0xfc,
-	r14_iep     = 0x02,     // if set, generate IRQ on position detection (?)
-	r14_iev     = 0x01,     // if set, generate IRQ on vertical border interval draw
-
-	// these 4 are currently unimplemented by us
-	r16_fpm     = 0x80,
-	r16_il8     = 0x40,
-	r16_res16   = 0x20,
-	r16_ih      = 0x1f,
-
-	r17_ba1     = 0x70,
-	r17_ba0     = 0x07,
-	r18_ba3     = 0x70,
-	r18_ba2     = 0x07,
-	r19_ba5     = 0x70,
-	r19_ba4     = 0x07,
-	r20_ba7     = 0x70,
-	r20_ba6     = 0x07,
-	r21_bb1     = 0x70,
-	r21_bb0     = 0x07,
-	r22_bb3     = 0x70,
-	r22_bb2     = 0x07,
-	r23_bb5     = 0x70,
-	r23_bb4     = 0x07,
-	r24_bb7     = 0x70,
-	r24_bb6     = 0x07,
-
-	r39_hsw     = 0xe0,
-	r39_hbw     = 0x1f,
-
-	r40_htl89   = 0xc0,
-	r40_hdw     = 0x3f,
-
-	r43_vsw     = 0xe0,
-	r43_vbw     = 0x1f,
-
-	r44_vsls    = 0x40,
-	r44_vdw     = 0x1f,
-
-	r45_vtl8    = 0x80,
-	r45_tres    = 0x40,
-	r45_vdp     = 0x1f
 };
 
 
@@ -443,7 +348,7 @@ ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, de
 void ygv608_device::device_start()
 {
 	memset(&m_ports, 0, sizeof(m_ports));
-	memset(&m_regs, 0, sizeof(m_regs));
+//	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_pattern_name_table, 0, sizeof(m_pattern_name_table));
 	memset(&m_sprite_attribute_table, 0, sizeof(m_sprite_attribute_table));
 
@@ -966,7 +871,7 @@ void ygv608_device::postload()
 void ygv608_device::register_state_save()
 {
 	save_item(NAME(m_ports.b));
-	save_item(NAME(m_regs.b));
+//	save_item(NAME(m_regs.b));
 	save_item(NAME(m_pattern_name_table));
 	save_item(NAME(m_sprite_attribute_table.b));
 	save_item(NAME(m_scroll_data_table));
@@ -1382,9 +1287,7 @@ READ8_MEMBER( ygv608_device::palette_data_r )
 READ8_MEMBER(ygv608_device::register_data_r)
 {
 	int regNum = m_register_address & 0x3f;
-	uint8_t res = m_regs.b[regNum];
-
-	//m_iospace->read_byte(regNum);
+	uint8_t res = m_iospace->read_byte(regNum);
 
 
 	if (m_register_autoinc_r == true)
@@ -1560,7 +1463,6 @@ WRITE8_MEMBER( ygv608_device::register_data_w )
 	uint8_t regNum = m_register_address & 0x3f;
 	//logerror( "R#%d = $%02X\n", regNum, data );
 
-	m_regs.b[regNum] = data;
 	m_iospace->write_byte(regNum, data);
 
 	if (m_register_autoinc_w == true)
@@ -1614,12 +1516,18 @@ WRITE8_MEMBER( ygv608_device::system_control_w )
 // TODO: actual timing of this
 void ygv608_device::HandleYGV608Reset()
 {
+	int i;
 	/* Clear ports #0-7 */
 	memset( &m_ports.b[0], 0, 8 );
 
 	/* Clear registers #0-38, #47-49 */
-	memset( &m_regs.b[0], 0, 39 );
-	memset( &m_regs.b[47], 0, 3 );
+	for(i=0;i<39;i++)
+		m_iospace->write_byte(i, 0x00);
+	for(i=47;i<50;i++)
+		m_iospace->write_byte(i, 0x00);
+
+//	memset( &m_regs.b[0], 0, 39 );
+//	memset( &m_regs.b[47], 0, 3 );
 
 	/* Clear internal ram */
 	memset( m_pattern_name_table, 0, 4096 );
@@ -1640,6 +1548,7 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
 	popmessage("ROM DMA used %02x",type);
 
 #if 0
+	// TODO: eventually update this code to latest
 	static uint8_t *sdt = (uint8_t *)m_scroll_data_table;
 	static uint8_t *sat = (uint8_t *)m_sprite_attribute_table.b;
 
@@ -1698,7 +1607,7 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
  // R#0R - Pattern Name Table Access pointer Y
 READ8_MEMBER( ygv608_device::pattern_name_table_y_r )
 {
-	return ((m_xtile_autoinc == true) << 7) | ((m_plane_select_access == true) << 6) | m_xtile_ptr;
+	return (m_ytile_autoinc << 7) | (m_plane_select_access << 6) | m_ytile_ptr;
 }
 
  // R#0W - Pattern Name Table Access pointer Y
@@ -1718,7 +1627,7 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_y_w )
  // R#1R - Pattern Name Table Access pointer X
 READ8_MEMBER( ygv608_device::pattern_name_table_x_r )
 {
-	return ((m_xtile_autoinc == true) << 7) | m_xtile_ptr;
+	return (m_xtile_autoinc << 7) | m_xtile_ptr;
 }
 
  // R#1W - Pattern Name Table Access pointer X
@@ -2286,132 +2195,3 @@ void ygv608_device::screen_configure()
 }
 
 
-void ygv608_device::ShowYGV608Registers()
-{
-	int p, b;
-
-	logerror( "YGV608 Registers\n" );
-	logerror(
-		"\tR#00: $%02X : PNYA(%d),B/A(%c),PNY(%d)\n",
-		m_regs.b[0],
-		m_regs.s.r0 & r0_pnya,
-		((m_plane_select_access == true) ? 'B' : 'A' ),
-		m_regs.s.r0 & r0_pny);
-
-	logerror(
-		"\tR#01: $%02X : PNXA(%d),PNX(%d)\n",
-		m_regs.b[1],
-		m_regs.s.r1 & r1_pnxa,
-		m_regs.s.r1 & r1_pnx);
-
-	logerror(
-		"\tR#02: $%02X : CPAW(%d),CPAR(%d),B/A(%d),SCAW(%d),SCAR(%d),SAAW(%d),SAAR(%d)\n",
-		m_regs.b[2],
-		m_regs.s.r2 & r2_cpaw,
-		m_regs.s.r2 & r2_cpar,
-		m_regs.s.r2 & r2_b_a,
-		m_regs.s.r2 & r2_scaw,
-		m_regs.s.r2 & r2_scar,
-		m_regs.s.r2 & r2_saaw,
-		m_regs.s.r2 & r2_saar);
-
-	logerror(
-		"\tR#03: $%02X : SAA($%02X)\n",
-		m_regs.b[3],
-		m_sprite_address );
-
-	logerror(
-		"\tR#04: $%02X : SCA($%02X)\n",
-		m_regs.b[4],
-		m_regs.s.sca );
-
-	logerror(
-		"\tR#05: $%02X : CC($%02X)\n",
-		m_regs.b[5],
-		m_regs.s.cc );
-
-	logerror(
-		"\tR#06: $%02X : SBA($%02X)\n",
-		m_regs.b[6],
-		m_sprite_bank );
-
-	logerror(
-		"\tR#07: $%02X : DSPE(%d),MD(%d),ZRON(%d),FLIP(%d),DCKM(%d)\n",
-		m_regs.b[7],
-		m_regs.s.r7 & r7_dspe,
-		m_regs.s.r7 & r7_md,
-		m_regs.s.r7 & r7_zron,
-		m_regs.s.r7 & r7_flip,
-		m_regs.s.r7 & r7_dckm);
-
-	logerror(
-		"\tR#08: $%02X : HDS(%d),VDS(%d),RLRT(%d),RLSC(%d),PGS(%d)\n",
-		m_regs.b[8],
-		m_regs.s.r8 & r8_hds,
-		m_regs.s.r8 & r8_vds,
-		m_regs.s.r8 & r8_rlrt,
-		m_regs.s.r8 & r8_rlsc,
-		m_regs.s.r8 & r8_pgs);
-
-	logerror(
-		"\tR#11: $%02X : CTPA(%d),CTPB(%d),PRM(%d),CBDR(%d),YSE(%d),SCM(%d)\n",
-		m_regs.b[11],
-		m_regs.s.r11 & r11_ctpa,
-		m_regs.s.r11 & r11_ctpb,
-		m_regs.s.r11 & r11_prm,
-		m_regs.s.r11 & r11_cbdr,
-		m_regs.s.r11 & r11_yse,
-		m_regs.s.r11 & r11_scm);
-
-	logerror(
-		"\tR#40: $%02X : HTL9:8($%02X)=$%06X,HDW(%d)\n",
-		m_regs.b[40],
-		m_regs.s.r40 & r40_htl89, (int)(m_regs.s.r40 & r40_htl89) << 8,
-		m_regs.s.r40 & r40_hdw);
-
-	logerror(
-		"\tR#41: $%02X : HDSP($%02X)\n",
-		m_regs.b[41],
-		m_regs.s.hdsp );
-
-	logerror(
-		"\tR#42: $%02X : HTL7:0($%02X)\n",
-		m_regs.b[42],
-		m_regs.s.htl );
-
-	logerror(
-		"\t              HTL=$%03X\n",
-		( (int)(m_regs.s.r40 & r40_htl89) << 8 ) |
-		( (int)m_regs.s.htl ) );
-
-	logerror(
-		"\tR#47: $%02X : TB12:5($%02X) = $%06X\n",
-		m_regs.b[47],
-		m_regs.s.tb5, (int)m_regs.s.tb5 << 5 );
-
-	logerror(
-		"\tR#48: $%02X : TB20:13($%02X) = $%06X\n",
-		m_regs.b[48],
-		m_regs.s.tb13, (int)m_regs.s.tb13 << 13 );
-
-	logerror(
-		"\t              TB=$%06X\n",
-		( (int)m_regs.s.tb13 << 13 ) |
-		( (int)m_regs.s.tb5 << 5 ) );
-
-	logerror(
-		"\tR#49: $%02X : TN11:4($%02X) = $%04X\n",
-		m_regs.b[49],
-		m_regs.s.tn4, (int)m_regs.s.tn4 << 4 );
-
-	logerror(
-		"ShortCuts:\n" );
-
-	for( p=0; p<2; p++ ) {
-	logerror( "\t" );
-	for( b=0; b<8; b++ ) {
-		logerror( "%02X ", m_base_addr[p][b] );
-	}
-	logerror( "\n" );
-	}
-}
