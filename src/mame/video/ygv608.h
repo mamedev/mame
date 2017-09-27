@@ -64,6 +64,8 @@ public:
 	DECLARE_WRITE8_MEMBER(screen_ctrl_9_w);
 	DECLARE_READ8_MEMBER(screen_ctrl_10_r);
 	DECLARE_WRITE8_MEMBER(screen_ctrl_10_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_11_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_11_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -320,6 +322,13 @@ private:
 	uint8_t m_h_div_size;			/**< SLH: size of horizontal division in screen division scrolling */
 	uint8_t m_v_div_size;			/**< SLV: size of vertical division in screen division scrolling */
 	
+	bool m_planeA_trans_enable;		/**< CTPA: enable transparency for plane A */
+	bool m_planeB_trans_enable;		/**< CTPA: enable transparency for plane B */
+	uint8_t m_priority_mode;		/**< PRM: priority mode select */
+	bool m_cbdr;					/**< CBDR: color bus terminals CB7 to 0 and SPRT */
+	bool m_yse;						/**< YSE: permission control of trasparency timing output of YS terminal */
+	uint8_t m_scm;					/**< SCM: output frequency of clock signal output from terminal FSC */
+
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;

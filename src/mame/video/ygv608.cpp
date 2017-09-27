@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mark McDougall
+// copyright-holders:Mark McDougall, Angelo Salese
 
 /*
  *    Yamaha YGV608 - PVDC2 Pattern mode Video Display Controller 2
@@ -42,7 +42,7 @@
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
  *    - color palette accessors presumably accesses an internal RAMDAC with controllable auto-increment, convert to that;
- *    - fix char getting cut off from GAME SELECT msg in NCV2;
+ *    - fix char getting cut off from GAME SELECT msg in NCV2 (sprite issue);
  *    - clean-ups & documentation;
  *
  *
@@ -222,9 +222,9 @@ enum {
 
 // R#11(prm)
 #define PRM_SABDEX        0x00
-#define PRM_ASBDEX        0x04
-#define PRM_SEABDX        0x08
-#define PRM_ASEBDX        0x0c
+#define PRM_ASBDEX        0x01
+#define PRM_SEABDX        0x02
+#define PRM_ASEBDX        0x03
 
 // R#40
 #define HDW_SHIFT         0
@@ -383,6 +383,7 @@ static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 	AM_RANGE( 8,  8) AM_READWRITE(screen_ctrl_8_r,  screen_ctrl_8_w)
 	AM_RANGE( 9,  9) AM_READWRITE(screen_ctrl_9_r,  screen_ctrl_9_w)
 	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_10_r, screen_ctrl_10_w)
+	AM_RANGE(11, 11) AM_READWRITE(screen_ctrl_11_r, screen_ctrl_11_w)
 
 	AM_RANGE(13, 13) AM_WRITE(border_color_w)
 	// interrupt section
@@ -996,7 +997,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int i;
 
 	/* ensure that sprites are enabled */
-	if( (m_dspe == false ) || (m_sprite_disable == true))
+	if( (m_dspe == false ) || (m_sprite_disable == true) )
 		return;
 
 	/* draw sprites */
@@ -1004,153 +1005,157 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	sa = &m_sprite_attribute_table.s[MAX_SPRITES-1];
 	for( i=0; i<MAX_SPRITES; i++, sa-- )
 	{
-	int code, color, sx, sy, size, attr, g_attr, spf;
+		int code, color, sx, sy, size, attr, g_attr, spf;
 
-	color = (sa->attr >> 4) & 0x0f;
-	sx = ( (int)(sa->attr & 0x02) << 7 ) | (int)sa->sx;
-	sy = ( ( ( (int)(sa->attr & 0x01) << 8 ) | (int)sa->sy ) + 1 ) & 0x1ff;
-	attr = (sa->attr & 0x0c) >> 2;
-	g_attr = m_sprite_aux_reg & 3;
-	spf = (m_regs.s.r12 & r12_spf) >> 6;
+		color = (sa->attr >> 4) & 0x0f;
+		sx = ( (int)(sa->attr & 0x02) << 7 ) | (int)sa->sx;
+		sy = ( ( ( (int)(sa->attr & 0x01) << 8 ) | (int)sa->sy ) + 1 ) & 0x1ff;
+		attr = (sa->attr & 0x0c) >> 2;
+		g_attr = m_sprite_aux_reg & 3;
+		spf = (m_regs.s.r12 & r12_spf) >> 6;
 
-	if (m_sprite_aux_mode == SPAS_SPRITESIZE )
-	{
-		size = g_attr;
-		flipx = (attr & SZ_HORIZREVERSE) != 0;
-		flipy = (attr & SZ_VERTREVERSE) != 0;
-	}
-	else
-	{
-		size = attr;
-		flipx = (g_attr & SZ_HORIZREVERSE) != 0;
-		flipy = (g_attr & SZ_VERTREVERSE) != 0;
-	}
-
-	switch( size )
-	{
-	case SZ_8X8 :
-		code = ( (int)m_sprite_bank << 8 ) | (int)sa->sn;
-		if (spf != 0)
-		color = ( code >> ( (spf - 1) * 2 ) ) & 0x0f;
-		if( code >= layout_total(GFX_8X8_4BIT) ) {
-		logerror( "SZ_8X8: sprite=%d\n", code );
-		code = 0;
+		if (m_sprite_aux_mode == SPAS_SPRITESIZE )
+		{
+			size = g_attr;
+			flipx = (attr & SZ_HORIZREVERSE) != 0;
+			flipy = (attr & SZ_VERTREVERSE) != 0;
 		}
-		gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x10000,
-			color,
-			flipx,flipy,
-			sx,sy,0x00);
-		// redraw with wrap-around
-		if( sx > 512-8 )
-		gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x10000,
-			color,
-			flipx,flipy,
-			sx-512,sy,0x00);
-		if( sy > 512-8 )
-		gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x10000,
-			color,
-			flipx,flipy,
-			sx,sy-512,0x00);
-		// really should draw again for both wrapped!
-		// - ignore until someone thinks it's required
-		break;
-
-	case SZ_16X16 :
-		code = ( ( (int)m_sprite_bank & 0xfc ) << 6 ) | (int)sa->sn;
-		if (spf != 0)
-		color = ( code >> (spf * 2) ) & 0x0f;
-		if( code >= layout_total(GFX_16X16_4BIT) ) {
-		logerror( "SZ_8X8: sprite=%d\n", code );
-		code = 0;
+		else
+		{
+			size = attr;
+			flipx = (g_attr & SZ_HORIZREVERSE) != 0;
+			flipy = (g_attr & SZ_VERTREVERSE) != 0;
 		}
-		gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x4000,
-			color,
-			flipx,flipy,
-			sx,sy,0x00);
-		// redraw with wrap-around
-		if( sx > 512-16 )
-		gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x4000,
-			color,
-			flipx,flipy,
-			sx-512,sy,0x00);
-		if( sy > 512-16 )
-		gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x4000,
-			color,
-			flipx,flipy,
-			sx,sy-512,0x00);
-		// really should draw again for both wrapped!
-		// - ignore until someone thinks it's required
-		break;
 
-	case SZ_32X32 :
-		code = ( ( (int)m_sprite_bank & 0xf0 ) << 4 ) | (int)sa->sn;
-		if (spf != 0)
-	color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
-		if( code >= layout_total(GFX_32X32_4BIT) ) {
-		logerror( "SZ_32X32: sprite=%d\n", code );
-	code = 0;
+		switch( size )
+		{
+			case SZ_8X8:
+				code = ( (int)m_sprite_bank << 8 ) | (int)sa->sn;
+				if (spf != 0)
+					color = ( code >> ( (spf - 1) * 2 ) ) & 0x0f;
+				if( code >= layout_total(GFX_8X8_4BIT) ) 
+				{
+					logerror( "SZ_8X8: sprite=%d\n", code );
+					code = 0;
+				}
+				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x10000,
+					color,
+					flipx,flipy,
+					sx,sy,0x00);
+				// redraw with wrap-around
+				if( sx > 512-8 )
+				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x10000,
+					color,
+					flipx,flipy,
+					sx-512,sy,0x00);
+				if( sy > 512-8 )
+				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x10000,
+					color,
+					flipx,flipy,
+					sx,sy-512,0x00);
+				// really should draw again for both wrapped!
+				// - ignore until someone thinks it's required
+				break;
+
+			case SZ_16X16:
+				code = ( ( (int)m_sprite_bank & 0xfc ) << 6 ) | (int)sa->sn;
+				if (spf != 0)
+					color = ( code >> (spf * 2) ) & 0x0f;
+				if( code >= layout_total(GFX_16X16_4BIT) ) 
+				{
+					logerror( "SZ_8X8: sprite=%d\n", code );
+					code = 0;
+				}
+				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x4000,
+					color,
+					flipx,flipy,
+					sx,sy,0x00);
+				// redraw with wrap-around
+				if( sx > 512-16 )
+				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x4000,
+					color,
+					flipx,flipy,
+					sx-512,sy,0x00);
+				if( sy > 512-16 )
+				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x4000,
+					color,
+					flipx,flipy,
+					sx,sy-512,0x00);
+				// really should draw again for both wrapped!
+				// - ignore until someone thinks it's required
+				break;
+
+			case SZ_32X32:
+				code = ( ( (int)m_sprite_bank & 0xf0 ) << 4 ) | (int)sa->sn;
+				if (spf != 0)
+					color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
+				if( code >= layout_total(GFX_32X32_4BIT) ) 
+				{
+					logerror( "SZ_32X32: sprite=%d\n", code );
+					code = 0;
+				}
+				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x1000,
+					color,
+					flipx,flipy,
+					sx,sy,0x00);
+				// redraw with wrap-around
+				if( sx > 512-32 )
+				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x1000,
+					color,
+					flipx,flipy,
+					sx-512,sy,0x00);
+				if( sy > 512-32 )
+				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x1000,
+					color,
+					flipx,flipy,
+					sx,sy-512,0x00);
+				// really should draw again for both wrapped!
+				// - ignore until someone thinks it's required
+				break;
+
+			case SZ_64X64:
+				code = ( ( (int)m_sprite_bank & 0xc0 ) << 2 ) | (int)sa->sn;
+				if (spf != 0)
+					color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
+				if( code >= layout_total(GFX_64X64_4BIT) ) 
+				{
+					logerror( "SZ_64X64: sprite=%d\n", code );
+					code = 0;
+				}
+				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x400,
+					color,
+					flipx,flipy,
+					sx,sy,0x00);
+				// redraw with wrap-around
+				if( sx > 512-64 )
+				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x400,
+					color,
+					flipx,flipy,
+					sx-512,sy,0x00);
+				if( sy > 512-64 )
+				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x400,
+					color,
+					flipx,flipy,
+					sx,sy-512,0x00);
+				// really should draw again for both wrapped!
+				// - ignore until someone thinks it's required
+				break;
+
+			default:
+				break;
 		}
-		gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x1000,
-			color,
-			flipx,flipy,
-			sx,sy,0x00);
-		// redraw with wrap-around
-		if( sx > 512-32 )
-		gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x1000,
-			color,
-			flipx,flipy,
-			sx-512,sy,0x00);
-		if( sy > 512-32 )
-		gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x1000,
-			color,
-			flipx,flipy,
-			sx,sy-512,0x00);
-		// really should draw again for both wrapped!
-		// - ignore until someone thinks it's required
-		break;
-
-	case SZ_64X64 :
-		code = ( ( (int)m_sprite_bank & 0xc0 ) << 2 ) | (int)sa->sn;
-		if (spf != 0)
-		color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
-		if( code >= layout_total(GFX_64X64_4BIT) ) {
-		logerror( "SZ_64X64: sprite=%d\n", code );
-		code = 0;
-		}
-		gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x400,
-			color,
-			flipx,flipy,
-			sx,sy,0x00);
-		// redraw with wrap-around
-		if( sx > 512-64 )
-		gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x400,
-			color,
-			flipx,flipy,
-			sx-512,sy,0x00);
-		if( sy > 512-64 )
-		gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
-			code+m_namcond1_gfxbank*0x400,
-			color,
-			flipx,flipy,
-			sx,sy-512,0x00);
-		// really should draw again for both wrapped!
-		// - ignore until someone thinks it's required
-		break;
-
-	default :
-		break;
-	}
 	}
 
 #endif
@@ -1241,9 +1246,9 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 			m_tilemap_A = m_tilemap_A_cache_16[index];
 		m_tilemap_A->mark_all_dirty();
 
-		m_tilemap_A->set_transparent_pen(0 );
+		m_tilemap_A->set_transparent_pen(0);
 		// for NCV1 it's sufficient to scroll only columns
-		m_tilemap_A->set_scroll_cols(m_page_x );
+		m_tilemap_A->set_scroll_cols(m_page_x);
 
 		if (m_pattern_size == PTS_8X8 )
 			m_tilemap_B = m_tilemap_B_cache_8[index];
@@ -1252,7 +1257,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		m_tilemap_B->mark_all_dirty();
 
 		// for NCV1 it's sufficient to scroll only columns
-		m_tilemap_B->set_scroll_cols(m_page_x );
+		m_tilemap_B->set_scroll_cols(m_page_x);
 
 		// now clear the screen in case we change to 1-plane mode
 		m_work_bitmap.fill(0, finalclip );
@@ -1292,12 +1297,12 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 	m_tilemap_A->enable(m_dspe == true);
 	if(m_md & MD_1PLANE )
-		m_tilemap_B->enable(0 );
+		m_tilemap_B->enable(0);
 	else
 		m_tilemap_B->enable(m_dspe == true);
 
-	m_tilemap_A ->mark_all_dirty();
-	m_tilemap_B ->mark_all_dirty();
+	m_tilemap_A->mark_all_dirty();
+	m_tilemap_B->mark_all_dirty();
 
 
 	/*
@@ -1316,7 +1321,10 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	{
 		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
 
-		copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
+		if(m_planeB_trans_enable == true)
+			copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
+		else
+			copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
 	}
 
 	// for some reason we can't use an opaque m_tilemap_A
@@ -1324,15 +1332,19 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	// - look at why this is the case?!?
 	m_work_bitmap.fill(0, visarea );
 
-	if ((m_regs.s.r11 & r11_prm) == PRM_ASBDEX ||
-		(m_regs.s.r11 & r11_prm) == PRM_ASEBDX )
+	if (m_priority_mode == PRM_ASBDEX ||
+		m_priority_mode == PRM_ASEBDX )
 		draw_sprites(bitmap, finalclip);
 
 	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
-	copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
+	
+	if(m_planeA_trans_enable == true)
+		copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
+	else
+		copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
 
-	if ((m_regs.s.r11 & r11_prm) == PRM_SABDEX ||
-		(m_regs.s.r11 & r11_prm) == PRM_SEABDX)
+	if (m_priority_mode == PRM_SABDEX ||
+		m_priority_mode == PRM_SEABDX)
 		draw_sprites(bitmap,finalclip );
 
 
@@ -2049,7 +2061,14 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_9_w )
 	}
 }
  
- // R#10R - screen control: mosaic & sprite
+// R#10R - screen control 10: mosaic & sprite
+/***
+ * xx-- ---- SPAx: Auxiliary bits of sprite attribute table (0=8x8 or no flip, 1=16x16 or flipy, 2=32x32 or flipx, 3=64x64 or flipx & y )
+ * --x- ---- SPAS: Auxiliary function select (0=SPAx selects sprite size, 1=SPAx selects flipping)
+ * ---x ---- SPRD: Sprite display disable
+ * ---- xx-- MCBx: Mosaic enable on plane B
+ * ---- --xx MCAx: Mosaic enable on plane A
+ ***/
 READ8_MEMBER( ygv608_device::screen_ctrl_10_r )
 {
 	return (m_sprite_aux_reg << 6) | ((m_sprite_aux_mode == true) << 5) | ((m_sprite_disable == true) << 4)
@@ -2059,15 +2078,34 @@ READ8_MEMBER( ygv608_device::screen_ctrl_10_r )
 // R#10W - screen control: mosaic & sprite
 WRITE8_MEMBER( ygv608_device::screen_ctrl_10_w )
 {
+	m_sprite_aux_reg = (data & 0xc0) >> 6;
+	m_sprite_aux_mode = BIT(data, 5);
+	m_sprite_disable = BIT(data, 4);
+
 	// check mosaic
-	m_mosaic_aplane = data & 3;
 	m_mosaic_bplane = (data & 0xc) >> 2;
+	m_mosaic_aplane = data & 3;
 	if(m_mosaic_aplane || m_mosaic_bplane)
 		popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
+}
 
-	m_sprite_disable = BIT(data, 4);
-	m_sprite_aux_mode = BIT(data, 5);
-	m_sprite_aux_reg = (data & 0xc0) >> 6;
+// R#11R - screen control 11
+READ8_MEMBER( ygv608_device::screen_ctrl_11_r )
+{
+	return (m_scm<<6)|(m_yse<<5)|(m_cbdr<<4)|
+           (m_priority_mode<<2)|(m_planeB_trans_enable<<1)|(m_planeA_trans_enable<<0);
+}
+
+// R#11W - screen control 11
+WRITE8_MEMBER( ygv608_device::screen_ctrl_11_w )
+{
+/**/m_scm = (data >> 6) & 3;
+/**/m_yse = BIT(data,5);
+/**/m_cbdr = BIT(data,4);
+	m_priority_mode = (data >> 2) & 3;
+	m_planeB_trans_enable = BIT(data,1);
+	m_planeA_trans_enable = BIT(data,0);
+
 }
 
 // R#13W - border color
