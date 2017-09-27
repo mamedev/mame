@@ -1898,6 +1898,7 @@ files {
 	MAME_DIR .. "src/mame/machine/ms7004.h",
 	MAME_DIR .. "src/mame/drivers/mk85.cpp",
 	MAME_DIR .. "src/mame/drivers/mk90.cpp",
+	MAME_DIR .. "src/mame/drivers/ms6102.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "elektor")

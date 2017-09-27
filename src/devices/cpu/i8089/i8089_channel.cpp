@@ -685,16 +685,16 @@ void i8089_channel_device::examine_ccw(uint8_t ccw)
 	m_r[PSW].w = (m_r[PSW].w & 0x5f) | (ccw & 0xa0);
 
 	// acknowledge interrupt
-	if (BIT(ccw, 4))
+	if (BIT(ccw, 3))
 	{
 		m_write_sintr(0);
 		m_r[PSW].w &= ~(1 << 5);
 	}
 
 	// interrupt enable
-	if (BIT(ccw, 5))
+	if (BIT(ccw, 4))
 	{
-		if (BIT(ccw, 4))
+		if (BIT(ccw, 3))
 			m_r[PSW].w &= ~(1 << 4);
 		else
 			m_r[PSW].w |= 1 << 4;

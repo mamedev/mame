@@ -94,26 +94,6 @@ WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 	m_romdisk_msb = data;
 }
 
-READ8_MEMBER( vector06_state::vector06_8255_1_r )
-{
-	return m_ppi->read(space, offset^3);
-}
-
-WRITE8_MEMBER( vector06_state::vector06_8255_1_w )
-{
-	m_ppi->write(space, offset^3, data);
-}
-
-READ8_MEMBER( vector06_state::vector06_8255_2_r )
-{
-	return m_ppi2->read(space, offset^3);
-}
-
-WRITE8_MEMBER( vector06_state::vector06_8255_2_w )
-{
-	m_ppi2->write(space, offset^3, data);
-}
-
 INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
@@ -204,16 +184,6 @@ WRITE8_MEMBER(vector06_state::vector06_status_callback)
 WRITE_LINE_MEMBER(vector06_state::speaker_w)
 {
 	m_speaker->level_w(state);
-}
-
-WRITE8_MEMBER(vector06_state::pit8253_w)
-{
-	m_pit8253->write(space, offset ^ 3, data);
-}
-
-READ8_MEMBER(vector06_state::pit8253_r)
-{
-	return m_pit8253->read(space,  offset ^ 3);
 }
 
 void vector06_state::machine_start()

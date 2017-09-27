@@ -161,6 +161,7 @@ enum
 	XTAL_15_92MHz       = 15920000,     /* HP Integral PC */
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
+	XTAL_16_4MHz        = 16400000,     /* MS 6102 */
 	XTAL_16_5888MHz     = 16588800,     /* SM 7238 */
 	XTAL_16_67MHz       = 16670000,
 	XTAL_16_777216MHz   = 16777216,     /* Nintendo Game Boy Advance */
