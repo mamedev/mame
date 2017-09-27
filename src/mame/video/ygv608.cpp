@@ -982,7 +982,11 @@ void ygv608_device::register_state_save()
 void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef _ENABLE_SPRITES
-
+	const int sprite_limits[4] = { 512-8, 512-16, 512-32, 512-64 };
+	const uint32_t spritebank_size[4] = { 0x10000, 0x4000, 0x1000, 0x400 };
+	const int sprite_shift[4] = { 8, 6, 4, 2 };
+	const int sprite_mask[4] = { 0xff, 0xfc, 0xf0, 0xc0 };
+	const int spf_shift[4] = { -1, 0, +1, +2 };
 	// sprites are always clipped to 512x512
 	// - regardless of the visible display dimensions
 	rectangle spriteClip(0, 512, 0, 512);
@@ -1021,152 +1025,44 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipx = (g_attr & SZ_HORIZREVERSE) != 0;
 			flipy = (g_attr & SZ_VERTREVERSE) != 0;
 		}
-		
-		switch( size )
+
+		// calculate code and apply sprite base address 
+		code = ( (int)(m_sprite_bank & sprite_mask[size]) << sprite_shift[size] ) | (int)sa->sn;
+		// apply spf to color (invalidates individual attribute bits for color)
+		if (spf != 0)
+			color = ( code >> ( (spf + spf_shift[size]) * 2 ) ) & 0x0f;
+		// check code boundary (TODO: do we really need this?)
+		if( code >= layout_total(size) ) 
 		{
-			case SZ_8X8:
-				code = ( (int)m_sprite_bank << 8 ) | (int)sa->sn;
-				if (spf != 0)
-					color = ( code >> ( (spf - 1) * 2 ) ) & 0x0f;
-				if( code >= layout_total(GFX_8X8_4BIT) ) 
-				{
-					logerror( "SZ_8X8: sprite=%d\n", code );
-					code = 0;
-				}
-				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x10000,
-					color,
-					flipx,flipy,
-					sx,sy,0x00);
-				// redraw with wrap-around
-				if( sx > 512-8 )
-				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x10000,
-					color,
-					flipx,flipy,
-					sx-512,sy,0x00);
-				if( sy > 512-8 )
-				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x10000,
-					color,
-					flipx,flipy,
-					sx,sy-512,0x00);
-				if( sx > 512-8 && sy > 512-8)
-				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x10000,
-					color,
-					flipx,flipy,
-					sx-512,sy-512,0x00);
-				break;
-
-			case SZ_16X16:
-				code = ( ( (int)m_sprite_bank & 0xfc ) << 6 ) | (int)sa->sn;
-				if (spf != 0)
-					color = ( code >> (spf * 2) ) & 0x0f;
-				if( code >= layout_total(GFX_16X16_4BIT) ) 
-				{
-					logerror( "SZ_8X8: sprite=%d\n", code );
-					code = 0;
-				}
-				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x4000,
-					color,
-					flipx,flipy,
-					sx,sy,0x00);
-				// redraw with wrap-around
-				if( sx > 512-16 )
-				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x4000,
-					color,
-					flipx,flipy,
-					sx-512,sy,0x00);
-				if( sy > 512-16 )
-				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x4000,
-					color,
-					flipx,flipy,
-					sx,sy-512,0x00);
-				if( sx > 512-16 && sy > 512-16)
-				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x4000,
-					color,
-					flipx,flipy,
-					sx-512,sy-512,0x00);
-				break;
-
-			case SZ_32X32:
-				code = ( ( (int)m_sprite_bank & 0xf0 ) << 4 ) | (int)sa->sn;
-				if (spf != 0)
-					color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
-				if( code >= layout_total(GFX_32X32_4BIT) ) 
-				{
-					logerror( "SZ_32X32: sprite=%d\n", code );
-					code = 0;
-				}
-				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x1000,
-					color,
-					flipx,flipy,
-					sx,sy,0x00);
-				// redraw with wrap-around
-				if( sx > 512-32 )
-				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x1000,
-					color,
-					flipx,flipy,
-					sx-512,sy,0x00);
-				if( sy > 512-32 )
-				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x1000,
-					color,
-					flipx,flipy,
-					sx,sy-512,0x00);
-				if( sx > 512-32 && sy > 512-32)
-				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x1000,
-					color,
-					flipx,flipy,
-					sx-512,sy-512,0x00);
-				break;
-
-			case SZ_64X64:
-				code = ( ( (int)m_sprite_bank & 0xc0 ) << 2 ) | (int)sa->sn;
-				if (spf != 0)
-					color = ( code >> ( (spf + 1) * 2 ) ) & 0x0f;
-				if( code >= layout_total(GFX_64X64_4BIT) ) 
-				{
-					logerror( "SZ_64X64: sprite=%d\n", code );
-					code = 0;
-				}
-				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x400,
-					color,
-					flipx,flipy,
-					sx,sy,0x00);
-				// redraw with wrap-around
-				if( sx > 512-64 )
-				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x400,
-					color,
-					flipx,flipy,
-					sx-512,sy,0x00);
-				if( sy > 512-64 )
-				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x400,
-					color,
-					flipx,flipy,
-					sx,sy-512,0x00);
-				if( sx > 512-64 && sy > 512-64 )				
-				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
-					code+m_namcond1_gfxbank*0x400,
-					color,
-					flipx,flipy,
-					sx-512,sy-512,0x00);
-				break;
-
-			default:
-				break;
+			logerror( "SZ_%d: sprite=%d\n", size, code );
+			code = 0;
 		}
+		// draw the sprite
+		gfx(size)->transpen(bitmap,spriteClip,
+			code+m_namcond1_gfxbank*spritebank_size[size],
+			color,
+			flipx,flipy,
+			sx,sy,0x00);
+		// draw with wraparound
+		if(sx > sprite_limits[size] || sy > sprite_limits[size] )
+		{
+			gfx(size)->transpen(bitmap,spriteClip,
+				code+m_namcond1_gfxbank*spritebank_size[size],
+				color,
+				flipx,flipy,
+				sx-512,sy,0x00);
+			gfx(size)->transpen(bitmap,spriteClip,
+				code+m_namcond1_gfxbank*spritebank_size[size],
+				color,
+				flipx,flipy,
+				sx,sy-512,0x00);
+			gfx(size)->transpen(bitmap,spriteClip,
+				code+m_namcond1_gfxbank*spritebank_size[size],
+				color,
+				flipx,flipy,
+				sx-512,sy-512,0x00);
+		}
+		
 	}
 
 #endif
