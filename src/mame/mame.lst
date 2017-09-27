@@ -96,7 +96,8 @@ sgi_ip6                         // IP6: 4D/PI, R2000, 20MHz
 4enraya                         // (c) 1990 IDSA
 4enrayaa                        //
 unkpacg                         // (c) 19?? ???
-unkfr                           // 1998?
+unksig                          // 1998?
+unksiga                         // 1998?
 
 @source:4roses.cpp
 4roses                          // (c) 1999 Unknown
