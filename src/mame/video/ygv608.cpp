@@ -42,7 +42,7 @@
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
  *    - color palette accessors presumably accesses an internal RAMDAC with controllable auto-increment, convert to that;
- *    - fix char getting cut off from GAME SELECT msg in NCV2 (sprite issue);
+ *    - fix char getting cut off from GAME SELECT msg in NCV2 (done, sprite wraparound for sx & sy);
  *    - clean-ups & documentation;
  *
  *
@@ -1021,7 +1021,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipx = (g_attr & SZ_HORIZREVERSE) != 0;
 			flipy = (g_attr & SZ_VERTREVERSE) != 0;
 		}
-
+		
 		switch( size )
 		{
 			case SZ_8X8:
@@ -1051,8 +1051,12 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					color,
 					flipx,flipy,
 					sx,sy-512,0x00);
-				// really should draw again for both wrapped!
-				// - ignore until someone thinks it's required
+				if( sx > 512-8 && sy > 512-8)
+				gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x10000,
+					color,
+					flipx,flipy,
+					sx-512,sy-512,0x00);
 				break;
 
 			case SZ_16X16:
@@ -1082,8 +1086,12 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					color,
 					flipx,flipy,
 					sx,sy-512,0x00);
-				// really should draw again for both wrapped!
-				// - ignore until someone thinks it's required
+				if( sx > 512-16 && sy > 512-16)
+				gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x4000,
+					color,
+					flipx,flipy,
+					sx-512,sy-512,0x00);
 				break;
 
 			case SZ_32X32:
@@ -1113,8 +1121,12 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					color,
 					flipx,flipy,
 					sx,sy-512,0x00);
-				// really should draw again for both wrapped!
-				// - ignore until someone thinks it's required
+				if( sx > 512-32 && sy > 512-32)
+				gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x1000,
+					color,
+					flipx,flipy,
+					sx-512,sy-512,0x00);
 				break;
 
 			case SZ_64X64:
@@ -1144,8 +1156,12 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					color,
 					flipx,flipy,
 					sx,sy-512,0x00);
-				// really should draw again for both wrapped!
-				// - ignore until someone thinks it's required
+				if( sx > 512-64 && sy > 512-64 )				
+				gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+					code+m_namcond1_gfxbank*0x400,
+					color,
+					flipx,flipy,
+					sx-512,sy-512,0x00);
 				break;
 
 			default:
@@ -2021,7 +2037,7 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_9_w )
 		m_tilemap_resize = 1;
 	
 	m_pattern_size = new_pts;
-	m_h_div_size = (data >> 3) & 7;
+/**/m_h_div_size = (data >> 3) & 7;
 	m_v_div_size = (data >> 0) & 7;
 
 	//popmessage("%02x %02x",m_h_div_size,m_v_div_size);
@@ -2089,7 +2105,6 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_11_w )
 	m_priority_mode = (data >> 2) & 3;
 	m_planeB_trans_enable = BIT(data,1);
 	m_planeA_trans_enable = BIT(data,0);
-
 }
 
 // R#13W - border color
