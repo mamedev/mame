@@ -36,7 +36,7 @@ Pressing enter will change the prompt from KMD > to KMD+> and pressing
 space will change it back.
 
 BIOS 0 uses the UART and works
-BIOS 1 uses SID/SOD and doesn't work
+BIOS 1,2 use SID/SOD and don't work
 
 ****************************************************************************/
 
@@ -138,6 +138,11 @@ ROM_START( mfabfz )
 	ROMX_LOAD( "mfa_mat32k_vers.1.8-t_ic0.bin", 0x0000, 0x8000, CRC(6cba989e) SHA1(81611b6250a5319e5d28af5ce3a1e261af8315ae), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v18", "V1.8" ) // 1982, not working
 	ROMX_LOAD( "mfa_mat32k_vers.1.8-s_ic0.bin", 0x0000, 0x8000, CRC(021d7dff) SHA1(aa34b3a8bac52fc7746d35f5ffc6328734788cc2), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v18a", "V1.8(small roms)" ) // 1982, not working
+	ROMX_LOAD( "mfa_mat_1_0000.bin", 0x0000, 0x0800, CRC(73b588ea) SHA1(2b9570fe44c3c19d6aa7c7c11ecf390fa5d48998), ROM_BIOS(3) )
+	ROMX_LOAD( "mfa_mat_2_0800.bin", 0x0800, 0x0800, CRC(13f5be91) SHA1(2b9d64600679bab319a37381fc84e874c3b2a877), ROM_BIOS(3) )
+	ROMX_LOAD( "mfa_mat_3_1000.bin", 0x1000, 0x0800, CRC(c9b91bb4) SHA1(ef829964f507b1f6bbcf3c557c274fe728636efe), ROM_BIOS(3) )
+	ROMX_LOAD( "mfa_mat_4_1800.bin", 0x1800, 0x0800, CRC(649cd7f0) SHA1(e92f29c053234b36f22d525fe92e61bf24476f14), ROM_BIOS(3) )
 ROM_END
 
 
