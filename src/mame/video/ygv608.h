@@ -219,8 +219,6 @@ private:
 
 	void HandleYGV608Reset();
 	void HandleRomTransfers(uint8_t type);
-	void SetPreShortcuts(int reg, int data );
-	void SetPostShortcuts(int reg);
 	void ShowYGV608Registers();
 
 	union {

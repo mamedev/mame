@@ -958,13 +958,8 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 
 void ygv608_device::postload()
 {
-	int i;
-
 	m_screen_resize = 1;
 	m_tilemap_resize = 1;
-
-	for(i = 0; i < 50; i++)
-		SetPostShortcuts(i);
 }
 
 void ygv608_device::register_state_save()
@@ -1652,9 +1647,7 @@ WRITE8_MEMBER( ygv608_device::register_data_w )
 	uint8_t regNum = m_register_address & 0x3f;
 	//logerror( "R#%d = $%02X\n", regNum, data );
 
-	SetPreShortcuts (regNum, data);
 	m_regs.b[regNum] = data;
-	SetPostShortcuts (regNum);
 	m_iospace->write_byte(regNum, data);
 
 	if (m_register_autoinc_w == true)
@@ -1708,8 +1701,6 @@ WRITE8_MEMBER( ygv608_device::system_control_w )
 // TODO: actual timing of this
 void ygv608_device::HandleYGV608Reset()
 {
-	int i;
-
 	/* Clear ports #0-7 */
 	memset( &m_ports.b[0], 0, 8 );
 
@@ -1723,12 +1714,6 @@ void ygv608_device::HandleYGV608Reset()
 			SPRITE_ATTR_TABLE_SIZE );
 	memset( m_scroll_data_table, 0, 2*256 );
 	memset( m_colour_palette, 0, 256*3 );
-
-	/* should set shortcuts here too */
-	for( i=0; i<50; i++ ) {
-		//SetPreShortcuts( i );
-		SetPostShortcuts( i );
-	}
 }
 
 /*
@@ -1737,7 +1722,6 @@ void ygv608_device::HandleYGV608Reset()
     it for testing trojan ROM software.
     - So leave it in!
  */
-
 void ygv608_device::HandleRomTransfers(uint8_t type)
 {
 	popmessage("ROM DMA used %02x",type);
@@ -2281,10 +2265,15 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 
 		case 40:
 		{
+			int new_display_width = (data & 0x3f) * 16;
+			
 			m_crtc.htotal &= ~0x600;
 			m_crtc.htotal |= (data & 0xc0) << 3;
 
-			m_crtc.display_width = (data & 0x3f) * 16;
+			if(new_display_width != m_crtc.display_width)
+				m_screen_resize = 1;
+			
+			m_crtc.display_width = new_display_width;
 			break;
 		}
 
@@ -2313,9 +2302,13 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 
 		case 44:
 		{
-			// TODO: VSLS, bit 6
+			int new_display_height = (data & 0x3f) * 8;
 
-			m_crtc.display_height = (data & 0x3f) * 8;
+			// TODO: VSLS, bit 6
+			if(new_display_height != m_crtc.display_height)
+				m_screen_resize = 1;
+			
+			m_crtc.display_height = new_display_height;
 			break;
 		}
 
@@ -2365,47 +2358,6 @@ void ygv608_device::screen_configure()
 	//m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_vstart+m_crtc.display_height,0), 0, m_screen->frame_period());
 	m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_height,0), 0, m_screen->frame_period());
 }
-
-// Set any "short-cut" variables before we update the YGV608 registers
-// - these are used only in optimisation of the emulation
-void ygv608_device::SetPreShortcuts( int reg, int data )
-{
-	switch( reg ) {
-		
-
-		case 40 :
-			if( ( ( data >> HDW_SHIFT ) & HDW_MASK ) != (m_regs.s.r40 & r40_hdw))
-				m_screen_resize = 1;
-			break;
-
-		case 44 :
-			if( ( ( data >> VDW_SHIFT ) & VDW_MASK ) != (m_regs.s.r44 & r44_vdw))
-				m_screen_resize = 1;
-			break;
-	}
-}
-
-// Set any "short-cut" variables after we have updated the YGV608 registers
-// - these are used only in optimisation of the emulation
-// TODO: actually this is legacy code that needs to go away
-void ygv608_device::SetPostShortcuts(int reg )
-{
-
-	switch (reg)
-	{
-
-
-	case 11 :
-	//ShowYGV608Registers();
-	break;
-
-	}
-
-}
-
-
-
-
 
 
 void ygv608_device::ShowYGV608Registers()
