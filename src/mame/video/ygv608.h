@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(screen_ctrl_10_w);
 	DECLARE_READ8_MEMBER(screen_ctrl_11_r);
 	DECLARE_WRITE8_MEMBER(screen_ctrl_11_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_12_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_12_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -327,6 +329,10 @@ private:
 	bool m_yse;						/**< YSE: permission control of trasparency timing output of YS terminal */
 	uint8_t m_scm;					/**< SCM: output frequency of clock signal output from terminal FSC */
 
+	uint8_t m_planeA_color_fetch;	/**< APF: A plane color fetch mode */
+	uint8_t m_planeB_color_fetch; 	/**< BPF: B plane color fetch mode */
+	uint8_t m_sprite_color_fetch;	/**< SPF: sprite color fetch mode */
+	
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;

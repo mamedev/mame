@@ -384,6 +384,7 @@ static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 	AM_RANGE( 9,  9) AM_READWRITE(screen_ctrl_9_r,  screen_ctrl_9_w)
 	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_10_r, screen_ctrl_10_w)
 	AM_RANGE(11, 11) AM_READWRITE(screen_ctrl_11_r, screen_ctrl_11_w)
+	AM_RANGE(12, 12) AM_READWRITE(screen_ctrl_12_r, screen_ctrl_12_w)
 
 	AM_RANGE(13, 13) AM_WRITE(border_color_w)
 	// interrupt section
@@ -651,11 +652,11 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 			logerror( "A_8X8: tilemap=%d\n", j );
 			j = 0;
 		}
-		if ((m_regs.s.r12 & r12_apf) != 0)
+		if (m_planeA_color_fetch != 0)
 		{
 			// attribute only valid in 16 color mode
 			if( set == GFX_8X8_4BIT )
-				attr = ( j >> ( ((m_regs.s.r12 & r12_apf) - 1 ) * 2 ) ) & 0x0f;
+				attr = ( j >> ( (m_planeA_color_fetch - 1 ) * 2 ) ) & 0x0f;
 		}
 		// banking
 		if (set == GFX_8X8_4BIT)
@@ -749,9 +750,9 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 			logerror( "B_8X8: tilemap=%d\n", j );
 			j = 0;
 		}
-		if ((m_regs.s.r12 & r12_bpf) != 0)
+		if (m_planeB_color_fetch != 0)
 		{
-			uint8_t color = (m_regs.s.r12 & r12_bpf) >> 3;
+			uint8_t color = (m_planeB_color_fetch);
 
 			/* assume 16 colour mode for now... */
 			attr = ( j >> ( (color - 1 ) * 2 ) ) & 0x0f;
@@ -841,11 +842,11 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 		j = 0;
 	}
 
-	if ((m_regs.s.r12 & r12_apf) != 0)
+	if (m_planeA_color_fetch != 0)
 	{
 		// attribute only valid in 16 color mode
 		if( set == GFX_16X16_4BIT )
-		attr = ( j >> ( ((m_regs.s.r12 & r12_apf)) * 2 ) ) & 0x0f;
+			attr = ( j >> ( m_planeA_color_fetch * 2 ) ) & 0x0f;
 	}
 
 	// banking
@@ -934,9 +935,9 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 		j = 0;
 	}
 
-	if ((m_regs.s.r12 & r12_bpf) != 0)
+	if (m_planeB_color_fetch != 0)
 	{
-		uint8_t color = (m_regs.s.r12 & r12_bpf) >> 3;
+		uint8_t color = (m_planeB_color_fetch);
 
 		/* assume 16 colour mode for now... */
 		attr = ( j >> (color * 2)) & 0x0f;
@@ -1011,7 +1012,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		sy = ( ( ( (int)(sa->attr & 0x01) << 8 ) | (int)sa->sy ) + 1 ) & 0x1ff;
 		attr = (sa->attr & 0x0c) >> 2;
 		g_attr = m_sprite_aux_reg & 3;
-		spf = (m_regs.s.r12 & r12_spf) >> 6;
+		spf = m_sprite_color_fetch;
 
 		if (m_sprite_aux_mode == SPAS_SPRITESIZE )
 		{
@@ -2001,6 +2002,20 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_11_w )
 	m_priority_mode = (data >> 2) & 3;
 	m_planeB_trans_enable = BIT(data,1);
 	m_planeA_trans_enable = BIT(data,0);
+}
+
+// R#12R - screen control 12: color fetch modes
+READ8_MEMBER( ygv608_device::screen_ctrl_12_r )
+{
+	return (m_sprite_color_fetch<<6)|(m_planeB_color_fetch<<3)|(m_planeA_color_fetch<<0);
+}
+
+// R#12W - screen control 12: color fetch modes
+WRITE8_MEMBER( ygv608_device::screen_ctrl_12_w )
+{
+	m_sprite_color_fetch = (data >> 6) & 3;
+	m_planeB_color_fetch = (data >> 3) & 7;
+	m_planeA_color_fetch = (data >> 0) & 7;
 }
 
 // R#13W - border color
