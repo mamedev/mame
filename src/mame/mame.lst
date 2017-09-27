@@ -20627,6 +20627,9 @@ wldarrow                        // (c) 1982 Meyco Games
 @source:meyc8088.cpp
 gldarrow                        // (c) 1984 Meyco Games
 
+@source:mfabfz.cpp
+mfabfz                          //
+
 @source:mgames.cpp
 mgames                          // (c) 1981 Merit
 
