@@ -1712,7 +1712,7 @@ shaders: bgfx-tools
 
 translation:
 	$(SILENT) echo Generating mame.pot
-	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -k__ -o mame.pot
-	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgmerge -U -N %% mame.pot
-	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%
+	$(SILENT) find src plugins -iname "*.cpp" -print0 -o -iname "*.lua" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -j -o mame.pot
+	$(SILENT) find language -iname "*.po" -print0 | xargs -0 -n 1 -I %% msgmerge -U -N %% mame.pot
+	$(SILENT) find language -iname "*.po" -print0 | xargs -0 -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%
 
