@@ -923,8 +923,15 @@ static MACHINE_CONFIG_START( apc )
 	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
 	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
 
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(apc_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP) // TODO: check ir7_w
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(apc_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w)) // TODO: check ir7_w
+	MCFG_PIC8259_IN_SP_CB(GND)
+
 	MCFG_DEVICE_ADD("i8237", AM9517A, MAIN_CLOCK)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apc_state, apc_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(apc_state, apc_tc_w))

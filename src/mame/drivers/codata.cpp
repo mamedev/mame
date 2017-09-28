@@ -13,9 +13,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
+#include "bus/rs232/rs232.h"
+#include "machine/am9513.h"
+#include "machine/z80sio.h"
 
 class codata_state : public driver_device
 {
@@ -23,32 +23,24 @@ public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_base(*this, "rambase"),
-		m_terminal(*this, TERMINAL_TAG),
 		m_maincpu(*this, "maincpu")
 	{
 	}
 
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
-	void kbd_put(u8 data);
-
 private:
-	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
-	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
 };
 
 static ADDRESS_MAP_START(codata_mem, AS_PROGRAM, 16, codata_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase")
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);
 	AM_RANGE(0x400000, 0x403fff) AM_ROM AM_REGION("user1", 0x4000);
-	AM_RANGE(0x600000, 0x600001) AM_READ(keyin_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_READ(status_r)
-	//AM_RANGE(0x600000, 0x600003) uPD7201 SIO
-	//AM_RANGE(0x800000, 0x800003) AM9513 5 channel timer
+	AM_RANGE(0x600000, 0x600007) AM_MIRROR(0x1ffff8) AM_DEVREADWRITE8("uart", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
+	AM_RANGE(0x800000, 0x800003) AM_MIRROR(0x1ffffc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
+	AM_RANGE(0xe00000, 0xe00001) AM_MIRROR(0x1ffffe) AM_READ_PORT("INPUT")
 	//AM_RANGE(0xa00000, 0xbfffff) page map (rw)
 	//AM_RANGE(0xc00000, 0xdfffff) segment map (rw), context register (r)
 	//AM_RANGE(0xe00000, 0xffffff) context register (w), 16-bit parallel input port (r)
@@ -56,42 +48,52 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( codata )
+	PORT_START("INPUT")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-
-READ16_MEMBER( codata_state::keyin_r )
-{
-	uint16_t ret = m_term_data;
-	m_term_data = 0;
-	return ret << 8;
-}
-
-READ16_MEMBER( codata_state::status_r )
-{
-	return (m_term_data) ? 0x500 : 0x400;
-}
-
-void codata_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 void codata_state::machine_reset()
 {
 	uint8_t* RAM = memregion("user1")->base();
 	memcpy(m_p_base, RAM, 16);
-	m_term_data = 0;
 	m_maincpu->reset();
 }
+
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
+DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( codata )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(codata_mem)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(codata_state, kbd_put))
+	MCFG_DEVICE_ADD("uart", UPD7201_NEW, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs423b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+
+	MCFG_DEVICE_ADD("timer", AM9513A, XTAL_16MHz / 4)
+	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Timer 1 = "Abort/Reset" (watchdog)
+	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // Timer 2
+	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh
+	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("uart", upd7201_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", upd7201_new_device, txca_w))
+	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("uart", upd7201_new_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", upd7201_new_device, txcb_w))
+
+	MCFG_RS232_PORT_ADD("rs423a", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxa_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", upd7201_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", upd7201_new_device, ctsa_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+
+	MCFG_RS232_PORT_ADD("rs423b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

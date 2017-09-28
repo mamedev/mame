@@ -708,17 +708,19 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 
 			// look for the region
 			for (device_t &dev : device_iterator(m_device->mconfig().root_device()))
-				for (const rom_entry *romp = rom_first_region(dev); romp != nullptr && !found; romp = rom_next_region(romp))
+			{
+				for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 				{
-					if (rom_region_name(dev, romp) == entry_region)
+					if (dev.subtag(region.get_tag()) == entry_region)
 					{
 						// verify the address range is within the region's bounds
-						offs_t length = ROMREGION_GETLENGTH(romp);
+						offs_t const length = region.get_length();
 						if (entry.m_rgnoffs + (byteend - bytestart + 1) > length)
 							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, length);
 						found = true;
 					}
 				}
+			}
 
 			// error if not found
 			if (!found)

@@ -272,7 +272,7 @@ http_manager::http_manager(bool active, short port, const char *root)
 
 	auto& endpoint = m_wsserver->m_endpoint["/"];
 
-	m_server->on_get([this, root](auto response, auto request) {
+	m_server->on_get([root](auto response, auto request) {
 		std::string doc_root = root;
 
 		auto request_impl = std::make_shared<http_request_impl>(request);

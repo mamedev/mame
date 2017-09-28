@@ -35,34 +35,36 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 
 todo: make this actually readable, we don't support unicode source files
 
- Title                                       PCB ID  REV    CF ID       Dumped  Region  PIC             MAIN BD Serial
-Battle Police                               ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Beetle DASH!!                               ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Bingo Galaxy                                ???-?????               no      ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
-Bingo Parade                                ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
-Brick People / Block People                 834-14881               ROM ALL 253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
-Dinosaur King                               834-14493-01 D          ROM US  253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
-Dinosaur King - Operation: Dinosaur Rescue  837-14434-91    MDA-C0021?  ROM US/EXP  253-5508-0408   AAFE-01A30164715, AAFE-01B92094811
--                                           834-14662-01
-Dinosaur King 2                             ???-?????               no      253-5508-0408   AAFE-xxxxxxxxxxx
-Dinosaur King 2 Ver 2.5                     834-14792-02 F  MDA-C0047   CF  EXP 253-5508-0408   AAFE-01D73384904
-Disney: Magical Dream Dance on Stage        ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Future Police Patrol Chase                  ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Issyouni Turbo Drive                        ???-?????               no      ???-????-????   AAFE-01E91305101
-Issyouni Wan Wan                            ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-King of Beetle: Battle Terminal             ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Love & Berry Ver 1.003                      834-14661-02            ROM EXP 253-5508-0446   AAFE-01D84934906
-Love & Berry Ver 2.000                      834-14661-02            ROM EXP 253-5508-0446   AAFE-01D8493xxxx
-Love & Berry 3 EXP Ver 1.002                834-14661-01    MDA-C0042   CF  US/EXP  253-5508-0446   AAFE-01D64704904
-Marine & Marine                             ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Mirage World                                ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
-Monopoly: The Medal                         ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
-Monopoly: The Medal 2nd Edition             ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
-Mushiking 2K6 2ND                           ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Mushiking 2K7 1ST                           ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
-Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076   CF  ALL 253-5508-0604   AAFE-01G03025212
-Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G          ROM ALL 253-5508-0604   AAFE-xxxxxxxxxxx
-Thomas: The Tank Engine                     ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+ Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
+Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Bingo Galaxy                                ???-?????                 no          ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
+Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
+Dinosaur King - Operation: Dinosaur Rescue  837-14434-91              ROM  US/EXP 253-5508-0408   AAFE-01A30164715, AAFE-01B92094811
+- // -                                      834-14662-01    MDA-C0021 CF                          AAFE-01B87574811
+Dinosaur King 2                             ???-?????                 no          253-5508-0408   AAFE-xxxxxxxxxxx
+Dinosaur King 2 Ver 2.5                     834-14792-02 F  MDA-C0047 CF   EXP    253-5508-0408   AAFE-01D73384904
+Disney: Magical Dream Dance on Stage        ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Issyouni Turbo Drive                        ???-?????                 no          ???-????-????   AAFE-01E91305101
+Issyouni Wan Wan                            ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+King of Beetle: Battle Terminal             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Love & Berry Ver 1.003                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D84934906
+Love & Berry Ver 2.000                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D8493xxxx
+Love & Berry 3 EXP Ver 1.002                834-14661-01    MDA-C0042 CF   US/EXP 253-5508-0446   AAFE-01D64704904
+Marine & Marine                             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Medalink                                    837-14699                 no
+Medalink                                    837-14700                 no
+Mirage World                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal                         ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal 2nd Edition             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Mushiking 2K7 1ST                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY    253-5508-0604   AAFE-01G03025212
+Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
+Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 
 REV PCB       IC6s      Flash       AU1500
 D  171-8278D  315-6370  8x 128Mbit  AMD
@@ -400,27 +402,6 @@ ROM_START( dinoking )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
 ROM_END
 
-ROM_START( dinokior )
-	SEGASP_BIOS
-	SEGASP_US
-	SEGASP_MISC
-
-	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ic62",  0x00000000, 0x01000000, CRC(d3f37d05) SHA1(54c25ddca061acc092a357d958f180f523b86b65) )
-	ROM_LOAD( "ic63",  0x01000000, 0x01000000, CRC(07a9491a) SHA1(24b4a6e2fb136dd02fd8ede3d07dc8e3cec36f3d) )
-	ROM_LOAD( "ic64",  0x02000000, 0x01000000, CRC(d14a95f7) SHA1(b078ae9ca1b75a80dfd35227351b5aa6f4465cd2) )
-	ROM_LOAD( "ic65",  0x03000000, 0x01000000, CRC(09bf6418) SHA1(6d833a82e1268548a837df7fb681940faee17096) )
-	ROM_LOAD( "ic66s", 0x04000000, 0x01000000, CRC(014de6b8) SHA1(68c2f25bc91dee4e1e069b586314b2e1fe4bc1b2) )
-	ROM_LOAD( "ic67s", 0x05000000, 0x01000000, CRC(7bf77663) SHA1(51a0c867290dce11dcc49f61c1af0d4ed42b02f1) )
-	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(ff5ed2b8) SHA1(d8d86b3ed976c8c8fc51d225ae661e5f237b6e1d) )
-	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(ab8ac4eb) SHA1(e6b3ce796ae4887011e2764261f3f437dc9939f9) )
-
-	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
-
-	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
-ROM_END
-
 ROM_START( lovebery )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -477,6 +458,22 @@ ROM_START( tetgiant )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )
 ROM_END
 
+
+ROM_START( dinokior )
+	SEGASP_BIOS
+	SEGASP_US
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0021", 0, SHA1(947c987fb93a32c5acf7839e0186de91b5a9facc) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
+ROM_END
 
 ROM_START( dinoki25 )
 	SEGASP_BIOS
@@ -540,23 +537,14 @@ ROM_END
 #define GAME_FLAGS (MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
 
 GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
-
 // These use ROMs
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
-
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
-
-GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export)", GAME_FLAGS )
-
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
 GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
-
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
-
 // These use a CF card
-
+GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
-
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
-
 GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )

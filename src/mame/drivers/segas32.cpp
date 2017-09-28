@@ -3665,6 +3665,10 @@ ROM_END
 /**************************************************************************************************************************
     F1 Super Lap (Japan)
     protected via FD1149 317-0210
+
+    Sega Game ID codes:
+     GAME BD NO. 833-9407 F1 SUPER LAP
+      A/D BD NO. 837-7536
 */
 ROM_START( f1lapj )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */

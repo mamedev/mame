@@ -56,6 +56,13 @@ WRITE8_MEMBER(starwars_state::r6532_porta_w)
  *
  *************************************/
 
+WRITE_LINE_MEMBER(starwars_state::boost_interleave_hack)
+{
+	if (state)
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+}
+
+
 READ8_MEMBER(starwars_state::starwars_main_ready_flag_r)
 {
 	return m_riot->porta_in_get() & 0xc0;    /* only upper two flag bits mapped */

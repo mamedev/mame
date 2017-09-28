@@ -387,7 +387,8 @@ void smc91c9x_device::process_command(uint16_t data)
 				logerror("   RESET TX FIFOS\n");
 			break;
 	}
-	m_reg[EREG_MMU_COMMAND] &= ~0x0001;
+	// Set Busy (clear on next read)
+	m_reg[EREG_MMU_COMMAND] |= 0x0001;
 }
 
 
@@ -412,6 +413,11 @@ READ16_MEMBER( smc91c9x_device::read )
 
 	switch (offset)
 	{
+		case EREG_MMU_COMMAND:
+			// Clear busy
+			m_reg[EREG_MMU_COMMAND] &= ~0x0001;
+			break;
+
 		case EREG_PNR_ARR:
 			if (ACCESSING_BITS_8_15)
 			{
@@ -556,6 +562,9 @@ WRITE16_MEMBER( smc91c9x_device::write )
 
 		case EREG_INTERRUPT:
 			m_reg[EREG_INTERRUPT] &= ~(data & 0x56);
+			// Need to clear tx int here for vegas cartfury
+			if (m_reg[EREG_FIFO_PORTS] & 0x0080)
+				m_reg[EREG_INTERRUPT] &= ~EINT_TX;
 			update_ethernet_irq();
 			break;
 	}

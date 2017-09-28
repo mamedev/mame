@@ -55,7 +55,7 @@ Changes:
 27/2/2000   KT -    Added disk image support to Spectrum +3 driver.
 27/2/2000   KT -    Added joystick I/O code to the Spectrum +3 I/O handler.
 14/3/2000   DJR -   Tape handling dipswitch.
-26/3/2000   DJR -   Snapshot files are now classifed as snapshots not
+26/3/2000   DJR -   Snapshot files are now classified as snapshots not
             cartridges.
 04/4/2000   DJR -   Spectrum 128 / +2 Support.
 13/4/2000   DJR -   +4 Support (unofficial 48K hack).
@@ -96,17 +96,17 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 interrupt routine is put. Due to unideal
                 bankswitching in MAME this JP were to 0001 what
                 causes Spectrum to reset. Fixing this problem
-                made much more software runing (i.e. Paperboy).
+                made much more software running (i.e. Paperboy).
             Corrected frames per second value for 48k and 128k
             Sinclair machines.
                 There are 50.08 frames per second for Spectrum
                 48k what gives 69888 cycles for each frame and
                 50.021 for Spectrum 128/+2/+2A/+3 what gives
                 70908 cycles for each frame.
-            Remaped some Spectrum+ keys.
-                Presing F3 to reset was seting 0xf7 on keyboard
+            Remapped some Spectrum+ keys.
+                Pressing F3 to reset was setting 0xf7 on keyboard
                 input port. Problem occurred for snapshots of
-                some programms where it was readed as pressing
+                some programs where it was read as pressing
                 key 4 (which is exit in Tapecopy by R. Dannhoefer
                 for example).
             Added support to load .SP snapshots.
@@ -115,7 +115,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 is an only difference.
 08/03/2002  KS -    #FF port emulation added.
                 Arkanoid works now, but is not playable due to
-                completly messed timings.
+                completely messed timings.
 
 Initialisation values used when determining which model is being emulated:
  48K        Spectrum doesn't use either port.
@@ -228,19 +228,16 @@ void spectrum_state::spectrum_plus3_update_memory()
 		/* Bank 2 in 0x8000 - 0xbfff */
 		membank("bank3")->set_base(messram + (2 << 14));
 
-		if (!m_cart->exists())
-		{
-			/* ROM switching */
-			int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
+		/* ROM switching */
+		int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
 
-			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
-			unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
+		/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
+		unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
 
-			membank("bank1")->set_base(ChosenROM);
-			space.unmap_write(0x0000, 0x3fff);
+		membank("bank1")->set_base(ChosenROM);
+		space.unmap_write(0x0000, 0x3fff);
 
-			logerror("rom switch: %02x\n", ROMSelection);
-		}
+		logerror("rom switch: %02x\n", ROMSelection);
 	}
 	else
 	{
@@ -311,13 +308,19 @@ The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
 	AM_RANGE(0x2000, 0x2000) AM_READ(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(spectrum_plus3_mem, AS_PROGRAM, 8, spectrum_state)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
@@ -368,6 +371,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spectrum_plus3_mem)
 	MCFG_CPU_IO_MAP(spectrum_plus3_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.01)
@@ -378,6 +382,9 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+
+	MCFG_DEVICE_MODIFY("exp")
+	MCFG_DEVICE_SLOT_INTERFACE(specpls3_expansion_devices, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "specpls3_flop")
 MACHINE_CONFIG_END
@@ -452,10 +459,10 @@ ROM_START(sp3eata)
 	ROMX_LOAD("3ezxaes.rom",0x10000,0x10000, CRC(8f0ae91a) SHA1(71693e18b30c90914be58cba26682ca025c924ea), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1987, specpl2a, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus2,  "Amstrad plc",          "ZX Spectrum +2a" , 0 )
-COMP( 1987, specpls3, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3" , 0 )
-COMP( 2000, specpl3e, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e" , MACHINE_UNOFFICIAL )
-COMP( 2002, sp3e8bit, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit IDE" , MACHINE_UNOFFICIAL )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT      STATE            INIT    COMPANY                 FULLNAME                         FLAGS */
+COMP( 1987, specpl2a, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus2,  "Amstrad plc",          "ZX Spectrum +2a",               0 )
+COMP( 1987, specpls3, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3",                0 )
+COMP( 2000, specpl3e, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e",               MACHINE_UNOFFICIAL )
+COMP( 2002, sp3e8bit, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit IDE",      MACHINE_UNOFFICIAL )
 COMP( 2002, sp3eata,  spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , MACHINE_UNOFFICIAL )
-COMP( 2002, sp3ezcf,  spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF" , MACHINE_UNOFFICIAL )
+COMP( 2002, sp3ezcf,  spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF",     MACHINE_UNOFFICIAL )

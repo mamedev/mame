@@ -46,20 +46,19 @@
 class votrtnt_state : public driver_device
 {
 public:
-	votrtnt_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_votrax(*this, "votrax"),
-		m_acia(*this, "acia")
-	{
-	}
+	votrtnt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_votrax(*this, "votrax")
+		, m_clock(*this, "acia_clock")
+	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	DECLARE_MACHINE_RESET(votrtnt);
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
-	required_device<acia6850_device> m_acia;
+	required_device<clock_device> m_clock;
 };
 
 
@@ -113,12 +112,23 @@ static INPUT_PORTS_START(votrtnt)
 	PORT_DIPSETTING(    0x80, "9600" )
 INPUT_PORTS_END
 
-
-WRITE_LINE_MEMBER(votrtnt_state::write_acia_clock)
+MACHINE_RESET_MEMBER( votrtnt_state, votrtnt )
 {
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
+	// Read the dips, whichever one is found to be on first is accepted
+	u8 dips = ioport("DSW1")->read();
+	u8 speed = 1;
+	for (u8 i = 0; i < 7; i++)
+	{
+		if (BIT(dips, i))
+		{
+			m_clock->set_unscaled_clock(75*speed*16);
+			return;
+		}
+		speed *= 2;
+	}
+	// if none are on we'll leave the default which is 9600 baud
 }
+
 
 
 /******************************************************************************
@@ -129,6 +139,8 @@ static MACHINE_CONFIG_START( votrtnt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(6802_mem)
+
+	MCFG_MACHINE_RESET_OVERRIDE(votrtnt_state, votrtnt)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_votrtnt)
@@ -143,7 +155,8 @@ static MACHINE_CONFIG_START( votrtnt )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(votrtnt_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

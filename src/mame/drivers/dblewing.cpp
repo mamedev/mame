@@ -61,7 +61,8 @@ Notes:
 
 
 
- - sound CPU seems to miss commands sometimes
+ - Main program writes two commands to soundlatch without pause in some places. Should the 104 custom
+   chip be handling this through an internal FIFO?
  - should sprites be buffered, is the Deco '77' a '71' or similar?
 
 */
@@ -73,6 +74,7 @@ Notes:
 #include "machine/deco104.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "video/deco16ic.h"
@@ -103,9 +105,6 @@ public:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
-	/* misc */
-	uint8_t m_sound_irq;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -114,7 +113,6 @@ public:
 	required_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_DRIVER_INIT(dblewing);
 	virtual void machine_start() override;
@@ -191,10 +189,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(dblewing_state::irq_latch_r)
 {
-	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
-	m_sound_irq &= ~0x02;
-	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	return m_sound_irq;
+	return m_soundlatch->pending_r() ? 0 : 1;
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
@@ -329,16 +324,6 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(dblewing_state::sound_irq)
-{
-	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
-	if (state)
-		m_sound_irq |= 0x01;
-	else
-		m_sound_irq &= ~0x01;
-	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-}
-
 DECO16IC_BANK_CB_MEMBER(dblewing_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
@@ -352,19 +337,15 @@ DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
 
 void dblewing_state::machine_start()
 {
-	save_item(NAME(m_sound_irq));
 }
 
 void dblewing_state::machine_reset()
 {
-	m_sound_irq = 0;
 }
 
 void dblewing_state::dblewing_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	m_soundlatch->write(space, 0, data & 0xff);
-	m_sound_irq |= 0x02;
-	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( dblewing )
@@ -378,6 +359,9 @@ static MACHINE_CONFIG_START( dblewing )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz/9)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
+
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -416,6 +400,9 @@ static MACHINE_CONFIG_START( dblewing )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(dblewing_state, dblewing_sound_cb)
@@ -424,9 +411,10 @@ static MACHINE_CONFIG_START( dblewing )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(dblewing_state, sound_irq))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/28, PIN7_HIGH)

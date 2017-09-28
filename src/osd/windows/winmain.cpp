@@ -273,11 +273,13 @@ const options_entry windows_options::s_option_entries[] =
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
-//  utf8_main
+//  main
 //============================================================
 
-int main(std::vector<std::string> &args)
+int main(int argc, char *argv[])
 {
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
+
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
 		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);

@@ -40,6 +40,10 @@
 #define RS232_BAUD_57600 (0x0c)
 #define RS232_BAUD_115200 (0x0d)
 
+// Some systems may not include a dedicated XTAL capable of producing standard baud rates for the UART.
+// These slightly deviant rates, which might lie within tolerance limits of actual hardware, have been found in use.
+#define RS232_BAUD_9615 (0x0e)
+
 #define MCFG_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
@@ -51,6 +55,7 @@
 	PORT_CONFSETTING( RS232_BAUD_2400, "2400") \
 	PORT_CONFSETTING( RS232_BAUD_4800, "4800") \
 	PORT_CONFSETTING( RS232_BAUD_9600, "9600") \
+	PORT_CONFSETTING( RS232_BAUD_9615, "9615") \
 	PORT_CONFSETTING( RS232_BAUD_14400, "14400") \
 	PORT_CONFSETTING( RS232_BAUD_19200, "19200") \
 	PORT_CONFSETTING( RS232_BAUD_28800, "28800") \
@@ -199,7 +204,8 @@ protected:
 			28800,
 			38400,
 			57600,
-			115200
+			115200,
+			9615
 		};
 
 		return values[baud];

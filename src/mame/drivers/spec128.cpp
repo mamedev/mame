@@ -55,7 +55,7 @@ Changes:
 27/2/2000   KT -    Added disk image support to Spectrum +3 driver.
 27/2/2000   KT -    Added joystick I/O code to the Spectrum +3 I/O handler.
 14/3/2000   DJR -   Tape handling dipswitch.
-26/3/2000   DJR -   Snapshot files are now classifed as snapshots not
+26/3/2000   DJR -   Snapshot files are now classified as snapshots not
             cartridges.
 04/4/2000   DJR -   Spectrum 128 / +2 Support.
 13/4/2000   DJR -   +4 Support (unofficial 48K hack).
@@ -96,7 +96,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 interrupt routine is put. Due to unideal
                 bankswitching in MAME this JP were to 0001 what
                 causes Spectrum to reset. Fixing this problem
-                made much more software runing (i.e. Paperboy).
+                made much more software running (i.e. Paperboy).
             Corrected frames per second value for 48k and 128k
             Sinclair machines.
                 There are 50.08 frames per second for Spectrum
@@ -104,9 +104,9 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 50.021 for Spectrum 128/+2/+2A/+3 what gives
                 70908 cycles for each frame.
             Remapped some Spectrum+ keys.
-                Pressing F3 to reset was seting 0xf7 on keyboard
+                Pressing F3 to reset was setting 0xf7 on keyboard
                 input port. Problem occurred for snapshots of
-                some programms where it was readed as pressing
+                some programs where it was read as pressing
                 key 4 (which is exit in Tapecopy by R. Dannhoefer
                 for example).
             Added support to load .SP snapshots.
@@ -115,7 +115,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 is an only difference.
 08/03/2002  KS -    #FF port emulation added.
                 Arkanoid works now, but is not playable due to
-                completly messed timings.
+                completely messed timings.
 
 Initialisation values used when determining which model is being emulated:
  48K        Spectrum doesn't use either port.
@@ -165,6 +165,31 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
+WRITE8_MEMBER( spectrum_state::spectrum_128_bank1_w )
+{
+	if (m_exp->romcs())
+		m_exp->mreq_w(space, offset, data);
+}
+
+READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
+{
+	uint8_t data;
+
+	if (m_exp->romcs())
+	{
+		data = m_exp->mreq_r(space, offset);
+	}
+	else
+	{
+		/* ROM switching */
+		int ROMSelection = BIT(m_port_7ffd_data, 4);
+
+		/* rom 0 is 128K rom, rom 1 is 48 BASIC */
+		data = memregion("maincpu")->base()[0x010000 + (ROMSelection << 14) + offset];
+	}
+	return data;
+}
+
 WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
 {
 	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
@@ -199,17 +224,6 @@ void spectrum_state::spectrum_128_update_memory()
 		m_screen_location = messram + (7<<14);
 	else
 		m_screen_location = messram + (5<<14);
-
-	if (!m_cart->exists())
-	{
-		/* ROM switching */
-		int ROMSelection = BIT(m_port_7ffd_data, 4);
-
-		/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-		unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
-
-		membank("bank1")->set_base(ChosenROM);
-	}
 }
 
 READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
@@ -221,9 +235,6 @@ READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
 
 static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x00df, 0x00df) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(spectrum_128_port_7ffd_w) AM_MIRROR(0x7ffd)   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
@@ -231,7 +242,7 @@ static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8, spectrum_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8, spectrum_state )
-	AM_RANGE( 0x0000, 0x3fff) AM_ROMBANK("bank1") // don't use RAMBANK here otherwise programs can erase the ROM(!)
+	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE(spectrum_128_bank1_r, spectrum_128_bank1_w)
 	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
@@ -284,7 +295,7 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 	MCFG_CPU_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
 	MCFG_CPU_PROGRAM_MAP(spectrum_128_mem)
 	MCFG_CPU_IO_MAP(spectrum_128_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
@@ -297,8 +308,12 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spec128)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
+	MCFG_SOUND_ADD("ay8912", AY8912, X1_128_SINCLAIR / 10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* expansion port */
+	MCFG_DEVICE_MODIFY("exp")
+	MCFG_DEVICE_SLOT_INTERFACE(spec128_expansion_devices, nullptr, false)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -360,7 +375,7 @@ ROM_START(hc2000)
 ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE       INPUT      STATE           INIT  COMPANY                  FULLNAME           FLAGS
-COMP( 1986, spec128,  0,       0,      spectrum_128, spec_plus, spectrum_state, 0,    "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
+COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, 0,    "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
 COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "Amstrad plc",           "ZX Spectrum +2",  0 )
 COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-128",          0 )
 COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )

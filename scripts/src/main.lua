@@ -83,10 +83,6 @@ end
 			}
 	end
 
-	configuration { "vs*" }
-		flags {
-			"Unicode",
-		}
 
 	configuration { "winstore*" }
 		-- Windows Required Files

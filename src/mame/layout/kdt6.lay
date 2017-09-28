@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="driveled" defstate="0">
+		<rect state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="DRIVE0">
+		<text string="A">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="DRIVE1">
+		<text string="B">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="61" y="0" width="1024" height="768" />
+		</screen>
+		<bezel name="drive0_led" element="driveled">
+			<bounds x="15" y="3" width="10" height="10" />
+		</bezel>
+		<bezel name="drive1_led" element="driveled">
+			<bounds x="15" y="18" width="10" height="10" />
+		</bezel>
+			<bezel name="label20" element="DRIVE0">
+			<bounds x="0" y="0" width="15" height="16" />
+		</bezel>
+		<bezel name="label21" element="DRIVE1">
+			<bounds x="0" y="14" width="15" height="16" />
+		</bezel>
+
+	</view>
+</mamelayout>

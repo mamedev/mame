@@ -141,15 +141,6 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "speaker.h"
 
 
-WRITE16_MEMBER(spbactn_state::soundcommand_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
 static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
@@ -165,8 +156,8 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 
 	/* this are an awful lot of unknowns */
 	AM_RANGE(0x90000, 0x90001) AM_WRITENOP
-	AM_RANGE(0x90010, 0x90011) AM_WRITE(soundcommand_w)
-//  AM_RANGE(0x90020, 0x90021) AM_WRITE(soundcommand_w)
+	AM_RANGE(0x90010, 0x90011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+//  AM_RANGE(0x90020, 0x90021) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x90030, 0x90031) AM_WRITENOP
 
 	AM_RANGE(0x90080, 0x90081) AM_WRITENOP
@@ -441,6 +432,7 @@ static MACHINE_CONFIG_START( spbactn )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -494,6 +486,7 @@ static MACHINE_CONFIG_START( spbactnp )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

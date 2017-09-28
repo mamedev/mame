@@ -5,6 +5,7 @@
     rendutil.c
 
     Core rendering utilities.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -794,4 +795,36 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 
 	// set the hasalpha flag
 	return (accumalpha != 0xff);
+}
+
+
+/*-------------------------------------------------
+    render_detect_image - detect image format
+-------------------------------------------------*/
+
+ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char *filename)
+{
+	// open the file
+	std::string fname;
+	if (dirname)
+		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
+	else
+		fname.assign(filename);
+	osd_file::error const filerr = file.open(fname.c_str());
+	if (filerr != osd_file::error::NONE)
+		return RENDUTIL_IMGFORMAT_ERROR;
+
+	// PNG: check for valid header
+	png_error const result = png_info::verify_header(file);
+	if (result == PNGERR_NONE)
+	{
+		file.close();
+		return RENDUTIL_IMGFORMAT_PNG;
+	}
+
+	file.seek(0, SEEK_SET);
+	// TODO: add more when needed
+
+	file.close();
+	return RENDUTIL_IMGFORMAT_UNKNOWN;
 }

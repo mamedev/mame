@@ -265,8 +265,10 @@ SOUNDS["AD1848"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["MEA8000"] = true
 SOUNDS["DAC76"] = true
+SOUNDS["TA7630"] = true
 SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
+SOUNDS["LC7535"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -388,6 +390,7 @@ MACHINES["ADC1213X"] = true
 MACHINES["AICARTC"] = true
 --MACHINES["AM2847"] = true
 MACHINES["AM53CF96"] = true
+--MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
 MACHINES["AT_KEYBC"] = true
@@ -1621,6 +1624,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/vaportra.cpp",
 	MAME_DIR .. "src/mame/includes/vaportra.h",
 	MAME_DIR .. "src/mame/video/vaportra.cpp",
+	MAME_DIR .. "src/mame/machine/deco_irq.cpp",
+	MAME_DIR .. "src/mame/machine/deco_irq.h",
 	MAME_DIR .. "src/mame/machine/deco102.cpp",
 	MAME_DIR .. "src/mame/machine/deco102.h",
 	MAME_DIR .. "src/mame/machine/decocrpt.cpp",
@@ -3631,6 +3636,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/bigevglf.cpp",
 	MAME_DIR .. "src/mame/includes/bigevglf.h",
 	MAME_DIR .. "src/mame/video/bigevglf.cpp",
+	MAME_DIR .. "src/mame/drivers/bingowav.cpp",
 	MAME_DIR .. "src/mame/drivers/bking.cpp",
 	MAME_DIR .. "src/mame/includes/bking.h",
 	MAME_DIR .. "src/mame/video/bking.cpp",

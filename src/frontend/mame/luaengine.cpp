@@ -746,6 +746,8 @@ void lua_engine::initialize()
  * emu.print_info(str) -- output to stderr at info level
  * emu.print_debug(str) -- output to stderr at debug level
  * emu.driver_find(driver) -- find and return game_driver for driver
+ * emu.wait(len) -- wait for len within coroutine
+ * emu.lang_translate(str) -- get translation for str if available
  */
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
@@ -806,6 +808,7 @@ void lua_engine::initialize()
 			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
 			return lua_yield(L, 0);
 		});
+	emu["lang_translate"] = &lang_translate;
 
 /*
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
@@ -920,7 +923,7 @@ void lua_engine::initialize()
 */
 
 	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
-			"start", [this](context &ctx, const char *scr) {
+			"start", [](context &ctx, const char *scr) {
 					std::string script(scr);
 					if(ctx.busy)
 						return false;
@@ -959,13 +962,13 @@ void lua_engine::initialize()
 					th.detach();
 					return true;
 				},
-			"continue", [this](context &ctx, const char *val) {
+			"continue", [](context &ctx, const char *val) {
 					if(!ctx.yield)
 						return;
 					ctx.result = val;
 					ctx.sync.notify_all();
 				},
-			"result", sol::property([this](context &ctx) -> std::string {
+			"result", sol::property([](context &ctx) -> std::string {
 					if(ctx.busy && !ctx.yield)
 						return "";
 					return ctx.result;
@@ -1005,7 +1008,7 @@ void lua_engine::initialize()
 					}
 					return sol::make_object(sol(), ret);
 				},
-			"read_block", [this](save_item &item, int offset, sol::buffer *buff) {
+			"read_block", [](save_item &item, int offset, sol::buffer *buff) {
 					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
 						buff->set_len(0);
 					else
@@ -1264,7 +1267,7 @@ void lua_engine::initialize()
  * debug:wplist(space)[] - table of watchpoints
  */
 	sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor,
-			"step", [this](device_debug &dev, sol::object num) {
+			"step", [](device_debug &dev, sol::object num) {
 					int steps = 1;
 					if(num.is<int>())
 						steps = num.as<int>();

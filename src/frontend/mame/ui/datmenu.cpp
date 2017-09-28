@@ -54,7 +54,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 		{
 			std::string version;
 			mame_machine_manager::instance()->lua()->call_plugin("data_version", count, version);
-			m_items_list.emplace_back(_(item.c_str()), count, std::move(version));
+			m_items_list.emplace_back(item.c_str(), count, std::move(version));
 			count++;
 		}
 	}
@@ -86,7 +86,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 		{
 			std::string version;
 			mame_machine_manager::instance()->lua()->call_plugin("data_version", count - 1, version);
-			m_items_list.emplace_back(_(item.c_str()), count, std::move(version));
+			m_items_list.emplace_back(item.c_str(), count, std::move(version));
 			count++;
 		}
 	}

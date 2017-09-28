@@ -70,7 +70,13 @@ public:
 
 	enum cu_cb_cs_mask
 	{
-		CB_MAXCOL = 0x00000007, // number of collisions (82596 only)
+		CB_MAXCOL = 0x0000000f, // number of collisions
+		CB_S5     = 0x00000020, // transmission unsuccessful due to maximum collision retries
+		CB_S6     = 0x00000040, // heart beat indicator
+		CB_S7     = 0x00000080, // transmission deferred due to traffic on link
+		CB_S8     = 0x00000100, // transmission unsuccessful due to dma underrun
+		CB_S9     = 0x00000200, // transmission unsuccessful due to loss of cts
+		CB_S10    = 0x00000400, // no carrier sense during transmission
 		CB_A      = 0x00001000, // command aborted
 		CB_OK     = 0x00002000, // error free completion
 		CB_B      = 0x00004000, // busy executing command
@@ -147,6 +153,7 @@ public:
 	static const u32 SCP_ADDRESS = 0x00fffff4; // the default value of the system configuration pointer
 	static const u32 TBD_EMPTY   = 0x0000ffff; // FIXME: datasheet says this field should be "all 1's", but InterPro sets only lower 16 bits (in linear mode)
 	static const u32 RBD_EMPTY   = 0x0000ffff;
+	static const int MAX_FRAME_SIZE = 65536;   // real device effectively has no limit, emulation relies on index wrapping
 
 	static const u32 FCS_RESIDUE = 0xdebb20e3; // the residue after computing the fcs over a complete frame (including fcs)
 
@@ -221,9 +228,10 @@ protected:
 	u32 m_cba;           // current command block address
 	u32 m_rfd;           // current receive frame descriptor address
 
-	u64 m_mac_multi;   // multicast address hash table
-	u8 m_lb_buf[1528]; // storage for loopback frames
-	int m_lb_length;   // length of loopback frame
+	u64 m_mac_multi; // multicast address hash table
+
+	u8 m_lb_buf[MAX_FRAME_SIZE]; // storage for loopback frames
+	u16 m_lb_length;             // length of loopback frame (relies on wrapping to match 64k max buffer size)
 
 	// configure parameters
 	enum lb_mode
@@ -350,7 +358,6 @@ private:
 
 	u8 m_cfg_bytes[CFG_SIZE];
 	u8 m_sysbus;
-	u32 m_iscp_address;
 
 	u64 m_mac_multi_ia; // multi-ia address hash table
 };

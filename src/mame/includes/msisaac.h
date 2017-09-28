@@ -4,6 +4,7 @@
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "sound/ta7630.h"
 
 /* Disabled because the mcu dump is currently unavailable. -AS */
 //#define USE_MCU
@@ -21,6 +22,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
+		m_ta7630(*this, "ta7630"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
@@ -49,7 +51,6 @@ public:
 	uint8_t       m_direction;
 #endif
 
-	int         m_vol_ctrl[16];
 	uint8_t       m_snd_ctrl0;
 	uint8_t       m_snd_ctrl1;
 	uint8_t       m_snd_ctrl2;
@@ -60,6 +61,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
+	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -89,7 +91,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(ta7630);
 	uint32_t screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

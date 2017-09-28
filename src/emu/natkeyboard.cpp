@@ -570,7 +570,7 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 
 void natural_keyboard::build_codes(ioport_manager &manager)
 {
-	// find all shfit keys
+	// find all shift keys
 	unsigned mask = 0;
 	ioport_field *shift[SHIFT_COUNT];
 	std::fill(std::begin(shift), std::end(shift), nullptr);
@@ -606,25 +606,33 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 						char32_t const code = field.keyboard_code(curshift);
 						if (((code < UCHAR_SHIFT_BEGIN) || (code > UCHAR_SHIFT_END)) && (code != 0))
 						{
-							keycode_map_entry newcode;
-							newcode.ch = code;
-							std::fill(std::begin(newcode.field), std::end(newcode.field), nullptr);
-
-							unsigned fieldnum = 0;
-							for (unsigned i = 0, bits = curshift; (i < SHIFT_COUNT) && bits; ++i, bits >>= 1)
+							// prefer lowest shift state
+							keycode_map::iterator const found(m_keycode_map.find(code));
+							if ((m_keycode_map.end() == found) || (found->second.shift > curshift))
 							{
-								if (BIT(bits, 0))
-									newcode.field[fieldnum++] = shift[i];
-							}
+								keycode_map_entry newcode;
+								std::fill(std::begin(newcode.field), std::end(newcode.field), nullptr);
+								newcode.shift = curshift;
 
-							assert(fieldnum < ARRAY_LENGTH(newcode.field));
-							newcode.field[fieldnum] = &field;
-							m_keycode_map.push_back(std::move(newcode));
+								unsigned fieldnum = 0;
+								for (unsigned i = 0, bits = curshift; (i < SHIFT_COUNT) && bits; ++i, bits >>= 1)
+								{
+									if (BIT(bits, 0))
+										newcode.field[fieldnum++] = shift[i];
+								}
 
-							if (LOG_NATURAL_KEYBOARD)
-							{
-								machine().logerror("natural_keyboard: code=%u (%s) port=%p field.name='%s'\n",
-										code, unicode_to_string(code), (void *)&port, field.name());
+								assert(fieldnum < ARRAY_LENGTH(newcode.field));
+								newcode.field[fieldnum] = &field;
+								if (m_keycode_map.end() == found)
+									m_keycode_map.emplace(code, newcode);
+								else
+									found->second = newcode;
+
+								if (LOG_NATURAL_KEYBOARD)
+								{
+									machine().logerror("natural_keyboard: code=%u (%s) port=%p field.name='%s'\n",
+											code, unicode_to_string(code), (void *)&port, field.name());
+								}
 							}
 						}
 					}
@@ -834,12 +842,8 @@ std::string natural_keyboard::unicode_to_string(char32_t ch) const
 
 const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t ch) const
 {
-	for (auto & elem : m_keycode_map)
-	{
-		if (elem.ch == ch)
-			return &elem;
-	}
-	return nullptr;
+	keycode_map::const_iterator const found(m_keycode_map.find(ch));
+	return (m_keycode_map.end() != found) ? &found->second : nullptr;
 }
 
 
@@ -852,20 +856,22 @@ void natural_keyboard::dump(std::ostream &str) const
 	constexpr size_t left_column_width = 24;
 
 	// loop through all codes
+	bool first(true);
 	for (auto &code : m_keycode_map)
 	{
 		// describe the character code
-		std::string description = string_format("%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
+		std::string const description(string_format("%08X (%s) ", code.first, unicode_to_string(code.first)));
 
 		// pad with spaces
 		util::stream_format(str, "%-*s", left_column_width, description);
 
 		// identify the keys used
-		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != nullptr; field++)
-			util::stream_format(str, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
+		for (std::size_t field = 0; (ARRAY_LENGTH(code.second.field) > field) && code.second.field[field]; ++field)
+			util::stream_format(str, "%s'%s'", first ? "" : ", ", code.second.field[field]->name());
 
 		// carriage return
 		str << '\n';
+		first = false;
 	}
 }
 

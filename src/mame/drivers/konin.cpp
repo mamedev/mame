@@ -54,15 +54,11 @@ public:
 	konin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "uart")
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart;
 };
 
 static ADDRESS_MAP_START( konin_mem, AS_PROGRAM, 8, konin_state )
@@ -82,24 +78,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( konin )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( konin )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
-DEVICE_INPUT_DEFAULTS_END
-
 
 void konin_state::machine_reset()
 {
-}
-
-WRITE_LINE_MEMBER( konin_state::clock_w )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
 }
 
 static MACHINE_CONFIG_START( konin )
@@ -107,6 +88,10 @@ static MACHINE_CONFIG_START( konin )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(konin_mem)
 	MCFG_CPU_IO_MAP(konin_io)
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -117,10 +102,6 @@ static MACHINE_CONFIG_START( konin )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", konin )
-
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(konin_state, clock_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

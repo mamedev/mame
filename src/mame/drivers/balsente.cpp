@@ -231,9 +231,10 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/cem3394.h"
+#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/cem3394.h"
 #include "speaker.h"
 
 #include "stocker.lh"
@@ -252,7 +253,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9000, 0x9007) AM_WRITE(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ(balsente_adc_data_r)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(balsente_misc_output_w)
+	AM_RANGE(0x9800, 0x981f) AM_MIRROR(0x0060) AM_DEVWRITE_MOD("outlatch", ls259_device, write_d7, rshift<2>)
 	AM_RANGE(0x9880, 0x989f) AM_WRITE(balsente_random_reset_w)
 	AM_RANGE(0x98a0, 0x98bf) AM_WRITE(balsente_rombank_select_w)
 	AM_RANGE(0x98c0, 0x98df) AM_WRITE(balsente_palette_select_w)
@@ -1297,6 +1298,18 @@ static MACHINE_CONFIG_START( balsente )
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, balsente_clock_counter_0_ff)
 	MCFG_TIMER_DRIVER_ADD("8253_1_timer", balsente_state, balsente_counter_callback)
 	MCFG_TIMER_DRIVER_ADD("8253_2_timer", balsente_state, balsente_counter_callback)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U9H
+	// these outputs are generally used to control the various lamps
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(balsente_state, out0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(balsente_state, out1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(balsente_state, out2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(balsente_state, out3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(balsente_state, out4_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(balsente_state, out5_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(balsente_state, out6_w))
+	// special case is output 7, which recalls the NVRAM data
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(balsente_state, nvrecall_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

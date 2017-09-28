@@ -10,8 +10,7 @@ defines {
 configuration { "mingw* or vs*" }
 	defines {
 		"UNICODE",
-		"_UNICODE",
-		"main=utf8_main",
+		"_UNICODE"
 	}
 
 configuration { "vs*" }

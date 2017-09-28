@@ -269,6 +269,7 @@ SOUNDS["MEA8000"] = true
 --SOUNDS["DAC76"] = true
 --SOUNDS["MM5837"] = true
 SOUNDS["DAVE"] = true
+--SOUNDS["LC7535"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -378,6 +379,7 @@ MACHINES["ADC1213X"] = true
 MACHINES["AICARTC"] = true
 MACHINES["AM2847"] = true
 MACHINES["AM53CF96"] = true
+MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
 MACHINES["AT_KEYBC"] = true
@@ -678,6 +680,7 @@ BUSES["IQ151"] = true
 BUSES["ISA"] = true
 BUSES["ISBX"] = true
 BUSES["HP_OPTROM"] = true
+BUSES["HP80_OPTROM"] = true
 BUSES["HP9845_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
@@ -718,6 +721,7 @@ BUSES["SMS_EXP"] = true
 BUSES["SNES"] = true
 BUSES["SNES_CTRL"] = true
 BUSES["SPC1000"] = true
+BUSES["SPECTRUM"] = true
 BUSES["SUNKBD"] = true
 BUSES["SVI_EXPANDER"] = true
 BUSES["SVI_SLOT"] = true
@@ -1146,6 +1150,10 @@ function createMESSProjects(_target, _subtarget, _name)
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
 	}
+
+	includedirs {
+		ext_includedir("zlib")
+	}
 end
 
 function createProjects_mame_mess(_target, _subtarget)
@@ -1384,6 +1392,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/altos5.cpp",
 	MAME_DIR .. "src/mame/drivers/altos486.cpp",
 	MAME_DIR .. "src/mame/drivers/altos8600.cpp",
+	MAME_DIR .. "src/mame/machine/acs8600_ics.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ami")
@@ -2064,6 +2073,7 @@ createMESSProjects(_target, _subtarget, "hegener")
 files {
 	MAME_DIR .. "src/mame/drivers/glasgow.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_montec.cpp",
 	MAME_DIR .. "src/mame/drivers/mmodular.cpp",
 	MAME_DIR .. "src/mame/drivers/polgar.cpp",
 	MAME_DIR .. "src/mame/drivers/risc2500.cpp",
@@ -2465,6 +2475,8 @@ files {
 	MAME_DIR .. "src/mame/includes/gba.h",
 	MAME_DIR .. "src/mame/drivers/n64.cpp",
 	MAME_DIR .. "src/mame/includes/n64.h",
+	MAME_DIR .. "src/mame/drivers/nds.cpp",
+	MAME_DIR .. "src/mame/includes/nds.h",
 	MAME_DIR .. "src/mame/drivers/nes.cpp",
 	MAME_DIR .. "src/mame/includes/nes.h",
 	MAME_DIR .. "src/mame/machine/nes.cpp",
@@ -2808,6 +2820,7 @@ files {
 createMESSProjects(_target, _subtarget, "sharp")
 files {
 	MAME_DIR .. "src/mame/drivers/hh_sm510.cpp",
+	MAME_DIR .. "src/mame/includes/hh_sm510.h",
 	MAME_DIR .. "src/mame/video/mz700.cpp",
 	MAME_DIR .. "src/mame/drivers/mz700.cpp",
 	MAME_DIR .. "src/mame/includes/mz700.h",
@@ -2972,6 +2985,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "ta")
 files {
+	MAME_DIR .. "src/mame/drivers/alphatpx.cpp",
 	MAME_DIR .. "src/mame/drivers/alphatro.cpp",
 }
 
@@ -3119,6 +3133,7 @@ files {
 	MAME_DIR .. "src/mame/machine/gamecom.cpp",
 	MAME_DIR .. "src/mame/video/gamecom.cpp",
 	MAME_DIR .. "src/mame/drivers/k28.cpp",
+	MAME_DIR .. "src/mame/drivers/rzone.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "tigertel")
@@ -3488,6 +3503,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/micronic.cpp",
 	MAME_DIR .. "src/mame/includes/micronic.h",
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
+	MAME_DIR .. "src/mame/drivers/miniframe.cpp",
 	MAME_DIR .. "src/mame/drivers/minitel_2_rpic.cpp",
 	MAME_DIR .. "src/mame/drivers/mmd1.cpp",
 	MAME_DIR .. "src/mame/drivers/mod8.cpp",

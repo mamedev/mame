@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 
 /***************************************************************************
@@ -882,6 +883,9 @@ void CLIB_DECL osd_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
 void CLIB_DECL osd_printf_info(const char *format, ...) ATTR_PRINTF(1,2);
 void CLIB_DECL osd_printf_verbose(const char *format, ...) ATTR_PRINTF(1,2);
 void CLIB_DECL osd_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
+
+// returns command line arguments as an std::vector<std::string> in UTF-8
+std::vector<std::string> osd_get_command_line(int argc, char *argv[]);
 
 /* discourage the use of printf directly */
 /* sadly, can't do this because of the ATTR_PRINTF under GCC */

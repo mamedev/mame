@@ -15,6 +15,9 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "machine/1ma6.h"
+#include "bus/hp80_optroms/hp80_optrom.h"
+#include "softlist.h"
+#include "machine/bankdev.h"
 
 // Debugging
 #define VERBOSE 1
@@ -114,12 +117,12 @@ protected:
 	required_device<timer_device> m_clk_busy_timer;
 	required_device<beep_device> m_beep;
 	required_device<dac_1bit_device> m_dac;
-	required_region_ptr<uint8_t> m_rom00;
-	required_memory_bank m_rombank;
 	required_ioport m_io_key0;
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_modkeys;
+	required_device_array<hp80_optrom_slot_device , 6> m_rom_drawers;
+	required_device<address_map_bank_device> m_rombank;
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
@@ -132,7 +135,6 @@ protected:
 	uint8_t m_crt_ctl;
 	uint8_t m_crt_read_byte;
 	uint8_t m_crt_write_byte;
-	uint8_t m_empty_bank[ 0x2000 ];
 	bool m_global_int_en;
 	uint16_t m_int_req;
 	uint16_t m_int_serv;
@@ -183,12 +185,12 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 	  m_clk_busy_timer(*this , "clk_busy_timer"),
 	  m_beep(*this , "beeper"),
 	  m_dac(*this , "dac"),
-	  m_rom00(*this , "rom00"),
-	  m_rombank(*this , "rombank"),
 	  m_io_key0(*this , "KEY0"),
 	  m_io_key1(*this , "KEY1"),
 	  m_io_key2(*this , "KEY2"),
 	  m_io_modkeys(*this, "MODKEYS"),
+	  m_rom_drawers(*this , "drawer%u" , 1),
+	  m_rombank(*this , "rombank"),
 	  m_chargen(*this , "chargen")
 {
 }
@@ -197,14 +199,6 @@ void hp85_state::machine_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 	m_video_mem.resize(VIDEO_MEM_SIZE);
-
-	// ROM in bank 0 is always present (it's part of system ROMs)
-	m_rombank->configure_entry(0 , m_rom00);
-
-	memset(&m_empty_bank[ 0 ] , 0xff , sizeof(m_empty_bank));
-
-	// All other entries in rombank (01-FF) not present for now
-	m_rombank->configure_entries(1 , 255 , m_empty_bank , 0);
 }
 
 void hp85_state::machine_reset()
@@ -215,9 +209,6 @@ void hp85_state::machine_reset()
 	m_crt_ctl = BIT_MASK(CRT_CTL_POWERDN_BIT) | BIT_MASK(CRT_CTL_WIPEOUT_BIT);
 	m_crt_read_byte = 0;
 	m_crt_write_byte = 0;
-	// Clear RSELEC
-	m_rombank->set_entry(0xff);
-
 	m_int_req = 0;
 	m_int_serv = 0;
 	m_top_pending = NO_IRQ;
@@ -243,6 +234,16 @@ void hp85_state::machine_reset()
 	m_timer_idx = 0;
 	m_clk_busy = false;
 	update_irl();
+
+	// Load optional ROMs (if any)
+	// All entries in rombanks [01..FF] initially not present
+	m_rombank->space(AS_PROGRAM).unmap_read(HP80_OPTROM_SIZE * 1 , HP80_OPTROM_SIZE * 0x100 - 1);
+	for (auto& draw : m_rom_drawers) {
+		LOG("Loading opt ROM in drawer %s\n" , draw->tag());
+		draw->install_read_handler(m_rombank->space(AS_PROGRAM));
+	}
+	// Clear RSELEC
+	m_rombank->set_bank(0xff);
 }
 
 uint32_t hp85_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -534,7 +535,7 @@ WRITE8_MEMBER(hp85_state::clkdat_w)
 
 WRITE8_MEMBER(hp85_state::rselec_w)
 {
-	m_rombank->set_entry(data);
+	m_rombank->set_bank(data);
 }
 
 // Outer index: key position [0..79] = r * 8 + c
@@ -1011,7 +1012,7 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000 , 0x5fff) AM_ROM
-	AM_RANGE(0x6000 , 0x7fff) AM_ROMBANK("rombank")
+	AM_RANGE(0x6000 , 0x7fff) AM_DEVICE("rombank" , address_map_bank_device , amap8)
 	AM_RANGE(0x8000 , 0xbfff) AM_RAM
 	AM_RANGE(0xff00 , 0xff00) AM_WRITE(ginten_w)
 	AM_RANGE(0xff01 , 0xff01) AM_WRITE(gintdis_w)
@@ -1024,10 +1025,23 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0xff18 , 0xff18) AM_WRITE(rselec_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(rombank_mem_map , AS_PROGRAM , 8 , hp85_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	// ROM in bank 0 is always present (it's part of system ROMs)
+	AM_RANGE(0x0000 , 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_START(hp85)
 	MCFG_CPU_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
+
+	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(21)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_SCREEN_ADD("screen" , RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
@@ -1055,6 +1069,22 @@ static MACHINE_CONFIG_START(hp85)
 
 	// Tape drive
 	MCFG_DEVICE_ADD("tape" , HP_1MA6 , 0)
+
+	// Optional ROMs
+	MCFG_DEVICE_ADD("drawer1", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer2", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer3", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer4", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer5", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer6", HP80_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+
+	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
 MACHINE_CONFIG_END
 
 ROM_START(hp85)
@@ -1063,7 +1093,7 @@ ROM_START(hp85)
 	ROM_LOAD("romsys2.bin" , 0x2000 , 0x2000 , CRC(50a85263) SHA1(3cf1d08749103ee245d572550ba1b053ffc7ef57))
 	ROM_LOAD("romsys3.bin" , 0x4000 , 0x2000 , CRC(0df385f0) SHA1(4c5ce5afd28f6d776f16cabbbbcc09769ff306b7))
 
-	ROM_REGION(0x2000 , "rom00" , 0)
+	ROM_REGION(0x2000 , "rombank" , 0)
 	ROM_LOAD("rom000.bin" , 0 , 0x2000 , CRC(e13b8ae3) SHA1(2374618d25d1a000ddb534ae4f55ebd98ce0fff3))
 
 	ROM_REGION(0x400 , "chargen" , 0)

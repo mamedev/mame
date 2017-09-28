@@ -280,12 +280,59 @@ Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddi
 On board ports: speaker
 Options: 8087 FPU
 
+Ericsson PC
+===========
+Links: https://youtu.be/6uilOdMJc24
+Form Factor: Desktop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: 6x ISA
+Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: 2 x 5.25" 360K or 1 20Mb HDD
+On board ports: Beeper,
+Ports: serial, parallel
+Internal Options: Up to 640K RAM through add-on RAM card
+Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
+
+Ericsson Portable PC - EPPC
+===========================
+Links: https://youtu.be/Qmke4L4Jls8 , https://youtu.be/yXK01gBQE6Q
+Form Factor: Laptop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: No internal slots
+Video: Monochrome 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: half height 5.25" 360K
+On board ports: Beeper,
+Ports: serial, parallel, ext. floppy
+Internal Options: 256K RAM, thermal printer
+External Options: A disk cabinet with networking, 1200/300 accoustic modem, 256K Ergo disk electronic disk drive
+Misc: No battery due to the power hungry GP display. 10-15.000 units sold
+
+AEG Olympia Olytext 30
+=======================
+Form Factor: Desktop
+CPU: NEC V20 @ 4.77MHz
+RAM: 768K, not sure how to address the area above 640K
+Bus: 8x ISA:    1) NEC V20 Slot CPU with 786K RAM, TI TACT80181FT chip
+                2) Z180 CP/M emulation card, needed to run the proprietary Olytext 30 word processor)
+                3) Monochrome graphics/color graphics card (possibly EGA capable) ICs: Chips P82C441 and P82A442A
+                4) MFM hard disk controller HDC-770, ICs: HDC9224, HDC92C26, HDC9223,
+                5) Floppy, serial and RTC DIO-770, ICs: 2x UM8250B, UM8272A, OKI M5832
+Video: MDA/Hercules/CGA, possibly EGA
+Mass storage: 1x 3.5" 720K, 20MB Miniscribe harddisk
+On board ports: speaker
+Options: 8087 FPU
+
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "machine/genpc.h"
 #include "cpu/i86/i86.h"
+#include "cpu/nec/nec.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -448,12 +495,25 @@ static MACHINE_CONFIG_START( cfg_single_360K )
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( cfg_single_720K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("35dd")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_REMOVE("fdc:1")
+MACHINE_CONFIG_END
+
 //Data General One
 static MACHINE_CONFIG_DERIVED( dgone, pccga )
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 MACHINE_CONFIG_END
 
+// Ericsson Information System
+static MACHINE_CONFIG_DERIVED( epc, pccga )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( eppc, pccga )
+MACHINE_CONFIG_END
 
 // Bondwell BW230
 static INPUT_PORTS_START( bondwell )
@@ -707,6 +767,20 @@ static MACHINE_CONFIG_START( laser_turbo_xt )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
+//Olytext 30
+static MACHINE_CONFIG_DERIVED(olytext30, pccga)
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_PC(pc8, pc8, V20, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
+	MCFG_DEVICE_MODIFY("isa3")
+	MCFG_SLOT_DEFAULT_OPTION("")
+	MCFG_DEVICE_MODIFY("isa5")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("768K")
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
@@ -714,6 +788,18 @@ MACHINE_CONFIG_END
 ROM_START( dgone )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_LOAD( "dgone.bin",  0x8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
+ROM_END
+
+ROM_START( epc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55))
+	ROM_LOAD( "epcbios2.bin",  0xc000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e))
+	ROM_LOAD( "epcbios3.bin",  0xa000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f))
+ROM_END
+
+ROM_START( eppc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "eppcbios60605.bin",  0xc000, 0x04000, CRC(fe82e11b) SHA1(97ed48dc30f1ed0acce0a14b8085f13b84d4444b))
 ROM_END
 
 ROM_START( bw230 )
@@ -870,6 +956,10 @@ ROM_START( laser_xt3 )
 	ROM_LOAD("laser_xt3.bin", 0x0e000, 0x02000, CRC(b45a7dd3) SHA1(62f17c408be0036d00a182e94c5c88b83d46b625)) // version 1.26 - 27c64
 ROM_END
 
+ROM_START( olytext30 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("o45995.bin", 0xe000, 0x2000, CRC(fdc05b4f) SHA1(abb94e75e7394be1e85ff706d4d8f3b9cdfea09f))
+ROM_END
 
 /***************************************************************************
 
@@ -879,6 +969,8 @@ ROM_END
 
 //    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
 COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
+COMP( 1985,   epc,              ibm5150,    0,          epc,            pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
+COMP( 1985,   eppc,             ibm5150,    0,          eppc,           pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
 COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
 COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
 COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
@@ -899,3 +991,4 @@ COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,  
 COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    pc_state, 0,        "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
 COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
 COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )
+COMP( 198?,   olytext30,        ibm5150,    0,          olytext30,      pccga,    pc_state, 0,        "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )

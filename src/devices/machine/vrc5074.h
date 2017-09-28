@@ -24,8 +24,6 @@
 
 class vrc5074_device : public pci_host_device {
 public:
-	static constexpr unsigned SYSTEM_CLOCK = 100000000;
-
 	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	required_device<ns16550_device> m_uart;
 
@@ -79,6 +77,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	// This value is not verified to be correct
+	static constexpr unsigned SYSTEM_CLOCK = 100000000;
+
 	enum
 	{
 		AS_PCI_MEM = 1,
@@ -99,6 +100,7 @@ private:
 	emu_timer* m_dma_timer;
 	TIMER_CALLBACK_MEMBER(dma_transfer);
 	emu_timer *m_timer[4];
+	double m_timer_period[4];
 	TIMER_CALLBACK_MEMBER(nile_timer_callback);
 
 	required_memory_region m_romRegion;

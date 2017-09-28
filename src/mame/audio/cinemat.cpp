@@ -1438,10 +1438,10 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cinemat_state::qb3_sound4_w)
+WRITE8_MEMBER(cinemat_state::qb3_sound_fifo_w)
 {
 	uint16_t rega = m_maincpu->state_int(ccpu_cpu_device::CCPU_A);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cinemat_state::synced_sound_w), this), ~rega & 0x0f);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cinemat_state::synced_sound_w), this), rega & 0x0f);
 }
 
 
@@ -1459,5 +1459,5 @@ MACHINE_CONFIG_DERIVED( qb3_sound, demon_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, qb3)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cinemat_state, qb3_sound4_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // not mapped through LS259
 MACHINE_CONFIG_END

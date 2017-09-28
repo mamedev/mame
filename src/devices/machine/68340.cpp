@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* 68340 */
+/* 68340
+ * TODO: - convert all modules to devices
+ */
 
 #include "emu.h"
 #include "68340.h"
 
 DEFINE_DEVICE_TYPE(M68340, m68340_cpu_device, "mc68340", "MC68340")
-
 
 int m68340_cpu_device::calc_cs(offs_t address) const
 {
@@ -78,23 +79,26 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 			int base = m68340_base & 0xfffff000;
 
 			internal->install_readwrite_handler(base + 0x000, base + 0x03f,
-												read16_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_r),this),
-												write16_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_w),this),0xffffffff);
+								read16_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_r),this),
+								write16_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_w),this),0xffffffff);
 			internal->install_readwrite_handler(base + 0x010, base + 0x01f, // Intentionally punches a hole in previous address mapping
-												read8_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_ports_r),this),
-												write8_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_ports_w),this),0xffffffff);
+								read8_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_ports_r),this),
+								write8_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_ports_w),this),0xffffffff);
 			internal->install_readwrite_handler(base + 0x040, base + 0x05f,
-												read32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_r),this),
-												write32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_w),this));
-			internal->install_readwrite_handler(base + 0x600, base + 0x67f,
-												read16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_r),this),
-												write16_delegate(FUNC(m68340_cpu_device::m68340_internal_timer_w),this),0xffffffff);
+								read32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_r),this),
+								write32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_w),this));
+			internal->install_readwrite_handler(base + 0x600, base + 0x63f,
+								READ16_DEVICE_DELEGATE(m_timer1, mc68340_timer_module_device, read),
+								WRITE16_DEVICE_DELEGATE(m_timer1, mc68340_timer_module_device, write),0xffffffff);
+			internal->install_readwrite_handler(base + 0x640, base + 0x67f,
+								READ16_DEVICE_DELEGATE(m_timer2, mc68340_timer_module_device, read),
+								WRITE16_DEVICE_DELEGATE(m_timer2, mc68340_timer_module_device, write),0xffffffff);
 			internal->install_readwrite_handler(base + 0x700, base + 0x723,
-												read32_delegate(FUNC(m68340_cpu_device::m68340_internal_serial_r),this),
-												write32_delegate(FUNC(m68340_cpu_device::m68340_internal_serial_w),this));
+								READ8_DEVICE_DELEGATE(m_serial, mc68340_serial_module_device, read),
+								WRITE8_DEVICE_DELEGATE(m_serial, mc68340_serial_module_device, write),0xffffffff);
 			internal->install_readwrite_handler(base + 0x780, base + 0x7bf,
-												read32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_r),this),
-												write32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_w),this));
+								read32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_r),this),
+								write32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_w),this));
 
 		}
 
@@ -108,17 +112,31 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 
 }
 
-
 static ADDRESS_MAP_START( m68340_internal_map, AS_PROGRAM, 32, m68340_cpu_device )
 	AM_RANGE(0x0003ff00, 0x0003ff03) AM_READWRITE( m68340_internal_base_r, m68340_internal_base_w)
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+MACHINE_CONFIG_MEMBER( m68340_cpu_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("serial", MC68340_SERIAL_MODULE, 0)
+	MCFG_MC68340SER_IRQ_CALLBACK(DEVWRITELINE("serial", mc68340_serial_module_device, irq_w))
+	MCFG_DEVICE_ADD("timer1", MC68340_TIMER_MODULE, 0)
+	MCFG_DEVICE_ADD("timer2", MC68340_TIMER_MODULE, 0)
+MACHINE_CONFIG_END
 
 
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
 m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, ADDRESS_MAP_NAME(m68340_internal_map))
+	, m_serial(*this, "serial")
+	, m_timer1(*this, "timer1")
+	, m_timer2(*this, "timer2")
 	, m_clock_mode(0)
 	, m_crystal(0)
 	, m_extal(0)
@@ -126,24 +144,11 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	, m_pa_in_cb(*this)
 	, m_pb_out_cb(*this)
 	, m_pb_in_cb(*this)
-	, m_tout1_out_cb(*this)
-	, m_tin1_in_cb(*this)
-	, m_tgate1_in_cb(*this)
-	, m_tout2_out_cb(*this)
-	, m_tin2_in_cb(*this)
-	, m_tgate2_in_cb(*this)
 {
 	m68340SIM = nullptr;
 	m68340DMA = nullptr;
-	m68340SERIAL = nullptr;
-	m68340TIMER = nullptr;
 	m68340_base = 0;
 }
-
-
-
-
-
 
 void m68340_cpu_device::device_reset()
 {
@@ -165,16 +170,11 @@ void m68340_cpu_device::device_start()
 
 	m68340SIM    = new m68340_sim();
 	m68340DMA    = new m68340_dma();
-	m68340SERIAL = new m68340_serial();
-	m68340TIMER  = new m68340_timer();
 
 	m68340SIM->reset();
 	m68340DMA->reset();
-	m68340SERIAL->reset();
-	m68340TIMER->reset();
 
 	start_68340_sim();
-	start_68340_timer();
 
 	m68340_base = 0x00000000;
 

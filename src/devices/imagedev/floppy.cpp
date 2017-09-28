@@ -185,7 +185,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		motor_always_on(false),
 		dskchg_writable(false),
 		has_trk00_sensor(true),
-		dir(0), stp(0), wtg(0), mon(0), ss(0), idx(0), wpt(0), rdy(0), dskchg(0),
+		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(0), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
 		floppy_ratio_1(0),
@@ -238,6 +238,11 @@ void floppy_image_device::setup_ready_cb(ready_cb cb)
 void floppy_image_device::setup_wpt_cb(wpt_cb cb)
 {
 	cur_wpt_cb = cb;
+}
+
+void floppy_image_device::setup_led_cb(led_cb cb)
+{
+	cur_led_cb = cb;
 }
 
 void floppy_image_device::set_formats(const floppy_format_type *formats)
@@ -314,6 +319,9 @@ void floppy_image_device::device_start()
 	dskchg_writable = false;
 	has_trk00_sensor = true;
 
+	// better would be an extra parameter in the MCFG macro
+	drive_index = atoi(owner()->basetag());
+
 	idx = 0;
 
 	/* motor off */
@@ -322,6 +330,7 @@ void floppy_image_device::device_start()
 	cyl = 0;
 	subcyl = 0;
 	ss  = 0;
+	ds = -1;
 	stp = 1;
 	wpt = 0;
 	dskchg = exists() ? 1 : 0;
@@ -349,11 +358,7 @@ void floppy_image_device::device_reset()
 	revolution_start_time = attotime::never;
 	revolution_count = 0;
 	mon = 1;
-	if(!ready) {
-		ready = true;
-		if(!cur_ready_cb.isnull())
-			cur_ready_cb(this, ready);
-	}
+	set_ready(true);
 	if(motor_always_on)
 		mon_w(0);
 }
@@ -480,11 +485,9 @@ void floppy_image_device::call_unload()
 	if (motor_always_on) {
 		// When disk is removed, stop motor
 		mon_w(1);
-	} else if(!ready) {
-		ready = true;
-		if(!cur_ready_cb.isnull())
-			cur_ready_cb(this, ready);
 	}
+
+	set_ready(true);
 }
 
 image_init_result floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
@@ -535,9 +538,7 @@ void floppy_image_device::mon_w(int state)
 		if (motor_always_on) {
 			// Drives with motor that is always spinning are immediately ready when a disk is loaded
 			// because there is no spin-up time
-			ready = false;
-			if(!cur_ready_cb.isnull())
-				cur_ready_cb(this, ready);
+			set_ready(false);
 		} else {
 			ready_counter = 2;
 		}
@@ -550,11 +551,7 @@ void floppy_image_device::mon_w(int state)
 			commit_image();
 		revolution_start_time = attotime::never;
 		index_timer->adjust(attotime::zero);
-		if(!ready) {
-			ready = true;
-			if(!cur_ready_cb.isnull())
-				cur_ready_cb(this, ready);
-		}
+		set_ready(true);
 	}
 
 	// Create a motor sound (loaded or empty)
@@ -602,9 +599,7 @@ void floppy_image_device::index_resync()
 			ready_counter--;
 			if(!ready_counter) {
 				// logerror("Drive spun up\n");
-				ready = false;
-				if(!cur_ready_cb.isnull())
-					cur_ready_cb(this, ready);
+				set_ready(false);
 			}
 		}
 		if (!cur_index_pulse_cb.isnull())
@@ -615,6 +610,23 @@ void floppy_image_device::index_resync()
 bool floppy_image_device::ready_r()
 {
 	return ready;
+}
+
+void floppy_image_device::set_ready(bool state)
+{
+	if (state != ready)
+	{
+		ready = state;
+		check_led();
+		if (!cur_ready_cb.isnull())
+			cur_ready_cb(this, ready);
+	}
+}
+
+void floppy_image_device::check_led()
+{
+	if(!cur_led_cb.isnull())
+		cur_led_cb(this, (ds == drive_index) && !ready ? 1 : 0);
 }
 
 double floppy_image_device::get_pos()

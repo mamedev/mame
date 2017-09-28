@@ -162,6 +162,7 @@ private:
 		uint8_t ctrll;
 		uint8_t ctrlh;
 		uint8_t buf;
+		uint8_t recv;
 	} m_serial[2];
 
 	// ports

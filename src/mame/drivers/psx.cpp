@@ -1,9 +1,9 @@
-// license:BSD-3-Clause
+// license:GPL-2.0+
 // copyright-holders:smf, pSXAuthor, R. Belmont
 /***************************************************************************
 
-  Sony Playstaion
-  ===============
+  Sony PlayStation
+  ================
   Preliminary driver by smf
   Additional development by pSXAuthor and R. Belmont
 
@@ -25,6 +25,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include <zlib.h>
 
 #define PSXCD_TAG   "psxcd"
 
@@ -32,14 +33,13 @@ class psx1_state : public driver_device
 {
 public:
 	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram")
 	{
 	}
 
-	uint8_t *m_exe_buffer;
-	int m_exe_size;
+	std::vector<uint8_t> m_exe_buffer;
 	int m_cd_param_p;
 	int m_cd_result_p;
 	int m_cd_result_c;
@@ -51,6 +51,14 @@ public:
 	uint8_t m_cd_result[8];
 	DECLARE_MACHINE_RESET(psx);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	void psxexe_conv32(uint32_t *uint32);
+	int load_psxexe(std::vector<uint8_t> buffer);
+	void cpe_set_register(int r, int v);
+	int load_cpe(std::vector<uint8_t> buffer);
+	int load_psf(std::vector<uint8_t> buffer);
+	DECLARE_READ16_MEMBER(parallel_r);
+	DECLARE_WRITE16_MEMBER(parallel_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(psx_exe_load);
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
@@ -73,6 +81,392 @@ inline void ATTR_PRINTF(3,4)  psx1_state::verboselog( int n_level, const char *s
 	}
 }
 
+void psx1_state::psxexe_conv32(uint32_t *uint32)
+{
+	uint8_t *uint8 = (uint8_t *)uint32;
+
+	*(uint32) = uint8[0] | (uint8[1] << 8) | (uint8[2] << 16) | (uint8[3] << 24);
+}
+
+int psx1_state::load_psxexe(std::vector<uint8_t> buffer)
+{
+	struct PSXEXE_HEADER
+	{
+		uint8_t id[8];
+		uint32_t text;    /* SCE only */
+		uint32_t data;    /* SCE only */
+		uint32_t pc0;
+		uint32_t gp0;     /* SCE only */
+		uint32_t t_addr;
+		uint32_t t_size;
+		uint32_t d_addr;  /* SCE only */
+		uint32_t d_size;  /* SCE only */
+		uint32_t b_addr;  /* SCE only */
+		uint32_t b_size;  /* SCE only */
+		uint32_t s_addr;
+		uint32_t s_size;
+		uint32_t SavedSP;
+		uint32_t SavedFP;
+		uint32_t SavedGP;
+		uint32_t SavedRA;
+		uint32_t SavedS0;
+		uint8_t dummy[0x800 - 76];
+	};
+
+	struct PSXEXE_HEADER *psxexe_header = reinterpret_cast<struct PSXEXE_HEADER *>(&buffer[0]);
+
+	if (buffer.size() >= sizeof(struct PSXEXE_HEADER) &&
+		memcmp(psxexe_header->id, "PS-X EXE", 8) == 0)
+	{
+		psxexe_conv32(&psxexe_header->text);
+		psxexe_conv32(&psxexe_header->data);
+		psxexe_conv32(&psxexe_header->pc0);
+		psxexe_conv32(&psxexe_header->gp0);
+		psxexe_conv32(&psxexe_header->t_addr);
+		psxexe_conv32(&psxexe_header->t_size);
+		psxexe_conv32(&psxexe_header->d_addr);
+		psxexe_conv32(&psxexe_header->d_size);
+		psxexe_conv32(&psxexe_header->b_addr);
+		psxexe_conv32(&psxexe_header->b_size);
+		psxexe_conv32(&psxexe_header->s_addr);
+		psxexe_conv32(&psxexe_header->s_size);
+		psxexe_conv32(&psxexe_header->SavedSP);
+		psxexe_conv32(&psxexe_header->SavedFP);
+		psxexe_conv32(&psxexe_header->SavedGP);
+		psxexe_conv32(&psxexe_header->SavedRA);
+		psxexe_conv32(&psxexe_header->SavedS0);
+
+		/* todo: check size.. */
+
+		logerror("psx_exe_load: pc    %08x\n", psxexe_header->pc0);
+		logerror("psx_exe_load: org   %08x\n", psxexe_header->t_addr);
+		logerror("psx_exe_load: len   %08x\n", psxexe_header->t_size);
+		logerror("psx_exe_load: sp    %08x\n", psxexe_header->s_addr);
+		logerror("psx_exe_load: len   %08x\n", psxexe_header->s_size);
+
+		uint8_t *ram_pointer = m_ram->pointer();
+		uint32_t ram_size = m_ram->size();
+
+		uint8_t *text = reinterpret_cast<uint8_t *>(&buffer[sizeof(struct PSXEXE_HEADER)]);
+
+		uint32_t address = psxexe_header->t_addr;
+		uint32_t size = psxexe_header->t_size;
+		while (size != 0)
+		{
+			ram_pointer[BYTE4_XOR_LE(address++) % ram_size] = *(text++);
+			size--;
+		}
+
+		m_maincpu->set_state_int(PSXCPU_PC, psxexe_header->pc0);
+		m_maincpu->set_state_int(PSXCPU_R28, psxexe_header->gp0);
+		uint32_t stack = psxexe_header->s_addr + psxexe_header->s_size;
+		if (stack != 0)
+		{
+			m_maincpu->set_state_int(PSXCPU_R29, stack);
+			m_maincpu->set_state_int(PSXCPU_R30, stack);
+		}
+
+		return 1;
+	}
+	return 0;
+}
+
+void psx1_state::cpe_set_register(int r, int v)
+{
+	if (r < 0x80 && (r % 4) == 0)
+	{
+		logerror("psx_exe_load: r%-2d   %08x\n", r / 4, v);
+		m_maincpu->set_state_int(PSXCPU_R0 + (r / 4), v);
+	}
+	else if (r == 0x80)
+	{
+		logerror("psx_exe_load: lo    %08x\n", v);
+		m_maincpu->set_state_int(PSXCPU_LO, v);
+	}
+	else if (r == 0x84)
+	{
+		logerror("psx_exe_load: hi    %08x\n", v);
+		m_maincpu->set_state_int(PSXCPU_HI, v);
+	}
+	else if (r == 0x88)
+	{
+		logerror("psx_exe_load: sr    %08x\n", v);
+		m_maincpu->set_state_int(PSXCPU_CP0R12, v);
+	}
+	else if (r == 0x8c)
+	{
+		logerror("psx_exe_load: cause %08x\n", v);
+		m_maincpu->set_state_int(PSXCPU_CP0R13, v);
+	}
+	else if (r == 0x90)
+	{
+		logerror("psx_exe_load: pc    %08x\n", v);
+		m_maincpu->set_state_int(PSXCPU_PC, v);
+	}
+	else if (r == 0x94)
+	{
+		logerror("psx_exe_load: prid  %08x\n", v);
+		m_maincpu->set_state_int(PSXCPU_CP0R15, v);
+	}
+	else
+	{
+		logerror("psx_exe_load: invalid register %04x/%08x\n", r, v);
+	}
+}
+
+int psx1_state::load_cpe(std::vector<uint8_t> buffer)
+{
+	if (buffer.size() >= 4 &&
+		memcmp(reinterpret_cast<void *>(&buffer[0]), "CPE\001", 4) == 0)
+	{
+		int offset = 4;
+
+		for (;;)
+		{
+			if (offset >= buffer.size() || buffer[offset] > 8)
+			{
+				break;
+			}
+
+			switch (buffer[offset++])
+			{
+			case 0:
+				/* end of file */
+				return 1;
+
+			case 1:
+				/* read bytes */
+				{
+					unsigned int address = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
+					unsigned int size = buffer[offset + 4] | (buffer[offset + 5] << 8) | (buffer[offset + 6] << 16) | (buffer[offset + 7] << 24);
+
+					uint8_t *ram_pointer = m_ram->pointer();
+					uint32_t ram_size = m_ram->size();
+
+					offset += 8;
+
+					logerror("psx_exe_load: org   %08x\n", address);
+					logerror("psx_exe_load: len   %08x\n", size);
+
+					while (size > 0)
+					{
+						ram_pointer[BYTE4_XOR_LE(address) % ram_size] = buffer[offset++];
+						address++;
+						size--;
+					}
+				}
+				break;
+
+			case 2:
+				/* run address: not tested */
+				{
+					unsigned int v = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
+
+					offset += 4;
+
+					cpe_set_register(0x90, v);
+				}
+				break;
+
+			case 3:
+				/* set reg to longword */
+				{
+					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
+					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16) | (buffer[offset + 5] << 24);
+
+					offset += 6;
+
+					cpe_set_register(r, v);
+				}
+				break;
+
+			case 4:
+				/* set reg to word: not tested */
+				{
+					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
+					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8);
+
+					offset += 4;
+
+					cpe_set_register(r, v);
+				}
+				break;
+
+			case 5:
+				/* set reg to byte: not tested */
+				{
+					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
+					unsigned int v = buffer[offset + 2];
+
+					offset += 3;
+
+					cpe_set_register(r, v);
+				}
+				break;
+
+			case 6:
+				/* set reg to 3-byte: not tested */
+				{
+					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
+					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16);
+
+					offset += 5;
+
+					cpe_set_register(r, v);
+				}
+				break;
+
+			case 7:
+				/* workspace: not tested */
+				offset += 4;
+				break;
+
+			case 8:
+				/* unit */
+				{
+					int unit = buffer[offset + 0];
+
+					offset++;
+
+					logerror("psx_exe_load: unit  %08x\n", unit);
+				}
+				break;
+			}
+		}
+	}
+
+	return 0;
+}
+
+int psx1_state::load_psf(std::vector<uint8_t> buffer)
+{
+	unsigned long crc;
+	unsigned long compressed_size;
+	unsigned char *compressed_buffer;
+	unsigned long uncompressed_size;
+	std::vector<uint8_t> uncompressed_buffer;
+
+	struct PSF_HEADER
+	{
+		unsigned char id[4];
+		uint32_t reserved_size;
+		uint32_t exe_size;
+		uint32_t exe_crc;
+	};
+
+	struct PSF_HEADER *psf_header = reinterpret_cast<struct PSF_HEADER *>(&buffer[0]);
+
+	if (buffer.size() >= sizeof(struct PSF_HEADER) &&
+		memcmp(reinterpret_cast<void *>(&buffer[0]), "PSF", 3) == 0)
+	{
+		psxexe_conv32(&psf_header->reserved_size);
+		psxexe_conv32(&psf_header->exe_size);
+		psxexe_conv32(&psf_header->exe_crc);
+
+		logerror("psx_exe_load: reserved_size %08x\n", psf_header->reserved_size);
+		logerror("psx_exe_load: exe_size      %08x\n", psf_header->exe_size);
+		logerror("psx_exe_load: exe_crc       %08x\n", psf_header->exe_crc);
+
+		compressed_size = psf_header->exe_size;
+		compressed_buffer = reinterpret_cast<Bytef *>(&buffer[sizeof(struct PSF_HEADER) + psf_header->reserved_size]);
+
+		crc = crc32(crc32(0L, Z_NULL, 0), compressed_buffer, compressed_size);
+		if (crc != psf_header->exe_crc)
+		{
+			logerror("psx_exe_load: psf invalid crc\n");
+			return 0;
+		}
+
+		uncompressed_size = 0x200000;
+		uncompressed_buffer.resize(uncompressed_size);
+
+		if (uncompress(reinterpret_cast<Bytef *>(&uncompressed_buffer[0]), &uncompressed_size, compressed_buffer, compressed_size) != Z_OK)
+		{
+			logerror("psx_exe_load: psf uncompress failed\n");
+		}
+		else
+		{
+			uncompressed_buffer.resize(uncompressed_size);
+
+			if (!load_psxexe(uncompressed_buffer))
+			{
+				logerror("psx_exe_load: psf load failed\n");
+			}
+			else
+			{
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+READ16_MEMBER(psx1_state::parallel_r)
+{
+	const uint16_t bootloader[] =
+	{
+		0x00b0, 0x1f00, 0x694c, 0x6563, 0x736e, 0x6465, 0x6220, 0x2079,
+		0x6f53, 0x796e, 0x4320, 0x6d6f, 0x7570, 0x6574, 0x2072, 0x6e45,
+		0x6574, 0x7472, 0x6961, 0x6d6e, 0x6e65, 0x2074, 0x6e49, 0x2e63,
+		0x1f00, 0x3c08, 0x8000, 0x3c09, 0x000c, 0x3529, 0x00fc, 0x8d0a,
+		0xfffc, 0x2529, 0x0044, 0xad2a, 0xfffc, 0x0520, 0xfffc, 0x2508,
+		0x8003, 0x3c08, 0x1800, 0x4088, 0xffff, 0x3c08, 0xffff, 0x3508,
+		0x5800, 0x4088, 0xa180, 0x3c08, 0x0008, 0x03e0, 0x3800, 0x4088,
+		0x1f00, 0x3c1a, 0x0100, 0x275a, 0x0008, 0x0340, 0x0010, 0x4200,
+		0x3800, 0x4080, 0x1800, 0x4080, 0x5800, 0x4080, 0x1f00, 0x3c08,
+		0x0000, 0xad00, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
+	};
+
+	if (m_exe_buffer.size() != 0 && offset >= 0x40 && offset <= 0x8f)
+	{
+		return bootloader[offset - 0x40];
+	}
+
+	return 0;
+}
+
+WRITE16_MEMBER(psx1_state::parallel_w)
+{
+	if (m_exe_buffer.size() != 0)
+	{
+		if (load_psxexe(m_exe_buffer) ||
+			load_cpe(m_exe_buffer) ||
+			load_psf(m_exe_buffer))
+		{
+			// stop the cpu from advancing to the next instruction, otherwise it would skip the exe's first instruction
+			m_maincpu->set_state_int(PSXCPU_DELAYR, PSXCPU_DELAYR_PC);
+			m_maincpu->set_state_int(PSXCPU_DELAYV, m_maincpu->state_int(PSXCPU_PC));
+
+			// workround to fix controller in amidog tests that do not initialise the sio registers
+			m_maincpu->space(AS_PROGRAM).write_word(0x1f80104e, 0x0088);
+			m_maincpu->space(AS_PROGRAM).write_word(0x1f801048, 0x000d);
+
+			// stop on the first instruction of the exe if the debugger is active
+			machine().debug_break();
+		}
+		else
+		{
+			logerror("psx_exe_load: invalid exe\n");
+			m_maincpu->reset();
+		}
+
+		m_exe_buffer.resize(0);
+	}
+}
+
+QUICKLOAD_LOAD_MEMBER(psx1_state, psx_exe_load)
+{
+	m_exe_buffer.resize(quickload_size);
+
+	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), quickload_size) != quickload_size)
+	{
+		m_exe_buffer.resize(0);
+		return image_init_result::FAIL;
+	}
+
+	return image_init_result::PASS;
+}
 
 void psx1_state::cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
@@ -87,6 +481,7 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
+	AM_RANGE(0x1f000000, 0x1f0001ff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
@@ -120,6 +515,8 @@ static MACHINE_CONFIG_START( psj )
 	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
@@ -166,6 +563,8 @@ static MACHINE_CONFIG_START( pse )
 	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 

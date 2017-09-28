@@ -32,19 +32,15 @@ public:
 	int m_sound_cpu_busy;
 	uint32_t m_bg_tile_offset;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_ack_r);
 	DECLARE_WRITE8_MEMBER(c600_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_r);
-
 	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mainsnk);
 

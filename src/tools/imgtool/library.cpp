@@ -182,7 +182,7 @@ library::modulelist::iterator library::find(const std::string &module_name)
 	return std::find_if(
 		m_modules.begin(),
 		m_modules.end(),
-		[this, module_name](std::unique_ptr<imgtool_module> &module) { return !module_name.compare(module->name); });
+		[module_name](std::unique_ptr<imgtool_module> &module) { return !module_name.compare(module->name); });
 }
 
 

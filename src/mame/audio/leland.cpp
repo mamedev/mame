@@ -638,6 +638,9 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			m_dac2vol->write(((data >> 3) & 7) << 5);
 			m_dac3vol->write(((data >> 6) & 3) << 6);
 			return;
+		case 0x21:
+			dac_w(space, 3, data, mem_mask);
+			return;
 		}
 	}
 
@@ -666,14 +669,6 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			COMBINE_DATA(&m_ext_stop);
 			m_ext_stop <<= 4;
 			if (LOG_EXTERN) logerror("External DAC stop = %05X\n", m_ext_stop);
-			return;
-		}
-		break;
-	default:
-		switch (offset)
-		{
-		case 0x21:
-			dac_w(space, 3, data, mem_mask);
 			return;
 		}
 		break;

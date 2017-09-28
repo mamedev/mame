@@ -115,6 +115,12 @@ WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+WRITE8_MEMBER(hexion_state::ccu_int_time_w)
+{
+	logerror("ccu_int_time rewritten with value of %02x\n", data);
+	m_ccu_int_time = data;
+}
+
 static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
@@ -232,10 +238,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 {
 	int scanline = param;
 
+	// z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
 	if(scanline == 256)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-	else if ((scanline == 85) || (scanline == 170)) //TODO
+
+	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
+	// the following code is emulating INT_TIME of the k053252, this code will go away
+	// when the new konami branch is merged.
+	m_ccu_int_time_count--;
+	if (m_ccu_int_time_count <= 0)
+	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_ccu_int_time_count = m_ccu_int_time;
+	}
 }
 
 
@@ -250,6 +265,7 @@ static MACHINE_CONFIG_START( hexion )
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
+	MCFG_K053252_INT_TIME_CB(WRITE8(hexion_state, ccu_int_time_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -279,7 +295,7 @@ static MACHINE_CONFIG_DERIVED( hexionb, hexion )
 
 	MCFG_DEVICE_REMOVE("k051649")
 
-	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

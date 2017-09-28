@@ -1506,8 +1506,9 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x10000000, 0x101fffff) AM_WRITE(mode_w)
 	AM_RANGE(0x10400000, 0x105fffff) AM_READ(polygon_count_r)
 
-	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM AM_SHARE("share1") // framebuffer (last bronx)
-	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("share1") // FB mirror
+	// format is xGGGGGBBBBBRRRRR (512x400)
+	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM AM_SHARE("fbvram1") // framebuffer A (last bronx title screen)
+	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("fbvram2") // framebuffer B
 ADDRESS_MAP_END
 
 READ8_MEMBER(model2_state::virtuacop_lightgun_r)
@@ -2338,6 +2339,7 @@ static ADDRESS_MAP_START( copro_sharc_map, AS_DATA, 32, model2_state )
 	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
 	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
 	AM_RANGE(0x1c00000, 0x1dfffff) AM_ROM AM_REGION("user5", 0)
+//  AM_RANGE(0x3c000000, 0x3fffffff) AM_WRITE(copro_sharc_output_fifo_w) // last bronx, cpu core bug?
 ADDRESS_MAP_END
 
 #if 0
@@ -4523,7 +4525,7 @@ ROM_START( pltkids ) /* Pilot Kids Revision A, Model 2B */
 	ROM_PARAMETER( ":315_5881:key", "042e2dc1" )
 ROM_END
 
-ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits to start - Can be set to Deluxe setting in service mode, Sega Game ID# 833-12361, ROM board ID# 834-12362 */
+ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits to start - Can be set to Deluxe setting in service mode, Sega Game ID# 833-12361 INDY 500EXP, ROM board ID# 834-12362 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18598a.15", 0x000000, 0x080000, CRC(3cdcac0f) SHA1(2f616e363f4d246fece309e81325e5e3c4e9d9f8) ) /* Higher rom numbers indicate a newer version */
 	ROM_LOAD32_WORD("epr-18599a.16", 0x000002, 0x080000, CRC(32bde9a2) SHA1(0982952ab3c5b035f37beb9304ac950c0e78aea8) ) /* Different attract mode... what else??? */

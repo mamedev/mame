@@ -127,4 +127,15 @@
 		</part>
 	</software>
 
+	<software name="synhcs">
+		<description>Synergy Host Control System 10/11/85</description>
+		<year>1985</year>
+		<publisher>Digital Keyboards</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="191031">
+				<rom name="synhcs.imd" size="191031" crc="c87f1400" sha1="550c6c35e7605956498345df3c151b6abd89b62d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
