@@ -53,28 +53,12 @@ public:
 	mfabfz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_rs232(*this, "rs232")
-	{ }
-
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
+		{ }
 
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<rs232_port_device> m_rs232;
 };
-
-
-WRITE_LINE_MEMBER( mfabfz_state::sod_w )
-{
-	m_rs232->write_txd(state);
-}
-
-READ_LINE_MEMBER( mfabfz_state::sid_r )
-{
-	return m_rs232->rxd_r();
-}
 
 
 static ADDRESS_MAP_START(mfabfz_mem, AS_PROGRAM, 8, mfabfz_state)
@@ -107,8 +91,8 @@ static MACHINE_CONFIG_START( mfabfz )
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
 	MCFG_CPU_IO_MAP(mfabfz_io)
-	MCFG_I8085A_SID(READLINE(mfabfz_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(mfabfz_state, sod_w))
+	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_I8085A_SOD(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	/* video hardware */
 
 	// uart1 - terminal - clock hardware unknown
