@@ -1076,6 +1076,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Activision" />
 		<info name="serial" value="26-3165" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="65536">
