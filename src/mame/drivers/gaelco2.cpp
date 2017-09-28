@@ -1185,10 +1185,10 @@ ROM_START( touchgo ) /* REF: 950906 */
 	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(a497e1af) SHA1(68ee1f87631183541adadf927fb18ed4422d5bb6) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
+	/* touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots */
 	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
 	/* these are the default states stored in NVRAM */
 	DS5002FP_SET_MON( 0x19 )
@@ -1212,10 +1212,10 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
+	/* touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots */
 	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
 	/* these are the default states stored in NVRAM */
 	DS5002FP_SET_MON( 0x19 )
@@ -1239,10 +1239,10 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(e977d2db) SHA1(d6a4ef74eb776d9e898f25a70f0302f3199b4fa1) ) /* marked as BAD_DUMP until a 2nd board is used to verify */
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	/* touchgo requires some valids in scratchram to be initialized or it won't copy the high score table when it boots */
+	/* touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots */
 	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
 	/* these are the default states stored in NVRAM */
 	DS5002FP_SET_MON( 0x19 )
