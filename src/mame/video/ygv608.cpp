@@ -2089,7 +2089,7 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 			int new_display_width = (data & 0x3f) * 16;
 			
 			m_crtc.htotal &= ~0x600;
-			m_crtc.htotal |= (data & 0xc0) << 3;
+			m_crtc.htotal |= ((data & 0xc0) << 3);
 
 			if(new_display_width != m_crtc.display_width)
 				m_screen_resize = 1;
@@ -2108,7 +2108,7 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 		case 42:
 		{
 			m_crtc.htotal &= ~0x1fe;
-			m_crtc.htotal |= (data & 0xff) << 1;
+			m_crtc.htotal |= ((data & 0xff) << 1);
 
 			//printf("H %d %d %d %d %d\n",m_crtc.htotal,m_crtc.display_hstart,m_crtc.display_width,m_crtc.display_hsync,m_crtc.border_width);
 			break;
@@ -2148,7 +2148,7 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 		{
 			m_crtc.vtotal &= ~0xff;
 			m_crtc.vtotal |= data & 0xff;
-
+						
 			// TODO: call it for all mods in the CRTC, add sanity checks
 			screen_configure();
 
@@ -2170,7 +2170,9 @@ void ygv608_device::screen_configure()
 	//rectangle visarea(m_crtc.display_hstart, display_hend, m_crtc.display_vstart, display_vend);
 	rectangle visarea(0, display_hend, 0, display_vend);
 
-	attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * m_crtc.vtotal * (m_crtc.htotal / 2);
+	// TODO: Dig Dug Original wants this to be 60.60 Hz (like original Namco HW), lets compensate somehow
+	//      (clock is really 6144000 x 8 = 49152000, so it must have same parameters in practice)
+	attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
 
 	m_screen->configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
 
