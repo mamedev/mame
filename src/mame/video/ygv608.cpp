@@ -286,6 +286,8 @@ static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
 
 	// CRTC
 	AM_RANGE(39, 46) AM_WRITE(crtc_w)
+//  47-48 ROM transfer control - DMA source address
+//  49 ROM transfer control - DMA size
 ADDRESS_MAP_END
 
 /***************************************
