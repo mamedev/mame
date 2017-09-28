@@ -929,7 +929,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="mindroll">
+	<software name="mindroll" supported="no">
 	<!-- This cartridge contains the CoCo 1/2 & the CoCo 3 versions  -->
 		<description>Mind-Roll</description>
 		<year>1988</year>
@@ -1070,7 +1070,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="predator">
+	<software name="predator" supported="no">
 		<description>Predator</description>
 		<year>1989</year>
 		<publisher>Tandy</publisher>
@@ -1154,7 +1154,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="robocop">
+	<software name="robocop" supported="no">
 		<description>RoboCop</description>
 		<year>1988</year>
 		<publisher>Tandy</publisher>
