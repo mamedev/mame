@@ -135,7 +135,7 @@ uint32_t targeth_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_pant[0]->set_scrolly(0, m_vregs[0]);
 	m_pant[0]->set_scrollx(0, m_vregs[1] + 0x04);
 	m_pant[1]->set_scrolly(0, m_vregs[2]);
-	m_pant[1]->set_scrollx(0, m_vregs[3] + 0x00);
+	m_pant[1]->set_scrollx(0, m_vregs[3]);
 
 	m_pant[1]->draw(screen, bitmap, cliprect, 0,0);
 	m_pant[0]->draw(screen, bitmap, cliprect, 0,0);
