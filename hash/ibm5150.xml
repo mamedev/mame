@@ -6927,7 +6927,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="opwolf">
-		<description>Operation Wolf</description>
+		<description>Operation Wolf (5.25")</description>
 		<year>1989</year>
 		<publisher>Taito Corporation</publisher>
 		<info name="developer" value="Taito Corporation" />
@@ -6939,6 +6939,29 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Operation Wolf [Taito Corporation] [1989] [5.25] [disk 2 of 2].img" size="368640" crc="61685134" sha1="e0f1f60365e7d2b59b18ab6e7ebde0e98c82a459" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opwolf35" cloneof="opwolf">
+		<description>Operation Wolf (3.5")</description>
+		<year>1989</year>
+		<publisher>Taito Corporation</publisher>
+		<info name="developer" value="Taito Corporation" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Operation Wolf [3.5DD] [Disk 1 of 1].img" size="737280" crc="503b46c4" sha1="c935a1b639b653433380589894d61b573e7c6c5a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outrun">
+		<description>Out Run</description>
+		<year>1989</year>
+		<publisher>Sega Computer Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Outrun [3.5DD]  [Disk 1 of 1].img" size="737280" crc="5bf4afae" sha1="f189136da8ac284cfb3bf06b402328cd827a42a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
