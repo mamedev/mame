@@ -6224,6 +6224,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="gryzor">
+		<description>Gryzor</description>
+		<year>1987</year>
+		<publisher>Ocean Software</publisher>
+		<info name="developer" value="Banana Development" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<!-- file modification dates from 2000 -->
+				<rom name="[PC] Gryzor [3.5DD] [Disk 1 of 1].img" size="737280" crc="05683022" sha1="22ad717d799485d329fc0daea5a0dc44ec1de8fe" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gunboat">
 		<description>Gunboat: River Combat Simulation</description>
 		<year>1990</year>
@@ -6724,6 +6737,28 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Links - Championship Course - Bountiful Golf Course (1991)(Access Software)(Disk 2 of 2).dsk" size="368640" crc="0c9664aa" sha1="a6977e88cf98a673164d9ac9698585edc01e3dc8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loomfr">
+		<description>Loom (French)</description>
+		<year>1990</year>
+		<publisher>Lucasfilm Games</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<!-- contains save game files -->
+				<rom name="[PC] Loom [3.5DD] [Disk 1 of 3].img" size="737280" crc="4eb7337f" sha1="12a339ed2ca53198eec0e080b16079b21e003a8e" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Loom [3.5DD] [Disk 2 of 3].img" size="737280" crc="782ac666" sha1="4888d439a399a86353e55189d0e999a9e22a94f2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Loom [3.5DD] [Disk 3 of 3].img" size="737280" crc="da3a8e6e" sha1="c7980c4e45ebc03edd883a0031a63e0825d6698c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7696,6 +7731,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Zany Golf Program Disk 2.bin" size="368640" crc="a8cddc3d" sha1="1302026fe22d921dc4513330d33bc16566b583b8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombi">
+		<description>Zombi</description>
+		<year>1990</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Zombi [5.25DD].img" size="368640" crc="74039539" sha1="bfbcc808ff9a7e6a603ae9ff71a3c7cbf3908440" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
