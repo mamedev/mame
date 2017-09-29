@@ -412,7 +412,7 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 	imgtool_dirent ent;
 	filter_getinfoproc filter;
 	int unnamedargs;
-	const char *path = nullptr;
+	const char *path = "";
 	int arg;
 	int partition_index = 0;
 

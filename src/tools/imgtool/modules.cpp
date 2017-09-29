@@ -102,5 +102,6 @@ MODULE(psion)
 MODULE(bml3)
 MODULE(hp48)
 MODULE(hp9845_tape)
+MODULE(hp85_tape)
 
 #endif /* MODULES_RECURSIVE */
