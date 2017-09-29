@@ -937,6 +937,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Epyx" />
 		<info name="serial" value="26-3100" />
 		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="32768">
 				<rom name="mind-roll (1988)(26-3100)(epyx)[!].rom" size="32768" crc="83bd6056" sha1="f7b505383ca5739a98a5130549d534c38cb1bd2f" offset="0" />
 			</dataarea>
@@ -1075,7 +1076,9 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Activision" />
 		<info name="serial" value="26-3165" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="65536">
 				<rom name="predator (1989) (26-3165) (activision).rom" size="65536" crc="a9680ede" sha1="551d8d95fd310b2d72b1e22028a517c325fe9ab4" offset="0" />
 			</dataarea>
@@ -1160,6 +1163,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="26-3164" />
 		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="131072">
 				<rom name="robocop (1988)(26-3164)(data east).rom" size="131072" crc="dd94dd06" sha1="82ad8a207a446d99455926bd27d4490578de2b41" offset="0" />
 			</dataarea>

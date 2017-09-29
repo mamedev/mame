@@ -111,10 +111,12 @@ local function init()
 	db:exec("END TRANSACTION")
 end
 
-init()
+if db then
+	init()
+end
 
 function dat.check(set, softlist)
-	if softlist or not ver then
+	if softlist or not ver or not db then
 		return nil
 	end
 	info = nil

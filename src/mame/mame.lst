@@ -20628,6 +20628,10 @@ wldarrow                        // (c) 1982 Meyco Games
 @source:meyc8088.cpp
 gldarrow                        // (c) 1984 Meyco Games
 
+@source:mfabfz.cpp
+mfabfz                          //
+mfabfz85                        //
+
 @source:mgames.cpp
 mgames                          // (c) 1981 Merit
 
@@ -36040,6 +36044,7 @@ tapatune                        //
 @source:targeth.cpp
 targeth                         // (c) 1994 - Ref 940531
 targetha                        // (c) 1994 - Ref 940531
+targeth10                       // (c) 1994 - Ref 940531
 
 @source:tasman.cpp
 dragsphr                        //
