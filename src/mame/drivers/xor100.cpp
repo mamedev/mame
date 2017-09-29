@@ -361,20 +361,6 @@ static INPUT_PORTS_START( xor100 )
 	PORT_CONFSETTING( 0x01, "Disabled" )
 INPUT_PORTS_END
 
-/* COM5016 Interface */
-
-WRITE_LINE_MEMBER( xor100_state::com5016_fr_w )
-{
-	m_uart_a->write_txc(state);
-	m_uart_a->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
-{
-	m_uart_b->write_txc(state);
-	m_uart_b->write_rxc(state);
-}
-
 /* Printer 8255A Interface */
 
 WRITE_LINE_MEMBER( xor100_state::write_centronics_busy )
@@ -540,8 +526,10 @@ static MACHINE_CONFIG_START( xor100 )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(xor100_state, com5016_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(xor100_state, com5016_ft_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_A_TAG, i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_B_TAG, i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))

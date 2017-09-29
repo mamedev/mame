@@ -19,7 +19,12 @@ Notes:
 Known programs:
 - BS_BASIC V1.0
 - Challenge Golf
-- Tennis
+- Excite Tennis
+- Excite Baseball
+- Perfect Mah-Jongg
+- Mobile Suit (says Mobil Suit on the start screen)
+- The ProWrestling
+- 3-dimension graphics
 
 ==============================================================================================================
 Summary of Monitor commands.

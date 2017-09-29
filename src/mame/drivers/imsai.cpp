@@ -22,32 +22,27 @@
 #include "machine/pit8253.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class imsai_state : public driver_device
 {
 public:
 	imsai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_uart(*this, "uart"),
-		m_pit(*this, "pit")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+		, m_pit(*this, "pit")
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	required_device<i8251_device> m_uart;
 	required_device<pit8253_device> m_pit;
 };
 
@@ -63,13 +58,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(imsai_io, AS_IO, 8, imsai_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x02, 0x02) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x03, 0x03) AM_READ(status_r)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x14, 0x14) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x14, 0x14) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x15, 0x15) AM_READ(status_r)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(control_w)
 ADDRESS_MAP_END
@@ -95,12 +90,6 @@ void imsai_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-WRITE_LINE_MEMBER(imsai_state::write_uart_clock)
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 WRITE8_MEMBER( imsai_state::control_w )
 {
 }
@@ -117,7 +106,7 @@ static MACHINE_CONFIG_START( imsai )
 	MCFG_CPU_IO_MAP(imsai_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(imsai_state, kbd_put))
 
 	/* Devices */
@@ -125,7 +114,8 @@ static MACHINE_CONFIG_START( imsai )
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_6MHz / 3) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(imsai_state, write_uart_clock))
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(XTAL_6MHz / 3) /* Timer 1: user */
 	MCFG_PIT8253_CLK2(XTAL_6MHz / 3) /* Timer 2: user */
 MACHINE_CONFIG_END

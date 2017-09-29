@@ -71,7 +71,7 @@ Notes:
   1988 fsoccer: use the service mode dip switch
   1988 fitegolf: use the service mode dip switch
 
-- in all games except jcross, credits are edded on the 0->1 transition of the
+- in all games except jcross, credits are added on the 0->1 transition of the
   coin inputs. However declaring the inputs as ACTIVE_HIGH makes ikarijp
   enter test mode on boot, therefore I have to assume that ACTIVE_LOW is the
   correct setting and the games just wait for the pulse to finish before
@@ -4626,6 +4626,39 @@ ROM_START( athena )
 	ROM_LOAD( "up01_t2.rom",  0x10000, 0x8000, CRC(57b35c73) SHA1(6d15b94b50c3734f7d60bd9bd1c5e6c76591d829) )
 ROM_END
 
+// the following set is supposed to be a bootleg. The PCB set only has a "ferrocal" guarantee sticker
+// but main PCB is marked A6001 UP02-02 and the video A6001 UP01-02, which seem original (see fitegolf)
+
+ROM_START( athenab )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // the two program ROMs differ quite a lot from the parent
+	ROM_LOAD( "p4.bin",  0x0000, 0x4000,  CRC(a341677e) SHA1(b78bf999054cfd82e8b7b7ee23d0999b3499e940) )
+	ROM_LOAD( "m4.bin",  0x4000, 0x8000,  CRC(26e2b14f) SHA1(d62694267635bfa21fb04a3d810dafba36f03da3) )
+
+	ROM_REGION( 0x10000 , "sub", 0 )
+	ROM_LOAD( "p8.bin",  0x0000, 0x4000, CRC(df50af7e) SHA1(2a69089aecf598cb11f4f1c9b42d81670f9bd68e) )
+	ROM_LOAD( "m8.bin",  0x4000, 0x8000, CRC(f3c933df) SHA1(70a0bf63230be53da9196fae4c3e604205275ddd) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "g6.bin",  0x0000, 0x4000, CRC(42dbe029) SHA1(9aa311860693bd3e73f2b72ca4b171cb95f069ee) )
+	ROM_LOAD( "k6.bin",  0x4000, 0x8000, CRC(596f1c8a) SHA1(8f1400c77473c845e57a14fa479cf4f7ac66a909) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "c2.bin",  0x000, 0x400, CRC(294279ae) SHA1(b3db5617b83845a6c1abca8f71fa4598758a2a56) )
+	ROM_LOAD( "b1.bin",  0x400, 0x400, CRC(d25c9099) SHA1(f3933075cce1255affc61dfefd9559b6e15ed29c) )
+	ROM_LOAD( "c1.bin",  0x800, 0x400, CRC(a4a4e7dc) SHA1(aa694c2d44dcabc6cfd46307c55c3759eff57236) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "d2.bin",  0x0000, 0x4000,  CRC(18b4bcca) SHA1(2476aa6c8d55e117d840202a97fe2a65e252ad7f) )
+
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
+	ROM_LOAD( "b2.bin",  0x0000, 0x8000,  CRC(f269c0eb) SHA1(a947c6e4d82e0aafa616d25395ef63c33d9beb06) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "p2.bin",  0x00000, 0x8000, CRC(c63a871f) SHA1(0ab8ebebd750fdcad283eed427179f2124b300ae) )
+	ROM_LOAD( "s2.bin",  0x08000, 0x8000, CRC(760568d8) SHA1(9dc447c446791c79322e21e3caef6ceae347e2fb) )
+	ROM_LOAD( "t2.bin",  0x10000, 0x8000, CRC(57b35c73) SHA1(6d15b94b50c3734f7d60bd9bd1c5e6c76591d829) )
+ROM_END
+
 ROM_START( sathena )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.128", 0x0000, 0x4000, CRC(26eb2ce1) SHA1(fb60cfbc01d1e3446e0e98b9a6ba8854563bb418) )
@@ -6512,6 +6545,7 @@ GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, 0,        ROT2
 GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.N.K III (US)", 0 )
 GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
 GAME( 1986, athena,    0,        athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena", 0 )
+GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
 GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
 GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
 GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
