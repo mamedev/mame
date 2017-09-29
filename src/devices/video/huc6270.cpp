@@ -486,8 +486,8 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 	state &= 0x01;
 	if ( m_vsync != state )
 	{
-		/* Check for low->high VSYNC transition */
-		if ( state )
+		/* Check for high->low VSYNC transition */
+		if ( !state )
 		{
 			m_vert_state = v_state::VCR;
 			m_vert_to_go = 0;
@@ -496,8 +496,9 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 				next_vert_state();
 		}
 		else
-		/* High->low transition */
 		{
+			/* Check for low->high VSYNC transition */
+			// VBlank IRQ happens at the beginning of HDW period after VDW ends
 			handle_vblank();
 
 			/* Should we perform VRAM-VRAM dma.
@@ -535,40 +536,47 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 {
 	state &= 0x01;
 
-	/* Check for high->low HSYNC transition */
-	/* Check for low->high HSYNC transition */
-	if( ! m_hsync && state )
+	if(m_hsync != state)
 	{
-		if ( m_satb_countdown )
+		/* Check for low->high HSYNC transition */
+		if(state)
 		{
-			m_satb_countdown--;
-
-			if ( m_satb_countdown == 0 )
+			if ( m_satb_countdown )
 			{
-				m_status |= HUC6270_DS;
-				m_irq_changed_cb( ASSERT_LINE );
+				m_satb_countdown--;
+
+				if ( m_satb_countdown == 0 )
+				{
+					m_status |= HUC6270_DS;
+					m_irq_changed_cb( ASSERT_LINE );
+				}
 			}
+
+			m_horz_state = h_state::HSW;
+			m_horz_to_go = 0;
+			m_horz_steps = 0;
+			m_byr_latched += 1;
+			m_raster_count += 1;
+			if ( m_vert_to_go == 1 && m_vert_state == v_state::VDS )
+			{
+				m_raster_count = 0x40;
+			}
+
+			m_vert_to_go -= 1;
+
+			while ( m_horz_to_go == 0 )
+				next_horz_state();
+
 		}
-
-		m_horz_state = h_state::HSW;
-		m_horz_to_go = 0;
-		m_horz_steps = 0;
-		m_byr_latched += 1;
-		m_raster_count += 1;
-		if ( m_vert_to_go == 1 && m_vert_state == v_state::VDS )
+		else
 		{
-			m_raster_count = 0x40;
-		}
-
-		m_vert_to_go -= 1;
-
-		while ( m_horz_to_go == 0 )
-			next_horz_state();
-
-		if ( m_raster_count == m_rcr && ( m_cr & 0x04 ) )
-		{
-			m_status |= HUC6270_RR;
-			m_irq_changed_cb( ASSERT_LINE );
+			/* Check for high->low HSYNC transition */
+			// RCR IRQ happens near the end of the HDW period
+			if ( m_raster_count == m_rcr && ( m_cr & 0x04 ) )
+			{
+				m_status |= HUC6270_RR;
+				m_irq_changed_cb( ASSERT_LINE );
+			}			
 		}
 	}
 
