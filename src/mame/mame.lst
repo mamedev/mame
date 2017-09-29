@@ -20630,6 +20630,7 @@ gldarrow                        // (c) 1984 Meyco Games
 
 @source:mfabfz.cpp
 mfabfz                          //
+mfabfz85                        //
 
 @source:mgames.cpp
 mgames                          // (c) 1981 Merit

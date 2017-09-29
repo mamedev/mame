@@ -76,6 +76,13 @@ static ADDRESS_MAP_START(mfabfz_io, AS_IO, 8, mfabfz_state)
 	AM_RANGE(0xff, 0xff) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(mfabfz85_io, AS_IO, 8, mfabfz_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xfe, 0xfe) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
+	AM_RANGE(0xff, 0xff) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+ADDRESS_MAP_END
+
 /* Input ports */
 static INPUT_PORTS_START( mfabfz )
 INPUT_PORTS_END
@@ -91,9 +98,6 @@ static MACHINE_CONFIG_START( mfabfz )
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
 	MCFG_CPU_IO_MAP(mfabfz_io)
-	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_I8085A_SOD(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	/* video hardware */
 
 	// uart1 - terminal - clock hardware unknown
 	MCFG_DEVICE_ADD("uart1_clock", CLOCK, 153600)
@@ -114,21 +118,48 @@ static MACHINE_CONFIG_START( mfabfz )
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
 MACHINE_CONFIG_END
 
-/* ROM definition */
+#if 0
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_4800 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_4800 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
+#endif
 
+static MACHINE_CONFIG_START( mfabfz85 )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
+	MCFG_CPU_IO_MAP(mfabfz85_io)
+	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_I8085A_SOD(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // enable once correct parameters have been found
+	MCFG_DEVICE_ADD("uart2", I8251, 0)
+MACHINE_CONFIG_END
+
+
+/* ROM definition */
 ROM_START( mfabfz )
+	ROM_REGION( 0x8000, "roms", 0 ) // MAT32K, 1986, works
+	ROM_LOAD( "mfa_mat32k_vers.1.8-t_ic0.bin", 0x0000, 0x8000, CRC(6cba989e) SHA1(81611b6250a5319e5d28af5ce3a1e261af8315ae) )
+ROM_END
+
+ROM_START( mfabfz85 )
 	ROM_REGION( 0x8000, "roms", 0 )
-	ROM_SYSTEM_BIOS( 0, "v18t", "V1.8T" ) // 1986, works
-	ROMX_LOAD( "mfa_mat32k_vers.1.8-t_ic0.bin", 0x0000, 0x8000, CRC(6cba989e) SHA1(81611b6250a5319e5d28af5ce3a1e261af8315ae), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v18", "V1.8" ) // 1982, not working
-	ROMX_LOAD( "mfa_mat32k_vers.1.8-s_ic0.bin", 0x0000, 0x8000, CRC(021d7dff) SHA1(aa34b3a8bac52fc7746d35f5ffc6328734788cc2), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "v18a", "V1.8(small roms)" ) // 1982, not working
-	ROMX_LOAD( "mfa_mat_1_0000.bin", 0x0000, 0x0800, CRC(73b588ea) SHA1(2b9570fe44c3c19d6aa7c7c11ecf390fa5d48998), ROM_BIOS(3) )
-	ROMX_LOAD( "mfa_mat_2_0800.bin", 0x0800, 0x0800, CRC(13f5be91) SHA1(2b9d64600679bab319a37381fc84e874c3b2a877), ROM_BIOS(3) )
-	ROMX_LOAD( "mfa_mat_3_1000.bin", 0x1000, 0x0800, CRC(c9b91bb4) SHA1(ef829964f507b1f6bbcf3c557c274fe728636efe), ROM_BIOS(3) )
-	ROMX_LOAD( "mfa_mat_4_1800.bin", 0x1800, 0x0800, CRC(649cd7f0) SHA1(e92f29c053234b36f22d525fe92e61bf24476f14), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 0, "32k", "MAT85 32k" ) // 1982, not working
+	ROMX_LOAD( "mfa_mat32k_vers.1.8-s_ic0.bin", 0x0000, 0x8000, CRC(021d7dff) SHA1(aa34b3a8bac52fc7746d35f5ffc6328734788cc2), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "2k", "MAT85 2k" ) // 1982, not working
+	ROMX_LOAD( "mfa_mat_1_0000.bin", 0x0000, 0x0800, CRC(73b588ea) SHA1(2b9570fe44c3c19d6aa7c7c11ecf390fa5d48998), ROM_BIOS(2) )
+	ROMX_LOAD( "mfa_mat_2_0800.bin", 0x0800, 0x0800, CRC(13f5be91) SHA1(2b9d64600679bab319a37381fc84e874c3b2a877), ROM_BIOS(2) )
+	ROMX_LOAD( "mfa_mat_3_1000.bin", 0x1000, 0x0800, CRC(c9b91bb4) SHA1(ef829964f507b1f6bbcf3c557c274fe728636efe), ROM_BIOS(2) )
+	ROMX_LOAD( "mfa_mat_4_1800.bin", 0x1800, 0x0800, CRC(649cd7f0) SHA1(e92f29c053234b36f22d525fe92e61bf24476f14), ROM_BIOS(2) )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS,        INIT   COMPANY                                FULLNAME                       FLAGS */
-COMP( 1979, mfabfz, 0,      0,       mfabfz,    mfabfz,   mfabfz_state,   0, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS,        INIT   COMPANY                                FULLNAME                       FLAGS */
+COMP( 1979, mfabfz,   0,      0,       mfabfz,    mfabfz,   mfabfz_state,   0, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1979, mfabfz85, mfabfz, 0,       mfabfz85,  mfabfz,   mfabfz_state,   0, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung MAT85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
