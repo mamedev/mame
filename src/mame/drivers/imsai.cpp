@@ -49,10 +49,10 @@ private:
 
 static ADDRESS_MAP_START(imsai_mem, AS_PROGRAM, 8, imsai_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("prom", 0)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM
 	AM_RANGE(0xd100, 0xd103) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xd800, 0xdfff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0xd800, 0xdfff) AM_ROM AM_REGION("prom", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(imsai_io, AS_IO, 8, imsai_state)
@@ -122,8 +122,14 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( imsai )
-	ROM_REGION( 0x800, "roms", 0 )
+	ROM_REGION( 0x800, "prom", 0 ) // 2716 or 2708 program PROM
 	ROM_LOAD( "vdb-80.rom",   0x0000, 0x0800, CRC(0afc4683) SHA1(a5419aaee00badf339d7c627f50ef8b2538e42e2) )
+
+	ROM_REGION( 0x200, "decode", 0 ) // 512x4 address decoder ROM
+	ROM_LOAD( "3622.u31", 0x000, 0x200, NO_DUMP )
+
+	ROM_REGION( 0x20, "status", 0 ) // PROM for decoding 8085 status signals
+	ROM_LOAD( "74s288.u38", 0x00, 0x20, NO_DUMP )
 ROM_END
 
 /* Driver */
