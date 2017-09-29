@@ -253,10 +253,9 @@ void generic_terminal_device::term_write(uint8_t data)
 ***************************************************************************/
 uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t options = m_io_term_conf->read();
-	uint16_t cursor = m_y_pos * m_width + m_x_pos;
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t const options = m_io_term_conf->read();
+	uint16_t const cursor = m_y_pos * m_width + m_x_pos;
+	uint16_t sy=0,ma=0;
 
 	switch (options & 0x030)
 	{
@@ -270,20 +269,20 @@ uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bi
 		m_palette->set_pen_color(1, rgb_t(0x00, 0xff, 0x00));
 		break;
 	}
-	pen_t font_color = m_palette->pen(1);
+	pen_t const font_color = m_palette->pen(1);
 
 	m_framecnt++;
 
-	for (y = 0; y < m_height; y++)
+	for (uint8_t y = 0; y < m_height; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint32_t  *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
-			for (x = ma; x < ma + m_width; x++)
+			for (uint16_t x = ma; x < ma + m_width; x++)
 			{
-				chr = m_buffer[x];
-				gfx = terminal_font[(chr<<4) | ra ];
+				uint8_t const chr = m_buffer[x];
+				uint8_t gfx = terminal_font[(chr << 4) | ra];
 
 				if ((x == cursor) && (options & 0x001)) // at cursor position and want a cursor
 				{
@@ -303,14 +302,14 @@ uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bi
 				}
 
 				/* Display a scanline of a character */
-				*p++ = (BIT( gfx, 7 ))?font_color:0;
-				*p++ = (BIT( gfx, 6 ))?font_color:0;
-				*p++ = (BIT( gfx, 5 ))?font_color:0;
-				*p++ = (BIT( gfx, 4 ))?font_color:0;
-				*p++ = (BIT( gfx, 3 ))?font_color:0;
-				*p++ = (BIT( gfx, 2 ))?font_color:0;
-				*p++ = (BIT( gfx, 1 ))?font_color:0;
-				*p++ = (BIT( gfx, 0 ))?font_color:0;
+				*p++ = (BIT(gfx, 7)) ? font_color : 0;
+				*p++ = (BIT(gfx, 6)) ? font_color : 0;
+				*p++ = (BIT(gfx, 5)) ? font_color : 0;
+				*p++ = (BIT(gfx, 4)) ? font_color : 0;
+				*p++ = (BIT(gfx, 3)) ? font_color : 0;
+				*p++ = (BIT(gfx, 2)) ? font_color : 0;
+				*p++ = (BIT(gfx, 1)) ? font_color : 0;
+				*p++ = (BIT(gfx, 0)) ? font_color : 0;
 			}
 		}
 		ma += m_width;
