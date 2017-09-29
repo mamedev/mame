@@ -35,8 +35,8 @@ T     Trace interval
 Pressing enter will change the prompt from KMD > to KMD+> and pressing
 space will change it back.
 
-BIOS 0 uses the UART and works
-BIOS 1,2 use SID/SOD and don't work
+mfabfz85 -bios 1 : produces no output
+others are working
 
 ****************************************************************************/
 
@@ -118,7 +118,6 @@ static MACHINE_CONFIG_START( mfabfz )
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
 MACHINE_CONFIG_END
 
-#if 0
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_4800 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_4800 )
@@ -127,7 +126,6 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
-#endif
 
 static MACHINE_CONFIG_START( mfabfz85 )
 	/* basic machine hardware */
@@ -135,9 +133,9 @@ static MACHINE_CONFIG_START( mfabfz85 )
 	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
 	MCFG_CPU_IO_MAP(mfabfz85_io)
 	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_I8085A_SOD(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8085A_SOD(DEVWRITELINE("rs232", rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // enable once correct parameters have been found
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
 MACHINE_CONFIG_END
 
