@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-28 09:22-0500\n"
-"PO-Revision-Date: 2017-08-27 10:17+0300\n"
+"PO-Revision-Date: 2017-09-29 23:45+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -19,11 +19,11 @@ msgstr ""
 
 #: plugins/cheat/init.lua:458
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Επιλογή cheat για ρύθμιση συντόμευσης"
 
 #: plugins/cheat/init.lua:464
 msgid "Press button for hotkey or wait to clear"
-msgstr ""
+msgstr "Πιέστε πλήκτρο για συντόμευση ή περιμένετε για καθαρισμό"
 
 #: plugins/cheat/init.lua:476 src/frontend/mame/ui/simpleselgame.cpp:347
 msgid "None"
@@ -31,11 +31,11 @@ msgstr "Κανένα"
 
 #: plugins/cheat/init.lua:481
 msgid "Done"
-msgstr ""
+msgstr "Έγινε"
 
 #: plugins/cheat/init.lua:495 plugins/cheat/init.lua:509
 msgid "Set"
-msgstr ""
+msgstr "Ρύθμιση"
 
 #: plugins/cheat/init.lua:499 plugins/cheatfind/init.lua:589
 #: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
@@ -54,7 +54,7 @@ msgstr "Off"
 
 #: plugins/cheat/init.lua:528
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Ρύθμιση συντομεύσεων"
 
 #: plugins/cheat/init.lua:529 src/frontend/mame/ui/cheatopt.cpp:157
 msgid "Reset All"
@@ -66,12 +66,12 @@ msgstr "Επαναφόρτωση όλων"
 
 #: plugins/cheat/init.lua:601
 msgid "Cheat Comment:\n"
-msgstr ""
+msgstr "Σχόλιο Cheat:\n"
 
 #: plugins/cheat/init.lua:668 plugins/cheat/init.lua:671
 #: plugins/cheat/init.lua:729
 msgid "Activated"
-msgstr ""
+msgstr "Ενεργοποιήθηκε"
 
 #: plugins/cheat/init.lua:683 src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Cheat"
@@ -93,206 +93,210 @@ msgstr "Απενεργοποιημένο"
 
 #: plugins/cheat/init.lua:776
 msgid " added"
-msgstr ""
+msgstr " προστέθηκε"
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
-msgstr ""
+msgstr "Αποθήκευση Cheat"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Default"
-msgstr ""
+msgstr "Προεπιλογή"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Custom"
-msgstr ""
+msgstr "Προσαρμογή"
 
 #: plugins/cheatfind/init.lua:348
 msgid "Cheat Name"
-msgstr ""
+msgstr "Όνομα Cheat"
 
 #: plugins/cheatfind/init.lua:354 plugins/cheatfind/init.lua:718
 msgid "Default name is "
-msgstr ""
+msgstr "Το προεπιλεγμένο όνομα είναι "
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
-msgstr ""
+msgstr "Παίκτης"
 
 #: plugins/cheatfind/init.lua:367
 msgid "Type"
-msgstr ""
+msgstr "Τύπος"
 
 #: plugins/cheatfind/init.lua:373
 msgid "Save"
-msgstr ""
+msgstr "Αποθήκευση"
 
 #: plugins/cheatfind/init.lua:399
 msgid "Cheat written to "
-msgstr ""
+msgstr "Το Cheat γράφτηκε στο "
 
 #: plugins/cheatfind/init.lua:399
 msgid " and added to cheat.simple"
-msgstr ""
+msgstr " και προστέθηκε στο cheat.simple"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Το Cheat προστέθηκε στο cheat.simple"
 
 #: plugins/cheatfind/init.lua:412
 msgid ""
 "Unable to write file\n"
 "Check cheatpath dir exists"
 msgstr ""
+"Αδύνατη η εγγραφή του αρχείου\n"
+"Ελέγξτε ότι υπάρχει ο φάκελος του cheat"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
-msgstr ""
+msgstr "Ακύρωση"
 
 #: plugins/cheatfind/init.lua:426
 msgid "CPU or RAM"
-msgstr ""
+msgstr "Επεξεργαστής ή μνήμη RAM"
 
 #: plugins/cheatfind/init.lua:430
 msgid "Changes to this only take effect when \"Start new search\" is selected"
 msgstr ""
+"Οι αλλαγές σε αυτό ισχύουν μόνο όταν η \"Έναρξη νέας αναζήτησης\" έχει "
+"επιλεγεί"
 
 #: plugins/cheatfind/init.lua:449
 msgid "Data cleared and current state saved"
-msgstr ""
+msgstr "Τα δεδομένα έχουν διαγραφεί και η τρέχουσα κατάσταση έχει αποθηκευτεί"
 
 #: plugins/cheatfind/init.lua:457
 msgid "Start new search"
-msgstr ""
+msgstr "Έναρξη νέας αναζήτησης"
 
 #: plugins/cheatfind/init.lua:467
 msgid "Current state saved"
-msgstr ""
+msgstr "Η τρέχουσα κατάσταση έχει αποθηκευτεί"
 
 #: plugins/cheatfind/init.lua:474
 msgid "Save current -- #"
-msgstr ""
+msgstr "Αποθήκευση τρέχουσας -- #"
 
 #: plugins/cheatfind/init.lua:506
 msgid " total matches found"
-msgstr ""
+msgstr "  συνολικές αντιστοιχίες βρέθηκαν"
 
 #: plugins/cheatfind/init.lua:513
 msgid "Compare"
-msgstr ""
+msgstr "Συγκρίση"
 
 #: plugins/cheatfind/init.lua:516
 msgid "Left operand"
-msgstr ""
+msgstr "Αριστερός όρος"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Current"
-msgstr ""
+msgstr "Τρέχων"
 
 #: plugins/cheatfind/init.lua:524
 msgid "Operator"
-msgstr ""
+msgstr "Τελεστής"
 
 #: plugins/cheatfind/init.lua:531
 msgid "Left less than right, value is difference"
-msgstr ""
+msgstr "Αριστερά μικρότερη από τη δεξιά, η τιμή είναι η διαφορά"
 
 #: plugins/cheatfind/init.lua:533
 msgid "Left greater than right, value is difference"
-msgstr ""
+msgstr "Αριστερά μεγαλύτερη από τη δεξιά, η τιμή είναι η διαφορά"
 
 #: plugins/cheatfind/init.lua:535
 msgid "Left equal to right"
-msgstr ""
+msgstr "Αριστερά είναι ίση με τη δεξιά"
 
 #: plugins/cheatfind/init.lua:537
 msgid "Left not equal to right, value is difference"
-msgstr ""
+msgstr "Αριστερά δεν είναι ίση με τη δεξιά, η τιμή είναι η διαφορά"
 
 #: plugins/cheatfind/init.lua:539
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Αριστερά είναι ίση με τη δεξιά με bitmask"
 
 #: plugins/cheatfind/init.lua:541
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Αριστερά δεν είναι ίση με τη δεξιά με bitmask"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Left less than value"
-msgstr ""
+msgstr "Αριστερά λιγότερη από την αξία"
 
 #: plugins/cheatfind/init.lua:545
 msgid "Left greater than value"
-msgstr ""
+msgstr "Αριστερά περισσότερη από την αξία"
 
 #: plugins/cheatfind/init.lua:547
 msgid "Left equal to value"
-msgstr ""
+msgstr "Αριστερά ίση με την αξία"
 
 #: plugins/cheatfind/init.lua:549
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Αριστερά όχι ίση με την αξία"
 
 #: plugins/cheatfind/init.lua:560
 msgid "Right operand"
-msgstr ""
+msgstr "Δεξιός όρος"
 
 #: plugins/cheatfind/init.lua:568
 msgid "Value"
-msgstr ""
+msgstr "Αξία"
 
 #: plugins/cheatfind/init.lua:572
 msgid "Any"
-msgstr ""
+msgstr "Οποιαδήποτε"
 
 #: plugins/cheatfind/init.lua:578
 msgid "Data Format"
-msgstr ""
+msgstr "Μορφή Δεδομένων"
 
 #: plugins/cheatfind/init.lua:602
 msgid "Undo last search -- #"
-msgstr ""
+msgstr "Αναίρεση τελευταίας αναζήτησης -- #"
 
 #: plugins/cheatfind/init.lua:606
 msgid "Match block"
-msgstr ""
+msgstr "Ταίριασμα τομέα"
 
 #: plugins/cheatfind/init.lua:609
 msgid "All"
-msgstr ""
+msgstr "Όλα"
 
 #: plugins/cheatfind/init.lua:660
 #, lua-format
 msgid "Test cheat at addr %08X"
-msgstr ""
+msgstr "Δοκιμή cheat στην addr %08X"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Η μηχανή Cheat δεν είναι διαθέσιμη"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Test"
-msgstr ""
+msgstr "Δοκιμή"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Write"
-msgstr ""
+msgstr "Εγγραφή"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Watch"
-msgstr ""
+msgstr "Επιτήρηση"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Page"
-msgstr ""
+msgstr "Σελίδα"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Clear Watches"
-msgstr ""
+msgstr "Καθαρισμός Επιτηρήσεων"
 
 #: plugins/cheatfind/init.lua:786
 msgid "Cheat Finder"
-msgstr ""
+msgstr "Εύρεση Cheat"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -317,6 +321,10 @@ msgid ""
 "--- DRIVER INFO ---\n"
 "Driver: "
 msgstr ""
+"\n"
+"\n"
+"--- ΠΛΗΡΟΦΟΡΙΕΣ ΟΔΗΓΟΥ ---\n"
+"Οδηγός: "
 
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
@@ -340,19 +348,19 @@ msgstr "Sysinfo"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
-msgstr ""
+msgstr "Τρέχων χρόνος"
 
 #: plugins/timer/init.lua:96
 msgid "Total time"
-msgstr ""
+msgstr "Συνολικός χρόνος"
 
 #: plugins/timer/init.lua:98
 msgid "Play Count"
-msgstr ""
+msgstr "Αριθμός Παιχνιδιών"
 
 #: plugins/timer/init.lua:106
 msgid "Timer"
-msgstr ""
+msgstr "Χρονομετρητής"
 
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
@@ -1349,7 +1357,7 @@ msgstr "Εξαγωγή σε μορφή XML (όπως -listxml, χωρίς τις
 
 #: src/frontend/mame/ui/miscmenu.cpp:657
 msgid "Export list in TXT format (like -listfull)"
-msgstr "Εξαγωγή σε μορφή TXT(όπως -listfull)"
+msgstr "Εξαγωγή σε μορφή TXT (όπως -listfull)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:709 src/frontend/mame/ui/ui.cpp:2217
 msgid ""
@@ -2637,7 +2645,7 @@ msgstr "Υποστήριξη Αποθήκευσης"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr "Χωρίς Υποστήριξη Αποθήκευσης"
+msgstr "Μη Υποστήριξη Αποθήκευσης"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
