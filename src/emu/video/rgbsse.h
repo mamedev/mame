@@ -38,9 +38,9 @@ public:
 	rgbaint_t &operator=(const rgbaint_t& other) = default;
 
 	void set(const rgbaint_t& other) { m_value = other.m_value; }
-	void set(u32 rgba) { m_value = _mm_and_si128(_mm_set1_epi32(0xff), _mm_set_epi32(rgba >> 24, rgba >> 16, rgba >> 8, rgba)); }
+	void set(const u32& rgba) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgba), _mm_setzero_si128()), _mm_setzero_si128()); }
 	void set(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_set_epi32(a, r, g, b); }
-	void set(const rgb_t& rgb) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgb), _mm_setzero_si128()), _mm_setzero_si128()); }
+	void set(const rgb_t& rgb) { set((const u32&) rgb); }
 
 	inline rgb_t to_rgba() const
 	{

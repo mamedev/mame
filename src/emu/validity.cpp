@@ -597,6 +597,14 @@ void validity_checker::validate_rgb()
 	rgb.set(rgbaint_t(expected_a, expected_r, expected_g, expected_b));
 	check_expected("rgbaint_t::set(rgbaint_t)");
 
+	packed = random_i32();
+	expected_a = packed.a();
+	expected_r = packed.r();
+	expected_g = packed.g();
+	expected_b = packed.b();
+	rgb.set(packed);
+	check_expected("rgbaint_t::set(const rgb_t& rgb)");
+
 	// check construct/assign
 	expected_a = random_i32();
 	expected_r = random_i32();
