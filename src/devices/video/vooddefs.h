@@ -607,7 +607,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chromaKeyTest(voodoo_device *vd, st
 	if (FBZMODE_ENABLE_CHROMAKEY(fbzModeReg))
 	{
 		rgb_union color;
-		color.u = (rgbaIntColor.get_a()<<24) | (rgbaIntColor.get_r()<<16) | (rgbaIntColor.get_g()<<8) | rgbaIntColor.get_b();
+		color.u = rgbaIntColor.to_rgba();
 		/* non-range version */
 		if (!CHROMARANGE_ENABLE(vd->reg[chromaRange].u))
 		{
