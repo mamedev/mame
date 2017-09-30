@@ -143,8 +143,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( mfabfz )
 	ROM_REGION( 0x8000, "roms", 0 ) // MAT32K, 1986, works
-	ROM_SYSTEM_BIOS (0, "32k_v1.8t", "MAT32K v1.8t" )
-	ROMX_LOAD( "mfa_mat32k_vers.1.8-t_ic0.bin", 0x0000, 0x8000, CRC(6cba989e) SHA1(81611b6250a5319e5d28af5ce3a1e261af8315ae), ROM_BIOS(1) )
+	ROM_LOAD( "mfa_mat32k_vers.1.8-t_ic0.bin", 0x0000, 0x8000, CRC(6cba989e) SHA1(81611b6250a5319e5d28af5ce3a1e261af8315ae) )
 ROM_END
 
 ROM_START( mfabfz85 )
