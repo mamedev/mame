@@ -78,7 +78,6 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 
 private:
-	uint8_t m_term_data;
 	uint8_t m_key_row;
 	uint8_t m_2;
 	virtual void machine_start() override;
