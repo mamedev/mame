@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mode_w);
 	DECLARE_WRITE_LINE_MEMBER(cpuif_w);
 	DECLARE_WRITE_LINE_MEMBER(fddrq_w);
+	DECLARE_WRITE_LINE_MEMBER(sintr1_w);
 	DECLARE_WRITE8_MEMBER(ics_attn_w);
 	IRQ_CALLBACK_MEMBER(inta);
 protected:
@@ -123,7 +124,6 @@ void altos8600_state::machine_reset()
 bool altos8600_state::find_sector()
 {
 	u8 head = m_head >> 4;
-	logerror("head %d cyl %d curcyl %d sect %d", head, m_cyl, m_curcyl, m_sect);
 
 	if(!m_geom)
 		return false;
@@ -166,6 +166,7 @@ u8 altos8600_state::read_sector()
 	if(secoff >= 511)
 	{
 		m_dmac->drq1_w(CLEAR_LINE);
+		m_pic2->ir0_w(ASSERT_LINE);
 		m_stat &= ~1;
 		m_stat |= 2;
 	}
@@ -179,13 +180,13 @@ bool altos8600_state::write_sector(u8 data)
 	if(m_secoff >= 512)
 		return true;
 	m_sector[m_secoff++] = data;
-	logerror("secoff %d", m_secoff);
 	if(m_secoff == 512)
 	{
 		m_stat &= ~1;
 		m_stat |= 2;
 		hard_disk_write(m_hdd->get_hard_disk_file(), m_lba, m_sector);
 		m_dmac->drq1_w(CLEAR_LINE);
+		m_pic2->ir0_w(ASSERT_LINE);
 		return true;
 	}
 	return false;
@@ -200,7 +201,7 @@ READ8_MEMBER(altos8600_state::hd_r)
 				return read_sector();
 			break;
 		case 3:
-			m_pic1->ir3_w(CLEAR_LINE);
+			m_pic2->ir0_w(CLEAR_LINE);
 			return m_stat;
 	}
 	return 0;
@@ -238,7 +239,10 @@ WRITE8_MEMBER(altos8600_state::hd_w)
 				break;
 			}
 			if(m_sechi)
+			{
+				m_sechi = false;
 				m_sect |= (data & 7) << 8;
+			}
 			else
 			{
 				m_sechi = true;
@@ -247,7 +251,10 @@ WRITE8_MEMBER(altos8600_state::hd_w)
 			break;
 		case 2:
 			if(m_cylhi)
+			{
+				m_cylhi = false;
 				m_cyl |= (data & 7) << 8;
+			}
 			else
 			{
 				m_cylhi = true;
@@ -255,7 +262,6 @@ WRITE8_MEMBER(altos8600_state::hd_w)
 			}
 			break;
 		case 3:
-			logerror("cmd %02x stat %04x\n", data, m_stat);
 			m_cmd = data;
 			m_cylhi = false;
 			m_sechi = false;
@@ -269,7 +275,7 @@ WRITE8_MEMBER(altos8600_state::hd_w)
 					m_curcyl = m_cyl;
 					m_stat |= 2;
 					break;
-				case 0x11:
+				case 0x20:
 					m_curcyl = 0;
 					m_stat |= 2;
 					break;
@@ -308,6 +314,20 @@ WRITE_LINE_MEMBER(altos8600_state::fddrq_w)
 {
 	if(!m_dmamplex)
 		m_dmac->drq2_w(state);
+}
+
+WRITE_LINE_MEMBER(altos8600_state::sintr1_w)
+{
+	if(state)
+	{
+		m_dmac->drq1_w(CLEAR_LINE);
+		m_pic2->ir0_w(ASSERT_LINE);
+		m_pic2->ir3_w(ASSERT_LINE);
+		m_stat &= ~1;
+		m_stat |= 2;
+	}
+	else
+		m_pic2->ir3_w(CLEAR_LINE);
 }
 
 READ16_MEMBER(altos8600_state::fault_r)
@@ -672,7 +692,7 @@ static MACHINE_CONFIG_START(altos8600)
 	MCFG_CPU_PROGRAM_MAP(dmac_mem)
 	MCFG_CPU_IO_MAP(dmac_io)
 	MCFG_I8089_DATABUS_WIDTH(16)
-	MCFG_I8089_SINTR1(DEVWRITELINE("pic8259_2", pic8259_device, ir3_w))
+	MCFG_I8089_SINTR1(WRITELINE(altos8600_state, sintr1_w))
 	MCFG_I8089_SINTR2(DEVWRITELINE("pic8259_2", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
