@@ -12,8 +12,16 @@ TODO:
 - Colours are incorrect
 
 Notes:
-- BS-BASIC v1.0 have a graphic bug with the RX-78 logo, it doesn't set the read bank so all of the color
-  info minus plane 1 is lost when the screen scrolls vertically. Almost certainly a btanb.
+- BS-BASIC v1.0 notes:
+  -- COLOR x doesn't do anything. It sets a memory location with x, but does nothing with it.
+  -- COLOR x,y where y sets the background colour. This part works.
+  -- When BASIC is first started, it sets the colours but doesn't save the information. So when
+     COLOR x is entered, although x has no effect, it also sets the background colour, which not
+     having been set, sets the background black.
+  -- At the first scroll, the display memory is disrupted in the logo area, probably another
+     btanb. After that, scrolling works correctly.
+  -- Need a real machine to confirm these problems, but if true, one can only wonder how such
+     obvious issues made it out the door.
 - To stop a cmt load, press STOP + SHIFT keys
 
 Known programs:
