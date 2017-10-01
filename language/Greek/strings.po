@@ -145,7 +145,7 @@ msgid ""
 "Check cheatpath dir exists"
 msgstr ""
 "Αδύνατη η εγγραφή του αρχείου\n"
-"Ελέγξτε ότι υπάρχει ο φάκελος του cheat"
+"Ελέγξτε ότι υπάρχει ο φάκελος του cheatpath"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
