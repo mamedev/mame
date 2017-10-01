@@ -1644,7 +1644,7 @@ protected:
 		rgb_t               int8[256];              /* intensity 8-bit lookup table */
 		rgb_t               ai44[256];              /* alpha, intensity 4-4 lookup table */
 
-		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
+		rgb_t*              rgb565;                 /* RGB 5-6-5 lookup table */
 		rgb_t               argb1555[65536];        /* ARGB 1-5-5-5 lookup table */
 		rgb_t               argb4444[65536];        /* ARGB 4-4-4-4 lookup table */
 	};
@@ -1723,6 +1723,7 @@ protected:
 		rgb_t               pen[65536];             /* mapping from pixels to pens */
 		rgb_t               clut[512];              /* clut gamma data */
 		uint8_t               clut_dirty;             /* do we need to recompute? */
+		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
 	};
 
 
