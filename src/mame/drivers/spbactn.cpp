@@ -408,10 +408,8 @@ static MACHINE_CONFIG_START( spbactn )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	// actual blanking frequencies unknown, but should be close to NTSC
+	MCFG_SCREEN_RAW_PARAMS(XTAL_22_656MHz / 2, 720, 0, 512, 262, 16, 240)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
