@@ -7275,6 +7275,41 @@ ROM_START( puyofevp )
 	ROM_PARAMETER( ":rom_board:key", "ff9d4d3c" ) // this key used by dev. BIOS for such type dev. ROM boards test
 ROM_END
 
+ROM_START( vathletep )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("rom1.ic1s",   0x00800000, 0x00800000, CRC(fd691f92) SHA1(6fce053e8ef34505f107803ba98d1b49080fdb60) )
+	ROM_LOAD("rom2.ic2s",   0x01000000, 0x00800000, CRC(8469167d) SHA1(0f87f7e9e4fc531dc251d3bdfe28aeb97bf06ab6) )
+	ROM_LOAD("rom3.ic3s",   0x01800000, 0x00800000, CRC(bc540882) SHA1(50e5d7a0b4137901a1410acd8616c4c2a75d715e) )
+	ROM_LOAD("rom4.ic4s",   0x02000000, 0x00800000, CRC(0e55bea8) SHA1(a60500c83dae7ea4427d2afb2ad061e7a60efce4) )
+	ROM_LOAD("rom5.ic5s",   0x02800000, 0x00800000, CRC(4bf2aa06) SHA1(f36abcc4b906a30ed2abc7c35197e0eae8b40e8d) )
+	ROM_LOAD("rom6.ic6s",   0x03000000, 0x00800000, CRC(a3b0e5be) SHA1(8f02f21aa78c7e4a02ad0b532bc6044380cbd3cf) )
+	ROM_LOAD("rom7.ic7s",   0x03800000, 0x00800000, CRC(a57b1dbe) SHA1(baad364303483b88534adf68f2ab7741bdc48c9f) )
+	ROM_LOAD("rom8.ic8s",   0x04000000, 0x00800000, CRC(9548cf96) SHA1(4e7b161303a7455872c34977a35bd2af2abc8e42) )
+	ROM_LOAD("rom9.ic9s",   0x04800000, 0x00800000, CRC(bf87eb66) SHA1(aafdc4be502f77ecc76e8b8d550e5ff3716b5c7a) )
+	ROM_LOAD("rom10.ic10s", 0x05000000, 0x00800000, CRC(d54a97e5) SHA1(34c85f1b6a325ab9a41705603761a0a25c7e1108) )
+	ROM_LOAD("rom11.ic11s", 0x05800000, 0x00800000, CRC(513d8642) SHA1(314dd6abd0a31e05007f13d42e77b1b78da6256b) )
+	ROM_LOAD("rom12.ic12s", 0x06000000, 0x00800000, CRC(f4c0a57c) SHA1(21f6f6744a78e9d0d0aa6284923815d2c498ac41) )
+	ROM_LOAD("rom13.ic13s", 0x06800000, 0x00800000, CRC(d85c5bb1) SHA1(74e6b81f52f3ed5f0f57ff6f8900149fa9011795) )
+	ROM_LOAD("rom14.ic14s", 0x07000000, 0x00800000, CRC(1ba7f58d) SHA1(f66d23975d1a36137e0c6c87b3675bf8c82c9fdc) )
+	// ROMs below is unused garbage data
+	ROM_LOAD("rom15.ic15s", 0x07800000, 0x00800000, CRC(feb0d72a) SHA1(af03cf22d0d5e6bd3dded391ad0499e118b975f2) )
+	ROM_LOAD("rom16.ic16s", 0x08000000, 0x00800000, CRC(c9548b34) SHA1(1cfdec1f82e0ac912570d05645533a0399a39105) )
+	ROM_LOAD("rom17.ic17s", 0x08800000, 0x00800000, CRC(b1509241) SHA1(9c7e98359a6974007c15ca9dc59230c53976c860) )
+	ROM_LOAD("rom18.ic18s", 0x09000000, 0x00800000, CRC(c56fe297) SHA1(ce27f8708c7cccc8317f90aa72c9832aa7246e7f) )
+	ROM_LOAD("rom19.ic19s", 0x09800000, 0x00800000, CRC(bb7a97b7) SHA1(86adadb89a256497c6bd694438d8f4148a6a7540) )
+	ROM_LOAD("rom20.ic20s", 0x0a000000, 0x00800000, CRC(9beb6827) SHA1(c95b31c14f00756371c692e996abbf69d992c236) )
+	ROM_LOAD("rom21.ic21s", 0x0a800000, 0x00800000, CRC(3994d2d7) SHA1(a5c90abbca5d9cd6090b890df3ceae6bd0df7243) )
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.ic37",   0x000000, 0x000084, CRC(6ed247bf) SHA1(ab4263570c2034562cb80ca83797792f42146f60) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, not used
+ROM_END
+
+
 /* GD-ROM titles - a PIC supplies a decryption key
 
 PIC stuff
@@ -10186,6 +10221,7 @@ ROM_END
 
 /* Cartridge prototypes of games released on GD-ROM */
 /* none */ GAME( 2003, puyofevp,  puyofev,  naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )
+/* none */ GAME( 2001, vathletep, vathlete, naomim2, naomi, naomi_state, naomi, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (prototype)", GAME_FLAGS )
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
 /* 0046 */ GAME( 2001, wldrider, naomi2,  naomi2m2, naomi, naomi2_state, naomi2,   ROT0, "Sega", "Wild Riders", GAME_FLAGS )
