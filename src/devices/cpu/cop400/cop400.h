@@ -162,8 +162,6 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
@@ -226,8 +224,6 @@ protected:
 	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers */
 	uint8_t   m_sio;            /* 4-bit shift register and counter */
 	int     m_skl;            /* 1-bit latch for SK output */
-	uint8_t   m_flags;          // used for debugger state only
-	uint8_t   m_temp_m;         // 4-bit RAM at B (for debugger state only)
 
 	/* counter */
 	uint8_t   m_t;              /* 8-bit timer */
@@ -288,6 +284,11 @@ protected:
 
 	void skip();
 	void sk_update();
+
+	uint8_t get_flags() const;
+	void set_flags(uint8_t flags);
+	uint8_t get_m() const;
+	void set_m(uint8_t m);
 
 	void illegal(uint8_t operand);
 	void asc(uint8_t operand);
