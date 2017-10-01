@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
 	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
 	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
+	DECLARE_WRITE16_MEMBER(mceeprom_w);
 	DECLARE_READ16_MEMBER(mccontrol_r);
 	DECLARE_WRITE16_MEMBER(mccontrol_w);
 	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
