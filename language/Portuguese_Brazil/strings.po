@@ -94,7 +94,7 @@ msgstr "Desativado"
 
 #: plugins/cheat/init.lua:776
 msgid " added"
-msgstr "adicionado"
+msgstr " adicionado"
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
@@ -146,7 +146,7 @@ msgid ""
 "Check cheatpath dir exists"
 msgstr ""
 "Impossível escrever no arquivo\n"
-"Verifique se o caminho do diretório da trapaça existe"
+"Verifique se o caminho do diretório cheatpath existe"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
@@ -1030,7 +1030,7 @@ msgid ""
 msgstr ""
 "ESTA MÁQUINA NÃO FUNCIONA. A emulação para esta máquina está incompleta. "
 "Não há nada que você possa fazer para resolver este problema exceto aguardar os "
-"desenvolvedores melhorarm a emulação.\n"
+"desenvolvedores melhorarem a emulação.\n"
 
 #: src/frontend/mame/ui/info.cpp:243
 msgid ""
